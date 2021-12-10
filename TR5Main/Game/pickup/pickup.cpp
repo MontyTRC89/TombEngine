@@ -10,6 +10,7 @@
 #include "items.h"
 #include "lara_fire.h"
 #include "lara_flare.h"
+#include "lara_helpers.h"
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
 #include "setup.h"
@@ -653,10 +654,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (flag)
 	{
-		lara->headYrot = 0;
-		lara->headXrot = 0;
-		lara->torsoYrot = 0;
-		lara->torsoXrot = 0;
+		ResetLaraFlex(l);
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 		lara->isMoving = false;
 		lara->gunStatus = LG_HANDS_BUSY;
@@ -925,10 +923,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 				laraitem->animNumber = SearchAnims[objNumber];
 				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(laraitem);
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				if (item->objectNumber == ID_SEARCH_OBJECT4)

@@ -13,7 +13,7 @@ void GameScriptAnimations::Register(sol::state* lua)
 		"crawlExtended", &GameScriptAnimations::CrawlExtended,
 		"crouchRoll", &GameScriptAnimations::CrouchRoll,
 		"crawlspaceSwandive", &GameScriptAnimations::CrawlspaceSwandive,
-		"monkeyReverse", &GameScriptAnimations::MonkeyReverse,
+		"monkeyTurn180", &GameScriptAnimations::MonkeyTurn180,
 		"monkeyAutoJump", &GameScriptAnimations::MonkeyAutoJump,
 		"oscillateHang", &GameScriptAnimations::OscillateHang,
 		"pose", &GameScriptAnimations::Pose

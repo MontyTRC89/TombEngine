@@ -77,7 +77,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -97,8 +97,8 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME / 2 + 4) // If anyone complains about the walk jump being nerfed, increase this value.
-		info->jumpCount = LARA_JUMP_TIME / 2 + 4;
+	if (info->jumpCount > LARA_JUMP_TIME - 4) // If anyone complains about the walk jump being nerfed, increase this value.
+		info->jumpCount = LARA_JUMP_TIME - 4;
 
 	if (item->hitPoints <= 0)
 	{
@@ -114,16 +114,16 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
@@ -214,16 +214,16 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_FAST_TURN)
-			info->turnRate = -LARA_FAST_TURN;
+		if (info->turnRate < -LARA_FAST_TURN_MAX)
+			info->turnRate = -LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_FAST_TURN)
-			info->turnRate = LARA_FAST_TURN;
+		if (info->turnRate > LARA_FAST_TURN_MAX)
+			info->turnRate = LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -341,7 +341,7 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_IDLE (2)
+// State:		LS_IDLE (2), LS_POSE (4)
 // Collision:	lara_col_idle()
 void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -374,15 +374,15 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT &&
 		!(TrInput & IN_JUMP))
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (info->waterStatus == LW_WADE)
@@ -467,7 +467,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		if (TrInput & IN_SPRINT ||
-			info->turnRate <= -LARA_SLOW_TURN ||
+			info->turnRate <= -LARA_SLOW_TURN_MAX ||
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
@@ -481,7 +481,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_SPRINT ||
-			info->turnRate >= LARA_SLOW_TURN ||
+			info->turnRate >= LARA_SLOW_TURN_MAX ||
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
@@ -639,7 +639,7 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_POSE (4)
-// Control:		lara_col_pose()
+// Collision:	lara_col_idle()
 void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
@@ -672,13 +672,6 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_IDLE;
 }
 
-// State:		LS_POSE (4)
-// Control:		lara_as_pose()
-void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll)
-{
-	lara_col_idle(item, coll);
-}
-
 // State:		LS_RUN_BACK (5)
 // Collision:	lara_col_run_back()
 void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
@@ -688,16 +681,16 @@ void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MED_TURN)
-			info->turnRate = -LARA_MED_TURN;
+		if (info->turnRate < -LARA_MED_TURN_MAX)
+			info->turnRate = -LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MED_TURN)
-			info->turnRate = LARA_MED_TURN;
+		if (info->turnRate > LARA_MED_TURN_MAX)
+			info->turnRate = LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
@@ -770,8 +763,8 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate += LARA_TURN_RATE;
 	if (info->turnRate < 0)
 		info->turnRate = 0;
-	else if (info->turnRate > LARA_MED_FAST_TURN)
-		info->turnRate = LARA_MED_FAST_TURN;
+	else if (info->turnRate > LARA_MED_FAST_TURN_MAX)
+		info->turnRate = LARA_MED_FAST_TURN_MAX;
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -858,10 +851,10 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
 
-			if (info->turnRate > LARA_SLOW_TURN)
-				info->turnRate = LARA_SLOW_TURN;
+			if (info->turnRate > LARA_SLOW_TURN_MAX)
+				info->turnRate = LARA_SLOW_TURN_MAX;
 		}
-		else if (info->turnRate > LARA_SLOW_MED_TURN)
+		else if (info->turnRate > LARA_SLOW_MED_TURN_MAX)
 			item->goalAnimState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -981,8 +974,8 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	info->turnRate -= LARA_TURN_RATE;
 	if (info->turnRate > 0)
 		info->turnRate = 0;
-	else if (info->turnRate < -LARA_MED_FAST_TURN)
-		info->turnRate = -LARA_MED_FAST_TURN;
+	else if (info->turnRate < -LARA_MED_FAST_TURN_MAX)
+		info->turnRate = -LARA_MED_FAST_TURN_MAX;
 
 	if (info->waterStatus == LW_WADE)
 	{
@@ -1069,10 +1062,10 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_TURN_LEFT_SLOW;
 
-			if (info->turnRate < -LARA_SLOW_TURN)
-				info->turnRate = -LARA_SLOW_TURN;
+			if (info->turnRate < -LARA_SLOW_TURN_MAX)
+				info->turnRate = -LARA_SLOW_TURN_MAX;
 		}
-		else if (info->turnRate < -LARA_SLOW_MED_TURN)
+		else if (info->turnRate < -LARA_SLOW_MED_TURN_MAX)
 			item->goalAnimState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->goalAnimState = LS_TURN_RIGHT_SLOW;
@@ -1279,8 +1272,8 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 
@@ -1288,8 +1281,8 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
@@ -1312,8 +1305,8 @@ void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN / 3)
-			info->turnRate = -LARA_SLOW_TURN / 3;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX / 3)
+			info->turnRate = -LARA_SLOW_TURN_MAX / 3;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 
@@ -1321,8 +1314,8 @@ void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN / 3)
-			info->turnRate = LARA_SLOW_TURN / 3;
+		if (info->turnRate > LARA_SLOW_TURN_MAX / 3)
+			info->turnRate = LARA_SLOW_TURN_MAX / 3;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 	}
@@ -1392,10 +1385,10 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	info->turnRate += LARA_TURN_RATE;
-	if (info->turnRate < LARA_MED_TURN)
-		info->turnRate = LARA_MED_TURN;
-	else if (info->turnRate > LARA_FAST_TURN)
-		info->turnRate = LARA_FAST_TURN;
+	if (info->turnRate < LARA_MED_TURN_MAX)
+		info->turnRate = LARA_MED_TURN_MAX;
+	else if (info->turnRate > LARA_FAST_TURN_MAX)
+		info->turnRate = LARA_FAST_TURN_MAX;
 
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
@@ -1506,10 +1499,10 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	info->turnRate -= LARA_TURN_RATE;
-	if (info->turnRate > -LARA_MED_TURN)
-		info->turnRate = -LARA_MED_TURN;
-	else if (info->turnRate < -LARA_FAST_TURN)
-		info->turnRate = -LARA_FAST_TURN;
+	if (info->turnRate > -LARA_MED_TURN_MAX)
+		info->turnRate = -LARA_MED_TURN_MAX;
+	else if (info->turnRate < -LARA_FAST_TURN_MAX)
+		info->turnRate = -LARA_FAST_TURN_MAX;
 
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
@@ -1626,14 +1619,14 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_RSTEP)
@@ -1708,14 +1701,14 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_LSTEP)
@@ -1918,16 +1911,16 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_FAST_TURN)
-			info->turnRate = -LARA_FAST_TURN;
+		if (info->turnRate < -LARA_FAST_TURN_MAX)
+			info->turnRate = -LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_FAST_TURN)
-			info->turnRate = LARA_FAST_TURN;
+		if (info->turnRate > LARA_FAST_TURN_MAX)
+			info->turnRate = LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
@@ -2039,16 +2032,16 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -2154,16 +2147,16 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}

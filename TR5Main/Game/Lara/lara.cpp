@@ -75,7 +75,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_walk_back,//16
 	lara_as_swim,//17
 	lara_as_glide,//18
-	lara_as_controlledl,//19
+	lara_as_controlled_no_look,//19
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
@@ -143,16 +143,16 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crawl_turn_left,//84
 	lara_as_crawl_turn_right,//85
 	lara_as_crawl_back,//86
-	lara_as_controlledl,
-	lara_as_controlledl,
+	lara_as_controlled_no_look,
+	lara_as_controlled_no_look,
 	lara_as_controlled,
 	lara_as_ropel,
 	lara_as_roper,
 	lara_as_controlled,
 	lara_as_controlled,
 	lara_as_controlled,
-	lara_as_controlledl,
-	lara_as_controlledl,
+	lara_as_controlled_no_look,
+	lara_as_controlled_no_look,
 	lara_as_controlled,
 	lara_as_pickup,//98
 	lara_as_pole_idle,//99
@@ -176,7 +176,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlled,
 	lara_as_swimcheat,
 	lara_as_trpose,//119
-	lara_as_controlledl,//120
+	lara_as_controlled_no_look,//120
 	lara_as_trwalk,//121
 	lara_as_trfall,//122
 	lara_as_trfall,//123
@@ -191,8 +191,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_parallelbars,//128
 	lara_as_pbleapoff,//129
 	lara_as_null,//130
-	lara_as_controlledl,//131
-	lara_as_controlledl,//132
+	lara_as_controlled_no_look,//131
+	lara_as_controlled_no_look,//132
 	lara_as_null,//133
 	lara_as_null,//134
 	lara_as_null,//135
@@ -206,7 +206,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,// 143 - Unused
 	lara_as_null,// 144 - Unused
 	lara_as_null,// 145 - Unused
-	lara_as_controlledl,
+	lara_as_controlled_no_look,
 	lara_as_null,
 	lara_as_null,
 	lara_as_null,
@@ -223,7 +223,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_run_forward,
 	lara_col_idle,
 	lara_col_forwardjump,
-	lara_col_pose,
+	lara_col_idle,//4
 	lara_col_run_back,
 	lara_col_turn_right_slow,
 	lara_col_turn_left_slow,
@@ -745,18 +745,17 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	info->isDucked = coll->Setup.Height < LARA_HEIGHT; // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT;
-
 	if (TrInput & IN_LOOK && info->look &&
 		info->ExtraAnim == NO_ITEM)
 	{
 		LookLeftRight();
 	}
-	else if (!info->isDucked)
+	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
+	// TODO: Move radius and height default resets above look checks when
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT;
 	info->look = true;
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
