@@ -265,8 +265,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 		}
 
-		GotLaraSpheres = false;
-
 		// Update all items
 		InItemControlLoop = true;
 
