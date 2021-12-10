@@ -105,11 +105,8 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-
-        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::AnisotropicClamp);
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
         // Set matrices
         CCameraMatrixBuffer HudCamera;
@@ -278,11 +275,8 @@ namespace TEN::Renderer
         m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-
-        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::AnisotropicClamp);
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
         // Set camera matrices
         Matrix view = Matrix::CreateLookAt(lightPos,
@@ -1196,11 +1190,8 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-
-        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::AnisotropicClamp);
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
         if (CurrentLevel == 0)
         {
@@ -2459,14 +2450,11 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
 
         // Set texture
-        ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
-        m_context->PSSetSamplers(0, 1, &sampler);
         int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
         int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-        int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
-        m_context->PSSetShaderResources(1, 1, m_sprites[causticsFrame].Texture->ShaderResourceView.GetAddressOf());
-        m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
+        int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;   
+        bindTexture(TextureRegister::CausticsTexture, m_sprites[causticsFrame].Texture, SamplerStateType::None);
+        bindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
         // Set shadow map data
         if (m_shadowLight != NULL)
@@ -2504,8 +2492,8 @@ namespace TEN::Renderer
 
         // Draw geometry
         if (info->animated) {
-            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[info->texture])).ShaderResourceView.GetAddressOf());
-            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[info->texture])).ShaderResourceView.GetAddressOf());
+            bindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[info->texture]), SamplerStateType::AnisotropicClamp);
+            bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[info->texture]), SamplerStateType::None);
 
             RendererAnimatedTextureSet& set = m_animatedTextureSets[info->texture];
             m_stAnimated.NumFrames = set.NumTextures;
@@ -2519,8 +2507,8 @@ namespace TEN::Renderer
             m_cbAnimated.updateData(m_stAnimated, m_context.Get());
         }
         else {
-            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[info->texture])).ShaderResourceView.GetAddressOf());
-            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[info->texture])).ShaderResourceView.GetAddressOf());
+            bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[info->texture]), SamplerStateType::AnisotropicClamp);
+            bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[info->texture]), SamplerStateType::None);
         }
        
         setBlendMode(info->blendMode);
@@ -2561,10 +2549,8 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[info->bucket->texture]), SamplerStateType::AnisotropicClamp);
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[info->bucket->texture]), SamplerStateType::None);
 
         m_stStatic.World = Matrix::Identity;
         m_stStatic.Position = Vector4::One;
@@ -2624,7 +2610,7 @@ namespace TEN::Renderer
 
         // Prepare the scene to draw
         auto time1 = std::chrono::high_resolution_clock::now();
-        collectRooms(view);
+        collectRooms(view, false);
         updateLaraAnimations(false);
         updateItemsAnimations(view);
         updateEffects(view);
@@ -2762,7 +2748,7 @@ namespace TEN::Renderer
     {
         GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
-        collectRooms(view);
+        collectRooms(view, true);
         // Draw shadow map
 
         // Reset GPU state
@@ -2812,11 +2798,8 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psItems.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::AnisotropicClamp); 
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
         m_stMisc.AlphaTest = !transparent;
         m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -2975,11 +2958,8 @@ namespace TEN::Renderer
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[info->bucket->texture])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[info->bucket->texture])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[info->bucket->texture]), SamplerStateType::AnisotropicClamp); 
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[info->bucket->texture]), SamplerStateType::None);
 
         m_stMisc.AlphaTest = false;
         m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -3092,10 +3072,8 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
         // Set texture
-        m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, (std::get<1>(m_staticsTextures[0])).ShaderResourceView.GetAddressOf());
-        ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[0]), SamplerStateType::AnisotropicClamp); 
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[0]), SamplerStateType::None);
 
         m_stMisc.AlphaTest = true;
         m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -3193,9 +3171,9 @@ namespace TEN::Renderer
         int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
         int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
         int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
-        m_context->PSSetShaderResources(1, 1, m_sprites[causticsFrame].Texture->ShaderResourceView.GetAddressOf());
-        m_context->PSSetSamplers(1, 1, m_shadowSampler.GetAddressOf());
-        m_context->PSSetShaderResources(2, 1, m_shadowMap.ShaderResourceView.GetAddressOf());
+
+        bindTexture(TextureRegister::CausticsTexture, m_sprites[causticsFrame].Texture, SamplerStateType::None);
+        bindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
         // Set shadow map data
         if (m_shadowLight != NULL)
@@ -3239,6 +3217,7 @@ namespace TEN::Renderer
             {
                 if (isSortingRequired(bucket.blendMode))
                 {
+                    continue;
                     // Collect transparent faces
                     for (int j = 0; j < bucket.Polygons.size(); j++)
                     {
@@ -3297,8 +3276,8 @@ namespace TEN::Renderer
                             if (!bucket.animated)
                                 continue;
 
-                            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_animatedTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+                            bindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
+                            bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[bucket.texture]), SamplerStateType::None);
 
                             RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
                             m_stAnimated.NumFrames = set.NumTextures;
@@ -3314,8 +3293,9 @@ namespace TEN::Renderer
                         else {
                             if (bucket.animated)
                                 continue;
-                            m_context->PSSetShaderResources(0, 1, (std::get<0>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                            m_context->PSSetShaderResources(3, 1, (std::get<1>(m_roomTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
+
+                            bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
+                            bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[bucket.texture]), SamplerStateType::None);
                         }
                         if (bucket.Vertices.size() == 0)
                             continue;
@@ -3407,9 +3387,7 @@ namespace TEN::Renderer
         m_cbMisc.updateData(m_stMisc, m_context.Get());
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-        m_context->PSSetShaderResources(0, 1, m_skyTexture.ShaderResourceView.GetAddressOf());
-        sampler = m_states->AnisotropicClamp();
-        m_context->PSSetSamplers(0, 1, &sampler);
+        bindTexture(TextureRegister::MainTexture, &m_skyTexture, SamplerStateType::AnisotropicClamp);
 
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
@@ -3464,10 +3442,8 @@ namespace TEN::Renderer
                     if (bucket.Vertices.size() == 0)
                         continue;
 
-                    m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                    m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[bucket.texture])).ShaderResourceView.GetAddressOf());
-                    sampler = m_states->AnisotropicClamp();
-                    m_context->PSSetSamplers(0, 1, &sampler);
+                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
+                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.texture]), SamplerStateType::None);
 
 					setBlendMode(bucket.blendMode);
 
@@ -3485,7 +3461,7 @@ namespace TEN::Renderer
 
     void Renderer11::Draw()
 	{
-        //renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+        renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
         renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
         //drawFinalPass();

@@ -13,8 +13,8 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 };
 
-Texture2D Texture;
-SamplerState Sampler;
+Texture2D Texture : register(t0);
+SamplerState Sampler : register(s0);
 
 PixelShaderInput VS(VertexShaderInput input)
 {

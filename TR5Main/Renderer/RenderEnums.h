@@ -107,6 +107,37 @@ enum RendererTransparentFaceType
 	TRANSPARENT_FACE_NONE
 };
 
+enum ConstantBufferRegister
+{
+	CameraBuffer = 0,
+	ItemBuffer = 1,
+	LightBuffer = 2,
+	MiscBuffer = 3,
+	ShadowLightBuffer = 4,
+	RoomBuffer = 5,
+	AnimatedTexturesBuffer = 6
+};
+
+enum TextureRegister
+{
+	MainTexture = 0,
+	NormalMapTexture = 1,
+	CausticsTexture = 2,
+	ShadowMapTexture = 3,
+	ReflectionMapTexture = 4,
+};
+
+enum SamplerStateType
+{
+	None = 0,
+	PointWrap = 1,
+	LinearWrap = 2,
+	LinearClamp = 3,
+	AnisotropicWrap = 4,
+	AnisotropicClamp = 5,
+	ShadowMap = 6
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);

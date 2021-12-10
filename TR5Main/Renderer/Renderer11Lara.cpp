@@ -238,11 +238,8 @@ void TEN::Renderer::Renderer11::drawLara(RenderView& view, bool transparent, boo
 	}
 
 	// Set texture
-	m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-	m_context->PSSetShaderResources(2, 1, (std::get<1>(m_moveablesTextures[0])).ShaderResourceView.GetAddressOf());
-	m_context->PSSetShaderResources(1, 1, m_reflectionCubemap.ShaderResourceView.GetAddressOf());
-	ID3D11SamplerState *sampler = m_states->AnisotropicClamp();
-	m_context->PSSetSamplers(0, 1, &sampler);
+	bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::LinearClamp);
+	bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
 	m_stMisc.AlphaTest = !transparent;
 	m_cbMisc.updateData(m_stMisc, m_context.Get());

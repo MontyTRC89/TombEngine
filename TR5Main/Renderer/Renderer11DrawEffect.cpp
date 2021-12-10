@@ -832,9 +832,9 @@ namespace TEN::Renderer
 					currentBlendMode = spr.BlendMode;
 					setBlendMode(spr.BlendMode);
 				}
-				m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
-				ID3D11SamplerState* sampler = m_states->LinearClamp();
-				m_context->PSSetSamplers(0, 1, &sampler);
+
+				bindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
+
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
 					UINT stride = sizeof(RendererVertex);
@@ -984,9 +984,7 @@ namespace TEN::Renderer
 	{
 		setBlendMode(info->blendMode);
 
-		m_context->PSSetShaderResources(0, 1, info->sprite->Sprite->Texture->ShaderResourceView.GetAddressOf());
-		ID3D11SamplerState* sampler = m_states->LinearClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
+		bindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0; 
@@ -1109,20 +1107,13 @@ namespace TEN::Renderer
 
 				if (!deb->isStatic) 
 				{
-					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
-
+					bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				} 
 				else 
 				{
-					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
+					bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				}
 
-				ID3D11SamplerState* sampler = m_states->LinearClamp();
-				m_context->PSSetSamplers(0, 1, &sampler);
-				//m_stCameraMatrices.View = View.Transpose();
-				//m_stCameraMatrices.Projection = Projection.Transpose();
-				//updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-				//m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices);
 				m_stMisc.AlphaTest = !transparent;
 				m_cbMisc.updateData(m_stMisc, m_context.Get());
 				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());

@@ -713,6 +713,7 @@
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
+    <ClInclude Include="Renderer\TextureBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

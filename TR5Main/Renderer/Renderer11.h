@@ -31,6 +31,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 #include "Specific\fast_vector.h"
+#include "Renderer/TextureBase.h"
 
 struct CAMERA_INFO;
 
@@ -490,6 +491,8 @@ namespace TEN::Renderer
 		int m_pickupRotation = 0;
 
 		// Private functions
+		void bindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType);
+
 		int getAnimatedTextureInfo(short textureId);
 		void drawAllStrings();
 		void fromTrAngle(DirectX::SimpleMath::Matrix* matrix, short* frameptr, int index);
@@ -497,9 +500,9 @@ namespace TEN::Renderer
 		void buildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void updateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask,bool useObjectWorldRotation = false);
 		bool printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-		void getVisibleObjects(int from, int to, RenderView& renderView);
+		void getVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms);
 		bool checkPortal(short roomIndex, ROOM_DOOR* portal,const Matrix& viewProjection);
-		void collectRooms(RenderView& renderView);
+		void collectRooms(RenderView& renderView, bool onlyRooms);
 		void collectItems(short roomNumber, RenderView& renderView);
 		void collectStatics(short roomNumber, RenderView& renderView);
 		void collectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);

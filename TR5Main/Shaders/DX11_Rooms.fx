@@ -63,16 +63,16 @@ struct PixelShaderInput
 	float3x3 TBN : TBN;
 	float Fog : FOG;
 };
-Texture2D NormalTexture : register(t3);
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
-Texture2D CausticsTexture : register(t1);
+Texture2D NormalTexture : register(t1);
 
-Texture2D ShadowMap : register(t2);
-SamplerComparisonState ShadowMapSampler : register(s1);
+Texture2D CausticsTexture : register(t2);
 
+Texture2D ShadowMap : register(t3);
+SamplerComparisonState ShadowMapSampler : register(s3);
 
 float hash(float3 n)
 {
