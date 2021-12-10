@@ -304,6 +304,16 @@ int GetFrameCount(short animNumber)
 	return &g_Level.Anims[animNumber].frameEnd - &g_Level.Anims[animNumber].frameBase;
 }
 
+int GetNextAnimState(ITEM_INFO* item)
+{
+	return GetNextAnimState(item->objectNumber, item->animNumber);
+}
+
+int GetNextAnimState(short objectID, short animNumber)
+{
+	auto nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
+	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].currentAnimState;
+}
 
 void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 {

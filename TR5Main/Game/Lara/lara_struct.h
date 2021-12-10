@@ -87,13 +87,13 @@ enum LARA_STATE
 	LS_LADDER_STOP = 59,
 	LS_LADDER_RIGHT = 60,
 	LS_LADDER_DOWN = 61,
-	LS_TEST_1 = 62,	// Used for monkey auto jump.
+	LS_MONKEY_VAULT = 62,	// Used for auto monkey up jump.
 	LS_TEST_2 = 63,
 	LS_TEST_3 = 64,
 	LS_WADE_FORWARD = 65,
 	LS_UNDERWATER_ROLL = 66,
 	LS_PICKUP_FLARE = 67,
-	LS_JUMP_ROLL_180 = 68,	// Hm? Was SWANDIVE_ROLL in WT.
+	LS_JUMP_ROLL_180 = 68,
 	LS_KICK = 69,
 	LS_ZIPLINE_RIDE = 70,
 
