@@ -35,6 +35,9 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = WALL_SIZE;
+
+	if (TestLastFrame(item))
+		item->goalAnimState = GetNextAnimState(item);
 }
 
 void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
