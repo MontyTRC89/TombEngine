@@ -480,6 +480,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 					if (item->currentAnimState == LS_SWANDIVE_START)
 					{
+						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(45.0f);
 						item->goalAnimState = LS_DIVE;
 						AnimateLara(item);
@@ -487,6 +488,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else if (item->currentAnimState == LS_SWANDIVE_END)
 					{
+						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(85.0f);
 						item->goalAnimState = LS_DIVE;
 						AnimateLara(item);
