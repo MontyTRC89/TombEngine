@@ -20,6 +20,9 @@
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
+	if (coll->Middle.Floor == NO_HEIGHT)
+		return;
+
 	if (!TestLaraSwamp(item))
 	{
 		if (TestLaraStepUp(item, coll))
@@ -47,20 +50,18 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	constexpr int rate = 50;
 	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
 	int sign = std::copysign(1, coll->Middle.Floor);
-	if (coll->Middle.Floor != NO_HEIGHT)
+	
+	if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
+		item->pos.yPos += SWAMP_GRAVITY;
+	else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))			// Outer range.
+		item->pos.yPos += rate * sign;
+	else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
+		abs(coll->Middle.Floor) >= threshold)
 	{
-		if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
-			item->pos.yPos += SWAMP_GRAVITY;
-		else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))			// Outer range.
-			item->pos.yPos += rate * sign;
-		else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
-			abs(coll->Middle.Floor) >= threshold)
-		{
-			item->pos.yPos += std::max((int)abs(coll->Middle.Floor / 2.75), threshold) * sign;
-		}
-		else
-			item->pos.yPos += coll->Middle.Floor;
+		item->pos.yPos += std::max((int)abs(coll->Middle.Floor / 2.75), threshold) * sign;
 	}
+	else
+		item->pos.yPos += coll->Middle.Floor;
 }
 
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
@@ -226,7 +227,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) &&
-		!(coll->Setup.Height < LARA_HEIGHT) &&
+		coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&
 		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
 		ResetLaraFlex(item, 12);

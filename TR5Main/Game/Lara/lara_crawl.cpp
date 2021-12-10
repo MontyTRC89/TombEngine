@@ -38,6 +38,10 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
+	// TODO: Dispatch pickups from within states.
+	if (item->goalAnimState == LS_PICKUP)
+		return;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -48,9 +52,9 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		info->turnRate = -LARA_CRAWL_TURN;
+		info->turnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->turnRate = LARA_CRAWL_TURN;
+		info->turnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
@@ -138,16 +142,16 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_CROUCH_ROLL_TURN)
-			info->turnRate = -LARA_CROUCH_ROLL_TURN;
+		if (info->turnRate < -LARA_CROUCH_ROLL_TURN_MAX)
+			info->turnRate = -LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_CROUCH_ROLL_TURN)
-			info->turnRate = LARA_CROUCH_ROLL_TURN;
+		if (info->turnRate > LARA_CROUCH_ROLL_TURN_MAX)
+			info->turnRate = LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -227,7 +231,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	info->turnRate = -LARA_CRAWL_TURN;
+	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
@@ -283,7 +287,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	info->turnRate = LARA_CRAWL_TURN;
+	info->turnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
@@ -336,6 +340,10 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
+	// TODO: Dispatch pickups from within states.
+	if (item->goalAnimState == LS_PICKUP)
+		return;
+
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -346,9 +354,9 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		info->turnRate = -LARA_CRAWL_TURN;
+		info->turnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->turnRate = LARA_CRAWL_TURN;
+		info->turnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
@@ -474,18 +482,18 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate < -LARA_CRAWL_MOVE_TURN)
-			info->turnRate = -LARA_CRAWL_MOVE_TURN;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate > LARA_CRAWL_MOVE_TURN)
-			info->turnRate = LARA_CRAWL_MOVE_TURN;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
@@ -577,18 +585,18 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate < -LARA_CRAWL_MOVE_TURN)
-			info->turnRate = -LARA_CRAWL_MOVE_TURN;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate > LARA_CRAWL_MOVE_TURN)
-			info->turnRate = LARA_CRAWL_MOVE_TURN;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX, LARA_CRAWL_FLEX_RATE);
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
@@ -668,7 +676,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->turnRate = -LARA_CRAWL_TURN;
+	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)
@@ -728,7 +736,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->turnRate = LARA_CRAWL_TURN;
+	info->turnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
 		info->waterStatus != LW_WADE)

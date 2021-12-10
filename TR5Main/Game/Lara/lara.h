@@ -4,8 +4,6 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 
-// TODO: Rename these to be consistent and define state-specific rates.
-// State code seems to cherry-pick whatever is handy. @Sezz 2021.09.27
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
 
@@ -16,26 +14,26 @@ struct COLL_INFO;
 // Turn rates
 #define LARA_TURN_RATE ANGLE(2.25f)
 #define LARA_CRAWL_MOVE_TURN_RATE ANGLE(2.15f)
-#define SUB_SUIT_TURN_RATE ANGLE(0.75f)
 #define LARA_POLE_TURN_RATE ANGLE(2.25f)
+#define LARA_SUBSUIT_TURN_RATE ANGLE(0.75f)
 
 // Turn rate maxes
-#define LARA_SLOW_TURN ANGLE(4.0f)
-#define LARA_SLOW_MED_TURN ANGLE(5.0f)
-#define LARA_MED_TURN ANGLE(6.0f)
-#define LARA_MED_FAST_TURN ANGLE(7.0f)
-#define LARA_FAST_TURN ANGLE(8.0f)
+#define LARA_SLOW_TURN_MAX ANGLE(4.0f)
+#define LARA_SLOW_MED_TURN_MAX ANGLE(5.0f)
+#define LARA_MED_TURN_MAX ANGLE(6.0f)
+#define LARA_MED_FAST_TURN_MAX ANGLE(7.0f)
+#define LARA_FAST_TURN_MAX ANGLE(8.0f)
 #define LARA_WADE_TURN_MAX ANGLE(5.5f)
 #define LARA_SWAMP_TURN_MAX ANGLE(2.0f)
-#define LARA_JUMP_TURN ANGLE(3.0f)
-#define LARA_CRAWL_TURN ANGLE(2.0f)
-#define LARA_CRAWL_MOVE_TURN ANGLE(3.75f)
-#define LARA_CROUCH_ROLL_TURN ANGLE(2.75f)
+#define LARA_JUMP_TURN_MAX ANGLE(3.0f)
+#define LARA_CRAWL_TURN_MAX ANGLE(2.0f)
+#define LARA_CRAWL_MOVE_TURN_MAX ANGLE(3.75f)
+#define LARA_CROUCH_ROLL_TURN_MAX ANGLE(2.75f)
 #define LARA_POLE_TURN_MAX ANGLE(4.5f)
 
 // Flex rates
-#define LARA_CRAWL_FLEX ANGLE(40.0f) / 2		// 2 = hardcoded number of bones to flex (head and torso).
-#define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
+#define LARA_CRAWL_FLEX_MAX_RATE ANGLE(2.25f)
+#define LARA_CRAWL_FLEX_MAX ANGLE(40.0f) / 2		// 2 = hardcoded number of bones to flex (head and torso).
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.

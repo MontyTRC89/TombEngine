@@ -90,7 +90,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyReverse)
+		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}

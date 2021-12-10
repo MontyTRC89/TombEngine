@@ -18,7 +18,7 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_special(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_null(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_controlledl(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll);
 
 // ---------------
 // BASIC MOVEMENT:
@@ -33,7 +33,6 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll);
 void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_pose(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll);

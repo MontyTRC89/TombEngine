@@ -54,16 +54,14 @@ void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-
-		if (info->turnRate < -LARA_JUMP_TURN)
-			info->turnRate = -LARA_JUMP_TURN;
+		if (info->turnRate < -LARA_JUMP_TURN_MAX)
+			info->turnRate = -LARA_JUMP_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-
-		if (info->turnRate > LARA_JUMP_TURN)
-			info->turnRate = LARA_JUMP_TURN;
+		if (info->turnRate > LARA_JUMP_TURN_MAX)
+			info->turnRate = LARA_JUMP_TURN_MAX;
 	}
 }
 
@@ -242,15 +240,15 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 		TrInput & (IN_FORWARD | IN_BACK))
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN)
-			info->turnRate = -LARA_SLOW_TURN;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT &&
 		TrInput & (IN_FORWARD | IN_BACK))
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN)
-			info->turnRate = LARA_SLOW_TURN;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_FORWARD &&
@@ -551,16 +549,16 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN)
-			info->turnRate = -LARA_JUMP_TURN;
+		if (info->turnRate < -LARA_JUMP_TURN_MAX)
+			info->turnRate = -LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN)
-			info->turnRate = LARA_JUMP_TURN;
+		if (info->turnRate > LARA_JUMP_TURN_MAX)
+			info->turnRate = LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
