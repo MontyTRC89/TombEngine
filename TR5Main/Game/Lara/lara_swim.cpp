@@ -318,15 +318,6 @@ void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->pos.zRot += LARA_LEAN_RATE;
 	}
-
-	// LEGACY sample:
-	/*else if (TrInput & IN_RIGHT)
-	{
-		Lara.turnRate += 409;
-		if (Lara.turnRate > ANGLE(6))
-			Lara.turnRate = ANGLE(6);
-		item->pos.zRot += ANGLE(3);
-	}*/
 }
 
 void SwimDive(ITEM_INFO* item)

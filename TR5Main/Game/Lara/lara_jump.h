@@ -23,7 +23,6 @@ void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll);
