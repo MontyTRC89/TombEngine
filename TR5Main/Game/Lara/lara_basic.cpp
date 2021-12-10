@@ -388,9 +388,9 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
-			pseudo_lara_as_swamp_idle(item, coll);
+			PseudoLaraAsSwampIdle(item, coll);
 		else [[likely]]
-			pseudo_lara_as_wade_idle(item, coll);
+			PseudoLaraAsWadeIdle(item, coll);
 
 		return;
 	}
@@ -509,7 +509,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Future-proof for rising water.
 // TODO: Make these into true states someday? It may take a bit of work. @Sezz 2021.10.13
 // Pseudo-state for idling in wade-height water.
-void pseudo_lara_as_wade_idle(ITEM_INFO* item, COLL_INFO* coll)
+void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_JUMP &&
 		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
@@ -556,7 +556,7 @@ void pseudo_lara_as_wade_idle(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for idling in swamps.
-void pseudo_lara_as_swamp_idle(ITEM_INFO* item, COLL_INFO* coll)
+void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
@@ -776,9 +776,9 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
-			pseudo_lara_as_swamp_turn_right_slow(item, coll);
+			PsuedoLaraAsSwampTurnRightSlow(item, coll);
 		else [[likely]]
-			pseudo_lara_as_wade_turn_right_slow(item, coll);
+			PsuedoLaraAsWadeTurnRightSlow(item, coll);
 
 		return;
 	}
@@ -873,7 +873,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning right slowly in wade-height water.
-void pseudo_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
+void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -919,7 +919,7 @@ void pseudo_lara_as_wade_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning right slowly in swamps.
-void pseudo_lara_as_swamp_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
+void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -987,9 +987,9 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->waterStatus == LW_WADE)
 	{
 		if (TestLaraSwamp(item))
-			pseudo_lara_as_swamp_turn_left_slow(item, coll);
+			PsuedoLaraAsSwampTurnLeftSlow(item, coll);
 		else [[likely]]
-			pseudo_lara_as_wade_turn_left_slow(item, coll);
+			PsuedoLaraAsWadeTurnLeftSlow(item, coll);
 
 		return;
 	}
@@ -1085,7 +1085,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning left slowly in wade-height water.
-void pseudo_lara_as_wade_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
+void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1131,7 +1131,7 @@ void pseudo_lara_as_wade_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for turning left slowly in swamps.
-void pseudo_lara_as_swamp_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
+void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1273,7 +1273,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSwamp(item) &&
 		info->waterStatus == LW_WADE)
 	{
-		pseudo_lara_as_swamp_walk_back(item, coll);
+		PseudoLaraAsSwampWalkBack(item, coll);
 		return;
 	}
 
@@ -1306,7 +1306,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for walking back in swamps.
-void pseudo_lara_as_swamp_walk_back(ITEM_INFO* item, COLL_INFO* coll)
+void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1913,7 +1913,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSwamp(item))
 	{
-		pseudo_lara_as_swamp_wade_forward(item, coll);
+		PseudoLaraAsSwampWadeForward(item, coll);
 		return;
 	}
 
@@ -1948,7 +1948,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Pseudo-state for wading in swamps.
-void pseudo_lara_as_swamp_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
+void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 

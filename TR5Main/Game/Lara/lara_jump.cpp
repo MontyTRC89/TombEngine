@@ -368,7 +368,7 @@ void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 25*/
 	/*state code: lara_as_backjump*/
 	info->moveAngle = item->pos.yRot + ANGLE(180);
-	lara_col_jumper(item, coll);
+	LaraJumpCollision(item, coll);
 }
 
 void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -391,7 +391,7 @@ void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 26*/
 	/*state code: lara_as_rightjump*/
 	info->moveAngle = item->pos.yRot + ANGLE(90);
-	lara_col_jumper(item, coll);
+	LaraJumpCollision(item, coll);
 }
 
 void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -414,36 +414,7 @@ void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 27*/
 	/*state code: lara_as_leftjump*/
 	info->moveAngle = item->pos.yRot - ANGLE(90);
-	lara_col_jumper(item, coll);
-}
-
-void lara_col_jumper(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*states 25, 26, 27*/
-	/*state code: none, but is called in lara_col_backjump, lara_col_rightjump and lara_col_leftjump*/
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
-
-	GetCollisionInfo(coll, item);
-	LaraDeflectEdgeJump(item, coll);
-
-	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		item->fallspeed = 0;
-		item->gravityStatus = 0;
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
-	}
+	LaraJumpCollision(item, coll);
 }
 
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)

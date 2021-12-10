@@ -470,7 +470,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (isWater)
 				{
-					info->air = 1800;
+					info->air = LARA_AIR_MAX;
 					info->waterStatus = LW_UNDERWATER;
 					item->gravityStatus = false;
 					item->pos.yPos += 100;
@@ -499,11 +499,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->fallspeed = 3 * item->fallspeed / 2;
 					}
 
-					info->torsoYrot = 0;
-					info->torsoXrot = 0;
-					info->headYrot = 0;
-					info->headXrot = 0;
-
+					ResetLaraFlex(item);
 					Splash(item);
 				}
 			}
@@ -547,10 +543,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->pos.zRot = 0;
 						item->pos.xRot = 0;
 						info->waterStatus = LW_ABOVE_WATER;
-						info->torsoYrot = 0;
-						info->torsoXrot = 0;
-						info->headYrot = 0;
-						info->headXrot = 0;
+						ResetLaraFlex(item);
 					}
 					else
 					{
@@ -561,10 +554,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->pos.xRot = 0;
 						info->waterStatus = LW_SURFACE;
 						info->diveCount = 11;
-						info->torsoYrot = 0;
-						info->torsoXrot = 0;
-						info->headYrot = 0;
-						info->headXrot = 0;
+						ResetLaraFlex(item);
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 						SoundEffect(SFX_TR4_LARA_BREATH, &item->pos, 2);
@@ -580,10 +570,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.xRot = 0;
 				info->waterStatus = LW_SURFACE;
 				info->diveCount = 11;
-				info->torsoYrot = 0;
-				info->torsoXrot = 0;
-				info->headYrot = 0;
-				info->headXrot = 0;
+				ResetLaraFlex(item);
 
 				UpdateItemRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &item->pos, 2);
@@ -612,10 +599,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->fallspeed = 0;
 				item->pos.zRot = 0;
 				item->pos.xRot = 0;
-				info->torsoYrot = 0;
-				info->torsoXrot = 0;
-				info->headYrot = 0;
-				info->headXrot = 0;
+				ResetLaraFlex(item);
 			}
 
 			break;
@@ -636,10 +620,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->pos.zRot = 0;
 					item->pos.xRot = 0;
 					info->diveCount = 0;
-					info->torsoYrot = 0;
-					info->torsoXrot = 0;
-					info->headYrot = 0;
-					info->headXrot = 0;
+					ResetLaraFlex(item);
 
 					UpdateItemRoom(item, 0);
 				}
@@ -764,7 +745,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	info->isDucked = coll->Setup.Height < LARA_HEIGHT; // temp
+	info->isDucked = coll->Setup.Height < LARA_HEIGHT; // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 
@@ -832,55 +813,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	// Reset running jump timer.
-	if (item->currentAnimState != LS_RUN_FORWARD &&
-		item->currentAnimState != LS_WALK_FORWARD &&
-		item->currentAnimState != LS_JUMP_FORWARD &&
-		item->currentAnimState != LS_SPRINT_DIVE)
-	{
-		info->jumpCount = 0;
-	}
-
-	// Increment/reset AFK pose timer.
-	if (info->poseCount < LARA_POSE_TIME &&
-		TestLaraPose(item, coll) &&
-		!(TrInput & (IN_WAKE | IN_LOOK)) &&
-		g_GameFlow->Animations.Pose)
-	{
-		info->poseCount++;
-	}
-	else
-		info->poseCount = 0;
-
 	// Handle current Lara status.
 	lara_control_routines[item->currentAnimState](item, coll);
 
-	// Reset lean.
-	if (!info->isMoving || (info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
-	{
-		if (abs(item->pos.zRot) > ANGLE(0.1f))
-			item->pos.zRot += item->pos.zRot / -6;
-		else
-			item->pos.zRot = 0;
-	}
-
-	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) &&
-		info->isDucked &&
-		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
-	{
-		ResetLaraFlex(item, 12);
-	}
-
-	// Reset turn rate.
-	int sign = copysign(1, info->turnRate);
-	if (abs(info->turnRate) > ANGLE(2.0f))
-		info->turnRate -= ANGLE(2.0f) * sign;
-	else if (abs(info->turnRate) > ANGLE(0.5f))
-		info->turnRate -= ANGLE(0.5f) * sign;
-	else
-		info->turnRate = 0;
-	item->pos.yRot += info->turnRate;
+	HandleLaraMovementParameters(item, coll);
 
 	// Animate Lara.
 	AnimateLara(item);
@@ -965,7 +901,6 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (level->LaraType == LaraType::Divesuit)
 		UpdateSubsuitAngles();
 
-	// TODO: Conditions seem fine, but test this thoroughly. Different from surface. @Sezz 2021.09.26
 	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
 		if (abs(item->pos.zRot) > ANGLE(0.0f))
@@ -1081,18 +1016,16 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->hitPoints = 1000;
+	item->hitPoints = LARA_HEALTH_MAX;
 	LaraUnderWater(item, coll);
+
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
 		if (TestLaraWater(item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
 		{
 			info->waterStatus = LW_UNDERWATER;
 			SetAnimation(item, LA_UNDERWATER_IDLE);
-			info->torsoYrot = 0;
-			info->torsoXrot = 0;
-			info->headYrot = 0;
-			info->headXrot = 0;
+			ResetLaraFlex(item);
 		}
 		else
 		{
@@ -1100,14 +1033,12 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_STAND_SOLID);
 			item->pos.zRot = 0;
 			item->pos.xRot = 0;
-			info->torsoYrot = 0;
-			info->torsoXrot = 0;
-			info->headYrot = 0;
-			info->headXrot = 0;
+			ResetLaraFlex(item);
 		}
+
 		info->gunStatus = LG_HANDS_FREE;
 		LaraInitialiseMeshes();
-		item->hitPoints = 1000;
+		item->hitPoints = LARA_HEALTH_MAX;
 	}
 }
 
