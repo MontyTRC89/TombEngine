@@ -620,7 +620,7 @@ namespace TEN::Renderer
 		return 0;
 	}
 
-	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView)
+	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
 	{
 		// Avoid allocations, 1024 should be fine
 		RendererRoomNode nodes[512];
@@ -657,10 +657,13 @@ namespace TEN::Renderer
 			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
 			g_Level.Rooms[node->To].boundActive = true;
 
-			collectLightsForRoom(node->To, renderView);
-			collectItems(node->To, renderView);
-			collectStatics(node->To, renderView);
-			collectEffects(node->To, renderView);
+			if (!onlyRooms)
+			{
+				collectLightsForRoom(node->To, renderView);
+				collectItems(node->To, renderView);
+				collectStatics(node->To, renderView);
+				collectEffects(node->To, renderView);
+			}
 
 			Vector4 clipPort;
 

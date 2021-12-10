@@ -23,8 +23,8 @@ struct PixelShaderInput
 	float Fog : FOG;
 };
 
-Texture2D Texture;
-SamplerState Sampler;
+Texture2D Texture : register(t0);
+SamplerState Sampler : register(s0);
 
 PixelShaderInput VS(VertexShaderInput input)
 {

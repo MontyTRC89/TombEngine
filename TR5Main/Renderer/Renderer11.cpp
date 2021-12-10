@@ -63,14 +63,14 @@ namespace TEN::Renderer
 
 		return nf;
 	}
-
+	 
 	void Renderer11::updateProgress(float value) {
 		m_progress = value;
 	}
 
 	void Renderer11::renderToCubemap(const RenderTargetCube& dest,const Vector3& pos,int roomNumer) {
 		for (int i = 0; i < 6; i++) {
-			RenderView renderView = RenderView(pos,RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
+			RenderView renderView = RenderView(pos, RenderTargetCube::forwardVectors[i],RenderTargetCube::upVectors[i],dest.resolution,dest.resolution,Camera.pos.roomNumber,10,20480, 90* RADIAN);
 			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
@@ -212,5 +212,43 @@ namespace TEN::Renderer
 		m_fps = fps;
 
 		return fps;
+	}
+
+	void Renderer11::bindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
+	{
+		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
+
+		ID3D11SamplerState* samplerState = nullptr;
+		switch (samplerType)
+		{
+		case SamplerStateType::AnisotropicClamp:
+			samplerState = m_states->AnisotropicClamp();
+			break;
+
+		case SamplerStateType::AnisotropicWrap:
+			samplerState = m_states->AnisotropicWrap();
+			break;
+
+		case SamplerStateType::LinearClamp:
+			samplerState = m_states->LinearClamp();
+			break;
+
+		case SamplerStateType::LinearWrap:
+			samplerState = m_states->LinearWrap();
+			break;
+
+		case SamplerStateType::PointWrap:
+			samplerState = m_states->PointWrap();
+			break;
+
+		case SamplerStateType::ShadowMap:
+			samplerState = m_shadowSampler.Get();
+			break;
+
+		default:
+			return;
+		}
+
+		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 }

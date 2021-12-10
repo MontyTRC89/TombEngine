@@ -190,6 +190,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
