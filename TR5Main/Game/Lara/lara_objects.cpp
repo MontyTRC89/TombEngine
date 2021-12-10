@@ -95,7 +95,7 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 95*/
-	/*state code: lara_as_controlledl*/
+	/*state code: lara_as_controlled_no_look*/
 	if (coll->Setup.OldPosition.x != item->pos.xPos || coll->Setup.OldPosition.z != item->pos.zPos)
 	{
 		if (item->animNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
