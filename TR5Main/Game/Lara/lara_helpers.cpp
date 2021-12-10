@@ -5,9 +5,11 @@
 #include "items.h"
 #include "level.h"
 #include "lara.h"
+#include "lara_helpers.h"
 #include "lara_tests.h"
 #include "lara_collide.h"
 #include "setup.h"
+#include "GameFlowScript.h"
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -42,8 +44,8 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
 	// TODO: This approach might cause underirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
+	constexpr int rate = 50;
 	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
-	int rate = 50;
 	int sign = std::copysign(1, coll->Middle.Floor);
 	if (coll->Middle.Floor != NO_HEIGHT)
 	{
@@ -65,12 +67,7 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
-	info->torsoZrot = 0;
-	info->headXrot = 0;
-	info->headYrot = 0;
-	info->headZrot = 0;
+	ResetLaraFlex(item);
 
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
@@ -143,7 +140,21 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
-void ResetLaraFlex(ITEM_INFO* item, short rate)
+void SetLaraFallState(ITEM_INFO* item)
+{
+	SetAnimation(item, LA_FALL_START);
+	item->fallspeed = 0;
+	item->gravityStatus = true;
+}
+
+void SetLaraFallBackState(ITEM_INFO* item)
+{
+	SetAnimation(item, LA_FALL_BACK);
+	item->fallspeed = 0;
+	item->gravityStatus = true;
+}
+
+void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
 	LaraInfo*& info = item->data;
 
@@ -180,16 +191,54 @@ void ResetLaraFlex(ITEM_INFO* item, short rate)
 		info->torsoZrot = 0;
 }
 
-void SetLaraFallState(ITEM_INFO* item)
+void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
-	SetAnimation(item, LA_FALL_START);
-	item->fallspeed = 0;
-	item->gravityStatus = true;
-}
+	LaraInfo*& info = item->data;
 
-void SetLaraFallBackState(ITEM_INFO* item)
-{
-	SetAnimation(item, LA_FALL_BACK);
-	item->fallspeed = 0;
-	item->gravityStatus = true;
+	// Reset running jump timer.
+	if (item->currentAnimState != LS_RUN_FORWARD &&
+		item->currentAnimState != LS_WALK_FORWARD &&
+		item->currentAnimState != LS_JUMP_FORWARD &&
+		item->currentAnimState != LS_SPRINT_DIVE)
+	{
+		info->jumpCount = 0;
+	}
+
+	// Increment/reset AFK pose timer.
+	if (info->poseCount < LARA_POSE_TIME &&
+		TestLaraPose(item, coll) &&
+		!(TrInput & (IN_WAKE | IN_LOOK)) &&
+		g_GameFlow->Animations.Pose)
+	{
+		info->poseCount++;
+	}
+	else
+		info->poseCount = 0;
+
+	// Reset lean.
+	if (!info->isMoving || (info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	{
+		if (abs(item->pos.zRot) > ANGLE(0.1f))
+			item->pos.zRot += item->pos.zRot / -6;
+		else
+			item->pos.zRot = 0;
+	}
+
+	// Reset crawl flex.
+	if (!(TrInput & IN_LOOK) &&
+		!(coll->Setup.Height < LARA_HEIGHT) &&
+		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+	{
+		ResetLaraFlex(item, 12);
+	}
+
+	// Reset turn rate.
+	int sign = copysign(1, info->turnRate);
+	if (abs(info->turnRate) > ANGLE(2.0f))
+		info->turnRate -= ANGLE(2.0f) * sign;
+	else if (abs(info->turnRate) > ANGLE(0.5f))
+		info->turnRate -= ANGLE(0.5f) * sign;
+	else
+		info->turnRate = 0;
+	item->pos.yRot += info->turnRate;
 }
