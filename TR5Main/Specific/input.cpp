@@ -250,9 +250,9 @@ int S_UpdateInput()
 	if (Key(KEY_OPTION))
 		linput |= IN_OPTION;
 	if (Key(KEY_STEPL))
-		linput |= IN_WALK | IN_LEFT;
+		linput |= IN_LSTEP;
 	if (Key(KEY_STEPR))
-		linput |= IN_WALK | IN_RIGHT;
+		linput |= IN_RSTEP;
 	if (Key(KEY_PAUSE))
 		linput |= IN_PAUSE;
 	if (Key(KEY_SELECT))

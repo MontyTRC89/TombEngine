@@ -1057,7 +1057,6 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STEP_LEFT;
 		return;
 	}
-	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
@@ -1585,7 +1584,6 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_STEP_LEFT;
 		return;
 	}
-	// TODO: Lara steps left. Why?? @Sezz 2021.10.08
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
 		item->goalAnimState = LS_STEP_RIGHT;
