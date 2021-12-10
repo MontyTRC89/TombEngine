@@ -32,20 +32,20 @@ enum BOAT_STATE
 #define	IN_REVERSE			IN_BACK
 #define	IN_DISMOUNT			IN_JUMP
 #define	IN_TURBO			(IN_ACTION)
-#define	IN_TURNL			(IN_LEFT|IN_LSTEP)
-#define	IN_TURNR			(IN_RIGHT|IN_RSTEP)
+#define	IN_TURNL			(IN_LEFT | IN_LSTEP)
+#define	IN_TURNR			(IN_RIGHT | IN_RSTEP)
 #define BOAT_GETONLW_ANIM	0
 #define BOAT_GETONRW_ANIM	8
 #define BOAT_GETONJ_ANIM	6
 #define BOAT_GETON_START	1
 #define BOAT_FALL_ANIM		15
 #define BOAT_DEATH_ANIM		18
-#define BOAT_UNDO_TURN		(ONE_DEGREE/4)
-#define BOAT_TURN			(ONE_DEGREE/8)
+#define BOAT_UNDO_TURN		(ONE_DEGREE / 4)
+#define BOAT_TURN			(ONE_DEGREE / 8)
 #define BOAT_MAX_TURN		ANGLE(4)
 #define BOAT_MAX_SPEED		110
-#define BOAT_SLOW_SPEED		(BOAT_MAX_SPEED/3)
-#define BOAT_FAST_SPEED		(BOAT_MAX_SPEED+75)
+#define BOAT_SLOW_SPEED		(BOAT_MAX_SPEED / 3)
+#define BOAT_FAST_SPEED		(BOAT_MAX_SPEED + 75)
 #define BOAT_MIN_SPEED		20
 #define BOAT_ACCELERATION	5
 #define BOAT_BRAKE			5
@@ -62,8 +62,8 @@ enum BOAT_STATE
 #define BOAT_MAX_HEIGHT		(STEP_SIZE)
 #define GETOFF_DIST			(1024)
 #define BOAT_WAKE			700
-#define BOAT_SOUND_CEILING	(WALL_SIZE*5)
-#define BOAT_TIP			(BOAT_FRONT+250)
+#define BOAT_SOUND_CEILING	(WALL_SIZE * 5)
+#define BOAT_TIP			(BOAT_FRONT + 250)
 #define SKIDOO_HIT_LEFT		11
 #define SKIDOO_HIT_RIGHT	12
 #define SKIDOO_HIT_FRONT	13
@@ -214,42 +214,42 @@ bool SpeedBoatCanGetOff(int direction)
 	return true;
 }
 
-BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
+BoatGetOn SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 {
-	BOAT_GETON geton = BOAT_GETON::NONE;
+	BoatGetOn geton = BoatGetOn::None;
 
 	if (Lara.gunStatus != LG_NO_ARMS)
-		return BOAT_GETON::NONE;
+		return BoatGetOn::None;
 
 	ITEM_INFO* boat = &g_Level.Items[itemNum];
 
 	if (!TestBoundsCollide(boat, LaraItem, coll->Setup.Radius))
-		return BOAT_GETON::NONE;
+		return BoatGetOn::None;
 
 	if (!TestCollision(boat, LaraItem))
-		return BOAT_GETON::NONE;
+		return BoatGetOn::None;
 
 	int dist = (LaraItem->pos.zPos - boat->pos.zPos) * phd_cos(-boat->pos.yRot) - (LaraItem->pos.xPos - boat->pos.xPos) * phd_sin(-boat->pos.yRot);
 	if (dist > 200)
-		return BOAT_GETON::NONE;
+		return BoatGetOn::None;
 
 	short rot = boat->pos.yRot - LaraItem->pos.yRot;
 	if (Lara.waterStatus == LW_SURFACE || Lara.waterStatus == LW_WADE)
 	{
 		if (!(TrInput & IN_ACTION) || LaraItem->gravityStatus || boat->speed)
-			return BOAT_GETON::NONE;
+			return BoatGetOn::None;
 
 		if (rot > ANGLE(45) && rot < ANGLE(135))
-			geton = BOAT_GETON::WATER_RIGHT;
+			geton = BoatGetOn::WaterRight;
 		else if (rot > -ANGLE(135) && rot < -ANGLE(45))
-			geton = BOAT_GETON::WATER_LEFT;
+			geton = BoatGetOn::WaterLeft;
 	}
 	else if (Lara.waterStatus == LW_ABOVE_WATER)
 	{
 		if (LaraItem->fallspeed > 0)
 		{
-			if (rot > -ANGLE(135) && rot < ANGLE(135) && (LaraItem->pos.yPos + 512) > boat->pos.yPos)
-				geton = BOAT_GETON::JUMP;
+			if (rot > -ANGLE(135) && rot < ANGLE(135) && LaraItem->pos.yPos > boat->pos.yPos)
+				geton = BoatGetOn::Jump;
 		}
 		else if (LaraItem->fallspeed == 0)
 		{
@@ -258,9 +258,9 @@ BOAT_GETON SpeedBoatCheckGeton(short itemNum, COLL_INFO* coll)
 				if (LaraItem->pos.xPos == boat->pos.xPos
 					&& LaraItem->pos.yPos == boat->pos.yPos 
 					&& LaraItem->pos.zPos == boat->pos.zPos)
-					geton = BOAT_GETON::STARTPOS;
+					geton = BoatGetOn::StartPosition;
 				else
-					geton = BOAT_GETON::JUMP;
+					geton = BoatGetOn::Jump;
 			}
 		}
 	}
@@ -482,27 +482,18 @@ int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y)
 
 int SpeedBoatDynamics(short itemNum)
 {
-	ITEM_INFO* boat;
-	BOAT_INFO* binfo;
-	PHD_VECTOR moved, fl, fr, br, bl, f;
-	PHD_VECTOR old, fl_old, fr_old, bl_old, br_old, f_old;
-	int hfl, hfr, hbr, hbl, hf;
-	int hfr_old, hfl_old, hbr_old, hbl_old, hf_old;
-	FLOOR_INFO* floor;
-	int height, slip, collide;
-	short roomNumber, rot;
-	int newspeed;
-
-	boat = &g_Level.Items[itemNum];
-	binfo = boat->data;
+	auto boat = &g_Level.Items[itemNum];
+	auto binfo = (BOAT_INFO*)boat->data;
 
 	boat->pos.zRot -= binfo->tiltAngle;
 
-	hfl_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl_old);
-	hfr_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr_old);
-	hbl_old = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl_old);
-	hbr_old = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br_old);
-	hf_old = SpeedBoatTestWaterHeight(boat, BOAT_TIP, 0, &f_old);
+	PHD_VECTOR old, fl_old, fr_old, bl_old, br_old, f_old;
+	int hfl_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl_old);
+	int hfr_old = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr_old);
+	int hbl_old = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl_old);
+	int hbr_old = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br_old);
+	int hf_old  = SpeedBoatTestWaterHeight(boat, BOAT_TIP, 0, &f_old);
+
 	old.x = boat->pos.xPos;
 	old.y = boat->pos.yPos;
 	old.z = boat->pos.zPos;
@@ -524,7 +515,7 @@ int SpeedBoatDynamics(short itemNum)
 	boat->pos.xPos += boat->speed * phd_sin(boat->pos.yRot);
 	boat->pos.zPos += boat->speed * phd_cos(boat->pos.yRot);
 	
-	slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot);
+	int slip = BOAT_SIDE_SLIP * phd_sin(boat->pos.zRot);
 	if (!slip && boat->pos.zRot)
 		slip = (boat->pos.zRot > 0) ? 1 : -1;
 	boat->pos.xPos += slip * phd_sin(boat->pos.yRot);
@@ -536,28 +527,29 @@ int SpeedBoatDynamics(short itemNum)
 	boat->pos.xPos -= slip * phd_sin(boat->pos.yRot);
 	boat->pos.zPos -= slip * phd_cos(boat->pos.yRot);
 	
-	moved.x = boat->pos.xPos;
-	moved.z = boat->pos.zPos;
+	auto moved = PHD_VECTOR(boat->pos.xPos, 0, boat->pos.zPos);
 
 	SpeedBoatDoBoatShift(itemNum);
 
-	rot = 0;
-	hbl = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl);
+	PHD_VECTOR fl, fr, br, bl, f;
+	short rot = 0;
+	int hbl = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, -BOAT_SIDE, &bl);
 	if (hbl < bl_old.y - STEP_SIZE / 2)
 		rot = SpeedBoatDoShif(boat, &bl, &bl_old);
 
-	hbr = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br);
+	int hbr = SpeedBoatTestWaterHeight(boat, -BOAT_FRONT, BOAT_SIDE, &br);
 	if (hbr < br_old.y - STEP_SIZE / 2)
 		rot += SpeedBoatDoShif(boat, &br, &br_old);
 
-	hfl = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
+	int hfl = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
 	if (hfl < fl_old.y - STEP_SIZE / 2)
 		rot += SpeedBoatDoShif(boat, &fl, &fl_old);
 
-	hfr = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
+	int hfr = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
 	if (hfr < fr_old.y - STEP_SIZE / 2)
 		rot += SpeedBoatDoShif(boat, &fr, &fr_old);
-
+	
+	int hf = 0;
 	if (!slip)
 	{
 		hf = SpeedBoatTestWaterHeight(boat, BOAT_TIP, 0, &f);
@@ -565,20 +557,20 @@ int SpeedBoatDynamics(short itemNum)
 			SpeedBoatDoShif(boat, &f, &f_old);
 	}
 
-	roomNumber = boat->roomNumber;
-	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &roomNumber);
-	height = GetWaterHeight(boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos, roomNumber);
+	auto collResult = GetCollisionResult(boat);
+	auto height = GetWaterHeight(boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos, collResult.RoomNumber);
 
 	if (height == NO_HEIGHT)
-		height = GetFloorHeight(floor, boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos);
+		height = GetFloorHeight(collResult.Block, boat->pos.xPos, boat->pos.yPos - 5, boat->pos.zPos);
 
 	if (height < boat->pos.yPos - (STEP_SIZE / 2))
 		SpeedBoatDoShif(boat, (PHD_VECTOR*)&boat->pos, &old);
 
 	binfo->extraRotation = rot;
 
-	collide = SpeedBoatGetCollisionAnim(boat, &moved);
+	auto collide = SpeedBoatGetCollisionAnim(boat, &moved);
 
+	int newspeed = 0;
 	if (slip || collide)
 	{
 		newspeed = (boat->pos.zPos - old.z) * phd_cos(boat->pos.yRot) + (boat->pos.xPos - old.x) * phd_sin(boat->pos.yRot);
@@ -827,30 +819,34 @@ void InitialiseSpeedBoat(short itemNum)
 
 void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 {
-	int geton;
-	ITEM_INFO* boat;
-
 	if (litem->hitPoints < 0 || Lara.Vehicle != NO_ITEM)
 		return;
 
-	boat = &g_Level.Items[itemNum];
+	auto boat = &g_Level.Items[itemNum];
 
-	geton = SpeedBoatCheckGeton(itemNum, coll);
-	if (!geton)
+	switch (SpeedBoatCheckGeton(itemNum, coll))
 	{
+	case BoatGetOn::None:
 		coll->Setup.EnableObjectPush = true;
 		ObjectCollision(itemNum, litem, coll);
 		return;
-	}
 
-	if (geton == 2)
+	case BoatGetOn::WaterLeft:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONLW_ANIM;
-	else if (geton == 1)
+		break;
+
+	case BoatGetOn::WaterRight:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONRW_ANIM;
-	else if (geton == 3)
+		break;
+
+	case BoatGetOn::Jump:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETONJ_ANIM;
-	else
+		break;
+
+	case BoatGetOn::StartPosition:
 		litem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + BOAT_GETON_START;
+		break;
+	}
 
 	Lara.waterStatus = LW_ABOVE_WATER;
 	litem->pos.xPos = boat->pos.xPos;
@@ -880,20 +876,18 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll)
 
 void SpeedBoatControl(short itemNumber)
 {
-	ITEM_INFO* boat;
-	BOAT_INFO* binfo;
 	PHD_VECTOR fl, fr, prop;
-	int hfl, hfr, no_turn = 1, drive = 0;
+	int no_turn = 1, drive = 0;
 	FLOOR_INFO* floor;
-	int height, collide, water, ceiling, pitch, h, ofs, nowake;
+	int height, water, ceiling, pitch, h, ofs, nowake;
 	short roomNumber, x_rot, z_rot;
 
-	boat = &g_Level.Items[itemNumber];
-	binfo = (BOAT_INFO*)boat->data;
-	collide = SpeedBoatDynamics(itemNumber);
+	auto boat = &g_Level.Items[itemNumber];
+	auto binfo = (BOAT_INFO*)boat->data;
+	int collide = SpeedBoatDynamics(itemNumber);
 
-	hfl = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
-	hfr = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
+	int hfl = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, -BOAT_SIDE, &fl);
+	int hfr = SpeedBoatTestWaterHeight(boat, BOAT_FRONT, BOAT_SIDE, &fr);
 
 	roomNumber = boat->roomNumber;
 	floor = GetFloor(boat->pos.xPos, boat->pos.yPos, boat->pos.zPos, &roomNumber);
@@ -925,7 +919,6 @@ void SpeedBoatControl(short itemNumber)
 	}
 	else
 	{
-
 		if (boat->speed > BOAT_SLOWDOWN)
 			boat->speed -= BOAT_SLOWDOWN;
 		else

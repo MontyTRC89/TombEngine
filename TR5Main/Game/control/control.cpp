@@ -265,8 +265,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 		}
 
-		GotLaraSpheres = false;
-
 		// Update all items
 		InItemControlLoop = true;
 
@@ -976,6 +974,9 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		}
 	} while (adjoiningRoom != NO_ROOM);
 
+	if (floor->IsWall(x, z))
+		return NO_HEIGHT;
+
 	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
@@ -983,7 +984,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
 
 			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
-				return r->minfloor;
+				return GetCollisionResult(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
+				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 
 			floor = GetSector(r, x - r->x, z - r->z);
 
@@ -1000,7 +1002,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 
 			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
-				return r->maxceiling;
+				return GetCollisionResult(x, r->minfloor, z, floor->RoomBelow(x, r->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, r->minfloor, z);
+				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
 
 			floor = GetSector(r, x - r->x, z - r->z);
 
