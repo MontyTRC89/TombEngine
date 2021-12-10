@@ -10,6 +10,7 @@
 #include "items.h"
 #include "control/control.h"
 #include "Objects/Generic/Object/rope.h"
+#include "Game/Lara/lara_tests.h"
 
 using namespace TEN::Entities::Generic;
 
@@ -34,6 +35,9 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = WALL_SIZE;
+
+	if (TestLastFrame(item))
+		item->goalAnimState = GetNextAnimState(item);
 }
 
 void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
@@ -769,46 +773,10 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 // VERTICAL POLE
 // -------------
 
-bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up)
-{
-	static constexpr auto poleProbeCollRadius = 16.0f;
-
-	bool atLeastOnePoleCollided = false;
-
-	if (GetCollidedObjects(item, WALL_SIZE, true, CollidedItems, nullptr, 0) && CollidedItems[0])
-	{
-		auto laraBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
-
-		// HACK: because Core implemented upward pole movement as SetPosition command, we can't precisely
-		// check her position. So we add a fixed height offset.
-
-		auto offset = up ? -STEP_SIZE : poleProbeCollRadius;
-		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, laraBox.Extents.y * (up ? -1 : 1) + offset, 0), poleProbeCollRadius);
-		
-		int i = 0;
-		while (CollidedItems[i] != NULL)
-		{
-			auto& obj = CollidedItems[i];
-			i++;
-
-			if (obj->objectNumber != ID_POLEROPE)
-				continue;
-
-			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
-			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
-
-			if (poleBox.Intersects(sphere))
-				atLeastOnePoleCollided = true;
-		}
-	}
-
-	return atLeastOnePoleCollided;
-}
-
 // TODO: Move test functions to lara_tests.cpp when lara_state_cleaning_etc branch is merged.
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!TestLaraPoleCollision(item, coll, true))
+	if (!TestLaraPoleCollision(item, coll, true, STEP_SIZE))
 		return false;
 
 	// TODO: Accuracy.
