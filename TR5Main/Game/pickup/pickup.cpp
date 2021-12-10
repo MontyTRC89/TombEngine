@@ -345,7 +345,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) && 
 		(g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
 		BinocularRange ||
-		(l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || lara->gunStatus) &&
+		(l->currentAnimState != LS_IDLE || l->animNumber != LA_STAND_IDLE || lara->gunStatus) &&
 		(l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || lara->gunStatus) &&
 		(l->currentAnimState != LS_CRAWL_IDLE || l->animNumber != LA_CRAWL_IDLE))
 	{
