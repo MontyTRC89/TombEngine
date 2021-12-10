@@ -265,7 +265,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->animNumber = LA_STAND_IDLE;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
-		item->currentAnimState = LS_TEST_1;
+		item->currentAnimState = LS_MONKEY_VAULT;
 
 		return true;
 	}
