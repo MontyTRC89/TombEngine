@@ -14,7 +14,7 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer;
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
-	void Renderer11::collectRooms(RenderView &renderView)
+	void Renderer11::collectRooms(RenderView &renderView, bool onlyRooms)
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
@@ -26,7 +26,7 @@ namespace TEN::Renderer
 			m_rooms[i].Visited = false;
 		}
 
-		getVisibleObjects(-1, baseRoomIndex, renderView);
+		getVisibleObjects(-1, baseRoomIndex, renderView, onlyRooms);
 	}
 
 	void Renderer11::collectItems(short roomNumber, RenderView &renderView)

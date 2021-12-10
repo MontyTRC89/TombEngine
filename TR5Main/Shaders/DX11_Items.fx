@@ -51,10 +51,13 @@ struct PixelShaderInput
 	float3x3 TBN : TBN;
 	float Fog : FOG;
 };
-Texture2D NormalTexture : register(t2);
+
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
-TextureCube Reflection : register (t1);
+
+Texture2D NormalTexture : register(t1);
+
+//TextureCube Reflection : register (t4);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -122,7 +125,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		clip(output.w - 0.5f);
 
 	float3 lighting = AmbientLight.xyz;
-	float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
+	//float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
+	//lighting = reflectionColor.xyz;
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Position.w;
