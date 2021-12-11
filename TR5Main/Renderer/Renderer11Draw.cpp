@@ -1935,14 +1935,11 @@ namespace TEN::Renderer
         }
 
         dynamicLight->Position = Vector3(float(x), float(y), float(z));
-        //dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
         dynamicLight->Out = falloff * 256.0f;
         dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-        dynamicLight->Dynamic = true;
         dynamicLight->Intensity = 2.0f;
 
         m_dynamicLights.push_back(dynamicLight);
-        //NumDynamics++;
     }
 
     void Renderer11::clearDynamicLights()

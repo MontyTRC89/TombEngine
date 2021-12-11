@@ -118,7 +118,7 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector3 Position;
 		int Type;
 		DirectX::SimpleMath::Vector3 Color;
-		int Dynamic;
+		float LocalIntensity;
 		DirectX::SimpleMath::Vector3 Direction;
 		float Distance;
 		float Intensity;
@@ -507,7 +507,6 @@ namespace TEN::Renderer
 		void collectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
 		void collectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
 		void collectLightsForRoom(short roomNumber, RenderView& renderView);
-		void prepareLights(RenderView& view);
 		void collectEffects(short roomNumber, RenderView& renderView);
 		void clearSceneItems();
 		void updateItemsAnimations(RenderView& view);
