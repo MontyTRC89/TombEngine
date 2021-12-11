@@ -230,6 +230,14 @@ namespace TEN::Renderer
 
 		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
 
+		if (nativeItem->objectNumber == ID_LARA)
+		{
+			shadowLight = nullptr;
+		}
+
+		RendererLight* brightestLight = NULL;
+		float brightest = 0.0f;
+
 		// Dynamic lights have the priority
 		for (int i = 0; i < m_dynamicLights.size(); i++)
 		{
@@ -241,18 +249,14 @@ namespace TEN::Renderer
 			if (distance > light->Out)
 				continue;
 
+			float attenuation = 1.0f - distance / light->Out;
+			float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+			light->LocalIntensity = intensity;
 			light->Distance = distance;
 
 			tempLights.push_back(light);
 		}
-
-		if (nativeItem->objectNumber == ID_LARA)
-		{
-			shadowLight = nullptr;
-		}
-
-		RendererLight* brightestLight = NULL;
-		float brightest = 0.0f;
 
 		int numLights = room.Lights.size();
 
@@ -265,6 +269,7 @@ namespace TEN::Renderer
 			{
 				// Sun is added without checks
 				light->Distance = D3D11_FLOAT32_MAX;
+				light->LocalIntensity = 0;
 			}
 			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
 			{
@@ -280,12 +285,14 @@ namespace TEN::Renderer
 				if (distance > light->Out)
 					continue;
 
+				float attenuation = 1.0f - distance / light->Out;
+				float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				light->LocalIntensity = intensity;
+
 				// If Lara, try to collect shadow casting light
 				if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 				{
-					float attenuation = 1.0f - distance / light->Out;
-					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
 					if (intensity >= brightest)
 					{
 						brightest = intensity;
@@ -309,12 +316,14 @@ namespace TEN::Renderer
 				if (distance > light->Range)
 					continue;
 
+				float attenuation = 1.0f - distance / light->Range;
+				float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+				light->LocalIntensity = intensity;
+
 				// If Lara, try to collect shadow casting light
 				if (nativeItem->objectNumber == ID_LARA)
-				{
-					float attenuation = 1.0f - distance / light->Range;
-					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
+				{		
 					if (intensity >= brightest)
 					{
 						brightest = intensity;
@@ -343,22 +352,24 @@ namespace TEN::Renderer
 			tempLights.begin(),
 			tempLights.end(),
 			[](RendererLight* a, RendererLight* b) {
-				return a->Distance > b->Distance;
+				return a->LocalIntensity > b->LocalIntensity;
 			}
 		);
 
 		// Add max 8 lights per item, including the shadow light for Lara eventually
-		numLights = std::min((size_t)MAX_LIGHTS_PER_ITEM, tempLights.size());
 		if (shadowLight != nullptr)
 		{
 			item->LightsToDraw.push_back(shadowLight);
-			numLights--;
 		}
-		for (int i = 0; i < numLights; i++)
+		for (int i = 0; i < tempLights.size(); i++)
 		{
 			if (shadowLight != nullptr && shadowLight == tempLights[i])
 				continue;
+
 			item->LightsToDraw.push_back(tempLights[i]);
+
+			if (item->LightsToDraw.size() == MAX_LIGHTS_PER_ITEM)
+				break;
 		}
 	}
 
@@ -385,85 +396,6 @@ namespace TEN::Renderer
 				&& sphereBoxIntersection(boxMin, boxMax, center, light->Out))
 				renderView.lightsToDraw.push_back(light);
 		}
-	}
-
-	void Renderer11::prepareLights(RenderView& view)
-	{
-		// Add dynamic lights
-		for (int i = 0; i < m_dynamicLights.size(); i++)
-			if (view.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1)
-				view.lightsToDraw.push_back(m_dynamicLights[i]);
-
-		// Now I have a list full of draw. Let's sort them.
-		//std::sort(m_lightsToDraw.begin(), m_lightsToDraw.end(), SortLightsFunction);
-		//m_lightsToDraw.Sort(SortLightsFunction);
-
-		// Let's draw first 32 lights
-		//if (m_lightsToDraw.size() > 32)
-		//	m_lightsToDraw.resize(32);
-
-		// Now try to search for a shadow caster, using Lara as reference
-		RendererRoom& room = m_rooms[LaraItem->roomNumber];
-
-		// Search for the brightest light. We do a simple version of the classic calculation done in pixel shader.
-		RendererLight* brightestLight = NULL;
-		float brightest = 0.0f;
-
-		// Try room lights
-		
-		for (int j = 0; j < room.Lights.size(); j++)
-		{
-			RendererLight *light = &room.Lights[j];
-
-			Vector4 itemPos = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-			Vector4 lightVector = itemPos - light->Position;
-
-			float distance = lightVector.Length();
-			lightVector.Normalize();
-
-			float intensity;
-			float attenuation;
-			float angle;
-			float d;
-			float attenuationRange;
-			float attenuationAngle;
-
-			switch ((int)light->Type)
-			{
-			case LIGHT_TYPES::LIGHT_TYPE_POINT:
-				if (distance > light->Out || light->Out < 2048.0f)
-					continue;
-
-				attenuation = 1.0f - distance / light->Out;
-				intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-				if (intensity >= brightest)
-				{
-					brightest = intensity;
-					brightestLight = light;
-				}
-
-				break;
-
-			case LIGHT_TYPES::LIGHT_TYPE_SPOT:
-				if (distance > light->Range)
-					continue;
-
-				attenuation = 1.0f - distance / light->Range;
-				intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-				if (intensity >= brightest)
-				{
-					brightest = intensity;
-					brightestLight = light;
-				}
-
-				break;
-			}
-		}
-
-		// If the brightest light is found, then fill the data structure. We ignore for now dynamic lights for shadows.
-		shadowLight = brightestLight;
 	}
 
 	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)

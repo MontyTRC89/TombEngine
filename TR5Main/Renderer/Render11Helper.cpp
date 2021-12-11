@@ -576,13 +576,6 @@ namespace TEN::Renderer
 		dxgiFactory->Release();
 	}
 
-	int SortLightsFunction(RendererLight *a, RendererLight *b)
-	{
-		if (a->Dynamic > b->Dynamic)
-			return -1;
-		return 0;
-	}
-
 	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
 	{
 		// Avoid allocations, 1024 should be fine

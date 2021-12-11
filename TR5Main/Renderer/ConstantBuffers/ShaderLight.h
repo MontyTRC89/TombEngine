@@ -5,7 +5,7 @@ struct alignas(16) ShaderLight
 	Vector3 Position;
 	int Type;
 	Vector3 Color;
-	int Dynamic;
+	int LocalIntensity;
 	Vector3 Direction;
 	float Distance;
 	float Intensity;

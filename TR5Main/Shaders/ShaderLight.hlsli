@@ -10,7 +10,7 @@ struct ShaderLight {
 	float3 Position;
 	int Type;
 	float3 Color;
-	int Dynamic;
+	float LocalIntensity;
 	float3 Direction;
 	float Distance;
 	float Intensity;
