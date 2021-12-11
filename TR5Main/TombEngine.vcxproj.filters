@@ -748,6 +748,6 @@
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
-    <None Include="Shaders\FogBuffer.hlsli" />
+    <None Include="Shaders\ShaderLight.hlsli" />
   </ItemGroup>
 </Project>

@@ -53,48 +53,6 @@ namespace TEN::Renderer
 		return &m_adapters;
 	}
 
-	void Renderer11::createBillboardMatrix(Matrix *out, Vector3 *particlePos, Vector3 *cameraPos, float rotation)
-	{
-		/*
-		Vector3 look = *particlePos;
-		look = look - *cameraPos;
-		look.Normalize();
-
-		*out = Matrix::CreateBillboard(*particlePos, *cameraPos, cameraUp);
-
-		Vector3 right;
-		right = cameraUp.Cross(look);
-		right.Normalize();
-
-		// Rotate right vector
-		Matrix rightTransform = Matrix::CreateFromAxisAngle(look, rotation);
-		right = Vector3::Transform(right, rightTransform);
-
-		Vector3 up;
-		up = look.Cross(right);
-		up.Normalize();
-
-		*out = Matrix::Identity;
-
-		out->_11 = right.x;
-		out->_12 = right.y;
-		out->_13 = right.z;
-
-		out->_21 = up.x;
-		out->_22 = up.y;
-		out->_23 = up.z;
-
-		out->_31 = look.x;
-		out->_32 = look.y;
-		out->_33 = look.z;
-
-		out->_41 = particlePos->x;
-		out->_42 = particlePos->y;
-		out->_43 = particlePos->z;
-		*/
-	}
-
-
 	void Renderer11::updateEffects(RenderView& view)
 	{
 		for (auto room : view.roomsToDraw)
@@ -195,19 +153,24 @@ namespace TEN::Renderer
 		}
 
 		// Apply mutations on top
-		if (item && item->Item->mutator.size() == boneIndexList.size()) // Paranoid
+		if (item) 
 		{
-			for (int i = 0; i < boneIndexList.size(); i++)
+			ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+
+			if (nativeItem->mutator.size() == boneIndexList.size())
 			{
-				auto mutator = item->Item->mutator[boneIndexList[i]];
-				if (mutator.IsEmpty())
-					continue;
+				for (int i : boneIndexList)
+				{
+					auto mutator = nativeItem->mutator[i];
+					if (mutator.IsEmpty())
+						continue;
 
-				auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
-				auto s = Matrix::CreateScale(mutator.Scale);
-				auto t = Matrix::CreateTranslation(mutator.Offset);
+					auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
+					auto s = Matrix::CreateScale(mutator.Scale);
+					auto t = Matrix::CreateTranslation(mutator.Offset);
 
-				transforms[boneIndexList[i]] = m * s * t * transforms[boneIndexList[i]];
+					transforms[i] = m * s * t * transforms[i];
+				}
 			}
 		}
 	}
@@ -223,22 +186,22 @@ namespace TEN::Renderer
 
 	void Renderer11::updateItemAnimations(int itemNumber, bool force)
 	{
-		RendererItem *itemToDraw = &m_items[itemNumber];
-		itemToDraw->Id = itemNumber;
-		itemToDraw->Item = &g_Level.Items[itemNumber];
+		RendererItem* itemToDraw = &m_items[itemNumber];
+		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
 
-		ITEM_INFO *item = itemToDraw->Item;
-		
+		// TODO: hack for fixing a bug, check again if needed
+		itemToDraw->ItemNumber = itemNumber;
+
 		// Lara has her own routine
-		if (item->objectNumber == ID_LARA)
+		if (nativeItem->objectNumber == ID_LARA)
 			return;
 
 		// Has been already done?
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		OBJECT_INFO *obj = &Objects[item->objectNumber];
-		RendererObject &moveableObj = *m_moveableObjects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+		RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
 
 		// Update animation matrices
 		if (obj->animIndex != -1 /*&& item->objectNumber != ID_HARPOON*/)
@@ -250,42 +213,42 @@ namespace TEN::Renderer
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
-				item->data.apply(
-				[&j, &currentBone](QUAD_INFO& quad) {
-				if(j == 3 || j == 4) {
-					currentBone->ExtraRotation.x = TO_RAD(quad.rearRot);
-				} else if(j == 6 || j == 7) {
-					currentBone->ExtraRotation.x = TO_RAD(quad.frontRot);
-				}
+				nativeItem->data.apply(
+					[&j, &currentBone](QUAD_INFO& quad) {
+					if(j == 3 || j == 4) {
+						currentBone->ExtraRotation.x = TO_RAD(quad.rearRot);
+					} else if(j == 6 || j == 7) {
+						currentBone->ExtraRotation.x = TO_RAD(quad.frontRot);
+					}
 				},
 				[&j, &currentBone](JEEP_INFO& jeep) {
-				switch(j) {
-				case 9:
-					currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
-					break;
-				case 10:
-					currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
+					switch(j) {
+					case 9:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
+						break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
 
-					break;
-				case 12:
-					currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
+						break;
+					case 12:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
 
-					break;
-				case 13:
-					currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
+						break;
+					case 13:
+						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
 
-					break;
-				}
+						break;
+					}
 				},
 				[&j, &currentBone](MOTORBIKE_INFO& bike) {
 				switch(j) {
-				case 2:
-				case 4:
-					currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
-					break;
-				case 10:
-					currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
-				}
+					case 2:
+					case 4:
+						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
+						break;
+					case 10:
+						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
+					}
 				},
 				[&j, &currentBone](RUBBER_BOAT_INFO& boat) {
 				if(j == 2)
@@ -320,11 +283,11 @@ namespace TEN::Renderer
 
 			ANIM_FRAME* framePtr[2];
 			int rate;
-			int frac = GetFrame(item, framePtr, &rate);
+			int frac = GetFrame(nativeItem, framePtr, &rate);
 
 			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
-			for (int m = 0; m < itemToDraw->NumMeshes; m++)
+			for (int m = 0; m < obj->nmeshes; m++)
 				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 		}
 
@@ -339,13 +302,13 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				ITEM_INFO* item = itemToDraw->Item;
+				ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
 
 				// Lara has her own routine
-				if (item->objectNumber == ID_LARA)
+				if (nativeItem->objectNumber == ID_LARA)
 					continue;
 
-				updateItemAnimations(itemToDraw->Id, false);
+				updateItemAnimations(itemToDraw->ItemNumber, false);
 			}
 		}
 	}
@@ -810,11 +773,11 @@ namespace TEN::Renderer
 	void Renderer11::getItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
-		rendererItem->Id = itemNumber;
-		rendererItem->Item = &g_Level.Items[itemNumber];
-		ITEM_INFO *item = rendererItem->Item;
+		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
 
-		if (!item)
+		rendererItem->ItemNumber = itemNumber;
+
+		if (!rendererItem)
 			return;
 
 		if (!rendererItem->DoneAnimations)
@@ -831,15 +794,15 @@ namespace TEN::Renderer
 
 	int Renderer11::getSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
 	{
-		RendererItem *rendererItem = &m_items[itemNumber];
-		rendererItem->Id = itemNumber;
-		rendererItem->Item = &g_Level.Items[itemNumber];
-		ITEM_INFO *item = rendererItem->Item;
+		RendererItem* itemToDraw = &m_items[itemNumber];
+		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
 
-		if (!item)
+		itemToDraw->ItemNumber = itemNumber;
+
+		if (!nativeItem)
 			return 0;
 
-		if (!rendererItem->DoneAnimations)
+		if (!itemToDraw->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
 				updateLaraAnimations(false);
@@ -850,25 +813,26 @@ namespace TEN::Renderer
 		Matrix world;
 
 		if (worldSpace & SPHERES_SPACE_WORLD)
-			world = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos) * local;
+			world = Matrix::CreateTranslation(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos) * local;
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot), TO_RAD(item->pos.xRot), TO_RAD(item->pos.zRot)) * world;
+		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->pos.yRot), TO_RAD(nativeItem->pos.xRot), TO_RAD(nativeItem->pos.zRot)) * world;
 
-		short objNum = item->objectNumber;
+		short objNum = nativeItem->objectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;
-		RendererObject &moveable = *m_moveableObjects[objNum];
 
-		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
+		RendererObject& moveable = *m_moveableObjects[objNum];
+
+		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
 		{
-			RendererMesh *mesh = moveable.ObjectMeshes[i];
+			auto mesh = moveable.ObjectMeshes[i];
 
 			Vector3 pos = mesh->Sphere.Center;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
 				pos += moveable.LinearizedBones[i]->Translation;
 
-			spheres[i].Center = Vector3::Transform(pos, (rendererItem->AnimationTransforms[i] * world));
+			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimationTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
 
 			// Spheres debug
@@ -890,9 +854,12 @@ namespace TEN::Renderer
 		else
 		{
 			updateItemAnimations(itemNumber, true);
-			RendererItem& item = m_items[itemNumber];
-			RendererObject& obj = *m_moveableObjects[item.Item->objectNumber];
-			*outMatrix = obj.AnimationTransforms[joint] * item.World;
+			
+			RendererItem* rendererItem = &m_items[itemNumber];
+			ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
+
+			RendererObject& obj = *m_moveableObjects[nativeItem->objectNumber];
+			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;
 		}
 	}
-} // namespace TEN::Renderer
+}

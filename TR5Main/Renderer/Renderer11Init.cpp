@@ -48,7 +48,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	std::string shadowSizeString = std::to_string(g_Configuration.shadowMapSize);
 	const D3D_SHADER_MACRO roomDefines[] = {"SHADOW_MAP_SIZE",shadowSizeString.c_str(),nullptr,nullptr};
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "SHADOW_MAP_SIZE",shadowSizeString.c_str(),"ANIMATED" ,"",nullptr,nullptr };
-
+	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefines[0], blob);
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -127,7 +127,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
-		m_items[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
