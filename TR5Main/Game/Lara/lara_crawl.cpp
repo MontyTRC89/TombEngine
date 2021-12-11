@@ -485,7 +485,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
 			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -493,7 +493,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
 			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
@@ -588,7 +588,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
 			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
+		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
@@ -596,7 +596,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
 			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
-		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_MAX_RATE);
+		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
 	if ((TrInput & IN_DUCK || info->keepCrouched) &&
