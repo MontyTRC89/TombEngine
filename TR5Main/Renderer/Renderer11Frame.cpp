@@ -14,6 +14,7 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer;
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
+
 	void Renderer11::collectRooms(RenderView &renderView, bool onlyRooms)
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
@@ -41,8 +42,6 @@ namespace TEN::Renderer
 		short itemNum = NO_ITEM;
 		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
 		{
-			//printf("ItemNum: %d, NextItem: %d\n", itemNum, g_Level.Items[itemNum].nextItem);
-
 			ITEM_INFO* item = &g_Level.Items[itemNum];
 
 			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
@@ -65,16 +64,17 @@ namespace TEN::Renderer
 				continue;
 
 			auto newItem = &m_items[itemNum];
-			newItem->Item = item;
-			newItem->Id = itemNum;
-			newItem->NumMeshes = Objects[item->objectNumber].nmeshes;
+
+			newItem->ItemNumber = itemNum;
 			newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot),
 															   TO_RAD(item->pos.xRot),
 															   TO_RAD(item->pos.zRot));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
+
 			collectLightsForItem(item->roomNumber, newItem, renderView);
+
 			room.ItemsToDraw.push_back(newItem);
 		}
 	}
@@ -143,7 +143,7 @@ namespace TEN::Renderer
 
 		int numLights = room.Lights.size();
 
-		m_shadowLight = NULL;
+		shadowLight = NULL;
 		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
 
@@ -215,22 +215,25 @@ namespace TEN::Renderer
 
 	void Renderer11::collectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
 	{
-		item->Lights.clear();
+		item->LightsToDraw.clear();
+
 		if (m_rooms.size() < roomNumber){
 			return;
 		}
 
 		RendererRoom& room = m_rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
+		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
-		LinearArrayBuffer<RendererLight*, 8> tempLights;
+		std::vector<RendererLight*> tempLights;
+		tempLights.reserve(MAX_LIGHTS_DRAW);
 
-		Vector3 itemPosition = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
 
 		// Dynamic lights have the priority
 		for (int i = 0; i < m_dynamicLights.size(); i++)
 		{
-			RendererLight *light = m_dynamicLights[i];
+			RendererLight* light = m_dynamicLights[i];
 
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -238,23 +241,30 @@ namespace TEN::Renderer
 			if (distance > light->Out)
 				continue;
 
+			light->Distance = distance;
+
 			tempLights.push_back(light);
 		}
 
-		int numLights = room.Lights.size();
+		if (nativeItem->objectNumber == ID_LARA)
+		{
+			shadowLight = nullptr;
+		}
 
-		m_shadowLight = NULL;
-		RendererLight *brightestLight = NULL;
+		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
+
+		int numLights = room.Lights.size();
 
 		for (int j = 0; j < numLights; j++)
 		{
-			RendererLight *light = &room.Lights[j];
+			RendererLight* light = &room.Lights[j];
 
 			// Check only lights different from sun
 			if (light->Type == LIGHT_TYPE_SUN)
 			{
 				// Sun is added without checks
+				light->Distance = D3D11_FLOAT32_MAX;
 			}
 			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
 			{
@@ -271,7 +281,7 @@ namespace TEN::Renderer
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (item->Item->objectNumber == ID_LARA)
+				if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 				{
 					float attenuation = 1.0f - distance / light->Out;
 					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
@@ -282,6 +292,8 @@ namespace TEN::Renderer
 						brightestLight = light;
 					}
 				}
+
+				light->Distance = distance;
 			}
 			else if (light->Type == LIGHT_TYPE_SPOT)
 			{
@@ -298,7 +310,7 @@ namespace TEN::Renderer
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (item->Item->objectNumber == ID_LARA)
+				if (nativeItem->objectNumber == ID_LARA)
 				{
 					float attenuation = 1.0f - distance / light->Range;
 					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
@@ -309,6 +321,8 @@ namespace TEN::Renderer
 						brightestLight = light;
 					}
 				}
+
+				light->Distance = distance;
 			}
 			else
 			{
@@ -319,14 +333,32 @@ namespace TEN::Renderer
 			tempLights.push_back(light);
 		} 
 
-		for (int i = 0; i < std::min(static_cast<size_t>(MAX_LIGHTS_PER_ITEM), tempLights.size()); i++)
+		if (nativeItem->objectNumber == ID_LARA)
 		{
-			item->Lights.push_back(tempLights[i]);
+			shadowLight = brightestLight;
 		}
 
-		if (item->Item->objectNumber == ID_LARA)
+		// Sort lights by distance
+		std::sort(
+			tempLights.begin(),
+			tempLights.end(),
+			[](RendererLight* a, RendererLight* b) {
+				return a->Distance > b->Distance;
+			}
+		);
+
+		// Add max 8 lights per item, including the shadow light for Lara eventually
+		numLights = std::min((size_t)MAX_LIGHTS_PER_ITEM, tempLights.size());
+		if (shadowLight != nullptr)
 		{
-			m_shadowLight = brightestLight;
+			item->LightsToDraw.push_back(shadowLight);
+			numLights--;
+		}
+		for (int i = 0; i < numLights; i++)
+		{
+			if (shadowLight != nullptr && shadowLight == tempLights[i])
+				continue;
+			item->LightsToDraw.push_back(tempLights[i]);
 		}
 	}
 
@@ -431,7 +463,7 @@ namespace TEN::Renderer
 		}
 
 		// If the brightest light is found, then fill the data structure. We ignore for now dynamic lights for shadows.
-		m_shadowLight = brightestLight;
+		shadowLight = brightestLight;
 	}
 
 	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)

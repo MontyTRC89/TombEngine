@@ -1,4 +1,5 @@
 #include "./CameraMatrixBuffer.hlsli"
+#include "./VertexInput.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b1)
 {
@@ -11,8 +12,6 @@ cbuffer MiscBuffer : register(b3)
 {
 	int AlphaTest;
 };
-
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {
@@ -37,6 +36,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color * Color;
 	output.UV = input.UV;
 
+	// Apply distance fog
 	float4 d = length(CamPositionWS - worldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
@@ -52,9 +52,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	if (AlphaTest && output.w < 0.01f) {
 		discard;
 	}
+
 	float3 colorMul = min(input.Color.xyz, 1.0f);
 	output.xyz = output.xyz * colorMul.xyz;
-	//output.w = 1.0f;
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);

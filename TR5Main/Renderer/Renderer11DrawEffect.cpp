@@ -538,9 +538,9 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-		m_stLights.NumLights = item->Lights.size();
-		for (int j = 0; j < item->Lights.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+		m_stLights.NumLights = item->LightsToDraw.size();
+		for (int j = 0; j < item->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
@@ -639,19 +639,20 @@ namespace TEN::Renderer
 			for (auto item : room->ItemsToDraw)
 			{
 				// Does the item need gunflash?
-				OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
-				if (obj->biteOffset == -1 || !item->Item->firedWeapon)
+				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+				OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+				if (obj->biteOffset == -1 || !nativeItem->firedWeapon)
 					continue;
 
-				RendererRoom const& room = m_rooms[item->Item->roomNumber];
+				RendererRoom const& room = m_rooms[nativeItem->roomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 				m_stItem.AmbientLight = room.AmbientLight;
 				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-				m_stLights.NumLights = item->Lights.size();
-				for (int j = 0; j < item->Lights.size(); j++)
-					memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+				m_stLights.NumLights = item->LightsToDraw.size();
+				for (int j = 0; j < item->LightsToDraw.size(); j++)
+					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 				m_cbLights.updateData(m_stLights, m_context.Get());
 				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 

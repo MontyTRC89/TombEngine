@@ -54,8 +54,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	Matrix world;
 
 	RendererItem *item = &m_items[Lara.itemNumber];
-	item->Id = Lara.itemNumber;
-	item->Item = LaraItem;
+	item->ItemNumber = Lara.itemNumber;
 
 	if (!force && item->DoneAnimations)
 		return;
@@ -259,9 +258,9 @@ void TEN::Renderer::Renderer11::drawLara(RenderView& view, bool transparent, boo
 
 	if (!shadowMap)
 	{
-		m_stLights.NumLights = item->Lights.size();
-		for (int j = 0; j < item->Lights.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+		m_stLights.NumLights = item->LightsToDraw.size();
+		for (int j = 0; j < item->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 	}

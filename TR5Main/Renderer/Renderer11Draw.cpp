@@ -164,83 +164,7 @@ namespace TEN::Renderer
 
     void Renderer11::renderShadowMap(RenderView& renderView)
     {
-        m_shadowLight = NULL;
-        RendererLight *brightestLight = NULL;
-        float brightest = 0.0f;
-        Vector3 itemPosition = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-
-        for (int k = 0; k < renderView.roomsToDraw.size(); k++)
-        {
-            RendererRoom *room = renderView.roomsToDraw[k];
-            int numLights = room->Lights.size();
-
-            for (int j = 0; j < numLights; j++)
-            {
-                RendererLight *light = &room->Lights[j];
-
-                // Check only lights different from sun
-                if (light->Type == LIGHT_TYPE_SUN)
-                {
-                    // Sun is added without checks
-                }
-                else if (light->Type == LIGHT_TYPE_POINT)
-                {
-                    Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-                    float distance = (itemPosition - lightPosition).Length();
-
-                    // Collect only lights nearer than 20 sectors
-                    if (distance >= 20 * WALL_SIZE)
-                        continue;
-
-                    // Check the out radius
-                    if (distance > light->Out)
-                        continue;
-
-                    float attenuation = 1.0f - distance / light->Out;
-                    float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-                    if (intensity >= brightest)
-                    {
-                        brightest = intensity;
-                        brightestLight = light;
-                    }
-                }
-                else if (light->Type == LIGHT_TYPE_SPOT)
-                {
-                    Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-                    float distance = (itemPosition - lightPosition).Length();
-
-                    // Collect only lights nearer than 20 sectors
-                    if (distance >= 20 * WALL_SIZE)
-                        continue;
-
-                    // Check the range
-                    if (distance > light->Range)
-                        continue;
-
-                    // If Lara, try to collect shadow casting light
-                    float attenuation = 1.0f - distance / light->Range;
-                    float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-                    if (intensity >= brightest)
-                    {
-                        brightest = intensity;
-                        brightestLight = light;
-                    }
-                }
-                else
-                {
-                    // Invalid light type
-                    continue;
-                }
-            }
-        }
-
-        m_shadowLight = brightestLight;
-
-        if (m_shadowLight == NULL)
+        if (shadowLight == nullptr)
             return;
 
         // Reset GPU state
@@ -257,7 +181,7 @@ namespace TEN::Renderer
 
         //drawLara(false, true);
 
-        Vector3 lightPos = Vector3(m_shadowLight->Position.x, m_shadowLight->Position.y, m_shadowLight->Position.z);
+        Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
         Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
         if (lightPos == itemPos)
             return;
@@ -283,7 +207,7 @@ namespace TEN::Renderer
                                            itemPos,
                                            Vector3(0.0f, -1.0f, 0.0f));
         Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
-                                                                 (m_shadowLight->Type == LIGHT_TYPE_POINT ? m_shadowLight->Out : m_shadowLight->Range) * 1.2f);
+                                                                 (shadowLight->Type == LIGHT_TYPE_POINT ? shadowLight->Out : shadowLight->Range) * 1.2f);
         CCameraMatrixBuffer shadowProjection;
         shadowProjection.ViewProjection = view * projection;
         m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
@@ -435,9 +359,9 @@ namespace TEN::Renderer
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-        m_stLights.NumLights = item->Lights.size();
-        for (int j = 0; j < item->Lights.size(); j++)
-            memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+        m_stLights.NumLights = item->LightsToDraw.size();
+        for (int j = 0; j < item->LightsToDraw.size(); j++)
+            memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
         m_cbLights.updateData(m_stLights, m_context.Get());
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
@@ -2222,7 +2146,7 @@ namespace TEN::Renderer
                         }
                         else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
                             (oldInfo->blendMode != face.info.blendMode
-                                || oldInfo->item->Id != face.info.item->Id
+                                || oldInfo->item->ItemNumber != face.info.item->ItemNumber
                                 || m_transparentFacesIndices.size() + (face.info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
                         {
                             outputPolygons = true;
@@ -2457,10 +2381,10 @@ namespace TEN::Renderer
         bindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
         // Set shadow map data
-        if (m_shadowLight != NULL)
+        if (shadowLight != NULL)
         {
 
-            memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
+            memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
         }
@@ -2616,7 +2540,7 @@ namespace TEN::Renderer
         updateEffects(view);
         if (g_Configuration.EnableShadows)
             renderShadowMap(view);
-        m_items[Lara.itemNumber].Item = LaraItem;
+        m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
         auto time2 = std::chrono::high_resolution_clock::now();
@@ -2809,14 +2733,14 @@ namespace TEN::Renderer
         {
             for (auto itemToDraw : room->ItemsToDraw)
             {
-                ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->Id];
+                ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
                 RendererRoom& room = m_rooms[nativeItem->roomNumber];
                 RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
 
                 if (moveableObj.DoNotDraw)
                     continue;
 
-                short objectNumber = itemToDraw->Item->objectNumber;
+                short objectNumber = nativeItem->objectNumber;
 
                 if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
                 {
@@ -2847,21 +2771,22 @@ namespace TEN::Renderer
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
-        RendererRoom& room = m_rooms[item->Item->roomNumber];
-        RendererObject& moveableObj = *m_moveableObjects[item->Item->objectNumber];
-        OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
+        ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+        RendererRoom& room = m_rooms[nativeItem->roomNumber];
+        RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
+        OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
 
         m_stItem.World = item->World;
-        m_stItem.Position = Vector4(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos, 1.0f);
+        m_stItem.Position = Vector4(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos, 1.0f);
         m_stItem.AmbientLight = room.AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
         m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
         m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
-        m_stLights.NumLights = item->Lights.size();
-        for (int j = 0; j < item->Lights.size(); j++)
-            memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+        m_stLights.NumLights = item->LightsToDraw.size();
+        for (int j = 0; j < item->LightsToDraw.size(); j++)
+            memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
         m_cbLights.updateData(m_stLights, m_context.Get());
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
@@ -2870,12 +2795,12 @@ namespace TEN::Renderer
         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
         for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++) {
-            if (!(item->Item->meshBits & (1 << k)))
+            if (!(nativeItem->meshBits & (1 << k)))
                 continue;
 
             RendererMesh *mesh = moveableObj.ObjectMeshes[k];
 
-            if (obj->meshSwapSlot != -1 && ((item->Item->swapMeshFlags >> k) & 1)) 
+            if (obj->meshSwapSlot != -1 && ((nativeItem->swapMeshFlags >> k) & 1)) 
 			{
                 RendererObject &swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
 				if (swapMeshObj.ObjectMeshes.size() > k)
@@ -2902,7 +2827,7 @@ namespace TEN::Renderer
                         face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
                         face.info.polygon = p;
                         face.distance = distance;
-                        face.info.position = Vector3(item->Item->pos.xPos, item->Item->pos.yPos, item->Item->pos.zPos);
+                        face.info.position = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
                         face.info.animated = bucket.animated;
                         face.info.texture = bucket.texture;
                         face.info.room = &room;
@@ -2935,9 +2860,10 @@ namespace TEN::Renderer
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
-        RendererRoom& room = m_rooms[info->item->Item->roomNumber];
-        RendererObject& moveableObj = *m_moveableObjects[info->item->Item->objectNumber];
-        OBJECT_INFO* obj = &Objects[info->item->Item->objectNumber];
+        ITEM_INFO* nativeItem = &g_Level.Items[info->item->ItemNumber];
+        RendererRoom& room = m_rooms[nativeItem->roomNumber];
+        RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
+        OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
 
         // Set shaders
         m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
@@ -2951,9 +2877,9 @@ namespace TEN::Renderer
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
         m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
 
-        m_stLights.NumLights = info->item->Lights.size();
-        for (int j = 0; j < info->item->Lights.size(); j++)
-            memcpy(&m_stLights.Lights[j], info->item->Lights[j], sizeof(ShaderLight));
+        m_stLights.NumLights = info->item->LightsToDraw.size();
+        for (int j = 0; j < info->item->LightsToDraw.size(); j++)
+            memcpy(&m_stLights.Lights[j], info->item->LightsToDraw[j], sizeof(ShaderLight));
         m_cbLights.updateData(m_stLights, m_context.Get());
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
@@ -2986,25 +2912,27 @@ namespace TEN::Renderer
 
     void Renderer11::drawDarts(RenderView& view, RendererItem* item, bool transparent, bool animated)
     {
+        ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+        
         Vector3 start = Vector3(
-            item->Item->pos.xPos,
-            item->Item->pos.yPos,
-            item->Item->pos.zPos);
+            nativeItem->pos.xPos,
+            nativeItem->pos.yPos,
+            nativeItem->pos.zPos);
 
-        float speed = (-96 * phd_cos(TO_RAD(item->Item->pos.xRot)));
+        float speed = (-96 * phd_cos(TO_RAD(nativeItem->pos.xRot)));
 
         Vector3 end = Vector3(
-            item->Item->pos.xPos + speed * phd_sin(TO_RAD(item->Item->pos.yRot)),
-            item->Item->pos.yPos + 96 * phd_sin(TO_RAD(item->Item->pos.xRot)),
-            item->Item->pos.zPos + speed * phd_cos(TO_RAD(item->Item->pos.yRot)));
+            nativeItem->pos.xPos + speed * phd_sin(TO_RAD(nativeItem->pos.yRot)),
+            nativeItem->pos.yPos + 96 * phd_sin(TO_RAD(nativeItem->pos.xRot)),
+            nativeItem->pos.zPos + speed * phd_cos(TO_RAD(nativeItem->pos.yRot)));
 
         addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
     }
 
 	void Renderer11::drawWraithExtra(RenderView& view,RendererItem* item, bool transparent, bool animated)
 	{
-		ITEM_INFO* nativeItem = item->Item;
-		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
+        ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+        WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
 		
 		if (transparent || animated)
 			return ;
@@ -3176,9 +3104,9 @@ namespace TEN::Renderer
         bindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
         // Set shadow map data
-        if (m_shadowLight != NULL)
+        if (shadowLight != NULL)
         {
-            memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
+            memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
             m_stShadowMap.CastShadows = true;
             //m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
         }
@@ -3217,7 +3145,6 @@ namespace TEN::Renderer
             {
                 if (isSortingRequired(bucket.blendMode))
                 {
-                    continue;
                     // Collect transparent faces
                     for (int j = 0; j < bucket.Polygons.size(); j++)
                     {
@@ -3461,7 +3388,7 @@ namespace TEN::Renderer
 
     void Renderer11::Draw()
 	{
-        renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+        //renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
         renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
         //drawFinalPass();
