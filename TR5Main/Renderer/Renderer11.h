@@ -116,10 +116,11 @@ namespace TEN::Renderer
 	struct RendererLight
 	{
 		DirectX::SimpleMath::Vector3 Position;
-		float Type;
+		int Type;
 		DirectX::SimpleMath::Vector3 Color;
-		bool Dynamic;
-		DirectX::SimpleMath::Vector4 Direction;
+		int Dynamic;
+		DirectX::SimpleMath::Vector3 Direction;
+		float Distance;
 		float Intensity;
 		float In;
 		float Out;
@@ -168,16 +169,14 @@ namespace TEN::Renderer
 	
 	struct RendererItem
 	{
-		int Id;
-		ITEM_INFO* Item;
+		short ItemNumber;
+		bool DoneAnimations;
 		DirectX::SimpleMath::Matrix World;
 		DirectX::SimpleMath::Matrix Translation;
 		DirectX::SimpleMath::Matrix Rotation;
 		DirectX::SimpleMath::Matrix Scale;
 		DirectX::SimpleMath::Matrix AnimationTransforms[32];
-		int NumMeshes;
-		std::vector<RendererLight*> Lights;
-		bool DoneAnimations;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 	
 	struct RendererMesh
@@ -431,7 +430,7 @@ namespace TEN::Renderer
 		int m_nextLine2D;
 		RendererRect2D* m_rects2DBuffer;
 		int m_nextRect2D;
-		RendererLight* m_shadowLight;
+		RendererLight* shadowLight;
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
 		std::vector<RendererSprite> m_sprites;

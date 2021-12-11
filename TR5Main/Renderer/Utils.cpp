@@ -21,7 +21,21 @@ namespace TEN::Renderer::Utils {
 	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) 
 	{
 		ComPtr<ID3D10Blob> errors;
-		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(),errors.GetAddressOf()));
+		HRESULT res = (D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(),errors.GetAddressOf()));
+		if (FAILED(res))
+		{
+			ID3D10Blob* errorObj = errors.Get();
+			if (errorObj != nullptr)
+			{
+				auto error = std::string((char*)errorObj->GetBufferPointer());
+				TENLog(error, LogLevel::Error);
+				throw std::runtime_error(error);
+			}
+			else
+			{
+				throwIfFailed(res);
+			}
+		}
 		ComPtr<ID3D11VertexShader> shader;
 		throwIfFailed(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 		if constexpr(DebugBuild){

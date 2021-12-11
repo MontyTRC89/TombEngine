@@ -1,20 +1,11 @@
-#include "CameraMatrixBuffer.hlsli"
+#include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
-
-struct RendererLight {
-	float4 Position;
-	float4 Color;
-	float4 Direction;
-	float Intensity;
-	float In;
-	float Out;
-	float Range;
-};
+#include "./ShaderLight.hlsli"
 
 cbuffer LightsBuffer : register(b1)
 {
-	RendererLight Lights[48];
+	ShaderLight Lights[MAX_LIGHTS];
 	int NumLights;
 	float3 Padding;
 };
@@ -25,9 +16,9 @@ cbuffer MiscBuffer : register(b3)
 	int Caustics;
 };
 
-cbuffer CShadowLightBuffer : register(b4)
+cbuffer ShadowLightBuffer : register(b4)
 {
-	RendererLight Light;
+	ShaderLight Light;
 	float4x4 LightViewProjection;
 	int CastShadows;
 	float3 Padding2;
@@ -90,16 +81,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	// Setting effect weight on TE side prevents portal vertices from moving.
 	// Here we just read weight and decide if we should apply refraction or movement effect.
-	
 	float weight = input.Effects.z;
 	
 	// Wibble effect returns different value depending on vertex hash and frame number.
 	// In theory, hash could be affected by WaterScheme value from room.
-	
 	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI2)); // sin from -1 to 1 with a period of 64 frames
 	
 	// Glow
-	
 	if (input.Effects.x > 0.0f)
 	{
 		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
@@ -107,12 +95,10 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 	
 	// Movement
-	
 	if (input.Effects.y > 0.0f)
         pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
 
 	// Refraction
-	
 	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
 	if (CameraUnderwater != Water)
@@ -155,6 +141,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
 	output.TBN = TBN;
 
+	// Apply distance fog
 	float4 d = length(CamPositionWS - output.WorldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
@@ -174,11 +161,10 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	if (AlphaTest && output.w < 0.5f) {
 		discard;
 	}
+
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
-	//Normal = float3(0.5, 0.5, 1);
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
-	//Normal = input.Normal;
 	
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -206,7 +192,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			}
 
 			float shadowFactor = sum / 16.0;
-			lighting = lerp(lighting, min(AmbientColor,lighting), 1-saturate(shadowFactor));
+			lighting = lerp(lighting, min(AmbientColor,lighting), 1 - saturate(shadowFactor));
 		}
 	}
 

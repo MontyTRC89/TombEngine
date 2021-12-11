@@ -881,11 +881,15 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
-    <None Include="Shaders\FogBuffer.hlsli">
+    <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Shaders\Math.hlsli" />
-    <None Include="Shaders\VertexInput.hlsli" />
+    <None Include="Shaders\Math.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Shaders\VertexInput.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
