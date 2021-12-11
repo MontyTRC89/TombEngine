@@ -1049,10 +1049,11 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, STEP_SIZE, coll->Setup.Height);
-
+	
+	// TODO: Ceiling test interfered with bridges. For now, behaves as original.
 	if (!TestLaraFacingCorner(item, angle, STEP_SIZE) &&
-		probe.Position.Floor - y >= -STEPUP_HEIGHT &&									// Highest floor bound.
-		probe.Position.Ceiling - y < -(coll->Setup.Height + LARA_HEADROOM * 0.7f))		// Lowest ceiling bound.
+		probe.Position.Floor + probe.Position.Bridge - y >= -STEPUP_HEIGHT &&									// Highest floor bound.
+		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
