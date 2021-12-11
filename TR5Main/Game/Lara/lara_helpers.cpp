@@ -20,9 +20,6 @@
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->Middle.Floor == NO_HEIGHT)
-		return;
-
 	if (!TestLaraSwamp(item))
 	{
 		if (TestLaraStepUp(item, coll))
