@@ -2535,8 +2535,12 @@ namespace TEN::Renderer
         updateLaraAnimations(false);
         updateItemsAnimations(view);
         updateEffects(view);
+
+        // Prepare the shadow map
         if (g_Configuration.EnableShadows)
             renderShadowMap(view);
+
+        // Setup Lara item
         m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
 
@@ -2544,23 +2548,18 @@ namespace TEN::Renderer
         m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
         time1 = time2;
 
-        // Draw shadow map
-
         // Reset GPU state
-        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+        setBlendMode(BLENDMODE_OPAQUE);
         m_context->RSSetState(m_states->CullCounterClockwise());
-        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
         // Bind and clear render target
-
         m_context->ClearRenderTargetView(target, Colors::Black);
         m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         m_context->OMSetRenderTargets(1, &target, depthTarget);
-
         m_context->RSSetViewports(1, &view.viewport);
 
-        // Opaque geometry
-        m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+        // The camera constant buffer contains matrices, camera position, fog values and other 
+        // things that are shared for all shaders
         CCameraMatrixBuffer cameraConstantBuffer;
         view.fillConstantBuffer(cameraConstantBuffer);
         cameraConstantBuffer.Frame = GlobalCounter;
@@ -2578,9 +2577,11 @@ namespace TEN::Renderer
         }
         m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
-        drawHorizonAndSky(view, depthTarget);
-		m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
 
+        // Draw the horizon and the sky
+        drawHorizonAndSky(view, depthTarget);
+
+        // Draw rooms and objects
         drawRooms(view);
         drawStatics(false, view);
         drawLara(false, view);
@@ -2595,20 +2596,6 @@ namespace TEN::Renderer
         drawSpiders(view);
 		drawScarabs(view);
         drawLocusts(view);
-
-        // Transparent geometry
-        m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-        m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-        // NOTE: some faces will be drawn immediately, like for additive blending, instead 
-        // other blend modes (like alpha blend) will require collecting the faces and draw them
-        // sorted in a latter stage
-        drawStatics(true, view);
-        drawEffects(view,true);
-        drawDebris(view,true);
-
-        m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-        m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
         // Do special effects and weather 
         // NOTE: functions here just fill the sprites to draw array
