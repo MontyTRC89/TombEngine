@@ -91,20 +91,20 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		bool success = false;
 
-		if (coll->Front.Floor < 0 && coll->Front.Floor >= -256)
+		if (coll->Front.Floor < 0 && coll->Front.Floor >= -CLICK(1))
 		{
-			if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < CLICK(1)))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + 256;
+				item->pos.yPos += coll->Front.Floor + CLICK(1);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
-		else if (coll->Front.Floor >= -640 && coll->Front.Floor <= -384)
+		else if (coll->Front.Floor >= -CLICK(2.5f) && coll->Front.Floor <= -CLICK(1.5f))
 		{
 			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
@@ -114,22 +114,22 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = LS_STOP;
-				item->pos.yPos += coll->Front.Floor + 512;
+				item->pos.yPos += coll->Front.Floor + CLICK(2);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < CLICK(1)))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + 512;
+				item->pos.yPos += coll->Front.Floor + CLICK(2);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
-		else if (coll->Front.Floor >= -896 && coll->Front.Floor <= -640)
+		else if (coll->Front.Floor >= -CLICK(3.5f) && coll->Front.Floor <= -CLICK(2.5f))
 		{
 			if (coll->Front.Floor - coll->Front.Ceiling >= 0 &&
 				coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= 0 &&
@@ -139,22 +139,22 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->goalAnimState = LS_STOP;
-				item->pos.yPos += coll->Front.Floor + 768;
+				item->pos.yPos += coll->Front.Floor + CLICK(3);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
-			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < 256))
+			else if (g_GameFlow->Animations.CrawlExtra && (abs(coll->Front.Ceiling - coll->Front.Floor) < CLICK(1)))
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + 768;
+				item->pos.yPos += coll->Front.Floor + CLICK(3);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
-		else if (coll->Front.Floor >= -1920 && coll->Front.Floor <= -896)
+		else if (coll->Front.Floor >= -CLICK(7.5f) && coll->Front.Floor <= -CLICK(3.5f))
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -174,9 +174,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedgeAngle(item, coll) && Lara.climbStatus)
 	{
-		if (coll->Front.Floor > -1920 || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -1920 || coll->FrontRight.Floor > -2048 || coll->Middle.Ceiling > -1158)
+		if (coll->Front.Floor > -CLICK(7.5f) || Lara.waterStatus == LW_WADE || coll->FrontLeft.Floor > -CLICK(7.5f) || coll->FrontRight.Floor > -CLICK(8) || coll->Middle.Ceiling > -1158)
 		{
-			if ((coll->Front.Floor < -1024 || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
+			if ((coll->Front.Floor < -CLICK(4) || coll->Front.Ceiling >= 506) && coll->Middle.Ceiling <= -518)
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
@@ -787,7 +787,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	// Setup new GCI call
 	Lara.moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -512;
+	coll->Setup.BadHeightUp = -CLICK(2);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
@@ -806,10 +806,10 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -700, STOP_SIZE, &shift_r) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, STOP_SIZE, &shift_r) != 1)
 		return false;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -700, STOP_SIZE, &shift_l) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, STOP_SIZE, &shift_l) != 1)
 		return false;
 
 	if (shift_r)
