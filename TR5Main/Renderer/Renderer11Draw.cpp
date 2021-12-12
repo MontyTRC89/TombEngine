@@ -2583,7 +2583,7 @@ namespace TEN::Renderer
 
         // Draw rooms and objects
         drawRooms(view);
-        drawStatics(false, view);
+        drawStatics(view);
         drawLara(false, view);
         drawItems(view);
         drawEffects(view, false);
@@ -2898,9 +2898,9 @@ namespace TEN::Renderer
 
 	}
 
-    void Renderer11::drawStatics(bool transparent, RenderView& view)
+    void Renderer11::drawStatics(RenderView& view)
     {
-        //return true;
+        // Bind vertex and index buffer
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -2909,17 +2909,11 @@ namespace TEN::Renderer
         m_context->IASetInputLayout(m_inputLayout.Get());
         m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-        // Set shaders
+        // Bind shaders
         m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
         m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-        // Set texture
-        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[0]), SamplerStateType::AnisotropicClamp); 
-        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[0]), SamplerStateType::None);
-
-        m_stMisc.AlphaTest = true;
-        m_cbMisc.updateData(m_stMisc, m_context.Get());
-        m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
+        Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
         for (auto room : view.roomsToDraw)
         {
@@ -2928,24 +2922,22 @@ namespace TEN::Renderer
                 if (!m_staticObjects[msh->staticNumber])
                     continue;
 
+                Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot), TO_RAD(msh->pos.zRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+                m_stStatic.World = world;
+                m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
+                m_stStatic.Color = msh->color;
+                m_cbStatic.updateData(m_stStatic, m_context.Get());
+                m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+
                 RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
                 if (staticObj.ObjectMeshes.size() > 0)
                 {
                     RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
-                    Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot), TO_RAD(msh->pos.zRot)) * Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
-                    m_stStatic.World = world;
-                    m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
-                    m_stStatic.Color = msh->color;
-                    m_cbStatic.updateData(m_stStatic, m_context.Get());
-                    m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
-
                     for (auto& bucket : mesh->buckets)
                     {
                         if (bucket.Vertices.size() == 0)
-                            continue;
-                        if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
                             continue;
 
                         if (isSortingRequired(bucket.blendMode))
@@ -2954,28 +2946,55 @@ namespace TEN::Renderer
                             for (int j = 0; j < bucket.Polygons.size(); j++)
                             {
                                 RendererPolygon* p = &bucket.Polygons[j];
+
+                                // As polygon distance, for moveables, we use the averaged distance
                                 Vector3 centre = Vector3::Transform(p->centre, world);
-                                int distance = (centre - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+                                int distance = (centre - cameraPosition).Length();
+
                                 RendererTransparentFace face;
                                 face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
                                 face.info.polygon = p;
                                 face.distance = distance;
                                 face.info.animated = bucket.animated;
                                 face.info.texture = bucket.texture;
-                                face.info.color = msh->color;
-                                face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
                                 face.info.room = room;
                                 face.info.staticMesh = msh;
-                                face.info.world = world;
-                                face.info.bucket = &bucket;
+                                face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
+                                face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
                                 face.info.blendMode = bucket.blendMode;
+                                face.info.bucket = &bucket;
                                 room->TransparentFacesToDraw.push_back(face);
                             }
                         }
                         else
                         {
-                            setBlendMode(bucket.blendMode);
-                            m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                            int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+
+                            for (int pass = 0; pass < passes; pass++)
+                            {
+                                if (pass == 0)
+                                {
+                                    m_stMisc.AlphaTest = bucket.blendMode == BLENDMODE_ALPHATEST;
+                                    m_cbMisc.updateData(m_stMisc, m_context.Get());
+                                    m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+                                    setBlendMode(bucket.blendMode);
+                                }
+                                else
+                                {
+                                    m_stMisc.AlphaTest = false;
+                                    m_cbMisc.updateData(m_stMisc, m_context.Get());
+                                    m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+                                    setBlendMode(BLENDMODE_ALPHABLEND);
+                                }
+
+                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
+                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[bucket.texture]), SamplerStateType::None);
+
+                                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                                m_numDrawCalls++;
+                            }
                         }
                     }
                 }
