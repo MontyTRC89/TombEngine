@@ -681,7 +681,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		// Store next position
 		Lara.nextCornerPos.xPos = item->pos.xPos;
-		Lara.nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
 		Lara.nextCornerPos.zPos = item->pos.zPos;
 		Lara.nextCornerPos.yRot = item->pos.yRot;
 		Lara.moveAngle = item->pos.yRot;
@@ -736,7 +736,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		// Store next position
 		Lara.nextCornerPos.xPos = item->pos.xPos;
-		Lara.nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1)).Position.Floor + abs(bounds->Y1);
+		Lara.nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
 		Lara.nextCornerPos.zPos = item->pos.zPos;
 		Lara.nextCornerPos.yRot = item->pos.yRot;
 		Lara.moveAngle = item->pos.yRot;
