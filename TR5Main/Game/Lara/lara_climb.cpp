@@ -569,84 +569,75 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->animNumber != LA_LADDER_RIGHT)
 		return 0;
 
-	int oldYrot = item->pos.yRot;
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
+	auto oldPos = item->pos;
+	auto oldRot = Lara.moveAngle;
 
 	short angle = GetQuadrant(item->pos.yRot);
 	int x, z;
 
 	if (angle && angle != SOUTH)
 	{
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos % 1024) + 1024;
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
+		x = (item->pos.xPos & -WALL_SIZE) - (item->pos.zPos % WALL_SIZE) + WALL_SIZE;
+		z = (item->pos.zPos & -WALL_SIZE) - (item->pos.xPos % WALL_SIZE) + WALL_SIZE;
 	}
 	else
 	{
-		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
+		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & (WALL_SIZE - 1);
+		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & (WALL_SIZE - 1);
 	}
 
 	int shift = 0;
 
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 	{
-		item->pos.xPos = x;
-		item->pos.zPos = z;
-		Lara.nextCornerPos.xPos = x;
+		Lara.nextCornerPos.xPos = item->pos.xPos = x;
 		Lara.nextCornerPos.yPos = item->pos.yPos;
-		Lara.nextCornerPos.zPos = z;
-		item->pos.yRot += ANGLE(90);
-		Lara.moveAngle = item->pos.yRot;
+		Lara.nextCornerPos.zPos = item->pos.zPos = z;
+		Lara.nextCornerPos.yRot = item->pos.yRot = Lara.moveAngle = item->pos.yRot + ANGLE(90);
 
-		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+		item->itemFlags[3] = result;
 	}
 
 	if (!result)
 	{
-		item->pos.xPos = oldX;
-		Lara.moveAngle = oldYrot;
-		item->pos.yRot = oldYrot;
-		item->pos.zPos = oldZ;
-
-		int newX, newZ;
+		item->pos = oldPos;
+		Lara.moveAngle = oldRot;
 
 		switch (angle)
 		{
 		case NORTH:
-			newX = ((item->pos.xPos + 1024) & 0xFFFFFC00) - (item->pos.zPos % 1024) + 1024;
-			newZ = ((item->pos.zPos + 1024) & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
+			x = ((item->pos.xPos + WALL_SIZE) & -WALL_SIZE) - (item->pos.zPos % WALL_SIZE) + WALL_SIZE;
+			z = ((item->pos.zPos + WALL_SIZE) & -WALL_SIZE) - (item->pos.xPos % WALL_SIZE) + WALL_SIZE;
 			break;
 
 		case SOUTH:
-			newX = ((item->pos.xPos - 1024) & 0xFFFFFC00) - (item->pos.zPos % 1024) + 1024;
-			newZ = ((item->pos.zPos - 1024) & 0xFFFFFC00) - (item->pos.xPos % 1024) + 1024;
+			x = ((item->pos.xPos - WALL_SIZE) & -WALL_SIZE) - (item->pos.zPos % WALL_SIZE) + WALL_SIZE;
+			z = ((item->pos.zPos - WALL_SIZE) & -WALL_SIZE) - (item->pos.xPos % WALL_SIZE) + WALL_SIZE;
 			break;
 
 		case EAST:
-			newX = ((item->pos.zPos ^ item->pos.xPos) % 1024) ^ (item->pos.xPos + 1024);
-			newZ = (item->pos.zPos ^ ((item->pos.zPos ^ item->pos.xPos) % 1024)) - 1024;
+			x = ((item->pos.zPos ^ item->pos.xPos) % WALL_SIZE) ^ (item->pos.xPos + WALL_SIZE);
+			z = (item->pos.zPos ^ ((item->pos.zPos ^ item->pos.xPos) % WALL_SIZE)) - WALL_SIZE;
 			break;
 
 		case WEST:
 		default:
-			newX = (item->pos.xPos ^ (item->pos.zPos ^ item->pos.xPos) % 1024) - 1024;
-			newZ = ((item->pos.zPos ^ item->pos.xPos) % 1024) ^ (item->pos.zPos + 1024);
+			x = (item->pos.xPos ^ (item->pos.zPos ^ item->pos.xPos) % WALL_SIZE) - WALL_SIZE;
+			z = ((item->pos.zPos ^ item->pos.xPos) % WALL_SIZE) ^ (item->pos.zPos + WALL_SIZE);
 			break;
 
 		}
 
-		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftIntRightExtTab[angle])
+		if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 		{
-			item->pos.xPos = newX;
-			item->pos.zPos = newZ;
-			Lara.nextCornerPos.xPos = newX;
+			Lara.nextCornerPos.xPos = item->pos.xPos = x;
 			Lara.nextCornerPos.yPos = item->pos.yPos;
-			Lara.nextCornerPos.zPos = newZ;
-			item->pos.yRot -= ANGLE(90);
-			Lara.moveAngle = item->pos.yRot;
-			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift) != 0;
+			Lara.nextCornerPos.zPos = item->pos.zPos = z;
+			Lara.nextCornerPos.yRot = item->pos.yRot = Lara.moveAngle = item->pos.yRot - ANGLE(90);
+
+			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+			item->itemFlags[3] = result;
 		}
 	}
 	else
@@ -654,10 +645,8 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		result = -1;
 	}
 
-	item->pos.xPos = oldX;
-	item->pos.yRot = oldYrot;
-	item->pos.zPos = oldZ;
-	Lara.moveAngle = oldYrot;
+	item->pos = oldPos;
+	Lara.moveAngle = oldRot;
 
 	return result;
 }
@@ -669,83 +658,74 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->animNumber != LA_LADDER_LEFT)
 		return 0;
 
-	int oldYrot = item->pos.yRot;
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
+	auto oldPos = item->pos;
+	auto oldRot = Lara.moveAngle;
 
 	short angle = GetQuadrant(item->pos.yRot);
 	int x, z;
 
 	if (angle && angle != SOUTH)
 	{
-		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
-		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & 0x3FF;
+		x = item->pos.xPos ^ (item->pos.xPos ^ item->pos.zPos) & (WALL_SIZE - 1);
+		z = item->pos.zPos ^ (item->pos.xPos ^ item->pos.zPos) & (WALL_SIZE - 1);
 	}
 	else
 	{
-		x = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + 1024;
-		z = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
+		x = (item->pos.xPos & -WALL_SIZE) - (item->pos.zPos & (WALL_SIZE - 1)) + WALL_SIZE;
+		z = (item->pos.zPos & -WALL_SIZE) - (item->pos.xPos & (WALL_SIZE - 1)) + WALL_SIZE;
 	}
 
 	int shift = 0;
 
 	if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftIntRightExtTab[angle])
 	{
-		item->pos.xPos = x;
-		item->pos.zPos = z;
-		Lara.nextCornerPos.xPos = x;
+		Lara.nextCornerPos.xPos = item->pos.xPos = x;
 		Lara.nextCornerPos.yPos = item->pos.yPos;
-		Lara.nextCornerPos.zPos = z;
-		item->pos.yRot -= ANGLE(90);
-		Lara.moveAngle = item->pos.yRot;
+		Lara.nextCornerPos.zPos = item->pos.zPos = z;
+		Lara.nextCornerPos.yRot = item->pos.yRot = Lara.moveAngle = item->pos.yRot - ANGLE(90);
 
-		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->itemFlags[3] = result;
 	}
 
 	if (!result)
 	{
-		item->pos.xPos = oldX;
-		Lara.moveAngle = oldYrot;
-		item->pos.yRot = oldYrot;
-		item->pos.zPos = oldZ;
-
-		int newX, newZ;
+		item->pos = oldPos;
+		Lara.moveAngle = oldRot;
 
 		switch (angle)
 		{
 		case NORTH:
-			newX = (item->pos.xPos ^ ((item->pos.zPos ^ item->pos.xPos) & 0x3FF)) - 1024;
-			newZ = ((item->pos.zPos ^ item->pos.xPos) & 0x3FF) ^ (item->pos.zPos + 1024);
+			x = (item->pos.xPos ^ ((item->pos.zPos ^ item->pos.xPos) & (WALL_SIZE - 1))) - WALL_SIZE;
+			z = ((item->pos.zPos ^ item->pos.xPos) & (WALL_SIZE - 1)) ^ (item->pos.zPos + WALL_SIZE);
 			break;
 
 		case SOUTH:
-			newX = ((item->pos.zPos ^ item->pos.xPos) & 0x3FF) ^ (item->pos.xPos + 1024);
-			newZ = ((item->pos.zPos ^ item->pos.xPos) & 0x3FF) ^ (item->pos.zPos - 1024);
+			x = ((item->pos.zPos ^ item->pos.xPos) & (WALL_SIZE - 1)) ^ (item->pos.xPos + WALL_SIZE);
+			z = ((item->pos.zPos ^ item->pos.xPos) & (WALL_SIZE - 1)) ^ (item->pos.zPos - WALL_SIZE);
 			break;
 
 		case EAST:
-			newX = ((item->pos.xPos + 1024) & 0xFFFFFC00) - (item->pos.zPos & 0x3FF) + 1024;
-			newZ = ((item->pos.zPos + 1024) & 0xFFFFFC00) - (item->pos.xPos & 0x3FF) + 1024;
+			x = ((item->pos.xPos + WALL_SIZE) & -WALL_SIZE) - (item->pos.zPos & (WALL_SIZE - 1)) + WALL_SIZE;
+			z = ((item->pos.zPos + WALL_SIZE) & -WALL_SIZE) - (item->pos.xPos & (WALL_SIZE - 1)) + WALL_SIZE;
 			break;
 
 		case WEST:
 		default:
-			newX = (item->pos.xPos & 0xFFFFFC00) - (item->pos.zPos & 0x3FF);
-			newZ = (item->pos.zPos & 0xFFFFFC00) - (item->pos.xPos & 0x3FF);
+			x = (item->pos.xPos & -WALL_SIZE) - (item->pos.zPos & (WALL_SIZE - 1));
+			z = (item->pos.zPos & -WALL_SIZE) - (item->pos.xPos & (WALL_SIZE - 1));
 			break;
 
 		}
 
-		if (GetClimbFlags(newX, item->pos.yPos, newZ, item->roomNumber) & (short)LeftExtRightIntTab[angle])
+		if (GetClimbFlags(x, item->pos.yPos, z, item->roomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			item->pos.xPos = Lara.nextCornerPos.xPos = newX;
-			item->pos.yPos = Lara.nextCornerPos.yPos = item->pos.yPos;
-			item->pos.zPos = Lara.nextCornerPos.zPos = newZ;
-			item->pos.yRot += ANGLE(90);
-			Lara.moveAngle = item->pos.yRot;
-			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - 120, -512, 512, &shift);
+			Lara.nextCornerPos.xPos = item->pos.xPos = x;
+			Lara.nextCornerPos.yPos = item->pos.yPos;
+			Lara.nextCornerPos.zPos = item->pos.zPos = z;
+			Lara.nextCornerPos.yRot = item->pos.yRot = Lara.moveAngle = item->pos.yRot + ANGLE(90);
+
+			item->itemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 			result = item->itemFlags[3] != 0;
 		}
 	}
@@ -754,10 +734,8 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		result = -1;
 	}
 
-	item->pos.xPos = oldX;
-	item->pos.yRot = oldYrot;
-	item->pos.zPos = oldZ;
-	Lara.moveAngle = oldYrot;
+	item->pos = oldPos;
+	Lara.moveAngle = oldRot;
 
 	return result;
 }
