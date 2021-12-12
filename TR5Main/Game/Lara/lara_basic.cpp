@@ -228,17 +228,14 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	if ((TrInput & IN_JUMP || info->queueJump) &&
+	if ((TrInput & IN_JUMP || info->jumpQueued) &&
 		!item->gravityStatus &&
 		info->waterStatus != LW_WADE)
 	{
-		info->queueJump = TrInput & IN_FORWARD;
+		info->jumpQueued = TrInput & IN_FORWARD;
 		
 		if (info->jumpCount >= LARA_JUMP_TIME)
-		{
-			info->queueJump = false;
 			item->goalAnimState = LS_JUMP_FORWARD;
-		}
 
 		return;
 	}
@@ -2018,6 +2015,10 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->sprintTimer--;
+
+	info->jumpCount++;
+	if (info->jumpCount > LARA_JUMP_TIME)
+		info->jumpCount = LARA_JUMP_TIME;
 
 	if (item->hitPoints <= 0)
 	{

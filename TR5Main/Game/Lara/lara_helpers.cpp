@@ -197,6 +197,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->currentAnimState != LS_RUN_FORWARD &&
 		item->currentAnimState != LS_WALK_FORWARD &&
 		item->currentAnimState != LS_JUMP_FORWARD &&
+		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_SPRINT_DIVE)
 	{
 		info->jumpCount = 0;
@@ -204,7 +205,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset jump action queue.
 	if (item->currentAnimState != LS_RUN_FORWARD)
-		info->queueJump = false;
+		info->jumpQueued = false;
 
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
