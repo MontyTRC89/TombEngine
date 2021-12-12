@@ -1390,7 +1390,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t climb_status = 0;
   int32_t pose_count = 0;
   int32_t jump_count = 0;
-  bool queue_jump = false;
+  bool jump_queued = false;
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
   int32_t sprint_timer = 0;
@@ -1510,7 +1510,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
     VT_JUMP_COUNT = 28,
-    VT_QUEUE_JUMP = 30,
+    VT_JUMP_QUEUED = 30,
     VT_HIT_FRAME = 32,
     VT_HIT_DIRECTION = 34,
     VT_SPRINT_TIMER = 36,
@@ -1650,8 +1650,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t jump_count() const {
     return GetField<int32_t>(VT_JUMP_COUNT, 0);
   }
-  bool queue_jump() const {
-    return GetField<uint8_t>(VT_QUEUE_JUMP, 0) != 0;
+  bool jump_queued() const {
+    return GetField<uint8_t>(VT_JUMP_QUEUED, 0) != 0;
   }
   int32_t hit_frame() const {
     return GetField<int32_t>(VT_HIT_FRAME, 0);
@@ -1965,7 +1965,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_JUMP_COUNT) &&
-           VerifyField<uint8_t>(verifier, VT_QUEUE_JUMP) &&
+           VerifyField<uint8_t>(verifier, VT_JUMP_QUEUED) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_SPRINT_TIMER) &&
@@ -2132,8 +2132,8 @@ struct LaraBuilder {
   void add_jump_count(int32_t jump_count) {
     fbb_.AddElement<int32_t>(Lara::VT_JUMP_COUNT, jump_count, 0);
   }
-  void add_queue_jump(bool queue_jump) {
-    fbb_.AddElement<uint8_t>(Lara::VT_QUEUE_JUMP, static_cast<uint8_t>(queue_jump), 0);
+  void add_jump_queued(bool jump_queued) {
+    fbb_.AddElement<uint8_t>(Lara::VT_JUMP_QUEUED, static_cast<uint8_t>(jump_queued), 0);
   }
   void add_hit_frame(int32_t hit_frame) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
@@ -2458,7 +2458,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t climb_status = 0,
     int32_t pose_count = 0,
     int32_t jump_count = 0,
-    bool queue_jump = false,
+    bool jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t sprint_timer = 0,
@@ -2671,7 +2671,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_keep_crouched(keep_crouched);
   builder_.add_burn(burn);
   builder_.add_look(look);
-  builder_.add_queue_jump(queue_jump);
+  builder_.add_jump_queued(jump_queued);
   return builder_.Finish();
 }
 
@@ -2695,7 +2695,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t climb_status = 0,
     int32_t pose_count = 0,
     int32_t jump_count = 0,
-    bool queue_jump = false,
+    bool jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t sprint_timer = 0,
@@ -2822,7 +2822,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       climb_status,
       pose_count,
       jump_count,
-      queue_jump,
+      jump_queued,
       hit_frame,
       hit_direction,
       sprint_timer,
@@ -5111,7 +5111,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
   { auto _e = jump_count(); _o->jump_count = _e; }
-  { auto _e = queue_jump(); _o->queue_jump = _e; }
+  { auto _e = jump_queued(); _o->jump_queued = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
   { auto _e = sprint_timer(); _o->sprint_timer = _e; }
@@ -5234,7 +5234,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
   auto _jump_count = _o->jump_count;
-  auto _queue_jump = _o->queue_jump;
+  auto _jump_queued = _o->jump_queued;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
   auto _sprint_timer = _o->sprint_timer;
@@ -5349,7 +5349,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _climb_status,
       _pose_count,
       _jump_count,
-      _queue_jump,
+      _jump_queued,
       _hit_frame,
       _hit_direction,
       _sprint_timer,
