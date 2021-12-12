@@ -857,7 +857,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	// Setup new GCI call
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -512;
+	coll->Setup.BadHeightUp = -CLICK(2);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -876,10 +876,10 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int shift_r, shift_l;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -700, CLICK(2), &shift_r) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shift_r) != 1)
 		return false;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -700, CLICK(2), &shift_l) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, CLICK(2), &shift_l) != 1)
 		return false;
 
 	if (shift_r)
