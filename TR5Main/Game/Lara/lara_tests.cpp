@@ -697,8 +697,8 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		if (Lara.climbStatus)
 		{
-			auto angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
-			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
+			auto& angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
+			if (GetClimbFlags(Lara.nextCornerPos.xPos, item->pos.yPos, Lara.nextCornerPos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
 				return CORNER_RESULT::INNER;
 		}
 	}
@@ -749,8 +749,8 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		if (Lara.climbStatus)
 		{
-			auto angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
-			if (GetClimbFlags(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
+			auto& angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
+			if (GetClimbFlags(Lara.nextCornerPos.xPos, item->pos.yPos, Lara.nextCornerPos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
 				return CORNER_RESULT::OUTER;
 		}
 	}
