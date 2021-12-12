@@ -202,6 +202,10 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 		info->jumpCount = 0;
 	}
 
+	// Reset jump action queue.
+	if (item->currentAnimState != LS_RUN_FORWARD)
+		info->queueJump = false;
+
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&

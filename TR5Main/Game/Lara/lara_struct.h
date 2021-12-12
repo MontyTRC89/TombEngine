@@ -997,6 +997,7 @@ struct LaraInfo
 	short climbStatus;
 	short poseCount;
 	int jumpCount;
+	bool queueJump;
 	short hitFrame;
 	short hitDirection;
 	int sprintTimer;

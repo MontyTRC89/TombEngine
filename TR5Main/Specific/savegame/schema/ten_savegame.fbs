@@ -100,6 +100,7 @@ table Lara {
 	climb_status: int32;
 	pose_count: int32;
 	jump_count: int32;
+	queue_jump: bool;
 	hit_frame: int32;
 	hit_direction: int32;
 	sprint_timer: int32;
