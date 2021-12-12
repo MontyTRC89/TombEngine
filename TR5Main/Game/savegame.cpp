@@ -284,6 +284,7 @@ bool SaveGame::Save(int slot)
 	lara.add_is_moving(Lara.isMoving);
 	lara.add_item_number(Lara.itemNumber);
 	lara.add_jump_count(Lara.jumpCount);
+	lara.add_queue_jump(Lara.queueJump);
 	lara.add_keep_crouched(Lara.keepCrouched);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
@@ -1197,6 +1198,7 @@ bool SaveGame::Load(int slot)
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
 	Lara.jumpCount = s->lara()->jump_count();
+	Lara.queueJump = s->lara()->queue_jump();
 	Lara.keepCrouched = s->lara()->keep_crouched();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();

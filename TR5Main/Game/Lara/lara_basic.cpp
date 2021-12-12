@@ -228,19 +228,15 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	// Pseudo action queue for running jump.
-	// Creates a committal lock when JUMP is pressed and released while allowJump isn't true yet.
-	static bool commitJump = false;
-
-	if ((TrInput & IN_JUMP || commitJump) &&
+	if ((TrInput & IN_JUMP || info->queueJump) &&
 		!item->gravityStatus &&
 		info->waterStatus != LW_WADE)
 	{
-		commitJump = TrInput & IN_FORWARD;
-
+		info->queueJump = TrInput & IN_FORWARD;
+		
 		if (info->jumpCount >= LARA_JUMP_TIME)
 		{
-			commitJump = false;
+			info->queueJump = false;
 			item->goalAnimState = LS_JUMP_FORWARD;
 		}
 
