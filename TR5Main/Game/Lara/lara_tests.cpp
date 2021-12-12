@@ -699,7 +699,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		{
 			auto& angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
 			if (GetClimbFlags(Lara.nextCornerPos.xPos, item->pos.yPos, Lara.nextCornerPos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
+			{
+				Lara.nextCornerPos.yPos = item->pos.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
 				return CORNER_RESULT::INNER;
+			}
 		}
 	}
 
@@ -751,7 +754,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		{
 			auto& angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
 			if (GetClimbFlags(Lara.nextCornerPos.xPos, item->pos.yPos, Lara.nextCornerPos.zPos, item->roomNumber) & (short)angleSet[GetQuadrant(item->pos.yRot)])
+			{
+				Lara.nextCornerPos.yPos = item->pos.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
 				return CORNER_RESULT::OUTER;
+			}
 		}
 	}
 

@@ -62,25 +62,25 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 	case 28:
 	case 29:
-		yShift = 256;
+		yShift = CLICK(1);
 		break;
 
 	case 57:
-		yShift = 512;
+		yShift = CLICK(2);
 		break;
 
 	default:
 		return;
 	}
 
-	item->pos.yPos += yShift + 256;
+	item->pos.yPos += yShift + CLICK(1);
 
 	int shiftLeft = 0;
 	int shiftRight = 0;
-	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shiftRight);
-	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -512, 512, &shiftLeft);
+	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shiftRight);
+	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shiftLeft);
 
-	item->pos.yPos -= 256;
+	item->pos.yPos -= CLICK(1);
 
 	if (resultRight != 0 && resultLeft != 0 &&
 		resultRight != -2 && resultLeft != -2 &&
@@ -147,23 +147,23 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (frame == 28 || frame == 29)
 		{
-			yShift = -256;
+			yShift = -CLICK(1);
 		}
 		else if (frame == 57)
 		{
-			yShift = -512;
+			yShift = -CLICK(2);
 		}
 		else
 		{
 			return;
 		}
 
-		item->pos.yPos += yShift - 256;
+		item->pos.yPos += yShift - CLICK(1);
 
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), &shiftLeft, &ledgeLeft);
 
-		item->pos.yPos += 256;
+		item->pos.yPos += CLICK(1);
 		 
 		if (resultRight && resultLeft && TrInput & IN_FORWARD)
 		{
@@ -173,7 +173,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 
 				AnimateLara(item);
 
-				if (abs(ledgeRight - ledgeLeft) <= 120)
+				if (abs(ledgeRight - ledgeLeft) <= CLICK(0.5f))
 				{
 					if (resultRight != -1 || resultLeft != -1)
 					{
@@ -183,7 +183,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 					else
 					{
 						item->goalAnimState = LS_GRABBING;
-						item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - 256;
+						item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
 					}
 				}
 			}
@@ -217,7 +217,7 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 		Lara.moveAngle = item->pos.yRot + ANGLE(90);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
 
@@ -239,7 +239,7 @@ void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 		Lara.moveAngle = item->pos.yRot - ANGLE(90);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + 120), -512, 512, &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
 
@@ -274,12 +274,12 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 
 		item->goalAnimState = LS_LADDER_IDLE;
-		item->pos.yPos += 256;
+		item->pos.yPos += CLICK(1);
 		
-		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, -512, 512, &ledgeRight);
-		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -120 - coll->Setup.Radius, -512, 512, &ledgeLeft);
+		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &ledgeRight);
+		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, -CLICK(2), CLICK(2), &ledgeLeft);
 		
-		item->pos.yPos -= 256;
+		item->pos.yPos -= CLICK(1);
 		
 		if (!resultRight || !resultLeft || resultLeft == -2 || resultRight == -2)
 			return;
@@ -307,8 +307,8 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 	else if (item->goalAnimState != LS_GRABBING)
 	{
 		item->goalAnimState = LS_LADDER_IDLE;
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + 120, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -120 - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
 		if (!resultRight || !resultLeft)
 			return;
@@ -335,12 +335,12 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_LADDER_UP;
 			item->pos.yPos += yShift;
 		}
-		else if (abs(ledgeLeft - ledgeRight) <= 120)
+		else if (abs(ledgeLeft - ledgeRight) <= CLICK(0.5f))
 		{
 			if (resultRight == -1 && resultLeft == -1)
 			{
 				item->goalAnimState = LS_GRABBING;
-				item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - 256;
+				item->pos.yPos += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
 			}
 			else
 			{
@@ -425,26 +425,26 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	case NORTH:
 		x = item->pos.xPos + right;
 		z = item->pos.zPos + front;
-		zFront = 256;
+		zFront = CLICK(1);
 		break;
 
 	case EAST:
 		x = item->pos.xPos + front;
 		z = item->pos.zPos - right;
-		xFront = 256;
+		xFront = CLICK(1);
 		break;
 
 	case SOUTH:
 		x = item->pos.xPos - right;
 		z = item->pos.zPos - front;
-		zFront = -256;
+		zFront = -CLICK(1);
 		break;
 
 	case WEST:
 	default:
 		x = item->pos.xPos - front;
 		z = item->pos.zPos + right;
-		xFront = -256;
+		xFront = -CLICK(1);
 		break;
 	}
 
@@ -748,12 +748,12 @@ int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, i
 		return 0;
 
 	short roomNumber = itemRoom;
-	FLOOR_INFO* floor = GetFloor(x, y - 128, z, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(x, y - CLICK(0.5f), z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 	if (height == NO_HEIGHT)
 		return 0;
 
-	height -= (128 + y + itemHeight);
+	height -= (CLICK(0.5f) + y + itemHeight);
 	if (height < -70)
 		return 0;
 	if (height < 0)
@@ -802,25 +802,25 @@ int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, i
 			return 1;
 		if (ceiling - y <= height)
 			return 1;
-		if (ceiling - y >= 512)
+		if (ceiling - y >= CLICK(2))
 			return 1;
 		if (ceiling - y <= 442)
 			return -(hang != 0);
 		if (*shift > 0)
 			return -(hang != 0);
-		*shift = ceiling - y - 512;
+		*shift = ceiling - y - CLICK(2);
 
 		return 1;
 	}
 	
 	ceiling = GetCeiling(floor, dx, y, dz) - y;
-	if (ceiling >= 512)
+	if (ceiling >= CLICK(2))
 		return 1;
 	if (ceiling > 442)
 	{
 		if (*shift > 0)
 			return -(hang != 0);
-		*shift = ceiling - 512;
+		*shift = ceiling - CLICK(2);
 
 		return 1;
 	}
@@ -871,7 +871,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 
 	short roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-	int ceiling = 256 - y + GetCeiling(floor, x, y, z);
+	int ceiling = CLICK(1) - y + GetCeiling(floor, x, y, z);
 	
 	if (ceiling > 70)
 		return 0;
@@ -892,18 +892,18 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 		height -= y;
 		*ledge = height;
 		
-		if (height <= 128)
+		if (height <= CLICK(0.5f))
 		{
 			if (height > 0 && height > *shift)
 				*shift = height;
 
 			roomNumber = item->roomNumber;
-			GetFloor(x, y + 512, z, &roomNumber);
-			floor = GetFloor(x + xFront, y + 512, z + zFront, &roomNumber);
-			ceiling = GetCeiling(floor, x + xFront, y + 512, z + zFront) - y;
+			GetFloor(x, y + CLICK(2), z, &roomNumber);
+			floor = GetFloor(x + xFront, y + CLICK(2), z + zFront, &roomNumber);
+			ceiling = GetCeiling(floor, x + xFront, y + CLICK(2), z + zFront) - y;
 			if (ceiling <= height)
 				return 1;						
-			if (ceiling >= 512)
+			if (ceiling >= CLICK(2))
 				return 1;					
 			else
 				return 0;
@@ -911,11 +911,11 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 		else
 		{
 			ceiling = GetCeiling(floor, x + xFront, y, z + zFront) - y;
-			if (ceiling < 512)
+			if (ceiling < CLICK(2))
 			{
 				if (height - ceiling <= LARA_HEIGHT)
 				{
-					if (height - ceiling < 512)
+					if (height - ceiling < CLICK(2))
 						return 0;
 					*shift = height;
 					return -2;
@@ -943,7 +943,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 
-	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER)//can't let go on this anim
+	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
 		return 0;
 
 	Lara.torsoYrot = 0;
