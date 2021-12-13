@@ -1488,7 +1488,6 @@ bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->Middle.Floor < -CLICK(0.5f) &&				// Lower floor bound.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&				// Upper floor bound.
-		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&			// Crawl step up handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{
@@ -1502,7 +1501,6 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (coll->Middle.Floor > CLICK(0.5f) &&				// Upper floor bound.
 		coll->Middle.Floor <= STEPUP_HEIGHT &&			// Lower floor bound.
-		coll->Middle.Floor != NO_HEIGHT &&
 		item->currentAnimState != LS_CRAWL_IDLE &&		// Crawl step down handled differently.
 		item->currentAnimState != LS_CRAWL_FORWARD)
 	{

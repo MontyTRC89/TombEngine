@@ -68,7 +68,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 
-	if (item->frameNumber == TestLastFrame(item, item->animNumber) - 1)
+	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
 		info->gunStatus = LG_HANDS_FREE;
 
@@ -97,7 +97,7 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME - 4) // If anyone complains about the walk jump being nerfed, increase this value.
+	if (info->jumpCount > LARA_JUMP_TIME - 4)
 		info->jumpCount = LARA_JUMP_TIME - 4;
 
 	if (item->hitPoints <= 0)
@@ -232,12 +232,13 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		!item->gravityStatus &&
 		info->waterStatus != LW_WADE)
 	{
-		info->jumpQueued = TrInput & IN_FORWARD;
-		
 		if (info->jumpCount >= LARA_JUMP_TIME)
+		{
 			item->goalAnimState = LS_JUMP_FORWARD;
+			return;
+		}
 
-		return;
+		info->jumpQueued = TrInput & IN_FORWARD;
 	}
 
 	if (TrInput & IN_SPRINT && info->sprintTimer &&
@@ -247,7 +248,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL &&
+	if (TrInput & IN_ROLL && !info->jumpQueued &&
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
