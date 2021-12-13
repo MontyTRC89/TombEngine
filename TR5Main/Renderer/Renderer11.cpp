@@ -215,7 +215,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::bindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
-	{  
+	{   
 		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;

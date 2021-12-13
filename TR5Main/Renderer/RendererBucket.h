@@ -8,6 +8,7 @@ namespace TEN::Renderer {
 		size_t texture;
 		bool animated;
 		BLEND_MODES blendMode;
+		bool doubleSided;
 		std::vector<RendererVertex> Vertices;
 		std::vector<int> Indices;
 		std::vector<RendererPolygon> Polygons;
