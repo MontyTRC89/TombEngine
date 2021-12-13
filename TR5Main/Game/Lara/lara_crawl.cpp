@@ -100,6 +100,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	info->isDucked = true;
 	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -135,6 +137,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	info->look = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -801,15 +804,11 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 
+		// TODO: When refactoring monkey swing, get rid of this.
 		if (TestHangSwingIn(item, item->pos.yRot))
 		{
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-			info->headXrot = 0;
-			info->headYrot = 0;
-			info->headZrot = 0;
-			info->torsoXrot = 0;
-			info->torsoYrot = 0;
-			info->torsoZrot = 0;
+			ResetLaraFlex(item);
 		}
 		else
 			SetAnimation(item, LA_REACH_TO_HANG, 12);

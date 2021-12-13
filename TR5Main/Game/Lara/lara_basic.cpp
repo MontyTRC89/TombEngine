@@ -229,7 +229,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_JUMP || info->jumpQueued) &&
-		!item->gravityStatus &&
 		info->waterStatus != LW_WADE)
 	{
 		if (info->jumpCount >= LARA_JUMP_TIME)
@@ -238,7 +237,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		info->jumpQueued = TrInput & IN_FORWARD;
+		info->jumpQueued = item->goalAnimState == LS_RUN_FORWARD;
 	}
 
 	if (TrInput & IN_SPRINT && info->sprintTimer &&

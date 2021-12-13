@@ -113,6 +113,9 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
 void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
 {
+	if (!item->speed)
+		return;
+
 	int sign = copysign(1, maxAngle);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
