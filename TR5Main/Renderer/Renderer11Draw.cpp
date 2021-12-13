@@ -3004,6 +3004,7 @@ namespace TEN::Renderer
 
     void Renderer11::drawRooms(RenderView& view)
     {
+        
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -3077,7 +3078,7 @@ namespace TEN::Renderer
 
                 for (auto& bucket : room->Buckets)
                 {
-                    if (animated ^ bucket.animated)
+                    if ((animated == 1) ^ bucket.animated || bucket.Vertices.size() == 0)
                         continue;
 
                     if (isSortingRequired(bucket.blendMode))
@@ -3116,6 +3117,15 @@ namespace TEN::Renderer
                     {
                         int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
+                        if (bucket.doubleSided)
+                        {
+                            m_context->RSSetState(m_states->CullNone());
+                        }
+                        else
+                        {
+                            m_context->RSSetState(m_states->CullCounterClockwise());
+                        }
+
                         for (int pass = 0; pass < passes; pass++)
                         {
                             if (pass == 0)
@@ -3136,7 +3146,8 @@ namespace TEN::Renderer
                             }
 
                             // Draw geometry
-                            if (animated) {
+                            if (animated) 
+                            {
                                 if (!bucket.animated)
                                     continue;
 
@@ -3145,7 +3156,8 @@ namespace TEN::Renderer
 
                                 RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
                                 m_stAnimated.NumFrames = set.NumTextures;
-                                for (unsigned char i = 0; i < set.NumTextures; i++) {
+                                for (unsigned char i = 0; i < set.NumTextures; i++) 
+                                {
                                     auto& tex = set.Textures[i];
                                     m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
                                     m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
@@ -3154,15 +3166,14 @@ namespace TEN::Renderer
                                 }
                                 m_cbAnimated.updateData(m_stAnimated, m_context.Get());
                             }
-                            else {
+                            else 
+                            {
                                 if (bucket.animated)
                                     continue;
 
                                 bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
                                 bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[bucket.texture]), SamplerStateType::None);
                             }
-                            if (bucket.Vertices.size() == 0)
-                                continue;
 
                             m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                             m_numDrawCalls++;
@@ -3171,6 +3182,8 @@ namespace TEN::Renderer
                 }
             }
         }
+
+        m_context->RSSetState(m_states->CullCounterClockwise());
     }
 
 
