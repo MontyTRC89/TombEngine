@@ -1579,18 +1579,16 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 	if (!item->data)
 		return;
 
-	CREATURE_INFO* creature;
-	ITEM_INFO* enemy;
-	LOT_INFO* LOT;
-	int boxNumber, startBox, overlapIndex, nextBox, flags;
-	BOUNDING_BOX* bounds;
+	int boxNumber;
 
-	creature = (CREATURE_INFO*)item->data;
-	enemy = creature->enemy;
-	LOT = &creature->LOT;
+	auto creature = (CREATURE_INFO*)item->data;
+	auto enemy = creature->enemy;
+	auto LOT = &creature->LOT;
 
-	switch (creature->mood)
+	if (enemy != nullptr)
 	{
+		switch (creature->mood)
+		{
 		case BORED_MOOD:
 			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 			if (ValidBox(item, info->zoneNumber, boxNumber)
@@ -1616,7 +1614,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 			if (LOT->fly != NO_FLYING && Lara.waterStatus == LW_ABOVE_WATER)
 			{
-				bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+				auto bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 				LOT->target.y += bounds->Y1;
 			}
 			break;
@@ -1656,12 +1654,13 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 				}
 			}
 			break;
+		}
 	}
 
 	if (LOT->targetBox == NO_BOX)
 		TargetBox(LOT, item->boxNumber);
-#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 
+#ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	bool shouldUpdateTarget = false;
 	switch(creature->priority) {
 	case CREATURE_AI_PRIORITY::HIGH:
@@ -1697,12 +1696,13 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 
 	if (item->boxNumber != NO_BOX)
 	{
-		startBox = LOT->node[item->boxNumber].exitBox;
+		auto startBox = LOT->node[item->boxNumber].exitBox;
 		if (startBox != NO_BOX)
 		{
-			overlapIndex = g_Level.Boxes[item->boxNumber].overlapIndex;
-			nextBox = 0;
-			flags = 0;
+			int overlapIndex = g_Level.Boxes[item->boxNumber].overlapIndex;
+			int nextBox = 0;
+			int flags = 0;
+
 			if (overlapIndex >= 0)
 			{
 				do
