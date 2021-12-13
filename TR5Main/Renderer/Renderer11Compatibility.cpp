@@ -250,6 +250,7 @@ namespace TEN::Renderer
 				RendererBucket bucket{};
 				bucket.animated = levelBucket->animated;
 				bucket.blendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
+				bucket.doubleSided = levelBucket->doubleSided;
 				bucket.texture = levelBucket->texture;
 				bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
 				bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
