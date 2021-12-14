@@ -22,7 +22,8 @@ using namespace TEN::Effects::Environment;
 
 constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
 constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
-constexpr auto COLL_DISCARD_THRESHOLD = CLICK(1);
+constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS          = CLICK(0.5f);
 
 struct OLD_CAMERA
 {
@@ -1829,16 +1830,13 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	Camera.pos.x = pos->xPos + (cos * x + sin * z);
 	Camera.pos.z = pos->zPos + (cos * z - sin * x);
 
-	auto floor = GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
-	auto h = GetFloorHeight(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	auto c = GetCeiling(floor, Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-	if (h == NO_HEIGHT || Camera.pos.y > h || Camera.pos.y < c)
+	auto coll = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
 	{
 		Camera.pos.x = CamOldPos.x;
 		Camera.pos.y = CamOldPos.y;
 		Camera.pos.z = CamOldPos.z;
-		GetFloor(CamOldPos.x, CamOldPos.y, CamOldPos.z, &Camera.pos.roomNumber);
+		Camera.pos.roomNumber = coll.RoomNumber;
 	}
 }
 
@@ -1959,7 +1957,7 @@ void ItemsCollideCamera()
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
-		if (TestBoundsCollideCamera(bounds, &item->pos, 1024))
+		if (TestBoundsCollideCamera(bounds, &item->pos, CAMERA_RADIUS))
 			ItemPushCamera(bounds, &item->pos, rad);
 
 #ifdef _DEBUG
@@ -1990,7 +1988,7 @@ void ItemsCollideCamera()
 			continue;
 
 		auto bounds = &stat->collisionBox;
-		if (TestBoundsCollideCamera(bounds, &mesh->pos, 1024))
+		if (TestBoundsCollideCamera(bounds, &mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
