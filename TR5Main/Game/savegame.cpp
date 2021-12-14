@@ -867,6 +867,9 @@ bool SaveGame::Load(int slot)
 			// Kill immediately item if already killed and continue
 			if (savedItem->flags() & IFLAG_KILLED)
 			{
+				if (obj->floor != nullptr)
+					UpdateBridgeItem(itemNumber, true);
+
 				KillItem(i);
 				item->status = ITEM_DEACTIVATED;
 				item->flags |= ONESHOT;
