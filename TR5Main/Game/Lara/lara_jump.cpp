@@ -100,7 +100,7 @@ void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll)
 				if (TrInput & IN_FORWARD && !(TrInput & IN_WALK))
 					SetAnimation(item, LA_LAND_TO_RUN);
 				else
-					SetAnimation(item, LA_LAND);
+					item->goalAnimState = LS_IDLE;
 			}
 		}
 
