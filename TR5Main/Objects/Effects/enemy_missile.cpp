@@ -122,7 +122,7 @@ namespace TEN::Entities::Effects
 	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	{
 		ShatterItem.yRot = fx->pos.yRot;
-		ShatterItem.meshp = &g_Level.Meshes[fx->frameNumber];
+		ShatterItem.meshIndex = fx->frameNumber;
 		ShatterItem.sphere.x = fx->pos.xPos;
 		ShatterItem.sphere.y = fx->pos.yPos;
 		ShatterItem.sphere.z = fx->pos.zPos;

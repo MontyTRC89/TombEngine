@@ -188,7 +188,6 @@ namespace TEN::Renderer
 		}
 		vertexBufferBorder = VertexBuffer(m_device, verticesBorder.size(), verticesBorder.data());
 		indexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
-
 	}
 
 	float Renderer11::calculateFrameRate()

@@ -147,7 +147,7 @@ namespace TEN::Renderer
 
             for (auto& bucket : mesh->buckets)
             {
-                if (bucket.Vertices.size() == 0)
+                if (bucket.NumVertices == 0)
                     continue;
 
 				setBlendMode(bucket.BlendMode);
@@ -156,7 +156,7 @@ namespace TEN::Renderer
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
             }
         }
 
@@ -237,11 +237,11 @@ namespace TEN::Renderer
 
             for (auto& bucket : mesh->buckets)
             {
-                if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
+                if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
                     continue;
 
                 // Draw vertices
-                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                 m_numDrawCalls++;
             }
         }
@@ -256,11 +256,11 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
+					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
 						continue;
 
 					// Draw vertices
-					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 					m_numDrawCalls++;
 				}
             }
@@ -272,11 +272,11 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->buckets)
 			{
-				if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
+				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 				m_numDrawCalls++;
 			}
         }
@@ -306,11 +306,11 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->buckets)
 			{
-				if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
+				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 				m_numDrawCalls++;
 			}
         }
@@ -390,11 +390,11 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.Vertices.size() == 0 && bucket.BlendMode == BLENDMODE_OPAQUE)
+					if (bucket.NumVertices == 0 && bucket.BlendMode == BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
-					m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 					m_numDrawCalls++;
 				}
             }
@@ -2934,7 +2934,7 @@ namespace TEN::Renderer
 
                     for (auto& bucket : mesh->buckets)
                     {
-                        if (bucket.Vertices.size() == 0)
+                        if (bucket.NumVertices == 0)
                             continue;
 
                         if (isSortingRequired(bucket.BlendMode))
@@ -2990,7 +2990,7 @@ namespace TEN::Renderer
                                 bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
                                 bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[bucket.Texture]), SamplerStateType::None);
 
-                                m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                                m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                                 m_numDrawCalls++;
                             }
                         }
@@ -3312,7 +3312,7 @@ namespace TEN::Renderer
 
                 for (auto& bucket: mesh->buckets) {
 
-                    if (bucket.Vertices.size() == 0)
+                    if (bucket.NumVertices == 0)
                         continue;
 
                     bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
@@ -3321,7 +3321,7 @@ namespace TEN::Renderer
 					setBlendMode(bucket.BlendMode);
 
                     // Draw vertices
-                    m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                    m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
@@ -3347,7 +3347,7 @@ namespace TEN::Renderer
 
         for (auto& bucket : mesh->buckets)
         {
-            if (bucket.Vertices.size() == 0)
+            if (bucket.NumVertices == 0)
                 continue;
 
             if (isSortingRequired(bucket.BlendMode))
@@ -3400,7 +3400,7 @@ namespace TEN::Renderer
                     bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
                     bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
 
-                    m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                    m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                     m_numDrawCalls++;
                 }
             }
