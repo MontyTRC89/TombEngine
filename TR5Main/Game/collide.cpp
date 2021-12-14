@@ -167,29 +167,6 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	return (numItems || numMeshes);
 }
 
-std::set<int> CollectConnectedRooms(int roomNumber)
-{
-	std::set<int> result;
-	
-	if (g_Level.Rooms.size() <= roomNumber)
-		return result;
-
-	result.insert(roomNumber);
-
-	auto room = &g_Level.Rooms[roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		result.insert(room->doors[i].room);
-
-	for (auto i : result)
-	{
-		room = &g_Level.Rooms[i];
-		for (int j = 0; j < room->doors.size(); j++)
-			result.insert(room->doors[j].room);
-	}
-
-	return result;
-}
-
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->HitTallObject = false;
