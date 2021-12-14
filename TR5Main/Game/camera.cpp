@@ -1850,24 +1850,21 @@ static bool CheckItemCollideCamera(ITEM_INFO* item)
 						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
 						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
+	if (!close_enough || !item->collidable || !Objects[item->objectNumber].usingDrawAnimatingItem)
+		return false;
+
 	// TODO: Find a better way to define objects which are collidable with camera.
+	if (Objects[item->objectNumber].intelligent || Objects[item->objectNumber].isPickup || Objects[item->objectNumber].isPuzzleHole)
+		return false;
 
-	if (close_enough && item->collidable &&
-		!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
-		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem)
-	{
+	// Check extents, if any 2 bounds are smaller than threshold, discard.
+	Vector3 extents = TO_DX_BBOX(item->pos, GetBoundsAccurate(item)).Extents;
+	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+		return false;
 
-		// Check extents, if smaller than threshold, discard
-		Vector3 extents = TO_DX_BBOX(item->pos, GetBoundsAccurate(item)).Extents;
-		if (abs(extents.x) < COLL_DISCARD_THRESHOLD ||
-			abs(extents.y) < COLL_DISCARD_THRESHOLD ||
-			abs(extents.z) < COLL_DISCARD_THRESHOLD)
-			return false;
-		else
-			return true;
-	}
-
-	return false;
+	return true;
 }
 
 std::vector<short> FillCollideableItemList()
@@ -1898,13 +1895,27 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	auto dz = Camera.pos.z - mesh->pos.zPos;
 
 	bool close_enough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
-						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
 						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
-	if (close_enough) // Literally anything else?
-		return true;
+	if (!close_enough)
+		return false;
 
-	return false;
+	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		return false;
+
+	auto stat = &StaticObjects[mesh->staticNumber];
+	auto extents = Vector3(abs(stat->collisionBox.X1 - stat->collisionBox.X2),
+		abs(stat->collisionBox.Y1 - stat->collisionBox.Y2),
+		abs(stat->collisionBox.Z1 - stat->collisionBox.Z2));
+
+	// Check extents, if any 2 bounds are smaller than threshold, discard.
+	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+		return false;
+
+	return true;
 }
 
 std::vector<MESH_INFO*> FillCollideableStaticsList()
@@ -1917,14 +1928,7 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 		auto room = &g_Level.Rooms[i];
 		for (short j = 0; j < room->mesh.size(); j++)
 		{
-			auto mesh = &room->mesh[j];
-			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
-				continue;
-
-			auto stat = &StaticObjects[mesh->staticNumber];
-			if (abs(stat->collisionBox.X1 - stat->collisionBox.X2) < COLL_DISCARD_THRESHOLD ||
-				abs(stat->collisionBox.Y1 - stat->collisionBox.Y2) < COLL_DISCARD_THRESHOLD ||
-				abs(stat->collisionBox.Z1 - stat->collisionBox.Z2) < COLL_DISCARD_THRESHOLD)
+			if (!CheckStaticCollideCamera(&room->mesh[j]))
 				continue;
 
 			staticList.push_back(&room->mesh[j]);
