@@ -13,13 +13,15 @@
 #include "control/los.h"
 #include "savegame.h"
 #include "input.h"
-#include "pickup/pickup.h"
 #include "items.h"
 #include "Objects/Generic/Object/burning_torch.h"
 
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
+
+constexpr auto COLL_CHECK_THRESHOLD = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD = SECTOR(2);
 
 struct OLD_CAMERA
 {
@@ -1846,14 +1848,18 @@ static bool CheckItemCollideCamera(short item_number)
 	auto dy = Camera.pos.y - item->pos.yPos;
 	auto dz = Camera.pos.z - item->pos.zPos;
 
-	bool close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+	bool close_enough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
+						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
-	if (!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
-		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem &&
-		item->collidable && close_enough)
+	// TODO: Find a better way to define objects which are collidable with camera.
+
+	if (close_enough && item->collidable &&
+		!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
+		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem)
 		return true;
-
-	return false;
+	else
+		return false;
 }
 
 std::vector<short> FillCollideableItemList()
@@ -1874,7 +1880,10 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	auto dx = Camera.pos.x - mesh->pos.xPos;
 	auto dy = Camera.pos.y - mesh->pos.yPos;
 	auto dz = Camera.pos.z - mesh->pos.zPos;
-	auto close_enough = dx > -SECTOR(4) && dx < SECTOR(4) && dz > -SECTOR(4) && dz < SECTOR(4) && dy > -SECTOR(4) && dy < SECTOR(4);
+
+	bool close_enough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
+						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
 	if (close_enough) // Literally anything else?
 		return 1;
@@ -1917,6 +1926,7 @@ void ItemsCollideCamera()
 	auto itemList = FillCollideableItemList();
 
 	// Collide with the items list
+
 	for (int i = 0; i < itemList.size(); i++)
 	{
 		auto item = &g_Level.Items[itemList[i]];
@@ -1929,7 +1939,7 @@ void ItemsCollideCamera()
 		auto dz = abs(LaraItem->pos.zPos - item->pos.zPos);
 
 		// If camera is stuck behind some item, and Lara runs off somewhere
-		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
+		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
@@ -1938,13 +1948,13 @@ void ItemsCollideCamera()
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->pos, bounds),
-			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
 
 	itemList.clear(); // Done
 
-	/*now statics*/
+	// Collide with static meshes
 
 	auto staticList = FillCollideableStaticsList();
 
@@ -1960,7 +1970,7 @@ void ItemsCollideCamera()
 		auto dy = abs(LaraItem->pos.yPos - mesh->pos.yPos);
 		auto dz = abs(LaraItem->pos.zPos - mesh->pos.zPos);
 
-		if (dx > SECTOR(3) || dz > SECTOR(3) || dy > SECTOR(3))
+		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = &stat->collisionBox;
@@ -1969,7 +1979,7 @@ void ItemsCollideCamera()
 
 #ifdef _DEBUG
 		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(mesh->pos, bounds),
-			Vector4(1.0F, 0.0F, 0.0F, 1.0F), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
 
