@@ -27,7 +27,7 @@ struct SHATTER_ITEM
 {
 	SPHERE sphere;
 	ITEM_LIGHT* il;
-	MESH* meshp;
+	int meshIndex;
 	int bit;
 	short yRot;
 	short flags;
