@@ -381,8 +381,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	LaraCheatyBits();
-
 	if (info->hasFired)
 	{
 		AlertNearbyGuards(item);
@@ -445,10 +443,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
-
-	TriggerLaraDrips(item);
-
-	short roomNumber;
 
 	if (info->Vehicle == NO_ITEM && info->ExtraAnim == -1)
 	{
@@ -541,9 +535,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case LW_UNDERWATER:
-			roomNumber = item->roomNumber;
-			GetFloor(item->pos.xPos, item->pos.yPos - STEP_SIZE, item->pos.zPos, &roomNumber);
-
 			if (isWater ||
 				waterDepth == DEEP_WATER ||
 				abs(heightFromWater) >= STEP_SIZE ||
