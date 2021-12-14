@@ -1895,12 +1895,9 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 {
 	std::vector<MESH_INFO*> staticList;
 	std::vector<short> roomList;
-	ROOM_INFO* room;
-	MESH_INFO* mesh;
-	short roomNum;
 	
-	roomNum = Camera.pos.roomNumber;
-	room = &g_Level.Rooms[roomNum];
+	short roomNum = Camera.pos.roomNumber;
+	auto room = &g_Level.Rooms[roomNum];
 
 	// Definitely check camera room 
 	roomList.push_back(roomNum);
