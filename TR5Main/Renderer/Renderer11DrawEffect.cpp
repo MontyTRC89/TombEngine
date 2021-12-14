@@ -588,7 +588,7 @@ namespace TEN::Renderer
 
 			for (auto& flashBucket : flashMesh->buckets) 
 			{
-				if (flashBucket.blendMode == BLENDMODE_OPAQUE)
+				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
 				if (flashBucket.Vertices.size() != 0) 
 				{
@@ -678,7 +678,7 @@ namespace TEN::Renderer
 
 					for (auto& flashBucket : flashMesh->buckets)
 					{
-						if (flashBucket.blendMode == BLENDMODE_OPAQUE)
+						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
 						if (flashBucket.Vertices.size() != 0)
 						{
@@ -1053,7 +1053,7 @@ namespace TEN::Renderer
 		{
 			if (bucket.Vertices.size() == 0)
 				continue;
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
+			if (transparent && bucket.BlendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices

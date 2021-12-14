@@ -22,45 +22,6 @@ namespace TEN::Renderer
 
 		m_meshes.clear();
 
-		// Step 0: prepare animated textures
-		/*short numSets = *AnimTextureRanges;
-		short *animatedPtr = AnimTextureRanges;
-		animatedPtr++;
-
-		m_animatedTextureSets = vector<RendererAnimatedTextureSet>(NUM_ANIMATED_SETS);
-		m_numAnimatedTextureSets = numSets;
-
-		for (int i = 0; i < numSets; i++)
-		{
-			m_animatedTextureSets[i] = RendererAnimatedTextureSet();
-			RendererAnimatedTextureSet &const set = m_animatedTextureSets[i];
-			short numTextures = *animatedPtr + 1;
-			animatedPtr++;
-
-			set.Textures = vector<RendererAnimatedTexture>(numTextures);
-			set.NumTextures = numTextures;
-
-			for (int j = 0; j < numTextures; j++)
-			{
-				short textureId = *animatedPtr;
-				animatedPtr++;
-
-				OBJECT_TEXTURE *texture = &g_Level.ObjectTextures[textureId];
-				int tile = texture->tileAndFlag & 0x7FFF;
-				set.Textures[j] = RendererAnimatedTexture();
-				RendererAnimatedTexture &const newTexture = set.Textures[j];
-				newTexture.Id = textureId;
-
-				for (int k = 0; k < 4; k++)
-				{
-					float x = texture->vertices[k].x;
-					float y = texture->vertices[k].y;
-
-					newTexture.UV[k] = Vector2(x, y);
-				}
-			}
-		}*/
-
 		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(m_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
 			RendererAnimatedTextureSet set{};
 			set.NumTextures = sequence.numFrames;
@@ -79,53 +40,6 @@ namespace TEN::Renderer
 			return set;
 		});
 
-		// Step 1: create the texture atlas
-		/*byte* buffer = (byte*)malloc(TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
-		ZeroMemory(buffer, TEXTURE_ATLAS_SIZE * TEXTURE_ATLAS_SIZE * 4);
-		int blockX = 0;
-		int blockY = 0;
-		for (int p = 0; p < NumTexturePages; p++)
-		{
-			for (int y = 0; y < 256; y++)
-			{
-				for (int x = 0; x < 256; x++)
-				{
-					int pixelIndex = blockY * TEXTURE_PAGE_SIZE * NUM_TEXTURE_PAGES_PER_ROW + y * 256 * NUM_TEXTURE_PAGES_PER_ROW * 4 + blockX * 256 * 4 + x * 4;
-					int oldPixelIndex = p * TEXTURE_PAGE_SIZE + y * 256 * 4 + x * 4;
-					byte r = Texture32[oldPixelIndex];
-					byte g = Texture32[oldPixelIndex + 1];
-					byte b = Texture32[oldPixelIndex + 2];
-					byte a = Texture32[oldPixelIndex + 3];
-					buffer[pixelIndex + 0] = b;
-					buffer[pixelIndex + 1] = g;
-					buffer[pixelIndex + 2] = r;
-					buffer[pixelIndex + 3] = a;
-				}
-			}
-			blockX++;
-			if (blockX == NUM_TEXTURE_PAGES_PER_ROW)
-			{
-				blockX = 0;
-				blockY++;
-			}
-		}
-		if (m_textureAtlas != NULL)
-			delete m_textureAtlas;
-		m_textureAtlas = Texture2D::LoadFromByteArray(m_device, TEXTURE_ATLAS_SIZE, TEXTURE_ATLAS_SIZE, &buffer[0]);
-		if (m_textureAtlas == NULL)
-			return false;
-		free(buffer);
-		buffer = (byte*)malloc(256 * 256 * 4);
-		memcpy(buffer, MiscTextures + 256 * 512 * 4, 256 * 256 * 4);
-		m_skyTexture = Texture2D::LoadFromByteArray(m_device, 256, 256, &buffer[0]);
-		if (m_skyTexture == NULL)
-			return false;*/
-
-		//D3DX11SaveTextureToFileA(m_context, m_skyTexture->Texture, D3DX11_IFF_PNG, "H:\\sky.png");
-
-		//free(buffer);
-
-		// Upload textures to GPU memory
 		m_roomTextures.resize(g_Level.RoomTextures.size());
 		for (int i = 0; i < g_Level.RoomTextures.size(); i++)
 		{
@@ -216,125 +130,121 @@ namespace TEN::Renderer
 
 		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), g_Level.SkyTexture.colorMapData.size());
 
-		// Step 2: prepare rooms
-		vector<RendererVertex> roomVertices;
-		vector<int> roomIndices;
+		int totalVertices = 0;
+		int totalIndices = 0;
+		for (auto& room : g_Level.Rooms)
+			for (auto& bucket : room.buckets)
+			{
+				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
+				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+			}
 
-		int totalRoomsVertices = 0;
-		int totalRoomsIndices = 0;
+		roomsVertices.resize(totalVertices);
+		roomsIndices.resize(totalIndices);
+
+		int lastVertex = 0;
+		int lastIndex = 0;
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
-			ROOM_INFO* room = &g_Level.Rooms[i];
+			ROOM_INFO& room = g_Level.Rooms[i];
 
 			RendererRoom* r = &m_rooms[i];
-
 			r->RoomNumber = i;
-			r->AmbientLight = Vector4(room->ambient.x, room->ambient.y, room->ambient.z, 1.0f);
+			r->AmbientLight = Vector4(room.ambient.x, room.ambient.y, room.ambient.z, 1.0f);
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
-			if (room->mesh.size() > 0)
+			if (room.mesh.size() > 0)
 			{
-				r->StaticsToDraw.reserve(room->mesh.size());
+				r->StaticsToDraw.reserve(room.mesh.size());
 			}
 
-			if (room->positions.size() == 0)
+			if (room.positions.size() == 0)
 				continue;
-
-			int baseRoomVertex = 0;
-			int baseRoomIndex = 0;
 			
-			for (int n = 0; n < room->buckets.size(); n++)
+			for (auto& levelBucket : room.buckets)
 			{
-				BUCKET* levelBucket = &room->buckets[n];
 				RendererBucket bucket{};
-				bucket.animated = levelBucket->animated;
-				bucket.blendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
-				bucket.doubleSided = levelBucket->doubleSided;
-				bucket.texture = levelBucket->texture;
-				bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-				bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 
-				int lastVertex = 0;
-				int lastIndex = 0;
+				bucket.Animated = levelBucket.animated;
+				bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket.blendMode);
+				bucket.DoubleSided = levelBucket.doubleSided;
+				bucket.Texture = levelBucket.texture;
+				bucket.StartVertex = lastVertex;
+				bucket.StartIndex = lastIndex;
+				bucket.NumVertices += levelBucket.numQuads * 4 + levelBucket.numTriangles * 3;
+				bucket.NumIndices += levelBucket.numQuads * 6 + levelBucket.numTriangles * 3;
 
-				for (int p = 0; p < levelBucket->polygons.size(); p++)
+				for (auto& poly : levelBucket.polygons)
 				{
-					POLYGON* poly = &levelBucket->polygons[p];
 					RendererPolygon newPoly;
 
-					newPoly.shape = poly->shape;
+					newPoly.shape = poly.shape;
 					
 					int baseVertices = lastVertex;
-
-					for (int k = 0; k < poly->indices.size(); k++)
+					for (int k = 0; k < poly.indices.size(); k++)
 					{
-						RendererVertex* vertex = &bucket.Vertices[lastVertex];
-						int v = poly->indices[k];
+						RendererVertex* vertex = &roomsVertices[lastVertex];
+						int index = poly.indices[k];
 
-						vertex->Position.x = room->x + room->positions[v].x;
-						vertex->Position.y = room->y + room->positions[v].y;
-						vertex->Position.z = room->z + room->positions[v].z;
+						vertex->Position.x = room.x + room.positions[index].x;
+						vertex->Position.y = room.y + room.positions[index].y;
+						vertex->Position.z = room.z + room.positions[index].z;
 
-						vertex->Normal = poly->normals[k];
-						vertex->UV = poly->textureCoordinates[k];
-						vertex->Color = Vector4(room->colors[v].x, room->colors[v].y, room->colors[v].z, 1.0f);
-						vertex->Tangent = poly->tangents[k];
-						vertex->BiTangent = poly->bitangents[k];
+						vertex->Normal = poly.normals[k];
+						vertex->UV = poly.textureCoordinates[k];
+						vertex->Color = Vector4(room.colors[index].x, room.colors[index].y, room.colors[index].z, 1.0f);
+						vertex->Tangent = poly.tangents[k];
+						vertex->BiTangent = poly.bitangents[k];
 						vertex->IndexInPoly = k;
-						vertex->OriginalIndex = v;
-						vertex->Effects = room->effects[v];
+						vertex->OriginalIndex = index;
+						vertex->Effects = room.effects[index];
 						unsigned long long primes[]{ 73856093ULL ,19349663ULL ,83492791ULL };
 
 						vertex->hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];
 						vertex->Bone = 0;
 
 						lastVertex++;
-						totalRoomsVertices++;
 					}
 
-					if (poly->shape == 0)
+					if (poly.shape == 0)
 					{
 						newPoly.baseIndex = lastIndex;
 
-						bucket.Indices[lastIndex + 0] = baseVertices + 0;
-						bucket.Indices[lastIndex + 1] = baseVertices + 1;
-						bucket.Indices[lastIndex + 2] = baseVertices + 3;
-						bucket.Indices[lastIndex + 3] = baseVertices + 2;
-						bucket.Indices[lastIndex + 4] = baseVertices + 3;
-						bucket.Indices[lastIndex + 5] = baseVertices + 1;
-
-						newPoly.baseIndex = lastIndex;
+						roomsIndices[lastIndex + 0] = baseVertices + 0;
+						roomsIndices[lastIndex + 1] = baseVertices + 1;
+						roomsIndices[lastIndex + 2] = baseVertices + 3;
+						roomsIndices[lastIndex + 3] = baseVertices + 2;
+						roomsIndices[lastIndex + 4] = baseVertices + 3;
+						roomsIndices[lastIndex + 5] = baseVertices + 1;
 
 						lastIndex += 6;
-						totalRoomsIndices += 6;
 					}
 					else
 					{
 						newPoly.baseIndex = lastIndex;
  
-						bucket.Indices[lastIndex + 0] = baseVertices + 0;
-						bucket.Indices[lastIndex + 1] = baseVertices + 1;
-						bucket.Indices[lastIndex + 2] = baseVertices + 2;
+						roomsIndices[lastIndex + 0] = baseVertices + 0;
+						roomsIndices[lastIndex + 1] = baseVertices + 1;
+						roomsIndices[lastIndex + 2] = baseVertices + 2;
 
 						lastIndex += 3;
-						totalRoomsIndices += 3;
 					}
 
 					bucket.Polygons.push_back(newPoly);
-
 				}
-				r->Buckets.push_back(bucket);
-				
+
+				r->Buckets.push_back(bucket);		
 			}
 
-			if (room->lights.size() != 0)
+			if (room.lights.size() != 0)
 			{
-				r->Lights.resize(room->lights.size());
-				for (int l = 0; l < room->lights.size(); l++)
+				r->Lights.resize(room.lights.size());
+
+				for (int l = 0; l < room.lights.size(); l++)
 				{
 					RendererLight* light = &r->Lights[l];
-					ROOM_LIGHT* oldLight = &room->lights[l];
+					ROOM_LIGHT* oldLight = &room.lights[l];
 
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
@@ -383,50 +293,38 @@ namespace TEN::Renderer
 				}
 			}
 		}
-
-		roomVertices.resize(totalRoomsVertices);
-		roomIndices.resize(totalRoomsIndices);
-
-		int baseRoomVertex = 0;
-		int baseRoomIndex = 0;
-
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
-			ROOM_INFO* room = &g_Level.Rooms[i];
-			RendererRoom* r = &m_rooms[i];
-			// Merge vertices and indices in a single list
-			for (auto& bucket : r->Buckets) {
-				bucket.StartVertex = baseRoomVertex;
-				bucket.StartIndex = baseRoomIndex;
-
-				for (int k = 0; k < bucket.Vertices.size(); k++)
-					roomVertices[baseRoomVertex + k] = bucket.Vertices[k];
-
-				for (int k = 0; k < bucket.Indices.size(); k++)
-					roomIndices[baseRoomIndex + k] = baseRoomVertex + bucket.Indices[k];
-
-				baseRoomVertex += bucket.Vertices.size();
-				baseRoomIndex += bucket.Indices.size();
-			}
-		}
-
-		// Create a single vertex buffer and a single index buffer for all rooms
-		// NOTICE: in theory, a 1,000,000 vertices scene should have a VB of 52 MB and an IB of 4 MB
-		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomVertices.size(), roomVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomIndices.size(), roomIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomsVertices.size(), roomsVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomsIndices.size(), roomsIndices.data());
 
 		m_numHairVertices = 0;
 		m_numHairIndices = 0;
 
-		vector<RendererVertex> moveablesVertices;
-		vector<int> moveablesIndices;
-		int baseMoveablesVertex = 0;
-		int baseMoveablesIndex = 0;
-
 		bool skinPresent = false;
 		bool hairsPresent = false;
 
-		// Step 3: prepare moveables
+		totalVertices = 0;
+		totalIndices = 0;
+		for (int i = 0; i < MoveablesIds.size(); i++)
+		{
+			int objNum = MoveablesIds[i];
+			OBJECT_INFO* obj = &Objects[objNum];
+
+			for (int j = 0; j < obj->nmeshes; j++)
+			{
+				MESH* mesh = &g_Level.Meshes[obj->meshIndex + j];
+
+				for (auto& bucket : mesh->buckets)
+				{
+					totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
+					totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+				}
+			}
+		}
+		moveablesVertices.resize(totalVertices);
+		moveablesIndices.resize(totalIndices);
+
+		lastVertex = 0;
+		lastIndex = 0;
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
@@ -447,7 +345,7 @@ namespace TEN::Renderer
 					RendererMesh *mesh = getRendererMeshFromTrMesh(&moveable,
 																   &g_Level.Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-																   MoveablesIds[i] == ID_LARA_HAIR);
+																   MoveablesIds[i] == ID_LARA_HAIR, &lastVertex, &lastIndex);
 					moveable.ObjectMeshes.push_back(mesh);
 				}
 
@@ -564,9 +462,9 @@ namespace TEN::Renderer
 							{
 								RendererBucket *jointBucket = &jointMesh->buckets[b1];
 
-								for (int v1 = 0; v1 < jointBucket->Vertices.size(); v1++)
+								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									RendererVertex *jointVertex = &jointBucket->Vertices[v1];
+									RendererVertex *jointVertex = &moveablesVertices[v1];
 
 									bool done = false;
 
@@ -578,17 +476,17 @@ namespace TEN::Renderer
 										for (int b2 = 0; b2 < skinMesh->buckets.size(); b2++)
 										{
 											RendererBucket *skinBucket = &skinMesh->buckets[b2];
-											for (int v2 = 0; v2 < skinBucket->Vertices.size(); v2++)
+											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												RendererVertex *skinVertex = &skinBucket->Vertices[v2];
+												RendererVertex *skinVertex = &moveablesVertices[v2];
 
-												int x1 = jointBucket->Vertices[v1].Position.x + jointBone->GlobalTranslation.x;
-												int y1 = jointBucket->Vertices[v1].Position.y + jointBone->GlobalTranslation.y;
-												int z1 = jointBucket->Vertices[v1].Position.z + jointBone->GlobalTranslation.z;
+												int x1 = moveablesVertices[v1].Position.x + jointBone->GlobalTranslation.x;
+												int y1 = moveablesVertices[v1].Position.y + jointBone->GlobalTranslation.y;
+												int z1 = moveablesVertices[v1].Position.z + jointBone->GlobalTranslation.z;
 
-												int x2 = skinBucket->Vertices[v2].Position.x + skinBone->GlobalTranslation.x;
-												int y2 = skinBucket->Vertices[v2].Position.y + skinBone->GlobalTranslation.y;
-												int z2 = skinBucket->Vertices[v2].Position.z + skinBone->GlobalTranslation.z;
+												int x2 = moveablesVertices[v2].Position.x + skinBone->GlobalTranslation.x;
+												int y2 = moveablesVertices[v2].Position.y + skinBone->GlobalTranslation.y;
+												int z2 = moveablesVertices[v2].Position.z + skinBone->GlobalTranslation.z;
 
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
@@ -626,9 +524,9 @@ namespace TEN::Renderer
 							{
 								RendererBucket* currentBucket = &currentMesh->buckets[b1];
 
-								for (int v1 = 0; v1 < currentBucket->Vertices.size(); v1++)
+								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
-									RendererVertex* currentVertex = &currentBucket->Vertices[v1];
+									RendererVertex* currentVertex = &moveablesVertices[v1];
 									currentVertex->Bone = j + 1;
 
 									if (j == 0)
@@ -645,9 +543,9 @@ namespace TEN::Renderer
 											for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
 											{
 												RendererBucket* parentBucket = &parentMesh->buckets[b2];
-												for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
+												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													RendererVertex* parentVertex = &parentBucket->Vertices[v2];
+													RendererVertex* parentVertex = &moveablesVertices[v2];
 
 													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
 													{
@@ -668,17 +566,17 @@ namespace TEN::Renderer
 										for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
 										{
 											RendererBucket* parentBucket = &parentMesh->buckets[b2];
-											for (int v2 = 0; v2 < parentBucket->Vertices.size(); v2++)
+											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												RendererVertex* parentVertex = &parentBucket->Vertices[v2];
+												RendererVertex* parentVertex = &moveablesVertices[v2];
 
-												int x1 = currentBucket->Vertices[v1].Position.x + currentBone->GlobalTranslation.x;
-												int y1 = currentBucket->Vertices[v1].Position.y + currentBone->GlobalTranslation.y;
-												int z1 = currentBucket->Vertices[v1].Position.z + currentBone->GlobalTranslation.z;
+												int x1 = moveablesVertices[v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = moveablesVertices[v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = moveablesVertices[v1].Position.z + currentBone->GlobalTranslation.z;
 
-												int x2 = parentBucket->Vertices[v2].Position.x + parentBone->GlobalTranslation.x;
-												int y2 = parentBucket->Vertices[v2].Position.y + parentBone->GlobalTranslation.y;
-												int z2 = parentBucket->Vertices[v2].Position.z + parentBone->GlobalTranslation.z;
+												int x2 = moveablesVertices[v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = moveablesVertices[v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = moveablesVertices[v2].Position.z + parentBone->GlobalTranslation.z;
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
@@ -697,77 +595,44 @@ namespace TEN::Renderer
 						}
 					}
 				}
-
-				// Merge vertices and indices in a single list
-				for (int m = 0; m < moveable.ObjectMeshes.size(); m++)
-				{
-					RendererMesh *msh = moveable.ObjectMeshes[m];
-
-					for (int j = 0; j < msh->buckets.size(); j++)
-					{
-						RendererBucket *bucket = &msh->buckets[j];
-
-						bucket->StartVertex = baseMoveablesVertex;
-						bucket->StartIndex = baseMoveablesIndex;
-
-						for (int k = 0; k < bucket->Vertices.size(); k++)
-							moveablesVertices.push_back(bucket->Vertices[k]);
-
-						for (int k = 0; k < bucket->Indices.size(); k++)
-							moveablesIndices.push_back(baseMoveablesVertex + bucket->Indices[k]);
-
-						baseMoveablesVertex += bucket->Vertices.size();
-						baseMoveablesIndex += bucket->Indices.size();
-					}
-				}
 			}
 		}
-
-		// Create a single vertex buffer and a single index buffer for all moveables
 		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), moveablesVertices.size(), moveablesVertices.data());
 		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), moveablesIndices.size(), moveablesIndices.data());
 
-		// Step 4: prepare static meshes
-		vector<RendererVertex> staticsVertices;
-		vector<int> staticsIndices;
-		int baseStaticsVertex = 0;
-		int baseStaticsIndex = 0;
+		totalVertices = 0;
+		totalIndices = 0;
+		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		{
+			int objNum = StaticObjectsIds[i];
+			STATIC_INFO* obj = &StaticObjects[objNum];
+			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
 
+			for (auto& bucket : mesh->buckets)
+			{
+				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
+				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+			}
+		}
+		staticsVertices.resize(totalVertices);
+		staticsIndices.resize(totalIndices);
+
+		lastVertex = 0;
+		lastIndex = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
+			staticObject.Type = 1;
 			staticObject.Id = StaticObjectsIds[i];
 
-			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false);
+			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
 			staticObject.ObjectMeshes.push_back(mesh);
 
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
-
-			// Merge vertices and indices in a single list
-			RendererMesh *msh = staticObject.ObjectMeshes[0];
-
-			for (int j = 0; j < msh->buckets.size(); j++)
-			{
-				RendererBucket* bucket = &msh->buckets[j];
-
-				bucket->StartVertex = baseStaticsVertex;
-				bucket->StartIndex = baseStaticsIndex;
-
-				for (int k = 0; k < bucket->Vertices.size(); k++)
-					staticsVertices.push_back(bucket->Vertices[k]);
-
-				for (int k = 0; k < bucket->Indices.size(); k++)
-					staticsIndices.push_back(baseStaticsVertex + bucket->Indices[k]);
-
-				baseStaticsVertex += bucket->Vertices.size();
-				baseStaticsIndex += bucket->Indices.size();
-			}
 		}
-
-		// Create a single vertex buffer and a single index buffer for all statics
 		m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
 		m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
 
@@ -828,4 +693,136 @@ namespace TEN::Renderer
 		*/
 		return true;
 	}
-} // namespace TEN::Renderer
+
+	RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex)
+	{
+		RendererMesh* mesh = new RendererMesh();
+
+		mesh->Sphere = meshPtr->sphere;
+
+		if (meshPtr->positions.size() == 0)
+			return mesh;
+
+		mesh->Positions.resize(meshPtr->positions.size());
+		for (int i = 0; i < meshPtr->positions.size(); i++)
+			mesh->Positions[i] = meshPtr->positions[i];
+
+		for (int n = 0; n < meshPtr->buckets.size(); n++)
+		{
+			BUCKET* levelBucket = &meshPtr->buckets[n];
+			RendererBucket bucket{};
+			int bucketIndex;
+			bucket.Animated = levelBucket->animated;
+			bucket.Texture = levelBucket->texture;
+			bucket.DoubleSided = levelBucket->doubleSided;
+			bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
+			bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+			bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+			bucket.StartVertex = *lastVertex;
+			bucket.StartIndex = *lastIndex;
+
+			for (int p = 0; p < levelBucket->polygons.size(); p++)
+			{
+				POLYGON* poly = &levelBucket->polygons[p];
+				RendererPolygon newPoly;
+
+				newPoly.shape = poly->shape;
+				newPoly.centre = (
+					meshPtr->positions[poly->indices[0]] +
+					meshPtr->positions[poly->indices[1]] +
+					meshPtr->positions[poly->indices[2]]) / 3.0f;
+
+				int baseVertices = *lastVertex;
+
+				for (int k = 0; k < poly->indices.size(); k++)
+				{
+					RendererVertex vertex;
+					int v = poly->indices[k];
+
+					vertex.Position.x = meshPtr->positions[v].x;
+					vertex.Position.y = meshPtr->positions[v].y;
+					vertex.Position.z = meshPtr->positions[v].z;
+
+					vertex.Normal.x = poly->normals[k].x;
+					vertex.Normal.y = poly->normals[k].y;
+					vertex.Normal.z = poly->normals[k].z;
+
+					vertex.UV.x = poly->textureCoordinates[k].x;
+					vertex.UV.y = poly->textureCoordinates[k].y;
+
+					vertex.Color.x = meshPtr->colors[v].x;
+					vertex.Color.y = meshPtr->colors[v].y;
+					vertex.Color.z = meshPtr->colors[v].z;
+					vertex.Color.w = 1.0f;
+
+					vertex.Bone = meshPtr->bones[v];
+					vertex.OriginalIndex = v;
+
+					vertex.Effects = meshPtr->effects[v];
+					vertex.hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
+
+					if (obj->Type == 0)
+						moveablesVertices[*lastVertex] = vertex;
+					else
+						staticsVertices[*lastVertex] = vertex;
+
+					*lastVertex = *lastVertex + 1;
+				}
+
+				if (poly->shape == 0)
+				{
+					newPoly.baseIndex = *lastIndex;
+
+					if (obj->Type == 0)
+					{
+						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+					}
+					else
+					{
+						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
+						staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
+						staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
+						staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+					}
+
+					*lastIndex = *lastIndex + 6;
+				}
+				else
+				{
+					newPoly.baseIndex = *lastIndex;
+
+					if (obj->Type == 0)
+					{
+						moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+					}
+					else
+					{
+						staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
+						staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
+						staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+					}
+
+					*lastIndex = *lastIndex + 3;
+				}
+
+				bucket.Polygons.push_back(newPoly);
+			}
+
+			mesh->buckets.push_back(bucket);
+		}
+
+		m_meshes.push_back(mesh);
+
+		return mesh;
+	}
+}
+

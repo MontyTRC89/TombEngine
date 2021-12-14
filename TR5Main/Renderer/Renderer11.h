@@ -198,6 +198,7 @@ namespace TEN::Renderer
 	struct RendererObject
 	{
 		int Id;
+		int Type;
 		std::vector<RendererMesh*> ObjectMeshes;
 		RendererBone* Skeleton;
 		std::vector<DirectX::SimpleMath::Matrix> AnimationTransforms;
@@ -355,7 +356,6 @@ namespace TEN::Renderer
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDBarColor;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_shadowSampler;
 	
-	
 		// Constant buffers
 		RenderView gameCamera;
 		ConstantBuffer<CCameraMatrixBuffer> m_cbCameraMatrices;
@@ -489,6 +489,19 @@ namespace TEN::Renderer
 		bool m_enableCinematicBars = false;
 		int m_pickupRotation = 0;
 
+		std::vector<RendererVertex> roomsVertices;
+		std::vector<int> roomsIndices;
+		std::vector<RendererVertex> moveablesVertices;
+		std::vector<int> moveablesIndices;
+		std::vector<RendererVertex> staticsVertices;
+		std::vector<int> staticsIndices;
+
+
+
+
+
+
+
 		// Private functions
 		void bindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType);
 
@@ -595,7 +608,7 @@ namespace TEN::Renderer
 		}
 
 	public:
-		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs);
+		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void drawBar(float percent, const RendererHUDBar * const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 
 		DirectX::SimpleMath::Matrix View;
