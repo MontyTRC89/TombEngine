@@ -174,4 +174,3 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
-std::set<int> CollectConnectedRooms(int roomNumber);
