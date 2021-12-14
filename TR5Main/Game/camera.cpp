@@ -20,8 +20,9 @@ using TEN::Renderer::g_Renderer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
 
-constexpr auto COLL_CHECK_THRESHOLD = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD = SECTOR(2);
+constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
+constexpr auto COLL_DISCARD_THRESHOLD = CLICK(1);
 
 struct OLD_CAMERA
 {
@@ -1841,9 +1842,8 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	}
 }
 
-static bool CheckItemCollideCamera(short item_number)
+static bool CheckItemCollideCamera(ITEM_INFO* item)
 {
-	auto item = &g_Level.Items[item_number];
 	auto dx = Camera.pos.x - item->pos.xPos;
 	auto dy = Camera.pos.y - item->pos.yPos;
 	auto dz = Camera.pos.z - item->pos.zPos;
@@ -1857,19 +1857,37 @@ static bool CheckItemCollideCamera(short item_number)
 	if (close_enough && item->collidable &&
 		!Objects[item->objectNumber].intelligent && !Objects[item->objectNumber].isPickup &&
 		!Objects[item->objectNumber].isPuzzleHole && Objects[item->objectNumber].usingDrawAnimatingItem)
-		return true;
-	else
-		return false;
+	{
+
+		// Check extents, if smaller than threshold, discard
+		Vector3 extents = TO_DX_BBOX(item->pos, GetBoundsAccurate(item)).Extents;
+		if (abs(extents.x) < COLL_DISCARD_THRESHOLD ||
+			abs(extents.y) < COLL_DISCARD_THRESHOLD ||
+			abs(extents.z) < COLL_DISCARD_THRESHOLD)
+			return false;
+		else
+			return true;
+	}
+
+	return false;
 }
 
 std::vector<short> FillCollideableItemList()
 {
 	std::vector<short> itemList;
+	auto roomList = CollectConnectedRooms(Camera.pos.roomNumber);
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
-		if (CheckItemCollideCamera(i))
-			itemList.push_back(i);
+		auto item = &g_Level.Items[i];
+
+		if (!roomList.count(item->roomNumber))
+			continue;
+
+		if (!CheckItemCollideCamera(&g_Level.Items[i]))
+			continue;
+		
+		itemList.push_back(i);
 	}
 
 	return itemList;
@@ -1886,32 +1904,33 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
 	if (close_enough) // Literally anything else?
-		return 1;
+		return true;
 
-	return 0;
+	return false;
 }
 
 std::vector<MESH_INFO*> FillCollideableStaticsList()
 {
 	std::vector<MESH_INFO*> staticList;
-	std::vector<short> roomList;
-	
-	short roomNum = Camera.pos.roomNumber;
-	auto room = &g_Level.Rooms[roomNum];
+	auto roomList = CollectConnectedRooms(Camera.pos.roomNumber);
 
-	// Definitely check camera room 
-	roomList.push_back(roomNum);
-
-	// And neighbouring rooms
-	for (short i = 0; i < room->doors.size(); i++)
-		roomList.push_back(room->doors[i].room);
-
-	for (short i = 0; i < roomList.size(); i++)
+	for (auto i : roomList)
 	{
-		room = &g_Level.Rooms[roomList[i]];
-
+		auto room = &g_Level.Rooms[i];
 		for (short j = 0; j < room->mesh.size(); j++)
+		{
+			auto mesh = &room->mesh[j];
+			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			auto stat = &StaticObjects[mesh->staticNumber];
+			if (abs(stat->collisionBox.X1 - stat->collisionBox.X2) < COLL_DISCARD_THRESHOLD ||
+				abs(stat->collisionBox.Y1 - stat->collisionBox.Y2) < COLL_DISCARD_THRESHOLD ||
+				abs(stat->collisionBox.Z1 - stat->collisionBox.Z2) < COLL_DISCARD_THRESHOLD)
+				continue;
+
 			staticList.push_back(&room->mesh[j]);
+		}
 	}
 
 	return staticList;
