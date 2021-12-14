@@ -180,7 +180,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 
 	BoatMountType mountType = BoatMountType::None;
 
-	if (laraInfo->gunStatus != LG_NO_ARMS)
+	if (laraInfo->gunStatus != LG_HANDS_FREE)
 		return mountType;
 
 	if (!TestBoundsCollide(sBoatItem, laraItem, coll->Setup.Radius))
