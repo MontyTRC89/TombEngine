@@ -464,7 +464,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									RendererVertex *jointVertex = &moveablesVertices[v1];
+									RendererVertex *jointVertex = &moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool done = false;
 
@@ -478,15 +478,15 @@ namespace TEN::Renderer
 											RendererBucket *skinBucket = &skinMesh->buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												RendererVertex *skinVertex = &moveablesVertices[v2];
+												RendererVertex *skinVertex = &moveablesVertices[skinBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[v1].Position.x + jointBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[v1].Position.y + jointBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[v1].Position.z + jointBone->GlobalTranslation.z;
+												int x1 = moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
+												int y1 = moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
+												int z1 = moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[v2].Position.x + skinBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[v2].Position.y + skinBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[v2].Position.z + skinBone->GlobalTranslation.z;
+												int x2 = moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
+												int y2 = moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
+												int z2 = moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
 
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
@@ -526,7 +526,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
-									RendererVertex* currentVertex = &moveablesVertices[v1];
+									RendererVertex* currentVertex = &moveablesVertices[currentBucket->StartVertex + v1];
 									currentVertex->Bone = j + 1;
 
 									if (j == 0)
@@ -545,7 +545,7 @@ namespace TEN::Renderer
 												RendererBucket* parentBucket = &parentMesh->buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													RendererVertex* parentVertex = &moveablesVertices[v2];
+													RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
 
 													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
 													{
@@ -568,15 +568,15 @@ namespace TEN::Renderer
 											RendererBucket* parentBucket = &parentMesh->buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												RendererVertex* parentVertex = &moveablesVertices[v2];
+												RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
 
-												int x1 = moveablesVertices[v1].Position.x + currentBone->GlobalTranslation.x;
-												int y1 = moveablesVertices[v1].Position.y + currentBone->GlobalTranslation.y;
-												int z1 = moveablesVertices[v1].Position.z + currentBone->GlobalTranslation.z;
+												int x1 = moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
 
-												int x2 = moveablesVertices[v2].Position.x + parentBone->GlobalTranslation.x;
-												int y2 = moveablesVertices[v2].Position.y + parentBone->GlobalTranslation.y;
-												int z2 = moveablesVertices[v2].Position.z + parentBone->GlobalTranslation.z;
+												int x2 = moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
@@ -716,10 +716,12 @@ namespace TEN::Renderer
 			bucket.Texture = levelBucket->texture;
 			bucket.DoubleSided = levelBucket->doubleSided;
 			bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
-			bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-			bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
+			//bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
+			//bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 			bucket.StartVertex = *lastVertex;
 			bucket.StartIndex = *lastIndex;
+			bucket.NumVertices = levelBucket->numQuads * 4 + levelBucket->numTriangles * 3;
+			bucket.NumIndices = levelBucket->numQuads * 6 + levelBucket->numTriangles * 3;
 
 			for (int p = 0; p < levelBucket->polygons.size(); p++)
 			{
