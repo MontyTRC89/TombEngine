@@ -150,9 +150,9 @@ namespace TEN::Renderer
                 if (bucket.Vertices.size() == 0)
                     continue;
 
-				setBlendMode(bucket.blendMode);
+				setBlendMode(bucket.BlendMode);
 
-                m_stMisc.AlphaTest = (bucket.blendMode != BLEND_MODES::BLENDMODE_OPAQUE);
+                m_stMisc.AlphaTest = (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE);
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
@@ -237,7 +237,7 @@ namespace TEN::Renderer
 
             for (auto& bucket : mesh->buckets)
             {
-                if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+                if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
                     continue;
 
                 // Draw vertices
@@ -256,7 +256,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+					if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
 						continue;
 
 					// Draw vertices
@@ -272,7 +272,7 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->buckets)
 			{
-				if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+				if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
 					continue;
 
 				// Draw vertices
@@ -306,7 +306,7 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->buckets)
 			{
-				if (bucket.Vertices.size() == 0 && bucket.blendMode != 0)
+				if (bucket.Vertices.size() == 0 && bucket.BlendMode != 0)
 					continue;
 
 				// Draw vertices
@@ -390,7 +390,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.Vertices.size() == 0 && bucket.blendMode == BLENDMODE_OPAQUE)
+					if (bucket.Vertices.size() == 0 && bucket.BlendMode == BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
@@ -2089,6 +2089,8 @@ namespace TEN::Renderer
                     room->TransparentFacesToDraw.begin(),
                     room->TransparentFacesToDraw.end(),
                     [](RendererTransparentFace& a, RendererTransparentFace& b) {
+                        return a.distance < b.distance;
+
                         int aDistance = std::floor(a.distance / 256);
                         int bDistance = std::floor(b.distance / 256);
 
@@ -2199,53 +2201,20 @@ namespace TEN::Renderer
                 if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
                 {
                     // For rooms, we already pass world coordinates, just copy vertices
-                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
-
-                    /*int* srcData = face.info.bucket->Indices.data();
-                    int* destData = m_transparentFacesIndices.data();
-                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
-
-                    m_numTransparentIndices += numVertices;*/
-
-                    //for (int i = 0; i < numVertices; i++)
-                    //{
-                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
-                    //}
+                    int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(roomsIndices.data(), face.info.polygon->baseIndex, numIndices);
                 }
                 else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
                 {
                     // For rooms, we already pass world coordinates, just copy vertices
-                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
-
-                    /*int* srcData = face.info.bucket->Indices.data();
-                    int* destData = m_transparentFacesIndices.data();
-                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
-
-                    m_numTransparentIndices += numVertices;*/
-
-                    //for (int i = 0; i < numVertices; i++)
-                    //{
-                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
-                    //}
+                    int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(moveablesIndices.data(), face.info.polygon->baseIndex, numIndices);
                 }
                 else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
                 {
                     // For rooms, we already pass world coordinates, just copy vertices
-                    int numVertices = (face.info.polygon->shape == 0 ? 6 : 3);
-                    m_transparentFacesIndices.bulk_push_back(face.info.bucket->Indices.data(), face.info.polygon->baseIndex, numVertices);
-
-                    /*int* srcData = face.info.bucket->Indices.data();
-                    int* destData = m_transparentFacesIndices.data();
-                    memcpy(destData + m_transparentFacesIndices.size(), srcData + face.info.polygon->baseIndex, sizeof(int) * numVertices);
-
-                    m_numTransparentIndices += numVertices;*/
-
-                    //for (int i = 0; i < numVertices; i++)
-                    //{
-                    //    m_transparentFacesIndices.push_back(face.info.bucket->Indices[face.info.polygon->baseIndex + i]);
-                    //}
+                    int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
+                    m_transparentFacesIndices.bulk_push_back(staticsIndices.data(), face.info.polygon->baseIndex, numIndices);
                 }
                 else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
                 {
@@ -2342,6 +2311,8 @@ namespace TEN::Renderer
                 drawSpritesTransparent(oldInfo, view);
             }
         }
+
+        m_context->RSSetState(m_states->CullCounterClockwise());
     }
 
     void Renderer11::drawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
@@ -2433,6 +2404,15 @@ namespace TEN::Renderer
         }
        
         setBlendMode(info->blendMode);
+
+        if (info->bucket->DoubleSided)
+        {
+            m_context->RSSetState(m_states->CullNone());
+        }
+        else
+        {
+            m_context->RSSetState(m_states->CullCounterClockwise());
+        }
        
         m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
 
@@ -2454,6 +2434,8 @@ namespace TEN::Renderer
 
             drawnVertices += TRANSPARENT_BUCKET_SIZE;
         }
+
+        m_context->RSSetState(m_states->CullCounterClockwise());
     }
 
     void Renderer11::drawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
@@ -2461,7 +2443,7 @@ namespace TEN::Renderer
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
-        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
@@ -2470,12 +2452,12 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
         // Set texture
-        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[info->bucket->texture]), SamplerStateType::AnisotropicClamp);
-        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[info->bucket->texture]), SamplerStateType::None);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[info->bucket->Texture]), SamplerStateType::AnisotropicClamp);
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[info->bucket->Texture]), SamplerStateType::None);
 
-        m_stStatic.World = Matrix::Identity;
-        m_stStatic.Position = Vector4::One;
-        m_stStatic.Color = Vector4::One;
+        m_stStatic.World = info->world;
+        m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
+        m_stStatic.Color = info->color;
         m_cbStatic.updateData(m_stStatic, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
 
@@ -2486,13 +2468,25 @@ namespace TEN::Renderer
         setBlendMode(info->blendMode);
 
         int drawnVertices = 0;
-        while (drawnVertices < m_transparentFacesVertices.size())
-        {
-            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > m_transparentFacesVertices.size() ?
-                m_transparentFacesVertices.size() - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+        int size = m_transparentFacesIndices.size();
 
-            m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, drawnVertices, count);
-            m_context->Draw(count, 0);
+        if (info->bucket->DoubleSided)
+        {
+            m_context->RSSetState(m_states->CullNone());
+        }
+        else
+        {
+            m_context->RSSetState(m_states->CullCounterClockwise());
+        }
+
+        while (drawnVertices < size)
+        {
+            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size ? size - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+
+            m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
+            m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+            m_context->DrawIndexed(count, 0, 0);
 
             m_numDrawCalls++;
             m_numTransparentDrawCalls++;
@@ -2784,7 +2778,7 @@ namespace TEN::Renderer
         // Set vertex buffer
         //m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
-        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
@@ -2812,8 +2806,8 @@ namespace TEN::Renderer
         m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
         // Set texture
-        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[info->bucket->texture]), SamplerStateType::AnisotropicClamp); 
-        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[info->bucket->texture]), SamplerStateType::None);
+        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[info->bucket->Texture]), SamplerStateType::AnisotropicClamp); 
+        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[info->bucket->Texture]), SamplerStateType::None);
 
         m_stMisc.AlphaTest = false;
         m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -2822,17 +2816,20 @@ namespace TEN::Renderer
         setBlendMode(info->blendMode);
 
         int drawnVertices = 0;
-        while (drawnVertices < m_transparentFacesVertices.size())
-        {
-            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > m_transparentFacesVertices.size() ?
-                m_transparentFacesVertices.size() - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+        int size = m_transparentFacesIndices.size();
 
-            m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, drawnVertices, count);
-            m_context->Draw(count, 0);
+        while (drawnVertices < size)
+        {
+            int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size ? size - drawnVertices : TRANSPARENT_BUCKET_SIZE);
+
+            m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
+            m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+            m_context->DrawIndexed(count, 0, 0);
 
             m_numDrawCalls++;
             m_numTransparentDrawCalls++;
-            m_numMoveablesTransparentDrawCalls++;
+            m_numStaticsTransparentDrawCalls++;
 
             drawnVertices += TRANSPARENT_BUCKET_SIZE;
         }
@@ -2940,7 +2937,7 @@ namespace TEN::Renderer
                         if (bucket.Vertices.size() == 0)
                             continue;
 
-                        if (isSortingRequired(bucket.blendMode))
+                        if (isSortingRequired(bucket.BlendMode))
                         {
                             // Collect transparent faces
                             for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -2955,30 +2952,31 @@ namespace TEN::Renderer
                                 face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
                                 face.info.polygon = p;
                                 face.distance = distance;
-                                face.info.animated = bucket.animated;
-                                face.info.texture = bucket.texture;
+                                face.info.animated = bucket.Animated;
+                                face.info.texture = bucket.Texture;
                                 face.info.room = room;
                                 face.info.staticMesh = msh;
+                                face.info.world = m_stStatic.World;
                                 face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
                                 face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
-                                face.info.blendMode = bucket.blendMode;
+                                face.info.blendMode = bucket.BlendMode;
                                 face.info.bucket = &bucket;
                                 room->TransparentFacesToDraw.push_back(face);
                             }
                         }
                         else
                         {
-                            int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+                            int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
                             for (int pass = 0; pass < passes; pass++)
                             {
                                 if (pass == 0)
                                 {
-                                    m_stMisc.AlphaTest = bucket.blendMode == BLENDMODE_ALPHATEST;
+                                    m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
                                     m_cbMisc.updateData(m_stMisc, m_context.Get());
                                     m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                                    setBlendMode(bucket.blendMode);
+                                    setBlendMode(bucket.BlendMode);
                                 }
                                 else
                                 {
@@ -2989,8 +2987,8 @@ namespace TEN::Renderer
                                     setBlendMode(BLENDMODE_ALPHABLEND);
                                 }
 
-                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
-                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[bucket.texture]), SamplerStateType::None);
+                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[bucket.Texture]), SamplerStateType::None);
 
                                 m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                                 m_numDrawCalls++;
@@ -3004,7 +3002,6 @@ namespace TEN::Renderer
 
     void Renderer11::drawRooms(RenderView& view)
     {
-        
         UINT stride = sizeof(RendererVertex);
         UINT offset = 0;
 
@@ -3018,8 +3015,6 @@ namespace TEN::Renderer
         m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
 
         // Bind caustics and shadow map textures
-        ID3D11SamplerState* sampler = m_states->AnisotropicWrap();
-        m_context->PSSetSamplers(0, 1, &sampler);
         int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
         int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
         int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
@@ -3078,10 +3073,10 @@ namespace TEN::Renderer
 
                 for (auto& bucket : room->Buckets)
                 {
-                    if ((animated == 1) ^ bucket.animated || bucket.Vertices.size() == 0)
+                    if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
                         continue;
 
-                    if (isSortingRequired(bucket.blendMode))
+                    if (isSortingRequired(bucket.BlendMode))
                     {
                         // Collect transparent faces
                         for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3092,12 +3087,12 @@ namespace TEN::Renderer
                             Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
                             Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-                            int d1 = (roomPosition + bucket.Vertices[bucket.Indices[p->baseIndex + 0]].Position - cameraPosition).Length();
-                            int d2 = (roomPosition + bucket.Vertices[bucket.Indices[p->baseIndex + 1]].Position - cameraPosition).Length();
-                            int d3 = (roomPosition + bucket.Vertices[bucket.Indices[p->baseIndex + 2]].Position - cameraPosition).Length();
+                            int d1 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
+                            int d2 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
+                            int d3 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
                             int d4 = 0;
                             if (p->shape == 0)
-                                d4 = (roomPosition + bucket.Vertices[bucket.Indices[p->baseIndex + 3]].Position - cameraPosition).Length();
+                                d4 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
 
                             int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
@@ -3105,19 +3100,19 @@ namespace TEN::Renderer
                             face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
                             face.info.polygon = p;
                             face.distance = distance;
-                            face.info.animated = bucket.animated;
-                            face.info.texture = bucket.texture;
+                            face.info.animated = bucket.Animated;
+                            face.info.texture = bucket.Texture;
                             face.info.room = room;
-                            face.info.blendMode = bucket.blendMode;
+                            face.info.blendMode = bucket.BlendMode;
                             face.info.bucket = &bucket;
                             room->TransparentFacesToDraw.push_back(face);
                         }
                     }
                     else
                     {
-                        int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+                        int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
-                        if (bucket.doubleSided)
+                        if (bucket.DoubleSided)
                         {
                             m_context->RSSetState(m_states->CullNone());
                         }
@@ -3130,11 +3125,11 @@ namespace TEN::Renderer
                         {
                             if (pass == 0)
                             {
-                                m_stMisc.AlphaTest = bucket.blendMode == BLENDMODE_ALPHATEST;
+                                m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
                                 m_cbMisc.updateData(m_stMisc, m_context.Get());
                                 m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                                setBlendMode(bucket.blendMode);
+                                setBlendMode(bucket.BlendMode);
                             }
                             else
                             {
@@ -3148,13 +3143,13 @@ namespace TEN::Renderer
                             // Draw geometry
                             if (animated) 
                             {
-                                if (!bucket.animated)
+                                if (!bucket.Animated)
                                     continue;
 
-                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
-                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[bucket.texture]), SamplerStateType::None);
+                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[bucket.Texture]), SamplerStateType::None);
 
-                                RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.texture];
+                                RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
                                 m_stAnimated.NumFrames = set.NumTextures;
                                 for (unsigned char i = 0; i < set.NumTextures; i++) 
                                 {
@@ -3168,14 +3163,14 @@ namespace TEN::Renderer
                             }
                             else 
                             {
-                                if (bucket.animated)
+                                if (bucket.Animated)
                                     continue;
 
-                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
-                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[bucket.texture]), SamplerStateType::None);
+                                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[bucket.Texture]), SamplerStateType::None);
                             }
 
-                            m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+                            m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                             m_numDrawCalls++;
                         }
                     }
@@ -3320,10 +3315,10 @@ namespace TEN::Renderer
                     if (bucket.Vertices.size() == 0)
                         continue;
 
-                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
-                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.texture]), SamplerStateType::None);
+                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
 
-					setBlendMode(bucket.blendMode);
+					setBlendMode(bucket.BlendMode);
 
                     // Draw vertices
                     m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
@@ -3355,7 +3350,7 @@ namespace TEN::Renderer
             if (bucket.Vertices.size() == 0)
                 continue;
 
-            if (isSortingRequired(bucket.blendMode))
+            if (isSortingRequired(bucket.BlendMode))
             {
                 // Collect transparent faces
                 for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3370,28 +3365,28 @@ namespace TEN::Renderer
                     face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
                     face.info.polygon = p;
                     face.distance = distance;
-                    face.info.animated = bucket.animated;
-                    face.info.texture = bucket.texture;
+                    face.info.animated = bucket.Animated;
+                    face.info.texture = bucket.Texture;
                     face.info.room = room;
                     face.info.item = itemToDraw;
-                    face.info.blendMode = bucket.blendMode;
+                    face.info.blendMode = bucket.BlendMode;
                     face.info.bucket = &bucket;
                     room->TransparentFacesToDraw.push_back(face);
                 }
             }
             else
             {
-                int passes = bucket.blendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+                int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
                 for (int pass = 0; pass < passes; pass++)
                 {
                     if (pass == 0)
                     {
-                        m_stMisc.AlphaTest = bucket.blendMode == BLENDMODE_ALPHATEST;
+                        m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
                         m_cbMisc.updateData(m_stMisc, m_context.Get());
                         m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-                        setBlendMode(bucket.blendMode);
+                        setBlendMode(bucket.BlendMode);
                     }
                     else
                     {
@@ -3402,8 +3397,8 @@ namespace TEN::Renderer
                         setBlendMode(BLENDMODE_ALPHABLEND);
                     }
 
-                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.texture]), SamplerStateType::AnisotropicClamp);
-                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.texture]), SamplerStateType::None);
+                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
 
                     m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
                     m_numDrawCalls++;
