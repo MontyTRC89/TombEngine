@@ -128,6 +128,9 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 {
 	LaraInfo*& info = item->data;
 
+	if (!item->speed)
+		return;
+
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
