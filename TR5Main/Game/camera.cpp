@@ -23,7 +23,7 @@ using namespace TEN::Effects::Environment;
 constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
 constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
-constexpr auto CAMERA_RADIUS          = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 struct OLD_CAMERA
 {
