@@ -3,17 +3,23 @@
 #include "RendererVertex.h"
 #include "RendererPolygon.h"
 #include <vector>
-namespace TEN::Renderer {
-	struct RendererBucket {
-		size_t texture;
-		bool animated;
-		BLEND_MODES blendMode;
-		bool doubleSided;
-		std::vector<RendererVertex> Vertices;
-		std::vector<int> Indices;
-		std::vector<RendererPolygon> Polygons;
+
+namespace TEN::Renderer 
+{
+	struct RendererBucket 
+{
+		int Texture;
+		bool Animated;
+		BLEND_MODES BlendMode;
+		bool DoubleSided;
 		int StartVertex;
 		int StartIndex;
+		int NumVertices;
+		int NumIndices;
+		std::vector<RendererPolygon> Polygons;
 
+		// TODO: used only by debris, maybe to trash definitevly?
+		std::vector<RendererVertex> Vertices;
+		std::vector<int> Indices;
 	};
 }

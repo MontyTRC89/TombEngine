@@ -29,6 +29,8 @@ DebrisFragment* GetFreeDebrisFragment()
 
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
+	return;
+
 	MESH* meshPtr = nullptr;
 	RendererMesh* fragmentsMesh;
 	short yRot = 0;
@@ -48,7 +50,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		yRot = item->yRot;
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
-	fragmentsMesh = g_Renderer.getRendererMeshFromTrMesh(nullptr, meshPtr, num, 0, 0);
+	//fragmentsMesh = g_Renderer.getRendererMeshFromTrMesh(nullptr, meshPtr, num, 0, 0);
 	for (auto& renderBucket : fragmentsMesh->buckets) {
 		vector<RendererVertex>& meshVertices = renderBucket.Vertices;
 		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
@@ -76,8 +78,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->mesh.vertices[0] = vtx0;
 				fragment->mesh.vertices[1] = vtx1;
 				fragment->mesh.vertices[2] = vtx2;
-				fragment->mesh.blendMode = renderBucket.blendMode;
-				fragment->mesh.tex = renderBucket.texture;
+				fragment->mesh.blendMode = renderBucket.BlendMode;
+				fragment->mesh.tex = renderBucket.Texture;
 				fragment->isStatic = isStatic;
 				fragment->active = true;
 				fragment->terminalVelocity = 1024;
