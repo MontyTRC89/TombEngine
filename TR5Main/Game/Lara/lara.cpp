@@ -431,8 +431,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	bool isWater = TestLaraWater(item);
 	bool isSwamp = TestLaraSwamp(item);
 
-	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	auto waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	auto waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
 	int heightFromWater;
 	if (waterHeight != NO_HEIGHT)
@@ -454,13 +454,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			Camera.targetElevation = -ANGLE(22.0f);
 
-			if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
-				!isSwamp &&
-				item->currentAnimState != LS_RUN_FORWARD &&		// Prevent ridiculous entrances when stepping down into wade-height water. @Sezz 2021.11.17
-				item->currentAnimState != LS_SPRINT &&
-				item->currentAnimState != LS_WALK_FORWARD &&
-				item->currentAnimState != LS_WALK_BACK &&
-				item->currentAnimState != LS_CRAWL_IDLE)
+			if (waterDepth >= SWIM_DEPTH &&
+				!isSwamp)
 			{
 				if (isWater)
 				{
@@ -499,26 +494,16 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					Splash(item);
 				}
 			}
-			// Temp hack to prevent Lara snapping to the surface when entering vertical water rooms.
-			else if (waterDepth >= SWIM_DEPTH &&
-				!isSwamp &&
-				(item->currentAnimState == LS_RUN_FORWARD ||
-				item->currentAnimState == LS_SPRINT ||
-				item->currentAnimState == LS_WALK_FORWARD ||
-				item->currentAnimState == LS_WALK_BACK ||
-				item->currentAnimState == LS_CRAWL_IDLE))
-			{
-				item->pos.xRot = -ANGLE(45.0f);
-				SetAnimation(item, LA_FREEFALL_DIVE);
-				item->fallspeed = 3 * item->fallspeed / 2;
-				ResetLaraFlex(item);
-				Splash(item);
-			}
 			else if (heightFromWater > WADE_DEPTH)
 			{
 				info->waterStatus = LW_WADE;
 
-				if (!item->gravityStatus)
+				if (waterDepth > (SWIM_DEPTH - STEP_SIZE))
+				{
+					Splash(item);
+					item->goalAnimState = LS_IDLE;
+				}
+				else if (!item->gravityStatus)
 					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
 				{
