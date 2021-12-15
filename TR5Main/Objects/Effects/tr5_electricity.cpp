@@ -241,7 +241,7 @@ void ElectricityWiresControl(short itemNumber)
 				if (instantKill)
 					collItem->hitPoints = 0;
 				else
-					collItem->hitPoints--;
+					collItem->hitPoints -= 8;
 
 				for (int j = 0; j < collObj->nmeshes; j++)
 				{
