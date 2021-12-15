@@ -431,8 +431,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	bool isWater = TestLaraWater(item);
 	bool isSwamp = TestLaraSwamp(item);
 
-	auto waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	auto waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
 	int heightFromWater;
 	if (waterHeight != NO_HEIGHT)
@@ -454,6 +454,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			Camera.targetElevation = -ANGLE(22.0f);
 
+			// Water is deep enough to swim; dispatch dive.
 			if (waterDepth >= SWIM_DEPTH &&
 				!isSwamp)
 			{
@@ -494,15 +495,20 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					Splash(item);
 				}
 			}
-			else if (heightFromWater > WADE_DEPTH)
+			// Water is at wade depth; update water status and do special handling.
+			else if (heightFromWater >= WADE_DEPTH)
 			{
 				info->waterStatus = LW_WADE;
 
-				if (waterDepth > (SWIM_DEPTH - STEP_SIZE))
+				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
+				if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
+					!isSwamp &&
+					item->gravityStatus)
 				{
 					Splash(item);
 					item->goalAnimState = LS_IDLE;
 				}
+				// Lara is grounded; block land-to-run.
 				else if (!item->gravityStatus)
 					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
