@@ -59,7 +59,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 		spark->xVel = (GetRandomControl() & 0x1F) - 0x0F;
 		spark->yVel = (GetRandomControl() & 0x1F) - 0x0F;
 		spark->zVel = (GetRandomControl() & 0x1F) - 0x0F;
-		spark->y = (GetRandomControl() & 0x1F) - 0x0F;
+		spark->y = (GetRandomControl() & 0x3F) - 0x1F;
 	}
 	spark->friction = 51;
 	spark->maxYvel = 0;
@@ -81,13 +81,13 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	spark->dSize = spark->size / 2;
 }
 
-void TriggerLaraElectricitySparks(int flame)
+void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 {
 	PHD_VECTOR pos;
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	GetLaraJointPosition(&pos, GetRandomControl() % 15);
+	GetJointAbsPosition(item, &pos, joint);
 
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -173,32 +173,44 @@ void ElectricityWiresControl(short itemNumber)
 			}
 		}
 
-		short roomNumber = item->roomNumber;
-		auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-
-		bool waterTouch = false;
-		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
-		{
-			waterTouch = true;
-			if ((GetRandomControl() & 127) < 16)
-				SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-		}
-
 		currentEndNode++;
+	}
 
-		int k = 0;
-		while (CollidedItems[k] != nullptr)
+	if (GetRandomControl() & 1)
+		return;
+
+	int k = 0;
+	while (CollidedItems[k] != nullptr)
+	{
+		auto collItem = CollidedItems[k];
+		auto collObj = &Objects[collItem->objectNumber];
+
+		k++;
+
+		if (collItem->objectNumber != ID_LARA && !collObj->intelligent)
+			continue;
+
+		bool isWaterNearby = false;
+		auto npcBox = TO_DX_BBOX(collItem->pos, GetBoundsAccurate(collItem));
+
+		for (int i = 0; i < obj->nmeshes; i++)
 		{
-			auto collItem = CollidedItems[k];
-			auto collObj = &Objects[collItem->objectNumber];
+			auto pos = PHD_VECTOR(0, 0, CLICK(1));
+			GetJointAbsPosition(item, &pos, i);
 
-			k++;
+			short roomNumber = item->roomNumber;
+			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
-			if (collItem->objectNumber != ID_LARA && !collObj->intelligent)
+			bool waterTouch = false;
+			if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
+			{
+				waterTouch = true;
+				if ((GetRandomControl() & 127) < 16)
+					SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+			}
+
+			if (pos.y < cableBottomPlane)
 				continue;
-
-			bool isWaterNearby = false;
-			auto npcBox = TO_DX_BBOX(collItem->pos, GetBoundsAccurate(collItem));
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
@@ -221,8 +233,6 @@ void ElectricityWiresControl(short itemNumber)
 					lara->burnBlue = 1;
 					lara->burnCount = 48;
 
-					TriggerLaraElectricitySparks(0);
-
 					if (!isWaterNearby)
 						LaraBurn(collItem);
 				}
@@ -231,6 +241,12 @@ void ElectricityWiresControl(short itemNumber)
 					collItem->hitPoints = 0;
 				else
 					collItem->hitPoints--;
+
+				for (int j = 0; j < collObj->nmeshes; j++)
+				{
+					if ((GetRandomControl() & 127) < 16)
+						TriggerElectricitySparks(collItem, j, false);
+				}
 
 				TriggerDynamicLight(
 					collItem->pos.xPos,
