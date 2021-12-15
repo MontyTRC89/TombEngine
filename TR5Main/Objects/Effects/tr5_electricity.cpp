@@ -16,7 +16,7 @@
 
 using namespace TEN::Effects::Lara;
 
-void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flags)
+void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = true;
@@ -27,7 +27,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flag
 	spark->dG = (GetRandomControl() & 0x7F) + 64;
 	spark->dB = 255;
 
-	if (flags)
+	if (glow)
 	{
 		spark->colFadeSpeed = 1;
 		spark->fadeToBlack = 0;
@@ -37,7 +37,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flag
 	{
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 4;
-		spark->life = spark->sLife = 16;
+		spark->life = spark->sLife = 24;
 	}
 
 	spark->fxObj = objNum;
@@ -48,7 +48,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flag
 	spark->z = z;
 	spark->y = 0;
 
-	if (flags)
+	if (glow)
 	{
 		spark->xVel = 0;
 		spark->yVel = 0;
@@ -65,7 +65,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flag
 	spark->maxYvel = 0;
 	spark->gravity = 0;
 
-	if (flags)
+	if (glow)
 	{
 		spark->scalar = 1;
 		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
@@ -147,7 +147,7 @@ void ElectricityWiresControl(short itemNumber)
 	auto obj = &Objects[item->objectNumber];
 
 	auto cableBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
-	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(2);
+	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
 	int flashingNode = GlobalCounter % 3;
@@ -167,9 +167,10 @@ void ElectricityWiresControl(short itemNumber)
 		{
 			if (GetRandomControl() & 1)
 			{
-				int x = (GetRandomControl() & 0x4F) - 0x2F;
-				int z = (GetRandomControl() & 0x4F) - 0x2F;
-				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, 0);
+				int x = (GetRandomControl() & 0x3F) - 0x1F;
+				int z = (GetRandomControl() & 0x3F) - 0x1F;
+				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, false);
+				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, true);
 			}
 		}
 
