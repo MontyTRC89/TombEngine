@@ -972,17 +972,14 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	auto oldPos = item->pos;
 
 	static constexpr auto sidewayTestDistance = 16;
-	item->pos.xPos += phd_sin(Lara.moveAngle) * sidewayTestDistance;
-	item->pos.zPos += phd_cos(Lara.moveAngle) * sidewayTestDistance;
-
-	Lara.moveAngle = item->pos.yRot + angle;
+	item->pos.xPos += phd_sin(item->pos.yRot + angle) * sidewayTestDistance;
+	item->pos.zPos += phd_cos(item->pos.yRot + angle) * sidewayTestDistance;
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	auto res = TestLaraHang(item, coll);
 
 	item->pos = oldPos;
-	Lara.moveAngle = item->pos.yRot + angle;
 
 	return !res;
 }
