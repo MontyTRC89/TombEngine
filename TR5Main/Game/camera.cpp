@@ -1855,7 +1855,8 @@ static bool CheckItemCollideCamera(ITEM_INFO* item)
 		return false;
 
 	// TODO: Find a better way to define objects which are collidable with camera.
-	if (Objects[item->objectNumber].intelligent || Objects[item->objectNumber].isPickup || Objects[item->objectNumber].isPuzzleHole)
+	auto obj = &Objects[item->objectNumber];
+	if (obj->intelligent || obj->isPickup || obj->isPuzzleHole || obj->collision == nullptr)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
