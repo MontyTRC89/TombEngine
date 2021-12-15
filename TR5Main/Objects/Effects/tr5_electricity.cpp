@@ -16,7 +16,7 @@
 
 using namespace TEN::Effects::Lara;
 
-void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int flags)
+void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, int flags)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = true;
@@ -169,7 +169,7 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				int x = (GetRandomControl() & 0x4F) - 0x2F;
 				int z = (GetRandomControl() & 0x4F) - 0x2F;
-				TriggerElectricityWiresSparks(x, z, itemNumber, s + 2, 0);
+				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, 0);
 			}
 		}
 
