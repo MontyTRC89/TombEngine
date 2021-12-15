@@ -35,72 +35,72 @@ using namespace TEN::Effects::Environment;
 void FireHarpoon()
 {
 	Ammo& ammos = GetAmmo(LaraItem, WEAPON_HARPOON_GUN);
-	if (ammos.getCount() > 0 || ammos.hasInfinite())
+	if (!ammos)
+		return;
+
+	Lara.hasFired = true;
+
+	// Create a new item for harpoon
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
 	{
-		Lara.hasFired = true;
+		if (!ammos.hasInfinite())
+			(ammos)--;
 
-		// Create a new item for harpoon
-		short itemNumber = CreateItem();
-		if (itemNumber != NO_ITEM)
+		GAME_VECTOR pos;
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+
+		item->shade = 0x4210 | 0x8000;
+		item->objectNumber = ID_HARPOON;
+		item->roomNumber = LaraItem->roomNumber;
+
+		PHD_VECTOR jointPos;
+		
+		jointPos.x = -2;
+		jointPos.y = 273 + 100;
+		jointPos.z = 77;
+
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+
+		if (height >= jointPos.y)
 		{
-			if (!ammos.hasInfinite())
-				(ammos)--;
-
-			GAME_VECTOR pos;
-			ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-			item->shade = 0x4210 | 0x8000;
-			item->objectNumber = ID_HARPOON;
-			item->roomNumber = LaraItem->roomNumber;
-
-			PHD_VECTOR jointPos;
-			
-			jointPos.x = -2;
-			jointPos.y = 273 + 100;
-			jointPos.z = 77;
-
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
-			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-
-			if (height >= jointPos.y)
-			{
-				item->pos.xPos = jointPos.x;
-				item->pos.yPos = jointPos.y;
-				item->pos.zPos = jointPos.z;
-			}
-			else
-			{
-				item->pos.xPos = LaraItem->pos.xPos;
-				item->pos.yPos = jointPos.y;
-				item->pos.zPos = LaraItem->pos.zPos;
-				item->roomNumber = LaraItem->roomNumber;
-			}
-
-			InitialiseItem(itemNumber);
-
-			item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
-			item->pos.zRot = 0;
-			item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
-
-			if (!Lara.leftArm.lock)
-			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
-			}
-
-			item->pos.zRot = 0;
-
-			item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
-			item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
-			item->hitPoints = HARPOON_TIME;
-
-			AddActiveItem(itemNumber);
-
-			Statistics.Level.AmmoUsed++;
-			Statistics.Game.AmmoUsed++;
+			item->pos.xPos = jointPos.x;
+			item->pos.yPos = jointPos.y;
+			item->pos.zPos = jointPos.z;
 		}
+		else
+		{
+			item->pos.xPos = LaraItem->pos.xPos;
+			item->pos.yPos = jointPos.y;
+			item->pos.zPos = LaraItem->pos.zPos;
+			item->roomNumber = LaraItem->roomNumber;
+		}
+
+		InitialiseItem(itemNumber);
+
+		item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
+		item->pos.zRot = 0;
+		item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
+
+		if (!Lara.leftArm.lock)
+		{
+			item->pos.xRot += Lara.torsoXrot;
+			item->pos.yRot += Lara.torsoYrot;
+		}
+
+		item->pos.zRot = 0;
+
+		item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+		item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
+		item->hitPoints = HARPOON_TIME;
+
+		AddActiveItem(itemNumber);
+
+		Statistics.Level.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -256,86 +256,86 @@ void FireGrenade()
 	int z = 0;
 	
 	Ammo& ammo = GetAmmo(LaraItem, WEAPON_GRENADE_LAUNCHER);
-	if (ammo.getCount() > 0 || ammo.hasInfinite())
+	if (!ammo)
+		return;
+
+	Lara.hasFired = true;
+
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
 	{
-		Lara.hasFired = true;
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		
+		item->shade = 0xC210;
+		item->objectNumber = ID_GRENADE;
+		item->roomNumber = LaraItem->roomNumber;
 
-		short itemNumber = CreateItem();
-		if (itemNumber != NO_ITEM)
+		PHD_VECTOR jointPos;
+		jointPos.x = 0;
+		jointPos.y = 276;
+		jointPos.z = 80;
+
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		item->pos.xPos = x = jointPos.x;
+		item->pos.yPos = y = jointPos.y;
+		item->pos.zPos = z = jointPos.z;
+
+		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+		if (height < jointPos.y)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNumber];
-			
-			item->shade = 0xC210;
-			item->objectNumber = ID_GRENADE;
+			item->pos.xPos = LaraItem->pos.xPos;
+			item->pos.yPos = jointPos.y;
+			item->pos.zPos = LaraItem->pos.zPos;
 			item->roomNumber = LaraItem->roomNumber;
-
-			PHD_VECTOR jointPos;
-			jointPos.x = 0;
-			jointPos.y = 276;
-			jointPos.z = 80;
-
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			item->pos.xPos = x = jointPos.x;
-			item->pos.yPos = y = jointPos.y;
-			item->pos.zPos = z = jointPos.z;
-
-			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
-			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-			if (height < jointPos.y)
-			{
-				item->pos.xPos = LaraItem->pos.xPos;
-				item->pos.yPos = jointPos.y;
-				item->pos.zPos = LaraItem->pos.zPos;
-				item->roomNumber = LaraItem->roomNumber;
-			}
-
-			jointPos.x = 0;
-			jointPos.y = 1204;
-			jointPos.z = 5;
-
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			SmokeCountL = 32;
-			SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
-
-			if (LaraItem->meshBits)
-			{
-				for (int i = 0; i < 5; i++)
-					TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
-
-			}
-
-			InitialiseItem(itemNumber);
-
-			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-			item->pos.zRot = 0;
-
-			if (!Lara.leftArm.lock)
-			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
-			}
-
-			item->speed = GRENADE_SPEED;
-			item->fallspeed = -512 * phd_sin(item->pos.xRot);
-			item->currentAnimState = item->pos.xRot;
-			item->goalAnimState = item->pos.yRot;
-			item->requiredAnimState = 0;
-			item->hitPoints = 120;	
-			item->itemFlags[0] = WEAPON_AMMO2;
-
-			AddActiveItem(itemNumber);
-
-			if (!ammo.hasInfinite())
-				(ammo)--;
-
-			item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
-
-			Statistics.Level.AmmoUsed++;
-			Statistics.Game.AmmoUsed++;
 		}
+
+		jointPos.x = 0;
+		jointPos.y = 1204;
+		jointPos.z = 5;
+
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		SmokeCountL = 32;
+		SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
+
+		if (LaraItem->meshBits)
+		{
+			for (int i = 0; i < 5; i++)
+				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
+
+		}
+
+		InitialiseItem(itemNumber);
+
+		item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
+		item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
+		item->pos.zRot = 0;
+
+		if (!Lara.leftArm.lock)
+		{
+			item->pos.xRot += Lara.torsoXrot;
+			item->pos.yRot += Lara.torsoYrot;
+		}
+
+		item->speed = GRENADE_SPEED;
+		item->fallspeed = -512 * phd_sin(item->pos.xRot);
+		item->currentAnimState = item->pos.xRot;
+		item->goalAnimState = item->pos.yRot;
+		item->requiredAnimState = 0;
+		item->hitPoints = 120;	
+		item->itemFlags[0] = WEAPON_AMMO2;
+
+		AddActiveItem(itemNumber);
+
+		if (!ammo.hasInfinite())
+			(ammo)--;
+
+		item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+
+		Statistics.Level.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -1519,84 +1519,84 @@ void RifleHandler(int weaponType)
 void FireCrossbow(PHD_3DPOS* pos)
 {
 	Ammo& ammos = GetAmmo(LaraItem, WEAPON_CROSSBOW);
-	if (ammos.getCount() > 0 || ammos.hasInfinite())
+	if (!ammos)
+		return;
+
+	Lara.hasFired = true;
+
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
 	{
-		Lara.hasFired = true;
-
-		short itemNumber = CreateItem();
-		if (itemNumber != NO_ITEM)
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		item->objectNumber = ID_CROSSBOW_BOLT;
+		item->shade = 0xC210;
+		if (!ammos.hasInfinite())
+			(ammos)--;
+		if (pos)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNumber];
-			item->objectNumber = ID_CROSSBOW_BOLT;
-			item->shade = 0xC210;
-			if (!ammos.hasInfinite())
-				(ammos)--;
-			if (pos)
+			item->roomNumber = LaraItem->roomNumber;
+			item->pos.xPos = pos->xPos;
+			item->pos.yPos = pos->yPos;
+			item->pos.zPos = pos->zPos;
+
+			InitialiseItem(itemNumber);
+
+			item->pos.xRot = pos->xRot;
+			item->pos.yRot = pos->yRot;
+			item->pos.zRot = pos->zRot;
+		}
+		else
+		{
+
+			PHD_VECTOR jointPos;
+			jointPos.x = 0;
+			jointPos.y = 228;
+			jointPos.z = 32;
+
+			GetLaraJointPosition(&jointPos, LM_RHAND);
+
+			item->roomNumber = LaraItem->roomNumber;
+
+			FLOOR_INFO * floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
+
+			if (height >= jointPos.y)
 			{
-				item->roomNumber = LaraItem->roomNumber;
-				item->pos.xPos = pos->xPos;
-				item->pos.yPos = pos->yPos;
-				item->pos.zPos = pos->zPos;
-
-				InitialiseItem(itemNumber);
-
-				item->pos.xRot = pos->xRot;
-				item->pos.yRot = pos->yRot;
-				item->pos.zRot = pos->zRot;
+				item->pos.xPos = jointPos.x;
+				item->pos.yPos = jointPos.y;
+				item->pos.zPos = jointPos.z;
 			}
 			else
 			{
-
-				PHD_VECTOR jointPos;
-				jointPos.x = 0;
-				jointPos.y = 228;
-				jointPos.z = 32;
-
-				GetLaraJointPosition(&jointPos, LM_RHAND);
-
+				item->pos.xPos = LaraItem->pos.xPos;
+				item->pos.yPos = jointPos.y;
+				item->pos.zPos = LaraItem->pos.zPos;
 				item->roomNumber = LaraItem->roomNumber;
-
-				FLOOR_INFO * floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
-				int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-
-				if (height >= jointPos.y)
-				{
-					item->pos.xPos = jointPos.x;
-					item->pos.yPos = jointPos.y;
-					item->pos.zPos = jointPos.z;
-				}
-				else
-				{
-					item->pos.xPos = LaraItem->pos.xPos;
-					item->pos.yPos = jointPos.y;
-					item->pos.zPos = LaraItem->pos.zPos;
-					item->roomNumber = LaraItem->roomNumber;
-				}
-
-				InitialiseItem(itemNumber);
-
-				item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
-				item->pos.zRot = 0;
-				item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
-
-				if (!Lara.leftArm.lock)
-				{
-					item->pos.xRot += Lara.torsoXrot;
-					item->pos.yRot += Lara.torsoYrot;
-				}
 			}
 
-			item->speed = 512;
+			InitialiseItem(itemNumber);
 
-			AddActiveItem(itemNumber);
+			item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
+			item->pos.zRot = 0;
+			item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
 
-			item->itemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
-
-			SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
-
-			Statistics.Level.AmmoUsed++;
-			Statistics.Game.AmmoUsed++;
+			if (!Lara.leftArm.lock)
+			{
+				item->pos.xRot += Lara.torsoXrot;
+				item->pos.yRot += Lara.torsoYrot;
+			}
 		}
+
+		item->speed = 512;
+
+		AddActiveItem(itemNumber);
+
+		item->itemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+
+		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
+
+		Statistics.Level.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -1626,75 +1626,75 @@ void FireCrossBowFromLaserSight(GAME_VECTOR* src, GAME_VECTOR* target)
 void FireRocket()
 {
 	Ammo& ammos = GetAmmo(LaraItem, WEAPON_ROCKET_LAUNCHER);
-	if (ammos.getCount() > 0 || ammos.hasInfinite())
+	if (!ammos)
+		return;
+
+	Lara.hasFired = true;
+
+	short itemNumber = CreateItem();
+	if (itemNumber != NO_ITEM)
 	{
-		Lara.hasFired = true;
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		item->objectNumber = ID_ROCKET;
+		item->roomNumber = LaraItem->roomNumber;
 
-		short itemNumber = CreateItem();
-		if (itemNumber != NO_ITEM)
+		if (!ammos.hasInfinite())
+			(ammos)--;
+
+		PHD_VECTOR jointPos;
+		jointPos.x = 0;
+		jointPos.y = 180;
+		jointPos.z = 72;
+
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		int x, y, z;
+		item->pos.xPos = x = jointPos.x;
+		item->pos.yPos = y = jointPos.y;
+		item->pos.zPos = z = jointPos.z;
+
+		jointPos.x = 0;
+		jointPos.y = 180 + 1024;
+		jointPos.z = 72;
+
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		SmokeCountL = 32;
+		SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
+
+		for(int i = 0; i < 5; i++)
+			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
+
+		jointPos.x = 0;
+		jointPos.y = -256;
+		jointPos.z = 0;
+		
+		GetLaraJointPosition(&jointPos, LM_RHAND);
+
+		for(int i = 0; i < 10; i++)
+			TriggerGunSmoke(jointPos.x, jointPos.y, jointPos.z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 2, WEAPON_ROCKET_LAUNCHER, 32);
+
+		InitialiseItem(itemNumber);
+
+		item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
+		item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
+		item->pos.zRot = 0;
+
+		if (!Lara.leftArm.lock)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNumber];
-			item->objectNumber = ID_ROCKET;
-			item->roomNumber = LaraItem->roomNumber;
-
-			if (!ammos.hasInfinite())
-				(ammos)--;
-
-			PHD_VECTOR jointPos;
-			jointPos.x = 0;
-			jointPos.y = 180;
-			jointPos.z = 72;
-
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			int x, y, z;
-			item->pos.xPos = x = jointPos.x;
-			item->pos.yPos = y = jointPos.y;
-			item->pos.zPos = z = jointPos.z;
-
-			jointPos.x = 0;
-			jointPos.y = 180 + 1024;
-			jointPos.z = 72;
-
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			SmokeCountL = 32;
-			SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
-
-			for(int i = 0; i < 5; i++)
-				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_ROCKET_LAUNCHER, 32);
-
-			jointPos.x = 0;
-			jointPos.y = -256;
-			jointPos.z = 0;
-			
-			GetLaraJointPosition(&jointPos, LM_RHAND);
-
-			for(int i = 0; i < 10; i++)
-				TriggerGunSmoke(jointPos.x, jointPos.y, jointPos.z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 2, WEAPON_ROCKET_LAUNCHER, 32);
-
-			InitialiseItem(itemNumber);
-
-			item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-			item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-			item->pos.zRot = 0;
-
-			if (!Lara.leftArm.lock)
-			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
-			}
-
-			item->speed = 512 >> 5;
-			item->itemFlags[0] = 0;
-
-			AddActiveItem(itemNumber);
-
-			SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
-
-			Statistics.Level.AmmoUsed++;
-			Statistics.Game.AmmoUsed++;
+			item->pos.xRot += Lara.torsoXrot;
+			item->pos.yRot += Lara.torsoYrot;
 		}
+
+		item->speed = 512 >> 5;
+		item->itemFlags[0] = 0;
+
+		AddActiveItem(itemNumber);
+
+		SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
+
+		Statistics.Level.AmmoUsed++;
+		Statistics.Game.AmmoUsed++;
 	}
 }
 
