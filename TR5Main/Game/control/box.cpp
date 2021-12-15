@@ -45,8 +45,8 @@ void DropBaddyPickups(ITEM_INFO* item)
 	for (short pickupNumber = item->carriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->carriedItem)
 	{
 		pickup = &g_Level.Items[pickupNumber];
-		pickup->pos.xPos = (item->pos.xPos & -CLICK(2)) | CLICK(2);
-		pickup->pos.zPos = (item->pos.zPos & -CLICK(2)) | CLICK(2);
+		pickup->pos.xPos = (item->pos.xPos & -CLICK(1)) | CLICK(1);
+		pickup->pos.zPos = (item->pos.zPos & -CLICK(1)) | CLICK(1);
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos, &roomNumber);
