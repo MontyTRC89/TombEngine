@@ -7,6 +7,7 @@
 #include "animation.h"
 #include "lara.h"
 #include "lara_collide.h"
+#include "collide.h"
 #include "Sound\sound.h"
 #include "sphere.h"
 #include "traps.h"
@@ -15,7 +16,7 @@
 
 using namespace TEN::Effects::Lara;
 
-void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int flags)
+void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = true;
@@ -26,7 +27,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	spark->dG = (GetRandomControl() & 0x7F) + 64;
 	spark->dB = 255;
 
-	if (flags)
+	if (glow)
 	{
 		spark->colFadeSpeed = 1;
 		spark->fadeToBlack = 0;
@@ -36,7 +37,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	{
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 4;
-		spark->life = spark->sLife = 16;
+		spark->life = spark->sLife = 24;
 	}
 
 	spark->fxObj = objNum;
@@ -47,7 +48,7 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	spark->z = z;
 	spark->y = 0;
 
-	if (flags)
+	if (glow)
 	{
 		spark->xVel = 0;
 		spark->yVel = 0;
@@ -55,15 +56,16 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	}
 	else
 	{
-		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
-		spark->yVel = GetRandomControl() - 64;
-		spark->zVel = (GetRandomControl() & 0x1FF) - 256;
+		spark->xVel = (GetRandomControl() & 0x1F) - 0x0F;
+		spark->yVel = (GetRandomControl() & 0x1F) - 0x0F;
+		spark->zVel = (GetRandomControl() & 0x1F) - 0x0F;
+		spark->y = (GetRandomControl() & 0x3F) - 0x1F;
 	}
 	spark->friction = 51;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
 
-	if (flags)
+	if (glow)
 	{
 		spark->scalar = 1;
 		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
@@ -79,13 +81,13 @@ void TriggerElectricityWiresSparks(int x, int z, byte objNum, byte node, int fla
 	spark->dSize = spark->size / 2;
 }
 
-void TriggerLaraElectricitySparks(int flame)
+void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 {
 	PHD_VECTOR pos;
 	pos.x = 0;
 	pos.y = 0;
 	pos.z = 0;
-	GetLaraJointPosition(&pos, GetRandomControl() % 15);
+	GetJointAbsPosition(item, &pos, joint);
 
 	SPARKS* spark = &Sparks[GetFreeSpark()];
 
@@ -131,159 +133,132 @@ static bool ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta)
 
 void ElectricityWiresControl(short itemNumber)
 {
-	bool flag = false;
-	int counter = 3;
-
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-
-	if (item->itemFlags[0] > 2)
-	{
-		TriggerDynamicLight(
-			LaraItem->pos.xPos,
-			LaraItem->pos.yPos,
-			LaraItem->pos.zPos,
-			item->itemFlags[0],
-			0,
-			(GetRandomControl() & 0x1F) + 8 * item->itemFlags[0],
-			(GetRandomControl() & 0x1F) + 8 * item->itemFlags[0]);
-
-		item->itemFlags[0] -= 2;
-	}
-
-	if (TriggerActive(item))
-	{
-		SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->pos, 0);
-
-		counter = (abs(LaraItem->pos.xPos - item->pos.xPos) > 2048)
-			+ (abs(LaraItem->pos.zPos - item->pos.zPos) > 2048)
-			+ (abs(LaraItem->pos.yPos - item->pos.yPos) > 4096);
-
-		int x = (GetRandomControl() & 0x1F) - 16;
-		int z = (GetRandomControl() & 0x1F) - 16;
-
-		for (int i = 0; i < 3; i++)
-		{
-			if (GetRandomControl() & 1)
-				TriggerElectricityWiresSparks(x, z, itemNumber, i + 2, 0);
-		}
-
-		if (!(GlobalCounter & 3))
-		{
-			TriggerElectricityWiresSparks(0, 0, itemNumber, 2, 1);
-			TriggerElectricityWiresSparks(0, 0, itemNumber, 3, 1);
-			TriggerElectricityWiresSparks(0, 0, itemNumber, 4, 1);
-		}
-	}
-	else
-	{
-		flag = true;
-	}
+	auto item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
 
-	if (!Lara.burn && !flag && !counter)
+	if (!TriggerActive(item))
+		return;
+
+	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->pos, 0);
+
+	GetCollidedObjects(item, SECTOR(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
+
+	auto obj = &Objects[item->objectNumber];
+
+	auto cableBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
+
+	int currentEndNode = 0;
+	int flashingNode = GlobalCounter % 3;
+
+	for (int i = 0; i < obj->nmeshes; i++)
 	{
-		GetLaraDeadlyBounds();
-
-		for (int i = 2; i < 28; i += 3)
-		{
-			PHD_VECTOR pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
-
-			GetJointAbsPosition(item, &pos, i);
-
-			if (ElectricityWireCheckDeadlyBounds(&pos, item->triggerFlags))
-			{
-				for (int i = 0; i < 48; i++)
-					TriggerLaraElectricitySparks(0);
-
-				item->itemFlags[0] = 28;
-				LaraBurn(LaraItem);
-				Lara.burnBlue = 1;
-				Lara.burnCount = 48;
-				LaraItem->hitPoints = 0;
-			}
-		}
-	}
-
-	int i = 8;
-	int j = 0;
-	counter = GlobalCounter % 3;
-	short roomNumber = item->roomNumber;
-	bool water = false;
-
-	for (int i = 8; i < 27; i += 9, j++)
-	{
-		PHD_VECTOR pos;
-		pos.x = 0;
-		pos.y = 0;
-		pos.z = 256;
+		auto pos = PHD_VECTOR(0, 0, CLICK(1));
 		GetJointAbsPosition(item, &pos, i);
 
-		if (GetRandomControl() & 1 && !flag)
-		{
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 12, 0, ((GetRandomControl() & 0x3F) + 128) / 2, (GetRandomControl() & 0x3F) + 128);
-		}
+		if (pos.y < cableBottomPlane)
+			continue;
 
-		roomNumber = item->roomNumber;
-		GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+		if (((GetRandomControl() & 0x0F) < 8) && flashingNode == currentEndNode)
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 0, ((GetRandomControl() & 0x3F) + 96) / 2, (GetRandomControl() & 0x3F) + 128);
 
-		if (r->flags & ENV_FLAG_WATER)
+		for (int s = 0; s < 3; s++)
 		{
-			if (counter == j)
+			if (GetRandomControl() & 1)
 			{
-				SetupRipple(pos.x, r->maxceiling, pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				int x = (GetRandomControl() & 0x3F) - 0x1F;
+				int z = (GetRandomControl() & 0x3F) - 0x1F;
+				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, false);
+				TriggerElectricityWireSparks(x, z, itemNumber, s + 2, true);
 			}
-
-			water = true;
 		}
+
+		currentEndNode++;
 	}
 
-	if (!flag && !Lara.burn)
+	if (GetRandomControl() & 1)
+		return;
+
+	int k = 0;
+	while (CollidedItems[k] != nullptr)
 	{
-		if (water)
+		auto collItem = CollidedItems[k];
+		auto collObj = &Objects[collItem->objectNumber];
+
+		k++;
+
+		if (collItem->objectNumber != ID_LARA && !collObj->intelligent)
+			continue;
+
+		bool isWaterNearby = false;
+		auto npcBox = TO_DX_BBOX(collItem->pos, GetBoundsAccurate(collItem));
+
+		for (int i = 0; i < obj->nmeshes; i++)
 		{
-			int flipNumber = g_Level.Rooms[roomNumber].flipNumber;
+			auto pos = PHD_VECTOR(0, 0, CLICK(1));
+			GetJointAbsPosition(item, &pos, i);
 
-			PHD_VECTOR pos1;
-			pos1.x = 0;
-			pos1.y = 0;
-			pos1.z = 0;
-			GetLaraJointPosition(&pos1, LM_LFOOT);
+			short roomNumber = item->roomNumber;
+			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
-			short roomNumber1 = LaraItem->roomNumber;
-			GetFloor(pos1.x, pos1.y, pos1.z, &roomNumber1);
-
-			PHD_VECTOR pos2;
-			pos2.x = 0;
-			pos2.y = 0;
-			pos2.z = 0;
-			GetLaraJointPosition(&pos2, LM_RFOOT);
-
-			short roomNumber2 = LaraItem->roomNumber;
-			GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber2);
-
-			if (g_Level.Rooms[roomNumber1].flipNumber == flipNumber || g_Level.Rooms[roomNumber2].flipNumber == flipNumber)
+			bool waterTouch = false;
+			if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 			{
-				if (LaraItem->hitPoints > 32)
+				waterTouch = true;
+				if ((GetRandomControl() & 127) < 16)
+					SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+			}
+
+			if (pos.y < cableBottomPlane)
+				continue;
+
+			for (int j = 0; j < collObj->nmeshes; j++)
+			{
+				PHD_VECTOR collPos = {};
+				GetJointAbsPosition(collItem, &collPos, j);
+
+				auto collJointRoom = GetCollisionResult(collPos.x, collPos.y, collPos.z, collItem->roomNumber).RoomNumber;
+
+				if (!isWaterNearby && waterTouch && roomNumber == collJointRoom)
+					isWaterNearby = true;
+			}
+
+			bool instantKill = BoundingSphere(Vector3(pos.x, pos.y, pos.z), CLICK(0.25f)).Intersects(npcBox);
+
+			if (isWaterNearby || instantKill)
+			{
+				if (collItem->data.is<LaraInfo*>())
 				{
-					SoundEffect(SFX_TR4_LARA_ELECTRIC_CRACKLES, &LaraItem->pos, 0);
-					TriggerLaraElectricitySparks(0);
-					TriggerLaraElectricitySparks(1);
-					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, GetRandomControl() & 0x7F, (GetRandomControl() & 0x3F) + 128);
-					LaraItem->hitPoints -= 10;
+					auto lara = (LaraInfo*&)collItem->data;
+					lara->burnBlue = 1;
+					lara->burnCount = 48;
+
+					if (!isWaterNearby)
+						LaraBurn(collItem);
 				}
+
+				if (instantKill)
+					collItem->hitPoints = 0;
 				else
+					collItem->hitPoints -= 8;
+
+				for (int j = 0; j < collObj->nmeshes; j++)
 				{
-					item->itemFlags[0] = 28;
-					LaraBurn(LaraItem);
-					Lara.burnBlue = 1;
-					Lara.burnCount = 48;
-					LaraItem->hitPoints = 0;
+					if ((GetRandomControl() & 127) < 16)
+						TriggerElectricitySparks(collItem, j, false);
 				}
+
+				TriggerDynamicLight(
+					collItem->pos.xPos,
+					collItem->pos.yPos,
+					collItem->pos.zPos,
+					5,
+					0,
+					(GetRandomControl() & 0x3F) + 0x2F,
+					(GetRandomControl() & 0x3F) + 0x4F);
+
+				break;
 			}
 		}
 	}
