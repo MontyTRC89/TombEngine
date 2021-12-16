@@ -1044,18 +1044,17 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	LaraInfo*& info = item->data;
 	auto oldPos = item->pos;
 
+	Lara.moveAngle = item->pos.yRot + angle;
+
 	static constexpr auto sidewayTestDistance = 16;
 	item->pos.xPos += phd_sin(info->moveAngle) * sidewayTestDistance;
 	item->pos.zPos += phd_cos(info->moveAngle) * sidewayTestDistance;
-
-	info->moveAngle = item->pos.yRot + angle;
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	auto res = TestLaraHang(item, coll);
 
 	item->pos = oldPos;
-	info->moveAngle = item->pos.yRot + angle;
 
 	return !res;
 }
@@ -1682,13 +1681,13 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), 0);		// Crossing.
 	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2), 0);		// Approximate destination.
 
-	if ((probeA.Position.Floor - y) <= -CLICK(1) &&																				// Lower floor bound. Synced with crawl states' BadHeightUp.
-		(probeA.Position.Floor - y) >= -STEPUP_HEIGHT &&																		// Upper floor bound.
-		abs(probeA.Position.Floor - probeB.Position.Floor) <= (CLICK(1) - 1) &&													// Destination height is within idle threshold.
+	if ((probeA.Position.Floor - y) <= -CLICK(1) &&																			// Lower floor bound. Synced with crawl states' BadHeightUp.
+		(probeA.Position.Floor - y) >= -STEPUP_HEIGHT &&																	// Upper floor bound.
+		abs(probeA.Position.Floor - probeB.Position.Floor) <= (CLICK(1) - 1) &&												// Destination height is within idle threshold.
 		((coll->Front.Ceiling - LARA_HEIGHT_CRAWL) - (probeA.Position.Floor - y)) <= -(CLICK(0.5f) + CLICK(1) / 8) &&		// Gap is optically feasible for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&												// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&												// Destination is not a clamp.
-		!probeA.Position.Slope && !probeB.Position.Slope &&																		// No slopes.
+		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Crossing is not a clamp.
+		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Destination is not a clamp.
+		!probeA.Position.Slope && !probeB.Position.Slope &&																	// No slopes.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;

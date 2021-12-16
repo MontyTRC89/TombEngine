@@ -1247,21 +1247,17 @@ void LoadSprites()
 
 void GetCarriedItems()
 {
-	int i;
-	ITEM_INFO* item, *item2;
-	short linknum;
-
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 		g_Level.Items[i].carriedItem = NO_ITEM;
 
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &g_Level.Items[i];
+		auto item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
 		{
-			for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+			for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 			{
-				item2 = &g_Level.Items[linknum];
+				auto item2 = &g_Level.Items[linknum];
 				if (abs(item2->pos.xPos - item->pos.xPos) < 512
 					&& abs(item2->pos.zPos - item->pos.zPos) < 512
 					&& abs(item2->pos.yPos - item->pos.yPos) < 256
@@ -1279,19 +1275,15 @@ void GetCarriedItems()
 
 void GetAIPickups()
 {
-	int i, num;
-	ITEM_INFO* item;
-	AI_OBJECT* object;
-
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &g_Level.Items[i];
+		auto item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent)
 		{
 			item->aiBits = 0;
-			for (num = 0; num < g_Level.AIObjects.size(); ++num)
+			for (int num = 0; num < g_Level.AIObjects.size(); ++num)
 			{
-				object = &g_Level.AIObjects[num];
+				auto object = &g_Level.AIObjects[num];
 				if (abs(object->x - item->pos.xPos) < 512
 					&& abs(object->z - item->pos.zPos) < 512
 					&& object->roomNumber == item->roomNumber
@@ -1303,6 +1295,7 @@ void GetAIPickups()
 						object->roomNumber = NO_ROOM;
 				}
 			}
+
 			item->TOSSPAD |= item->aiBits << 8 | (char) item->itemFlags[3];
 		}
 	}

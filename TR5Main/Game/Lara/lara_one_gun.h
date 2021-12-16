@@ -15,7 +15,7 @@ enum GRENADE_TYPE
 constexpr auto HARPOON_DRAW_ANIM = 1;
 constexpr auto ROCKET_DRAW_ANIM = 0;
 constexpr auto HARPOON_SPEED = 256;
-constexpr auto HARPOON_TIME = 256;
+constexpr auto HARPOON_TIME = 300;
 constexpr auto ROCKET_SPEED = 512;
 constexpr auto GRENADE_SPEED = 128;
 constexpr auto MAX_GRENADE_FALLSPEED = 128;
