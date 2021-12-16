@@ -127,8 +127,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 						dy >= -2048	&& dy <= 2048 && 
 						dz >= -2048	&& dz <= 2048 && 
 						collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 && 
-						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2 && 
-						collidingItem->floor >= item->pos.yPos)
+						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
 					{
 						float s = phd_sin(item->pos.yRot);
 						float c = phd_cos(item->pos.yRot);
@@ -165,29 +164,6 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	}
 
 	return (numItems || numMeshes);
-}
-
-std::set<int> CollectConnectedRooms(int roomNumber)
-{
-	std::set<int> result;
-	
-	if (g_Level.Rooms.size() <= roomNumber)
-		return result;
-
-	result.insert(roomNumber);
-
-	auto room = &g_Level.Rooms[roomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		result.insert(room->doors[i].room);
-
-	for (auto i : result)
-	{
-		room = &g_Level.Rooms[i];
-		for (int j = 0; j < room->doors.size(); j++)
-			result.insert(room->doors[j].room);
-	}
-
-	return result;
 }
 
 void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)

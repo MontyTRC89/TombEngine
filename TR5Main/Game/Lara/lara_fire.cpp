@@ -554,7 +554,6 @@ void LaraGun(ITEM_INFO* laraItem)
 			if (!GetAmmo(laraItem, laraInfo->gunType))
 			{
 				laraInfo->requestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
-
 				return;
 			}
 		}
@@ -631,7 +630,6 @@ void LaraGun(ITEM_INFO* laraItem)
 Ammo& GetAmmo(ITEM_INFO* lara, int weaponType)
 {
 	LaraInfo*& laraInfo = lara->data;
-
 	return laraInfo->Weapons[weaponType].Ammo[laraInfo->Weapons[weaponType].SelectedAmmo];
 }
 
