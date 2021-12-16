@@ -114,16 +114,16 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
+		if (info->turnRate < -LARA_MED_TURN_MAX)
+			info->turnRate = -LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		if (info->turnRate > LARA_MED_TURN_MAX)
+			info->turnRate = LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
