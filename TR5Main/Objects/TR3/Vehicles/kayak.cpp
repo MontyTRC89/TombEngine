@@ -213,7 +213,7 @@ int KayakGetIn(short itemNumber, COLL_INFO* coll)
 	ITEM_INFO* l = LaraItem;
 
 	if ((!(TrInput & IN_ACTION))
-		|| (Lara.gunStatus != LG_NO_ARMS)
+		|| (Lara.gunStatus != LG_HANDS_FREE)
 		|| (l->gravityStatus))
 		return 0;
 
@@ -1028,7 +1028,7 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 
 			l->fallspeed = 0;
 			l->gravityStatus = true;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.Vehicle = NO_ITEM;
 		}
 		break;
@@ -1055,7 +1055,7 @@ void KayakUserInput(ITEM_INFO* v, ITEM_INFO* l, KAYAK_INFO* Kayak)
 
 			l->fallspeed = 0;
 			l->gravityStatus = true;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.Vehicle = NO_ITEM;
 		}
 	}

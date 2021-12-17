@@ -1049,7 +1049,7 @@ namespace TEN::Entities::TR4
 						LaraItem->speed = 2;
 						LaraItem->fallspeed = 1;
 						LaraItem->pos.yPos += (STEP_SIZE * 0.75f);
-						Lara.gunStatus = LG_NO_ARMS;
+						Lara.gunStatus = LG_HANDS_FREE;
 						currentCreature->flags = 1;
 					}
 				}

@@ -9,12 +9,13 @@ namespace sol {
 
 struct GameScriptAnimations
 {
+	bool CrawlExtended;				// Extended crawl moveset
 	bool CrouchRoll;				// Crouch roll
-	bool MonkeyRoll;				// The 180 degrees roll on monkeybars
-	bool CrawlExtra;				// All extra crawl moves
-	bool MonkeyVault;				// Vault up to monkeybars when pressing up + action underneath them
-	bool SwandiveRollRun;			// The transition from swandive roll to run
-	bool OscillateHanging;			// The thin ledge grab animation from TR1 and 2
+	bool CrawlspaceSwandive;		// Swandive into crawlspaces
+	bool MonkeyTurn180;				// 180 degree turn on monkey swing
+	bool MonkeyAutoJump;			// Auto jump to monkey swing when pressing UP + ACTION beneath
+	bool OscillateHang;				// Grab thin ledge animation from TR1 and 2
+	bool Pose;						// Crossed arms AFK posing
 
 	static void Register(sol::state* lua);
 };

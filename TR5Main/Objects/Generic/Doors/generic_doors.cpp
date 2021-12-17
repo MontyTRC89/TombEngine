@@ -167,10 +167,10 @@ namespace TEN::Entities::Doors
 		if (item->triggerFlags == 2
 			&& item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
 			&& ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-				&& l->currentAnimState == LS_STOP
+				&& l->currentAnimState == LS_IDLE
 				&& l->animNumber == LA_STAND_IDLE
 				&& !l->hitStatus
-				&& Lara.gunStatus == LG_NO_ARMS
+				&& Lara.gunStatus == LG_HANDS_FREE
 				|| Lara.isMoving && Lara.interactedItem == itemNum))
 		{
 			item->pos.yRot ^= ANGLE(180);
@@ -229,7 +229,7 @@ namespace TEN::Entities::Doors
 			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = 0;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
 			item->pos.yRot ^= ANGLE(180);

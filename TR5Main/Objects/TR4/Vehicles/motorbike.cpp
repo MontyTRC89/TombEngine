@@ -298,7 +298,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->gravityStatus)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
@@ -364,7 +364,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
                 Lara.flareAge = 0;
             }
 
-            Lara.gunStatus = LG_NO_ARMS;
+            Lara.gunStatus = LG_HANDS_FREE;
 
             short angle = phd_atan(item->pos.zPos - laraitem->pos.zPos, item->pos.xPos - laraitem->pos.xPos) - item->pos.yRot;
             if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
@@ -547,14 +547,14 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->pos.yRot -= 0x4000;
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_STOP;
-			LaraItem->currentAnimState = LS_STOP;
+			LaraItem->goalAnimState = LS_IDLE;
+			LaraItem->currentAnimState = LS_IDLE;
 			LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot);
 			LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.sprintTimer = 120;
 			return true;
 		}
