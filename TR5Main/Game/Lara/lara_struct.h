@@ -738,6 +738,7 @@ enum LARA_ANIM
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 45,
 	// 245, 265, 266, 268, 273, 274, 278, 280,
+	// 364, 366, 368, 370,
 	// 484, 485, 486, 487, 488, 499, 490, 491, 492, 493, 494
 };
 #pragma endregion
