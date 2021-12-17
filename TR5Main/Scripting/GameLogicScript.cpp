@@ -11,16 +11,11 @@
 #include "level.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
-#include "pickup.h"
 #include "gui.h"
 #include "ObjectIDs.h"
 #include "GameScriptDisplayString.h"
 #include "ReservedScriptNames.h"
-#include "camera.h"
 #include <Renderer/RenderEnums.h>
-#include "Game/effects/lightning.h"
-
-using namespace TEN::Effects::Lightning;
 
 /***
 Functions and callbacks for level-specific logic scripts.
