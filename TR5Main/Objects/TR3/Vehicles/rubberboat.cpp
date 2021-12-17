@@ -125,7 +125,7 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 	RubberBoatMountType getOn = RBOAT_MOUNT_NONE;
 
 	if (!(TrInput & IN_ACTION) ||
-		Lara.gunStatus != LG_NO_ARMS ||
+		Lara.gunStatus != LG_HANDS_FREE ||
 		lara->gravityStatus ||
 		rBoat->speed)
 	{

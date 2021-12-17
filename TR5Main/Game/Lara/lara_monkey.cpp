@@ -23,7 +23,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hang2*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
@@ -90,7 +90,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyRoll)
+		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
@@ -530,6 +530,6 @@ void MonkeySwingFall(ITEM_INFO* item)
 		item->fallspeed = 1;
 		item->pos.yPos += 256;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 }

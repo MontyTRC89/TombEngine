@@ -1238,16 +1238,12 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	{
 		if (!(Wibble & 0xF))
 		{
-			if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_STOP)
+			if (!(GetRandomControl() & 0xF) || item->currentAnimState != LS_IDLE)
 			{
-				if (item->currentAnimState == LS_STOP)
-				{
+				if (item->currentAnimState == LS_IDLE)
 					SetupRipple(item->pos.xPos, wh - 1, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-				}
 				else
-				{
 					SetupRipple(item->pos.xPos, wh - 1, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-				}
 			}
 		}
 	}

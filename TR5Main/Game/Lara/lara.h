@@ -4,31 +4,53 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 
-#define FRONT_ARC ANGLE(90.0f)
+#define LARA_GRAB_THRESHOLD ANGLE(35.0f)
+#define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
+
+// Lean rates
 #define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)
-#define LARA_LEAN_DASH_MAX ANGLE(16.0f)
-#define LARA_TURN_RATE ANGLE(2.25f)
-#define SUB_SUIT_TURN_RATE ANGLE(0.75f)
-#define LARA_JUMP_TURN ANGLE(3.0f)
-#define LARA_SLOW_TURN ANGLE(4.0f)
-#define LARA_MED_TURN  ANGLE(6.0f)
-#define LARA_FAST_TURN ANGLE(8.0f)
-#define LARA_GRAB_THRESHOLD ANGLE(30.0f)
 
-constexpr auto LARA_HEIGHT = CLICK(3) - 1; // The size of Lara (from the floor to the top of the head)
-constexpr auto LARA_HEIGHT_CRAWL = 400;    // Size of Lara in crawl state
-constexpr auto LARA_HEIGHT_MONKEY = 600;   // Size of Lara in monkey state
-constexpr auto LARA_HEIGHT_SURFSWIM = 700; // Size of Lara in surface swim state
-constexpr auto LARA_HEIGHT_STRETCH = 870;  // Size of Lara in jump-up or ledge hanging state
-constexpr auto LARA_HEIGHT_SURFACE = 800;  // Size of Lara when surfacing water
-constexpr auto LARA_HEADROOM = 160;        // Amount of reasonable space above Lara's head
+// Turn rates
+#define LARA_TURN_RATE ANGLE(2.25f)
+#define LARA_CRAWL_MOVE_TURN_RATE ANGLE(2.15f)
+#define LARA_POLE_TURN_RATE ANGLE(2.25f)
+#define LARA_SUBSUIT_TURN_RATE ANGLE(0.75f)
+
+// Turn rate maxes
+#define LARA_SLOW_TURN_MAX ANGLE(4.0f)
+#define LARA_SLOW_MED_TURN_MAX ANGLE(5.0f)
+#define LARA_MED_TURN_MAX ANGLE(6.0f)
+#define LARA_MED_FAST_TURN_MAX ANGLE(7.0f)
+#define LARA_FAST_TURN_MAX ANGLE(8.0f)
+#define LARA_WADE_TURN_MAX ANGLE(5.5f)
+#define LARA_SWAMP_TURN_MAX ANGLE(2.0f)
+#define LARA_JUMP_TURN_MAX ANGLE(3.0f)
+#define LARA_CRAWL_TURN_MAX ANGLE(2.0f)
+#define LARA_CRAWL_MOVE_TURN_MAX ANGLE(3.75f)
+#define LARA_CROUCH_ROLL_TURN_MAX ANGLE(2.75f)
+#define LARA_POLE_TURN_MAX ANGLE(4.5f)
+
+// Flex rates
+#define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
+#define LARA_CRAWL_FLEX_MAX ANGLE(50.0f) / 2		// 2 = hardcoded number of bones to flex (head and torso).
+
+constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
+constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
+constexpr auto LARA_HEIGHT_MONKEY = 600;		// Lara height in monkey swing states.
+constexpr auto LARA_HEIGHT_SURFSWIM = 700;		// Lara height in water treading states.
+constexpr auto LARA_HEIGHT_STRETCH = 870;		// Lara height in jump-up and ledge hanging states.
+constexpr auto LARA_HEIGHT_SURFACE = 800;		// Lara height when surfacing water.
+constexpr auto LARA_HEADROOM = 160;				// Amount of reasonable space above Lara's head.
 constexpr auto LARA_RAD = 100;
 constexpr auto LARA_RAD_CRAWL = 200;
 constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_VELOCITY = 12;
+
+constexpr auto LARA_JUMP_TIME = 22;				// Frames to count before running jump is possible.
+constexpr auto LARA_POSE_TIME = 30 * 30;		// 30 frames * 30 = 30 seconds to AFK pose.
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
 constexpr auto LARA_AIR_MAX = 1800.0f;
