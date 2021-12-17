@@ -11,6 +11,8 @@
 #include "animation.h"
 #include "items.h"
 
+constexpr auto MAX_ROLLINGBALL_SPEED = WALL_SIZE * 3;
+
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -47,10 +49,7 @@ void RollingBallControl(short itemNumber)
 	item->pos.yPos += item->fallspeed;
 	item->pos.zPos += item->itemFlags[1] / 32;
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	int dh = height - 512;
+	int dh = GetCollisionResult(item).Position.Floor - CLICK(2);
 
 	if (item->pos.yPos > dh)
 	{
@@ -81,69 +80,77 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	int x = item->pos.xPos;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-
 	int frontX = item->pos.xPos;
-	int frontZ = item->pos.zPos + 128;
-	int backX = item->pos.xPos;
-	int backZ = item->pos.zPos - 128;
-	int rightX = item->pos.xPos + 128;
+	int frontZ = item->pos.zPos + CLICK(0.5f);
+	int backX  = item->pos.xPos;
+	int backZ  = item->pos.zPos - CLICK(0.5f);
+	int rightX = item->pos.xPos + CLICK(0.5f);
 	int rightZ = item->pos.zPos;
-	int leftX = item->pos.xPos - 128;
-	int leftZ = item->pos.zPos;
+	int leftX  = item->pos.xPos - CLICK(0.5f);
+	int leftZ  = item->pos.zPos;
 
-	floor = GetFloor(frontX, item->pos.yPos, frontZ, &roomNumber);
-	int frontHeight = GetFloorHeight(floor, frontX, item->pos.yPos, frontZ) - 512;
-	floor = GetFloor(backX, item->pos.yPos, backZ, &roomNumber);
-	int backHeight = GetFloorHeight(floor, backX, item->pos.yPos, backZ) - 512;
-	floor = GetFloor(rightX, item->pos.yPos, rightZ, &roomNumber);
-	int rightHeight = GetFloorHeight(floor, rightX, item->pos.yPos, rightZ) - 512;
-	floor = GetFloor(leftX, item->pos.yPos, leftZ, &roomNumber);
-	int leftHeight = GetFloorHeight(floor, leftX, item->pos.yPos, leftZ) - 512;
+	auto frontFloor = GetCollisionResult(frontX, item->pos.yPos, frontZ, item->roomNumber);
+	auto backFloor  = GetCollisionResult(backX,  item->pos.yPos, backZ,  item->roomNumber);
+	auto rightFloor = GetCollisionResult(rightX, item->pos.yPos, rightZ, item->roomNumber);
+	auto leftFloor  = GetCollisionResult(leftX,  item->pos.yPos, leftZ,  item->roomNumber);
+
+	int frontHeight = frontFloor.Position.Floor - CLICK(2);
+	int backHeight  = backFloor.Position.Floor  - CLICK(2);
+	int rightHeight = rightFloor.Position.Floor - CLICK(2);
+	int leftHeight  = leftFloor.Position.Floor  - CLICK(2);
+
+	int frontCeiling = frontFloor.Position.Ceiling + CLICK(2);
+	int backCeiling  = backFloor.Position.Ceiling  + CLICK(2);
+	int rightCeiling = rightFloor.Position.Ceiling + CLICK(2);
+	int leftCeiling  = leftFloor.Position.Ceiling  + CLICK(2);
 
 	frontX = item->pos.xPos;
-	frontZ = item->pos.zPos + 512;
-	backX = item->pos.xPos;
-	backZ = item->pos.zPos - 512;
-	rightX = item->pos.xPos + 512;
+	frontZ = item->pos.zPos + CLICK(2);
+	backX  = item->pos.xPos;
+	backZ  = item->pos.zPos - CLICK(2);
+	rightX = item->pos.xPos + CLICK(2);
 	rightZ = item->pos.zPos;
-	leftX = item->pos.xPos - 512;
-	leftZ = item->pos.zPos;
+	leftX  = item->pos.xPos - CLICK(2);
+	leftZ  = item->pos.zPos;
 
-	floor = GetFloor(frontX, item->pos.yPos, frontZ, &roomNumber);
-	int frontFarHeight = GetFloorHeight(floor, frontX, item->pos.yPos, frontZ) - 512;
-	floor = GetFloor(backX, item->pos.yPos, backZ, &roomNumber);
-	int backFarHeight = GetFloorHeight(floor, backX, item->pos.yPos, backZ) - 512;
-	floor = GetFloor(rightX, item->pos.yPos, rightZ, &roomNumber);
-	int rightFarHeight = GetFloorHeight(floor, rightX, item->pos.yPos, rightZ) - 512;
-	floor = GetFloor(leftX, item->pos.yPos, leftZ, &roomNumber);
-	int leftFarHeight = GetFloorHeight(floor, leftX, item->pos.yPos, leftZ) - 512;
+	auto fronFarFloor  = GetCollisionResult(frontX, item->pos.yPos, frontZ, item->roomNumber);
+	auto backFarFloor  = GetCollisionResult(backX,  item->pos.yPos, backZ,  item->roomNumber);
+	auto rightFarFloor = GetCollisionResult(rightX, item->pos.yPos, rightZ, item->roomNumber);
+	auto leftFarFloor  = GetCollisionResult(leftX,  item->pos.yPos, leftZ,  item->roomNumber);
 
-	if (item->pos.yPos - dh > -256 ||
-		item->pos.yPos - frontFarHeight >= 512 ||
-		item->pos.yPos - rightFarHeight >= 512 ||
-		item->pos.yPos - backFarHeight >= 512 ||
-		item->pos.yPos - leftFarHeight >= 512)
+	int frontFarHeight = fronFarFloor.Position.Floor  - CLICK(2);
+	int backFarHeight  = backFarFloor.Position.Floor  - CLICK(2);
+	int rightFarHeight = rightFarFloor.Position.Floor - CLICK(2);
+	int leftFarHeight  = leftFarFloor.Position.Floor  - CLICK(2);
+
+	int frontFarCeiling = fronFarFloor.Position.Ceiling  + CLICK(2);
+	int backFarCeiling  = backFarFloor.Position.Ceiling  + CLICK(2);
+	int rightFarCeiling = rightFarFloor.Position.Ceiling + CLICK(2);
+	int leftFarCeiling  = leftFarFloor.Position.Ceiling  + CLICK(2);
+
+	if (item->pos.yPos - dh > -CLICK(1) ||
+		item->pos.yPos - frontFarHeight >= CLICK(2) ||
+		item->pos.yPos - rightFarHeight >= CLICK(2) ||
+		item->pos.yPos - backFarHeight  >= CLICK(2) ||
+		item->pos.yPos - leftFarHeight  >= CLICK(2))
 	{
 		int counterZ = 0;
 
-		if (frontFarHeight - dh <= 256)
+		if (frontFarHeight - dh <= CLICK(1))
 		{
-			if (frontFarHeight - dh < -1024 || frontHeight - dh < -256)
+			if (frontFarHeight - dh < -CLICK(4) || frontHeight - dh < -CLICK(1))
 			{
 				if (item->itemFlags[1] <= 0)
 				{
 					if (!item->itemFlags[1] && item->itemFlags[0])
 					{
-						item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+						item->pos.zPos = (item->pos.zPos & ~(CLICK(4) - 1)) | CLICK(2);
 					}
 				}
 				else
 				{
 					item->itemFlags[1] = -item->itemFlags[1] / 2;
-					item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+					item->pos.zPos = (item->pos.zPos & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (frontHeight == dh)
@@ -156,21 +163,21 @@ void RollingBallControl(short itemNumber)
 			}
 		}
 
-		if (backHeight - dh <= 256)
+		if (backHeight - dh <= CLICK(1))
 		{
-			if (backFarHeight - dh < -1024 || backHeight - dh < -256)
+			if (backFarHeight - dh < -CLICK(4) || backHeight - dh < -CLICK(1))
 			{
 				if (item->itemFlags[1] >= 0)
 				{
 					if (!item->itemFlags[1] && item->itemFlags[0])
 					{
-						item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+						item->pos.zPos = (item->pos.zPos & ~(CLICK(4) - 1)) | CLICK(2);
 					}
 				}
 				else
 				{
 					item->itemFlags[1] = -item->itemFlags[1] / 2;
-					item->pos.zPos = (item->pos.zPos & (~1023)) | 512;
+					item->pos.zPos = (item->pos.zPos & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (backHeight == dh)
@@ -193,21 +200,21 @@ void RollingBallControl(short itemNumber)
 
 		int counterX = 0;
 
-		if (leftHeight - dh <= 256)
+		if (leftHeight - dh <= CLICK(1))
 		{
-			if (leftFarHeight - dh < -1024 || leftHeight - dh < -256)
+			if (leftFarHeight - dh < -CLICK(4) || leftHeight - dh < -CLICK(1))
 			{
 				if (item->itemFlags[0] >= 0)
 				{
 					if (!item->itemFlags[0] && item->itemFlags[1])
 					{
-						item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+						item->pos.xPos = (item->pos.xPos & ~(CLICK(4) - 1)) | CLICK(2);
 					}
 				}
 				else
 				{
 					item->itemFlags[0] = -item->itemFlags[0] / 2;
-					item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+					item->pos.xPos = (item->pos.xPos & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (leftHeight == dh)
@@ -220,21 +227,21 @@ void RollingBallControl(short itemNumber)
 			}
 		}
 
-		if (rightHeight - dh <= 256)
+		if (rightHeight - dh <= CLICK(1))
 		{
-			if (rightFarHeight - dh < -1024 || rightHeight - dh < -256)
+			if (rightFarHeight - dh < -CLICK(4) || rightHeight - dh < -CLICK(1))
 			{
 				if (item->itemFlags[0] <= 0)
 				{
 					if (!item->itemFlags[0] && item->itemFlags[1])
 					{
-						item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+						item->pos.xPos = (item->pos.xPos & ~(CLICK(4) - 1)) | CLICK(2);
 					}
 				}
 				else
 				{
 					item->itemFlags[0] = -item->itemFlags[0] / 2;
-					item->pos.xPos = (item->pos.xPos & (~1023)) | 512;
+					item->pos.xPos = (item->pos.xPos & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (rightHeight == dh)
@@ -256,20 +263,20 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	auto roomNumber = GetCollisionResult(item).RoomNumber;
 
 	if (item->roomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if (item->itemFlags[0] > 3072)
-		item->itemFlags[0] = 3072;
-	else if (item->itemFlags[0] < -3072)
-		item->itemFlags[0] = -3072;
+	if (item->itemFlags[0] > MAX_ROLLINGBALL_SPEED)
+		item->itemFlags[0] = MAX_ROLLINGBALL_SPEED;
+	else if (item->itemFlags[0] < -MAX_ROLLINGBALL_SPEED)
+		item->itemFlags[0] = -MAX_ROLLINGBALL_SPEED;
 
-	if (item->itemFlags[1] > 3072)
-		item->itemFlags[1] = 3072;
-	else if (item->itemFlags[1] < -3072)
-		item->itemFlags[1] = -3072;
+	if (item->itemFlags[1] > MAX_ROLLINGBALL_SPEED)
+		item->itemFlags[1] = MAX_ROLLINGBALL_SPEED;
+	else if (item->itemFlags[1] < -MAX_ROLLINGBALL_SPEED)
+		item->itemFlags[1] = -MAX_ROLLINGBALL_SPEED;
 
 	short angle = 0;
 
