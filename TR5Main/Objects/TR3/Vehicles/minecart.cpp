@@ -116,7 +116,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
+	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->gravityStatus)
 		return 0;
 
 	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
@@ -617,7 +617,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		break;
 
@@ -636,7 +636,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		break;
 

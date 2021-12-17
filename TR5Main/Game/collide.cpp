@@ -610,9 +610,9 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.xPos += coll->Shift.x;
 	item->pos.yPos += coll->Shift.y;
 	item->pos.zPos += coll->Shift.z;
-	coll->Shift.z = 0;
-	coll->Shift.y = 0;
 	coll->Shift.x = 0;
+	coll->Shift.y = 0;
+	coll->Shift.z = 0;
 }
 
 void MoveItem(ITEM_INFO* item, short angle, int x, int y)
@@ -845,7 +845,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	if (item == LaraItem && Lara.isMoving && Lara.moveCount > 15)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return true;
@@ -965,7 +965,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 	if (lara != nullptr && lara->moveCount > 15)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return true;
@@ -1190,7 +1190,7 @@ bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	if (Lara.isMoving)
 	{
 		Lara.isMoving = false;
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 
 	return false;
@@ -1543,7 +1543,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->Front.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->Front.Floor > 0 && 
+			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
@@ -1591,7 +1591,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor > 0 && 
+			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
@@ -1634,7 +1634,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->FrontLeft.Floor > 0 && 
+			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
@@ -1682,7 +1682,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleRight.Floor > 0 && 
+			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
@@ -1725,7 +1725,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->FrontRight.Floor > 0 && 
+			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
@@ -1762,9 +1762,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->CollisionType = CT_TOP;
 	}
 
-	if (coll->Front.Floor > coll->Setup.BadHeightDown || 
+	if (coll->Front.Floor > coll->Setup.BadHeightDown ||
 		coll->Front.Floor < coll->Setup.BadHeightUp ||
-		coll->Front.Ceiling > coll->Setup.BadCeilingHeight)
+		coll->Front.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->Front.Floor - coll->Front.Ceiling <= 0)
 	{
 		if (coll->Front.HasDiagonalSplit())
 		{
@@ -1804,7 +1805,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightDown ||
 		coll->MiddleLeft.Floor < coll->Setup.BadHeightUp ||
-		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight)
+		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->MiddleLeft.Floor - coll->MiddleLeft.Ceiling <= 0)
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.Slope)
 		{
@@ -1854,7 +1856,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	if (coll->MiddleRight.Floor > coll->Setup.BadHeightDown ||
 		coll->MiddleRight.Floor < coll->Setup.BadHeightUp ||
-		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight)
+		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeight ||
+		coll->MiddleRight.Floor - coll->MiddleRight.Ceiling <= 0)
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.Slope)
 		{

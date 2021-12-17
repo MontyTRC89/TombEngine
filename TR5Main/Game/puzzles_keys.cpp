@@ -54,7 +54,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
-		&& l->currentAnimState == LS_STOP
+		&& l->currentAnimState == LS_IDLE
 		&& l->animNumber == LA_STAND_IDLE
 		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
 		|| (Lara.isMoving
@@ -141,7 +141,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 
@@ -248,7 +248,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
-		&& l->currentAnimState == LS_STOP
+		&& l->currentAnimState == LS_IDLE
 		&& l->animNumber == LA_STAND_IDLE)
 		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
@@ -315,7 +315,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 

@@ -99,8 +99,11 @@ table Lara {
 	water_status: int32;
 	climb_status: int32;
 	pose_count: int32;
+	jump_count: int32;
+	jump_queued: bool;
 	hit_frame: int32;
 	hit_direction: int32;
+	sprint_timer: int32;
 	air: int32;
 	dive_count: int32;
 	death_count: int32;
@@ -119,7 +122,7 @@ table Lara {
 	flare_control_left: int32;
 	look: bool;
 	burn: bool;
-	keep_ducked: bool;
+	keep_crouched: bool;
 	is_moving: bool;
 	can_monkey_swing: bool;
 	burn_blue: int32;
