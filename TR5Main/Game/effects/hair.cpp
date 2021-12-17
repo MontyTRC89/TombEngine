@@ -41,7 +41,14 @@ void InitialiseHair()
 	}
 }
 
-void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
+void HairControl(ITEM_INFO* item, bool young)
+{
+	HairControl(item, 0, 0);
+	if (young)
+		HairControl(item, 1, 0);
+}
+
+void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
 	OBJECT_INFO* object = &Objects[ID_LARA];
@@ -49,45 +56,47 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
 
+	LaraInfo*& lara = item->data;
+
 	if (framePtr == NULL)
 	{
-		if (Lara.hitDirection >= 0)
+		if (lara->hitDirection >= 0)
 		{
-			switch (Lara.hitDirection)
+			switch (lara->hitDirection)
 			{
 			case NORTH:
-				if (Lara.isDucked)
+				if (lara->isDucked)
 					spaz = 294;
 				else
 					spaz = 125;
 				break;
 
 			case SOUTH:
-				if (Lara.isDucked)
+				if (lara->isDucked)
 					spaz = 293;
 				else
 					spaz = 126;
 				break;
 
 			case EAST:
-				if (Lara.isDucked)
+				if (lara->isDucked)
 					spaz = 295;
 				else
 					spaz = 127;
 				break;
 
 			default:
-				if (Lara.isDucked)
+				if (lara->isDucked)
 					spaz = 296;
 				else
 					spaz = 128;
 				break;
 			}
 
-			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + Lara.hitFrame];
+			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + lara->hitFrame];
 		}
 		else
-			frame = GetBestFrame(LaraItem);
+			frame = GetBestFrame(item);
 	}
 	else
 	{
@@ -95,7 +104,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	}
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	MESH* mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HIPS]];
+	MESH* mesh = &g_Level.Meshes[lara->meshPtrs[LM_HIPS]];
 	PHD_VECTOR pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
@@ -103,7 +112,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_TORSO]];
+	mesh = &g_Level.Meshes[lara->meshPtrs[LM_TORSO]];
 	pos = { (int)mesh->sphere.Center.x - 10, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z + 25 }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
@@ -113,7 +122,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_HEAD]];
+	mesh = &g_Level.Meshes[lara->meshPtrs[LM_HEAD]];
 	pos = { (int)mesh->sphere.Center.x - 2, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
@@ -121,7 +130,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[2].z = pos.z;
 	sphere[2].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_RINARM]];
+	mesh = &g_Level.Meshes[lara->meshPtrs[LM_RINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
@@ -129,7 +138,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[3].z = pos.z;
 	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
-	mesh = &g_Level.Meshes[Lara.meshPtrs[LM_LINARM]];
+	mesh = &g_Level.Meshes[lara->meshPtrs[LM_LINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;
@@ -151,7 +160,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 	sphere[5].r = youngLara ? 0 : (int)(3.0f * (float)sphere[2].r / 4.0f);
 
 	Matrix world;
-	g_Renderer.getBoneMatrix(Lara.itemNumber, LM_HEAD, &world);
+	g_Renderer.getBoneMatrix(lara->itemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{
@@ -197,20 +206,11 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
 
-		short roomNumber = LaraItem->roomNumber;
-		int wh;
-
-		if (cutscene)
-		{
-			wh = NO_HEIGHT;
-		}
-		else
-		{
-			int x = LaraItem->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-			int y = LaraItem->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
-			int z = LaraItem->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
-			wh = GetWaterHeight(x, y, z, roomNumber);
-		}
+		short roomNumber = item->roomNumber;
+		int x = item->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int y = item->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+		int z = item->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
+		int wh = GetWaterHeight(x, y, z, roomNumber);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
@@ -218,17 +218,8 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 			Hairs[ponytail][0].hvel.y = Hairs[ponytail][i].pos.yPos;
 			Hairs[ponytail][0].hvel.z = Hairs[ponytail][i].pos.zPos;
 
-			int height;
-
-			if (!cutscene)
-			{
-				FLOOR_INFO* floor = GetFloor(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos, &roomNumber);
-				height = GetFloorHeight(floor, Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);
-			}
-			else
-			{
-				height = 32767;
-			}
+			auto floor = GetFloor(Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos, &roomNumber);
+			int height = GetFloorHeight(floor, Hairs[ponytail][i].pos.xPos, Hairs[ponytail][i].pos.yPos, Hairs[ponytail][i].pos.zPos);
 
 			Hairs[ponytail][i].pos.xPos += Hairs[ponytail][i].hvel.x * 3 / 4;
 			Hairs[ponytail][i].pos.yPos += Hairs[ponytail][i].hvel.y * 3 / 4;
@@ -236,7 +227,7 @@ void HairControl(int cutscene, int ponytail, ANIM_FRAME* framePtr)
 
 			// TR3 UPV uses a hack which forces Lara water status to dry. 
 			// Therefore, we can't directly use water status value to determine hair mode.
-			bool dryMode = (Lara.waterStatus == LW_ABOVE_WATER) && (Lara.Vehicle == -1 || g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV);
+			bool dryMode = (lara->waterStatus == LW_ABOVE_WATER) && (lara->Vehicle == -1 || g_Level.Items[lara->Vehicle].objectNumber != ID_UPV);
 
 			if (dryMode)
 			{

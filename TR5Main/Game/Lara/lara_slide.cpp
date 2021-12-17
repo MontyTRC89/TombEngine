@@ -20,6 +20,14 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
 
+	// Temporary measure. @Sezz 2021.12.16
+	if (TestLaraSwamp(item))
+	{
+		item->goalAnimState = LS_IDLE;
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		return;
+	}
+
 	if (!LaraHitCeiling(item, coll))
 	{
 		LaraDeflectEdge(item, coll);
@@ -37,7 +45,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_RUN_FORWARD;
 				}
 				else
-					item->goalAnimState = LS_STOP;
+					item->goalAnimState = LS_IDLE;
 
 				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			}

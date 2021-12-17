@@ -16,7 +16,7 @@ void SpringBoardControl(short itemNumber)
 		if (LaraItem->hitPoints <= 0)
 			return;
 
-		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_HOP_BACK)
+		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_RUN_BACK)
 			LaraItem->speed = -LaraItem->speed;
 
 		LaraItem->fallspeed = -240;

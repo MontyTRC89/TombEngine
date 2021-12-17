@@ -68,7 +68,7 @@ namespace TEN::Entities::Switches
 				&& (TrInput & IN_ACTION
 					&& !Lara.gunStatus
 					&& !item->gravityStatus
-					&& l->currentAnimState == LS_STOP
+					&& l->currentAnimState == LS_IDLE
 					&& l->animNumber == LA_STAND_IDLE
 					|| Lara.isMoving
 					&& Lara.interactedItem == itemNum))
@@ -111,7 +111,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
 
@@ -129,7 +129,7 @@ namespace TEN::Entities::Switches
 		{
 			if (item->goalAnimState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->goalAnimState = LS_STOP;
+				LaraItem->goalAnimState = LS_IDLE;
 				item->goalAnimState = SWITCH_OFF;
 			}
 
@@ -153,9 +153,9 @@ namespace TEN::Entities::Switches
 
 				LaraItem->animNumber = LA_STAND_SOLID;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = LS_STOP;
-				LaraItem->currentAnimState = LS_STOP;
-				Lara.gunStatus = LG_NO_ARMS;
+				LaraItem->goalAnimState = LS_IDLE;
+				LaraItem->currentAnimState = LS_IDLE;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 	}

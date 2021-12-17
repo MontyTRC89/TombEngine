@@ -20,7 +20,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		item->pos.yPos += STEP_SIZE;
 		item->fallspeed = 1;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 
 		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
 		return;
@@ -53,7 +53,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
@@ -276,6 +276,14 @@ void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
 	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+}
+
+void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 54*/
+	/*collision: lara_default_col*/
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
 }
 
 /*go around corners*/
