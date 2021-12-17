@@ -496,6 +496,7 @@ namespace TEN::Renderer
 		std::vector<RendererVertex> staticsVertices;
 		std::vector<int> staticsIndices;
 
+		int numRoomsTransparentPolygons;
 
 
 

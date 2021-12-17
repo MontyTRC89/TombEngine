@@ -155,7 +155,7 @@ float2 texOffset(int u, int v) {
 	return float2(u * 1.0f / SHADOW_MAP_SIZE, v * 1.0f / SHADOW_MAP_SIZE);
 }
 
-float4 PS(PixelShaderInput input, bool isFrontFace : SV_IsFrontFace) : SV_TARGET
+float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
 	if (AlphaTest && output.w < 0.5f) {
@@ -166,9 +166,6 @@ float4 PS(PixelShaderInput input, bool isFrontFace : SV_IsFrontFace) : SV_TARGET
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
 
-	if (!isFrontFace)
-		Normal *= -1.0f;
-	
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
