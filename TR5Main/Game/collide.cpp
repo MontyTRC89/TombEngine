@@ -29,8 +29,6 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	short roomsArray[255];
 	short numRooms;
 	short numItems = 0, numMeshes = 0;
-	float c, s;
-	int rx, rz;
 
 	// Collect all the rooms where to check
 	GetRoomList(collidingItem->roomNumber, roomsArray, &numRooms);
@@ -46,31 +44,31 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 				MESH_INFO* mesh = &room->mesh[j];
 				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
 
-				if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
-				{
-					if (collidingItem->pos.yPos + radius + STEP_SIZE/2 >= mesh->pos.yPos + staticMesh->collisionBox.Y1)
-					{
-						if (collidingItem->pos.yPos <= mesh->pos.yPos + staticMesh->collisionBox.Y2)
-						{
-							s = phd_sin(mesh->pos.yRot);
-							c = phd_cos(mesh->pos.yRot);
-							rx = (collidingItem->pos.xPos - mesh->pos.xPos) * c - s * (collidingItem->pos.zPos - mesh->pos.zPos);
-							rz = (collidingItem->pos.zPos - mesh->pos.zPos) * c + s * (collidingItem->pos.xPos - mesh->pos.xPos);
+				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
 
-							if (radius + rx + STEP_SIZE/2 >= staticMesh->collisionBox.X1 && rx - radius - STEP_SIZE/2 <= staticMesh->collisionBox.X2)
-							{
-								if (radius + rz + STEP_SIZE/2 >= staticMesh->collisionBox.Z1 && rz - radius - STEP_SIZE/2 <= staticMesh->collisionBox.Z2)
-								{
-									collidedMeshes[numMeshes++] = mesh;
-									if (!radius)
-									{
-										collidedItems[0] = NULL;
-										return true;
-									}
-								}
-							}
-						}
-					}
+				if (collidingItem->pos.yPos + radius + CLICK(0.5f) < mesh->pos.yPos + staticMesh->collisionBox.Y1)
+					continue;
+
+				if (collidingItem->pos.yPos > mesh->pos.yPos + staticMesh->collisionBox.Y2)
+					continue;
+
+				auto s = phd_sin(mesh->pos.yRot);
+				auto c = phd_cos(mesh->pos.yRot);
+				auto rx = (collidingItem->pos.xPos - mesh->pos.xPos) * c - s * (collidingItem->pos.zPos - mesh->pos.zPos);
+				auto rz = (collidingItem->pos.zPos - mesh->pos.zPos) * c + s * (collidingItem->pos.xPos - mesh->pos.xPos);
+
+				if (radius + rx + CLICK(0.5f) < staticMesh->collisionBox.X1 || rx - radius - CLICK(0.5f) > staticMesh->collisionBox.X2)
+					continue;
+
+				if (radius + rz + CLICK(0.5f) < staticMesh->collisionBox.Z1 || rz - radius - CLICK(0.5f) > staticMesh->collisionBox.Z2)
+					continue;
+
+				collidedMeshes[numMeshes++] = mesh;
+				if (!radius)
+				{
+					collidedItems[0] = NULL;
+					return true;
 				}
 			}
 		}
