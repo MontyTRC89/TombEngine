@@ -85,14 +85,16 @@
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(TargetDir)\Shaders" 
-xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
-xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)Specific\savegame\schema\
-CALL gen.bat</Command>
-      <Message>Generating savegame flatbuffer...</Message>
+CALL gen.bat
+md "$(TargetDir)\Shaders" 
+xcopy /Y "$(ProjectDir)Shaders\*.*" "$(TargetDir)\Shaders"
+xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
+      <Message>Generating savegame flatbuffer and copying shaders to output...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -194,6 +196,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
+    <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />

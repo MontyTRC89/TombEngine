@@ -18,7 +18,6 @@ struct BUCKET
 	int texture;
 	byte blendMode;
 	bool animated;
-	bool doubleSided;
 	int numQuads;
 	int numTriangles;
 	std::vector<POLYGON> polygons;

@@ -11,7 +11,6 @@ namespace TEN::Renderer
 		int Texture;
 		bool Animated;
 		BLEND_MODES BlendMode;
-		bool DoubleSided;
 		int StartVertex;
 		int StartIndex;
 		int NumVertices;

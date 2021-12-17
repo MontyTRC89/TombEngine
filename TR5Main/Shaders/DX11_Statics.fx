@@ -49,7 +49,7 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.01f) {
+	if (AlphaTest && output.w < 0.5f) {
 		discard;
 	}
 
