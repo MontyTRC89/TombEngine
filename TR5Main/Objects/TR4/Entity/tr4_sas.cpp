@@ -690,7 +690,7 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_STOP
+			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus
 			|| l->gravityStatus
