@@ -195,6 +195,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
@@ -603,6 +604,10 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Scripting\GameScriptFog.cpp" />
     <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
+    <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />

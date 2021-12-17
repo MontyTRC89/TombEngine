@@ -321,6 +321,7 @@
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="frameworkandsol.cpp" />
+    <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -721,6 +722,7 @@
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
+    <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
