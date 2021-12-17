@@ -26,7 +26,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_CROSSBOW:
 		case WEAPON_SHOTGUN:
-			return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+			return (LaraItem->currentAnimState == LS_IDLE || LaraItem->currentAnimState == LS_TURN_LEFT_FAST || LaraItem->currentAnimState == LS_TURN_RIGHT_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
 			break;
 		case WEAPON_HK:
 		{
@@ -35,7 +35,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 			if(laraInfo.rightArm.animNumber - baseAnim == 0 || laraInfo.rightArm.animNumber - baseAnim == 2 || laraInfo.rightArm.animNumber - baseAnim == 4){
 				return true;
 			} else
-				return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+				return (LaraItem->currentAnimState == LS_IDLE || LaraItem->currentAnimState == LS_TURN_LEFT_FAST || LaraItem->currentAnimState == LS_TURN_RIGHT_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
 		}
 			break;
 		default:
@@ -86,7 +86,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
+	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_HANDS_FREE || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);

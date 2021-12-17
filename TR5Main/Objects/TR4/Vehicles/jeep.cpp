@@ -401,14 +401,14 @@ static int JeepCheckGetOff()
 			LaraItem->pos.yRot += ANGLE(90);
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_STOP;
-			LaraItem->currentAnimState = LS_STOP;
+			LaraItem->goalAnimState = LS_IDLE;
+			LaraItem->currentAnimState = LS_IDLE;
 			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
 			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			return false;
 		}
 	}
@@ -429,7 +429,7 @@ static int GetOnJeep(int itemNumber)
 	if (Lara.gunStatus)
 		return 0;
 
-	if (LaraItem->currentAnimState != LS_STOP)
+	if (LaraItem->currentAnimState != LS_IDLE)
 		return 0;
 
 	if (LaraItem->animNumber != LA_STAND_IDLE)

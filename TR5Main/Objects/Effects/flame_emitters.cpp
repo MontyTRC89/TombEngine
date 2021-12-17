@@ -645,7 +645,7 @@ namespace TEN::Entities::Effects
 			|| Lara.litTorch == (item->status & 1)
 			|| item->timer == -1
 			|| !(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_STOP
+			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| l->gravityStatus)
 		{

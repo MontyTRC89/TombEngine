@@ -413,7 +413,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[item_num];
 
-	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_STOP && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS &&
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_IDLE && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE &&
 		!item->active || Lara.isMoving && Lara.interactedItem == item_num)
 	{
 		laraitem->pos.yRot ^= 0x8000;

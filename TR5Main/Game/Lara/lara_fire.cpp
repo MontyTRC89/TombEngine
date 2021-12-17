@@ -235,15 +235,17 @@ WEAPON_INFO Weapons[NUM_WEAPONS] =
 	}
 };
 
+// States in which Lara will hold the flare out in front.
 short HoldStates[] = {
 	LS_WALK_FORWARD,
 	LS_RUN_FORWARD,
-	LS_STOP,
+	LS_IDLE,
 	LS_POSE,
 	LS_TURN_RIGHT_SLOW,
 	LS_TURN_LEFT_SLOW,
 	LS_WALK_BACK,
-	LS_TURN_FAST,
+	LS_TURN_RIGHT_FAST,
+	LS_TURN_LEFT_FAST,
 	LS_STEP_RIGHT,
 	LS_STEP_LEFT,
 	LS_PICKUP,
@@ -355,8 +357,8 @@ void LaraGun(ITEM_INFO* laraItem)
 	}
 
 	if (laraItem->hitPoints <= 0)
-		laraInfo->gunStatus = LG_NO_ARMS;
-	else if (laraInfo->gunStatus == LG_NO_ARMS)
+		laraInfo->gunStatus = LG_HANDS_FREE;
+	else if (laraInfo->gunStatus == LG_HANDS_FREE)
 	{
 		// Draw weapon.
 		if (TrInput & IN_DRAW)
@@ -365,12 +367,6 @@ void LaraGun(ITEM_INFO* laraItem)
 		else if (TrInput & IN_FLARE &&
 			(g_GameFlow->GetLevel(CurrentLevel)->LaraType != LaraType::Young))
 		{
-			if (laraItem->currentAnimState == LS_CROUCH_IDLE &&
-				laraItem->animNumber != LA_CROUCH_IDLE)
-			{
-				return;
-			}
-
 			if (laraInfo->gunType == WEAPON_FLARE)
 			{
 			//	if (!laraInfo->leftArm.frameNumber)	//NO
@@ -496,7 +492,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			break;
 
 		default:
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 
 			break;
 		}
@@ -587,7 +583,7 @@ void LaraGun(ITEM_INFO* laraItem)
 
 		break;
 
-	case LG_NO_ARMS:
+	case LG_HANDS_FREE:
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
 			if (laraInfo->Vehicle != NO_ITEM ||
@@ -661,7 +657,7 @@ void InitialiseNewWeapon(ITEM_INFO* lara)
 	case WEAPON_UZI:
 		laraInfo->rightArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 		laraInfo->leftArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		if (laraInfo->gunStatus != LG_NO_ARMS)
+		if (laraInfo->gunStatus != LG_HANDS_FREE)
 			draw_pistol_meshes(laraInfo->gunType);
 		break;
 
@@ -673,14 +669,14 @@ void InitialiseNewWeapon(ITEM_INFO* lara)
 	case WEAPON_ROCKET_LAUNCHER:
 		laraInfo->rightArm.frameBase = Objects[WeaponObject(laraInfo->gunType)].frameBase;
 		laraInfo->leftArm.frameBase = Objects[WeaponObject(laraInfo->gunType)].frameBase;
-		if (laraInfo->gunStatus != LG_NO_ARMS)
+		if (laraInfo->gunStatus != LG_HANDS_FREE)
 			draw_shotgun_meshes(laraInfo->gunType);
 		break;
 
 	case WEAPON_FLARE:
 		laraInfo->rightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		laraInfo->leftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
-		if (laraInfo->gunStatus != LG_NO_ARMS)
+		if (laraInfo->gunStatus != LG_HANDS_FREE)
 			DrawFlareMeshes(lara);
 		break;
 
@@ -1113,7 +1109,7 @@ void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weaponInfo)
 			if (TargetList[slot] == laraInfo->target)
 				break;
 		}
-		if (laraInfo->gunStatus != LG_NO_ARMS || TrInput & IN_LOOKSWITCH)
+		if (laraInfo->gunStatus != LG_HANDS_FREE || TrInput & IN_LOOKSWITCH)
 		{
 			if (!laraInfo->target)
 			{

@@ -472,7 +472,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 	if (frameLeft == p->draw1Anim && frameRight == p->draw1Anim)
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;

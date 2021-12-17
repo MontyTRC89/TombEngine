@@ -1389,8 +1389,11 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t water_status = 0;
   int32_t climb_status = 0;
   int32_t pose_count = 0;
+  int32_t jump_count = 0;
+  bool jump_queued = false;
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
+  int32_t sprint_timer = 0;
   int32_t air = 0;
   int32_t dive_count = 0;
   int32_t death_count = 0;
@@ -1409,7 +1412,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t flare_control_left = 0;
   bool look = false;
   bool burn = false;
-  bool keep_ducked = false;
+  bool keep_crouched = false;
   bool is_moving = false;
   bool can_monkey_swing = false;
   int32_t burn_blue = 0;
@@ -1506,104 +1509,107 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WATER_STATUS = 22,
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
-    VT_HIT_FRAME = 28,
-    VT_HIT_DIRECTION = 30,
-    VT_AIR = 32,
-    VT_DIVE_COUNT = 34,
-    VT_DEATH_COUNT = 36,
-    VT_CURRENT_ACTIVE = 38,
-    VT_CURRENT_X_VEL = 40,
-    VT_CURRENT_Y_VEL = 42,
-    VT_CURRENT_Z_VEL = 44,
-    VT_SPAZ_EFFECT_COUNT = 46,
-    VT_FLARE_AGE = 48,
-    VT_BURN_COUNT = 50,
-    VT_WEAPON_ITEM = 52,
-    VT_HOLSTER_INFO = 54,
-    VT_FLARE_FRAME = 56,
-    VT_POISONED = 58,
-    VT_WET = 60,
-    VT_FLARE_CONTROL_LEFT = 62,
-    VT_LOOK = 64,
-    VT_BURN = 66,
-    VT_KEEP_DUCKED = 68,
-    VT_IS_MOVING = 70,
-    VT_CAN_MONKEY_SWING = 72,
-    VT_BURN_BLUE = 74,
-    VT_BURN_SMOKE = 76,
-    VT_IS_DUCKED = 78,
-    VT_HAS_FIRED = 80,
-    VT_BUSY = 82,
-    VT_OLD_BUSY = 84,
-    VT_UNCONTROLLABLE = 86,
-    VT_LIT_TORCH = 88,
-    VT_IS_CLIMBING = 90,
-    VT_FIRED = 92,
-    VT_WATER_SURFACE_DIST = 94,
-    VT_LAST_POSITION = 96,
-    VT_NEXT_CORNER_POSITION = 98,
-    VT_NEXT_CORNER_ROTATION = 100,
-    VT_MESH_PTRS = 102,
-    VT_TARGET_ANGLES = 104,
-    VT_TURN_RATE = 106,
-    VT_MOVE_ANGLE = 108,
-    VT_HEAD_X_ROT = 110,
-    VT_HEAD_Y_ROT = 112,
-    VT_HEAD_Z_ROT = 114,
-    VT_TORSO_X_ROT = 116,
-    VT_TORSO_Y_ROT = 118,
-    VT_TORSO_Z_ROT = 120,
-    VT_LEFT_ARM = 122,
-    VT_RIGHT_ARM = 124,
-    VT_ROPE_SEGMENT = 126,
-    VT_ROPE_DIRECTION = 128,
-    VT_ROPE_ARC_FRONT = 130,
-    VT_ROPE_ARC_BACK = 132,
-    VT_ROPE_LAST_X = 134,
-    VT_ROPE_MAX_X_FORWARD = 136,
-    VT_ROPE_MAX_X_BACKWARD = 138,
-    VT_ROPE_DFRAME = 140,
-    VT_ROPE_FRAME = 142,
-    VT_ROPE_FRAMERATE = 144,
-    VT_ROPE_Y = 146,
-    VT_ROPE_PTR = 148,
-    VT_INTERACTED_ITEM = 150,
-    VT_ROPE_OFFSET = 152,
-    VT_ROPE_DOWN_VEL = 154,
-    VT_ROPE_FLAG = 156,
-    VT_ROPE_COUNT = 158,
-    VT_MOVE_COUNT = 160,
-    VT_LOCATION = 162,
-    VT_HIGHEST_LOCATION = 164,
-    VT_LOCATION_PAD = 166,
-    VT_TIGHTROPE = 168,
-    VT_BEETLE_LIFE = 170,
-    VT_HAS_BEETLE_THINGS = 172,
-    VT_SMALL_WATERSKIN = 174,
-    VT_BIG_WATERSKIN = 176,
-    VT_VEHICLE = 178,
-    VT_EXTRA_ANIM = 180,
-    VT_MINE_L = 182,
-    VT_MINE_R = 184,
-    VT_WEAPONS = 186,
-    VT_PUZZLES = 188,
-    VT_KEYS = 190,
-    VT_PICKUPS = 192,
-    VT_EXAMINES = 194,
-    VT_PUZZLES_COMBO = 196,
-    VT_KEYS_COMBO = 198,
-    VT_PICKUPS_COMBO = 200,
-    VT_EXAMINES_COMBO = 202,
-    VT_SECRETS = 204,
-    VT_LASERSIGHT = 206,
-    VT_CROWBAR = 208,
-    VT_TORCH = 210,
-    VT_SILENCER = 212,
-    VT_BINOCULARS = 214,
-    VT_NUM_LARGE_MEDIPACKS = 216,
-    VT_NUM_SMALL_MEDIPACKS = 218,
-    VT_NUM_FLARES = 220,
-    VT_TARGET_ITEM_NUMBER = 222
+    VT_JUMP_COUNT = 28,
+    VT_JUMP_QUEUED = 30,
+    VT_HIT_FRAME = 32,
+    VT_HIT_DIRECTION = 34,
+    VT_SPRINT_TIMER = 36,
+    VT_AIR = 38,
+    VT_DIVE_COUNT = 40,
+    VT_DEATH_COUNT = 42,
+    VT_CURRENT_ACTIVE = 44,
+    VT_CURRENT_X_VEL = 46,
+    VT_CURRENT_Y_VEL = 48,
+    VT_CURRENT_Z_VEL = 50,
+    VT_SPAZ_EFFECT_COUNT = 52,
+    VT_FLARE_AGE = 54,
+    VT_BURN_COUNT = 56,
+    VT_WEAPON_ITEM = 58,
+    VT_HOLSTER_INFO = 60,
+    VT_FLARE_FRAME = 62,
+    VT_POISONED = 64,
+    VT_WET = 66,
+    VT_FLARE_CONTROL_LEFT = 68,
+    VT_LOOK = 70,
+    VT_BURN = 72,
+    VT_KEEP_CROUCHED = 74,
+    VT_IS_MOVING = 76,
+    VT_CAN_MONKEY_SWING = 78,
+    VT_BURN_BLUE = 80,
+    VT_BURN_SMOKE = 82,
+    VT_IS_DUCKED = 84,
+    VT_HAS_FIRED = 86,
+    VT_BUSY = 88,
+    VT_OLD_BUSY = 90,
+    VT_UNCONTROLLABLE = 92,
+    VT_LIT_TORCH = 94,
+    VT_IS_CLIMBING = 96,
+    VT_FIRED = 98,
+    VT_WATER_SURFACE_DIST = 100,
+    VT_LAST_POSITION = 102,
+    VT_NEXT_CORNER_POSITION = 104,
+    VT_NEXT_CORNER_ROTATION = 106,
+    VT_MESH_PTRS = 108,
+    VT_TARGET_ANGLES = 110,
+    VT_TURN_RATE = 112,
+    VT_MOVE_ANGLE = 114,
+    VT_HEAD_X_ROT = 116,
+    VT_HEAD_Y_ROT = 118,
+    VT_HEAD_Z_ROT = 120,
+    VT_TORSO_X_ROT = 122,
+    VT_TORSO_Y_ROT = 124,
+    VT_TORSO_Z_ROT = 126,
+    VT_LEFT_ARM = 128,
+    VT_RIGHT_ARM = 130,
+    VT_ROPE_SEGMENT = 132,
+    VT_ROPE_DIRECTION = 134,
+    VT_ROPE_ARC_FRONT = 136,
+    VT_ROPE_ARC_BACK = 138,
+    VT_ROPE_LAST_X = 140,
+    VT_ROPE_MAX_X_FORWARD = 142,
+    VT_ROPE_MAX_X_BACKWARD = 144,
+    VT_ROPE_DFRAME = 146,
+    VT_ROPE_FRAME = 148,
+    VT_ROPE_FRAMERATE = 150,
+    VT_ROPE_Y = 152,
+    VT_ROPE_PTR = 154,
+    VT_INTERACTED_ITEM = 156,
+    VT_ROPE_OFFSET = 158,
+    VT_ROPE_DOWN_VEL = 160,
+    VT_ROPE_FLAG = 162,
+    VT_ROPE_COUNT = 164,
+    VT_MOVE_COUNT = 166,
+    VT_LOCATION = 168,
+    VT_HIGHEST_LOCATION = 170,
+    VT_LOCATION_PAD = 172,
+    VT_TIGHTROPE = 174,
+    VT_BEETLE_LIFE = 176,
+    VT_HAS_BEETLE_THINGS = 178,
+    VT_SMALL_WATERSKIN = 180,
+    VT_BIG_WATERSKIN = 182,
+    VT_VEHICLE = 184,
+    VT_EXTRA_ANIM = 186,
+    VT_MINE_L = 188,
+    VT_MINE_R = 190,
+    VT_WEAPONS = 192,
+    VT_PUZZLES = 194,
+    VT_KEYS = 196,
+    VT_PICKUPS = 198,
+    VT_EXAMINES = 200,
+    VT_PUZZLES_COMBO = 202,
+    VT_KEYS_COMBO = 204,
+    VT_PICKUPS_COMBO = 206,
+    VT_EXAMINES_COMBO = 208,
+    VT_SECRETS = 210,
+    VT_LASERSIGHT = 212,
+    VT_CROWBAR = 214,
+    VT_TORCH = 216,
+    VT_SILENCER = 218,
+    VT_BINOCULARS = 220,
+    VT_NUM_LARGE_MEDIPACKS = 222,
+    VT_NUM_SMALL_MEDIPACKS = 224,
+    VT_NUM_FLARES = 226,
+    VT_TARGET_ITEM_NUMBER = 228
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -1641,11 +1647,20 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t pose_count() const {
     return GetField<int32_t>(VT_POSE_COUNT, 0);
   }
+  int32_t jump_count() const {
+    return GetField<int32_t>(VT_JUMP_COUNT, 0);
+  }
+  bool jump_queued() const {
+    return GetField<uint8_t>(VT_JUMP_QUEUED, 0) != 0;
+  }
   int32_t hit_frame() const {
     return GetField<int32_t>(VT_HIT_FRAME, 0);
   }
   int32_t hit_direction() const {
     return GetField<int32_t>(VT_HIT_DIRECTION, 0);
+  }
+  int32_t sprint_timer() const {
+    return GetField<int32_t>(VT_SPRINT_TIMER, 0);
   }
   int32_t air() const {
     return GetField<int32_t>(VT_AIR, 0);
@@ -1701,8 +1716,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool burn() const {
     return GetField<uint8_t>(VT_BURN, 0) != 0;
   }
-  bool keep_ducked() const {
-    return GetField<uint8_t>(VT_KEEP_DUCKED, 0) != 0;
+  bool keep_crouched() const {
+    return GetField<uint8_t>(VT_KEEP_CROUCHED, 0) != 0;
   }
   bool is_moving() const {
     return GetField<uint8_t>(VT_IS_MOVING, 0) != 0;
@@ -1949,8 +1964,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyField<int32_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_JUMP_COUNT) &&
+           VerifyField<uint8_t>(verifier, VT_JUMP_QUEUED) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
+           VerifyField<int32_t>(verifier, VT_SPRINT_TIMER) &&
            VerifyField<int32_t>(verifier, VT_AIR) &&
            VerifyField<int32_t>(verifier, VT_DIVE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_DEATH_COUNT) &&
@@ -1971,7 +1989,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLARE_CONTROL_LEFT) &&
            VerifyField<uint8_t>(verifier, VT_LOOK) &&
            VerifyField<uint8_t>(verifier, VT_BURN) &&
-           VerifyField<uint8_t>(verifier, VT_KEEP_DUCKED) &&
+           VerifyField<uint8_t>(verifier, VT_KEEP_CROUCHED) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOVING) &&
            VerifyField<uint8_t>(verifier, VT_CAN_MONKEY_SWING) &&
            VerifyField<int32_t>(verifier, VT_BURN_BLUE) &&
@@ -2111,11 +2129,20 @@ struct LaraBuilder {
   void add_pose_count(int32_t pose_count) {
     fbb_.AddElement<int32_t>(Lara::VT_POSE_COUNT, pose_count, 0);
   }
+  void add_jump_count(int32_t jump_count) {
+    fbb_.AddElement<int32_t>(Lara::VT_JUMP_COUNT, jump_count, 0);
+  }
+  void add_jump_queued(bool jump_queued) {
+    fbb_.AddElement<uint8_t>(Lara::VT_JUMP_QUEUED, static_cast<uint8_t>(jump_queued), 0);
+  }
   void add_hit_frame(int32_t hit_frame) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
   }
   void add_hit_direction(int32_t hit_direction) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_DIRECTION, hit_direction, 0);
+  }
+  void add_sprint_timer(int32_t sprint_timer) {
+    fbb_.AddElement<int32_t>(Lara::VT_SPRINT_TIMER, sprint_timer, 0);
   }
   void add_air(int32_t air) {
     fbb_.AddElement<int32_t>(Lara::VT_AIR, air, 0);
@@ -2171,8 +2198,8 @@ struct LaraBuilder {
   void add_burn(bool burn) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN, static_cast<uint8_t>(burn), 0);
   }
-  void add_keep_ducked(bool keep_ducked) {
-    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_DUCKED, static_cast<uint8_t>(keep_ducked), 0);
+  void add_keep_crouched(bool keep_crouched) {
+    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_CROUCHED, static_cast<uint8_t>(keep_crouched), 0);
   }
   void add_is_moving(bool is_moving) {
     fbb_.AddElement<uint8_t>(Lara::VT_IS_MOVING, static_cast<uint8_t>(is_moving), 0);
@@ -2430,8 +2457,11 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
+    int32_t jump_count = 0,
+    bool jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
+    int32_t sprint_timer = 0,
     int32_t air = 0,
     int32_t dive_count = 0,
     int32_t death_count = 0,
@@ -2450,7 +2480,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_ducked = false,
+    bool keep_crouched = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
@@ -2604,8 +2634,10 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_death_count(death_count);
   builder_.add_dive_count(dive_count);
   builder_.add_air(air);
+  builder_.add_sprint_timer(sprint_timer);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
+  builder_.add_jump_count(jump_count);
   builder_.add_pose_count(pose_count);
   builder_.add_climb_status(climb_status);
   builder_.add_water_status(water_status);
@@ -2636,9 +2668,10 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_can_monkey_swing(can_monkey_swing);
   builder_.add_is_moving(is_moving);
-  builder_.add_keep_ducked(keep_ducked);
+  builder_.add_keep_crouched(keep_crouched);
   builder_.add_burn(burn);
   builder_.add_look(look);
+  builder_.add_jump_queued(jump_queued);
   return builder_.Finish();
 }
 
@@ -2661,8 +2694,11 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
+    int32_t jump_count = 0,
+    bool jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
+    int32_t sprint_timer = 0,
     int32_t air = 0,
     int32_t dive_count = 0,
     int32_t death_count = 0,
@@ -2681,7 +2717,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_ducked = false,
+    bool keep_crouched = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
@@ -2785,8 +2821,11 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       water_status,
       climb_status,
       pose_count,
+      jump_count,
+      jump_queued,
       hit_frame,
       hit_direction,
+      sprint_timer,
       air,
       dive_count,
       death_count,
@@ -2805,7 +2844,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       flare_control_left,
       look,
       burn,
-      keep_ducked,
+      keep_crouched,
       is_moving,
       can_monkey_swing,
       burn_blue,
@@ -5071,8 +5110,11 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
+  { auto _e = jump_count(); _o->jump_count = _e; }
+  { auto _e = jump_queued(); _o->jump_queued = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
+  { auto _e = sprint_timer(); _o->sprint_timer = _e; }
   { auto _e = air(); _o->air = _e; }
   { auto _e = dive_count(); _o->dive_count = _e; }
   { auto _e = death_count(); _o->death_count = _e; }
@@ -5091,7 +5133,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = flare_control_left(); _o->flare_control_left = _e; }
   { auto _e = look(); _o->look = _e; }
   { auto _e = burn(); _o->burn = _e; }
-  { auto _e = keep_ducked(); _o->keep_ducked = _e; }
+  { auto _e = keep_crouched(); _o->keep_crouched = _e; }
   { auto _e = is_moving(); _o->is_moving = _e; }
   { auto _e = can_monkey_swing(); _o->can_monkey_swing = _e; }
   { auto _e = burn_blue(); _o->burn_blue = _e; }
@@ -5191,8 +5233,11 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _water_status = _o->water_status;
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
+  auto _jump_count = _o->jump_count;
+  auto _jump_queued = _o->jump_queued;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
+  auto _sprint_timer = _o->sprint_timer;
   auto _air = _o->air;
   auto _dive_count = _o->dive_count;
   auto _death_count = _o->death_count;
@@ -5211,7 +5256,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _flare_control_left = _o->flare_control_left;
   auto _look = _o->look;
   auto _burn = _o->burn;
-  auto _keep_ducked = _o->keep_ducked;
+  auto _keep_crouched = _o->keep_crouched;
   auto _is_moving = _o->is_moving;
   auto _can_monkey_swing = _o->can_monkey_swing;
   auto _burn_blue = _o->burn_blue;
@@ -5303,8 +5348,11 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _water_status,
       _climb_status,
       _pose_count,
+      _jump_count,
+      _jump_queued,
       _hit_frame,
       _hit_direction,
+      _sprint_timer,
       _air,
       _dive_count,
       _death_count,
@@ -5323,7 +5371,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _flare_control_left,
       _look,
       _burn,
-      _keep_ducked,
+      _keep_crouched,
       _is_moving,
       _can_monkey_swing,
       _burn_blue,

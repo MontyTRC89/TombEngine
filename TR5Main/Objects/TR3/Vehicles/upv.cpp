@@ -329,7 +329,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	LaraInfo*& laraInfo = laraItem->data;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_NO_ARMS ||
+		laraInfo->gunStatus != LG_HANDS_FREE ||
 		laraItem->gravityStatus)
 	{
 		return false;
@@ -694,7 +694,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UpdateItemRoom(laraItem, 0);
 
 			laraInfo->waterStatus = LW_UNDERWATER;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->hitPoints = 0;
@@ -738,7 +738,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraInfo->torsoYrot = 0;
 			laraInfo->headXrot = 0;
 			laraInfo->headYrot = 0;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->hitPoints = 0;
