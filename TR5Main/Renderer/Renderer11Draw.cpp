@@ -1176,14 +1176,14 @@ namespace TEN::Renderer
         {
             Menu pause_menu = g_Gui.GetMenuToDisplay();
 
-            if (pause_menu == Menu::Pause || pause_menu == Menu::Options)
+            /*if (pause_menu == Menu::Pause || pause_menu == Menu::Options)
             {
                 guiRect.left  = pause_menu == Menu::Pause ? 335 : 295;
                 guiRect.right = pause_menu == Menu::Pause ? 135 : 215;
                 guiRect.top = 265;
                 guiRect.bottom = 100;
                 addQuad2D(guiRect, 0, 0, 64, 180);
-            }
+            }*/
 
             renderPauseMenu();
             return;
@@ -1374,6 +1374,8 @@ namespace TEN::Renderer
 	
 	void Renderer11::drawRects2D()
 	{
+        return;
+
 		m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
 
@@ -2026,6 +2028,7 @@ namespace TEN::Renderer
                 printDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
                 printDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
                 printDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
+                printDebugMessage("Total rooms transparent polygons: %d", numRoomsTransparentPolygons);
                 break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
@@ -2089,15 +2092,7 @@ namespace TEN::Renderer
                     room->TransparentFacesToDraw.begin(),
                     room->TransparentFacesToDraw.end(),
                     [](RendererTransparentFace& a, RendererTransparentFace& b) {
-                        return a.distance < b.distance;
-
-                        int aDistance = std::floor(a.distance / 256);
-                        int bDistance = std::floor(b.distance / 256);
-
-                        if (aDistance == bDistance)
-                            return a.info.texture < b.info.texture;
-                        else
-                            return aDistance < bDistance;
+                        return (a.distance > b.distance);
                     }
                 );
             }
@@ -2325,7 +2320,7 @@ namespace TEN::Renderer
         // Set vertex buffer
         //m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
-        m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+        m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
         m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_context->IASetInputLayout(m_inputLayout.Get());
 
@@ -2405,15 +2400,6 @@ namespace TEN::Renderer
        
         setBlendMode(info->blendMode);
 
-        if (info->bucket->DoubleSided)
-        {
-            m_context->RSSetState(m_states->CullNone());
-        }
-        else
-        {
-            m_context->RSSetState(m_states->CullCounterClockwise());
-        }
-       
         m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
 
         int drawnVertices = 0;
@@ -2469,15 +2455,6 @@ namespace TEN::Renderer
 
         int drawnVertices = 0;
         int size = m_transparentFacesIndices.size();
-
-        if (info->bucket->DoubleSided)
-        {
-            m_context->RSSetState(m_states->CullNone());
-        }
-        else
-        {
-            m_context->RSSetState(m_states->CullCounterClockwise());
-        }
 
         while (drawnVertices < size)
         {
@@ -3036,11 +3013,18 @@ namespace TEN::Renderer
         m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
         m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
 
+        Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
+        numRoomsTransparentPolygons = 0;
+
+        //for (int i = 0; i < view.roomsToDraw.size(); i++)
         for (int i = 0; i < view.roomsToDraw.size(); i++)
         {
             int index = i;
             RendererRoom* room = view.roomsToDraw[index];
             ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+            Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
 
             m_stLights.NumLights = view.lightsToDraw.size();
             for (int j = 0; j < view.lightsToDraw.size(); j++)
@@ -3083,10 +3067,15 @@ namespace TEN::Renderer
                         {
                             RendererPolygon* p = &bucket.Polygons[j];
 
-                            // As polygon distance, for rooms, we use the farthest vertex distance
-                            Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
-                            Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+                            // Don't queue back-face polygons
+                            Vector3 cameraVector = (roomPosition + p->centre) - cameraPosition;
+                            cameraVector.Normalize();
+                            if (p->Normal.Dot(cameraVector) < 0.0f)
+                                continue;
 
+                            numRoomsTransparentPolygons++;
+
+                            // As polygon distance, for rooms, we use the farthest vertex distance                            
                             int d1 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
                             int d2 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
                             int d3 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
@@ -3109,17 +3098,8 @@ namespace TEN::Renderer
                         }
                     }
                     else
-                    {
+                    { 
                         int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
-
-                        if (bucket.DoubleSided)
-                        {
-                            m_context->RSSetState(m_states->CullNone());
-                        }
-                        else
-                        {
-                            m_context->RSSetState(m_states->CullCounterClockwise());
-                        }
 
                         for (int pass = 0; pass < passes; pass++)
                         {
@@ -3143,9 +3123,6 @@ namespace TEN::Renderer
                             // Draw geometry
                             if (animated) 
                             {
-                                if (!bucket.Animated)
-                                    continue;
-
                                 bindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
                                 bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[bucket.Texture]), SamplerStateType::None);
 
@@ -3163,9 +3140,6 @@ namespace TEN::Renderer
                             }
                             else 
                             {
-                                if (bucket.Animated)
-                                    continue;
-
                                 bindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
                                 bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[bucket.Texture]), SamplerStateType::None);
                             }
@@ -3177,8 +3151,6 @@ namespace TEN::Renderer
                 }
             }
         }
-
-        m_context->RSSetState(m_states->CullCounterClockwise());
     }
 
 

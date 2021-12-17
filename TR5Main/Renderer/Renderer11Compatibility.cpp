@@ -54,7 +54,7 @@ namespace TEN::Renderer
 			m_roomTextures[i] = tex;
 
 #ifdef DUMP_TEXTURES
-			char filename[255];ifdef DUMP_TEXTURES
+			char filename[255];
 			sprintf(filename, "dump\\room_%d.png", i);
 
 			std::ofstream outfile(filename, std::ios::out | std::ios::binary);
@@ -134,7 +134,7 @@ namespace TEN::Renderer
 		int totalIndices = 0;
 		for (auto& room : g_Level.Rooms)
 			for (auto& bucket : room.buckets)
-			{
+			{ 
 				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
 				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 			}
@@ -168,7 +168,6 @@ namespace TEN::Renderer
 
 				bucket.Animated = levelBucket.animated;
 				bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket.blendMode);
-				bucket.DoubleSided = levelBucket.doubleSided;
 				bucket.Texture = levelBucket.texture;
 				bucket.StartVertex = lastVertex;
 				bucket.StartIndex = lastIndex;
@@ -180,6 +179,20 @@ namespace TEN::Renderer
 					RendererPolygon newPoly;
 
 					newPoly.shape = poly.shape;
+
+					newPoly.centre = (
+						room.positions[poly.indices[0]] +
+						room.positions[poly.indices[1]] +
+						room.positions[poly.indices[2]]) / 3.0f;
+
+					Vector3 p1 = room.positions[poly.indices[0]];
+					Vector3 p2 = room.positions[poly.indices[1]];
+					Vector3 p3 = room.positions[poly.indices[2]];
+
+					Vector3 n = (p2 - p1).Cross(p3 - p1);
+					n.Normalize();
+
+					newPoly.Normal = n;
 					
 					int baseVertices = lastVertex;
 					for (int k = 0; k < poly.indices.size(); k++)
@@ -714,10 +727,7 @@ namespace TEN::Renderer
 			int bucketIndex;
 			bucket.Animated = levelBucket->animated;
 			bucket.Texture = levelBucket->texture;
-			bucket.DoubleSided = levelBucket->doubleSided;
 			bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
-			//bucket.Vertices.resize(levelBucket->numQuads * 4 + levelBucket->numTriangles * 3);
-			//bucket.Indices.resize(levelBucket->numQuads * 6 + levelBucket->numTriangles * 3);
 			bucket.StartVertex = *lastVertex;
 			bucket.StartIndex = *lastIndex;
 			bucket.NumVertices = levelBucket->numQuads * 4 + levelBucket->numTriangles * 3;
