@@ -21,36 +21,45 @@ using namespace TEN::Floordata;
 // Test if a ledge in front of item is valid to climb.
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool heightLimit)
 {
-	// Determine probe base point.
-	// We use 1/3 radius extents here for two purposes. First - we can't guarantee that
-	// shifts weren't already applied and misfire may occur. Second - it guarantees
-	// that Lara won't land on a very thin edge of diagonal geometry.
-
-	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.3f);
-	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.3f);
-
-	// Determine probe left/right points
-	int xl = xf + phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int zl = zf + phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int xr = xf + phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
-	int zr = zf + phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	// Determine probe base left/right points
+	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
+	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
 
 	// Determine probe top point
 	int y = item->pos.yPos - coll->Setup.Height;
 
-	// Get floor heights at both points
-	auto left  = GetCollisionResult(item->pos.xPos + xl, y, item->pos.zPos + zl, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
-	auto right = GetCollisionResult(item->pos.xPos + xr, y, item->pos.zPos + zr, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+	// Get frontal collision data
+	auto frontLeft  = GetCollisionResult(item->pos.xPos + xl, y, item->pos.zPos + zl, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber);
+	auto frontRight = GetCollisionResult(item->pos.xPos + xr, y, item->pos.zPos + zr, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber);
+
+	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
+	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
+	if (frontLeft.Position.Floor < (item->pos.yPos - CLICK(0.5f)) || frontRight.Position.Floor < (item->pos.yPos - CLICK(0.5f)))
+		return false;
+	if (frontLeft.Position.Ceiling > (item->pos.yPos - coll->Setup.Height) || frontRight.Position.Ceiling > (item->pos.yPos - coll->Setup.Height))
+		return false;
 
 	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xl, left, item->pos.zPos + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
 	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xr, right, item->pos.zPos + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	
+	// Determine ledge probe embed offset.
+	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
+	// and misfire may occur. Second - it guarantees that Lara won't land on a very thin edge of diagonal geometry.
+	int xf = phd_sin(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
+	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 
-	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+	// Get floor heights at both points
+	auto left = GetCollisionResult(item->pos.xPos + xf + xl, y, item->pos.zPos + zf + zl, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
+	auto right = GetCollisionResult(item->pos.xPos + xf + xr, y, item->pos.zPos + zf + zr, GetRoom(item->location, item->pos.xPos, y, item->pos.zPos).roomNumber).Position.Floor;
 
 	// If specified, limit vertical search zone only to nearest height
 	if (heightLimit && (abs(left - y) > (STEP_SIZE / 2) || abs(right - y) > (STEP_SIZE / 2)))
 		return false;
+
+	// Determine allowed slope difference for a given collision radius
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
@@ -514,7 +523,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.zPos += phd_cos(item->pos.yRot) * coll->Setup.Radius * 0.5f;
 
 	// Get height difference with side spaces (left or right, depending on movement direction)
-	auto hdif = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius * 1.5f);
+	auto hdif = LaraFloorFront(item, Lara.moveAngle, coll->Setup.Radius * 1.4f);
 
 	// Set stopped flag, if floor height is above footspace which is step size
 	auto stopped = hdif < STEP_SIZE / 2;
@@ -962,18 +971,17 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	auto oldPos = item->pos;
 
+	Lara.moveAngle = item->pos.yRot + angle;
+
 	static constexpr auto sidewayTestDistance = 16;
 	item->pos.xPos += phd_sin(Lara.moveAngle) * sidewayTestDistance;
 	item->pos.zPos += phd_cos(Lara.moveAngle) * sidewayTestDistance;
-
-	Lara.moveAngle = item->pos.yRot + angle;
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
 	auto res = TestLaraHang(item, coll);
 
 	item->pos = oldPos;
-	Lara.moveAngle = item->pos.yRot + angle;
 
 	return !res;
 }
