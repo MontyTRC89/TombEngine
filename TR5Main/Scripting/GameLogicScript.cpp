@@ -28,135 +28,6 @@ Functions and callbacks for level-specific logic scripts.
 @pragma nostrip
 */
 
-static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> looped)
-{
-	auto mode = looped.value_or(false) ? SOUNDTRACK_PLAYTYPE::OneShot : SOUNDTRACK_PLAYTYPE::BGM;
-	PlaySoundTrack(trackName, mode);
-}
-
-static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
-{
-	PHD_3DPOS pos;
-
-	pos.xPos = p.x;
-	pos.yPos = p.y;
-	pos.zPos = p.z;
-	pos.xRot = 0;
-	pos.yRot = 0;
-	pos.zRot = 0;
-
-	SoundEffect(id, &pos, flags);
-}
-
-static void PlaySoundEffect(int id, int flags)
-{
-	SoundEffect(id, NULL, flags);
-}
-
-static void SetAmbientTrack(std::string const & trackName)
-{
-	PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
-}
-
-static int FindRoomNumber(GameScriptPosition pos)
-{
-	return 0;
-}
-
-static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
-{
-	PHD_VECTOR p1;
-	p1.x = src.x;
-	p1.y = src.y;
-	p1.z = src.z;
-
-	PHD_VECTOR p2;
-	p2.x = dest.x;
-	p2.y = dest.y;
-	p2.z = dest.z;
-
-	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
-}
-
-static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
-{
-	PHD_3DPOS p;
-	p.xPos = pos.x;
-	p.yPos = pos.y;
-	p.zPos = pos.z;
-	
-	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
-}
-
-static void AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
-{
-	TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
-}
-
-static void AddBlood(GameScriptPosition pos, int num)
-{
-	TriggerBlood(pos.x, pos.y, pos.z, -1, num);
-}
-
-static void AddFireFlame(GameScriptPosition pos, int size)
-{
-	AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
-}
-
-static void Earthquake(int strength)
-{
-	Camera.bounce = -strength;
-}
-
-static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
-{
-	// If 0 is passed in, then the amount added will be the default amount
-	// for that pickup - i.e. the amount you would get from picking up the
-	// item in-game (e.g. 1 for medipacks, 12 for flares).
-	PickedUpObject(slot.m_pair.first, count.value_or(0));
-}
-
-static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
-{
-	// 0 is default for the same reason as in InventoryAdd.
-	RemoveObjectFromInventory(slot.m_pair.first, count.value_or(0));
-}
-
-static int InventoryGetCount(ItemEnumPair slot)
-{
-	return GetInventoryCount(slot.m_pair.first);
-}
-
-static void InventorySetCount(ItemEnumPair slot, int count)
-{
-	// add the amount we'd need to add to get to count
-	int currAmt = GetInventoryCount(slot.m_pair.first);
-	InventoryAdd(slot, count - currAmt);
-}
-
-static void InventoryCombine(int slot1, int slot2)
-{
-	
-}
-
-static void InventorySeparate(int slot)
-{
-
-}
-
-static int CalculateDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
-{
-	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
-	return static_cast<int>(round(result));
-}
-
-static int CalculateHorizontalDistance(GameScriptPosition const & pos1, GameScriptPosition const & pos2)
-{
-	auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
-	return static_cast<int>(round(result));
-}
-
-// A "special" table is essentially one that TEN reserves and does things with.
 template <typename funcIndex, typename funcNewindex, typename obj>
 static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
 {
@@ -193,73 +64,6 @@ static std::tuple<double, double> ScreenToPercent(int x, int y)
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
-/*** Ambience and music
-@section Music
-*/
-
-/*** Set and play an ambient track
-@function SetAmbientTrack
-@tparam string name of track (without file extension) to play
-*/
-	m_lua->set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
-
-/*** Play an audio track
-@function PlayAudioTrack
-@tparam string name of track (without file extension) to play
-@tparam bool loop if true, the track will loop; if false, it won't (default: false)
-*/
-	m_lua->set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
-
-
-/*** Player inventory management
-@section Inventory
-*/
-
-/*** Add x of an item to the inventory.
-A count of 0 will add the "default" amount of that item
-(i.e. the amount the player would get from a pickup of that type).
-For example, giving "zero" crossbow ammo would give the player
-10 instead, whereas giving "zero" medkits would give the player 1 medkit.
-@function GiveInvItem
-@tparam InvItem item the item to be added
-@tparam int count the number of items to add (default: 0)
-*/
-	m_lua->set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
-
-/***
-Remove x of a certain item from the inventory.
-As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item.
-@function TakeInvItem
-@tparam InvItem item the item to be removed
-@tparam int count the number of items to remove (default: 0)
-*/
-	m_lua->set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
-
-/***
-Get the amount the player holds of an item.
-@function GetInvItemCount
-@tparam InvItem item the item to check
-@treturn int the amount of the item the player has in the inventory
-*/
-	m_lua->set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
-
-/***
-Set the amount of a certain item the player has in the inventory.
-Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
-@function SetInvItemCount
-@tparam @{InvItem} item the item to be set
-@tparam int count the number of items the player will have
-*/
-	m_lua->set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
-
-/*** Game entity getters.
-All Lua variables created with these functions will be non-owning.
-This means that the actual in-game entity (object/camera/sink/whatever)
-will _not_ be removed from the game if the Lua variable goes out of scope
-or is destroyed in some other way.
-@section getters
-*/
-
 /***
 Get an ItemInfo by its name.
 @function GetItemByName
@@ -301,27 +105,9 @@ Get a SoundSourceInfo by its name.
 	m_lua->set_function(ScriptReserved_GetSoundSourceByName, &GameScript::GetByName<GameScriptSoundSourceInfo, ScriptReserved_SoundSourceInfo>, this);
 
 /***
-Calculate the distance between two positions.
-@function CalculateDistance
-@tparam Position posA first position
-@tparam Position posB second position
-@treturn int the direct distance from one position to the other
-*/
-	m_lua->set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
-
-/***
-Calculate the horizontal distance between two positions.
-@function CalculateHorizontalDistance
-@tparam Position posA first position
-@tparam Position posB second position
-@treturn int the direct distance on the XZ plane from one position to the other
-*/
-	m_lua->set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-
-/***
 Show some text on-screen.
-@function ShowString
 @tparam DisplayString str the string object to draw
+@function ShowString
 @tparam float time the time in seconds for which to show the string.
 If not given, the string will have an "infinite" life, and will show
 until @{HideString} is called or until the level is finished.

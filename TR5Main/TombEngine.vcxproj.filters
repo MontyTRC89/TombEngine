@@ -317,6 +317,7 @@
     <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="frameworkandsol.cpp" />
+    <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -711,6 +712,7 @@
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
+    <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
