@@ -205,7 +205,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Begin ladder climb.
-	if (info->climbStatus)
+	if (info->climbStatus && TestValidLedgeAngle(item, coll))
 	{
 		if (coll->Front.Floor > -CLICK(7.5f) ||				// Upper front floor bound.
 			coll->FrontLeft.Floor > -CLICK(7.5f) ||			// Upper left floor bound.
@@ -254,7 +254,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to monkey swing.
 	if (info->canMonkeySwing &&
 		!TestLaraSwamp(item) &&
-		Lara.canMonkeySwing && g_GameFlow->Animations.MonkeyAutoJump)
+		g_GameFlow->Animations.MonkeyAutoJump)
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
