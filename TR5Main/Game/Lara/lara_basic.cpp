@@ -174,7 +174,10 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (TestLaraVault(item, coll))
 		return;
@@ -305,7 +308,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (TestLaraVault(item, coll))
 		return;
@@ -618,7 +624,10 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 
@@ -727,7 +736,10 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
@@ -1353,7 +1365,10 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
@@ -1662,7 +1677,10 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
@@ -1744,7 +1762,10 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
@@ -1797,7 +1818,10 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2)) // Was 200.
 	{
@@ -1869,7 +1893,10 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 
@@ -2102,7 +2129,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	if (LaraDeflectEdge(item, coll))
 	{

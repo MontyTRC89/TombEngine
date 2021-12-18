@@ -11,7 +11,6 @@
 #include "lara_helpers.h"
 #include "lara_jump.h"
 #include "lara_basic.h"
-#include "lara_slide.h"
 #include "Scripting/GameFlowScript.h"
 
 // -----------------------------
@@ -314,7 +313,10 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	// TODO: Better handling.
 	if (coll->Middle.Ceiling > -100)
@@ -593,7 +595,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
 
 		if (TestLaraSlide(item, coll))
-			;
+			SetLaraSlideState(item, coll);
 		else if (info->keepCrouched ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
