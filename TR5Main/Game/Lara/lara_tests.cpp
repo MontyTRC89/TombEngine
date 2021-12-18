@@ -304,54 +304,16 @@ bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+// TODO: item paremeter not necessary.
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
-
-	if (TestLaraSwamp(item))
-		return false;
-
-	static short oldAngle = 1;
-
-	if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
-		return false;
-
-	short angle = ANGLE(0.0f);
-	if (coll->TiltX > 2)
-		angle = -ANGLE(90.0f);
-	else if (coll->TiltX < -2)
-		angle = ANGLE(90.0f);
-
-	if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
-		angle = ANGLE(180.0f);
-	else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
-		angle = ANGLE(0.0f);
-
-	short delta = angle - item->pos.yRot;
-
-	ShiftItem(item, coll);
-
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	if ((abs(coll->TiltX) > 2 || abs(coll->TiltZ) > 2)
+		&& !TestLaraSwamp(item))
 	{
-		if (item->currentAnimState == LS_SLIDE_BACK && oldAngle == angle)
-			return true;
-
-		SetAnimation(item, LA_SLIDE_BACK_START);
-		item->pos.yRot = angle + ANGLE(180.0f);
-	}
-	else
-	{
-		if (item->currentAnimState == LS_SLIDE_FORWARD && oldAngle == angle)
-			return true;
-
-		SetAnimation(item, LA_SLIDE_FORWARD);
-		item->pos.yRot = angle;
+		return true;
 	}
 
-	info->moveAngle = angle;
-	oldAngle = angle;
-
-	return true;
+	return false;
 }
 
 bool TestLaraSwamp(ITEM_INFO* item)

@@ -120,7 +120,10 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 	
@@ -199,7 +202,10 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 
@@ -454,7 +460,10 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 	
@@ -556,7 +565,10 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 
@@ -651,7 +663,10 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
 		return;
+	}
 
 	ShiftItem(item, coll);
 

@@ -158,6 +158,61 @@ void SetLaraFallBackState(ITEM_INFO* item)
 	item->gravityStatus = true;
 }
 
+void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	auto dir = GetLaraSlideDirection(coll);
+	short delta = dir - item->pos.yRot;
+	static short oldAngle = 1;
+
+	ShiftItem(item, coll);
+
+	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	{
+		if (item->currentAnimState == LS_SLIDE_BACK && oldAngle == dir)
+			return;
+
+		SetAnimation(item, LA_SLIDE_BACK_START);
+		item->pos.yRot = dir + ANGLE(180.0f);
+	}
+	else
+	{
+		if (item->currentAnimState == LS_SLIDE_FORWARD && oldAngle == dir)
+			return;
+
+		SetAnimation(item, LA_SLIDE_FORWARD);
+		item->pos.yRot = dir;
+	}
+
+	info->moveAngle = dir;
+	oldAngle = dir;
+}
+
+short GetLaraSlideDirection(COLL_INFO* coll)
+{
+	short dir = 0; //
+
+	//if (g_GameFlow->Animations.SlideExtended)
+	//{
+	//	// TODO: Get true slope direction.
+	//}
+	//else
+	{
+		if (coll->TiltX > 2)
+			dir = -ANGLE(90.0f);
+		else if (coll->TiltX < -2)
+			dir = ANGLE(90.0f);
+
+		if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
+			dir = ANGLE(180.0f);
+		else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
+			dir = ANGLE(0.0f);
+	}
+
+	return dir;
+}
+
 void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
 	LaraInfo*& info = item->data;
