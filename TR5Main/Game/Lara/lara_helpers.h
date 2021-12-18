@@ -15,5 +15,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void SetLaraFallState(ITEM_INFO* item);
 void SetLaraFallBackState(ITEM_INFO* item);
+void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
+short GetLaraSlideDirection(COLL_INFO* coll);
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);

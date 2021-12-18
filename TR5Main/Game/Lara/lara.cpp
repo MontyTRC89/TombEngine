@@ -80,7 +80,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_step_right,//21
 	lara_as_step_left,//22
 	lara_as_roll_back,
-	lara_as_slide,//24
+	lara_as_slide_forward,//24
 	lara_as_backjump,//25
 	lara_as_rightjump,//26
 	lara_as_leftjump,//27
@@ -88,7 +88,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_fallback,//29
 	lara_as_hangleft,//30
 	lara_as_hangright,//31
-	lara_as_slideback,//32
+	lara_as_slide_back,//32
 	lara_as_surftread,
 	lara_as_surfswim,
 	lara_as_dive,
@@ -243,7 +243,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_step_right,
 	lara_col_step_left,
 	lara_col_roll_back,
-	lara_col_slide,
+	lara_col_slide_forward,//24
 	lara_col_backjump,
 	lara_col_rightjump,
 	lara_col_leftjump,
@@ -251,7 +251,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_fallback,
 	lara_col_hangleft,
 	lara_col_hangright,
-	lara_col_slideback,
+	lara_col_slide_back,//32
 	lara_col_surftread,
 	lara_col_surfswim,
 	lara_col_dive,

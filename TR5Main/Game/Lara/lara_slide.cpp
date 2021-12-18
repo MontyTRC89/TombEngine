@@ -2,6 +2,7 @@
 #include "lara.h"
 #include "lara_collide.h"
 #include "lara_tests.h"
+#include "lara_helpers.h"
 #include "input.h"
 #include "Sound\sound.h"
 #include "collide.h"
@@ -9,135 +10,190 @@
 #include "level.h"
 #include "items.h"
 
-/*this file has all the related functions to sliding*/
+// -----------------------------
+// SLIDE
+// Control & Collision Functions
+// -----------------------------
 
-void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SLIDE_FORWARD (24)
+// Collision:	lara_col_slide_forward()
+void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -512;
-	coll->Setup.BadCeilingHeight = 0;
+	LaraInfo*& info = item->data;
 
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	GetCollisionInfo(coll, item);
+	Camera.targetElevation = -ANGLE(45.0f);
 
-	// Temporary measure. @Sezz 2021.12.16
-	if (TestLaraSwamp(item))
+	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		item->goalAnimState = LS_DEATH; //
 		return;
 	}
 
-	if (!LaraHitCeiling(item, coll))
+	if (TestLaraSlide(item, coll))
 	{
-		LaraDeflectEdge(item, coll);
+		// Not yet.
+		//if (TrInput & IN_LEFT/* &&
+		//	g_GameFlow->Animations.SlideExtended*/)
+		//{
+		//	info->turnRate -= LARA_TURN_RATE;
+		//	if (info->turnRate < -LARA_SLIDE_TURN_MAX)
+		//		info->turnRate = -LARA_SLIDE_TURN_MAX;
 
-		if (coll->Middle.Floor <= 200)
+		//	DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+		//}
+		//else if (TrInput & IN_RIGHT/* &&
+		//	g_GameFlow->Animations.SlideExtended*/)
+		//{
+		//	info->turnRate += LARA_TURN_RATE;
+		//	if (info->turnRate > LARA_SLIDE_TURN_MAX)
+		//		info->turnRate = LARA_SLIDE_TURN_MAX;
+
+		//	DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+		//}
+
+		if (TrInput & IN_JUMP)
 		{
-			TestLaraSlide(item, coll);
-
-			item->pos.yPos += coll->Middle.Floor;
-
-			if (abs(coll->TiltX) <= 2 && abs(coll->TiltZ) <= 2)
-			{
-				if (TrInput & IN_FORWARD && item->currentAnimState != LS_SLIDE_BACK)
-				{
-					item->goalAnimState = LS_RUN_FORWARD;
-				}
-				else
-					item->goalAnimState = LS_IDLE;
-
-				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-			}
+			item->goalAnimState = LS_JUMP_FORWARD;
+			return;
 		}
-		else
+
+		item->goalAnimState = LS_SLIDE_FORWARD;
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+		item->goalAnimState = LS_RUN_FORWARD;
+	else
+		item->goalAnimState = LS_IDLE;
+
+	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	return;
+}
+
+// State:		LS_SLIDE_FORWARD (24)
+// Control:		lara_as_slide_forward()
+void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -CLICK(2);
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (coll->Middle.Floor >= CLICK(1))
+	{
+		SetLaraFallState(item);
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+		SetLaraSlideState(item, coll);
+
+	LaraDeflectEdge(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		LaraSnapToHeight(item, coll);
+		//DoLaraStep(item, coll);
+		return;
+	}
+}
+
+// State:		LS_SLIDE_BACK (32)
+// Collision:	lara_col_slide_back()
+void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetAngle = ANGLE(135.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_DEATH; //
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		// Not yet.
+		//if (TrInput & IN_LEFT/* &&
+		//	g_GameFlow->Animations.SlideExtended*/)
+		//{
+		//	info->turnRate -= LARA_TURN_RATE;
+		//	if (info->turnRate < -LARA_SLIDE_TURN_MAX)
+		//		info->turnRate = -LARA_SLIDE_TURN_MAX;
+
+		//	DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+		//}
+		//else if (TrInput & IN_RIGHT/* &&
+		//	g_GameFlow->Animations.SlideExtended*/)
+		//{
+		//	info->turnRate += LARA_TURN_RATE;
+		//	if (info->turnRate > LARA_SLIDE_TURN_MAX)
+		//		info->turnRate = LARA_SLIDE_TURN_MAX;
+
+		//	DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+		//}
+
+		if (TrInput & IN_JUMP)
 		{
-			if (item->currentAnimState == LS_SLIDE_FORWARD)
-				SetAnimation(item, LA_FALL_START);
-			else
-				SetAnimation(item, LA_FALL_BACK);
-
-			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-
-			item->gravityStatus = true;
-			item->fallspeed = 0;
+			item->goalAnimState = LS_JUMP_BACK;
+			return;
 		}
+
+		item->goalAnimState = LS_SLIDE_BACK;
+		return;
 	}
+
+	item->goalAnimState = LS_IDLE;
+	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	return;
 }
 
-void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SLIDE_BACK (32)
+// Control:		lara_as_slide_back()
+void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	ShiftItem(item, coll);
+	LaraInfo*& info = item->data;
 
-	switch (coll->CollisionType)
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -CLICK(2);
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
 	{
-	case CT_LEFT:
-		item->pos.yRot += ANGLE(5.0f);
-		break;
-
-	case CT_RIGHT:
-		item->pos.yRot -= ANGLE(5.0f);
-		break;
-
-	case CT_TOP:
-	case CT_TOP_FRONT:
-		if (item->fallspeed <= 0)
-			item->fallspeed = 1;
-		break;
-
-	case CT_CLAMP:
-		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
-		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
-
-		item->speed = 0;
-
-		coll->Middle.Floor = 0;
-
-		if (item->fallspeed <= 0)
-			item->fallspeed = 16;
-
-		break;
+		SetLaraHitCeiling(item, coll);
+		return;
 	}
-}
-/*end tests and others*/
-/*-*/
-/*Lara state code*/
-void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 24*/
-	/*collision: lara_col_slide*/
-	Camera.targetElevation = -ANGLE(45.0f); // FIXED
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_BACK))
+
+	if (coll->Middle.Floor >= CLICK(1))
 	{
-		item->goalAnimState = LS_JUMP_FORWARD;
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		SetLaraFallBackState(item);
+		return;
 	}
-}
 
-void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 24*/
-	/*state code: lara_as_slide*/
-	Lara.moveAngle = item->pos.yRot;
-	lara_slide_slope(item, coll);
-}
+	if (TestLaraSlide(item, coll))
+		SetLaraSlideState(item, coll);
 
-void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 32*/
-	/*collision: lara_col_slideback*/
-	if ((TrInput & IN_JUMP) && !(TrInput & IN_FORWARD))
+	LaraDeflectEdge(item, coll);
+
+	if (TestLaraStep(coll))
 	{
-		item->goalAnimState = LS_JUMP_BACK;
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		LaraSnapToHeight(item, coll);
+		//DoLaraStep(item, coll);
+		return;
 	}
 }
-
-void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 32*/
-	/*state code: lara_as_slideback*/
-	Lara.moveAngle = item->pos.yRot + ANGLE(180);
-	lara_slide_slope(item, coll);
-}
-/*end Lara state code*/

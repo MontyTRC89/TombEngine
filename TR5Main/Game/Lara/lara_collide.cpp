@@ -93,6 +93,40 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	ShiftItem(item, coll);
+
+	switch (coll->CollisionType)
+	{
+	case CT_LEFT:
+		item->pos.yRot += ANGLE(5.0f);
+		break;
+
+	case CT_RIGHT:
+		item->pos.yRot -= ANGLE(5.0f);
+		break;
+
+	case CT_TOP:
+	case CT_TOP_FRONT:
+		if (item->fallspeed <= 0)
+			item->fallspeed = 1;
+		break;
+
+	case CT_CLAMP:
+		item->pos.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
+		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
+
+		item->speed = 0;
+		coll->Middle.Floor = 0;
+
+		if (item->fallspeed <= 0)
+			item->fallspeed = 16;
+
+		break;
+	}
+}
+
 bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Useless in the best case; Lara does not have to embed in order to perform climbing actions in crawl states. Keeping for security. @Sezz 2021.11.26

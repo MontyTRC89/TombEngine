@@ -9,6 +9,7 @@ constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
 
 bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
+void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll);
