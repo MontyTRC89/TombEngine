@@ -217,19 +217,18 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.BottomBlock = floor;
 
 	// Get tilts from new floordata.
-	auto tilts = floor->TiltXZ(x, z);
-	result.TiltX = tilts.first;
-	result.TiltZ = tilts.second;
+	result.TiltFloor   = floor->TiltXZ(x, z, true);
+	result.TiltCeiling = floor->TiltXZ(x, z, false);
 
 	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(tilts.first)) > 2 || (abs(tilts.second)) > 2);
+	result.Position.Slope = (result.Position.Bridge < 0) && ((abs(result.TiltFloor.x) > 2 || (abs(result.TiltFloor.y)) > 2));
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
 	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
-		result.TiltZ = result.TiltX = 0;
+		result.TiltFloor = Vector2::Zero;
 
 	return result;
 }
@@ -327,8 +326,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
 	auto collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
-	coll->TiltX = collResult.TiltX;
-	coll->TiltZ = collResult.TiltZ;
+	coll->TiltX = (int)collResult.TiltFloor.x;
+	coll->TiltZ = (int)collResult.TiltFloor.y;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
