@@ -11,7 +11,7 @@
 #include "camera.h"
 #include "Objects/Generic/Object/objects.h"
 #include "rope.h"
-#include "traps.h"
+#include "Objects/Generic/Traps/traps.h"
 #include "level.h"
 /// objects initializer
 #include "generic_objects.h"

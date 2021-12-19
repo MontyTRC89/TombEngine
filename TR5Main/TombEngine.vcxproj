@@ -518,11 +518,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\spotcam.h" />
-    <ClInclude Include="Game\switch.h" />
+    <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Game\text.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\effects\tomb4fx.h" />
-    <ClInclude Include="Game\traps.h" />
+    <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Scripting\GameLogicScript.h" />
@@ -826,10 +826,10 @@ CALL gen.bat</Command>
     <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
-    <ClCompile Include="Game\switch.cpp" />
+    <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
-    <ClCompile Include="Game\traps.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />

@@ -8,7 +8,7 @@
 #include "Specific/trmath.h"
 #include "Sound/sound.h"
 #include "lara.h"
-#include "traps.h"
+#include "Objects/Generic/Traps/traps.h"
 #include "people.h"
 #include "effects/tomb4fx.h"
 #include "tr4_wraith_info.h"

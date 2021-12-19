@@ -7,7 +7,7 @@
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "animation.h"
-#include "traps.h"
+#include "Objects/Generic/Traps/traps.h"
 #include "lara.h"
 #include "tr5_smashobject.h"
 #include "lara_one_gun.h"

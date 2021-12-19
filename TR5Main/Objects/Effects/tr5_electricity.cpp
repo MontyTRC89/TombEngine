@@ -11,7 +11,7 @@
 #include "collision/collide_item.h"
 #include "Sound/sound.h"
 #include "collision/sphere.h"
-#include "traps.h"
+#include "Objects/Generic/Traps/traps.h"
 #include "Game/effects/lara_fx.h"
 #include "items.h"
 

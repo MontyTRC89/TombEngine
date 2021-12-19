@@ -5,7 +5,7 @@
 #include "control/box.h"
 #include "control/lot.h"
 #include "spotcam.h"
-#include "traps.h"
+#include "Objects/Generic/Traps/traps.h"
 #include "collision/floordata.h"
 #include "room.h"
 #include "sound/sound.h"
