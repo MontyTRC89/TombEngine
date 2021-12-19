@@ -13,6 +13,7 @@
 #include "Specific/input.h"
 #include "Lara/lara_one_gun.h"
 #include "itemdata/creature_info.h"
+#include "collision/collide_item.h"
 
 namespace TEN::Entities::TR4
 {

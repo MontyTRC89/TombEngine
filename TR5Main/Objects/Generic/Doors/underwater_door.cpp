@@ -10,13 +10,13 @@
 #include "pickup.h"
 #include "sound.h"
 #include "animation.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "lara_struct.h"
 #include "lara.h"
 #include "trmath.h"
 #include "misc.h"
 #include "underwater_door.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 
 namespace TEN::Entities::Doors
 {
