@@ -2,7 +2,7 @@
 #include "los.h"
 #include "animation.h"
 #include "Sound/sound.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "switch.h"
 #include "lara_fire.h"
 #include "input.h"

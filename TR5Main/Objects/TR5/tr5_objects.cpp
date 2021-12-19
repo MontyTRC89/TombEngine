@@ -52,14 +52,14 @@
 /// shatter
 #include "tr5_smashobject.h"
 /// necessary import
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "lara_one_gun.h"
 #include "lara_flare.h"
 #include "lara_initialise.h"
 #include "pickup.h"
 #include "setup.h"
 #include "switch.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "level.h"
 /// register objects
 #include "object_helper.h"

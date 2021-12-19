@@ -173,7 +173,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	DWORD sampleFlags = SOUND_SAMPLE_FLAGS;
 
 	// Effect's chance to play.
-	if ((sampleInfo->Randomness) && ((GetRandomControl() & 127) > sampleInfo->Randomness))
+	if ((sampleInfo->Randomness) && ((GetRandomControl() & UCHAR_MAX) > sampleInfo->Randomness))
 		return 0;
 
 	// Apply 3D attrib only to sound with position property
@@ -181,7 +181,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 		sampleFlags |= BASS_SAMPLE_3D;
 
 	// Set & randomize volume (if needed)
-	float gain = (static_cast<float>(sampleInfo->Volume) / 255.0f) * gainMultiplier;
+	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * gainMultiplier;
 	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
 		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
 
@@ -193,7 +193,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f)* SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
-	float radius = (float)(sampleInfo->Radius) * 1024.0f;
+	float radius = (float)(sampleInfo->Radius) * SECTOR(1);
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.

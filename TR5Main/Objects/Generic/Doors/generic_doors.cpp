@@ -10,7 +10,7 @@
 #include "pickup.h"
 #include "sound.h"
 #include "animation.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "cog_switch.h"
 #include "objectslist.h"
 #include "lara_struct.h"
@@ -18,7 +18,8 @@
 #include "trmath.h"
 #include "misc.h"
 #include "itemdata/door_data.h"
-#include "collide.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "itemdata/itemdata.h"
 
 namespace TEN::Entities::Doors

@@ -186,7 +186,7 @@ PHD_3DPOS GetRoomCenter(int roomNumber)
 	return center;
 }
 
-std::set<int> CollectConnectedRooms(int roomNumber)
+std::set<int> GetRoomList(int roomNumber)
 {
 	std::set<int> result;
 

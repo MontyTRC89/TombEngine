@@ -3,7 +3,7 @@
 #include "Lara.h"
 #include "control/control.h"
 #include "animation.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "camera.h"
 #include "level.h"
 #include "input.h"

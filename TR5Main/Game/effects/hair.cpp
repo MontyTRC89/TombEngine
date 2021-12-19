@@ -6,7 +6,7 @@
 #include "control/control.h"
 #include "GameFlowScript.h"
 #include "setup.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "level.h"
 #include "effects\weather.h"
 #include "Renderer11.h"
