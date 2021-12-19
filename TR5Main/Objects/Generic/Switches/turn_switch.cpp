@@ -7,7 +7,8 @@
 #include "setup.h"
 #include "camera.h"
 #include "level.h"
-#include "collide.h"
+#include "collision/collide_item.h"
+#include "collision/collide_room.h"
 #include "animation.h"
 #include "items.h"
 

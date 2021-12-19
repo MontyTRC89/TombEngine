@@ -4,13 +4,15 @@
 #include "savegame.h"
 #include "setup.h"
 #include "control/control.h"
-#include "objects.h"
-#include <lara_struct.h>
+#include "Objects/Generic/Object/objects.h"
+#include "lara_struct.h"
 #include <tuple>
 #include <stack>
+
 using std::optional;
 using std::stack;
 using std::vector;
+
 namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()

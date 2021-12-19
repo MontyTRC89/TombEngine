@@ -7,7 +7,7 @@
 #include "level.h"
 #include "control/control.h"
 #include "lara.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "GameFlowScript.h"
 #include "Renderer\RenderView\RenderView.h"
 #include "quad.h"
