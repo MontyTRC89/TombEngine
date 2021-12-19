@@ -1,5 +1,5 @@
 #pragma once
-#include <collide.h>
+#include "collision/collision.h"
 
 namespace TEN::Entities::TR4
 {

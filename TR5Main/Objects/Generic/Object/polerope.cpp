@@ -9,8 +9,8 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
-#include "Game/collide.h"
-#include "Game/sphere.h"
+#include "Game/collision/collision.h"
+#include "Game/collision/sphere.h"
 
 namespace TEN::Entities::Generic
 {

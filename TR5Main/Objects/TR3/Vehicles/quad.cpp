@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "effects/effects.h"
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "camera.h"
 #include "effects/tomb4fx.h"
 #include "lara_flare.h"

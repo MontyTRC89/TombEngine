@@ -13,7 +13,7 @@
 #include "Sound/sound.h"
 #include "animation.h"
 #include "pickup.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "items.h"
 #include "camera.h"
 #include "GameFlowScript.h"

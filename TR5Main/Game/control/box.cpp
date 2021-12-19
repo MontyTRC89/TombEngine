@@ -4,7 +4,7 @@
 #include "control/lot.h"
 #include "Lara.h"
 #include "animation.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "camera.h"
 #include "control/control.h"
 #include "room.h"

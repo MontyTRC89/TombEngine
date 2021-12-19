@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_blade.h"
 #include "level.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "lara.h"
 #include "control/control.h"
 #include "effects/effects.h"

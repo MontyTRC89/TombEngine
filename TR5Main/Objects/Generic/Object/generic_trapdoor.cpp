@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "generic_trapdoor.h"
 #include "lara.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "input.h"
 #include "camera.h"
 #include "control/control.h"

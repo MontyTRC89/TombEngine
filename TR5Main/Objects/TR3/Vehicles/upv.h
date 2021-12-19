@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 void SubInitialise(short itemNum);
 void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);

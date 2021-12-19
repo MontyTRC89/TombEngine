@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_rollingball.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "camera.h"
 #include "control/control.h"
 #include "lara.h"

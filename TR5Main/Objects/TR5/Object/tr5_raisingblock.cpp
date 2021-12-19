@@ -3,14 +3,14 @@
 #include "items.h"
 #include "level.h"
 #include "setup.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "animation.h"
 #include "control/control.h"
 #include "control/box.h"
 #include "objectslist.h"
 #include "Sound/sound.h"
 #include "camera.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 
 using namespace TEN::Floordata;
 

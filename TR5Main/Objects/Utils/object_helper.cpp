@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "object_helper.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "objects.h"
 #include "pickup.h"
 #include "puzzles_keys.h"

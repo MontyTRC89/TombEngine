@@ -10,7 +10,7 @@
 #include "Objects/Effects/flame_emitters.h"
 #include "Game/effects/effects.h"
 #include "Specific/setup.h"
-#include "Game/collide.h"
+#include "Game/collision/collision.h"
 #include "Game/control/los.h"
 
 using namespace TEN::Entities::Effects;

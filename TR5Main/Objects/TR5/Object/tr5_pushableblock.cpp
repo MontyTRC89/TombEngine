@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "animation.h"
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "flipeffect.h"
 #include "control/box.h"
 #include "level.h"

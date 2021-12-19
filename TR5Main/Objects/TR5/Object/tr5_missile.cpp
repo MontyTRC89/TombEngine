@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_missile.h"
 #include "items.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects/tomb4fx.h"
 #include "effects/effects.h"
 #include "level.h"
@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "Game/effects/lara_fx.h"
 
 using namespace TEN::Effects::Lara;

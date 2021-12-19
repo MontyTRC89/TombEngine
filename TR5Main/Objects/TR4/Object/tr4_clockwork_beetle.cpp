@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "animation.h"
 #include "Sound/sound.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 void ClockworkBeetleControl(short item_number)
 {

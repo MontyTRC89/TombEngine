@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "control/control.h"
 
 void InitialiseTrapDoor(short itemNumber);

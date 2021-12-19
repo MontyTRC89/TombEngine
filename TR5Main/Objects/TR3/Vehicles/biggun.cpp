@@ -2,7 +2,7 @@
 #include "biggun.h"
 #include "items.h"
 #include "level.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "input.h"
 #include "lara.h"
 #include "lara_flare.h"

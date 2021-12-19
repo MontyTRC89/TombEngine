@@ -30,7 +30,7 @@
 #include "upv.h"
 #include "rubberboat.h"
 /// necessary import
-#include "collide.h"
+#include "collision/collision.h"
 #include "setup.h"
 #include "level.h"
 #include "itemdata/creature_info.h"

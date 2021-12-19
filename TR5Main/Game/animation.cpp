@@ -8,7 +8,7 @@
 #include "Sound/sound.h"
 #include "flipeffect.h"
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 using TEN::Renderer::g_Renderer;
 

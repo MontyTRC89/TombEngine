@@ -6,7 +6,7 @@
 #include "control/lot.h"
 #include "spotcam.h"
 #include "traps.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "room.h"
 #include "sound/sound.h"
 #include "level.h"

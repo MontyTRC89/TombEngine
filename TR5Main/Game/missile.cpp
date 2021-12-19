@@ -7,7 +7,7 @@
 #include "level.h"
 #include "setup.h"
 #include "lara.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 #define SHARD_DAMAGE 30
 #define ROCKET_DAMAGE 100

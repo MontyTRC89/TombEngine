@@ -4,13 +4,13 @@
 #include "effects/effects.h"
 #include "animation.h"
 #include "Lara.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "control/control.h"
 #include "setup.h"
 #include "level.h"
 #include "input.h"
 #include "Sound/sound.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];

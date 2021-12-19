@@ -7,7 +7,7 @@
 #include "Sound\sound.h"
 #include "pickup.h"
 #include "level.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "items.h"
 
 namespace TEN::Entities::Switches

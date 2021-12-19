@@ -2,7 +2,7 @@
 #include "control/control.h"
 #include "lara.h"
 #include "animation.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "sound.h"
 #include "effects/footprint.h"
 #include "level.h"

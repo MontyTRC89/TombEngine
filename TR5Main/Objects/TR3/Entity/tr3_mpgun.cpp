@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr3_mpgun.h"
 #include "control/box.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects/effects.h"
 #include "people.h"
 #include "setup.h"

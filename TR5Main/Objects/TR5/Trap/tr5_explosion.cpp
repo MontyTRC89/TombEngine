@@ -13,7 +13,7 @@
 #include "lara_one_gun.h"
 #include "effects/debris.h"
 #include "generic_switch.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "control/box.h"
 #include "Game/effects/lara_fx.h"
 #include "items.h"

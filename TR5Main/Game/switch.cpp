@@ -5,7 +5,7 @@
 #include "objects.h"
 #include "Lara.h"
 #include "animation.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "camera.h"
 #include "setup.h"
 #include "level.h"

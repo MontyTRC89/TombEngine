@@ -3,7 +3,7 @@
 #include "control/box.h"
 #include "effects\effects.h"
 #include "items.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "lara.h"
 #include "Sound\sound.h"
 #include "people.h"

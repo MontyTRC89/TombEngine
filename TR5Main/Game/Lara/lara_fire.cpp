@@ -7,7 +7,7 @@
 #include "camera.h"
 #include "objects.h"
 #include "effects/effects.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "animation.h"
 #include "level.h"
 #include "control/lot.h"

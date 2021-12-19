@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "collide.h"
+#include "collision/collision.h"
 
 void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
 void DragonControl(short backNum);

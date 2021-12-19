@@ -1,7 +1,7 @@
 #pragma once
 #include <framework.h>
 #include "newtypes.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "Specific\phd_global.h"
 
 struct TRIGGER_VOLUME;

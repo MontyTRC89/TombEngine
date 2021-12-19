@@ -4,7 +4,7 @@
 #include "animation.h"
 #include "camera.h"
 #include "Lara.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "lara_flare.h"
 #include "items.h"
 #include "level.h"

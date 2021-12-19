@@ -8,7 +8,7 @@
 #include "control/control.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
-#include "collide.h"
+#include "collision/collision.h"
 #include "effects/debris.h"
 #include "effects/weather.h"
 #include "lara_two_guns.h"
