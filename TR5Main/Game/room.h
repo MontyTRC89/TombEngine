@@ -123,7 +123,7 @@ struct ROOM_INFO
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
 constexpr auto OUTSIDE_Z = 64;
-constexpr auto OUTSIDE_SIZE = 108;
+constexpr auto OUTSIDE_SIZE = 1024;
 
 extern byte FlipStatus;
 extern int FlipStats[MAX_FLIPMAP];
