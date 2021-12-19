@@ -8,6 +8,7 @@
 #include "items.h"
 
 using std::vector;
+
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
 {
     return (CREATURE_INFO*)item->data;
@@ -24,18 +25,19 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		target = &g_Level.Items[i];
-		if (target != nullptr)
+
+		if (target == nullptr)
+			continue;
+
+		if (target != item && target->hitPoints > 0 && target->status != ITEM_INVISIBLE)
 		{
-			if (target != item && target->hitPoints > 0 && target->status != ITEM_INVISIBLE)
+			x = target->pos.xPos - item->pos.xPos;
+			z = target->pos.zPos - item->pos.zPos;
+			distance = SQUARE(z) + SQUARE(x);
+			if (distance < bestdistance)
 			{
-				x = target->pos.xPos - item->pos.xPos;
-				z = target->pos.zPos - item->pos.zPos;
-				distance = SQUARE(z) + SQUARE(x);
-				if (distance < bestdistance)
-				{
-					creature->enemy = target;
-					bestdistance = distance;
-				}
+				creature->enemy = target;
+				bestdistance = distance;
 			}
 		}
 	}
