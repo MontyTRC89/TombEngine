@@ -1,7 +1,7 @@
 #pragma once
 
 #include "items.h"
-#include "collide.h"
+#include "collision/collide_room.h"
 
 namespace TEN::Entities::TR5
 {

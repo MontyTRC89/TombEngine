@@ -2,7 +2,7 @@
 #include "Specific\phd_global.h"
 #include "level.h"
 #include "items.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 
 using namespace TEN::Floordata;
 

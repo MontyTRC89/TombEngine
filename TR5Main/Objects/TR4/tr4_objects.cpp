@@ -68,8 +68,8 @@
 #include "motorbike.h"
 #include "jeep.h"
 /// necessary import
-#include "collide.h"
-#include "objects.h"
+#include "collision/collide_item.h"
+#include "Objects/Generic/Object/objects.h"
 #include "setup.h"
 #include "level.h"
 #include "tr4_enemy_jeep.h"

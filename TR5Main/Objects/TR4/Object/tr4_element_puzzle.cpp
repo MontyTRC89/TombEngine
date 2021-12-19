@@ -5,12 +5,13 @@
 #include "Sound/sound.h"
 #include "animation.h"
 #include "lara.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "input.h"
 #include "generic_switch.h"
-#include "collide.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "items.h"
 
 using namespace TEN::Entities::Switches;

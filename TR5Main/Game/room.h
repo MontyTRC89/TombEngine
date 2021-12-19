@@ -1,7 +1,7 @@
 #pragma once
 #include <framework.h>
 #include "newtypes.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "Specific\phd_global.h"
 
 struct TRIGGER_VOLUME;
@@ -136,6 +136,6 @@ int IsObjectInRoom(short roomNumber, short objectNumber);
 bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
 PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
-std::set<int> CollectConnectedRooms(int roomNumber);
+std::set<int> GetRoomList(int roomNumber);
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

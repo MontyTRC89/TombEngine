@@ -20,6 +20,3 @@ enum LARA_MESH_MASK
 
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item);
 void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature);
-
-void GetRoomList(short roomNumber, short* roomArray, short* numRooms); // return the value via roomArray and numRooms
-void GetRoomList(short roomNumber, std::vector<short>* DestRoomList);  // return the value via DestRoomList
