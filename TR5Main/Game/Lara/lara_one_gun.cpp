@@ -12,7 +12,7 @@
 #include "effects/debris.h"
 #include "effects/weather.h"
 #include "lara_two_guns.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "camera.h"
 #include "level.h"
 #include "setup.h"

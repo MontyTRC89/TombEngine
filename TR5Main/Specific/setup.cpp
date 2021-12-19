@@ -9,7 +9,7 @@
 #include "room.h"
 #include "pickup.h"
 #include "camera.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "rope.h"
 #include "traps.h"
 #include "level.h"

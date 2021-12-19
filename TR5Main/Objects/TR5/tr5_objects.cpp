@@ -59,7 +59,7 @@
 #include "pickup.h"
 #include "setup.h"
 #include "switch.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "level.h"
 /// register objects
 #include "object_helper.h"

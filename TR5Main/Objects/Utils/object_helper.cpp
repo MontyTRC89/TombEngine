@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "object_helper.h"
 #include "collision/collide_item.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "pickup.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "level.h"

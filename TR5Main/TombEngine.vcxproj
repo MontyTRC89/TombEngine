@@ -511,7 +511,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
-    <ClInclude Include="Game\objects.h" />
+    <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup\pickup.h" />
     <ClInclude Include="Game\savegame.h" />
@@ -819,7 +819,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
-    <ClCompile Include="Game\objects.cpp" />
+    <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup\pickup.cpp" />
     <ClCompile Include="Game\savegame.cpp" />

@@ -2,7 +2,7 @@
 #include "switch.h"
 #include "items.h"
 #include "control/lot.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "Lara.h"
 #include "animation.h"
 #include "collision/sphere.h"

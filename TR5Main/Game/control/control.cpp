@@ -15,7 +15,7 @@
 #include "Sound/sound.h"
 #include "spotcam.h"
 #include "control/box.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "collision/sphere.h"
 #include "level.h"
 #include "input.h"

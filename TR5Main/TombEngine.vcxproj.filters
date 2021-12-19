@@ -260,7 +260,6 @@
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
-    <ClCompile Include="Game\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup\pickup.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
@@ -320,6 +319,7 @@
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
+    <ClCompile Include="Objects\Generic\Object\objects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -676,7 +676,6 @@
     <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
-    <ClInclude Include="Game\objects.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup\pickup.h" />
     <ClInclude Include="Game\savegame.h" />
@@ -716,6 +715,7 @@
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
+    <ClInclude Include="Objects\Generic\Object\objects.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

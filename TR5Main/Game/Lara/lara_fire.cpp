@@ -5,7 +5,7 @@
 #include "lara_one_gun.h"
 #include "lara_two_guns.h"
 #include "camera.h"
-#include "objects.h"
+#include "Objects/Generic/Object/objects.h"
 #include "effects/effects.h"
 #include "collision/sphere.h"
 #include "animation.h"
