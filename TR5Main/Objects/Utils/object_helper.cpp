@@ -3,7 +3,7 @@
 #include "collision/collide_item.h"
 #include "objects.h"
 #include "pickup.h"
-#include "puzzles_keys.h"
+#include "Objects/Generic/puzzles_keys.h"
 #include "level.h"
 #include "tr5_smashobject.h"
 #include "tr5_pushableblock.h"

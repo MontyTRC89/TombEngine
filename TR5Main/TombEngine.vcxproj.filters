@@ -40,7 +40,6 @@
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
-    <ClCompile Include="Game\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\pushpull_kick_door.cpp" />
@@ -320,6 +319,7 @@
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
+    <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -371,7 +371,6 @@
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
     <ClInclude Include="Specific\prng.h" />
-    <ClInclude Include="Game\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
     <ClInclude Include="Objects\Generic\Doors\pushpull_kick_door.h" />
@@ -716,6 +715,7 @@
     <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
+    <ClInclude Include="Objects\Generic\puzzles_keys.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

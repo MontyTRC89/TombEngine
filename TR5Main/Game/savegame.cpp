@@ -21,7 +21,7 @@
 #include "Game/effects/lara_fx.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Game/misc.h"
-#include "Game/puzzles_keys.h"
+#include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "Objects/Generic/Object/rope.h"
 

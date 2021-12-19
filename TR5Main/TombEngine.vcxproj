@@ -204,7 +204,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
     <ClInclude Include="Specific\prng.h" />
-    <ClInclude Include="Game\puzzles_keys.h" />
+    <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
     <ClInclude Include="Objects\Generic\Doors\pushpull_kick_door.h" />
@@ -591,7 +591,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
-    <ClCompile Include="Game\puzzles_keys.cpp" />
+    <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\pushpull_kick_door.cpp" />
