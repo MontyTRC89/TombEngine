@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_autoguns.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "lara.h"
 #include "animation.h"
 #include "control\los.h"

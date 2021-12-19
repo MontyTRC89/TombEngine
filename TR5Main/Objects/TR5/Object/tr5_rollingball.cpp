@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr5_rollingball.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "camera.h"
 #include "control/control.h"
 #include "lara.h"
@@ -10,6 +10,7 @@
 #include "level.h"
 #include "animation.h"
 #include "items.h"
+#include "collision/collide_item.h"
 
 constexpr auto MAX_ROLLINGBALL_SPEED = WALL_SIZE * 3;
 

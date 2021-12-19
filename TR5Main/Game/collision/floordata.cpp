@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "Specific\trmath.h"
 #include "room.h"
 #include "level.h"

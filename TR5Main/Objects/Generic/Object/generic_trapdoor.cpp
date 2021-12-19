@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "generic_trapdoor.h"
 #include "lara.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "input.h"
 #include "camera.h"
 #include "control/control.h"
@@ -9,6 +9,8 @@
 #include "animation.h"
 #include "items.h"
 #include "Renderer11.h"
+#include "collision/collide_item.h"
+
 using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;
