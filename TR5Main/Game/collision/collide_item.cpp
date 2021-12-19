@@ -96,20 +96,18 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
-	ROOM_INFO* room;
-	short roomsArray[255];
 	short numRooms;
 	short numItems = 0, numMeshes = 0;
 
 	// Collect all the rooms where to check
-	GetRoomList(collidingItem->roomNumber, roomsArray, &numRooms);
+	auto roomsArray = GetRoomList(collidingItem->roomNumber);
 
-	if (collidedMeshes)
+	for (auto i : roomsArray)
 	{
-		for (int i = 0; i < numRooms; i++)
-		{
-			room = &g_Level.Rooms[roomsArray[i]];
+		auto room = &g_Level.Rooms[i];
 
+		if (collidedMeshes)
+		{
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				MESH_INFO* mesh = &room->mesh[j];
@@ -136,23 +134,19 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 					continue;
 
 				collidedMeshes[numMeshes++] = mesh;
+
 				if (!radius)
 				{
 					collidedItems[0] = NULL;
 					return true;
 				}
 			}
+
+			collidedMeshes[numMeshes] = NULL;
 		}
 
-		collidedMeshes[numMeshes] = NULL;
-	}
-
-	if (collidedItems)
-	{
-		for (int i = 0; i < numRooms; i++)
+		if (collidedItems)
 		{
-			ROOM_INFO* room = &g_Level.Rooms[roomsArray[i]];
-
 			int itemNumber = room->itemNumber;
 			if (itemNumber != NO_ITEM)
 			{
@@ -217,6 +211,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 							if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
 							{
 								collidedItems[numItems++] = item;
+
 								if (!radius)
 									return true;
 							}
@@ -227,9 +222,9 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 
 				} while (itemNumber != NO_ITEM);
 			}
-		}
 
-		collidedItems[numItems] = NULL;
+			collidedItems[numItems] = NULL;
+		}
 	}
 
 	return (numItems || numMeshes);
@@ -283,7 +278,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 
 		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
-		for (auto i : CollectConnectedRooms(item->roomNumber))
+		for (auto i : GetRoomList(item->roomNumber))
 		{
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
@@ -856,7 +851,7 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->HitTallObject = false;
 
-	for (auto i : CollectConnectedRooms(item->roomNumber))
+	for (auto i : GetRoomList(item->roomNumber))
 	{
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
@@ -1681,7 +1676,7 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	if (l->hitPoints > 0)
 	{
 		short* door, numDoors;
-		for (auto i : CollectConnectedRooms(l->roomNumber))
+		for (auto i : GetRoomList(l->roomNumber))
 		{
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
