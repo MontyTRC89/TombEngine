@@ -1030,7 +1030,7 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	
 	// TODO: Ceiling test interfered with bridges. For now, behaves as original.
 	if (!TestLaraFacingCorner(item, angle, CLICK(1)) &&
-		probe.Position.Floor + probe.Position.Bridge - y >= -STEPUP_HEIGHT &&									// Highest floor bound.
+		probe.Position.Floor + probe.Position.Bridge - y >= -STEPUP_HEIGHT &&		// Highest floor bound.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1487,7 +1487,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope, bool checkDeath)
 {
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4, 0);	// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	auto probe = GetCollisionResult(item, angle, coll->Setup.Radius * sqrt(2) + 4);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 	auto isSlope = checkSlope ? probe.Position.Slope : false;
 	auto isDeath = checkDeath ? probe.Block->Flags.Death : false;
 
@@ -1512,7 +1512,7 @@ bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound,
 bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope, bool checkDeath)
 {
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4, 0);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	auto probe = GetCollisionResult(item, angle, LARA_RAD_CRAWL * sqrt(2) + 4);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 	auto isSlope = checkSlope ? probe.Position.Slope : false;
 	auto isDeath = checkDeath ? probe.Block->Flags.Death : false;
 
@@ -1532,7 +1532,7 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos - coll->Setup.Height;
-	auto probe = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4, 0);
+	auto probe = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4);
 	
 	// Hack to ensure Lara can run off diagonal ledges and stops on slanted ceilings. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
 	// BUG: This interferes with the one-step stand-to-crouch vault where the ceiling is lower than Lara's height.
@@ -1623,7 +1623,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE / 2, 0);
+	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE / 2);
 
 	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Lower floor bound.
 		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Upper floor bound.
@@ -1642,8 +1642,8 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), 0);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2), 0);		// Approximate destination.
+	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1));		// Crossing.
+	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2));		// Approximate destination.
 
 	if ((probeA.Position.Floor - y) <= -CLICK(1) &&																			// Lower floor bound. Synced with crawl states' BadHeightUp.
 		(probeA.Position.Floor - y) >= -STEPUP_HEIGHT &&																	// Upper floor bound.
@@ -1663,8 +1663,8 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), 0);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2), 0);		// Approximate destination.
+	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1));		// Crossing.
+	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2));		// Approximate destination.
 
 	if ((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&									// Lower floor bound. Synced with crawl exit jump's highest floor bound.
 		(probeA.Position.Floor - y) >= CLICK(1) &&										// Upper floor bound. Synced with crawl states' BadHeightDown.
@@ -1684,8 +1684,8 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), 0);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f), 0);		// Approximate destination.
+	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1));			// Crossing.
+	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f));		// Approximate destination.
 
 	if ((((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor bound. Synced with crawl exit jump's highest floor bound.
 		(probeA.Position.Floor - y) >= CLICK(1)) ||										// Upper floor bound. Synced with crawl states' BadHeightDown. OR
@@ -1704,8 +1704,8 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), 0);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f), 0);		// Approximate destination.
+	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1));			// Crossing.
+	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f));		// Approximate destination.
 
 	if ((probeA.Position.Floor - y) > STEPUP_HEIGHT &&								// Highest floor bound. Synced with crawl down step and crawl exit down step's lower floor bounds.
 		(probeA.Position.Ceiling - y) <= -CLICK(1.25f) &&							// Gap is optically feasible for action.
@@ -1735,8 +1735,8 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), CLICK(1), 0);
-	auto objectCollided = TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), CLICK(1), 0);
+	auto probe = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), CLICK(1));
+	auto objectCollided = TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), CLICK(1));
 
 	if (!objectCollided &&											// No obstruction.
 		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&		// Highest floor bound.

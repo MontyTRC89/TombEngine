@@ -144,6 +144,51 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
+void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int radius = CLICK(1);
+	auto probeFront = GetCollisionResult(item, item->pos.yRot, radius);
+	auto probeBack = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), radius);
+	auto probeLeft = GetCollisionResult(item, item->pos.yRot - ANGLE(90.0f), radius);
+	auto probeRight = GetCollisionResult(item, item->pos.yRot + ANGLE(90.0f), radius);
+	auto probeMiddle = GetCollisionResult(item);
+
+	int yOffset = item->pos.yPos - coll->Setup.Height;
+	probeFront.Position.Ceiling -= yOffset;
+	probeBack.Position.Ceiling -= yOffset;
+	probeLeft.Position.Ceiling -= yOffset;
+	probeRight.Position.Ceiling -= yOffset;
+	probeMiddle.Position.Ceiling -= yOffset;
+
+	auto headroom = -(LARA_HEADROOM * 0.7f);
+	if (TrInput & IN_FORWARD &&
+		probeFront.Position.Ceiling < headroom)
+	{
+		info->jumpDirection = LaraJumpDirection::Forward;
+	}
+	else if (TrInput & IN_BACK &&
+		probeBack.Position.Ceiling < headroom)
+	{
+		info->jumpDirection = LaraJumpDirection::Back;
+	}
+	else if (TrInput & IN_LEFT &&
+		probeLeft.Position.Ceiling < headroom)
+	{
+		info->jumpDirection = LaraJumpDirection::Left;
+	}
+	else if (TrInput & IN_RIGHT &&
+		probeRight.Position.Ceiling < headroom)
+	{
+		info->jumpDirection = LaraJumpDirection::Right;
+	}
+	else if (probeMiddle.Position.Ceiling < headroom) [[likely]]
+		info->jumpDirection = LaraJumpDirection::Up;
+	else
+		info->jumpDirection = LaraJumpDirection::None;
+}
+
 void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -205,7 +250,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 short GetLaraSlideDirection(COLL_INFO* coll)
 {
-	short dir = 0; //
+	short dir = 0;
 
 	//if (g_GameFlow->Animations.SlideExtended)
 	//{
