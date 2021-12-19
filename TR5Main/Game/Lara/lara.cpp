@@ -29,7 +29,7 @@
 
 #include "animation.h"
 #include "GameFlowScript.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "Sound/sound.h"
 #include "savegame.h"
 #include "rope.h"

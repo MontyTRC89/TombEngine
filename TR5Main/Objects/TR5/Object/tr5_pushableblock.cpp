@@ -5,7 +5,7 @@
 #include "items.h"
 #include "collision/collide_room.h"
 #include "collision/collide_item.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "control/box.h"
 #include "level.h"
 #include "input.h"

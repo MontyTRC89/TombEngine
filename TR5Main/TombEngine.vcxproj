@@ -496,7 +496,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
-    <ClInclude Include="Game\flipeffect.h" />
+    <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\items.h" />
@@ -805,7 +805,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
-    <ClCompile Include="Game\flipeffect.cpp" />
+    <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\items.cpp" />

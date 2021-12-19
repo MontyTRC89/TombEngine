@@ -3,7 +3,7 @@
 #include "level.h"
 #include "effects/effects.h"
 #include "room.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "objectslist.h"
 #include "Specific/trmath.h"
 #include "Sound/sound.h"

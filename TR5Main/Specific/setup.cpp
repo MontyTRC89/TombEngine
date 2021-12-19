@@ -2,7 +2,7 @@
 #include "setup.h"
 #include "animation.h"
 #include "collision/collide_item.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "switch.h"

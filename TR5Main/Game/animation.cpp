@@ -6,7 +6,7 @@
 #include "setup.h"
 #include "Renderer11.h"
 #include "Sound/sound.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "items.h"
 #include "collision/collide_room.h"
 

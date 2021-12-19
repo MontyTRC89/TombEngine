@@ -246,7 +246,6 @@
     <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
-    <ClCompile Include="Game\flipeffect.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\items.cpp" />
@@ -320,6 +319,7 @@
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Object\objects.cpp" />
+    <ClCompile Include="Game\control\flipeffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -661,7 +661,6 @@
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
-    <ClInclude Include="Game\flipeffect.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\items.h" />
@@ -716,6 +715,7 @@
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Objects\Generic\Object\objects.h" />
+    <ClInclude Include="Game\control\flipeffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

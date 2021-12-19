@@ -12,7 +12,7 @@
 #include "level.h"
 #include "setup.h"
 #include "sound.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "tr5_rats_emitter.h"
 #include "tr5_bats_emitter.h"
 #include "tr5_spider_emitter.h"
