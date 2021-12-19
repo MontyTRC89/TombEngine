@@ -2,7 +2,7 @@
 #include "items.h"
 #include "room.h"
 #include "setup.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "flipeffect.h"
 #include "objectslist.h"
 #include "control/box.h"

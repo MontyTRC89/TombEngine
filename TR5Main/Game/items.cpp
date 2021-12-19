@@ -4,7 +4,7 @@
 #include "level.h"
 #include "lara.h"
 #include "control/control.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "effects/effects.h"
 
 using namespace TEN::Floordata;

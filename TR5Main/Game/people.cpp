@@ -3,7 +3,7 @@
 #include "effects\effects.h"
 #include "animation.h"
 #include "control\los.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects\debris.h"
 #include "lara.h"
 #include "Sound\sound.h"

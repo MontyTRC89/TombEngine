@@ -5,7 +5,7 @@
 #include "effects/effects.h"
 #include "lara.h"
 #include "gui.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "lara_flare.h"
 #include "setup.h"
 #include "lara_one_gun.h"

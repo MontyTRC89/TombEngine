@@ -8,7 +8,7 @@
 #include "control/los.h"
 #include "lara_flare.h"
 #include "lara_helpers.h"
-#include "collide.h"
+#include "collision/collide_room.h"
 #include "items.h"
 #include "camera.h"
 #include "control/control.h"

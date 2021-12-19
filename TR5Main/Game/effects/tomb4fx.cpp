@@ -15,7 +15,7 @@
 #include "Renderer11.h"
 #include "effects/weather.h"
 #include "items.h"
-#include "Game/floordata.h"
+#include "Game/collision/floordata.h"
 #include "Specific/prng.h"
 
 using std::vector;
