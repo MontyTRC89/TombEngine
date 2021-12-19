@@ -65,8 +65,8 @@ struct COLL_RESULT
 
 	COLL_POSITION Position;
 
-	int TiltX;
-	int TiltZ;
+	Vector2 TiltFloor;
+	Vector2 TiltCeiling;
 };
 
 struct COLL_SETUP

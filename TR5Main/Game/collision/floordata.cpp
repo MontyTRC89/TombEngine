@@ -28,13 +28,13 @@ int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
-std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
+Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const
 {
-	auto plane = FloorCollision.Planes[SectorPlane(x, z)];
+	auto plane = floor ? FloorCollision.Planes[SectorPlane(x, z)] : CeilingCollision.Planes[SectorPlane(x, z)];
 	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
 	auto tiltZ = (int)-(plane.y * WALL_SIZE / STEP_SIZE);
 
-	return std::make_pair(tiltX, tiltZ);
+	return Vector2(tiltX, tiltZ);
 }
 
 bool FLOOR_INFO::FloorIsSplit() const
