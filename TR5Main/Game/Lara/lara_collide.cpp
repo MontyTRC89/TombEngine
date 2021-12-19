@@ -580,17 +580,16 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 		TestLaraWaterDepth(item, coll);
 }
 
-bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height)
+bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height, int side)
 {
 	auto oldPos = item->pos;
+	int sideSign = copysign(1, side);
 
-	item->pos.xPos += dist * phd_sin(item->pos.yRot + angle);
+	item->pos.xPos += phd_sin(item->pos.yRot + angle) * dist + phd_cos(angle + ANGLE(90.0f) * sideSign) * abs(side);
 	item->pos.yPos += height;
-	item->pos.zPos += dist * phd_cos(item->pos.yRot + angle);
+	item->pos.zPos += phd_cos(item->pos.yRot + angle) * dist + phd_sin(angle + ANGLE(90.0f) * sideSign) * abs(side);
 
 	auto result = GetCollidedObjects(item, LARA_RAD, 1, CollidedItems, CollidedMeshes, 0);
-
 	item->pos = oldPos;
-
 	return result;
 }

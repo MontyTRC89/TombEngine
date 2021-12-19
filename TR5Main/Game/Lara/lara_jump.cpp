@@ -215,23 +215,17 @@ void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_JUMP_PREPARE (15)
-// Collision:	lara_col_compress()
-void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_col_jump_prepare()
+void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	// TODO: dispatch
-	/*if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_DEATH;
-
+	if (item->hitPoints <= 0)
 		return;
-	}*/
 
 	if (info->waterStatus == LW_WADE)
 	{
 		item->goalAnimState = LS_JUMP_UP;
-
 		return;
 	}
 
@@ -250,50 +244,51 @@ void lara_as_compress(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (TrInput & IN_FORWARD &&
+	if ((TrInput & IN_FORWARD ||
+			info->jumpDirection == LaraJumpDirection::Forward && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
-		info->moveAngle = item->pos.yRot;
 		item->goalAnimState = LS_JUMP_FORWARD;
-
+		info->jumpDirection = LaraJumpDirection::Forward;
+		info->moveAngle = item->pos.yRot;
 		return;
 	}
-	else if (TrInput & IN_BACK &&
+	else if ((TrInput & IN_BACK ||
+			info->jumpDirection == LaraJumpDirection::Back && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
 	{
-		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 		item->goalAnimState = LS_JUMP_BACK;
-
+		info->jumpDirection = LaraJumpDirection::Back;
+		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 		return;
 	}
 
-	if (TrInput & IN_LEFT &&
+	if ((TrInput & IN_LEFT ||
+			info->jumpDirection == LaraJumpDirection::Left && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
-		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_LEFT;
-
+		info->jumpDirection = LaraJumpDirection::Left;
+		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 		return;
 	}
-	else if (TrInput & IN_RIGHT &&
+	else if ((TrInput & IN_RIGHT ||
+			info->jumpDirection == LaraJumpDirection::Right && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
 	{
-		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 		item->goalAnimState = LS_JUMP_RIGHT;
-
+		info->jumpDirection = LaraJumpDirection::Right;
+		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 		return;
 	}
-
+	
 	item->goalAnimState = LS_JUMP_UP;
-
-	// TODO: What is this? @Sezz 2021.11.13
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
-		item->goalAnimState = LS_FREEFALL;
+	info->jumpDirection = LaraJumpDirection::Up;
 }
 
 // State:		LS_JUMP_PREPARE (15)
-// Collision:	lara_as_compress()
-void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
+// Collision:	lara_as_jump_prepare()
+void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -316,19 +311,6 @@ void lara_col_compress(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		SetLaraSlideState(item, coll);
 		return;
-	}
-
-	// TODO: Better handling.
-	if (coll->Middle.Ceiling > -100)
-	{
-		SetAnimation(item, LA_STAND_SOLID);
-		item->speed = 0;
-		item->fallspeed = 0;
-		item->gravityStatus = false;
-
-		item->pos.xPos = coll->Setup.OldPosition.x;
-		item->pos.yPos = coll->Setup.OldPosition.y;
-		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
 
 	if (coll->Middle.Floor > -STEP_SIZE && coll->Middle.Floor < STEP_SIZE)

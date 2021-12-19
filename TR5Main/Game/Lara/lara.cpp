@@ -72,7 +72,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_splat,
 	lara_as_tread,
 	lara_void_func,
-	lara_as_compress,//15
+	lara_as_jump_prepare,//15
 	lara_as_walk_back,//16
 	lara_as_swim,//17
 	lara_as_glide,//18
@@ -235,7 +235,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_splat,
 	lara_col_tread,
 	lara_col_land,
-	lara_col_compress,
+	lara_col_jump_prepare,//15
 	lara_col_walk_back,
 	lara_col_swim,
 	lara_col_glide,
@@ -812,6 +812,53 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 	}
+
+	// Temp. debug stuff
+	//---
+
+	static PHD_3DPOS  posO = { 0, 0, 0, 0, 0, 0 };
+	static short roomNumO = item->roomNumber;
+	static CAMERA_INFO camO = Camera;
+
+	if (KeyMap[DIK_Q] && TrInput & IN_WALK)
+	{
+		posO = item->pos;
+		roomNumO = item->roomNumber;
+		camO = Camera;
+	}
+	else if (KeyMap[DIK_E])//
+	{
+		item->pos = posO;
+		item->roomNumber - roomNumO;
+		Camera = camO;
+	}
+	
+	// Forward 1 unit.
+	if (KeyMap[DIK_I])
+	{
+		item->pos.xPos += phd_sin(item->pos.yRot);
+		item->pos.zPos += phd_cos(item->pos.yRot);
+	}
+	// Back 1 unit.
+	else if (KeyMap[DIK_K])
+	{
+		item->pos.xPos += phd_sin(item->pos.yRot + ANGLE(180.0f));
+		item->pos.zPos += phd_cos(item->pos.yRot + ANGLE(180.0f));
+	}
+	// Left 1 unit.
+	else if (KeyMap[DIK_J])
+	{
+		item->pos.xPos += phd_sin(item->pos.yRot - ANGLE(90.0f));
+		item->pos.zPos += phd_cos(item->pos.yRot - ANGLE(90.0f));
+	}
+	// Right 1 unit.
+	else if (KeyMap[DIK_L])
+	{
+		item->pos.xPos += phd_sin(item->pos.yRot + ANGLE(90.0f));
+		item->pos.zPos += phd_cos(item->pos.yRot + ANGLE(90.0f));
+	}
+
+	//---
 
 	// Handle current Lara status.
 	lara_control_routines[item->currentAnimState](item, coll);
