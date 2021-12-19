@@ -152,26 +152,55 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// State:		LS_REACH (11)
+// Collision:	lara_col_reach()
 void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 11*/
-	/*collision: lara_col_reach*/
+	LaraInfo*& info = item->data;
+
 	Camera.targetAngle = ANGLE(85.0f);
+
+	if (item->hitPoints <= 0)
+		return;
+
+	if (TrInput & IN_LEFT)
+	{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_REACH_TURN_MAX)
+			info->turnRate = -LARA_REACH_TURN_MAX;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_REACH_TURN_MAX)
+			info->turnRate = LARA_REACH_TURN_MAX;
+	}
+
+	if (TestLaraLand(item))
+	{
+		item->goalAnimState = LS_IDLE;
+		item->fallspeed = 0;
+		item->gravityStatus = false;
+		return;
+	}
+
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	{
 		item->goalAnimState = LS_FREEFALL;
+		return;
+	}
+
+	item->goalAnimState = LS_REACH;
 }
 
+// State:		LS_REACH (11)
+// Control:		lara_as_reach()
 void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 11*/
-	/*state code: lara_as_reach*/
-	if (info->ropePtr == -1)
-		item->gravityStatus = true;
-
 	info->moveAngle = item->pos.yRot;
-
+	item->gravityStatus = (info->ropePtr == -1) ? true : false;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
@@ -179,7 +208,6 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
-
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHangJump(item, coll))
@@ -193,14 +221,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
 	{
 		if (LaraLandedBad(item, coll))
-		{
 			item->goalAnimState = LS_DEATH;
-		}
 		else
 		{
-			item->goalAnimState = LS_IDLE;
-			item->fallspeed = 0;
-			item->gravityStatus = false;
 			if (coll->Middle.Floor != NO_HEIGHT)
 				item->pos.yPos += coll->Middle.Floor;
 		}

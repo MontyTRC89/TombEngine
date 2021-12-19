@@ -1160,6 +1160,19 @@ bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
+bool TestLaraLand(ITEM_INFO* item)
+{
+	auto probe = GetCollisionResult(item);
+
+	if (((probe.Position.Floor - item->pos.yPos) <= item->fallspeed || TestLaraSwamp(item)) &&
+		item->fallspeed >= 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int landspeed = item->fallspeed - 140;
