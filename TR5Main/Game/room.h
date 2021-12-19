@@ -1,7 +1,7 @@
 #pragma once
 #include <framework.h>
 #include "newtypes.h"
-#include "floordata.h"
+#include "collision/floordata.h"
 #include "Specific\phd_global.h"
 
 struct TRIGGER_VOLUME;
@@ -123,7 +123,7 @@ struct ROOM_INFO
 constexpr auto NUM_ROOMS = 1024;
 constexpr auto NO_ROOM = -1;
 constexpr auto OUTSIDE_Z = 64;
-constexpr auto OUTSIDE_SIZE = 108;
+constexpr auto OUTSIDE_SIZE = 1024;
 
 extern byte FlipStatus;
 extern int FlipStats[MAX_FLIPMAP];
@@ -136,6 +136,6 @@ int IsObjectInRoom(short roomNumber, short objectNumber);
 bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
 PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
-std::set<int> CollectConnectedRooms(int roomNumber);
+std::set<int> GetRoomList(int roomNumber);
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

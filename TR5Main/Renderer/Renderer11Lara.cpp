@@ -6,7 +6,7 @@
 #include "control/control.h"
 #include "spotcam.h"
 #include "camera.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "level.h"
 #include "GameFlowScript.h"
 #include <Specific\setup.h>

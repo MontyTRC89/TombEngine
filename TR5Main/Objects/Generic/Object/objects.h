@@ -9,7 +9,6 @@ extern float WaterfallY[6];
 void SmashObject(short itemNumber);
 void SmashObjectControl(short itemNumber);
 void ControlAnimatingSlots(short itemNumber);
-void PoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 void ControlTriggerTriggerer(short itemNumber);
 void AnimateWaterfalls();
 void ControlWaterfall(short itemNumber);

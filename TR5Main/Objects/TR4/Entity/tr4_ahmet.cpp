@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_ahmet.h"
 #include "control/control.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects/effects.h"
 #include "effects/weather.h"
 #include "Sound/sound.h"

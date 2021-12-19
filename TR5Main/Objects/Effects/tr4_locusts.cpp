@@ -2,11 +2,11 @@
 #include "tr4_locusts.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "level.h"
 #include "lara.h"
 #include "effects/tomb4fx.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "animation.h"
 #include "items.h"
 

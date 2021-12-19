@@ -7,6 +7,7 @@
 #include "pickup.h"
 #include "setup.h"
 #include "health.h"
+#include "collision/collide_item.h"
 
 static PHD_VECTOR SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
