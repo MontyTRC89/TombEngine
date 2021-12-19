@@ -144,6 +144,20 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
+void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	int dist = WALL_SIZE;// WALL_SIZE / LARA_JUMP_TIME * std::max(1, LARA_JUMP_TIME/* - info->jumpCount*/); // TODO: Adaptive distance.
+	auto probe = GetCollisionResult(item, item->pos.yRot, dist, 0);
+
+	if ((probe.Position.Ceiling - y + LARA_HEIGHT) < -(LARA_HEADROOM * 0.7f))
+		info->jumpQueued = item->goalAnimState == LS_RUN_FORWARD;
+	else
+		info->jumpQueued = false;
+}
+
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
