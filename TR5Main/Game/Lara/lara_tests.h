@@ -32,14 +32,15 @@ bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
 bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle);
 
-int  LaraFloorFront(ITEM_INFO* item, short ang, int dist);
-int  LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
+int LaraFloorFront(ITEM_INFO* item, short ang, int dist);
+int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
 COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist);
 COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h);
 COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h);
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLand(ITEM_INFO* item);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
