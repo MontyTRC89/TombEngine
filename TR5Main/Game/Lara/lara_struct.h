@@ -820,12 +820,21 @@ enum LARA_WEAPON_TYPE_CARRIED
 	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
-
 enum LARA_CLOTH_TYPES
 {
 	CLOTH_MISSING,
 	CLOTH_DRY,
 	CLOTH_WET
+};
+
+enum class LaraJumpDirection
+{
+	None,
+	Up,
+	Forward,
+	Back,
+	Left,
+	Right
 };
 
 enum class HOLSTER_SLOT : int {
@@ -997,6 +1006,7 @@ struct LaraInfo
 	LARA_WATER_STATUS waterStatus; // LW_enum
 	short climbStatus;
 	short poseCount;
+	LaraJumpDirection jumpDirection;
 	int jumpCount;
 	bool jumpQueued;
 	short hitFrame;

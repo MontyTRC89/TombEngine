@@ -28,4 +28,4 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHitCeiling(COLL_INFO* coll);
 void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height);
+bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);

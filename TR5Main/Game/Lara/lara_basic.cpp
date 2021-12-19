@@ -349,13 +349,6 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = ((TestLaraSwamp(item) && info->waterStatus == LW_WADE) || item->animNumber == LA_SWANDIVE_ROLL) ? false : true;
 
-	// TODO: Hardcoding
-	if (item->animNumber != LA_SPRINT_TO_STAND_RIGHT &&
-		item->animNumber != LA_SPRINT_TO_STAND_LEFT)
-	{
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-	}
-
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_DEATH;
@@ -395,11 +388,18 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
-		return;
+		SetLaraJumpDirection(item, coll);
+		if (info->jumpDirection != LaraJumpDirection::None)
+		{
+			item->goalAnimState = LS_JUMP_PREPARE;
+			return;
+		}
+
+		// TODO: Can't jump left or right when holding WALK. Why?
+		if (TrInput & IN_WALK)
+			return;
 	}
 
 	if (TrInput & IN_ROLL)

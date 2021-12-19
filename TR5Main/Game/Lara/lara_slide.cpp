@@ -54,6 +54,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
+			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
@@ -92,6 +93,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor >= CLICK(1))
 	{
 		SetLaraFallState(item);
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
@@ -148,6 +150,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
+			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
@@ -182,6 +185,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->Middle.Floor >= CLICK(1))
 	{
 		SetLaraFallBackState(item);
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
