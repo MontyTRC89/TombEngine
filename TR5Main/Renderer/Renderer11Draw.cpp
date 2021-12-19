@@ -3070,18 +3070,18 @@ namespace TEN::Renderer
                             // Don't queue back-face polygons
                             Vector3 cameraVector = (roomPosition + p->centre) - cameraPosition;
                             cameraVector.Normalize();
-                            if (p->Normal.Dot(cameraVector) < 0.0f)
-                                continue;
+                            //if (p->Normal.Dot(cameraVector) < 0.0f)
+                             //   continue;
 
                             numRoomsTransparentPolygons++;
 
                             // As polygon distance, for rooms, we use the farthest vertex distance                            
-                            int d1 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
-                            int d2 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
-                            int d3 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
+                            int d1 = ( roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
+                            int d2 = ( roomsVertices[roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
+                            int d3 = ( roomsVertices[roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
                             int d4 = 0;
                             if (p->shape == 0)
-                                d4 = (roomPosition + roomsVertices[roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
+                                d4 = ( roomsVertices[roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
 
                             int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
