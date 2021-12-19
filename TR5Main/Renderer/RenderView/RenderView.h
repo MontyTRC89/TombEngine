@@ -5,9 +5,11 @@
 #include "camera.h"
 #include "Frustum.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "memory\LinearArrayBuffer.h"
+#include "Specific/memory/LinearArrayBuffer.h"
 #include "RendererSprites.h"
-namespace TEN::Renderer {
+
+namespace TEN::Renderer 
+{
 	struct RendererStatic;
 	struct RendererItem;
 	struct RendererLight;

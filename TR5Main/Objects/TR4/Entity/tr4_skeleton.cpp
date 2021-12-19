@@ -13,8 +13,8 @@
 #include "level.h"
 #include "animation.h"
 #include "itemdata/creature_info.h"
-#include "floordata.h"
-#include "collide.h"
+#include "collision/floordata.h"
+#include "collision/collide_room.h"
 
 namespace TEN::Entities::TR4
 {

@@ -3,7 +3,7 @@
 #include "lara.h"
 #include "gui.h"
 #include "effects/effects.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "lara_one_gun.h"
 #include "items.h"
 #include "camera.h"

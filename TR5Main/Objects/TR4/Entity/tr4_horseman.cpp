@@ -8,7 +8,7 @@
 #include "Specific/trmath.h"
 #include "lara.h"
 #include "Sound/sound.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "control/box.h"
 #include "animation.h"
 

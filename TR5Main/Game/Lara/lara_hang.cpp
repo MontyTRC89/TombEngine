@@ -3,7 +3,8 @@
 #include "input.h"
 #include "lara_tests.h"
 #include "items.h"
-#include "collide.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "camera.h"
 #include "level.h"
 

@@ -2,14 +2,14 @@
 #include "tr4_element_puzzle.h"
 #include "level.h"
 #include "control/control.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include "animation.h"
-#include <lara.h>
-#include <sphere.h>
-#include <effects\effects.h>
-#include <effects\tomb4fx.h>
-#include <switch.h>
-#include <input.h>
+#include "lara.h"
+#include "Game/collision/sphere.h"
+#include "effects/effects.h"
+#include "effects/tomb4fx.h"
+#include "switch.h"
+#include "input.h"
 
 void HammerControl(short itemNumber)
 {

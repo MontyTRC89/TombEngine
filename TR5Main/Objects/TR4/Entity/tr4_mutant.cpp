@@ -5,7 +5,7 @@
 #include "misc.h"
 #include "lara.h"
 #include "setup.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "objectslist.h"
 #include "Specific/trmath.h"
 #include "itemdata/creature_info.h"
