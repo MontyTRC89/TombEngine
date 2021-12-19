@@ -9,7 +9,7 @@
 #include "Sound/sound.h"
 #include "camera.h"
 #include "lara.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "collision/floordata.h"
 
 using namespace TEN::Floordata;

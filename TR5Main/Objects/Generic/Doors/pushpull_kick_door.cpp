@@ -16,7 +16,7 @@
 #include "trmath.h"
 #include "misc.h"
 #include "pushpull_kick_door.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "itemdata/door_data.h"
 
 namespace TEN::Entities::Doors

@@ -9,6 +9,8 @@
 #include "animation.h"
 #include "items.h"
 #include "Renderer11.h"
+#include "collision/collide_item.h"
+
 using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;

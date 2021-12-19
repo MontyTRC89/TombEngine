@@ -5,7 +5,7 @@
 #include "items.h"
 #include "lara.h"
 #include "Sound/sound.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "collision/floordata.h"
 #include "Renderer11.h"
 using namespace TEN::Renderer;

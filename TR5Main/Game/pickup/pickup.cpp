@@ -25,7 +25,7 @@
 #include "pickup/pickup_consumable.h"
 #include "pickup/pickup_misc_items.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/collision/collision.h"
+#include "collision/collide_item.h"
 
 using namespace TEN::Entities::Generic;
 

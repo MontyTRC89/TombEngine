@@ -7,7 +7,7 @@
 #include "animation.h"
 #include "rope.h"
 #include "camera.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "items.h"
 #include "control/control.h"
 #include "Objects/Generic/Object/rope.h"

@@ -3,7 +3,7 @@
 #include "items.h"
 #include "level.h"
 #include "setup.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "animation.h"
 #include "control/control.h"
 #include "control/box.h"

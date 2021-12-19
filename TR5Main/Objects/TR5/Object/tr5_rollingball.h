@@ -1,6 +1,6 @@
 #pragma once
 #include "items.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 
 void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void RollingBallControl(short itemNumber);

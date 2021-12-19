@@ -11,7 +11,7 @@
 #include "animation.h"
 #include "misc.h"
 #include "itemdata/creature_info.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 
 enum CROCODILE_STATE
 {

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "effects/debris.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "camera.h"
 #include "animation.h"
 #include "collision/floordata.h"

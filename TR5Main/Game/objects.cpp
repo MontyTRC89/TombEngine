@@ -10,7 +10,7 @@
 #include "level.h"
 #include "input.h"
 #include "Sound/sound.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];

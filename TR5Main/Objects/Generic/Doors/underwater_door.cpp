@@ -16,7 +16,7 @@
 #include "trmath.h"
 #include "misc.h"
 #include "underwater_door.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 
 namespace TEN::Entities::Doors
 {

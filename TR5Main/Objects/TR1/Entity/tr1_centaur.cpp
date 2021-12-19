@@ -10,7 +10,7 @@
 #include "lara_one_gun.h"
 #include "effects/effects.h"
 #include "animation.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "setup.h"
 
 enum centaur_anims { 

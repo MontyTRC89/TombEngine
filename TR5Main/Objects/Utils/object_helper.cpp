@@ -1,13 +1,15 @@
 #include "framework.h"
 #include "object_helper.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "objects.h"
 #include "pickup.h"
 #include "puzzles_keys.h"
 #include "level.h"
 #include "tr5_smashobject.h"
 #include "tr5_pushableblock.h"
+
 using std::function;
+
 void InitSmashObject(OBJECT_INFO* obj, int objectNumber)
 {
 	obj = &Objects[objectNumber];

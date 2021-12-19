@@ -18,7 +18,8 @@
 #include "trmath.h"
 #include "misc.h"
 #include "itemdata/door_data.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "itemdata/itemdata.h"
 
 namespace TEN::Entities::Doors

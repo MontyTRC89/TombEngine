@@ -52,7 +52,7 @@
 /// shatter
 #include "tr5_smashobject.h"
 /// necessary import
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "lara_one_gun.h"
 #include "lara_flare.h"
 #include "lara_initialise.h"

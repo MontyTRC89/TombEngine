@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "setup.h"
 #include "animation.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "flipeffect.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"

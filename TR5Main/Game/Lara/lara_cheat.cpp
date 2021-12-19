@@ -5,7 +5,7 @@
 #include "GameFlowScript.h"
 #include "effects/effects.h"
 #include "Sound/sound.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "items.h"
 #include "setup.h"
 #include "level.h"

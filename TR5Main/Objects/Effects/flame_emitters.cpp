@@ -6,7 +6,7 @@
 #include "level.h"
 #include "lara.h"
 #include "effects/tomb4fx.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "animation.h"
 #include "Game/effects/effects.h"
 #include "weather.h"

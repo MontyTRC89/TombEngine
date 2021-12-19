@@ -318,7 +318,8 @@
     <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
-    <ClCompile Include="Game\collision\collision.cpp" />
+    <ClCompile Include="Game\collision\collide_item.cpp" />
+    <ClCompile Include="Game\collision\collide_room.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -713,7 +714,8 @@
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\collision\collision.h" />
+    <ClInclude Include="Game\collision\collide_item.h" />
+    <ClInclude Include="Game\collision\collide_room.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

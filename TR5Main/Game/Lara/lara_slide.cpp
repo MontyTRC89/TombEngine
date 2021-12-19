@@ -4,7 +4,7 @@
 #include "lara_tests.h"
 #include "input.h"
 #include "Sound\sound.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "camera.h"
 #include "level.h"
 #include "items.h"

@@ -11,7 +11,7 @@
 #include "lara.h"
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "control/los.h"
 
 static void TriggerSubmarineSparks(short itemNumber)

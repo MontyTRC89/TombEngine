@@ -7,7 +7,7 @@
 #include "itemdata/door_data.h"
 #include "control/box.h"
 #include "generic_doors.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "animation.h"
 #include "items.h"
 

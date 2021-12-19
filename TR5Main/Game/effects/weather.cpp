@@ -2,7 +2,7 @@
 #include "camera.h"
 #include "savegame.h"
 #include "weather.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "effects/effects.h"
 #include "effects/tomb4fx.h"
 #include "Sound/sound.h"

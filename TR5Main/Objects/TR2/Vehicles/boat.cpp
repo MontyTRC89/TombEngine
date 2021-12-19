@@ -2,7 +2,7 @@
 #include "boat.h"
 #include "lara.h"
 #include "items.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "collision/sphere.h"
 #include "camera.h"
 #include "setup.h"

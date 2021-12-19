@@ -14,7 +14,7 @@
 #include "animation.h"
 #include "itemdata/creature_info.h"
 #include "collision/floordata.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 
 namespace TEN::Entities::TR4
 {

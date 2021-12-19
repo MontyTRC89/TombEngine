@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "itemdata/creature_info.h"
 #include "collision/floordata.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };

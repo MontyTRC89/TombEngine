@@ -1,5 +1,5 @@
 #pragma once
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "lara_struct.h"
 
 struct ITEM_INFO;

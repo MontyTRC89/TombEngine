@@ -2,7 +2,7 @@
 #include "snowmobile.h"
 #include "lara.h"
 #include "items.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "lara_fire.h"
 #include "lara_one_gun.h"
 #include "effects/effects.h"

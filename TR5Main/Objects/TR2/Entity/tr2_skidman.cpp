@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr2_skidman.h"
 #include "items.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "lara.h"
 #include "control/lot.h"
 #include "control/box.h"

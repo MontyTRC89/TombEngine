@@ -2,7 +2,7 @@
 #include "rubberboat.h"
 #include "items.h"
 #include "level.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "lara.h"
 #include "input.h"
 #include "collision/sphere.h"

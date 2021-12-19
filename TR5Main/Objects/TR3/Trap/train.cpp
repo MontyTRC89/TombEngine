@@ -9,7 +9,8 @@
 #include "camera.h"
 #include "collision/sphere.h"
 #include "lara.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "animation.h"
 
 #define TRAIN_VEL	260

@@ -10,7 +10,8 @@
 #include "effects/tomb4fx.h"
 #include "input.h"
 #include "generic_switch.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 #include "items.h"
 
 using namespace TEN::Entities::Switches;

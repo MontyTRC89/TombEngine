@@ -1,7 +1,7 @@
 #include "framework.h"
 #include <process.h>
 #include "winmain.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "control/control.h"
 #include "pickup.h"
 #include "camera.h"

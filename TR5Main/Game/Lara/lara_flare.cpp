@@ -8,7 +8,7 @@
 #include "items.h"
 #include "lara_fire.h"
 #include "Lara.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "effects/effects.h"
 #include "effects/chaffFX.h"
 #include "Specific/prng.h"

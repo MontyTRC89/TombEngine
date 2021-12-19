@@ -147,6 +147,7 @@ CALL gen.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\effects\bubble.h" />
@@ -490,7 +491,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\GameFlowScript.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
-    <ClInclude Include="Game\collision\collision.h" />
+    <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Game\control\control.h" />
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\animation.h" />
@@ -545,6 +546,7 @@ CALL gen.bat</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -798,7 +800,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\Renderer11.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\camera.cpp" />
-    <ClCompile Include="Game\collision\collision.cpp" />
+    <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\animation.cpp" />

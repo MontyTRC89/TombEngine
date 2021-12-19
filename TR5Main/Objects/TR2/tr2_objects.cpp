@@ -30,7 +30,7 @@
 #include "boat.h"
 #include "snowmobile.h"
 /// necessary import
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "control/box.h"
 #include "setup.h"
 #include "level.h"

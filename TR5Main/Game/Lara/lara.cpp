@@ -35,6 +35,7 @@
 #include "rope.h"
 #include "misc.h"
 #include "control/volume.h"
+#include "collision/collide_item.h"
 #include "Renderer11.h"
 #include "camera.h"
 #include "items.h"

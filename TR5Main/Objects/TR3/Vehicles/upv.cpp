@@ -4,7 +4,7 @@
 #include "items.h"
 #include "collision/sphere.h"
 #include "effects/effects.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "control/box.h"
 #include "lara_flare.h"
 #include "lara_one_gun.h"

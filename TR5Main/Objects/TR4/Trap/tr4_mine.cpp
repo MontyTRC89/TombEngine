@@ -7,7 +7,7 @@
 #include "effects/tomb4fx.h"
 #include "effects/weather.h"
 #include "items.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "objectslist.h"
 
 using namespace TEN::Effects::Environment;

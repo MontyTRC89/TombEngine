@@ -15,7 +15,7 @@
 
 /// necessary import
 #include "control/box.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "setup.h"
 #include "level.h"
 #include "object_helper.h"

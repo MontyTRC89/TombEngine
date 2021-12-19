@@ -14,6 +14,8 @@
 #include "items.h"
 #include "Renderer11.h"
 #include "Scripting/GameFlowScript.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;

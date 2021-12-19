@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "control/control.h"
 #include "input.h"
 #include "items.h"

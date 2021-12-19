@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "minecart.h"
 #include "lara.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "effects/effects.h"
 #include "lara_flare.h"
 #include "items.h"

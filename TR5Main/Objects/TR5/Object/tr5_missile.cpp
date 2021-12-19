@@ -10,7 +10,7 @@
 #include "Sound/sound.h"
 #include "tr5_roman_statue.h"
 #include "tr5_hydra.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "Game/effects/lara_fx.h"
 
 using namespace TEN::Effects::Lara;

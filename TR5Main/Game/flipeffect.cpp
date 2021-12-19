@@ -6,7 +6,7 @@
 #include "level.h"
 #include "setup.h"
 #include "camera.h"
-#include "collision/collision.h"
+#include "collision/collide_room.h"
 #include "Sound/sound.h"
 #include "tr5_spider_emitter.h"
 #include "tr5_pushableblock.h"

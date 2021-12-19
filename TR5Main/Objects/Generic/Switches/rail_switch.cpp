@@ -4,7 +4,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "level.h"
-#include "collision/collision.h"
+#include "collision/collide_item.h"
 #include "animation.h"
 #include "items.h"
 
