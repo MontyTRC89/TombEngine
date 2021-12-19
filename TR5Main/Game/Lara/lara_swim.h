@@ -1,5 +1,5 @@
 #pragma once
-#include "collide.h"
+#include "collision/collide_room.h"
 
 void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll);

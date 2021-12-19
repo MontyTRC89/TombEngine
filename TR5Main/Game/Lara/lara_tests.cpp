@@ -14,6 +14,8 @@
 #include "items.h"
 #include "Renderer11.h"
 #include "Scripting/GameFlowScript.h"
+#include "collision/collide_room.h"
+#include "collision/collide_item.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
@@ -720,7 +722,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->pos.xPos += coll->Shift.x;
-			item->pos.yPos += GetBoundsAccurate(item)->Y2 * 2.4f;
+			item->pos.yPos += GetBoundsAccurate(item)->Y2 * 1.8f;
 			item->pos.zPos += coll->Shift.z;
 			item->gravityStatus = true;
 			item->speed = 2;

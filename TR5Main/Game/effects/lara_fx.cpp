@@ -4,7 +4,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/lara_fx.h"
-#include "Game/floordata.h"
+#include "Game/collision/floordata.h"
 #include "Game/items.h"
 #include "Game/control/control.h"
 

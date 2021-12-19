@@ -2,10 +2,10 @@
 #include "tr4_littlebeetle.h"
 #include "level.h"
 #include "control/control.h"
-#include "Specific\trmath.h"
+#include "Specific/trmath.h"
 #include "lara.h"
 #include "setup.h"
-#include "flipeffect.h"
+#include "control/flipeffect.h"
 #include "items.h"
 
 namespace TEN::Entities::TR4

@@ -5,7 +5,7 @@
 #include "lara.h"
 #include "generic_switch.h"
 #include "animation.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "items.h"
 
 namespace TEN::Entities::Switches

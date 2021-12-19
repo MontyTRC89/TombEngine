@@ -4,7 +4,7 @@
 #include "underwater_switch.h"
 #include "generic_switch.h"
 #include "camera.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "level.h"
 #include "animation.h"
 #include "items.h"

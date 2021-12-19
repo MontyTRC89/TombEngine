@@ -2,11 +2,12 @@
 #include "upv.h"
 #include "lara.h"
 #include "items.h"
-#include "sphere.h"
+#include "collision/sphere.h"
 #include "effects/effects.h"
-#include "collide.h"
+#include "collision/collide_item.h"
 #include "control/box.h"
 #include "lara_flare.h"
+#include "lara_one_gun.h"
 #include "animation.h"
 #include "camera.h"
 #include "setup.h"
@@ -49,7 +50,6 @@
 #define WALLDEFLECT			(ANGLE(2.0f) * 65536)
 #define GETOFF_DIST 		WALL_SIZE
 #define HARPOON_SPEED		256
-#define HARPOON_TIME		256
 #define HARPOON_RELOAD		15
 
 #define UPV_TURBINE_BONE 3
@@ -910,6 +910,8 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	LaraInfo*& laraInfo = laraItem->data;
 	ITEM_INFO* UPVItem = &g_Level.Items[laraInfo->Vehicle];
 	SUB_INFO* UPVInfo = UPVItem->data;
+	
+	auto oldPos = UPVItem->pos;
 	auto probe = GetCollisionResult(UPVItem);
 
 	if (!(UPVInfo->Flags & UPV_DEAD))
@@ -932,13 +934,21 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVItem->pos.zPos += phd_cos(UPVItem->pos.yRot) * UPVItem->speed * phd_cos(UPVItem->pos.xRot);
 	}
 
+	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
+	int waterHeight = GetWaterHeight(UPVItem->pos.xPos, UPVItem->pos.yPos, UPVItem->pos.zPos, UPVItem->roomNumber);
+
+	if ((newHeight - waterHeight) < SUB_HEIGHT || (newHeight < UPVItem->pos.yPos - SUB_HEIGHT / 2))
+	{
+		UPVItem->pos.xPos = oldPos.xPos;
+		UPVItem->pos.yPos = oldPos.yPos;
+		UPVItem->pos.zPos = oldPos.zPos;
+		UPVItem->speed = 0;
+	}
+
 	UPVItem->floor = probe.Position.Floor;
 
-	if (UPVInfo->Flags & UPV_CONTROL &&
-		!(UPVInfo->Flags & UPV_DEAD))
+	if (UPVInfo->Flags & UPV_CONTROL && !(UPVInfo->Flags & UPV_DEAD))
 	{
-		int waterHeight = GetWaterHeight(UPVItem->pos.xPos, UPVItem->pos.yPos, UPVItem->pos.zPos, UPVItem->roomNumber);
-
 		if (!(g_Level.Rooms[UPVItem->roomNumber].flags & ENV_FLAG_WATER) &&
 			waterHeight != NO_HEIGHT)
 		{
@@ -954,8 +964,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			UPVInfo->Flags |= UPV_SURFACE;
 		}
 
-		else if ((waterHeight - UPVItem->pos.yPos) >= -SURFACE_DIST &&
-			waterHeight != NO_HEIGHT)
+		else if ((waterHeight - UPVItem->pos.yPos) >= -SURFACE_DIST && waterHeight != NO_HEIGHT)
 		{
 			UPVItem->pos.yPos = waterHeight + SURFACE_DIST;
 
