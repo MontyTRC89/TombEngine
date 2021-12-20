@@ -49,7 +49,8 @@ bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 
 bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	ShiftItem(item, coll);
+	if (coll->CollisionType != CT_NONE)
+		ShiftItem(item, coll);
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
