@@ -148,42 +148,30 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	int radius = CLICK(1);
-	auto probeFront = GetCollisionResult(item, item->pos.yRot, radius);
-	auto probeBack = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), radius);
-	auto probeLeft = GetCollisionResult(item, item->pos.yRot - ANGLE(90.0f), radius);
-	auto probeRight = GetCollisionResult(item, item->pos.yRot + ANGLE(90.0f), radius);
 	auto probeMiddle = GetCollisionResult(item);
+	probeMiddle.Position.Ceiling -= item->pos.yPos - coll->Setup.Height;
 
-	int yOffset = item->pos.yPos - coll->Setup.Height;
-	probeFront.Position.Ceiling -= yOffset;
-	probeBack.Position.Ceiling -= yOffset;
-	probeLeft.Position.Ceiling -= yOffset;
-	probeRight.Position.Ceiling -= yOffset;
-	probeMiddle.Position.Ceiling -= yOffset;
-
-	auto headroom = -(LARA_HEADROOM * 0.7f);
 	if (TrInput & IN_FORWARD &&
-		probeFront.Position.Ceiling < headroom)
+		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
 		info->jumpDirection = LaraJumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
-		probeBack.Position.Ceiling < headroom)
+		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
 	{
 		info->jumpDirection = LaraJumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
-		probeLeft.Position.Ceiling < headroom)
+		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
 		info->jumpDirection = LaraJumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
-		probeRight.Position.Ceiling < headroom)
+		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
 	{
 		info->jumpDirection = LaraJumpDirection::Right;
 	}
-	else if (probeMiddle.Position.Ceiling < headroom) [[likely]]
+	else if (probeMiddle.Position.Ceiling < -(LARA_HEADROOM * 0.7f)) [[likely]]
 		info->jumpDirection = LaraJumpDirection::Up;
 	else
 		info->jumpDirection = LaraJumpDirection::None;
