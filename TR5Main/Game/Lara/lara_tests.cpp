@@ -1165,7 +1165,7 @@ bool TestLaraLand(ITEM_INFO* item)
 	auto probe = GetCollisionResult(item);
 
 	if (((probe.Position.Floor - item->pos.yPos) <= item->fallspeed || TestLaraSwamp(item)) &&
-		item->fallspeed >= 0)
+		item->fallspeed > 0)
 	{
 		return true;
 	}

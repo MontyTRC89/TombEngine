@@ -500,43 +500,58 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_fallback(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_FALL_BACK (29)
+// Collision:	lara_col_fall_back()
+void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 29*/
-	/*collision: lara_col_fallback*/
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
-		item->goalAnimState = LS_FREEFALL;
+	if (item->hitPoints <= 0)
+		return;
 
-	if (TrInput & IN_ACTION)
-		if (info->gunStatus == LG_HANDS_FREE)
-			item->goalAnimState = LS_REACH;
-}
-
-void lara_col_fallback(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 29*/
-	/*state code: lara_as_fallback*/
-	info->moveAngle = item->pos.yRot + ANGLE(180);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
-	coll->Setup.ForwardAngle = info->moveAngle;
-	GetCollisionInfo(coll, item);
-	LaraDeflectEdgeJump(item, coll);
-
-	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+	if (TestLaraLand(item))
 	{
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
+		return;
+	}
+
+	if (TrInput & IN_ACTION &&
+		info->gunStatus == LG_HANDS_FREE)
+	{
+		item->goalAnimState = LS_REACH;
+		return;
+	}
+
+	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	{
+		item->goalAnimState = LS_FREEFALL;
+		return;
+	}
+
+	item->goalAnimState = LS_FALL_BACK;
+}
+
+// State:		LS_FALL_BACK (29)
+// Collision:	lara_col_fall_back()
+void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	GetCollisionInfo(coll, item);
+
+	LaraDeflectEdgeJump(item, coll);
+
+	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+	{
 		LaraResetGravityStatus(item, coll);
 		LaraSnapToHeight(item, coll);
 	}
