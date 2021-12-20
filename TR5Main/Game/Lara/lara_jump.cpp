@@ -274,7 +274,6 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_FORWARD;
 		info->jumpDirection = LaraJumpDirection::Forward;
 		info->moveAngle = item->pos.yRot;
-		return;
 	}
 	else if ((TrInput & IN_BACK ||
 			info->jumpDirection == LaraJumpDirection::Back && !(TrInput & IN_DIRECTION)) &&
@@ -283,17 +282,14 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
 		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-		return;
 	}
-
-	if ((TrInput & IN_LEFT ||
+	else if ((TrInput & IN_LEFT ||
 			info->jumpDirection == LaraJumpDirection::Left && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
 		info->jumpDirection = LaraJumpDirection::Left;
 		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
-		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
 			info->jumpDirection == LaraJumpDirection::Right && !(TrInput & IN_DIRECTION)) &&
@@ -302,17 +298,20 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
 		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
-		return;
 	}
-	
-	item->goalAnimState = LS_JUMP_UP;
-	info->jumpDirection = LaraJumpDirection::Up;
+	else
+	{
+		item->goalAnimState = LS_JUMP_UP;
+		info->jumpDirection = LaraJumpDirection::Up;
+	}
 }
 
 // State:		LS_JUMP_PREPARE (15)
 // Collision:	lara_as_jump_prepare()
 void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// TODO: Reuse lara_col_idle() instead?
+
 	LaraInfo*& info = item->data;
 
 	item->fallspeed = 0;
@@ -326,7 +325,6 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-
 		return;
 	}
 
@@ -336,8 +334,13 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor > -STEP_SIZE && coll->Middle.Floor < STEP_SIZE)
-		item->pos.yPos += coll->Middle.Floor;
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
+	if (abs(coll->Middle.Floor) < STEP_SIZE)
+		LaraSnapToHeight(item, coll);
 }
 
 void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
