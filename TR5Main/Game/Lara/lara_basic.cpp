@@ -247,7 +247,8 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL && !info->jumpQueued &&
+	// TODO: Control settings option to enable/disable FORWARD+BACK as roll input.
+	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->jumpQueued &&
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
