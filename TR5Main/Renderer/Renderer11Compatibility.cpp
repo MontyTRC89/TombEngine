@@ -264,16 +264,17 @@ namespace TEN::Renderer
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
 						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
-						light->Intensity = 1.0f;
 					}
 					else if (oldLight->type == LIGHT_TYPE_POINT)
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->In = oldLight->in;
@@ -284,6 +285,7 @@ namespace TEN::Renderer
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->In = oldLight->in;
@@ -295,6 +297,7 @@ namespace TEN::Renderer
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);

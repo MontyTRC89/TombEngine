@@ -207,11 +207,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
-			lightVec = normalize(lightVec);
 			if (distance > radius)
 				continue;
 
-			float d = saturate(dot(Normal,-lightVec ));
+			lightVec = normalize(lightVec);
+			float d = saturate(dot(Normal, -lightVec ));
 			if (d < 0)
 				continue;
 			
