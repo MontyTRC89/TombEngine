@@ -103,11 +103,7 @@ namespace TEN::Renderer
         // Set shaders
         m_context->VSSetShader(m_vsInventory.Get(), NULL, 0);
         m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
-
-        // Set texture
-        bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::AnisotropicClamp);
-        bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
-
+ 
         // Set matrices
         CCameraMatrixBuffer HudCamera;
         HudCamera.ViewProjection = view * projection;
@@ -151,6 +147,9 @@ namespace TEN::Renderer
                     continue;
 
 				setBlendMode(bucket.BlendMode);
+
+                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
 
                 m_stMisc.AlphaTest = (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE);
                 m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -1928,7 +1927,7 @@ namespace TEN::Renderer
             dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
         }
         else
-        {
+        { 
             r = (r * falloff) >> 3;
             g = (g * falloff) >> 3;
             b = (b * falloff) >> 3;
@@ -2510,7 +2509,7 @@ namespace TEN::Renderer
         // Prepare the shadow map
         if (g_Configuration.EnableShadows)
             renderShadowMap(view);
-
+ 
         // Setup Lara item
         m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);

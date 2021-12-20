@@ -114,9 +114,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	float3 lighting = AmbientLight.xyz;
 
-	//float4 reflectionColor = Reflection.Sample(Sampler,input.ReflectionVector.xyz);
-	//lighting = reflectionColor.xyz;
-
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Type;
@@ -135,18 +132,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float attenuation = pow(((radius - distance) / radius), 2);
-			float d = dot(Normal, lightVec);
-			d *= 0.5;
-			d += 0.5f;
-			d *= d;
+			float d = saturate(dot(Normal, -lightVec));
 			if (d < 0)
 				continue;
-			
-			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
-			float s = pow(saturate(dot(h, Normal)), 0.5f);
 
-			lighting += color * d * intensity * attenuation; // *0.6f + s * 0.5f;
+			float attenuation = pow(((radius - distance) / radius), 2);
+
+			lighting += color * intensity * attenuation * d * 2.0f;
 		}
 		else if (lightType == LT_SUN)
 		{
@@ -157,16 +149,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			direction = normalize(direction);
 
 			float d = dot(Normal, direction);
-			d *= 0.5;
-			d += 0.5f;
-			d *= d;
 			if (d < 0)
 				continue;
 			
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
 			float s = pow(saturate(dot(h, Normal)), 0.5f);
 			
-			lighting += color * d * intensity; // *0.6f + s * 0.5f;
+			lighting += color * d * intensity * 2.0f;
 		}
 		else if (lightType == LT_SPOT)
 		{
@@ -191,17 +180,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
 			attenuation = pow(attenuation, 2);
-			float d = dot(Normal, lightVec);
-			d *= 0.5;
-			d += 0.5f;
-			d *= d;
+			float d = saturate(dot(Normal, lightVec));
 			if (d < 0)
 				continue;
 
-			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + lightVec);
-			float s = pow(saturate(dot(h, Normal)), 0.5f);
-
-			lighting += color * d * intensity * attenuation; // *0.6f + s * 0.5f;
+			lighting += color * intensity * attenuation * d * 2.0f;
 		}
 	}
 
