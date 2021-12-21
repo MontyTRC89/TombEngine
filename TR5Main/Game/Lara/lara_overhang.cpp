@@ -563,8 +563,8 @@ void lara_as_slopeclimbup(ITEM_INFO* lara, COLL_INFO* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetFrameNumber(lara, 0);
-		int length = g_Level.Anims[lara->animNumber].frameEnd - g_Level.Anims[lara->animNumber].frameBase;
+		int frame = GetCurrentRelativeFrameNumber(lara);
+		int length = GetFrameCount(lara->animNumber);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
 		TranslateItem(lara, 0, dPos, dPos);
@@ -594,8 +594,8 @@ void lara_as_slopeclimbdown(ITEM_INFO* lara, COLL_INFO* coll)
 
 	if (!(TrInput & IN_ACTION))
 	{
-		int frame = GetFrameNumber(lara, 0);
-		int length = g_Level.Anims[lara->animNumber].frameEnd - g_Level.Anims[lara->animNumber].frameBase;
+		int frame = GetCurrentRelativeFrameNumber(lara);
+		int length = GetFrameCount(lara->animNumber);
 		int dPos = frame * CLICK(1) / length;
 
 		TranslateItem(lara, 0, dPos, dPos);
@@ -612,11 +612,10 @@ void lara_as_sclimbstart(ITEM_INFO* lara, COLL_INFO* coll)
 	// rotating camera effect during monkey to overhead slope transition
 	if (lara->animNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
 	{
-		int frame = GetFrameNumber(lara, 0);
-		float frac = 0.0f;
-		int numFrames = g_Level.Anims[lara->animNumber].frameEnd - g_Level.Anims[lara->animNumber].frameBase;
+		int frame = GetCurrentRelativeFrameNumber(lara);
+		int numFrames = GetFrameCount(lara->animNumber);
 
-		frac = (frame * 1.5f) / (float)(numFrames);
+		float frac = (frame * 1.5f) / (float)(numFrames);
 		if (frac > 1.0f)
 			frac = 1.0f;
 
@@ -674,8 +673,8 @@ void lara_as_sclimbstop(ITEM_INFO* lara, COLL_INFO* coll)
 	// rotating camera effect during concave slope to monkey transition
 	else if (lara->animNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
 	{
-		int frame = GetFrameNumber(lara, 0);
-		int numFrames = g_Level.Anims[lara->animNumber].frameEnd - g_Level.Anims[lara->animNumber].frameBase;
+		int frame = GetCurrentRelativeFrameNumber(lara);
+		int numFrames = GetFrameCount(lara->animNumber);
 
 		float frac = (frame * 1.25f) / (float)(numFrames);
 		if (frac > 1.0f)
