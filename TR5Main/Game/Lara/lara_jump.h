@@ -8,8 +8,8 @@ struct COLL_INFO;
 // Control & Collision Functions
 // -----------------------------
 
-void lara_as_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_forwardjump(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll);
