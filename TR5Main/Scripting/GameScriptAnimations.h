@@ -16,6 +16,7 @@ struct GameScriptAnimations
 	bool MonkeyAutoJump;			// Auto jump to monkey swing when pressing UP + ACTION beneath
 	bool OscillateHang;				// Grab thin ledge animation from TR1 and 2
 	bool Pose;						// Crossed arms AFK posing
+	bool Overhang;				    // Overhang functionality by Krys
 
 	static void Register(sol::state* lua);
 };
