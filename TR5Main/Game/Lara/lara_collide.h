@@ -20,7 +20,7 @@ void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll);
 short GetDirOctant(int rot);
 void GetLaraDeadlyBounds();
 
-void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll);
+void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle);
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll);
 

@@ -372,32 +372,23 @@ void GetLaraDeadlyBounds()
 	DeadlyBounds[5] = LaraItem->pos.zPos + tbounds.Z2;
 }
 
-void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll)
+void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 {
 	LaraInfo*& info = item->data;
 
-	/*states 25, 26, 27*/
-	/*state code: none, but is called in lara_col_backjump, lara_col_rightjump and lara_col_leftjump*/
+	info->moveAngle = moveAngle;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
-
 	GetCollisionInfo(coll, item);
+
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
+	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		item->fallspeed = 0;
-		item->gravityStatus = 0;
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraResetGravityStatus(item, coll);
+		LaraSnapToHeight(item, coll);
 	}
 }
 
