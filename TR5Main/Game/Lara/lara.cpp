@@ -60,7 +60,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_walk_forward,
 	lara_as_run_forward,
 	lara_as_idle,
-	lara_as_forwardjump,
+	lara_as_jump_forward,//33
 	lara_as_pose,//4
 	lara_as_run_back,//5
 	lara_as_turn_right_slow,//6
@@ -219,11 +219,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlled
 };
 
-function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
+function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
+{
 	lara_col_walk_forward,
 	lara_col_run_forward,
 	lara_col_idle,
-	lara_col_forwardjump,
+	lara_col_jump_forward,//3
 	lara_col_idle,//4
 	lara_col_run_back,
 	lara_col_turn_right_slow,
@@ -509,7 +510,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					Splash(item);
 					item->goalAnimState = LS_IDLE;
 				}
-				// Lara is grounded; block land-to-run.
+				// Lara is grounded; don't splash again.
 				else if (!item->gravityStatus)
 					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
