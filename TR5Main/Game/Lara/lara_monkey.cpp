@@ -3,6 +3,7 @@
 #include "input.h"
 #include "control/control.h"
 #include "lara_collide.h"
+#include "lara_overhang.h"
 #include "lara_tests.h"
 #include "lara_monkey.h"
 #include "collision/floordata.h"
@@ -45,6 +46,8 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
+
+	monkey_slope_extra(item, coll);
 }
 
 void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)

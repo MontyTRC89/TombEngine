@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "lara_climb.h"
+#include "lara_overhang.h"
 #include "Lara.h"
 #include "control/control.h"
 #include "animation.h"
@@ -129,6 +130,8 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 
 	Camera.targetElevation = -ANGLE(45);
+
+	climbdown_slope_extra(item, coll);
 }
 
 void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
@@ -389,6 +392,8 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.moveAngle = item->pos.yRot + ANGLE(180);
 		}
 	}
+
+	climb_slope_extra(item, coll);
 }
 
 void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
