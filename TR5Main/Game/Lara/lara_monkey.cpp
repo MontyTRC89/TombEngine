@@ -47,7 +47,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	monkey_slope_extra(item, coll);
+	SlopeMonkeyExtra(item, coll);
 }
 
 void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)

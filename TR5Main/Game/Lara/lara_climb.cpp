@@ -131,7 +131,7 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(45);
 
-	climbdown_slope_extra(item, coll);
+	SlopeClimbDownExtra(item, coll);
 }
 
 void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
@@ -393,7 +393,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	climb_slope_extra(item, coll);
+	SlopeClimbExtra(item, coll);
 }
 
 void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)

@@ -21,8 +21,8 @@ void lara_as_sclimbstart(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_sclimbstop(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_sclimbend(ITEM_INFO* lara, COLL_INFO* coll);
 
-void hang_slope_extra(ITEM_INFO* lara, COLL_INFO* col);
-void reach_slope_extra(ITEM_INFO* lara, COLL_INFO* col);
-void climb_slope_extra(ITEM_INFO* lara, COLL_INFO* coll);
-void climbdown_slope_extra(ITEM_INFO* lara, COLL_INFO* coll);
-void monkey_slope_extra(ITEM_INFO* lara, COLL_INFO* coll);
+void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* col);
+void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* col);
+void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll);
+void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll);
+void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll);
