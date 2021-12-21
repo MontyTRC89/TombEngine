@@ -2,6 +2,7 @@
 #include "lara.h"
 #include "input.h"
 #include "lara_tests.h"
+#include "lara_overhang.h"
 #include "items.h"
 #include "collision/collide_room.h"
 #include "collision/collide_item.h"
@@ -67,6 +68,8 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
+
+	hang_slope_extra(item, coll);
 }
 
 void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
