@@ -162,7 +162,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
 
-	reach_slope_extra(item, coll);
+	SlopeReachExtra(item, coll);
 }
 
 void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
