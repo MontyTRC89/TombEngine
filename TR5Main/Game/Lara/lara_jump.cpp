@@ -81,7 +81,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
 		return;
@@ -174,14 +174,14 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_REACH_TURN_MAX)
-			info->turnRate = -LARA_REACH_TURN_MAX;
+		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_REACH_TURN_MAX)
-			info->turnRate = LARA_REACH_TURN_MAX;
+		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item))
@@ -194,7 +194,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
 		return;
@@ -236,6 +236,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// TODO: Unused? Naming is also completely mismatched; enum calls it LS_GRAB_TO_FALL.
 void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 14*/
@@ -252,6 +253,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 		return;
 
+	///////
 	if (info->waterStatus == LW_WADE)
 	{
 		item->goalAnimState = LS_JUMP_UP;
@@ -280,6 +282,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_FORWARD;
 		info->jumpDirection = LaraJumpDirection::Forward;
 		info->moveAngle = item->pos.yRot;
+		return;
 	}
 	else if ((TrInput & IN_BACK ||
 			info->jumpDirection == LaraJumpDirection::Back && !(TrInput & IN_DIRECTION)) &&
@@ -288,14 +291,17 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
 		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+		return;
 	}
-	else if ((TrInput & IN_LEFT ||
+	
+	if ((TrInput & IN_LEFT ||
 			info->jumpDirection == LaraJumpDirection::Left && !(TrInput & IN_DIRECTION)) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
 		info->jumpDirection = LaraJumpDirection::Left;
 		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
+		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
 			info->jumpDirection == LaraJumpDirection::Right && !(TrInput & IN_DIRECTION)) &&
@@ -304,135 +310,150 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
 		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
+		return;
 	}
-	else
-	{
-		item->goalAnimState = LS_JUMP_UP;
-		info->jumpDirection = LaraJumpDirection::Up;
-	}
+	
+	item->goalAnimState = LS_JUMP_UP;
+	info->jumpDirection = LaraJumpDirection::Up;
 }
 
 // State:		LS_JUMP_PREPARE (15)
 // Collision:	lara_as_jump_prepare()
 void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Reuse lara_col_idle() instead?
-
-	LaraInfo*& info = item->data;
-
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.ForwardAngle = info->moveAngle;
-	GetCollisionInfo(coll, item);
-
-	if (TestLaraFall(item, coll))
-	{
-		SetLaraFallState(item);
-		return;
-	}
-
-	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		return;
-	}
-
-	if (TestLaraStep(coll))
-	{
-		DoLaraStep(item, coll);
-		return;
-	}
-
-	if (TestLaraStep(coll))
-	{
-		DoLaraStep(item, coll);
-		return;
-	}
+	lara_col_idle(item, coll);
 }
 
-void lara_as_backjump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_JUMP_BACK (25)
+// Collision:	lara_col_jump_back()
+void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 25*/
-	/*collision: lara_col_backjump*/
 	info->look = false;
-
 	Camera.targetAngle = ANGLE(135.0f);
-	if (item->fallspeed <= LARA_FREEFALL_SPEED)
+
+	if (TrInput & IN_LEFT)
 	{
-		if (item->goalAnimState == LS_RUN_FORWARD)
-		{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = LARA_JUMP_TURN_MAX / 2;
+	}
+
+	if (TestLaraLand(item))
+	{
+		item->goalAnimState = LS_IDLE;
+		return;
+	}
+
+	if (TrInput & (IN_ROLL | IN_FORWARD))
+	{
+		item->goalAnimState = LS_JUMP_ROLL_180;
+		return;
+	}
+
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	{
+		item->goalAnimState = LS_FREEFALL;
+		return;
+	}
+
+	item->goalAnimState = LS_JUMP_BACK;
+}
+
+// State:		LS_JUMP_BACK (25)
+// Control:		lara_as_jump_back()
+void lara_col_jump_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraJumpCollision(item, coll, item->pos.yRot + ANGLE(180.0f));
+}
+
+// State:		LS_JUMP_RIGHT (26)
+// Collision:	lara_col_jump_right()
+void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->look = false;
+
+	if (TestLaraLand(item))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
 			item->goalAnimState = LS_IDLE;
-		}
-		else if ((TrInput & IN_FORWARD || TrInput & IN_ROLL) && item->goalAnimState != LS_IDLE)
-		{
-			item->goalAnimState = LS_JUMP_ROLL_180;
-		}
+
+		return;
 	}
-	else
+
+	// TODO: Core seems to have planned this feature. Add an animation to make it possible.
+	/*if (TrInput & (IN_ROLL | IN_LEFT))
+	{
+		item->goalAnimState = LS_JUMP_ROLL_180;
+		return;
+	}*/
+
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
+		return;
 	}
+
+	item->goalAnimState = LS_JUMP_RIGHT;
 }
 
-void lara_col_backjump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_JUMP_RIGHT (26)
+// Control:		lara_as_jump_right()
+void lara_col_jump_right(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraJumpCollision(item, coll, item->pos.yRot + ANGLE(90.0f));
+}
+
+// State:		LS_JUMP_LEFT (27)
+// Collision:	lara_as_jump_left()
+void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 25*/
-	/*state code: lara_as_backjump*/
-	info->moveAngle = item->pos.yRot + ANGLE(180);
-	LaraJumpCollision(item, coll);
-}
-
-void lara_as_rightjump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 26*/
-	/*collision: lara_col_rightjump*/
 	info->look = false;
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
-		item->goalAnimState = LS_FREEFALL;
-	else if (TrInput & IN_LEFT && item->goalAnimState != LS_IDLE)
+
+	if (TestLaraLand(item))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
+	// TODO: Core seems to have planned this feature. Add an animation to make it possible.
+	/*if (TrInput & (IN_ROLL | IN_RIGHT))
+	{
 		item->goalAnimState = LS_JUMP_ROLL_180;
-}
+		return;
+	}*/
 
-void lara_col_rightjump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 26*/
-	/*state code: lara_as_rightjump*/
-	info->moveAngle = item->pos.yRot + ANGLE(90);
-	LaraJumpCollision(item, coll);
-}
-
-void lara_as_leftjump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 27*/
-	/*collision: lara_col_leftjump*/
-	info->look = false;
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	{
 		item->goalAnimState = LS_FREEFALL;
-	else if (TrInput & IN_RIGHT && item->goalAnimState != LS_IDLE)
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		return;
+	}
+
+	item->goalAnimState = LS_JUMP_LEFT;
 }
 
-void lara_col_leftjump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_JUMP_LEFT (27)
+// Control:		lara_as_jump_left()
+void lara_col_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
-
-	/*state 27*/
-	/*state code: lara_as_leftjump*/
-	info->moveAngle = item->pos.yRot - ANGLE(90);
-	LaraJumpCollision(item, coll);
+	LaraJumpCollision(item, coll, item->pos.yRot - ANGLE(90.0f));
 }
 
 void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
@@ -521,6 +542,19 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 		return;
+
+	if (TrInput & IN_LEFT)
+	{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
+			info->turnRate = LARA_JUMP_TURN_MAX / 2;
+	}
 
 	if (TestLaraLand(item))
 	{

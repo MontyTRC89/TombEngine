@@ -601,12 +601,12 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	item->gravityStatus = false;
+	item->fallspeed = 0;
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	item->gravityStatus = false;
-	item->fallspeed = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
