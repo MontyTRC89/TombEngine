@@ -115,32 +115,16 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_FREEFALL (9)
+// Collision:	lara_col_freefall()
+void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 9*/
-	/*collision: lara_col_fastfall*/
 	item->speed = (item->speed * 95) / 100;
-	if (item->fallspeed == 154)
+
+	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED)
 		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
-}
 
-void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 9*/
-	/*state code: lara_as_fastfall*/
-	item->gravityStatus = true;
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
-	coll->Setup.ForwardAngle = info->moveAngle;
-	GetCollisionInfo(coll, item);
-	LaraSlideEdgeJump(item, coll);
-
-	if (coll->Middle.Floor <= 0 || TestLaraSwamp(item))
+	if (TestLaraLand(item))
 	{
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
@@ -148,10 +132,30 @@ void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_FREEFALL_LAND);
 
 		StopSoundEffect(SFX_TR4_LARA_FALL);
+		return;
+	}
 
-		item->fallspeed = 0;
-		item->gravityStatus = false;
+	item->goalAnimState = LS_FREEFALL;
+}
 
+// State:		LS_FREEFALL (9)
+// Control:		lara_as_freefall()
+void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	item->gravityStatus = true;
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	GetCollisionInfo(coll, item);
+
+	LaraSlideEdgeJump(item, coll);
+
+	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+	{
+		LaraResetGravityStatus(item, coll);
 		LaraSnapToHeight(item, coll);
 	}
 }
