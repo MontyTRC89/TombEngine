@@ -10,8 +10,8 @@ struct COLL_INFO;
 
 void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll);
-void lara_as_fastfall(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_fastfall(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_land(ITEM_INFO* item, COLL_INFO* coll);

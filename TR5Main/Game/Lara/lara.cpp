@@ -66,7 +66,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_turn_right_slow,//6
 	lara_as_turn_left_slow,//7
 	lara_as_death,//8
-	lara_as_fastfall,
+	lara_as_freefall,//9
 	lara_as_hang,
 	lara_as_reach,
 	lara_as_splat,
@@ -230,7 +230,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_turn_right_slow,
 	lara_col_turn_left_slow,
 	lara_col_death,
-	lara_col_fastfall,
+	lara_col_freefall,//9
 	lara_col_hang,
 	lara_col_reach,
 	lara_col_splat,
