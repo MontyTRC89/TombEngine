@@ -12,6 +12,7 @@
 #include "lara_jump.h"
 #include "lara_basic.h"
 #include "lara_slide.h"
+#include "lara_overhang.h"
 #include "Scripting/GameFlowScript.h"
 
 // -----------------------------
@@ -160,6 +161,8 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(85.0f);
 	if (item->fallspeed > LARA_FREEFALL_SPEED)
 		item->goalAnimState = LS_FREEFALL;
+
+	reach_slope_extra(item, coll);
 }
 
 void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
