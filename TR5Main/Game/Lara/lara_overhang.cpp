@@ -1,20 +1,14 @@
 #include "framework.h"
-#include "lara.h"
 #include "lara_overhang.h"
 #include "input.h"
 #include "camera.h"
 #include "control/control.h"
-#include "lara_collide.h"
 #include "lara_climb.h"
 #include "lara_tests.h"
-#include "lara_monkey.h"
 #include "collision/floordata.h"
 #include "collision/collide_room.h"
-#include "collision/collide_item.h"
 #include "items.h"
-#include "camera.h"
 #include "level.h"
-#include "Scripting/GameFlowScript.h"
 
 
 #define SLOPE_CHECK (slope.x == goal.x && slope.y == goal.y) // HACK - convert to subfuncs 
