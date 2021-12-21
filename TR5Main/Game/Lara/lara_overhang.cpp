@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "lara.h"
 #include "lara_overhang.h"
 #include "input.h"
 #include "camera.h"
