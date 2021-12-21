@@ -23,4 +23,5 @@ anims.monkeyTurn180 = true;
 anims.monkeyAutoJump = false;
 anims.oscillateHang = true;
 anims.pose = false;
+anims.overhang = true;
 SetAnimations(anims);
