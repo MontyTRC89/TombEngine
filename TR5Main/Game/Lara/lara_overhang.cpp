@@ -381,9 +381,10 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 			if (bridge1 < 0)
 				bridge1 = FindBridge(1, goalOrient, up, &height, -9 * CLICK(1) / 4, -5 * CLICK(1) / 4);
 
-			if (yDiff > -CLICK(1) && yDiff <= -CLICK(1) / 2 &&
-				((abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge1 >= 0))
-				SetAnimation(lara, LA_OVERHANG_SLOPE_MONKEY_CONCAVE); // slope to overhead monkey transition (concave)
+			// HACK: because of the different calculations of bridge height in TR4 and TEN, we need to lower yDiff tolerance to 0.9f.
+
+			if (yDiff > -CLICK(0.9f) && yDiff <= -CLICK(0.5f) && ((abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge1 >= 0))
+				SetAnimation(lara, LA_OVERHANG_SLOPE_MONKEY_CONCAVE); // Slope to overhead monkey transition (concave)
 		}
 	}
 	else if (TrInput & IN_BACK)
