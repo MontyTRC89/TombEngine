@@ -14,12 +14,12 @@
 /// traps
 
 /// necessary import
-#include "control/box.h"
-#include "collision/collide_item.h"
-#include "setup.h"
-#include "level.h"
+#include "Game/control/box.h"
+#include "Game/collision/collide_item.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 #include "object_helper.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {

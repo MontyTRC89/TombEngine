@@ -1,6 +1,6 @@
 #pragma once
-#include "collision/collide_room.h"
-#include "lara_struct.h"
+#include "Game/collision/collide_room.h"
+#include "Game/Lara/lara_struct.h"
 
 struct ITEM_INFO;
 struct COLL_INFO;

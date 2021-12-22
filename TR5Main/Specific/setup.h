@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objectslist.h"
+#include "Objects/objectslist.h"
 #include "phd_global.h"
 
 struct ITEM_INFO;

@@ -30,11 +30,11 @@
 #include "upv.h"
 #include "rubberboat.h"
 /// necessary import
-#include "collision/collide_item.h"
-#include "setup.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "control/box.h"
+#include "Game/collision/collide_item.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/box.h"
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];

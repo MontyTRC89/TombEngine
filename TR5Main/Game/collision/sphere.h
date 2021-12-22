@@ -1,5 +1,5 @@
 #pragma once
-#include "items.h"
+#include "Game/items.h"
 
 #define SPHERES_SPACE_LOCAL			0
 #define SPHERES_SPACE_WORLD			1

@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr2_worker_shotgun.h"
-#include "animation.h"
-#include "control/box.h"
+#include "Game/animation.h"
+#include "Game/control/box.h"
 #include "people.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
-#include "control/control.h"
-#include "itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/itemdata/creature_info.h"
 
 BITE_INFO workerShotgun = { 0, 281, 40, 9 };
 

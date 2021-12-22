@@ -22,9 +22,9 @@
 #include "tr5_submarine.h"	  // OK
 #include "tr5_willowwisp.h"	  // OK
 /// emitter
-#include "tr5_rats_emitter.h"
-#include "tr5_bats_emitter.h"
-#include "tr5_spider_emitter.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "tr5_smoke_emitter.h"
 /// objects
 #include "tr5_pushableblock.h"
@@ -52,19 +52,19 @@
 /// shatter
 #include "tr5_smashobject.h"
 /// necessary import
-#include "collision/collide_item.h"
-#include "lara_one_gun.h"
-#include "lara_flare.h"
-#include "lara_initialise.h"
-#include "pickup.h"
-#include "setup.h"
+#include "Game/collision/collide_item.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_initialise.h"
+#include "Game/pickup/pickup.h"
+#include "Specific/setup.h"
 #include "switch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "level.h"
+#include "Specific/level.h"
 /// register objects
 #include "object_helper.h"
-#include "itemdata/creature_info.h"
-#include "control/box.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/box.h"
 using namespace TEN::Entities::TR5;
 
 static void StartBaddy(OBJECT_INFO *obj)

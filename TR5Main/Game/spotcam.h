@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
 

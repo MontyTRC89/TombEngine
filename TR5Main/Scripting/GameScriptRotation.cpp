@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "GameScriptRotation.h"
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
