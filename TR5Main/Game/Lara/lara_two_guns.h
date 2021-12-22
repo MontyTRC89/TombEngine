@@ -1,5 +1,5 @@
 #pragma once
-#include "lara_struct.h"
+#include "Game/Lara/lara_struct.h"
 
 void AnimatePistols(LARA_WEAPON_TYPE weaponType);
 void PistolHandler(LARA_WEAPON_TYPE weaponType);

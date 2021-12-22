@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr5_genslot.h"
-#include "items.h"
-#include "level.h"
-#include "control/control.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "lara.h"
-#include "lara_collide.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_collide.h"
 
 void GenSlot1Control(short itemNumber)
 {

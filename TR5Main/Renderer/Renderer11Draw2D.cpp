@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Renderer11.h"
-#include "camera.h"
-#include "spotcam.h"
-#include "setup.h"
-#include "control/control.h"
-#include "effects/weather.h"
+#include "Renderer/Renderer11.h"
+#include "Game/camera.h"
+#include "Game/spotcam.h"
+#include "Specific/setup.h"
+#include "Game/control/control.h"
+#include "Game/effects/weather.h"
 
 using namespace TEN::Effects::Environment;
 

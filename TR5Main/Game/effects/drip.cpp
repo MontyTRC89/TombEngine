@@ -2,14 +2,14 @@
 #include "drip.h"
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "control/control.h"
-#include "level.h"
-#include "room.h"
-#include "Specific\trmath.h"
-#include "effects\effects.h"
-#include "effects\weather.h"
-#include "setup.h"
-#include "Specific\prng.h"
+#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Game/room.h"
+#include "Specific/trmath.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/weather.h"
+#include "Specific/setup.h"
+#include "Specific/prng.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;

@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr5_lagoon_witch.h"
-#include "items.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "gui.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/gui.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/itemdata/creature_info.h"
 
 #define STATE_LAGOON_WITCH_SWIM			1
 #define STATE_LAGOON_WITCH_STOP			2

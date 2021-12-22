@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
 #include "Game/Control/control.h"
-#include "collision/collide_item.h"
+#include "Game/collision/collide_item.h"
 #include "Game/effects/lara_fx.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
