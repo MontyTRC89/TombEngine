@@ -967,9 +967,9 @@ struct DiaryInfo
 struct LARA_ARM
 {
 	int frameBase;
-	short frameNumber;
-	short animNumber;
-	byte lock;
+	int frameNumber;
+	int animNumber;
+	bool lock;
 	short yRot;
 	short xRot;
 	short zRot;

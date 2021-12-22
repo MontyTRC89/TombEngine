@@ -190,7 +190,7 @@ void GuideControl(short itemNumber)
 	bool someFlag = false;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos1;
-	short frameNumber;
+	int frameNumber;
 	short random;
 
 	TENLog("Guide state:" + std::to_string(item->currentAnimState), LogLevel::Info);

@@ -13,7 +13,7 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 			if ((frameNumber <= 14 || frameNumber >= 24) && (frameNumber < 138 || frameNumber > 140))
 			{
