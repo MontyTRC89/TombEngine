@@ -15,6 +15,7 @@
 #include "Game/gui.h"
 #include "ObjectIDs.h"
 #include "GameScriptDisplayString.h"
+#include "GameScriptFreeFunctions.h"
 #include "ReservedScriptNames.h"
 #include "Game/camera.h"
 #include <Renderer/Renderer11Enums.h>
@@ -42,25 +43,6 @@ static void MakeSpecialTable(sol::state * state, std::string const & name, funcI
 	meta.set_function("__newindex", fni, objPtr);
 }
 
-static std::tuple<int, int> PercentToScreen(double x, double y)
-{
-	auto fWidth = static_cast<double>(g_Configuration.Width);
-	auto fHeight = static_cast<double>(g_Configuration.Height);
-	int resX = std::round(fWidth / 100.0 * x);
-	int resY = std::round(fHeight / 100.0 * y);
-	//todo this still assumes a resolution of 800/600. account for this somehow
-	return std::make_tuple(resX, resY);
-}
-
-static std::tuple<double, double> ScreenToPercent(int x, int y)
-{
-
-	auto fWidth = static_cast<double>(g_Configuration.Width);
-	auto fHeight = static_cast<double>(g_Configuration.Height);
-	double resX = x/fWidth * 100.0;
-	double resY = y/fHeight * 100.0;
-	return std::make_tuple(resX, resY);
-}
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
@@ -124,27 +106,6 @@ with a call to @{ShowString}, or this function will have no effect.
 */
 	m_lua->set_function(ScriptReserved_HideString, [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
 
-/***
-Translate a pair of percentages to screen-space pixel coordinates.
-To be used with @{DisplayString:SetPos} and @{DisplayString.new}.
-@function PercentToScreen
-@tparam float x percent value to translate to x-coordinate
-@tparam float y percent value to translate to y-coordinate
-@treturn int x x coordinate in pixels
-@treturn int y y coordinate in pixels
-*/
-	m_lua->set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
-
-/***
-Translate a pair of coordinates to percentages of window dimensions.
-To be used with @{DisplayString:GetPos}.
-@function ScreenToPercent
-@tparam int x pixel value to translate to a percentage of the window width
-@tparam int y pixel value to translate to a percentage of the window height
-@treturn float x coordinate as percentage
-@treturn float y coordinate as percentage
-*/
-	m_lua->set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
 	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
@@ -195,6 +156,7 @@ To be used with @{DisplayString:GetPos}.
 		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
 		);
 	GameScriptPosition::Register(m_lua);
+	GameScriptFreeFunctions::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
