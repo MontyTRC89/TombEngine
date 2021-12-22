@@ -1,5 +1,5 @@
 #pragma once
-#include "lara_struct.h"
+#include "Game/Lara/lara_struct.h"
 
 // Hanging and shimmying
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll);

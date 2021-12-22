@@ -1,5 +1,5 @@
 #pragma once
-#include "items.h"
+#include "Game/items.h"
 
 #define MAX_COLLECTED_PICKUPS 32
 

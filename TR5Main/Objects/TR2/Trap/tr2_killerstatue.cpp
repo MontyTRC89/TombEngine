@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr2_killerstatue.h"
-#include "level.h"
-#include "setup.h"
-#include "control/control.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Game/control/control.h"
+#include "Game/Lara/lara.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 void InitialiseKillerStatue(short itemNumber)
 {

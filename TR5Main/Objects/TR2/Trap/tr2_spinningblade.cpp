@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr2_spinningblade.h"
-#include "level.h"
-#include "control/control.h"
-#include "lara.h"
-#include "setup.h"
-#include "effects/effects.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/Lara/lara.h"
+#include "Specific/setup.h"
+#include "Game/effects/effects.h"
 #include "Sound/sound.h"
-#include "items.h"
-#include "animation.h"
+#include "Game/items.h"
+#include "Game/animation.h"
 
 void InitialiseSpinningBlade(short itemNumber)
 {

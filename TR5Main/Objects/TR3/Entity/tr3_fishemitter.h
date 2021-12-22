@@ -1,5 +1,5 @@
 #pragma once
-#include "items.h"
+#include "Game/items.h"
 
 void SetupShoal(int shoalNumber);
 void ControlFish(short itemNumber);

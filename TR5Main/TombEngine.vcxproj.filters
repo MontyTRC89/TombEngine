@@ -336,7 +336,6 @@
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
     <ClInclude Include="Game\effects\footprint.h" />
-    <ClInclude Include="Game\roomvector.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
