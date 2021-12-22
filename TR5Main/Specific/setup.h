@@ -33,8 +33,8 @@ enum ShatterType
 
 struct OBJECT_INFO
 {
-	short nmeshes; 
-	short meshIndex; 
+	int nmeshes; 
+	int meshIndex;
 	int boneIndex; 
 	int frameBase;
 	std::function<void(short itemNumber)> initialise;
