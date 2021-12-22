@@ -148,9 +148,6 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	auto probeMiddle = GetCollisionResult(item);
-	probeMiddle.Position.Ceiling -= item->pos.yPos - coll->Setup.Height;
-
 	if (TrInput & IN_FORWARD &&
 		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
@@ -171,7 +168,7 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		info->jumpDirection = LaraJumpDirection::Right;
 	}
-	else if (probeMiddle.Position.Ceiling < -(LARA_HEADROOM * 0.7f)) [[likely]]
+	else if (TestLaraStandingJump(item, coll, item->pos.yRot, 0)) [[likely]]
 		info->jumpDirection = LaraJumpDirection::Up;
 	else
 		info->jumpDirection = LaraJumpDirection::None;

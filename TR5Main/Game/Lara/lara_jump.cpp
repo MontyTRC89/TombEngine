@@ -253,13 +253,6 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 		return;
 
-	///////
-	if (info->waterStatus == LW_WADE)
-	{
-		item->goalAnimState = LS_JUMP_UP;
-		return;
-	}
-
 	if (TrInput & IN_LEFT &&
 		TrInput & (IN_FORWARD | IN_BACK))
 	{
@@ -275,53 +268,122 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
+	if (info->waterStatus == LW_WADE)
+	{
+		if (TestLaraStandingJump(item, coll, item->pos.yRot, 0))
+			item->goalAnimState = LS_JUMP_UP;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
 	if ((TrInput & IN_FORWARD ||
-			info->jumpDirection == LaraJumpDirection::Forward && !(TrInput & IN_DIRECTION)) &&
+			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot))
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
 		info->jumpDirection = LaraJumpDirection::Forward;
-		info->moveAngle = item->pos.yRot;
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-			info->jumpDirection == LaraJumpDirection::Back && !(TrInput & IN_DIRECTION)) &&
+			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
 	{
 		item->goalAnimState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
-		info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 		return;
 	}
 	
 	if ((TrInput & IN_LEFT ||
-			info->jumpDirection == LaraJumpDirection::Left && !(TrInput & IN_DIRECTION)) &&
+			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
 		info->jumpDirection = LaraJumpDirection::Left;
-		info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-			info->jumpDirection == LaraJumpDirection::Right && !(TrInput & IN_DIRECTION)) &&
+			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
 		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
 	{
 		item->goalAnimState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
-		info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 		return;
 	}
 	
-	item->goalAnimState = LS_JUMP_UP;
-	info->jumpDirection = LaraJumpDirection::Up;
+	if (TestLaraStandingJump(item, coll, item->pos.yRot, 0))
+	{
+		item->goalAnimState = LS_JUMP_UP;
+		info->jumpDirection = LaraJumpDirection::Up;
+		return;
+	}
+
+	item->goalAnimState = LS_IDLE;
+	info->jumpDirection = LaraJumpDirection::None;
 }
 
 // State:		LS_JUMP_PREPARE (15)
 // Collision:	lara_as_jump_prepare()
 void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
-	lara_col_idle(item, coll);
+	LaraInfo*& info = item->data;
+
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+
+	info->moveAngle = item->pos.yRot;
+	switch (info->jumpDirection)
+	{
+	case LaraJumpDirection::Back:
+		info->moveAngle += ANGLE(180.0f);
+		break;
+
+	case LaraJumpDirection::Left:
+		info->moveAngle -= ANGLE(90.0f);
+		break;
+
+	case LaraJumpDirection::Right:
+		info->moveAngle += ANGLE(90.0f);
+		break;
+
+	default:
+		break;
+	}
+	
+	coll->Setup.BadHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (TestLaraFall(item, coll))
+	{
+		SetLaraFallState(item);
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+		return;
+	}
+
+	ShiftItem(item, coll);
+
+	if (TestLaraStep(coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_JUMP_BACK (25)
