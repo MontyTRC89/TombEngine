@@ -1,6 +1,6 @@
 #pragma once
-#include "Specific\phd_global.h"
-#include "level.h"
+#include "Specific/phd_global.h"
+#include "Specific/level.h"
 
 struct ITEM_INFO;
 struct BITE_INFO;

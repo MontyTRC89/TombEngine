@@ -1,12 +1,12 @@
 #include "framework.h"
-#include "control/lot.h"
-#include "control/box.h"
-#include "setup.h"
-#include "camera.h"
-#include "lara.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "items.h"
+#include "Game/control/lot.h"
+#include "Game/control/box.h"
+#include "Specific/setup.h"
+#include "Game/camera.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32

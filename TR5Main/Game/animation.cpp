@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "animation.h"
-#include "Lara.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
-#include "Renderer11.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/camera.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
-#include "control/flipeffect.h"
-#include "items.h"
-#include "collision/collide_room.h"
+#include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/collision/collide_room.h"
 
 using TEN::Renderer::g_Renderer;
 

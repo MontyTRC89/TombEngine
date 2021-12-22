@@ -1,7 +1,7 @@
 #include "framework.h"
-#include "level.h"
+#include "Specific/level.h"
 #include "generic_bridge.h"
-#include "collision/floordata.h"
+#include "Game/collision/floordata.h"
 
 using namespace TEN::Floordata;
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "items.h"
-#include "collision/collide_room.h"
-#include "control/control.h"
+#include "Game/items.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
 
 void InitialiseTrapDoor(short itemNumber);
 void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);

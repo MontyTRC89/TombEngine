@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_teethspike.h"
 #include "control.h"
-#include "lara.h"
-#include "level.h"
-#include "Sound\sound.h"
-#include "effects\tomb4fx.h"
-#include "Specific\trmath.h"
-#include "setup.h"
-#include "items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Sound/sound.h"
+#include "Game/effects/tomb4fx.h"
+#include "Specific/trmath.h"
+#include "Specific/setup.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {
