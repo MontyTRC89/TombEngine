@@ -181,7 +181,7 @@ void HarpoonBoltControl(short itemNumber)
 	bool foundCollidedObjects = false;
 
 	// Found possible collided items and statics
-	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
+	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 1);
 
 	// If no collided items and meshes are found, then exit the loop
 	if (!CollidedItems[0] && !CollidedMeshes[0])
@@ -582,7 +582,7 @@ void GrenadeControl(short itemNumber)
 			// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 			// Found possible collided items and statics
-			GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], false);
+			GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
 
 			if (explode)
 			{
@@ -835,7 +835,7 @@ void RocketControl(short itemNumber)
 		// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 		// Found possible collided items and statics
-		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], true);
+		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], true);
 
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
@@ -1322,7 +1322,7 @@ void CrossbowBoltControl(short itemNumber)
 		// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 		// Found possible collided items and statics
-		GetCollidedObjects(item, radius, 1, &CollidedItems[0], &CollidedMeshes[0], true);
+		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], true);
 		
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
