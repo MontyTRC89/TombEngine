@@ -1,9 +1,9 @@
 #include "framework.h"
 #include "tr4_slicerdicer.h"
-#include "level.h"
+#include "Specific/level.h"
 #include "Sound/sound.h"
-#include "items.h"
-#include "animation.h"
+#include "Game/items.h"
+#include "Game/animation.h"
 #include "Specific/trmath.h"
 
 namespace TEN::Entities::TR4

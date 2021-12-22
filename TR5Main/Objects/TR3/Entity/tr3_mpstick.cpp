@@ -1,15 +1,15 @@
 #include "framework.h"
 #include "tr3_mpstick.h"
-#include "control/box.h"
-#include "effects/effects.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
 #include "people.h"
-#include "items.h"
-#include "setup.h"
-#include "control/lot.h"
-#include "level.h"
-#include "lara.h"
+#include "Game/items.h"
+#include "Specific/setup.h"
+#include "Game/control/lot.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 
 BITE_INFO mpstickBite1 = { 247, 10, 11, 13 };
 BITE_INFO mpstickBite2 = { 0, 0, 100, 6 };

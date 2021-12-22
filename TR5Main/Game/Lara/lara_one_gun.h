@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific\trmath.h"
+#include "Specific/trmath.h"
 
 struct ITEM_INFO;
 enum GRENADE_TYPE

@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_objects.h"
-#include "pickup.h"
+#include "Game/pickup/pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
@@ -68,13 +68,13 @@
 #include "motorbike.h"
 #include "jeep.h"
 /// necessary import
-#include "collision/collide_item.h"
+#include "Game/collision/collide_item.h"
 #include "Objects/Generic/Object/objects.h"
-#include "setup.h"
-#include "level.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 #include "tr4_enemy_jeep.h"
-#include "itemdata/creature_info.h"
-#include "control/box.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/box.h"
 
 using namespace TEN::Entities::TR4;
 

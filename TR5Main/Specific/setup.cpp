@@ -1,18 +1,18 @@
 #include "framework.h"
-#include "setup.h"
-#include "animation.h"
-#include "collision/collide_item.h"
-#include "control/flipeffect.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
+#include "Specific/setup.h"
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
 #include "switch.h"
-#include "room.h"
-#include "pickup.h"
-#include "camera.h"
+#include "Game/room.h"
+#include "Game/pickup/pickup.h"
+#include "Game/camera.h"
 #include "Objects/Generic/Object/objects.h"
 #include "rope.h"
 #include "Objects/Generic/Traps/traps.h"
-#include "level.h"
+#include "Specific/level.h"
 /// objects initializer
 #include "generic_objects.h"
 #include "tr1_objects.h"
@@ -26,7 +26,7 @@
 #include "object_helper.h"
 
 #include "fullblock_switch.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 #include <Objects/Effects/effect_objects.h>
 
 using namespace TEN::Entities::Switches;

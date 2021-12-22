@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "input.h"
-#include "lara.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
 #include "underwater_switch.h"
 #include "generic_switch.h"
-#include "camera.h"
-#include "collision/collide_item.h"
-#include "level.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Specific/level.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 
 namespace TEN::Entities::Switches

@@ -1,6 +1,6 @@
 #pragma once
-#include "items.h"
-#include "collision/collide_room.h"
+#include "Game/items.h"
+#include "Game/collision/collide_room.h"
 
 void InitialiseSkidoo(short itemNum);
 void SkidooCollision(short itemNum, ITEM_INFO* litem, COLL_INFO* coll);

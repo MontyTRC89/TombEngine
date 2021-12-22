@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "tr5_smoke_emitter.h"
-#include "objectslist.h"
-#include "items.h"
-#include "level.h"
+#include "Objects/objectslist.h"
+#include "Game/items.h"
+#include "Specific/level.h"
 #include "Specific/trmath.h"
 
 void InitialiseSmokeEmitter(short itemNumber)
