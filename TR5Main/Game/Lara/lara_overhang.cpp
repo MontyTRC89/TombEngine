@@ -9,7 +9,8 @@
 #include "collision/floordata.h"
 #include "collision/collide_room.h"
 #include "items.h"
-#include "level.h"
+#include "items.h"
+#include "setup.h"
 #include "Scripting/GameFlowScript.h"
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
@@ -30,6 +31,82 @@ inline bool SlopeInvCheck(Vector2 slope, Vector2 goal)
 bool TestMonkey(FLOOR_INFO* floor, int x, int y, int z)
 {
 	return GetCollisionResult(floor, x, y, z).BottomBlock->Flags.Monkeyswing;
+}
+
+short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight, int minCeilY = 0, int maxCeilY = 0)
+{
+	short bridgeSlot;
+
+	switch (tiltGrade)
+	{
+	case 0:
+		bridgeSlot = ID_BRIDGE_FLAT;
+		break;
+	case 1:
+		bridgeSlot = ID_BRIDGE_TILT1;
+		break;
+	case 2:
+		bridgeSlot = ID_BRIDGE_TILT2;
+		break;
+	case 3:
+		bridgeSlot = ID_BRIDGE_TILT3;
+		break;
+	case 4:
+		bridgeSlot = ID_BRIDGE_TILT4;
+		break;
+	default:
+		bridgeSlot = ID_BRIDGE_CUSTOM;
+		break;
+	}
+
+	int xmin = pos.x & ~WALL_MASK;
+	int xmax = xmin + WALL_MASK;
+	int zmin = pos.z & ~WALL_MASK;
+	int zmax = zmin + WALL_MASK;
+
+	for (int i = 0; i < g_Level.Items.size(); i++)
+	{
+		auto obj = &g_Level.Items[i];
+		i++;
+
+		if (obj->objectNumber != bridgeSlot)
+			continue;
+
+		short facingDiff = (short)(obj->pos.yRot - facing);
+
+		bool facingCheck = false;
+		if (facingDiff == ANGLE(90))
+			facingCheck = true;
+		else if (obj->objectNumber == ID_BRIDGE_FLAT)
+			facingCheck = true;
+		else if ((obj->objectNumber == ID_BRIDGE_TILT1 || obj->objectNumber == ID_BRIDGE_TILT2) && abs(facingDiff) == ANGLE(90))
+			facingCheck = true;
+
+		if (!facingCheck)
+			continue;
+
+		if (obj->pos.xPos >= xmin &&
+			obj->pos.xPos <= xmax &&
+			obj->pos.zPos >= zmin &&
+			obj->pos.zPos <= zmax)
+		{
+			if (minCeilY || maxCeilY)
+			{
+				if (Objects[obj->objectNumber].ceiling == nullptr)
+					continue;
+
+				*returnHeight = Objects[obj->objectNumber].ceiling(i, pos.x, pos.y, pos.z).value_or(NO_HEIGHT);
+				
+				int ceilingDist = *returnHeight - pos.y;
+				if (ceilingDist >= minCeilY && ceilingDist <= maxCeilY)
+					return i;
+			}
+			else
+				return i;
+		}
+	}
+
+	return NO_ITEM;
 }
 
 // Get the signed diff between two orients
@@ -276,7 +353,7 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 			int height; // Height variable for bridge ceiling functions
 
 			// Test for upwards slope to climb
-			short bridge1 = -1; // FindBridge(4, lara->pos.yRot, up, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2); FIXME
+			short bridge1 = FindBridge(4, lara->pos.yRot, up, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2);
 			if (yDiff >= -5 * CLICK(1) / 4 && yDiff <= -3 * CLICK(1) / 4 && (SlopeCheck(slope, goal) || bridge1 >= 0))
 			{
 				// do one more check for wall/ceiling step 2*offX/Z further to avoid lara sinking her head in wall/step
@@ -293,9 +370,9 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 			}
 
 			// Test for flat monkey (abs(slope) < 2)
-			bridge1 = -1; // FindBridge(0, goalOrient, up, &height, -9 * CLICK(1) / 4, -5 * CLICK(1) / 4); FIXME
+			bridge1 = FindBridge(0, goalOrient, up, &height, -9 * CLICK(1) / 4, -5 * CLICK(1) / 4);
 			if (bridge1 < 0)
-				bridge1 = -1; // FindBridge(1, goalOrient, up, &height, -9 * CLICK(1) / 4, -5 * CLICK(1) / 4); FIXME
+				bridge1 = FindBridge(1, goalOrient, up, &height, -9 * CLICK(1) / 4, -5 * CLICK(1) / 4);
 
 			if (yDiff > -CLICK(1) && yDiff <= -CLICK(1) / 2 &&
 				((abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge1 >= 0))
@@ -323,15 +400,15 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 			int yDiff = GetCeiling(floorNext, down.x, down.y, down.z) - ceiling;
 
 			// Test for flat monkey (abs(slope) < 2)
-			short bridge1 = -1; // FindBridge(0, goalOrient, down, &height, -3 * CLICK(1), -2 * CLICK(1)); FIXME
+			short bridge1 = FindBridge(0, goalOrient, down, &height, -3 * CLICK(1), -2 * CLICK(1));
 			if (bridge1 < 0)
-				bridge1 = -1; // FindBridge(1, goalOrient, down, &height, -3 * CLICK(1), -2 * CLICK(1)); FIXME
+				bridge1 = FindBridge(1, goalOrient, down, &height, -3 * CLICK(1), -2 * CLICK(1));
 
 			if ((abs(yDiff) < CLICK(1) && abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge1 >= 0)
 				SetAnimation(lara, LA_OVERHANG_SLOPE_MONKEY_CONVEX); // Force slope to underlying monkey transition (convex)
 
 			// Test for downwards slope to climb
-			bridge1 = -1; // FindBridge(4, goalOrient, down, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2); FIXME
+			bridge1 = FindBridge(4, goalOrient, down, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2);
 			if (yDiff >= 3 * CLICK(1) / 4 && yDiff <= 5 * CLICK(1) / 4 && (SlopeCheck(slope, goal) || bridge1 >= 0))
 			{
 				SetAnimation(lara, lara->animNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
@@ -442,7 +519,7 @@ void lara_col_slopehang(ITEM_INFO* lara, COLL_INFO* coll)
 				int yDiff = GetCeiling(floorNext, shimmy.x, shimmy.y, shimmy.z) - ceiling;
 
 				int height;
-				short bridge1 = -1; // FindBridge(4, goalOrient, shimmy, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2); FIXME
+				short bridge1 = FindBridge(4, goalOrient, shimmy, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2);
 
 				if ((SlopeCheck(slope, goal) && abs(yDiff) < 64) || bridge1 >= 0)
 					SetAnimation(lara, dir < 0 ? LA_OVERHANG_SHIMMY_LEFT : LA_OVERHANG_SHIMMY_RIGHT);
@@ -510,7 +587,7 @@ void lara_col_slopeshimmy(ITEM_INFO* lara, COLL_INFO* coll)
 		int yDiff = GetCeiling(floorNext, shimmy.x, shimmy.y, shimmy.z) - ceiling;
 
 		int height;
-		short bridge1 = -1; // FindBridge(4, goalOrient, shimmy, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2); fixme
+		short bridge1 = FindBridge(4, goalOrient, shimmy, &height, -5 * CLICK(1) / 2, -3 * CLICK(1) / 2); 
 
 		if ((SlopeCheck(slope, goal) && abs(yDiff) < 64) || bridge1 >= 0)
 			cancelShimmy = false;
@@ -821,7 +898,7 @@ void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* col)
 		slope = floorNow->TiltXZ(now.x, now.z, false);
 
 		int height;
-		short bridge1 = -1; // FindBridge(4, goalOrient, now, &height, -4 * CLICK(1), -5 * (CLICK(1) / 2)); fixme
+		short bridge1 = FindBridge(4, goalOrient, now, &height, -4 * CLICK(1), -5 * (CLICK(1) / 2)); 
 
 		if (abs(slope.x) > 2 || abs(slope.y) > 2 || bridge1 >= 0)
 		{
@@ -876,7 +953,7 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				short facing = lara->pos.yRot + 0x2000;
 				facing &= 0xC000;
 
-				short bridge1 = -1; // FindBridge(4, facing, now, &height, -4 * CLICK(1), -3 * CLICK(1)); FIXME
+				short bridge1 = FindBridge(4, facing, now, &height, -4 * CLICK(1), -3 * CLICK(1)); 
 
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
@@ -901,7 +978,7 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				short facing = lara->pos.yRot + 0x2000;
 				facing &= 0xC000;
 
-				short bridge1 = -1; // FindBridge(4, facing, down, &height, -CLICK(1) / 2, -CLICK(1) / 4); FIXME
+				short bridge1 = FindBridge(4, facing, down, &height, -CLICK(1) / 2, -CLICK(1) / 4); 
 
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
@@ -952,13 +1029,13 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				int height;
 				if (!GetFrameNumber(lara, 0))
 				{
-					short bridge1 = -1; // FindBridge(4, goalOrient, down, &height, -CLICK(1) * 3, CLICK(1) * 4); fixme
+					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(1) * 3, CLICK(1) * 4); 
 					if (ceilDist < CLICK(1) && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 						lara->goalAnimState = 56;
 				}
 				else if (GetFrameNumber(lara, 0) == midpoint)
 				{
-					short bridge1 = -1; // FindBridge(4, goalOrient, down, &height, -CLICK(1) * 2, CLICK(1) * 5); fixme
+					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(1) * 2, CLICK(1) * 5); 
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
 						lara->pos.yPos += CLICK(1); // do midpoint Y translation
@@ -1006,7 +1083,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 			short facing = lara->pos.yRot + 0x2000;
 			facing &= 0xC000;
 
-			short bridge1 = -1; // FindBridge(4, facing, now, &height, -7 * CLICK(1) / 2, -5 * CLICK(1) / 2); fixme
+			short bridge1 = FindBridge(4, facing, now, &height, -7 * CLICK(1) / 2, -5 * CLICK(1) / 2); 
 
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
@@ -1039,7 +1116,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 
 					int height;
 
-					short bridge1 = -1; // FindBridge(4, goalOrient, down, &height, -7 * CLICK(1) >> 1, -5 * CLICK(1) >> 1); fixme
+					short bridge1 = FindBridge(4, goalOrient, down, &height, -7 * CLICK(1) >> 1, -5 * CLICK(1) >> 1);
 					if ((SlopeCheck(slope, goal) && yDiff > 0 && yDiff < CLICK(1)) || bridge1 >= 0)
 					{
 						AlignToEdge(lara, 154);
@@ -1048,7 +1125,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 						//PerformFlipeffect(NULL, 51, 1, 2); // Disable the UP key command for 2 sec // HACK!!!
 					}
 
-					bridge1 = -1; // FindBridge(4, goalOrient + 0x8000, down, &height, -5 * CLICK(1), -4 * CLICK(1)); fixme
+					bridge1 = FindBridge(4, goalOrient + 0x8000, down, &height, -5 * CLICK(1), -4 * CLICK(1));
 					if ((SlopeInvCheck(slope, goal) && yDiff > -CLICK(1) && yDiff < 0) || bridge1 >= 0)
 					{
 						AlignToEdge(lara, 154);
