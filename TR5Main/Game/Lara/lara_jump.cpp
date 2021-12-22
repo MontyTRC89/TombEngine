@@ -25,7 +25,12 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
 		return;
+	}
 
 	// runJumpCount?
 	// Update running jump counter in preparation for possible dispatch soon after landing.
@@ -121,8 +126,11 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = (item->speed * 95) / 100;
 
-	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED)
+	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
+		item->hitPoints > 0)
+	{
 		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
+	}
 
 	if (TestLaraLand(item))
 	{
@@ -169,7 +177,12 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(85.0f);
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
 		return;
+	}
 
 	if (TrInput & IN_LEFT)
 	{
@@ -251,7 +264,10 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_IDLE;
 		return;
+	}
 
 	if (TrInput & IN_LEFT &&
 		TrInput & (IN_FORWARD | IN_BACK))
@@ -395,6 +411,14 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 	Camera.targetAngle = ANGLE(135.0f);
 
+	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
@@ -444,6 +468,14 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 
+	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
 	if (TestLaraLand(item))
 	{
 		if (LaraLandedBad(item, coll))
@@ -485,6 +517,14 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 
+	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
 	if (TestLaraLand(item))
 	{
 		if (LaraLandedBad(item, coll))
@@ -518,41 +558,72 @@ void lara_col_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraJumpCollision(item, coll, item->pos.yRot - ANGLE(90.0f));
 }
 
-void lara_as_upjump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_JUMP_UP (27)
+// Collision:	lara_col_jump_up()
+void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
 	info->look = false;
 
-	/*state 28*/
-	/*collision: lara_col_upjump*/
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
-	{
-		item->goalAnimState = LS_FREEFALL;
-	}
-}
-
-void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	/*state 28*/
-	/*state code: lara_as_upjump*/
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item))
+			item->goalAnimState = LS_IDLE;
+
+		return;
+	}
+
+	if (TestLaraLand(item))
 	{
 		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
-	info->moveAngle = item->pos.yRot;
+	if (TrInput & IN_FORWARD)
+	{
+		item->speed += 2;
+		if (item->speed > 5)
+			item->speed = 5;
 
+		item->pos.xRot -= std::min((short)(LARA_LEAN_RATE / 3), (short)(abs(ANGLE(item->speed) - item->pos.xRot) / 3)) * 1;
+		info->headXrot -= (ANGLE(5.0f) - item->pos.zRot) / 3;
+
+	}
+	else if (TrInput & IN_BACK)
+	{
+		item->speed -= 2;
+		if (item->speed < -5)
+			item->speed = -5;
+
+		item->pos.xRot += std::min((short)(LARA_LEAN_RATE / 3), (short)(abs(ANGLE(item->speed) - item->pos.xRot) / 3)) * 1;
+		info->headYrot += (ANGLE(10.0f) - item->pos.zRot) / 3;
+	}
+	else
+		item->speed = item->speed <= 0 ? -2 : 2;
+
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	{
+		item->goalAnimState = LS_FREEFALL;
+		return;
+	}
+
+	item->goalAnimState = LS_JUMP_UP;
+}
+
+// State:		LS_JUMP_UP (28)
+// Control:		lara_as_jump_up()
+void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = item->speed < 0 ? info->moveAngle + ANGLE(180.0f) : info->moveAngle;
+	coll->Setup.ForwardAngle = (item->speed >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
-
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHangJumpUp(item, coll))
@@ -561,38 +632,16 @@ void lara_col_upjump(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType == CT_CLAMP ||
 		coll->CollisionType == CT_TOP ||
 		coll->CollisionType == CT_TOP_FRONT)
+	{
 		item->fallspeed = 1;
+	}
 
 	ShiftItem(item, coll);
 
-	if (coll->CollisionType == CT_NONE)
+	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
-		if (item->fallspeed < -70)
-		{
-			if (TrInput & IN_FORWARD && item->speed < 5)
-			{
-				item->speed++;
-			}
-			else if (TrInput & IN_BACK && item->speed > -5)
-			{
-				item->speed -= 2;
-			}
-		}
-	}
-	else
-	{
-		item->speed = item->speed <= 0 ? -2 : 2;
-	}
-
-	if (item->fallspeed > 0 && coll->Middle.Floor <= 0)
-	{
-		item->goalAnimState = LaraLandedBad(item, coll) ? LS_DEATH : LS_IDLE;
-
-		item->gravityStatus = false;
-		item->fallspeed = 0;
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		LaraResetGravityStatus(item, coll);
+		LaraSnapToHeight(item, coll);
 	}
 }
 
@@ -635,7 +684,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed > LARA_FREEFALL_SPEED)
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
 		return;
