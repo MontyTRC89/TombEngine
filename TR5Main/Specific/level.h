@@ -75,21 +75,6 @@ struct AI_OBJECT
 	std::string luaName;
 };
 
-struct CHANGE_STRUCT
-{
-	short goalAnimState;
-	short numberRanges;
-	short rangeIndex;
-};
-
-struct RANGE_STRUCT
-{
-	short startFrame;
-	short endFrame;
-	short linkAnimNum;
-	short linkFrameNum;
-};
-
 struct SPRITE
 {
 	int tile;

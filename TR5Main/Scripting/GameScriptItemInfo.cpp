@@ -121,11 +121,11 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
-	short currentAnimState,
-	short requiredAnimState,
-	short goalAnimState,
-	short animNumber,
-	short frameNumber,
+	int currentAnimState,
+	int requiredAnimState,
+	int goalAnimState,
+	int animNumber,
+	int frameNumber,
 	short hp,
 	short ocb,
 	sol::as_table_t<std::array<short, 8>> flags,
@@ -410,17 +410,17 @@ void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> cons
 	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
 }
 
-short GameScriptItemInfo::GetCurrentAnimState() const
+int GameScriptItemInfo::GetCurrentAnimState() const
 {
 	return m_item->currentAnimState;
 }
 
-void GameScriptItemInfo::SetCurrentAnimState(short animState)
+void GameScriptItemInfo::SetCurrentAnimState(int animState)
 {
 	m_item->currentAnimState = animState;
 }
 
-short GameScriptItemInfo::GetRequiredAnimState() const
+int GameScriptItemInfo::GetRequiredAnimState() const
 {
 	return m_item->requiredAnimState;
 }
@@ -430,34 +430,34 @@ void GameScriptItemInfo::SetRequiredAnimState(short animState)
 	m_item->requiredAnimState = animState;
 }
 
-short GameScriptItemInfo::GetGoalAnimState() const
+int GameScriptItemInfo::GetGoalAnimState() const
 {
 	return m_item->goalAnimState;
 }
 
-void GameScriptItemInfo::SetGoalAnimState(short state)
+void GameScriptItemInfo::SetGoalAnimState(int state)
 {
 	m_item->goalAnimState = state;
 }
 
-short GameScriptItemInfo::GetAnimNumber() const
+int GameScriptItemInfo::GetAnimNumber() const
 {
 	return m_item->animNumber - Objects[m_item->objectNumber].animIndex;
 }
 
-void GameScriptItemInfo::SetAnimNumber(short animNumber)
+void GameScriptItemInfo::SetAnimNumber(int animNumber)
 {
 	//TODO fixme: we need bounds checking with an error message once it's in the level file format
 	m_item->animNumber = animNumber +  Objects[m_item->objectNumber].animIndex;
 }
 
-short GameScriptItemInfo::GetFrameNumber() const
+int GameScriptItemInfo::GetFrameNumber() const
 {
 	return m_item->frameNumber - g_Level.Anims[m_item->animNumber].frameBase;
 }
 
 
-void GameScriptItemInfo::SetFrameNumber(short frameNumber)
+void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 {
 	auto const fBase = g_Level.Anims[m_item->animNumber].frameBase;
 	auto const fEnd = g_Level.Anims[m_item->animNumber].frameEnd;
