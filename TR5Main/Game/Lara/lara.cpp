@@ -85,7 +85,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_jump_back,//25
 	lara_as_jump_right,//26
 	lara_as_jump_left,//27
-	lara_as_upjump,//28
+	lara_as_jump_up,//28
 	lara_as_fall_back,//29
 	lara_as_hangleft,//30
 	lara_as_hangright,//31
@@ -249,7 +249,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_back,//25
 	lara_col_jump_right,//26
 	lara_col_jump_left,//27
-	lara_col_upjump,
+	lara_col_jump_up,//28
 	lara_col_fall_back,//29
 	lara_col_hangleft,
 	lara_col_hangright,

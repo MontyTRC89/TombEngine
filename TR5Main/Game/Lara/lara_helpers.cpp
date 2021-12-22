@@ -332,6 +332,12 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.zRot = 0;
 	}
 
+	// Temp.
+	if (abs(item->pos.xRot) > ANGLE(0.1f))
+		item->pos.xRot += item->pos.xRot / -6;
+	else
+		item->pos.xRot = 0;
+
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) &&
 		coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&
