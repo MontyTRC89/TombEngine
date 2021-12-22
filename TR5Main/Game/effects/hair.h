@@ -1,6 +1,5 @@
 #pragma once
-
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 
 constexpr auto HAIR_MAX = 2; // HAIR_NORMAL = 0, HAIR_YOUNG = 1
 constexpr auto HAIR_SEGMENTS = 6; // classic = 7, young = 14

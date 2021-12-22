@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr3_civvy.h"
-#include "control/box.h"
-#include "effects\effects.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
 #include "people.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "Sound\sound.h"
-#include "itemdata/creature_info.h"
-#include "items.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 
 BITE_INFO civvy_hit = { 0,0,0, 13 };
 

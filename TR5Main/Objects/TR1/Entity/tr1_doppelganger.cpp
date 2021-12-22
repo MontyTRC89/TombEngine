@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr1_doppelganger.h"
-#include "items.h"
-#include "lara_fire.h"
-#include "misc.h"
-#include "level.h"
-#include "lara.h"
-#include "control/control.h"
-#include "animation.h"
+#include "Game/items.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/misc.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/animation.h"
 
 // TODO: Evil lara is not targetable and cant move like lara.
 

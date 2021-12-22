@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr5_bodypart.h"
-#include "effects\effects.h"
-#include "Specific\trmath.h"
-#include "Sound\sound.h"
+#include "Game/effects/effects.h"
+#include "Specific/trmath.h"
+#include "Sound/sound.h"
 #include "tr5_missile.h"
-#include "control/control.h"
-#include "items.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
 void ControlBodyPart(short fxNumber)
 {
 	FX_INFO* fx = &EffectList[fxNumber];

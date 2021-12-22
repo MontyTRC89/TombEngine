@@ -1,6 +1,6 @@
 #pragma once
 #include "Specific/phd_global.h"
-#include "items.h"
+#include "Game/items.h"
 
 enum class CAMERA_TYPE
 {

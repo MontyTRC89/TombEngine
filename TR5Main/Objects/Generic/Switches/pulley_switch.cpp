@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "pulley_switch.h"
-#include "control/control.h"
-#include "input.h"
-#include "lara.h"
+#include "Game/control/control.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
 #include "generic_switch.h"
 #include "Sound/sound.h"
-#include "pickup.h"
-#include "level.h"
-#include "collision/collide_item.h"
-#include "items.h"
+#include "Game/pickup/pickup.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::Switches
 {
