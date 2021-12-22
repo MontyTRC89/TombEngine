@@ -1,13 +1,6 @@
 #pragma once
 #include "trmath.h"
 
-constexpr short FACING_NORTH = 0;
-constexpr short FACING_EAST = 16384;
-constexpr short FACING_SOUTH = -32768;
-constexpr short FACING_WEST = -16384;
-
-constexpr auto HEIGHT_ADJUST = 20 + CLICK(2);
-
 void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_slopefall(ITEM_INFO* lara, COLL_INFO* coll);

@@ -16,6 +16,14 @@
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
 constexpr auto HORIZONTAL_ALIGN_SOUTHWEST = 101;
 
+constexpr short FACING_NORTH = 0;
+constexpr short FACING_EAST = 16384;
+constexpr short FACING_SOUTH = -32768;
+constexpr short FACING_WEST = -16384;
+
+constexpr auto HEIGHT_ADJUST = 20 + CLICK(2);
+
+
 // **************  Utility functions section  *************** //
 
 inline bool SlopeCheck(Vector2 slope, Vector2 goal)
@@ -161,7 +169,7 @@ bool InStrip(int x, int z, short facing, int min, int max)
 
 
 // Align facing and X/Z pos to sector edg
-void AlignToEdge(ITEM_INFO* lara, WORD edgeDist)
+void AlignToEdge(ITEM_INFO* lara, short edgeDist)
 {
 	if (edgeDist > WALL_MASK)
 		edgeDist = WALL_MASK;
