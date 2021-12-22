@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr5_romehammer.h"
-#include "items.h"
-#include "level.h"
+#include "Game/items.h"
+#include "Specific/level.h"
 
 void InitialiseRomeHammer(short itemNumber)
 {

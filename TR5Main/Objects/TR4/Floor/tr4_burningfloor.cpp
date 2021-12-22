@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_burningfloor.h"
-#include "level.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Game/items.h"
 
 void InitialiseBurningFloor(short itemNum)
 {
