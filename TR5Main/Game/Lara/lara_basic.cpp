@@ -2189,11 +2189,11 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}
 
-	// TODO: What?
+	// TODO: Make this state a true jump?
 	if (item->goalAnimState != LS_DEATH &&
 		item->goalAnimState != LS_IDLE &&
 		item->goalAnimState != LS_RUN_FORWARD &&
-		item->fallspeed > LARA_FREEFALL_SPEED)
+		item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
 	}
@@ -2205,7 +2205,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->moveAngle = (item->speed < 0) ? item->pos.yRot + ANGLE(180.0f) : item->pos.yRot;
+	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;

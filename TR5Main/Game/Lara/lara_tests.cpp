@@ -1027,13 +1027,12 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dis
 {
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, dist, coll->Setup.Height);
-	probe.Position.Ceiling -= item->pos.yPos - coll->Setup.Height;
 
 	// TODO: Check with bridges (again!).
-	if (!TestLaraSwamp(item) &&									// Swamp failsafe.
+	if (!TestLaraSwamp(item) &&																// Swamp failsafe.
 		!TestLaraFacingCorner(item, angle, dist) &&
-		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&			// Highest floor bound.
-		probe.Position.Ceiling < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
+		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Highest floor bound.
+		(probe.Position.Ceiling - y - coll->Setup.Height) < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
