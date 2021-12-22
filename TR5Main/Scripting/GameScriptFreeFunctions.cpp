@@ -140,6 +140,26 @@ namespace GameScriptFreeFunctions {
 		return static_cast<int>(round(result));
 	}
 
+	static std::tuple<int, int> PercentToScreen(double x, double y)
+	{
+		auto fWidth = static_cast<double>(g_Configuration.Width);
+		auto fHeight = static_cast<double>(g_Configuration.Height);
+		int resX = std::round(fWidth / 100.0 * x);
+		int resY = std::round(fHeight / 100.0 * y);
+		//todo this still assumes a resolution of 800/600. account for this somehow
+		return std::make_tuple(resX, resY);
+	}
+
+	static std::tuple<double, double> ScreenToPercent(int x, int y)
+	{
+
+		auto fWidth = static_cast<double>(g_Configuration.Width);
+		auto fHeight = static_cast<double>(g_Configuration.Height);
+		double resX = x / fWidth * 100.0;
+		double resY = y / fHeight * 100.0;
+		return std::make_tuple(resX, resY);
+	}
+
 
 	void Register(sol::state* lua) {
 		///Set and play an ambient track
@@ -186,7 +206,6 @@ namespace GameScriptFreeFunctions {
 		//@function SetInvItemCount
 		//@tparam @{InvItem} item the item to be set
 		//@tparam int count the number of items the player will have
-		
 		lua->set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
 
 	
@@ -195,7 +214,6 @@ namespace GameScriptFreeFunctions {
 		//@tparam Position posA first position
 		//@tparam Position posB second position
 		//@treturn int the direct distance from one position to the other
-		
 		lua->set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 		
@@ -204,8 +222,26 @@ namespace GameScriptFreeFunctions {
 		//@tparam Position posA first position
 		//@tparam Position posB second position
 		//@treturn int the direct distance on the XZ plane from one position to the other
-		
 		lua->set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-	}
 
+
+		///Translate a pair of percentages to screen-space pixel coordinates.
+		//To be used with @{DisplayString:SetPos} and @{DisplayString.new}.
+		//@function PercentToScreen
+		//@tparam float x percent value to translate to x-coordinate
+		//@tparam float y percent value to translate to y-coordinate
+		//@treturn int x x coordinate in pixels
+		//@treturn int y y coordinate in pixels
+		lua->set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+
+
+		///Translate a pair of coordinates to percentages of window dimensions.
+		//To be used with @{DisplayString:GetPos}.
+		//@function ScreenToPercent
+		//@tparam int x pixel value to translate to a percentage of the window width
+		//@tparam int y pixel value to translate to a percentage of the window height
+		//@treturn float x coordinate as percentage
+		//@treturn float y coordinate as percentage
+		lua->set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+	}
 }
