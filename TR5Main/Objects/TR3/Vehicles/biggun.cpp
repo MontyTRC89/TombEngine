@@ -141,8 +141,8 @@ void BigGunCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
-			CreateFlare(lara, ID_FLARE_ITEM, 0);
-			undraw_flare_meshes(lara);
+			CreateFlare(lara, ID_FLARE_ITEM, false);
+			UndrawFlareMeshes(lara);
 
 			laraInfo->flareControlLeft = false;
 			laraInfo->requestGunType = WEAPON_NONE;
@@ -251,7 +251,7 @@ bool BigGunControl(ITEM_INFO* lara, COLL_INFO* coll)
 		bigGun->animNumber = Objects[ID_BIGGUN].animIndex + (lara->animNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
 		bigGun->frameNumber = g_Level.Anims[bigGun->animNumber].frameBase + (lara->frameNumber - g_Level.Anims[lara->animNumber].frameBase);
 
-		if (bigGunInfo->flags & BGUN_FLAG_DISMOUNT && TestLastFrame(lara, lara->animNumber))
+		if (bigGunInfo->flags & BGUN_FLAG_DISMOUNT && TestLastFrame(lara))
 		{
 			SetAnimation(lara, LA_STAND_IDLE);
 			laraInfo->Vehicle = NO_ITEM;

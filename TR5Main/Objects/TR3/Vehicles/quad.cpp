@@ -238,7 +238,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		return true;
 
 	if ((lara->currentAnimState == QUAD_STATE_DISMOUNT_RIGHT || lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT) &&
-		TestLastFrame(lara, lara->animNumber))
+		TestLastFrame(lara))
 	{
 		if (lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT)
 			lara->pos.yRot += ANGLE(90.0f);
@@ -1182,7 +1182,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
 			CreateFlare(lara, ID_FLARE_ITEM, 0);
-			undraw_flare_meshes(lara);
+			UndrawFlareMeshes(lara);
 			laraInfo->flareControlLeft = 0;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}

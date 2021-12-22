@@ -26,6 +26,7 @@ GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
 	GameScriptMirror::Register(m_lua);
 	GameScriptInventoryObject::Register(m_lua);
 	GameScriptSettings::Register(m_lua);
+	GameScriptAnimations::Register(m_lua);
 	GameScriptAudioTrack::Register(m_lua);
 	GameScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
@@ -77,6 +78,11 @@ settings.lua shouldn't be bundled with any finished levels/games.
 @tparam Settings settings a settings object 
 */
 	m_lua->set_function("SetSettings", &GameFlow::SetSettings, this);
+/***
+@function SetSettings
+@tparam Settings settings a settings object 
+*/
+	m_lua->set_function("SetAnimations", &GameFlow::SetAnimations, this);
 
 /*** tracks.lua.
 __TODO CONFIRM PROPER BEHAVIOUR__
@@ -137,6 +143,11 @@ void GameFlow::SetStrings(sol::nested<std::unordered_map<std::string, std::vecto
 void GameFlow::SetSettings(GameScriptSettings const & src)
 {
 	m_settings = src;
+}
+
+void GameFlow::SetAnimations(GameScriptAnimations const& src)
+{
+	Animations = src;
 }
 
 void GameFlow::AddLevel(GameScriptLevel const& level)
