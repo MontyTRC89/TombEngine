@@ -1,15 +1,15 @@
 #include "framework.h"
 #include "tr5_chef.h"
-#include "items.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
 #include "people.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 
 #define STATE_CHEF_COOKING			1
 #define STATE_CHEF_TURN_180			2

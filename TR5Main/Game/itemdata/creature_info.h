@@ -1,6 +1,6 @@
 #pragma once
-#include "phd_global.h"
 #include <vector>
+#include "Specific/phd_global.h"
 
 struct BOX_NODE {
 	int exitBox;

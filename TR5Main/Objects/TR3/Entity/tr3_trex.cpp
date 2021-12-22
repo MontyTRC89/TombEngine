@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr3_trex.h"
-#include "items.h"
-#include "control/box.h"
-#include "camera.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "itemdata/creature_info.h"
-#include "control/control.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/camera.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/control.h"
 
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {

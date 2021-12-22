@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr4_jeanyves.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "control/control.h"
-#include "animation.h"
-#include "items.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 void InitialiseJeanYves(short itemNumber)
 {
