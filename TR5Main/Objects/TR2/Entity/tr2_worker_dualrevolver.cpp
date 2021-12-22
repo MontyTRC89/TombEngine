@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr2_worker_dualrevolver.h"
-#include "control/box.h"
+#include "Game/control/box.h"
 #include "people.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "itemdata/creature_info.h"
-#include "items.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 
 BITE_INFO workerDualGunL = { -2, 275, 23, 6 };
 BITE_INFO workerDualGunR = { 2, 275, 23, 10 };

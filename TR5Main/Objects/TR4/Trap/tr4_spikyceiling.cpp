@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr4_spikyceiling.h"
-#include "level.h"
-#include "control/control.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "items.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "animation.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
 
 void ControlSpikyCeiling(short itemNumber)
 {
