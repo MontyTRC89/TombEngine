@@ -770,6 +770,10 @@ namespace TEN::Floordata
 	{
 		auto item = &g_Level.Items[itemNumber];
 
+		// Force removal if object was killed
+		if (item->flags & IFLAG_KILLED)
+			forceRemoval = true;
+
 		// Get real OBB bounds of a bridge in world space
 		auto bounds = GetBoundsAccurate(item);
 		auto dxBounds = TO_DX_BBOX(item->pos, bounds);

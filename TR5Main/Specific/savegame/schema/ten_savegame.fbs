@@ -37,7 +37,6 @@ table Item {
 	looked_at: bool;
 	poisoned: bool;
 	ai_bits: int32;
-	really_active: bool;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 }
@@ -136,6 +135,7 @@ table Lara {
 	water_surface_dist: int32;
 	last_position: Vector3;
 	next_corner_position: Vector3;
+	next_corner_rotation: Vector3;
 	mesh_ptrs: [int32];
 	target_angles: [int32];
 	turn_rate: int32;

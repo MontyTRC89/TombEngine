@@ -65,7 +65,6 @@ extern short CurrentFOV;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
-int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push);
 void InitialiseCamera();
 void MoveCamera(GAME_VECTOR* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);
@@ -82,3 +81,6 @@ void LookLeftRight();
 void LookUpDown();
 void ResetLook();
 void RumbleScreen();
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
+void ItemsCollideCamera();

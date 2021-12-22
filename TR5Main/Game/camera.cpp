@@ -9,6 +9,7 @@
 #include "level.h"
 #include "setup.h"
 #include "collide.h"
+#include "room.h"
 #include "Sound/sound.h"
 #include "control/los.h"
 #include "savegame.h"
@@ -19,6 +20,11 @@
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
+
+constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
+constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
+constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
+constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 struct OLD_CAMERA
 {
@@ -82,92 +88,6 @@ void AlterFOV(int value)
 	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
-int mgLOS(GAME_VECTOR* start, GAME_VECTOR* target, int push)
-{
-	int floorHeight, ceilingHeight;
-	FLOOR_INFO* floor;
-
-	auto x = start->x;
-	auto y = start->y;
-	auto z = start->z;
-	auto roomNum = start->roomNumber;
-	auto roomNum2 = roomNum;
-	auto dx = target->x - x >> 3;
-	auto dy = target->y - y >> 3;
-	auto dz = target->z - z >> 3;
-	auto flag = false;
-	auto result = false;
-
-	int i;
-	for (i = 0; i < 8; ++i)
-	{
-		roomNum2 = roomNum;
-		floor = GetFloor(x, y, z, &roomNum);
-
-		if (g_Level.Rooms[roomNum2].flags & ENV_FLAG_SWAMP)
-		{
-			flag = true;
-
-			break;
-		}
-
-		floorHeight = GetFloorHeight(floor, x, y, z);
-		ceilingHeight = GetCeiling(floor, x, y, z);
-		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
-		{
-			if (y > floorHeight)
-			{
-				if (y - floorHeight >= push)
-				{
-					flag = true;
-
-					break;
-				}
-
-				y = floorHeight;
-			}
-
-			if (y < ceilingHeight)
-			{
-				if (ceilingHeight - y >= push)
-				{
-					flag = true;
-
-					break;
-				}
-
-				y = ceilingHeight;
-			}
-
-			result = true;
-		}
-		else if (result)
-		{
-			flag = true;
-
-			break;
-		}
-
-		x += dx;
-		y += dy;
-		z += dz;
-	}
-
-	if (i)
-	{
-		x -= dx;
-		y -= dy;
-		z -= dz;
-	}
-
-	GetFloor(x, y, z, &roomNum2);
-	target->x = x;
-	target->y = y;
-	target->z = z;
-	target->roomNumber = roomNum2;
-
-	return !flag;
-}
 
 void InitialiseCamera()
 {
@@ -304,7 +224,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	if (yPos < GetCeiling(floor, Camera.pos.x, yPos, Camera.pos.z) ||
 		yPos > floorHeight)
 	{
-		mgLOS(&Camera.target, &Camera.pos, 0);
+		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 		
 		if (abs(Camera.pos.x - ideal->x) < (WALL_SIZE - STEP_SIZE) &&
 			abs(Camera.pos.y - ideal->y) < (WALL_SIZE - STEP_SIZE) &&
@@ -320,7 +240,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 			from.z = ideal->z;
 			from.roomNumber = ideal->roomNumber;
 
-			if (!mgLOS(&from, &to, 0) &&
+			if (!LOSAndReturnTarget(&from, &to, 0) &&
 				++CameraSnaps >= 8)
 			{
 				Camera.pos.x = ideal->x;
@@ -369,6 +289,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		Camera.pos.z = ideal->z;
 		Camera.pos.roomNumber = ideal->roomNumber;
 	}
+
+	ItemsCollideCamera();
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 	LookAt(&Camera, 0);
@@ -452,7 +374,7 @@ void ChaseCamera(ITEM_INFO* item)
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
-		if (mgLOS(&Camera.target, &Ideals[i], 200))
+		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
@@ -464,7 +386,7 @@ void ChaseCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
@@ -494,7 +416,7 @@ void ChaseCamera(ITEM_INFO* item)
 			temp[1].z = Camera.pos.z;
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
-			if (i == 0 || mgLOS(&temp[0], &temp[1], 0))
+			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
@@ -635,7 +557,7 @@ void CombatCamera(ITEM_INFO* item)
 		Ideals[i].z = Camera.target.z - distance * phd_cos(angle);
 		Ideals[i].roomNumber = Camera.target.roomNumber;
 
-		if (mgLOS(&Camera.target, &Ideals[i], 200))
+		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
 		{
 			temp[0].x = Ideals[i].x;
 			temp[0].y = Ideals[i].y;
@@ -648,7 +570,7 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
 			if (i == 0 ||
-				mgLOS(&temp[0], &temp[1], 0))
+				LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				if (i == 0)
 				{
@@ -679,7 +601,7 @@ void CombatCamera(ITEM_INFO* item)
 			temp[1].roomNumber = Camera.pos.roomNumber;
 
 			if (i == 0 ||
-				mgLOS(&temp[0], &temp[1], 0))
+				LOSAndReturnTarget(&temp[0], &temp[1], 0))
 			{
 				int dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
 				int dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
@@ -1142,7 +1064,7 @@ void LookCamera(ITEM_INFO* item)
 		floorHeight == NO_HEIGHT ||
 		ceilingHeight == NO_HEIGHT)
 	{
-		mgLOS(&Camera.target, &Camera.pos, 0);
+		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 	}
 
 	x = Camera.pos.x;
@@ -1164,6 +1086,8 @@ void LookCamera(ITEM_INFO* item)
 		Camera.pos.z = pos.z;
 		Camera.pos.roomNumber = LaraItem->roomNumber;
 	}
+
+	ItemsCollideCamera();
 
 	GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 	LookAt(&Camera, 0);
@@ -1864,6 +1788,221 @@ void ResetLook()
 				Lara.torsoYrot = 0;
 		}
 	}
+}
+
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
+{
+	auto dxBox = TO_DX_BBOX(*pos, bounds);
+	auto sphere = BoundingSphere(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), radius);
+	return sphere.Intersects(dxBox);
+}
+
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
+{
+	auto dx = Camera.pos.x - pos->xPos;
+	auto dz = Camera.pos.z - pos->zPos;
+	auto sin = phd_sin(pos->yRot);
+	auto cos = phd_cos(pos->yRot);
+	auto x = dx * cos - dz * sin;
+	auto z = dx * sin + dz * cos;
+
+	auto xmin = bounds->X1 - radius;
+	auto xmax = bounds->X2 + radius;
+	auto zmin = bounds->Z1 - radius;
+	auto zmax = bounds->Z2 + radius;
+
+	if (x <= xmin || x >= xmax || z <= zmin || z >= zmax)
+		return;
+
+	auto left = x - xmin;
+	auto right = xmax - x;
+	auto top = zmax - z;
+	auto bottom = z - zmin;
+
+	if (left <= right && left <= top && left <= bottom) // Left is closest
+		x -= left;
+	else if (right <= left && right <= top && right <= bottom) // Right is closest
+		x += right;
+	else if (top <= left && top <= right && top <= bottom) // Top is closest
+		z += top;
+	else
+		z -= bottom; // Bottom
+
+	Camera.pos.x = pos->xPos + (cos * x + sin * z);
+	Camera.pos.z = pos->zPos + (cos * z - sin * x);
+
+	auto coll = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
+	{
+		Camera.pos.x = CamOldPos.x;
+		Camera.pos.y = CamOldPos.y;
+		Camera.pos.z = CamOldPos.z;
+		Camera.pos.roomNumber = coll.RoomNumber;
+	}
+}
+
+static bool CheckItemCollideCamera(ITEM_INFO* item)
+{
+	auto dx = Camera.pos.x - item->pos.xPos;
+	auto dy = Camera.pos.y - item->pos.yPos;
+	auto dz = Camera.pos.z - item->pos.zPos;
+
+	bool close_enough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
+						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
+
+	if (!close_enough || !item->collidable || !Objects[item->objectNumber].usingDrawAnimatingItem)
+		return false;
+
+	// TODO: Find a better way to define objects which are collidable with camera.
+	if (Objects[item->objectNumber].intelligent || Objects[item->objectNumber].isPickup || Objects[item->objectNumber].isPuzzleHole)
+		return false;
+
+	// Check extents, if any 2 bounds are smaller than threshold, discard.
+	Vector3 extents = TO_DX_BBOX(item->pos, GetBoundsAccurate(item)).Extents;
+	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+		return false;
+
+	return true;
+}
+
+std::vector<short> FillCollideableItemList()
+{
+	std::vector<short> itemList;
+	auto roomList = CollectConnectedRooms(Camera.pos.roomNumber);
+
+	for (short i = 0; i < g_Level.NumItems; i++)
+	{
+		auto item = &g_Level.Items[i];
+
+		if (!roomList.count(item->roomNumber))
+			continue;
+
+		if (!CheckItemCollideCamera(&g_Level.Items[i]))
+			continue;
+		
+		itemList.push_back(i);
+	}
+
+	return itemList;
+}
+
+static bool CheckStaticCollideCamera(MESH_INFO* mesh)
+{
+	auto dx = Camera.pos.x - mesh->pos.xPos;
+	auto dy = Camera.pos.y - mesh->pos.yPos;
+	auto dz = Camera.pos.z - mesh->pos.zPos;
+
+	bool close_enough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
+						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
+
+	if (!close_enough)
+		return false;
+
+	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		return false;
+
+	auto stat = &StaticObjects[mesh->staticNumber];
+	auto extents = Vector3(abs(stat->collisionBox.X1 - stat->collisionBox.X2),
+		abs(stat->collisionBox.Y1 - stat->collisionBox.Y2),
+		abs(stat->collisionBox.Z1 - stat->collisionBox.Z2));
+
+	// Check extents, if any 2 bounds are smaller than threshold, discard.
+	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
+		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+		return false;
+
+	return true;
+}
+
+std::vector<MESH_INFO*> FillCollideableStaticsList()
+{
+	std::vector<MESH_INFO*> staticList;
+	auto roomList = CollectConnectedRooms(Camera.pos.roomNumber);
+
+	for (auto i : roomList)
+	{
+		auto room = &g_Level.Rooms[i];
+		for (short j = 0; j < room->mesh.size(); j++)
+		{
+			if (!CheckStaticCollideCamera(&room->mesh[j]))
+				continue;
+
+			staticList.push_back(&room->mesh[j]);
+		}
+	}
+
+	return staticList;
+}
+
+void ItemsCollideCamera()
+{
+	auto rad = 128;
+	auto itemList = FillCollideableItemList();
+
+	// Collide with the items list
+
+	for (int i = 0; i < itemList.size(); i++)
+	{
+		auto item = &g_Level.Items[itemList[i]];
+
+		if (!item)
+			return;
+
+		auto dx = abs(LaraItem->pos.xPos - item->pos.xPos);
+		auto dy = abs(LaraItem->pos.yPos - item->pos.yPos);
+		auto dz = abs(LaraItem->pos.zPos - item->pos.zPos);
+
+		// If camera is stuck behind some item, and Lara runs off somewhere
+		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
+			continue;
+
+		auto bounds = GetBoundsAccurate(item);
+		if (TestBoundsCollideCamera(bounds, &item->pos, CAMERA_RADIUS))
+			ItemPushCamera(bounds, &item->pos, rad);
+
+#ifdef _DEBUG
+		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->pos, bounds),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+#endif
+	}
+
+	itemList.clear(); // Done
+
+	// Collide with static meshes
+
+	auto staticList = FillCollideableStaticsList();
+
+	for (int i = 0; i < staticList.size(); i++)
+	{
+		auto mesh = staticList[i];
+		auto stat = &StaticObjects[mesh->staticNumber];
+
+		if (!mesh || !stat)
+			return;
+
+		auto dx = abs(LaraItem->pos.xPos - mesh->pos.xPos);
+		auto dy = abs(LaraItem->pos.yPos - mesh->pos.yPos);
+		auto dz = abs(LaraItem->pos.zPos - mesh->pos.zPos);
+
+		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
+			continue;
+
+		auto bounds = &stat->collisionBox;
+		if (TestBoundsCollideCamera(bounds, &mesh->pos, CAMERA_RADIUS))
+			ItemPushCamera(bounds, &mesh->pos, rad);
+
+#ifdef _DEBUG
+		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(mesh->pos, bounds),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+#endif
+	}
+
+	staticList.clear(); // Done
 }
 
 void RumbleScreen()

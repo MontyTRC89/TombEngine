@@ -88,13 +88,13 @@ enum LARA_STATE
 	LS_LADDER_STOP = 59,
 	LS_LADDER_RIGHT = 60,
 	LS_LADDER_DOWN = 61,
-	LS_TEST_1 = 62,	// Used for auto monkey up jump.
+	LS_MONKEY_VAULT = 62,	// Used for auto monkey up jump.
 	LS_TEST_2 = 63,
 	LS_TEST_3 = 64,
 	LS_WADE_FORWARD = 65,
 	LS_UNDERWATER_ROLL = 66,
 	LS_PICKUP_FLARE = 67,
-	LS_JUMP_ROLL_180 = 68,	// Hm? Was SWANDIVE_ROLL in WT.
+	LS_JUMP_ROLL_180 = 68,
 	LS_KICK = 69,
 	LS_ZIPLINE_RIDE = 70,
 
@@ -173,13 +173,13 @@ enum LARA_STATE
 	LS_LADDER_TO_CROUCH = 138,
 
 	// TombEngine
-	LS_HANG_FEET = 139,
-	LS_SHIMMY_FEET_RIGHT = 140,
-	LS_SHIMMY_FEET_LEFT = 141,
-	LS_SHIMMY_FEET_INNER_RIGHT = 142,
-	LS_SHIMMY_FEET_INNER_LEFT = 143,
-	LS_SHIMMY_FEET_OUTER_RIGHT = 144,
-	LS_SHIMMY_FEET_OUTER_LEFT = 145,
+	LS_SHIMMY_45_OUTER_LEFT  = 139,
+	LS_SHIMMY_45_OUTER_RIGHT = 140,
+	LS_SHIMMY_45_INNER_LEFT  = 141,
+	LS_SHIMMY_45_INNER_RIGHT = 142,
+	LS_UNUSED1 = 143, // Foot hang leftovers - may be safely reused
+	LS_UNUSED2 = 144, // Foot hang leftovers - may be safely reused
+	LS_UNUSED3 = 145, // Foot hang leftovers - may be safely reused
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
@@ -572,14 +572,14 @@ enum LARA_ANIM
 	LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END = 352,			// Push turnswitch counter-clockwise (3/3)
 	LA_CROUCH_TURN_LEFT = 353,								// Rotate left crouching (looped)
 	LA_CROUCH_TURN_RIGHT = 354,								// Rotate right crouching (looped)
-	LA_SHIMMY_LEFT_CORNER_OUTER_START = 355,				// Shimmy around outer left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_OUTER_END = 356,					// Shimmy around outer left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_START = 357,				// Shimmy around outer right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_OUTER_END = 358,					// Shimmy around outer right corner (2/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_START = 359,				// Shimmy around inner left corner (1/2)
-	LA_SHIMMY_LEFT_CORNER_INNER_END = 360,					// Shimmy around inner left corner (2/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_START = 361,				// Shimmy around inner right corner (1/2)
-	LA_SHIMMY_RIGHT_CORNER_INNER_END = 362,					// Shimmy around inner right corner (2/2)
+	LA_SHIMMY_LEFT_CORNER_OUTER_90 = 355,				    // Shimmy around outer left corner (90)
+	LA_SHIMMY_LEFT_CORNER_OUTER_45 = 356,					// Shimmy around outer left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_90 = 357,				    // Shimmy around outer right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_OUTER_45 = 358,					// Shimmy around outer right corner (45)
+	LA_SHIMMY_LEFT_CORNER_INNER_90 = 359,				    // Shimmy around inner left corner (90)
+	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
+	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
+	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
 	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
 	LA_LADDER_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
@@ -711,17 +711,17 @@ enum LARA_ANIM
 	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
 	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
 	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_HANG_TO_HANG_FEET = 484,								// Hang > hang, feet on wall idle
-	LA_SHIMMY_FEET_RIGHT = 485,								// Shimmy, feet on wall right
-	LA_SHIMMY_FEET_LEFT = 486,								// Shimmy, feet on wall left
-	LA_HANG_FEET_TO_STAND = 487,							// Pull up from hang, feet on wall > stand
-	LA_HANG_FEET_IDLE = 488,								// Hang, feet on wall idle (looped)
-	LA_HANG_FEET_TO_CROUCH = 489,							// Pull up from hang, feet on wall > crouch
-	LA_SHIMMY_FEET_RIGHT_CORNER_INNER = 490,				// Shimmy, feet on wall around inner right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_INNER = 491,					// Shimmy, feet on wall around inner left corner
-	LA_SHIMMY_FEET_RIGHT_CORNER_OUTER = 492,				// Shimmy, feet on wall around outer right corner
-	LA_SHIMMY_FEET_LEFT_CORNER_OUTER = 493,					// Shimmy, feet on wall around outer left corner
-	LA_HANG_FEET_HANDSTAND = 494,							// Hang, feet on wall > stand via handstand
+	LA_UNUSED1  = 484,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED2  = 485,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED3  = 486,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED4  = 487,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED5  = 488,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED6  = 489,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED7  = 490,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED8  = 491,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED9  = 492,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED10 = 493,                                      // Foot hang leftovers - may be safely reused
+	LA_UNUSED11 = 494,                                      // Foot hang leftovers - may be safely reused
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
@@ -970,7 +970,7 @@ struct LARA_ARM
 struct AnimsNew
 {
 	bool CrouchRoll;				// crouch roll
-	bool Monkey180Roll;				// the 180� roll on monkeybars
+	bool Monkey180Roll;				// the 180 degrees roll on monkeybars
 	bool Crawl1clickup;				// going 1 click up in crawlspaces
 	bool Crawl1clickdown;			// going 1 click down in crawlspaces
 	bool CrawlExit1click;			// crawlspace exit at 1 click
@@ -983,7 +983,6 @@ struct AnimsNew
 	bool CrawlExitJump;				// TR5 crawlspace exit with jump!
 	bool SwandiveRollRun;			// the transition from swandive roll to run
 	bool OscillateHanging;			// the thin ledge grab animation from TR1 and 2
-	bool FeetHanging;				// Daniel's super awesome feet hanging
 	bool CrawlFlexWaterPullUp;
 	bool CrawlFlexSubmerged;
 };
@@ -1045,7 +1044,7 @@ struct LaraInfo
 	bool fired;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
-	PHD_VECTOR nextCornerPos;
+	PHD_3DPOS nextCornerPos;
 	FX_INFO* spazEffect;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
@@ -1094,7 +1093,6 @@ struct LaraInfo
 	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
 	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	AnimsNew NewAnims;//troye's creative naming
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;

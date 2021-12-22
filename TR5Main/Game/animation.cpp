@@ -296,6 +296,25 @@ short GetFrameNumber(short objectID, short animNumber, short frameToStart)
 	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
 }
 
+int GetFrameCount(short animNumber)
+{
+	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
+		return 0;
+
+	return &g_Level.Anims[animNumber].frameEnd - &g_Level.Anims[animNumber].frameBase;
+}
+
+int GetNextAnimState(ITEM_INFO* item)
+{
+	return GetNextAnimState(item->objectNumber, item->animNumber);
+}
+
+int GetNextAnimState(short objectID, short animNumber)
+{
+	auto nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
+	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].currentAnimState;
+}
+
 void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 {
 	auto index = Objects[item->objectNumber].animIndex + animIndex;
@@ -306,6 +325,9 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 		return;
 	}
 
+	if (item->animNumber == animIndex)
+		return;
+
 	item->animNumber = index;
 	item->frameNumber = g_Level.Anims[index].frameBase + frameToStart;
 	item->currentAnimState = g_Level.Anims[index].currentAnimState;
@@ -314,10 +336,13 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 
 bool TestLastFrame(ITEM_INFO* item, short animNumber)
 {
-	if ((animNumber >= 0) && (item->animNumber != animNumber))
+	if (animNumber < 0)
+		animNumber = item->animNumber;
+
+	if (item->animNumber != animNumber)
 		return false;
 
-	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	ANIM_STRUCT* anim = &g_Level.Anims[animNumber];
 	return (item->frameNumber >= anim->frameEnd);
 }
 

@@ -129,7 +129,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_crouch_roll,//72
 	lara_as_dash,
 	lara_as_dashdive,
-	lara_as_hang2,
+	lara_as_monkey_idle,
 	lara_as_monkeyswing,
 	lara_as_monkeyl,
 	lara_as_monkeyr,
@@ -161,10 +161,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_pulley,//104
 	lara_as_duckl,//105
 	lara_as_duckr,//106
-	lara_as_extcornerl,//107
-	lara_as_extcornerr,//108
-	lara_as_intcornerl,//109
-	lara_as_intcornerr,//110
+	lara_as_corner,//107
+	lara_as_corner,//108
+	lara_as_corner,//109
+	lara_as_corner,//110
 	lara_as_rope,//111
 	lara_as_climbrope,//112
 	lara_as_climbroped,//113
@@ -197,13 +197,13 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//136
 	lara_as_null,//137
 	lara_as_null,//138
-	lara_as_null,//ara_as_hang_feet,//139
-	lara_as_hang_feet_shimmyr,//140
-	lara_as_hang_feet_shimmyl,//141
-	lara_as_hang_feet_inRcorner,//142
-	lara_as_hang_feet_inLcorner,//143
-	lara_as_hang_feet_outRcorner,//144
-	lara_as_hang_feet_outLcorner,//145
+	lara_as_null,//139
+	lara_as_null,//140
+	lara_as_null,//141
+	lara_as_null,//142
+	lara_as_null,// 143 - Unused
+	lara_as_null,// 144 - Unused
+	lara_as_null,// 145 - Unused
 	lara_as_controlledl,
 	lara_as_null,
 	lara_as_null,
@@ -288,7 +288,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_crouch_roll,
 	lara_col_dash,
 	lara_col_dashdive,
-	lara_col_hang2,
+	lara_col_monkey_idle,
 	lara_col_monkeyswing,
 	lara_col_monkeyl,
 	lara_col_monkeyr,
@@ -352,13 +352,13 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_hang_feet,
-	lara_col_hang_feet_shimmyr,
-	lara_col_hang_feet_shimmyl,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
+	lara_void_func, // 143 - Unused
+	lara_void_func, // 144 - Unused
+	lara_void_func, // 145 - Unused
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
@@ -448,6 +448,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			Camera.targetElevation = -ANGLE(22.0f);
 
+
 			if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
 				!isSwamp &&
 				item->currentAnimState != LS_RUN_FORWARD &&		// Prevent ridiculous entrances when stepping down into wade-height water. @Sezz 2021.11.17
@@ -507,41 +508,6 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_WADE);
 				}
 			}
-
-			if (heightFromWater >= WADE_DEPTH)
-			{
-				if (heightFromWater > SWIM_DEPTH)
-				{
-					if (isSwamp)
-						SetAnimation(item, LA_WADE);
-					else
-					{
-						SetAnimation(item, LA_ONWATER_IDLE);
-						Lara.waterStatus = LW_SURFACE;
-						item->pos.yPos += 1 - heightFromWater;
-						Lara.diveCount = 0;
-					}
-					
-					item->gravityStatus = false;
-					item->fallspeed = 0;
-					item->pos.zRot = 0;
-					item->pos.xRot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					
-					UpdateItemRoom(item, 0);
-				}
-			}
-			else
-			{
-				Lara.waterStatus = LW_ABOVE_WATER;
-
-				if (item->currentAnimState == LS_WADE_FORWARD)
-					item->goalAnimState = LS_RUN_FORWARD;
-			}
-
 			break;
 
 		case LW_UNDERWATER:
@@ -826,7 +792,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_UPV:
-			if (SubControl())
+			if (SubControl(item, coll))
 				return;
 			break;
 

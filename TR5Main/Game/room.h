@@ -136,5 +136,6 @@ int IsObjectInRoom(short roomNumber, short objectNumber);
 bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
 PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
+std::set<int> CollectConnectedRooms(int roomNumber);
 
 FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);

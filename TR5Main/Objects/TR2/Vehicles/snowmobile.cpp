@@ -305,7 +305,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			laraInfo->gunStatus = LG_NO_ARMS;
 		}
 		else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF &&
-			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara, lara->animNumber)))
+			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara)))
 		{
 			SetAnimation(lara, LA_FREEFALL);
 
@@ -665,7 +665,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 	if (laraInfo->gunType == WEAPON_FLARE)
 	{
 		CreateFlare(lara, ID_FLARE_ITEM, false);
-		undraw_flare_meshes(lara);
+		UndrawFlareMeshes(lara);
 		laraInfo->flareControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
 		laraInfo->gunStatus = LG_NO_ARMS;
