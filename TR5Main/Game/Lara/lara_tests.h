@@ -22,7 +22,6 @@ int  TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge);
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
 CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
 bool TestHangSwingIn(ITEM_INFO* item, short angle);
-bool TestHangFeet(ITEM_INFO* item, short angle);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 bool LaraFacingCorner(ITEM_INFO* item, short ang, int dist);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
@@ -36,13 +35,11 @@ COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h)
 bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
-void SetCornerAnimFeet(ITEM_INFO* item, COLL_INFO* coll, short rot, short flip);
-
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset = 0.0f);
 
 #ifndef NEW_TIGHTROPE
 void GetTighRopeFallOff(int Regularity);

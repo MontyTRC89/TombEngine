@@ -94,7 +94,7 @@ void MeshSwapFromPour(ITEM_INFO* item)
 
 void Pickup(ITEM_INFO* item)
 {
-	DoPickup();
+	DoPickup(item);
 }
 
 void Puzzle(ITEM_INFO* item)
