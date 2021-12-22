@@ -376,7 +376,7 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 			else
 				SoundEffect(SFX_TR2_CLATTER_2, &skidoo->pos, 0);
 
-			lara->animNumber = (short)(Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide);
+			lara->animNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide;
 			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
 			lara->currentAnimState = lara->goalAnimState = SKIDOO_STATE_HIT;
 		}

@@ -760,7 +760,7 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 	{
 		if (laraItem->currentAnimState != SBOAT_STATE_HIT)
 		{
-			laraItem->animNumber = (short)(Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide);
+			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
 			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
 			laraItem->currentAnimState = laraItem->goalAnimState = SBOAT_STATE_HIT;
 		}

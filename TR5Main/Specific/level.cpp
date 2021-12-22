@@ -304,7 +304,7 @@ void LoadObjects()
 		Objects[objNum].meshIndex = (short)ReadInt16();
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();
-		Objects[objNum].animIndex = (short)ReadInt16();
+		Objects[objNum].animIndex = ReadInt32();
 
 		ReadInt16();
 
