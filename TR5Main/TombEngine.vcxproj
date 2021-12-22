@@ -165,7 +165,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
-    <ClInclude Include="Game\roomvector.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />

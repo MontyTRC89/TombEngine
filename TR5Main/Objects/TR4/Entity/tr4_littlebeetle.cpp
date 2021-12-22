@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr4_littlebeetle.h"
-#include "level.h"
-#include "control/control.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Specific/trmath.h"
-#include "lara.h"
-#include "setup.h"
-#include "control/flipeffect.h"
-#include "items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/setup.h"
+#include "Game/control/flipeffect.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {

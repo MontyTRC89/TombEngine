@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr4_sethblade.h"
-#include "level.h"
-#include "setup.h"
-#include "control/control.h"
-#include "animation.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Game/control/control.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {

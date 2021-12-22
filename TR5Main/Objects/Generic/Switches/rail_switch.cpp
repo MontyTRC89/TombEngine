@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "rail_switch.h"
-#include "input.h"
-#include "lara.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
 #include "generic_switch.h"
-#include "level.h"
-#include "collision/collide_item.h"
-#include "animation.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::Switches
 {

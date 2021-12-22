@@ -1,6 +1,6 @@
 #pragma once
-#include "Specific\phd_global.h"
-#include "trmath.h"
+#include "Specific/phd_global.h"
+#include "Specific/trmath.h"
 
 struct ITEM_INFO;
 struct COLL_INFO;

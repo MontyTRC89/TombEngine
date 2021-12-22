@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr5_hydra.h"
-#include "items.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "setup.h"
-#include "animation.h"
-#include "level.h"
-#include "lara.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Specific/setup.h"
+#include "Game/animation.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 
 #define STATE_HYDRA_STOP			0
 #define STATE_HYDRA_BITE_ATTACK1	1

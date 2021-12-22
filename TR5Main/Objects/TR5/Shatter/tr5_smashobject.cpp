@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr5_smashobject.h"
-#include "level.h"
-#include "control/box.h"
+#include "Specific/level.h"
+#include "Game/control/box.h"
 #include "Sound/sound.h"
-#include "effects/tomb4fx.h"
-#include "items.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
 
 void InitialiseSmashObject(short itemNumber)
 {

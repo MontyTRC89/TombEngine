@@ -31,10 +31,10 @@
 #include "Objects/Generic/Object/rope.h"
 
 /// necessary import
-#include "setup.h"
+#include "Specific/setup.h"
 
 #include "Game/pickup/pickup.h"
-#include "collision/collide_item.h"
+#include "Game/collision/collide_item.h"
 #include "Objects/Generic/Object/burning_torch.h"
 
 using namespace TEN::Entities::Switches;

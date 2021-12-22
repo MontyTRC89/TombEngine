@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "tr4_locusts.h"
+#include "Objects/Effects/tr4_locusts.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
-#include "collision/sphere.h"
-#include "level.h"
-#include "lara.h"
-#include "effects/tomb4fx.h"
-#include "collision/collide_item.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/collision/sphere.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/collision/collide_item.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4 
 {

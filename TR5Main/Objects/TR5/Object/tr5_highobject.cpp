@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr5_highobject.h"
-#include "items.h"
-#include "level.h"
-#include "room.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/room.h"
 #include "Sound/sound.h"
-#include "objectslist.h"
+#include "Objects/objectslist.h"
 
 void InitialiseHighObject1(short itemNumber)
 {
