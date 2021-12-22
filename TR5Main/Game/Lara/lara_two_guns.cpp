@@ -492,7 +492,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 void set_arm_info(LARA_ARM* arm, int frame)
 {
 	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
-	short animBase = Objects[p->objectNum].animIndex;
+	int animBase = Objects[p->objectNum].animIndex;
 	
 	if (frame < p->draw1Anim)
 		arm->animNumber = animBase;
