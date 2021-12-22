@@ -1,4 +1,4 @@
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "GameScriptAnimations.h"
 
 /***
