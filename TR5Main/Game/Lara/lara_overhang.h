@@ -1,5 +1,5 @@
 #pragma once
-#include "trmath.h"
+#include "Specific/trmath.h"
 
 void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
