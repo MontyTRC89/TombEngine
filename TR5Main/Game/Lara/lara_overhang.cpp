@@ -67,7 +67,6 @@ short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{
 		auto obj = &g_Level.Items[i];
-		i++;
 
 		if (obj->objectNumber != bridgeSlot)
 			continue;
