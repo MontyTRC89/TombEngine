@@ -300,8 +300,8 @@ void LoadObjects()
 		MoveablesIds.push_back(objNum);
 
 		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = (short)ReadInt16();
-		Objects[objNum].meshIndex = (short)ReadInt16();
+		Objects[objNum].nmeshes = ReadInt32();
+		Objects[objNum].meshIndex = ReadInt32();
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
