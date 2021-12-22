@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr5_brownbeast.h"
-#include "items.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Game/itemdata/creature_info.h"
 
 BITE_INFO BrownBeastBite1 = { 0, 0, 0, 16 };
 BITE_INFO BrownBeastBite2 = { 0, 0, 0, 22 };

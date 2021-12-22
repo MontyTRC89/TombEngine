@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <array>
+
 struct ITEM_INFO;
 namespace TEN{
 	namespace Effects {

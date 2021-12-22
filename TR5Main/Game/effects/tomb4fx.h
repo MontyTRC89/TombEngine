@@ -1,7 +1,7 @@
 #pragma once
 #include "Specific/phd_global.h"
-#include "effects/effects.h"
-#include "lara_struct.h"
+#include "Game/effects/effects.h"
+#include "Game/Lara/lara_struct.h"
 
 struct ITEM_INFO;
 

@@ -2,7 +2,7 @@
 #include <string>
 #include "ItemEnumPair.h"
 #include "GameScriptRotation.h"
-#include "gui.h"
+#include "Game/gui.h"
 
 static const std::unordered_map<std::string, RotationFlags> kRotAxes{
 	{"X", RotationFlags::INV_ROT_X},

@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr5_autoguns.h"
-#include "collision/sphere.h"
-#include "lara.h"
-#include "animation.h"
-#include "control\los.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "level.h"
-#include "Sound\sound.h"
-#include "items.h"
+#include "Game/collision/sphere.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
+#include "Game/control/los.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Specific/level.h"
+#include "Sound/sound.h"
+#include "Game/items.h"
 
 void InitialiseAutoGuns(short itemNumber)
 {

@@ -1,5 +1,6 @@
 #pragma once
-#include "collision/floordata.h"
+#include "Game/collision/floordata.h"
+
 struct ITEM_INFO;
 struct DOORPOS_DATA {
 	FLOOR_INFO* floor;

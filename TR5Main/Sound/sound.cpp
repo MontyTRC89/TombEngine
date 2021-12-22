@@ -2,12 +2,12 @@
 #include <filesystem>
 #include "winmain.h"
 #include "Sound/sound.h"
-#include "lara.h"
-#include "camera.h"
-#include "room.h"
-#include "setup.h"
+#include "Game/Lara/lara.h"
+#include "Game/camera.h"
+#include "Game/room.h"
+#include "Specific/setup.h"
 #include "configuration.h"
-#include "level.h"
+#include "Specific/level.h"
 
 HSTREAM BASS_3D_Mixdown;
 HFX BASS_FXHandler[(int)SOUND_FILTER::Count];

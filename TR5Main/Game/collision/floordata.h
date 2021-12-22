@@ -1,7 +1,7 @@
 #pragma once
 #include <optional>
-#include "Specific\trmath.h"
-#include "roomvector.h"
+#include "Specific/trmath.h"
+#include "Specific/newtypes.h"
 
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 

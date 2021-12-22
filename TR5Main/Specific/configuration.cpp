@@ -2,11 +2,11 @@
 #include "configuration.h"
 #include "winmain.h"
 #include "resource.h"
-#include "Renderer11.h"
-#include "input.h"
+#include "Renderer/Renderer11.h"
+#include "Specific/input.h"
 #include "GameFlowScript.h"
 #include "configuration.h"
-#include "Sound\sound.h"
+#include "Sound/sound.h"
 #include <CommCtrl.h>
 
 using namespace TEN::Renderer;

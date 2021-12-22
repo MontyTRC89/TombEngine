@@ -1,16 +1,15 @@
 #include "framework.h"
-#include "hair.h"
-
-#include "animation.h"
-#include "lara.h"
-#include "control/control.h"
+#include "Game/effects/hair.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
 #include "GameFlowScript.h"
-#include "setup.h"
-#include "collision/sphere.h"
-#include "level.h"
-#include "effects\weather.h"
-#include "Renderer11.h"
-#include "items.h"
+#include "Specific/setup.h"
+#include "Game/collision/sphere.h"
+#include "Specific/level.h"
+#include "Game/effects/weather.h"
+#include "Renderer/Renderer11.h"
+#include "Game/items.h"
 
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
