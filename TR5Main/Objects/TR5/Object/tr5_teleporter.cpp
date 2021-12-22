@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "tr5_teleporter.h"
-#include "items.h"
-#include "level.h"
-#include "control/control.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "effects/weather.h"
-#include "lara.h"
-#include "camera.h"
+#include "Game/effects/weather.h"
+#include "Game/Lara/lara.h"
+#include "Game/camera.h"
 
 using namespace TEN::Effects::Environment;
 

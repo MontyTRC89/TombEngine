@@ -2,7 +2,7 @@
 
 #include <bass.h>
 #include <bass_fx.h>
-#include "control/control.h"
+#include "Game/control/control.h"
 #include "sound_effects.h"
 
 constexpr auto SFX_ALWAYS                    = 2;

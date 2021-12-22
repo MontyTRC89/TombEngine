@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr2_rat.h"
-#include "lara.h"
-#include "control/box.h"
-#include "effects\effects.h"
-#include "setup.h"
-#include "control/control.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "control/control.h"
-#include "items.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Specific/setup.h"
+#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
 
 BITE_INFO ratBite = { 0, 0, 57, 2 };
 
