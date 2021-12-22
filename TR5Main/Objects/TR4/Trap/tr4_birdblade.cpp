@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			short frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 			if (frameNumber <= 14 || frameNumber >= 31)
 				*((int*)&item->itemFlags[0]) = 0;

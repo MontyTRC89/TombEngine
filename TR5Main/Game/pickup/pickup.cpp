@@ -961,7 +961,7 @@ void SearchObjectControl(short itemNumber)
 {
 	ITEM_INFO* item, *item2;
 	int objNumber;
-	short frameNumber;
+	int frameNumber;
 
 	item = &g_Level.Items[itemNumber];
 	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
