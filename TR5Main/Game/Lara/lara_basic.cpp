@@ -1248,8 +1248,8 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (coll->Middle.Floor >= -STEP_SIZE && coll->Middle.Floor <= STEP_SIZE)
-		item->pos.yPos += coll->Middle.Floor;
+	if (abs(coll->Middle.Floor) <= CLICK(1))
+		LaraSnapToHeight(item, coll);
 }
 
 // State:		LS_WALK_BACK (16)
@@ -1657,8 +1657,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.75f);
+	coll->Setup.BadHeightUp = -CLICK(0.75f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1742,8 +1742,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.75f);
+	coll->Setup.BadHeightUp = -CLICK(0.75f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -2020,7 +2020,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->Front.Floor < -STEPUP_HEIGHT &&
 			!coll->Front.Slope &&
-			!TestLaraSwamp(item))
+			!TestLaraSwamp(item)) // TODO: Check this.
 		{
 			item->goalAnimState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
