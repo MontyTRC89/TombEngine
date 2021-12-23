@@ -327,66 +327,6 @@ bool TestLaraWater(ITEM_INFO* item)
 	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER);
 }
 
-SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down)
-{
-	int x = item->pos.xPos;
-	int y = item->pos.yPos + down;
-	int z = item->pos.zPos;
-
-	short angle = GetQuadrant(item->pos.yRot);
-	short roomNum = item->roomNumber;
-
-	switch (angle)
-	{
-	case NORTH:
-		x -= right;
-		break;
-	case EAST:
-		z -= right;
-		break;
-	case SOUTH:
-		x += right;
-		break;
-	case WEST:
-		z += right;
-		break;
-	default:
-		break;
-	}
-
-	GetFloor(x, y, z, &roomNum);
-
-	switch (angle)
-	{
-	case NORTH:
-		z += front;
-		break;
-	case EAST:
-		x += front;
-		break;
-	case SOUTH:
-		z -= front;
-		break;
-	case WEST:
-		x -= front;
-		break;
-	default:
-		break;
-	}
-
-	auto floor = GetFloor(x, y, z, &roomNum);
-	auto floorHeight = GetFloorHeight(floor, x, y, z);
-	auto ceilHeight = GetCeiling(floor, x, y, z);
-
-	if (floorHeight == NO_HEIGHT)
-		return SPLAT_COLL::WALL;
-
-	if (y >= floorHeight || y <= ceilHeight)
-		return SPLAT_COLL::STEP;
-
-	return SPLAT_COLL::NONE;
-}
-
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;

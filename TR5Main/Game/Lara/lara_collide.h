@@ -7,6 +7,11 @@ constexpr auto DEFLECT_DIAGONAL_ANGLE = 12.0f;
 constexpr auto DEFLECT_STRAIGHT_ANGLE_CRAWL = 2.0f;
 constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
 
+// -----------------------------
+// COLLISION TEST FUNCTIONS
+// For State Control & Collision
+// -----------------------------
+
 bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
