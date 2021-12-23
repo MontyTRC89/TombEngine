@@ -827,7 +827,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		roomNumO = item->roomNumber;
 		camO = Camera;
 	}
-	else if (KeyMap[DIK_E])//
+	else if (KeyMap[DIK_E])
 	{
 		item->pos = posO;
 		item->roomNumber - roomNumO;

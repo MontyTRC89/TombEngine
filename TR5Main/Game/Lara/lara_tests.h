@@ -10,7 +10,6 @@ struct COLL_INFO;
 // For State Control & Collision
 // -----------------------------
 
-SPLAT_COLL TestLaraWall(ITEM_INFO* item, int front, int right, int down);
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
@@ -30,7 +29,7 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
-bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1));
+bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.2f));
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);

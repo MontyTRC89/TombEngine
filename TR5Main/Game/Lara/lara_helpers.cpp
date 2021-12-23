@@ -16,6 +16,20 @@
 // For State Control & Collision
 // -----------------------------
 
+// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
+void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
+{
+	if (!item->speed)
+		return;
+
+	int sign = copysign(1, maxAngle);
+
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		item->pos.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->pos.zRot) / 3)) * sign;
+	else
+		item->pos.zRot += std::min(rate, (short)(abs(maxAngle - item->pos.zRot) / 3)) * sign;
+}
+
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
@@ -108,20 +122,6 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	MoveItem(item, item->pos.yRot, -LARA_RAD_CRAWL);
 	item->pos.yRot += ANGLE(180.0f);
 	LaraResetGravityStatus(item, coll);
-}
-
-// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
-{
-	if (!item->speed)
-		return;
-
-	int sign = copysign(1, maxAngle);
-
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->pos.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->pos.zRot) / 3)) * sign;
-	else
-		item->pos.zRot += std::min(rate, (short)(abs(maxAngle - item->pos.zRot) / 3)) * sign;
 }
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
@@ -231,6 +231,19 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = dir;
 	oldAngle = dir;
+}
+
+SplatType GetLaraSplatType(ITEM_INFO* item, int dist, int height, int side)
+{
+	int y = item->pos.yPos + height;
+	auto probe = GetCollisionResult(item, item->pos.yRot, dist, height, side);
+
+	if (probe.Position.Floor == NO_HEIGHT)
+		return SplatType::Wall;
+	else if (y >= probe.Position.Floor || y <= probe.Position.Ceiling)
+		return SplatType::Step;
+	else
+		return SplatType::None;
 }
 
 short GetLaraSlideDirection(COLL_INFO* coll)
