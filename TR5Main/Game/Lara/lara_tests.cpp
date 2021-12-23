@@ -306,11 +306,10 @@ bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// TODO: item paremeter not necessary.
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if ((abs(coll->TiltX) > 2 || abs(coll->TiltZ) > 2)
-		&& !TestLaraSwamp(item))
+	if ((abs(coll->TiltX) > 2 || abs(coll->TiltZ) > 2) &&
+		!TestLaraSwamp(item))
 	{
 		return true;
 	}
@@ -1028,11 +1027,10 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dis
 	auto y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
 	
-	// TODO: Ceiling test interfered with bridges. For now, behaves as original.
 	if (!TestLaraSwamp(item) &&																// Swamp failsafe.
-		!TestLaraFacingCorner(item, angle, CLICK(1)) &&
+		!TestLaraFacingCorner(item, angle, dist) &&
 		probe.Position.Floor - y >= -STEPUP_HEIGHT &&										// Highest floor bound.
-		(probe.Position.Ceiling - y - coll->Setup.Height) < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
+		(probe.Position.Ceiling - y + coll->Setup.Height) < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1147,34 +1145,25 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
-// TODO: Gradually replace calls.
-bool LaraFallen(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	if (info->waterStatus == LW_WADE || coll->Middle.Floor <= STEPUP_HEIGHT)
-		return false;
-
-	SetAnimation(item, LA_FALL_START);
-	item->fallspeed = 0;
-	item->gravityStatus = true;
-
-	return true;
-}
-
 bool TestLaraLand(ITEM_INFO* item)
 {
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item);
 
-	if (probe.Position.Floor <= y ||
-		(probe.Position.Floor - y) <= item->fallspeed ||
+	if (item->fallspeed >= -10 &&									// Avoid landing when jumping at steps.
+		(probe.Position.Floor <= y ||								// Lara is below the floor.
+			(probe.Position.Floor - y) <= item->fallspeed) ||		// Lara will land on the floor the folowing frame.
 		TestLaraSwamp(item))
 	{
 		return true;
 	}
 
 	return false;
+}
+
+bool TestLaraHardLanding(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return (item->fallspeed - 140);
 }
 
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
