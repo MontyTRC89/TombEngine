@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "Game/effects/debris.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
+
 #include "Game/control/control.h"
-#include "Specific/trmath.h"
+#include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
 
 using std::vector;
 using namespace TEN::Renderer;

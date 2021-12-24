@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_objects.h"
+#include "Objects/TR4/tr4_objects.h"
 #include "Game/pickup/pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
@@ -13,7 +13,7 @@
 #include "tr4_horseman.h" // OFF
 #include "tr4_jeanyves.h" // OK
 #include "tr4_knighttemplar.h" // OK
-#include "tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
 #include "tr4_sentrygun.h" // OK
@@ -37,7 +37,7 @@
 /// objects
 #include "tr4_sarcophagus.h"
 #include "tr4_senet.h"
-#include "tr4_clockwork_beetle.h"
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "tr4_obelisk.h"
 
 /// puzzle
@@ -65,8 +65,8 @@
 #include "tr4_teethspike.h"
 
 /// vehicles
-#include "motorbike.h"
-#include "jeep.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+#include "Objects/TR4/Vehicles/jeep.h"
 /// necessary import
 #include "Game/collision/collide_item.h"
 #include "Objects/Generic/Object/objects.h"

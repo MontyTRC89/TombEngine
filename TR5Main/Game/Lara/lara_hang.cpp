@@ -1,11 +1,13 @@
 #include "framework.h"
-#include "Game/Lara/lara.h"
-#include "Specific/input.h"
-#include "Game/Lara/lara_tests.h"
-#include "Game/items.h"
+#include "Game/Lara/lara_hang.h"
+
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
-#include "Game/camera.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/input.h"
 #include "Specific/level.h"
 
 /*this file has all the lara_as/lara_col functions related to hanging*/

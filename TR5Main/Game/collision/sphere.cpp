@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "Game/collision/sphere.h"
-#include "Game/animation.h"
+
 #include "Game/Lara/lara.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Renderer/Renderer11.h"
 #include "Specific/trmath.h"
-#include "Game/items.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;
 

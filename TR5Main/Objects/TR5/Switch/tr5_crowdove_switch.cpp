@@ -4,7 +4,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/items.h"

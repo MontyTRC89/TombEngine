@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "Game/Lara/lara_surface.h"
-#include "Game/Lara/lara_tests.h"
-#include "Game/control/control.h"
+
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {

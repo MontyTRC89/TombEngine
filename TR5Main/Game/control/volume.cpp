@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "Game/control/volume.h"
-#include "Game/room.h"
-#include "Specific/setup.h"
-#include "Game/Lara/lara.h"
+
 #include "Game/animation.h"
-#include "Game/savegame.h"
-#include "RenderEnums.h"
-#include "Renderer/Renderer11.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/room.h"
+#include "Game/savegame.h"
+#include "Specific/setup.h"
+#include "Renderer/RenderEnums.h"
+#include "Renderer/Renderer11.h"
 
 
 using TEN::Renderer::g_Renderer;

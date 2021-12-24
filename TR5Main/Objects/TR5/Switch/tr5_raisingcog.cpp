@@ -6,7 +6,7 @@
 #include "Sound/sound.h"
 #include "Game/spotcam.h"
 #include "Objects/objectslist.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/animation.h"
 
 using namespace TEN::Entities::Switches;
