@@ -1,9 +1,8 @@
 #pragma once
-
 #include <bass.h>
 #include <bass_fx.h>
 #include "Game/control/control.h"
-#include "sound_effects.h"
+#include "Sound/sound_effects.h"
 
 constexpr auto SFX_ALWAYS                    = 2;
 constexpr auto SOUND_BASS_UNITS              = 1.0f / 1024.0f;	// TR->BASS distance unit coefficient

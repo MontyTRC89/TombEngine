@@ -3,7 +3,7 @@
 #include "Game/control/box.h"
 #include "people.h"
 #include "Game/items.h"
-#include "missile.h"
+#include "Game/missile.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
 #include "Game/effects/effects.h"

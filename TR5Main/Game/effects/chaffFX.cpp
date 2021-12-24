@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "Game/effects/chaffFX.h"
-#include "Game/effects/bubble.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/control/control.h"
-#include "Game/Lara/lara.h"
+
 #include "Game/animation.h"
-#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/effects/bubble.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
-#include "Specific/prng.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/prng.h"
 
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;

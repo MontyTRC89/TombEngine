@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "generic_objects.h"
+#include "Objects/Generic/generic_objects.h"
 
 // objects
 #include "generic_trapdoor.h"
@@ -9,15 +9,15 @@
 #include "cog_switch.h"
 #include "rail_switch.h"
 #include "jump_switch.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "crowbar_switch.h"
 #include "underwater_switch.h"
 #include "pulley_switch.h"
-#include "fullblock_switch.h"
+#include "Objects/Generic/Switches/fullblock_switch.h"
 #include "turn_switch.h"
 
 // Doors
-#include "generic_doors.h"
+#include "Objects/Generic/Doors/generic_doors.h"
 #include "double_doors.h"
 #include "pushpull_kick_door.h"
 #include "sequence_door.h"

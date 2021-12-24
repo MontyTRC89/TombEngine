@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "biggun.h"
+#include "Objects/TR3/Vehicles/biggun.h"
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
@@ -14,7 +14,7 @@
 #include "Game/animation.h"
 #include "Specific/setup.h"
 #include "Game/camera.h"
-#include "biggun_info.h"
+#include "Objects/TR3/Vehicles/biggun_info.h"
 
 #define RECOIL_TIME 26
 #define RECOIL_Z	25
