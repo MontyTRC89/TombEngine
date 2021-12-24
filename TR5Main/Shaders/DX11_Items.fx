@@ -102,17 +102,18 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) {
+	if (AlphaTest && output.w < 0.5f) 
+	{
 		discard;
 	}
 
-	float3 colorMul = min(input.Color.xyz, 1.0f);
+	float3 colorMul = input.Color.xyz; // min(input.Color.xyz, 1.0f);
 
 	float3 Normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(input.TBN, Normal));
 
-	float3 lighting = AmbientLight.xyz;
+	float3 lighting = AmbientLight.xyz * 2.0f;
 
 	for (int i = 0; i < NumLights; i++)
 	{
@@ -123,7 +124,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
 			float radius = Lights[i].Out;
-			float intensity = Lights[i].Intensity;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
@@ -132,19 +132,18 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 				continue;
 
 			lightVec = normalize(lightVec);
-			float d = saturate(dot(Normal, -lightVec));
+			float d = saturate(dot(Normal, lightVec));
 			if (d < 0)
 				continue;
 
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * intensity * attenuation * d * 2.0f;
+			lighting += color * attenuation * d * 2.0f;
 		}
 		else if (lightType == LT_SUN)
 		{
 			float3 color = Lights[i].Color.xyz;
 			float3 direction = Lights[i].Direction.xyz;
-			float intensity = Lights[i].Intensity;
 			
 			direction = normalize(direction);
 
@@ -155,7 +154,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
 			float s = pow(saturate(dot(h, Normal)), 0.5f);
 			
-			lighting += color * d * intensity * 2.0f;
+			lighting += color * d * 2.0f;
 		}
 		else if (lightType == LT_SPOT)
 		{
@@ -163,7 +162,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 color = Lights[i].Color.xyz;
 			float3 direction = Lights[i].Direction.xyz;
 			float range = Lights[i].Range;
-			float intensity = Lights[i].Intensity;
 			float inAngle = Lights[i].In;
 			float outAngle = Lights[i].Out;
 			
@@ -180,16 +178,17 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
 			attenuation = pow(attenuation, 2);
+
 			float d = saturate(dot(Normal, lightVec));
 			if (d < 0)
 				continue;
 
-			lighting += color * intensity * attenuation * d * 2.0f;
+			lighting += color * attenuation * d * 2.0f;
 		}
 	}
 
-	output.xyz *= lighting.xyz;
 	output.xyz *= colorMul.xyz;
+	output.xyz *= lighting.xyz;
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);
