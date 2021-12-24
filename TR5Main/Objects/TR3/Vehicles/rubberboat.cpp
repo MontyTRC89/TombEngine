@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "rubberboat.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Game/collision/collide_item.h"
-#include "Game/Lara/lara.h"
-#include "Specific/input.h"
-#include "Game/collision/sphere.h"
-#include "Sound/sound.h"
-#include "Game/effects/bubble.h"
+#include "Objects/TR3/Vehicles/rubberboat.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Specific/setup.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/effects/bubble.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Objects/TR3/Vehicles/rubberboat_info.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 #define RBOAT_SLIP		10
 #define RBOAT_SIDE_SLIP	30

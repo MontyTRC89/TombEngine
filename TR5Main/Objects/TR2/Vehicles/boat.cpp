@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "boat.h"
-#include "Game/Lara/lara.h"
-#include "Game/items.h"
+#include "Objects/TR2/Vehicles/boat.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
-#include "Game/camera.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
-#include "Game/animation.h"
-#include "Sound/sound.h"
 #include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/particle/SimpleParticle.h"
 #include "Objects/TR2/Vehicles/boat_info.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 enum SpeedBoatState
 {
