@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "generic_doors.h"
+#include "Objects/Generic/Doors/generic_doors.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/control/box.h"
@@ -16,7 +16,7 @@
 #include "Specific/trmath.h"
 #include "Game/misc.h"
 #include "sequence_door.h"
-#include "fullblock_switch.h"
+#include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Game/itemdata/door_data.h"
 
 using namespace TEN::Entities::Switches;

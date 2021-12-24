@@ -1,13 +1,15 @@
 #include "framework.h"
+#include "Game/Lara/lara_slide.h"
+
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_tests.h"
-#include "Specific/input.h"
 #include "Sound/sound.h"
-#include "Game/collision/collide_room.h"
-#include "Game/camera.h"
+#include "Specific/input.h"
 #include "Specific/level.h"
-#include "Game/items.h"
 
 /*this file has all the related functions to sliding*/
 

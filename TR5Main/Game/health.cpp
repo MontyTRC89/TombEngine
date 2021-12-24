@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "Game/health.h"
+
 #include "Game/animation.h"
-#include "Game/pickup/pickup.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/camera.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Game/pickup/pickup.h"
 #include "Renderer/Renderer11.h"
-#include "Game/items.h"
+#include "Specific/level.h"
 
 using namespace TEN::Renderer;
 short PickupX;

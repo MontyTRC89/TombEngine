@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_clockwork_beetle.h"
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"

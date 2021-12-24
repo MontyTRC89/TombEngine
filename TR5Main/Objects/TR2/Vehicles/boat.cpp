@@ -12,7 +12,7 @@
 #include "Sound/sound.h"
 #include "Game/effects/effects.h"
 #include "Game/particle/SimpleParticle.h"
-#include "boat_info.h"
+#include "Objects/TR2/Vehicles/boat_info.h"
 
 enum SpeedBoatState
 {
