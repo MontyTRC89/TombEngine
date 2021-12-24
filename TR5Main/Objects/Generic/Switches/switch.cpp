@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "switch.h"
+#include "Objects/Generic/Switches/switch.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Objects/Generic/Object/objects.h"

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "upv.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/collision/sphere.h"
@@ -16,7 +16,7 @@
 #include "Specific/input.h"
 #include "Game/savegame.h"
 #include "Sound/sound.h"
-#include "upv_info.h"
+#include "Objects/TR3/Vehicles/upv_info.h"
 #include "Game/control/los.h"
 
 #define	UPV_CONTROL 1

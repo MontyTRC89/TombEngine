@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "tr5_laserhead_info.h"
+#include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/lara_fx.h"
 

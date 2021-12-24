@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "Streams.h"
+#include "Specific/IO/Streams.h"
 
 extern char* LevelDataPtr;
 

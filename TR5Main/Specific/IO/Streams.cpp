@@ -1,10 +1,12 @@
 #include "framework.h"
-#include "Streams.h"
+#include "Specific/IO/Streams.h"
+
 using std::ios;
 using std::string;
 using std::ifstream;
 using std::fstream;
 using std::ofstream;
+
 bool BaseStream::ReadBytes(byte* value, int length) {
 	return Read(reinterpret_cast<char*>(value), length);
 }

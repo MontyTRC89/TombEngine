@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "Game/control/control.h"
-#include "Specific/input.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Sound/sound.h"
+#include "Game/Lara/lara_jump.h"
+
 #include "Game/camera.h"
+#include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_jump.h"
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_slide.h"
 #include "Scripting/GameFlowScript.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 // -----------------------------
 // JUMP

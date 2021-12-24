@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "kayak.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Game/effects/effects.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -12,7 +12,7 @@
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Game/control/control.h"
-#include "kayak_info.h"
+#include "Objects/TR3/Vehicles/kayak_info.h"
 
 using std::vector;
 

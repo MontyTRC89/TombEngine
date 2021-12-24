@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "motorbike.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,7 +16,7 @@
 #include "Game/camera.h"
 #include "Game/animation.h"
 #include "Specific/prng.h"
-#include "motorbike_info.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Game/items.h"
 
 using namespace TEN::Math::Random;

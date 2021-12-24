@@ -1,10 +1,9 @@
 #pragma once
-
-#include "Specific/phd_global.h"
 #include "Game/animation.h"
+#include "Game/control/trigger.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Game/control/trigger.h"
+#include "Specific/phd_global.h"
 
 struct BOUNDING_BOX;
 struct ITEM_INFO;
