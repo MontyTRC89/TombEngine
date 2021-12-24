@@ -1,15 +1,16 @@
 #include "framework.h"
-#include "tr2_sword_guardian.h"
-#include "animation.h"
-#include "control/box.h"
-#include "control/lot.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "effects/tomb4fx.h"
-#include "level.h"
-#include "lara.h"
+#include "Objects/TR2/Entity/tr2_sword_guardian.h"
+
+#include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Specific/level.h"
 
 BITE_INFO swordBite = { 0, 37, 550, 15 };
 

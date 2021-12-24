@@ -1,6 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
-#include "RenderEnums.h"
+#include "Renderer/RenderEnums.h"
 
 namespace TEN::Renderer {
 	struct RenderView;

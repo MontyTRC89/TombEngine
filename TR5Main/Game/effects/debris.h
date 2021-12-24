@@ -1,9 +1,10 @@
 #pragma once
-#include "collision/sphere.h"
-#include "Renderer11.h"
-#include "newtypes.h"
-#include "level.h"
-#include "RendererVertex.h"
+#include "Game/collision/sphere.h"
+#include "Specific/newtypes.h"
+#include "Specific/level.h"
+#include "Renderer/Renderer11.h"
+#include "Renderer/RendererVertex.h"
+
 #define MAX_DEBRIS 256
 
 struct ILIGHT

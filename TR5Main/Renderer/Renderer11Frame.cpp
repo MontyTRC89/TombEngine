@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Renderer11.h"
-#include "animation.h"
-#include "lara.h"
-#include "effects\effects.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
+#include "Renderer/Renderer11.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/effects/effects.h"
+#include "Game/camera.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 #include "RenderView\RenderView.h"
-#include "items.h"
+#include "Game/items.h"
 
 namespace TEN::Renderer
 {

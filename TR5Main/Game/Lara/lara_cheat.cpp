@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "lara.h"
-#include "lara_cheat.h"
-#include "input.h"
-#include "GameFlowScript.h"
-#include "effects/effects.h"
+#include "Game/Lara/lara_cheat.h"
+
+#include "Game/collision/collide_room.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
-#include "collision/collide_room.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 int NoCheatCounter;
 

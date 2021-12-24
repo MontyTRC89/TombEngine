@@ -1,13 +1,14 @@
 #include "framework.h"
-#include "spotcam.h"
-#include "camera.h"
-#include "control/control.h"
-#include "animation.h"
-#include "effects\tomb4fx.h"
-#include "lara.h"
-#include "input.h"
-#include "control\volume.h"
-#include "items.h"
+#include "Game/spotcam.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/control/volume.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/input.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;

@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "tr4_laradouble.h"
-#include "items.h"
-#include "level.h"
+#include "Game/items.h"
+#include "Specific/level.h"
 #include "Sound/sound.h"
-#include "control/box.h"
-#include "lara.h"
-#include "animation.h"
+#include "Game/control/box.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 
 void InitialiseLaraDouble(short itemNum)
 {

@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "tr5_willowwisp.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
+#include "Game/items.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 
 void InitialiseLightingGuide(short itemNum)
 {

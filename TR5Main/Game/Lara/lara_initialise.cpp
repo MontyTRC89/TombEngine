@@ -1,11 +1,12 @@
 #include "framework.h"
-#include "lara.h"
-#include "lara_initialise.h"
-#include "lara_tests.h"
-#include "health.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
+#include "Game/Lara/lara_initialise.h"
+
+#include "Game/health.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 void InitialiseLara(int restore)
 {

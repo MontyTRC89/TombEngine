@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr1_bigrat.h"
-#include "control/box.h"
-#include "effects\effects.h"
-#include "lara.h"
-#include "level.h"
-#include "misc.h"
-#include "people.h"
-#include "setup.h"
-#include "control/control.h"
-#include "items.h"
+#include "Objects/TR1/Entity/tr1_bigrat.h"
+
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/people.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 #define BIG_RAT_RUN_TURN ANGLE(6.0f)
 #define BIG_RAT_SWIM_TURN ANGLE(3.0f)

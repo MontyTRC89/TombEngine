@@ -1,7 +1,7 @@
 #pragma once
-#include "Streams.h"
-#include "LEB128.h"
-#include "ChunkId.h"
+#include "Specific/IO/Streams.h"
+#include "Specific/IO/LEB128.h"
+#include "Specific/IO/ChunkId.h"
 
 struct ChunkWritingState
 {
