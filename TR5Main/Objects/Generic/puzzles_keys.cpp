@@ -9,7 +9,7 @@
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "puzzles_keys.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/camera.h"
 #include "Game/items.h"
 

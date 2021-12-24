@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "jeep.h"
+#include "Objects/TR4/Vehicles/jeep.h"
 #include "Game/Lara/lara.h"
 #include "Game/gui.h"
 #include "Game/effects/effects.h"
@@ -14,7 +14,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/animation.h"
-#include "jeep_info.h"
+#include "Objects/TR4/Vehicles/jeep_info.h"
 
 using std::vector;
 

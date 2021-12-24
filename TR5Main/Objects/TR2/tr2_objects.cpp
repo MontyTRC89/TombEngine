@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr2_objects.h"
+#include "Objects/TR2/tr2_objects.h"
 /// entities
 #include "tr2_barracuda.h" // OK
 #include "tr2_birdmonster.h" // OK
@@ -28,7 +28,7 @@
 #include "tr2_killerstatue.h"
 /// vehicles
 #include "boat.h"
-#include "snowmobile.h"
+#include "Objects/TR2/Vehicles/snowmobile.h"
 /// necessary import
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"

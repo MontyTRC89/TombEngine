@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "Game/items.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
+
 #include "Game/control/control.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
+#include "Game/Lara/lara.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 
 using namespace TEN::Floordata;
 
