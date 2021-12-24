@@ -1,17 +1,17 @@
 #include "framework.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_tests.h"
-#include "Specific/input.h"
-#include "Specific/level.h"
-#include "Sound/sound.h"
+#include "Game/Lara/lara_objects.h"
+
 #include "Game/animation.h"
-#include "rope.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/items.h"
 #include "Game/control/control.h"
-#include "Objects/Generic/Object/rope.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
+#include "Objects/Generic/Object/rope.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Entities::Generic;
 

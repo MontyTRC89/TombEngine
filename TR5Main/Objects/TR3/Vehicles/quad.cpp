@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "quad.h"
-#include "quad_info.h"
+#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"

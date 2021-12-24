@@ -11,7 +11,7 @@
 #include "Specific/input.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "tr5_pushableblock_info.h"
+#include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
 PHD_VECTOR PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 

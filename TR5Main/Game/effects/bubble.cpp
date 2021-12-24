@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "Game/effects/bubble.h"
-#include "Specific/level.h"
+
 #include "Game/control/control.h"
-#include "Specific/trmath.h"
 #include "Objects/objectslist.h"
+#include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/prng.h"
+#include "Specific/trmath.h"
 
 using std::vector;
 using namespace TEN::Math::Random;

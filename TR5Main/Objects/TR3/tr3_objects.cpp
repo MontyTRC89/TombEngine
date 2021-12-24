@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr3_objects.h"
+#include "Objects/TR3/tr3_objects.h"
 /// entities
 #include "tr3_civvy.h" // OK
 #include "tr3_cobra.h" // OK
@@ -23,11 +23,11 @@
 /// switch
 
 /// vehicles
-#include "biggun.h"
-#include "kayak.h"
-#include "minecart.h"
-#include "quad.h"
-#include "upv.h"
+#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
+#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "rubberboat.h"
 /// necessary import
 #include "Game/collision/collide_item.h"

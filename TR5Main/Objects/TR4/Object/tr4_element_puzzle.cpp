@@ -9,7 +9,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/input.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"

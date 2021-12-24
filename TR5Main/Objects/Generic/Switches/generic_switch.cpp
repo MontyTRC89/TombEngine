@@ -3,7 +3,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"

@@ -1,6 +1,8 @@
 #include "framework.h"
-#include "Game/pickup/pickup_misc_items.h"
+#include "Game/pickup/pickup_key_items.h"
+
 #include "Game/Lara/lara_struct.h"
+#include "Game/pickup/pickup_misc_items.h"
 #include "Objects/objectslist.h"
 
 template <size_t N> struct KeyPickupInfo

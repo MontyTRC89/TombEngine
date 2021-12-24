@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "Game/room.h"
+
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Renderer/Renderer11.h"
 #include "Game/items.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
