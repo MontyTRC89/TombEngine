@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr5_objects.h"
+#include "Objects/TR5/tr5_objects.h"
 /// entities
 #include "tr5_autoguns.h"	  // OK
 #include "tr5_brownbeast.h"	  // OK
@@ -41,7 +41,7 @@
 /// traps
 #include "tr5_ventilator.h"
 #include "tr5_deathslide.h"
-#include "tr5_electricity.h"
+#include "Objects/Effects/tr5_electricity.h"
 #include "tr5_romehammer.h"
 #include "tr5_fallingceiling.h"
 #include "tr5_rollingball.h"
@@ -58,11 +58,11 @@
 #include "Game/Lara/lara_initialise.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
-#include "switch.h"
+#include "Objects/Generic/Switches/switch.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Specific/level.h"
 /// register objects
-#include "object_helper.h"
+#include "Objects/Utils/object_helper.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/box.h"
 using namespace TEN::Entities::TR5;

@@ -1,12 +1,13 @@
 #include "framework.h"
-#include "Game/control/control.h"
-#include "Game/Lara/lara.h"
+#include "Game/effects/footprint.h"
+
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Sound/sound.h"
-#include "Game/effects/footprint.h"
-#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 namespace TEN {
 namespace Effects {

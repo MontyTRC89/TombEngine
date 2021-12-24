@@ -8,7 +8,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "switch.h"
+#include "Objects/Generic/Switches/switch.h"
 #include "Specific/input.h"
 
 void HammerControl(short itemNumber)

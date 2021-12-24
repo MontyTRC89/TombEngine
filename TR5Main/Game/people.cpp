@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "Game/people.h"
-#include "Game/effects/effects.h"
+
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/sphere.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
 
 int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {

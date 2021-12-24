@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11.h"
