@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
 #include "Objects/objectslist.h"

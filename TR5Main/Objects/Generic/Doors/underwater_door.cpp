@@ -15,7 +15,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
-#include "underwater_door.h"
+#include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"
 
 namespace TEN::Entities::Doors

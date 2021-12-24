@@ -1,18 +1,18 @@
 #include "framework.h"
-#include "tr2_worker_flamethrower.h"
+#include "Objects/TR2/Entity/tr2_worker_flamethrower.h"
+
 #include "Game/animation.h"
 #include "Game/control/box.h"
-#include "people.h"
-#include "Game/items.h"
-#include "Game/missile.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/missile.h"
+#include "Game/people.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Game/animation.h"
-#include "Game/effects/effects.h"
 #include "Specific/trmath.h"
-#include "Game/itemdata/creature_info.h"
 
 BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 

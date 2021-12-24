@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr2_knifethrower.h"
-#include "Game/items.h"
-#include "Game/effects/effects.h"
-#include "Game/control/box.h"
-#include "people.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Objects/TR2/Entity/tr2_knifethrower.h"
+
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Sound/sound.h"
 
 BITE_INFO knifeLeft = { 0, 0, 0, 5 };
 BITE_INFO knifeRight = { 0, 0, 0, 8 };
