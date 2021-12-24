@@ -1,4 +1,6 @@
 #include "framework.h"
+#include "Game/debug/debug.h"
+
 #include <spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>

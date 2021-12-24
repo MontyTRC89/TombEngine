@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "minecart.h"
+#include "Objects/TR3/Vehicles/minecart.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
@@ -12,7 +12,7 @@
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Sound/sound.h"
-#include "minecart_info.h"
+#include "Objects/TR3/Vehicles/minecart_info.h"
 
 using std::vector;
 

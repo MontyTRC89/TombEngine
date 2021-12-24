@@ -10,9 +10,9 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
-#include "snowmobile.h"
+#include "Objects/TR2/Vehicles/snowmobile.h"
 #include "Game/itemdata/creature_info.h"
-#include "skidoo_info.h"
+#include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Game/animation.h"
 
 enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };

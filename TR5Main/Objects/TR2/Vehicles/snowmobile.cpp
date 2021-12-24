@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "snowmobile.h"
+#include "Objects/TR2/Vehicles/snowmobile.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
@@ -17,7 +17,7 @@
 #include "Game/particle/SimpleParticle.h"
 #include "Specific/prng.h"
 #include "Game/camera.h"
-#include "skidoo_info.h"
+#include "Objects/TR2/Vehicles/skidoo_info.h"
 
 using std::vector;
 using namespace TEN::Math::Random;

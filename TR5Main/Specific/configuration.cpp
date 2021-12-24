@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "configuration.h"
-#include "winmain.h"
+#include "Specific/configuration.h"
+
+#include <CommCtrl.h>
 #include "resource.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
-#include "GameFlowScript.h"
-#include "configuration.h"
+#include "Specific/winmain.h"
 #include "Sound/sound.h"
-#include <CommCtrl.h>
 
 using namespace TEN::Renderer;
 using std::vector;

@@ -1,13 +1,14 @@
 #include "framework.h"
+#include "Game/collision/collide_room.h"
+
 #include "Game/control/los.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/room.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
-#include "Game/room.h"
 #include "Renderer/Renderer11.h"
 
 using std::vector;

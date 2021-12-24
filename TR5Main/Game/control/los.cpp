@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "Game/control/los.h"
+
 #include "Game/animation.h"
-#include "Sound/sound.h"
-#include "Objects/Generic/Object/objects.h"
-#include "switch.h"
-#include "Game/Lara/lara_fire.h"
-#include "Specific/input.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
-#include "Game/Lara/lara_one_gun.h"
 #include "Game/items.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Switches/switch.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
 #include "Specific/setup.h"
 
 int NumberLosRooms;
