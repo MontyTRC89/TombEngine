@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
-#include "Specific/trmath.h"
+
+#include "Game/items.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/items.h"
+#include "Specific/trmath.h"
 
 using namespace TEN::Floordata;
 

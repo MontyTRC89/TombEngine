@@ -1,18 +1,18 @@
 #include "framework.h"
-#include "Game/control/los.h"
 #include "Game/collision/collide_item.h"
+
+#include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 #include "Game/collision/sphere.h"
-#include "Game/misc.h"
+#include "Game/room.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
-#include "Game/room.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Math::Random;

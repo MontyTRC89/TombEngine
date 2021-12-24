@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "Game/Lara/lara_two_guns.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara.h"
-#include "Game/effects/effects.h"
-#include "Game/animation.h"
-#include "Game/effects/tomb4fx.h"
+#include "Game/savegame.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/camera.h"
 #include "Specific/input.h"
-#include "Sound/sound.h"
-#include "Game/savegame.h"
-#include "Specific/prng.h"
-#include "Game/items.h"
 
 using namespace TEN::Math::Random;
 struct PISTOL_DEF

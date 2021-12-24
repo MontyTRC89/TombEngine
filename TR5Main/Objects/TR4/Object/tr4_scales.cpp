@@ -9,7 +9,7 @@
 #include "Game/animation.h"
 #include "Game/effects/tomb4fx.h"
 #include "tr4_ahmet.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Entities::Switches;

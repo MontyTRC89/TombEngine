@@ -1,7 +1,7 @@
 #pragma once
-#include "LEB128.h"
-#include "Streams.h"
 #include <memory>
+#include "Specific/IO/LEB128.h"
+#include "Specific/IO/Streams.h"
 
 struct ChunkId
 {

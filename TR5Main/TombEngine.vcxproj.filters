@@ -264,7 +264,6 @@
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
-    <ClCompile Include="Game\text.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
@@ -679,7 +678,6 @@
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Game\spotcam.h" />
-    <ClInclude Include="Game\text.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\effects\tomb4fx.h" />
     <ClInclude Include="Objects\objectslist.h" />

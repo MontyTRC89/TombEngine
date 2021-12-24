@@ -1,6 +1,9 @@
 #pragma once
 #include "Game/Lara/lara_struct.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
+
 // -----------------------------
 // CRAWL & CROUCH
 // Control & Collision Functions

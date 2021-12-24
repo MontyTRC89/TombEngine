@@ -1,11 +1,11 @@
 #pragma once
+#include "Scripting/GameFlowScript.h"
+#include "Scripting/GameLogicScript.h"	
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/ChunkWriter.h"
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
-#include "Scripting/GameFlowScript.h"
-#include "Scripting/GameLogicScript.h"	
 
 constexpr auto SAVEGAME_MAX = 16;
 

@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Specific/clock.h"
 
 LARGE_INTEGER PerformanceCount;
 double LdFreq;
