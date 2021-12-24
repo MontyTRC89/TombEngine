@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Specific/trmath.h"

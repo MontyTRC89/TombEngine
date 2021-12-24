@@ -2,7 +2,7 @@
 #include "rail_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
 #include "Game/animation.h"

@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "Specific/input.h"
-#include "Game/Lara/lara.h"
-#include "winmain.h"
+
 #include "Game/camera.h"
-#include "Sound/sound.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
-#include "Game/items.h"
+#include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using TEN::Renderer::g_Renderer;
 

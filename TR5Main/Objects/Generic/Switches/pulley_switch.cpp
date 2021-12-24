@@ -3,7 +3,7 @@
 #include "Game/control/control.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/level.h"

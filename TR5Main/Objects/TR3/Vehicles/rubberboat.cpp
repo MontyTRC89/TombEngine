@@ -11,7 +11,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Specific/setup.h"
-#include "rubberboat_info.h"
+#include "Objects/TR3/Vehicles/rubberboat_info.h"
 
 #define RBOAT_SLIP		10
 #define RBOAT_SIDE_SLIP	30
