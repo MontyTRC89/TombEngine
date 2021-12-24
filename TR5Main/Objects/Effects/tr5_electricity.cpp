@@ -1,4 +1,6 @@
 #include "framework.h"
+#include "Objects/Effects/tr5_electricity.h"
+
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
@@ -9,7 +11,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
-#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
