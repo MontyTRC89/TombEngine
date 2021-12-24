@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr1_natla.h"
+#include "Objects/TR1/Entity/tr1_natla.h"
+
 #include "Game/control/box.h"
-#include "people.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/missile.h"
-#include "Specific/level.h"
+#include "Game/people.h"
 #include "Sound/sound.h"
-#include "Game/effects/effects.h"
+#include "Specific/level.h"
 #include "Specific/trmath.h"
-#include "Game/itemdata/creature_info.h"
 
 #define NATLA_NEAR_DEATH 200
 

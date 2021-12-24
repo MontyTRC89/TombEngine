@@ -1,6 +1,6 @@
 #pragma once
 
-#include  "items.h"
+#include "Game/items.h"
 #include "Game/collision/collide_room.h"
 
 void InitialiseRubberBoat(short itemNum);

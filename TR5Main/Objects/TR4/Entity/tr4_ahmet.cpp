@@ -10,7 +10,7 @@
 #include "Specific/level.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
