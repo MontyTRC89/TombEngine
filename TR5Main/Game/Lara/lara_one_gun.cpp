@@ -238,6 +238,8 @@ void HarpoonBoltControl(short itemNumber)
 				}
 			}
 
+			foundCollidedObjects = true;
+
 			k++;
 			currentMesh = CollidedMeshes[k];
 
