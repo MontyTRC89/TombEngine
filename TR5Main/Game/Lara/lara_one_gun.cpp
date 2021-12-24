@@ -180,6 +180,7 @@ void HarpoonBoltControl(short itemNumber)
 
 	int n = 0;
 	bool foundCollidedObjects = false;
+	bool explodeItem = true;
 
 	// Found possible collided items and statics
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
@@ -201,7 +202,10 @@ void HarpoonBoltControl(short itemNumber)
 				foundCollidedObjects = true;
 
 			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+			{
+				explodeItem = false;
 				HitTarget(LaraItem, currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
+			}
 
 			// All other items (like puzzles) can't be hit
 			k++;
@@ -243,7 +247,8 @@ void HarpoonBoltControl(short itemNumber)
 	// If harpoon has hit some objects then shatter itself
 	if (foundCollidedObjects)
 	{
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		if (explodeItem)
+			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
 	}
 }
