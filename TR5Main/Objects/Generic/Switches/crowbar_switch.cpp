@@ -2,7 +2,7 @@
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "crowbar_switch.h"
+#include "Objects/Generic/Switches/crowbar_switch.h"
 #include "Game/gui.h"
 #include "Sound/sound.h"
 #include "Game/pickup/pickup.h"

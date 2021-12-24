@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr3_shiva.h"
+#include "Objects/TR3/Entity/tr3_shiva.h"
+
 #include "Game/animation.h"
-#include "Game/effects/effects.h"
 #include "Game/control/box.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
 BITE_INFO shivaRightBite = { 0, 0, 920, 22 };

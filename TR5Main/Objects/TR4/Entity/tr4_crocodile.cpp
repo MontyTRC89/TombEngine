@@ -2,7 +2,7 @@
 #include "tr4_crocodile.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/items.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
