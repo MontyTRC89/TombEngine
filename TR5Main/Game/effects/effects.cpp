@@ -1010,41 +1010,46 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 	for (i = 0; i < MAX_RIPPLES; i++)
 	{
 		ripple = &Ripples[i];
-		if (!(ripple->active)) {
+		if (!(ripple->active)) 
+		{
 			ripple->active = true;
 			ripple->size = size;
 			ripple->lifeTime = 0;
 			ripple->SpriteID = spriteID;
-			if (flags & RIPPLE_FLAG_SHORT_LIFE) {
-				ripple->life = (rand() & 16) + 16;
 
-			}
-			else {
+			if (flags & RIPPLE_FLAG_SHORT_LIFE)
+				ripple->life = (rand() & 16) + 16;
+			else
 				ripple->life = (rand() & 16) + 48;
-			}
+
 			ripple->worldPos = { (float)x,(float)y,(float)z };
 			ripple->currentColor = Vector4(0, 0, 0, 0);
 			ripple->rotation = rotation;
 
-			if (flags & RIPPLE_FLAG_BLOOD ) {
+			if (flags & RIPPLE_FLAG_BLOOD ) 
+			{
 				ripple->initialColor = Vector4(1, 0, 0, 1);
 				ripple->lifeRate = 0.9f;
 				ripple->sizeRate = 8.0f;
-				ripple->isBillboard = true;
+				ripple->isBillboard = false;
 			}
-			else {
+			else 
+			{
 				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
 				ripple->isBillboard = false;
 			}
+
 			if (flags & RIPPLE_FLAG_LOW_OPACITY)
 				ripple->initialColor *= 0.6f;
+
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
 				ripple->worldPos.x += GenerateFloat(-32, 32);
 				ripple->worldPos.z += GenerateFloat(-32, 32);
 			}
+
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
 				ripple->rotation += GenerateFloat(-PI, PI);
@@ -1100,7 +1105,7 @@ void TriggerLaraBlood()
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD);
+	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_SMOKE_SPRITES].meshIndex);
 }
 
 void Richochet(PHD_3DPOS* pos)
