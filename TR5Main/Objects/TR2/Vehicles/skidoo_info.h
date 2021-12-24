@@ -1,6 +1,7 @@
 #pragma once
 
-struct SKIDOO_INFO {
+struct SKIDOO_INFO 
+{
 	short trackMesh;
 	int skidooTurn;
 	int leftFallspeed;

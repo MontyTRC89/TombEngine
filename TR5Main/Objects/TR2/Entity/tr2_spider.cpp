@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr2_spider.h"
-#include "Game/effects/effects.h"
-#include "Game/control/box.h"
-#include "Game/items.h"
-#include "Game/control/lot.h"
-#include "Game/Lara/lara.h"
-#include "Specific/setup.h"
-#include "Game/effects/tomb4fx.h"
-#include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Objects/TR2/Entity/tr2_spider.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO spiderBite = { 0, 0, 41, 1 };
 

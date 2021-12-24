@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "cog_switch.h"
+#include "Objects/Generic/Switches/cog_switch.h"
 #include "Game/control/control.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"

@@ -1,12 +1,13 @@
 #include "framework.h"
-#include "tr3_cobra.h"
+#include "Objects/TR3/Entity/tr3_cobra.h"
+
 #include "Game/control/box.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
+#include "Specific/setup.h"
 
 BITE_INFO cobraBite = { 0, 0, 0, 13 };
 

@@ -1,17 +1,18 @@
 #include "framework.h"
+#include "Objects/Generic/puzzles_keys.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/control/control.h"
+#include "Game/gui.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/pickup/pickup.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/Lara/lara.h"
-#include "Game/gui.h"
-#include "Game/pickup/pickup.h"
-#include "Game/animation.h"
-#include "Game/control/control.h"
-#include "puzzles_keys.h"
-#include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/camera.h"
-#include "Game/items.h"
 
 using namespace TEN::Entities::Switches;
 

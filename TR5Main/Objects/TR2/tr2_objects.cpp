@@ -1,40 +1,39 @@
 #include "framework.h"
 #include "Objects/TR2/tr2_objects.h"
-/// entities
-#include "tr2_barracuda.h" // OK
-#include "tr2_birdmonster.h" // OK
-#include "tr2_dragon.h" // OK
-#include "tr2_eagle_or_crow.h" // OK
-#include "tr2_knifethrower.h" // OK
-#include "tr2_mercenary.h" // OK
-#include "tr2_monk.h" // OK
-#include "tr2_rat.h" // OK
-#include "tr2_shark.h" // OK
-#include "tr2_silencer.h" // OK
-#include "tr2_skidman.h" // OK
-#include "tr2_spear_guardian.h" // OK
-#include "tr2_spider.h" // OK
-#include "tr2_sword_guardian.h" // OK
-#include "tr2_worker_dualrevolver.h" // OK
-#include "tr2_worker_flamethrower.h" // OK
-#include "tr2_worker_machinegun.h" // OK
-#include "tr2_worker_shotgun.h" // OK
-#include "tr2_yeti.h" // OK
-/// objects
 
+/// entities
+#include "Objects/TR2/Entity/tr2_barracuda.h" // OK
+#include "Objects/TR2/Entity/tr2_birdmonster.h" // OK
+#include "Objects/TR2/Entity/tr2_dragon.h" // OK
+#include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
+#include "Objects/TR2/Entity/tr2_knifethrower.h" // OK
+#include "Objects/TR2/Entity/tr2_mercenary.h" // OK
+#include "Objects/TR2/Entity/tr2_monk.h" // OK
+#include "Objects/TR2/Entity/tr2_rat.h" // OK
+#include "Objects/TR2/Entity/tr2_shark.h" // OK
+#include "Objects/TR2/Entity/tr2_silencer.h" // OK
+#include "Objects/TR2/Entity/tr2_skidman.h" // OK
+#include "Objects/TR2/Entity/tr2_spear_guardian.h" // OK
+#include "Objects/TR2/Entity/tr2_spider.h" // OK
+#include "Objects/TR2/Entity/tr2_sword_guardian.h" // OK
+#include "Objects/TR2/Entity/tr2_worker_dualrevolver.h" // OK
+#include "Objects/TR2/Entity/tr2_worker_flamethrower.h" // OK
+#include "Objects/TR2/Entity/tr2_worker_machinegun.h" // OK
+#include "Objects/TR2/Entity/tr2_worker_shotgun.h" // OK
+#include "Objects/TR2/Entity/tr2_yeti.h" // OK
 /// trap
-#include "tr2_spinningblade.h"
-#include "tr2_springboard.h"
-#include "tr2_killerstatue.h"
+#include "Objects/TR2/Trap/tr2_spinningblade.h"
+#include "Objects/TR2/Trap/tr2_springboard.h"
+#include "Objects/TR2/Trap/tr2_killerstatue.h"
 /// vehicles
-#include "boat.h"
+#include "Objects/TR2/Vehicles/boat.h"
 #include "Objects/TR2/Vehicles/snowmobile.h"
 /// necessary import
-#include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
+#include "Game/collision/collide_item.h"
+#include "Game/itemdata/creature_info.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {
