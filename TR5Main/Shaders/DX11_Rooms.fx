@@ -203,7 +203,6 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
 			float radius = Lights[i].Out;
-			float intensity = Lights[i].Intensity;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
@@ -217,7 +216,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * intensity * attenuation * d;
+			lighting += color * attenuation * d * 2.0f;
 		}
 	}
 
