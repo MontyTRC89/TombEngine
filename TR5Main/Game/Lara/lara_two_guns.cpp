@@ -477,8 +477,8 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 	}
 
 	if (!(TrInput & IN_LOOK))
