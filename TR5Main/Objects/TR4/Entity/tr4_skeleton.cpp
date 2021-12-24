@@ -2,7 +2,7 @@
 #include "tr4_skeleton.h"
 #include "Game/items.h"
 #include "Game/control/box.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
 #include "Game/control/lot.h"

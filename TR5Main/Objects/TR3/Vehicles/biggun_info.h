@@ -1,6 +1,7 @@
 #pragma once
 
-struct BIGGUNINFO {
+struct BIGGUNINFO
+{
 	short xRot;
 	short yRot;
 	short startYRot;

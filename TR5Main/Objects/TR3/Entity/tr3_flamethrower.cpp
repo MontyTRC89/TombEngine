@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr3_flamethrower.h"
-#include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "people.h"
-#include "Game/items.h"
+#include "Objects/TR3/Entity/tr3_flamethrower.h"
+
 #include "Game/animation.h"
-#include "Specific/setup.h"
+#include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
