@@ -12,7 +12,7 @@
 #include "tr5_smashobject.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/debris.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/box.h"
 #include "Game/effects/lara_fx.h"

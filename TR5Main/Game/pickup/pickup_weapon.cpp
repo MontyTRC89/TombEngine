@@ -1,10 +1,11 @@
 #include "framework.h"
-#include <array>
 #include "Game/pickup/pickup_weapon.h"
-#include "Objects/objectslist.h"
-#include "Game/pickup/pickup_ammo.h"
+
+#include <array>
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
+#include "Game/pickup/pickup_ammo.h"
+#include "Objects/objectslist.h"
 
 struct WeaponPickupInfo
 {

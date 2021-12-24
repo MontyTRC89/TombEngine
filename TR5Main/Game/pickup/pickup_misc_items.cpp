@@ -1,9 +1,10 @@
 #include "framework.h"
-#include <array>
 #include "Game/pickup/pickup_misc_items.h"
-#include "Objects/objectslist.h"
+
+#include <array>
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"
+#include "Objects/objectslist.h"
 
 auto SilencerIsEquipped(LaraInfo& lara)
 {

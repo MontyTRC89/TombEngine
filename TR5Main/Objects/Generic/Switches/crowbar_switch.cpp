@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "generic_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
 #include "crowbar_switch.h"

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr1_objects.h"
+#include "Objects/TR1/tr1_objects.h"
 /// entities
 #include "tr1_ape.h" // OK
 #include "tr1_bear.h" // OK
@@ -18,7 +18,7 @@
 #include "Game/collision/collide_item.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "object_helper.h"
+#include "Objects/Utils/object_helper.h"
 #include "Game/itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
