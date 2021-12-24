@@ -1,4 +1,6 @@
 #include "framework.h"
+#include "Objects/Effects/flame_emitters.h"
+
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
@@ -9,7 +11,6 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Objects/Effects/flame_emitters.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
