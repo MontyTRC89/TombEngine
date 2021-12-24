@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "Game/Lara/lara_climb.h"
-#include "Game/Lara/lara.h"
-#include "Game/control/control.h"
+
 #include "Game/animation.h"
-#include "Game/collision/sphere.h"
 #include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
-#include "Game/items.h"
 
 short GetClimbFlags(int x, int y, int z, short roomNumber)
 {

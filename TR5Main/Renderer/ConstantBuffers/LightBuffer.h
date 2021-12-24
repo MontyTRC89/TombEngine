@@ -1,6 +1,6 @@
 #pragma once
 #include "ShaderLight.h"
-#include "RenderEnums.h"
+#include "Renderer/RenderEnums.h"
 
 struct alignas(16) CLightBuffer
 {

@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/collision/sphere.h"
-#include "Renderer/Renderer11.h"
 #include "Specific/newtypes.h"
 #include "Specific/level.h"
+#include "Renderer/Renderer11.h"
 #include "Renderer/RendererVertex.h"
 
 #define MAX_DEBRIS 256

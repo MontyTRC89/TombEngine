@@ -1,15 +1,16 @@
 #include "framework.h"
+#include "Game/Lara/lara_helpers.h"
+
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
-#include "Specific/input.h"
 #include "Game/items.h"
-#include "Specific/level.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_collide.h"
-#include "Specific/setup.h"
 #include "Scripting/GameFlowScript.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 // -----------------------------
 // HELPER FUNCTIONS

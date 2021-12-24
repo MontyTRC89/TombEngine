@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderEnums.h"
+#include "Renderer/RenderEnums.h"
 #include "ConstantBuffers/StaticBuffer.h"
 #include "ConstantBuffers/LightBuffer.h"
 #include "ConstantBuffers/MiscBuffer.h"

@@ -4,7 +4,7 @@
 #include "Game/control/box.h"
 #include "people.h"
 #include "Game/items.h"
-#include "missile.h"
+#include "Game/missile.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
