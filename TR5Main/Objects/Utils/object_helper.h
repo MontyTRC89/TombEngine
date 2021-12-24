@@ -1,5 +1,5 @@
 #pragma once
-#include "setup.h"
+#include "Specific/setup.h"
 
 #define InitFunction void(short itemNumber)
 

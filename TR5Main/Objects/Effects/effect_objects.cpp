@@ -1,8 +1,9 @@
 #include "framework.h"
 #include "Objects/Effects/effect_objects.h"
-#include "Specific/setup.h"
+
 #include "Objects/Effects/flame_emitters.h"
 #include "Objects/Effects/enemy_missile.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Effects;
 

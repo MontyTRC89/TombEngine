@@ -1,7 +1,8 @@
 #pragma once
+#include <array>
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <array>
+
 namespace TEN {
 	namespace Effects {
 		namespace Drip {

@@ -1,6 +1,5 @@
 #pragma once
-
-#include "control/box.h"
+#include "Game/control/box.h"
 
 #define CHK_ANY(var, flag) (var & flag) != 0
 #define CHK_EXI(var, flag) var & flag

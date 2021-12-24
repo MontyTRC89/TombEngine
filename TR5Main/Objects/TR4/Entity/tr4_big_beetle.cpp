@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr4_big_beetle.h"
-#include "items.h"
-#include "effects/effects.h"
-#include "setup.h"
-#include "level.h"
-#include "control/control.h"
+#include "Game/items.h"
+#include "Game/effects/effects.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Specific/trmath.h"
-#include "lara.h"
-#include "people.h"
-#include "itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Game/itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4
 {

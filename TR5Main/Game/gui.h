@@ -1,6 +1,6 @@
 #pragma once
-#include "configuration.h"
-#include <Scripting/LanguageScript.h>
+#include "Scripting/LanguageScript.h"
+#include "Specific/configuration.h"
 
 enum class InventoryMode
 {
