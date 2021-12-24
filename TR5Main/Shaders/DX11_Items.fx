@@ -113,7 +113,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(input.TBN, Normal));
 
-	float3 lighting = AmbientLight.xyz * 2.0f;
+	float3 lighting = AmbientLight.xyz;
 
 	for (int i = 0; i < NumLights; i++)
 	{
@@ -138,7 +138,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * attenuation * d * 2.0f;
+			lighting += color * attenuation * d;
 		}
 		else if (lightType == LT_SUN)
 		{
@@ -154,7 +154,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
 			float s = pow(saturate(dot(h, Normal)), 0.5f);
 			
-			lighting += color * d * 2.0f;
+			lighting += color * d;
 		}
 		else if (lightType == LT_SPOT)
 		{
@@ -183,7 +183,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			if (d < 0)
 				continue;
 
-			lighting += color * attenuation * d * 2.0f;
+			lighting += color * attenuation * d;
 		}
 	}
 

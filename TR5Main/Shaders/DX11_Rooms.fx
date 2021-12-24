@@ -216,7 +216,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * attenuation * d * 2.0f;
+			lighting += color * attenuation * d;
 		}
 	}
 
