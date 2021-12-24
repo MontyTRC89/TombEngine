@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr5_smashobject.h"
+#include "Objects/TR5/Shatter/tr5_smashobject.h"
 #include "Specific/level.h"
 #include "Game/control/box.h"
 #include "Sound/sound.h"

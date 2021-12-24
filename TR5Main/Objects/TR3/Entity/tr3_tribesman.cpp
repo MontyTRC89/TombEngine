@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr3_tribesman.h"
+#include "Objects/TR3/Entity/tr3_tribesman.h"
+
+#include "Game/animation.h"
 #include "Game/control/box.h"
+#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Game/collision/sphere.h"
-#include "Game/Lara/lara.h"
-#include "Sound/sound.h"
-#include "people.h"
-#include "Game/animation.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Traps;
 
