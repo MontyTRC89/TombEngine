@@ -1,13 +1,14 @@
 #include "framework.h"
-#include "tr2_worker_machinegun.h"
+#include "Objects/TR2/Entity/tr2_worker_machinegun.h"
+
 #include "Game/animation.h"
-#include "people.h"
 #include "Game/control/box.h"
-#include "Game/items.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 #include "Game/control/control.h"
+#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/people.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
 

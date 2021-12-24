@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr5_pushableblock.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 #include "Game/items.h"

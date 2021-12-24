@@ -15,7 +15,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
-#include "double_doors.h"
+#include "Objects/Generic/Doors/double_doors.h"
 #include "Game/collision/collide_item.h"
 
 namespace TEN::Entities::Doors

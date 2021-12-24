@@ -15,7 +15,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
-#include "sequence_door.h"
+#include "Objects/Generic/Doors/sequence_door.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Game/itemdata/door_data.h"
 

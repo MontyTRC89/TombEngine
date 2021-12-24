@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "tr3_mpgun.h"
+#include "Objects/TR3/Entity/tr3_mpgun.h"
+
+#include "Game/animation.h"
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
-#include "people.h"
-#include "Specific/setup.h"
-#include "Game/control/lot.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
-#include "Game/animation.h"
-#include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 enum MPGUN_STATES
 {

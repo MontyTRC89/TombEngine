@@ -11,7 +11,7 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
-#include "cog_switch.h"
+#include "Objects/Generic/Switches/cog_switch.h"
 #include "Objects/objectslist.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
