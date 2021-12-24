@@ -1,13 +1,14 @@
 #include "framework.h"
-#include "tr2_yeti.h"
+#include "Objects/TR2/Entity/tr2_yeti.h"
+
 #include "Game/control/box.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO yetiBiteR = { 12, 101, 19, 10 };
 BITE_INFO yetiBiteL = { 12, 101, 19, 13 };

@@ -3,7 +3,7 @@
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/Lara/lara.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"

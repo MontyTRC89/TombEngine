@@ -7,7 +7,7 @@
 #include "Game/control/control.h"
 #include "Specific/trmath.h"
 #include "Game/Lara/lara.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4

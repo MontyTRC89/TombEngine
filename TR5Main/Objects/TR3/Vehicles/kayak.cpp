@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "Objects/TR3/Vehicles/kayak.h"
-#include "Game/effects/effects.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/Lara/lara.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/Lara/lara_flare.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Specific/input.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Specific/setup.h"
 
 using std::vector;
 

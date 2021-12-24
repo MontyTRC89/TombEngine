@@ -9,7 +9,7 @@
 #include "Game/animation.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Game/Lara/lara.h"
-#include "tr5_smashobject.h"
+#include "Objects/TR5/Shatter/tr5_smashobject.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/debris.h"
 #include "Objects/Generic/Switches/generic_switch.h"
