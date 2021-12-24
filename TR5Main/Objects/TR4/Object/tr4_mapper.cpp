@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr4_mapper.h"
-#include "level.h"
-#include "control/control.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "animation.h"
-#include "lara.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
-#include "effects/effects.h"
-#include "items.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {

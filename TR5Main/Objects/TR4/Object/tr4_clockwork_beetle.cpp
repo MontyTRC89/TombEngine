@@ -1,11 +1,11 @@
 #include "framework.h"
-#include "tr4_clockwork_beetle.h"
-#include "items.h"
-#include "level.h"
-#include "lara.h"
-#include "animation.h"
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 #include "Sound/sound.h"
-#include "collision/collide_room.h"
+#include "Game/collision/collide_room.h"
 
 void ClockworkBeetleControl(short item_number)
 {

@@ -1,24 +1,25 @@
 #include "framework.h"
-#include "animation.h"
-#include "effects.h"
-#include "lara.h"
-#include "effects/tomb4fx.h"
-#include "Specific/trmath.h"
-#include "Sound/sound.h"
-#include "setup.h"
-#include "level.h"
-#include "objectslist.h"
-#include "GameFlowScript.h"
-#include "spark.h"
-#include "explosion.h"
-#include "effects/drip.h"
-#include "effects/bubble.h"
-#include "effects/weather.h"
-#include "smoke.h"
-#include "Specific/prng.h"
-#include "Renderer11.h"
+#include "Game/effects/effects.h"
+
+#include "Game/animation.h"
 #include "Game/effects/lara_fx.h"
-#include "items.h"
+#include "Game/effects/drip.h"
+#include "Game/effects/bubble.h"
+#include "Game/effects/explosion.h"
+#include "Game/effects/smoke.h"
+#include "Game/effects/spark.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Objects/objectslist.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/prng.h"
+#include "Specific/trmath.h"
+#include "Scripting/GameFlowScript.h"
+#include "Renderer/Renderer11.h"
 
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Effects::Explosion;
@@ -1009,41 +1010,46 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 	for (i = 0; i < MAX_RIPPLES; i++)
 	{
 		ripple = &Ripples[i];
-		if (!(ripple->active)) {
+		if (!(ripple->active)) 
+		{
 			ripple->active = true;
 			ripple->size = size;
 			ripple->lifeTime = 0;
 			ripple->SpriteID = spriteID;
-			if (flags & RIPPLE_FLAG_SHORT_LIFE) {
-				ripple->life = (rand() & 16) + 16;
 
-			}
-			else {
+			if (flags & RIPPLE_FLAG_SHORT_LIFE)
+				ripple->life = (rand() & 16) + 16;
+			else
 				ripple->life = (rand() & 16) + 48;
-			}
+
 			ripple->worldPos = { (float)x,(float)y,(float)z };
 			ripple->currentColor = Vector4(0, 0, 0, 0);
 			ripple->rotation = rotation;
 
-			if (flags & RIPPLE_FLAG_BLOOD ) {
+			if (flags & RIPPLE_FLAG_BLOOD ) 
+			{
 				ripple->initialColor = Vector4(1, 0, 0, 1);
 				ripple->lifeRate = 0.9f;
 				ripple->sizeRate = 8.0f;
-				ripple->isBillboard = true;
+				ripple->isBillboard = false;
 			}
-			else {
+			else 
+			{
 				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
 				ripple->lifeRate = 1.0f;
 				ripple->sizeRate = 4.0f;
 				ripple->isBillboard = false;
 			}
+
 			if (flags & RIPPLE_FLAG_LOW_OPACITY)
 				ripple->initialColor *= 0.6f;
+
 			if (flags & RIPPLE_FLAG_RAND_POS)
 			{
 				ripple->worldPos.x += GenerateFloat(-32, 32);
 				ripple->worldPos.z += GenerateFloat(-32, 32);
 			}
+
 			if (flags & RIPPLE_FLAG_RAND_ROT)
 			{
 				ripple->rotation += GenerateFloat(-PI, PI);
@@ -1099,7 +1105,7 @@ void TriggerLaraBlood()
 
 void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
 {
-	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD);
+	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_SMOKE_SPRITES].meshIndex);
 }
 
 void Richochet(PHD_3DPOS* pos)

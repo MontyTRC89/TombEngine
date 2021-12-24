@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "tr3_monkey.h"
-#include "control/box.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "setup.h"
-#include "control/lot.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "control/control.h"
+#include "Objects/TR3/Entity/tr3_monkey.h"
+
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 

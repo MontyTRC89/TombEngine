@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr4_mine.h"
-#include "level.h"
-#include "collision/sphere.h"
+#include "Specific/level.h"
+#include "Game/collision/sphere.h"
 #include "Sound/sound.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "effects/weather.h"
-#include "items.h"
-#include "collision/collide_item.h"
-#include "objectslist.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/collision/collide_item.h"
+#include "Objects/objectslist.h"
 
 using namespace TEN::Effects::Environment;
 

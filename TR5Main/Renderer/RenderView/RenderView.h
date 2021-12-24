@@ -2,7 +2,7 @@
 #include <vector>
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "camera.h"
+#include "Game/camera.h"
 #include "Frustum.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Specific/memory/LinearArrayBuffer.h"

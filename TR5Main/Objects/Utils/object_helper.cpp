@@ -1,12 +1,12 @@
 #include "framework.h"
-#include "object_helper.h"
-#include "collision/collide_item.h"
+#include "Objects/Utils/object_helper.h"
+#include "Game/collision/collide_item.h"
 #include "Objects/Generic/Object/objects.h"
-#include "pickup.h"
+#include "Game/pickup/pickup.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "level.h"
-#include "tr5_smashobject.h"
-#include "tr5_pushableblock.h"
+#include "Specific/level.h"
+
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 
 using std::function;
 

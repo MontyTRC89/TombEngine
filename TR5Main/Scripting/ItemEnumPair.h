@@ -1,6 +1,6 @@
 #pragma once
-#include "gui.h"
-#include "objectslist.h"
+#include "Game/gui.h"
+#include "Objects/objectslist.h"
 #include <utility>
 
 struct ItemEnumPair

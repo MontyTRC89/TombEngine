@@ -1,22 +1,23 @@
 #include "framework.h"
-#include "lara.h"
-#include "lara_basic.h"
-#include "lara_tests.h"
-#include "lara_collide.h"
-#include "lara_slide.h"
-#include "lara_monkey.h"
-#include "lara_helpers.h"
-#include "input.h"
-#include "level.h"
-#include "setup.h"
-#include "health.h"
+#include "Game/Lara/lara_basic.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/health.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_tests.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_slide.h"
+#include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
-#include "animation.h"
-#include "pickup.h"
-#include "collision/collide_room.h"
-#include "items.h"
-#include "camera.h"
-#include "GameFlowScript.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Scripting/GameFlowScript.h"
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -247,7 +248,8 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL && !info->jumpQueued &&
+	// TODO: Control settings option to enable/disable FORWARD+BACK as roll input.
+	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->jumpQueued &&
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;

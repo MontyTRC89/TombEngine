@@ -1,27 +1,28 @@
 #include "framework.h"
-#include "lara_one_gun.h"
-#include "items.h"
-#include "Lara.h"
-#include "lara_fire.h"
-#include "animation.h"
-#include "control/box.h"
-#include "control/control.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "collision/collide_item.h"
-#include "effects/debris.h"
-#include "effects/weather.h"
-#include "lara_two_guns.h"
-#include "Objects/Generic/Object/objects.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
-#include "input.h"
-#include "savegame.h"
-#include "Sound/sound.h"
-#include "effects/bubble.h"
-#include "generic_switch.h"
+#include "Game/Lara/lara_one_gun.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/effects/bubble.h"
+#include "Game/control/control.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/effects.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_two_guns.h"
+#include "Game/savegame.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/input.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
@@ -179,6 +180,7 @@ void HarpoonBoltControl(short itemNumber)
 
 	int n = 0;
 	bool foundCollidedObjects = false;
+	bool explodeItem = true;
 
 	// Found possible collided items and statics
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 1);
@@ -200,7 +202,10 @@ void HarpoonBoltControl(short itemNumber)
 				foundCollidedObjects = true;
 
 			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+			{
+				explodeItem = false;
 				HitTarget(LaraItem, currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
+			}
 
 			// All other items (like puzzles) can't be hit
 			k++;
@@ -233,6 +238,8 @@ void HarpoonBoltControl(short itemNumber)
 				}
 			}
 
+			foundCollidedObjects = true;
+
 			k++;
 			currentMesh = CollidedMeshes[k];
 
@@ -242,7 +249,8 @@ void HarpoonBoltControl(short itemNumber)
 	// If harpoon has hit some objects then shatter itself
 	if (foundCollidedObjects)
 	{
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		if (explodeItem)
+			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
 	}
 }

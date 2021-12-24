@@ -1,5 +1,7 @@
 #pragma once
-#include "lara_struct.h"
+
+struct ITEM_INFO;
+struct COLL_INFO;
 
 // -----------------------------------
 // MISCELLANEOUS INTERACTABLE OBJECT

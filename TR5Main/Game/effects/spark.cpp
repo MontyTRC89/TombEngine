@@ -1,9 +1,11 @@
 #pragma once
 #include "framework.h"
-#include "spark.h"
+#include "Game/effects/spark.h"
+
 #include <array>
-#include <Specific\trmath.h>
-#include "Specific\prng.h"
+#include "Specific/trmath.h"
+#include "Specific/prng.h"
+
 using namespace DirectX::SimpleMath;
 using namespace TEN::Math::Random;
 
