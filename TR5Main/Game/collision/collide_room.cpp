@@ -152,11 +152,13 @@ int FindGridShift(int x, int z)
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 
-COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height)
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height, int side)
 {
-	auto xProbe = item->pos.xPos + phd_sin(angle) * dist;
+	int sideSign = copysign(1, side);
+
+	auto xProbe = item->pos.xPos + phd_sin(angle) * dist + phd_cos(angle + ANGLE(90.0f) * sideSign) * abs(side);
 	auto yProbe = item->pos.yPos + height;
-	auto zProbe = item->pos.zPos + phd_cos(angle) * dist;
+	auto zProbe = item->pos.zPos + phd_cos(angle) * dist + phd_sin(angle + ANGLE(90.0f) * sideSign) * abs(side);
 
 	return GetCollisionResult(xProbe, yProbe, zProbe, GetRoom(item->location, xProbe, yProbe, zProbe).roomNumber);
 }
