@@ -622,6 +622,12 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 		return;
 
+	if (TrInput & IN_FORWARD) // Temp.
+	{
+		if (TestLaraVault(item, coll))
+			return;
+	}
+
 	ShiftItem(item, coll);
 
 	// TODO: Vaulting from this state.

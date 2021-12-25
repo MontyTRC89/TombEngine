@@ -74,12 +74,12 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 		return false;
 
 	// Discard if ledge is not within distance threshold
-	if (abs(coll->NearestLedgeDistance) > coll->Setup.Radius)
+	if (abs(coll->NearestLedgeDistance) > coll->Setup.Radius * sqrt(2) + 4)
 		return false;
 
 	// Discard if ledge is not within angle threshold
 	if (!TestValidLedgeAngle(item, coll))
-		return false; 
+		return false;
 	
 	if (!ignoreHeadroom)
 	{
@@ -88,7 +88,8 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 			return false;
 	}
 	
-	return (coll->CollisionType == CT_FRONT);
+	// Temp.
+	return (TrInput & IN_ACTION);
 }
 
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
@@ -100,102 +101,112 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+	if (!(TrInput & IN_ACTION) ||
+		info->gunStatus != LG_HANDS_FREE)
+	{
 		return false;
+	}
 
 	if (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3))
 		return false;
+
+	int y = item->pos.yPos;
+	auto probeFront = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
+	auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
+	auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
 
 	if (TestValidLedge(item, coll))
 	{
 		bool success = false;
 
 		// Vault to crouch up one step.
-		if (coll->Front.Floor < 0 &&					// Lower floor bound.
-			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor bound.
+		if ((probeFront.Position.Floor - y) < 0 &&					// Lower floor bound.
+			(probeFront.Position.Floor - y) > -STEPUP_HEIGHT &&		// Upper floor bound.
 			g_GameFlow->Animations.CrawlExtended)
 		{
-			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL)		// Front clamp buffer. Presumably, nothing more is necessary, but tend to this in the future. @Sezz 2021.11.06
+			if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT_CRAWL &&					// Front clamp buffer.
+				abs(probeFrontLeft.Position.Ceiling - probeFrontLeft.Position.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
+				abs(probeFrontRight.Position.Ceiling - probeFrontRight.Position.Floor) > LARA_HEIGHT_CRAWL)			// Right clamp buffer.
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GetFrameNumber(item, 0);
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + CLICK(1);
+				item->pos.yPos = probeFront.Position.Floor + CLICK(1);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
 		// Vault up two steps.
-		else if (coll->Front.Floor <= -STEPUP_HEIGHT &&		// Lower floor bound.
-			coll->Front.Floor >= -CLICK(2.5f))				// Upper floor bound.
+		else if ((probeFront.Position.Floor - y) <= -STEPUP_HEIGHT &&		// Lower floor bound.
+			(probeFront.Position.Floor - y) >= -CLICK(2.5f))				// Upper floor bound.
 		{
 			// Vault to stand up two steps.
-			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT)		// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
+			if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT)		// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
 			{
 				item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GetFrameNumber(item, 0);
 				item->goalAnimState = LS_IDLE;
-				item->pos.yPos += coll->Front.Floor + CLICK(2);
+				item->pos.yPos = probeFront.Position.Floor + CLICK(2);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 			// Vault to crouch up two steps.
-			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
-				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
-				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
+			else if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT_CRAWL &&			// Front clamp buffer.
+				abs(probeFrontLeft.Position.Ceiling - probeFrontLeft.Position.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
+				abs(probeFrontRight.Position.Ceiling - probeFrontRight.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
 				g_GameFlow->Animations.CrawlExtended)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + CLICK(2);
+				item->pos.yPos = probeFront.Position.Floor + CLICK(2);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
 		// Vault up three steps.
-		else if (coll->Front.Floor <= -CLICK(2.5f) &&		// Lower floor bound.
-			coll->Front.Floor >= -CLICK(3.5f))				// Upper floor bound.
+		else if ((probeFront.Position.Floor - y) <= -CLICK(2.5f) &&		// Lower floor bound.
+			(probeFront.Position.Floor - y) >= -CLICK(3.5f))			// Upper floor bound.
 		{
 			// Vault to stand up three steps.
-			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT)		// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
+			if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT)		// Front clamp buffer. BUG: Turned away from the ledge and toward a section with a low ceiling, stand-to-crawl vault will be performed instead. @Sezz 2021.11.06
 			{
 				item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 				item->currentAnimState = LS_GRABBING;
 				item->frameNumber = GetFrameNumber(item, 0);
 				item->goalAnimState = LS_IDLE;
-				item->pos.yPos += coll->Front.Floor + CLICK(3);
+				item->pos.yPos = probeFront.Position.Floor + CLICK(3);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 			// Vault to crouch up three steps.
-			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
-				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
-				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
+			else if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT_CRAWL &&			// Front clamp buffer.
+				abs(probeFrontLeft.Position.Ceiling - probeFrontLeft.Position.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
+				abs(probeFrontRight.Position.Ceiling - probeFrontRight.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
 				g_GameFlow->Animations.CrawlExtended)
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
 				item->currentAnimState = LS_GRABBING;
 				item->goalAnimState = LS_CROUCH_IDLE;
-				item->pos.yPos += coll->Front.Floor + CLICK(3);
+				item->pos.yPos = probeFront.Position.Floor + CLICK(3);
 				info->gunStatus = LG_HANDS_BUSY;
 				success = true;
 			}
 		}
 		// Auto jump.
-		else if (coll->Front.Floor >= -CLICK(7.5f) &&		// Upper floor bound.
-			coll->Front.Floor <= -CLICK(3.5f) &&			// Lower floor bound.
+		else if ((probeFront.Position.Floor - y) >= -CLICK(7.5f) &&		// Upper floor bound.
+			(probeFront.Position.Floor - y) <= -CLICK(3.5f) &&			// Lower floor bound.
 			!TestLaraSwamp(item))
 		{
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_IDLE;
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * coll->Front.Floor);
+			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
 			AnimateLara(item);
 			success = true;
 		}
@@ -210,13 +221,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Begin ladder climb.
 	if (info->climbStatus && TestValidLedgeAngle(item, coll))
 	{
-		if (coll->Front.Floor > -CLICK(7.5f) ||				// Upper front floor bound.
-			coll->FrontLeft.Floor > -CLICK(7.5f) ||			// Upper left floor bound.
-			coll->FrontRight.Floor > -CLICK(2) ||			// Upper right floor bound.
-			coll->Middle.Ceiling > -CLICK(4.5f) + 6 ||		// Upper ceiling bound.
+		if ((probeFront.Position.Floor - y) > -CLICK(7.5f) ||			// Upper front floor bound.
+			(probeFrontLeft.Position.Floor - y) > -CLICK(7.5f) ||		// Upper left floor bound.
+			(probeFrontRight.Position.Floor - y) > -CLICK(2) ||			// Upper right floor bound.
+			coll->Middle.Ceiling > -CLICK(4.5f) + 6 ||					// Upper ceiling bound.
 			info->waterStatus == LW_WADE)
 		{
-			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (CLICK(2) - 6)) &&
+			if (((probeFront.Position.Floor - y) < -CLICK(4) || probeFront.Position.Ceiling >= -(coll->Setup.Height + CLICK(2) + 6)) && // TODO: This is wrong.
 				coll->Middle.Ceiling <= -(CLICK(2) + 6))
 			{
 				if (TestLaraClimbStance(item, coll))
@@ -1570,32 +1581,13 @@ bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerB
 
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos - coll->Setup.Height;
-	auto probe = GetCollisionResult(item, item->pos.yRot, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
-	
-	// Hack to ensure Lara can run off diagonal ledges and stops on slanted ceilings. coll->Front.Floor often holds the wrong height because of quadrant-dependent wall pushing. @Sezz 2021.11.06
-	// BUG: This interferes with the one-step stand-to-crouch vault where the ceiling is lower than Lara's height.
-	if ((probe.Position.Ceiling - y) < 0)
-		return true;
-
-	return false;
-
-	// TODO: TestLaraMove() call not useful yet; it can block Lara from climbing. @Sezz 2021.10.28
-	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT, false);		// Using BadHeightUp/Down defined in walk and run state collision functions.
+	// TODO: Running down slopes.
+	return TestLaraMove(item, coll, item->pos.yRot, NO_BAD_POS, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->CollisionType != CT_FRONT &&
-		coll->CollisionType != CT_TOP_FRONT)
-	{
-		return true;
-	}
-
-	return false;
-
-	// TODO: Same issues as in TestLaraRunForward().
-	//return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT, true, true);		// Using BadHeightUp/Down defined in walk and run state collision functions.
+	return TestLaraMove(item, coll, item->pos.yRot, STEPUP_HEIGHT, -STEPUP_HEIGHT);		// Using BadHeightUp/Down defined in walk and run state collision functions.
 }
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
