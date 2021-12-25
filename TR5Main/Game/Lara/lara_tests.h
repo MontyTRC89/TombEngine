@@ -54,9 +54,18 @@ void GetTighRopeFallOff(int Regularity);
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
+
 bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
+
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int lowerClampLimit, int upperClampLimit);
+bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
 bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
