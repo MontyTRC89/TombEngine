@@ -119,7 +119,7 @@ struct COLL_INFO
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
-COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height);
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
