@@ -9,7 +9,7 @@
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Objects/Generic/Traps/traps.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/effects/tomb4fx.h"
 #include "Objects/TR4/Entity/tr4_wraith_info.h"
 #include "Game/effects/lara_fx.h"

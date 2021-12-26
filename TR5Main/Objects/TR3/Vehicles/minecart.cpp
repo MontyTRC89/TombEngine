@@ -1,18 +1,19 @@
 #include "framework.h"
 #include "Objects/TR3/Vehicles/minecart.h"
-#include "Game/Lara/lara.h"
-#include "Game/collision/collide_item.h"
-#include "Game/effects/effects.h"
-#include "Game/Lara/lara_flare.h"
-#include "Game/items.h"
-#include "Game/collision/sphere.h"
+
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
+#include "Objects/TR3/Vehicles/minecart_info.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/input.h"
-#include "Sound/sound.h"
-#include "Objects/TR3/Vehicles/minecart_info.h"
 
 using std::vector;
 

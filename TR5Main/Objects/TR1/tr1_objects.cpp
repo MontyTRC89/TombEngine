@@ -1,25 +1,23 @@
 #include "framework.h"
 #include "Objects/TR1/tr1_objects.h"
-/// entities
-#include "tr1_ape.h" // OK
-#include "tr1_bear.h" // OK
-#include "tr1_doppelganger.h" // OK
-#include "tr1_natla.h" // OK
-#include "tr1_giant_mutant.h" // OK
-#include "tr1_wolf.h" // OK
-#include "tr1_bigrat.h" // OK
-#include "tr1_centaur.h"
-/// objects
-
-/// traps
 
 /// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
+#include "Game/itemdata/creature_info.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+
+/// entities
+#include "Objects/TR1/Entity/tr1_ape.h" // OK
+#include "Objects/TR1/Entity/tr1_bear.h" // OK
+#include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
+#include "Objects/TR1/Entity/tr1_natla.h" // OK
+#include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
+#include "Objects/TR1/Entity/tr1_wolf.h" // OK
+#include "Objects/TR1/Entity/tr1_bigrat.h" // OK
+#include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
-#include "Game/itemdata/creature_info.h"
 
 static void StartBaddy(OBJECT_INFO* obj)
 {

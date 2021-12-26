@@ -27,7 +27,7 @@
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "tr5_smoke_emitter.h"
 /// objects
-#include "tr5_pushableblock.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "tr5_twoblockplatform.h"
 #include "tr5_raisingcog.h"
 #include "tr5_raisingblock.h"
@@ -50,7 +50,7 @@
 #include "tr5_crowdove_switch.h"
 
 /// shatter
-#include "tr5_smashobject.h"
+#include "Objects/TR5/Shatter/tr5_smashobject.h"
 /// necessary import
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_one_gun.h"
