@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_harpy.h"
-#include "people.h"
+#include "Game/people.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
