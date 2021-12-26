@@ -441,7 +441,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -553,7 +553,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -828,7 +828,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -920,7 +920,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate > LARA_SWAMP_TURN_MAX)
 		info->turnRate = LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -1039,7 +1039,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -1131,7 +1131,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate < -LARA_SWAMP_TURN_MAX)
 		info->turnRate = -LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -1452,7 +1452,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -1566,7 +1566,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;

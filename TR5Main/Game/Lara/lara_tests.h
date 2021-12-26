@@ -59,7 +59,7 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int lowerClampLimit, int upperClampLimit);
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int lowerClampLimit, int upperClampLimit, bool checkSwampDepth = true);
 bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll);
@@ -67,14 +67,15 @@ bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
+bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlopeDown = true, bool checkSlopeUp = true, bool checkDeath = true);
 bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll);
