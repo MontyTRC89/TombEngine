@@ -1,12 +1,13 @@
 #include "framework.h"
-#include "tr1_ape.h"
+#include "Objects/TR1/Entity/tr1_ape.h"
+
 #include "Game/control/box.h"
-#include "Game/effects/effects.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO apeBite = { 0, -19, 75, 15 };
 

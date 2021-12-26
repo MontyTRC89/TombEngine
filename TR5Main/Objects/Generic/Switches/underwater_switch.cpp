@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "underwater_switch.h"
+#include "Objects/Generic/Switches/underwater_switch.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
