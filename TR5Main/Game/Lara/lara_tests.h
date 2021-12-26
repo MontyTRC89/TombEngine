@@ -59,7 +59,7 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int lowerClampLimit, int upperClampLimit, bool checkSwampDepth = true);
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMax, bool checkSwampDepth = true);
 bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll);
