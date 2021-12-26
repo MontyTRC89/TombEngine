@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "generic_trapdoor.h"
+#include "Objects/Generic/Object/generic_trapdoor.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/floordata.h"
 #include "Specific/input.h"

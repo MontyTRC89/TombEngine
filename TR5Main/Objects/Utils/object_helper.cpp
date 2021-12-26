@@ -5,8 +5,8 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Specific/level.h"
-#include "tr5_smashobject.h"
-#include "tr5_pushableblock.h"
+
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 
 using std::function;
 

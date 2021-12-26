@@ -15,7 +15,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
-#include "steel_door.h"
+#include "Objects/Generic/Doors/steel_door.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 
