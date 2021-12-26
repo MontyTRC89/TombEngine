@@ -199,6 +199,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
 
 	// Begin ladder climb.
+	// TODO: Broken. Lara will always perform a ladder mount.
 	if (info->climbStatus && TestValidLedgeAngle(item, coll))
 	{
 		if ((probeFront.Position.Floor - y) > -CLICK(7.5f) ||			// Upper front floor bound.
@@ -207,7 +208,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			coll->Middle.Ceiling > -CLICK(4.5f) + 6 ||					// Upper ceiling bound.
 			info->waterStatus == LW_WADE)
 		{
-			if (((probeFront.Position.Floor - y) < -CLICK(4) || probeFront.Position.Ceiling >= -(coll->Setup.Height + CLICK(2) + 6)) && // TODO: This is wrong.
+			if (((probeFront.Position.Floor - y) < -CLICK(4) || probeFront.Position.Ceiling >= -coll->Setup.Height - CLICK(2) - 6) &&
 				coll->Middle.Ceiling <= -(CLICK(2) + 6))
 			{
 				if (TestLaraClimbStance(item, coll))
@@ -1512,19 +1513,27 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int lowerClampLimit, int upperClampLimit, bool checkSwampDepth)
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMin, bool checkSwampDepth)
 {
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
+	auto probeMiddle = GetCollisionResult(item);
 	bool swampTooDeep = checkSwampDepth ? (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3)) : TestLaraSwamp(item);
-	
-	if ((probeFront.Position.Floor - y) < lowerBound &&											// Lower floor bound.
-		(probeFront.Position.Floor - y) >= upperBound &&										// Upper floor bound.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > lowerClampLimit &&		// Lower clamp limit.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= upperClampLimit &&		// Upper clamp limit.
-		!swampTooDeep)																			// Swamp depth is permissive.
+
+	if (probeFront.Position.Ceiling > y - coll->Setup.Height)
+	{
+		// https://github.com/MontyTRC89/TombEngine/issues/391
+		// Now what? Even old master didn't allow this. How do I get the height of the floor in the above room??
+	}
+
+	if ((probeFront.Position.Floor - y) < lowerBound &&									// Lower floor bound.
+		(probeFront.Position.Floor - y) >= upperBound &&								// Upper floor bound.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > clampMin &&		// Lower clamp limit.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMax &&		// Upper clamp limit.
+		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= gapMin &&		// Gap is optically permissive for action.
+		!swampTooDeep)																	// Swamp depth is permissive.
 	{
 		return true;
 	}
@@ -1534,32 +1543,32 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 
 bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT, -MAX_HEIGHT);		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
+	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 }
 
 bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT, -MAX_HEIGHT);		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
+	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 }
 
 bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -CLICK(3.5f), -CLICK(7.5f), CLICK(0.1f) /* TODO: How much hand room?*/, -MAX_HEIGHT, false);		// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
+	return TestLaraVaultTolerance(item, coll, -CLICK(3.5f), -CLICK(7.5f), CLICK(0.1f) /* TODO: How much hand room?*/, -MAX_HEIGHT, CLICK(0.1f), false);		// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
 }
 
 bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, 0, -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, LARA_HEIGHT);		// Floor range: (0, -STEPUP_HEIGHT]
+	return TestLaraVaultTolerance(item, coll, 0, -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (0, -STEPUP_HEIGHT]
 }
 
 bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT);		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
+	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 }
 
 bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT);		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
+	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
