@@ -11,7 +11,7 @@
 #include "Scripting/GameFlowScript.h"
 #include "Renderer\RenderView\RenderView.h"
 #include "Objects/TR3/Vehicles/quad.h"
-#include "rubberboat.h"
+#include "Objects/TR3/Vehicles/rubberboat.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/biggun.h"
 #include "Objects/TR4/Vehicles/jeep.h"

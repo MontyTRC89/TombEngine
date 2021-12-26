@@ -15,7 +15,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
-#include "pushpull_kick_door.h"
+#include "Objects/Generic/Doors/pushpull_kick_door.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/door_data.h"
 

@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "tr2_springboard.h"
-#include "Specific/level.h"
-#include "Game/Lara/lara.h"
+#include "Objects/TR2/Trap/tr2_springboard.h"
+
 #include "Game/animation.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
 
 void SpringBoardControl(short itemNumber)
 {
