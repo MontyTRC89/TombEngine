@@ -42,7 +42,7 @@ namespace TEN::Renderer
 
 	constexpr auto NUM_ANIMATED_SETS = 1024;
 	//constexpr auto MAX_LIGHTS_DRAW = 16384;
-	constexpr auto MAX_DYNAMIC_LIGHTS = 16384;
+	constexpr auto MAX_DYNAMIC_LIGHTS = 128;
 	constexpr auto MAX_DRAW_STATICS = 16384;
 	constexpr auto MAX_BONES = 32;
 	constexpr auto MAX_SPRITES = 16384;
@@ -418,7 +418,7 @@ namespace TEN::Renderer
 		short m_numHairIndices;
 		std::vector<RendererVertex> m_hairVertices;
 		std::vector<short> m_hairIndices;
-		std::vector<RendererLight*> m_dynamicLights;
+		std::vector<RendererLight> dynamicLights;
 		std::vector<RendererLine3D*> m_lines3DToDraw;
 		std::vector<RendererLine2D*> m_lines2DToDraw;
 		std::vector<RendererRect2D*> m_rects2DToDraw;
@@ -458,7 +458,6 @@ namespace TEN::Renderer
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
 		RendererItem m_items[NUM_ITEMS];
 		RendererEffect m_effects[NUM_ITEMS];
-		RendererLight m_lights[MAX_LIGHTS];
 		int m_nextLight;
 		int m_currentY;
 		std::vector<RendererTransparentFace> m_transparentFaces;
