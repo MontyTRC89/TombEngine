@@ -30,6 +30,7 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
 bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.2f));
+bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side = 0);
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist);
 int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
