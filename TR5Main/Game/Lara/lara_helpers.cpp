@@ -203,6 +203,30 @@ void SetLaraFallBackState(ITEM_INFO* item)
 	item->gravityStatus = true;
 }
 
+short GetLaraSlideDirection(COLL_INFO* coll)
+{
+	short dir = 0;
+
+	//if (g_GameFlow->Animations.SlideExtended)
+	//{
+	//	// TODO: Get true slope direction.
+	//}
+	//else
+	{
+		if (coll->TiltX > 2)
+			dir = -ANGLE(90.0f);
+		else if (coll->TiltX < -2)
+			dir = ANGLE(90.0f);
+
+		if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
+			dir = ANGLE(180.0f);
+		else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
+			dir = ANGLE(0.0f);
+	}
+
+	return dir;
+}
+
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -232,43 +256,6 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = dir;
 	oldAngle = dir;
-}
-
-SplatType GetLaraSplatType(ITEM_INFO* item, int dist, int height, int side)
-{
-	int y = item->pos.yPos + height;
-	auto probe = GetCollisionResult(item, item->pos.yRot, dist, height, side);
-
-	if (probe.Position.Floor == NO_HEIGHT)
-		return SplatType::Wall;
-	else if (y >= probe.Position.Floor || y <= probe.Position.Ceiling)
-		return SplatType::Step;
-	else
-		return SplatType::None;
-}
-
-short GetLaraSlideDirection(COLL_INFO* coll)
-{
-	short dir = 0;
-
-	//if (g_GameFlow->Animations.SlideExtended)
-	//{
-	//	// TODO: Get true slope direction.
-	//}
-	//else
-	{
-		if (coll->TiltX > 2)
-			dir = -ANGLE(90.0f);
-		else if (coll->TiltX < -2)
-			dir = ANGLE(90.0f);
-
-		if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
-			dir = ANGLE(180.0f);
-		else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
-			dir = ANGLE(0.0f);
-	}
-
-	return dir;
 }
 
 void ResetLaraFlex(ITEM_INFO* item, float rate)

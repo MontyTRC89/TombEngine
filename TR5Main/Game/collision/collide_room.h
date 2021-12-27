@@ -29,13 +29,6 @@ enum class COLL_PROBE_MODE
 	FREE_FLAT
 };
 
-enum class SplatType
-{
-	None,
-	Wall,
-	Step
-};
-
 enum class CORNER_RESULT
 {
 	NONE,
