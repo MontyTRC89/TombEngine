@@ -145,6 +145,16 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
+void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	item->speed = 0;
+
+	LaraSnapToHeight(item, coll);
+	AnimateLara(item);
+}
+
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
