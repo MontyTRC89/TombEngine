@@ -1101,25 +1101,14 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
-bool TestLaraLand(ITEM_INFO* item)
+bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item);
-
-	if (item->fallspeed >= -10 &&									// Avoid landing when jumping at steps.
-		(probe.Position.Floor <= y ||								// Lara is below the floor.
-			(probe.Position.Floor - y) <= item->fallspeed) ||		// Lara will land on the floor the folowing frame.
-		TestLaraSwamp(item))
+	if (item->gravityStatus && item->fallspeed >= 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
 		return true;
 	}
 
 	return false;
-}
-
-bool TestLaraHardLanding(ITEM_INFO* item, COLL_INFO* coll)
-{
-	return (item->fallspeed - 140);
 }
 
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)

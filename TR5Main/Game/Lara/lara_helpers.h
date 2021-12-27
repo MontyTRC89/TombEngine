@@ -14,6 +14,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
+void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
