@@ -20,10 +20,8 @@ void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraFallState(ITEM_INFO* item);
 void SetLaraFallBackState(ITEM_INFO* item);
-void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
-
-SplatType GetLaraSplatType(ITEM_INFO* item, int dist, int height, int side = 0);
 short GetLaraSlideDirection(COLL_INFO* coll);
+void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
 
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);

@@ -1006,6 +1006,21 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	return ((result1 == 0) && (result2 == 0));
 }
 
+bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
+{
+	auto start = GAME_VECTOR(item->pos.xPos,
+		item->pos.yPos + height,
+		item->pos.zPos,
+		item->roomNumber);
+
+	auto end = GAME_VECTOR(item->pos.xPos + dist * phd_sin(item->pos.yRot),
+		item->pos.yPos + height,
+		item->pos.zPos + dist * phd_cos(item->pos.yRot),
+		item->roomNumber);
+
+	return !LOS(&start, &end);
+}
+
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 {
 	auto pos1 = GAME_VECTOR(item->pos.xPos,
