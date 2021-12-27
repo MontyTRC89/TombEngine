@@ -225,6 +225,43 @@ namespace TEN::Renderer
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
+		std::vector<int> roomsToCheck;
+		roomsToCheck.push_back(roomNumber);
+		for (auto& door : nativeRoom->doors)
+		{
+			roomsToCheck.push_back(door.room);
+		};
+
+		// Interpolate ambient light between rooms
+		if (item->PreviousRoomNumber == NO_ITEM)
+		{
+			item->PreviousRoomNumber = nativeItem->roomNumber;
+			item->CurrentRoomNumber = nativeItem->roomNumber;
+			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
+		}
+		else if (nativeItem->roomNumber != item->CurrentRoomNumber)
+		{
+			item->PreviousRoomNumber = item->CurrentRoomNumber;
+			item->CurrentRoomNumber = nativeItem->roomNumber;
+			item->AmbientLightSteps = 0;
+		}
+		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
+		{
+			item->AmbientLightSteps++;
+		}
+
+		if (item->PreviousRoomNumber == NO_ITEM)
+		{
+			item->AmbientLight = m_rooms[nativeItem->roomNumber].AmbientLight;
+		}
+		else
+		{
+			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
+				(item->AmbientLightSteps / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->CurrentRoomNumber].AmbientLight);
+			item->AmbientLight.w = 1.0f;
+		}
+
+		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 
@@ -258,89 +295,94 @@ namespace TEN::Renderer
 			tempLights.push_back(light);
 		}
 
-		int numLights = room.Lights.size();
-
-		for (int j = 0; j < numLights; j++)
+		// Check current room and also neighbour rooms
+		for (int roomToCheck : roomsToCheck)
 		{
-			RendererLight* light = &room.Lights[j];
+			RendererRoom& currentRoom = m_rooms[roomToCheck];
+			int numLights = currentRoom.Lights.size();
 
-			// Check only lights different from sun
-			if (light->Type == LIGHT_TYPE_SUN)
+			for (int j = 0; j < numLights; j++)
 			{
-				// Sun is added without checks
-				light->Distance = D3D11_FLOAT32_MAX;
-				light->LocalIntensity = 0;
-			}
-			else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
-			{
-				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+				RendererLight* light = &currentRoom.Lights[j];
 
-				float distance = (itemPosition - lightPosition).Length();
-
-				// Collect only lights nearer than 20 sectors
-				if (distance >= 20 * WALL_SIZE)
-					continue;
-
-				// Check the out radius
-				if (distance > light->Out)
-					continue;
-
-				float attenuation = 1.0f - distance / light->Out;
-				float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-				light->LocalIntensity = intensity;
-
-				// If Lara, try to collect shadow casting light
-				if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+				// Check only lights different from sun
+				if (light->Type == LIGHT_TYPE_SUN)
 				{
-					if (intensity >= brightest)
+					// Sun is added without checks
+					light->Distance = D3D11_FLOAT32_MAX;
+					light->LocalIntensity = 0;
+				}
+				else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+				{
+					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+					float distance = (itemPosition - lightPosition).Length();
+
+					// Collect only lights nearer than 20 sectors
+					if (distance >= 20 * WALL_SIZE)
+						continue;
+
+					// Check the out radius
+					if (distance > light->Out)
+						continue;
+
+					float attenuation = 1.0f - distance / light->Out;
+					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+					light->LocalIntensity = intensity;
+
+					// If Lara, try to collect shadow casting light
+					if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 					{
-						brightest = intensity;
-						brightestLight = light;
+						if (intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = light;
+						}
 					}
+
+					light->Distance = distance;
+				}
+				else if (light->Type == LIGHT_TYPE_SPOT)
+				{
+					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+
+					float distance = (itemPosition - lightPosition).Length();
+
+					// Collect only lights nearer than 20 sectors
+					if (distance >= 20 * WALL_SIZE)
+						continue;
+
+					// Check the range
+					if (distance > light->Range)
+						continue;
+
+					float attenuation = 1.0f - distance / light->Range;
+					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
+
+					light->LocalIntensity = intensity;
+
+					// If Lara, try to collect shadow casting light
+					if (nativeItem->objectNumber == ID_LARA)
+					{
+						if (intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = light;
+						}
+					}
+
+					light->Distance = distance;
+				}
+				else
+				{
+					// Invalid light type
+					continue;
 				}
 
-				light->Distance = distance;
+				tempLights.push_back(light);
 			}
-			else if (light->Type == LIGHT_TYPE_SPOT)
-			{
-				Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-				float distance = (itemPosition - lightPosition).Length();
-
-				// Collect only lights nearer than 20 sectors
-				if (distance >= 20 * WALL_SIZE)
-					continue;
-
-				// Check the range
-				if (distance > light->Range)
-					continue;
-
-				float attenuation = 1.0f - distance / light->Range;
-				float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
-
-				light->LocalIntensity = intensity;
-
-				// If Lara, try to collect shadow casting light
-				if (nativeItem->objectNumber == ID_LARA)
-				{		
-					if (intensity >= brightest)
-					{
-						brightest = intensity;
-						brightestLight = light;
-					}
-				}
-
-				light->Distance = distance;
-			}
-			else
-			{
-				// Invalid light type
-				continue;
-			}
-
-			tempLights.push_back(light);
-		} 
+		}
 
 		if (nativeItem->objectNumber == ID_LARA)
 		{

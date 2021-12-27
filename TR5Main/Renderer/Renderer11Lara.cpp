@@ -242,7 +242,7 @@ void TEN::Renderer::Renderer11::drawLara(bool shadowMap, RenderView& view)
 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
-	m_stItem.AmbientLight = room->AmbientLight;
+	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
