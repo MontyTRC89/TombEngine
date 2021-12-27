@@ -2713,7 +2713,7 @@ namespace TEN::Renderer
 
         m_stItem.World = item->World;
         m_stItem.Position = Vector4(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos, 1.0f);
-        m_stItem.AmbientLight = room->AmbientLight;
+        m_stItem.AmbientLight = item->AmbientLight;
         memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
         m_cbItem.updateData(m_stItem, m_context.Get());
         m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
