@@ -177,6 +177,10 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Matrix Scale;
 		DirectX::SimpleMath::Matrix AnimationTransforms[32];
 		std::vector<RendererLight*> LightsToDraw;
+		int PreviousRoomNumber = NO_ROOM;
+		int CurrentRoomNumber = NO_ROOM;
+		Vector4 AmbientLight;
+		int AmbientLightSteps;
 	};
 	
 	struct RendererMesh
