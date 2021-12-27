@@ -8,6 +8,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
@@ -386,10 +387,14 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->fallspeed > 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+	if (TestLaraLand(item, coll))
 	{
-		LaraResetGravityStatus(item, coll);
-		LaraSnapToHeight(item, coll);
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
 	}
 }
 
