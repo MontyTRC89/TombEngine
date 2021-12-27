@@ -591,7 +591,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
-		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, 0);
+		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 
 		if (TestLaraSlide(item, coll))
 			;
