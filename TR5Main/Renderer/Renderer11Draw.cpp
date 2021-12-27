@@ -1917,14 +1917,11 @@ namespace TEN::Renderer
 
     void Renderer11::addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
     {
-        if (m_nextLight >= MAX_LIGHTS)
-            return;
-
-        RendererLight *dynamicLight = &m_lights[m_nextLight++];
+        RendererLight dynamicLight;
 
         if (falloff >= 8)
         {
-            dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
+            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
         }
         else
         { 
@@ -1932,20 +1929,19 @@ namespace TEN::Renderer
             g = (g * falloff) >> 3;
             b = (b * falloff) >> 3;
 
-            dynamicLight->Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
+            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
         }
 
-        dynamicLight->Position = Vector3(float(x), float(y), float(z));
-        dynamicLight->Out = falloff * 256.0f;
-        dynamicLight->Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
-        dynamicLight->Intensity = 2.0f;
+        dynamicLight.Position = Vector3(float(x), float(y), float(z));
+        dynamicLight.Out = falloff * 256.0f;
+        dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
 
-        m_dynamicLights.push_back(dynamicLight);
+        dynamicLights.push_back(dynamicLight);
     }
 
     void Renderer11::clearDynamicLights()
-{
-        m_dynamicLights.clear();
+    {
+        dynamicLights.clear();
     }
 
     void Renderer11::drawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget)
