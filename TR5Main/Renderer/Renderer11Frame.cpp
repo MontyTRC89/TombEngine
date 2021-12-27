@@ -128,9 +128,9 @@ namespace TEN::Renderer
 		Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < m_dynamicLights.size(); i++)
+		for (int i = 0; i < dynamicLights.size(); i++)
 		{
-			RendererLight *light = m_dynamicLights[i];
+			RendererLight* light = &dynamicLights[i];
 
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -239,9 +239,9 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < m_dynamicLights.size(); i++)
+		for (int i = 0; i < dynamicLights.size(); i++)
 		{
-			RendererLight* light = m_dynamicLights[i];
+			RendererLight* light = &dynamicLights[i];
 
 			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
@@ -384,9 +384,9 @@ namespace TEN::Renderer
 		int numLights = room.Lights.size();
 
 		// Collect dynamic lights for rooms
-		for (int i = 0; i < m_dynamicLights.size(); i++)
+		for (int i = 0; i < dynamicLights.size(); i++)
 		{
-			RendererLight *light = m_dynamicLights[i];
+			RendererLight* light = &dynamicLights[i];
 
 			Vector3 boxMin = Vector3(r->x - 2 * WALL_SIZE, -(r->minfloor + STEP_SIZE), r->z - 2 * WALL_SIZE);
 			Vector3 boxMax = Vector3(r->x + (r->xSize + 1) * WALL_SIZE, -(r->maxceiling - STEP_SIZE), r->z + (r->zSize + 1) * WALL_SIZE);
