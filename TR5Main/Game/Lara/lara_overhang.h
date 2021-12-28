@@ -1,6 +1,9 @@
 #pragma once
 #include "Specific/trmath.h"
 
+struct ITEM_INFO;
+struct COLL_INFO;
+
 void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_slopefall(ITEM_INFO* lara, COLL_INFO* coll);
@@ -14,8 +17,8 @@ void lara_as_sclimbstart(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_sclimbstop(ITEM_INFO* lara, COLL_INFO* coll);
 void lara_as_sclimbend(ITEM_INFO* lara, COLL_INFO* coll);
 
-void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* col);
-void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* col);
+void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll);
+void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll);
