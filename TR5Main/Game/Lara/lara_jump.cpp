@@ -73,7 +73,8 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_FORWARD;
+	// TODO
+	//item->goalAnimState = LS_JUMP_FORWARD;
 }
 
 // State:		LS_JUMP_FORWARD (3)
@@ -115,7 +116,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->speed = (item->speed * 95) / 100;
+	item->speed = item->speed * 0.95f;
 
 	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
 		item->hitPoints > 0)
@@ -146,7 +147,7 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 		if (LaraLandedBad(item, coll))
 			item->goalAnimState = LS_DEATH;
 		else
-			SetAnimation(item, LA_FREEFALL_LAND);
+			item->goalAnimState = LS_IDLE;
 
 		StopSoundEffect(SFX_TR4_LARA_FALL);
 		DoLaraLand(item, coll);
