@@ -107,6 +107,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->goalAnimState = LS_IDLE;
 
+		// TODO: It's still possible to achieve a softlock.
 		DoLaraLand(item, coll);
 	}
 }

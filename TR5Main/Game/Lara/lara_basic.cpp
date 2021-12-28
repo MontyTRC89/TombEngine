@@ -513,10 +513,12 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in wade-height water.
 void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	LaraInfo*& info = item->data;
+
+	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
+		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
@@ -881,10 +883,10 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate > LARA_WADE_TURN_MAX)
 		info->turnRate = LARA_WADE_TURN_MAX;
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
+		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
@@ -1092,10 +1094,10 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate < -LARA_WADE_TURN_MAX)
 		info->turnRate = -LARA_WADE_TURN_MAX;
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_PREPARE;
+		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
