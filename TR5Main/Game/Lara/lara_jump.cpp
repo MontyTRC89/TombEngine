@@ -95,7 +95,6 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->speed < 0)
 		info->moveAngle = item->pos.yRot;
 
-	// TODO: Try doing land test in control functions again someday. Blocks such as these do not belong in collision functions. @Sezz 2021.12.27
 	if (TestLaraLand(item, coll))
 	{
 		if (LaraLandedBad(item, coll))
@@ -261,7 +260,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->waterStatus == LW_WADE)
 	{
-		if (TestLaraStandingJump(item, coll, item->pos.yRot, 0))
+		if (TestLaraJumpUp(item, coll))
 			item->goalAnimState = LS_JUMP_UP;
 		else
 			item->goalAnimState = LS_IDLE;
@@ -271,7 +270,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	if ((TrInput & IN_FORWARD ||
 			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
-		TestLaraStandingJump(item, coll, item->pos.yRot))
+		TestLaraJumpForward(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
 		info->jumpDirection = LaraJumpDirection::Forward;
@@ -279,7 +278,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if ((TrInput & IN_BACK ||
 			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
-		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
+		TestLaraJumpBack(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
@@ -288,7 +287,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if ((TrInput & IN_LEFT ||
 			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
-		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
+		TestLaraJumpLeft(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
 		info->jumpDirection = LaraJumpDirection::Left;
@@ -296,14 +295,14 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if ((TrInput & IN_RIGHT ||
 			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
-		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
+		TestLaraJumpRight(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
 		return;
 	}
 	
-	if (TestLaraStandingJump(item, coll, item->pos.yRot, 0))
+	if (TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_UP;
 		info->jumpDirection = LaraJumpDirection::Up;
