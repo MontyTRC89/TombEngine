@@ -52,6 +52,7 @@ constexpr auto LARA_VELOCITY = 12;
 
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_FREEFALL_SCREAM_SPEED = 154;
+constexpr auto LARA_FREEFALL_DIVE_DEATH_SPEED = 154;
 constexpr auto LARA_TERMINAL_VELOCITY = 0; // TODO
 
 constexpr auto LARA_JUMP_TIME = 22;				// Frames to count before running jump is possible.

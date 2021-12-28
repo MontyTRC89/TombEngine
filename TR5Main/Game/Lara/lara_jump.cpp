@@ -63,7 +63,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_WALK &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
-		item->goalAnimState = LS_SWANDIVE_START;
+		item->goalAnimState = LS_SWAN_DIVE_START;
 		return;
 	}
 
@@ -444,7 +444,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Core seems to have planned this feature. Add an animation to make it possible.
+	// TODO: Core appears to have planned this feature. Add an animation to make it possible.
 	/*if (TrInput & (IN_ROLL | IN_LEFT))
 	{
 		item->goalAnimState = LS_JUMP_ROLL_180;
@@ -478,7 +478,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 		return;
 
-	// TODO: Core seems to have planned this feature. Add an animation to make it possible.
+	// TODO: Core appears to have planned this feature. Add an animation to make it possible.
 	/*if (TrInput & (IN_ROLL | IN_RIGHT))
 	{
 		item->goalAnimState = LS_JUMP_ROLL_180;
@@ -642,9 +642,9 @@ void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_SWANDIVE_START (52)
-// Control:		lara_col_swandive()
-void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SWAN_DIVE_START (52)
+// Collision:	lara_col_swan_dive()
+void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -670,19 +670,18 @@ void lara_as_swandive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
-	// TODO: Why?
-	if (item->fallspeed > LARA_FREEFALL_SPEED && item->goalAnimState != LS_DIVE)
-		item->goalAnimState = LS_SWANDIVE_END;
+	if (item->fallspeed >= LARA_FREEFALL_SPEED && item->goalAnimState != LS_FREEFALL_DIVE)
+		item->goalAnimState = LS_SWAN_DIVE_END;
 }
 
-void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_SWAN_DIVE_START (52)
+// Control:		lara_as_swan_dive()
+void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 	auto bounds = GetBoundsAccurate(item);
 	auto realHeight = bounds->Y2 - bounds->Y1;
 
-	/*state 52*/
-	/*state code: lara_as_swandive*/
 	info->moveAngle = item->pos.yRot;
 	info->keepCrouched = TestLaraKeepCrouched(item, coll);
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
@@ -721,44 +720,46 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_fastdive(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_FREEFALL_DIVE (53)
+// Collision:	lara_col_freefall_dive()
+void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 53*/
-	/*collision: lara_col_fastdive*/
-	if (TrInput & IN_ROLL && item->goalAnimState == LS_SWANDIVE_END)
-		item->goalAnimState = LS_JUMP_ROLL_180;
+	item->speed = item->speed * 0.95f;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
-	item->speed = (item->speed * 95) / 100;
+
+	if (TrInput & IN_ROLL &&
+		item->goalAnimState == LS_SWAN_DIVE_END)
+	{
+		item->goalAnimState = LS_JUMP_ROLL_180;
+		return;
+	}
+
+	item->goalAnimState = LS_FREEFALL_DIVE;
 }
 
-void lara_col_fastdive(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_FREEFALL_DIVE (53)
+// Control:		lara_as_freefall_dive()
+void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	/*state 53*/
-	/*state code: lara_as_fastdive*/
 	info->moveAngle = item->pos.yRot;
-
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
-
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
+
 	LaraDeflectEdgeJump(item, coll);
 
-	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	if (TestLaraLand(item, coll))
 	{
-		if (item->fallspeed <= 133)
-			item->goalAnimState = LS_IDLE;
-		else
+		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
 			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
 
-		item->fallspeed = 0;
-		item->gravityStatus = 0;
-
-		if (coll->Middle.Floor != NO_HEIGHT)
-			item->pos.yPos += coll->Middle.Floor;
+		DoLaraLand(item, coll);
 	}
 }
