@@ -963,47 +963,30 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	return !res;
 }
 
-bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist)
-{
-	auto y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
-	
-	if (!TestLaraSwamp(item) &&																// Swamp failsafe.
-		!TestLaraFacingCorner(item, angle, dist) &&
-		probe.Position.Floor - y >= -STEPUP_HEIGHT &&										// Highest floor bound.
-		(probe.Position.Ceiling - y + coll->Setup.Height) < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 {
-	auto angle1 = angle + ANGLE(15.0f);
-	auto angle2 = angle - ANGLE(15.0f);
+	short angle1 = angle + ANGLE(15.0f);
+	short angle2 = angle - ANGLE(15.0f);
 
-	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle1),
-							item->roomNumber);
+	auto start = GAME_VECTOR(item->pos.xPos,
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle2),
-							item->roomNumber);
+	auto end1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angle1),
+		item->roomNumber);
 
-	auto pos = GAME_VECTOR(item->pos.xPos,
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos,
-							item->roomNumber);
+	auto end2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angle2),
+		item->roomNumber);
 
-	auto result1 = LOS(&pos, &vec1);
-	auto result2 = LOS(&pos, &vec2);
+	bool result1 = LOS(&start, &end1);
+	bool result2 = LOS(&start, &end2);
 
-	return ((result1 == 0) && (result2 == 0));
+	return (!result1 && !result2);
 }
 
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
@@ -1433,6 +1416,48 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
+}
+
+bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist)
+{
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
+
+	if (!TestLaraSwamp(item) &&																// Swamp failsafe.
+		!TestLaraFacingCorner(item, angle, dist) &&											// Avoid jumping through corners.
+		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Highest floor bound.
+		(probe.Position.Ceiling - y + coll->Setup.Height) < -(LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
+		probe.Position.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraStandingJump(item, coll, item->pos.yRot);
+}
+
+bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f));
+}
+
+bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f));
+}
+
+bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f));
+}
+
+bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraStandingJump(item, coll, item->pos.yRot, 0);
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
