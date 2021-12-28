@@ -1103,7 +1103,9 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (item->gravityStatus && item->fallspeed >= 0 && (coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+	if (item->gravityStatus &&
+		item->fallspeed >= 0 &&
+		(coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
 	{
 		return true;
 	}
