@@ -108,8 +108,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_surfright,//49
 	lara_void_func,//50
 	lara_void_func,//51
-	lara_as_swandive,//52
-	lara_as_fastdive,//53
+	lara_as_swan_dive,//52
+	lara_as_freefall_dive,//53
 	lara_as_gymnast,//54
 	lara_as_waterout,
 	lara_as_climbstnc,
@@ -272,8 +272,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_surfright,
 	lara_void_func,
 	lara_void_func,
-	lara_col_swandive,
-	lara_col_fastdive,
+	lara_col_swan_dive,//52
+	lara_col_freefall_dive,//53
 	lara_default_col,
 	lara_default_col,
 	lara_col_climbstnc,
@@ -469,19 +469,19 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					UpdateItemRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
-					if (item->currentAnimState == LS_SWANDIVE_START)
+					if (item->currentAnimState == LS_SWAN_DIVE_START)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(45.0f);
-						item->goalAnimState = LS_DIVE;
+						item->goalAnimState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
 						item->fallspeed *= 2;
 					}
-					else if (item->currentAnimState == LS_SWANDIVE_END)
+					else if (item->currentAnimState == LS_SWAN_DIVE_END)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(85.0f);
-						item->goalAnimState = LS_DIVE;
+						item->goalAnimState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
 						item->fallspeed *= 2;
 					}
@@ -514,8 +514,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
 				{
-					if (item->currentAnimState == LS_SWANDIVE_START ||
-						item->currentAnimState == LS_SWANDIVE_END)
+					if (item->currentAnimState == LS_SWAN_DIVE_START ||
+						item->currentAnimState == LS_SWAN_DIVE_END)
 					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
 					}
