@@ -823,7 +823,7 @@ void lara_as_sclimbend(ITEM_INFO* lara, COLL_INFO* coll)
 // ********  Extending existing state routines  ********
 
 // Extends state 10 (AS_HANG)
-void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* col)
+void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll)
 {
 	if (!g_GameFlow->Animations.Overhang)
 		return;
@@ -871,7 +871,7 @@ void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* col)
 }
 
 // Extends state 11 (AS_REACH)
-void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* col)
+void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* coll)
 {
 	if (!g_GameFlow->Animations.Overhang)
 		return;
