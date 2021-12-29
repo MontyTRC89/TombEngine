@@ -107,11 +107,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		discard;
 	}
 
-	float3 colorMul = input.Color.xyz; // min(input.Color.xyz, 1.0f);
+	float3 colorMul = input.Color.xyz;
 
-	float3 Normal = NormalTexture.Sample(Sampler, input.UV).rgb;
-	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(input.TBN, Normal));
+	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
+	normal = normal * 2 - 1;
+	normal = normalize(mul(input.TBN, normal));
 
 	float3 lighting = AmbientLight.xyz;
 
@@ -121,69 +121,15 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 		if (lightType == LT_POINT || lightType == LT_SHADOW)
 		{
-			float3 lightPos = Lights[i].Position.xyz;
-			float3 color = Lights[i].Color.xyz;
-			float radius = Lights[i].Out;
-
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-
-			if (distance > radius)
-				continue;
-
-			lightVec = normalize(lightVec);
-			float d = saturate(dot(Normal, lightVec));
-			if (d < 0)
-				continue;
-
-			float attenuation = pow(((radius - distance) / radius), 2);
-
-			lighting += color * attenuation * d;
+			lighting += DoPointLight(input.WorldPosition, normal, Lights[i]);
 		}
 		else if (lightType == LT_SUN)
 		{
-			float3 color = Lights[i].Color.xyz;
-			float3 direction = Lights[i].Direction.xyz;
-			
-			direction = normalize(direction);
-
-			float d = dot(Normal, direction);
-			if (d < 0)
-				continue;
-			
-			float3 h = normalize(normalize(CameraPosition - input.WorldPosition) + direction);
-			float s = pow(saturate(dot(h, Normal)), 0.5f);
-			
-			lighting += color * d;
+			lighting += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
 		}
 		else if (lightType == LT_SPOT)
 		{
-			float3 lightPos = Lights[i].Position.xyz;
-			float3 color = Lights[i].Color.xyz;
-			float3 direction = Lights[i].Direction.xyz;
-			float range = Lights[i].Range;
-			float inAngle = Lights[i].In;
-			float outAngle = Lights[i].Out;
-			
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-
-			if (distance > range)
-				continue;
-
-			lightVec = normalize(lightVec);
-			float inCone = dot(lightVec, direction); 
-			if (inCone < outAngle)
-				continue;			
-
-			float attenuation = (range - distance) / range * (inCone - outAngle) / (1.0f - outAngle);
-			attenuation = pow(attenuation, 2);
-
-			float d = saturate(dot(Normal, lightVec));
-			if (d < 0)
-				continue;
-
-			lighting += color * attenuation * d;
+			lighting += DoSpotLight(input.WorldPosition, normal, Lights[i]);
 		}
 	}
 
@@ -191,7 +137,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	output.xyz *= lighting.xyz;
 
 	if (FogMaxDistance != 0)
+	{
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+	}
 
 	return output;
 }
