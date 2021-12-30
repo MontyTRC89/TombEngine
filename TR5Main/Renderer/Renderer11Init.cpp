@@ -146,6 +146,43 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_subtractiveBlendState.GetAddressOf()));
+	
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_DEST_COLOR;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_screenBlendState.GetAddressOf()));
+
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_MAX;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_lightenBlendState.GetAddressOf()));
+
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_excludeBlendState.GetAddressOf()));
+
 	D3D11_SAMPLER_DESC shadowSamplerDesc = {};
 	shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;

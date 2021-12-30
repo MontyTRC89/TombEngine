@@ -1234,6 +1234,21 @@ namespace TEN::Renderer
 			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
 
 			break;
+		case BLENDMODE_SCREEN:
+			m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_LIGHTEN:
+			m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_EXCLUDE:
+			m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
 		}
 	}
 
