@@ -313,6 +313,9 @@ namespace TEN::Renderer
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain = nullptr;
 		std::unique_ptr<CommonStates> m_states = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11BlendState> m_subtractiveBlendState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11BlendState> m_screenBlendState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11BlendState> m_lightenBlendState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11BlendState> m_excludeBlendState = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
