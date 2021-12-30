@@ -787,35 +787,33 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int shift_r, shift_l;
+	int shiftRight, shiftLeft;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shift_r) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shiftRight) != 1)
 		return false;
 
-	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, CLICK(2), &shift_l) != 1)
+	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, CLICK(2), &shiftLeft) != 1)
 		return false;
 
-	if (shift_r)
+	if (shiftRight)
 	{
-		if (shift_l)
+		if (shiftLeft)
 		{
-			if (shift_r < 0 != shift_l < 0)
+			if (shiftRight < 0 != shiftLeft < 0)
 				return false;
 
-			if ((shift_r < 0 && shift_l < shift_r) ||
-				(shift_r > 0 && shift_l > shift_r))
+			if ((shiftRight < 0 && shiftLeft < shiftRight) ||
+				(shiftRight > 0 && shiftLeft > shiftRight))
 			{
-				item->pos.yPos += shift_l;
+				item->pos.yPos += shiftLeft;
 				return true;
 			}
 		}
 
-		item->pos.yPos += shift_r;
+		item->pos.yPos += shiftRight;
 	}
-	else if (shift_l)
-	{
-		item->pos.yPos += shift_l;
-	}
+	else if (shiftLeft)
+		item->pos.yPos += shiftLeft;
 
 	return true;
 }
@@ -912,31 +910,28 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 bool TestHangSwingIn(ITEM_INFO* item, short angle)
 {
 	LaraInfo*& info = item->data;
-	int x = item->pos.xPos;
+
 	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor;
-	int floorHeight, ceilingHeight;
+	auto probe = GetCollisionResult(item, angle, CLICK(0.5f));
 
-	z += phd_cos(angle) * CLICK(0.5f);
-	x += phd_sin(angle) * CLICK(0.5f);
-
-	floor = GetFloor(x, y, z, &roomNum);
-	floorHeight = GetFloorHeight(floor, x, y, z);
-	ceilingHeight = GetCeiling(floor, x, y, z);
-
-	if (floorHeight != NO_HEIGHT)
+	if (probe.Position.Floor != NO_HEIGHT)
 	{
 		if (g_GameFlow->Animations.OscillateHang)
 		{
-			if (floorHeight - y > 0 && ceilingHeight - y < -400)
+			if ((probe.Position.Floor - y) > 0 &&
+				(probe.Position.Ceiling - y) < -400)
+			{
 				return true;
+			}
 		}
 		else
 		{
-			if (floorHeight - y > 0 && ceilingHeight - y < -400 && (y - 819 - ceilingHeight > -72))
+			if ((probe.Position.Floor - y) > 0 &&
+				(probe.Position.Ceiling - y) < -400 &&
+				(y - 819 - probe.Position.Ceiling) > -72)
+			{
 				return true;
+			}
 		}
 	}
 
@@ -946,9 +941,10 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
 	LaraInfo*& info = item->data;
+
 	auto oldPos = item->pos;
 
-	Lara.moveAngle = item->pos.yRot + angle;
+	info->moveAngle = item->pos.yRot + angle;
 
 	static constexpr auto sidewayTestDistance = 16;
 	item->pos.xPos += phd_sin(info->moveAngle) * sidewayTestDistance;
@@ -956,7 +952,7 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 
 	coll->Setup.OldPosition.y = item->pos.yPos;
 
-	auto res = TestLaraHang(item, coll);
+	bool res = TestLaraHang(item, coll);
 
 	item->pos = oldPos;
 
