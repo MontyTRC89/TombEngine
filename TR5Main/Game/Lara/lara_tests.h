@@ -68,6 +68,8 @@ bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlopeDown = true, bool checkSlopeUp = true, bool checkDeath = true);
 bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
