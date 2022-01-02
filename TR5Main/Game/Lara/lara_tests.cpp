@@ -108,9 +108,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3))
 		return false;
-
-	int y = item->pos.yPos;
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	
 	if (TestValidLedge(item, coll))
 	{
@@ -124,7 +121,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
-			item->pos.yPos = probeFront.Position.Floor + CLICK(1);
 			success = true;
 		}
 		
@@ -136,7 +132,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
-			item->pos.yPos = probeFront.Position.Floor + CLICK(2);
 			success = true;
 		}
 		// Vault to crouch up two steps.
@@ -148,7 +143,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->currentAnimState = LS_GRABBING;
 			item->goalAnimState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
-			item->pos.yPos = probeFront.Position.Floor + CLICK(2);
 			success = true;
 		}
 
@@ -160,7 +154,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
-			item->pos.yPos = probeFront.Position.Floor + CLICK(3);
 			success = true;
 		}
 		// Vault to crouch up three steps.
@@ -172,7 +165,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->currentAnimState = LS_GRABBING;
 			item->goalAnimState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
-			item->pos.yPos = probeFront.Position.Floor + CLICK(3);
 			success = true;
 		}
 
@@ -183,7 +175,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
 			item->currentAnimState = LS_IDLE;
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
 			AnimateLara(item);
 			success = true;
 		}
@@ -195,6 +186,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
+	int y = item->pos.yPos;
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
 	auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
 
@@ -1513,7 +1506,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMin, bool checkSwampDepth)
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMin, int snapHeight, bool checkSwampDepth)
 {
 	LaraInfo*& info = item->data;
 
@@ -1522,19 +1515,31 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 	auto probeMiddle = GetCollisionResult(item);
 	bool swampTooDeep = checkSwampDepth ? (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3)) : TestLaraSwamp(item);
 
-	if (probeFront.Position.Ceiling > y - coll->Setup.Height)
+	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
+	int yOffset = lowerBound;  // May fail?
+	while (((probeFront.Position.Floor - y) > 0 || abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMin) &&
+			yOffset > upperBound)
 	{
-		// https://github.com/MontyTRC89/TombEngine/issues/391
-		// Now what? Even old master didn't allow this. How do I get the height of the floor in the above room??
+		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset - coll->Setup.Height);
+		yOffset -= CLICK(0.5f);
 	}
-
+	
+	// Assess vault candidate location.
 	if ((probeFront.Position.Floor - y) < lowerBound &&									// Lower floor bound.
 		(probeFront.Position.Floor - y) >= upperBound &&								// Upper floor bound.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > clampMin &&		// Lower clamp limit.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMax &&		// Upper clamp limit.
-		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= gapMin &&		// Gap is optically permissive for action.
+		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= gapMin &&		// Gap is optically permissive.
 		!swampTooDeep)																	// Swamp depth is permissive.
 	{
+		// TODO: Command query separation please.
+		// Calculate auto jump velocity.
+		if (snapHeight == 0)
+			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
+		// Snap y position to align vault animation.
+		else
+			item->pos.yPos = probeFront.Position.Floor + snapHeight;
+
 		return true;
 	}
 
@@ -1543,12 +1548,12 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 
 bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
+	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1), CLICK(2));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 }
 
 bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
+	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT, -MAX_HEIGHT, CLICK(1), CLICK(3));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 }
 
 bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1558,17 +1563,17 @@ bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, 0, -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (0, -STEPUP_HEIGHT]
+	return TestLaraVaultTolerance(item, coll, 0, -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1), CLICK(1));		// Floor range: (0, -STEPUP_HEIGHT]
 }
 
 bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
+	return TestLaraVaultTolerance(item, coll, -STEPUP_HEIGHT, -CLICK(2.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1), CLICK(2));		// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 }
 
 bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
+	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1), CLICK(3));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
@@ -1704,7 +1709,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Upper floor bound.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lowest ceiling bound.
 		!probe.Position.Slope &&									// Not a slope.
-		info->waterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive for action.
+		info->waterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0))		// Not handling flare.
 	{
@@ -1714,84 +1719,49 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int gapMin, int crossDist, int destDist, int probeDeltaMax, bool checkSlope, bool checkDeath)
 {
 	int y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), -LARA_HEIGHT_CRAWL);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2), -LARA_HEIGHT_CRAWL);		// Approximate destination.
+	auto probeA = GetCollisionResult(item, item->pos.yRot, crossDist, -LARA_HEIGHT_CRAWL);		// Crossing.
+	auto probeB = GetCollisionResult(item, item->pos.yRot, destDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
+	auto probeMiddle = GetCollisionResult(item);
+	bool isSlope = checkSlope ? probeB.Position.Slope : false;
+	bool isDeath = checkDeath ? probeB.Block->Flags.Death : false;
 
-	if ((probeA.Position.Floor - y) <= -CLICK(1) &&																			// Lower floor bound. Synced with crawl states' BadHeightUp.
-		(probeA.Position.Floor - y) >= -STEPUP_HEIGHT &&																	// Upper floor bound.
-		abs(probeA.Position.Floor - probeB.Position.Floor) <= (CLICK(1) - 1) &&												// Destination height is within idle threshold.
-		((coll->Front.Ceiling - LARA_HEIGHT_CRAWL) - (probeA.Position.Floor - y)) <= -(CLICK(0.5f) + CLICK(1) / 8) &&		// Gap is optically permissive for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&											// Destination is not a clamp.
-		!probeA.Position.Slope && !probeB.Position.Slope &&																	// No slopes.
+	if ((probeA.Position.Floor - y) <= lowerBound &&								// Lower floor bound.
+		(probeA.Position.Floor - y) >= upperBound &&								// Upper floor bound.
+		abs(probeA.Position.Ceiling - probeA.Position.Floor) > clampMin &&			// Crossing clamp limit.
+		abs(probeB.Position.Ceiling - probeB.Position.Floor) > clampMin &&			// Destination clamp limit.
+		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= gapMin &&		// Gap is optically permissive.
+		abs(probeA.Position.Floor - probeB.Position.Floor) <= probeDeltaMax &&		// Destination height is within crawl states' BadHeightUp/Down threshold.
+		!isSlope && !isDeath &&														// No slope or death sector.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
 
 	return false;
+}
+
+bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, (CLICK(0.5f) + CLICK(0.25) / 2), CLICK(1), CLICK(2), CLICK(1) - 1);
 }
 
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), -LARA_HEIGHT_CRAWL);		// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(2), -LARA_HEIGHT_CRAWL);		// Approximate destination.
-
-	if ((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&									// Lower floor bound. Synced with crawl exit jump's highest floor bound.
-		(probeA.Position.Floor - y) >= CLICK(1) &&										// Upper floor bound. Synced with crawl states' BadHeightDown.
-		abs(probeA.Position.Floor - probeB.Position.Floor) <= (CLICK(1) - 1) &&			// Destination height is within idle threshold.
-		(probeA.Position.Ceiling - y) <= -CLICK(0.75f) &&								// Gap is optically permissive for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Destination is not a clamp.
-		!probeA.Position.Slope && !probeB.Position.Slope &&								// No slopes.
-		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	// TODO: Up/down gap tolerance needs to be the same.
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.75f), CLICK(1), CLICK(2), CLICK(1) - 1);
 }
 
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), -LARA_HEIGHT_CRAWL);			// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f), -LARA_HEIGHT_CRAWL);		// Approximate destination.
-
-	if ((((probeA.Position.Floor - y) <= STEPUP_HEIGHT &&								// Lower floor bound. Synced with crawl exit jump's highest floor bound.
-		(probeA.Position.Floor - y) >= CLICK(1)) ||										// Upper floor bound. Synced with crawl states' BadHeightDown. OR
-		(probeA.Position.Slope && probeB.Position.Slope)) &&							// Slopes ahead.
-		(probeA.Position.Ceiling - y) <= -CLICK(1.25f) &&								// Gap is optically permissive for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&			// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&			// Destination is not a clamp.
-		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);
 }
 
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int y = item->pos.yPos;
-	auto probeA = GetCollisionResult(item, item->pos.yRot, CLICK(1), -LARA_HEIGHT_CRAWL);			// Crossing.
-	auto probeB = GetCollisionResult(item, item->pos.yRot, CLICK(1.5f), -LARA_HEIGHT_CRAWL);		// Approximate destination.
-
-	if ((probeA.Position.Floor - y) > STEPUP_HEIGHT &&								// Highest floor bound. Synced with crawl down step and crawl exit down step's lower floor bounds.
-		(probeA.Position.Ceiling - y) <= -CLICK(1.25f) &&							// Gap is optically permissive for action.
-		abs(probeA.Position.Ceiling - probeA.Position.Floor) > LARA_HEIGHT &&		// Crossing is not a clamp.
-		abs(probeB.Position.Ceiling - probeB.Position.Floor) > LARA_HEIGHT &&		// Destination is not a clamp.
-		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
+	return TestLaraCrawlStepTolerance(item, coll, -MAX_HEIGHT, STEPUP_HEIGHT + 1, LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);
 }
 
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
@@ -1815,7 +1785,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!objectCollided &&											// No obstruction.
 		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&		// Highest floor bound.
-		(probe.Position.Ceiling - y) <= -CLICK(0.75f) &&			// Gap is optically permissive for action.
+		(probe.Position.Ceiling - y) <= -CLICK(0.75f) &&			// Gap is optically permissive.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
