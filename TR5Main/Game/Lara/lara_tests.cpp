@@ -240,26 +240,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Auto jump to monkey swing.
-	if (info->canMonkeySwing &&
-		!TestLaraSwamp(item) &&
+	if (TestLaraMonkeyAutoJump(item, coll) &&
 		g_GameFlow->Animations.MonkeyAutoJump)
 	{
-		short roomNum = item->roomNumber;
-		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
-			item->pos.xPos, item->pos.yPos, item->pos.zPos))-(item->pos.yPos);
-
-		if (ceiling > CLICK(7) ||
-			ceiling < -CLICK(7) ||
-			abs(ceiling) == CLICK(3))
-		{
-			return false;
-		}
-
 		item->animNumber = LA_STAND_IDLE;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
 		item->currentAnimState = LS_MONKEY_VAULT;
-
 		return true;
 	}
 
@@ -1575,6 +1562,24 @@ bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return TestLaraVaultTolerance(item, coll, -CLICK(2.5f), -CLICK(3.5f), LARA_HEIGHT_CRAWL, LARA_HEIGHT, CLICK(1), CLICK(3));		// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
+}
+
+bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (info->canMonkeySwing &&										// Monkey swing sector flag set. (TODO: Is canMonkeySwing member necessary? Could simply check for sector flag here.)
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_STRETCH &&		// Lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(7) &&				// Upper ceiling bound.
+		!TestLaraSwamp(item))										// No swamp.
+	{
+		return true;
+	}
+
+	return false;
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
