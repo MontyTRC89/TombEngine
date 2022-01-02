@@ -786,11 +786,14 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
-		return;
+		SetLaraJumpDirection(item, coll);
+		if (info->jumpDirection != LaraJumpDirection::None)
+		{
+			item->goalAnimState = LS_JUMP_PREPARE;
+			return;
+		}
 	}
 
 	if (TrInput & IN_ROLL)
@@ -997,11 +1000,14 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
-		return;
+		SetLaraJumpDirection(item, coll);
+		if (info->jumpDirection != LaraJumpDirection::None)
+		{
+			item->goalAnimState = LS_JUMP_PREPARE;
+			return;
+		}
 	}
 
 	if (TrInput & IN_ROLL)
@@ -1403,11 +1409,14 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	else if (info->turnRate > LARA_FAST_TURN_MAX)
 		info->turnRate = LARA_FAST_TURN_MAX;
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
-		return;
+		SetLaraJumpDirection(item, coll);
+		if (info->jumpDirection != LaraJumpDirection::None)
+		{
+			item->goalAnimState = LS_JUMP_PREPARE;
+			return;
+		}
 	}
 
 	if (TrInput & IN_ROLL &&
@@ -1517,11 +1526,14 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	else if (info->turnRate < -LARA_FAST_TURN_MAX)
 		info->turnRate = -LARA_FAST_TURN_MAX;
 
-	if (TrInput & IN_JUMP &&
-		coll->Middle.Ceiling < -(LARA_HEADROOM * 0.7f))
+	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
-		return;
+		SetLaraJumpDirection(item, coll);
+		if (info->jumpDirection != LaraJumpDirection::None)
+		{
+			item->goalAnimState = LS_JUMP_PREPARE;
+			return;
+		}
 	}
 
 	if (TrInput & IN_ROLL &&

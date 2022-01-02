@@ -160,26 +160,26 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (TrInput & IN_FORWARD &&
-		TestLaraStandingJump(item, coll, item->pos.yRot))
+		TestLaraJumpForward(item, coll))
 	{
 		info->jumpDirection = LaraJumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
-		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f)))
+		TestLaraJumpBack(item, coll))
 	{
 		info->jumpDirection = LaraJumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
-		TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f)))
+		TestLaraJumpLeft(item, coll))
 	{
 		info->jumpDirection = LaraJumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
-		TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f)))
+		TestLaraJumpRight(item, coll))
 	{
 		info->jumpDirection = LaraJumpDirection::Right;
 	}
-	else if (TestLaraStandingJump(item, coll, item->pos.yRot, 0)) [[likely]]
+	else if (TestLaraJumpUp(item, coll)) [[likely]]
 		info->jumpDirection = LaraJumpDirection::Up;
 	else
 		info->jumpDirection = LaraJumpDirection::None;

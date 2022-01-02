@@ -269,6 +269,23 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// JUMP key repressed without directional key; cancel directional jump lock.
+	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
+	{
+		if (TestLaraJumpUp(item, coll))
+		{
+			item->goalAnimState = LS_JUMP_UP;
+			info->jumpDirection = LaraJumpDirection::Up;
+		}
+		else
+		{
+			item->goalAnimState = LS_IDLE;
+			info->jumpDirection = LaraJumpDirection::None;
+		}
+
+		return;
+	}
+
 	if ((TrInput & IN_FORWARD ||
 			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
@@ -303,6 +320,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	
+	// No directional key pressed and no directional lock; commit to jump up.
 	if (TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_UP;
