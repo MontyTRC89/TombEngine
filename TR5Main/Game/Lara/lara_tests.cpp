@@ -1530,7 +1530,8 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > clampMin &&		// Lower clamp limit.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMax &&		// Upper clamp limit.
 		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= gapMin &&		// Gap is optically permissive.
-		!swampTooDeep)																	// Swamp depth is permissive.
+		!swampTooDeep &&																// Swamp depth is permissive.
+		probeFront.Position.Floor != NO_HEIGHT)
 	{
 		// TODO: Command query separation please.
 		// Calculate auto jump velocity.
@@ -1646,12 +1647,12 @@ bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), CLICK(0.5f), -CLICK(0.5f));		// Using BadHeightUp/Down defined in step left state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), CLICK(0.8f), -CLICK(0.8f));		// Using BadHeightUp/Down defined in step left state collision function.
 }
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), CLICK(0.5f), -CLICK(0.5f));		// Using BadHeightUp/Down defined in step right state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), CLICK(0.8f), -CLICK(0.8f));		// Using BadHeightUp/Down defined in step right state collision function.
 }
 
 bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll)
@@ -1666,12 +1667,12 @@ bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -CLICK(0.5f), false, false, false);			// Using BadHeightUp defined in step left state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot - ANGLE(90.0f), NO_BAD_POS, -CLICK(0.8f), false, false, false);			// Using BadHeightUp defined in step left state collision function.
 }
 
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -CLICK(0.5f), false, false, false);			// Using BadHeightUp defined in step right state collision function.
+	return TestLaraMove(item, coll, item->pos.yRot + ANGLE(90.0f), NO_BAD_POS, -CLICK(0.8f), false, false, false);			// Using BadHeightUp defined in step right state collision function.
 }
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
@@ -1732,7 +1733,8 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 		(probeA.Position.Floor - y) >= upperBound &&								// Upper floor bound.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > clampMin &&			// Crossing clamp limit.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > clampMin &&			// Destination clamp limit.
-		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= gapMin &&		// Gap is optically permissive.
+		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= gapMin &&		// Gap is optically permissive (going up).
+		abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= gapMin &&		// Gap is optically permissive (going down).
 		abs(probeA.Position.Floor - probeB.Position.Floor) <= probeDeltaMax &&		// Destination height is within crawl states' BadHeightUp/Down threshold.
 		!isSlope && !isDeath &&														// No slope or death sector.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
@@ -1745,13 +1747,13 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, (CLICK(0.5f) + CLICK(0.25) / 2), CLICK(1), CLICK(2), CLICK(1) - 1);
+	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);
 }
 
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Up/down gap tolerance needs to be the same.
-	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.75f), CLICK(1), CLICK(2), CLICK(1) - 1);
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);
 }
 
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)

@@ -1648,8 +1648,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1730,8 +1730,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEP_SIZE / 2;
-	coll->Setup.BadHeightUp = -STEP_SIZE / 2;
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
