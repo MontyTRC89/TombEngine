@@ -305,6 +305,11 @@ namespace TEN::Renderer
 			{
 				RendererLight* light = &currentRoom.Lights[j];
 
+				if (!light->AffectNeighbourRooms && roomToCheck != roomNumber)
+				{
+					continue;
+				}
+
 				// Check only lights different from sun
 				if (light->Type == LIGHT_TYPE_SUN)
 				{
