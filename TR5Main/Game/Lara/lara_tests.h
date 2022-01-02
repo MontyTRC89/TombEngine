@@ -59,7 +59,7 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMax, bool checkSwampDepth = true);
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int clampMax, int gapMin, int snapHeight = 0, bool checkSwampDepth = true);
 bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraAutoJump(ITEM_INFO* item, COLL_INFO* coll);
@@ -84,6 +84,8 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
+
+bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, int upperBound, int clampMin, int gapMin, int crossDist, int destDist, int probeDeltaMax, bool checkSlope = true, bool checkDeath = true);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
