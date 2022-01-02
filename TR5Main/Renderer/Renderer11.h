@@ -125,6 +125,7 @@ namespace TEN::Renderer
 		float In;
 		float Out;
 		float Range;
+		bool AffectNeighbourRooms;
 	};
 	
 	struct RendererAnimatedTexture 
