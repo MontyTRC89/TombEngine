@@ -1747,23 +1747,22 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);
+	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);		// Floor range: [-CLICK(1), -STEPUP_HEIGHT]
 }
 
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Up/down gap tolerance needs to be the same.
-	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 }
 
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 }
 
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, -MAX_HEIGHT, STEPUP_HEIGHT + 1, LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);
+	return TestLaraCrawlStepTolerance(item, coll, -MAX_HEIGHT, STEPUP_HEIGHT + 1, LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [-MAX_HEIGHT, STEPUP_HEIGHT)
 }
 
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
