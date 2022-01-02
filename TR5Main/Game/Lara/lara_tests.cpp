@@ -181,57 +181,37 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (success)
 		{
+			info->turnRate = 0;
 			SnapItemToLedge(item, coll, 0.2f);
 			return true;
 		}
 	}
-
-	int y = item->pos.yPos;
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
-	auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
-	auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
-
-	// Begin ladder climb.
-	// TODO: Broken. Lara will always perform a ladder mount.
-	if (info->climbStatus && TestValidLedgeAngle(item, coll))
+	
+	// Auto jump to ladder.
+	if (TestLaraLadderAutoJump(item, coll))
 	{
-		if ((probeFront.Position.Floor - y) > -CLICK(7.5f) ||			// Upper front floor bound.
-			(probeFrontLeft.Position.Floor - y) > -CLICK(7.5f) ||		// Upper left floor bound.
-			(probeFrontRight.Position.Floor - y) > -CLICK(2) ||			// Upper right floor bound.
-			coll->Middle.Ceiling > -CLICK(4.5f) + 6 ||					// Upper ceiling bound.
-			info->waterStatus == LW_WADE)
-		{
-			if (((probeFront.Position.Floor - y) < -CLICK(4) || probeFront.Position.Ceiling >= -coll->Setup.Height - CLICK(2) - 6) &&
-				coll->Middle.Ceiling <= -(CLICK(2) + 6))
-			{
-				if (TestLaraClimbStance(item, coll))
-				{
-					item->animNumber = LA_STAND_SOLID;
-					item->frameNumber = GetFrameNumber(item, 0);
-					item->goalAnimState = LS_LADDER_IDLE;
-					item->currentAnimState = LS_IDLE;
-					info->gunStatus = LG_HANDS_BUSY;
-					info->turnRate = 0;
+			item->animNumber = LA_STAND_SOLID;
+			item->frameNumber = GetFrameNumber(item, 0);
+			item->goalAnimState = LS_JUMP_UP;
+			item->currentAnimState = LS_IDLE;
+			info->turnRate = 0;
 
-					ShiftItem(item, coll);
-					SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-					AnimateLara(item);
+			ShiftItem(item, coll);
+			SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+			AnimateLara(item);
 
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		// Auto jump to ladder. TODO: Check swamps.
+			return true;
+	}
+	// Mount ladder.
+	else if (TestLaraLadderMount(item, coll))
+	{
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
-		item->goalAnimState = LS_JUMP_UP;
+		item->goalAnimState = LS_LADDER_IDLE;
 		item->currentAnimState = LS_IDLE;
-		info->calcFallSpeed = -116;
+		info->gunStatus = LG_HANDS_BUSY;
 		info->turnRate = 0;
-		
+
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		AnimateLara(item);
@@ -1575,6 +1555,54 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_STRETCH &&		// Lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7) &&				// Upper ceiling bound.
 		!TestLaraSwamp(item))										// No swamp.
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
+	auto probeMiddle = GetCollisionResult(item);
+	//auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
+	//auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
+
+	if (info->climbStatus &&									// Ladder sector flag set.
+		coll->NearestLedgeDistance <= coll->Setup.Radius &&		// Appropriate distance from wall.
+		TestValidLedgeAngle(item, coll) &&
+		!TestLaraSwamp(item) &&									// No swamp.
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f))		// Lower middle ceiling bound.
+	{
+		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((probeMiddle.Position.Ceiling - y + CLICK(0.2f)), -CLICK(7.1f)));
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probeMiddle = GetCollisionResult(item);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
+	//auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
+	//auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
+
+	if (info->climbStatus &&										// Ladder sector flag set.
+		coll->NearestLedgeDistance <= coll->Setup.Radius &&			// Appropriate distance from wall.
+		TestLaraClimbStance(item, coll) &&
+		TestValidLedgeAngle(item, coll) &&
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower middle ceiling bound.
+		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower front ceiling bound.
+		(probeMiddle.Position.Floor - y) > -CLICK(7.5f))			// Upper floor bound.
+		//(probeFront.Position.Ceiling - y) > -CLICK(7.5f))			// Upper ceiling bound.
 	{
 		return true;
 	}
