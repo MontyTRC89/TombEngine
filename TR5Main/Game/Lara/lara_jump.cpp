@@ -72,9 +72,6 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	// TODO
-	//item->goalAnimState = LS_JUMP_FORWARD;
 }
 
 // State:		LS_JUMP_FORWARD (3)
@@ -431,8 +428,6 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	item->goalAnimState = LS_JUMP_BACK;
 }
 
 // State:		LS_JUMP_BACK (25)
@@ -475,8 +470,6 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	item->goalAnimState = LS_JUMP_RIGHT;
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -509,8 +502,6 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	item->goalAnimState = LS_JUMP_LEFT;
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -558,8 +549,6 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	item->goalAnimState = LS_JUMP_UP;
 }
 
 // State:		LS_JUMP_UP (28)
@@ -631,8 +620,6 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
-
-	item->goalAnimState = LS_FALL_BACK;
 }
 
 // State:		LS_FALL_BACK (29)
@@ -753,8 +740,6 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 		return;
 	}
-
-	item->goalAnimState = LS_FREEFALL_DIVE;
 }
 
 // State:		LS_FREEFALL_DIVE (53)
