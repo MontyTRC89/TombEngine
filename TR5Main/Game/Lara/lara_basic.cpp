@@ -236,7 +236,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		if (info->runJumpCount >= LARA_RUN_JUMP_TIME &&
-			coll->Front.Ceiling < -(LARA_HEADROOM * 0.7f))
+			TestLaraRunJumpForward(item, coll))
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
 			return;

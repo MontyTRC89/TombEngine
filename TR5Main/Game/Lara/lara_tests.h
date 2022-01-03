@@ -58,7 +58,8 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.2f));
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.2f));
+bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll);

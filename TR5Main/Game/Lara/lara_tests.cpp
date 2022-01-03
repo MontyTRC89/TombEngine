@@ -1417,15 +1417,16 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist)
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist)
 {
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
+	// TODO: Test water height for running jump.
 
-	if (!TestLaraSwamp(item) &&																// Swamp failsafe.
-		!TestLaraFacingCorner(item, angle, dist) &&											// Avoid jumping through corners.
-		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Highest floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height - (LARA_HEADROOM * 0.7f) &&		// Ceiling height is permissive.
+	if ((probe.Position.Floor - y) >= -STEPUP_HEIGHT &&											// Highest floor bound.
+		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) &&		// Ceiling height is permissive.
+		!TestLaraSwamp(item) &&																	// No swamp.
+		!TestLaraFacingCorner(item, angle, dist) &&												// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1434,29 +1435,34 @@ bool TestLaraStandingJump(ITEM_INFO* item, COLL_INFO* coll, short angle, int dis
 	return false;
 }
 
+bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.8f)); // TODO: Slightly increase distance? Test at floor height -(STEPUP_HEIGHT + 1).
+}
+
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraStandingJump(item, coll, item->pos.yRot);
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot);
 }
 
 bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(180.0f));
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot + ANGLE(180.0f));
 }
 
 bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraStandingJump(item, coll, item->pos.yRot - ANGLE(90.0f));
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot - ANGLE(90.0f));
 }
 
 bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraStandingJump(item, coll, item->pos.yRot + ANGLE(90.0f));
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot + ANGLE(90.0f));
 }
 
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraStandingJump(item, coll, item->pos.yRot, 0);
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot, 0);
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
