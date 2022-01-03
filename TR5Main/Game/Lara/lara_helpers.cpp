@@ -115,6 +115,7 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
+// TODO: Doesn't always work on bridges.
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.ForwardAngle = item->pos.yRot + ANGLE(180.0f);
