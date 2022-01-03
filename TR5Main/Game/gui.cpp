@@ -2066,7 +2066,7 @@ void GuiController::UseCurrentItem()
 		case INV_OBJECT_BINOCULARS:
 
 			if (((LaraItem->currentAnimState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
-				|| (Lara.isDucked && !(TrInput & IN_DUCK)))
+				|| (Lara.isLow && !(TrInput & IN_DUCK)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{

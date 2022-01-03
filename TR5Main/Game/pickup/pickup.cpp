@@ -389,7 +389,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	switch (triggerFlags)
 	{
 	case 1: // Pickup from wall hole
-		if (lara->isDucked || !TestLaraPosition(&HiddenPickUpBounds, item, l))
+		if (lara->isLow || !TestLaraPosition(&HiddenPickUpBounds, item, l))
 		{
 			if (lara->isMoving)
 			{
@@ -417,7 +417,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	case 2: // Pickup with crowbar
 		item->pos.yRot = oldYrot;
-		if (lara->isDucked || !TestLaraPosition(&CrowbarPickUpBounds, item, l))
+		if (lara->isLow || !TestLaraPosition(&CrowbarPickUpBounds, item, l))
 		{
 			if (!lara->isMoving)
 			{
@@ -494,7 +494,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
-		if (TestLaraPosition(&PlinthPickUpBounds, item, l) && !lara->isDucked)
+		if (TestLaraPosition(&PlinthPickUpBounds, item, l) && !lara->isLow)
 		{
 			if (item->pos.yPos == l->pos.yPos)
 				PlinthPickUpPosition.y = 0;
