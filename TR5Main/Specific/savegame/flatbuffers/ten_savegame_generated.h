@@ -1389,8 +1389,8 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t water_status = 0;
   int32_t climb_status = 0;
   int32_t pose_count = 0;
-  int32_t jump_count = 0;
-  bool jump_queued = false;
+  int32_t run_jump_count = 0;
+  bool run_jump_queued = false;
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
   int32_t sprint_timer = 0;
@@ -1412,12 +1412,12 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t flare_control_left = 0;
   bool look = false;
   bool burn = false;
-  bool keep_crouched = false;
+  bool keep_low = false;
+  bool is_low = false;
   bool is_moving = false;
   bool can_monkey_swing = false;
   int32_t burn_blue = 0;
   bool burn_smoke = false;
-  bool is_ducked = false;
   bool has_fired = false;
   bool busy = false;
   bool old_busy = false;
@@ -1509,8 +1509,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WATER_STATUS = 22,
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
-    VT_JUMP_COUNT = 28,
-    VT_JUMP_QUEUED = 30,
+    VT_RUN_JUMP_COUNT = 28,
+    VT_RUN_JUMP_QUEUED = 30,
     VT_HIT_FRAME = 32,
     VT_HIT_DIRECTION = 34,
     VT_SPRINT_TIMER = 36,
@@ -1532,12 +1532,12 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FLARE_CONTROL_LEFT = 68,
     VT_LOOK = 70,
     VT_BURN = 72,
-    VT_KEEP_CROUCHED = 74,
-    VT_IS_MOVING = 76,
-    VT_CAN_MONKEY_SWING = 78,
-    VT_BURN_BLUE = 80,
-    VT_BURN_SMOKE = 82,
-    VT_IS_DUCKED = 84,
+    VT_KEEP_LOW = 74,
+    VT_IS_LOW = 76,
+    VT_IS_MOVING = 78,
+    VT_CAN_MONKEY_SWING = 80,
+    VT_BURN_BLUE = 82,
+    VT_BURN_SMOKE = 84,
     VT_HAS_FIRED = 86,
     VT_BUSY = 88,
     VT_OLD_BUSY = 90,
@@ -1647,11 +1647,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t pose_count() const {
     return GetField<int32_t>(VT_POSE_COUNT, 0);
   }
-  int32_t jump_count() const {
-    return GetField<int32_t>(VT_JUMP_COUNT, 0);
+  int32_t run_jump_count() const {
+    return GetField<int32_t>(VT_RUN_JUMP_COUNT, 0);
   }
-  bool jump_queued() const {
-    return GetField<uint8_t>(VT_JUMP_QUEUED, 0) != 0;
+  bool run_jump_queued() const {
+    return GetField<uint8_t>(VT_RUN_JUMP_QUEUED, 0) != 0;
   }
   int32_t hit_frame() const {
     return GetField<int32_t>(VT_HIT_FRAME, 0);
@@ -1716,8 +1716,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool burn() const {
     return GetField<uint8_t>(VT_BURN, 0) != 0;
   }
-  bool keep_crouched() const {
-    return GetField<uint8_t>(VT_KEEP_CROUCHED, 0) != 0;
+  bool keep_low() const {
+    return GetField<uint8_t>(VT_KEEP_LOW, 0) != 0;
+  }
+  bool is_low() const {
+    return GetField<uint8_t>(VT_IS_LOW, 0) != 0;
   }
   bool is_moving() const {
     return GetField<uint8_t>(VT_IS_MOVING, 0) != 0;
@@ -1730,9 +1733,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool burn_smoke() const {
     return GetField<uint8_t>(VT_BURN_SMOKE, 0) != 0;
-  }
-  bool is_ducked() const {
-    return GetField<uint8_t>(VT_IS_DUCKED, 0) != 0;
   }
   bool has_fired() const {
     return GetField<uint8_t>(VT_HAS_FIRED, 0) != 0;
@@ -1964,8 +1964,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyField<int32_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
-           VerifyField<int32_t>(verifier, VT_JUMP_COUNT) &&
-           VerifyField<uint8_t>(verifier, VT_JUMP_QUEUED) &&
+           VerifyField<int32_t>(verifier, VT_RUN_JUMP_COUNT) &&
+           VerifyField<uint8_t>(verifier, VT_RUN_JUMP_QUEUED) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_SPRINT_TIMER) &&
@@ -1989,12 +1989,12 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLARE_CONTROL_LEFT) &&
            VerifyField<uint8_t>(verifier, VT_LOOK) &&
            VerifyField<uint8_t>(verifier, VT_BURN) &&
-           VerifyField<uint8_t>(verifier, VT_KEEP_CROUCHED) &&
+           VerifyField<uint8_t>(verifier, VT_KEEP_LOW) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LOW) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOVING) &&
            VerifyField<uint8_t>(verifier, VT_CAN_MONKEY_SWING) &&
            VerifyField<int32_t>(verifier, VT_BURN_BLUE) &&
            VerifyField<uint8_t>(verifier, VT_BURN_SMOKE) &&
-           VerifyField<uint8_t>(verifier, VT_IS_DUCKED) &&
            VerifyField<uint8_t>(verifier, VT_HAS_FIRED) &&
            VerifyField<uint8_t>(verifier, VT_BUSY) &&
            VerifyField<uint8_t>(verifier, VT_OLD_BUSY) &&
@@ -2129,11 +2129,11 @@ struct LaraBuilder {
   void add_pose_count(int32_t pose_count) {
     fbb_.AddElement<int32_t>(Lara::VT_POSE_COUNT, pose_count, 0);
   }
-  void add_jump_count(int32_t jump_count) {
-    fbb_.AddElement<int32_t>(Lara::VT_JUMP_COUNT, jump_count, 0);
+  void add_run_jump_count(int32_t run_jump_count) {
+    fbb_.AddElement<int32_t>(Lara::VT_RUN_JUMP_COUNT, run_jump_count, 0);
   }
-  void add_jump_queued(bool jump_queued) {
-    fbb_.AddElement<uint8_t>(Lara::VT_JUMP_QUEUED, static_cast<uint8_t>(jump_queued), 0);
+  void add_run_jump_queued(bool run_jump_queued) {
+    fbb_.AddElement<uint8_t>(Lara::VT_RUN_JUMP_QUEUED, static_cast<uint8_t>(run_jump_queued), 0);
   }
   void add_hit_frame(int32_t hit_frame) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
@@ -2198,8 +2198,11 @@ struct LaraBuilder {
   void add_burn(bool burn) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN, static_cast<uint8_t>(burn), 0);
   }
-  void add_keep_crouched(bool keep_crouched) {
-    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_CROUCHED, static_cast<uint8_t>(keep_crouched), 0);
+  void add_keep_low(bool keep_low) {
+    fbb_.AddElement<uint8_t>(Lara::VT_KEEP_LOW, static_cast<uint8_t>(keep_low), 0);
+  }
+  void add_is_low(bool is_low) {
+    fbb_.AddElement<uint8_t>(Lara::VT_IS_LOW, static_cast<uint8_t>(is_low), 0);
   }
   void add_is_moving(bool is_moving) {
     fbb_.AddElement<uint8_t>(Lara::VT_IS_MOVING, static_cast<uint8_t>(is_moving), 0);
@@ -2212,9 +2215,6 @@ struct LaraBuilder {
   }
   void add_burn_smoke(bool burn_smoke) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN_SMOKE, static_cast<uint8_t>(burn_smoke), 0);
-  }
-  void add_is_ducked(bool is_ducked) {
-    fbb_.AddElement<uint8_t>(Lara::VT_IS_DUCKED, static_cast<uint8_t>(is_ducked), 0);
   }
   void add_has_fired(bool has_fired) {
     fbb_.AddElement<uint8_t>(Lara::VT_HAS_FIRED, static_cast<uint8_t>(has_fired), 0);
@@ -2457,8 +2457,8 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
-    int32_t jump_count = 0,
-    bool jump_queued = false,
+    int32_t run_jump_count = 0,
+    bool run_jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t sprint_timer = 0,
@@ -2480,12 +2480,12 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_crouched = false,
+    bool keep_low = false,
+    bool is_low = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
     bool burn_smoke = false,
-    bool is_ducked = false,
     bool has_fired = false,
     bool busy = false,
     bool old_busy = false,
@@ -2637,7 +2637,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_sprint_timer(sprint_timer);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
-  builder_.add_jump_count(jump_count);
+  builder_.add_run_jump_count(run_jump_count);
   builder_.add_pose_count(pose_count);
   builder_.add_climb_status(climb_status);
   builder_.add_water_status(water_status);
@@ -2664,14 +2664,14 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_old_busy(old_busy);
   builder_.add_busy(busy);
   builder_.add_has_fired(has_fired);
-  builder_.add_is_ducked(is_ducked);
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_can_monkey_swing(can_monkey_swing);
   builder_.add_is_moving(is_moving);
-  builder_.add_keep_crouched(keep_crouched);
+  builder_.add_is_low(is_low);
+  builder_.add_keep_low(keep_low);
   builder_.add_burn(burn);
   builder_.add_look(look);
-  builder_.add_jump_queued(jump_queued);
+  builder_.add_run_jump_queued(run_jump_queued);
   return builder_.Finish();
 }
 
@@ -2694,8 +2694,8 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
-    int32_t jump_count = 0,
-    bool jump_queued = false,
+    int32_t run_jump_count = 0,
+    bool run_jump_queued = false,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t sprint_timer = 0,
@@ -2717,12 +2717,12 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t flare_control_left = 0,
     bool look = false,
     bool burn = false,
-    bool keep_crouched = false,
+    bool keep_low = false,
+    bool is_low = false,
     bool is_moving = false,
     bool can_monkey_swing = false,
     int32_t burn_blue = 0,
     bool burn_smoke = false,
-    bool is_ducked = false,
     bool has_fired = false,
     bool busy = false,
     bool old_busy = false,
@@ -2821,8 +2821,8 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       water_status,
       climb_status,
       pose_count,
-      jump_count,
-      jump_queued,
+      run_jump_count,
+      run_jump_queued,
       hit_frame,
       hit_direction,
       sprint_timer,
@@ -2844,12 +2844,12 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       flare_control_left,
       look,
       burn,
-      keep_crouched,
+      keep_low,
+      is_low,
       is_moving,
       can_monkey_swing,
       burn_blue,
       burn_smoke,
-      is_ducked,
       has_fired,
       busy,
       old_busy,
@@ -5110,8 +5110,8 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
-  { auto _e = jump_count(); _o->jump_count = _e; }
-  { auto _e = jump_queued(); _o->jump_queued = _e; }
+  { auto _e = run_jump_count(); _o->run_jump_count = _e; }
+  { auto _e = run_jump_queued(); _o->run_jump_queued = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
   { auto _e = sprint_timer(); _o->sprint_timer = _e; }
@@ -5133,12 +5133,12 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = flare_control_left(); _o->flare_control_left = _e; }
   { auto _e = look(); _o->look = _e; }
   { auto _e = burn(); _o->burn = _e; }
-  { auto _e = keep_crouched(); _o->keep_crouched = _e; }
+  { auto _e = keep_low(); _o->keep_low = _e; }
+  { auto _e = is_low(); _o->is_low = _e; }
   { auto _e = is_moving(); _o->is_moving = _e; }
   { auto _e = can_monkey_swing(); _o->can_monkey_swing = _e; }
   { auto _e = burn_blue(); _o->burn_blue = _e; }
   { auto _e = burn_smoke(); _o->burn_smoke = _e; }
-  { auto _e = is_ducked(); _o->is_ducked = _e; }
   { auto _e = has_fired(); _o->has_fired = _e; }
   { auto _e = busy(); _o->busy = _e; }
   { auto _e = old_busy(); _o->old_busy = _e; }
@@ -5233,8 +5233,8 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _water_status = _o->water_status;
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
-  auto _jump_count = _o->jump_count;
-  auto _jump_queued = _o->jump_queued;
+  auto _run_jump_count = _o->run_jump_count;
+  auto _run_jump_queued = _o->run_jump_queued;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
   auto _sprint_timer = _o->sprint_timer;
@@ -5256,12 +5256,12 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _flare_control_left = _o->flare_control_left;
   auto _look = _o->look;
   auto _burn = _o->burn;
-  auto _keep_crouched = _o->keep_crouched;
+  auto _keep_low = _o->keep_low;
+  auto _is_low = _o->is_low;
   auto _is_moving = _o->is_moving;
   auto _can_monkey_swing = _o->can_monkey_swing;
   auto _burn_blue = _o->burn_blue;
   auto _burn_smoke = _o->burn_smoke;
-  auto _is_ducked = _o->is_ducked;
   auto _has_fired = _o->has_fired;
   auto _busy = _o->busy;
   auto _old_busy = _o->old_busy;
@@ -5348,8 +5348,8 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _water_status,
       _climb_status,
       _pose_count,
-      _jump_count,
-      _jump_queued,
+      _run_jump_count,
+      _run_jump_queued,
       _hit_frame,
       _hit_direction,
       _sprint_timer,
@@ -5371,12 +5371,12 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _flare_control_left,
       _look,
       _burn,
-      _keep_crouched,
+      _keep_low,
+      _is_low,
       _is_moving,
       _can_monkey_swing,
       _burn_blue,
       _burn_smoke,
-      _is_ducked,
       _has_fired,
       _busy,
       _old_busy,

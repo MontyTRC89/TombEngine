@@ -28,11 +28,10 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 		return;
 
-	// runJumpCount?
-	// Update running jump counter in preparation for possible dispatch soon after landing.
-	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME / 2)
-		info->jumpCount = LARA_JUMP_TIME / 2;
+	// Update running jump counter in preparation for possible jump action soon after landing.
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME / 2)
+		info->runJumpCount = LARA_RUN_JUMP_TIME / 2;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -689,7 +688,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	auto realHeight = bounds->Y2 - bounds->Y1;
 
 	info->moveAngle = item->pos.yRot;
-	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->keepLow = TestLaraKeepLow(item, coll);
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
@@ -706,13 +705,13 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
-		else if (info->keepCrouched ||
+		else if (info->keepLow ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
-			if (!info->keepCrouched) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
+			if (!info->keepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
 				MoveItem(item, coll->Setup.ForwardAngle, STEP_SIZE / 2);
 		}
 		else [[likely]]

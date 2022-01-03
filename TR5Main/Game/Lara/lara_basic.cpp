@@ -97,9 +97,9 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME - 4)
-		info->jumpCount = LARA_JUMP_TIME - 4;
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME - 4)
+		info->runJumpCount = LARA_RUN_JUMP_TIME - 4;
 
 	if (item->hitPoints <= 0)
 	{
@@ -205,9 +205,9 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME)
-		info->jumpCount = LARA_JUMP_TIME;
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME)
+		info->runJumpCount = LARA_RUN_JUMP_TIME;
 
 	if (item->hitPoints <= 0)
 	{
@@ -232,10 +232,10 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	if ((TrInput & IN_JUMP || info->jumpQueued) &&
+	if ((TrInput & IN_JUMP || info->runJumpQueued) &&
 		info->waterStatus != LW_WADE)
 	{
-		if (info->jumpCount >= LARA_JUMP_TIME &&
+		if (info->runJumpCount >= LARA_RUN_JUMP_TIME &&
 			coll->Front.Ceiling < -(LARA_HEADROOM * 0.7f))
 		{
 			item->goalAnimState = LS_JUMP_FORWARD;
@@ -253,7 +253,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Control settings option to enable/disable FORWARD+BACK as roll input.
-	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->jumpQueued &&
+	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->runJumpQueued &&
 		info->waterStatus != LW_WADE)
 	{
 		item->goalAnimState = LS_ROLL_FORWARD;
@@ -2060,9 +2060,9 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->sprintTimer--;
 
-	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME)
-		info->jumpCount = LARA_JUMP_TIME;
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME)
+		info->runJumpCount = LARA_RUN_JUMP_TIME;
 
 	if (item->hitPoints <= 0)
 	{
@@ -2184,9 +2184,9 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->jumpCount++;
-	if (info->jumpCount > LARA_JUMP_TIME)
-		info->jumpCount = LARA_JUMP_TIME;
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME)
+		info->runJumpCount = LARA_RUN_JUMP_TIME;
 
 	if (TrInput & IN_LEFT)
 	{

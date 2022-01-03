@@ -281,7 +281,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraKeepCrouched(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Temporary. coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().

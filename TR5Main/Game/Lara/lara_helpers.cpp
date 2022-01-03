@@ -190,13 +190,13 @@ void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	int dist = WALL_SIZE;// WALL_SIZE / LARA_JUMP_TIME * std::max(1, LARA_JUMP_TIME/* - info->jumpCount*/); // TODO: Adaptive distance.
-	auto probe = GetCollisionResult(item, item->pos.yRot, dist, 0);
+	int dist = WALL_SIZE;// WALL_SIZE / LARA_RUN_JUMP_TIME * std::max(1, LARA_RUN_JUMP_TIME/* - info->runJumpCount*/); // TODO: Adaptive distance.
+	auto probe = GetCollisionResult(item, item->pos.yRot, dist, -coll->Setup.Height);
 
-	if ((probe.Position.Ceiling - y + LARA_HEIGHT) < -(LARA_HEADROOM * 0.7f))
-		info->jumpQueued = item->goalAnimState == LS_RUN_FORWARD;
+	if ((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)))
+		info->runJumpQueued = (item->goalAnimState == LS_RUN_FORWARD);
 	else
-		info->jumpQueued = false;
+		info->runJumpQueued = false;
 }
 
 void SetLaraFallState(ITEM_INFO* item)
@@ -316,12 +316,12 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState != LS_SPRINT &&
 		item->currentAnimState != LS_SPRINT_DIVE)
 	{
-		info->jumpCount = 0;
+		info->runJumpCount = 0;
 	}
 
-	// Reset jump action queue.
+	// Reset running jump action queue.
 	if (item->currentAnimState != LS_RUN_FORWARD)
-		info->jumpQueued = false;
+		info->runJumpQueued = false;
 
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
