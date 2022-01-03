@@ -1598,12 +1598,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot, WALL_SIZE / 2, -LARA_HEIGHT_CRAWL);
+	auto probe = GetCollisionResult(item, item->pos.yRot, CLICK(2), -LARA_HEIGHT_CRAWL);
 
 	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Lower floor bound.
 		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Upper floor bound.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Lowest ceiling bound.
-		!probe.Position.Slope &&									// Not a slope.
+		!probe.Position.Slope &&									// No slope.
 		info->waterSurfaceDist >= -CLICK(1) &&						// Water depth is optically feasible for action.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0))		// Not handling flare.
