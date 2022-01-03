@@ -1389,6 +1389,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t water_status = 0;
   int32_t climb_status = 0;
   int32_t pose_count = 0;
+  int32_t jump_direction = 0;
   int32_t run_jump_count = 0;
   bool run_jump_queued = false;
   int32_t hit_frame = 0;
@@ -1509,107 +1510,108 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WATER_STATUS = 22,
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
-    VT_RUN_JUMP_COUNT = 28,
-    VT_RUN_JUMP_QUEUED = 30,
-    VT_HIT_FRAME = 32,
-    VT_HIT_DIRECTION = 34,
-    VT_SPRINT_TIMER = 36,
-    VT_AIR = 38,
-    VT_DIVE_COUNT = 40,
-    VT_DEATH_COUNT = 42,
-    VT_CURRENT_ACTIVE = 44,
-    VT_CURRENT_X_VEL = 46,
-    VT_CURRENT_Y_VEL = 48,
-    VT_CURRENT_Z_VEL = 50,
-    VT_SPAZ_EFFECT_COUNT = 52,
-    VT_FLARE_AGE = 54,
-    VT_BURN_COUNT = 56,
-    VT_WEAPON_ITEM = 58,
-    VT_HOLSTER_INFO = 60,
-    VT_FLARE_FRAME = 62,
-    VT_POISONED = 64,
-    VT_WET = 66,
-    VT_FLARE_CONTROL_LEFT = 68,
-    VT_LOOK = 70,
-    VT_BURN = 72,
-    VT_KEEP_LOW = 74,
-    VT_IS_LOW = 76,
-    VT_IS_MOVING = 78,
-    VT_CAN_MONKEY_SWING = 80,
-    VT_BURN_BLUE = 82,
-    VT_BURN_SMOKE = 84,
-    VT_HAS_FIRED = 86,
-    VT_BUSY = 88,
-    VT_OLD_BUSY = 90,
-    VT_UNCONTROLLABLE = 92,
-    VT_LIT_TORCH = 94,
-    VT_IS_CLIMBING = 96,
-    VT_FIRED = 98,
-    VT_WATER_SURFACE_DIST = 100,
-    VT_LAST_POSITION = 102,
-    VT_NEXT_CORNER_POSITION = 104,
-    VT_NEXT_CORNER_ROTATION = 106,
-    VT_MESH_PTRS = 108,
-    VT_TARGET_ANGLES = 110,
-    VT_TURN_RATE = 112,
-    VT_MOVE_ANGLE = 114,
-    VT_HEAD_X_ROT = 116,
-    VT_HEAD_Y_ROT = 118,
-    VT_HEAD_Z_ROT = 120,
-    VT_TORSO_X_ROT = 122,
-    VT_TORSO_Y_ROT = 124,
-    VT_TORSO_Z_ROT = 126,
-    VT_LEFT_ARM = 128,
-    VT_RIGHT_ARM = 130,
-    VT_ROPE_SEGMENT = 132,
-    VT_ROPE_DIRECTION = 134,
-    VT_ROPE_ARC_FRONT = 136,
-    VT_ROPE_ARC_BACK = 138,
-    VT_ROPE_LAST_X = 140,
-    VT_ROPE_MAX_X_FORWARD = 142,
-    VT_ROPE_MAX_X_BACKWARD = 144,
-    VT_ROPE_DFRAME = 146,
-    VT_ROPE_FRAME = 148,
-    VT_ROPE_FRAMERATE = 150,
-    VT_ROPE_Y = 152,
-    VT_ROPE_PTR = 154,
-    VT_INTERACTED_ITEM = 156,
-    VT_ROPE_OFFSET = 158,
-    VT_ROPE_DOWN_VEL = 160,
-    VT_ROPE_FLAG = 162,
-    VT_ROPE_COUNT = 164,
-    VT_MOVE_COUNT = 166,
-    VT_LOCATION = 168,
-    VT_HIGHEST_LOCATION = 170,
-    VT_LOCATION_PAD = 172,
-    VT_TIGHTROPE = 174,
-    VT_BEETLE_LIFE = 176,
-    VT_HAS_BEETLE_THINGS = 178,
-    VT_SMALL_WATERSKIN = 180,
-    VT_BIG_WATERSKIN = 182,
-    VT_VEHICLE = 184,
-    VT_EXTRA_ANIM = 186,
-    VT_MINE_L = 188,
-    VT_MINE_R = 190,
-    VT_WEAPONS = 192,
-    VT_PUZZLES = 194,
-    VT_KEYS = 196,
-    VT_PICKUPS = 198,
-    VT_EXAMINES = 200,
-    VT_PUZZLES_COMBO = 202,
-    VT_KEYS_COMBO = 204,
-    VT_PICKUPS_COMBO = 206,
-    VT_EXAMINES_COMBO = 208,
-    VT_SECRETS = 210,
-    VT_LASERSIGHT = 212,
-    VT_CROWBAR = 214,
-    VT_TORCH = 216,
-    VT_SILENCER = 218,
-    VT_BINOCULARS = 220,
-    VT_NUM_LARGE_MEDIPACKS = 222,
-    VT_NUM_SMALL_MEDIPACKS = 224,
-    VT_NUM_FLARES = 226,
-    VT_TARGET_ITEM_NUMBER = 228
+    VT_JUMP_DIRECTION = 28,
+    VT_RUN_JUMP_COUNT = 30,
+    VT_RUN_JUMP_QUEUED = 32,
+    VT_HIT_FRAME = 34,
+    VT_HIT_DIRECTION = 36,
+    VT_SPRINT_TIMER = 38,
+    VT_AIR = 40,
+    VT_DIVE_COUNT = 42,
+    VT_DEATH_COUNT = 44,
+    VT_CURRENT_ACTIVE = 46,
+    VT_CURRENT_X_VEL = 48,
+    VT_CURRENT_Y_VEL = 50,
+    VT_CURRENT_Z_VEL = 52,
+    VT_SPAZ_EFFECT_COUNT = 54,
+    VT_FLARE_AGE = 56,
+    VT_BURN_COUNT = 58,
+    VT_WEAPON_ITEM = 60,
+    VT_HOLSTER_INFO = 62,
+    VT_FLARE_FRAME = 64,
+    VT_POISONED = 66,
+    VT_WET = 68,
+    VT_FLARE_CONTROL_LEFT = 70,
+    VT_LOOK = 72,
+    VT_BURN = 74,
+    VT_KEEP_LOW = 76,
+    VT_IS_LOW = 78,
+    VT_IS_MOVING = 80,
+    VT_CAN_MONKEY_SWING = 82,
+    VT_BURN_BLUE = 84,
+    VT_BURN_SMOKE = 86,
+    VT_HAS_FIRED = 88,
+    VT_BUSY = 90,
+    VT_OLD_BUSY = 92,
+    VT_UNCONTROLLABLE = 94,
+    VT_LIT_TORCH = 96,
+    VT_IS_CLIMBING = 98,
+    VT_FIRED = 100,
+    VT_WATER_SURFACE_DIST = 102,
+    VT_LAST_POSITION = 104,
+    VT_NEXT_CORNER_POSITION = 106,
+    VT_NEXT_CORNER_ROTATION = 108,
+    VT_MESH_PTRS = 110,
+    VT_TARGET_ANGLES = 112,
+    VT_TURN_RATE = 114,
+    VT_MOVE_ANGLE = 116,
+    VT_HEAD_X_ROT = 118,
+    VT_HEAD_Y_ROT = 120,
+    VT_HEAD_Z_ROT = 122,
+    VT_TORSO_X_ROT = 124,
+    VT_TORSO_Y_ROT = 126,
+    VT_TORSO_Z_ROT = 128,
+    VT_LEFT_ARM = 130,
+    VT_RIGHT_ARM = 132,
+    VT_ROPE_SEGMENT = 134,
+    VT_ROPE_DIRECTION = 136,
+    VT_ROPE_ARC_FRONT = 138,
+    VT_ROPE_ARC_BACK = 140,
+    VT_ROPE_LAST_X = 142,
+    VT_ROPE_MAX_X_FORWARD = 144,
+    VT_ROPE_MAX_X_BACKWARD = 146,
+    VT_ROPE_DFRAME = 148,
+    VT_ROPE_FRAME = 150,
+    VT_ROPE_FRAMERATE = 152,
+    VT_ROPE_Y = 154,
+    VT_ROPE_PTR = 156,
+    VT_INTERACTED_ITEM = 158,
+    VT_ROPE_OFFSET = 160,
+    VT_ROPE_DOWN_VEL = 162,
+    VT_ROPE_FLAG = 164,
+    VT_ROPE_COUNT = 166,
+    VT_MOVE_COUNT = 168,
+    VT_LOCATION = 170,
+    VT_HIGHEST_LOCATION = 172,
+    VT_LOCATION_PAD = 174,
+    VT_TIGHTROPE = 176,
+    VT_BEETLE_LIFE = 178,
+    VT_HAS_BEETLE_THINGS = 180,
+    VT_SMALL_WATERSKIN = 182,
+    VT_BIG_WATERSKIN = 184,
+    VT_VEHICLE = 186,
+    VT_EXTRA_ANIM = 188,
+    VT_MINE_L = 190,
+    VT_MINE_R = 192,
+    VT_WEAPONS = 194,
+    VT_PUZZLES = 196,
+    VT_KEYS = 198,
+    VT_PICKUPS = 200,
+    VT_EXAMINES = 202,
+    VT_PUZZLES_COMBO = 204,
+    VT_KEYS_COMBO = 206,
+    VT_PICKUPS_COMBO = 208,
+    VT_EXAMINES_COMBO = 210,
+    VT_SECRETS = 212,
+    VT_LASERSIGHT = 214,
+    VT_CROWBAR = 216,
+    VT_TORCH = 218,
+    VT_SILENCER = 220,
+    VT_BINOCULARS = 222,
+    VT_NUM_LARGE_MEDIPACKS = 224,
+    VT_NUM_SMALL_MEDIPACKS = 226,
+    VT_NUM_FLARES = 228,
+    VT_TARGET_ITEM_NUMBER = 230
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -1646,6 +1648,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t pose_count() const {
     return GetField<int32_t>(VT_POSE_COUNT, 0);
+  }
+  int32_t jump_direction() const {
+    return GetField<int32_t>(VT_JUMP_DIRECTION, 0);
   }
   int32_t run_jump_count() const {
     return GetField<int32_t>(VT_RUN_JUMP_COUNT, 0);
@@ -1964,6 +1969,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyField<int32_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_RUN_JUMP_COUNT) &&
            VerifyField<uint8_t>(verifier, VT_RUN_JUMP_QUEUED) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
@@ -2128,6 +2134,9 @@ struct LaraBuilder {
   }
   void add_pose_count(int32_t pose_count) {
     fbb_.AddElement<int32_t>(Lara::VT_POSE_COUNT, pose_count, 0);
+  }
+  void add_jump_direction(int32_t jump_direction) {
+    fbb_.AddElement<int32_t>(Lara::VT_JUMP_DIRECTION, jump_direction, 0);
   }
   void add_run_jump_count(int32_t run_jump_count) {
     fbb_.AddElement<int32_t>(Lara::VT_RUN_JUMP_COUNT, run_jump_count, 0);
@@ -2457,6 +2466,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
+    int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
     bool run_jump_queued = false,
     int32_t hit_frame = 0,
@@ -2638,6 +2648,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
   builder_.add_run_jump_count(run_jump_count);
+  builder_.add_jump_direction(jump_direction);
   builder_.add_pose_count(pose_count);
   builder_.add_climb_status(climb_status);
   builder_.add_water_status(water_status);
@@ -2694,6 +2705,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t water_status = 0,
     int32_t climb_status = 0,
     int32_t pose_count = 0,
+    int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
     bool run_jump_queued = false,
     int32_t hit_frame = 0,
@@ -2821,6 +2833,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       water_status,
       climb_status,
       pose_count,
+      jump_direction,
       run_jump_count,
       run_jump_queued,
       hit_frame,
@@ -5110,6 +5123,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
+  { auto _e = jump_direction(); _o->jump_direction = _e; }
   { auto _e = run_jump_count(); _o->run_jump_count = _e; }
   { auto _e = run_jump_queued(); _o->run_jump_queued = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
@@ -5233,6 +5247,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _water_status = _o->water_status;
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
+  auto _jump_direction = _o->jump_direction;
   auto _run_jump_count = _o->run_jump_count;
   auto _run_jump_queued = _o->run_jump_queued;
   auto _hit_frame = _o->hit_frame;
@@ -5348,6 +5363,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _water_status,
       _climb_status,
       _pose_count,
+      _jump_direction,
       _run_jump_count,
       _run_jump_queued,
       _hit_frame,

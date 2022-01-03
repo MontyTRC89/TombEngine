@@ -828,7 +828,7 @@ enum LARA_CLOTH_TYPES
 	CLOTH_WET
 };
 
-enum class LaraJumpDirection
+enum LaraJumpDirection
 {
 	None,
 	Up,
