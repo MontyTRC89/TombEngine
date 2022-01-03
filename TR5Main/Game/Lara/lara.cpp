@@ -427,7 +427,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->currentAnimState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
 		info->sprintTimer++;
 
-	info->isDucked = false;
+	info->isLow = false;
 
 	bool isWater = TestLaraWater(item);
 	bool isSwamp = TestLaraSwamp(item);

@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
                 //if (LaraItem == nullptr)
                 //    LaraItem = LaraItem;
 
-                if ((Lara.keepCrouched || LaraItem->hitPoints <= 0)
+                if ((Lara.keepLow || LaraItem->hitPoints <= 0)
                     && locust->counter >= 90
                     && !(GetRandomControl() & 7))
                     locust->counter = 90;

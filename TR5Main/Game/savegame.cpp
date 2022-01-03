@@ -280,12 +280,12 @@ bool SaveGame::Save(int slot)
 	lara.add_hit_frame(Lara.hitFrame);
 	lara.add_interacted_item(Lara.interactedItem);
 	lara.add_is_climbing(Lara.isClimbing);
-	lara.add_is_ducked(Lara.isDucked);
+	lara.add_is_low(Lara.isLow);
 	lara.add_is_moving(Lara.isMoving);
 	lara.add_item_number(Lara.itemNumber);
-	lara.add_jump_count(Lara.jumpCount);
-	lara.add_jump_queued(Lara.jumpQueued);
-	lara.add_keep_crouched(Lara.keepCrouched);
+	lara.add_run_jump_count(Lara.runJumpCount);
+	lara.add_run_jump_queued(Lara.runJumpQueued);
+	lara.add_keep_low(Lara.keepLow);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
 	lara.add_lasersight(Lara.Lasersight);
@@ -1197,12 +1197,12 @@ bool SaveGame::Load(int slot)
 	Lara.hitFrame = s->lara()->hit_frame();
 	Lara.interactedItem = s->lara()->interacted_item();
 	Lara.isClimbing = s->lara()->is_climbing();
-	Lara.isDucked = s->lara()->is_ducked();
+	Lara.isLow = s->lara()->is_low();
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
-	Lara.jumpCount = s->lara()->jump_count();
-	Lara.jumpQueued = s->lara()->jump_queued();
-	Lara.keepCrouched = s->lara()->keep_crouched();
+	Lara.runJumpCount = s->lara()->run_jump_count();
+	Lara.runJumpQueued = s->lara()->run_jump_queued();
+	Lara.keepLow = s->lara()->keep_low();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
 	Lara.lastPos = PHD_VECTOR(

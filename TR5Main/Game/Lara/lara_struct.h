@@ -1029,10 +1029,10 @@ struct LaraInfo
 	short calcFallSpeed;
 	LARA_WATER_STATUS waterStatus; // LW_enum
 	short climbStatus;
-	short poseCount;
+	int poseCount;
 	LaraJumpDirection jumpDirection;
-	int jumpCount;
-	bool jumpQueued;
+	int runJumpCount;
+	bool runJumpQueued;
 	short hitFrame;
 	short hitDirection;
 	int sprintTimer;
@@ -1054,12 +1054,12 @@ struct LaraInfo
 	bool flareControlLeft;
 	bool look;
 	bool burn;
-	bool keepCrouched;
+	bool keepLow;
+	bool isLow;
 	bool isMoving;
 	bool canMonkeySwing;
 	byte burnBlue;
 	bool burnSmoke;
-	bool isDucked;
 	bool hasFired;
 	bool busy;
 	bool oldBusy;

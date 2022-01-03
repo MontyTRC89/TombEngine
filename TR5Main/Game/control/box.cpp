@@ -1563,7 +1563,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	z = abs(z);
 
 	// Makes Lara smaller
-	if (enemy == LaraItem && ((LaraInfo*)enemy)->isDucked)
+	if (enemy == LaraItem && ((LaraInfo*)enemy)->isLow)
 		y -= STEPUP_HEIGHT;
 
 	if (x > z)
