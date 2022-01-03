@@ -190,20 +190,21 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to ladder.
 	if (TestLaraLadderAutoJump(item, coll))
 	{
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_IDLE;
-			info->turnRate = 0;
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = GetFrameNumber(item, 0);
+		item->goalAnimState = LS_JUMP_UP;
+		item->currentAnimState = LS_IDLE;
+		info->turnRate = 0;
 
-			ShiftItem(item, coll);
-			SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-			AnimateLara(item);
+		ShiftItem(item, coll);
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		AnimateLara(item);
 
-			return true;
+		return true;
 	}
 	// Mount ladder.
-	else if (TestLaraLadderMount(item, coll))
+	else if (TestLaraLadderMount(item, coll) &&
+		TestLaraClimbStance(item, coll))
 	{
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
@@ -1551,10 +1552,10 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item);
 
-	if (info->canMonkeySwing &&										// Monkey swing sector flag set. (TODO: Is canMonkeySwing member necessary? Could simply check for sector flag here.)
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_STRETCH &&		// Lower ceiling bound.
-		(probe.Position.Ceiling - y) >= -CLICK(7) &&				// Upper ceiling bound.
-		!TestLaraSwamp(item))										// No swamp.
+	if (!TestLaraSwamp(item) &&										// No swamp.
+		info->canMonkeySwing &&										// Monkey swing sector flag set. (TODO: Is canMonkeySwing member necessary? Could simply check for sector flag here.)
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
 	{
 		return true;
 	}
@@ -1569,15 +1570,14 @@ bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
-	//auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
-	//auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
 
-	if (info->climbStatus &&									// Ladder sector flag set.
-		coll->NearestLedgeDistance <= coll->Setup.Radius &&		// Appropriate distance from wall.
-		TestValidLedgeAngle(item, coll) &&
-		!TestLaraSwamp(item) &&									// No swamp.
-		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f))		// Lower middle ceiling bound.
+	if (TestValidLedgeAngle(item, coll) &&
+		!TestLaraSwamp(item) &&										// No swamp.
+		info->climbStatus &&										// Ladder sector flag set.
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Lower middle ceiling bound.
+		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
+		// TODO: Calculate jump velocity outside this function.
 		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((probeMiddle.Position.Ceiling - y + CLICK(0.2f)), -CLICK(7.1f)));
 		return true;
 	}
@@ -1592,17 +1592,13 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probeMiddle = GetCollisionResult(item);
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
-	//auto probeFrontLeft = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, -coll->Setup.Radius);
-	//auto probeFrontRight = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height, coll->Setup.Radius);
 
-	if (info->climbStatus &&										// Ladder sector flag set.
-		coll->NearestLedgeDistance <= coll->Setup.Radius &&			// Appropriate distance from wall.
-		TestLaraClimbStance(item, coll) &&
-		TestValidLedgeAngle(item, coll) &&
+	if (TestValidLedgeAngle(item, coll) &&
+		info->climbStatus &&										// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower middle ceiling bound.
+		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&			// Upper middle floor bound.
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower front ceiling bound.
-		(probeMiddle.Position.Floor - y) > -CLICK(7.5f))			// Upper floor bound.
-		//(probeFront.Position.Ceiling - y) > -CLICK(7.5f))			// Upper ceiling bound.
+		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
 		return true;
 	}
