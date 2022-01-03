@@ -278,13 +278,13 @@ bool SaveGame::Save(int slot)
 	lara.add_highest_location(Lara.highestLocation);
 	lara.add_hit_direction(Lara.hitDirection);
 	lara.add_hit_frame(Lara.hitFrame);
+	lara.add_holster_info(holsterInfoOffset);
 	lara.add_interacted_item(Lara.interactedItem);
 	lara.add_is_climbing(Lara.isClimbing);
 	lara.add_is_low(Lara.isLow);
 	lara.add_is_moving(Lara.isMoving);
 	lara.add_item_number(Lara.itemNumber);
-	lara.add_run_jump_count(Lara.runJumpCount);
-	lara.add_run_jump_queued(Lara.runJumpQueued);
+	lara.add_jump_direction(Lara.jumpDirection);
 	lara.add_keep_low(Lara.keepLow);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
@@ -329,6 +329,8 @@ bool SaveGame::Save(int slot)
 	lara.add_rope_ptr(Lara.ropePtr);
 	lara.add_rope_segment(Lara.ropeSegment);
 	lara.add_rope_y(Lara.ropeY);
+	lara.add_run_jump_count(Lara.runJumpCount);
+	lara.add_run_jump_queued(Lara.runJumpQueued);
 	lara.add_secrets(Lara.Secrets);
 	lara.add_silencer(Lara.Silencer);
 	lara.add_small_waterskin(Lara.small_waterskin);
@@ -336,6 +338,7 @@ bool SaveGame::Save(int slot)
 	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
+	lara.add_tightrope(tightRopeOffset);
 	lara.add_torch(Lara.Torch);
 	lara.add_torso_x_rot(Lara.torsoXrot);
 	lara.add_torso_y_rot(Lara.torsoYrot);
@@ -346,10 +349,8 @@ bool SaveGame::Save(int slot)
 	lara.add_water_status(Lara.waterStatus);
 	lara.add_water_surface_dist(Lara.waterSurfaceDist);
 	lara.add_weapon_item(Lara.weaponItem);
-	lara.add_wet(wetOffset);
-	lara.add_tightrope(tightRopeOffset);
-	lara.add_holster_info(holsterInfoOffset);
 	lara.add_weapons(carriedWeaponsOffset);
+	lara.add_wet(wetOffset);
 
 	auto laraOffset = lara.Finish();
 
@@ -1200,8 +1201,7 @@ bool SaveGame::Load(int slot)
 	Lara.isLow = s->lara()->is_low();
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
-	Lara.runJumpCount = s->lara()->run_jump_count();
-	Lara.runJumpQueued = s->lara()->run_jump_queued();
+	Lara.jumpDirection = (LaraJumpDirection)s->lara()->jump_direction();
 	Lara.keepLow = s->lara()->keep_low();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
@@ -1256,6 +1256,8 @@ bool SaveGame::Load(int slot)
 	Lara.ropePtr = s->lara()->rope_ptr();
 	Lara.ropeSegment = s->lara()->rope_segment();
 	Lara.ropeY = s->lara()->rope_y();
+	Lara.runJumpCount = s->lara()->run_jump_count();
+	Lara.runJumpQueued = s->lara()->run_jump_queued();
 	Lara.Secrets = s->lara()->secrets();
 	Lara.Silencer = s->lara()->silencer();
 	Lara.small_waterskin = s->lara()->small_waterskin();
