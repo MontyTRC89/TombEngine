@@ -988,14 +988,16 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
 {
-	auto start = GAME_VECTOR(item->pos.xPos,
+	auto start = GAME_VECTOR(
+		item->pos.xPos + (phd_cos(item->pos.yRot) * side),
 		item->pos.yPos + height,
-		item->pos.zPos,
+		item->pos.zPos + (phd_sin(item->pos.yRot) * -side),
 		item->roomNumber);
 
-	auto end = GAME_VECTOR(item->pos.xPos + dist * phd_sin(item->pos.yRot),
+	auto end = GAME_VECTOR(
+		item->pos.xPos + (phd_sin(item->pos.yRot) * dist) + (phd_cos(item->pos.yRot) * side),
 		item->pos.yPos + height,
-		item->pos.zPos + dist * phd_cos(item->pos.yRot),
+		item->pos.zPos + (phd_cos(item->pos.yRot) * dist) + (phd_sin(item->pos.yRot) * -side),
 		item->roomNumber);
 
 	return !LOS(&start, &end);
