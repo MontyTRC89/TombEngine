@@ -194,9 +194,10 @@ void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	int dist = WALL_SIZE;// WALL_SIZE / LARA_RUN_JUMP_TIME * std::max(1, LARA_RUN_JUMP_TIME/* - info->runJumpCount*/); // TODO: Adaptive distance.
 	auto probe = GetCollisionResult(item, item->pos.yRot, dist, -coll->Setup.Height);
 
-	if (TestLaraRunJumpForward(item, coll) ||
+	if ((TestLaraRunJumpForward(item, coll) ||													// Area ahead is permissive.
 		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
-		(probe.Position.Floor - y) >= CLICK(0.5f))												// OR there is a drop below
+		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below
+		probe.Position.Floor != NO_HEIGHT)
 		{
 			info->runJumpQueued = (item->goalAnimState == LS_RUN_FORWARD);
 		}

@@ -255,16 +255,6 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (info->waterStatus == LW_WADE)
-	{
-		if (TestLaraJumpUp(item, coll))
-			item->goalAnimState = LS_JUMP_UP;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		return;
-	}
-
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
 	{
