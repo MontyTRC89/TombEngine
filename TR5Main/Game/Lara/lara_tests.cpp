@@ -1417,27 +1417,32 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist)
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist, bool checkWadeStatus)
 {
+	LaraInfo*& info = item->data;
+
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
-	// TODO: Test water height for running jump.
+	bool isWading = checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
-	if ((probe.Position.Floor - y) >= -STEPUP_HEIGHT &&											// Highest floor bound.
-		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) &&		// Ceiling height is permissive.
+	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
+			probe.Position.Slope) &&															// OR surface is a slope.
+		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
+			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below.
+		!isWading &&																			// Not wading in water (if applicable).
 		!TestLaraSwamp(item) &&																	// No swamp.
 		!TestLaraFacingCorner(item, angle, dist) &&												// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
-
+	
 	return false;
 }
 
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.8f)); // TODO: Slightly increase distance? Test at floor height -(STEPUP_HEIGHT + 1).
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.5f), true); // TODO: Slightly increase distance? Test at floor height -(STEPUP_HEIGHT + 1).
 }
 
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
