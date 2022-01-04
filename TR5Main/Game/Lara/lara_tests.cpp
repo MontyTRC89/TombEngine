@@ -1426,9 +1426,10 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int di
 	bool isWading = checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
 	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
-			probe.Position.Slope) &&															// OR surface is a slope.
+			probe.Position.Slope) &&																// OR surface is a slope.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
-			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below.
+			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
+			(probe.Position.Floor - y) >= CLICK(0.5f))) &&											// AND there is a drop below.
 		!isWading &&																			// Not wading in water (if applicable).
 		!TestLaraSwamp(item) &&																	// No swamp.
 		!TestLaraFacingCorner(item, angle, dist) &&												// Avoid jumping through corners.
