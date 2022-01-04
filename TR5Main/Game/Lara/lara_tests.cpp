@@ -1484,14 +1484,16 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 	bool swampTooDeep = checkSwampDepth ? (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3)) : TestLaraSwamp(item);
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
-	int yOffset = lowerBound;  // May fail?
-	while (((probeFront.Position.Floor - y) > 0 || abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMin) &&
-			yOffset > upperBound)
+	int yOffset = lowerBound;
+	while (((probeFront.Position.Ceiling - y) > 0 ||										// Ceiling is lower than Lara's height.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMin ||		// Clamp is too small.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > clampMax) &&		// Clamp is too large.
+		yOffset > (upperBound - coll->Setup.Height))
 	{
-		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset - coll->Setup.Height);
+		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
 		yOffset -= CLICK(0.5f);
 	}
-	
+
 	// Assess vault candidate location.
 	if ((probeFront.Position.Floor - y) < lowerBound &&									// Lower floor bound.
 		(probeFront.Position.Floor - y) >= upperBound &&								// Upper floor bound.
@@ -1501,7 +1503,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 		!swampTooDeep &&																// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-		// TODO: Command query separation please.
+		// TODO: Command query separation?
 		// Calculate auto jump velocity.
 		if (snapHeight == 0)
 			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
