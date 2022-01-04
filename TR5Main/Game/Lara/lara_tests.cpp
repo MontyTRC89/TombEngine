@@ -1442,7 +1442,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int di
 
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.5f), true); // TODO: Slightly increase distance? Test at floor height -(STEPUP_HEIGHT + 1).
+	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.5f));
 }
 
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
@@ -1467,7 +1467,7 @@ bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot, 0);
+	return TestLaraJumpTolerance(item, coll, 0, 0, false);
 }
 
 // TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
