@@ -1505,7 +1505,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 	{
 		// TODO: Command query separation?
 		// Calculate auto jump velocity.
-		if (snapHeight == 0)
+		if (!snapHeight)
 			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
 		// Snap y position to align vault animation.
 		else
@@ -1766,7 +1766,7 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > clampMin &&			// Destination clamp limit.
 		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= gapMin &&		// Gap is optically permissive (going up).
 		abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= gapMin &&		// Gap is optically permissive (going down).
-		abs(probeA.Position.Floor - probeB.Position.Floor) <= probeDeltaMax &&		// Destination height is within crawl states' BadHeightUp/Down threshold.
+		abs(probeA.Position.Floor - probeB.Position.Floor) <= probeDeltaMax &&		// Crossing and destination floor height difference suggests continuous crawl surface.
 		!isSlope && !isDeath &&														// No slope or death sector.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
