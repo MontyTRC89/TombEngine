@@ -100,7 +100,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) ||
+	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) ||
 		info->gunStatus != LG_HANDS_FREE)
 	{
 		return false;
