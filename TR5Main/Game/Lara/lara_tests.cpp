@@ -1485,7 +1485,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound, in
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
 	int yOffset = lowerBound;
-	while (((probeFront.Position.Ceiling - y) > 0 ||										// Ceiling is lower than Lara's height.
+	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||						// Ceiling is lower than Lara's height.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= clampMin ||		// Clamp is too small.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > clampMax) &&		// Clamp is too large.
 		yOffset > (upperBound - coll->Setup.Height))
@@ -1767,6 +1767,7 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= gapMin &&		// Gap is optically permissive (going up).
 		abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= gapMin &&		// Gap is optically permissive (going down).
 		abs(probeA.Position.Floor - probeB.Position.Floor) <= probeDeltaMax &&		// Crossing and destination floor height difference suggests continuous crawl surface.
+		(probeA.Position.Ceiling - y) < -gapMin &&									// Ceiling height is permissive.
 		!isSlope && !isDeath &&														// No slope or death sector.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
 	{
@@ -1778,22 +1779,22 @@ bool TestLaraCrawlStepTolerance(ITEM_INFO* item, COLL_INFO* coll, int lowerBound
 
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);		// Floor range: [-CLICK(1), -STEPUP_HEIGHT]
+	return TestLaraCrawlStepTolerance(item, coll, -CLICK(1), -STEPUP_HEIGHT, LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1.2f), CLICK(2), CLICK(1) - 1);		// Floor range: [-CLICK(1), -STEPUP_HEIGHT]
 }
 
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1), CLICK(2), CLICK(1) - 1);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT_CRAWL, CLICK(0.6f), CLICK(1.2f), CLICK(2), CLICK(1) - 1);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 }
 
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
+	return TestLaraCrawlStepTolerance(item, coll, STEPUP_HEIGHT, CLICK(1), LARA_HEIGHT, CLICK(1.25f), CLICK(1.2f), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 }
 
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraCrawlStepTolerance(item, coll, -MAX_HEIGHT, STEPUP_HEIGHT + 1, LARA_HEIGHT, CLICK(1.25f), CLICK(1), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [-MAX_HEIGHT, STEPUP_HEIGHT)
+	return TestLaraCrawlStepTolerance(item, coll, -MAX_HEIGHT, STEPUP_HEIGHT + 1, LARA_HEIGHT, CLICK(1.25f), CLICK(1.2f), CLICK(1.5f), -MAX_HEIGHT, false);		// Floor range: [-MAX_HEIGHT, STEPUP_HEIGHT)
 }
 
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
