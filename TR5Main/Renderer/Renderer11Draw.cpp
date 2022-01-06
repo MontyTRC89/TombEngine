@@ -3345,6 +3345,9 @@ namespace TEN::Renderer
             {
                 int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
+                bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
+                bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
+
                 for (int pass = 0; pass < passes; pass++)
                 {
                     if (pass == 0)
@@ -3363,9 +3366,6 @@ namespace TEN::Renderer
 
                         setBlendMode(BLENDMODE_ALPHABLEND);
                     }
-
-                    bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]), SamplerStateType::AnisotropicClamp);
-                    bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]), SamplerStateType::None);
 
                     m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
                     m_numDrawCalls++;
