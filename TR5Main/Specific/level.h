@@ -105,6 +105,7 @@ struct SPRITE
 
 struct MESH
 {
+	byte LightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
