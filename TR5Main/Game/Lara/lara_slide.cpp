@@ -34,24 +34,25 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// Not yet.
-		//if (TrInput & IN_LEFT/* &&
-		//	g_GameFlow->Animations.SlideExtended*/)
-		//{
-		//	info->turnRate -= LARA_TURN_RATE;
-		//	if (info->turnRate < -LARA_SLIDE_TURN_MAX)
-		//		info->turnRate = -LARA_SLIDE_TURN_MAX;
+		/*if (g_GameFlow->Animations.SlideExtended)
+		{
+			if (TrInput & IN_LEFT)
+			{
+				info->turnRate -= LARA_TURN_RATE;
+				if (info->turnRate < -LARA_SLIDE_TURN_MAX)
+					info->turnRate = -LARA_SLIDE_TURN_MAX;
 
-		//	DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-		//}
-		//else if (TrInput & IN_RIGHT/* &&
-		//	g_GameFlow->Animations.SlideExtended*/)
-		//{
-		//	info->turnRate += LARA_TURN_RATE;
-		//	if (info->turnRate > LARA_SLIDE_TURN_MAX)
-		//		info->turnRate = LARA_SLIDE_TURN_MAX;
+				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+			}
+			else if (TrInput & IN_RIGHT)
+			{
+				info->turnRate += LARA_TURN_RATE;
+				if (info->turnRate > LARA_SLIDE_TURN_MAX)
+					info->turnRate = LARA_SLIDE_TURN_MAX;
 
-		//	DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-		//}
+				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+			}
+		}*/
 
 		if (TrInput & IN_JUMP)
 		{
@@ -81,7 +82,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -CLICK(2);
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -130,24 +131,25 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// Not yet.
-		//if (TrInput & IN_LEFT/* &&
-		//	g_GameFlow->Animations.SlideExtended*/)
-		//{
-		//	info->turnRate -= LARA_TURN_RATE;
-		//	if (info->turnRate < -LARA_SLIDE_TURN_MAX)
-		//		info->turnRate = -LARA_SLIDE_TURN_MAX;
+		/*if (g_GameFlow->Animations.SlideExtended)
+		{
+			if (TrInput & IN_LEFT)
+			{
+				info->turnRate -= LARA_TURN_RATE;
+				if (info->turnRate < -LARA_SLIDE_TURN_MAX)
+					info->turnRate = -LARA_SLIDE_TURN_MAX;
 
-		//	DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-		//}
-		//else if (TrInput & IN_RIGHT/* &&
-		//	g_GameFlow->Animations.SlideExtended*/)
-		//{
-		//	info->turnRate += LARA_TURN_RATE;
-		//	if (info->turnRate > LARA_SLIDE_TURN_MAX)
-		//		info->turnRate = LARA_SLIDE_TURN_MAX;
+				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+			}
+			else if (TrInput & IN_RIGHT)
+			{
+				info->turnRate += LARA_TURN_RATE;
+				if (info->turnRate > LARA_SLIDE_TURN_MAX)
+					info->turnRate = LARA_SLIDE_TURN_MAX;
 
-		//	DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-		//}
+				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
+			}
+		}*/
 
 		if (TrInput & IN_JUMP)
 		{
@@ -173,7 +175,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -CLICK(2);
+	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
