@@ -305,6 +305,8 @@ namespace TEN::Renderer
 			{
 				RendererLight* light = &currentRoom.Lights[j];
 
+				light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
+
 				if (!light->AffectNeighbourRooms && roomToCheck != roomNumber)
 				{
 					continue;
