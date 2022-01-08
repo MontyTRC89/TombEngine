@@ -54,9 +54,28 @@ void GetTighRopeFallOff(int Regularity);
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
+
 bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
+
+bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData);
+bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData);
+bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
+
+bool TestLaraCrouchToCrawl(ITEM_INFO* item);
+bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.3f), bool checkWadeStatus = true);
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll);
@@ -66,26 +85,24 @@ bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraMove(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
-bool TestLaraMoveCrawl(ITEM_INFO* item, COLL_INFO* coll, short angle, int lowerBound, int upperBound, bool checkSlope = true, bool checkDeath = true);
-bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraHopBack(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData);
+bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraCrouchToCrawl(ITEM_INFO* item);
-bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
+
+bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestData testData);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
+
 bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
 
