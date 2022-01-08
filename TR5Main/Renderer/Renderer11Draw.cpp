@@ -1921,7 +1921,7 @@ namespace TEN::Renderer
 
         if (falloff >= 8)
         {
-            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
+            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
         }
         else
         { 
@@ -1929,7 +1929,7 @@ namespace TEN::Renderer
             g = (g * falloff) >> 3;
             b = (b * falloff) >> 3;
 
-            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f);
+            dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
         }
 
         dynamicLight.Position = Vector3(float(x), float(y), float(z));
