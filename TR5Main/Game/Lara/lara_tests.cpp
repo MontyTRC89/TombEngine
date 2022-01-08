@@ -1628,22 +1628,22 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist, bool checkWadeStatus)
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testData)
 {
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, dist, -coll->Setup.Height);
-	bool isWading = checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
+	auto probe = GetCollisionResult(item, testData.angle, testData.dist, -coll->Setup.Height);
+	bool isWading = testData.checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
 	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
-		probe.Position.Slope) &&																// OR surface is a slope.
+		probe.Position.Slope) &&																	// OR surface is a slope.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
-				(probe.Position.Floor - y) >= CLICK(0.5f))) &&											// AND there is a drop below.
+				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
 		!isWading &&																			// Not wading in water (if applicable).
 		!TestLaraSwamp(item) &&																	// No swamp.
-		!TestLaraFacingCorner(item, angle, dist) &&												// Avoid jumping through corners.
+		!TestLaraFacingCorner(item, testData.angle, testData.dist) &&							// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1654,32 +1654,65 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int di
 
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot, CLICK(1.5f));
+	JumpTestData testData
+	{
+		item->pos.yRot,
+		CLICK(1.5f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot);
+	JumpTestData testData
+	{
+		item->pos.yRot
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot + ANGLE(180.0f));
+	JumpTestData testData
+	{
+		item->pos.yRot + ANGLE(180.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot - ANGLE(90.0f));
+	JumpTestData testData
+	{
+		item->pos.yRot - ANGLE(90.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, item->pos.yRot + ANGLE(90.0f));
+	JumpTestData testData
+	{
+		item->pos.yRot + ANGLE(90.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return TestLaraJumpTolerance(item, coll, 0, 0, false);
+	JumpTestData testData
+	{
+		0,
+		0,
+		false
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
@@ -1693,10 +1726,10 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
 	int yOffset = testData.lowerBound;
-	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is lower than Lara's height.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
-		yOffset > (testData.upperBound - CLICK(1)))													// Offset is too high.
+	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||									// Ceiling is lower than Lara's height.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
+		yOffset > (testData.upperBound - coll->Setup.Height))											// Offset is too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
 		yOffset -= CLICK(0.5f);
