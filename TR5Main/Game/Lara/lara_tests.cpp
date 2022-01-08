@@ -1745,7 +1745,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is lower than Lara's height.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
-		yOffset > (testData.upperBound - CLICK(1)))													// Offset is too high.
+		yOffset > (testData.upperBound - coll->Setup.Height))										// Offset is too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
 		yOffset -= CLICK(0.5f);
