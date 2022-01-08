@@ -74,7 +74,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 		return false;
 
 	// Discard if ledge is not within distance threshold
-	if (abs(coll->NearestLedgeDistance) > coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT)
+	if (abs(coll->NearestLedgeDistance) > coll->Setup.Radius * sqrt(2) + 4)
 		return false;
 
 	// Discard if ledge is not within angle threshold
@@ -1479,7 +1479,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT, -coll->Setup.Height);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
+	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
 	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
 	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
 	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
@@ -1505,7 +1505,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testDa
 bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, LARA_RAD_CRAWL * PROBE_RADIUS_OFFSET_MULT, -LARA_HEIGHT_CRAWL);
+	auto probe = GetCollisionResult(item, testData.angle, LARA_RAD_CRAWL * sqrt(2) + 4, -LARA_HEIGHT_CRAWL);
 	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
 	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
 	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
@@ -1736,7 +1736,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT, -coll->Setup.Height);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 	bool swampTooDeep = testData.checkSwampDepth ? (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3)) : TestLaraSwamp(item);
 
@@ -1747,7 +1747,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
 		yOffset > (testData.upperBound - CLICK(1)))													// Offset is too high.
 	{
-		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT, yOffset);
+		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
 		yOffset -= CLICK(0.5f);
 	}
 
@@ -1905,7 +1905,7 @@ bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT, -coll->Setup.Height);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
 	if (TestValidLedgeAngle(item, coll) &&
@@ -1928,7 +1928,7 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 
 	int y = item->pos.yPos;
 	auto probeMiddle = GetCollisionResult(item);
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * PROBE_RADIUS_OFFSET_MULT, -coll->Setup.Height);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 
 	if (TestValidLedgeAngle(item, coll) &&
 		info->climbStatus &&										// Ladder sector flag set.
