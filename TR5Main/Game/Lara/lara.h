@@ -4,7 +4,6 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 
-#define PROBE_RADIUS_OFFSET_MULT (sqrt(2) + 4)		// Necessary for movement tests due to Tomb Raider's "hard" collision system.
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
 #define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
 
