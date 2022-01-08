@@ -448,7 +448,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -562,7 +562,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -633,6 +633,9 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraSlideState(item, coll);
 		return;
 	}
+
+	if (TestLaraVault(item, coll))
+		return;
 
 	ShiftItem(item, coll);
 
@@ -840,7 +843,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -932,7 +935,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate > LARA_SWAMP_TURN_MAX)
 		info->turnRate = LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -1054,7 +1057,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -1146,7 +1149,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->turnRate < -LARA_SWAMP_TURN_MAX)
 		info->turnRate = -LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
 		item->goalAnimState = LS_WADE_FORWARD;
 		return;
@@ -1473,7 +1476,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -1590,7 +1593,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
-		else if (TestLaraHopBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
 			item->goalAnimState = LS_RUN_BACK;
 			return;
@@ -1672,8 +1675,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.75f);
-	coll->Setup.BadHeightUp = -CLICK(0.75f);
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1757,8 +1760,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.75f);
-	coll->Setup.BadHeightUp = -CLICK(0.75f);
+	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
