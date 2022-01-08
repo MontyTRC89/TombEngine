@@ -77,7 +77,7 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, short angle, int dist = CLICK(1.3f), bool checkWadeStatus = true);
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testData);
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll);
