@@ -122,6 +122,13 @@ struct MoveTestData
 	bool checkDeath = true;
 };
 
+struct JumpTestData
+{
+	short angle;
+	int dist = CLICK(1.3f);
+	bool checkWadeStatus = true;
+};
+
 struct VaultTestData
 {
 	int lowerBound;
