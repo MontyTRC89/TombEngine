@@ -252,7 +252,7 @@ void FillSlopeData(short orient, Vector2& goal, short& climbOrient, short& goalO
 	case NORTH:
 		climbOrient = (short)CLIMB_DIRECTION::North;
 		goalOrient = ANGLE(0);
-		goal.y = 4;
+		goal.y = -4;
 		pos.z = CLICK(1);
 		break;
 	case EAST:
@@ -264,7 +264,7 @@ void FillSlopeData(short orient, Vector2& goal, short& climbOrient, short& goalO
 	case SOUTH:
 		climbOrient = (short)CLIMB_DIRECTION::South;
 		goalOrient = ANGLE(180);
-		goal.y = -4;
+		goal.y = 4;
 		pos.z = -CLICK(1);
 		break;
 	case WEST:
@@ -935,7 +935,7 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
 	// Block for ladder to overhead slope transition
-	if (lara->animNumber == 164)
+	if (lara->animNumber == LA_LADDER_IDLE)
 	{
 		if (TrInput & IN_FORWARD)
 		{
@@ -981,7 +981,7 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
 					lara->pos.yPos = ceiling - 156;
-					SetAnimation(lara, LA_OVERHANG_LADDER_SLOPE_CONCAVE); // ladder to underlying slope transition (convex)
+					SetAnimation(lara, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // ladder to underlying slope transition (convex)
 				}
 			}
 		}
@@ -1009,7 +1009,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = lara->roomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
-	if (lara->animNumber == 168) // make lara stop before underlying slope ceiling at correct height
+	if (lara->animNumber == LA_LADDER_DOWN) // make lara stop before underlying slope ceiling at correct height
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -1066,7 +1066,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = lara->roomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
-	if (lara->animNumber == 150 && !GetFrameNumber(lara, 0)) // Manage proper grabbing of monkey slope on forward jump
+	if (lara->animNumber == LA_REACH_TO_MONKEYSWING && !GetFrameNumber(lara, 0)) // Manage proper grabbing of monkey slope on forward jump
 	{
 		int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 		int ceilDist = lara->pos.yPos - ceiling;
@@ -1097,7 +1097,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD) // Monkey to slope transitions
 	{
-		if (TestMonkey(floorNow, now.x, now.y, now.z) && ((lara->animNumber == 150 && GetFrameNumber(lara, 0) >= 54) || lara->animNumber == 234))
+		if (TestMonkey(floorNow, now.x, now.y, now.z) && ((lara->animNumber == LA_REACH_TO_MONKEYSWING && GetFrameNumber(lara, 0) >= 54) || lara->animNumber == LA_MONKEYSWING_IDLE))
 		{
 			if (abs(DirOrientDiff(goalOrient, lara->pos.yRot)) <= ANGLE(30) &&
 				InStrip(lara->pos.xPos, lara->pos.zPos, lara->pos.yRot, 0, CLICK(1) / 2))
