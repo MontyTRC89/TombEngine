@@ -1525,7 +1525,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData t
 
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk and run state collision functions.
+	// Using BadHeightUp/Down defined in run state collision function.
 
 	MoveTestData testData
 	{
@@ -1540,7 +1540,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk and run state collision functions.
+	// Using BadHeightUp/Down defined in walk state collision function.
 
 	MoveTestData testData
 	{
@@ -1742,13 +1742,13 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
 	int yOffset = testData.lowerBound;
-	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is lower than Lara's height.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
-		yOffset > (testData.upperBound - coll->Setup.Height))										// Offset is too high.
+	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||									// Ceiling is below Lara's height.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
+		yOffset > (testData.upperBound - coll->Setup.Height))											// Offset is too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
-		yOffset -= CLICK(0.5f);
+		yOffset -= std::max((int)CLICK(0.5f), testData.clampMin);
 	}
 
 	// Assess vault candidate location.
