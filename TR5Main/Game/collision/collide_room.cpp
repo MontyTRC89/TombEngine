@@ -916,8 +916,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 			auto block = GetCollisionResult(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight = block->BridgeFloorHeight(ffpX, y, ffpZ); // HACK? FloorHeight never returns real bridge height!
-			auto ceilingHeight = block->CeilingHeight(ffpX, y, ffpZ);
+			auto floorHeight   = GetFloorHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
+			auto ceilingHeight = GetCeilingHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
 
 			// If ceiling height tests lower than Y value, it means ceiling
 			// ledge is in front and we should use it instead of floor.
