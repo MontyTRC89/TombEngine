@@ -24,11 +24,8 @@ namespace TEN::Renderer {
 		DirectX::SimpleMath::Vector3 ConstrainAxis;
 		DirectX::SimpleMath::Vector3 LookAtAxis;
 	};
+	
 	using namespace DirectX::SimpleMath;
-	void addSpriteBillboard(RendererSprite* sprite,Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
-	void addSpriteBillboardConstrained(RendererSprite* sprite,Vector3 pos,Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,Vector3 constrainAxis, RenderView& view);
-	void addSpriteBillboardConstrainedLookAt(RendererSprite* sprite,Vector3 pos,Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,Vector3 lookAtAxis, RenderView& view);
-	void addSprite3D(RendererSprite* sprite,Vector3 vtx1, Vector3 vtx2,Vector3 vtx3, Vector3 vtx4,Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode,RenderView& view);
-
+	
 
 }
