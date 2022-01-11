@@ -168,7 +168,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 
-		// Auto jump to vault.
+		// Auto jump to hang.
 		else if (TestLaraVaultAutoJump(item, coll))
 		{
 			item->animNumber = LA_STAND_SOLID;
@@ -1745,7 +1745,7 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||									// Ceiling is below Lara's height.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
-		yOffset >= (testData.upperBound - coll->Setup.Height))											// Offset is not too high.
+		yOffset > (testData.upperBound - coll->Setup.Height))											// Offset is not too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
 		yOffset -= std::max((int)CLICK(0.5f), testData.clampMin);
@@ -1890,7 +1890,7 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item);
 
 	if (!TestLaraSwamp(item) &&										// No swamp.
-		info->canMonkeySwing &&										// Monkey swing sector flag set. (TODO: Is canMonkeySwing member necessary? Could simply check for sector flag here.)
+		info->canMonkeySwing &&										// Monkey swing sector flag set.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
 	{
