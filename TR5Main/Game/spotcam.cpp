@@ -41,7 +41,7 @@ QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 bool SpotCamFirstLook;
 short CurrentSplineCamera;
-int LastSpotCam;
+int LastSpotCamSequence;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
@@ -110,7 +110,7 @@ void InitialiseSpotCam(short Sequence)
 	int sp;
 	int i;
 
-	if (TrackCameraInit != 0 && LastSpotCam == Sequence)
+	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
 		TrackCameraInit = 0;
 		return;
@@ -133,7 +133,7 @@ void InitialiseSpotCam(short Sequence)
 	Lara.busy = 0;
 
 	CameraFade = -1;
-	LastSpotCam = Sequence;
+	LastSpotCamSequence = Sequence;
 	TrackCameraInit = 0;
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
