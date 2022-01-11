@@ -792,7 +792,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_KAYAK:
-			if (KayakControl())
+			if (KayakControl(item))
 				return;
 			break;
 

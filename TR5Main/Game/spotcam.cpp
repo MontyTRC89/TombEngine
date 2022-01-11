@@ -14,7 +14,6 @@ using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
 
 int TrackCameraInit;
-int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
 int SpotcamLoopCnt;
@@ -42,7 +41,7 @@ QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 bool SpotCamFirstLook;
 short CurrentSplineCamera;
-int LastSpotCam;
+int LastSpotCamSequence;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
@@ -111,7 +110,7 @@ void InitialiseSpotCam(short Sequence)
 	int sp;
 	int i;
 
-	if (TrackCameraInit != 0 && LastSequence == Sequence)
+	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
 		TrackCameraInit = 0;
 		return;
@@ -134,7 +133,7 @@ void InitialiseSpotCam(short Sequence)
 	Lara.busy = 0;
 
 	CameraFade = -1;
-	LastSequence = Sequence;
+	LastSpotCamSequence = Sequence;
 	TrackCameraInit = 0;
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
@@ -508,8 +507,7 @@ void CalculateSpotCameras()
 		Camera.pos.y = cpy;
 		Camera.pos.z = cpz;
 
-		if ((s->flags & SCF_FOCUS_LARA_HEAD
-			|| s->flags & SCF_TRACKING_CAM))
+		if ((s->flags & SCF_FOCUS_LARA_HEAD) || (s->flags & SCF_TRACKING_CAM))
 		{
 			Camera.target.x = LaraItem->pos.xPos;
 			Camera.target.y = LaraItem->pos.yPos;
