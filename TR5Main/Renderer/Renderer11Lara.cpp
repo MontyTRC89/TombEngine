@@ -96,18 +96,16 @@ void Renderer11::updateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-
-		if (Lara.gunType == WEAPON_REVOLVER) // im so sorry but it's either this or crazy arms with the revolver
-		{
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
-		}
-		else
+		if (Lara.gunType == WEAPON_PISTOLS || Lara.gunType == WEAPON_UZI)
 		{
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.yRot), TO_RAD(Lara.leftArm.zRot));
 			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
 		}
-		// yRot still messed up in some situations but it's definitely better now!!
+		else
+		{
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
+		}
 
 		LARA_ARM *leftArm = &Lara.leftArm;
 		LARA_ARM *rightArm = &Lara.rightArm;
