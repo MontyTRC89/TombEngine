@@ -32,8 +32,8 @@ enum ShatterType
 
 struct OBJECT_INFO
 {
-	short nmeshes; 
-	short meshIndex; 
+	int nmeshes; 
+	int meshIndex;
 	int boneIndex; 
 	int frameBase;
 	std::function<void(short itemNumber)> initialise;
@@ -46,7 +46,7 @@ struct OBJECT_INFO
 	std::function<void(ITEM_INFO* item)> drawRoutineExtra;
 	std::function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
 	ZoneType zoneType;
-	short animIndex; 
+	int animIndex; 
 	short hitPoints; 
 	short pivotLength; 
 	short radius; 
