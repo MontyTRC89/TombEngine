@@ -73,7 +73,8 @@ using namespace TEN::Math::Random;
 #define QUAD_IN_LEFT		IN_LEFT
 #define QUAD_IN_RIGHT		IN_RIGHT
 
-enum QuadState {
+enum QuadState
+{
 	QUAD_STATE_DRIVE = 1,
 	QUAD_STATE_TURN_LEFT = 2,
 	QUAD_STATE_SLOW = 5,
@@ -97,7 +98,8 @@ enum QuadState {
 	QUAD_STATE_DISMOUNT_LEFT = 24,
 };
 
-enum QuadAnim {
+enum QuadAnim
+{
 	QUAD_ANIM_IDLE_DEATH = 0,
 	QUAD_ANIM_UNK_1 = 1,
 	QUAD_ANIM_DRIVE_BACK = 2,
@@ -129,12 +131,14 @@ enum QuadAnim {
 	QUAD_ANIM_LEAP_TO_FREEFALL = 28
 };
 
-enum QuadFlags {
+enum QuadFlags
+{
 	QUAD_FLAG_DEAD = 0x80,
 	QUAD_FLAG_IS_FALLING = 0x40
 };
 
-enum QuadEffectPosition {
+enum QuadEffectPosition
+{
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
 	FRONT_LEFT_TYRE,
@@ -143,7 +147,8 @@ enum QuadEffectPosition {
 	BACK_RIGHT_TYRE
 };
 
-BITE_INFO quadEffectsPositions[6] = {
+BITE_INFO quadEffectsPositions[6] =
+{
 	{ -56, -32, -380, 0	},
 	{ 56, -32, -380, 0 },
 	{ -8, 180, -48, 3 },
@@ -157,9 +162,9 @@ bool QuadCanDriftStart;
 int QuadSmokeStart;
 bool QuadNoGetOff;
 
-void InitialiseQuadBike(short itemNumber)
+void InitialiseQuadBike(short itemNum)
 {
-	ITEM_INFO* quad = &g_Level.Items[itemNumber];
+	ITEM_INFO* quad = &g_Level.Items[itemNum];
 	quad->data = QUAD_INFO();
 	QUAD_INFO* quadInfo = quad->data;
 
