@@ -283,7 +283,7 @@ namespace TEN::Entities::TR4
                     l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                     l->currentAnimState = LS_MISC_CONTROL;
                     Lara.flareControlLeft = false;
-                    Lara.leftArm.lock = 3;
+                    Lara.leftArm.lock = true;
                     item->itemFlags[0] = 2;
                 }
                 item->pos.yRot = oldRot;

@@ -36,20 +36,20 @@ public:
 	GameScriptRotation GetRot() const;
 	void SetRot(GameScriptRotation const& rot);
 
-	short GetCurrentAnimState() const;
-	void SetCurrentAnimState(short animState);
+	int GetCurrentAnimState() const;
+	void SetCurrentAnimState(int animState);
 
-	short GetAnimNumber() const;
-	void SetAnimNumber(short animNumber);
+	int GetAnimNumber() const;
+	void SetAnimNumber(int animNumber);
 
-	short GetFrameNumber() const;
-	void SetFrameNumber(short frameNumber);
+	int GetFrameNumber() const;
+	void SetFrameNumber(int frameNumber);
 
-	short GetRequiredAnimState() const;
+	int GetRequiredAnimState() const;
 	void SetRequiredAnimState(short animState);
 
-	short GetGoalAnimState() const;
-	void SetGoalAnimState(short animState);
+	int GetGoalAnimState() const;
+	void SetGoalAnimState(int animState);
 
 	short GetHP() const;
 	void SetHP(short hp);

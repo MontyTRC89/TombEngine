@@ -197,7 +197,7 @@ void GuideControl(short itemNumber)
 	bool someFlag = false;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos1;
-	short frameNumber;
+	int frameNumber;
 	short random;
 
 	switch (item->currentAnimState)
