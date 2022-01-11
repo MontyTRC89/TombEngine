@@ -168,7 +168,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 
-		// Auto jump to vault.
+		// Auto jump to hang.
 		else if (TestLaraVaultAutoJump(item, coll))
 		{
 			item->animNumber = LA_STAND_SOLID;
@@ -1422,7 +1422,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData t
 
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk and run state collision functions.
+	// Using BadHeightUp/Down defined in run state collision function.
 
 	MoveTestData testData
 	{
@@ -1437,7 +1437,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk and run state collision functions.
+	// Using BadHeightUp/Down defined in walk state collision function.
 
 	MoveTestData testData
 	{
@@ -1726,13 +1726,13 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
 	int yOffset = testData.lowerBound;
-	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||									// Ceiling is lower than Lara's height.
+	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||									// Ceiling is below Lara's height.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testData.clampMin ||		// Clamp is too small.
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testData.clampMax) &&		// Clamp is too large.
-		yOffset > (testData.upperBound - coll->Setup.Height))											// Offset is too high.
+		yOffset > (testData.upperBound - coll->Setup.Height))											// Offset is not too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, yOffset);
-		yOffset -= CLICK(0.5f);
+		yOffset -= std::max((int)CLICK(0.5f), testData.clampMin);
 	}
 
 	// Assess vault candidate location.
@@ -1874,7 +1874,7 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item);
 
 	if (!TestLaraSwamp(item) &&										// No swamp.
-		info->canMonkeySwing &&										// Monkey swing sector flag set. (TODO: Is canMonkeySwing member necessary? Could simply check for sector flag here.)
+		info->canMonkeySwing &&										// Monkey swing sector flag set.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
 	{
@@ -1913,6 +1913,7 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 
 	if (TestValidLedgeAngle(item, coll) &&
 		info->climbStatus &&										// Ladder sector flag set.

@@ -17,7 +17,8 @@
 
 using std::vector;
 
-enum MINECART_STATE {
+enum MinecartState
+{
 	CART_GETIN,
 	CART_GETOUT,
 	CART_GETOUTL,
