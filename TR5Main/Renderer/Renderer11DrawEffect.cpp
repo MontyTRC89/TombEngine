@@ -781,7 +781,8 @@ namespace TEN::Renderer
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
 
-		for (auto& spr : view.spritesToDraw) {
+		for (auto& spr : view.spritesToDraw) 
+		{
 			// Calculate matrices for sprites
 			Matrix spriteMatrix;
 			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
@@ -823,7 +824,9 @@ namespace TEN::Renderer
 				face.distance = distance;
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
-				//view.TransparentFacesToDraw.push_back(face);
+
+				RendererRoom& room = m_rooms[GetRoomNumberForSpriteTest(spr.pos)];
+				room.TransparentFacesToDraw.push_back(face);
 			}
 			else
 			{

@@ -604,6 +604,11 @@ namespace TEN::Renderer
 		void drawSimpleParticles(RenderView& view); 
 		void setBlendMode(BLEND_MODES blendMode);
 		float calculateFrameRate();
+		void addSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		void addSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 constrainAxis, RenderView& view);
+		void addSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis, RenderView& view);
+		void addSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color, float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+		short GetRoomNumberForSpriteTest(Vector3 position);
 
 		inline bool isSortingRequired(BLEND_MODES blendMode)
 		{
