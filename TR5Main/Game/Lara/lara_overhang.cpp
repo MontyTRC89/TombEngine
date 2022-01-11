@@ -742,7 +742,7 @@ void lara_as_sclimbstart(ITEM_INFO* lara, COLL_INFO* coll)
 
 void lara_as_sclimbstop(ITEM_INFO* lara, COLL_INFO* coll)
 {
-	// rotating camera effect during monkey to overhead slope transition
+	// Rotating camera effect during monkey to overhead slope transition
 
 	// Following camera effect during the slope to underlying monkey transition
 	if (lara->animNumber == LA_OVERHANG_SLOPE_MONKEY_CONVEX)
@@ -840,7 +840,7 @@ void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = lara->roomNumber));
 	int ceilDist = lara->pos.yPos - GetCeiling(floorNext, down.x, down.y, down.z);
 
-	if (lara->goalAnimState == LS_LADDER_IDLE) // prevent going from hang to climb mode if slope is under ladder
+	if (lara->goalAnimState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
 	{
 		if (ceilDist >= CLICK(1) && ceilDist < CLICK(2))
 		{
@@ -981,7 +981,7 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
 					lara->pos.yPos = ceiling - 156;
-					SetAnimation(lara, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // ladder to underlying slope transition (convex)
+					SetAnimation(lara, LA_OVERHANG_LADDER_SLOPE_CONVEX); // Ladder to underlying slope transition (convex)
 				}
 			}
 		}
@@ -1009,7 +1009,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = lara->roomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
-	if (lara->animNumber == LA_LADDER_DOWN) // make lara stop before underlying slope ceiling at correct height
+	if (lara->animNumber == LA_LADDER_DOWN) // Make Lara stop before underlying slope ceiling at correct height
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -1036,7 +1036,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(2), CLICK(5)); 
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
-						lara->pos.yPos += CLICK(1); // do midpoint Y translation
+						lara->pos.yPos += CLICK(1); // Do midpoint Y translation
 						lara->goalAnimState = 56;
 					}
 				}
