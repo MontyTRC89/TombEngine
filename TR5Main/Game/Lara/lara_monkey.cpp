@@ -279,8 +279,8 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
 	GetCollisionInfo(coll, item);
 
-	//if (LaraDeflectEdgeMonkey(item, coll))
-	//	LaraCollideStopMonkey(item, coll);
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
 
 	bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
 
@@ -303,6 +303,91 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
+	DoLaraMonkeySnap(item, coll);
+}
+
+// TODO: Add state to enum and function names to lists.
+// State:		LS_MONKEY_BACK ()
+// Collision:	lara_col_monkey_back()
+void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->hitPoints <= 0)
+	{
+		item->goalAnimState = LS_MONKEY_IDLE; //
+		return;
+	}
+
+	if (TrInput & IN_LEFT)
+	{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
+	}
+
+	if (TrInput & IN_ACTION &&
+		info->canMonkeySwing)
+	{
+		if (TrInput & IN_BACK)
+		{
+			//item->goalAnimState = LS_MONKEY_BACK;
+			return;
+		}
+
+		item->goalAnimState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	SetLaraMonkeyFallState(item);
+}
+
+// State:		LS_MONKEY_BACK (156)
+// State:		lara_as_monkey_back()
+void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	coll->Setup.BadHeightDown = NO_BAD_POS;
+	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
+	GetCollisionInfo(coll, item);
+
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
+
+	/*if (coll->CollisionType == CT_FRONT ||
+		coll->CollisionType == CT_TOP_FRONT)
+	{
+		SetAnimation(item, LA_MONKEYSWING_IDLE);
+	}*/
+
+	/*if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > SLOPE_DIFFERENCE ||
+		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) > SLOPE_DIFFERENCE)
+	{
+		SetAnimation(item, LA_MONKEYSWING_IDLE);
+	}*/
+
+	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
 }
 
@@ -369,11 +454,8 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
 	GetCollisionInfo(coll, item);
 
-	if (!TestLaraMonkeyShimmyLeft(item, coll))
-		SetAnimation(item, LA_MONKEYSWING_IDLE);
-
-	ShiftItem(item, coll);
-	DoLaraMonkeySnap(item, coll);
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
 }
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
@@ -441,8 +523,8 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
 	GetCollisionInfo(coll, item);
 
-	if (!TestLaraMonkeyShimmyRight(item, coll))
-		SetAnimation(item, LA_MONKEYSWING_IDLE);
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
 
 	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
