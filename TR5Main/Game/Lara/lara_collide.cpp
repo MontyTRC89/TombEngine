@@ -158,8 +158,33 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// TODO: Move the following two functions to lara_tests.cpp and lara_helpers.cpp?
-// @Sezz 2021.09.26
+bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
+{
+	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
+	{
+		ShiftItem(item, coll);
+
+		item->goalAnimState = LS_MONKEY_IDLE;
+		item->speed = 0;
+		item->gravityStatus = false;
+
+		return true;
+	}
+
+	if (coll->CollisionType == CT_LEFT)
+	{
+		ShiftItem(item, coll);
+		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+	}
+	else if (coll->CollisionType == CT_RIGHT)
+	{
+		ShiftItem(item, coll);
+		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+	}
+
+	return false;
+}
+
 bool TestLaraHitCeiling(COLL_INFO* coll)
 {
 	if (coll->CollisionType == CT_TOP ||
@@ -180,28 +205,6 @@ void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 	item->speed = 0;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-}
-
-// LEGACY
-// TODO: Gradually replace usage with TestLaraHitCeiling() and SetLaraHitCeiling(). @Sezz 2021.09.27
-bool LaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (coll->CollisionType == CT_TOP || coll->CollisionType == CT_CLAMP)
-	{
-		item->pos.xPos = coll->Setup.OldPosition.x;
-		item->pos.yPos = coll->Setup.OldPosition.y;
-		item->pos.zPos = coll->Setup.OldPosition.z;
-
-		SetAnimation(item, LA_STAND_SOLID);
-
-		item->speed = 0;
-		item->fallspeed = 0;
-		item->gravityStatus = false;
-
-		return true;
-	}
-
-	return false;
 }
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
@@ -283,6 +286,41 @@ void LaraCollideStopCrawl(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->animNumber != LA_CRAWL_IDLE)
 		{
 			item->animNumber = LA_CRAWL_IDLE;
+			item->frameNumber = GetFrameNumber(item, 0);
+		}
+
+		break;
+	}
+}
+
+void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll)
+{
+	switch (coll->Setup.OldAnimState)
+	{
+	case LS_CRAWL_IDLE:
+	case LS_CRAWL_TURN_LEFT:
+	case LS_CRAWL_TURN_RIGHT:
+		item->currentAnimState = coll->Setup.OldAnimState;
+		item->animNumber = coll->Setup.OldAnimNumber;
+		item->frameNumber = coll->Setup.OldFrameNumber;
+
+		if (TrInput & IN_LEFT)
+			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+		else if (TrInput & IN_RIGHT)
+			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+		else
+			item->goalAnimState = LS_MONKEY_IDLE;
+
+		AnimateLara(item);
+		break;
+
+	default:
+		item->currentAnimState = LS_MONKEY_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
+
+		if (item->animNumber != LA_MONKEYSWING_IDLE)
+		{
+			item->animNumber = LA_MONKEYSWING_IDLE;
 			item->frameNumber = GetFrameNumber(item, 0);
 		}
 

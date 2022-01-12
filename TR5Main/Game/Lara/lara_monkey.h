@@ -12,6 +12,8 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll);
