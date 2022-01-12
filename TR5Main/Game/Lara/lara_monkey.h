@@ -24,6 +24,3 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll);
 void lara_col_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll);
-
-short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll);
-short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll);
