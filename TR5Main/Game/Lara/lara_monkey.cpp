@@ -48,18 +48,17 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_TURN_MAX / 2)
-			info->turnRate = -LARA_MONKEY_TURN_MAX / 2;
+		if (info->turnRate < -LARA_MONKEY_MOVE_TURN_MAX / 2)
+			info->turnRate = -LARA_MONKEY_MOVE_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_TURN_MAX / 2)
-			info->turnRate = LARA_MONKEY_TURN_MAX / 2;
+		if (info->turnRate > LARA_MONKEY_MOVE_TURN_MAX / 2)
+			info->turnRate = LARA_MONKEY_MOVE_TURN_MAX / 2;
 	}
 
-	if (TrInput & IN_ACTION &&
-		info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
 		if (TrInput & IN_ROLL)
 		{
@@ -408,58 +407,132 @@ void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_MONKEY_TURN_180 (79)
+// Control:		lara_col_monkey_turn_180()
+void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 79*/
-	/*collision: lara_col_monkey180*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
 	item->goalAnimState = LS_MONKEY_IDLE;
 }
 
-void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 79*/
 	/*state code: lara_as_monkey180*/
 	lara_col_monkeyswing(item, coll);
 }
 
-void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_MONKEYSWING_TURN_LEFT (82)
+// Collision:	lara_as_monkey_turn_left()
+void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 83*/
-	/*collision: lara_col_hangturnlr*/
+	LaraInfo*& info = item->data;
+
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
 	if (item->hitPoints <= 0)
 	{
+		item->goalAnimState = LS_MONKEY_IDLE; //
+		return;
+	}
+
+	item->pos.yRot -= LARA_MONKEY_TURN_MAX;
+
+	if (TrInput & IN_ACTION &&
+		info->canMonkeySwing)
+	{
+		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			return;
+		}
+		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			return;
+		}
+
 		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	Camera.targetElevation = 1820;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	item->pos.yRot += ANGLE(1.5f);
-
-	if (!(TrInput & IN_RIGHT))
-		item->goalAnimState = LS_MONKEY_IDLE;
+	SetLaraMonkeyFallState(item);
 }
-//both lara_as_hangturnl and lara_as_hangturnr states use lara_col_hangturnlr for collision//
-void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
+
+// State:		LS_MONKEYSWING_TURN_LEFT (82)
+// Control:		lara_as_monkey_turn_left()
+void lara_col_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 82*/
-	/*collision: lara_col_hangturnlr*/
+	lara_col_monkey_idle(item, coll);
+}
+
+// State:		LS_MONKEYSWING_TURN_RIGHT (83)
+// Collision:	lara_as_monkey_turn_right()
+void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
 	if (item->hitPoints <= 0)
 	{
+		item->goalAnimState = LS_MONKEY_IDLE; //
+		return;
+	}
+
+	item->pos.yRot += LARA_MONKEY_TURN_MAX;
+
+	if (TrInput & IN_ACTION &&
+		info->canMonkeySwing)
+	{
+		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			return;
+		}
+		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			return;
+		}
+
+		if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+			return;
+		}
+
 		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	Camera.targetElevation = 1820;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	item->pos.yRot -= ANGLE(1.5f);
+	SetLaraMonkeyFallState(item);
+}
 
-	if (!(TrInput & IN_LEFT))
-		item->goalAnimState = LS_MONKEY_IDLE;
+// State:		LS_MONKEYSWING_TURN_RIGHT (83)
+// Control:		lara_as_monkey_turn_right()
+void lara_col_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+{
+	lara_col_monkey_idle(item, coll);
 }
 
 void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
@@ -487,8 +560,6 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraMonkeyFallState(item);
 	}
 }
-
-/*tests and other functions*/
 
 short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
