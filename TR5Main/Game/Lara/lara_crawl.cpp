@@ -817,15 +817,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		MoveItem(item, item->pos.yRot, -STEP_SIZE);
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
-
-		// TODO: When refactoring monkey swing, get rid of this.
-		if (TestHangSwingIn(item, item->pos.yRot))
-		{
-			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-			ResetLaraFlex(item);
-		}
-		else
-			SetAnimation(item, LA_REACH_TO_HANG, 12);
+		SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
 		info->gunStatus = LG_HANDS_BUSY;
