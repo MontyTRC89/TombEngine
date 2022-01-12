@@ -64,9 +64,7 @@ struct COLL_RESULT
 	FLOOR_INFO* BottomBlock;
 
 	COLL_POSITION Position;
-
-	Vector2 TiltFloor;
-	Vector2 TiltCeiling;
+	Vector2 Tilt;
 };
 
 struct COLL_SETUP
