@@ -203,7 +203,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//140
 	lara_as_null,//141
 	lara_as_null,//142
-	lara_as_null,// 143 - Unused
+	lara_as_monkey_back,//143
 	lara_as_null,// 144 - Unused
 	lara_as_null,// 145 - Unused
 	lara_as_controlled_no_look,
@@ -363,7 +363,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_void_func, // 143 - Unused
+	lara_col_monkey_back,//143
 	lara_void_func, // 144 - Unused
 	lara_void_func, // 145 - Unused
 	lara_void_func,

@@ -1631,7 +1631,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestData testData)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4);
+	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 
 	if (probe.Position.Floor - y - (coll->Setup.Radius * 1.6f) > 0 &&							// Upper floor boundary. TODO: Offset is required because Lara's local y position is above feet.
 		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY <= testData.lowerBound &&						// Lower ceiling boundary.

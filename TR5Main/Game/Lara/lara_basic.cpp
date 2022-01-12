@@ -723,7 +723,6 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
@@ -1895,7 +1894,6 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesArePits = false;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
