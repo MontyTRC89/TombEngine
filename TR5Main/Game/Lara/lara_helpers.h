@@ -13,6 +13,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate);
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
+void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 
@@ -21,6 +22,7 @@ void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraFallState(ITEM_INFO* item);
 void SetLaraFallBackState(ITEM_INFO* item);
+void SetLaraMonkeyFallState(ITEM_INFO* item);
 short GetLaraSlideDirection(COLL_INFO* coll);
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
 
