@@ -318,16 +318,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
 		return false;
 
-	auto angle = item->pos.yRot;
-
-	if (TestHangSwingIn(item, angle))
-	{
-		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-	}
-	else
-	{
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
-	}
 
 	auto bounds = GetBoundsAccurate(item);
 
@@ -356,15 +347,14 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || (info->gunStatus != LG_HANDS_FREE) || (coll->HitStatic))
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
 		return false;
 
 	if (info->canMonkeySwing && coll->CollisionType == CT_TOP)
 	{
+		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		ResetLaraFlex(item);
 		info->gunStatus = LG_HANDS_BUSY;
-
-		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
@@ -372,10 +362,12 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		return true;
 	}
 
-	if ((coll->Middle.Ceiling > -STEPUP_HEIGHT) ||
-		(coll->Middle.Floor < 200) ||
-		(coll->CollisionType != CT_FRONT))
+	if (coll->Middle.Ceiling > -STEPUP_HEIGHT ||
+		coll->Middle.Floor < 200 ||
+		coll->CollisionType != CT_FRONT)
+	{
 		return false;
+	}
 
 	int edge;
 	auto edgeCatch = TestLaraEdgeCatch(item, coll, &edge);
@@ -386,22 +378,14 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!(ladder && edgeCatch) &&
 		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
-		return false;
-
-	auto angle = item->pos.yRot;
-
-	if (TestHangSwingIn(item, angle))
 	{
-		if (g_GameFlow->Animations.OscillateHang)
-		{
-			ResetLaraFlex(item);
-			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
-		}
-		else
-		{
-			ResetLaraFlex(item);
-			SetAnimation(item, LA_REACH_TO_MONKEYSWING);
-		}
+		return false;
+	}
+
+	if (TestHangSwingIn(item))
+	{
+		SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
+		ResetLaraFlex(item);
 	}
 	else
 		SetAnimation(item, LA_REACH_TO_HANG);
@@ -421,11 +405,10 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll, 0.2f);
 
+	info->gunStatus = LG_HANDS_BUSY;
 	item->gravityStatus = true;
 	item->speed = 2;
 	item->fallspeed = 1;
-
-	info->gunStatus = LG_HANDS_BUSY;
 
 	return true;
 }
@@ -862,32 +845,18 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 	return 1;
 }
 
-bool TestHangSwingIn(ITEM_INFO* item, short angle)
+bool TestHangSwingIn(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, angle, CLICK(0.5f));
+	auto probe = GetCollisionResult(item, item->pos.yRot, CLICK(0.5f));
 
-	if (probe.Position.Floor != NO_HEIGHT)
+	if ((probe.Position.Floor - y) > 0 &&
+		(probe.Position.Ceiling - y) < -400 &&
+		probe.Position.Floor != NO_HEIGHT)
 	{
-		if (g_GameFlow->Animations.OscillateHang)
-		{
-			if ((probe.Position.Floor - y) > 0 &&
-				(probe.Position.Ceiling - y) < -400)
-			{
-				return true;
-			}
-		}
-		else
-		{
-			if ((probe.Position.Floor - y) > 0 &&
-				(probe.Position.Ceiling - y) < -400 &&
-				(y - 819 - probe.Position.Ceiling) > -72)
-			{
-				return true;
-			}
-		}
+		return true;
 	}
 
 	return false;
