@@ -299,7 +299,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 		info->gunStatus = LG_HANDS_BUSY;
 
-		MonkeySwingSnap(item, coll);
+		DoLaraMonkeySnap(item, coll);
 
 		return true;
 	}
@@ -1371,7 +1371,7 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-// TODO: This function and its clone below should become obsolete with more accurate and accessible collision detection in the future.
+// TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData)
 {
@@ -1385,32 +1385,6 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testDa
 		(probe.Position.Floor - y) >= testData.upperBound &&							// Upper floor bound.
 		(probe.Position.Ceiling - y) < -coll->Setup.Height &&							// Lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height &&		// Space is not a clamp.
-		!isSlopeDown && !isSlopeUp && !isDeath &&										// No slope or death sector (if applicable).
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-// HACK: coll->Setup.Radius and coll->Setup.Height are only set
-// in COLLISION functions, then reset by LaraAboveWater() to defaults.
-// This means they will store the wrong values for tests called in crawl CONTROL functions.
-// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
-// for this clone function. @Sezz 2021.12.05
-bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData)
-{
-	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, LARA_RAD_CRAWL * sqrt(2) + 4, -LARA_HEIGHT_CRAWL);
-	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
-	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
-	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
-
-	if ((probe.Position.Floor - y) <= testData.lowerBound &&							// Lower floor bound.
-		(probe.Position.Floor - y) >= testData.upperBound &&							// Upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&							// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
 		!isSlopeDown && !isSlopeUp && !isDeath &&										// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
 	{
@@ -1565,6 +1539,32 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraMoveTolerance(item, coll, testData);
 }
 
+// HACK: coll->Setup.Radius and coll->Setup.Height are only set
+// in COLLISION functions, then reset by LaraAboveWater() to defaults.
+// This means they will store the wrong values for tests called in crawl CONTROL functions.
+// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
+// for this clone function. @Sezz 2021.12.05
+bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData)
+{
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, testData.angle, LARA_RAD_CRAWL * sqrt(2) + 4, -LARA_HEIGHT_CRAWL);
+	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
+	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
+	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
+
+	if ((probe.Position.Floor - y) <= testData.lowerBound &&							// Lower floor bound.
+		(probe.Position.Floor - y) >= testData.upperBound &&							// Upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&							// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&		// Space is not a clamp.
+		!isSlopeDown && !isSlopeUp && !isDeath &&										// No slope or death sector (if applicable).
+		probe.Position.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Using BadHeightUp/Down defined in crawl state collision functions.
@@ -1628,23 +1628,19 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testData)
+bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestData testData)
 {
-	LaraInfo*& info = item->data;
-
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, testData.dist, -coll->Setup.Height);
-	bool isWading = testData.checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
+	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4);
 
-	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
-		probe.Position.Slope) &&																	// OR surface is a slope.
-		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
-			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
-				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
-		!isWading &&																			// Not wading in water (if applicable).
-		!TestLaraSwamp(item) &&																	// No swamp.
-		!TestLaraFacingCorner(item, testData.angle, testData.dist) &&							// Avoid jumping through corners.
-		probe.Position.Floor != NO_HEIGHT)
+	if (probe.Position.Floor - y - (coll->Setup.Radius * 1.6f) > 0 &&							// Upper floor boundary. TODO: Offset is required because Lara's local y position is above feet.
+		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY <= testData.lowerBound &&						// Lower ceiling boundary.
+		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY >= testData.upperBound &&						// Upper ceiling boundary.
+		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY - CLICK(0.5f) <= testData.lowerBound &&
+		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY - CLICK(0.5f) >= testData.upperBound &&
+		//probe.Position.Floor - y <= lowerBound &&
+		abs(coll->Middle.Ceiling - coll->Front.Ceiling) < SLOPE_DIFFERENCE &&					// Longitudinally, slope is not too steep.
+		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) < (SLOPE_DIFFERENCE * 2))		// Laterally, slope is not too steep on the right.
 	{
 		return true;
 	}
@@ -1652,67 +1648,52 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testDa
 	return false;
 }
 
-bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	JumpTestData testData
+	MonkeyMoveTestData testData
 	{
-		item->pos.yRot,
-		CLICK(1.5f)
+		coll->Setup.ForwardAngle,
+		CLICK(1),
+		-CLICK(1)
 	};
 
-	return TestLaraJumpTolerance(item, coll, testData);
+	return TestLaraMonkeyMoveTolerance(item, coll, testData);
 }
 
-bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	JumpTestData testData
+	MonkeyMoveTestData testData
 	{
-		item->pos.yRot
+		coll->Setup.ForwardAngle + ANGLE(180.0f),
+		CLICK(1),
+		-CLICK(1)
 	};
 
-	return TestLaraJumpTolerance(item, coll, testData);
+	return TestLaraMonkeyMoveTolerance(item, coll, testData);
 }
 
-bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	JumpTestData testData
+	MonkeyMoveTestData testData
 	{
-		item->pos.yRot + ANGLE(180.0f)
+		coll->Setup.ForwardAngle - ANGLE(90.0f),
+		CLICK(0.8f),
+		-CLICK(0.8f)
 	};
 
-	return TestLaraJumpTolerance(item, coll, testData);
+	return TestLaraMonkeyMoveTolerance(item, coll, testData);
 }
 
-bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	JumpTestData testData
+	MonkeyMoveTestData testData
 	{
-		item->pos.yRot - ANGLE(90.0f)
+		coll->Setup.ForwardAngle + ANGLE(90.0f),
+		CLICK(0.8f),
+		-CLICK(0.8f)
 	};
 
-	return TestLaraJumpTolerance(item, coll, testData);
-}
-
-bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
-{
-	JumpTestData testData
-	{
-		item->pos.yRot + ANGLE(90.0f)
-	};
-
-	return TestLaraJumpTolerance(item, coll, testData);
-}
-
-bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
-{
-	JumpTestData testData
-	{
-		0,
-		0,
-		false
-	};
-
-	return TestLaraJumpTolerance(item, coll, testData);
+	return TestLaraMonkeyMoveTolerance(item, coll, testData);
 }
 
 bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
@@ -2055,6 +2036,93 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
+}
+
+bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testData)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item, testData.angle, testData.dist, -coll->Setup.Height);
+	bool isWading = testData.checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
+
+	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
+		probe.Position.Slope) &&																	// OR surface is a slope.
+		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
+			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
+				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
+		!isWading &&																			// Not wading in water (if applicable).
+		!TestLaraSwamp(item) &&																	// No swamp.
+		!TestLaraFacingCorner(item, testData.angle, testData.dist) &&							// Avoid jumping through corners.
+		probe.Position.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		item->pos.yRot,
+		CLICK(1.5f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
+}
+
+bool TestLaraJumpForward(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		item->pos.yRot
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
+}
+
+bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		item->pos.yRot + ANGLE(180.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
+}
+
+bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		item->pos.yRot - ANGLE(90.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
+}
+
+bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		item->pos.yRot + ANGLE(90.0f)
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
+}
+
+bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
+{
+	JumpTestData testData
+	{
+		0,
+		0,
+		false
+	};
+
+	return TestLaraJumpTolerance(item, coll, testData);
 }
 
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)

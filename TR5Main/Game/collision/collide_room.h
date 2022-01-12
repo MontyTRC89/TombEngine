@@ -122,11 +122,11 @@ struct MoveTestData
 	bool checkDeath = true;
 };
 
-struct JumpTestData
+struct MonkeyMoveTestData
 {
 	short angle;
-	int dist = CLICK(1.3f);
-	bool checkWadeStatus = true;
+	int lowerBound;
+	int upperBound;
 };
 
 struct VaultTestData
@@ -151,6 +151,13 @@ struct CrawlVaultTestData
 	int probeDeltaMax;
 	bool checkSlope = true;
 	bool checkDeath = true;
+};
+
+struct JumpTestData
+{
+	short angle;
+	int dist = CLICK(1.3f);
+	bool checkWadeStatus = true;
 };
 
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);

@@ -48,14 +48,14 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_TURN_MAX)
-			info->turnRate = -LARA_MONKEY_TURN_MAX;
+		if (info->turnRate < -LARA_MONKEY_TURN_MAX / 2)
+			info->turnRate = -LARA_MONKEY_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_TURN_MAX)
-			info->turnRate = LARA_MONKEY_TURN_MAX;
+		if (info->turnRate > LARA_MONKEY_TURN_MAX / 2)
+			info->turnRate = LARA_MONKEY_TURN_MAX / 2;
 	}
 
 	if (TrInput & IN_ACTION &&
@@ -158,7 +158,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
-			MonkeySwingSnap(item, coll);
+			DoLaraMonkeySnap(item, coll);
 	}
 	else
 	{
@@ -300,12 +300,12 @@ void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 			}
 
 			Camera.targetElevation = ANGLE(10.0f);
-			MonkeySwingSnap(item, coll);
+			DoLaraMonkeySnap(item, coll);
 		}
 	}
 	else
 	{
-		MonkeySwingFall(item);
+		SetLaraMonkeyFallState(item);
 	}
 }
 
@@ -345,7 +345,7 @@ void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestMonkeyRight(item, coll))
 		{
-			MonkeySwingSnap(item, coll);
+			DoLaraMonkeySnap(item, coll);
 		}
 		else
 		{
@@ -354,7 +354,7 @@ void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		MonkeySwingFall(item);
+		SetLaraMonkeyFallState(item);
 	}
 }
 
@@ -395,7 +395,7 @@ void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestMonkeyLeft(item, coll))
 		{
-			MonkeySwingSnap(item, coll);
+			DoLaraMonkeySnap(item, coll);
 		}
 		else
 		{
@@ -404,7 +404,7 @@ void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		MonkeySwingFall(item);
+		SetLaraMonkeyFallState(item);
 	}
 }
 
@@ -480,11 +480,11 @@ void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
 		coll->Setup.SlopesAreWalls = true;
 
 		GetCollisionInfo(coll, item);
-		MonkeySwingSnap(item, coll);
+		DoLaraMonkeySnap(item, coll);
 	}
 	else
 	{
-		MonkeySwingFall(item);
+		SetLaraMonkeyFallState(item);
 	}
 }
 
@@ -571,31 +571,4 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return 0;
-}
-
-void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
-{
-	DoLaraMonkeySnap(item, coll);
-
-	return;
-
-	ROOM_VECTOR location = GetRoom(item->location, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	int height = GetCeilingHeight(location, item->pos.xPos, item->pos.zPos).value_or(NO_HEIGHT);
-	if (height != NO_HEIGHT)
-		item->pos.yPos = height + 704;
-}
-
-void MonkeySwingFall(ITEM_INFO* item)
-{
-	if (item->currentAnimState != LS_MONKEY_TURN_180)
-	{
-		SetAnimation(item, LA_JUMP_UP, 9);
-
-		item->speed = 2;
-		item->gravityStatus = true;
-		item->fallspeed = 1;
-		item->pos.yPos += 256;
-
-		Lara.gunStatus = LG_HANDS_FREE;
-	}
 }
