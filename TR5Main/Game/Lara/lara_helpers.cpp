@@ -235,10 +235,12 @@ void SetLaraFallBackState(ITEM_INFO* item)
 
 void SetLaraMonkeyFallState(ITEM_INFO* item)
 {
+	LaraInfo*& info = item->data;
+
 	if (item->currentAnimState != LS_MONKEY_TURN_180)
 	{
 		SetAnimation(item, LS_JUMP_UP, 9);
-		Lara.gunStatus = LG_HANDS_FREE;
+		info->gunStatus = LG_HANDS_FREE;
 		item->speed = 2;
 		item->fallspeed = 1;
 		item->gravityStatus = true;
