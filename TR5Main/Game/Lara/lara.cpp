@@ -133,8 +133,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_sprint_dive,
 	lara_as_monkey_idle,
 	lara_as_monkey_forward,//76
-	lara_as_monkeyl,
-	lara_as_monkeyr,
+	lara_as_monkey_shimmy_left,//77
+	lara_as_monkey_shimmy_right,//78
 	lara_as_monkey_turn_180,//79
 	lara_as_crawl_idle,//80
 	lara_as_crawl_forward,//81
@@ -297,8 +297,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_sprint_dive,
 	lara_col_monkey_idle,
 	lara_col_monkey_forward,//76
-	lara_col_monkeyl,
-	lara_col_monkeyr,
+	lara_col_monkey_shimmy_left,//77
+	lara_col_monkey_shimmy_right,//78
 	lara_col_monkey_turn_180,//79
 	lara_col_crawl_idle,
 	lara_col_crawl_forward,
