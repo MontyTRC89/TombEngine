@@ -126,6 +126,20 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
+void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto y = item->pos.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (probe.Block->Flags.Monkeyswing &&
+		//(probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY) <= CLICK(0.8f) &&			// Upper ceiling bound.
+		//(probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY) >= -CLICK(0.8f) &&		// Upper ceiling bound.
+		probe.Position.Ceiling != NO_HEIGHT)
+	{
+		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
+	}
+}
+
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
 	LaraInfo*& info = item->data;
@@ -217,6 +231,18 @@ void SetLaraFallBackState(ITEM_INFO* item)
 	SetAnimation(item, LA_FALL_BACK);
 	item->fallspeed = 0;
 	item->gravityStatus = true;
+}
+
+void SetLaraMonkeyFallState(ITEM_INFO* item)
+{
+	if (item->currentAnimState != LS_MONKEY_TURN_180)
+	{
+		SetAnimation(item, LS_JUMP_UP, 9);
+		Lara.gunStatus = LG_HANDS_FREE;
+		item->speed = 2;
+		item->fallspeed = 1;
+		item->gravityStatus = true;
+	}
 }
 
 short GetLaraSlideDirection(COLL_INFO* coll)

@@ -1913,7 +1913,6 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 
 	if (TestValidLedgeAngle(item, coll) &&
 		info->climbStatus &&										// Ladder sector flag set.
