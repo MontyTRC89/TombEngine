@@ -337,10 +337,10 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->currentAnimState >= LS_MONKEYSWING_IDLE &&
-				(LaraItem->currentAnimState <= LS_MONKEYSWING_TURN_180 ||
-					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT ||
-					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
+			if (LaraItem->currentAnimState >= LS_MONKEY_IDLE &&
+				(LaraItem->currentAnimState <= LS_MONKEY_TURN_180 ||
+					LaraItem->currentAnimState == LS_MONKEY_TURN_LEFT ||
+					LaraItem->currentAnimState == LS_MONKEY_TURN_RIGHT))
 				break;
 			return;
 
@@ -372,7 +372,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				LaraItem->currentAnimState == LS_LADDER_STOP ||
 				LaraItem->currentAnimState == LS_LADDER_RIGHT ||
 				LaraItem->currentAnimState == LS_LADDER_DOWN ||
-				LaraItem->currentAnimState == LS_MONKEYSWING_IDLE)
+				LaraItem->currentAnimState == LS_MONKEY_IDLE)
 				break;
 			return;
 

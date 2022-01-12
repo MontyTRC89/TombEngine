@@ -150,7 +150,7 @@ void ImpControl(short itemNumber)
 
 			if (LaraItem->currentAnimState == LS_CROUCH_IDLE
 				|| LaraItem->currentAnimState == LS_CROUCH_ROLL
-				|| LaraItem->currentAnimState > LS_MONKEYSWING_TURN_180
+				|| LaraItem->currentAnimState > LS_MONKEY_TURN_180
 				&& LaraItem->currentAnimState < LS_HANG_TO_CRAWL
 				|| LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT
 				|| LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)

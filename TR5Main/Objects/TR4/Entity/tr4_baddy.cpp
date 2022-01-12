@@ -975,13 +975,13 @@ namespace TEN::Entities::TR4
 
 				if (laraInfo.ahead
 					&& laraInfo.distance < SQUARE(682)
-					&& (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
-						|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
+					&& (LaraItem->currentAnimState == LS_MONKEY_IDLE
+						|| LaraItem->currentAnimState == LS_MONKEY_FORWARD
+						|| LaraItem->currentAnimState == LS_MONKEY_SHIMMY_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEY_SHIMMY_RIGHT
+						|| LaraItem->currentAnimState == LS_MONKEY_TURN_180
+						|| LaraItem->currentAnimState == LS_MONKEY_TURN_LEFT
+						|| LaraItem->currentAnimState == LS_MONKEY_TURN_RIGHT))
 				{
 					item->goalAnimState = STATE_BADDY_MONKEY_PUSH_OFF;
 				}
@@ -1021,13 +1021,13 @@ namespace TEN::Entities::TR4
 					if (laraInfo.distance < SQUARE(682))
 					{
 
-						if (LaraItem->currentAnimState == LS_MONKEYSWING_IDLE
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_FORWARD
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_LEFT
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_RIGHT
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_180
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT
-							|| LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT)
+						if (LaraItem->currentAnimState == LS_MONKEY_IDLE
+							|| LaraItem->currentAnimState == LS_MONKEY_FORWARD
+							|| LaraItem->currentAnimState == LS_MONKEY_SHIMMY_LEFT
+							|| LaraItem->currentAnimState == LS_MONKEY_SHIMMY_RIGHT
+							|| LaraItem->currentAnimState == LS_MONKEY_TURN_180
+							|| LaraItem->currentAnimState == LS_MONKEY_TURN_LEFT
+							|| LaraItem->currentAnimState == LS_MONKEY_TURN_RIGHT)
 						{
 							item->goalAnimState = STATE_BADDY_MONKEY_IDLE;
 						}

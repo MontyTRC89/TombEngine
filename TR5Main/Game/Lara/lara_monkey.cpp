@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -16,36 +17,95 @@
 
 using namespace TEN::Floordata;
 
-/*this file has all the related functions to monkeyswinging*/
+// -----------------------------
+// MONKEY SWING
+// Control & Collision Functions
+// -----------------------------
 
-/*monkeyswing state handling functions*/
+// State:		LS_MONKEY_IDLE (75)
+// Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 75*/
-	/*collision: lara_col_hang2*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_IDLE;
-		return;
-	}
+	LaraInfo*& info = item->data;
 
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
+	Camera.targetAngle = 0;
+	Camera.targetElevation = -ANGLE(5.0f);
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-
-	if (Lara.canMonkeySwing)
+	if (item->hitPoints <= 0)
 	{
-		if (!(TrInput & IN_ACTION) || item->hitPoints <= 0)
-			MonkeySwingFall(item);
-
-		Camera.targetAngle = 0;
-		Camera.targetElevation = -ANGLE(45.0f);
+		item->goalAnimState = LS_IDLE; //
+		return;
 	}
 
 	if (TrInput & IN_LOOK)
 		LookUpDown();
+
+	if (TrInput & IN_LEFT)
+	{
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_MONKEY_TURN_MAX)
+			info->turnRate = -LARA_MONKEY_TURN_MAX;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_MONKEY_TURN_MAX)
+			info->turnRate = LARA_MONKEY_TURN_MAX;
+	}
+
+	if (TrInput & IN_ACTION &&
+		info->canMonkeySwing)
+	{
+		if (TrInput & IN_ROLL)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_180;
+			return;
+		}
+
+		if (TrInput & IN_FORWARD /*&& TestLaraMonkeyForward(item, coll)*/)
+		{
+			item->goalAnimState = LS_MONKEY_FORWARD;
+			return;
+		}
+		// Not yet.
+		/*else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_BACK;
+			return;
+		}*/
+
+		if (TrInput & IN_LEFT)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			return;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+			return;
+		}
+
+		if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			return;
+		}
+		else if (TrInput & IN_RSTEP && TestMonkeyRight(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			return;
+		}
+
+		item->goalAnimState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	SetLaraMonkeyFallState(item);
 }
 
 void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
@@ -74,27 +134,27 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
 			if (monkeyFront)
-				item->goalAnimState = LS_MONKEYSWING_FORWARD;
+				item->goalAnimState = LS_MONKEY_FORWARD;
 		}
 		else if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
 		{
-			item->goalAnimState = LS_MONKEYSWING_LEFT;
+			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
 		}
 		else if (TrInput & IN_RSTEP && TestMonkeyRight(item, coll))
 		{
-			item->goalAnimState = LS_MONKEYSWING_RIGHT;
+			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
 		}
 		else if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_LEFT;
+			item->goalAnimState = LS_MONKEY_TURN_LEFT;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
+			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
 		}
 		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_180;
+			item->goalAnimState = LS_MONKEY_TURN_180;
 		}
 
 		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
@@ -104,7 +164,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		TestLaraHang(item, coll);
 
-		if (item->goalAnimState == LS_MONKEYSWING_IDLE)
+		if (item->goalAnimState == LS_MONKEY_IDLE)
 		{
 			TestForObjectOnLedge(item, coll);
 
@@ -162,7 +222,7 @@ void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_monkeyswing*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
@@ -176,9 +236,9 @@ void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_FORWARD)
-		item->goalAnimState = LS_MONKEYSWING_FORWARD;
+		item->goalAnimState = LS_MONKEY_FORWARD;
 	else
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -255,7 +315,7 @@ void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_monkeyr*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
@@ -267,12 +327,12 @@ void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RSTEP)
 	{
-		item->goalAnimState = LS_MONKEYSWING_RIGHT;
+		item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
 		Camera.targetElevation = ANGLE(10.0f);
 	}
 	else
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		Camera.targetElevation = ANGLE(10.0f);
 	}
 }
@@ -304,7 +364,7 @@ void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_monkeyl*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 
 		return;
 	}
@@ -317,12 +377,12 @@ void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LSTEP)
 	{
-		item->goalAnimState = LS_MONKEYSWING_LEFT;
+		item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
 		Camera.targetElevation = ANGLE(10.0f);
 	}
 	else
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		Camera.targetElevation = ANGLE(10.0f);
 	}
 }
@@ -354,7 +414,7 @@ void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_monkey180*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	item->goalAnimState = LS_MONKEYSWING_IDLE;
+	item->goalAnimState = LS_MONKEY_IDLE;
 }
 
 void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll)
@@ -370,7 +430,7 @@ void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangturnlr*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
@@ -380,7 +440,7 @@ void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot += ANGLE(1.5f);
 
 	if (!(TrInput & IN_RIGHT))
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 }
 //both lara_as_hangturnl and lara_as_hangturnr states use lara_col_hangturnlr for collision//
 void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
@@ -389,7 +449,7 @@ void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangturnlr*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 		return;
 	}
 
@@ -399,7 +459,7 @@ void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot -= ANGLE(1.5f);
 
 	if (!(TrInput & IN_LEFT))
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+		item->goalAnimState = LS_MONKEY_IDLE;
 }
 
 void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
@@ -515,6 +575,10 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
+	DoLaraMonkeySnap(item, coll);
+
+	return;
+
 	ROOM_VECTOR location = GetRoom(item->location, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int height = GetCeilingHeight(location, item->pos.xPos, item->pos.zPos).value_or(NO_HEIGHT);
 	if (height != NO_HEIGHT)
@@ -523,7 +587,7 @@ void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void MonkeySwingFall(ITEM_INFO* item)
 {
-	if (item->currentAnimState != LS_MONKEYSWING_TURN_180)
+	if (item->currentAnimState != LS_MONKEY_TURN_180)
 	{
 		SetAnimation(item, LA_JUMP_UP, 9);
 
