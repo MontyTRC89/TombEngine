@@ -2047,7 +2047,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testDa
 	bool isWading = testData.checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
 	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
-		probe.Position.Slope) &&																	// OR surface is a slope.
+			probe.Position.Slope) &&																// OR surface is a slope.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
 				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
