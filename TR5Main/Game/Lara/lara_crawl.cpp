@@ -457,14 +457,12 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 	{
 		SetLaraSlideState(item, coll);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
@@ -563,14 +561,12 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 	
 	if (TestLaraSlide(item, coll))
 	{
 		SetLaraSlideState(item, coll);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
@@ -662,14 +658,12 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 	{
 		SetLaraSlideState(item, coll);
-		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 

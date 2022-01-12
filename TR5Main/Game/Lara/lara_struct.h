@@ -177,7 +177,7 @@ enum LARA_STATE
 	LS_SHIMMY_45_OUTER_RIGHT = 140,
 	LS_SHIMMY_45_INNER_LEFT = 141,
 	LS_SHIMMY_45_INNER_RIGHT = 142,
-	LS_UNUSED1 = 143, // Foot hang leftovers - may be safely reused
+	LS_MONKEY_BACK = 143,
 	LS_UNUSED2 = 144, // Foot hang leftovers - may be safely reused
 	LS_UNUSED3 = 145, // Foot hang leftovers - may be safely reused
 	LS_COGWHEEL_UNGRAB = 146,
@@ -194,7 +194,7 @@ enum LARA_STATE
 	NUM_LARA_STATES
 
 	// TRASHED STATES (please reuse slots before going any higher and remove entries from this list as you go):
-	// 143, 144, 145, 149
+	// 144, 145, 149
 };
 
 enum LARA_ANIM
