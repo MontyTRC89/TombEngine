@@ -75,29 +75,38 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		item->goalAnimState = LS_ONWATER_FORWARD;
+		return;
 	}
 	else if (TrInput & IN_BACK)
 	{
 		item->goalAnimState = LS_ONWATER_BACK;
+		return;
 	}
-
-	if (TrInput & IN_LSTEP)
+	else if (TrInput & IN_ROLL)
+	{
+		item->goalAnimState = LS_ROLL_FORWARD;
+		return;
+	}
+	else if (TrInput & IN_LSTEP)
 	{
 		item->goalAnimState = LS_ONWATER_LEFT;
+		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
 		item->goalAnimState = LS_ONWATER_RIGHT;
+		return;
 	}
-
-	if (TrInput & IN_JUMP)
+	else if (TrInput & IN_JUMP)
 	{
 		Lara.diveCount++;
 		if (Lara.diveCount == 10)
 			SwimDive(item);
+		return;
 	}
-	else
-		Lara.diveCount = 0;
+
+	Lara.diveCount = 0;
+	item->goalAnimState = LS_ONWATER_STOP;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
