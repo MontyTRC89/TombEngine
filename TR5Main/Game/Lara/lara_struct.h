@@ -716,7 +716,7 @@ enum LARA_ANIM
 	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
 	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
 	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_UNUSED1 = 484,										// Foot hang leftovers - may be safely reused
+	LA_LADDER_TO_MONKEY = 484,										// Foot hang leftovers - may be safely reused
 	LA_UNUSED2 = 485,										// Foot hang leftovers - may be safely reused
 	LA_UNUSED3 = 486,										// Foot hang leftovers - may be safely reused
 	LA_UNUSED4 = 487,										// Foot hang leftovers - may be safely reused

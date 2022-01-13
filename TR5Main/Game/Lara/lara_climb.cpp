@@ -315,7 +315,13 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
 		if (!resultRight || !resultLeft)
+		{
+			auto result = GetCollisionResult(item);
+			if (result.BottomBlock->Flags.Monkeyswing && (item->pos.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
+				item->goalAnimState = LS_MONKEYSWING_IDLE;
+
 			return;
+		}
 
 		if (resultRight >= 0 && resultLeft >= 0)
 		{
