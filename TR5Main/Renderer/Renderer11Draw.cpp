@@ -2470,16 +2470,16 @@ namespace TEN::Renderer
 
     void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
-		m_timeUpdate = 0;
-		m_timeDraw = 0;
-		m_timeFrame = 0;
-		m_numDrawCalls = 0;
+        m_timeUpdate = 0;
+        m_timeDraw = 0;
+        m_timeFrame = 0;
+        m_numDrawCalls = 0;
         m_numTransparentDrawCalls = 0;
-		m_nextLight = 0;
-		m_nextSprite = 0;
-		m_nextLine3D = 0;
-		m_nextLine2D = 0;
-		m_nextRect2D = 0;
+        m_nextLight = 0;
+        m_nextSprite = 0;
+        m_nextLine3D = 0;
+        m_nextLine2D = 0;
+        m_nextRect2D = 0;
         m_numRoomsTransparentDrawCalls = 0;
         m_numMoveablesTransparentDrawCalls = 0;
         m_numStaticsTransparentDrawCalls = 0;
@@ -2491,7 +2491,7 @@ namespace TEN::Renderer
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
 
-        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+        GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
         m_stLights.CameraPosition = view.camera.WorldPosition;
 
@@ -2505,7 +2505,7 @@ namespace TEN::Renderer
         // Prepare the shadow map
         if (g_Configuration.EnableShadows)
             renderShadowMap(view);
- 
+
         // Setup Lara item
         m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
         collectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
@@ -2519,9 +2519,9 @@ namespace TEN::Renderer
         m_context->RSSetState(m_states->CullCounterClockwise());
 
         // Bind and clear render target
-        m_context->ClearRenderTargetView(target, Colors::Black);
-        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        m_context->OMSetRenderTargets(1, &target, depthTarget);
+        m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
+        m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
         m_context->RSSetViewports(1, &view.viewport);
 
         // The camera constant buffer contains matrices, camera position, fog values and other 
@@ -2545,7 +2545,7 @@ namespace TEN::Renderer
         m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
         // Draw the horizon and the sky
-        drawHorizonAndSky(view, depthTarget);
+        drawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 
         // Draw rooms and objects
         drawRooms(view);
@@ -2556,11 +2556,11 @@ namespace TEN::Renderer
         drawGunFlashes(view);
         drawGunShells(view);
         drawBaddieGunflashes(view);
-        drawDebris(view,false);
+        drawDebris(view, false);
         drawBats(view);
         drawRats(view);
         drawSpiders(view);
-		drawScarabs(view);
+        drawScarabs(view);
         drawLocusts(view);
 
         // Do special effects and weather 
@@ -2574,7 +2574,7 @@ namespace TEN::Renderer
         drawFootprints(view);
         drawDripParticles(view);
         drawBlood(view);
-		drawWeatherParticles(view);
+        drawWeatherParticles(view);
         drawSparks(view);
         drawBubbles(view);
         drawDrips(view);
@@ -2593,8 +2593,8 @@ namespace TEN::Renderer
         drawTransparentFaces(view);
 
         // Draw GUI stuff at the end
-		drawRects2D();
-		drawLines2D();
+        drawRects2D();
+        drawLines2D();
 
         // Bars
         int flash = FlashIt();
@@ -2603,15 +2603,73 @@ namespace TEN::Renderer
         UpdateAirBar(LaraItem, flash);
         DrawAllPickups();
 
-		drawOverlays(view); // Draw binoculars or lasersight
+        drawOverlays(view); // Draw binoculars or lasersight
 
-		time2 = std::chrono::high_resolution_clock::now();
-		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
-		time1 = time2;
+        time2 = std::chrono::high_resolution_clock::now();
+        m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+        time1 = time2;
 
-		drawDebugInfo();
-		drawAllStrings();
-		clearScene();
+        // Post-process (for now, just cinematic bars and fading)
+        setBlendMode(BLENDMODE_OPAQUE);
+        m_context->RSSetState(m_states->CullCounterClockwise());
+
+        m_context->ClearRenderTargetView(target, Colors::Black);
+        m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_context->OMSetRenderTargets(1, &target, depthTarget);
+        m_context->RSSetViewports(1, &view.viewport);
+
+        RendererVertex vertices[4];
+
+        vertices[0].Position.x = -1.0f;
+        vertices[0].Position.y = 1.0f;
+        vertices[0].Position.z = 0.0f;
+        vertices[0].UV.x = 0.0f;
+        vertices[0].UV.y = 0.0f;
+        vertices[0].Color = Vector4::One;
+
+        vertices[1].Position.x = 1.0f;
+        vertices[1].Position.y = 1.0f;
+        vertices[1].Position.z = 0.0f;
+        vertices[1].UV.x = 1.0f;
+        vertices[1].UV.y = 0.0f;
+        vertices[1].Color = Vector4::One;
+
+        vertices[2].Position.x = 1.0f;
+        vertices[2].Position.y = -1.0f;
+        vertices[2].Position.z = 0.0f;
+        vertices[2].UV.x = 1.0f;
+        vertices[2].UV.y = 1.0f;
+        vertices[2].Color = Vector4::One;
+
+        vertices[3].Position.x = -1.0f;
+        vertices[3].Position.y = -1.0f;
+        vertices[3].Position.z = 0.0f;
+        vertices[3].UV.x = 0.0f;
+        vertices[3].UV.y = 1.0f;
+        vertices[3].Color = Vector4::One;
+
+        m_context->VSSetShader(m_vsFinalPass.Get(), NULL, 0);
+        m_context->PSSetShader(m_psFinalPass.Get(), NULL, 0);
+
+        m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_context->IASetInputLayout(m_inputLayout.Get());
+
+        m_stPostProcessBuffer.ViewportWidth = ScreenWidth;
+        m_stPostProcessBuffer.ViewportHeight = ScreenHeight;
+        m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent / 255.0f;
+        m_stPostProcessBuffer.CinematicBarsHeight = CinematicBarsHeight / 256.0f;
+        m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
+        m_context->PSSetConstantBuffers(7, 1, m_cbPostProcessBuffer.get());
+        
+        bindTexture(TextureRegister::MainTexture, &m_renderTarget, SamplerStateType::AnisotropicClamp);
+
+        m_primitiveBatch->Begin();
+        m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+        m_primitiveBatch->End();
+
+        drawDebugInfo();
+        drawAllStrings();
+        clearScene();
     }
 
     void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
@@ -3304,7 +3362,6 @@ namespace TEN::Renderer
         //renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
         renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
         m_context->ClearState();
-        //drawFinalPass();
         m_swapChain->Present(0, 0);
     }
 
