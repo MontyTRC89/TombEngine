@@ -179,8 +179,7 @@ void InitialiseSpotCam(short Sequence)
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
 		Lara.uncontrollable = true;
-		g_Renderer.enableCinematicBars(true);
-		//SetFadeClip(16, 1);
+		SetCinematicBars(16, 1);
 	}
 
 	if (s->flags & SCF_TRACKING_CAM)
@@ -664,10 +663,9 @@ void CalculateSpotCameras()
 					}
 
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
-					{
-						//SetFadeClip(16, 1);
+					{						
 						if (CurrentLevel)
-							g_Renderer.enableCinematicBars(true);
+							SetCinematicBars(16, 1);
 						Lara.uncontrollable = true;
 					}
 
@@ -770,8 +768,7 @@ void CalculateSpotCameras()
 						CheckTrigger = false;
 					}
 
-					//SetFadeClip(0, 1);
-					g_Renderer.enableCinematicBars(false);
+					SetCinematicBars(0, 1);
 
 					UseSpotCam = 0;
 					Lara.uncontrollable = false;
@@ -887,7 +884,7 @@ void CalculateSpotCameras()
 	}
 	else
 	{
-		g_Renderer.enableCinematicBars(false);
+		SetCinematicBars(0, 1);
 		UseSpotCam = false;
 		Lara.uncontrollable = false;
 		Camera.speed = 1;

@@ -32,6 +32,7 @@
 #include <d3d9types.h>
 #include "Specific\fast_vector.h"
 #include "Renderer/TextureBase.h"
+#include <Renderer\ConstantBuffers\PostProcessBuffer.h>
 
 struct CAMERA_INFO;
 
@@ -336,6 +337,7 @@ namespace TEN::Renderer
 		TEN::Renderer::RenderTarget2D m_currentRenderTarget;
 		TEN::Renderer::RenderTarget2D m_shadowMap;
 		TEN::Renderer::RenderTargetCube m_reflectionCubemap;
+
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
@@ -363,6 +365,8 @@ namespace TEN::Renderer
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDTexture;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psHUDBarColor;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_shadowSampler;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vsFinalPass;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_psFinalPass;
 	
 		// Constant buffers
 		RenderView gameCamera;
@@ -387,6 +391,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CHUDBarBuffer> m_cbHUDBar;
 		CSpriteBuffer m_stSprite;
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
+		CPostProcessBuffer m_stPostProcessBuffer;
+		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
 		// Text and sprites
 		std::unique_ptr<SpriteFont> m_gameFont;
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
