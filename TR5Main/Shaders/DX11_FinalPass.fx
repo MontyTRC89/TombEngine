@@ -1,7 +1,9 @@
-cbuffer MiscBuffer : register(b0)
+cbuffer PostProcessBuffer : register(b7)
 {
-	int CinematicBars;
-	float FadeFactor;
+	float CinematicBarsHeight;
+	float ScreenFadeFactor;
+	int ViewportWidth;
+	int ViewportHeight;
 };
 
 #include "./VertexInput.hlsli"
@@ -31,8 +33,19 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
 	float3 colorMul = min(input.Color.xyz, 1.0f);
-	output.xyz = output.xyz * colorMul.xyz;
-	output.w = 1.0f;
+
+	float y = input.Position.y / ViewportHeight;
+
+	if (y > 1.0f - CinematicBarsHeight ||
+		y < 0.0f + CinematicBarsHeight)
+	{
+		output = float4(0, 0, 0, 1);
+	}
+	else
+	{
+		output.xyz = output.xyz * colorMul.xyz * ScreenFadeFactor;
+		output.w = 1.0f;
+	}
 
 	return output;
 }
