@@ -40,6 +40,7 @@ constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY = 600;		// Lara height in monkey swing states.
 constexpr auto LARA_HEIGHT_SURFSWIM = 700;		// Lara height in water treading states.
 constexpr auto LARA_HEIGHT_STRETCH = 870;		// Lara height in jump-up and ledge hanging states.
+constexpr auto LARA_HEIGHT_REACH = 820;			// Lara height in reach state.
 constexpr auto LARA_HEIGHT_SURFACE = 800;		// Lara height when surfacing water.
 constexpr auto LARA_HEADROOM = 160;				// Amount of reasonable space above Lara's head.
 constexpr auto LARA_RAD = 100;
