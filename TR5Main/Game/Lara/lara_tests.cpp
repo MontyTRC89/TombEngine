@@ -1993,8 +1993,8 @@ bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), CLICK(1), -LARA_HEIGHT_CRAWL);
-	bool objectCollided = TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), CLICK(1), -LARA_HEIGHT_CRAWL);
+	auto probe = GetCollisionResult(item, item->pos.yRot + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+	bool objectCollided = TestLaraObjectCollision(item, item->pos.yRot + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
 
 	if (!objectCollided &&											// No obstruction.
 		(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&		// Highest floor bound.
