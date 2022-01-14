@@ -58,7 +58,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	if (Lara.canMonkeySwing)
+	if (Lara.canMonkeySwing && item->currentAnimState == LS_MONKEYSWING_IDLE)
 	{
 		coll->Setup.BadHeightDown = NO_BAD_POS;
 		coll->Setup.BadHeightUp = NO_HEIGHT;
