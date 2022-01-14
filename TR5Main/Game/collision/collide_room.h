@@ -119,39 +119,6 @@ struct COLL_INFO
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
-struct MoveTestData
-{
-	short angle;
-	int lowerBound;
-	int upperBound;
-	bool checkSlopeDown = true;
-	bool checkSlopeUp = true;
-	bool checkDeath = true;
-};
-
-struct VaultTestData
-{
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int clampMax;
-	int gapMin;
-	bool checkSwampDepth = true;
-};
-
-struct CrawlVaultTestData
-{
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int gapMin;
-	int crossDist;
-	int destDist;
-	int probeDeltaMax;
-	bool checkSlope = true;
-	bool checkDeath = true;
-};
-
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
