@@ -135,6 +135,5 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
-bool SnapAndTestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer);
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
