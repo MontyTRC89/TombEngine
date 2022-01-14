@@ -111,11 +111,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestValidLedge(item, coll))
 	{
+		int o_floorHeight;
 		bool success = false;
 
 		// Vault to crouch up one step.
-		if (TestLaraVault1StepToCrouch(item, coll))
+		if (TestLaraVault1StepToCrouch(item, coll, &o_floorHeight))
 		{
+			item->pos.yPos = o_floorHeight + CLICK(1);
 			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -125,8 +127,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		
 		// Vault to stand up two steps.
-		else if (TestLaraVault2Steps(item, coll))
+		else if (TestLaraVault2Steps(item, coll, &o_floorHeight))
 		{
+			item->pos.yPos = o_floorHeight + CLICK(2);
 			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -135,9 +138,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up two steps.
-		else if (TestLaraVault2StepsToCrouch(item, coll) &&
+		else if (TestLaraVault2StepsToCrouch(item, coll, &o_floorHeight) &&
 			g_GameFlow->Animations.CrawlExtended)
 		{
+			item->pos.yPos = o_floorHeight + CLICK(2);
 			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -147,8 +151,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Vault to stand up three steps.
-		else if (TestLaraVault3Steps(item, coll))
+		else if (TestLaraVault3Steps(item, coll, &o_floorHeight))
 		{
+			item->pos.yPos = o_floorHeight + CLICK(3);
 			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -157,9 +162,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up three steps.
-		else if (TestLaraVault3StepsToCrouch(item, coll) &&
+		else if (TestLaraVault3StepsToCrouch(item, coll, &o_floorHeight) &&
 				g_GameFlow->Animations.CrawlExtended)
 		{
+			item->pos.yPos = o_floorHeight + CLICK(3);
 			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -169,8 +175,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Auto jump to hang.
-		else if (TestLaraVaultAutoJump(item, coll))
+		else if (TestLaraVaultAutoJump(item, coll, &o_floorHeight))
 		{
+			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (o_floorHeight - item->pos.yPos));
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
@@ -188,8 +195,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	
 	// Auto jump to ladder.
-	if (TestLaraLadderAutoJump(item, coll))
+	int o_ceilHeight;
+	if (TestLaraLadderAutoJump(item, coll, &o_ceilHeight))
 	{
+		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((o_ceilHeight - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
@@ -1731,7 +1740,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData, int* o_floorHeight)
 {
 	LaraInfo*& info = item->data;
 
@@ -1760,21 +1769,14 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 		!swampTooDeep &&																			// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-		// TODO: Command query separation?
-		// Calculate auto jump velocity.
-		if (!testData.snapHeight)
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
-		// Snap y position to align vault animation.
-		else
-			item->pos.yPos = probeFront.Position.Floor + testData.snapHeight;
-
+		*o_floorHeight = probeFront.Position.Floor;
 		return true;
 	}
 
 	return false;
 }
 
-bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1785,14 +1787,13 @@ bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 		-CLICK(2.5f),
 		LARA_HEIGHT,
 		-MAX_HEIGHT,
-		CLICK(1),
-		CLICK(2)
+		CLICK(1)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
-bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1804,13 +1805,12 @@ bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT,
 		-MAX_HEIGHT,
 		CLICK(1),
-		CLICK(3)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
-bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
 	// Clamp range: (-CLICK(0.1f), MAX_HEIGHT]
@@ -1825,10 +1825,10 @@ bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		false
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
-bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (0, -STEPUP_HEIGHT]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1840,13 +1840,12 @@ bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(1)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
-bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1858,13 +1857,12 @@ bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(2)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
-bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1876,10 +1874,9 @@ bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(3)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData);
+	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
 }
 
 bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1900,7 +1897,7 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_ceilHeight)
 {
 	LaraInfo*& info = item->data;
 
@@ -1914,8 +1911,7 @@ bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Lower middle ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
-		// TODO: Calculate jump velocity outside this function.
-		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((probeMiddle.Position.Ceiling - y + CLICK(0.2f)), -CLICK(7.1f)));
+		*o_ceilHeight = probeMiddle.Position.Ceiling;
 		return true;
 	}
 
