@@ -77,16 +77,16 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData);
-bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData, int* o_floorHeight);
+bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
+bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
+bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
+bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
+bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
+bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight);
 
 bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_ceilHeight);
 bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestData testData);
