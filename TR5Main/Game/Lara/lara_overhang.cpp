@@ -988,6 +988,21 @@ void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	}
 }
 
+void LadderMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
+{
+	if (!g_GameFlow->Animations.Overhang)
+		return;
+
+	auto result = GetCollisionResult(lara);
+	auto ceilingTilt = result.Block->TiltXZ(lara->pos.xPos, lara->pos.yPos, false);
+
+	if (abs(ceilingTilt.x) > 2 || abs(ceilingTilt.y) > 2)
+		return;
+
+	if (result.BottomBlock->Flags.Monkeyswing && (lara->pos.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
+		lara->goalAnimState = LS_MONKEYSWING_IDLE;
+}
+
 // Extends state 61 (AS_CLIMBDOWN)
 void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 {

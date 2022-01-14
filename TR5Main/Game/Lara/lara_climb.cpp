@@ -316,10 +316,7 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!resultRight || !resultLeft)
 		{
-			auto result = GetCollisionResult(item);
-			if (result.BottomBlock->Flags.Monkeyswing && (item->pos.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
-				item->goalAnimState = LS_MONKEYSWING_IDLE;
-
+			LadderMonkeyExtra(item, coll);
 			return;
 		}
 

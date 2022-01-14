@@ -22,3 +22,4 @@ void SlopeReachExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeClimbExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll);
 void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll);
+void LadderMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll);
