@@ -177,7 +177,11 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 
-	coll->Setup.Height = LARA_HEIGHT_STRETCH;
+	// HACK: height is altered according to fallspeed to fix "issues" with physically impossible
+	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
+	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
+
+	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
 	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
