@@ -219,6 +219,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			if ((coll->Front.Floor < -WALL_SIZE || coll->Front.Ceiling >= (CLICK(2) - 6)) &&
 				coll->Middle.Ceiling <= -(CLICK(2) + 6))
 			{
+				ShiftItem(item, coll);
+
 				if (TestLaraClimbStance(item, coll))
 				{
 					item->animNumber = LA_STAND_SOLID;
@@ -228,7 +230,6 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 					info->gunStatus = LG_HANDS_BUSY;
 					info->turnRate = 0;
 
-					ShiftItem(item, coll);
 					SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 					AnimateLara(item);
 
