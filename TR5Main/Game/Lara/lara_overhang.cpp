@@ -1133,6 +1133,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 					{
 						AlignToEdge(lara, SLOPE_ALIGNMENT);
 						SetAnimation(lara, LA_OVERHANG_MONKEY_SLOPE_CONCAVE); // Transition from monkey to underlying slope (concave)
+						return;
 						//lara->pos.yPos = ceiling + 496;
 						//PerformFlipeffect(NULL, 51, 1, 2); // Disable the UP key command for 2 sec // HACK!!!
 					}
@@ -1142,8 +1143,33 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 					{
 						AlignToEdge(lara, SLOPE_ALIGNMENT);
 						SetAnimation(lara, LA_OVERHANG_MONKEY_SLOPE_CONVEX); // Transition from monkey to overhanging slope (convex)
+						return;
 						//lara->pos.yPos = ceiling + 914;
 					}
+				}
+			}
+		}
+
+		// Additional overhang ladder tests
+
+		auto collResult = GetCollisionResult(down.x, lara->pos.yPos - coll->Setup.Height, down.z, lara->roomNumber);
+		auto topSide = lara->pos.yPos - coll->Setup.Height;
+
+		if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(lara->pos.yRot + ANGLE(180))) && 
+			collResult.Position.Floor >= lara->pos.yPos - CLICK(1) &&
+			collResult.Position.Ceiling <= topSide - CLICK(1))
+		{
+			// Primary checks succeeded, now do C-shaped secondary probing
+			collResult = GetCollisionResult(down.x, topSide, down.z, collResult.RoomNumber);
+			collResult = GetCollisionResult(down.x, topSide - CLICK(2), down.z, collResult.RoomNumber);
+			collResult = GetCollisionResult(now.x,  topSide - CLICK(2), now.z,  collResult.RoomNumber);
+
+			if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
+			{
+				if (lara->goalAnimState != LS_LADDER_IDLE)
+				{
+					SnapItemToGrid(lara, coll);
+					lara->goalAnimState = LS_LADDER_IDLE;
 				}
 			}
 		}

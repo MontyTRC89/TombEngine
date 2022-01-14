@@ -32,6 +32,22 @@ short GetClimbFlags(FLOOR_INFO* floor)
 	return result;
 }
 
+CLIMB_DIRECTION GetClimbDirection(short angle)
+{
+	switch (GetQuadrant(angle))
+	{
+	default:
+	case NORTH:
+		return CLIMB_DIRECTION::North;
+	case EAST:
+		return CLIMB_DIRECTION::East;
+	case SOUTH:
+		return CLIMB_DIRECTION::South;
+	case WEST:
+		return CLIMB_DIRECTION::West;
+	}
+}
+
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
 	return;
