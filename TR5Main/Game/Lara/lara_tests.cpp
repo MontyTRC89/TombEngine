@@ -111,13 +111,13 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestValidLedge(item, coll))
 	{
-		int o_floorHeight;
 		bool success = false;
 
 		// Vault to crouch up one step.
-		if (TestLaraVault1StepToCrouch(item, coll, &o_floorHeight))
+		auto vaultResult = TestLaraVault1StepToCrouch(item, coll);
+		if (vaultResult.success && !success)
 		{
-			item->pos.yPos = o_floorHeight + CLICK(1);
+			item->pos.yPos = vaultResult.height + CLICK(1);
 			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -127,9 +127,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		
 		// Vault to stand up two steps.
-		else if (TestLaraVault2Steps(item, coll, &o_floorHeight))
+		vaultResult = TestLaraVault2Steps(item, coll);
+		if (vaultResult.success && !success)
 		{
-			item->pos.yPos = o_floorHeight + CLICK(2);
+			item->pos.yPos = vaultResult.height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -138,10 +139,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up two steps.
-		else if (TestLaraVault2StepsToCrouch(item, coll, &o_floorHeight) &&
+		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
+		if (vaultResult.success && !success &&
 			g_GameFlow->Animations.CrawlExtended)
 		{
-			item->pos.yPos = o_floorHeight + CLICK(2);
+			item->pos.yPos = vaultResult.height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -151,9 +153,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Vault to stand up three steps.
-		else if (TestLaraVault3Steps(item, coll, &o_floorHeight))
+		vaultResult = TestLaraVault3Steps(item, coll);
+		if (vaultResult.success && !success)
 		{
-			item->pos.yPos = o_floorHeight + CLICK(3);
+			item->pos.yPos = vaultResult.height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -162,10 +165,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up three steps.
-		else if (TestLaraVault3StepsToCrouch(item, coll, &o_floorHeight) &&
-				g_GameFlow->Animations.CrawlExtended)
+		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
+		if (vaultResult.success && !success &&
+			g_GameFlow->Animations.CrawlExtended)
 		{
-			item->pos.yPos = o_floorHeight + CLICK(3);
+			item->pos.yPos = vaultResult.height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -175,9 +179,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Auto jump to hang.
-		else if (TestLaraVaultAutoJump(item, coll, &o_floorHeight))
+		vaultResult = TestLaraVaultAutoJump(item, coll);
+		if (vaultResult.success && !success)
 		{
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (o_floorHeight - item->pos.yPos));
+			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (vaultResult.height - item->pos.yPos));
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
@@ -195,10 +200,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	
 	// Auto jump to ladder.
-	int o_ceilHeight;
-	if (TestLaraLadderAutoJump(item, coll, &o_ceilHeight))
+	auto ladderAutoJumpResult = TestLaraLadderAutoJump(item, coll);
+	if (ladderAutoJumpResult.success)
 	{
-		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((o_ceilHeight - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
+		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
@@ -1740,7 +1745,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData, int* o_floorHeight)
+VaultTestResultData TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
 {
 	LaraInfo*& info = item->data;
 
@@ -1769,14 +1774,14 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 		!swampTooDeep &&																			// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-		*o_floorHeight = probeFront.Position.Floor;
-		return true;
+
+		return VaultTestResultData { true, probeFront.Position.Floor };
 	}
 
-	return false;
+	return VaultTestResultData { false, NO_HEIGHT };
 }
 
-bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1790,10 +1795,10 @@ bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 		CLICK(1)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1807,10 +1812,10 @@ bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
 	// Clamp range: (-CLICK(0.1f), MAX_HEIGHT]
@@ -1825,10 +1830,10 @@ bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
 		false
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (0, -STEPUP_HEIGHT]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1842,10 +1847,10 @@ bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHe
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1859,10 +1864,10 @@ bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorH
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorHeight)
+VaultTestResultData TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1876,28 +1881,10 @@ bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll, int* o_floorH
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testData, o_floorHeight);
+	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item);
-
-	if (!TestLaraSwamp(item) &&										// No swamp.
-		info->canMonkeySwing &&										// Monkey swing sector flag set.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
-		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_ceilHeight)
+VaultTestResultData TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1911,11 +1898,10 @@ bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll, int* o_ceilHeight)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Lower middle ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
-		*o_ceilHeight = probeMiddle.Position.Ceiling;
-		return true;
+		return VaultTestResultData{ true, probeMiddle.Position.Ceiling };
 	}
 
-	return false;
+	return VaultTestResultData{ false, NO_HEIGHT };
 }
 
 bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
@@ -1932,6 +1918,24 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&			// Upper middle floor bound.
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (!TestLaraSwamp(item) &&										// No swamp.
+		info->canMonkeySwing &&										// Monkey swing sector flag set.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
 	{
 		return true;
 	}
