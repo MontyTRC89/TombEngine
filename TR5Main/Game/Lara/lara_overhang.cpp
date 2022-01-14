@@ -1150,26 +1150,29 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 			}
 		}
 
-		// Additional overhang ladder tests
-
-		auto collResult = GetCollisionResult(down.x, lara->pos.yPos - coll->Setup.Height, down.z, lara->roomNumber);
-		auto topSide = lara->pos.yPos - coll->Setup.Height;
-
-		if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(lara->pos.yRot + ANGLE(180))) && 
-			collResult.Position.Floor >= lara->pos.yPos - CLICK(1) &&
-			collResult.Position.Ceiling <= topSide - CLICK(1))
+		if (Lara.canMonkeySwing)
 		{
-			// Primary checks succeeded, now do C-shaped secondary probing
-			collResult = GetCollisionResult(down.x, topSide, down.z, collResult.RoomNumber);
-			collResult = GetCollisionResult(down.x, topSide - CLICK(2), down.z, collResult.RoomNumber);
-			collResult = GetCollisionResult(now.x,  topSide - CLICK(2), now.z,  collResult.RoomNumber);
+			// Additional overhang ladder tests
 
-			if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
+			auto collResult = GetCollisionResult(down.x, lara->pos.yPos - coll->Setup.Height, down.z, lara->roomNumber);
+			auto topSide = lara->pos.yPos - coll->Setup.Height;
+
+			if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(lara->pos.yRot + ANGLE(180))) &&
+				collResult.Position.Floor >= lara->pos.yPos - CLICK(1) &&
+				collResult.Position.Ceiling <= topSide - CLICK(1))
 			{
-				if (lara->goalAnimState != LS_LADDER_IDLE)
+				// Primary checks succeeded, now do C-shaped secondary probing
+				collResult = GetCollisionResult(down.x, topSide, down.z, collResult.RoomNumber);
+				collResult = GetCollisionResult(down.x, topSide - CLICK(2), down.z, collResult.RoomNumber);
+				collResult = GetCollisionResult(now.x, topSide - CLICK(2), now.z, collResult.RoomNumber);
+
+				if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
 				{
-					SnapItemToGrid(lara, coll);
-					lara->goalAnimState = LS_LADDER_IDLE;
+					if (lara->goalAnimState != LS_LADDER_IDLE)
+					{
+						SnapItemToLedge(lara, coll);
+						lara->goalAnimState = LS_LADDER_IDLE;
+					}
 				}
 			}
 		}

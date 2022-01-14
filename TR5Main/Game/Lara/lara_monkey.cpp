@@ -58,7 +58,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 
-	if (Lara.canMonkeySwing && item->goalAnimState == LS_MONKEYSWING_IDLE)
+	if (Lara.canMonkeySwing)
 	{
 		coll->Setup.BadHeightDown = NO_BAD_POS;
 		coll->Setup.BadHeightUp = NO_HEIGHT;
@@ -73,31 +73,35 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		GetCollisionInfo(coll, item);
 
-		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
+		// This check is needed to prevent stealing goal state from previously set.
+		if (item->goalAnimState == LS_MONKEYSWING_IDLE) 
 		{
-			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
-			if (monkeyFront)
-				item->goalAnimState = LS_MONKEYSWING_FORWARD;
-		}
-		else if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
-		{
-			item->goalAnimState = LS_MONKEYSWING_LEFT;
-		}
-		else if (TrInput & IN_RSTEP && TestMonkeyRight(item, coll))
-		{
-			item->goalAnimState = LS_MONKEYSWING_RIGHT;
-		}
-		else if (TrInput & IN_LEFT)
-		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_LEFT;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
-		}
-		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
-		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_180;
+			if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
+			{
+				bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
+				if (monkeyFront)
+					item->goalAnimState = LS_MONKEYSWING_FORWARD;
+			}
+			else if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
+			{
+				item->goalAnimState = LS_MONKEYSWING_LEFT;
+			}
+			else if (TrInput & IN_RSTEP && TestMonkeyRight(item, coll))
+			{
+				item->goalAnimState = LS_MONKEYSWING_RIGHT;
+			}
+			else if (TrInput & IN_LEFT)
+			{
+				item->goalAnimState = LS_MONKEYSWING_TURN_LEFT;
+			}
+			else if (TrInput & IN_RIGHT)
+			{
+				item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
+			}
+			else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
+			{
+				item->goalAnimState = LS_MONKEYSWING_TURN_180;
+			}
 		}
 
 		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
@@ -107,6 +111,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		TestLaraHang(item, coll);
 
+		// This check is needed to prevent stealing goal state from previously set.
 		if (item->goalAnimState == LS_MONKEYSWING_IDLE)
 		{
 			TestForObjectOnLedge(item, coll);
