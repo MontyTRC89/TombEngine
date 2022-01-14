@@ -136,7 +136,6 @@ struct VaultTestData
 	int clampMin;
 	int clampMax;
 	int gapMin;
-	int snapHeight;
 	bool checkSwampDepth = true;
 };
 
