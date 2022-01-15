@@ -108,8 +108,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
@@ -179,8 +179,8 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
@@ -447,8 +447,8 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
@@ -546,8 +546,8 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
+	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -643,8 +643,8 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -809,8 +809,8 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		info->moveAngle = item->pos.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+		coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+		coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 		coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = info->moveAngle;
 

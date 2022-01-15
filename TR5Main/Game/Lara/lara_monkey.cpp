@@ -115,8 +115,8 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -182,8 +182,8 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -251,8 +251,8 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -320,8 +320,8 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -389,8 +389,8 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;

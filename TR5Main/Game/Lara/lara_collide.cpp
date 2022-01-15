@@ -417,8 +417,8 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = moveAngle;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -496,7 +496,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	if (height < ((level->LaraType == LaraType::Divesuit) << 6) + 200)
 		height = ((level->LaraType == LaraType::Divesuit) << 6) + 200;
 
-	coll->Setup.BadHeightUp = -(STEP_SIZE / 4);
+	coll->Setup.BadFloorHeightUp = -(STEP_SIZE / 4);
 	coll->Setup.Height = height;
 
 	GetCollisionInfo(coll, item, PHD_VECTOR(0, height / 2, 0));

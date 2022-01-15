@@ -644,8 +644,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->CollisionType = CT_TOP;
 	}
 
-	if (coll->Front.Floor > coll->Setup.BadHeightDown ||
-		coll->Front.Floor < coll->Setup.BadHeightUp ||
+	if (coll->Front.Floor > coll->Setup.BadFloorHeightDown ||
+		coll->Front.Floor < coll->Setup.BadFloorHeightUp ||
 		coll->Front.Ceiling > coll->Setup.BadCeilingHeightDown ||
 		coll->Front.Ceiling < coll->Setup.BadCeilingHeightUp ||
 		coll->Front.Floor - coll->Front.Ceiling <= 0)
@@ -686,8 +686,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleLeft.Floor > coll->Setup.BadHeightDown ||
-		coll->MiddleLeft.Floor < coll->Setup.BadHeightUp ||
+	if (coll->MiddleLeft.Floor > coll->Setup.BadFloorHeightDown ||
+		coll->MiddleLeft.Floor < coll->Setup.BadFloorHeightUp ||
 		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeightDown ||
 		coll->MiddleLeft.Ceiling < coll->Setup.BadCeilingHeightUp ||
 		coll->MiddleLeft.Floor - coll->MiddleLeft.Ceiling <= 0)
@@ -738,8 +738,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleRight.Floor > coll->Setup.BadHeightDown ||
-		coll->MiddleRight.Floor < coll->Setup.BadHeightUp ||
+	if (coll->MiddleRight.Floor > coll->Setup.BadFloorHeightDown ||
+		coll->MiddleRight.Floor < coll->Setup.BadFloorHeightUp ||
 		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeightDown ||
 		coll->MiddleRight.Ceiling < coll->Setup.BadCeilingHeightUp ||
 		coll->MiddleRight.Floor - coll->MiddleRight.Ceiling <= 0)
