@@ -131,7 +131,10 @@ void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
 
-	if (probe.Block->Flags.Monkeyswing &&					// Monkey swing sector set.
+	// TODO: Static detection.
+	//TestForObjectOnLedge(item, coll);
+
+	if (probe.BottomBlock->Flags.Monkeyswing &&					// Monkey swing sector set.
 		(probe.Position.Ceiling - y) <= CLICK(1) &&			// Lower bound.
 		(probe.Position.Ceiling - y) >= -CLICK(1) &&		// Upper bound.
 		probe.Position.Ceiling != NO_HEIGHT)
