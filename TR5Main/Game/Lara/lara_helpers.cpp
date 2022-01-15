@@ -18,7 +18,7 @@
 // -----------------------------
 
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, int maxAngle, short rate)
+void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
 	if (!item->speed)
 		return;
@@ -128,16 +128,18 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto y = item->pos.yPos;
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
 
-	if (probe.Block->Flags.Monkeyswing &&
-		//(probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY) <= CLICK(0.8f) &&			// Upper ceiling bound.
-		//(probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY) >= -CLICK(0.8f) &&		// Upper ceiling bound.
+	if (probe.Block->Flags.Monkeyswing &&					// Monkey swing sector set.
+		(probe.Position.Ceiling - y) <= CLICK(1) &&			// Lower bound.
+		(probe.Position.Ceiling - y) >= -CLICK(1) &&		// Upper bound.
 		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
 	}
+	else
+		SetLaraMonkeyFallState(item);
 }
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
