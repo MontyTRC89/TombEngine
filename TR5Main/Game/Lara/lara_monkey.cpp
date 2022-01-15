@@ -117,7 +117,8 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.BadCeilingHeightDown = CLICK(1);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -125,93 +126,6 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	
 	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
-}
-
-void olara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 75*/
-	/*state code: lara_as_hang2*/
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-
-	if (Lara.canMonkeySwing)
-	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = NO_HEIGHT;
-		coll->Setup.BadCeilingHeightDown = 0;
-
-		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-		Lara.moveAngle = item->pos.yRot;
-
-		GetCollisionInfo(coll, item);
-
-		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
-		{
-			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
-			if (monkeyFront)
-				item->goalAnimState = LS_MONKEY_FORWARD;
-		}
-
-		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
-			DoLaraMonkeySnap(item, coll);
-	}
-	else
-	{
-		TestLaraHang(item, coll);
-
-		if (item->goalAnimState == LS_MONKEY_IDLE)
-		{
-			TestForObjectOnLedge(item, coll);
-
-			if (!(TrInput & IN_FORWARD) ||
-				coll->Front.Floor <= -850 ||
-				coll->Front.Floor >= -650 ||
-				coll->Front.Floor < coll->Front.Ceiling ||
-				coll->FrontLeft.Floor < coll->FrontLeft.Ceiling ||
-				coll->FrontRight.Floor < coll->FrontRight.Ceiling ||
-				coll->HitStatic)
-			{
-				if (!(TrInput & IN_FORWARD) ||
-					coll->Front.Floor <= -850 ||
-					coll->Front.Floor >= -650 ||
-					coll->Front.Floor - coll->Front.Ceiling < -256 ||
-					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling < -256 ||
-					coll->FrontRight.Floor - coll->FrontRight.Ceiling < -256 ||
-					coll->HitStatic)
-				{
-					if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
-					{
-						item->goalAnimState = LS_SHIMMY_LEFT;
-					}
-					else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
-					{
-						item->goalAnimState = LS_SHIMMY_RIGHT;
-					}
-				}
-				else
-				{
-					item->goalAnimState = LS_HANG_TO_CRAWL;
-					item->requiredAnimState = LS_CROUCH_IDLE;
-				}
-			}
-			else if (TrInput & IN_WALK)
-			{
-				item->goalAnimState = LS_HANDSTAND;
-			}
-			else if (TrInput & IN_DUCK)
-			{
-				item->goalAnimState = LS_HANG_TO_CRAWL;
-				item->requiredAnimState = LS_CROUCH_IDLE;
-			}
-			else
-			{
-				item->goalAnimState = LS_GRABBING;
-			}
-		}
-	}
 }
 
 // State:		LS_MONKEY_FORWARD (76)
@@ -279,27 +193,6 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
-
-	/*bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
-
-	if (!monkeyFront || coll->CollisionType == CT_FRONT || abs(coll->Middle.Ceiling - coll->Front.Ceiling) > SLOPE_DIFFERENCE)
-		SetAnimation(item, LA_MONKEYSWING_IDLE);
-	else
-	{
-		if (abs(coll->Middle.Ceiling - coll->FrontLeft.Ceiling) <= SLOPE_DIFFERENCE)
-		{
-			if (abs(coll->Middle.Ceiling - coll->FrontRight.Ceiling) > SLOPE_DIFFERENCE)
-			{
-				ShiftItem(item, coll);
-				item->pos.yRot -= ANGLE(5.0f);
-			}
-		}
-		else
-		{
-			ShiftItem(item, coll);
-			item->pos.yRot += ANGLE(5.0f);
-		}
-	}*/
 
 	DoLaraMonkeySnap(item, coll);
 }
@@ -370,7 +263,6 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
 }
 
@@ -440,7 +332,6 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
 }
 
@@ -512,7 +403,6 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
 }
 
@@ -640,87 +530,4 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_monkey_idle(item, coll);
-}
-
-short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
-{
-	short oct;
-
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-	GetCollisionInfo(coll, item);
-
-	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
-		return 0;
-
-	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
-		return 0;
-
-	if (coll->CollisionType == CT_NONE)
-		return 1;
-
-	oct = GetDirOctant(item->pos.yRot);
-	if (oct)
-	{
-		if (oct != 1)
-			return 1;
-		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-	else if (coll->CollisionType != CT_FRONT)
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
-short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
-{
-	short oct;
-
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-	GetCollisionInfo(coll, item);
-
-	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
-		return 0;
-
-	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
-		return 0;
-
-	if (coll->CollisionType == CT_NONE)
-		return 1;
-
-	oct = GetDirOctant(item->pos.yRot);
-	if (oct)
-	{
-		if (oct != 1)
-			return 1;
-		if (coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-	else
-	{
-		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-
-	return 0;
 }
