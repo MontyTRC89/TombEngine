@@ -38,7 +38,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	Lara.moveAngle = item->pos.yRot;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);

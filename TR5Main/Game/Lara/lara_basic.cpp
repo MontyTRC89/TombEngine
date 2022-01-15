@@ -38,8 +38,8 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = true;
 	coll->Setup.SlopesAreWalls = true;
@@ -153,8 +153,8 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
@@ -290,8 +290,8 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -604,8 +604,8 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	item->fallspeed = 0;
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -720,8 +720,8 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.SlopesArePits = true;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1209,8 +1209,8 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -1247,8 +1247,8 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.SlopesArePits = true;
-	coll->Setup.BadHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1352,8 +1352,8 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEPUP_HEIGHT;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1670,8 +1670,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
-	coll->Setup.BadHeightUp = -CLICK(0.8f);
+	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1755,8 +1755,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
-	coll->Setup.BadHeightUp = -CLICK(0.8f);
+	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
+	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
@@ -1818,8 +1818,8 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -1887,8 +1887,8 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->gravityStatus = false;
 	item->fallspeed = 0;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -2010,8 +2010,8 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -2123,8 +2123,8 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -2219,8 +2219,8 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.SlopesAreWalls = true;
 	coll->Setup.ForwardAngle = info->moveAngle;

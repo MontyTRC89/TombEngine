@@ -420,8 +420,8 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	SUB_INFO* UPVInfo = UPVItem->data;
 	COLL_INFO cinfo, * coll = &cinfo; // ??
 
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -SUB_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -SUB_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = SUB_HEIGHT;
 	coll->Setup.OldPosition.x = UPVItem->pos.xPos;
 	coll->Setup.OldPosition.y = UPVItem->pos.yPos;
@@ -445,7 +445,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (height < 200)
 		height = 200;
 
-	coll->Setup.BadHeightUp = -height;
+	coll->Setup.BadFloorHeightUp = -height;
 	coll->Setup.Height = height;
 
 	GetCollisionInfo(coll, UPVItem, PHD_VECTOR(0, height / 2, 0));
