@@ -447,7 +447,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
@@ -709,7 +709,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -CLICK(2);
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = info->moveAngle;
 

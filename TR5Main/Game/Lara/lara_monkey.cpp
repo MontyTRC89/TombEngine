@@ -117,7 +117,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -138,7 +138,7 @@ void olara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		coll->Setup.BadHeightDown = NO_BAD_POS;
 		coll->Setup.BadHeightUp = NO_HEIGHT;
-		coll->Setup.BadCeilingHeight = 0;
+		coll->Setup.BadCeilingHeightDown = 0;
 
 		coll->Setup.ForwardAngle = Lara.moveAngle;
 		coll->Setup.Radius = LARA_RAD;
@@ -270,7 +270,8 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = CLICK(1);
+	coll->Setup.BadCeilingHeightDown = CLICK(1);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -359,7 +360,8 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = CLICK(1);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -428,7 +430,8 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = CLICK(0.8f);
+	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -499,7 +502,8 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = CLICK(0.8f);
+	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -646,7 +650,7 @@ short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -687,7 +691,7 @@ short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	coll->Setup.Radius = LARA_RAD;

@@ -82,7 +82,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -132,7 +132,7 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = true;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -201,7 +201,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = 0;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
@@ -355,7 +355,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	
 	coll->Setup.BadHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
 	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -557,7 +557,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = (item->speed >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 	GetCollisionInfo(coll, item);
@@ -627,7 +627,7 @@ void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -689,7 +689,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -747,7 +747,7 @@ void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 

@@ -739,6 +739,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 
+	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = true;
 	coll->Setup.SlopesAreWalls = false;
@@ -899,7 +900,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.BadHeightDown = 32512;
 	coll->Setup.BadHeightUp = -400;
-	coll->Setup.BadCeilingHeight = 400;
+	coll->Setup.BadCeilingHeightDown = 400;
+	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
@@ -1005,7 +1007,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.BadHeightDown = 32512;
 	coll->Setup.BadHeightUp = -128;
-	coll->Setup.BadCeilingHeight = 100;
+	coll->Setup.BadCeilingHeightDown = 100;
+	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
