@@ -1044,7 +1044,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				{
 					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(3), CLICK(4)); 
 					if (ceilDist < CLICK(1) && (bridge1 >= 0 || SlopeCheck(slope, goal)))
-						lara->goalAnimState = 56;
+						lara->goalAnimState = LS_LADDER_IDLE;
 				}
 				else if (GetFrameNumber(lara, 0) == midpoint)
 				{
@@ -1052,7 +1052,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
 						lara->pos.yPos += CLICK(1); // Do midpoint Y translation
-						lara->goalAnimState = 56;
+						lara->goalAnimState = LS_LADDER_IDLE;
 					}
 				}
 			}
