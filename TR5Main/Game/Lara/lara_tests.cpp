@@ -445,8 +445,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Setup coll info
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 
@@ -707,8 +707,8 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Setup new GCI call
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -CLICK(2);
+	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
+	coll->Setup.BadFloorHeightUp = -CLICK(2);
 	coll->Setup.BadCeilingHeightDown = 0;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -1365,7 +1365,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testDa
 
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in run state collision function.
+	// Using BadFloorHeightUp/Down defined in run state collision function.
 
 	MoveTestData testData
 	{
@@ -1380,7 +1380,7 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk state collision function.
+	// Using BadFloorHeightUp/Down defined in walk state collision function.
 
 	MoveTestData testData
 	{
@@ -1394,7 +1394,7 @@ bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in walk back state collision function.
+	// Using BadFloorHeightUp/Down defined in walk back state collision function.
 
 	MoveTestData testData
 	{
@@ -1408,7 +1408,7 @@ bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in hop back state collision function.
+	// Using BadFloorHeightUp/Down defined in hop back state collision function.
 
 	MoveTestData testData
 	{
@@ -1422,7 +1422,7 @@ bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in step left state collision function.
+	// Using BadFloorHeightUp/Down defined in step left state collision function.
 
 	MoveTestData testData
 	{
@@ -1436,7 +1436,7 @@ bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in step right state collision function.
+	// Using BadFloorHeightUp/Down defined in step right state collision function.
 
 	MoveTestData testData
 	{
@@ -1450,7 +1450,7 @@ bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in wade forward state collision function.
+	// Using BadFloorHeightUp/Down defined in wade forward state collision function.
 
 	MoveTestData testData
 	{
@@ -1465,7 +1465,7 @@ bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp defined in walk back state collision function.
+	// Using BadFloorHeightUp defined in walk back state collision function.
 
 	MoveTestData testData
 	{
@@ -1480,7 +1480,7 @@ bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp defined in step left state collision function.
+	// Using BadFloorHeightUp defined in step left state collision function.
 
 	MoveTestData testData
 	{
@@ -1495,7 +1495,7 @@ bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp defined in step right state collision function.
+	// Using BadFloorHeightUp defined in step right state collision function.
 
 	MoveTestData testData
 	{
@@ -1536,7 +1536,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData t
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in crawl state collision functions.
+	// Using BadFloorHeightUp/Down defined in crawl state collision functions.
 
 	MoveTestData testData
 	{
@@ -1550,7 +1550,7 @@ bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadHeightUp/Down defined in crawl state collision functions.
+	// Using BadFloorHeightUp/Down defined in crawl state collision functions.
 
 	MoveTestData testData
 	{

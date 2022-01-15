@@ -898,8 +898,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.BadHeightDown = 32512;
-	coll->Setup.BadHeightUp = -400;
+	coll->Setup.BadFloorHeightDown = 32512;
+	coll->Setup.BadFloorHeightUp = -400;
 	coll->Setup.BadCeilingHeightDown = 400;
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
@@ -1005,8 +1005,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
-	coll->Setup.BadHeightDown = 32512;
-	coll->Setup.BadHeightUp = -128;
+	coll->Setup.BadFloorHeightDown = 32512;
+	coll->Setup.BadFloorHeightUp = -128;
 	coll->Setup.BadCeilingHeightDown = 100;
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
