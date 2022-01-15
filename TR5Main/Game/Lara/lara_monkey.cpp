@@ -33,7 +33,6 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
-	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -121,7 +120,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);		// Offset required to avoid ceiling interference with front collision.
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
 	ShiftItem(item, coll);
@@ -271,16 +270,16 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeight = CLICK(1);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
+	/*bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
 
 	if (!monkeyFront || coll->CollisionType == CT_FRONT || abs(coll->Middle.Ceiling - coll->Front.Ceiling) > SLOPE_DIFFERENCE)
 		SetAnimation(item, LA_MONKEYSWING_IDLE);
@@ -299,7 +298,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 			ShiftItem(item, coll);
 			item->pos.yRot += ANGLE(5.0f);
 		}
-	}
+	}*/
 
 	DoLaraMonkeySnap(item, coll);
 }
@@ -363,23 +362,11 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeight = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
-
-	/*if (coll->CollisionType == CT_FRONT ||
-		coll->CollisionType == CT_TOP_FRONT)
-	{
-		SetAnimation(item, LA_MONKEYSWING_IDLE);
-	}*/
-
-	/*if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > SLOPE_DIFFERENCE ||
-		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) > SLOPE_DIFFERENCE)
-	{
-		SetAnimation(item, LA_MONKEYSWING_IDLE);
-	}*/
 
 	ShiftItem(item, coll);
 	DoLaraMonkeySnap(item, coll);
@@ -441,14 +428,17 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeight = CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
+
+	ShiftItem(item, coll);
+	DoLaraMonkeySnap(item, coll);
 }
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
@@ -509,10 +499,10 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.BadCeilingHeight = CLICK(0.8f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY - CLICK(0.5f);
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeMonkey(item, coll))
@@ -646,32 +636,6 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_monkey_idle(item, coll);
-}
-
-void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 82 and 83*/
-	/*state code: lara_as_hangturnr(83), lara_as_hangturnl(82)*/
-	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
-	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-		coll->Setup.BadCeilingHeight = 0;
-
-		Lara.moveAngle = item->pos.yRot;
-
-		coll->Setup.ForwardAngle = item->pos.yRot;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.Height = LARA_HEIGHT_MONKEY;
-		coll->Setup.SlopesAreWalls = true;
-
-		GetCollisionInfo(coll, item);
-		DoLaraMonkeySnap(item, coll);
-	}
-	else
-	{
-		SetLaraMonkeyFallState(item);
-	}
 }
 
 short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)

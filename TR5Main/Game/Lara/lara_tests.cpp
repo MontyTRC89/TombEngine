@@ -1599,17 +1599,25 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestData testData)
 {
-	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4);
 
-	if (probe.Position.Floor - y - (coll->Setup.Radius * 1.6f) > 0 &&							// Upper floor boundary. TODO: Offset is required because Lara's local y position is above feet.
-		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY <= testData.lowerBound &&						// Lower ceiling boundary.
-		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY >= testData.upperBound &&						// Upper ceiling boundary.
-		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY - CLICK(0.5f) <= testData.lowerBound &&
-		//probe.Position.Ceiling - y - LARA_HEIGHT_MONKEY - CLICK(0.5f) >= testData.upperBound &&
-		//probe.Position.Floor - y <= lowerBound &&
-		abs(coll->Middle.Ceiling - coll->Front.Ceiling) < SLOPE_DIFFERENCE &&					// Longitudinally, slope is not too steep.
-		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) < (SLOPE_DIFFERENCE * 2))		// Laterally, slope is not too steep on the right.
+	// TODO: Determine the vector of the ceiling triangle instead.
+	bool isSlope;
+	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) >= SLOPE_DIFFERENCE &&
+		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) >= (SLOPE_DIFFERENCE * 2))
+	{
+		isSlope = true;
+	}
+	else
+		isSlope = false;
+
+	if (probe.Block->Flags.Monkeyswing &&
+		(probe.Position.Floor - y - LARA_HEIGHT_MONKEY) > 0 &&						// Upper floor boundary.
+		(probe.Position.Ceiling - y) <= testData.lowerBound &&						// Lower ceiling boundary.
+		(probe.Position.Ceiling - y) >= testData.upperBound &&						// Lower ceiling boundary. TODO: Not working??
+		!isSlope &&
+		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		return true;
 	}
