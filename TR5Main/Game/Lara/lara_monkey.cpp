@@ -357,14 +357,12 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-
 		if (info->turnRate < -LARA_SLOW_TURN_MAX)
 			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-
 		if (info->turnRate > LARA_SLOW_TURN_MAX)
 			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
@@ -443,8 +441,6 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->pos.yRot -= LARA_MONKEY_TURN_MAX;
-
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
@@ -461,6 +457,13 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			
+			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
+			// move the following block right beneath the death check. @Sezz 2022.01.16
+			info->turnRate -= LARA_TURN_RATE;
+			if (info->turnRate < -LARA_MONKEY_TURN_MAX)
+				info->turnRate = -LARA_MONKEY_TURN_MAX;
+
 			return;
 		}
 
@@ -497,8 +500,6 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	item->pos.yRot += LARA_MONKEY_TURN_MAX;
-
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
@@ -515,6 +516,13 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_RIGHT)
 		{
 			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+
+			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
+			// move the following block right beneath the death check. @Sezz 2022.01.16
+			info->turnRate += LARA_TURN_RATE;
+			if (info->turnRate > LARA_MONKEY_TURN_MAX)
+				info->turnRate = LARA_MONKEY_TURN_MAX;
+
 			return;
 		}
 
