@@ -1612,7 +1612,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	else
 		isSlope = false;
 
-	if (probe.Block->Flags.Monkeyswing &&
+	if (probe.BottomBlock->Flags.Monkeyswing &&
 		(probe.Position.Floor - y - LARA_HEIGHT_MONKEY) > 0 &&						// Upper floor boundary.
 		(probe.Position.Ceiling - y) <= testData.lowerBound &&						// Lower ceiling boundary.
 		(probe.Position.Ceiling - y) >= testData.upperBound &&						// Lower ceiling boundary. TODO: Not working??
