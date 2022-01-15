@@ -419,7 +419,7 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	info->moveAngle = moveAngle;
 	coll->Setup.BadHeightDown = NO_BAD_POS;
 	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
