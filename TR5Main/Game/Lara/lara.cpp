@@ -745,6 +745,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	if (TrInput & IN_LOOK && info->look &&
@@ -910,6 +911,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
@@ -952,7 +954,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
-		if (abs(item->pos.zRot) > ANGLE(0.0f))
+		if (abs(item->pos.zRot) > 0)
 			item->pos.zRot += item->pos.zRot / -8;
 	}
 
@@ -1017,6 +1019,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = false;
 	coll->Setup.SlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
@@ -1036,7 +1039,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
-		if (abs(item->pos.zRot) > ANGLE(0.0f))
+		if (abs(item->pos.zRot) > 0)
 			item->pos.zRot += item->pos.zRot / -8;
 	}
 

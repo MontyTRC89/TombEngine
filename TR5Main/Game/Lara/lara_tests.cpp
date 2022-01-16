@@ -1377,7 +1377,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testDa
 {
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);		// Offset required to account for gap between Lara and the wall. Results in slight overshoot, but avoids oscillation.
-	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
+	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
 	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
 
@@ -1548,7 +1548,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData t
 {
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, testData.angle, LARA_RAD_CRAWL * sqrt(2) + 4, -LARA_HEIGHT_CRAWL);
-	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor >= y) : false;
+	bool isSlopeDown = testData.checkSlopeDown ? (probe.Position.Slope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testData.checkSlopeUp ? (probe.Position.Slope && probe.Position.Floor < y) : false;
 	bool isDeath = testData.checkDeath ? probe.Block->Flags.Death : false;
 
@@ -1635,12 +1635,12 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 
 	// TODO: Determine the vector of the ceiling triangle instead.
 	bool isSlope;
-	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) >= SLOPE_DIFFERENCE &&
+	/*if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) >= SLOPE_DIFFERENCE &&
 		abs(coll->MiddleLeft.Ceiling - coll->MiddleRight.Ceiling) >= (SLOPE_DIFFERENCE * 2))
 	{
 		isSlope = true;
 	}
-	else
+	else*/
 		isSlope = false;
 
 	if (probe.BottomBlock->Flags.Monkeyswing &&
@@ -1685,8 +1685,8 @@ bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll)
 	MonkeyMoveTestData testData
 	{
 		coll->Setup.ForwardAngle - ANGLE(90.0f),
-		CLICK(0.8f),
-		-CLICK(0.8f)
+		CLICK(0.75f),
+		-CLICK(0.75f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);
@@ -1697,8 +1697,8 @@ bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 	MonkeyMoveTestData testData
 	{
 		coll->Setup.ForwardAngle + ANGLE(90.0f),
-		CLICK(0.8f),
-		-CLICK(0.8f)
+		CLICK(0.75f),
+		-CLICK(0.75f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);
