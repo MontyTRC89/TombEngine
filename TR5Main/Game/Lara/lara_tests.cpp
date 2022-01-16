@@ -1006,6 +1006,22 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
+bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollisionResult(item);
+
+	if (!probe.BottomBlock->Flags.Monkeyswing ||			// Monkey swing sector not set.
+		(probe.Position.Ceiling - y) > CLICK(1.25f) ||		// Lower bound.
+		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||		// Upper bound.
+		probe.Position.Ceiling == NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->gravityStatus &&
@@ -1307,6 +1323,21 @@ bool TestLaraStep(COLL_INFO* coll)
 		//coll->Middle.Floor <= STEPUP_HEIGHT &&		// Lower floor bound. BUG: Wading in water over a pit, Lara will not descend.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&			// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollisionResult(item);
+
+	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) ||			// Lower bound.
+		(probe.Position.Ceiling - y) >= -CLICK(1.25f) ||		// Upper bound.
+		probe.Position.Ceiling == NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1630,8 +1661,8 @@ bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll)
 	MonkeyMoveTestData testData
 	{
 		coll->Setup.ForwardAngle,
-		CLICK(1),
-		-CLICK(1)
+		CLICK(1.25f),
+		-CLICK(1.25f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);
@@ -1642,8 +1673,8 @@ bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll)
 	MonkeyMoveTestData testData
 	{
 		coll->Setup.ForwardAngle + ANGLE(180.0f),
-		CLICK(1),
-		-CLICK(1)
+		CLICK(1.25f),
+		-CLICK(1.25f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);

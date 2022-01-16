@@ -76,6 +76,26 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += coll->Middle.Floor;
 }
 
+void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollisionResult(item);
+
+	constexpr int rate = 50;
+	int threshold = std::max(abs(item->speed) / 3 * 2, (int)CLICK(1.25f) / 16);
+	int sign = std::copysign(1, probe.Position.Ceiling - y);
+
+	if (abs(probe.Position.Ceiling - y) > (CLICK(1.25f) / 2))				// Outer range.
+		item->pos.yPos += rate * sign;
+	else if (abs(probe.Position.Ceiling - y) <= (CLICK(1.25f) / 2) &&		// Inner range.
+		abs(probe.Position.Ceiling - y) >= threshold)
+	{
+		item->pos.yPos += std::max((int)abs((probe.Position.Ceiling - y) / 2.75), threshold) * sign;
+	}
+	else
+		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
+}
+
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;

@@ -39,6 +39,7 @@ COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int 
 COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h);
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
@@ -56,6 +57,7 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraStep(COLL_INFO* coll);
+bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 

@@ -117,8 +117,8 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(1);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1);
+	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -184,8 +184,8 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(1);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1);
+	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -194,7 +194,17 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	DoLaraMonkeySnap(item, coll);
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallState(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_MONKEY_BACK (143)
@@ -253,8 +263,8 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(1);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1);
+	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
