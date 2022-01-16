@@ -425,10 +425,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->Front.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
+			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
+	}
+	else if (coll->Setup.NoMonkeyFlagIsWall &&
+			!collResult.BottomBlock->Flags.Monkeyswing)
+	{
+		coll->Front.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 4: MIDDLE-LEFT PROBE
@@ -473,10 +478,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
+			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
+	}
+	else if (coll->Setup.NoMonkeyFlagIsWall &&
+			!collResult.BottomBlock->Flags.Monkeyswing)
+	{
+		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 5: FRONT-LEFT PROBE
@@ -516,10 +526,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
+			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
+	}
+	else if (coll->Setup.NoMonkeyFlagIsWall &&
+			!collResult.BottomBlock->Flags.Monkeyswing)
+	{
+		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 6: MIDDLE-RIGHT PROBE
@@ -564,10 +579,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
+			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
+	}
+	else if (coll->Setup.NoMonkeyFlagIsWall &&
+			!collResult.BottomBlock->Flags.Monkeyswing)
+	{
+		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 7: FRONT-RIGHT PROBE
@@ -607,10 +627,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.DeathFlagIsPit && 
-			 coll->MiddleLeft.Floor >= STEP_SIZE / 2 &&
+			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
+	}
+	else if (coll->Setup.NoMonkeyFlagIsWall &&
+			!collResult.BottomBlock->Flags.Monkeyswing)
+	{
+		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
 
 	// TEST 8: SOLID STATIC MESHES
@@ -677,7 +702,9 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->Front.Ceiling >= coll->Setup.BadCeilingHeightDown)
+	// TODO: Check whether HeightUp should be <= or <. @Sezz 2021.01.16
+	if (coll->Front.Ceiling >= coll->Setup.BadCeilingHeightDown ||
+		coll->Front.Ceiling <= coll->Setup.BadCeilingHeightUp)
 	{
 		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 		coll->Shift.y = coll->Setup.OldPosition.y - yPos;

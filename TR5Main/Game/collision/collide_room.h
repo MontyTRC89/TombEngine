@@ -69,14 +69,15 @@ struct COLL_SETUP
 	bool SlopesAreWalls;		// Treat steep slopes as walls
 	bool SlopesArePits;			// Treat steep slopes as pits
 	bool DeathFlagIsPit;		// Treat death sectors as pits
+	bool NoMonkeyFlagIsWall;	// Treat non-monkey sectors as walls
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpaz;			// Push is treated as hurt
 						    
 	int   Radius;				// Collision bounds horizontal size
 	int   Height;				// Collision bounds vertical size
 	short ForwardAngle;			// Forward angle direction
-	int   BadFloorHeightDown;	// Borderline step-up height 
-	int   BadFloorHeightUp;		// Borderline step-down height
+	int   BadFloorHeightDown;	// Borderline floor step-up height 
+	int   BadFloorHeightUp;		// Borderline floor step-down height
 	int   BadCeilingHeightDown;	// Borderline ceiling step-up height
 	int   BadCeilingHeightUp;	// Borderline ceiling step-down height
 
