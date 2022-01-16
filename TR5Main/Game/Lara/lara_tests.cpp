@@ -21,6 +21,14 @@
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
+// TODO: Move to lara_test_structs.h after merge of Sezz vaults branch
+struct CornerTestResult
+{
+	bool Success;
+	PHD_3DPOS ProbeResult;
+	PHD_3DPOS RealPositionResult;
+};
+
 // -----------------------------
 // TEST FUNCTIONS
 // For State Control & Collision
@@ -114,8 +122,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		bool success = false;
 
 		// Vault to crouch up one step.
-		if (TestLaraVault1StepToCrouch(item, coll))
+		auto vaultResult = TestLaraVault1StepToCrouch(item, coll);
+		if (vaultResult.success && !success)
 		{
+			item->pos.yPos = vaultResult.height + CLICK(1);
 			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -125,8 +135,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		
 		// Vault to stand up two steps.
-		else if (TestLaraVault2Steps(item, coll))
+		vaultResult = TestLaraVault2Steps(item, coll);
+		if (vaultResult.success && !success)
 		{
+			item->pos.yPos = vaultResult.height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -135,9 +147,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up two steps.
-		else if (TestLaraVault2StepsToCrouch(item, coll) &&
+		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
+		if (vaultResult.success && !success &&
 			g_GameFlow->Animations.CrawlExtended)
 		{
+			item->pos.yPos = vaultResult.height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -147,8 +161,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Vault to stand up three steps.
-		else if (TestLaraVault3Steps(item, coll))
+		vaultResult = TestLaraVault3Steps(item, coll);
+		if (vaultResult.success && !success)
 		{
+			item->pos.yPos = vaultResult.height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
 			item->currentAnimState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
@@ -157,9 +173,11 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			success = true;
 		}
 		// Vault to crouch up three steps.
-		else if (TestLaraVault3StepsToCrouch(item, coll) &&
-				g_GameFlow->Animations.CrawlExtended)
+		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
+		if (vaultResult.success && !success &&
+			g_GameFlow->Animations.CrawlExtended)
 		{
+			item->pos.yPos = vaultResult.height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->currentAnimState = LS_GRABBING;
@@ -169,8 +187,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		// Auto jump to hang.
-		else if (TestLaraVaultAutoJump(item, coll))
+		vaultResult = TestLaraVaultAutoJump(item, coll);
+		if (vaultResult.success && !success)
 		{
+			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (vaultResult.height - item->pos.yPos));
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->goalAnimState = LS_JUMP_UP;
@@ -188,8 +208,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	
 	// Auto jump to ladder.
-	if (TestLaraLadderAutoJump(item, coll))
+	auto ladderAutoJumpResult = TestLaraLadderAutoJump(item, coll);
+	if (ladderAutoJumpResult.success)
 	{
+		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->goalAnimState = LS_JUMP_UP;
@@ -574,6 +596,71 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
+CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer)
+{
+	auto result = CornerTestResult();
+
+	// Determine real turning angle
+	auto turnAngle = outer ? angle : -angle;
+
+	// Backup previous position into array
+	PHD_3DPOS pos[3] = { item->pos, item->pos, item->pos };
+
+	// Do a two-step rotation check. First step is real resulting position, and second step is probing
+	// position. We need this because checking at exact ending position does not always return
+	// correct results with nearest ledge angle.
+
+	for (int i = 0; i < 2; i++)
+	{
+		// Determine collision box anchor point and rotate collision box around this anchor point.
+		// Then determine new test position from centerpoint of new collision box position.
+
+		// Push back item a bit to compensate for possible edge ledge cases
+		pos[i].xPos -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_sin(pos[i].yRot));
+		pos[i].zPos -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(pos[i].yRot));
+
+		// Move item at the distance of full collision diameter plus half-radius margin to movement direction 
+		pos[i].xPos += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(Lara.moveAngle));
+		pos[i].zPos += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(Lara.moveAngle));
+
+		// Determine anchor point
+		auto cX = pos[i].xPos + round(coll->Setup.Radius * phd_sin(pos[i].yRot));
+		auto cZ = pos[i].zPos + round(coll->Setup.Radius * phd_cos(pos[i].yRot));
+		cX += (coll->Setup.Radius * phd_sin(pos[i].yRot + ANGLE(90.0f * -std::copysign(1.0f, angle))));
+		cZ += (coll->Setup.Radius * phd_cos(pos[i].yRot + ANGLE(90.0f * -std::copysign(1.0f, angle))));
+
+		// Determine distance from anchor point to new item position
+		auto dist = Vector2(pos[i].xPos, pos[i].zPos) - Vector2(cX, cZ);
+		auto s = phd_sin(ANGLE(turnAngle));
+		auto c = phd_cos(ANGLE(turnAngle));
+
+		// Shift item to a new anchor point
+		pos[i].xPos = dist.x * c - dist.y * s + cX;
+		pos[i].zPos = dist.x * s + dist.y * c + cZ;
+
+		// Virtually rotate item to new angle
+		short newAngle = pos[i].yRot - ANGLE(turnAngle);
+		pos[i].yRot = newAngle;
+
+		// Snap to nearest ledge, if any.
+		item->pos = pos[i];
+		SnapItemToLedge(item, coll, item->pos.yRot);
+
+		// Copy resulting position to an array and restore original item position.
+		pos[i] = item->pos;
+		item->pos = pos[2];
+
+		if (i == 1) // Both passes finished, construct the result.
+		{
+			result.RealPositionResult = pos[0];
+			result.ProbeResult = pos[1];
+			result.Success = newAngle == pos[i].yRot;
+		}
+	}
+
+	return result;
+}
+
 CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
 {
 	LaraInfo*& info = item->data;
@@ -592,19 +679,23 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	auto oldPos = item->pos;
 	auto oldMoveAngle = Lara.moveAngle;
 
+	auto cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, false);
+
 	// Do further testing only if test angle is equal to resulting edge angle
-	if (SnapAndTestItemAtNextCornerPosition(item, coll, testAngle, false))
+	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
 		auto bounds = GetBoundsAccurate(item);
 
 		// Store next position
+		item->pos = cornerResult.RealPositionResult;
 		info->nextCornerPos.xPos = item->pos.xPos;
 		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
 		info->nextCornerPos.zPos = item->pos.zPos;
 		info->nextCornerPos.yRot = item->pos.yRot;
 		info->moveAngle = item->pos.yRot;
 		
+		item->pos = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPos(item, coll);
 
 		// Restore original item positions
@@ -640,26 +731,28 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	if (!LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
 		return CORNER_RESULT::NONE;
 
-	bool snappable = SnapAndTestItemAtNextCornerPosition(item, coll, testAngle, true);
+	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
 
 	// Additional test if there's a material obstacles blocking outer corner pathway
 	if ((LaraFloorFront(item, item->pos.yRot, 0) < 0) ||
 		(LaraCeilingFront(item, item->pos.yRot, 0, coll->Setup.Height) > 0))
-		snappable = false;
+		cornerResult.Success = false;
 
 	// Do further testing only if test angle is equal to resulting edge angle
-	if (snappable)
+	if (cornerResult.Success)
 	{
 		// Get bounding box height for further ledge height calculations
 		auto bounds = GetBoundsAccurate(item);
 
 		// Store next position
+		item->pos = cornerResult.RealPositionResult;
 		info->nextCornerPos.xPos = item->pos.xPos;
 		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->pos.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
 		info->nextCornerPos.zPos = item->pos.zPos;
 		info->nextCornerPos.yRot = item->pos.yRot;
 		info->moveAngle = item->pos.yRot;
 
+		item->pos = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPos(item, coll);
 
 		// Restore original item positions
@@ -1704,7 +1797,7 @@ bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);
 }
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
+VaultTestResultData TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData)
 {
 	LaraInfo*& info = item->data;
 
@@ -1733,21 +1826,14 @@ bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData test
 		!swampTooDeep &&																			// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-		// TODO: Command query separation?
-		// Calculate auto jump velocity.
-		if (!testData.snapHeight)
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (probeFront.Position.Floor - y));
-		// Snap y position to align vault animation.
-		else
-			item->pos.yPos = probeFront.Position.Floor + testData.snapHeight;
 
-		return true;
+		return VaultTestResultData { true, probeFront.Position.Floor };
 	}
 
-	return false;
+	return VaultTestResultData { false, NO_HEIGHT };
 }
 
-bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1758,14 +1844,13 @@ bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 		-CLICK(2.5f),
 		LARA_HEIGHT,
 		-MAX_HEIGHT,
-		CLICK(1),
-		CLICK(2)
+		CLICK(1)
 	};
 
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
@@ -1777,13 +1862,12 @@ bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT,
 		-MAX_HEIGHT,
 		CLICK(1),
-		CLICK(3)
 	};
 
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
 	// Clamp range: (-CLICK(0.1f), MAX_HEIGHT]
@@ -1801,7 +1885,7 @@ bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (0, -STEPUP_HEIGHT]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1813,13 +1897,12 @@ bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(1)
 	};
 
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1831,13 +1914,12 @@ bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(2)
 	};
 
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
 	// Clamp range: (-LARA_HEIGHT_CRAWL, -LARA_HEIGHT]
@@ -1849,31 +1931,12 @@ bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		LARA_HEIGHT_CRAWL,
 		LARA_HEIGHT,
 		CLICK(1),
-		CLICK(3)
 	};
 
 	return TestLaraVaultTolerance(item, coll, testData);
 }
 
-bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item);
-
-	if (!TestLaraSwamp(item) &&										// No swamp.
-		info->canMonkeySwing &&										// Monkey swing sector flag set.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
-		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResultData TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -1887,12 +1950,10 @@ bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Lower middle ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
-		// TODO: Calculate jump velocity outside this function.
-		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((probeMiddle.Position.Ceiling - y + CLICK(0.2f)), -CLICK(7.1f)));
-		return true;
+		return VaultTestResultData{ true, probeMiddle.Position.Ceiling };
 	}
 
-	return false;
+	return VaultTestResultData{ false, NO_HEIGHT };
 }
 
 bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
@@ -1909,6 +1970,24 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&			// Upper middle floor bound.
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&		// Lower front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	int y = item->pos.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (!TestLaraSwamp(item) &&										// No swamp.
+		info->canMonkeySwing &&										// Monkey swing sector flag set.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
 	{
 		return true;
 	}

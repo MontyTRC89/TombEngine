@@ -114,54 +114,6 @@ struct COLL_INFO
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
-struct MoveTestData
-{
-	short angle;
-	int lowerBound;
-	int upperBound;
-	bool checkSlopeDown = true;
-	bool checkSlopeUp = true;
-	bool checkDeath = true;
-};
-
-struct MonkeyMoveTestData
-{
-	short angle;
-	int lowerBound;
-	int upperBound;
-};
-
-struct VaultTestData
-{
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int clampMax;
-	int gapMin;
-	int snapHeight;
-	bool checkSwampDepth = true;
-};
-
-struct CrawlVaultTestData
-{
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int gapMin;
-	int crossDist;
-	int destDist;
-	int probeDeltaMax;
-	bool checkSlope = true;
-	bool checkDeath = true;
-};
-
-struct JumpTestData
-{
-	short angle;
-	int dist = CLICK(1.3f);
-	bool checkWadeStatus = true;
-};
-
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
@@ -178,6 +130,5 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
-bool SnapAndTestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer);
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
