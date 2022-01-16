@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara_test_structs.h"
 
 struct ITEM_INFO;
 struct COLL_INFO;
@@ -85,17 +86,17 @@ bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData);
-bool TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData);
+VaultTestResultData TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResultData TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestData testData);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
