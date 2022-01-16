@@ -15,6 +15,9 @@
 #include "Specific/level.h"
 #include "Scripting/GameFlowScript.h"
 
+// TEMP FOR DEBUG
+#include <Game/effects/effects.h>
+
 using namespace TEN::Floordata;
 
 // -----------------------------
@@ -37,7 +40,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE; //
+		item->goalAnimState = LS_IDLE; // TODO: Death state dispatches for all monkey states.
 		return;
 	}
 
@@ -67,6 +70,9 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
+			//
+			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 50,50,50);
+
 			item->goalAnimState = LS_MONKEY_FORWARD;
 			return;
 		}
@@ -90,11 +96,17 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
+			//
+			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 0, 50, 50);
+
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
+			//
+			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 50, 0, 50);
+
 			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
@@ -115,6 +127,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->fallspeed = 0;
 	item->gravityStatus = false;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
@@ -125,7 +138,18 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 	
 	ShiftItem(item, coll);
-	DoLaraMonkeySnap(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallState(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_MONKEY_FORWARD (76)
@@ -182,6 +206,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
@@ -261,6 +286,7 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
@@ -273,7 +299,17 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	DoLaraMonkeySnap(item, coll);
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallState(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_MONKEY_SHIMMY_LEFT (77)
@@ -330,10 +366,11 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
+	coll->Setup.BadCeilingHeightDown = CLICK(0.75f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.75f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -342,7 +379,17 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	DoLaraMonkeySnap(item, coll);
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallState(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
@@ -399,10 +446,11 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.8f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.8f);
+	coll->Setup.BadCeilingHeightDown = CLICK(0.75f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.75f);
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -411,7 +459,17 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	DoLaraMonkeySnap(item, coll);
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallState(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_MONKEY_TURN_180 (79)
@@ -512,6 +570,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
+		// TODO: Dispaches.
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;

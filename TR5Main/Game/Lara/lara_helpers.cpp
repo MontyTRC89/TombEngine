@@ -65,9 +65,9 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	
 	if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
 		item->pos.yPos += SWAMP_GRAVITY;
-	else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))			// Outer range.
+	else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))		// Outer range.
 		item->pos.yPos += rate * sign;
-	else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&		// Inner range.
+	else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
 		abs(coll->Middle.Floor) >= threshold)
 	{
 		item->pos.yPos += std::max((int)abs(coll->Middle.Floor / 2.75), threshold) * sign;
@@ -85,9 +85,9 @@ void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 	int threshold = std::max(abs(item->speed) / 3 * 2, (int)CLICK(1.25f) / 16);
 	int sign = std::copysign(1, probe.Position.Ceiling - y);
 
-	if (abs(probe.Position.Ceiling - y) > (CLICK(1.25f) / 2))				// Outer range.
+	if (abs(probe.Position.Ceiling - y) > (CLICK(1.25f) / 2))			// Outer range.
 		item->pos.yPos += rate * sign;
-	else if (abs(probe.Position.Ceiling - y) <= (CLICK(1.25f) / 2) &&		// Inner range.
+	else if (abs(probe.Position.Ceiling - y) <= (CLICK(1.25f) / 2) &&	// Inner range.
 		abs(probe.Position.Ceiling - y) >= threshold)
 	{
 		item->pos.yPos += std::max((int)abs((probe.Position.Ceiling - y) / 2.75), threshold) * sign;
@@ -154,9 +154,9 @@ void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Static detection.
 	//TestForObjectOnLedge(item, coll);
 
-	if (probe.BottomBlock->Flags.Monkeyswing &&					// Monkey swing sector set.
-		(probe.Position.Ceiling - y) <= CLICK(1) &&			// Lower bound.
-		(probe.Position.Ceiling - y) >= -CLICK(1) &&		// Upper bound.
+	if (probe.BottomBlock->Flags.Monkeyswing &&			// Monkey swing sector set.
+		(probe.Position.Ceiling - y) <= CLICK(1) &&		// Lower bound.
+		(probe.Position.Ceiling - y) >= -CLICK(1) &&	// Upper bound.
 		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
