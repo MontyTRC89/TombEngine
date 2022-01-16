@@ -160,7 +160,8 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 
 bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
+	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT ||
+		!GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
 	{
 		ShiftItem(item, coll);
 
@@ -171,12 +172,14 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
 		return true;
 	}
 
-	if (coll->CollisionType == CT_LEFT)
+	if (coll->CollisionType == CT_LEFT ||
+		!GetCollisionResult(item, coll->Setup.ForwardAngle - ANGLE(90.0f), coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
-	else if (coll->CollisionType == CT_RIGHT)
+	else if (coll->CollisionType == CT_RIGHT ||
+		!GetCollisionResult(item, coll->Setup.ForwardAngle + ANGLE(90.0f), coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
 	{
 		ShiftItem(item, coll);
 		item->pos.yRot -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
