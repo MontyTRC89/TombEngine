@@ -192,7 +192,7 @@ void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 	item->gravityStatus = false;
 
 	LaraSnapToHeight(item, coll);
-	AnimateLara(item);
+	//AnimateLara(item);
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)

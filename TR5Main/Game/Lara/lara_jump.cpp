@@ -46,6 +46,22 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_JUMP_TURN_MAX;
 	}
 
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
+			info->waterStatus != LW_WADE) [[likely]]
+		{
+			item->goalAnimState = LS_RUN_FORWARD;
+		}
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	if (TrInput & IN_ACTION &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
@@ -71,6 +87,8 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_JUMP_FORWARD;
 }
 
 // State:		LS_JUMP_FORWARD (3)
@@ -80,6 +98,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
+	//item->gravityStatus = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -90,22 +109,6 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->speed < 0)
 		info->moveAngle = item->pos.yRot;
-
-	if (TestLaraLand(item, coll))
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
-			info->waterStatus != LW_WADE) [[likely]]
-		{
-			item->goalAnimState = LS_RUN_FORWARD;
-		}
-		else
-			item->goalAnimState = LS_IDLE;
-
-		// TODO: It's still possible to achieve a softlock.
-		DoLaraLand(item, coll);
-	}
 }
 
 // State:		LS_FREEFALL (9)
@@ -113,6 +116,18 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = item->speed * 0.95f;
+
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		StopSoundEffect(SFX_TR4_LARA_FALL);
+		return;
+	}
 
 	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
 		item->hitPoints > 0)
@@ -137,17 +152,6 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	LaraSlideEdgeJump(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		StopSoundEffect(SFX_TR4_LARA_FALL);
-		DoLaraLand(item, coll);
-	}
 }
 
 // State:		LS_REACH (11)
@@ -174,6 +178,17 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
 		item->goalAnimState = LS_FREEFALL;
@@ -198,6 +213,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
 	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
 
+	item->gravityStatus = true;
 	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = 0;
@@ -213,18 +229,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSlideEdgeJump(item, coll);
 
 	GetCollisionInfo(coll, item);
-
 	ShiftItem(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		DoLaraLand(item, coll);
-	}
 }
 
 // TODO: Unused? Naming is also completely mismatched; enum calls it LS_GRAB_TO_FALL.
@@ -413,6 +418,17 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	if (TrInput & (IN_ROLL | IN_FORWARD))
 	{
 		item->goalAnimState = LS_JUMP_ROLL_180;
@@ -424,6 +440,8 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_JUMP_BACK;
 }
 
 // State:		LS_JUMP_BACK (25)
@@ -451,6 +469,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->goalAnimState = LS_IDLE;
 
+		DoLaraLand(item, coll);
 		return;
 	}
 
@@ -466,6 +485,8 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_JUMP_RIGHT;
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -486,6 +507,17 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 		return;
 
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	// TODO: Core appears to have planned this feature. Add an animation to make it possible.
 	/*if (TrInput & (IN_ROLL | IN_RIGHT))
 	{
@@ -498,6 +530,8 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_JUMP_LEFT;
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -517,6 +551,13 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 		return;
+
+	if (TestLaraLand(item, coll))
+	{
+		item->goalAnimState = LS_IDLE;
+		DoLaraLand(item, coll);
+		return;
+	}
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -545,6 +586,8 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_JUMP_UP;
 }
 
 // State:		LS_JUMP_UP (28)
@@ -554,6 +597,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
+	item->gravityStatus = true;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -573,13 +617,6 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	ShiftItem(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		item->goalAnimState = LS_IDLE;
-
-		DoLaraLand(item, coll);
-	}
 }
 
 // State:		LS_FALL_BACK (29)
@@ -604,6 +641,17 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 			info->turnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
+	if (TestLaraLand(item, coll))
+	{
+		if (LaraLandedBad(item, coll))
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	if (TrInput & IN_ACTION &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
@@ -625,6 +673,7 @@ void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	item->gravityStatus = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -632,16 +681,6 @@ void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		DoLaraLand(item, coll);
-	}
 }
 
 // State:		LS_SWAN_DIVE_START (52)
@@ -686,6 +725,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	info->keepLow = TestLaraKeepLow(item, coll);
+	item->gravityStatus = true;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -730,6 +770,17 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = false;
 
+	if (TestLaraLand(item, coll))
+	{
+		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
+			item->goalAnimState = LS_DEATH;
+		else
+			item->goalAnimState = LS_IDLE;
+
+		DoLaraLand(item, coll);
+		return;
+	}
+
 	if (TrInput & IN_ROLL &&
 		item->goalAnimState == LS_SWAN_DIVE_END)
 	{
@@ -745,6 +796,7 @@ void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
+	item->gravityStatus = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -752,14 +804,4 @@ void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		DoLaraLand(item, coll);
-	}
 }
