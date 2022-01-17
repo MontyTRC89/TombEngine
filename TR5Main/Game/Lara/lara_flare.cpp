@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "lara_flare.h"
-#include "lara_tests.h"
-#include "level.h"
-#include "setup.h"
+#include "Game/Lara/lara_flare.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/chaffFX.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_tests.h"
 #include "Sound/sound.h"
-#include "animation.h"
-#include "items.h"
-#include "lara_fire.h"
-#include "Lara.h"
-#include "collide.h"
-#include "effects/effects.h"
-#include "effects/chaffFX.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Specific/prng.h"
 
 using namespace TEN::Math::Random;
@@ -84,7 +85,7 @@ void ReadyFlare(ITEM_INFO* laraItem)
 {
 	LaraInfo*& laraInfo = laraItem->data;
 
-	laraInfo->gunStatus = LG_NO_ARMS;
+	laraInfo->gunStatus = LG_HANDS_FREE;
 	laraInfo->leftArm.xRot = 0;
 	laraInfo->leftArm.yRot = 0;
 	laraInfo->leftArm.zRot = 0;
@@ -118,7 +119,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 	laraInfo->flareControlLeft = true;
 
-	if (laraItem->goalAnimState == LS_STOP &&
+	if (laraItem->goalAnimState == LS_IDLE &&
 		laraInfo->Vehicle == NO_ITEM)
 	{
 		if (laraItem->animNumber == LA_STAND_IDLE)
@@ -137,7 +138,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 			{
 				laraInfo->requestGunType = laraInfo->lastGunType;
 				laraInfo->gunType = laraInfo->lastGunType;
-				laraInfo->gunStatus = LG_NO_ARMS;
+				laraInfo->gunStatus = LG_HANDS_FREE;
 
 				InitialiseNewWeapon(laraItem);
 
@@ -190,7 +191,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 			armFrame = 0;
 			laraInfo->requestGunType = laraInfo->lastGunType;
 			laraInfo->gunType = laraInfo->lastGunType;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 
 			InitialiseNewWeapon(laraItem);
 
@@ -376,7 +377,7 @@ void DoFlareInHand(ITEM_INFO* laraItem, int flareAge)
 
 	if (ItemInfo->flareAge >= FLARE_AGE)
 	{
-		if (ItemInfo->gunStatus == LG_NO_ARMS)
+		if (ItemInfo->gunStatus == LG_HANDS_FREE)
 			ItemInfo->gunStatus = LG_UNDRAW_GUNS;
 	}
 	else if (ItemInfo->flareAge != 0)

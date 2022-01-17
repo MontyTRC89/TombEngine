@@ -1,6 +1,6 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
+#include "Game/items.h"
+#include "Game/collision/collide_room.h"
 
 
 

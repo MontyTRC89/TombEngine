@@ -1,15 +1,16 @@
 #include "framework.h"
-#include "lara_surface.h"
-#include "lara_tests.h"
-#include "control/control.h"
-#include "camera.h"
-#include "collide.h"
-#include "items.h"
-#include "Lara.h"
-#include "level.h"
-#include "input.h"
-#include "lara_collide.h"
-#include "lara_swim.h"
+#include "Game/Lara/lara_surface.h"
+
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
@@ -74,29 +75,38 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		item->goalAnimState = LS_ONWATER_FORWARD;
+		return;
 	}
 	else if (TrInput & IN_BACK)
 	{
 		item->goalAnimState = LS_ONWATER_BACK;
+		return;
 	}
-
-	if (TrInput & IN_LSTEP)
+	else if (TrInput & IN_ROLL)
+	{
+		item->goalAnimState = LS_ROLL_FORWARD;
+		return;
+	}
+	else if (TrInput & IN_LSTEP)
 	{
 		item->goalAnimState = LS_ONWATER_LEFT;
+		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
 		item->goalAnimState = LS_ONWATER_RIGHT;
+		return;
 	}
-
-	if (TrInput & IN_JUMP)
+	else if (TrInput & IN_JUMP)
 	{
 		Lara.diveCount++;
 		if (Lara.diveCount == 10)
 			SwimDive(item);
+		return;
 	}
-	else
-		Lara.diveCount = 0;
+
+	Lara.diveCount = 0;
+	item->goalAnimState = LS_ONWATER_STOP;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)

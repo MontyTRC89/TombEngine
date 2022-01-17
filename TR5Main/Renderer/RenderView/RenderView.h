@@ -2,12 +2,14 @@
 #include <vector>
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "camera.h"
+#include "Game/camera.h"
 #include "Frustum.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "memory\LinearArrayBuffer.h"
+#include "Specific/memory/LinearArrayBuffer.h"
 #include "RendererSprites.h"
-namespace TEN::Renderer {
+
+namespace TEN::Renderer 
+{
 	struct RendererStatic;
 	struct RendererItem;
 	struct RendererLight;

@@ -1,40 +1,41 @@
 #include "framework.h"
-#include "generic_objects.h"
+#include "Objects/Generic/generic_objects.h"
+
+#include "Game/pickup/pickup.h"
+#include "Game/collision/collide_item.h"
 
 // objects
-#include "generic_trapdoor.h"
-#include "generic_bridge.h"
+#include "Objects/Generic/Object/generic_trapdoor.h"
+#include "Objects/Generic/Object/generic_bridge.h"
+#include "Objects/Generic/Object/burning_torch.h"
+#include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/rope.h"
 
 // switches
-#include "cog_switch.h"
-#include "rail_switch.h"
-#include "jump_switch.h"
-#include "generic_switch.h"
-#include "crowbar_switch.h"
-#include "underwater_switch.h"
-#include "pulley_switch.h"
-#include "fullblock_switch.h"
-#include "turn_switch.h"
+#include "Objects/Generic/Switches/cog_switch.h"
+#include "Objects/Generic/Switches/rail_switch.h"
+#include "Objects/Generic/Switches/jump_switch.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/Switches/crowbar_switch.h"
+#include "Objects/Generic/Switches/underwater_switch.h"
+#include "Objects/Generic/Switches/pulley_switch.h"
+#include "Objects/Generic/Switches/fullblock_switch.h"
+#include "Objects/Generic/Switches/turn_switch.h"
 
 // Doors
-#include "generic_doors.h"
-#include "double_doors.h"
-#include "pushpull_kick_door.h"
-#include "sequence_door.h"
-#include "steel_door.h"
-#include "underwater_door.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Objects/Generic/Doors/double_doors.h"
+#include "Objects/Generic/Doors/pushpull_kick_door.h"
+#include "Objects/Generic/Doors/sequence_door.h"
+#include "Objects/Generic/Doors/steel_door.h"
+#include "Objects/Generic/Doors/underwater_door.h"
 
 // Traps
 #include "Objects/Generic/Traps/dart_emitter.h"
 
-#include "Objects/Generic/Object/polerope.h"
-#include "Objects/Generic/Object/rope.h"
+/// Necessary import
+#include "Specific/setup.h"
 
-/// necessary import
-#include "setup.h"
-
-#include "Game/pickup/pickup.h"
-#include "Objects/Generic/Object/burning_torch.h"
 
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Doors;

@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "lara_two_guns.h"
-#include "lara_fire.h"
-#include "lara.h"
-#include "effects\effects.h"
-#include "animation.h"
-#include "effects\tomb4fx.h"
-#include "level.h"
-#include "setup.h"
-#include "camera.h"
-#include "input.h"
-#include "Sound\sound.h"
-#include "savegame.h"
-#include "Specific\prng.h"
-#include "items.h"
+#include "Game/Lara/lara_two_guns.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara.h"
+#include "Game/savegame.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/input.h"
 
 using namespace TEN::Math::Random;
 struct PISTOL_DEF
@@ -472,7 +473,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 	if (frameLeft == p->draw1Anim && frameRight == p->draw1Anim)
 	{
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;

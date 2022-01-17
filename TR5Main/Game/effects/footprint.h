@@ -2,6 +2,8 @@
 #include <deque>
 #include "Specific/phd_global.h"
 
+struct ITEM_INFO;
+
 namespace TEN{
 namespace Effects {
 namespace Footprints {

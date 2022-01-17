@@ -1,6 +1,6 @@
 #pragma once
-#include "items.h"
-#include "collide.h"
+#include "Game/collision/collide_room.h"
+#include "Game/items.h"
 
 enum class CLIMB_DIRECTION : short
 {

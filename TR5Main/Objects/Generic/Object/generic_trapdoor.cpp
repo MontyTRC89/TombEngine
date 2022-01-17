@@ -1,14 +1,16 @@
 #include "framework.h"
-#include "generic_trapdoor.h"
-#include "lara.h"
-#include "floordata.h"
-#include "input.h"
-#include "camera.h"
-#include "control/control.h"
-#include "level.h"
-#include "animation.h"
-#include "items.h"
-#include "Renderer11.h"
+#include "Objects/Generic/Object/generic_trapdoor.h"
+#include "Game/Lara/lara.h"
+#include "Game/collision/floordata.h"
+#include "Specific/input.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Game/animation.h"
+#include "Game/items.h"
+#include "Renderer/Renderer11.h"
+#include "Game/collision/collide_item.h"
+
 using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;
@@ -45,7 +47,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
 
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_NO_ARMS && itemIsAbove && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_HANDS_FREE && itemIsAbove && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -85,7 +87,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_STOP && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_IDLE && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE
 		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))

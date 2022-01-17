@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "tr4_demigod.h"
-#include "items.h"
-#include "control/box.h"
-#include "people.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "effects/tomb4fx.h"
-#include "camera.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
-#include "control/control.h"
-#include "itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/people.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/camera.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4
 {
@@ -748,7 +748,7 @@ namespace TEN::Entities::TR4
 						LaraItem->hitStatus = true;
 						LaraItem->speed = 2;
 						LaraItem->fallspeed = 1;
-						Lara.gunStatus = LG_NO_ARMS;
+						Lara.gunStatus = LG_HANDS_FREE;
 					}
 				}
 

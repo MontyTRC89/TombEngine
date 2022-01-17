@@ -1,25 +1,26 @@
 #include "framework.h"
-#include "generic_doors.h"
-#include "level.h"
-#include "control/control.h"
-#include "control/box.h"
-#include "items.h"
-#include "control/lot.h"
-#include "gui.h"
-#include "input.h"
-#include "pickup.h"
-#include "sound.h"
-#include "animation.h"
-#include "sphere.h"
-#include "cog_switch.h"
-#include "objectslist.h"
-#include "lara_struct.h"
-#include "lara.h"
-#include "trmath.h"
-#include "misc.h"
-#include "itemdata/door_data.h"
-#include "collide.h"
-#include "itemdata/itemdata.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/control/box.h"
+#include "Game/items.h"
+#include "Game/control/lot.h"
+#include "Game/gui.h"
+#include "Specific/input.h"
+#include "Game/pickup/pickup.h"
+#include "Sound/sound.h"
+#include "Game/animation.h"
+#include "Game/collision/sphere.h"
+#include "Objects/Generic/Switches/cog_switch.h"
+#include "Objects/objectslist.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara.h"
+#include "Specific/trmath.h"
+#include "Game/misc.h"
+#include "Game/itemdata/door_data.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/itemdata/itemdata.h"
 
 namespace TEN::Entities::Doors
 {
@@ -167,10 +168,10 @@ namespace TEN::Entities::Doors
 		if (item->triggerFlags == 2
 			&& item->status == ITEM_NOT_ACTIVE && !item->gravityStatus // CHECK
 			&& ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-				&& l->currentAnimState == LS_STOP
+				&& l->currentAnimState == LS_IDLE
 				&& l->animNumber == LA_STAND_IDLE
 				&& !l->hitStatus
-				&& Lara.gunStatus == LG_NO_ARMS
+				&& Lara.gunStatus == LG_HANDS_FREE
 				|| Lara.isMoving && Lara.interactedItem == itemNum))
 		{
 			item->pos.yRot ^= ANGLE(180);
@@ -229,7 +230,7 @@ namespace TEN::Entities::Doors
 			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = 0;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
 			item->pos.yRot ^= ANGLE(180);

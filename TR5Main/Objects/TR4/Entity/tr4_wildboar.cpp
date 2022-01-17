@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "tr4_wildboar.h"
-#include "control/box.h"
-#include "items.h"
-#include "effects/effects.h"
-#include "setup.h"
-#include "control/lot.h"
-#include "level.h"
-#include "lara.h"
-#include "itemdata/creature_info.h"
-#include "control/control.h"
+#include "Game/control/box.h"
+#include "Game/items.h"
+#include "Game/effects/effects.h"
+#include "Specific/setup.h"
+#include "Game/control/lot.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/control/control.h"
 
 BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
 

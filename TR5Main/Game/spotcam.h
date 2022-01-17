@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
 
@@ -51,7 +51,7 @@ enum SPOTCAM_FLAGS
 extern SPOTCAM SpotCam[MAX_SPOTCAMS];
 extern byte SpotCamRemap[MAX_SPOTCAMS];
 extern byte CameraCnt[MAX_SPOTCAMS];
-extern int LastSpotCam;
+extern int LastSpotCamSequence;
 extern int NumberSpotcams;
 extern int UseSpotCam;
 extern int SpotcamDontDrawLara;

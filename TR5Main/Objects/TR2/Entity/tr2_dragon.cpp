@@ -1,19 +1,20 @@
 #include "framework.h"
-#include "tr2_dragon.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "collide.h"
-#include "control/box.h"
-#include "control/lot.h"
-#include "sphere.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
-#include "input.h"
-#include "animation.h"
+#include "Objects/TR2/Entity/tr2_dragon.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 #define DRAGON_SWIPE_DAMAGE 250
 #define DRAGON_TOUCH_DAMAGE 10
@@ -41,7 +42,8 @@
 
 BITE_INFO dragonMouthBite = { 35, 171, 1168, 12 };
 
-enum DRAGON_STATE {
+enum DRAGON_STATE 
+{
 	DRAGON_EMPTY,
 	DRAGON_WALK,
 	DRAGON_LEFT,

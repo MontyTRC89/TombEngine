@@ -1,40 +1,38 @@
 #include "framework.h"
-#include "tr3_objects.h"
+#include "Objects/TR3/tr3_objects.h"
+
 /// entities
-#include "tr3_civvy.h" // OK
-#include "tr3_cobra.h" // OK
-#include "tr3_fishemitter.h" // OK
-#include "tr3_flamethrower.h" // OK
-#include "tr3_monkey.h" // OK
-#include "tr3_mpgun.h" // OK
-#include "tr3_mpstick.h" // OK
-#include "tr3_raptor.h" // OK
-#include "tr3_scuba.h" // OK
-#include "tr3_shiva.h" // OK
-#include "tr3_sophia.h" // OK
-#include "tr3_tiger.h" // OK
-#include "tr3_tony.h" // OK
-#include "tr3_trex.h" // OK
-#include "tr3_tribesman.h" // OK
-/// objects
-
+#include "Objects/TR3/Entity/tr3_civvy.h" // OK
+#include "Objects/TR3/Entity/tr3_cobra.h" // OK
+#include "Objects/TR3/Entity/tr3_fishemitter.h" // OK
+#include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
+#include "Objects/TR3/Entity/tr3_monkey.h" // OK
+#include "Objects/TR3/Entity/tr3_mpgun.h" // OK
+#include "Objects/TR3/Entity/tr3_mpstick.h" // OK
+#include "Objects/TR3/Entity/tr3_raptor.h" // OK
+#include "Objects/TR3/Entity/tr3_scuba.h" // OK
+#include "Objects/TR3/Entity/tr3_shiva.h" // OK
+#include "Objects/TR3/Entity/tr3_sophia.h" // OK
+#include "Objects/TR3/Entity/tr3_tiger.h" // OK
+#include "Objects/TR3/Entity/tr3_tony.h" // OK
+#include "Objects/TR3/Entity/tr3_trex.h" // OK
+#include "Objects/TR3/Entity/tr3_tribesman.h" // OK
 /// traps
-#include "train.h"
-/// switch
-
+#include "Objects/TR3/Trap/train.h"
 /// vehicles
-#include "biggun.h"
-#include "kayak.h"
-#include "minecart.h"
-#include "quad.h"
-#include "upv.h"
-#include "rubberboat.h"
+#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
+#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/upv.h"
+#include "Objects/TR3/Vehicles/rubberboat.h"
 /// necessary import
-#include "collide.h"
-#include "setup.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "control/box.h"
+#include "Game/control/box.h"
+#include "Game/collision/collide_item.h"
+#include "Game/itemdata/creature_info.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+
 static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];

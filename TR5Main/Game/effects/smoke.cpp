@@ -1,15 +1,16 @@
-#include <algorithm>
 #include "framework.h"
-#include "Specific/trmath.h"
-#include "smoke.h"
-#include "room.h"
-#include "control/control.h"
-#include "level.h"
-#include "setup.h"
-#include "lara.h"
+#include "Game/effects/smoke.h"
+
+#include <algorithm>
+#include "Game/control/control.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/room.h"
+#include "Specific/level.h"
 #include "Specific/prng.h"
-#include "effects/weather.h"
-#include "items.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;

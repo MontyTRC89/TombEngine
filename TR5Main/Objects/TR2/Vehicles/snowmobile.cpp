@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "snowmobile.h"
-#include "lara.h"
-#include "items.h"
-#include "collide.h"
-#include "lara_fire.h"
-#include "lara_one_gun.h"
-#include "effects/effects.h"
-#include "lara_flare.h"
-#include "effects/tomb4fx.h"
-#include "sphere.h"
-#include "setup.h"
-#include "level.h"
-#include "input.h"
-#include "animation.h"
-#include "Sound/sound.h"
-#include "particle/SimpleParticle.h"
+#include "Objects/TR2/Vehicles/snowmobile.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/particle/SimpleParticle.h"
+#include "Objects/TR2/Vehicles/skidoo_info.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 #include "Specific/prng.h"
-#include "camera.h"
-#include "skidoo_info.h"
+#include "Specific/setup.h"
+#include "Sound/sound.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -302,7 +303,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			laraInfo->Vehicle = NO_ITEM;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 		}
 		else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF &&
 			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara)))
@@ -328,7 +329,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			lara->gravityStatus = true;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->moveAngle = skidoo->pos.yRot;
 			skidoo->flags |= ONESHOT;
 			skidoo->collidable = false;
@@ -618,7 +619,7 @@ int SkidooCheckGetOn(ITEM_INFO* lara, ITEM_INFO* skidoo, COLL_INFO* coll)
 	int mountType = 0;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_NO_ARMS ||
+		laraInfo->gunStatus != LG_HANDS_FREE ||
 		lara->gravityStatus)
 	{
 		return mountType = 0;
@@ -668,7 +669,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 		UndrawFlareMeshes(lara);
 		laraInfo->flareControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
-		laraInfo->gunStatus = LG_NO_ARMS;
+		laraInfo->gunStatus = LG_HANDS_FREE;
 	}
 
 	if (mountType == 1)

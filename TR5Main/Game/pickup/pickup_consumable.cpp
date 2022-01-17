@@ -1,10 +1,10 @@
-#pragma once
 #include "framework.h"
-#include "pickup_consumable.h"
-#include "objectslist.h"
+#include "Game/pickup/pickup_consumable.h"
+
 #include <array>
-#include "lara_struct.h"
-#include "pickuputil.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/pickup/pickuputil.h"
+#include "Objects/objectslist.h"
 
 struct ConsumablePickupInfo
 {

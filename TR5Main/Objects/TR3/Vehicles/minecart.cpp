@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "minecart.h"
-#include "lara.h"
-#include "collide.h"
-#include "effects/effects.h"
-#include "lara_flare.h"
-#include "items.h"
-#include "sphere.h"
-#include "animation.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
-#include "input.h"
+#include "Objects/TR3/Vehicles/minecart.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
+#include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Sound/sound.h"
-#include "minecart_info.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using std::vector;
 
-enum MINECART_STATE {
+enum MinecartState
+{
 	CART_GETIN,
 	CART_GETOUT,
 	CART_GETOUTL,
@@ -116,7 +118,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_NO_ARMS || l->gravityStatus)
+	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->gravityStatus)
 		return 0;
 
 	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
@@ -617,7 +619,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		break;
 
@@ -636,7 +638,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		break;
 

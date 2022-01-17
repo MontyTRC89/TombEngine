@@ -1,6 +1,7 @@
 #include "framework.h"
-#include "SimpleParticle.h"
-#include "items.h"
+#include "Game/particle/SimpleParticle.h"
+
+#include "Game/items.h"
 #include "Specific/trmath.h"
 #include "Specific/setup.h"
 #include "Specific/prng.h"

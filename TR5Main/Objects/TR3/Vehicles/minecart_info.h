@@ -1,5 +1,7 @@
 #pragma once
-struct CART_INFO {
+
+struct CART_INFO 
+{
 	int Speed;
 	int MidPos;
 	int FrontPos;

@@ -1,15 +1,15 @@
 #include "framework.h"
 #include "tr4_senet.h"
 #include "Sound/sound.h"
-#include "items.h"
-#include "control/control.h"
-#include "setup.h"
-#include "effects/tomb4fx.h"
-#include "lara.h"
-#include "lara_struct.h"
-#include "input.h"
-#include "level.h"
-#include "collide.h"
+#include "Game/items.h"
+#include "Game/control/control.h"
+#include "Specific/setup.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_struct.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
 
 short SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
@@ -413,7 +413,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[item_num];
 
-	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_STOP && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS &&
+	if (TrInput & IN_ACTION && laraitem->currentAnimState == LS_IDLE && laraitem->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE &&
 		!item->active || Lara.isMoving && Lara.interactedItem == item_num)
 	{
 		laraitem->pos.yRot ^= 0x8000;

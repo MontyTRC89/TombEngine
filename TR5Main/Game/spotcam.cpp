@@ -1,19 +1,19 @@
 #include "framework.h"
-#include "spotcam.h"
-#include "camera.h"
-#include "control/control.h"
-#include "animation.h"
-#include "effects\tomb4fx.h"
-#include "lara.h"
-#include "input.h"
-#include "control\volume.h"
-#include "items.h"
+#include "Game/spotcam.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/control/volume.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/input.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
 
 int TrackCameraInit;
-int LastSequence;
 int SpotcamTimer;
 int SpotcamPaused;
 int SpotcamLoopCnt;
@@ -41,7 +41,7 @@ QUAKE_CAMERA QuakeCam;
 int SplineFromCamera;
 bool SpotCamFirstLook;
 short CurrentSplineCamera;
-int LastSpotCam;
+int LastSpotCamSequence;
 int LaraHealth;
 int LaraAir;
 int CurrentSpotcamSequence;
@@ -110,7 +110,7 @@ void InitialiseSpotCam(short Sequence)
 	int sp;
 	int i;
 
-	if (TrackCameraInit != 0 && LastSequence == Sequence)
+	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
 		TrackCameraInit = 0;
 		return;
@@ -133,7 +133,7 @@ void InitialiseSpotCam(short Sequence)
 	Lara.busy = 0;
 
 	CameraFade = -1;
-	LastSequence = Sequence;
+	LastSpotCamSequence = Sequence;
 	TrackCameraInit = 0;
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
@@ -507,8 +507,7 @@ void CalculateSpotCameras()
 		Camera.pos.y = cpy;
 		Camera.pos.z = cpz;
 
-		if ((s->flags & SCF_FOCUS_LARA_HEAD
-			|| s->flags & SCF_TRACKING_CAM))
+		if ((s->flags & SCF_FOCUS_LARA_HEAD) || (s->flags & SCF_TRACKING_CAM))
 		{
 			Camera.target.x = LaraItem->pos.xPos;
 			Camera.target.y = LaraItem->pos.yPos;

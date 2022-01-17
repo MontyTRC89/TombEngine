@@ -1,48 +1,51 @@
 #include "framework.h"
+#include "Game/control/control.h"
+
 #include <process.h>
-#include "winmain.h"
-#include "collide.h"
-#include "control/control.h"
-#include "pickup.h"
-#include "camera.h"
-#include "Lara.h"
-#include "effects/hair.h"
-#include "items.h"
-#include "flipeffect.h"
-#include "gui.h"
-#include "control/lot.h"
-#include "health.h"
-#include "savegame.h"
-#include "Sound/sound.h"
-#include "spotcam.h"
-#include "control/box.h"
-#include "objects.h"
-#include "sphere.h"
-#include "level.h"
-#include "input.h"
-#include "setup.h"
-#include "room.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "effects/debris.h"
-#include "effects/footprint.h"
-#include "effects/smoke.h"
-#include "effects/spark.h"
-#include "effects/explosion.h"
-#include "effects/drip.h"
-#include "effects/weather.h"
-#include "tr5_rats_emitter.h"
-#include "tr5_bats_emitter.h"
-#include "tr5_spider_emitter.h"
-#include "tr4_locusts.h"
-#include "tr4_littlebeetle.h"
-#include "particle/SimpleParticle.h"
-#include "Specific/prng.h"
-#include "Specific/clock.h"
-#include "Lara/lara_one_gun.h"
-#include "generic_switch.h"
-#include "Scripting/GameFlowScript.h"
+#include "Game/collision/collide_room.h"
+#include "Game/pickup/pickup.h"
+#include "Game/camera.h"
+#include "Game/Lara/lara.h"
+#include "Game/items.h"
+#include "Game/control/flipeffect.h"
+#include "Game/gui.h"
+#include "Game/control/lot.h"
+#include "Game/health.h"
+#include "Game/savegame.h"
+#include "Game/room.h"
+#include "Game/effects/hair.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/footprint.h"
+#include "Game/effects/smoke.h"
+#include "Game/effects/spark.h"
+#include "Game/effects/explosion.h"
+#include "Game/effects/drip.h"
+#include "Game/effects/weather.h"
 #include "Game/effects/lightning.h"
+#include "Game/spotcam.h"
+#include "Game/control/box.h"
+#include "Game/particle/SimpleParticle.h"
+#include "Game/collision/sphere.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_cheat.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Objects/Effects/tr4_locusts.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Sound/sound.h"
+#include "Specific/clock.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/prng.h"
+#include "Specific/winmain.h"
+#include "Scripting/GameFlowScript.h"
 
 using std::vector;
 using std::unordered_map;
@@ -110,8 +113,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	g_GameScript->ProcessDisplayStrings(DELTA_TIME);
 	
-	static int FramesCount = 0;
-	for (FramesCount += numFrames; FramesCount > 0; FramesCount -= 2)
+	static int framesCount = 0;
+	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
 		GlobalCounter++;
 
@@ -210,7 +213,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->currentAnimState != LS_STOP || LaraItem->animNumber != LA_STAND_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != LA_CROUCH_IDLE || LaraItem->goalAnimState != LS_CROUCH_IDLE)))
+				((LaraItem->currentAnimState != LS_IDLE || LaraItem->animNumber != LA_STAND_IDLE) && (!Lara.isDucked || TrInput & IN_DUCK || LaraItem->animNumber != LA_CROUCH_IDLE || LaraItem->goalAnimState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -232,11 +235,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						Lara.busy = false;
 						Camera.type = BinocularOldCamera;
 
-						Lara.headYrot = 0;
-						Lara.headXrot = 0;
-
-						Lara.torsoYrot = 0;
-						Lara.torsoXrot = 0;
+						ResetLaraFlex(LaraItem);
 
 						Camera.bounce = 0;
 						BinocularOn = -8;
@@ -325,7 +324,6 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0)
 		{
-
 			// Control Lara
 			InItemControlLoop = true;
 			LaraControl(LaraItem, &LaraCollision);
@@ -340,10 +338,11 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 			}
 
+			LaraCheatyBits();
+			TriggerLaraDrips(LaraItem);
+
 			// Update Lara's ponytails
-			HairControl(0, 0, 0);
-			if (level->LaraType == LaraType::Young)
-				HairControl(0, 1, 0);
+			HairControl(LaraItem, level->LaraType == LaraType::Young);
 		}
 
 		if (UseSpotCam)

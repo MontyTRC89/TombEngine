@@ -61,7 +61,7 @@ short GetFrameNumber(short objectID, short animNumber, short frameToStart);
 int GetFrameCount(short animNumber);
 int GetNextAnimState(ITEM_INFO* item);
 int GetNextAnimState(short objectID, short animNumber);
-int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
+bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
 BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);

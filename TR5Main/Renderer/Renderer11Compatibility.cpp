@@ -1,16 +1,18 @@
 #include "framework.h"
-#include "Renderer11.h"
-#include "level.h"
-#include "savegame.h"
-#include "setup.h"
-#include "control/control.h"
-#include "objects.h"
-#include <lara_struct.h>
+#include "Renderer/Renderer11.h"
+#include "Specific/level.h"
+#include "Game/savegame.h"
+#include "Specific/setup.h"
+#include "Game/control/control.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Game/Lara/lara_struct.h"
 #include <tuple>
 #include <stack>
+
 using std::optional;
 using std::stack;
 using std::vector;
+
 namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()

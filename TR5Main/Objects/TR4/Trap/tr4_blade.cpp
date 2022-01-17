@@ -1,11 +1,12 @@
 #include "framework.h"
 #include "tr4_blade.h"
-#include "level.h"
-#include "collide.h"
-#include "lara.h"
-#include "control/control.h"
-#include "effects/effects.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {
