@@ -1,16 +1,16 @@
 #include "framework.h"
-#include "objects.h"
-#include "items.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "Lara.h"
-#include "sphere.h"
-#include "control/control.h"
-#include "setup.h"
-#include "level.h"
-#include "input.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Game/items.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
 #include "Sound/sound.h"
-#include "collide.h"
+#include "Game/collision/collide_item.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
@@ -106,7 +106,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (((TrInput & IN_ACTION) == 0
-		|| l->currentAnimState != LS_STOP
+		|| l->currentAnimState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)

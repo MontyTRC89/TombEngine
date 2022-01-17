@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "fullblock_switch.h"
-#include "input.h"
-#include "lara.h"
-#include "generic_switch.h"
-#include "setup.h"
-#include "collide.h"
-#include "level.h"
-#include "animation.h"
-#include "items.h"
+#include "Objects/Generic/Switches/fullblock_switch.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/setup.h"
+#include "Game/collision/collide_item.h"
+#include "Specific/level.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::Switches
 {
@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			|| item->flags & 0x100
 			|| CurrentSequence >= 3
 			|| Lara.gunStatus
-			|| l->currentAnimState != LS_STOP
+			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE)
 			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 		{
@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 					l->animNumber = LA_BUTTON_GIANT_PUSH;
 					item->goalAnimState = 0;
 				}
-				l->goalAnimState = LS_STOP;
+				l->goalAnimState = LS_IDLE;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				item->status = ITEM_ACTIVE;
 
@@ -77,7 +77,7 @@ namespace TEN::Entities::Switches
 		else if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 

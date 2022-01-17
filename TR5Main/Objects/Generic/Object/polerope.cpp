@@ -9,8 +9,8 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
-#include "Game/collide.h"
-#include "Game/sphere.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
 
 namespace TEN::Entities::Generic
 {
@@ -33,9 +33,9 @@ namespace TEN::Entities::Generic
 		auto isLara = (!item->data.is<LaraInfo*>());
 
 		if (isLara &&
-			(TrInput & IN_ACTION) && 
+			TrInput & IN_ACTION && 
 			!Lara.gunStatus && 
-			l->currentAnimState == LS_STOP && 
+			l->currentAnimState == LS_IDLE && 
 			l->animNumber == LA_STAND_IDLE || Lara.isMoving &&
 			Lara.interactedItem == itemNumber)
 		{
@@ -63,7 +63,7 @@ namespace TEN::Entities::Generic
 				if (Lara.isMoving && Lara.interactedItem == itemNumber)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->pos.yRot = rot;
 			}

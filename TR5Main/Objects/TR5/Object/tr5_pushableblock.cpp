@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "tr5_pushableblock.h"
-#include "lara.h"
-#include "animation.h"
-#include "items.h"
-#include "collide.h"
-#include "flipeffect.h"
-#include "control/box.h"
-#include "level.h"
-#include "input.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
+#include "Game/items.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/flipeffect.h"
+#include "Game/control/box.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
 #include "Sound/sound.h"
-#include "setup.h"
-#include "tr5_pushableblock_info.h"
+#include "Specific/setup.h"
+#include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
 PHD_VECTOR PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
@@ -31,7 +32,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x + 1024, y, z, roomNumber);
+			ClearMovableBlockSplitters(x + WALL_SIZE, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
@@ -39,7 +40,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x - 1024, y, z, roomNumber);
+			ClearMovableBlockSplitters(x - WALL_SIZE, y, z, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
@@ -47,7 +48,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z + 1024, roomNumber);
+			ClearMovableBlockSplitters(x, y, z + WALL_SIZE, roomNumber);
 	}
 
 	roomNumber = baseRoomNumber;
@@ -55,7 +56,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
-			ClearMovableBlockSplitters(x, y, z - 1024, roomNumber);
+			ClearMovableBlockSplitters(x, y, z - WALL_SIZE, roomNumber);
 	}
 }
 
@@ -202,25 +203,25 @@ void PushableBlockControl(short itemNumber)
 		{
 		case 0:
 			z = pushable->moveZ + displaceBox;
-			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
+			if (abs(item->pos.zPos - z) < CLICK(2) && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
 		case 1:
 			x = pushable->moveX + displaceBox;
-			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
+			if (abs(item->pos.xPos - x) < CLICK(2) && item->pos.xPos < x)
 				item->pos.xPos = x;
 			break;
 
 		case 2:
 			z = pushable->moveZ - displaceBox;
-			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
+			if (abs(item->pos.zPos - z) < CLICK(2) && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
 		case 3:
 			x = pushable->moveX - displaceBox;
-			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
+			if (abs(item->pos.xPos - x) < CLICK(2) && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
@@ -243,7 +244,7 @@ void PushableBlockControl(short itemNumber)
 					MoveStackXZ(itemNumber);
 					//SoundEffect(pushable->stopSound, &item->pos, 2);
 					DoPushPull = 0;
-					LaraItem->goalAnimState = LS_STOP;
+					LaraItem->goalAnimState = LS_IDLE;
 
 					item->gravityStatus = true; // do fall
 					return;
@@ -255,7 +256,7 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
 				{
-					LaraItem->goalAnimState = LS_STOP;
+					LaraItem->goalAnimState = LS_IDLE;
 				}
 				else
 				{
@@ -266,7 +267,7 @@ void PushableBlockControl(short itemNumber)
 			}
 			else
 			{
-				LaraItem->goalAnimState = LS_STOP;
+				LaraItem->goalAnimState = LS_IDLE;
 			}
 		}
 		break;
@@ -283,25 +284,25 @@ void PushableBlockControl(short itemNumber)
 		{
 		case NORTH:
 			z = pushable->moveZ + displaceBox;
-			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos > z)
+			if (abs(item->pos.zPos - z) < CLICK(2) && item->pos.zPos > z)
 				item->pos.zPos = z;
 			break;
 
 		case EAST:
 			x = pushable->moveX + displaceBox;
-			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos > x)
+			if (abs(item->pos.xPos - x) < CLICK(2) && item->pos.xPos > x)
 				item->pos.xPos = x;
 			break;
 
 		case SOUTH:
 			z = pushable->moveZ - displaceBox;
-			if (abs(item->pos.zPos - z) < 512 && item->pos.zPos < z)
+			if (abs(item->pos.zPos - z) < CLICK(2) && item->pos.zPos < z)
 				item->pos.zPos = z;
 			break;
 
 		case WEST:
 			x = pushable->moveX - displaceBox;
-			if (abs(item->pos.xPos - x) < 512 && item->pos.xPos < x)
+			if (abs(item->pos.xPos - x) < CLICK(2) && item->pos.xPos < x)
 				item->pos.xPos = x;
 			break;
 
@@ -317,7 +318,7 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPull(item, blockHeight, quadrant))
 				{
-					LaraItem->goalAnimState = LS_STOP;
+					LaraItem->goalAnimState = LS_IDLE;
 				}
 				else
 				{
@@ -328,7 +329,7 @@ void PushableBlockControl(short itemNumber)
 			}
 			else
 			{
-				LaraItem->goalAnimState = LS_STOP;
+				LaraItem->goalAnimState = LS_IDLE;
 			}
 		}
 		break;
@@ -375,7 +376,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int blockHeight = GetStackHeight(item);
 	
 	if ((!(TrInput & IN_ACTION)
-		|| l->currentAnimState != LS_STOP
+		|| l->currentAnimState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->gravityStatus
 		|| Lara.gunStatus
@@ -515,7 +516,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 			item->pos.yRot = rot;
 		}
@@ -558,19 +559,19 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		z += 1024;
+		z += WALL_SIZE;
 		break;
 
 	case EAST:
-		x += 1024;
+		x += WALL_SIZE;
 		break;
 
 	case SOUTH:
-		z -= 1024;
+		z -= WALL_SIZE;
 		break;
 
 	case WEST:
-		x -= 1024;
+		x -= WALL_SIZE;
 		break;
 	}
 
@@ -580,7 +581,8 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (GetSector(r, x - r->x, z - r->z)->Stopper)
 		return false;
 
-	if (collResult.Position.Slope || collResult.Position.DiagonalStep)
+	if (collResult.Position.Slope || collResult.Position.DiagonalStep ||
+		collResult.Block->FloorSlope(0) != Vector2::Zero || collResult.Block->FloorSlope(1) != Vector2::Zero)
 		return false;
 
 	if (((PUSHABLE_INFO*)item->data)->canFall)
@@ -603,7 +605,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(item, 256, true, &CollidedItems[0], nullptr, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
@@ -640,19 +642,19 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	switch (quadrant)
 	{
 	case NORTH:
-		zadd = -1024;
+		zadd = -WALL_SIZE;
 		break;
 
 	case EAST:
-		xadd = -1024;
+		xadd = -WALL_SIZE;
 		break;
 
 	case SOUTH:
-		zadd = 1024;
+		zadd = WALL_SIZE;
 		break;
 
 	case WEST:
-		xadd = 1024;
+		xadd = WALL_SIZE;
 		break;
 	}
 
@@ -670,8 +672,9 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (collResult.Position.Floor != y)
 		return false;
 
-	if (collResult.Position.Slope || collResult.Position.DiagonalStep)
-		return 0;
+	if (collResult.Position.Slope || collResult.Position.DiagonalStep || 
+		collResult.Block->FloorSlope(0) != Vector2::Zero || collResult.Block->FloorSlope(1) != Vector2::Zero)
+		return false;
 
 	int ceiling = y - blockhite + 100;
 

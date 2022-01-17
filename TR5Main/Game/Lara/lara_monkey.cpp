@@ -1,15 +1,17 @@
 #include "framework.h"
-#include "lara.h"
-#include "input.h"
-#include "control/control.h"
-#include "lara_collide.h"
-#include "lara_tests.h"
-#include "lara_monkey.h"
-#include "floordata.h"
-#include "collide.h"
-#include "items.h"
-#include "camera.h"
-#include "level.h"
+#include "Game/Lara/lara_monkey.h"
+
+#include "Game/camera.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 #include "Scripting/GameFlowScript.h"
 
 using namespace TEN::Floordata;
@@ -23,7 +25,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hang2*/
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
 
@@ -90,7 +92,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
 		}
-		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyRoll)
+		else if (TrInput & IN_ROLL && g_GameFlow->Animations.MonkeyTurn180)
 		{
 			item->goalAnimState = LS_MONKEYSWING_TURN_180;
 		}
@@ -530,6 +532,6 @@ void MonkeySwingFall(ITEM_INFO* item)
 		item->fallspeed = 1;
 		item->pos.yPos += 256;
 
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 	}
 }

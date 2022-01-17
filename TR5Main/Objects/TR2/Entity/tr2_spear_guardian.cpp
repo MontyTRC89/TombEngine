@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "animation.h"
-#include "tr2_spear_guardian.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
-#include "lara.h"
+#include "Objects/TR2/Entity/tr2_spear_guardian.h"
+
+#include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };

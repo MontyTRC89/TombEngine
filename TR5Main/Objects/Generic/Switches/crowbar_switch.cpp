@@ -1,15 +1,15 @@
 #include "framework.h"
-#include "generic_switch.h"
-#include "input.h"
-#include "lara.h"
-#include "crowbar_switch.h"
-#include "gui.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
+#include "Objects/Generic/Switches/crowbar_switch.h"
+#include "Game/gui.h"
 #include "Sound/sound.h"
-#include "pickup.h"
-#include "level.h"
-#include "collide.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/pickup/pickup.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::Switches
 {
@@ -43,9 +43,9 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((((TrInput & IN_ACTION) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-			&& l->currentAnimState == LS_STOP
+			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
-			&& Lara.gunStatus == LG_NO_ARMS
+			&& Lara.gunStatus == LG_HANDS_FREE
 			&& item->itemFlags[0] == 0)
 			|| (Lara.isMoving && Lara.interactedItem == itemNum))
 		{
@@ -79,7 +79,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				l->pos.yRot ^= (short)ANGLE(180);
 			}
@@ -111,7 +111,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
 		}

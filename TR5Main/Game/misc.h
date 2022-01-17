@@ -1,6 +1,5 @@
 #pragma once
-
-#include "control/box.h"
+#include "Game/control/box.h"
 
 #define CHK_ANY(var, flag) (var & flag) != 0
 #define CHK_EXI(var, flag) var & flag
@@ -20,6 +19,3 @@ enum LARA_MESH_MASK
 
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item);
 void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature);
-
-void GetRoomList(short roomNumber, short* roomArray, short* numRooms); // return the value via roomArray and numRooms
-void GetRoomList(short roomNumber, std::vector<short>* DestRoomList);  // return the value via DestRoomList

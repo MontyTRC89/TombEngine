@@ -1,11 +1,12 @@
 #include "framework.h"
-#include "lara.h"
-#include "lara_initialise.h"
-#include "lara_tests.h"
-#include "health.h"
-#include "items.h"
-#include "setup.h"
-#include "level.h"
+#include "Game/Lara/lara_initialise.h"
+
+#include "Game/health.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_tests.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 void InitialiseLara(int restore)
 {
@@ -35,6 +36,7 @@ void InitialiseLara(int restore)
 	Lara.look = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
+	Lara.sprintTimer = LARA_SPRINT_MAX;
 	Lara.air = LARA_AIR_MAX;
 	Lara.weaponItem = NO_ITEM;
 	PoisonFlag = 0;
@@ -60,7 +62,7 @@ void InitialiseLara(int restore)
 	Lara.highestLocation = -1;
 	Lara.ropePtr = -1;
 	LaraItem->hitPoints = LARA_HEALTH_MAX;
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;
 
@@ -98,7 +100,6 @@ void InitialiseLara(int restore)
 
 	InitialiseLaraAnims(LaraItem);
 	Lara.BeetleLife = 3;
-	Lara.sprintTimer = LARA_SPRINT_MAX;
 }
 
 void LaraInitialiseMeshes()
@@ -126,7 +127,7 @@ void LaraInitialiseMeshes()
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	}
 
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 	Lara.leftArm.frameNumber = 0;
 	Lara.rightArm.frameNumber = 0;
 	Lara.target = NULL;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameScriptNamedBase.h"
-#include "level.h"
+#include "Specific/level.h"
 
 namespace sol {
 	class state;

@@ -1,10 +1,10 @@
 #include "framework.h"
-#include "Renderer11.h"
-#include "configuration.h"
-#include "winmain.h"
-#include "GameFlowScript.h"
+#include "Renderer/Renderer11.h"
+#include "Specific/configuration.h"
+#include "Specific/winmain.h"
+#include "Scripting/GameFlowScript.h"
 #include "Quad/RenderQuad.h"
-#include "memory/Vector.h"
+#include "Specific/memory/Vector.h"
 #include <string>
 #include <memory>
 #include <filesystem>

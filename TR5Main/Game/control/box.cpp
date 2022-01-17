@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "control/box.h"
-#include "effects/tomb4fx.h"
-#include "control/lot.h"
-#include "Lara.h"
-#include "animation.h"
-#include "sphere.h"
-#include "camera.h"
-#include "control/control.h"
-#include "room.h"
-#include "setup.h"
+#include "Game/control/box.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/control/control.h"
+#include "Game/control/lot.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Lara/lara.h"
+#include "Game/items.h"
+#include "Game/room.h"
+#include "Specific/setup.h"
 #include "Specific/trmath.h"
-#include "objectslist.h"
-#include "itemdata/creature_info.h"
-#include "items.h"
+#include "Objects/objectslist.h"
+#include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
@@ -45,8 +46,8 @@ void DropBaddyPickups(ITEM_INFO* item)
 	for (short pickupNumber = item->carriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->carriedItem)
 	{
 		pickup = &g_Level.Items[pickupNumber];
-		pickup->pos.xPos = (item->pos.xPos & -CLICK(2)) | CLICK(2);
-		pickup->pos.zPos = (item->pos.zPos & -CLICK(2)) | CLICK(2);
+		pickup->pos.xPos = (item->pos.xPos & -CLICK(1)) | CLICK(1);
+		pickup->pos.zPos = (item->pos.zPos & -CLICK(1)) | CLICK(1);
 
 		roomNumber = item->roomNumber;
 		floor = GetFloor(pickup->pos.xPos, item->pos.yPos, pickup->pos.zPos, &roomNumber);

@@ -1,18 +1,19 @@
 #include "framework.h"
-#include "boat.h"
-#include "lara.h"
-#include "items.h"
-#include "collide.h"
-#include "sphere.h"
-#include "camera.h"
-#include "setup.h"
-#include "level.h"
-#include "input.h"
-#include "animation.h"
+#include "Objects/TR2/Vehicles/boat.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/particle/SimpleParticle.h"
+#include "Objects/TR2/Vehicles/boat_info.h"
 #include "Sound/sound.h"
-#include "effects/effects.h"
-#include "particle/SimpleParticle.h"
-#include "boat_info.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 enum SpeedBoatState
 {
@@ -180,7 +181,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 
 	BoatMountType mountType = BoatMountType::None;
 
-	if (laraInfo->gunStatus != LG_NO_ARMS)
+	if (laraInfo->gunStatus != LG_HANDS_FREE)
 		return mountType;
 
 	if (!TestBoundsCollide(sBoatItem, laraItem, coll->Setup.Radius))

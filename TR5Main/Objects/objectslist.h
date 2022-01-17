@@ -285,8 +285,8 @@ enum GAME_OBJECT_ID : short
 	ID_BURNING_ROOTS,
 	ID_ROPE,					// TR4 - OK but needs rendering
 	ID_FIREROPE,
-	ID_POLEROPE,
-	ID_ELECTRICAL_CABLES,
+	ID_POLEROPE,				// TR4 - OK
+	ID_ELECTRICAL_CABLES,       // TR5 - OK
 	ID_BURNING_FLOOR,
 	ID_DARTS,					// TR4 - OK	but needs rendering
 	ID_DART_EMITTER,			// TR4 - OK	

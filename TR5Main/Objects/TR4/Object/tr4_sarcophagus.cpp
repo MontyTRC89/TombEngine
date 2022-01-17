@@ -1,12 +1,13 @@
 #include "framework.h"
 #include "tr4_sarcophagus.h"
-#include "level.h"
-#include "input.h"
-#include "lara.h"
-#include "items.h"
-#include "pickup.h"
-#include "setup.h"
-#include "health.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
+#include "Game/items.h"
+#include "Game/pickup/pickup.h"
+#include "Specific/setup.h"
+#include "Game/health.h"
+#include "Game/collision/collide_item.h"
 
 static PHD_VECTOR SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
@@ -23,9 +24,9 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION &&
 		item->status != ITEM_ACTIVE &&
-		l->currentAnimState == LS_STOP &&
+		l->currentAnimState == LS_IDLE &&
 		l->animNumber == LA_STAND_IDLE &&
-		Lara.gunStatus == LG_NO_ARMS ||
+		Lara.gunStatus == LG_HANDS_FREE ||
 		Lara.isMoving && Lara.interactedItem == itemNum)
 	{
 		if (TestLaraPosition(&SarcophagusBounds, item, l))
@@ -57,7 +58,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 	}

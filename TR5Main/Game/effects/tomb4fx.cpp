@@ -1,22 +1,22 @@
 #include "framework.h"
-#include "effects/tomb4fx.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "setup.h"
-#include "level.h"
+#include "Game/effects/tomb4fx.h"
+
+#include "Game/animation.h"
+#include "Game/collision/floordata.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/bubble.h"
+#include "Game/effects/drip.h"
+#include "Game/effects/smoke.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Renderer/Renderer11.h"
+#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
-#include "effects/bubble.h"
-#include "Specific/trmath.h"
-#include "GameFlowScript.h"
-#include "smoke.h"
-#include "drip.h"
-#include "effects.h"
-#include "Renderer11.h"
-#include "effects/weather.h"
-#include "items.h"
-#include "Game/floordata.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Specific/prng.h"
+#include "Specific/trmath.h"
 
 using std::vector;
 using TEN::Renderer::g_Renderer;
@@ -1157,12 +1157,12 @@ void UpdateDrips()
 
 void TriggerLaraDrips(ITEM_INFO* item)
 {
-	auto pos = PHD_VECTOR();
-	
 	if (!(Wibble & 0xF))
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
+			auto pos = PHD_VECTOR();
+
 			GetLaraJointPosition(&pos, (LARA_MESHES)i);
 			auto room = GetRoom(item->location, pos.x, pos.y, pos.z).roomNumber;
 

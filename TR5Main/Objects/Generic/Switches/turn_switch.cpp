@@ -1,15 +1,16 @@
 #include "framework.h"
-#include "turn_switch.h"
-#include "control/control.h"
-#include "input.h"
-#include "lara.h"
-#include "sound.h"
-#include "setup.h"
-#include "camera.h"
-#include "level.h"
-#include "collide.h"
-#include "animation.h"
-#include "items.h"
+#include "Objects/Generic/Switches/turn_switch.h"
+#include "Game/control/control.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/setup.h"
+#include "Game/camera.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 
 namespace TEN::Entities::Switches
@@ -52,10 +53,10 @@ namespace TEN::Entities::Switches
 
 		if (item->currentAnimState == TURN_SWITCH_STOP
 			&& TrInput & IN_ACTION
-			&& l->currentAnimState == LS_STOP
+			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& l->gravityStatus == false
-			&& Lara.gunStatus == LG_NO_ARMS
+			&& Lara.gunStatus == LG_HANDS_FREE
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			if (TestLaraPosition(&TurnSwitchBoundsA, item, l))
@@ -99,7 +100,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				l->pos.yRot ^= (short)ANGLE(180);
 			}
@@ -225,7 +226,7 @@ namespace TEN::Entities::Switches
 		if (item->itemFlags[1] == 1)
 		{
 			l->animNumber = LA_STAND_IDLE;
-			l->currentAnimState = LS_STOP;
+			l->currentAnimState = LS_IDLE;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			item->animNumber = Objects[item->objectNumber].animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -233,7 +234,7 @@ namespace TEN::Entities::Switches
 
 			RemoveActiveItem(itemNum);
 
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			UseForcedFixedCamera = 0;
 			item->itemFlags[1] = 2;
 		}

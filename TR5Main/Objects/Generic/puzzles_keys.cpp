@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "collide.h"
-#include "input.h"
-#include "level.h"
-#include "setup.h"
-#include "lara.h"
-#include "gui.h"
-#include "pickup.h"
-#include "animation.h"
-#include "control/control.h"
-#include "puzzles_keys.h"
-#include "generic_switch.h"
-#include "camera.h"
-#include "items.h"
+#include "Objects/Generic/puzzles_keys.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/control.h"
+#include "Game/gui.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/pickup/pickup.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Switches;
 
@@ -54,7 +55,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
-		&& l->currentAnimState == LS_STOP
+		&& l->currentAnimState == LS_IDLE
 		&& l->animNumber == LA_STAND_IDLE
 		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
 		|| (Lara.isMoving
@@ -141,7 +142,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 
@@ -248,7 +249,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
 		&& !Lara.gunStatus
-		&& l->currentAnimState == LS_STOP
+		&& l->currentAnimState == LS_IDLE
 		&& l->animNumber == LA_STAND_IDLE)
 		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
@@ -315,7 +316,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 

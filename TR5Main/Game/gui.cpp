@@ -1,22 +1,23 @@
 #include "framework.h"
-#include "gui.h"
-#include "animation.h"
-#include "control/control.h"
-#include "lara_fire.h"
-#include "Sound\sound.h"
-#include "savegame.h"
-#include "Lara.h"
-#include "camera.h"
-#include "spotcam.h"
-#include "input.h"
-#include "configuration.h"
-#include "lara_one_gun.h"
-#include "lara_two_guns.h"
-#include "level.h"
-#include "input.h"
-#include "pickup.h"
-#include "Renderer11.h"
-#include "items.h"
+#include "Game/gui.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_two_guns.h"
+#include "Game/pickup/pickup.h"
+#include "Game/savegame.h"
+#include "Game/spotcam.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/configuration.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;
 GuiController g_Gui;
@@ -2008,7 +2009,7 @@ void GuiController::UseCurrentItem()
 		{
 			Lara.requestGunType = WEAPON_PISTOLS;
 
-			if (Lara.gunStatus != LG_NO_ARMS)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
 			if (Lara.gunType == WEAPON_PISTOLS)
@@ -2021,7 +2022,7 @@ void GuiController::UseCurrentItem()
 		{
 			Lara.requestGunType = WEAPON_UZI;
 
-			if (Lara.gunStatus != LG_NO_ARMS)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
 			if (Lara.gunType == WEAPON_UZI)
@@ -2036,7 +2037,7 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_FLARE_INV_ITEM)
 		{
-			if (Lara.gunStatus == LG_NO_ARMS)
+			if (Lara.gunStatus == LG_HANDS_FREE)
 			{
 				if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
 					LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
@@ -2064,7 +2065,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->currentAnimState == LS_STOP && LaraItem->animNumber == LA_STAND_IDLE)
+			if (((LaraItem->currentAnimState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
 				|| (Lara.isDucked && !(TrInput & IN_DUCK)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
@@ -2072,7 +2073,7 @@ void GuiController::UseCurrentItem()
 				Lara.oldBusy = true;
 				BinocularRange = 128;
 
-				if (Lara.gunStatus != LG_NO_ARMS)
+				if (Lara.gunStatus != LG_HANDS_FREE)
 					Lara.gunStatus = LG_UNDRAW_GUNS;
 			}
 
@@ -2166,7 +2167,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_SHOTGUN;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_SHOTGUN)
@@ -2179,7 +2180,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_REVOLVER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_REVOLVER)
@@ -2191,7 +2192,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_HK;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_HK)
@@ -2203,7 +2204,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_CROSSBOW;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_CROSSBOW)
@@ -2215,7 +2216,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_GRENADE_LAUNCHER)
@@ -2227,7 +2228,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_HARPOON_GUN;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_HARPOON_GUN)
@@ -2239,7 +2240,7 @@ void GuiController::UseCurrentItem()
 	{
 		Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
 
-		if (Lara.gunStatus != LG_NO_ARMS)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
 		if (Lara.gunType == WEAPON_ROCKET_LAUNCHER)

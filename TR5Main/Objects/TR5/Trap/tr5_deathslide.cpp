@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr5_deathslide.h"
-#include "input.h"
+#include "Specific/input.h"
 #include "Specific/trmath.h"
-#include "lara.h"
-#include "setup.h"
+#include "Game/Lara/lara.h"
+#include "Specific/setup.h"
 #include "Sound/sound.h"
-#include "control/box.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/control/box.h"
+#include "Game/animation.h"
+#include "Game/items.h"
+#include "Game/collision/collide_item.h"
 
 OBJECT_COLLISION_BOUNDS DeathSlideBounds = { -256, 256, -100, 100, 256, 512, 0, 0, -ANGLE(25.0f), ANGLE(25.0f), 0, 0 };
 PHD_VECTOR DeathSlidePosition(0, 0, 371);
@@ -25,7 +26,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_NO_ARMS || l->currentAnimState != LS_STOP)
+	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_HANDS_FREE || l->currentAnimState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];

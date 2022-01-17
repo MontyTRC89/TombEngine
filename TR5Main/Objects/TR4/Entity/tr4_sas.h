@@ -1,5 +1,5 @@
 #pragma once
-#include <collide.h>
+#include "Game/collision/collide_room.h"
 
 namespace TEN::Entities::TR4
 {

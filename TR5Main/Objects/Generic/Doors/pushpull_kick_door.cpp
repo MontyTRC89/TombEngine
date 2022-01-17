@@ -1,23 +1,23 @@
 #include "framework.h"
-#include "generic_doors.h"
-#include "level.h"
-#include "control/control.h"
-#include "control/box.h"
-#include "items.h"
-#include "control/lot.h"
-#include "gui.h"
-#include "input.h"
-#include "pickup.h"
-#include "sound.h"
-#include "animation.h"
-#include "sphere.h"
-#include "lara_struct.h"
-#include "lara.h"
-#include "trmath.h"
-#include "misc.h"
-#include "pushpull_kick_door.h"
-#include "collide.h"
-#include "itemdata/door_data.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/control/box.h"
+#include "Game/items.h"
+#include "Game/control/lot.h"
+#include "Game/gui.h"
+#include "Specific/input.h"
+#include "Game/pickup/pickup.h"
+#include "Sound/sound.h"
+#include "Game/animation.h"
+#include "Game/collision/sphere.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara.h"
+#include "Specific/trmath.h"
+#include "Game/misc.h"
+#include "Objects/Generic/Doors/pushpull_kick_door.h"
+#include "Game/collision/collide_item.h"
+#include "Game/itemdata/door_data.h"
 
 namespace TEN::Entities::Doors
 {
@@ -47,7 +47,7 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_STOP
+			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& item->status != ITEM_ACTIVE
 			&& !(l->hitStatus)
@@ -115,7 +115,7 @@ namespace TEN::Entities::Doors
 
 					item->status = ITEM_ACTIVE;
 					l->currentAnimState = LS_MISC_CONTROL;
-					l->goalAnimState = LS_STOP;
+					l->goalAnimState = LS_IDLE;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 				}
@@ -123,7 +123,7 @@ namespace TEN::Entities::Doors
 			else if (Lara.isMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.isMoving = false;
-				Lara.gunStatus = LG_NO_ARMS;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
 			if (pull)

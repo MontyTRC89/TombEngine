@@ -1,24 +1,25 @@
 #include "framework.h"
-#include "animation.h"
-#include "level.h"
-#include "setup.h"
-#include "animation.h"
-#include "control/lot.h"
-#include "Lara.h"
-#include "savegame.h"
-#include "spotcam.h"
-#include "camera.h"
-#include "control/control.h"
-#include "pickup.h"
-#include "control/volume.h"
-#include "generic_doors.h"
-#include "control/box.h"
-#include "sound.h"
-#include "GameFlowScript.h"
+#include "Specific/level.h"
+
 #include <process.h>
 #include <zlib.h>
-#include "Renderer11.h"
-#include "items.h"
+#include "Game/animation.h"
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/control/volume.h"
+#include "Game/control/lot.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/pickup/pickup.h"
+#include "Game/savegame.h"
+#include "Game/spotcam.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Renderer/Renderer11.h"
+#include "Scripting/GameFlowScript.h"
+#include "Sound/sound.h"
+#include "Specific/setup.h"
 
 
 using TEN::Renderer::g_Renderer;
@@ -1247,21 +1248,17 @@ void LoadSprites()
 
 void GetCarriedItems()
 {
-	int i;
-	ITEM_INFO* item, *item2;
-	short linknum;
-
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 		g_Level.Items[i].carriedItem = NO_ITEM;
 
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &g_Level.Items[i];
+		auto item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
 		{
-			for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+			for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 			{
-				item2 = &g_Level.Items[linknum];
+				auto item2 = &g_Level.Items[linknum];
 				if (abs(item2->pos.xPos - item->pos.xPos) < 512
 					&& abs(item2->pos.zPos - item->pos.zPos) < 512
 					&& abs(item2->pos.yPos - item->pos.yPos) < 256
@@ -1279,19 +1276,15 @@ void GetCarriedItems()
 
 void GetAIPickups()
 {
-	int i, num;
-	ITEM_INFO* item;
-	AI_OBJECT* object;
-
-	for (i = 0; i < g_Level.NumItems; ++i)
+	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		item = &g_Level.Items[i];
+		auto item = &g_Level.Items[i];
 		if (Objects[item->objectNumber].intelligent)
 		{
 			item->aiBits = 0;
-			for (num = 0; num < g_Level.AIObjects.size(); ++num)
+			for (int num = 0; num < g_Level.AIObjects.size(); ++num)
 			{
-				object = &g_Level.AIObjects[num];
+				auto object = &g_Level.AIObjects[num];
 				if (abs(object->x - item->pos.xPos) < 512
 					&& abs(object->z - item->pos.zPos) < 512
 					&& object->roomNumber == item->roomNumber
@@ -1303,6 +1296,7 @@ void GetAIPickups()
 						object->roomNumber = NO_ROOM;
 				}
 			}
+
 			item->TOSSPAD |= item->aiBits << 8 | (char) item->itemFlags[3];
 		}
 	}

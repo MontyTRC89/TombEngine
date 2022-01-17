@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "rubberboat.h"
-#include "items.h"
-#include "level.h"
-#include "collide.h"
-#include "lara.h"
-#include "input.h"
-#include "sphere.h"
+#include "Objects/TR3/Vehicles/rubberboat.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/effects/bubble.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Objects/TR3/Vehicles/rubberboat_info.h"
 #include "Sound/sound.h"
-#include "effects/bubble.h"
-#include "animation.h"
-#include "camera.h"
-#include "setup.h"
-#include "rubberboat_info.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 #define RBOAT_SLIP		10
 #define RBOAT_SIDE_SLIP	30
@@ -125,7 +126,7 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 	RubberBoatMountType getOn = RBOAT_MOUNT_NONE;
 
 	if (!(TrInput & IN_ACTION) ||
-		Lara.gunStatus != LG_NO_ARMS ||
+		Lara.gunStatus != LG_HANDS_FREE ||
 		lara->gravityStatus ||
 		rBoat->speed)
 	{

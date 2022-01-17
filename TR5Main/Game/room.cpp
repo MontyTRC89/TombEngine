@@ -1,10 +1,11 @@
 #include "framework.h"
-#include "room.h"
-#include "control/control.h"
-#include "control/lot.h"
-#include "control/volume.h"
-#include "Renderer11.h"
-#include "items.h"
+#include "Game/room.h"
+
+#include "Game/control/control.h"
+#include "Game/control/lot.h"
+#include "Game/control/volume.h"
+#include "Game/items.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
@@ -186,7 +187,7 @@ PHD_3DPOS GetRoomCenter(int roomNumber)
 	return center;
 }
 
-std::set<int> CollectConnectedRooms(int roomNumber)
+std::set<int> GetRoomList(int roomNumber)
 {
 	std::set<int> result;
 

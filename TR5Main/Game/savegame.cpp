@@ -1,31 +1,31 @@
 #include "framework.h"
-#include "savegame.h"
-#include "Lara.h"
-#include "items.h"
-#include "control/box.h"
-#include "control/lot.h"
-#include "spotcam.h"
-#include "traps.h"
-#include "floordata.h"
-#include "room.h"
-#include "sound/sound.h"
-#include "level.h"
-#include "setup.h"
-#include "sound.h"
-#include "flipeffect.h"
-#include "tr5_rats_emitter.h"
-#include "tr5_bats_emitter.h"
-#include "tr5_spider_emitter.h"
-#include "fullblock_switch.h"
-#include "itemdata/creature_info.h"
-#include "Game/effects/lara_fx.h"
-#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
-#include "Game/misc.h"
-#include "Game/puzzles_keys.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
-#include "Objects/Generic/Object/rope.h"
+#include "Game/savegame.h"
 
 #include <filesystem>
+#include "Game/collision/floordata.h"
+#include "Game/control/box.h"
+#include "Game/control/flipeffect.h"
+#include "Game/control/lot.h"
+#include "Game/effects/lara_fx.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Game/misc.h"
+#include "Game/spotcam.h"
+#include "Game/room.h"
+#include "Objects/Generic/Object/rope.h"
+#include "Objects/Generic/Switches/fullblock_switch.h"
+#include "Objects/Generic/Traps/traps.h"
+#include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
@@ -283,7 +283,9 @@ bool SaveGame::Save(int slot)
 	lara.add_is_ducked(Lara.isDucked);
 	lara.add_is_moving(Lara.isMoving);
 	lara.add_item_number(Lara.itemNumber);
-	lara.add_keep_ducked(Lara.keepDucked);
+	lara.add_jump_count(Lara.jumpCount);
+	lara.add_jump_queued(Lara.jumpQueued);
+	lara.add_keep_crouched(Lara.keepCrouched);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
 	lara.add_lasersight(Lara.Lasersight);
@@ -331,6 +333,7 @@ bool SaveGame::Save(int slot)
 	lara.add_silencer(Lara.Silencer);
 	lara.add_small_waterskin(Lara.small_waterskin);
 	lara.add_spaz_effect_count(Lara.spazEffectCount);
+	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
 	lara.add_torch(Lara.Torch);
@@ -1197,7 +1200,9 @@ bool SaveGame::Load(int slot)
 	Lara.isDucked = s->lara()->is_ducked();
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
-	Lara.keepDucked = s->lara()->keep_ducked();
+	Lara.jumpCount = s->lara()->jump_count();
+	Lara.jumpQueued = s->lara()->jump_queued();
+	Lara.keepCrouched = s->lara()->keep_crouched();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();
 	Lara.lastPos = PHD_VECTOR(
@@ -1255,6 +1260,7 @@ bool SaveGame::Load(int slot)
 	Lara.Silencer = s->lara()->silencer();
 	Lara.small_waterskin = s->lara()->small_waterskin();
 	Lara.spazEffectCount = s->lara()->spaz_effect_count();
+	Lara.sprintTimer = s->lara()->sprint_timer();
 	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
 	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
 	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);

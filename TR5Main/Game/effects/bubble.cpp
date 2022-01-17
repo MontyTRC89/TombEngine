@@ -1,13 +1,16 @@
 #include "framework.h"
-#include "effects\bubble.h"
-#include "level.h"
-#include "control/control.h"
-#include "Specific\trmath.h"
-#include "objectslist.h"
-#include "setup.h"
-#include "Specific\prng.h"
+#include "Game/effects/bubble.h"
+
+#include "Game/control/control.h"
+#include "Objects/objectslist.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/prng.h"
+#include "Specific/trmath.h"
+
 using std::vector;
 using namespace TEN::Math::Random;
+
 extern vector<BUBBLE_STRUCT> Bubbles = vector<BUBBLE_STRUCT>(MAX_BUBBLES);
 
 void DisableBubbles()

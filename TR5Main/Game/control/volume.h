@@ -1,8 +1,7 @@
 #pragma once
-
-#include "room.h"
-#include "setup.h"
-#include "Renderer11.h"
+#include "Game/room.h"
+#include "Specific/setup.h"
+#include "Renderer/Renderer11.h"
 
 enum TriggerStatus
 {

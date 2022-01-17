@@ -1,17 +1,18 @@
 #include "framework.h"
 #include "tr4_element_puzzle.h"
-#include "level.h"
-#include "control/control.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "animation.h"
-#include "lara.h"
-#include "sphere.h"
-#include "effects/effects.h"
-#include "effects/tomb4fx.h"
-#include "input.h"
-#include "generic_switch.h"
-#include "collide.h"
-#include "items.h"
+#include "Game/animation.h"
+#include "Game/Lara/lara.h"
+#include "Game/collision/sphere.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Specific/input.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 
 using namespace TEN::Entities::Switches;
 
@@ -244,7 +245,7 @@ namespace TEN::Entities::TR4
                 || !(TrInput & IN_ACTION)
                 || item->triggerFlags != 1 
                 || item->itemFlags[0] != 1
-                || l->currentAnimState != LS_STOP
+                || l->currentAnimState != LS_IDLE
                 || l->animNumber != LA_STAND_IDLE
                 || !Lara.litTorch
                 || l->gravityStatus)

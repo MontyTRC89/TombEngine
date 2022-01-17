@@ -1,8 +1,9 @@
 #pragma once
 #include "ScriptInterfaceGame.h"
-#include "room.h"
+#include "Game/items.h"
+#include "Game/room.h"
 #include "LuaHandler.h"
-#include "Specific\trmath.h"
+#include "Specific/trmath.h"
 #include <unordered_set>
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"

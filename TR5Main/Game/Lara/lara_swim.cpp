@@ -1,15 +1,17 @@
 #include "framework.h"
-#include "lara_swim.h"
-#include "control/control.h"
-#include "camera.h"
-#include "items.h"
-#include "Lara.h"
-#include "animation.h"
-#include "level.h"
-#include "input.h"
+#include "Game/Lara/lara_swim.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara.h"
+#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
-#include "GameFlowScript.h"
-#include "lara_collide.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
 
 struct SUBSUIT_INFO
 {
@@ -107,6 +109,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 
@@ -116,7 +119,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (level->LaraType == LaraType::Divesuit)
 		SwimTurnSubsuit(item);
 	else
-		SwimTurn(item);
+		SwimTurn(item, coll);
 
 	if (TrInput & IN_JUMP)
 		item->goalAnimState = LS_UNDERWATER_FORWARD;
@@ -127,7 +130,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 0;
 
 	if (Lara.gunStatus == LG_HANDS_BUSY)
-		Lara.gunStatus = LG_NO_ARMS;
+		Lara.gunStatus = LG_HANDS_FREE;
 }
 
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
@@ -143,11 +146,12 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 	
 	if (level->LaraType != LaraType::Divesuit)
-		SwimTurn(item);
+		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
 
@@ -175,11 +179,12 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+
 		return;
 	}
 	
 	if (level->LaraType != LaraType::Divesuit)
-		SwimTurn(item);
+		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
 
@@ -275,23 +280,23 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= SUB_SUIT_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
+		Lara.turnRate -= LARA_SUBSUIT_TURN_RATE;
+		if (Lara.turnRate < -LARA_MED_TURN_MAX)
+			Lara.turnRate = -LARA_MED_TURN_MAX;
 
-		item->pos.zRot -= LARA_LEAN_RATE * 2;
+		item->pos.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += SUB_SUIT_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
+		Lara.turnRate += LARA_SUBSUIT_TURN_RATE;
+		if (Lara.turnRate > LARA_MED_TURN_MAX)
+			Lara.turnRate = LARA_MED_TURN_MAX;
 
-		item->pos.zRot += LARA_LEAN_RATE * 2;
+		item->pos.zRot += LARA_LEAN_RATE;
 	}
 }
 
-void SwimTurn(ITEM_INFO* item)
+void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD)
 		item->pos.xRot -= ANGLE(2.0f);
@@ -301,18 +306,18 @@ void SwimTurn(ITEM_INFO* item)
 	if (TrInput & IN_LEFT)
 	{
 		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN)
-			Lara.turnRate = -LARA_MED_TURN;
+		if (Lara.turnRate < -LARA_MED_TURN_MAX)
+			Lara.turnRate = -LARA_MED_TURN_MAX;
 
-		item->pos.zRot -= LARA_LEAN_RATE * 2;
+		item->pos.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN)
-			Lara.turnRate = LARA_MED_TURN;
+		if (Lara.turnRate > LARA_MED_TURN_MAX)
+			Lara.turnRate = LARA_MED_TURN_MAX;
 
-		item->pos.zRot += LARA_LEAN_RATE * 2;
+		item->pos.zRot += LARA_LEAN_RATE;
 	}
 }
 

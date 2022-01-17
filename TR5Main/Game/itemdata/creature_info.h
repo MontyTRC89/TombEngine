@@ -1,15 +1,19 @@
 #pragma once
-#include "phd_global.h"
 #include <vector>
+#include "Specific/phd_global.h"
 
-struct BOX_NODE {
+struct ITEM_INFO;
+
+struct BOX_NODE 
+{
 	int exitBox;
 	int searchNumber;
 	int nextExpansion;
 	int boxNumber;
 };
 
-enum ZoneType : char {
+enum ZoneType : char 
+{
 	ZONE_NULL = -1,  // default zone
 	ZONE_SKELLY = 0,
 	ZONE_BASIC,
@@ -28,7 +32,8 @@ enum ZoneType : char {
 	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
-struct LOT_INFO {
+struct LOT_INFO 
+{
 	std::vector<BOX_NODE> node;
 	int head;
 	int tail;
@@ -49,21 +54,25 @@ struct LOT_INFO {
 	ZoneType zone;
 	bool initialised;
 };
-enum MOOD_TYPE {
+
+enum MOOD_TYPE 
+{
 	BORED_MOOD,
 	ATTACK_MOOD,
 	ESCAPE_MOOD,
 	STALK_MOOD
 };
 
-enum class CREATURE_AI_PRIORITY {
+enum class CREATURE_AI_PRIORITY 
+{
 	HIGH,
 	MEDIUM,
 	LOW,
 	NONE
 };
 
-struct CREATURE_INFO {
+struct CREATURE_INFO 
+{
 	short jointRotation[4];
 	short maximumTurn;
 	short flags;

@@ -1,8 +1,8 @@
 #pragma once
-#include "Specific\phd_global.h"
-#include "level.h"
-#include "items.h"
-#include "floordata.h"
+#include "Specific/phd_global.h"
+#include "Specific/level.h"
+#include "Game/items.h"
+#include "Game/collision/floordata.h"
 
 using namespace TEN::Floordata;
 
