@@ -1,5 +1,5 @@
 #pragma once
-#include "items.h"
+#include "Game/items.h"
 
 void ControlLaserBolts(short item_number);
 void ControlLondBossPlasmaBall(short fx_number);

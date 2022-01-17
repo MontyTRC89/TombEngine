@@ -1,12 +1,13 @@
 #include "framework.h"
-#include "tr2_barracuda.h"
-#include "control/box.h"
-#include "effects\effects.h"
-#include "lara.h"
-#include "setup.h"
-#include "level.h"
-#include "itemdata/creature_info.h"
-#include "items.h"
+#include "Objects/TR2/Entity/tr2_barracuda.h"
+
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO barracudaBite = { 2, -60, 121, 7 };
 

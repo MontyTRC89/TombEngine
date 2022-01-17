@@ -1,6 +1,6 @@
 #include "frameworkandsol.h"
 #include "GameScriptPosition.h"
-#include "Specific\phd_global.h"
+#include "Specific/phd_global.h"
 
 /***
 Represents a position in the game world.

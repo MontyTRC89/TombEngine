@@ -1,16 +1,17 @@
 #include "framework.h"
-#include "lara.h"
-#include "input.h"
-#include "level.h"
-#include "Sound/sound.h"
-#include "animation.h"
-#include "rope.h"
-#include "camera.h"
-#include "collide.h"
-#include "items.h"
-#include "control/control.h"
-#include "Objects/Generic/Object/rope.h"
+#include "Game/Lara/lara_objects.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
+#include "Objects/Generic/Object/rope.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Entities::Generic;
 
@@ -54,7 +55,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetDistance = WALL_SIZE;
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 }
 
 // ------
@@ -94,7 +95,7 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 95*/
-	/*state code: lara_as_controlledl*/
+	/*state code: lara_as_controlled_no_look*/
 	if (coll->Setup.OldPosition.x != item->pos.xPos || coll->Setup.OldPosition.z != item->pos.zPos)
 	{
 		if (item->animNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
@@ -200,7 +201,7 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(75.0f);
 
 	if (!(TrInput & IN_ACTION))
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 }
 
 // ------
@@ -222,7 +223,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION && pulley->triggerFlags)
 		item->goalAnimState = LS_PULLEY;
 	else
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 
 	if (item->animNumber == LA_PULLEY_PULL &&
 		item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 44)
@@ -257,7 +258,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->animNumber == LA_PULLEY_RELEASE &&
 		item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
-		info->gunStatus = LG_NO_ARMS;
+		info->gunStatus = LG_HANDS_FREE;
 	}
 }
 
@@ -773,24 +774,6 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 // VERTICAL POLE
 // -------------
 
-// TODO: Move test functions to lara_tests.cpp when lara_state_cleaning_etc branch is merged.
-bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (!TestLaraPoleCollision(item, coll, true, STEP_SIZE))
-		return false;
-
-	// TODO: Accuracy.
-	return (coll->Middle.Ceiling < -STEP_SIZE);
-}
-
-bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (!TestLaraPoleCollision(item, coll, false))
-		return false;
-
-	return (coll->Middle.Floor > 0);
-}
-
 // State:		LS_POLE_IDLE (99)
 // Collision:	lara_col_pole_idle()
 void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
@@ -815,15 +798,15 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				info->turnRate += LARA_TURN_RATE;
-				if (info->turnRate > LARA_SLOW_TURN)
-					info->turnRate = LARA_SLOW_TURN;
+				info->turnRate += LARA_POLE_TURN_RATE;
+				if (info->turnRate > LARA_POLE_TURN_MAX)
+					info->turnRate = LARA_POLE_TURN_MAX;
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				info->turnRate -= LARA_TURN_RATE;
-				if (info->turnRate < -LARA_SLOW_TURN)
-					info->turnRate = -LARA_SLOW_TURN;
+				info->turnRate -= LARA_POLE_TURN_RATE;
+				if (info->turnRate < -LARA_POLE_TURN_MAX)
+					info->turnRate = -LARA_POLE_TURN_MAX;
 			}
 		}
 
@@ -831,7 +814,6 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_JUMP)
 		{
 			item->goalAnimState = LS_JUMP_BACK;
-			info->gunStatus = LG_NO_ARMS;
 			return;
 		}
 
@@ -842,8 +824,8 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
 		{
-			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			item->goalAnimState = LS_POLE_DOWN;
+			item->itemFlags[2] = 0; // Doesn't seem necessary?
 			return;
 		}
 
@@ -862,18 +844,21 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->gunStatus = LG_NO_ARMS;
-
-	if (coll->Middle.Floor <= 0)
+	GetCollisionInfo(coll, item); // HACK: Lara may step off poles in mid-air upon reload without this.
+	if (coll->Middle.Floor <= 0 &&
+		item->animNumber != LA_POLE_JUMP_BACK) // Hack.
 	{
-		item->goalAnimState = LS_STOP;
+		item->goalAnimState = LS_IDLE;
 		return;
 	}
+	else if (item->animNumber == LA_POLE_IDLE)
+	{
+		item->goalAnimState = LS_FREEFALL;
 
-	// TODO: This should not be required. Update anim's root displacement + set position distance.
-	//item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
-	//item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
-	item->goalAnimState = LS_FREEFALL;
+		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
+		item->pos.xPos -= phd_sin(item->pos.yRot) * 64;
+		item->pos.zPos -= phd_cos(item->pos.yRot) * 64;
+	}
 }
 
 // State:		LS_POLE_IDLE (99)
@@ -891,6 +876,7 @@ void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
+	// TODO: There's a visible snap if Lara hits the ground at a high velocity.
 	if (coll->Middle.Floor < 0)
 		item->pos.yPos += coll->Middle.Floor;
 }
@@ -914,15 +900,21 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN)
-				info->turnRate = LARA_SLOW_TURN;
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN)
-				info->turnRate = -LARA_SLOW_TURN;
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
+		}
+
+		if (TrInput & IN_JUMP)
+		{
+			item->goalAnimState = LS_POLE_IDLE;
+			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
@@ -936,7 +928,6 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_POLE_IDLE; // TODO: Dispatch to freefall?
-
 }
 
 // State:		LS_POLE_UP (100)
@@ -968,15 +959,21 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN)
-				info->turnRate = LARA_SLOW_TURN;
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN)
-				info->turnRate = -LARA_SLOW_TURN;
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
+		}
+
+		if (TrInput & IN_JUMP)
+		{
+			item->goalAnimState = LS_POLE_IDLE;
+			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
@@ -985,9 +982,8 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->itemFlags[2] = 0; // ??
+		item->itemFlags[2] = 0; // Vertical velocity.
 		item->goalAnimState = LS_POLE_IDLE;
-
 		return;
 	}
 
@@ -1061,9 +1057,9 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN + ANGLE(0.5f))
-				info->turnRate = LARA_SLOW_TURN + ANGLE(0.5f);
+			info->turnRate += LARA_POLE_TURN_RATE;
+			if (info->turnRate > LARA_POLE_TURN_MAX)
+				info->turnRate = LARA_POLE_TURN_MAX;
 
 			item->goalAnimState = LS_POLE_TURN_CLOCKWISE;
 			return;
@@ -1095,7 +1091,6 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_POLE_IDLE; // TODO: Death state dispatch.
-
 		return;
 	}
 
@@ -1117,9 +1112,9 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -(LARA_SLOW_TURN + ANGLE(0.5f)))
-				info->turnRate = -(LARA_SLOW_TURN + ANGLE(0.5f));
+			info->turnRate -= LARA_POLE_TURN_RATE;
+			if (info->turnRate < -LARA_POLE_TURN_MAX)
+				info->turnRate = -LARA_POLE_TURN_MAX;
 
 			item->goalAnimState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 			return;

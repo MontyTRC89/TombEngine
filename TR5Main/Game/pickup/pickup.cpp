@@ -1,36 +1,38 @@
 #include "framework.h"
-#include "pickup.h"
-#include "Specific/phd_global.h"
-#include "lara.h"
-#include "animation.h"
-#include "gui.h"
-#include "room.h"
-#include "effects/debris.h"
-#include "health.h"
-#include "items.h"
-#include "lara_fire.h"
-#include "lara_flare.h"
-#include "lara_one_gun.h"
-#include "lara_two_guns.h"
-#include "setup.h"
-#include "camera.h"
-#include "level.h"
-#include "input.h"
-#include "Sound/sound.h"
-#include "tr4_clockwork_beetle.h"
-#include "pickup/pickup_ammo.h"
-#include "pickup/pickup_key_items.h"
-#include "pickup/pickup_weapon.h"
-#include "pickup/pickup_consumable.h"
-#include "pickup/pickup_misc_items.h"
+#include "Game/pickup/pickup.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/debris.h"
+#include "Game/gui.h"
+#include "Game/items.h"
+#include "Game/health.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_two_guns.h"
+#include "Game/pickup/pickup_ammo.h"
+#include "Game/pickup/pickup_key_items.h"
+#include "Game/pickup/pickup_weapon.h"
+#include "Game/pickup/pickup_consumable.h"
+#include "Game/pickup/pickup_misc_items.h"
+#include "Game/room.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/collide.h"
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Specific/phd_global.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
 
 static PHD_VECTOR PickUpPosition(0, 0, -100);
 OBJECT_COLLISION_BOUNDS PickUpBounds = 
-{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), 0, 0, 0, 0 };
+{ -256, 256, -200, 200, -256, 256, -ANGLE(10.0f), ANGLE(10.0f), 0, 0, -ANGLE(2.0f), ANGLE(2.0f) }; // TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04
 
 static PHD_VECTOR HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
@@ -323,8 +325,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						if (lara->interactedItem == itemNum)
 						{
 							getThisItemPlease = itemNum;
-							lara->isMoving = false;
-							lara->gunStatus = LG_NO_ARMS;
+							Lara.isMoving = false;
+							Lara.gunStatus = LG_HANDS_FREE;
 						}
 					}
 				}
@@ -345,7 +347,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) && 
 		(g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
 		BinocularRange ||
-		(l->currentAnimState != LS_STOP || l->animNumber != LA_STAND_IDLE || lara->gunStatus) &&
+		(l->currentAnimState != LS_IDLE || l->animNumber != LA_STAND_IDLE || lara->gunStatus) &&
 		(l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || lara->gunStatus) &&
 		(l->currentAnimState != LS_CRAWL_IDLE || l->animNumber != LA_CRAWL_IDLE))
 	{
@@ -393,8 +395,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (lara->interactedItem == itemNum)
 				{
-					lara->isMoving = false;
-					lara->gunStatus = LG_NO_ARMS;
+					Lara.isMoving = false;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
 
@@ -427,8 +429,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			if (lara->interactedItem == itemNum)
 			{
-				lara->isMoving = false;
-				lara->gunStatus = LG_NO_ARMS;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
 			item->pos.xRot = oldXrot;
@@ -528,8 +530,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		
 		if (lara->interactedItem == itemNum)
 		{
-			lara->isMoving = false;
-			lara->gunStatus = LG_NO_ARMS;
+			Lara.isMoving = false;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		
 		item->pos.xRot = oldXrot;
@@ -571,8 +573,8 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			
 			if (lara->interactedItem == itemNum)
 			{
-				lara->isMoving = false;
-				lara->gunStatus = LG_NO_ARMS;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
 			item->pos.xRot = oldXrot;
@@ -653,10 +655,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (flag)
 	{
-		lara->headYrot = 0;
-		lara->headXrot = 0;
-		lara->torsoYrot = 0;
-		lara->torsoXrot = 0;
+		ResetLaraFlex(l);
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 		lara->isMoving = false;
 		lara->gunStatus = LG_HANDS_BUSY;
@@ -895,9 +894,9 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
 
 	if (TrInput & IN_ACTION
-		&& laraitem->currentAnimState == LS_STOP
+		&& laraitem->currentAnimState == LS_IDLE
 		&& laraitem->animNumber == LA_STAND_IDLE 
-		&& Lara.gunStatus == LG_NO_ARMS 
+		&& Lara.gunStatus == LG_HANDS_FREE 
 		&& (item->status == ITEM_NOT_ACTIVE 
 			&& item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
 		|| Lara.isMoving && Lara.interactedItem == itemNumber)
@@ -925,10 +924,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 				laraitem->animNumber = SearchAnims[objNumber];
 				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(laraitem);
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				if (item->objectNumber == ID_SEARCH_OBJECT4)
@@ -953,7 +949,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 		else if (Lara.isMoving && Lara.interactedItem ==  itemNumber)
 		{
 			Lara.isMoving = false;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 	else if (laraitem->currentAnimState != LS_MISC_CONTROL)
@@ -1064,7 +1060,7 @@ int UseSpecialItem(ITEM_INFO* item)
 	int flag = 0;
 	int use = g_Gui.GetInventoryItemChosen();
 
-	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_NO_ARMS && use != NO_ITEM)
+	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE && use != NO_ITEM)
 	{
 		if ((use >= ID_WATERSKIN1_EMPTY) && (use <= ID_WATERSKIN2_5))
 		{

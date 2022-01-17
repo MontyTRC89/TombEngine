@@ -1,7 +1,6 @@
 #pragma once
-
-#include "objectslist.h"
-#include "phd_global.h"
+#include "Objects/objectslist.h"
+#include "Specific/phd_global.h"
 
 struct ITEM_INFO;
 struct COLL_INFO;

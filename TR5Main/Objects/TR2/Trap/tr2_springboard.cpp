@@ -1,9 +1,10 @@
 #include "framework.h"
-#include "tr2_springboard.h"
-#include "level.h"
-#include "lara.h"
-#include "animation.h"
-#include "items.h"
+#include "Objects/TR2/Trap/tr2_springboard.h"
+
+#include "Game/animation.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
 
 void SpringBoardControl(short itemNumber)
 {
@@ -16,7 +17,7 @@ void SpringBoardControl(short itemNumber)
 		if (LaraItem->hitPoints <= 0)
 			return;
 
-		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_HOP_BACK)
+		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_RUN_BACK)
 			LaraItem->speed = -LaraItem->speed;
 
 		LaraItem->fallspeed = -240;

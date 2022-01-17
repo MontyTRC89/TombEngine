@@ -1,6 +1,6 @@
 #pragma once
+#include "Game/items.h"
 #include "Specific/phd_global.h"
-#include "items.h"
 
 enum class CAMERA_TYPE
 {
@@ -79,7 +79,7 @@ void ConfirmCameraTargetPos();
 void CalculateCamera();
 void LookLeftRight();
 void LookUpDown();
-void ResetLook();
+void ResetLook(ITEM_INFO* item);
 void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);

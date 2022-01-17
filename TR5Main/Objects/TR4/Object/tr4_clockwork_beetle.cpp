@@ -1,11 +1,11 @@
 #include "framework.h"
-#include "tr4_clockwork_beetle.h"
-#include "items.h"
-#include "level.h"
-#include "lara.h"
-#include "animation.h"
+#include "Objects/TR4/Object/tr4_clockwork_beetle.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 #include "Sound/sound.h"
-#include "collide.h"
+#include "Game/collision/collide_room.h"
 
 void ClockworkBeetleControl(short item_number)
 {
@@ -307,10 +307,10 @@ void UseClockworkBeetle(short flag)
 	short itemNum;
 
 	if (flag
-		|| LaraItem->currentAnimState == LS_STOP
+		|| LaraItem->currentAnimState == LS_IDLE
 		&& LaraItem->animNumber == LA_STAND_IDLE
 		&& !LaraItem->hitStatus
-		&& Lara.gunStatus == LG_NO_ARMS)
+		&& Lara.gunStatus == LG_HANDS_FREE)
 	{
 		itemNum = CreateItem();
 

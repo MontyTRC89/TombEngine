@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "animation.h"
-#include "Lara.h"
-#include "camera.h"
-#include "level.h"
-#include "setup.h"
-#include "Renderer11.h"
+#include "Game/animation.h"
+
+#include "Game/camera.h"
+#include "Game/control/flipeffect.h"
+#include "Game/collision/collide_room.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
-#include "flipeffect.h"
-#include "items.h"
-#include "collide.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -198,13 +199,13 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->pos.zPos += -s * x + c * z;
 }
 
-int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
+bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 {
 	if (item->currentAnimState == item->goalAnimState)
-		return 0;
+		return false;
 
 	if (anim->numberChanges <= 0)
-		return 0;
+		return false;
 
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
@@ -219,13 +220,13 @@ int GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 					item->animNumber = range->linkAnimNum;
 					item->frameNumber = range->linkFrameNum;
 
-					return 1;
+					return true;
 				}
 			}
 		}
 	}
 
-	return 0;
+	return false;
 }
 
 BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)

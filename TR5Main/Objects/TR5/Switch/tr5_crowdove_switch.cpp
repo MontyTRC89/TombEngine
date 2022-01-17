@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "tr5_crowdove_switch.h"
-#include "control/control.h"
-#include "input.h"
-#include "level.h"
-#include "lara.h"
-#include "generic_switch.h"
+#include "Game/control/control.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/animation.h"
+#include "Game/items.h"
+#include "Game/collision/collide_item.h"
 
 using namespace TEN::Entities::Switches;
 
@@ -38,7 +39,7 @@ namespace TEN::Entities::TR5
 			|| !(item->meshBits & 4)
 			|| (!(TrInput & IN_ACTION)
 				|| Lara.gunStatus
-				|| l->currentAnimState != LS_STOP
+				|| l->currentAnimState != LS_IDLE
 				|| l->animNumber != LA_STAND_IDLE
 				|| l->gravityStatus)
 			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
@@ -85,7 +86,7 @@ namespace TEN::Entities::TR5
 				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->pos.yRot = oldYrot;
 			}

@@ -1,23 +1,24 @@
 #include "framework.h"
-#include "flipeffect.h"
-#include "Lara.h"
-#include "control/lot.h"
-#include "effects/hair.h"
-#include "level.h"
-#include "setup.h"
-#include "camera.h"
-#include "collide.h"
+#include "Game/control/flipeffect.h"
+
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/control/lot.h"
+#include "Game/effects/hair.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
+#include "Game/effects/footprint.h"
+#include "Game/effects/debris.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
-#include "tr5_spider_emitter.h"
-#include "tr5_pushableblock.h"
-#include "pickup.h"
-#include "puzzles_keys.h"
-#include "lara_fire.h"
-#include "effects/tomb4fx.h"
-#include "effects/weather.h"
-#include "effects/footprint.h"
-#include "effects/debris.h"
-#include "items.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Object/tr5_pushableblock.h"
 
 using std::function;
 using namespace TEN::Effects::Footprints;
@@ -172,7 +173,7 @@ void ShootRightGun(ITEM_INFO* item)
 
 void LaraHandsFree(ITEM_INFO* item)
 {
-	Lara.gunStatus = LG_NO_ARMS;
+	Lara.gunStatus = LG_HANDS_FREE;
 }
 
 void KillActiveBaddies(ITEM_INFO* item)

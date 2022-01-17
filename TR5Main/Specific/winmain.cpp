@@ -1,17 +1,18 @@
 #include "framework.h"
-#include "winmain.h"
-#include "resource.h"
-#include "Sound/sound.h"
-#include "control/control.h"
-#include "savegame.h"
-#include "level.h"
-#include "configuration.h"
-#include "Renderer11.h"
-#include "Scripting/GameFlowScript.h"
-#include "Scripting/GameLogicScript.h"
+#include "Specific/winmain.h"
+
 #include <CommCtrl.h>
 #include <process.h>
 #include <iostream>
+#include "Game/control/control.h"
+#include "Game/savegame.h"
+#include "Renderer/Renderer11.h"
+#include "resource.h"
+#include "Scripting/GameFlowScript.h"
+#include "Scripting/GameLogicScript.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/configuration.h"
 
 using namespace TEN::Renderer;
 using std::exception;

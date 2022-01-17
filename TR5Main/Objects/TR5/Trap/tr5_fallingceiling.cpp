@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "tr5_fallingceiling.h"
-#include "items.h"
-#include "level.h"
-#include "lara.h"
-#include "control/control.h"
-#include "animation.h"
+#include "Game/items.h"
+#include "Specific/level.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/animation.h"
 
 void FallingCeilingControl(short itemNumber)
 {

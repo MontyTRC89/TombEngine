@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "tr3_tiger.h"
-#include "control/box.h"
-#include "effects\effects.h"
-#include "setup.h"
-#include "level.h"
-#include "control/control.h"
-#include "lara.h"
-#include "itemdata/creature_info.h"
-#include "control/control.h"
-#include "items.h"
+#include "Objects/TR3/Entity/tr3_tiger.h"
+
+#include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 BITE_INFO tigerBite = { 19, -13, 3, 26 };
 

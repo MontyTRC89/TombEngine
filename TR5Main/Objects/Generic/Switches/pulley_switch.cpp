@@ -1,14 +1,14 @@
 #include "framework.h"
-#include "pulley_switch.h"
-#include "control/control.h"
-#include "input.h"
-#include "lara.h"
-#include "generic_switch.h"
-#include "Sound\sound.h"
-#include "pickup.h"
-#include "level.h"
-#include "collide.h"
-#include "items.h"
+#include "Objects/Generic/Switches/pulley_switch.h"
+#include "Game/control/control.h"
+#include "Specific/input.h"
+#include "Game/Lara/lara.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+#include "Sound/sound.h"
+#include "Game/pickup/pickup.h"
+#include "Specific/level.h"
+#include "Game/collision/collide_item.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::Switches
 {
@@ -43,8 +43,8 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((TrInput & IN_ACTION)
-			&& Lara.gunStatus == LG_NO_ARMS
-			&& l->currentAnimState == LS_STOP
+			&& Lara.gunStatus == LG_HANDS_FREE
+			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& l->gravityStatus == false
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
@@ -93,7 +93,7 @@ namespace TEN::Entities::Switches
 				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.isMoving = false;
-					Lara.gunStatus = LG_NO_ARMS;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->pos.yRot = oldYrot;
 			}

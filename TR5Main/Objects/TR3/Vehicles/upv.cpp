@@ -1,22 +1,24 @@
 #include "framework.h"
-#include "upv.h"
-#include "lara.h"
-#include "items.h"
-#include "sphere.h"
-#include "effects/effects.h"
-#include "collide.h"
-#include "control/box.h"
-#include "lara_flare.h"
-#include "animation.h"
-#include "camera.h"
-#include "setup.h"
-#include "effects/bubble.h"
-#include "level.h"
-#include "input.h"
-#include "savegame.h"
+#include "Objects/TR3/Vehicles/upv.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/box.h"
+#include "Game/control/los.h"
+#include "Game/effects/bubble.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/savegame.h"
+#include "Objects/TR3/Vehicles/upv_info.h"
 #include "Sound/sound.h"
-#include "upv_info.h"
-#include "control/los.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Specific/setup.h"
 
 #define	UPV_CONTROL 1
 #define	UPV_SURFACE 2
@@ -49,7 +51,6 @@
 #define WALLDEFLECT			(ANGLE(2.0f) * 65536)
 #define GETOFF_DIST 		WALL_SIZE
 #define HARPOON_SPEED		256
-#define HARPOON_TIME		256
 #define HARPOON_RELOAD		15
 
 #define UPV_TURBINE_BONE 3
@@ -329,7 +330,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	LaraInfo*& laraInfo = laraItem->data;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_NO_ARMS ||
+		laraInfo->gunStatus != LG_HANDS_FREE ||
 		laraItem->gravityStatus)
 	{
 		return false;
@@ -694,7 +695,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UpdateItemRoom(laraItem, 0);
 
 			laraInfo->waterStatus = LW_UNDERWATER;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->hitPoints = 0;
@@ -738,7 +739,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraInfo->torsoYrot = 0;
 			laraInfo->headXrot = 0;
 			laraInfo->headYrot = 0;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->hitPoints = 0;
@@ -910,6 +911,8 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	LaraInfo*& laraInfo = laraItem->data;
 	ITEM_INFO* UPVItem = &g_Level.Items[laraInfo->Vehicle];
 	SUB_INFO* UPVInfo = UPVItem->data;
+	
+	auto oldPos = UPVItem->pos;
 	auto probe = GetCollisionResult(UPVItem);
 
 	if (!(UPVInfo->Flags & UPV_DEAD))
@@ -932,13 +935,21 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVItem->pos.zPos += phd_cos(UPVItem->pos.yRot) * UPVItem->speed * phd_cos(UPVItem->pos.xRot);
 	}
 
+	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
+	int waterHeight = GetWaterHeight(UPVItem->pos.xPos, UPVItem->pos.yPos, UPVItem->pos.zPos, UPVItem->roomNumber);
+
+	if ((newHeight - waterHeight) < SUB_HEIGHT || (newHeight < UPVItem->pos.yPos - SUB_HEIGHT / 2))
+	{
+		UPVItem->pos.xPos = oldPos.xPos;
+		UPVItem->pos.yPos = oldPos.yPos;
+		UPVItem->pos.zPos = oldPos.zPos;
+		UPVItem->speed = 0;
+	}
+
 	UPVItem->floor = probe.Position.Floor;
 
-	if (UPVInfo->Flags & UPV_CONTROL &&
-		!(UPVInfo->Flags & UPV_DEAD))
+	if (UPVInfo->Flags & UPV_CONTROL && !(UPVInfo->Flags & UPV_DEAD))
 	{
-		int waterHeight = GetWaterHeight(UPVItem->pos.xPos, UPVItem->pos.yPos, UPVItem->pos.zPos, UPVItem->roomNumber);
-
 		if (!(g_Level.Rooms[UPVItem->roomNumber].flags & ENV_FLAG_WATER) &&
 			waterHeight != NO_HEIGHT)
 		{
@@ -954,8 +965,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			UPVInfo->Flags |= UPV_SURFACE;
 		}
 
-		else if ((waterHeight - UPVItem->pos.yPos) >= -SURFACE_DIST &&
-			waterHeight != NO_HEIGHT)
+		else if ((waterHeight - UPVItem->pos.yPos) >= -SURFACE_DIST && waterHeight != NO_HEIGHT)
 		{
 			UPVItem->pos.yPos = waterHeight + SURFACE_DIST;
 

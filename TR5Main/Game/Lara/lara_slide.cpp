@@ -1,13 +1,15 @@
 #include "framework.h"
-#include "lara.h"
-#include "lara_collide.h"
-#include "lara_tests.h"
-#include "input.h"
-#include "Sound\sound.h"
-#include "collide.h"
-#include "camera.h"
-#include "level.h"
-#include "items.h"
+#include "Game/Lara/lara_slide.h"
+
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_tests.h"
+#include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 
 /*this file has all the related functions to sliding*/
 
@@ -19,6 +21,14 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.ForwardAngle = Lara.moveAngle;
 	GetCollisionInfo(coll, item);
+
+	// Temporary measure. @Sezz 2021.12.16
+	if (TestLaraSwamp(item))
+	{
+		item->goalAnimState = LS_IDLE;
+		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		return;
+	}
 
 	if (!LaraHitCeiling(item, coll))
 	{
@@ -37,7 +47,7 @@ void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll)
 					item->goalAnimState = LS_RUN_FORWARD;
 				}
 				else
-					item->goalAnimState = LS_STOP;
+					item->goalAnimState = LS_IDLE;
 
 				StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			}

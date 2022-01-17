@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "tr5_twoblockplatform.h"
-#include "level.h"
-#include "control/control.h"
-#include "items.h"
-#include "lara.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "collide.h"
-#include "floordata.h"
-#include "Renderer11.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Renderer/Renderer11.h"
 using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;

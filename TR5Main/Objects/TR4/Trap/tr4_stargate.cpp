@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "tr4_stargate.h"
-#include "level.h"
-#include "control/control.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "collide.h"
-#include "sphere.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "animation.h"
-#include "items.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
+#include "Game/Lara/lara.h"
+#include "Game/effects/effects.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {

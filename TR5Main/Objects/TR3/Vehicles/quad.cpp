@@ -1,20 +1,22 @@
 #include "framework.h"
-#include "quad.h"
-#include "quad_info.h"
-#include "lara.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "collide.h"
-#include "camera.h"
-#include "effects/tomb4fx.h"
-#include "lara_flare.h"
-#include "lara_one_gun.h"
-#include "misc.h"
-#include "setup.h"
-#include "level.h"
-#include "input.h"
-#include "animation.h"
+#include "Objects/TR3/Vehicles/quad.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/misc.h"
+#include "Objects/TR3/Vehicles/quad_info.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
+#include "Specific/input.h"
+#include "Specific/setup.h"
 #include "Specific/prng.h"
 
 using std::vector;
@@ -71,7 +73,8 @@ using namespace TEN::Math::Random;
 #define QUAD_IN_LEFT		IN_LEFT
 #define QUAD_IN_RIGHT		IN_RIGHT
 
-enum QuadState {
+enum QuadState
+{
 	QUAD_STATE_DRIVE = 1,
 	QUAD_STATE_TURN_LEFT = 2,
 	QUAD_STATE_SLOW = 5,
@@ -95,7 +98,8 @@ enum QuadState {
 	QUAD_STATE_DISMOUNT_LEFT = 24,
 };
 
-enum QuadAnim {
+enum QuadAnim
+{
 	QUAD_ANIM_IDLE_DEATH = 0,
 	QUAD_ANIM_UNK_1 = 1,
 	QUAD_ANIM_DRIVE_BACK = 2,
@@ -127,12 +131,14 @@ enum QuadAnim {
 	QUAD_ANIM_LEAP_TO_FREEFALL = 28
 };
 
-enum QuadFlags {
+enum QuadFlags
+{
 	QUAD_FLAG_DEAD = 0x80,
 	QUAD_FLAG_IS_FALLING = 0x40
 };
 
-enum QuadEffectPosition {
+enum QuadEffectPosition
+{
 	EXHAUST_LEFT = 0,
 	EXHAUST_RIGHT,
 	FRONT_LEFT_TYRE,
@@ -141,7 +147,8 @@ enum QuadEffectPosition {
 	BACK_RIGHT_TYRE
 };
 
-BITE_INFO quadEffectsPositions[6] = {
+BITE_INFO quadEffectsPositions[6] =
+{
 	{ -56, -32, -380, 0	},
 	{ 56, -32, -380, 0 },
 	{ -8, 180, -48, 3 },
@@ -155,9 +162,9 @@ bool QuadCanDriftStart;
 int QuadSmokeStart;
 bool QuadNoGetOff;
 
-void InitialiseQuadBike(short itemNumber)
+void InitialiseQuadBike(short itemNum)
 {
-	ITEM_INFO* quad = &g_Level.Items[itemNumber];
+	ITEM_INFO* quad = &g_Level.Items[itemNum];
 	quad->data = QUAD_INFO();
 	QUAD_INFO* quadInfo = quad->data;
 
@@ -251,7 +258,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		lara->pos.xRot = 0;
 		lara->pos.zRot = 0;
 		laraInfo->Vehicle = NO_ITEM;
-		laraInfo->gunStatus = LG_NO_ARMS;
+		laraInfo->gunStatus = LG_HANDS_FREE;
 
 		if (lara->currentAnimState == QUAD_STATE_FALL_OFF)
 		{
@@ -268,7 +275,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			lara->hitPoints = 0;
-			laraInfo->gunStatus = LG_NO_ARMS;
+			laraInfo->gunStatus = LG_HANDS_FREE;
 			quad->flags |= ONESHOT;
 
 			return false;
@@ -295,7 +302,7 @@ static int GetOnQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, COLL_INFO* coll)
 
 	if (!(TrInput & IN_ACTION) ||
 		lara->gravityStatus ||
-		laraInfo->gunStatus != LG_NO_ARMS ||
+		laraInfo->gunStatus != LG_HANDS_FREE ||
 		quad->flags & ONESHOT ||
 		abs(quad->pos.yPos - lara->pos.yPos) > STEP_SIZE)
 	{

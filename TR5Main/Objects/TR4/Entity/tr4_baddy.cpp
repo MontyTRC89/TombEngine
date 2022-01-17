@@ -1,16 +1,16 @@
 #include "framework.h"
 #include "tr4_baddy.h"
-#include "items.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "lara.h"
-#include "people.h"
-#include "setup.h"
-#include "level.h"
-#include "control/control.h"
-#include "animation.h"
-#include "control/lot.h"
-#include "itemdata/creature_info.h"
+#include "Game/items.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/Lara/lara.h"
+#include "Game/people.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/animation.h"
+#include "Game/control/lot.h"
+#include "Game/itemdata/creature_info.h"
 
 /*
 ID_BADDY_1
@@ -1049,7 +1049,7 @@ namespace TEN::Entities::TR4
 						LaraItem->speed = 2;
 						LaraItem->fallspeed = 1;
 						LaraItem->pos.yPos += (STEP_SIZE * 0.75f);
-						Lara.gunStatus = LG_NO_ARMS;
+						Lara.gunStatus = LG_HANDS_FREE;
 						currentCreature->flags = 1;
 					}
 				}

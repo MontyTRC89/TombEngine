@@ -1,15 +1,15 @@
 #include "framework.h"
-#include "tr5_bats_emitter.h"
-#include "level.h"
-#include "control/control.h"
-#include "setup.h"
-#include "effects\effects.h"
-#include "effects\tomb4fx.h"
-#include "Sound\sound.h"
-#include "lara.h"
-#include "animation.h"
+#include "Objects/TR5/Emitter/tr5_bats_emitter.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Specific/setup.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Sound/sound.h"
+#include "Game/Lara/lara.h"
+#include "Game/animation.h"
 #include <Game\items.h>
-#include "items.h"
+#include "Game/items.h"
 
 int NextBat;
 BAT_STRUCT Bats[NUM_BATS];

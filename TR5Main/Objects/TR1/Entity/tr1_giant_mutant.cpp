@@ -1,15 +1,17 @@
 #include "framework.h"
-#include "control/box.h"
-#include "effects/effects.h"
-#include "items.h"
-#include "camera.h"
-#include "setup.h"
-#include "effects/tomb4fx.h"
-#include "level.h"
-#include "lara.h"
+#include "Objects/TR1/Entity/tr1_giant_mutant.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/box.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
+#include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "itemdata/creature_info.h"
-#include "animation.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 enum abortion_anims {
 	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,

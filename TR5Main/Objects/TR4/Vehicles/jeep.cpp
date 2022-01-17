@@ -1,20 +1,20 @@
 #include "framework.h"
-#include "jeep.h"
-#include "lara.h"
-#include "gui.h"
-#include "effects/effects.h"
-#include "collide.h"
-#include "lara_one_gun.h"
-#include "items.h"
-#include "camera.h"
-#include "effects/tomb4fx.h"
-#include "lara_flare.h"
-#include "input.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Game/Lara/lara.h"
+#include "Game/gui.h"
+#include "Game/effects/effects.h"
+#include "Game/collision/collide_item.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/items.h"
+#include "Game/camera.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Lara/lara_flare.h"
+#include "Specific/input.h"
 #include "Sound/sound.h"
-#include "setup.h"
-#include "level.h"
-#include "animation.h"
-#include "jeep_info.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
+#include "Game/animation.h"
+#include "Objects/TR4/Vehicles/jeep_info.h"
 
 using std::vector;
 
@@ -401,14 +401,14 @@ static int JeepCheckGetOff()
 			LaraItem->pos.yRot += ANGLE(90);
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_STOP;
-			LaraItem->currentAnimState = LS_STOP;
+			LaraItem->goalAnimState = LS_IDLE;
+			LaraItem->currentAnimState = LS_IDLE;
 			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
 			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			return false;
 		}
 	}
@@ -429,7 +429,7 @@ static int GetOnJeep(int itemNumber)
 	if (Lara.gunStatus)
 		return 0;
 
-	if (LaraItem->currentAnimState != LS_STOP)
+	if (LaraItem->currentAnimState != LS_IDLE)
 		return 0;
 
 	if (LaraItem->animNumber != LA_STAND_IDLE)

@@ -1,17 +1,17 @@
 #include "framework.h"
-#include "Renderer11.h"
-#include "animation.h"
-#include "effects\hair.h"
-#include "lara.h"
-#include "control/control.h"
-#include "spotcam.h"
-#include "camera.h"
-#include "sphere.h"
-#include "level.h"
-#include "GameFlowScript.h"
+#include "Renderer/Renderer11.h"
+#include "Game/animation.h"
+#include "Game/effects/hair.h"
+#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
+#include "Game/spotcam.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
+#include "Specific/level.h"
+#include "Scripting/GameFlowScript.h"
 #include <Specific\setup.h>
-#include "lara_fire.h"
-#include "items.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/items.h"
 
 using namespace TEN::Renderer;
 
@@ -26,7 +26,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_CROSSBOW:
 		case WEAPON_SHOTGUN:
-			return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+			return (LaraItem->currentAnimState == LS_IDLE || LaraItem->currentAnimState == LS_TURN_LEFT_FAST || LaraItem->currentAnimState == LS_TURN_RIGHT_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
 			break;
 		case WEAPON_HK:
 		{
@@ -35,7 +35,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 			if(laraInfo.rightArm.animNumber - baseAnim == 0 || laraInfo.rightArm.animNumber - baseAnim == 2 || laraInfo.rightArm.animNumber - baseAnim == 4){
 				return true;
 			} else
-				return (LaraItem->currentAnimState == LS_STOP || LaraItem->currentAnimState == LS_TURN_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
+				return (LaraItem->currentAnimState == LS_IDLE || LaraItem->currentAnimState == LS_TURN_LEFT_FAST || LaraItem->currentAnimState == LS_TURN_RIGHT_FAST || LaraItem->currentAnimState == LS_TURN_LEFT_SLOW || LaraItem->currentAnimState == LS_TURN_RIGHT_SLOW);
 		}
 			break;
 		default:
@@ -86,7 +86,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_NO_ARMS || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
+	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_HANDS_FREE || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -96,18 +96,16 @@ void Renderer11::updateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-
-		if (Lara.gunType == WEAPON_REVOLVER) // im so sorry but it's either this or crazy arms with the revolver
-		{
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
-		}
-		else
+		if (Lara.gunType == WEAPON_PISTOLS || Lara.gunType == WEAPON_UZI)
 		{
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.leftArm.xRot), TO_RAD(Lara.leftArm.yRot), TO_RAD(Lara.leftArm.zRot));
 			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
 		}
-		// yRot still messed up in some situations but it's definitely better now!!
+		else
+		{
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.rightArm.xRot), TO_RAD(Lara.rightArm.yRot), TO_RAD(Lara.rightArm.zRot));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
+		}
 
 		LARA_ARM *leftArm = &Lara.leftArm;
 		LARA_ARM *rightArm = &Lara.rightArm;

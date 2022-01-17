@@ -1,23 +1,23 @@
 #include "framework.h"
-#include "motorbike.h"
-#include "level.h"
-#include "control/control.h"
-#include "effects/effects.h"
-#include "lara.h"
-#include "gui.h"
-#include "collide.h"
-#include "lara_flare.h"
-#include "setup.h"
-#include "lara_one_gun.h"
-#include "effects/tomb4fx.h"
-#include "items.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+#include "Specific/level.h"
+#include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/Lara/lara.h"
+#include "Game/gui.h"
+#include "Game/collision/collide_item.h"
+#include "Game/Lara/lara_flare.h"
+#include "Specific/setup.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/items.h"
 #include "Sound/sound.h"
-#include "health.h"
-#include "camera.h"
-#include "animation.h"
+#include "Game/health.h"
+#include "Game/camera.h"
+#include "Game/animation.h"
 #include "Specific/prng.h"
-#include "motorbike_info.h"
-#include "items.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
+#include "Game/items.h"
 
 using namespace TEN::Math::Random;
 
@@ -298,7 +298,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus != LG_NO_ARMS || LaraItem->gravityStatus)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->gravityStatus)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
@@ -364,7 +364,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
                 Lara.flareAge = 0;
             }
 
-            Lara.gunStatus = LG_NO_ARMS;
+            Lara.gunStatus = LG_HANDS_FREE;
 
             short angle = phd_atan(item->pos.zPos - laraitem->pos.zPos, item->pos.xPos - laraitem->pos.xPos) - item->pos.yRot;
             if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
@@ -547,14 +547,14 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->pos.yRot -= 0x4000;
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_STOP;
-			LaraItem->currentAnimState = LS_STOP;
+			LaraItem->goalAnimState = LS_IDLE;
+			LaraItem->currentAnimState = LS_IDLE;
 			LaraItem->pos.xPos -= 2 * phd_sin(item->pos.yRot);
 			LaraItem->pos.zPos -= 2 * phd_cos(item->pos.yRot);
 			LaraItem->pos.xRot = 0;
 			LaraItem->pos.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_NO_ARMS;
+			Lara.gunStatus = LG_HANDS_FREE;
 			Lara.sprintTimer = 120;
 			return true;
 		}
