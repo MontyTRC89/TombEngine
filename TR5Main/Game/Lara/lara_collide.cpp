@@ -58,7 +58,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (!Lara.climbStatus || item->speed != 2)
 		{
-			if (coll->Middle.Floor <= STEP_SIZE)
+			if (coll->Middle.Floor <= CLICK(1))
 				SetAnimation(item, LA_LAND);
 			else
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
@@ -79,9 +79,9 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 			item->fallspeed = 1;
 	}
 	else if (coll->CollisionType == CT_LEFT)
-		item->pos.yRot += ANGLE(5.0f);
+		item->pos.yRot += DEFLECT_STRAIGHT_ANGLE;
 	else if (coll->CollisionType == CT_RIGHT)
-		item->pos.yRot -= ANGLE(5.0f);
+		item->pos.yRot -= DEFLECT_STRAIGHT_ANGLE;
 	else if (coll->CollisionType == CT_CLAMP)
 	{
 		item->pos.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
@@ -104,11 +104,11 @@ void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
-		item->pos.yRot += ANGLE(5.0f);
+		item->pos.yRot += DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_RIGHT:
-		item->pos.yRot -= ANGLE(5.0f);
+		item->pos.yRot -= DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_TOP:
@@ -417,6 +417,7 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = moveAngle;
+	item->gravityStatus = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -424,16 +425,6 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
-
-	if (TestLaraLand(item, coll))
-	{
-		if (LaraLandedBad(item, coll))
-			item->goalAnimState = LS_DEATH;
-		else
-			item->goalAnimState = LS_IDLE;
-
-		DoLaraLand(item, coll);
-	}
 }
 
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)

@@ -49,6 +49,6 @@ struct CrawlVaultTestData
 struct JumpTestData
 {
 	short angle;
-	int dist = CLICK(1.3f);
+	int dist = CLICK(1.1f);
 	bool checkWadeStatus = true;
 };

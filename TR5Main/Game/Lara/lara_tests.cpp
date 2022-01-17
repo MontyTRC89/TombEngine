@@ -1117,9 +1117,13 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (item->gravityStatus &&
+	g_Renderer.printDebugMessage("floor: %d", coll->Middle.Floor);
+	g_Renderer.printDebugMessage("fall: %d", item->fallspeed);
+	g_Renderer.printDebugMessage("grav: %d", item->gravityStatus);
+
+	if (//item->gravityStatus &&
 		item->fallspeed >= 0 &&
-		(coll->Middle.Floor <= 0 || TestLaraSwamp(item)))
+		(coll->Middle.Floor <= item->fallspeed || TestLaraSwamp(item)))
 	{
 		return true;
 	}
