@@ -838,26 +838,26 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Forward 1 unit.
 	if (KeyMap[DIK_I])
 	{
-		item->pos.xPos += phd_sin(item->pos.yRot);
-		item->pos.zPos += phd_cos(item->pos.yRot);
+		item->pos.xPos += round(phd_sin(item->pos.yRot));
+		item->pos.zPos += round(phd_cos(item->pos.yRot));
 	}
 	// Back 1 unit.
 	else if (KeyMap[DIK_K])
 	{
-		item->pos.xPos += phd_sin(item->pos.yRot + ANGLE(180.0f));
-		item->pos.zPos += phd_cos(item->pos.yRot + ANGLE(180.0f));
+		item->pos.xPos += round(phd_sin(item->pos.yRot + ANGLE(180.0f)));
+		item->pos.zPos += round(phd_cos(item->pos.yRot + ANGLE(180.0f)));
 	}
 	// Left 1 unit.
 	else if (KeyMap[DIK_J])
 	{
-		item->pos.xPos += phd_sin(item->pos.yRot - ANGLE(90.0f));
-		item->pos.zPos += phd_cos(item->pos.yRot - ANGLE(90.0f));
+		item->pos.xPos += round(phd_sin(item->pos.yRot - ANGLE(90.0f)));
+		item->pos.zPos += round(phd_cos(item->pos.yRot - ANGLE(90.0f)));
 	}
 	// Right 1 unit.
 	else if (KeyMap[DIK_L])
 	{
-		item->pos.xPos += phd_sin(item->pos.yRot + ANGLE(90.0f));
-		item->pos.zPos += phd_cos(item->pos.yRot + ANGLE(90.0f));
+		item->pos.xPos += round(phd_sin(item->pos.yRot + ANGLE(90.0f)));
+		item->pos.zPos += round(phd_cos(item->pos.yRot + ANGLE(90.0f)));
 	}
 
 	//---
@@ -867,18 +867,31 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	HandleLaraMovementParameters(item, coll);
 
-	// Animate Lara.
-	AnimateLara(item);
+	// Temp. debug stuff.
+	static bool doRoutines = true;
 
-	if (info->ExtraAnim == -1)
+	static bool dbT = false;
+	if (KeyMap[DIK_T] && !dbT)
+		doRoutines = !doRoutines;
+	dbT = KeyMap[DIK_T] ? true : false;
+
+	static bool dbU = false;
+	if (doRoutines || KeyMap[DIK_U] && !dbU)
 	{
-		// Check for collision with items.
-		DoObjectCollision(item, coll);
+		// Animate Lara.
+		AnimateLara(item);
 
-		// Handle Lara collision.
-		if (info->Vehicle == NO_ITEM)
-			lara_collision_routines[item->currentAnimState](item, coll);
+		if (info->ExtraAnim == -1)
+		{
+			// Check for collision with items.
+			DoObjectCollision(item, coll);
+
+			// Handle Lara collision.
+			if (info->Vehicle == NO_ITEM)
+				lara_collision_routines[item->currentAnimState](item, coll);
+		}
 	}
+	dbU = KeyMap[DIK_U] ? true : false;
 
 	//if (info->gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
@@ -1241,7 +1254,7 @@ void AnimateLara(ITEM_INFO* item)
 			item->speed -= velocity >> 16;
 			item->speed += (velocity + anim->acceleration) >> 16;
 			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
-			item->pos.yPos += item->fallspeed;
+			item->pos.yPos += std::min(LaraCollision.Middle.Floor, (int)item->fallspeed);
 		}
 	}
 	else
