@@ -218,7 +218,7 @@ static int CanQuadbikeGetOff(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, item->roomNumber);
 
-	if (collResult.Position.Slope ||
+	if (collResult.Position.FloorSlope ||
 		collResult.Position.Floor == NO_HEIGHT)
 	{
 		return false;

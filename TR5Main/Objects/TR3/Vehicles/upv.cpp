@@ -427,8 +427,8 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.OldPosition.y = UPVItem->pos.yPos;
 	coll->Setup.OldPosition.z = UPVItem->pos.zPos;
 	coll->Setup.Radius = SUB_RADIUS;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.SlopesArePits = false;
+	coll->Setup.FloorSlopesAreWalls = false;
+	coll->Setup.FloorSlopesArePits = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;

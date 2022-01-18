@@ -111,7 +111,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
 	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.FloorSlopesArePits = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -183,7 +184,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.FloorSlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
@@ -450,8 +451,8 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
 	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.SlopesAreWalls = true;
-	coll->Setup.SlopesArePits = true;
+	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.FloorSlopesArePits = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -549,8 +550,8 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.FloorSlopesArePits = true;
+	coll->Setup.FloorSlopesAreWalls = true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
@@ -646,8 +647,8 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
 	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.SlopesArePits = true;
-	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.FloorSlopesArePits = true;
+	coll->Setup.FloorSlopesAreWalls = true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);

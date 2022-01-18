@@ -273,7 +273,7 @@ bool SkidooCheckGetOffOK(ITEM_INFO* skidoo, int dir)
 	int z = skidoo->pos.zPos - SKIDOO_DISMOUNT_DIST * phd_cos(angle);
 	auto probe = GetCollisionResult(x, y, z, skidoo->roomNumber);
 
-	if ((probe.Position.Slope || probe.Position.Floor == NO_HEIGHT) ||
+	if ((probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT) ||
 		abs(probe.Position.Floor - skidoo->pos.yPos) > (WALL_SIZE / 2) ||
 		((probe.Position.Ceiling - skidoo->pos.yPos) > -LARA_HEIGHT || (probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT))
 	{

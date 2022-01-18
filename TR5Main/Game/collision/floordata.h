@@ -64,7 +64,8 @@ class FLOOR_INFO
 
 		int SectorPlane(int x, int z) const;
 		int SectorPlaneCeiling(int x, int z) const;
-		std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
+		std::pair<int, int> FLOOR_INFO::FloorTiltXZ(int x, int z) const;
+		std::pair<int, int> FLOOR_INFO::CeilingTiltXZ(int x, int z) const;
 		bool FloorIsSplit() const;
 		bool FloorIsDiagonalStep() const;
 		bool CeilingIsDiagonalStep() const;
