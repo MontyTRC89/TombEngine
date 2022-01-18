@@ -581,7 +581,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	if (GetSector(r, x - r->x, z - r->z)->Stopper)
 		return false;
 
-	if (collResult.Position.Slope || collResult.Position.DiagonalStep ||
+	if (collResult.Position.FloorSlope || collResult.Position.DiagonalStep ||
 		collResult.Block->FloorSlope(0) != Vector2::Zero || collResult.Block->FloorSlope(1) != Vector2::Zero)
 		return false;
 
@@ -672,7 +672,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	if (collResult.Position.Floor != y)
 		return false;
 
-	if (collResult.Position.Slope || collResult.Position.DiagonalStep || 
+	if (collResult.Position.FloorSlope || collResult.Position.DiagonalStep ||
 		collResult.Block->FloorSlope(0) != Vector2::Zero || collResult.Block->FloorSlope(1) != Vector2::Zero)
 		return false;
 

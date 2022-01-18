@@ -250,7 +250,7 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 	if ((probe.Position.Floor - sBoatItem->pos.yPos) < -CLICK(2))
 		return false;
 
-	if (probe.Position.Slope ||
+	if (probe.Position.FloorSlope ||
 		probe.Position.Floor == NO_HEIGHT)
 	{
 		return false;

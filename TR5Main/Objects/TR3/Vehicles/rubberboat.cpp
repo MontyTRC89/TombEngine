@@ -701,7 +701,7 @@ static int CanGetOffRubberBoat(int direction)
 	if (collResult.Position.Floor - boat->pos.yPos < -512)
 		return 0;
 
-	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
+	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT)
 		return 0;
 
 	if ((collResult.Position.Ceiling - boat->pos.yPos > -LARA_HEIGHT) || (collResult.Position.Floor - collResult.Position.Ceiling < LARA_HEIGHT))
