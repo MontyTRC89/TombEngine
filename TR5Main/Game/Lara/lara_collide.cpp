@@ -435,7 +435,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 	ShiftItem(item, coll);
 
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
-		coll->Middle.Floor < 0 && coll->Middle.Slope)
+		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
 		item->fallspeed = 0;
 		item->pos.xPos = coll->Setup.OldPosition.x;

@@ -1187,26 +1187,26 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		bs = 0;
 
-		if (collResult.Position.Slope && oldCollResult.Position.Floor < collResult.Position.Floor)
+		if (collResult.Position.FloorSlope && oldCollResult.Position.Floor < collResult.Position.Floor)
 		{
 			yang = (long)((unsigned short)item->pos.yRot);
-			if (collResult.TiltX < 0)
+			if (collResult.FloorTiltX < 0)
 			{
 				if (yang >= 0x8000)
 					bs = 1;
 			}
-			else if (collResult.TiltX > 0)
+			else if (collResult.FloorTiltX > 0)
 			{
 				if (yang <= 0x8000)
 					bs = 1;
 			}
 
-			if (collResult.TiltZ < 0)
+			if (collResult.FloorTiltZ < 0)
 			{
 				if (yang >= 0x4000 && yang <= 0xc000)
 					bs = 1;
 			}
-			else if (collResult.TiltZ > 0)
+			else if (collResult.FloorTiltZ > 0)
 			{
 				if (yang <= 0x4000 || yang >= 0xc000)
 					bs = 1;
@@ -1251,13 +1251,13 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->pos.yPos = y;
 			item->pos.zPos = z;
 		}
-		else if (collResult.Position.Slope) 	// Hit a steep slope?
+		else if (collResult.Position.FloorSlope) 	// Hit a steep slope?
 		{
 			// Need to know which direction the slope is.
 
 			item->speed -= (item->speed / 4);
 
-			if (collResult.TiltX < 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0x4000
+			if (collResult.FloorTiltX < 0 && ((abs(collResult.FloorTiltX)) - (abs(collResult.FloorTiltZ)) >= 2))	// Hit angle = 0x4000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x8000)
 				{
@@ -1269,7 +1269,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= collResult.TiltX * 2;
+						item->speed -= collResult.FloorTiltX * 2;
 						if ((unsigned short)item->pos.yRot > 0x4000 && (unsigned short)item->pos.yRot < 0xc000)
 						{
 							item->pos.yRot -= 4096;
@@ -1290,7 +1290,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX > 0 && ((abs(collResult.TiltX)) - (abs(collResult.TiltZ)) >= 2))	// Hit angle = 0xc000
+			else if (collResult.FloorTiltX > 0 && ((abs(collResult.FloorTiltX)) - (abs(collResult.FloorTiltZ)) >= 2))	// Hit angle = 0xc000
 			{
 				if (((unsigned short)item->pos.yRot) < 0x8000)
 				{
@@ -1302,7 +1302,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltX * 2;
+						item->speed += collResult.FloorTiltX * 2;
 						if ((unsigned short)item->pos.yRot > 0xc000 || (unsigned short)item->pos.yRot < 0x4000)
 						{
 							item->pos.yRot -= 4096;
@@ -1323,7 +1323,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ < 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0
+			else if (collResult.FloorTiltZ < 0 && ((abs(collResult.FloorTiltZ)) - (abs(collResult.FloorTiltX)) >= 2))	// Hit angle = 0
 			{
 				if (((unsigned short)item->pos.yRot) > 0x4000 && ((unsigned short)item->pos.yRot) < 0xc000)
 				{
@@ -1335,7 +1335,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed -= collResult.TiltZ * 2;
+						item->speed -= collResult.FloorTiltZ * 2;
 
 						if ((unsigned short)item->pos.yRot < 0x8000)
 						{
@@ -1357,7 +1357,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltZ > 0 && ((abs(collResult.TiltZ)) - (abs(collResult.TiltX)) >= 2))	// Hit angle = 0x8000
+			else if (collResult.FloorTiltZ > 0 && ((abs(collResult.FloorTiltZ)) - (abs(collResult.FloorTiltX)) >= 2))	// Hit angle = 0x8000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xc000 || ((unsigned short)item->pos.yRot) < 0x4000)
 				{
@@ -1369,7 +1369,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltZ * 2;
+						item->speed += collResult.FloorTiltZ * 2;
 
 						if ((unsigned short)item->pos.yRot > 0x8000)
 						{
@@ -1391,7 +1391,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX < 0 && collResult.TiltZ < 0)	// Hit angle = 0x2000
+			else if (collResult.FloorTiltX < 0 && collResult.FloorTiltZ < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x6000 && ((unsigned short)item->pos.yRot) < 0xe000)
 				{
@@ -1403,7 +1403,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-collResult.TiltX) + (-collResult.TiltZ);
+						item->speed += (-collResult.FloorTiltX) + (-collResult.FloorTiltZ);
 						if ((unsigned short)item->pos.yRot > 0x2000 && (unsigned short)item->pos.yRot < 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1424,7 +1424,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX < 0 && collResult.TiltZ > 0)	// Hit angle = 0x6000
+			else if (collResult.FloorTiltX < 0 && collResult.FloorTiltZ > 0)	// Hit angle = 0x6000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xa000 || ((unsigned short)item->pos.yRot) < 0x2000)
 				{
@@ -1436,7 +1436,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += (-collResult.TiltX) + collResult.TiltZ;
+						item->speed += (-collResult.FloorTiltX) + collResult.FloorTiltZ;
 						if ((unsigned short)item->pos.yRot < 0xe000 && (unsigned short)item->pos.yRot > 0x6000)
 						{
 							item->pos.yRot -= 4096;
@@ -1457,7 +1457,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX > 0 && collResult.TiltZ > 0)	// Hit angle = 0xa000
+			else if (collResult.FloorTiltX > 0 && collResult.FloorTiltZ > 0)	// Hit angle = 0xa000
 			{
 				if (((unsigned short)item->pos.yRot) > 0xe000 || ((unsigned short)item->pos.yRot) < 0x6000)
 				{
@@ -1469,7 +1469,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltX + collResult.TiltZ;
+						item->speed += collResult.FloorTiltX + collResult.FloorTiltZ;
 						if ((unsigned short)item->pos.yRot < 0x2000 || (unsigned short)item->pos.yRot > 0xa000)
 						{
 							item->pos.yRot -= 4096;
@@ -1490,7 +1490,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 				}
 			}
-			else if (collResult.TiltX > 0 && collResult.TiltZ < 0)	// Hit angle = 0xe000
+			else if (collResult.FloorTiltX > 0 && collResult.FloorTiltZ < 0)	// Hit angle = 0xe000
 			{
 				if (((unsigned short)item->pos.yRot) > 0x2000 && ((unsigned short)item->pos.yRot) < 0xa000)
 				{
@@ -1502,7 +1502,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->speed < 32)
 					{
-						item->speed += collResult.TiltX + (-collResult.TiltZ);
+						item->speed += collResult.FloorTiltX + (-collResult.FloorTiltZ);
 						if ((unsigned short)item->pos.yRot < 0x6000 || (unsigned short)item->pos.yRot > 0xe000)
 						{
 							item->pos.yRot -= 4096;

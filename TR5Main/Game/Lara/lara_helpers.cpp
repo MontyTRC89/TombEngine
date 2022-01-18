@@ -157,6 +157,7 @@ void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
 	if (probe.BottomBlock->Flags.Monkeyswing &&			// Monkey swing sector set.
 		(probe.Position.Ceiling - y) <= CLICK(1) &&		// Lower bound.
 		(probe.Position.Ceiling - y) >= -CLICK(1) &&	// Upper bound.
+		!probe.Position.CeilingSlope &&					// No ceiling slope.
 		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
@@ -282,14 +283,14 @@ short GetLaraSlideDirection(COLL_INFO* coll)
 	//}
 	//else
 	{
-		if (coll->TiltX > 2)
+		if (coll->FloorTiltX > 2)
 			dir = -ANGLE(90.0f);
-		else if (coll->TiltX < -2)
+		else if (coll->FloorTiltX < -2)
 			dir = ANGLE(90.0f);
 
-		if (coll->TiltZ > 2 && coll->TiltZ > abs(coll->TiltX))
+		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
 			dir = ANGLE(180.0f);
-		else if (coll->TiltZ < -2 && -coll->TiltZ > abs(coll->TiltX))
+		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
 			dir = ANGLE(0.0f);
 	}
 

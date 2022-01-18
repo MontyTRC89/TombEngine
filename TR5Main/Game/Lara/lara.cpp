@@ -742,8 +742,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = true;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.SlopesArePits = false;
+	coll->Setup.FloorSlopesAreWalls = false;
+	coll->Setup.FloorSlopesArePits = false;
+	coll->Setup.CeilingSlopesAreWalls = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
@@ -862,11 +863,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	//---
 
-	// Handle current Lara status.
-	lara_control_routines[item->currentAnimState](item, coll);
-
-	HandleLaraMovementParameters(item, coll);
-
 	// Temp. debug stuff.
 	static bool doRoutines = true;
 
@@ -878,6 +874,11 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	static bool dbU = false;
 	if (doRoutines || KeyMap[DIK_U] && !dbU)
 	{
+		// Handle current Lara status.
+		lara_control_routines[item->currentAnimState](item, coll);
+
+		HandleLaraMovementParameters(item, coll);
+
 		// Animate Lara.
 		AnimateLara(item);
 
@@ -921,8 +922,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.SlopesArePits = false;
+	coll->Setup.FloorSlopesAreWalls = false;
+	coll->Setup.FloorSlopesArePits = false;
+	coll->Setup.CeilingSlopesAreWalls = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = true;
@@ -1029,8 +1031,9 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.SlopesArePits = false;
+	coll->Setup.FloorSlopesAreWalls = false;
+	coll->Setup.FloorSlopesArePits = false;
+	coll->Setup.CeilingSlopesAreWalls = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = false;

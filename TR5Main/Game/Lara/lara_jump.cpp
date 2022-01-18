@@ -361,8 +361,8 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadFloorHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.SlopesArePits = TestLaraSwamp(item) ? false : true;
-	coll->Setup.SlopesAreWalls = TestLaraSwamp(item) ? false : true;
+	coll->Setup.FloorSlopesArePits = TestLaraSwamp(item) ? false : true;
+	coll->Setup.FloorSlopesAreWalls = TestLaraSwamp(item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 

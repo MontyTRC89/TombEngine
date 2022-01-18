@@ -159,7 +159,7 @@ static bool CanGetOut(int direction)
 
 	auto collResult = GetCollisionResult(x, y, z, v->roomNumber);
 
-	if (collResult.Position.Slope || collResult.Position.Floor == NO_HEIGHT)
+	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
 	if (abs(collResult.Position.Floor - v->pos.yPos) > WALL_SIZE / 2)

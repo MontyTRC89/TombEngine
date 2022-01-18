@@ -42,7 +42,8 @@ struct COLL_POSITION
 	int Ceiling;
 	int Bridge;
 	float SplitAngle;
-	bool Slope;
+	bool FloorSlope;
+	bool CeilingSlope;
 	bool DiagonalStep;
 
 	bool HasDiagonalSplit() { return SplitAngle == 45.0f * RADIAN || SplitAngle == 135.0f * RADIAN; }
@@ -58,16 +59,19 @@ struct COLL_RESULT
 
 	COLL_POSITION Position;
 
-	int TiltX;
-	int TiltZ;
+	int FloorTiltX;
+	int FloorTiltZ;
+	int CeilingTiltX;
+	int CeilingTiltZ;
 };
 
 struct COLL_SETUP
 {
 	COLL_PROBE_MODE Mode;		// Probe rotation mode
 
-	bool SlopesAreWalls;		// Treat steep slopes as walls
-	bool SlopesArePits;			// Treat steep slopes as pits
+	bool CeilingSlopesAreWalls;	// Treat steep slopes on ceilings as walls
+	bool FloorSlopesAreWalls;	// Treat steep slopes as walls
+	bool FloorSlopesArePits;	// Treat steep slopes as pits
 	bool DeathFlagIsPit;		// Treat death sectors as pits
 	bool NoMonkeyFlagIsWall;	// Treat non-monkey sectors as walls
 	bool EnableObjectPush;		// Can be pushed by objects
@@ -102,8 +106,10 @@ struct COLL_INFO
 	COLL_TYPE CollisionType;
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
-	int TiltX;
-	int TiltZ;
+	int FloorTiltX;
+	int FloorTiltZ;
+	int CeilingTiltX;
+	int CeilingTiltZ;
 
 	bool HitStatic;
 	bool HitTallObject;
