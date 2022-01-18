@@ -1,3 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Specific">
+      <UniqueIdentifier>{e0508e32-eb74-4561-a931-4806713cb0b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\level.h">
+      <Filter>Specific</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
