@@ -24,6 +24,7 @@ void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraFallState(ITEM_INFO* item);
 void SetLaraFallBackState(ITEM_INFO* item);
 void SetLaraMonkeyFallState(ITEM_INFO* item);
+void SetLaraMonkeyRelease(ITEM_INFO* item);
 short GetLaraSlideDirection(COLL_INFO* coll);
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
 

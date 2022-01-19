@@ -714,7 +714,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ITEM_INFO* item)
 {
-	ProcessSectorFlags(GetCollisionResult(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber).BottomBlock);
+	ProcessSectorFlags(GetCollisionResult(item).BottomBlock);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)

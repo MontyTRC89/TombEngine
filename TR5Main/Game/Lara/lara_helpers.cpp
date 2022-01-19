@@ -263,14 +263,22 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
-	if (item->currentAnimState != LS_MONKEY_TURN_180)
-	{
-		SetAnimation(item, LS_JUMP_UP, 9);
-		info->gunStatus = LG_HANDS_FREE;
-		item->speed = 2;
-		item->fallspeed = 1;
-		item->gravityStatus = true;
-	}
+	// Hack.
+	if (item->currentAnimState == LS_MONKEY_TURN_180)
+		return;
+
+	SetAnimation(item, LA_MONKEYSWING_TO_FREEFALL);
+	SetLaraMonkeyRelease(item);
+}
+
+void SetLaraMonkeyRelease(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+
+	info->gunStatus = LG_HANDS_FREE;
+	item->speed = 2;
+	item->fallspeed = 1;
+	item->gravityStatus = true;
 }
 
 short GetLaraSlideDirection(COLL_INFO* coll)

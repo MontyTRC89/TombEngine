@@ -315,11 +315,10 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->canMonkeySwing && coll->CollisionType == CT_TOP)
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
+		info->gunStatus = LG_HANDS_BUSY;
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
-
-		info->gunStatus = LG_HANDS_BUSY;
 
 		DoLaraMonkeySnap(item, coll);
 
@@ -380,6 +379,8 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
+
+		DoLaraMonkeySnap(item, coll);
 
 		return true;
 	}
@@ -1731,10 +1732,11 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4);
 
-	if (probe.BottomBlock->Flags.Monkeyswing &&
-		(probe.Position.Floor - y - LARA_HEIGHT_MONKEY) > 0 &&						// Upper floor boundary.
+	if (probe.BottomBlock->Flags.Monkeyswing &&										// Monkey swing sector flag set.
+		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Highest floor boundary.
 		(probe.Position.Ceiling - y) <= testData.lowerBound &&						// Lower ceiling boundary.
 		(probe.Position.Ceiling - y) >= testData.upperBound &&						// Lower ceiling boundary. TODO: Not working??
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY &&	// Space is not a clamp.
 		!probe.Position.CeilingSlope &&												// No ceiling slope.
 		probe.Position.Ceiling != NO_HEIGHT)
 	{
@@ -1748,7 +1750,7 @@ bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	MonkeyMoveTestData testData
 	{
-		coll->Setup.ForwardAngle,
+		item->pos.yRot,
 		CLICK(1.25f),
 		-CLICK(1.25f)
 	};
@@ -1760,7 +1762,7 @@ bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll)
 {
 	MonkeyMoveTestData testData
 	{
-		coll->Setup.ForwardAngle + ANGLE(180.0f),
+		item->pos.yRot + ANGLE(180.0f),
 		CLICK(1.25f),
 		-CLICK(1.25f)
 	};
@@ -1772,9 +1774,9 @@ bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	MonkeyMoveTestData testData
 	{
-		coll->Setup.ForwardAngle - ANGLE(90.0f),
-		CLICK(0.75f),
-		-CLICK(0.75f)
+		item->pos.yRot - ANGLE(90.0f),
+		CLICK(0.5f),
+		-CLICK(0.5f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);
@@ -1784,9 +1786,9 @@ bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
 	MonkeyMoveTestData testData
 	{
-		coll->Setup.ForwardAngle + ANGLE(90.0f),
-		CLICK(0.75f),
-		-CLICK(0.75f)
+		item->pos.yRot + ANGLE(90.0f),
+		CLICK(0.5f),
+		-CLICK(0.5f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testData);

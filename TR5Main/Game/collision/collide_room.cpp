@@ -182,9 +182,9 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.FloorTiltZ = floorTilts.second;
 
 	// Get ceiling tilts.
-	auto CeilingTilts = floor->CeilingTiltXZ(x, z);
-	result.CeilingTiltX = CeilingTilts.first;
-	result.CeilingTiltZ = CeilingTilts.second;
+	auto ceilingTilts = floor->CeilingTiltXZ(x, z);
+	result.CeilingTiltX = ceilingTilts.first;
+	result.CeilingTiltZ = ceilingTilts.second;
 
 	// Split, bridge and slope data.
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
@@ -192,7 +192,7 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.FloorSlope = (result.Position.Bridge < 0) && (abs(floorTilts.first) > 2 || abs(floorTilts.second) > 2);
 	// TODO: Check with bridges.
-	result.Position.CeilingSlope = abs(CeilingTilts.first) > 2 || abs(CeilingTilts.second) > 2;
+	result.Position.CeilingSlope = abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2;
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType.
 	if ((y + CLICK(2)) < floor->FloorHeight(x, z))
