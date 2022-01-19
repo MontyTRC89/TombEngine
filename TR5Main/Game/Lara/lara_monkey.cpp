@@ -115,7 +115,8 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_IDLE (75)
@@ -128,7 +129,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	item->gravityStatus = false;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightUp = 0;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
@@ -197,7 +198,8 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_FORWARD (76)
@@ -208,7 +210,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightUp = 0;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
@@ -278,18 +280,19 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_BACK (143)
-// State:		lara_as_monkey_back()
+// State:		LS_MONKEY_BACK (TODO)
+// Control:		lara_as_monkey_back()
 void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
+	coll->Setup.BadFloorHeightUp = 0;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
@@ -359,7 +362,8 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_SHIMMY_LEFT (7)
@@ -370,9 +374,9 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.75f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.75f);
+	coll->Setup.BadFloorHeightUp = 0;
+	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -440,7 +444,8 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
@@ -451,9 +456,9 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.75f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.75f);
+	coll->Setup.BadFloorHeightUp = 0;
+	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
+	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -478,7 +483,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_MONKEY_TURN_180 (79)
-// Control:		lara_col_monkey_turn_180()
+// Collision:	lara_as_monkey_turn_180()
 void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
@@ -488,15 +493,15 @@ void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 	item->goalAnimState = LS_MONKEY_IDLE;
 }
 
+// State:		LS_MONKEY_TURN_180 (79)
+// Control:		lara_as_monkey_turn_180()
 void lara_col_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 79*/
-	/*state code: lara_as_monkey180*/
-	lara_col_monkey_forward(item, coll);
+	lara_col_monkey_idle(item, coll);
 }
 
 // State:		LS_MONKEY_TURN_LEFT (82)
-// Collision:	lara_as_monkey_turn_left()
+// Collision:	lara_col_monkey_turn_left()
 void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -544,7 +549,8 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_TURN_LEFT (82)
@@ -555,7 +561,7 @@ void lara_col_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_MONKEY_TURN_RIGHT (83)
-// Collision:	lara_as_monkey_turn_right()
+// Collision:	lara_col_monkey_turn_right()
 void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -604,7 +610,8 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	SetLaraMonkeyFallState(item);
+	item->goalAnimState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
 // State:		LS_MONKEY_TURN_RIGHT (83)

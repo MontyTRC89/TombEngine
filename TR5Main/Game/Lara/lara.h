@@ -41,7 +41,7 @@ struct COLL_INFO;
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
-constexpr auto LARA_HEIGHT_MONKEY = 705;		// Lara height in monkey swing states.
+constexpr auto LARA_HEIGHT_MONKEY = 850;		// Lara height in monkey swing states.
 constexpr auto LARA_HEIGHT_SURFSWIM = 700;		// Lara height in water treading states.
 constexpr auto LARA_HEIGHT_STRETCH = 870;		// Lara height in jump-up and ledge hanging states.
 constexpr auto LARA_HEIGHT_REACH = 820;			// Lara height in reach state.
