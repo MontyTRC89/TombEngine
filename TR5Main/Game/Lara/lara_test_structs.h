@@ -12,9 +12,9 @@ struct MoveTestData
 
 struct MonkeyMoveTestData
 {
-	short angle;
-	int lowerBound;
-	int upperBound;
+	short Angle;
+	int LowerBound;
+	int UpperBound;
 };
 
 struct VaultTestData
@@ -48,7 +48,7 @@ struct CrawlVaultTestData
 
 struct JumpTestData
 {
-	short angle;
-	int dist = CLICK(1.1f);
-	bool checkWadeStatus = true;
+	short Angle;
+	int Dist = CLICK(0.85f);
+	bool CheckWadeStatus = true;
 };

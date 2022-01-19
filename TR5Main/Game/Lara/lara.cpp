@@ -819,6 +819,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Temp. debug stuff
 	//---
 
+	if (KeyMap[DIK_D])
+		item->hitPoints = 0;
+
 	static PHD_3DPOS  posO = { 0, 0, 0, 0, 0, 0 };
 	static short roomNumO = item->roomNumber;
 	static CAMERA_INFO camO = Camera;

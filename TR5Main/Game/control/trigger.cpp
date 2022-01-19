@@ -728,7 +728,7 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
 
 	// Burn Lara
-	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
+	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor && !LaraItem->gravityStatus || Lara.waterStatus))
 		LavaBurn(LaraItem);
 
 	// Set climb status
