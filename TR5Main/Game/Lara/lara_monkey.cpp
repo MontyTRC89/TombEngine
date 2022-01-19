@@ -40,7 +40,8 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE; // TODO: Death state dispatches for all monkey states.
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -133,7 +134,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	//coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -169,7 +170,8 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -214,7 +216,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	//coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -236,7 +238,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_MONKEY_BACK (143)
+// State:		LS_MONKEY_BACK (TODO)
 // Collision:	lara_col_monkey_back()
 void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -251,7 +253,8 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -296,7 +299,7 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	//coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -333,7 +336,8 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -378,7 +382,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	//coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -415,7 +419,8 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -460,7 +465,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	//coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -515,7 +520,8 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
@@ -534,14 +540,13 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_LEFT;
-			
 			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
 			// move the following block right beneath the death check. @Sezz 2022.01.16
 			info->turnRate -= LARA_TURN_RATE;
 			if (info->turnRate < -LARA_MONKEY_TURN_MAX)
 				info->turnRate = -LARA_MONKEY_TURN_MAX;
 
+			item->goalAnimState = LS_MONKEY_TURN_LEFT;
 			return;
 		}
 
@@ -575,13 +580,13 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEY_IDLE; //
+		item->goalAnimState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
-		// TODO: Dispaches.
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
@@ -595,14 +600,13 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
-
 			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
 			// move the following block right beneath the death check. @Sezz 2022.01.16
 			info->turnRate += LARA_TURN_RATE;
 			if (info->turnRate > LARA_MONKEY_TURN_MAX)
 				info->turnRate = LARA_MONKEY_TURN_MAX;
 
+			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
 			return;
 		}
 

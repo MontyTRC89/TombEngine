@@ -1105,10 +1105,10 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
 
-	if (!probe.BottomBlock->Flags.Monkeyswing ||			// Monkey swing sector not set.
-		(probe.Position.Ceiling - y) > CLICK(1.25f) ||		// Lower bound.
-		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||		// Upper bound.
-		probe.Position.CeilingSlope ||						// Ceiling slope.
+	if (!probe.BottomBlock->Flags.Monkeyswing ||		// No monkey sector.
+		(probe.Position.Ceiling - y) > CLICK(1.25f) ||	// Lower bound.
+		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||	// Upper bound.
+		probe.Position.CeilingSlope ||					// Ceiling slope.
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
 		return true;
@@ -1434,9 +1434,9 @@ bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
 
-	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) ||			// Lower bound.
-		(probe.Position.Ceiling - y) >= -CLICK(1.25f) ||		// Upper bound.
-		probe.Position.Ceiling == NO_HEIGHT)
+	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) &&		// Lower bound.
+		(probe.Position.Ceiling - y) >= -CLICK(1.25f) &&	// Upper bound.
+		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1730,12 +1730,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestData testData)
 {
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollisionResult(item, testData.angle, coll->Setup.Radius * sqrt(2) + 4);
+	auto probe = GetCollisionResult(item, testData.Angle, coll->Setup.Radius * sqrt(2) + 4);
 
-	if (probe.BottomBlock->Flags.Monkeyswing &&										// Monkey swing sector flag set.
+	if (//probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Highest floor boundary.
-		(probe.Position.Ceiling - y) <= testData.lowerBound &&						// Lower ceiling boundary.
-		(probe.Position.Ceiling - y) >= testData.upperBound &&						// Lower ceiling boundary. TODO: Not working??
+		(probe.Position.Ceiling - y) <= testData.LowerBound &&						// Lower ceiling boundary.
+		(probe.Position.Ceiling - y) >= testData.UpperBound &&						// Lower ceiling boundary. TODO: Not working??
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY &&	// Space is not a clamp.
 		!probe.Position.CeilingSlope &&												// No ceiling slope.
 		probe.Position.Ceiling != NO_HEIGHT)
@@ -2127,17 +2127,17 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testDa
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testData.angle, testData.dist, -coll->Setup.Height);
-	bool isWading = testData.checkWadeStatus ? (info->waterStatus == LW_WADE) : false;
+	auto probe = GetCollisionResult(item, testData.Angle, testData.Dist, -coll->Setup.Height);
+	bool isWading = testData.CheckWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
-	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||										// Highest floor bound...
-			probe.Position.FloorSlope) &&															// OR surface is a slope.
-		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
-			((probe.Position.Ceiling - y) < -coll->Setup.Height &&									// OR ceiling is level with Lara's head
-				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
-		!isWading &&																			// Not wading in water (if applicable).
-		!TestLaraSwamp(item) &&																	// No swamp.
-		!TestLaraFacingCorner(item, testData.angle, testData.dist) &&							// Avoid jumping through corners.
+	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||									// Highest floor bound...
+			probe.Position.FloorSlope) &&														// OR surface is a slope.
+		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||	// Ceiling height is permissive... 
+			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
+				(probe.Position.Floor - y) >= CLICK(0.5f))) &&									// AND there is a drop below.
+		!isWading &&																		// Not wading in water (if applicable).
+		!TestLaraSwamp(item) &&																// No swamp.
+		!TestLaraFacingCorner(item, testData.Angle, testData.Dist) &&						// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
