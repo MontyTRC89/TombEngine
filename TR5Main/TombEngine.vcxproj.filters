@@ -288,7 +288,6 @@
     <ClCompile Include="Scripting\GameScriptLevel.cpp" />
     <ClCompile Include="Scripting\GameScriptMeshInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptMirror.cpp" />
-    <ClCompile Include="Scripting\GameScriptPosition.cpp" />
     <ClCompile Include="Scripting\GameScriptRotation.cpp" />
     <ClCompile Include="Scripting\GameScriptSettings.cpp" />
     <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
