@@ -717,6 +717,7 @@
     <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
+    <ClInclude Include="frameworkandsol.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
