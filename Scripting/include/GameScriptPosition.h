@@ -1,7 +1,5 @@
 #pragma once
 
-#include "framework.h"
-
 namespace sol {
 	class state;
 }
