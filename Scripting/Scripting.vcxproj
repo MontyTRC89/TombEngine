@@ -28,6 +28,7 @@
     <ClCompile Include="frameworkandsol.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
@@ -91,6 +92,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)\Scripting\build\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)\Scripting\bin\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\sol;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -113,6 +115,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
