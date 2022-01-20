@@ -466,8 +466,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
     <ClInclude Include="Scripting\GameScriptMirror.h" />
     <ClInclude Include="Scripting\GameScriptNamedBase.h" />
-    <ClInclude Include="Scripting\GameScriptPosition.h" />
-    <ClInclude Include="Scripting\GameScriptRotation.h" />
     <ClInclude Include="Scripting\GameScriptSettings.h" />
     <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
     <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
@@ -885,10 +883,6 @@ CALL gen.bat</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptMirror.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptRotation.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
