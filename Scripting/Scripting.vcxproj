@@ -22,6 +22,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="frameworkandsol.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
+    <ClInclude Include="include\GameScriptRotation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -29,6 +30,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\GameScriptPosition.cpp" />
+    <ClCompile Include="src\GameScriptRotation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -109,7 +111,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
