@@ -9,5 +9,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\level.h">
       <Filter>Specific</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\room.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\phd_global.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Scripting\ScriptInterfaceGame.h" />
   </ItemGroup>
 </Project>

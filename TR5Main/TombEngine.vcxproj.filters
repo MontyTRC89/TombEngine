@@ -723,6 +723,7 @@
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
+    <ClInclude Include="frameworkandsol.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

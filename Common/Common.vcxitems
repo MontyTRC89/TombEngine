@@ -14,6 +14,9 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\room.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\level.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\phd_global.h" />
   </ItemGroup>
 </Project>
