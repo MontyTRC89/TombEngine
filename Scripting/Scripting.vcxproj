@@ -24,7 +24,10 @@
     <ClInclude Include="include\GameScriptPosition.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="frameworkandsol.cpp" />
+    <ClCompile Include="frameworkandsol.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
