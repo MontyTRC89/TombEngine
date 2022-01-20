@@ -191,10 +191,10 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
 	result.Position.FloorSlope = (result.Position.Bridge < 0) && (abs(floorTilts.first) > 2 || abs(floorTilts.second) > 2);
-	// TODO: Check with bridges.
-	result.Position.CeilingSlope = abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2;
+	result.Position.CeilingSlope = (result.Position.Bridge > 0) && (abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType.
+	// TODO: check with monkey swing.
 	if ((y + CLICK(2)) < floor->FloorHeight(x, z))
 		result.FloorTiltZ = result.FloorTiltX = 0;
 
@@ -695,9 +695,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	// TODO: Check whether HeightUp should be <= or <. @Sezz 2021.01.16
-	if (coll->Front.Ceiling >= coll->Setup.BadCeilingHeightDown ||
-		coll->Front.Ceiling <= coll->Setup.BadCeilingHeightUp)
+	if (coll->Front.Ceiling > coll->Setup.BadCeilingHeightDown ||
+		coll->Front.Ceiling < coll->Setup.BadCeilingHeightUp)
 	{
 		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
