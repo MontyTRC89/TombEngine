@@ -14,7 +14,6 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
-void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 

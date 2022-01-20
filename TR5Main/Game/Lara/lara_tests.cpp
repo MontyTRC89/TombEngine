@@ -309,23 +309,22 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || (info->gunStatus != LG_HANDS_FREE) || (coll->HitStatic))
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
 		return false;
 
-	if (info->canMonkeySwing && coll->CollisionType == CT_TOP)
+	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
+		coll->CollisionType == CT_TOP)
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		info->gunStatus = LG_HANDS_BUSY;
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
-
-		DoLaraMonkeySnap(item, coll);
-
+		item->pos.yPos += coll->Middle.Ceiling;
 		return true;
 	}
 
-	if ((coll->CollisionType != CT_FRONT) || (coll->Middle.Ceiling > -STEPUP_HEIGHT))
+	if (coll->Middle.Ceiling > -STEPUP_HEIGHT || coll->CollisionType != CT_FRONT)
 		return false;
 
 	int edge;
@@ -339,7 +338,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
 		return false;
 
-		SetAnimation(item, LA_REACH_TO_HANG, 12);
+	SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 	auto bounds = GetBoundsAccurate(item);
 
@@ -371,7 +370,8 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
 		return false;
 
-	if (info->canMonkeySwing && coll->CollisionType == CT_TOP)
+	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
+		coll->CollisionType == CT_TOP)
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		ResetLaraFlex(item);
@@ -379,9 +379,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
-
-		DoLaraMonkeySnap(item, coll);
-
+		item->pos.yPos += coll->Middle.Ceiling;
 		return true;
 	}
 
