@@ -55,7 +55,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\spdlog;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\flatbuffers;$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)TR5Main\Libs\spdlog</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
@@ -149,6 +149,7 @@ CALL gen.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="frameworkandsol.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
