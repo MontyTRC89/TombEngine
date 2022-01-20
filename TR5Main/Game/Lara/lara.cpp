@@ -822,7 +822,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (KeyMap[DIK_D])
 		item->hitPoints = 0;
 
-	static PHD_3DPOS  posO = { 0, 0, 0, 0, 0, 0 };
+	static PHD_3DPOS posO = item->pos;
 	static short roomNumO = item->roomNumber;
 	static CAMERA_INFO camO = Camera;
 
@@ -835,7 +835,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else if (KeyMap[DIK_E])
 	{
 		item->pos = posO;
-		item->roomNumber - roomNumO;
+		item->roomNumber = roomNumO;
 		Camera = camO;
 	}
 	

@@ -51,14 +51,14 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_MOVE_TURN_MAX / 2)
-			info->turnRate = -LARA_MONKEY_MOVE_TURN_MAX / 2;
+		if (info->turnRate < -LARA_MONKEY_TURN_MAX / 2)
+			info->turnRate = -LARA_MONKEY_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_MOVE_TURN_MAX / 2)
-			info->turnRate = LARA_MONKEY_MOVE_TURN_MAX / 2;
+		if (info->turnRate > LARA_MONKEY_TURN_MAX / 2)
+			info->turnRate = LARA_MONKEY_TURN_MAX / 2;
 	}
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
@@ -178,14 +178,14 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_MOVE_TURN_MAX)
-			info->turnRate = -LARA_MONKEY_MOVE_TURN_MAX;
+		if (info->turnRate < -LARA_MONKEY_TURN_MAX)
+			info->turnRate = -LARA_MONKEY_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_MOVE_TURN_MAX)
-			info->turnRate = LARA_MONKEY_MOVE_TURN_MAX;
+		if (info->turnRate > LARA_MONKEY_TURN_MAX)
+			info->turnRate = LARA_MONKEY_TURN_MAX;
 	}
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
@@ -527,6 +527,12 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
+		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_FORWARD;
+			return;
+		}
+
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
@@ -587,6 +593,12 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
+		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_FORWARD;
+			return;
+		}
+
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
