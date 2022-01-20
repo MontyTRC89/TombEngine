@@ -23,7 +23,6 @@ void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle);
 void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll);
 void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll);
-short GetDirOctant(int rot);
 void GetLaraDeadlyBounds();
 
 void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle);

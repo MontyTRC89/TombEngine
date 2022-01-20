@@ -163,7 +163,8 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 
 bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
+	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT
+		|| coll->HitTallObject)
 	{
 		ShiftItem(item, coll);
 
@@ -392,11 +393,6 @@ void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += SWAMP_GRAVITY;
 	else if (coll->Middle.Floor != NO_HEIGHT)
 		item->pos.yPos += coll->Middle.Floor;
-}
-
-short GetDirOctant(int rot)
-{
-	return abs(rot) >= ANGLE(45) && abs(rot) <= ANGLE(135.0f);
 }
 
 void GetLaraDeadlyBounds()

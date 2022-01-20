@@ -190,8 +190,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = (result.Position.Bridge < 0) && (abs(floorTilts.first) > 2 || abs(floorTilts.second) > 2);
-	result.Position.CeilingSlope = (result.Position.Bridge > 0) && (abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2);
+	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(floorTilts.first) > 2 || abs(floorTilts.second) > 2);
+	result.Position.CeilingSlope = result.Position.Bridge > 0 && (abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2);
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType.
 	// TODO: check with monkey swing.
