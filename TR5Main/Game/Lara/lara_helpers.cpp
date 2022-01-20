@@ -143,26 +143,6 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
-void DoLaraMonkeySnap(ITEM_INFO* item, COLL_INFO* coll)
-{
-	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollisionResult(item);
-
-	// TODO: Static detection.
-	//TestForObjectOnLedge(item, coll);
-
-	if (probe.BottomBlock->Flags.Monkeyswing &&			// Monkey swing sector set.
-		(probe.Position.Ceiling - y) <= CLICK(1) &&		// Lower bound.
-		(probe.Position.Ceiling - y) >= -CLICK(1) &&	// Upper bound.
-		!probe.Position.CeilingSlope &&					// No ceiling slope.
-		probe.Position.Ceiling != NO_HEIGHT)
-	{
-		item->pos.yPos = probe.Position.Ceiling + LARA_HEIGHT_MONKEY;
-	}
-	else
-		SetLaraMonkeyFallState(item);
-}
-
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
 	LaraInfo*& info = item->data;
