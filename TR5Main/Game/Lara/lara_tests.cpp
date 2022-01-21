@@ -2143,8 +2143,8 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testDa
 	auto probe = GetCollisionResult(item, testData.Angle, testData.Dist, -coll->Setup.Height);
 	bool isWading = testData.CheckWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
-	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||									// Highest floor bound...
-			probe.Position.FloorSlope) &&														// OR surface is a slope.
+	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||									// Within highest floor bound...
+			probe.Position.FloorSlope) &&														// OR surface is a slope. TODO: May fail when coming to a slope from the side.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||	// Ceiling height is permissive... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
 				(probe.Position.Floor - y) >= CLICK(0.5f))) &&									// AND there is a drop below.

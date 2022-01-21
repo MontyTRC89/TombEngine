@@ -242,7 +242,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		SetLaraJumpQueue(item, coll);
+		SetLaraRunJumpQueue(item, coll);
 	}
 
 	if (TrInput & IN_SPRINT && info->sprintTimer &&
