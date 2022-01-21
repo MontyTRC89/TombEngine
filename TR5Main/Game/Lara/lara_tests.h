@@ -40,6 +40,7 @@ COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int 
 COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h);
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
