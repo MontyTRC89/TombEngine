@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="frameworkandsol.h" />
+    <ClInclude Include="include\GameScriptCameraInfo.h" />
+    <ClInclude Include="include\GameScriptColor.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
     <ClInclude Include="include\GameScriptRotation.h" />
   </ItemGroup>
@@ -30,6 +32,8 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\GameScriptCameraInfo.cpp" />
+    <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
   </ItemGroup>
