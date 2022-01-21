@@ -1,5 +1,6 @@
 #include "frameworkandsol.h"
 #include "GameScriptColor.h"
+#include <cmath>
 
 /***
 An RGBA or RGB color.
@@ -8,6 +9,23 @@ Components are specified in bytes; all values are clamped to [0, 255].
 @miscclass Color
 @pragma nostrip
 */
+
+static byte FloatComponentToByte(float v)
+{
+	//todo look into what these actually do AND TEST THEM
+	//todo like, see if these are actually not undefined or some shit
+	auto lval = std::lroundf((v / 2.0f) * 255.0f);
+	return static_cast<byte>(lval);
+}
+
+static float ByteComponentToFloat(byte b)
+{
+	//todo look into what these actually do AND TEST THEM
+	//todo like, see if these are actually not undefined or some shit
+	float f = b;
+	f = (f / 255.0f) * 2.0f;
+	return f;
+}
 
 void GameScriptColor::Register(sol::state* state)
 {
@@ -60,9 +78,20 @@ GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a) : GameScriptCol
 	SetA(a);
 }
 
-GameScriptColor::GameScriptColor(Vector3 const& col) : GameScriptColor{ col.x, col.y, col.z } {}
+GameScriptColor::GameScriptColor(Vector3 const& col) :
+	r(FloatComponentToByte(col.x)),
+	g(FloatComponentToByte(col.y)),
+	b(FloatComponentToByte(col.z))
+{
+}
 
-GameScriptColor::GameScriptColor(Vector4 const& col) : GameScriptColor{ col.x, col.y, col.z, col.w } {}
+GameScriptColor::GameScriptColor(Vector4 const& col) :
+	r(FloatComponentToByte(col.x)),
+	g(FloatComponentToByte(col.y)),
+	b(FloatComponentToByte(col.z)),
+	a(FloatComponentToByte(col.w))
+{
+}
 
 GameScriptColor::GameScriptColor(D3DCOLOR col)
 {
@@ -77,12 +106,12 @@ GameScriptColor::GameScriptColor(D3DCOLOR col)
 
 GameScriptColor::operator Vector3() const
 {
-	return Vector3{ float(r), float(g), float(b) };
+	return Vector3{ ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b) };
 }
 
 GameScriptColor::operator Vector4() const
 {
-	return Vector4{ float(r), float(g), float(b), float(a) };
+	return Vector4{ ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) };
 }
 
 // D3DCOLOR is 32 bits and is layed out as ARGB.
