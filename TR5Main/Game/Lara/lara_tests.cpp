@@ -1131,13 +1131,8 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	g_Renderer.printDebugMessage("floor: %d", coll->Middle.Floor);
-	g_Renderer.printDebugMessage("fall: %d", item->fallspeed);
-	g_Renderer.printDebugMessage("grav: %d", item->airborne);
-
-	if (item->airborne &&
-		item->fallspeed >= 0 &&
-		(abs(coll->Middle.Floor) <= std::min(abs(item->fallspeed), STEPUP_HEIGHT) ||
+	if (item->airborne && item->fallspeed >= 0 &&
+		(coll->Middle.Floor <= std::min((int)item->fallspeed, STEPUP_HEIGHT) ||
 			TestLaraSwamp(item)))
 	{
 		return true;
