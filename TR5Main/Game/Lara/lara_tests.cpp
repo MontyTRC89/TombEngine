@@ -312,15 +312,14 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
 		return false;
 
-	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
-		(coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
+	if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
-		info->gunStatus = LG_HANDS_BUSY;
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
 		item->pos.yPos += coll->Middle.Ceiling;
+		info->gunStatus = LG_HANDS_BUSY;
 		return true;
 	}
 
@@ -357,8 +356,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	info->torsoYrot = 0;
 	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	info->torsoZrot = 0;
 
 	return true;
 }
@@ -370,16 +370,15 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
 		return false;
 
-	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
-		(coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
+	if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		ResetLaraFlex(item);
-		info->gunStatus = LG_HANDS_BUSY;
 		item->gravityStatus = false;
 		item->speed = 0;
 		item->fallspeed = 0;
 		item->pos.yPos += coll->Middle.Ceiling;
+		info->gunStatus = LG_HANDS_BUSY;
 		return true;
 	}
 
@@ -426,10 +425,10 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll, 0.2f);
 
-	info->gunStatus = LG_HANDS_BUSY;
 	item->gravityStatus = true;
 	item->speed = 2;
 	item->fallspeed = 1;
+	info->gunStatus = LG_HANDS_BUSY;
 
 	return true;
 }
@@ -1098,12 +1097,27 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 	return true;
 }
 
+bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(0.5f) &&
+		(coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
 
-	if (!probe.BottomBlock->Flags.Monkeyswing ||		// No monkey sector.
+	if (!info->canMonkeySwing ||						// No monkey sector.
 		(probe.Position.Ceiling - y) > CLICK(1.25f) ||	// Lower bound.
 		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||	// Upper bound.
 		probe.Position.CeilingSlope ||					// Ceiling slope.
@@ -1121,9 +1135,10 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 	g_Renderer.printDebugMessage("fall: %d", item->fallspeed);
 	g_Renderer.printDebugMessage("grav: %d", item->gravityStatus);
 
-	if (//item->gravityStatus &&
+	if (item->gravityStatus &&
 		item->fallspeed >= 0 &&
-		(coll->Middle.Floor <= item->fallspeed || TestLaraSwamp(item)))
+		(abs(coll->Middle.Floor) <= std::min(abs(item->fallspeed), STEPUP_HEIGHT) ||
+			TestLaraSwamp(item)))
 	{
 		return true;
 	}

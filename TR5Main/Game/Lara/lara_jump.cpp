@@ -28,7 +28,10 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -103,7 +106,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	//item->gravityStatus = true;
+	item->gravityStatus = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -170,7 +173,10 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -259,6 +265,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_IDLE;
+		info->jumpDirection = LaraJumpDirection::None;
 		return;
 	}
 
@@ -346,9 +353,6 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->gravityStatus = false;
-	item->fallspeed = 0;
-
 	info->moveAngle = item->pos.yRot;
 	switch (info->jumpDirection)
 	{
@@ -368,6 +372,8 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 	
+	item->gravityStatus = false;
+	item->fallspeed = 0; // TODO: Check this.
 	coll->Setup.BadFloorHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = 0;
@@ -415,7 +421,10 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -477,7 +486,10 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -527,7 +539,10 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -566,7 +581,7 @@ void lara_col_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraJumpCollision(item, coll, item->pos.yRot - ANGLE(90.0f));
 }
 
-// State:		LS_JUMP_UP (27)
+// State:		LS_JUMP_UP (28)
 // Collision:	lara_col_jump_up()
 void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -577,7 +592,10 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}
@@ -658,7 +676,10 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
+		{
 			item->goalAnimState = LS_DEATH;
+			DoLaraLand(item, coll);
+		}
 
 		return;
 	}

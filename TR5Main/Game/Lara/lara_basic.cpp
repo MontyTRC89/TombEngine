@@ -392,7 +392,6 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		// TODO: Can't jump left or right when holding WALK.
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
 			item->goalAnimState = LS_JUMP_PREPARE;
