@@ -129,7 +129,7 @@ namespace TEN::Entities::TR4
 
 				int bloodCount = 0;
 
-				if ((item->itemFlags[0] > 1024 || LaraItem->gravityStatus) 
+				if ((item->itemFlags[0] > 1024 || LaraItem->airborne) 
 					&& (item->triggerFlags & 7) > 2 
 					&& (item->triggerFlags & 7) < 6)
 				{
@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 						LaraItem->currentAnimState = LS_DEATH;
 						LaraItem->goalAnimState = LS_DEATH;
-						LaraItem->gravityStatus = false;
+						LaraItem->airborne = false;
 					}
 				}
 			}

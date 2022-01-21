@@ -30,7 +30,7 @@ bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->goalAnimState = LS_IDLE;
 		item->speed = 0;
-		item->gravityStatus = false;
+		item->airborne = false;
 
 		return true;
 	}
@@ -141,7 +141,7 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->gravityStatus = false;
+		item->airborne = false;
 		item->speed = 0;
 
 		return true;
@@ -170,7 +170,7 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->goalAnimState = LS_MONKEY_IDLE;
 		item->speed = 0;
-		item->gravityStatus = false;
+		item->airborne = false;
 
 		return true;
 	}
@@ -208,7 +208,7 @@ void SetLaraHitCeiling(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->speed = 0;
 	item->fallspeed = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 }
 
 void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
@@ -382,7 +382,7 @@ void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
-		item->gravityStatus = false;
+		item->airborne = false;
 		item->fallspeed = 0;
 	}
 }
@@ -416,7 +416,7 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = moveAngle;
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;

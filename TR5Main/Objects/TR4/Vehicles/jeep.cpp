@@ -435,7 +435,7 @@ static int GetOnJeep(int itemNumber)
 	if (LaraItem->animNumber != LA_STAND_IDLE)
 		return 0;
 
-	if (LaraItem->gravityStatus)
+	if (LaraItem->airborne)
 		return 0;
 
 	if (abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE)

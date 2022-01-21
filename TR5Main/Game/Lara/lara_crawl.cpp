@@ -104,7 +104,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	info->torsoXrot = 0;
 	info->torsoYrot = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
@@ -177,7 +177,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
-	item->gravityStatus = 0;
+	item->airborne = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
@@ -444,7 +444,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoXrot = 0;
 	info->torsoYrot = 0;
 	item->fallspeed = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -543,7 +543,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	info->torsoXrot = 0;
 	info->torsoYrot = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -640,7 +640,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -823,7 +823,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item);
 		info->gunStatus = LG_HANDS_BUSY;
 		item->pos.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
-		item->gravityStatus = true;
+		item->airborne = true;
 		item->speed = 2;
 		item->fallspeed = 1;
 	}

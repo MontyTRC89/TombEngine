@@ -79,7 +79,7 @@ static bool BigGunTestMount(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		Lara.gunStatus != LG_HANDS_FREE ||
-		laraItem->gravityStatus) // BUG: Lara can still mount when jumping up. @Sezz 2021.11.16
+		laraItem->airborne) // BUG: Lara can still mount when jumping up. @Sezz 2021.11.16
 	{
 		return false;
 	}
@@ -165,7 +165,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->goalAnimState = BGUN_STATE_MOUNT;
 		laraItem->currentAnimState = BGUN_STATE_MOUNT;
 		laraItem->pos = bGunItem->pos;
-		laraItem->gravityStatus = false;
+		laraItem->airborne = false;
 		laraInfo->gunStatus = LG_HANDS_BUSY;
 		bGunItem->hitPoints = 1;
 		bGunInfo->flags = 0;

@@ -419,7 +419,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState == LS_IDLE &&
 		item->goalAnimState == LS_IDLE &&
 		item->animNumber == LA_STAND_IDLE &&
-		!item->gravityStatus)
+		!item->airborne)
 	{
 		info->gunStatus = LG_HANDS_FREE;
 	}
@@ -463,7 +463,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					info->air = LARA_AIR_MAX;
 					info->waterStatus = LW_UNDERWATER;
-					item->gravityStatus = false;
+					item->airborne = false;
 					item->pos.yPos += 100;
 
 					UpdateItemRoom(item, 0);
@@ -504,13 +504,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
 					!isSwamp &&
-					item->gravityStatus)
+					item->airborne)
 				{
 					Splash(item);
 					item->goalAnimState = LS_IDLE;
 				}
 				// Lara is grounded; don't splash again.
-				else if (!item->gravityStatus)
+				else if (!item->airborne)
 					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
 				{
@@ -539,7 +539,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					{
 						SetAnimation(item, LA_FALL_START);
 						item->speed = item->fallspeed / 4;
-						item->gravityStatus = true;
+						item->airborne = true;
 						item->fallspeed = 0;
 						item->pos.zRot = 0;
 						item->pos.xRot = 0;
@@ -585,7 +585,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					SetAnimation(item, LA_FALL_START);
 					item->speed = item->fallspeed / 4;
-					item->gravityStatus = true;
+					item->airborne = true;
 					info->waterStatus = LW_ABOVE_WATER;
 				}
 				else
@@ -616,7 +616,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 					info->waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater;
-					item->gravityStatus = false;
+					item->airborne = false;
 					item->fallspeed = 0;
 					item->pos.zRot = 0;
 					item->pos.xRot = 0;
@@ -1145,7 +1145,7 @@ void AnimateLara(ITEM_INFO* item)
 				case COMMAND_JUMP_VELOCITY:
 					item->fallspeed = *(cmd++);
 					item->speed = *(cmd++);
-					item->gravityStatus = true;
+					item->airborne = true;
 					if (info->calcFallSpeed)
 					{
 						item->fallspeed = info->calcFallSpeed;
@@ -1237,7 +1237,7 @@ void AnimateLara(ITEM_INFO* item)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
 	lateral >>= 16;
 
-	if (item->gravityStatus)
+	if (item->airborne)
 	{
 		if (TestLaraSwamp(item))
 		{
@@ -1245,7 +1245,7 @@ void AnimateLara(ITEM_INFO* item)
 			if (abs(item->speed) < 8)
 			{
 				item->speed = 0;
-				item->gravityStatus = false;
+				item->airborne = false;
 			}
 			if (item->fallspeed > 128)
 				item->fallspeed /= 2;

@@ -31,7 +31,7 @@ table Item {
 	triggered: bool;
 	active: bool;
 	status: int32;
-	gravity_status: bool;
+	airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;

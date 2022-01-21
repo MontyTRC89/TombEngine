@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 		if ((TrInput & IN_ACTION)
 			&& !Lara.gunStatus
 			&& (l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
-			&& (l->status || l->gravityStatus)
+			&& (l->status || l->airborne)
 			&& l->fallspeed > 0
 			&& !item->currentAnimState)
 		{
@@ -41,7 +41,7 @@ namespace TEN::Entities::Switches
 				l->animNumber = LA_JUMPSWITCH_PULL;
 				l->fallspeed = 0;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->gravityStatus = false;
+				l->airborne = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				item->goalAnimState = SWITCH_ON;

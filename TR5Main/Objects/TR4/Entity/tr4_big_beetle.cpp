@@ -51,7 +51,7 @@ namespace TEN::Entities::TR4
 					{
 						item->animNumber = Objects[item->objectNumber].animIndex + 5;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->gravityStatus = true;
+						item->airborne = true;
 						item->currentAnimState = 6;
 						item->speed = 0;
 						item->pos.xRot = 0;
@@ -60,7 +60,7 @@ namespace TEN::Entities::TR4
 				else if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
-					item->gravityStatus = false;
+					item->airborne = false;
 					item->fallspeed = 0;
 					item->goalAnimState = 8;
 				}

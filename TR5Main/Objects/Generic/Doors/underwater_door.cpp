@@ -38,7 +38,7 @@ namespace TEN::Entities::Doors
 
 		if (TrInput & IN_ACTION
 			&& l->currentAnimState == LS_UNDERWATER_STOP
-			&& !(item->status && item->gravityStatus)
+			&& !(item->status && item->airborne)
 			&& Lara.waterStatus == LW_UNDERWATER
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.interactedItem == itemNum)

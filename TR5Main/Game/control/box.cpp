@@ -242,7 +242,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	LaraItem->pos.xRot = item->pos.xRot;
 	LaraItem->pos.zRot = item->pos.zRot;
 	LaraItem->fallspeed = 0;
-	LaraItem->gravityStatus = false;
+	LaraItem->airborne = false;
 	LaraItem->speed = 0;
 
 	if (item->roomNumber != LaraItem->roomNumber)

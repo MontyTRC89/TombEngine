@@ -76,7 +76,7 @@ namespace TEN::Entities::Generic
 			}
 
 			if (TrInput & IN_DRAW
-				&& !(LaraItem->gravityStatus)
+				&& !(LaraItem->airborne)
 				&& !LaraItem->fallspeed
 				&& LaraItem->currentAnimState != LS_JUMP_PREPARE
 				&& LaraItem->currentAnimState != LS_JUMP_UP
@@ -96,7 +96,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case 1:
-			if (Lara.leftArm.frameNumber < 12 && LaraItem->gravityStatus)
+			if (Lara.leftArm.frameNumber < 12 && LaraItem->airborne)
 			{
 				Lara.leftArm.lock = false;
 				Lara.leftArm.frameNumber = 0;
@@ -296,7 +296,7 @@ namespace TEN::Entities::Generic
 			|| !(TrInput & IN_ACTION)
 			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
-			|| l->gravityStatus)
+			|| l->airborne)
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, l, coll);

@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 			&& TrInput & IN_ACTION
 			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
-			&& l->gravityStatus == false
+			&& l->airborne == false
 			&& Lara.gunStatus == LG_HANDS_FREE
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{

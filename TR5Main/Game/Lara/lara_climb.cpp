@@ -941,7 +941,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short roomNumber = item->roomNumber;
 
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 
 	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
@@ -956,7 +956,7 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	SetAnimation(item, LA_FALL_START);
 
 	item->speed = 2;
-	item->gravityStatus = true;
+	item->airborne = true;
 	item->fallspeed = 1;
 
 	Lara.gunStatus = LG_HANDS_FREE;

@@ -21,7 +21,7 @@ void FallingCeilingControl(short itemNumber)
 	else
 	{
 		item->goalAnimState = 1;
-		item->gravityStatus = true;;
+		item->airborne = true;;
 	}
 
 	AnimateItem(item);
@@ -44,7 +44,7 @@ void FallingCeilingControl(short itemNumber)
 			if (item->pos.yPos >= item->floor)
 			{
 				item->pos.yPos = item->floor;
-				item->gravityStatus = false;
+				item->airborne = false;
 				item->goalAnimState = 2;
 				item->fallspeed = 0;
 			}

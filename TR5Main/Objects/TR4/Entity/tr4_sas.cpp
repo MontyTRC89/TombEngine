@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 			|| l->currentAnimState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus
-			|| l->gravityStatus
+			|| l->airborne
 			|| item->flags & 0x3E00)
 			&& (!(Lara.isMoving) || Lara.interactedItem != itemNumber))
 		{

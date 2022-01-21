@@ -328,7 +328,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
-			lara->gravityStatus = true;
+			lara->airborne = true;
 			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->moveAngle = skidoo->pos.yRot;
 			skidoo->flags |= ONESHOT;
@@ -620,7 +620,7 @@ int SkidooCheckGetOn(ITEM_INFO* lara, ITEM_INFO* skidoo, COLL_INFO* coll)
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
-		lara->gravityStatus)
+		lara->airborne)
 	{
 		return mountType = 0;
 	}

@@ -280,7 +280,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	ITEM_INFO* barItem = &g_Level.Items[Lara.interactedItem];
 
-	item->gravityStatus = true;
+	item->airborne = true;
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 	{
@@ -1152,7 +1152,7 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 
 		AnimateLara(item);
 
-		item->gravityStatus = true;
+		item->airborne = true;
 		item->speed = 100;
 		item->fallspeed = 40;
 		info->moveAngle = item->pos.yRot;

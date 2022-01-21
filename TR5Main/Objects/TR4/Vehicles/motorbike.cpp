@@ -298,7 +298,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->gravityStatus)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->airborne)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
@@ -1367,7 +1367,7 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even
     lara->goalAnimState = BIKE_IDLE;
     lara->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_IDLE;
     lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-    lara->gravityStatus = false;
+    lara->airborne = false;
     item->animNumber = lara->animNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
     item->frameNumber = lara->frameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
     item->hitPoints = 1;

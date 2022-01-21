@@ -183,11 +183,11 @@ namespace TEN::Entities::TR4
             {
                 item->goalAnimState = STATE_BAT_DEATH;
                 item->pos.yPos = item->floor;
-                item->gravityStatus = false;
+                item->airborne = false;
             }
             else
             {
-                item->gravityStatus = true;
+                item->airborne = true;
                 item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_FALLING;
                 item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
                 item->goalAnimState = STATE_BAT_FALLING;
