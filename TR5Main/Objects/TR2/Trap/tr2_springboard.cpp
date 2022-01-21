@@ -21,7 +21,7 @@ void SpringBoardControl(short itemNumber)
 			LaraItem->speed = -LaraItem->speed;
 
 		LaraItem->fallspeed = -240;
-		LaraItem->gravityStatus = true;
+		LaraItem->airborne = true;
 		LaraItem->animNumber = LA_FALL_START;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->currentAnimState = LS_JUMP_FORWARD;

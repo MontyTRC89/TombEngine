@@ -190,7 +190,7 @@ namespace TEN::Entities::Generic
 			&& Lara.gunStatus == LG_HANDS_FREE 
 			&& (l->currentAnimState == LS_REACH
 				|| l->currentAnimState == LS_JUMP_UP) 
-			&& l->gravityStatus 
+			&& l->airborne 
 			&& l->fallspeed > 0
 			&& rope->active)
 		{
@@ -219,7 +219,7 @@ namespace TEN::Entities::Generic
 				}
 
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->gravityStatus = false;
+				l->airborne = false;
 				l->fallspeed = 0;
 
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -641,7 +641,7 @@ namespace TEN::Entities::Generic
 			}
 
 			item->pos.xRot = 0;
-			item->gravityStatus = true;
+			item->airborne = true;
 
 			Lara.gunStatus = LG_HANDS_FREE;
 
@@ -678,7 +678,7 @@ namespace TEN::Entities::Generic
 		item->goalAnimState = LS_JUMP_FORWARD;
 
 		item->fallspeed = 0;
-		item->gravityStatus = true;
+		item->airborne = true;
 
 		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.ropePtr = -1;

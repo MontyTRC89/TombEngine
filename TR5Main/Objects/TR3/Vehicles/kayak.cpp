@@ -279,7 +279,7 @@ KayakMountType KayakGetMountType(short itemNum, ITEM_INFO* laraItem, COLL_INFO* 
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
-		laraItem->gravityStatus)
+		laraItem->airborne)
 	{
 		return KayakMountType::None;
 	}
@@ -1069,10 +1069,10 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 			laraItem->pos.xRot = 0;
 			laraItem->pos.yRot = kayakItem->pos.yRot - ANGLE(90.0f);
 			laraItem->pos.zRot = 0;
-			laraItem->gravityStatus = true;
+			laraItem->airborne = true;
 			laraItem->fallspeed = -50;
 			laraItem->speed = 40;
-			laraItem->gravityStatus = true;
+			laraItem->airborne = true;
 			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 		}
@@ -1093,10 +1093,10 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 			laraItem->pos.xRot = 0;
 			laraItem->pos.yRot = kayakItem->pos.yRot + ANGLE(90.0f);
 			laraItem->pos.zRot = 0;
-			laraItem->gravityStatus = true;
+			laraItem->airborne = true;
 			laraItem->fallspeed = -50;
 			laraItem->speed = 40;
-			laraItem->gravityStatus = true;
+			laraItem->airborne = true;
 			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 		}
@@ -1196,7 +1196,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 	laraItem->goalAnimState = 12;
 	laraItem->hitPoints = 0;
 	laraItem->fallspeed = 0;
-	laraItem->gravityStatus = 0;
+	laraItem->airborne = 0;
 	laraItem->speed = 0;
 
 	AnimateItem(laraItem);
@@ -1243,7 +1243,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->pos.zPos = kayakItem->pos.zPos;
 		laraItem->pos.yRot = kayakItem->pos.yRot;
 		laraItem->pos.xRot = laraItem->pos.zRot = 0;
-		laraItem->gravityStatus = false;
+		laraItem->airborne = false;
 		laraItem->speed = 0;
 		laraItem->fallspeed = 0;
 

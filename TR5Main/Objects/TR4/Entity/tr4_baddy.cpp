@@ -442,28 +442,28 @@ namespace TEN::Entities::TR4
 			switch (item->currentAnimState)
 			{
 			case STATE_BADDY_DEATH:
-				item->gravityStatus = true;
+				item->airborne = true;
 				currentCreature->LOT.isMonkeying = false;
 				if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
 					item->fallspeed = 0;
-					item->gravityStatus = false;
+					item->airborne = false;
 				}
 				break;
 
 			case STATE_BADDY_MONKEY_TO_FREEFALL:
 				item->goalAnimState = STATE_BADDY_FREEFALL;
-				item->gravityStatus = false;
+				item->airborne = false;
 				break;
 
 			case STATE_BADDY_FREEFALL:
-				item->gravityStatus = true;
+				item->airborne = true;
 				if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
 					item->fallspeed = 0;
-					item->gravityStatus = false;
+					item->airborne = false;
 					item->goalAnimState = STATE_BADDY_FREEFALL_LAND_DEATH;
 				}
 				break;
@@ -1045,7 +1045,7 @@ namespace TEN::Entities::TR4
 						LaraItem->goalAnimState = LS_JUMP_UP;
 						LaraItem->animNumber = LA_JUMP_UP;
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->frameNumber].frameBase + 9;
-						LaraItem->gravityStatus = true;
+						LaraItem->airborne = true;
 						LaraItem->speed = 2;
 						LaraItem->fallspeed = 1;
 						LaraItem->pos.yPos += (STEP_SIZE * 0.75f);

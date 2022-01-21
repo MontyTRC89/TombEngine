@@ -331,7 +331,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
-		laraItem->gravityStatus)
+		laraItem->airborne)
 	{
 		return false;
 	}
@@ -689,7 +689,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
 			laraItem->fallspeed = 0;
-			laraItem->gravityStatus = false;
+			laraItem->airborne = false;
 			laraItem->pos.xRot = laraItem->pos.zRot = 0;
 
 			UpdateItemRoom(laraItem, 0);
@@ -727,7 +727,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			SetAnimation(laraItem, LA_ONWATER_IDLE);
 			laraItem->fallspeed = 0;
-			laraItem->gravityStatus = false;
+			laraItem->airborne = false;
 			laraItem->pos.xRot = laraItem->pos.zRot = 0;
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
@@ -768,7 +768,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
 			laraItem->fallspeed = 0;
-			laraItem->gravityStatus = 0;
+			laraItem->airborne = 0;
 			
 			UPVInfo->Flags |= UPV_DEAD;
 		}
@@ -1070,7 +1070,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		SetAnimation(UPVItem, UPV_ANIM_IDLE);
 		UPVItem->fallspeed = 0;
 		UPVItem->speed = 0;
-		UPVItem->gravityStatus = true;
+		UPVItem->airborne = true;
 		AnimateItem(UPVItem);
 
 		return true;

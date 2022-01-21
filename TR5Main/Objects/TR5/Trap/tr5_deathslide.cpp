@@ -26,7 +26,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->gravityStatus || Lara.gunStatus != LG_HANDS_FREE || l->currentAnimState != LS_IDLE)
+	if (!(TrInput & IN_ACTION) || l->airborne || Lara.gunStatus != LG_HANDS_FREE || l->currentAnimState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -120,7 +120,7 @@ void ControlDeathSlide(short itemNumber)
 			{
 				LaraItem->goalAnimState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
-				LaraItem->gravityStatus = true;
+				LaraItem->airborne = true;
 				LaraItem->speed = item->fallspeed;
 				LaraItem->fallspeed = item->fallspeed / 4;
 			}

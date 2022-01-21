@@ -358,7 +358,7 @@ void InitialiseItem(short itemNum)
 
 	item->active = false;
 	item->status = ITEM_NOT_ACTIVE;
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->hitStatus = false;
 	item->collidable = true;
 	item->lookedAt = false;

@@ -41,7 +41,7 @@ namespace TEN::Entities::TR5
 				|| Lara.gunStatus
 				|| l->currentAnimState != LS_IDLE
 				|| l->animNumber != LA_STAND_IDLE
-				|| l->gravityStatus)
+				|| l->airborne)
 			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 		{
 			if (l->currentAnimState != LS_DOVESWITCH)

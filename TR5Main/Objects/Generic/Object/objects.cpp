@@ -200,7 +200,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			l->animNumber = LA_SWINGBAR_GRAB;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->fallspeed = false;
-			l->gravityStatus = false;
+			l->airborne = false;
 
 			Lara.headYrot = 0;
 			Lara.headXrot = 0;

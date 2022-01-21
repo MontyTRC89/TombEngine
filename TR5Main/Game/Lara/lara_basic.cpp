@@ -151,7 +151,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -600,7 +600,7 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.BadFloorHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
@@ -717,7 +717,7 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->fallspeed = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 	coll->Setup.FloorSlopesArePits = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -1349,7 +1349,7 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -1667,7 +1667,7 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
 	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
@@ -1752,7 +1752,7 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
 	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
@@ -1815,7 +1815,7 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -1884,7 +1884,7 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -2245,7 +2245,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->goalAnimState = LS_RUN_FORWARD;
 
-		item->gravityStatus = false;
+		item->airborne = false;
 		item->fallspeed = 0;
 		item->pos.yPos += coll->Middle.Floor;
 		item->speed = 0;

@@ -183,7 +183,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			anim = item->animNumber - Objects[ID_DRAGON_BACK].animIndex;
 			frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 			if ((anim == DRAGON_DEAD_ANIM || (anim == DRAGON_DEAD_ANIM + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
-				(TrInput & IN_ACTION) && item->objectNumber == ID_DRAGON_BACK && !laraitem->gravityStatus &&
+				(TrInput & IN_ACTION) && item->objectNumber == ID_DRAGON_BACK && !laraitem->airborne &&
 				shift <= DRAGON_MID && shift > DRAGON_CLOSE - 350 && side_shift > -350 && side_shift < 350 &&
 				angle > 0x4000 - ANGLE(30) && angle < 0x4000 + ANGLE(30))
 			{
@@ -199,7 +199,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				laraitem->pos.xRot = item->pos.xRot;
 				laraitem->pos.zRot = item->pos.zRot;
 				laraitem->fallspeed = 0;
-				laraitem->gravityStatus = false;
+				laraitem->airborne = false;
 				laraitem->speed = 0;
 
 				if (item->roomNumber != laraitem->roomNumber)

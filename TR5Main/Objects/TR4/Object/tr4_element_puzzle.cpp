@@ -248,7 +248,7 @@ namespace TEN::Entities::TR4
                 || l->currentAnimState != LS_IDLE
                 || l->animNumber != LA_STAND_IDLE
                 || !Lara.litTorch
-                || l->gravityStatus)
+                || l->airborne)
             {
                 if (l->animNumber != LA_TORCH_LIGHT_3
                     || g_Level.Anims[LA_TORCH_LIGHT_3].frameBase + 16
