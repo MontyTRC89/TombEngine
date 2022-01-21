@@ -244,9 +244,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Scripting\GameScriptAIObject.h" />
     <ClInclude Include="Scripting\GameScriptAudioTrack.h" />
-    <ClInclude Include="Scripting\GameScriptCameraInfo.h" />
     <ClInclude Include="Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="Scripting\GameScriptColor.h" />
     <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
@@ -465,7 +463,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
     <ClInclude Include="Scripting\GameScriptMirror.h" />
-    <ClInclude Include="Scripting\GameScriptNamedBase.h" />
     <ClInclude Include="Scripting\GameScriptSettings.h" />
     <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
     <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
@@ -478,8 +475,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\LuaHandler.h" />
     <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
-    <ClInclude Include="Scripting\ScriptAssert.h" />
-    <ClInclude Include="Scripting\ScriptUtil.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
@@ -907,14 +902,6 @@ CALL gen.bat</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptAudioTrack.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptColor.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>

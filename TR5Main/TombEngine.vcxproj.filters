@@ -294,8 +294,6 @@
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptAIObject.cpp" />
     <ClCompile Include="Scripting\GameScriptAudioTrack.cpp" />
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptColor.cpp" />
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
     <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
@@ -400,9 +398,7 @@
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Scripting\GameScriptAIObject.h" />
     <ClInclude Include="Scripting\GameScriptAudioTrack.h" />
-    <ClInclude Include="Scripting\GameScriptCameraInfo.h" />
     <ClInclude Include="Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="Scripting\GameScriptColor.h" />
     <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
@@ -621,7 +617,6 @@
     <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
     <ClInclude Include="Scripting\GameScriptMirror.h" />
-    <ClInclude Include="Scripting\GameScriptNamedBase.h" />
     <ClInclude Include="Scripting\GameScriptSettings.h" />
     <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
     <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
@@ -634,8 +629,6 @@
     <ClInclude Include="Scripting\LuaHandler.h" />
     <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
-    <ClInclude Include="Scripting\ScriptAssert.h" />
-    <ClInclude Include="Scripting\ScriptUtil.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
