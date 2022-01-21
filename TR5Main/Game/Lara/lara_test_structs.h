@@ -2,39 +2,39 @@
 
 struct MoveTestData
 {
-	short angle;
-	int lowerBound;
-	int upperBound;
-	bool checkSlopeDown = true;
-	bool checkSlopeUp = true;
-	bool checkDeath = true;
+	short Angle;
+	int LowerBound;
+	int UpperBound;
+	bool CheckSlopeDown = true;
+	bool CheckSlopeUp = true;
+	bool CheckDeath = true;
 };
 
 struct VaultTestData
 {
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int clampMax;
-	int gapMin;
-	bool checkSwampDepth = true;
+	int LowerBound;
+	int UpperBound;
+	int ClampMin;
+	int ClampMax;
+	int GapMin;
+	bool CheckSwampDepth = true;
 };
 
 struct VaultTestResultData
 {
-	bool success;
-	int height;
+	bool Success;
+	int Height;
 };
 
 struct CrawlVaultTestData
 {
-	int lowerBound;
-	int upperBound;
-	int clampMin;
-	int gapMin;
-	int crossDist;
-	int destDist;
-	int probeDeltaMax;
-	bool checkSlope = true;
-	bool checkDeath = true;
+	int LowerBound;
+	int UpperBound;
+	int ClampMin;
+	int GapMin;
+	int CrossDist;
+	int DestDist;
+	int ProbeHeightDifMax;
+	bool CheckSlope = true;
+	bool CheckDeath = true;
 };
