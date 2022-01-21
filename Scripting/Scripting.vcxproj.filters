@@ -27,6 +27,12 @@
     <ClInclude Include="include\GameScriptRotation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameScriptColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameScriptCameraInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -36,6 +42,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptRotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptCameraInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
