@@ -170,7 +170,6 @@ void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 	item->airborne = false;
 
 	LaraSnapToHeight(item, coll);
-	//AnimateLara(item);
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -203,17 +202,19 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 		info->jumpDirection = LaraJumpDirection::None;
 }
 
-void SetLaraJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
+// TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
+// runJumpQueued will never reset, and when the sad cloud flies away, Lara will jump. @Sezz 2022.01.22
+void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	int dist = WALL_SIZE;// WALL_SIZE / LARA_RUN_JUMP_TIME * std::max(1, LARA_RUN_JUMP_TIME/* - info->runJumpCount*/); // TODO: Adaptive distance.
+	int dist = WALL_SIZE;
 	auto probe = GetCollisionResult(item, item->pos.yRot, dist, -coll->Setup.Height);
 
-	if ((TestLaraRunJumpForward(item, coll) ||														// Area ahead is permissive.
-			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||		// Ceiling height is permissive... 
-			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below
+	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
+			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||	// OR ceiling height is permissive far ahead
+			(probe.Position.Floor - y) >= CLICK(0.5f)) &&										// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		info->runJumpQueued = (item->goalAnimState == LS_RUN_FORWARD);
