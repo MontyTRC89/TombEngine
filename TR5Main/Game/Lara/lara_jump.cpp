@@ -106,7 +106,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -152,7 +152,7 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -221,7 +221,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (info->ropePtr == -1)
-		item->gravityStatus = true;
+		item->airborne = true;
 
 	info->moveAngle = item->pos.yRot;
 
@@ -229,7 +229,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
 	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
 
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = 0;
@@ -372,7 +372,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 	
-	item->gravityStatus = false;
+	item->airborne = false;
 	item->fallspeed = 0; // TODO: Check this.
 	coll->Setup.BadFloorHeightDown = TestLaraSwamp(item) ? NO_BAD_POS : STEPUP_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -645,7 +645,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -729,7 +729,7 @@ void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
@@ -781,7 +781,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	info->keepLow = TestLaraKeepLow(item, coll);
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
@@ -811,7 +811,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
 
 		item->fallspeed = 0;
-		item->gravityStatus = false;
+		item->airborne = false;
 		info->gunStatus = LG_HANDS_FREE;
 
 		LaraSnapToHeight(item, coll);
@@ -852,7 +852,7 @@ void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->gravityStatus = true;
+	item->airborne = true;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
 	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;

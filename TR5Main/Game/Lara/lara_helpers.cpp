@@ -167,7 +167,7 @@ void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = 0;
 	item->fallspeed = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 
 	LaraSnapToHeight(item, coll);
 	//AnimateLara(item);
@@ -226,14 +226,14 @@ void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
 	item->fallspeed = 0;
-	item->gravityStatus = true;
+	item->airborne = true;
 }
 
 void SetLaraFallBackState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
 	item->fallspeed = 0;
-	item->gravityStatus = true;
+	item->airborne = true;
 }
 
 void SetLaraMonkeyFallState(ITEM_INFO* item)
@@ -255,7 +255,7 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 	info->gunStatus = LG_HANDS_FREE;
 	item->speed = 2;
 	item->fallspeed = 1;
-	item->gravityStatus = true;
+	item->airborne = true;
 }
 
 short GetLaraSlideDirection(COLL_INFO* coll)

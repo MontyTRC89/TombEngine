@@ -71,7 +71,7 @@ namespace TEN::Entities::Generic
 		else if (isLara && 
 				 TrInput & IN_ACTION &&
 			     !Lara.gunStatus && 
-				 l->gravityStatus && 
+				 l->airborne && 
 				 l->fallspeed > Lara.gunStatus && 
 				 l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
 		{
@@ -97,7 +97,7 @@ namespace TEN::Entities::Generic
 						l->animNumber = LA_JUMP_UP_TO_POLE;
 						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					}
-					l->gravityStatus = false;
+					l->airborne = false;
 					l->fallspeed = false;
 					l->currentAnimState = LS_POLE_IDLE;
 					Lara.gunStatus = LG_HANDS_BUSY;

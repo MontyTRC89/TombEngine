@@ -271,7 +271,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 			lara->pos.yPos = pos.y;
 			lara->pos.zPos = pos.z;
 			lara->fallspeed = quad->fallspeed;
-			lara->gravityStatus = true;
+			lara->airborne = true;
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			lara->hitPoints = 0;
@@ -301,7 +301,7 @@ static int GetOnQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, COLL_INFO* coll)
 	LaraInfo*& laraInfo = lara->data;
 
 	if (!(TrInput & IN_ACTION) ||
-		lara->gravityStatus ||
+		lara->airborne ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
 		quad->flags & ONESHOT ||
 		abs(quad->pos.yPos - lara->pos.yPos) > STEP_SIZE)

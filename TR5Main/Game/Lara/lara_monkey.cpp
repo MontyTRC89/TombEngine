@@ -128,7 +128,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	item->fallspeed = 0;
-	item->gravityStatus = false;
+	item->airborne = false;
 	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
 	coll->Setup.BadFloorHeightUp = 0;
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);

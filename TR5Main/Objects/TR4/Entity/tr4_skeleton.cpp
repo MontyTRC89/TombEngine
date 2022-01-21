@@ -548,7 +548,7 @@ namespace TEN::Entities::TR4
 						item->currentAnimState = 23;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						creature->LOT.isJumping = false;
-						item->gravityStatus = true;
+						item->airborne = true;
 					}
 				}
 				else
@@ -709,7 +709,7 @@ namespace TEN::Entities::TR4
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						item->currentAnimState = 23;
 						creature->LOT.isJumping = false;
-						item->gravityStatus = true;
+						item->airborne = true;
 					}
 				}
 				break;
@@ -766,7 +766,7 @@ namespace TEN::Entities::TR4
 					item->animNumber = Objects[item->objectNumber].animIndex + 47;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->currentAnimState = 24;
-					item->gravityStatus = true;
+					item->airborne = true;
 				}
 				break;
 

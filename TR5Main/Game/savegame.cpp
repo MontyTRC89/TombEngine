@@ -434,7 +434,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_triggered((itemToSerialize.flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.active);
 		serializedItem.add_status(itemToSerialize.status);
-		serializedItem.add_gravity_status(itemToSerialize.gravityStatus);
+		serializedItem.add_airborne(itemToSerialize.airborne);
 		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
 		serializedItem.add_poisoned(itemToSerialize.poisoned);
 		serializedItem.add_ai_bits(itemToSerialize.aiBits);
@@ -962,7 +962,7 @@ bool SaveGame::Load(int slot)
 		item->hitStatus = savedItem->hit_stauts();
 		item->status = savedItem->status();
 		item->aiBits = savedItem->ai_bits();
-		item->gravityStatus = savedItem->gravity_status();
+		item->airborne = savedItem->airborne();
 		item->collidable = savedItem->collidable();
 		item->lookedAt = savedItem->looked_at();
 		item->poisoned = savedItem->poisoned();

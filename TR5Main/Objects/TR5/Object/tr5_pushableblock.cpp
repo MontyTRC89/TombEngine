@@ -142,7 +142,7 @@ void PushableBlockControl(short itemNumber)
 	}
 
 	// control block falling
-	if (item->gravityStatus)
+	if (item->airborne)
 	{
 		auto floorHeight = GetCollisionResult(item->pos.xPos, item->pos.yPos + 10, item->pos.zPos, item->roomNumber).Position.Floor;
 
@@ -158,7 +158,7 @@ void PushableBlockControl(short itemNumber)
 		}
 		else
 		{
-			item->gravityStatus = false;
+			item->airborne = false;
 			int relY = floorHeight - item->pos.yPos;
 			item->pos.yPos = floorHeight;
 			if (item->fallspeed >= 96)
@@ -246,7 +246,7 @@ void PushableBlockControl(short itemNumber)
 					DoPushPull = 0;
 					LaraItem->goalAnimState = LS_IDLE;
 
-					item->gravityStatus = true; // do fall
+					item->airborne = true; // do fall
 					return;
 				}
 			}
@@ -378,7 +378,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if ((!(TrInput & IN_ACTION)
 		|| l->currentAnimState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
-		|| l->gravityStatus
+		|| l->airborne
 		|| Lara.gunStatus
 		|| item->status == ITEM_INVISIBLE
 		|| item->triggerFlags < 0)

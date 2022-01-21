@@ -50,7 +50,7 @@ void AnimateItem(ITEM_INFO* item)
 				case COMMAND_JUMP_VELOCITY:
 					item->fallspeed = *(cmd++);
 					item->speed = *(cmd++);
-					item->gravityStatus = true;
+					item->airborne = true;
 					break;
 
 				case COMMAND_DEACTIVATE:
@@ -163,7 +163,7 @@ void AnimateItem(ITEM_INFO* item)
 
 	int lateral = 0;
 
-	if (item->gravityStatus)
+	if (item->airborne)
 	{
 		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
 		item->pos.yPos += item->fallspeed;

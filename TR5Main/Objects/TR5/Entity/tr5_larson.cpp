@@ -104,14 +104,14 @@ void LarsonControl(short itemNumber)
 		if (CurrentLevel == 2)
 		{
 			item->itemFlags[3] = 1;
-			item->gravityStatus = false;
+			item->airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_DEACTIVATED;
 		}
 		else
 		{
-			item->gravityStatus = false;
+			item->airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_ACTIVE;
@@ -136,7 +136,7 @@ void LarsonControl(short itemNumber)
 		/*if (creature->flags)
 		{
 			item->hitPoints = 60;
-			item->gravityStatus = false;
+			item->airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_DESACTIVATED;
@@ -404,7 +404,7 @@ void LarsonControl(short itemNumber)
 			item->goalAnimState = STATE_TR5_LARSON_STOP;
 			item->requiredAnimState = STATE_TR5_LARSON_STOP;
 			creature->reachedGoal = false;
-			item->gravityStatus = false;
+			item->airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_NOT_ACTIVE;

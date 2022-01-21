@@ -39,7 +39,7 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION
 			&& l->currentAnimState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
-			&& !(item->status && item->gravityStatus)
+			&& !(item->status && item->airborne)
 			&& !(l->hitStatus)
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.interactedItem == itemNum)

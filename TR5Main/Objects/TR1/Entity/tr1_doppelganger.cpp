@@ -99,10 +99,10 @@ void DoppelgangerControl(short itemNum)
 
 		ItemNewRoom(itemNum, LaraItem->roomNumber);				// Follow Laras Room
 
-		if (h >= lh + WALL_SIZE + 1 && !LaraItem->gravityStatus) // added +1 to avoid bacon dying when exiting water rooms
+		if (h >= lh + WALL_SIZE + 1 && !LaraItem->airborne) // added +1 to avoid bacon dying when exiting water rooms
 		{
 			SetAnimation(item, LA_JUMP_WALL_SMASH_START);
-			item->gravityStatus = true;
+			item->airborne = true;
 			item->fallspeed = 0;
 			item->speed = 0;
 			item->data = -1;
@@ -126,7 +126,7 @@ void DoppelgangerControl(short itemNum)
 			item->floor = item->pos.yPos = h;
 			TestTriggers(x, h, z, item->roomNumber, true);
 
-			item->gravityStatus = false;
+			item->airborne = false;
 			item->fallspeed = 0;
 			item->goalAnimState = LS_DEATH;
 			item->requiredAnimState = LS_DEATH;

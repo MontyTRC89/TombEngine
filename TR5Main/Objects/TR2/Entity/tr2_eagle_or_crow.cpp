@@ -49,7 +49,7 @@ void EagleControl(short itemNum)
 			if (item->pos.yPos > item->floor)
 			{
 				item->pos.yPos = item->floor;
-				item->gravityStatus = 0;
+				item->airborne = 0;
 				item->fallspeed = 0;
 				item->goalAnimState = 5;
 			}
@@ -67,7 +67,7 @@ void EagleControl(short itemNum)
 
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			item->currentAnimState = 4;
-			item->gravityStatus = 1;
+			item->airborne = 1;
 			item->speed = 0;
 			break;
 		}

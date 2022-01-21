@@ -118,7 +118,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->gravityStatus)
+	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->airborne)
 		return 0;
 
 	if (!TestBoundsCollide(v, l, coll->Setup.Radius))

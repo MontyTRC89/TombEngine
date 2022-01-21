@@ -84,7 +84,7 @@ void LaraCheatyBits()
 				{
 					Lara.waterStatus = LW_FLYCHEAT;
 					SetAnimation(LaraItem, LA_DOZY);
-					LaraItem->gravityStatus = false;
+					LaraItem->airborne = false;
 					LaraItem->pos.xRot = ANGLE(30);
 					LaraItem->fallspeed = 30;
 					LaraItem->hitPoints = 1000;

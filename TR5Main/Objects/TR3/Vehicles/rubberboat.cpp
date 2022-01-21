@@ -127,7 +127,7 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 
 	if (!(TrInput & IN_ACTION) ||
 		Lara.gunStatus != LG_HANDS_FREE ||
-		lara->gravityStatus ||
+		lara->airborne ||
 		rBoat->speed)
 	{
 		return RBOAT_MOUNT_NONE;
@@ -663,7 +663,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 	lara->pos.xRot = 0;
 	lara->pos.yRot = item->pos.yRot;
 	lara->pos.zRot = 0;
-	lara->gravityStatus = false;
+	lara->airborne = false;
 	lara->fallspeed = 0;
 	lara->speed = 0;
 	lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
@@ -876,7 +876,7 @@ void RubberBoatDoGetOff(ITEM_INFO* boat)
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->goalAnimState = LS_JUMP_FORWARD;
 		LaraItem->currentAnimState = LS_JUMP_FORWARD;
-		LaraItem->gravityStatus = true;
+		LaraItem->airborne = true;
 		LaraItem->fallspeed = -40;
 		LaraItem->speed = 20;
 		LaraItem->pos.xRot = 0;

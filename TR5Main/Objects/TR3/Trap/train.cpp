@@ -128,7 +128,7 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 	larA->pos.yRot = train->pos.yRot;
 
 	larA->fallspeed = 0;
-	larA->gravityStatus = false;
+	larA->airborne = false;
 	larA->speed = 0;
 
 	AnimateItem(larA);

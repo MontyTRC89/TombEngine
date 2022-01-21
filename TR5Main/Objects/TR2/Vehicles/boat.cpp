@@ -197,7 +197,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	short rot = sBoatItem->pos.yRot - laraItem->pos.yRot;
 	if (laraInfo->waterStatus == LW_SURFACE || laraInfo->waterStatus == LW_WADE)
 	{
-		if (!(TrInput & IN_ACTION) || laraItem->gravityStatus || sBoatItem->speed)
+		if (!(TrInput & IN_ACTION) || laraItem->airborne || sBoatItem->speed)
 			return mountType;
 
 		if (rot > ANGLE(45.0f) && rot < ANGLE(135.0f))
@@ -279,7 +279,7 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 			laraItem->pos.yRot += ANGLE(90.0f);
 
 		SetAnimation(laraItem, LA_JUMP_FORWARD);
-		laraItem->gravityStatus = true;
+		laraItem->airborne = true;
 		laraItem->fallspeed = -50;
 		laraItem->speed = 40;
 		laraItem->pos.xRot = 0;
@@ -893,7 +893,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	laraItem->pos.yRot = sBoatItem->pos.yRot;
 	laraItem->pos.xRot = 0;
 	laraItem->pos.zRot = 0;
-	laraItem->gravityStatus = false;
+	laraItem->airborne = false;
 	laraItem->speed = 0;
 	laraItem->fallspeed = 0;
 	laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;

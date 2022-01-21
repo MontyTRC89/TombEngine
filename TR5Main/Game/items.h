@@ -72,7 +72,7 @@ struct ITEM_INFO
 	PHD_3DPOS pos;
 	bool active;
 	short status; // ItemStatus enum
-	bool gravityStatus;
+	bool airborne;
 	bool hitStatus;
 	bool collidable;
 	bool lookedAt;

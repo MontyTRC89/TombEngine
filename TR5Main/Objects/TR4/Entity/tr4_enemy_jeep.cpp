@@ -385,12 +385,12 @@ void EnemyJeepControl(short itemNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (item->pos.yPos < item->floor)
-			item->gravityStatus = true;
+			item->airborne = true;
 		else
 		{
 			item->fallspeed = 0;
 			item->pos.yPos = item->floor;
-			item->gravityStatus = false;
+			item->airborne = false;
 		}
 
 		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] * 1024) + 16777220);
