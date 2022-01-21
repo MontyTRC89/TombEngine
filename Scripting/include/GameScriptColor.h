@@ -1,5 +1,4 @@
 #pragma once
-#include "framework.h"
 
 typedef DWORD D3DCOLOR;
 

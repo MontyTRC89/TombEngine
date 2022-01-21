@@ -115,7 +115,6 @@ void GameScriptMeshInfo::SetStaticNumber(int staticNumber)
 
 GameScriptColor GameScriptMeshInfo::GetColor() const
 {
-
 	return GameScriptColor{ m_mesh.color };
 }
 
