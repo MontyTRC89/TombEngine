@@ -313,7 +313,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
-		coll->CollisionType == CT_TOP)
+		(coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 		info->gunStatus = LG_HANDS_BUSY;
@@ -371,7 +371,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(1.25f) &&
-		coll->CollisionType == CT_TOP)
+		(coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
 		ResetLaraFlex(item);

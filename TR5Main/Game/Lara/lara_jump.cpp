@@ -26,7 +26,12 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
 	info->runJumpCount++;
@@ -163,7 +168,12 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(85.0f);
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TrInput & IN_LEFT)
 	{
@@ -403,7 +413,12 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = ANGLE(135.0f);
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TrInput & IN_LEFT)
 	{
@@ -460,7 +475,12 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TestLaraLand(item, coll))
 	{
@@ -505,7 +525,12 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TestLaraLand(item, coll))
 	{
@@ -550,7 +575,12 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TestLaraLand(item, coll))
 	{
@@ -626,7 +656,12 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (item->hitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+			item->goalAnimState = LS_DEATH;
+
 		return;
+	}
 
 	if (TrInput & IN_LEFT)
 	{
