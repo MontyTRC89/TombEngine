@@ -1717,7 +1717,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item, testData.Angle, coll->Setup.Radius * sqrt(2) + 4);
 
-	if (//probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
+	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Highest floor boundary.
 		(probe.Position.Ceiling - y) <= testData.LowerBound &&						// Lower ceiling boundary.
 		(probe.Position.Ceiling - y) >= testData.UpperBound &&						// Lower ceiling boundary. TODO: Not working??

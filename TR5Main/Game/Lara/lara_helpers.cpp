@@ -163,6 +163,20 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
+void DoLaraFallDamage(ITEM_INFO* item)
+{
+	// TODO: Demagic more of these numbers.
+	int landSpeed = item->fallspeed - 140;
+
+	if (landSpeed > 0)
+	{
+		if (landSpeed <= 14)
+			item->hitPoints -= LARA_HEALTH_MAX * pow(landSpeed, 2) / 196;
+		else
+			item->hitPoints = 0;
+	}
+}
+
 short GetLaraSlideDirection(COLL_INFO* coll)
 {
 	short dir = 0;
@@ -236,20 +250,6 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 		info->runJumpQueued = false;
-}
-
-void SetLaraHardLanding(ITEM_INFO* item)
-{
-	// TODO: Demagic more of these numbers.
-	int landSpeed = item->fallspeed - 140;
-
-	if (landSpeed > 0)
-	{
-		if (landSpeed <= 14)
-			item->hitPoints -= LARA_HEALTH_MAX * SQUARE(landSpeed) / 196;
-		else
-			item->hitPoints = 0;
-	}
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)

@@ -229,6 +229,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
+	// TODO: Front collision handling when approaching non-monkey sectors displays strange behaviour.
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
