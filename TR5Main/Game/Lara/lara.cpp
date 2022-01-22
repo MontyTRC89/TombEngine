@@ -749,6 +749,9 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
+	// TEMP DEBUG
+	g_Renderer.printDebugMessage("collType: %d", coll->CollisionType);
+
 	if (TrInput & IN_LOOK && info->look &&
 		info->ExtraAnim == NO_ITEM)
 	{

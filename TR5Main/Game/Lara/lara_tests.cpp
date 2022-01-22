@@ -1141,29 +1141,6 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll)
-{
-	int landspeed = item->fallspeed - 140;
-
-	if (landspeed > 0)
-	{
-		if (landspeed <= 14)
-		{
-			item->hitPoints -= 1000 * SQUARE(landspeed) / 196;
-
-			return item->hitPoints <= 0;
-		}
-		else
-		{
-			item->hitPoints = -1;
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
