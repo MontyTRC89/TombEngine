@@ -2238,7 +2238,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
 			item->goalAnimState = LS_DEATH;
