@@ -318,7 +318,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		item->airborne = false;
 		item->speed = 0;
 		item->fallspeed = 0;
-		item->pos.yPos += coll->Middle.Ceiling;
+		item->pos.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		info->gunStatus = LG_HANDS_BUSY;
 		return true;
 	}
@@ -377,7 +377,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->airborne = false;
 		item->speed = 0;
 		item->fallspeed = 0;
-		item->pos.yPos += coll->Middle.Ceiling;
+		item->pos.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		info->gunStatus = LG_HANDS_BUSY;
 		return true;
 	}
