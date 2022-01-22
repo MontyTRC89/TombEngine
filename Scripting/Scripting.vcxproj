@@ -21,10 +21,14 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="frameworkandsol.h" />
+    <ClInclude Include="include\GameScriptAIObject.h" />
     <ClInclude Include="include\GameScriptCameraInfo.h" />
     <ClInclude Include="include\GameScriptColor.h" />
+    <ClInclude Include="include\GameScriptNamedBase.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
     <ClInclude Include="include\GameScriptRotation.h" />
+    <ClInclude Include="include\ScriptAssert.h" />
+    <ClInclude Include="include\ScriptUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -32,6 +36,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\GameScriptAIObject.cpp" />
     <ClCompile Include="src\GameScriptCameraInfo.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
