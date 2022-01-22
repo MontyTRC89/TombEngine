@@ -43,7 +43,6 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll);
-bool LaraLandedBad(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll);

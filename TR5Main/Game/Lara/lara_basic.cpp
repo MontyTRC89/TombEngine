@@ -366,7 +366,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT &&
-		!(TrInput & IN_JUMP))		// JUMP locks y rotation.
+		!(TrInput & IN_JUMP))	// JUMP locks y rotation.
 	{
 		info->turnRate -= LARA_TURN_RATE;
 		if (info->turnRate < -LARA_SLOW_TURN_MAX)
@@ -2238,7 +2238,9 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
 	{
-		if (LaraLandedBad(item, coll)) // TODO: It seems Core wanted to make the sprint dive a true jump.
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
 			item->goalAnimState = LS_DEATH;
 		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->waterStatus == LW_WADE)
 			item->goalAnimState = LS_IDLE;

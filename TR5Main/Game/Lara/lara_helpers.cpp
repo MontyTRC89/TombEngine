@@ -163,13 +163,28 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	}
 }
 
-void DoLaraLand(ITEM_INFO* item, COLL_INFO* coll)
+short GetLaraSlideDirection(COLL_INFO* coll)
 {
-	item->speed = 0;
-	item->fallspeed = 0;
-	item->airborne = false;
+	short dir = 0;
 
-	LaraSnapToHeight(item, coll);
+	//if (g_GameFlow->Animations.SlideExtended)
+	//{
+	//	// TODO: Get true slope direction.
+	//}
+	//else
+	{
+		if (coll->FloorTiltX > 2)
+			dir = -ANGLE(90.0f);
+		else if (coll->FloorTiltX < -2)
+			dir = ANGLE(90.0f);
+
+		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
+			dir = ANGLE(180.0f);
+		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
+			dir = ANGLE(0.0f);
+	}
+
+	return dir;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -223,6 +238,29 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 		info->runJumpQueued = false;
 }
 
+void SetLaraHardLanding(ITEM_INFO* item)
+{
+	// TODO: Demagic more of these numbers.
+	int landSpeed = item->fallspeed - 140;
+
+	if (landSpeed > 0)
+	{
+		if (landSpeed <= 14)
+			item->hitPoints -= LARA_HEALTH_MAX * SQUARE(landSpeed) / 196;
+		else
+			item->hitPoints = 0;
+	}
+}
+
+void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
+{
+	item->speed = 0;
+	item->fallspeed = 0;
+	item->airborne = false;
+
+	LaraSnapToHeight(item, coll);
+}
+
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
@@ -257,30 +295,6 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 	item->speed = 2;
 	item->fallspeed = 1;
 	item->airborne = true;
-}
-
-short GetLaraSlideDirection(COLL_INFO* coll)
-{
-	short dir = 0;
-
-	//if (g_GameFlow->Animations.SlideExtended)
-	//{
-	//	// TODO: Get true slope direction.
-	//}
-	//else
-	{
-		if (coll->FloorTiltX > 2)
-			dir = -ANGLE(90.0f);
-		else if (coll->FloorTiltX < -2)
-			dir = ANGLE(90.0f);
-
-		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
-			dir = ANGLE(180.0f);
-		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
-			dir = ANGLE(0.0f);
-	}
-
-	return dir;
 }
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
