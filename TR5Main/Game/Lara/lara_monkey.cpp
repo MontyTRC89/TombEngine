@@ -134,7 +134,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	//coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -216,7 +216,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	//coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -299,7 +299,7 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	//coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -382,7 +382,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	//coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -465,7 +465,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
 	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
 	coll->Setup.CeilingSlopesAreWalls = true;
-	//coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
