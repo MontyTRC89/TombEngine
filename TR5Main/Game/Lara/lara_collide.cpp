@@ -301,9 +301,9 @@ void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll)
 {
 	switch (coll->Setup.OldAnimState)
 	{
-	case LS_CRAWL_IDLE:
-	case LS_CRAWL_TURN_LEFT:
-	case LS_CRAWL_TURN_RIGHT:
+	case LS_MONKEY_IDLE:
+	case LS_MONKEY_TURN_LEFT:
+	case LS_MONKEY_TURN_RIGHT:
 		item->currentAnimState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;

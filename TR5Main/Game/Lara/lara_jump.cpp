@@ -25,6 +25,11 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	// Update running jump counter in preparation for possible jump action soon after landing.
+	info->runJumpCount++;
+	if (info->runJumpCount > LARA_RUN_JUMP_TIME / 2)
+		info->runJumpCount = LARA_RUN_JUMP_TIME / 2;
+
 	if (item->hitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
@@ -35,11 +40,6 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		return;
 	}
-
-	// Update running jump counter in preparation for possible jump action soon after landing.
-	info->runJumpCount++;
-	if (info->runJumpCount > LARA_RUN_JUMP_TIME / 2)
-		info->runJumpCount = LARA_RUN_JUMP_TIME / 2;
 
 	if (TrInput & IN_LEFT)
 	{
