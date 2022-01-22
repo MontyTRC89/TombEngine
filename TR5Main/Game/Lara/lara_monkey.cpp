@@ -190,6 +190,13 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
 	{
+		// TODO
+		/*if (TrInput & IN_ROLL | IN_BACK)
+		{
+			item->goalAnimState = LS_MONKEY_TURN_180;
+			return;
+		}*/
+
 		if (TrInput & IN_FORWARD)
 		{
 			item->goalAnimState = LS_MONKEY_FORWARD;

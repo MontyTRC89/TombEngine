@@ -35,7 +35,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -56,7 +56,9 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
 			info->waterStatus != LW_WADE) [[likely]]
@@ -66,7 +68,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -127,12 +129,14 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		StopSoundEffect(SFX_TR4_LARA_FALL);
 		return;
 	}
@@ -175,7 +179,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -196,12 +200,14 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -423,7 +429,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -444,12 +450,14 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -488,7 +496,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -496,12 +504,14 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -541,7 +551,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -549,12 +559,14 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -594,7 +606,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -603,7 +615,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraLand(item, coll))
 	{
 		item->goalAnimState = LS_IDLE;
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -678,7 +690,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (TestLaraLand(item, coll))
 		{
 			item->goalAnimState = LS_DEATH;
-			DoLaraLand(item, coll);
+			SetLaraLand(item, coll);
 		}
 
 		return;
@@ -699,12 +711,14 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (LaraLandedBad(item, coll))
+		SetLaraHardLanding(item);
+
+		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -833,7 +847,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->goalAnimState = LS_IDLE;
 
-		DoLaraLand(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
