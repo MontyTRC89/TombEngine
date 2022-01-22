@@ -19,6 +19,14 @@
 // Control & Collision Functions
 // -----------------------------
 
+// TODO: Unused? Naming is also completely mismatched; enum calls it LS_GRAB_TO_FALL.
+void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
+{
+	/*state 14*/
+	/*state code: lara_void_func*/
+	lara_col_idle(item, coll);
+}
+
 // State:		LS_JUMP_FORWARD (3)
 // Collision:	lara_col_jump_forward()
 void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
@@ -56,7 +64,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -127,9 +135,15 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = item->speed * 0.95f;
 
+	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
+		item->hitPoints > 0)
+	{
+		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
+	}
+
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -139,12 +153,6 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraLand(item, coll);
 		StopSoundEffect(SFX_TR4_LARA_FALL);
 		return;
-	}
-
-	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
-		item->hitPoints > 0)
-	{
-		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
 	}
 
 	item->goalAnimState = LS_FREEFALL;
@@ -200,7 +208,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -252,14 +260,6 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	GetCollisionInfo(coll, item);
 	ShiftItem(item, coll);
-}
-
-// TODO: Unused? Naming is also completely mismatched; enum calls it LS_GRAB_TO_FALL.
-void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 14*/
-	/*state code: lara_void_func*/
-	lara_col_idle(item, coll);
 }
 
 // State:		LS_JUMP_PREPARE (15)
@@ -450,7 +450,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -504,7 +504,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -559,7 +559,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -624,10 +624,6 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed += 2;
 		if (item->speed > 5)
 			item->speed = 5;
-
-		item->pos.xRot -= std::min((short)(LARA_LEAN_RATE / 3), (short)(abs(ANGLE(item->speed) - item->pos.xRot) / 3)) * 1;
-		info->headXrot -= (ANGLE(5.0f) - item->pos.zRot) / 3;
-
 	}
 	else if (TrInput & IN_BACK)
 	{
@@ -635,6 +631,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->speed < -5)
 			item->speed = -5;
 
+		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
 		item->pos.xRot += std::min((short)(LARA_LEAN_RATE / 3), (short)(abs(ANGLE(item->speed) - item->pos.xRot) / 3)) * 1;
 		info->headYrot += (ANGLE(10.0f) - item->pos.zRot) / 3;
 	}
@@ -669,6 +666,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHangJumpUp(item, coll))
 		return;
 
+	// TODO: Correct collision type is not always set when hitting very slanted ceilings.
 	if (coll->CollisionType == CT_CLAMP ||
 		coll->CollisionType == CT_TOP ||
 		coll->CollisionType == CT_TOP_FRONT)
@@ -711,7 +709,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		SetLaraHardLanding(item);
+		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
 			item->goalAnimState = LS_DEATH;
@@ -740,17 +738,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_fall_back()
 void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
-
-	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->airborne = true;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
-	GetCollisionInfo(coll, item);
-
-	LaraDeflectEdgeJump(item, coll);
+	LaraJumpCollision(item, coll, item->pos.yRot + ANGLE(180.0f));
 }
 
 // State:		LS_SWAN_DIVE_START (52)
@@ -863,15 +851,5 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_freefall_dive()
 void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
-
-	info->moveAngle = item->pos.yRot;
-	item->airborne = true;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
-	GetCollisionInfo(coll, item);
-
-	LaraDeflectEdgeJump(item, coll);
+	LaraJumpCollision(item, coll, item->pos.yRot);
 }
