@@ -666,10 +666,10 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHangJumpUp(item, coll))
 		return;
 
-	// TODO: Correct collision type is not always set when hitting very slanted ceilings.
-	if (coll->CollisionType == CT_CLAMP ||
+	if (coll->Middle.Ceiling >= 0 ||
 		coll->CollisionType == CT_TOP ||
-		coll->CollisionType == CT_TOP_FRONT)
+		coll->CollisionType == CT_TOP_FRONT ||
+		coll->CollisionType == CT_CLAMP)
 	{
 		item->fallspeed = 1;
 	}
