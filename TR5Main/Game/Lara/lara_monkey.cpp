@@ -15,9 +15,6 @@
 #include "Specific/level.h"
 #include "Scripting/GameFlowScript.h"
 
-// TEMP FOR DEBUG
-#include <Game/effects/effects.h>
-
 using namespace TEN::Floordata;
 
 // -----------------------------
@@ -71,9 +68,6 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			//
-			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 50,50,50);
-
 			item->goalAnimState = LS_MONKEY_FORWARD;
 			return;
 		}
@@ -97,17 +91,11 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			//
-			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 0, 50, 50);
-
 			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			//
-			TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 25, 50, 0, 50);
-
 			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}

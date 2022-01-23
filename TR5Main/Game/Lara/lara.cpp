@@ -749,9 +749,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	// TEMP DEBUG
-	g_Renderer.printDebugMessage("collType: %d", coll->CollisionType);
-
 	if (TrInput & IN_LOOK && info->look &&
 		info->ExtraAnim == NO_ITEM)
 	{
@@ -822,20 +819,30 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Temp. debug stuff
 	//---
 
+	// Kill Lara.
 	if (KeyMap[DIK_D])
 		item->hitPoints = 0;
+
+	// Say no.
+	static bool dbNo = false;
+	if (KeyMap[DIK_N] && !dbNo)
+		SayNo();
+	dbNo = KeyMap[DIK_N] ? true : false;
 
 	static PHD_3DPOS posO = item->pos;
 	static short roomNumO = item->roomNumber;
 	static CAMERA_INFO camO = Camera;
 
+	// Save position.
 	if (KeyMap[DIK_Q] && TrInput & IN_WALK)
 	{
 		posO = item->pos;
 		roomNumO = item->roomNumber;
 		camO = Camera;
 	}
-	else if (KeyMap[DIK_E])
+	
+	// Restore position.
+	if (KeyMap[DIK_E])
 	{
 		item->pos = posO;
 		item->roomNumber = roomNumO;
