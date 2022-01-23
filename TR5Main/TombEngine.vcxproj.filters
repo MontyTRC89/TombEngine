@@ -286,10 +286,7 @@
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp" />
     <ClCompile Include="Scripting\GameScriptLevel.cpp" />
-    <ClCompile Include="Scripting\GameScriptMirror.cpp" />
     <ClCompile Include="Scripting\GameScriptSettings.cpp" />
-    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp" />
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
@@ -608,10 +605,7 @@
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
     <ClInclude Include="Scripting\GameScriptLevel.h" />
-    <ClInclude Include="Scripting\GameScriptMirror.h" />
     <ClInclude Include="Scripting\GameScriptSettings.h" />
-    <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
-    <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
     <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="Scripting\InventorySlots.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
