@@ -365,11 +365,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->Front.Floor = height;
 	coll->Front.Ceiling = ceiling;
 
-	// Extra GCI call for front probe going beyond radius causes bugs with sector flag detection.
-	// It appears to be a dubious solution to an aspect of floor slope collision.
-	// Commenting out for now. Let's see what happens... @Sezz 2021.01.23
-	//collResult = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber);
-
 	if (playerCollision)
 	{
 		tfLocation = GetRoom(tfLocation, x + xfront, y, z + zfront);
@@ -378,7 +373,6 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	else
 	{
 		height = GetCollisionResult(x + xfront, y, z + zfront, topRoomNumber).Position.Floor;
-		// height = collResult.Position.Floor; // Old. @Sezz 2021.01.23
 	}
 	if (height != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 

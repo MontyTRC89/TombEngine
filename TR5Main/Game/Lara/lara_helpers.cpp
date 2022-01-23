@@ -177,9 +177,9 @@ void DoLaraFallDamage(ITEM_INFO* item)
 	}
 }
 
-short GetLaraSlideDirection(COLL_INFO* coll)
+short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	short dir = 0;
+	short direction = item->pos.yRot;
 
 	//if (g_GameFlow->Animations.SlideExtended)
 	//{
@@ -188,17 +188,17 @@ short GetLaraSlideDirection(COLL_INFO* coll)
 	//else
 	{
 		if (coll->FloorTiltX > 2)
-			dir = -ANGLE(90.0f);
+			direction = -ANGLE(90.0f);
 		else if (coll->FloorTiltX < -2)
-			dir = ANGLE(90.0f);
+			direction = ANGLE(90.0f);
 
 		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
-			dir = ANGLE(180.0f);
+			direction = ANGLE(180.0f);
 		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
-			dir = ANGLE(0.0f);
+			direction = ANGLE(0.0f);
 	}
 
-	return dir;
+	return direction;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -301,7 +301,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	short direction = GetLaraSlideDirection(coll);
+	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->pos.yRot;
 	static short oldAngle = 1;
 

@@ -17,7 +17,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void DoLaraFallDamage(ITEM_INFO* item);
 
-short GetLaraSlideDirection(COLL_INFO* coll);
+short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
