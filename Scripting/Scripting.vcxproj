@@ -27,9 +27,12 @@
     <ClInclude Include="include\GameScriptColor.h" />
     <ClInclude Include="include\GameScriptInventoryObject.h" />
     <ClInclude Include="include\GameScriptMeshInfo.h" />
+    <ClInclude Include="include\GameScriptMirror.h" />
     <ClInclude Include="include\GameScriptNamedBase.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
     <ClInclude Include="include\GameScriptRotation.h" />
+    <ClInclude Include="include\GameScriptSinkInfo.h" />
+    <ClInclude Include="include\GameScriptSkyLayer.h" />
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\ScriptUtil.h" />
@@ -46,8 +49,11 @@
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
     <ClCompile Include="src\GameScriptMeshInfo.cpp" />
+    <ClCompile Include="src\GameScriptMirror.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
+    <ClCompile Include="src\GameScriptSinkInfo.cpp" />
+    <ClCompile Include="src\GameScriptSkyLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
