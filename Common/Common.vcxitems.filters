@@ -12,5 +12,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\room.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\phd_global.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Scripting\ScriptInterfaceGame.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\items.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\animation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\trmath.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\newtypes.h" />
   </ItemGroup>
 </Project>
