@@ -24,6 +24,7 @@
     <ClInclude Include="include\GameScriptAIObject.h" />
     <ClInclude Include="include\GameScriptCameraInfo.h" />
     <ClInclude Include="include\GameScriptColor.h" />
+    <ClInclude Include="include\GameScriptInventoryObject.h" />
     <ClInclude Include="include\GameScriptNamedBase.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
     <ClInclude Include="include\GameScriptRotation.h" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\GameScriptAIObject.cpp" />
     <ClCompile Include="src\GameScriptCameraInfo.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
+    <ClCompile Include="src\GameScriptInventoryObject.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
   </ItemGroup>
