@@ -25,6 +25,7 @@
     <ClInclude Include="include\GameScriptAudioTrack.h" />
     <ClInclude Include="include\GameScriptCameraInfo.h" />
     <ClInclude Include="include\GameScriptColor.h" />
+    <ClInclude Include="include\GameScriptDisplayString.h" />
     <ClInclude Include="include\GameScriptInventoryObject.h" />
     <ClInclude Include="include\GameScriptMeshInfo.h" />
     <ClInclude Include="include\GameScriptMirror.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="include\GameScriptSinkInfo.h" />
     <ClInclude Include="include\GameScriptSkyLayer.h" />
     <ClInclude Include="include\ItemEnumPair.h" />
+    <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\ScriptUtil.h" />
   </ItemGroup>
@@ -47,6 +49,7 @@
     <ClCompile Include="src\GameScriptAudioTrack.cpp" />
     <ClCompile Include="src\GameScriptCameraInfo.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
+    <ClCompile Include="src\GameScriptDisplayString.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
     <ClCompile Include="src\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\GameScriptMirror.cpp" />
