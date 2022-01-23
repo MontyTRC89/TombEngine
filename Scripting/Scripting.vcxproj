@@ -32,8 +32,10 @@
     <ClInclude Include="include\GameScriptNamedBase.h" />
     <ClInclude Include="include\GameScriptPosition.h" />
     <ClInclude Include="include\GameScriptRotation.h" />
+    <ClInclude Include="include\GameScriptSettings.h" />
     <ClInclude Include="include\GameScriptSinkInfo.h" />
     <ClInclude Include="include\GameScriptSkyLayer.h" />
+    <ClInclude Include="include\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
@@ -55,8 +57,10 @@
     <ClCompile Include="src\GameScriptMirror.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
+    <ClCompile Include="src\GameScriptSettings.cpp" />
     <ClCompile Include="src\GameScriptSinkInfo.cpp" />
     <ClCompile Include="src\GameScriptSkyLayer.cpp" />
+    <ClCompile Include="src\GameScriptSoundSourceInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -135,7 +139,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NOMINMAX;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NOMINMAX;SPDLOG_COMPILED_LIB;</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
@@ -147,6 +151,9 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -154,7 +161,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NOMINMAX;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NOMINMAX;SPDLOG_COMPILED_LIB;</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
@@ -168,6 +175,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
