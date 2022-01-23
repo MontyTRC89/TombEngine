@@ -1102,7 +1102,8 @@ bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (info->canMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(0.5f) &&
-		(coll->Middle.Ceiling >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT))
+		(coll->Middle.Ceiling >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
+		abs(coll->Middle.Ceiling + coll->Middle.Floor + coll->Setup.Height) > LARA_HEIGHT_MONKEY)
 	{
 		return true;
 	}
