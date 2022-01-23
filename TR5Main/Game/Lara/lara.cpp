@@ -732,6 +732,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
+	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
+
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
@@ -739,7 +741,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 
-	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpaz = true;
 	coll->Setup.FloorSlopesAreWalls = false;
@@ -926,9 +927,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.BadFloorHeightDown = 32512;
-	coll->Setup.BadFloorHeightUp = -400;
-	coll->Setup.BadCeilingHeightDown = 400;
+	coll->Setup.BadFloorHeightDown = SHRT_MAX - (CLICK(1) - 1);
+	coll->Setup.BadFloorHeightUp = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
+	coll->Setup.BadCeilingHeightDown = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
@@ -1035,9 +1036,9 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
-	coll->Setup.BadFloorHeightDown = 32512;
-	coll->Setup.BadFloorHeightUp = -128;
-	coll->Setup.BadCeilingHeightDown = 100;
+	coll->Setup.BadFloorHeightDown = SHRT_MAX - (CLICK(1) - 1);
+	coll->Setup.BadFloorHeightUp = -CLICK(0.5f);
+	coll->Setup.BadCeilingHeightDown = LARA_RAD;
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
@@ -1085,7 +1086,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->Vehicle == NO_ITEM)
 		lara_collision_routines[item->currentAnimState](item, coll);
 
-	UpdateItemRoom(item, 100);
+	UpdateItemRoom(item, LARA_RAD);
 
 	LaraGun(item);
 
