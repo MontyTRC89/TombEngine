@@ -48,6 +48,15 @@
     <ClInclude Include="include\GameScriptInventoryObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ItemEnumPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameScriptAudioTrack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameScriptMeshInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -69,6 +78,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptInventoryObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptAudioTrack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptMeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
