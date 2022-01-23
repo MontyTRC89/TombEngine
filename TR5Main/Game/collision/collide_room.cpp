@@ -194,7 +194,6 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.CeilingSlope = abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2;
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType.
-	// TODO: check with monkey swing.
 	if ((y + CLICK(2)) < floor->FloorHeight(x, z))
 		result.FloorTiltZ = result.FloorTiltX = 0;
 
@@ -212,7 +211,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	// Therefore, we should differentiate these code paths.
 	bool playerCollision = item->data.is<LaraInfo*>();
 
-	// Reset out collision parameters.
+	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;
 	coll->Shift.x = 0;
 	coll->Shift.y = 0;
