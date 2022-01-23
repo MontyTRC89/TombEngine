@@ -294,7 +294,6 @@
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
     <ClCompile Include="Scripting\GameScriptAudioTrack.cpp" />
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Scripting\LuaHandler.cpp" />
@@ -397,7 +396,6 @@
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Scripting\GameScriptAudioTrack.h" />
     <ClInclude Include="Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
@@ -620,7 +618,6 @@
     <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
     <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="Scripting\InventorySlots.h" />
-    <ClInclude Include="Scripting\ItemEnumPair.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
