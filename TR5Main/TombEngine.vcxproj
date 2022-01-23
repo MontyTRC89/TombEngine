@@ -244,7 +244,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Scripting\GameScriptAudioTrack.h" />
     <ClInclude Include="Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
@@ -467,7 +466,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
     <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="Scripting\InventorySlots.h" />
-    <ClInclude Include="Scripting\ItemEnumPair.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -901,10 +899,6 @@ CALL gen.bat</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Scripting\GameScriptDisplayString.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
