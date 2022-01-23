@@ -288,7 +288,6 @@
     <ClCompile Include="Scripting\GameScriptLevel.cpp" />
     <ClCompile Include="Scripting\GameScriptSettings.cpp" />
     <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Scripting\LuaHandler.cpp" />
@@ -389,7 +388,6 @@
     <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
-    <ClInclude Include="Scripting\GameScriptDisplayString.h" />
     <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
@@ -613,7 +611,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scripting\LuaHandler.h" />
     <ClInclude Include="Scripting\ObjectIDs.h" />
-    <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
