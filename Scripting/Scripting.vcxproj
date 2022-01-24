@@ -40,6 +40,28 @@
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
+    <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
+    <ClInclude Include="include\Scripting\GameScriptAudioTrack.h" />
+    <ClInclude Include="include\Scripting\GameScriptCameraInfo.h" />
+    <ClInclude Include="include\Scripting\GameScriptColor.h" />
+    <ClInclude Include="include\Scripting\GameScriptDisplayString.h" />
+    <ClInclude Include="include\Scripting\GameScriptInventoryObject.h" />
+    <ClInclude Include="include\Scripting\GameScriptLevel.h" />
+    <ClInclude Include="include\Scripting\GameScriptMeshInfo.h" />
+    <ClInclude Include="include\Scripting\GameScriptMirror.h" />
+    <ClInclude Include="include\Scripting\GameScriptNamedBase.h" />
+    <ClInclude Include="include\Scripting\GameScriptPosition.h" />
+    <ClInclude Include="include\Scripting\GameScriptRotation.h" />
+    <ClInclude Include="include\Scripting\GameScriptSettings.h" />
+    <ClInclude Include="include\Scripting\GameScriptSinkInfo.h" />
+    <ClInclude Include="include\Scripting\GameScriptSkyLayer.h" />
+    <ClInclude Include="include\Scripting\GameScriptSoundSourceInfo.h" />
+    <ClInclude Include="include\Scripting\ItemEnumPair.h" />
+    <ClInclude Include="include\Scripting\ReservedScriptNames.h" />
+    <ClInclude Include="include\Scripting\ScriptAssert.h" />
+    <ClInclude Include="include\Scripting\ScriptInterfaceGame.h" />
+    <ClInclude Include="include\Scripting\ScriptInterfaceLevel.h" />
+    <ClInclude Include="include\Scripting\ScriptUtil.h" />
     <ClInclude Include="include\ScriptInterfaceGame.h" />
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
@@ -147,7 +169,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -169,7 +191,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
