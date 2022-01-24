@@ -4,7 +4,7 @@
 #include "GameScriptMirror.h"
 #include "GameScriptColor.h"
 #include "GameScriptInventoryObject.h"
-#include "ScriptInterfaceLevel.h"
+#include <ScriptInterfaceLevel.h>
 
 static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 {
