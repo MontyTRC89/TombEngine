@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
+#include "input.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
