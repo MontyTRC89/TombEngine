@@ -27,6 +27,7 @@
     <ClInclude Include="include\GameScriptColor.h" />
     <ClInclude Include="include\GameScriptDisplayString.h" />
     <ClInclude Include="include\GameScriptInventoryObject.h" />
+    <ClInclude Include="include\GameScriptLevel.h" />
     <ClInclude Include="include\GameScriptMeshInfo.h" />
     <ClInclude Include="include\GameScriptMirror.h" />
     <ClInclude Include="include\GameScriptNamedBase.h" />
@@ -39,6 +40,8 @@
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
+    <ClInclude Include="include\ScriptInterfaceGame.h" />
+    <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +56,7 @@
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptDisplayString.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
+    <ClCompile Include="src\GameScriptLevel.cpp" />
     <ClCompile Include="src\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\GameScriptMirror.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
