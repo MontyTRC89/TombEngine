@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Scripting/GameFlowScript.h"
-#include "Scripting/GameScriptLevel.h"
+#include <ScriptInterfaceLevel.h>
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS

@@ -9,7 +9,7 @@
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Scripting/GameScriptLevel.h"
+#include <ScriptInterfaceLevel.h>
 
 using namespace TEN::Math::Random;
 
@@ -76,15 +76,15 @@ namespace Environment
 		FlashProgress = 1.0f;
 		FlashSpeed = std::clamp(speed, 0.005f, 1.0f);
 		FlashColorBase = Vector3(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
-							     std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+								 std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
 								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
 	}
 
 	void EnvironmentController::UpdateSky(GameScriptLevel* level)
 	{
-		if (level->Layer1.Enabled)
+		if (level->GetSkyLayerEnabled(0))
 		{
-			SkyPosition1 += level->Layer1.CloudSpeed;
+			SkyPosition1 += level->GetSkyLayerSpeed(0);
 			if (SkyPosition1 <= SKY_POSITION_LIMIT)
 			{
 				if (SkyPosition1 < 0)
@@ -96,9 +96,9 @@ namespace Environment
 			}
 		}
 
-		if (level->Layer2.Enabled)
+		if (level->GetSkyLayerEnabled(1))
 		{
-			SkyPosition2 += level->Layer2.CloudSpeed;
+			SkyPosition2 += level->GetSkyLayerSpeed(1);
 			if (SkyPosition2 <= SKY_POSITION_LIMIT)
 			{
 				if (SkyPosition2 < 0)
