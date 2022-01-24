@@ -285,7 +285,6 @@
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp" />
-    <ClCompile Include="Scripting\GameScriptLevel.cpp" />
     <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Scripting\LuaHandler.cpp" />
@@ -600,7 +599,6 @@
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
-    <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\InventorySlots.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />

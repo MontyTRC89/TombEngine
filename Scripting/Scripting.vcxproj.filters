@@ -78,6 +78,15 @@
     <ClInclude Include="include\GameScriptSoundSourceInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameScriptLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScriptInterfaceLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ScriptInterfaceGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -123,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptSoundSourceInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
