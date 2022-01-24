@@ -141,6 +141,50 @@ __(not yet implemented)__
 		);
 }
 
+//todo add bindings and documents for this
+bool GameScriptLevel::GetSkyLayerEnabled(int index)
+{
+	bool cond = index == 0 || index == 1;
+	std::string msg{ "Index must be 0 or 1." };
+
+	if (index == 0)
+	{
+		return Layer1.Enabled;
+	}
+	else if (index == 1)
+	{
+		return Layer2.Enabled;
+	}
+	else
+	{
+		ScriptAssert(false, msg);
+		ScriptWarn("Returning false.");
+		return false;
+	}
+}
+
+//todo add bindings and documents for this
+short GameScriptLevel::GetSkyLayerSpeed(int index)
+{
+	bool cond = index == 0 || index == 1;
+	std::string msg{ "Index must be 0 or 1." };
+
+	if (index == 0)
+	{
+		return Layer1.CloudSpeed;
+	}
+	else if (index == 1)
+	{
+		return Layer2.CloudSpeed;
+	}
+	else
+	{
+		ScriptAssert(false, msg);
+		ScriptWarn("Returning 0.");
+		return 0;
+	}
+}
+
 void GameScriptLevel::SetWeatherStrength(float val)
 {
 	bool cond = val <= 1.0f && val >= 0.0f;
