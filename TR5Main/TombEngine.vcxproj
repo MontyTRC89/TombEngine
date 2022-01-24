@@ -242,7 +242,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
-    <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
@@ -853,10 +852,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>

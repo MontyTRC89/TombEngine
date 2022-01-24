@@ -285,7 +285,6 @@
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp" />
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
     <ClCompile Include="Scripting\GameLogicScript.cpp" />
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
@@ -385,7 +384,6 @@
     <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
-    <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
