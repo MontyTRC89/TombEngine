@@ -456,7 +456,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
-    <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\InventorySlots.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
@@ -854,10 +853,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Scripting\GameFlowScript.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptLevel.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
     </ClCompile>
