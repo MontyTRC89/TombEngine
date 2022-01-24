@@ -1,5 +1,5 @@
 #pragma once
-#include "ScriptInterfaceGame.h"
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "LuaHandler.h"
