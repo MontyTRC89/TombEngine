@@ -1,7 +1,9 @@
 #pragma once
 #include <SimpleMath.h>
-#include "Scripting/GameScriptLevel.h"
+#include <ScriptInterfaceLevel.h>
 #include "Specific/trmath.h"
+
+class GameScriptLevel;
 
 namespace TEN {
 namespace Effects {
