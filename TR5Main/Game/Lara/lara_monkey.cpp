@@ -48,14 +48,14 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_TURN_MAX / 2)
-			info->turnRate = -LARA_MONKEY_TURN_MAX / 2;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX / 2)
+			info->turnRate = -LARA_SLOW_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_TURN_MAX / 2)
-			info->turnRate = LARA_MONKEY_TURN_MAX / 2;
+		if (info->turnRate > LARA_SLOW_TURN_MAX / 2)
+			info->turnRate = LARA_SLOW_TURN_MAX / 2;
 	}
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
@@ -166,14 +166,14 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_MONKEY_TURN_MAX)
-			info->turnRate = -LARA_MONKEY_TURN_MAX;
+		if (info->turnRate < -LARA_SLOW_TURN_MAX)
+			info->turnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_MONKEY_TURN_MAX)
-			info->turnRate = LARA_MONKEY_TURN_MAX;
+		if (info->turnRate > LARA_SLOW_TURN_MAX)
+			info->turnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_ACTION && info->canMonkeySwing)
@@ -545,8 +545,8 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
 			// move the following block right beneath the death check. @Sezz 2022.01.16
 			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_MONKEY_TURN_MAX)
-				info->turnRate = -LARA_MONKEY_TURN_MAX;
+			if (info->turnRate < -LARA_SLOW_TURN_MAX)
+				info->turnRate = -LARA_SLOW_TURN_MAX;
 
 			item->goalAnimState = LS_MONKEY_TURN_LEFT;
 			return;
@@ -611,8 +611,8 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 			// TODO: When an immediate dispatch out of this state becomes possible from any frame,
 			// move the following block right beneath the death check. @Sezz 2022.01.16
 			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_MONKEY_TURN_MAX)
-				info->turnRate = LARA_MONKEY_TURN_MAX;
+			if (info->turnRate > LARA_SLOW_TURN_MAX)
+				info->turnRate = LARA_SLOW_TURN_MAX;
 
 			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
 			return;
