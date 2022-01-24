@@ -41,10 +41,12 @@
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
+    <ClInclude Include="include\Scripting\GameScriptAnimations.h" />
     <ClInclude Include="include\Scripting\GameScriptAudioTrack.h" />
     <ClInclude Include="include\Scripting\GameScriptCameraInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptColor.h" />
     <ClInclude Include="include\Scripting\GameScriptDisplayString.h" />
+    <ClInclude Include="include\Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="include\Scripting\GameScriptInventoryObject.h" />
     <ClInclude Include="include\Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptLevel.h" />
@@ -74,10 +76,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\GameScriptAIObject.cpp" />
+    <ClCompile Include="src\GameScriptAnimations.cpp" />
     <ClCompile Include="src\GameScriptAudioTrack.cpp" />
     <ClCompile Include="src\GameScriptCameraInfo.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptDisplayString.cpp" />
+    <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
     <ClCompile Include="src\GameScriptItemInfo.cpp" />
     <ClCompile Include="src\GameScriptLevel.cpp" />
@@ -149,11 +153,11 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)\Scripting\build\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)\Scripting\bin\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\sol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\bass;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\sol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\bass;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)\Scripting\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Scripting\build\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -171,7 +175,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -193,7 +197,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
