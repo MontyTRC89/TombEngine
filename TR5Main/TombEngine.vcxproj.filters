@@ -294,7 +294,6 @@
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
-    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
@@ -672,6 +671,7 @@
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Specific\fast_vector.h" />
+    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\collision\floordata.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
