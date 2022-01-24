@@ -5,13 +5,7 @@
 #include "GameScriptColor.h"
 #include "GameScriptInventoryObject.h"
 #include <GameScriptFog.h>
-
-enum class WeatherType
-{
-	None,
-	Rain,
-	Snow
-};
+#include "ScriptInterfaceLevel.h"
 
 static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 {
@@ -40,7 +34,7 @@ static const std::unordered_map<std::string, LaraType> kLaraTypes
 	{"Invisible", LaraType::Invisible}
 };
 
-struct GameScriptLevel
+struct GameScriptLevel : public ScriptInterfaceLevel
 {
 	std::string NameStringKey;
 	std::string FileName;
@@ -62,6 +56,8 @@ struct GameScriptLevel
 	bool UnlimitedAir{ false };
 	std::vector<GameScriptInventoryObject> InventoryObjects;
 
+	bool GetSkyLayerEnabled(int index) override;
+	short GetSkyLayerSpeed(int index) override;
 	void SetWeatherStrength(float val);
 	void SetLevelFarView(byte val);
 	static void Register(sol::state* state);
