@@ -47,16 +47,16 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -196,7 +196,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
-    <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
