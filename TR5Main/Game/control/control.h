@@ -70,16 +70,6 @@ extern short NextFxFree;
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
 
-extern bool ScreenFadedOut;
-extern bool ScreenFading;
-extern int ScreenFadeSpeed;
-extern int ScreenFadeStart;
-extern int ScreenFadeEnd;
-extern int ScreenFadeCurrent;
-extern int CinematicBarsDestinationHeight;
-extern int CinematicBarsHeight;
-extern int CinematicBarsSpeed;
-
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase();
@@ -106,10 +96,5 @@ int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterDepth(int x, int y, int z, short roomNumber);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-
-void SetScreenFadeOut(int speed);
-void SetScreenFadeIn(int speed);
-void SetCinematicBars(int height, int speed);
-void UpdateFadeScreenAndCinematicBars();
 
 unsigned CALLBACK GameMain(void*);

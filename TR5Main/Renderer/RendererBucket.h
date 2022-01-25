@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RenderEnums.h"
+#include "Renderer/Renderer11Enums.h"
 #include "RendererVertex.h"
 #include "RendererPolygon.h"
 #include <vector>

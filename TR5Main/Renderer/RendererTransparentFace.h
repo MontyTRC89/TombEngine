@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SimpleMath.h>
-#include "RenderEnums.h"
+#include "Renderer11Enums.h"
 
 struct MESH_INFO;
 

@@ -89,16 +89,6 @@ short NextFxFree;
 int WeaponDelay;
 int WeaponEnemyTimer;
 
-bool ScreenFadedOut = false;
-bool ScreenFading = false;
-int ScreenFadeSpeed = 0;
-int ScreenFadeStart = 0;
-int ScreenFadeEnd = 0;
-int ScreenFadeCurrent = 0;
-int CinematicBarsHeight = 0;
-int CinematicBarsDestinationHeight = 0;
-int CinematicBarsSpeed = 0;
-
 int DrawPhase()
 {
 	g_Renderer.Draw();
@@ -521,7 +511,7 @@ GAME_STATUS DoTitle(int index)
 
 		g_GameScript->OnStart();
 
-		SetScreenFadeIn(16);
+		SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 		ControlPhase(2, 0);
 
@@ -665,7 +655,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen
-	SetScreenFadeIn(16);
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 	// The game loop, finally!
 	while (true)
@@ -1071,76 +1061,4 @@ void CleanUp()
 
 	// Clear soundtrack masks
 	ClearSoundTrackMasks();
-}
-
-void SetScreenFadeOut(int speed)
-{
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 255;
-		ScreenFadeEnd = 0;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
-}
-
-void SetScreenFadeIn(int speed)
-{
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 0;
-		ScreenFadeEnd = 255;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
-}
-
-void SetCinematicBars(int height, int speed)
-{
-	CinematicBarsDestinationHeight = height;
-	CinematicBarsSpeed = speed;
-}
-
-void UpdateFadeScreenAndCinematicBars()
-{
-	if (CinematicBarsDestinationHeight < CinematicBarsHeight)
-	{
-		CinematicBarsHeight -= CinematicBarsSpeed;
-		if (CinematicBarsDestinationHeight > CinematicBarsHeight)
-			CinematicBarsHeight = CinematicBarsDestinationHeight;
-	}
-	else if (CinematicBarsDestinationHeight > CinematicBarsHeight)
-	{
-		CinematicBarsHeight += CinematicBarsSpeed;
-		if (CinematicBarsDestinationHeight < CinematicBarsHeight)
-			CinematicBarsHeight = CinematicBarsDestinationHeight;
-	}
-
-	int oldScreenFadeCurrent = ScreenFadeCurrent;
-
-	if (ScreenFadeEnd != 0 && ScreenFadeEnd >= ScreenFadeCurrent)
-	{
-		ScreenFadeCurrent += ScreenFadeSpeed;
-		if (ScreenFadeCurrent > ScreenFadeEnd)
-		{
-			ScreenFadeCurrent = ScreenFadeEnd;
-			if (oldScreenFadeCurrent >= ScreenFadeCurrent) 
-			{
-				ScreenFadedOut = true;
-				ScreenFading = false;
-			}
-
-		}
-	}
-	else if (ScreenFadeEnd < ScreenFadeCurrent)
-	{
-		ScreenFadeCurrent -= ScreenFadeSpeed;
-		if (ScreenFadeCurrent < ScreenFadeEnd)
-		{
-			ScreenFadeCurrent = ScreenFadeEnd;
-			ScreenFading = false;
-		}
-	}
 }
