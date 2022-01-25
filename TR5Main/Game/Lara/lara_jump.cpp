@@ -601,7 +601,7 @@ void lara_col_swandive(ITEM_INFO* item, COLL_INFO* coll)
 			;
 		else if (info->keepCrouched ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
-			g_GameFlow->Animations.CrawlspaceSwandive)
+			g_GameFlow->HasCrawlspaceSwandive())
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
