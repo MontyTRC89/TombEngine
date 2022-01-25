@@ -121,7 +121,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up one step.
 		if (coll->Front.Floor < 0 &&					// Lower floor bound.
 			coll->Front.Floor > -STEPUP_HEIGHT &&		// Upper floor bound.
-			g_GameFlow->Animations.CrawlExtended)
+			g_GameFlow->HasCrawlExtended())
 		{
 			if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL)		// Front clamp buffer. Presumably, nothing more is necessary, but tend to this in the future. @Sezz 2021.11.06
 			{
@@ -153,7 +153,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
-				g_GameFlow->Animations.CrawlExtended)
+				g_GameFlow->HasCrawlExtended())
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
@@ -183,7 +183,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			else if (abs((coll->Front.Ceiling - coll->Setup.Height) - coll->Front.Floor) > LARA_HEIGHT_CRAWL &&				// Front clamp buffer.
 				abs((coll->FrontLeft.Ceiling - coll->Setup.Height) - coll->FrontLeft.Floor) > LARA_HEIGHT_CRAWL &&			// Left clamp buffer.
 				abs((coll->FrontRight.Ceiling - coll->Setup.Height) - coll->FrontRight.Floor) > LARA_HEIGHT_CRAWL &&		// Right clamp buffer.
-				g_GameFlow->Animations.CrawlExtended)
+				g_GameFlow->HasCrawlExtended())
 			{
 				item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 				item->frameNumber = GetFrameNumber(item, 0);
@@ -266,7 +266,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to monkey swing.
 	if (info->canMonkeySwing &&
 		!TestLaraSwamp(item) &&
-		g_GameFlow->Animations.MonkeyAutoJump)
+		g_GameFlow->HasMonkeyAutoJump())
 	{
 		short roomNum = item->roomNumber;
 		int ceiling = (GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum),
@@ -545,7 +545,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestHangSwingIn(item, angle))
 	{
-		if (g_GameFlow->Animations.OscillateHang)
+		if (g_GameFlow->HasOscillateHang())
 		{
 			ResetLaraFlex(item);
 			SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
@@ -1107,7 +1107,7 @@ bool TestHangSwingIn(ITEM_INFO* item, short angle)
 
 	if (floorHeight != NO_HEIGHT)
 	{
-		if (g_GameFlow->Animations.OscillateHang)
+		if (g_GameFlow->HasOscillateHang())
 		{
 			if (floorHeight - y > 0 && ceilingHeight - y < -400)
 				return true;
@@ -1370,7 +1370,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->HasCrawlExtended())
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
 			else
 				return false;
@@ -1382,7 +1382,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->HasCrawlExtended())
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
 			else
 				return false;
@@ -1395,7 +1395,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->HasCrawlExtended())
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
 			else
 				return false;

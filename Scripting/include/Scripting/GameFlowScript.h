@@ -8,6 +8,7 @@
 #include "GameScriptAudioTrack.h"
 #include "GameScriptAnimations.h"
 #include "ScriptInterfaceGame.h"
+#include "ScriptInterfaceFlow.h"
 
 enum class TITLE_TYPE
 {
@@ -15,7 +16,7 @@ enum class TITLE_TYPE
 	BACKGROUND
 };
 
-class GameFlow : public LuaHandler
+class GameFlow : public LuaHandler, public ScriptInterfaceFlow
 {
 private:
 	GameScriptSettings				m_settings;
@@ -63,7 +64,16 @@ public:
 	void							SetIntroImagePath(std::string const& path);
 	void							SetTitleScreenImagePath(std::string const& path);
 	void							SetGameFarView(byte val);
+	bool							IsFlyCheatEnabled() const;
+
+	bool HasCrawlExtended() const { return Animations.CrawlExtended; }
+	bool HasCrouchRoll() const { return Animations.CrouchRoll; }
+	bool HasCrawlspaceSwandive() const { return Animations.CrawlspaceSwandive; }
+	bool HasMonkeyTurn180() const { return Animations.MonkeyTurn180; }
+	bool HasMonkeyAutoJump() const { return Animations.MonkeyAutoJump; }
+	bool HasOscillateHang() const { return Animations.OscillateHang; }
+	bool HasAFKPose() const { return Animations.Pose; }
 };
 
-extern GameFlow* g_GameFlow;
-extern ScriptInterfaceGame * g_GameScript;
+extern ScriptInterfaceFlow* g_GameFlow;
+extern ScriptInterfaceGame* g_GameScript;

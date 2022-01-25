@@ -67,7 +67,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraCheatyBits()
 {
-	if (g_GameFlow->FlyCheat)
+	if (g_GameFlow->IsFlyCheatEnabled())
 	{
 		if (KeyMap[DIK_O])
 		{
