@@ -201,3 +201,10 @@ constexpr auto ASSUMED_HEIGHT_FOR_TEXT_DRAWING = 600.0f;
 
 constexpr int MAX_BONES = 32;
 constexpr int AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
+constexpr auto REFERENCE_RES_WIDTH = 800;
+constexpr auto REFERENCE_RES_HEIGHT = 450;
+constexpr auto HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
+constexpr auto HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
+constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
+constexpr auto MAX_DYNAMIC_SHADOWS = 1;
+constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
