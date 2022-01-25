@@ -171,6 +171,21 @@
     <ClInclude Include="include\Scripting\GameFlowScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Scripting\InventorySlots.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scripting\ObjectIDs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scripting\AudioTracks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scripting\ScriptInterfaceFlow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scripting\ScriptInterfaceState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -240,6 +255,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ScriptAssert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScriptInterfaceState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

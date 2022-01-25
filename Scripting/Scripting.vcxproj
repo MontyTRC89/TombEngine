@@ -40,6 +40,7 @@
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
+    <ClInclude Include="include\Scripting\AudioTracks.h" />
     <ClInclude Include="include\Scripting\GameFlowScript.h" />
     <ClInclude Include="include\Scripting\GameLogicScript.h" />
     <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
@@ -61,12 +62,16 @@
     <ClInclude Include="include\Scripting\GameScriptSinkInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptSkyLayer.h" />
     <ClInclude Include="include\Scripting\GameScriptSoundSourceInfo.h" />
+    <ClInclude Include="include\Scripting\InventorySlots.h" />
     <ClInclude Include="include\Scripting\ItemEnumPair.h" />
     <ClInclude Include="include\Scripting\LuaHandler.h" />
+    <ClInclude Include="include\Scripting\ObjectIDs.h" />
     <ClInclude Include="include\Scripting\ReservedScriptNames.h" />
     <ClInclude Include="include\Scripting\ScriptAssert.h" />
+    <ClInclude Include="include\Scripting\ScriptInterfaceFlow.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceLevel.h" />
+    <ClInclude Include="include\Scripting\ScriptInterfaceState.h" />
     <ClInclude Include="include\Scripting\ScriptUtil.h" />
     <ClInclude Include="include\ScriptInterfaceGame.h" />
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
@@ -79,6 +84,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\GameFlowScript.cpp" />
+    <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameLogicScript.cpp" />
     <ClCompile Include="src\GameScriptAIObject.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
