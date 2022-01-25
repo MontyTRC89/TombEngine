@@ -458,7 +458,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Scripting\LuaHandler.h" />
     <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
@@ -475,7 +474,6 @@ CALL gen.bat</Command>
     <ClInclude Include="CustomObjects\raptor.h" />
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
-    <ClInclude Include="Scripting\GameFlowScript.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
@@ -511,7 +509,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
@@ -850,15 +847,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
-    <ClCompile Include="Scripting\GameFlowScript.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameLogicScript.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
   </ItemGroup>
   <ItemGroup>

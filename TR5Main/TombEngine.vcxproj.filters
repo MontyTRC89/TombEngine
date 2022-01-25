@@ -284,9 +284,6 @@
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
-    <ClCompile Include="Scripting\GameFlowScript.cpp" />
-    <ClCompile Include="Scripting\GameLogicScript.cpp" />
-    <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Scripting\GameScriptFog.cpp" />
@@ -600,7 +597,6 @@
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Scripting\LuaHandler.h" />
     <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
@@ -617,7 +613,6 @@
     <ClInclude Include="CustomObjects\raptor.h" />
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
-    <ClInclude Include="Scripting\GameFlowScript.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\control\control.h" />
@@ -647,7 +642,6 @@
     <ClInclude Include="Game\effects\tomb4fx.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
