@@ -1,6 +1,5 @@
 #pragma once
 #include "Scripting/GameFlowScript.h"
-#include "Scripting/GameLogicScript.h"	
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/ChunkWriter.h"
