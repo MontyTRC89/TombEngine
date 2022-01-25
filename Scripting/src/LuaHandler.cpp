@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "LuaHandler.h"
 
 LuaHandler::LuaHandler(sol::state* lua) {
