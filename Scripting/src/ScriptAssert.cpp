@@ -1,4 +1,4 @@
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "ScriptAssert.h"
 
 static ERROR_MODE ScriptErrorMode = ERROR_MODE::WARN;
