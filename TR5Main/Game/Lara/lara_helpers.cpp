@@ -35,7 +35,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!TestLaraSwamp(item))
+	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		if (TestLaraStepUp(item, coll))
 		{
@@ -63,7 +63,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
 	int sign = std::copysign(1, coll->Middle.Floor);
 	
-	if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
 		item->pos.yPos += SWAMP_GRAVITY;
 	else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))		// Outer range.
 		item->pos.yPos += rate * sign;

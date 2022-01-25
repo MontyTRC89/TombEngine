@@ -76,7 +76,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 		return true;
 	}
 
-	if (coll->CollisionType == CT_TOP)
+	if (coll->CollisionType == CT_TOP || coll->Middle.Ceiling >= 0)
 	{
 		if (item->fallspeed <= 0)
 			item->fallspeed = 1;
@@ -389,7 +389,7 @@ void LaraResetGravityStatus(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSnapToHeight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TestLaraSwamp(item) && coll->Middle.Floor > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
 		item->pos.yPos += SWAMP_GRAVITY;
 	else if (coll->Middle.Floor != NO_HEIGHT)
 		item->pos.yPos += coll->Middle.Floor;

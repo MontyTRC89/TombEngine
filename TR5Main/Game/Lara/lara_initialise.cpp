@@ -137,7 +137,7 @@ void LaraInitialiseMeshes()
 
 void InitialiseLaraAnims(ITEM_INFO* item)
 {
-	if (TestLaraWater(item))
+	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		Lara.waterStatus = LW_UNDERWATER;
 		item->fallspeed = 0;
