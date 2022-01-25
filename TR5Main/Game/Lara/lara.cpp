@@ -429,8 +429,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->isLow = false;
 
-	bool isWater = TestLaraWater(item);
-	bool isSwamp = TestLaraSwamp(item);
+	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 	int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
@@ -1104,7 +1104,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		if (TestLaraWater(item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
 		{
 			info->waterStatus = LW_UNDERWATER;
 			SetAnimation(item, LA_UNDERWATER_IDLE);
@@ -1215,7 +1215,7 @@ void AnimateLara(ITEM_INFO* item)
 				flags = cmd[1] & 0xC000;
 				if ( flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
 					(flags == (int)SOUND_PLAYCONDITION::Land && (info->waterSurfaceDist >= 0 || info->waterSurfaceDist == NO_HEIGHT)) ||
-					(flags == (int)SOUND_PLAYCONDITION::Water && info->waterSurfaceDist < 0 && info->waterSurfaceDist != NO_HEIGHT && !TestLaraSwamp(item)))
+					(flags == (int)SOUND_PLAYCONDITION::Water && info->waterSurfaceDist < 0 && info->waterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 				}
@@ -1250,7 +1250,7 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (item->airborne)
 	{
-		if (TestLaraSwamp(item))
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			item->speed -= item->speed >> 3;
 			if (abs(item->speed) < 8)
@@ -1278,7 +1278,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		int velocity;
 
-		if (info->waterStatus == LW_WADE && TestLaraSwamp(item))
+		if (info->waterStatus == LW_WADE && TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)

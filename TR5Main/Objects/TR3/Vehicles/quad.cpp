@@ -183,7 +183,7 @@ static void QuadbikeExplode(ITEM_INFO* lara, ITEM_INFO* quad)
 {
 	LaraInfo*& laraInfo = LaraItem->data;
 
-	if (g_Level.Rooms[quad->roomNumber].flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, quad))
 		TriggerUnderwaterExplosion(quad, 1);
 	else
 	{
@@ -963,7 +963,8 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 			break;
 		}
 
-		if (g_Level.Rooms[quad->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+		if (TestEnvironment(ENV_FLAG_WATER, quad) ||
+			TestEnvironment(ENV_FLAG_SWAMP, quad))
 		{
 			lara->goalAnimState = QUAD_STATE_FALL_OFF;
 			lara->pos.yPos = quad->pos.yPos + 700;
