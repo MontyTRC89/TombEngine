@@ -454,11 +454,9 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
-    <ClInclude Include="Scripting\InventorySlots.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Scripting\ObjectIDs.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
