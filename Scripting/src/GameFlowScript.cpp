@@ -16,7 +16,7 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-GameFlow* g_GameFlow;
+ScriptInterfaceFlow* g_GameFlow;
 ScriptInterfaceGame* g_GameScript;
 
 GameFlow::GameFlow(sol::state* lua) : LuaHandler{ lua }
@@ -229,6 +229,11 @@ GameScriptLevel* GameFlow::GetLevel(int id)
 int	GameFlow::GetNumLevels() const
 {
 	return Levels.size();
+}
+
+bool GameFlow::IsFlyCheatEnabled() const
+{
+	return FlyCheat;
 }
 
 bool GameFlow::DoGameflow()
