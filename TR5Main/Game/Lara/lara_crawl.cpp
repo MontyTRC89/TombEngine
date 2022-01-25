@@ -63,7 +63,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			info->gunStatus == LG_HANDS_FREE &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
@@ -242,7 +242,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
@@ -298,7 +298,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
@@ -380,7 +380,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
-				g_GameFlow->Animations.CrawlExtended)
+				g_GameFlow->HasCrawlExtended())
 			{
 				DoLaraCrawlVault(item, coll);
 				return;
