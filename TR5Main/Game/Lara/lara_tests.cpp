@@ -114,7 +114,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 	}
 
-	if (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
 		return false;
 	
 	if (TestValidLedge(item, coll))
@@ -287,22 +287,12 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (GetCollisionResult(item).Position.FloorSlope &&
-		!TestLaraSwamp(item))
+		!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		return true;
 	}
 
 	return false;
-}
-
-bool TestLaraSwamp(ITEM_INFO* item)
-{
-	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_SWAMP);
-}
-
-bool TestLaraWater(ITEM_INFO* item)
-{
-	return (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER);
 }
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
@@ -1000,23 +990,6 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	return (!result1 && !result2);
 }
 
-bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
-{
-	auto start = GAME_VECTOR(
-		item->pos.xPos + (phd_cos(item->pos.yRot) * side),
-		item->pos.yPos + height,
-		item->pos.zPos + (phd_sin(item->pos.yRot) * -side),
-		item->roomNumber);
-
-	auto end = GAME_VECTOR(
-		item->pos.xPos + (phd_sin(item->pos.yRot) * dist) + (phd_cos(item->pos.yRot) * side),
-		item->pos.yPos + height,
-		item->pos.zPos + (phd_cos(item->pos.yRot) * dist) + (phd_sin(item->pos.yRot) * -side),
-		item->roomNumber);
-
-	return !LOS(&start, &end);
-}
-
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 {
 	auto pos1 = GAME_VECTOR(item->pos.xPos,
@@ -1134,7 +1107,7 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->airborne && item->fallspeed >= 0 &&
 		(coll->Middle.Floor <= std::min((int)item->fallspeed, STEPUP_HEIGHT) ||
-			TestLaraSwamp(item)))
+			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
 	}
@@ -1386,11 +1359,28 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 	return false;
 }
 
+bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
+{
+	auto start = GAME_VECTOR(
+		item->pos.xPos + (phd_cos(item->pos.yRot) * side),
+		item->pos.yPos + height,
+		item->pos.zPos + (phd_sin(item->pos.yRot) * -side),
+		item->roomNumber);
+
+	auto end = GAME_VECTOR(
+		item->pos.xPos + (phd_sin(item->pos.yRot) * dist) + (phd_cos(item->pos.yRot) * side),
+		item->pos.yPos + height,
+		item->pos.zPos + (phd_cos(item->pos.yRot) * dist) + (phd_sin(item->pos.yRot) * -side),
+		item->roomNumber);
+
+	return !LOS(&start, &end);
+}
+
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!TestLaraSwamp(item) &&
+	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&
 		info->gunStatus == LG_HANDS_FREE &&								// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&							// Avoid unsightly concurrent actions.
 		(info->gunType != WEAPON_FLARE || info->flareAge > 0) &&		// Flare is not being handled. TODO: Will she pose with weapons drawn?
@@ -1543,8 +1533,8 @@ bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 	MoveTestData testData
 	{
 		item->pos.yRot - ANGLE(90.0f),
-		CLICK(0.8f),
-		-CLICK(0.8f)
+		CLICK(0.8),
+		-CLICK(0.8)
 	};
 
 	return TestLaraMoveTolerance(item, coll, testData);
@@ -1787,7 +1777,7 @@ VaultTestResultData TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, Vau
 	int y = item->pos.yPos;
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, coll->Setup.Radius * sqrt(2) + 4, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
-	bool swampTooDeep = testData.checkSwampDepth ? (TestLaraSwamp(item) && info->waterSurfaceDist < -CLICK(3)) : TestLaraSwamp(item);
+	bool swampTooDeep = testData.checkSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
 	int yOffset = testData.lowerBound;
@@ -1928,7 +1918,7 @@ VaultTestResultData TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeMiddle = GetCollisionResult(item);
 
 	if (TestValidLedgeAngle(item, coll) &&
-		!TestLaraSwamp(item) &&										// No swamp.
+		!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
 		info->climbStatus &&										// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Lower middle ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
@@ -1967,7 +1957,7 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item);
 
-	if (!TestLaraSwamp(item) &&										// No swamp.
+	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
 		info->canMonkeySwing &&										// Monkey swing sector flag set.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&		// Lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))					// Upper ceiling bound.
@@ -2122,7 +2112,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestData testDa
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
 				(probe.Position.Floor - y) >= CLICK(0.5f))) &&									// AND there is a drop below.
 		!isWading &&																		// Not wading in water (if applicable).
-		!TestLaraSwamp(item) &&																// No swamp.
+		!TestEnvironment(ENV_FLAG_SWAMP, item) &&										// No swamp.
 		!TestLaraFacingCorner(item, testData.Angle, testData.Dist) &&						// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{

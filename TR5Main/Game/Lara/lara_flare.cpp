@@ -22,7 +22,7 @@ void FlareControl(short itemNum)
 {
 	ITEM_INFO* flareItem = &g_Level.Items[itemNum];
 
-	if (TestLaraSwamp(flareItem))
+	if (TestEnvironment(ENV_FLAG_SWAMP, flareItem))
 	{
 		KillItem(itemNum);
 		return;
@@ -47,7 +47,8 @@ void FlareControl(short itemNum)
 	flareItem->pos.xPos += xVel;
 	flareItem->pos.zPos += zVel;
 
-	if (TestLaraWater(flareItem) || TestLaraSwamp(flareItem)) // TODO: Generic water/swamp test function.
+	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
+		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
 	{
 		flareItem->fallspeed += (5 - flareItem->fallspeed) / 2;
 		flareItem->speed += (5 - flareItem->speed) / 2;
@@ -244,7 +245,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->pos, TestLaraWater(laraItem));
+				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->pos, TestEnvironment(ENV_FLAG_WATER, laraItem));
 				laraInfo->flareAge = 1;
 			}
 

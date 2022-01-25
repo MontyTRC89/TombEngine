@@ -6,6 +6,7 @@ struct ITEM_INFO;
 struct COLL_INFO;
 struct FLOOR_INFO;
 struct MESH_INFO;
+enum RoomEnumFlag;
 
 constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadFloorHeightDown
 constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadFloorHeightUp
@@ -138,3 +139,7 @@ void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offset
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
+
+bool TestEnvironment(RoomEnumFlag roomType, int roomNum);
+bool TestEnvironment(RoomEnumFlag roomType, ITEM_INFO* item);
+bool TestEnvironment(RoomEnumFlag roomType, int x, int y, int z, int roomNum);

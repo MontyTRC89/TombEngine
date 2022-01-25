@@ -147,7 +147,7 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 	{
 		if (Lara.waterStatus != LW_UNDERWATER &&
 			Lara.waterStatus != LW_SURFACE &&
-			!(TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
+			!(TestEnvironment(ENV_FLAG_SWAMP, item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
 			return;
 	}
 

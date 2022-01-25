@@ -1077,7 +1077,7 @@ void RubberBoatControl(short itemNum)
 		GAME_VECTOR pos;
 		long cnt;
 		h = GetFloorHeight(floor, prop.x, prop.y, prop.z);
-		if (prop.y > h && !(g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER))
+		if (prop.y > h && !TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
 			pos.x = prop.x;
 			pos.y = prop.y;

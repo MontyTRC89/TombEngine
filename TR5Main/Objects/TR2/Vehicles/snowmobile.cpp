@@ -238,7 +238,7 @@ void SkidooExplode(ITEM_INFO* lara, ITEM_INFO* skidoo)
 {
 	LaraInfo*& laraInfo = lara->data;
 
-	if (g_Level.Rooms[skidoo->roomNumber].flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, skidoo))
 		TriggerUnderwaterExplosion(skidoo, 1);
 	else
 	{
@@ -461,7 +461,8 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 		}
 	}
 
-	if (g_Level.Rooms[skidoo->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	if (TestEnvironment(ENV_FLAG_WATER, skidoo) ||
+		TestEnvironment(ENV_FLAG_SWAMP, skidoo))
 	{
 		lara->goalAnimState = SKIDOO_STATE_JUMP_OFF;
 		lara->hitPoints = 0;
