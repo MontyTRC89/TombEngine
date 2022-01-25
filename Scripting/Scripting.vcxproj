@@ -99,6 +99,7 @@
     <ClCompile Include="src\GameScriptSkyLayer.cpp" />
     <ClCompile Include="src\GameScriptSoundSourceInfo.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
+    <ClCompile Include="src\ScriptAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
