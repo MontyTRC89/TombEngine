@@ -218,7 +218,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->poseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
-		g_GameFlow->Animations.Pose)
+		g_GameFlow->HasAFKPose())
 	{
 		info->poseCount++;
 	}
