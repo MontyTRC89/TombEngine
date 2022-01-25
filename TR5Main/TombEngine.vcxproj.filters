@@ -213,7 +213,7 @@
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp" />
-    <ClCompile Include="Renderer\Render11Helper.cpp" />
+    <ClCompile Include="Renderer\Renderer11Helper.cpp" />
     <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
     <ClCompile Include="Renderer\Renderer11Debug.cpp" />
     <ClCompile Include="Renderer\Renderer11Draw.cpp" />
@@ -558,7 +558,7 @@
     <ClInclude Include="Objects\TR5\Entity\tr5_willowwisp.h" />
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
-    <ClInclude Include="Renderer\RenderEnums.h" />
+    <ClInclude Include="Renderer\Renderer11Enums.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR2\tr2_objects.h" />

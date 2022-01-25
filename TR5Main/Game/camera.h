@@ -51,6 +51,8 @@ enum CAMERA_FLAGS
 constexpr auto MAX_CAMERA = 18;
 constexpr auto NO_MINY = 0xFFFFFF;
 
+constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
+
 extern PHD_VECTOR CurrentCameraPosition;
 extern CAMERA_INFO Camera;
 extern GAME_VECTOR ForcedFixedCamera;
@@ -62,6 +64,16 @@ extern CAMERA_TYPE BinocularOldCamera;
 extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
+
+extern bool ScreenFadedOut;
+extern bool ScreenFading;
+extern float ScreenFadeSpeed;
+extern float ScreenFadeStart;
+extern float ScreenFadeEnd;
+extern float ScreenFadeCurrent;
+extern float CinematicBarsDestinationHeight;
+extern float CinematicBarsHeight;
+extern float CinematicBarsSpeed;
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
@@ -84,3 +96,8 @@ void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemsCollideCamera();
+
+void SetScreenFadeOut(float speed);
+void SetScreenFadeIn(float speed);
+void SetCinematicBars(float height, float speed);
+void UpdateFadeScreenAndCinematicBars();
