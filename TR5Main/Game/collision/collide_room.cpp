@@ -176,26 +176,20 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	// Return probed bottom block into result.
 	result.BottomBlock = floor;
 
-	// Get floor tilts.
-	auto floorTilts = floor->FloorTiltXZ(x, z);
-	result.FloorTiltX = floorTilts.first;
-	result.FloorTiltZ = floorTilts.second;
+	// Get tilts.
+	result.FloorTilt = floor->TiltXZ(x, z, true);
+	result.CeilingTilt = floor->TiltXZ(x, z, false);
 
-	// Get ceiling tilts.
-	auto ceilingTilts = floor->CeilingTiltXZ(x, z);
-	result.CeilingTiltX = ceilingTilts.first;
-	result.CeilingTiltZ = ceilingTilts.second;
-
-	// Split, bridge and slope data.
+	// Split, bridge and slope data
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(floorTilts.first) > 2 || abs(floorTilts.second) > 2);
-	result.Position.CeilingSlope = abs(ceilingTilts.first) > 2 || abs(ceilingTilts.second) > 2;
+	result.Position.FloorSlope = result.Position.Bridge < 0 && ((abs(result.FloorTilt.x) > 2 || (abs(result.FloorTilt.y)) > 2));
+	result.Position.CeilingSlope = abs(result.CeilingTilt.x) > 2 || abs(result.CeilingTilt.y) > 2;
 
-	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType.
-	if ((y + CLICK(2)) < floor->FloorHeight(x, z))
-		result.FloorTiltZ = result.FloorTiltX = 0;
+	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
+	if ((y + CLICK(2)) < (floor->FloorHeight(x, z)))
+		result.FloorTilt = Vector2::Zero;
 
 	return result;
 }
@@ -293,10 +287,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
 	auto collResult = GetCollisionResult(x, item->pos.yPos, z, item->roomNumber);
-	coll->FloorTiltX = collResult.FloorTiltX;
-	coll->FloorTiltZ = collResult.FloorTiltZ;
-	coll->CeilingTiltX = collResult.CeilingTiltX;
-	coll->CeilingTiltZ = collResult.CeilingTiltZ;
+	coll->FloorTiltX = (int)collResult.FloorTilt.x;
+	coll->FloorTiltZ = (int)collResult.FloorTilt.y;
+	coll->CeilingTiltX = (int)collResult.CeilingTilt.x;
+	coll->CeilingTiltZ = (int)collResult.CeilingTilt.y;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance

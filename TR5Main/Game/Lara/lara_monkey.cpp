@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -45,6 +46,12 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
+	// TODO: overhang
+	//SlopeMonkeyExtra(item, coll);
+
+	// This check is needed to prevent stealing goal state from previously set.
+	//if (item->goalAnimState == LS_MONKEYSWING_IDLE)
+	//	return;
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;

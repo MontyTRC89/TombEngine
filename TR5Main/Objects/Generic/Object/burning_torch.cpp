@@ -233,7 +233,7 @@ namespace TEN::Entities::Generic
 
 		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
 
-		if (GetCollidedObjects(item, 0, 1, CollidedItems, CollidedMeshes, 0))
+		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, 0))
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
 			if (CollidedItems)

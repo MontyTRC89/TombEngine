@@ -59,11 +59,8 @@ struct COLL_RESULT
 	FLOOR_INFO* BottomBlock;
 
 	COLL_POSITION Position;
-
-	int FloorTiltX;
-	int FloorTiltZ;
-	int CeilingTiltX;
-	int CeilingTiltZ;
+	Vector2 FloorTilt;
+	Vector2 CeilingTilt;
 };
 
 struct COLL_SETUP

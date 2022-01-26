@@ -8,6 +8,8 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_basic.h"
+#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_slide.h"
 #include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -226,6 +228,8 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->goalAnimState = LS_REACH;
+	// TODO: overhang
+	//SlopeReachExtra(item, coll);
 }
 
 // State:		LS_REACH (11)

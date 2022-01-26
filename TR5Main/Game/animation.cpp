@@ -287,6 +287,11 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 	return(interp);
 }
 
+short GetCurrentRelativeFrameNumber(ITEM_INFO* item)
+{
+	return item->frameNumber - GetFrameNumber(item, 0);
+}
+
 short GetFrameNumber(ITEM_INFO* item, short frameToStart)
 {
 	return GetFrameNumber(item->objectNumber, item->animNumber, frameToStart);
@@ -302,7 +307,9 @@ int GetFrameCount(short animNumber)
 	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
 		return 0;
 
-	return &g_Level.Anims[animNumber].frameEnd - &g_Level.Anims[animNumber].frameBase;
+	int end  = g_Level.Anims[animNumber].frameEnd;
+	int base = g_Level.Anims[animNumber].frameBase;
+	return (end - base);
 }
 
 int GetNextAnimState(ITEM_INFO* item)
