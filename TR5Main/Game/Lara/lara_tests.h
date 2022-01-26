@@ -60,8 +60,8 @@ bool TestLaraStep(COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData);
-bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestData testData);
+bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup);
+bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup);
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll);
@@ -78,19 +78,19 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
 
-VaultTestResultData TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestData testData);
-VaultTestResultData TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResultData TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResultData TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResultData TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResultData TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResultData TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestSetup testSetup);
+VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 
-VaultTestResultData TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestData testData);
+bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestSetup testSetup);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
