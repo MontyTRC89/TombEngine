@@ -1,6 +1,6 @@
 #pragma once
 
-struct MoveTestData
+struct MoveTestSetup
 {
 	short Angle;
 	int LowerBound;
@@ -10,7 +10,7 @@ struct MoveTestData
 	bool CheckDeath = true;
 };
 
-struct VaultTestData
+struct VaultTestSetup
 {
 	int LowerBound;
 	int UpperBound;
@@ -20,13 +20,13 @@ struct VaultTestData
 	bool CheckSwampDepth = true;
 };
 
-struct VaultTestResultData
+struct VaultTestResult
 {
 	bool Success;
 	int Height;
 };
 
-struct CrawlVaultTestData
+struct CrawlVaultTestSetup
 {
 	int LowerBound;
 	int UpperBound;
@@ -37,4 +37,11 @@ struct CrawlVaultTestData
 	int ProbeHeightDifMax;
 	bool CheckSlope = true;
 	bool CheckDeath = true;
+};
+
+struct CornerTestResult
+{
+	bool Success;
+	PHD_3DPOS ProbeResult;
+	PHD_3DPOS RealPositionResult;
 };
