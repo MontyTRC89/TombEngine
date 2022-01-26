@@ -723,11 +723,11 @@ enum LARA_ANIM
 	LA_MONKEY_TO_LADDER_OVERHEAD_START = 487,				// Monkey idle > ladder idle, overhead (1/2)
 	LA_MONKEY_TO_LADDER_OVERHEAD_END = 488,					// Monkey idle > ladder idle, overhead (2/2)
 	LA_JUMP_PREPARE_TO_STAND = 489,							// Jump prepare > stand
-	LA_UNUSED7 = 490,										// 
-	LA_UNUSED8 = 491,										// 
-	LA_UNUSED9 = 492,										// 
-	LA_UNUSED10 = 493,										// 
-	LA_UNUSED11 = 494,										// 
+	LA_MONKEY_IDLE_TO_BACK_LEFT = 490,						// Monkey swing idle > monkey swing back, left hand leading
+	LA_MONKEY_IDLE_TO_BACK_RIGHT = 491,						// Monkey swing idle > monkey swing back, right hand leading
+	LA_MONKEY_BACK = 492,									// Monkey swing back
+	LA_MONKEY_BACK_TO_IDLE_LEFT = 493,						// Monkey swing back > monkey swing idle, left hand leading
+	LA_MONKEY_BACK_TO_IDLE_RIGHT = 494,						// Monkey swing back > monkey swing idle, right hand leading
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
