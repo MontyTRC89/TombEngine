@@ -221,7 +221,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_slopeshimmy,
 	lara_as_sclimbstart,
 	lara_as_sclimbstop,
-	lara_as_sclimbend
+	lara_as_sclimbend,
+	lara_as_controlled_no_look,//161
+	lara_as_controlled_no_look,//162
+	lara_as_monkey_back//163
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -386,7 +389,10 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_slopeshimmy, // lara_col_slopeshimmy
 	lara_default_col,	  // lara_col_sclimbstart
 	lara_default_col,     // lara_col_sclimbstop
-	lara_default_col	  // lara_col_sclimbend
+	lara_default_col,	  // lara_col_sclimbend
+	lara_void_func,//161
+	lara_void_func,//162
+	lara_col_monkey_back//163
 };
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)

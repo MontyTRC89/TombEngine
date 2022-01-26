@@ -52,6 +52,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// This check is needed to prevent stealing goal state from previously set.
 	//if (item->goalAnimState == LS_MONKEYSWING_IDLE)
 	//	return;
+
 	if (TrInput & IN_LEFT)
 	{
 		info->turnRate -= LARA_TURN_RATE;
@@ -78,12 +79,11 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_MONKEY_FORWARD;
 			return;
 		}
-		// Not yet.
-		/*else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_BACK;
 			return;
-		}*/
+		}
 
 		if (TrInput & IN_LEFT)
 		{
@@ -224,7 +224,6 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
-	// TODO: Front collision handling when approaching non-monkey sectors displays strange behaviour.
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
@@ -241,7 +240,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_MONKEY_BACK (TODO)
+// State:		LS_MONKEY_BACK (163)
 // Collision:	lara_col_monkey_back()
 void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -290,7 +289,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	SetLaraMonkeyRelease(item);
 }
 
-// State:		LS_MONKEY_BACK (TODO)
+// State:		LS_MONKEY_BACK (163)
 // Control:		lara_as_monkey_back()
 void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -535,6 +534,11 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			item->goalAnimState = LS_MONKEY_FORWARD;
 			return;
 		}
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_BACK;
+			return;
+		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
@@ -599,6 +603,11 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
 			item->goalAnimState = LS_MONKEY_FORWARD;
+			return;
+		}
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		{
+			item->goalAnimState = LS_MONKEY_BACK;
 			return;
 		}
 
