@@ -102,9 +102,9 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
 		if (TrInput & IN_DUCK && TestLaraCrawlDownStep(item, coll))
-			item->goalAnimState = LS_STEP_DOWN;
+			item->goalAnimState = LS_CRAWL_STEP_DOWN;
 		else [[likely]]
-			item->goalAnimState = LS_CRAWL_EXIT_DOWN_STEP;
+			item->goalAnimState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		return;
 	}
@@ -121,13 +121,13 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraCrawlUpStep(item, coll))
 	{
-		item->goalAnimState = LS_STEP_UP;
+		item->goalAnimState = LS_CRAWL_STEP_UP;
 		return;
 	}
 
 	if (TestLaraCrawlDownStep(item, coll))
 	{
-		item->goalAnimState = LS_STEP_DOWN;
+		item->goalAnimState = LS_CRAWL_STEP_DOWN;
 		return;
 	}
 }
