@@ -322,9 +322,9 @@ void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll)
 		item->currentAnimState = LS_MONKEY_IDLE;
 		item->goalAnimState = LS_MONKEY_IDLE;
 
-		if (item->animNumber != LA_MONKEYSWING_IDLE)
+		if (item->animNumber != LA_MONKEY_IDLE)
 		{
-			item->animNumber = LA_MONKEYSWING_IDLE;
+			item->animNumber = LA_MONKEY_IDLE;
 			item->frameNumber = GetFrameNumber(item, 0);
 		}
 

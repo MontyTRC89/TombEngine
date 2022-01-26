@@ -304,7 +304,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyGrab(item, coll))
 	{
-		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
+		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
 		item->airborne = false;
 		item->speed = 0;
 		item->fallspeed = 0;
@@ -362,7 +362,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyGrab(item, coll))
 	{
-		SetAnimation(item, LA_REACH_TO_MONKEYSWING);
+		SetAnimation(item, LA_REACH_TO_MONKEY);
 		ResetLaraFlex(item);
 		item->airborne = false;
 		item->speed = 0;
