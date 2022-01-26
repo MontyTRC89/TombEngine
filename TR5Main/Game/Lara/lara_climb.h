@@ -1,14 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-
-enum class CLIMB_DIRECTION : short
-{
-	North = 0x0100,
-	East  = 0x0200,
-	South = 0x0400,
-	West  = 0x0800
-};
+#include "Game/collision//floordata.h"
 
 static CLIMB_DIRECTION LeftIntRightExtTab[4] =
 {
@@ -22,6 +15,7 @@ static CLIMB_DIRECTION LeftExtRightIntTab[4] =
 
 short GetClimbFlags(int x, int y, int z, short roomNumber);
 short GetClimbFlags(FLOOR_INFO* floor);
+CLIMB_DIRECTION GetClimbDirection(short angle);
 
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll);

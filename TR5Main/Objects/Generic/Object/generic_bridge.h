@@ -32,7 +32,7 @@ std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 	if (bboxHeight.has_value() && tilt != 0)
 	{
 		const auto height = item->pos.yPos + tilt * (GetOffset(item->pos.yRot, x, z) / 4 + SECTOR(1) / 8);
-		return std::optional{ height + SECTOR(1) / 16 }; // To be customized with Lua
+		return std::optional{ height + CLICK(1) }; // To be customized with Lua
 	}
 	return bboxHeight;
 }

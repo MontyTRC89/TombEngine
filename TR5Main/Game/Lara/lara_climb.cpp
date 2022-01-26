@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_overhang.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 
@@ -29,6 +30,22 @@ short GetClimbFlags(FLOOR_INFO* floor)
 		result |= (short)CLIMB_DIRECTION::South;
 
 	return result;
+}
+
+CLIMB_DIRECTION GetClimbDirection(short angle)
+{
+	switch (GetQuadrant(angle))
+	{
+	default:
+	case NORTH:
+		return CLIMB_DIRECTION::North;
+	case EAST:
+		return CLIMB_DIRECTION::East;
+	case SOUTH:
+		return CLIMB_DIRECTION::South;
+	case WEST:
+		return CLIMB_DIRECTION::West;
+	}
 }
 
 void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
@@ -130,6 +147,8 @@ void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpaz = false;
 
 	Camera.targetElevation = -ANGLE(45);
+
+	SlopeClimbDownExtra(item, coll);
 }
 
 void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
@@ -312,7 +331,10 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
 		if (!resultRight || !resultLeft)
+		{
+			LadderMonkeyExtra(item, coll);
 			return;
+		}
 
 		if (resultRight >= 0 && resultLeft >= 0)
 		{
@@ -390,6 +412,8 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 			Lara.moveAngle = item->pos.yRot + ANGLE(180);
 		}
 	}
+
+	SlopeClimbExtra(item, coll);
 }
 
 void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)

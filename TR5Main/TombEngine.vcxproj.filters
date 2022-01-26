@@ -319,6 +319,7 @@
     <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
+    <ClCompile Include="Game\Lara\lara_overhang.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -713,6 +714,7 @@
     <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
+    <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
   </ItemGroup>
   <ItemGroup>

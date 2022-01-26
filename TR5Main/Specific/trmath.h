@@ -19,6 +19,7 @@ constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
 constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
 constexpr auto WALL_SIZE = 1024;
+constexpr auto WALL_MASK = WALL_SIZE - 1;
 constexpr auto STEP_SIZE = WALL_SIZE / 4;
 constexpr auto STOP_SIZE = WALL_SIZE / 2;
 constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;

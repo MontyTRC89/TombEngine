@@ -16,6 +16,7 @@ void GameScriptAnimations::Register(sol::state* lua)
 		"monkeyTurn180", &GameScriptAnimations::MonkeyTurn180,
 		"monkeyAutoJump", &GameScriptAnimations::MonkeyAutoJump,
 		"oscillateHang", &GameScriptAnimations::OscillateHang,
-		"pose", &GameScriptAnimations::Pose
+		"pose", &GameScriptAnimations::Pose,
+		"overhang", &GameScriptAnimations::Overhang
 		);
 }
