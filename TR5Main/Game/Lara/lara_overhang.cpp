@@ -344,7 +344,7 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 		if (GetClimbFlags(collResultUp.BottomBlock) & climbOrient &&
 			InStrip(lara->pos.xPos, lara->pos.zPos, lara->pos.yRot, CLICK(3), CLICK(4)))
 		{
-			if (TestLaraWall(lara, 0, 0, -CLICK(4)) != SPLAT_COLL::NONE &&
+			if (TestLaraSplat(lara, 0, 0, -CLICK(4)) &&
 				GetCeiling(collResultUp.Block, up.x, up.y, up.z) - lara->pos.yPos <= 1456)  // Check if a wall is actually there...
 			{
 				AlignToEdge(lara, FORWARD_ALIGNMENT);
@@ -447,7 +447,7 @@ void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 
 void lara_as_slopefall(ITEM_INFO* lara, COLL_INFO* coll)
 {
-	lara->gravityStatus = true;
+	lara->airborne = true;
 
 	if (GlobalCounter % 2)
 		lara->pos.xRot--;
@@ -705,7 +705,7 @@ void lara_as_sclimbstart(ITEM_INFO* lara, COLL_INFO* coll)
 		Camera.flags = 1;
 
 		int distance = 1664;
-		if (TestLaraWall(lara, 0, 1536, 0) != SPLAT_COLL::NONE)
+		if (TestLaraSplat(lara, 0, 1536, 0))
 		{
 			distance = 1024;
 		}
@@ -1000,7 +1000,7 @@ void LadderMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 		return;
 
 	if (result.BottomBlock->Flags.Monkeyswing && (lara->pos.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
-		lara->goalAnimState = LS_MONKEYSWING_IDLE;
+		lara->goalAnimState = LS_MONKEY_IDLE;
 }
 
 // Extends state 61 (AS_CLIMBDOWN)
