@@ -362,7 +362,7 @@ enum LARA_ANIM
 	LA_ROLL_180_CONTINUE = 147,								// Standing roll 180 (2/3)
 	LA_ROLL_180_END = 148,									// Standing roll 180 (3/3)
 	LA_SPIKE_DEATH = 149,									// Spike death
-	LA_REACH_TO_MONKEYSWING = 150,							// Reach > monkey swing
+	LA_REACH_TO_MONKEY = 150,								// Reach > monkey swing
 	LA_SWANDIVE_ROLL = 151,									// Swan dive > roll landing
 	LA_SWANDIVE_DIVE = 152,									// Swan dive > underwater
 	LA_SWANDIVE_FREEFALL = 153,								// Swan dive freefall
@@ -453,13 +453,13 @@ enum LARA_ANIM
 	LA_SPRINT_ROLL_TO_RUN_LEFT_START = 230,							// Sprint roll, left foot first > run (1/2)
 	LA_SPRINT_ROLL_TO_RUN_RIGHT_CONTINUE_ALTERNATE_UNUSED = 231,	// Sprint roll, left foot first > run (2/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_END = 232,							// Sprint roll, left foot first > run (2/2)
-	LA_JUMP_UP_TO_MONKEYSWING = 233,								// Jump up > monkey swing
-	LA_MONKEYSWING_IDLE = 234,										// Monkey swing idle (looped)
-	LA_MONKEYSWING_TO_FREEFALL = 235,								// Monkey swing > freefall
-	LA_MONKEYSWING_FORWARD = 236,									// Monkey swing forward (looped)
-	LA_MONKEYSWING_FORWARD_TO_IDLE_RIGHT = 237,						// Monkey-swing forward > monkey swing idle, right hand first
-	LA_MONKEYSWING_FORWARD_TO_IDLE_LEFT = 238,						// Monkey-swing forward > monkey swing idle, left hand first
-	LA_MONKEYSWING_IDLE_TO_FORWARD_LEFT = 239,						// Monkey idle > monkey forward, left hand first
+	LA_JUMP_UP_TO_MONKEY = 233,										// Jump up > monkey swing
+	LA_MONKEY_IDLE = 234,											// Monkey swing idle (looped)
+	LA_MONKEY_TO_FREEFALL = 235,									// Monkey swing > freefall
+	LA_MONKEY_FORWARD = 236,										// Monkey swing forward (looped)
+	LA_MONKEY_FORWARD_TO_IDLE_RIGHT = 237,							// Monkey-swing forward > monkey swing idle, right hand first
+	LA_MONKEY_FORWARD_TO_IDLE_LEFT = 238,							// Monkey-swing forward > monkey swing idle, left hand first
+	LA_MONKEY_IDLE_TO_FORWARD_LEFT = 239,							// Monkey idle > monkey forward, left hand first
 	LA_SPRINT_ROLL_TO_RUN_LEFT_START_ALTERNATE_UNUSED = 240,		// Sprint roll, left foot first > run (1/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_CONTINUE_ALTERNATE_UNUSED = 241,		// Sprint roll, left foot first > run (2/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_END_ALTERNATE_UNUSED = 242,			// Sprint roll, left foot first > run (3/3)
@@ -471,47 +471,47 @@ enum LARA_ANIM
 	LA_JUMP_FORWARD_TO_REACH_1 = 248,								// Jump forward > reach, 1st opportunity
 	LA_JUMP_FORWARD_TO_REACH_2 = 249,								// Jump forward > reach, 2nd opportunity
 	LA_RUN_JUMP_LEFT_TO_REACH = 251,								// Run jump, left foot first > reach
-	LA_MONKEYSWING_IDLE_TO_FORWARD_RIGHT = 252,						// Monkey swing idle > monkey swing forward, right hand first
-	LA_MONKEYSWING_SHIMMY_LEFT = 253,								// Monkey swing shimmy left (looped)
-	LA_MONKEYSWING_SHIMMY_LEFT_END = 254,							// Monkey swing shimmy left > monkey swing idle
-	LA_MONKEYSWING_SHIMMY_RIGHT = 255,								// Monkey swing shimmy right (looped)
-	LA_MONKEYSWING_SHIMMY_RIGHT_END = 256,							// Monkey swing shimmy right > monkey swing idle
+	LA_MONKEY_IDLE_TO_FORWARD_RIGHT = 252,							// Monkey swing idle > monkey swing forward, right hand first
+	LA_MONKEY_SHIMMY_LEFT = 253,									// Monkey swing shimmy left (looped)
+	LA_MONKEY_SHIMMY_LEFT_END = 254,								// Monkey swing shimmy left > monkey swing idle
+	LA_MONKEY_SHIMMY_RIGHT = 255,									// Monkey swing shimmy right (looped)
+	LA_MONKEY_SHIMMY_RIGHT_END = 256,								// Monkey swing shimmy right > monkey swing idle
 																		// TODO: generic shimmy anims between ledges and ladders?
-	LA_MONKEYSWING_TURN_180 = 257,							// Monkey swing turn 180
-	LA_CROUCH_TO_CRAWL_START = 258,							// Crouch > crawl (1/3)
-	LA_CRAWL_TO_CROUCH_START = 259,							// Crawl > crouch (1/3)
-	LA_CRAWL = 260,											// Crawl forward (looped)
-	LA_CRAWL_IDLE_TO_FORWARD = 261,							// Crawl idle > crawl forward
-	LA_CRAWL_TO_IDLE_LEFT = 262,							// Crawl forward > crawl idle, left leg first
-	LA_CRAWL_IDLE = 263,									// Crwal idle
-	LA_CROUCH_TO_CRAWL_END = 264,							// Crawl > crouch (2/2)
-	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,					// Crouch > crawl (3/3)
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.
-	LA_CRAWL_TO_IDLE_RIGHT = 267,							// Crawl forward > crawl idle, right leg first
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove.
-	LA_CRAWL_TURN_LEFT = 269,								// Crawl rotate left (looped)
-	LA_CRAWL_TURN_RIGHT = 270,								// Crawl rotate right (looped)
-	LA_MONKEYSWING_TURN_LEFT = 271,							// Monkey swing rotate left
-	LA_MONKEYSWING_TURN_RIGHT = 272,						// Monkey swing rotate right
-	LA_CROUCH_TO_CRAWL_CONTINUE = 273,						// Crouch > crawl (2/3)
-	LA_CRAWL_TO_CROUCH_CONTINUE = 274,						// Crouch > crawl (2/3)
-	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,						// Crawl > crawl back
-	LA_CRAWL_BACK = 276,									// Crawl back (looped)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,				// Crawl back > crawl idle, right foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,					// Crawl back > crawl idle, right foot first (2/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,					// Crawl back > crawl idle, left foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,					// Crawl back > crawl idle, left foot first (2/2)
-	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,					// Crawl rotate left > crawl idle, early opportunity
-	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,				// Crawl rotate right > crawl idle, early opportunity
-	LA_MONKEYSWING_TURN_LEFT_TO_IDLE_EARLY = 283,			// Turn left on monkey swing > monkey swing idle, 1st opportunity
-	LA_MONKEYSWING_TURN_LEFT_TO_IDLE_LATE = 284,			// Turn left on monkey swing > monkey swing idle, 2nd opportunity
-	LA_MONKEYSWING_TURN_RIGHT_TO_IDLE_EARLY = 285,			// Turn right on monkey swing > monkey swing idle, 1st opportunity
-	LA_MONKEYSWING_TURN_RIGHT_TO_IDLE_LATE = 286,			// Turn right on monkey swing > monkey swing idle, 2nd opportunity
-	LA_HANG_TO_CROUCH_START = 287,							// Pull up from hang > crouch (1/2)
-	LA_HANG_TO_CROUCH_END = 288,							// Pull up from hang > crouch (2/2)
-	LA_CRAWL_TO_HANG_START = 289,							// Crawl > hang (1/3)
-	LA_CRAWL_TO_HANG_CONTINUE = 290,						// Crawl > hang (2/3)
-																// TODO: position commands in 302 may be stacked in 290, so can remove 302?
+	LA_MONKEY_TURN_180 = 257,										// Monkey swing turn 180
+	LA_CROUCH_TO_CRAWL_START = 258,									// Crouch > crawl (1/3)
+	LA_CRAWL_TO_CROUCH_START = 259,									// Crawl > crouch (1/3)
+	LA_CRAWL = 260,													// Crawl forward (looped)
+	LA_CRAWL_IDLE_TO_FORWARD = 261,									// Crawl idle > crawl forward
+	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
+	LA_CRAWL_IDLE = 263,											// Crwal idle
+	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
+	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,							// Crouch > crawl (3/3)
+	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,							// TODO: remove.
+	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
+	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
+	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
+	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
+	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
+	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
+	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
+	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crouch > crawl (2/3)
+	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
+	LA_CRAWL_BACK = 276,											// Crawl back (looped)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,						// Crawl back > crawl idle, right foot first (1/2)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Crawl back > crawl idle, right foot first (2/2)
+	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,							// Crawl back > crawl idle, left foot first (1/2)
+	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Crawl back > crawl idle, left foot first (2/2)
+	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
+	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
+	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
+	LA_MONKEY_TURN_LEFT_TO_IDLE_LATE = 284,							// Turn left on monkey swing > monkey swing idle, 2nd opportunity
+	LA_MONKEY_TURN_RIGHT_TO_IDLE_EARLY = 285,						// Turn right on monkey swing > monkey swing idle, 1st opportunity
+	LA_MONKEY_TURN_RIGHT_TO_IDLE_LATE = 286,						// Turn right on monkey swing > monkey swing idle, 2nd opportunity
+	LA_HANG_TO_CROUCH_START = 287,									// Pull up from hang > crouch (1/2)
+	LA_HANG_TO_CROUCH_END = 288,									// Pull up from hang > crouch (2/2)
+	LA_CRAWL_TO_HANG_START = 289,									// Crawl > hang (1/3)
+	LA_CRAWL_TO_HANG_CONTINUE = 290,								// Crawl > hang (2/3)
+																		// TODO: position commands in 302 may be stacked in 290, so can remove 302?
 	LA_CROUCH_PICKUP = 291,									// Crouching pickup
 	LA_CRAWL_PICKUP = 292,									// Crawling pickup
 	LA_CROUCH_HIT_BACK = 293,								// Jerk back crouching from damage
@@ -712,73 +712,71 @@ enum LARA_ANIM
 	LA_VAULT_TO_CROUCH_3CLICK = 476,						// Vault standing up 2-click > crouch
 	LA_CRAWL_JUMP_DOWN_1CLICK = 477,						// Jump down 1-click from crawl > stand
 	LA_CRAWL_JUMP_DOWN_23CLICK = 478,						// Jump down 2-3-click from crawl > stand
-	LA_CRAWL_UP_STEP = 479,									// Crawl up step
-	LA_CRAWL_DOWN_STEP = 480,								// Crawl down step
+	LA_CRAWL_STEP_UP = 479,									// Crawl up step > crawl idle
+	LA_CRAWL_STEP_DOWN = 480,								// Crawl down step > crawl idle
 	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
 	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
 	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_LADDER_TO_MONKEY = 484,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED2 = 485,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED3 = 486,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED4 = 487,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED5 = 488,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED6 = 489,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED7 = 490,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED8 = 491,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED9 = 492,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED10 = 493,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED11 = 494,										// Foot hang leftovers - may be safely reused
+	LA_LADDER_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
+	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
+	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)
+	LA_MONKEY_TO_LADDER_OVERHEAD_START = 487,				// Monkey idle > ladder idle, overhead (1/2)
+	LA_MONKEY_TO_LADDER_OVERHEAD_END = 488,					// Monkey idle > ladder idle, overhead (2/2)
+	LA_JUMP_PREPARE_TO_STAND = 489,							// Jump prepare > stand
+	LA_UNUSED7 = 490,										// 
+	LA_UNUSED8 = 491,										// 
+	LA_UNUSED9 = 492,										// 
+	LA_UNUSED10 = 493,										// 
+	LA_UNUSED11 = 494,										// 
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
 	LA_LADDER_DISMOUNT_LEFT_END = 498,						// Ladder dismount left (2/2)
 	LA_LADDER_DISMOUNT_RIGHT_START = 499,					// Ladder dismount right (1/2)
 	LA_LADDER_DISMOUNT_RIGHT_END = 500,						// Ladder dismount right (2/2)
-	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
+	LA_ONWATER_TO_LADDER = 501,								// Tread water > ladder idle
 	LA_POSE_START = 502,									// Stand > AFK pose
 	LA_POSE_CONTINUE = 503,									// AFK pose (looped)
 	LA_POSE_END = 504,										// AFK pose > stand
 
-	LA_OVERHANG_IDLE_LEFT,
-	LA_OVERHANG_IDLE_RIGHT,
-	LA_OVERHANG_CLIMB_UP_LEFT,
-	LA_OVERHANG_CLIMB_UP_RIGHT,
-	LA_OVERHANG_CLIMB_DOWN_LEFT,
-	LA_OVERHANG_CLIMB_DOWN_RIGHT,
-	LA_OVERHANG_DROP_LEFT,
-	LA_OVERHANG_DROP_RIGHT,
-	LA_OVERHANG_IDLE_2_HANG_LEFT,
-	LA_OVERHANG_IDLE_2_HANG_RIGHT,
-	LA_OVERHANG_HANG_2_IDLE_LEFT,
-	LA_OVERHANG_HANG_2_IDLE_RIGHT,
-	LA_OVERHANG_HANG_SWING,
-	LA_OVERHANG_HANG_LOOP,
-	LA_OVERHANG_HANG_DROP,
-	LA_OVERHANG_SHIMMY_LEFT,
-	LA_OVERHANG_SHIMMY_LEFT_STOP,
-	LA_OVERHANG_SHIMMY_RIGHT,
-	LA_OVERHANG_SHIMMY_RIGHT_STOP,
-	LA_OVERHANG_LEDGE_VAULT_START,
-	LA_OVERHANG_LEDGE_VAULT,
-	LA_OVERHANG_LADDER_SLOPE_CONCAVE,
-	LA_OVERHANG_SLOPE_LADDER_CONCAVE,
-	LA_OVERHANG_LADDER_SLOPE_CONVEX,
-	LA_OVERHANG_SLOPE_LADDER_CONVEX_START,
-	LA_OVERHANG_SLOPE_LADDER_CONVEX,
-	LA_OVERHANG_MONKEY_SLOPE_CONCAVE,
-	LA_OVERHANG_SLOPE_MONKEY_CONCAVE,
-	LA_OVERHANG_SLOPE_MONKEY_CONCAVE_END,
-	LA_OVERHANG_MONKEY_SLOPE_CONVEX,
-	LA_OVERHANG_MONKEY_SLOPE_CONVEX_END,
-	LA_OVERHANG_SLOPE_MONKEY_CONVEX,
-	LA_OVERHANG_EXIT_MONKEY_FORWARD,
-	LA_OVERHANG_EXIT_MONKEY_IDLE,
-	LA_OVERHANG_EXIT_LADDER,
-	LA_OVERHANG_EXIT_VAULT,
-	LA_OVERHANG_EXIT_DROP,
-	LA_OVERHANG_EXIT_HANG,
-
-	LA_JUMP_PREPARE_TO_STAND = 543,
+	LA_OVERHANG_IDLE_LEFT = 505,
+	LA_OVERHANG_IDLE_RIGHT = 506,
+	LA_OVERHANG_CLIMB_UP_LEFT = 507,
+	LA_OVERHANG_CLIMB_UP_RIGHT = 508,
+	LA_OVERHANG_CLIMB_DOWN_LEFT = 509,
+	LA_OVERHANG_CLIMB_DOWN_RIGHT = 510,
+	LA_OVERHANG_DROP_LEFT = 511,
+	LA_OVERHANG_DROP_RIGHT = 512,
+	LA_OVERHANG_IDLE_2_HANG_LEFT = 513,
+	LA_OVERHANG_IDLE_2_HANG_RIGHT = 514,
+	LA_OVERHANG_HANG_2_IDLE_LEFT = 515,
+	LA_OVERHANG_HANG_2_IDLE_RIGHT = 516,
+	LA_OVERHANG_HANG_SWING = 517,
+	LA_OVERHANG_HANG_LOOP = 518,
+	LA_OVERHANG_HANG_DROP = 519,
+	LA_OVERHANG_SHIMMY_LEFT = 520,
+	LA_OVERHANG_SHIMMY_LEFT_STOP = 521,
+	LA_OVERHANG_SHIMMY_RIGHT = 522,
+	LA_OVERHANG_SHIMMY_RIGHT_STOP = 523,
+	LA_OVERHANG_LEDGE_VAULT_START = 524,
+	LA_OVERHANG_LEDGE_VAULT = 525,
+	LA_OVERHANG_LADDER_SLOPE_CONCAVE = 526,
+	LA_OVERHANG_SLOPE_LADDER_CONCAVE = 527,
+	LA_OVERHANG_LADDER_SLOPE_CONVEX = 528,
+	LA_OVERHANG_SLOPE_LADDER_CONVEX_START = 529,
+	LA_OVERHANG_SLOPE_LADDER_CONVEX = 530,
+	LA_OVERHANG_MONKEY_SLOPE_CONCAVE = 531,
+	LA_OVERHANG_SLOPE_MONKEY_CONCAVE = 532,
+	LA_OVERHANG_SLOPE_MONKEY_CONCAVE_END = 533,
+	LA_OVERHANG_MONKEY_SLOPE_CONVEX = 534,
+	LA_OVERHANG_MONKEY_SLOPE_CONVEX_END = 535,
+	LA_OVERHANG_SLOPE_MONKEY_CONVEX = 536,
+	LA_OVERHANG_EXIT_MONKEY_FORWARD = 537,
+	LA_OVERHANG_EXIT_MONKEY_IDLE = 538,
+	LA_OVERHANG_EXIT_LADDER = 539,
+	LA_OVERHANG_EXIT_VAULT = 540,
+	LA_OVERHANG_EXIT_DROP = 541,
+	LA_OVERHANG_EXIT_HANG = 542,
 
 	NUM_LARA_ANIMS
 	
@@ -786,7 +784,7 @@ enum LARA_ANIM
 	// 45,
 	// 245, 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
-	// 484, 485, 486, 487, 488, 499, 490, 491, 492, 493, 494
+	// 490, 491, 492, 493, 494
 };
 #pragma endregion
 
