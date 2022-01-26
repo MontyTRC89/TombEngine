@@ -283,7 +283,7 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 	if (item->currentAnimState == LS_MONKEY_TURN_180)
 		return;
 
-	SetAnimation(item, LA_MONKEYSWING_TO_FREEFALL);
+	SetAnimation(item, LA_MONKEY_TO_FREEFALL);
 	SetLaraMonkeyRelease(item);
 }
 
