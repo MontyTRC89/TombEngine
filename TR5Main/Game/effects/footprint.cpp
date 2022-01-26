@@ -158,10 +158,10 @@ namespace Footprints {
 		auto c2 = GetCollisionResult(p2.x, footPos.y - STEP_SIZE, p2.z, item->roomNumber);
 		auto c3 = GetCollisionResult(p3.x, footPos.y - STEP_SIZE, p3.z, item->roomNumber);
 
-		// Don't process footprint placement if all foot corners aren't on the same FloorTilt level
-		if ((c0.FloorTiltX != c1.FloorTiltX) || (c1.FloorTiltX != c2.FloorTiltX) || (c2.FloorTiltX != c3.FloorTiltX))
+		// Don't process footprint placement if all foot corners aren't on the same tilt level
+		if ((c0.FloorTilt.x != c1.FloorTilt.x) || (c1.FloorTilt.x != c2.FloorTilt.x) || (c2.FloorTilt.x != c3.FloorTilt.x))
 			return;
-		if ((c0.FloorTiltZ != c1.FloorTiltZ) || (c1.FloorTiltZ != c2.FloorTiltZ) || (c2.FloorTiltZ != c3.FloorTiltZ))
+		if ((c0.FloorTilt.y != c1.FloorTilt.y) || (c1.FloorTilt.y != c2.FloorTilt.y) || (c2.FloorTilt.y != c3.FloorTilt.y))
 			return;
 
 		// Don't process footprint placement if all foot corners aren't on the same height

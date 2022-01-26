@@ -685,7 +685,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(item, 256, true, &CollidedItems[0], 0, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
@@ -748,7 +748,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	oldZ = LaraItem->pos.zPos;
 	LaraItem->pos.xPos = x;
 	LaraItem->pos.zPos = z;
-	GetCollidedObjects(LaraItem, 256, 1, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(LaraItem, 256, true, &CollidedItems[0], 0, 1);
 	LaraItem->pos.xPos = oldX;
 	LaraItem->pos.zPos = oldZ;
 

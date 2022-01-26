@@ -118,7 +118,7 @@ void ControlCentaurBomb(short itemNumber)
 	int n = 0;
 	bool foundCollidedObjects = false;
 
-	GetCollidedObjects(item, HARPOON_HIT_RADIUS, 1, &CollidedItems[0], &CollidedMeshes[0], 0);
+	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 0);
 
 	if (!CollidedItems[0] && !CollidedMeshes[0])
 		return;

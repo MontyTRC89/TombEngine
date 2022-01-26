@@ -16,6 +16,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_initialise.h"
 
 #include "Objects/TR2/Vehicles/snowmobile.h"
@@ -203,19 +204,24 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//140
 	lara_as_null,//141
 	lara_as_null,//142
-	lara_as_null,// 143 - Unused
-	lara_as_null,// 144 - Unused
-	lara_as_null,// 145 - Unused
+	lara_as_slopeclimb,//143
+	lara_as_slopeclimbup,//144
+	lara_as_slopeclimbdown,//145
 	lara_as_controlled_no_look,
 	lara_as_null,
 	lara_as_null,
-	lara_as_null,
+	lara_as_slopefall,//149
 	lara_as_stepoff_left,
 	lara_as_stepoff_right,
 	lara_as_turn_left_fast,
 	lara_as_controlled,
 	lara_as_controlled,
-	lara_as_controlled
+	lara_as_controlled,//155
+	lara_as_slopehang,
+	lara_as_slopeshimmy,
+	lara_as_sclimbstart,
+	lara_as_sclimbstop,
+	lara_as_sclimbend
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -363,19 +369,24 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_void_func, // 143 - Unused
-	lara_void_func, // 144 - Unused
-	lara_void_func, // 145 - Unused
+	lara_col_slopeclimb,
+	lara_default_col,     // lara_col_slopeclimbup
+	lara_default_col,     // lara_col_slopeclimbdown
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_void_func,
+	lara_default_col,     // lara_col_slopefall
 	lara_default_col,
 	lara_default_col,
 	lara_col_turn_left_fast,
 	lara_default_col,
 	lara_default_col,
-	lara_default_col
+	lara_default_col,
+	lara_col_slopehang,	  // lara_col_slopehang
+	lara_col_slopeshimmy, // lara_col_slopeshimmy
+	lara_default_col,	  // lara_col_sclimbstart
+	lara_default_col,     // lara_col_sclimbstop
+	lara_default_col	  // lara_col_sclimbend
 };
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)

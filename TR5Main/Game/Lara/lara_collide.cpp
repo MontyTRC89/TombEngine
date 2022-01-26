@@ -615,7 +615,8 @@ bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int dist, int height,
 	item->pos.yPos += height;
 	item->pos.zPos += phd_cos(item->pos.yRot + angle) * dist + phd_sin(angle + ANGLE(90.0f) * sideSign) * abs(side);
 
-	auto result = GetCollidedObjects(item, LARA_RAD, 1, CollidedItems, CollidedMeshes, 0);
+	auto result = GetCollidedObjects(item, LARA_RAD, true, CollidedItems, CollidedMeshes, 0);
+
 	item->pos = oldPos;
 	return result;
 }
