@@ -426,6 +426,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	int oldY = item->pos.yPos;
 	int oldZ = item->pos.zPos;
 
+	// Set hands free failsafe.
 	if (info->gunStatus == LG_HANDS_BUSY &&
 		item->currentAnimState == LS_IDLE &&
 		item->goalAnimState == LS_IDLE &&
@@ -938,7 +939,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.BadFloorHeightDown = SHRT_MAX - (CLICK(1) - 1);
+	coll->Setup.BadFloorHeightDown = -NO_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
 	coll->Setup.BadCeilingHeightDown = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
@@ -1047,7 +1048,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
-	coll->Setup.BadFloorHeightDown = SHRT_MAX - (CLICK(1) - 1);
+	coll->Setup.BadFloorHeightDown = -NO_HEIGHT;
 	coll->Setup.BadFloorHeightUp = -CLICK(0.5f);
 	coll->Setup.BadCeilingHeightDown = LARA_RAD;
 	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
