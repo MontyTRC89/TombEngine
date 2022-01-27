@@ -424,8 +424,8 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	height = abs(height);
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	if (height < ((level->LaraType == LaraType::Divesuit) << 6) + 200)
-		height = ((level->LaraType == LaraType::Divesuit) << 6) + 200;
+	if (height < ((level->GetLaraType() == LaraType::Divesuit) << 6) + 200)
+		height = ((level->GetLaraType() == LaraType::Divesuit) << 6) + 200;
 
 	coll->Setup.BadHeightUp = -(STEP_SIZE / 4);
 	coll->Setup.Height = height;

@@ -14,15 +14,6 @@ static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 	{"Snow", WeatherType::Snow}
 };
 
-enum LaraType
-{
-	Normal = 1,
-	Young = 2,
-	Bunhead = 3,
-	Catsuit = 4,
-	Divesuit = 5,
-	Invisible = 7
-};
 
 static const std::unordered_map<std::string, LaraType> kLaraTypes
 {
@@ -50,15 +41,20 @@ struct GameScriptLevel : public ScriptInterfaceLevel
 	WeatherType Weather{ WeatherType::None };
 	float WeatherStrength{ 1.0f };
 	bool Rumble{ false };
-	LaraType LaraType{ LaraType::Normal };
+	LaraType Type{ LaraType::Normal };
 	GameScriptMirror Mirror;
 	int LevelFarView{ 0 };
 	bool UnlimitedAir{ false };
 	std::vector<GameScriptInventoryObject> InventoryObjects;
 
-	bool GetSkyLayerEnabled(int index) override;
-	short GetSkyLayerSpeed(int index) override;
+	float GetWeatherStrength() const override;
+	bool GetSkyLayerEnabled(int index) const override;
+	bool HasStorm() const override;
+	short GetSkyLayerSpeed(int index) const override;
+	RGBAColor8Byte GetSkyLayerColor(int index) const override;
+	LaraType GetLaraType() const override;
 	void SetWeatherStrength(float val);
 	void SetLevelFarView(byte val);
 	static void Register(sol::state* state);
+	WeatherType GetWeatherType() const override;
 };
