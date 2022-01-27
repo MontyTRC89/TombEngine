@@ -871,26 +871,26 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Forward 1 unit.
 	if (KeyMap[DIK_I])
 	{
-		item->pos.xPos += round(phd_sin(item->pos.yRot));
-		item->pos.zPos += round(phd_cos(item->pos.yRot));
+		item->pos.xPos += roundf(phd_sin(item->pos.yRot));
+		item->pos.zPos += roundf(phd_cos(item->pos.yRot));
 	}
 	// Back 1 unit.
 	else if (KeyMap[DIK_K])
 	{
-		item->pos.xPos += round(phd_sin(item->pos.yRot + ANGLE(180.0f)));
-		item->pos.zPos += round(phd_cos(item->pos.yRot + ANGLE(180.0f)));
+		item->pos.xPos += roundf(phd_sin(item->pos.yRot + ANGLE(180.0f)));
+		item->pos.zPos += roundf(phd_cos(item->pos.yRot + ANGLE(180.0f)));
 	}
 	// Left 1 unit.
 	else if (KeyMap[DIK_J])
 	{
-		item->pos.xPos += round(phd_sin(item->pos.yRot - ANGLE(90.0f)));
-		item->pos.zPos += round(phd_cos(item->pos.yRot - ANGLE(90.0f)));
+		item->pos.xPos += roundf(phd_sin(item->pos.yRot - ANGLE(90.0f)));
+		item->pos.zPos += roundf(phd_cos(item->pos.yRot - ANGLE(90.0f)));
 	}
 	// Right 1 unit.
 	else if (KeyMap[DIK_L])
 	{
-		item->pos.xPos += round(phd_sin(item->pos.yRot + ANGLE(90.0f)));
-		item->pos.zPos += round(phd_cos(item->pos.yRot + ANGLE(90.0f)));
+		item->pos.xPos += roundf(phd_sin(item->pos.yRot + ANGLE(90.0f)));
+		item->pos.zPos += roundf(phd_cos(item->pos.yRot + ANGLE(90.0f)));
 	}
 
 	//---
