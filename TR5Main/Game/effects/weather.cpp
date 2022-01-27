@@ -42,7 +42,7 @@ namespace Environment
 
 	void EnvironmentController::Update()
 	{
-		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 		UpdateSky(level);
 		UpdateStorm(level);
@@ -80,7 +80,7 @@ namespace Environment
 								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
 	}
 
-	void EnvironmentController::UpdateSky(GameScriptLevel* level)
+	void EnvironmentController::UpdateSky(ScriptInterfaceLevel* level)
 	{
 		if (level->GetSkyLayerEnabled(0))
 		{
@@ -111,11 +111,11 @@ namespace Environment
 		}
 	}
 
-	void EnvironmentController::UpdateStorm(GameScriptLevel* level)
+	void EnvironmentController::UpdateStorm(ScriptInterfaceLevel* level)
 	{
-		auto color = Vector4(level->Layer1.R / 255.0f, level->Layer1.G / 255.0f, level->Layer1.B / 255.0f, 1.0f);
+		auto color = Vector4(level->GetSkyLayerColor(0).GetR() / 255.0f, level->GetSkyLayerColor(0).GetG() / 255.0f, level->GetSkyLayerColor(0).GetB() / 255.0f, 1.0f);
 
-		if (level->Storm)
+		if (level->HasStorm())
 		{
 			if (StormCount || StormRand)
 			{
@@ -168,7 +168,7 @@ namespace Environment
 		}
 	}
 
-	void EnvironmentController::UpdateWind(GameScriptLevel* level)
+	void EnvironmentController::UpdateWind(ScriptInterfaceLevel* level)
 	{
 		WindCurrent += (GetRandomControl() & 7) - 3;
 		if (WindCurrent <= -2)
@@ -189,7 +189,7 @@ namespace Environment
 		WindZ = WindCurrent * phd_cos(WindAngle << 3);
 	}
 
-	void EnvironmentController::UpdateFlash(GameScriptLevel* level)
+	void EnvironmentController::UpdateFlash(ScriptInterfaceLevel* level)
 	{
 		if (FlashProgress > 0.0f)
 		{
@@ -202,7 +202,7 @@ namespace Environment
 			FlashColorBase = Vector3::Zero;
 	}
 
-	void EnvironmentController::UpdateWeather(GameScriptLevel* level)
+	void EnvironmentController::UpdateWeather(ScriptInterfaceLevel* level)
 	{
 		for (auto& p : Particles)
 		{
@@ -363,7 +363,7 @@ namespace Environment
 						p.Velocity.z = 4;
 				}
 
-				if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
+				if (p.Velocity.y < p.Size * 2 * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f))
 					p.Velocity.y += p.Size / 5.0f;
 
 				break;
@@ -371,13 +371,13 @@ namespace Environment
 		}
 	}
 
-	void EnvironmentController::SpawnWeatherParticles(GameScriptLevel* level)
+	void EnvironmentController::SpawnWeatherParticles(ScriptInterfaceLevel* level)
 	{
 		// Clean up dead particles
 		if (Particles.size() > 0)
 			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
 
-		if (level->Weather == WeatherType::None || level->WeatherStrength == 0.0f)
+		if (level->Weather == WeatherType::None || level->GetWeatherStrength() == 0.0f)
 			return;
 
 		int newParticlesCount = 0;

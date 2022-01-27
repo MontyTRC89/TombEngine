@@ -17,6 +17,7 @@ struct GameScriptSkyLayer
 	GameScriptSkyLayer() = default;
 	GameScriptSkyLayer(GameScriptColor const & col, short speed);
 	void SetColor(GameScriptColor const & col);
+	GameScriptColor GetColor() const;
 
 	static void Register(sol::state *);
 };

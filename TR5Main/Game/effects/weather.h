@@ -1,9 +1,7 @@
 #pragma once
 #include <SimpleMath.h>
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "ScriptInterfaceLevel.h"
 #include "Specific/trmath.h"
-
-class GameScriptLevel;
 
 namespace TEN {
 namespace Effects {
@@ -90,14 +88,14 @@ namespace Environment
 		byte StormSkyColor = 1;
 		byte StormSkyColor2 = 1;
 
-		void UpdateSky(GameScriptLevel* level);
-		void UpdateStorm(GameScriptLevel* level);
-		void UpdateWind(GameScriptLevel* level);
-		void UpdateFlash(GameScriptLevel* level);
-		void UpdateWeather(GameScriptLevel* level);
+		void UpdateSky(ScriptInterfaceLevel* level);
+		void UpdateStorm(ScriptInterfaceLevel* level);
+		void UpdateWind(ScriptInterfaceLevel* level);
+		void UpdateFlash(ScriptInterfaceLevel* level);
+		void UpdateWeather(ScriptInterfaceLevel* level);
 		void UpdateLightning();
 
-		void SpawnWeatherParticles(GameScriptLevel* level);
+		void SpawnWeatherParticles(ScriptInterfaceLevel* level);
 	};
 
 	extern EnvironmentController Weather;
