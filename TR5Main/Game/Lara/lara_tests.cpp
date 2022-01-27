@@ -1098,7 +1098,7 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->airborne && item->fallspeed >= 0 &&
-		(coll->Middle.Floor <= std::min((int)item->fallspeed, STEPUP_HEIGHT) ||
+		(coll->Middle.Floor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
@@ -1325,7 +1325,8 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 #ifndef NEW_TIGHTROPE
-void GetTighRopeFallOff(int regularity) {
+void GetTighRopeFallOff(int regularity)
+{
 	if (LaraItem->hitPoints <= 0 || LaraItem->hitStatus)
 		SetAnimation(LaraItem, LA_TIGHTROPE_FALL_LEFT);
 
@@ -1778,7 +1779,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 		yOffset > (testSetup.UpperBound - coll->Setup.Height))										// Offset is not too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), yOffset);
-		yOffset -= std::max((int)CLICK(0.5f), testSetup.ClampMin);
+		yOffset -= std::max<int>(CLICK(0.5f), testSetup.ClampMin);
 	}
 
 	// Assess vault candidate location.
