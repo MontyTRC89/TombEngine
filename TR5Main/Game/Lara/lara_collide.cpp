@@ -63,7 +63,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 				SetAnimation(item, LA_LAND);
 				LaraSnapToHeight(item, coll);
 			}
-			else
+			else if (abs(item->speed) > 50) // TODO: Tune and demagic value.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 
 			item->speed /= 4;

@@ -1742,7 +1742,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	// Conduct "ray" test at lower ceiling bound.
 	auto start = GAME_VECTOR(
 		item->pos.xPos,
-		y + testSetup.UpperBound,
+		y + testSetup.LowerBound + 1,
 		item->pos.zPos,
 		item->roomNumber);
 
