@@ -1458,9 +1458,9 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 		item->roomNumber);
 
 	auto end = GAME_VECTOR(
-		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
-		y + testSetup.UpperBound,
-		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		probe.Coordinates.x,
+		probe.Coordinates.y - 1,
+		probe.Coordinates.z,
 		item->roomNumber);
 
 	if (!LOS(&start, &end))
@@ -1648,9 +1648,9 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 		item->roomNumber);
 
 	auto end = GAME_VECTOR(
-		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
-		y + testSetup.UpperBound,
-		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		probe.Coordinates.x,
+		probe.Coordinates.y - 1,
+		probe.Coordinates.z,
 		item->roomNumber);
 
 	if (!LOS(&start, &end))
@@ -1747,9 +1747,9 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 		item->roomNumber);
 
 	auto end = GAME_VECTOR(
-		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
-		y + testSetup.LowerBound + 1,
-		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		probe.Coordinates.x,
+		probe.Coordinates.y + 1,
+		probe.Coordinates.z,
 		item->roomNumber);
 
 	if (!LOS(&start, &end))
