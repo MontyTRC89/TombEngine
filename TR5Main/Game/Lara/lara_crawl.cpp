@@ -130,7 +130,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -218,7 +218,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -469,7 +469,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -573,7 +573,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -670,7 +670,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

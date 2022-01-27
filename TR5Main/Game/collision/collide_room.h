@@ -6,10 +6,10 @@ struct ITEM_INFO;
 struct COLL_INFO;
 struct FLOOR_INFO;
 struct MESH_INFO;
-enum RoomEnumFlag;
+enum RoomEnvFlags;
 
-constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadFloorHeightDown
-constexpr auto NO_BAD_NEG = NO_HEIGHT;    // used by coll->Setup.BadFloorHeightUp
+constexpr auto NO_BAD_POS = -NO_HEIGHT;	// used by coll->Setup.BadFloorHeightDown
+constexpr auto NO_BAD_NEG = NO_HEIGHT;	// used by coll->Setup.BadFloorHeightUp
 constexpr auto COLLISION_CHECK_DISTANCE = WALL_SIZE * 8;
 
 enum COLL_TYPE
@@ -137,6 +137,6 @@ void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 
-bool TestEnvironment(RoomEnumFlag roomType, int roomNum);
-bool TestEnvironment(RoomEnumFlag roomType, ITEM_INFO* item);
-bool TestEnvironment(RoomEnumFlag roomType, int x, int y, int z, int roomNum);
+bool TestEnvironment(RoomEnvFlags roomType, int roomNum);
+bool TestEnvironment(RoomEnvFlags roomType, ITEM_INFO* item);
+bool TestEnvironment(RoomEnvFlags roomType, int x, int y, int z, int roomNum);

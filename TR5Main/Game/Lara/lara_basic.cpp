@@ -192,7 +192,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -336,7 +336,7 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -636,7 +636,7 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Vaulting from this state.
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -746,7 +746,7 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1221,7 +1221,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1381,7 +1381,7 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1699,7 +1699,7 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1784,7 +1784,7 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1845,7 +1845,7 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1913,7 +1913,7 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -2041,7 +2041,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -2167,7 +2167,7 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraVault(item, coll))
 		return;
 
-	if (TestLaraStep(coll) && coll->CollisionType != CT_FRONT)
+	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -2257,7 +2257,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

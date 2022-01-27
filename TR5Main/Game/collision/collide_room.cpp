@@ -1119,17 +1119,17 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 	return finalResult[usedProbe];
 }
 
-bool TestEnvironment(RoomEnumFlag roomType, int roomNum)
+bool TestEnvironment(RoomEnvFlags roomType, int roomNum)
 {
 	return (g_Level.Rooms[roomNum].flags & roomType);
 }
 
-bool TestEnvironment(RoomEnumFlag roomType, ITEM_INFO* item)
+bool TestEnvironment(RoomEnvFlags roomType, ITEM_INFO* item)
 {
 	return TestEnvironment(roomType, item->roomNumber);
 }
 
-bool TestEnvironment(RoomEnumFlag roomType, int x, int y, int z, int roomNum)
+bool TestEnvironment(RoomEnvFlags roomType, int x, int y, int z, int roomNum)
 {
 	return TestEnvironment(roomType, GetCollisionResult(x, y, z, roomNum).RoomNumber);
 }
