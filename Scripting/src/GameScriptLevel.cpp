@@ -104,7 +104,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
  __(not yet fully implemented)__
  @mem laraType*/
-		"laraType", &GameScriptLevel::LaraType,
+		"laraType", &GameScriptLevel::Type,
 
 /// (bool) Enable occasional screen shake effect.
 // As seen in TRC's Sinking Submarine.
@@ -142,7 +142,7 @@ __(not yet implemented)__
 }
 
 //todo add bindings and documents for this
-bool GameScriptLevel::GetSkyLayerEnabled(int index)
+bool GameScriptLevel::GetSkyLayerEnabled(int index) const
 {
 	bool cond = index == 0 || index == 1;
 	std::string msg{ "Index must be 0 or 1." };
@@ -164,7 +164,7 @@ bool GameScriptLevel::GetSkyLayerEnabled(int index)
 }
 
 //todo add bindings and documents for this
-short GameScriptLevel::GetSkyLayerSpeed(int index)
+short GameScriptLevel::GetSkyLayerSpeed(int index) const
 {
 	bool cond = index == 0 || index == 1;
 	std::string msg{ "Index must be 0 or 1." };
@@ -214,3 +214,45 @@ void GameScriptLevel::SetLevelFarView(byte val)
 		LevelFarView = val;
 	}
 }
+// todo test this
+RGBAColor8Byte GameScriptLevel::GetSkyLayerColor(int index) const
+{
+	bool cond = index == 0 || index == 1;
+	std::string msg{ "Index must be 0 or 1." };
+
+	if (index == 0)
+	{
+		return Layer1.GetColor();
+	}
+	else if (index == 1)
+	{
+		return Layer2.GetColor();
+	}
+	else
+	{
+		ScriptAssert(false, msg);
+		ScriptWarn("Returning 0, 0, 0, 0.");
+		return RGBAColor8Byte{ 0 };
+	}
+}
+
+LaraType GameScriptLevel::GetLaraType() const
+{
+	return Type;
+}
+
+bool GameScriptLevel::HasStorm() const
+{
+	return Storm;
+}
+
+float GameScriptLevel::GetWeatherStrength() const
+{
+	return WeatherStrength;
+}
+
+WeatherType GameScriptLevel::GetWeatherType() const
+{
+	return Weather;
+}
+
