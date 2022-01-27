@@ -1384,27 +1384,15 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraStep(COLL_INFO* coll)
+bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraInfo*& info = item->data;
+
 	if (abs(coll->Middle.Floor) > 0 &&
-		//coll->Middle.Floor <= STEPUP_HEIGHT &&	// Lower floor bound. BUG: Wading in water over a pit, Lara will not descend.
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&		// Upper floor bound.
+		(coll->Middle.Floor <= STEPUP_HEIGHT ||	// Lower floor bound met...
+			info->waterStatus == LW_WADE) &&		// OR Lara is wading.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&	// Upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
-{
-	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollisionResult(item);
-
-	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) &&		// Lower bound.
-		(probe.Position.Ceiling - y) >= -CLICK(1.25f) &&	// Upper bound.
-		probe.Position.Ceiling != NO_HEIGHT)
 	{
 		return true;
 	}
@@ -1434,20 +1422,35 @@ bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollisionResult(item);
+
+	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) &&		// Lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(1.25f) &&	// Upper ceiling bound.
+		probe.Position.Ceiling != NO_HEIGHT)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(LARA_RAD_CRAWL), -LARA_HEIGHT_CRAWL);
+	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height);
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
 	if ((probe.Position.Floor - y) <= testSetup.LowerBound &&						// Lower floor bound.
 		(probe.Position.Floor - y) >= testSetup.UpperBound &&						// Upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&						// Lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&	// Space is not a clamp.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height &&	// Space is not a clamp.
 		!isSlopeDown && !isSlopeUp && !isDeath &&									// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
 	{

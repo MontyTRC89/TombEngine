@@ -69,7 +69,7 @@ struct LIGHTINFO
 	short Cutoff; // size=0, offset=30
 };
 
-enum RoomEnumFlag
+enum RoomEnvFlags
 {
 	ENV_FLAG_WATER = 0x0001,
 	ENV_FLAG_SWAMP = 0x0004,
