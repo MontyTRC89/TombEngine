@@ -159,6 +159,11 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 {
 	COLL_RESULT result = {};
 
+	// Record coordinates.
+	result.Coordinates.x = x;
+	result.Coordinates.y = y;
+	result.Coordinates.z = z;
+
 	// Return provided block into result as itself.
 	result.Block = floor;
 
