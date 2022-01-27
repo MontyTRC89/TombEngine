@@ -605,6 +605,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
+    <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
