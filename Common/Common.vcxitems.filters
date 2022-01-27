@@ -15,5 +15,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\animation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\trmath.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\newtypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\RGBAColor8Byte.h" />
   </ItemGroup>
 </Project>
