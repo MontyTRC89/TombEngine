@@ -70,7 +70,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
 		abs(coll->Middle.Floor) >= threshold)
 	{
-		item->pos.yPos += std::max((int)abs(coll->Middle.Floor / 2.75), threshold) * sign;
+		item->pos.yPos += std::max<int>(abs(coll->Middle.Floor / 2.75), threshold) * sign;
 	}
 	else
 		item->pos.yPos += coll->Middle.Floor;
@@ -79,7 +79,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 {
 	constexpr int rate = 50;
-	int threshold = std::max(abs(item->speed) / 3 * 2, (int)CLICK(1.25f) / 16);
+	int threshold = std::max<int>(abs(item->speed) / 3 * 2, CLICK(1.25f) / 16);
 	int sign = std::copysign(1, coll->Middle.Ceiling);
 
 	if (abs(coll->Middle.Ceiling) > (CLICK(1.25f) / 2))			// Outer range.
@@ -87,7 +87,7 @@ void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 	else if (abs(coll->Middle.Ceiling) <= (CLICK(1.25f) / 2) &&	// Inner range.
 		abs(coll->Middle.Ceiling) >= threshold)
 	{
-		item->pos.yPos += std::max((int)abs(coll->Middle.Ceiling / 2.75), threshold) * sign;
+		item->pos.yPos += std::max<int>(abs(coll->Middle.Ceiling / 2.75), threshold) * sign;
 	}
 	else
 		item->pos.yPos += coll->Middle.Ceiling;
