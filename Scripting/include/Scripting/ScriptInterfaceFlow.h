@@ -1,4 +1,7 @@
 #pragma once
+
+class ScriptInterfaceLevel;
+
 class ScriptInterfaceFlow {
 public:
 	virtual ~ScriptInterfaceFlow() = default;
@@ -13,5 +16,6 @@ public:
 	virtual bool HasMonkeyAutoJump() const = 0;
 	virtual bool HasOscillateHang() const = 0;
 	virtual bool HasAFKPose() const = 0;
+	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 };
 

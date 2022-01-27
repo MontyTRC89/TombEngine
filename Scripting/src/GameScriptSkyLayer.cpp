@@ -51,3 +51,7 @@ void GameScriptSkyLayer::SetColor(GameScriptColor const & col)
 	B = col.GetB();
 }
 
+//todo can this return an RGBAColor8Byte instead?
+GameScriptColor GameScriptSkyLayer::GetColor() const {
+	return GameScriptColor{ R, G, B };
+}
