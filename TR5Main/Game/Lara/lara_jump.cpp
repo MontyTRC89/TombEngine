@@ -411,7 +411,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(coll))
+	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);
 		return;

@@ -54,10 +54,10 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side = 0);
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
 
-bool TestLaraStep(COLL_INFO* coll);
-bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraStepDown(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup);
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll);

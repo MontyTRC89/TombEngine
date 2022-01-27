@@ -222,8 +222,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_sclimbstart,
 	lara_as_sclimbstop,
 	lara_as_sclimbend,
-	lara_as_controlled_no_look,//161
-	lara_as_controlled_no_look,//162
+	lara_as_null,//161
+	lara_as_null,//162
 	lara_as_monkey_back//163
 };
 
