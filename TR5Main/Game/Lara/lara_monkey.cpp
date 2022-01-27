@@ -143,6 +143,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: ShiftItem() interferes when going down a step. Instant snap occurs instead of smooth transition. @Sezz 2022.01.27
 	if (TestLaraMonkeyStep(item, coll))
 	{
 		DoLaraMonkeyStep(item, coll);
