@@ -53,6 +53,7 @@ struct COLL_POSITION
 
 struct COLL_RESULT
 {
+	Vector3 Coordinates;
 	int RoomNumber;
 
 	FLOOR_INFO* Block;
