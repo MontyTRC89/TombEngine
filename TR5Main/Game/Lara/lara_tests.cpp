@@ -1443,11 +1443,30 @@ bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height);
+	int probeDist = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probe = GetCollisionResult(item, testSetup.Angle, probeDist, -coll->Setup.Height);
+
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
+	// Conduct "ray" test at upper floor bound.
+	auto start = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.UpperBound - 1,
+		item->pos.zPos,
+		item->roomNumber);
+
+	auto end = GAME_VECTOR(
+		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
+		y + testSetup.UpperBound,
+		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		item->roomNumber);
+
+	if (!LOS(&start, &end))
+		return false;
+
+	// Assess move feasibility to location ahead.
 	if ((probe.Position.Floor - y) <= testSetup.LowerBound &&						// Lower floor bound.
 		(probe.Position.Floor - y) >= testSetup.UpperBound &&						// Upper floor bound.
 		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Lowest ceiling bound.
@@ -1614,11 +1633,30 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(LARA_RAD_CRAWL), -LARA_HEIGHT_CRAWL);
+	int probeDist = OFFSET_RADIUS(LARA_RAD_CRAWL);
+	auto probe = GetCollisionResult(item, testSetup.Angle, probeDist, -LARA_HEIGHT_CRAWL);
+
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
+	// Conduct "ray" test at upper floor bound.
+	auto start = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.UpperBound - 1,
+		item->pos.zPos,
+		item->roomNumber);
+
+	auto end = GAME_VECTOR(
+		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
+		y + testSetup.UpperBound,
+		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		item->roomNumber);
+
+	if (!LOS(&start, &end))
+		return false;
+
+	// Assess move feasibility to location ahead.
 	if ((probe.Position.Floor - y) <= testSetup.LowerBound &&						// Lower floor bound.
 		(probe.Position.Floor - y) >= testSetup.UpperBound &&						// Upper floor bound.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&						// Lowest ceiling bound.
@@ -1698,8 +1736,26 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestSetup testSetup)
 {
 	int y = item->pos.yPos - LARA_HEIGHT_MONKEY;
-	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius));
+	int probeDist = coll->Setup.Radius;
+	auto probe = GetCollisionResult(item, testSetup.Angle, OFFSET_RADIUS(probeDist));
 
+	// Conduct "ray" test at lower ceiling bound.
+	auto start = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.UpperBound,
+		item->pos.zPos,
+		item->roomNumber);
+
+	auto end = GAME_VECTOR(
+		item->pos.xPos + phd_sin(testSetup.Angle) * probeDist,
+		y + testSetup.LowerBound + 1,
+		item->pos.zPos + phd_cos(testSetup.Angle) * probeDist,
+		item->roomNumber);
+
+	if (!LOS(&start, &end))
+		return false;
+
+	// Assess move feasibility to location ahead.
 	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Highest floor boundary.
 		(probe.Position.Ceiling - y) <= testSetup.LowerBound &&						// Lower ceiling boundary.
