@@ -1577,7 +1577,7 @@ void GuiController::ConstructObjectList()
 	CurrentGrenadeGunAmmoType = 0;
 	CurrentCrossBowAmmoType = 0;
 
-	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
+	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 	{
 		if (Lara.Weapons[WEAPON_PISTOLS].Present)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
@@ -1782,7 +1782,7 @@ void GuiController::ConstructCombineObjectList()
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		rings[(int)RingTypes::Ammo]->current_object_list[i].invitem = NO_ITEM;
 
-	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
+	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 	{
 		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
