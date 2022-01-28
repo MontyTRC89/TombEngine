@@ -16,5 +16,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\trmath.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\newtypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\RGBAColor8Byte.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\input.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\configuration.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\setup.h" />
   </ItemGroup>
 </Project>
