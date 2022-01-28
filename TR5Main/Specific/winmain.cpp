@@ -8,8 +8,6 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "resource.h"
-#include "Scripting/GameFlowScript.h"
-#include "Scripting/GameLogicScript.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
