@@ -1097,13 +1097,17 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// TODO: Shifts may interfere.
+	
 	if (item->airborne && item->fallspeed >= 0 &&
 		(coll->Middle.Floor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
+		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 20, 0, 50, 0);
+
 		return true;
 	}
-
+	TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 20, 50, 0, 50);
 	return false;
 }
 
