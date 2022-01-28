@@ -33,11 +33,6 @@ DWORD MainThreadID;
 string commit;
 #endif
 
-int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
-{
-	return luaL_error(L, description.data());
-}
-
 void WinProcMsg()
 {
 	MSG Msg;
@@ -163,15 +158,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	InitTENLog();
 
 	// Initialise the new scripting system
-	sol::state luaState;
-	luaState.open_libraries(sol::lib::base, sol::lib::math);
-	luaState.set_exception_handler(lua_exception_handler);
+	ScriptInterfaceState::Init();
 
 	try 
 	{
-		g_GameFlow = new GameFlow(&luaState);
+		// todo make sure the right objects are deleted at the end
+		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameFlow->LoadGameFlowScript();
-		g_GameScript = new GameScript(&luaState);
+		g_GameScript = ScriptInterfaceState::CreateGame();
 	}
 	catch (TENScriptException const& e)
 	{
