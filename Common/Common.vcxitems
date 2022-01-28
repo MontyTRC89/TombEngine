@@ -17,10 +17,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\animation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\items.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\room.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\configuration.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\RGBAColor8Byte.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\level.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\newtypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\phd_global.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Specific\setup.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\trmath.h" />
   </ItemGroup>
 </Project>
