@@ -54,7 +54,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	OBJECT_INFO* object = &Objects[ID_LARA];
 	ANIM_FRAME* frame;
 	int spaz;
-	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
 
 	LaraInfo*& lara = item->data;
 

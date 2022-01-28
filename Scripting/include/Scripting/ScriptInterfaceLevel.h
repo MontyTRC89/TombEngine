@@ -27,6 +27,7 @@ public:
 	std::string NameStringKey;
 	std::string FileName;
 	std::string ScriptFileName;
+	std::string LoadScreenFileName;
 
 	virtual ~ScriptInterfaceLevel() = default;
 

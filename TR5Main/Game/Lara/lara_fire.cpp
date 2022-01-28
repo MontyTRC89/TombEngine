@@ -366,7 +366,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			laraInfo->requestGunType = laraInfo->lastGunType;
 		// Draw flare.
 		else if (TrInput & IN_FLARE &&
-			(g_GameFlow->GetLevel(CurrentLevel)->LaraType != LaraType::Young))
+			(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
 		{
 			if (laraInfo->gunType == WEAPON_FLARE)
 			{
