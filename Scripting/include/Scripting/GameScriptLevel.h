@@ -26,20 +26,15 @@ static const std::unordered_map<std::string, LaraType> kLaraTypes
 
 struct GameScriptLevel : public ScriptInterfaceLevel
 {
-	std::string NameStringKey;
-	std::string FileName;
-	std::string ScriptFileName;
 	std::string LoadScreenFileName;
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;
-	bool Horizon{ false };
 	bool ColAddHorizon{ false };
 	GameScriptColor Fog{ 0, 0, 0 };
 	bool Storm{ false };
 	WeatherType Weather{ WeatherType::None };
 	float WeatherStrength{ 1.0f };
-	bool Rumble{ false };
 	LaraType Type{ LaraType::Normal };
 	GameScriptMirror Mirror;
 	int LevelFarView{ 0 };
@@ -56,4 +51,5 @@ struct GameScriptLevel : public ScriptInterfaceLevel
 	void SetLevelFarView(byte val);
 	static void Register(sol::state* state);
 	WeatherType GetWeatherType() const override;
+	short GetMirrorRoom() const override;
 };

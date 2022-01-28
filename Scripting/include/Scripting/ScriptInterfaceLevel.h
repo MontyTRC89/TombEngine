@@ -22,6 +22,12 @@ enum LaraType
 
 class ScriptInterfaceLevel {
 public:
+	bool Horizon{ false };
+	bool Rumble{ false };
+	std::string NameStringKey;
+	std::string FileName;
+	std::string ScriptFileName;
+
 	virtual ~ScriptInterfaceLevel() = default;
 
 	virtual bool GetSkyLayerEnabled(int index) const = 0;
@@ -31,4 +37,5 @@ public:
 	virtual float GetWeatherStrength() const = 0;
 	virtual WeatherType GetWeatherType() const = 0;
 	virtual RGBAColor8Byte GetSkyLayerColor(int index) const = 0;
+	virtual short GetMirrorRoom() const = 0;
 };

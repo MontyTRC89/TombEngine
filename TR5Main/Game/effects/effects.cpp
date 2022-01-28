@@ -1444,7 +1444,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
-	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->Mirror.Room);
+	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
 
 	bool water = false;
 	if (room->flags & ENV_FLAG_WATER)

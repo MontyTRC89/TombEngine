@@ -531,7 +531,7 @@ namespace TEN::Renderer
             for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
             {
                 int i2 = i - 1;
-                GameScriptLevel* levelScript = g_GameFlow->GetLevel(i);
+                ScriptInterfaceLevel* levelScript = g_GameFlow->GetLevel(i);
 
                 drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringKey.c_str()), D3DCOLOR_ARGB(255, 255, 255, 255),
                     PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (i - 1) ? PRINTSTRING_BLINK : 0));
@@ -1053,7 +1053,7 @@ namespace TEN::Renderer
         short Days, Hours, Min, Sec;
         char buffer[40];
         int seconds;
-        GameScriptLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
+        ScriptInterfaceLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 
         ypos = 150;
         drawString(400, ypos, STRING_STATISTICS, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
@@ -2159,7 +2159,7 @@ namespace TEN::Renderer
         using ns = std::chrono::nanoseconds;
         using get_time = std::chrono::steady_clock;
 
-        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+        ScriptInterfaceLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
         m_stLights.CameraPosition = view.camera.WorldPosition;
 
@@ -2283,7 +2283,7 @@ namespace TEN::Renderer
 
     void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
     {
-        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+        ScriptInterfaceLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
         collectRooms(view);
         // Draw shadow map
@@ -2691,7 +2691,7 @@ namespace TEN::Renderer
 
     void Renderer11::drawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
     {
-        GameScriptLevel *level = g_GameFlow->GetLevel(CurrentLevel);
+        ScriptInterfaceLevel *level = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
 		for (int k = 0; k < renderView.roomsToDraw.size(); k++)

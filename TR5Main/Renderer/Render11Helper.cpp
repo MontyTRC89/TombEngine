@@ -27,7 +27,7 @@
 #include "Game/items.h"
 
 extern GameConfiguration g_Configuration;
-extern GameFlow *g_GameFlow;
+extern ScriptInterfaceFlow *g_GameFlow;
 
 namespace TEN::Renderer
 {
