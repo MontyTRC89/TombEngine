@@ -189,7 +189,8 @@ COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z)
 	result.Position.DiagonalStep = floor->FloorIsDiagonalStep();
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->InsideBridge(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = result.Position.Bridge < 0 && ((abs(result.FloorTilt.x) > 2 || (abs(result.FloorTilt.y)) > 2));
+	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) > 2 || (abs(result.FloorTilt.y) > 2));
+	// TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
 	result.Position.CeilingSlope = abs(result.CeilingTilt.x) > 2 || abs(result.CeilingTilt.y) > 2;
 
 	// TODO: check if we need to keep here this slope vs. bridge check from legacy GetTiltType
