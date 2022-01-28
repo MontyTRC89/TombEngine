@@ -664,7 +664,7 @@ InventoryResult GuiController::TitleOptions()
 			switch (selected_option)
 			{
 			case 0:
-				if (g_GameFlow->PlayAnyLevel)
+				if (g_GameFlow->CanPlayAnyLevel())
 				{
 					selected_option_bak = selected_option;
 					selected_option = 0;
