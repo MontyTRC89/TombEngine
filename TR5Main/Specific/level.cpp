@@ -1087,7 +1087,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
-	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
@@ -1189,7 +1189,7 @@ int LoadLevelFile(int levelIndex)
 	g_FirstLevel = false;
 	
 	char filename[80];
-	GameScriptLevel* level = g_GameFlow->Levels[levelIndex];
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
 	strcpy_s(filename, level->FileName.c_str());
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
