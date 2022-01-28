@@ -10,12 +10,6 @@
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceFlow.h"
 
-enum class TITLE_TYPE
-{
-	FLYBY,
-	BACKGROUND
-};
-
 class GameFlow : public LuaHandler, public ScriptInterfaceFlow
 {
 private:
@@ -29,16 +23,10 @@ private:
 public:
 	int								FogInDistance{ 0 };
 	int								FogOutDistance{ 0 };
-	int								SelectedLevelForNewGame{ 0 };
-	int								SelectedSaveGame{ 0 };
-	bool							EnableLoadSave{ true };
 	bool							PlayAnyLevel{ true };
 	bool							FlyCheat{ true };
 	bool							DebugMode{ false };
 	byte							GameFarView{ 0 };
-	TITLE_TYPE						TitleType{ TITLE_TYPE::FLYBY };
-	std::string						IntroImagePath{};
-	std::string						TitleScreenImagePath{};
 
 	// New animation flag table
 	GameScriptAnimations			Animations{};
@@ -60,20 +48,20 @@ public:
 	GameScriptSettings*				GetSettings();
 	GameScriptLevel*				GetLevel(int id);
 	int								GetNumLevels() const;
-	bool							DoGameflow();
 	void							SetIntroImagePath(std::string const& path);
 	void							SetTitleScreenImagePath(std::string const& path);
 	void							SetGameFarView(byte val);
 	bool							IsFlyCheatEnabled() const;
-	bool							CanPlayAnyLevel(int index) const;
+	bool							CanPlayAnyLevel() const;
 
-	bool HasCrawlExtended() const { return Animations.CrawlExtended; }
-	bool HasCrouchRoll() const { return Animations.CrouchRoll; }
-	bool HasCrawlspaceSwandive() const { return Animations.CrawlspaceSwandive; }
-	bool HasMonkeyTurn180() const { return Animations.MonkeyTurn180; }
-	bool HasMonkeyAutoJump() const { return Animations.MonkeyAutoJump; }
-	bool HasOscillateHang() const { return Animations.OscillateHang; }
-	bool HasAFKPose() const { return Animations.Pose; }
+	bool HasCrawlExtended() const override { return Animations.CrawlExtended; }
+	bool HasCrouchRoll() const override { return Animations.CrouchRoll; }
+	bool HasCrawlspaceSwandive() const override { return Animations.CrawlspaceSwandive; }
+	bool HasMonkeyTurn180() const override { return Animations.MonkeyTurn180; }
+	bool HasMonkeyAutoJump() const override { return Animations.MonkeyAutoJump; }
+	bool HasOscillateHang() const override { return Animations.OscillateHang; }
+	bool HasAFKPose() const override { return Animations.Pose; }
+	bool DoGameflow() override;
 };
 
 extern ScriptInterfaceFlow* g_GameFlow;
