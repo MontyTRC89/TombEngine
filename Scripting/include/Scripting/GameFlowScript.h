@@ -65,6 +65,7 @@ public:
 	void							SetTitleScreenImagePath(std::string const& path);
 	void							SetGameFarView(byte val);
 	bool							IsFlyCheatEnabled() const;
+	bool							CanPlayAnyLevel(int index) const;
 
 	bool HasCrawlExtended() const { return Animations.CrawlExtended; }
 	bool HasCrouchRoll() const { return Animations.CrouchRoll; }
