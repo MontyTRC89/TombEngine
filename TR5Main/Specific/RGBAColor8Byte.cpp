@@ -108,3 +108,15 @@ RGBAColor8Byte::operator Vector4() const
 	return Vector4{ ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) };
 }
 
+RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b)
+{
+	SetR(r);
+	SetG(g);
+	SetB(b);
+}
+
+RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b, byte a) : RGBAColor8Byte(r, g, b)
+{
+	SetA(a);
+}
+
