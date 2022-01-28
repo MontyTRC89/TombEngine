@@ -256,3 +256,8 @@ WeatherType GameScriptLevel::GetWeatherType() const
 	return Weather;
 }
 
+short GameScriptLevel::GetMirrorRoom() const
+{
+	return Mirror.Room;
+}
+
