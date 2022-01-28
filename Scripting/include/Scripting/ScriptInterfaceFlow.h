@@ -17,5 +17,6 @@ public:
 	virtual bool HasOscillateHang() const = 0;
 	virtual bool HasAFKPose() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
+	virtual bool CanPlayAnyLevel(int index) const = 0;
 };
 

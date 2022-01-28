@@ -317,3 +317,8 @@ bool GameFlow::DoGameflow()
 
 	return true;
 }
+
+bool GameFlow::CanPlayAnyLevel(int index) const
+{
+	return PlayAnyLevel;
+}
