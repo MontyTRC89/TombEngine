@@ -1289,7 +1289,7 @@ void AnimateLara(ITEM_INFO* item)
 			item->speed -= velocity >> 16;
 			item->speed += (velocity + anim->acceleration) >> 16;
 			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
-			item->pos.yPos += std::min<int>(LaraCollision.Middle.Floor, item->fallspeed); // Dubious solution.
+			item->pos.yPos += item->fallspeed;
 		}
 	}
 	else

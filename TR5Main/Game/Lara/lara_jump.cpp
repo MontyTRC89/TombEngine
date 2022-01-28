@@ -735,6 +735,8 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_FREEFALL;
 		return;
 	}
+
+	item->goalAnimState = LS_FALL_BACK;
 }
 
 // State:		LS_FALL_BACK (29)
@@ -772,8 +774,14 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED && item->goalAnimState != LS_FREEFALL_DIVE)
+	if (item->fallspeed >= LARA_FREEFALL_SPEED &&
+		item->goalAnimState != LS_FREEFALL_DIVE) // Hack?
+	{
 		item->goalAnimState = LS_SWAN_DIVE_END;
+		return;
+	}
+
+	item->goalAnimState = LS_SWAN_DIVE_START;
 }
 
 // State:		LS_SWAN_DIVE_START (52)
@@ -848,6 +856,8 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 		item->goalAnimState = LS_JUMP_ROLL_180;
 		return;
 	}
+
+	item->goalAnimState = LS_FREEFALL_DIVE;
 }
 
 // State:		LS_FREEFALL_DIVE (53)
