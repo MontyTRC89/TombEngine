@@ -90,6 +90,10 @@ GameScriptColor::operator D3DCOLOR() const
 	return m_color;
 }
 
+GameScriptColor::operator RGBAColor8Byte() const
+{
+	return m_color;
+}
 
 byte GameScriptColor::GetR() const
 {
