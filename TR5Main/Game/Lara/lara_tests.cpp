@@ -266,9 +266,9 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches. @Sezz 2021.10.15
-	if ((probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||		// Front is not a clamp.
-		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT ||			// Back is not a clamp.
-		(probeMiddle.Position.Ceiling - y) >= -LARA_HEIGHT)			// Middle is not a clamp.
+	if ((probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||	// Front is not a clamp.
+		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT ||		// Back is not a clamp.
+		(probeMiddle.Position.Ceiling - y) >= -LARA_HEIGHT)		// Middle is not a clamp.
 	{
 		return true;
 	}
@@ -314,15 +314,15 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	bool ladder = TestLaraHangOnClimbWall(item, coll);
-
 	if (!(ladder && edgeCatch) &&
 		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
+	{
 		return false;
+	}
 
 	SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 	auto bounds = GetBoundsAccurate(item);
-
 	if (edgeCatch <= 0)
 		item->pos.yPos = edge - bounds->Y1 + 4;
 	else
@@ -336,7 +336,6 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->airborne = false;
 	item->speed = 0;
 	item->fallspeed = 0;
-
 	info->gunStatus = LG_HANDS_BUSY;
 	info->torsoXrot = 0;
 	info->torsoYrot = 0;
@@ -377,7 +376,6 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	bool ladder = TestLaraHangOnClimbWall(item, coll);
-
 	if (!(ladder && edgeCatch) &&
 		!(TestValidLedge(item, coll, true, true) && edgeCatch > 0))
 	{
@@ -393,7 +391,6 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_REACH_TO_HANG);
 
 	auto bounds = GetBoundsAccurate(item);
-
 	if (edgeCatch <= 0)
 	{
 		item->pos.yPos = edge - bounds->Y1 - 20;
@@ -533,7 +530,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if ((climbShift < 0 && coll->FrontLeft.Floor  != coll->Front.Floor) ||
 					(climbShift > 0 && coll->FrontRight.Floor != coll->Front.Floor))
+				{
 					stopped = true;
+				}
 			}
 
 			if (!stopped && 
@@ -560,7 +559,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				result = true;
 			}
 		}
-		else  // Death, incorrect ledge or action release
+		else // Death, incorrect ledge or ACTION release
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->pos.xPos += coll->Shift.x;
@@ -708,7 +707,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		return CORNER_RESULT::NONE;
 
 	// Last chance for possible diagonal vs. non-diagonal cases: ray test
-	if (!LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
+	if (!	LaraPositionOnLOS(item, item->pos.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
 		return CORNER_RESULT::NONE;
 
 	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
@@ -962,19 +961,19 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	short angle2 = angle - ANGLE(15.0f);
 
 	auto start = GAME_VECTOR(item->pos.xPos,
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos,
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos,
+							item->roomNumber);
 
 	auto end1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angle1),
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos + dist * phd_cos(angle1),
+							item->roomNumber);
 
 	auto end2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-		item->pos.yPos - STEPUP_HEIGHT,
-		item->pos.zPos + dist * phd_cos(angle2),
-		item->roomNumber);
+							item->pos.yPos - STEPUP_HEIGHT,
+							item->pos.zPos + dist * phd_cos(angle2),
+							item->roomNumber);
 
 	bool result1 = LOS(&start, &end1);
 	bool result2 = LOS(&start, &end2);
@@ -984,30 +983,30 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 {
-	auto pos1 = GAME_VECTOR(item->pos.xPos,
+	auto start1 = GAME_VECTOR(item->pos.xPos,
 						    item->pos.yPos - LARA_HEADROOM,
 						    item->pos.zPos,
 						    item->roomNumber);
 
-	auto pos2 = GAME_VECTOR(item->pos.xPos,
+	auto start2 = GAME_VECTOR(item->pos.xPos,
 						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
 						    item->pos.zPos,
 						    item->roomNumber);
 	
-	auto vec1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
+	auto end1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
 						    item->pos.yPos - LARA_HEADROOM,
 						    item->pos.zPos + dist * phd_cos(ang),
 						    item->roomNumber);
 
-	auto vec2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
+	auto end2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
 						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
 						    item->pos.zPos + dist * phd_cos(ang),
 						    item->roomNumber);
 
-	auto result1 = LOS(&pos1, &vec1);
-	auto result2 = LOS(&pos2, &vec2);
+	auto result1 = LOS(&start1, &end1);
+	auto result2 = LOS(&start2, &end2);
 
-	return (result1 != 0 && result2 != 0);
+	return (!result1 && !result2);
 }
 
 int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
@@ -1123,9 +1122,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (coll->Middle.Floor >= -CLICK(0.5f))
-	{
 		SetAnimation(item, LA_STAND_IDLE);
-	}
 	else
 	{
 		SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK);
@@ -1133,7 +1130,6 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->pos.yPos += coll->Middle.Floor + CLICK(2.75f) - 9;
-
 	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 
 	item->pos.zRot = 0;
@@ -1301,9 +1297,9 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+	short roomNum = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
+	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNum);
 
 	if (waterDepth == NO_HEIGHT)
 	{
@@ -1323,8 +1319,8 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->speed = 0;
 		item->fallspeed = 0;
 		item->airborne = false;
-		info->waterStatus = LW_WADE;
 		item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		info->waterStatus = LW_WADE;
 	}
 }
 
@@ -1721,7 +1717,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	int y = item->pos.yPos;
-	auto probe = GetCollisionResult(item, item->pos.yRot, CLICK(2), -LARA_HEIGHT_CRAWL);
+	auto probe = GetCollisionResult(item, item->pos.yRot, CLICK(3), -LARA_HEIGHT_CRAWL);
 
 	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Lower floor bound.
 		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Upper floor bound.
@@ -2284,7 +2280,6 @@ bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (!TestLaraPoleCollision(item, coll, true, CLICK(1)))
 		return false;
 
-	// TODO: Accuracy.
 	return (coll->Middle.Ceiling < -CLICK(1));
 }
 
