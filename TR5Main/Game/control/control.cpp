@@ -99,7 +99,7 @@ int DrawPhase()
 GAME_STATUS ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
-	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -342,7 +342,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			TriggerLaraDrips(LaraItem);
 
 			// Update Lara's ponytails
-			HairControl(LaraItem, level->LaraType == LaraType::Young);
+			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
 		}
 
 		if (UseSpotCam)
@@ -470,7 +470,7 @@ GAME_STATUS DoTitle(int index)
 		StopAllSounds();
 
 		// Run the level script
-		GameScriptLevel* level = g_GameFlow->Levels[index];
+		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
 		std::string err;
 		if (!level->ScriptFileName.empty())
 		{
@@ -584,7 +584,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	StopAllSounds();
 
 	// Run the level script
-	GameScriptLevel* level = g_GameFlow->Levels[index];
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
   
 	if (!level->ScriptFileName.empty())
 	{
