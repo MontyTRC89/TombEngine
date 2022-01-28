@@ -106,7 +106,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && level->GetLaraType() != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
@@ -116,7 +116,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 		SwimTurnSubsuit(item);
 	else
 		SwimTurn(item, coll);
@@ -143,14 +143,14 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && level->GetLaraType() != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
 		return;
 	}
 	
-	if (level->LaraType != LaraType::Divesuit)
+	if (level->GetLaraType() != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
@@ -176,14 +176,14 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && level->GetLaraType() != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 
 		return;
 	}
 	
-	if (level->LaraType != LaraType::Divesuit)
+	if (level->GetLaraType() != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);

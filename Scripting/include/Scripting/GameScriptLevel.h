@@ -26,7 +26,6 @@ static const std::unordered_map<std::string, LaraType> kLaraTypes
 
 struct GameScriptLevel : public ScriptInterfaceLevel
 {
-	std::string LoadScreenFileName;
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
 	GameScriptSkyLayer Layer2;

@@ -1045,7 +1045,7 @@ void LaraBubbles(ITEM_INFO* item)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 	{
 		pos.y = -192;
 		pos.z = -160;
