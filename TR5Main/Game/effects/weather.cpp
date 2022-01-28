@@ -377,17 +377,17 @@ namespace Environment
 		if (Particles.size() > 0)
 			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
 
-		if (level->Weather == WeatherType::None || level->GetWeatherStrength() == 0.0f)
+		if (level->GetWeatherType() == WeatherType::None || level->GetWeatherStrength() == 0.0f)
 			return;
 
 		int newParticlesCount = 0;
-		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
+		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->GetWeatherStrength();
 
 		// Snow is falling twice as fast, and must be spawned accordingly fast
-		if (level->Weather == WeatherType::Snow)
+		if (level->GetWeatherType() == WeatherType::Snow)
 			density *= 2;
 
-		if (density > 0.0f && level->Weather != WeatherType::None)
+		if (density > 0.0f && level->GetWeatherType() != WeatherType::None)
 		{
 			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
@@ -396,7 +396,7 @@ namespace Environment
 
 				newParticlesCount++;
 
-				auto distance = level->Weather == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
+				auto distance = level->GetWeatherType() == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
 				auto radius = GenerateInt(0, distance);
 				short angle = GenerateInt(ANGLE(0), ANGLE(180));
 
@@ -419,7 +419,7 @@ namespace Environment
 
 				auto part = WeatherParticle();
 
-				switch (level->Weather)
+				switch (level->GetWeatherType())
 				{
 				case WeatherType::Snow:
 					part.Size = GenerateFloat(MAX_SNOW_SIZE / 3, MAX_SNOW_SIZE);
@@ -429,7 +429,7 @@ namespace Environment
 
 				case WeatherType::Rain:
 					part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
-					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->WeatherStrength, 0.6f, 1.0f);
+					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f);
 					part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
 					break;
 				}
@@ -437,7 +437,7 @@ namespace Environment
 				part.Velocity.x = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 				part.Velocity.z = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 
-				part.Type = level->Weather;
+				part.Type = level->GetWeatherType();
 				part.Room = outsideRoom;
 				part.Position.x = xPos;
 				part.Position.y = yPos;
