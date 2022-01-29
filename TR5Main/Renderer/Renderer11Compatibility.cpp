@@ -156,6 +156,8 @@ namespace TEN::Renderer
 			r->AmbientLight = Vector4(room.ambient.x, room.ambient.y, room.ambient.z, 1.0f);
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
+			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
+
 			if (room.mesh.size() > 0)
 			{
 				r->StaticsToDraw.reserve(room.mesh.size());
@@ -458,7 +460,7 @@ namespace TEN::Renderer
 							moveable.LinearizedBones[n]->Translation.z);
 
 					moveable.Skeleton = moveable.LinearizedBones[0];
-					buildHierarchy(&moveable);
+					BuildHierarchy(&moveable);
 
 					// Fix Lara skin joints and hairs
 					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)

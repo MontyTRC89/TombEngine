@@ -119,15 +119,11 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	// Preallocate lists
 	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
-	m_lines3DToDraw = createVector<RendererLine3D*>(MAX_LINES_3D);
-	m_lines2DToDraw = createVector<RendererLine2D*>(MAX_LINES_2D);
+	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
+	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
 	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
 	m_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);
-
-	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
-	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
-	m_rects2DBuffer = (RendererRect2D*)malloc(sizeof(RendererRect2D) * MAX_RECTS_2D);
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{

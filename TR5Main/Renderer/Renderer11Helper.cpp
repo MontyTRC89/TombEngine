@@ -34,7 +34,7 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	bool Renderer11::isRoomUnderwater(short roomNumber)
+	bool Renderer11::IsRoomUnderwater(short roomNumber)
 	{
 		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
 	}
@@ -53,7 +53,7 @@ namespace TEN::Renderer
 		return &m_adapters;
 	}
 
-	void Renderer11::updateEffects(RenderView& view)
+	void Renderer11::UpdateEffects(RenderView& view)
 	{
 		for (auto room : view.roomsToDraw)
 		{
@@ -66,7 +66,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::updateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
 	{
 		static std::vector<int> boneIndexList;
 		boneIndexList.clear();
@@ -93,7 +93,7 @@ namespace TEN::Renderer
 				Vector3 p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
 
 				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
-				//fromTrAngle(&rotation, frmptr[0], bone->Index);
+				//FromTrAngle(&rotation, frmptr[0], bone->Index);
 				
 				if (frac)
 				{
@@ -101,7 +101,7 @@ namespace TEN::Renderer
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
 					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
-					//fromTrAngle(&rotation2, frmptr[1], bone->Index);
+					//FromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 					Quaternion q1, q2, q3;
 
@@ -173,15 +173,6 @@ namespace TEN::Renderer
 				}
 			}
 		}
-	}
-
-	int Renderer11::getFrame(short animation, short frame, ANIM_FRAME** framePtr, int *rate)
-	{
-		ITEM_INFO item;
-		item.animNumber = animation;
-		item.frameNumber = frame;
-
-		return GetFrame(&item, framePtr, rate);
 	}
 
 	void Renderer11::updateItemAnimations(int itemNumber, bool force)
@@ -285,7 +276,7 @@ namespace TEN::Renderer
 			int rate;
 			int frac = GetFrame(nativeItem, framePtr, &rate);
 
-			updateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
+			UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, 0xFFFFFFFF);
 
 			for (int m = 0; m < obj->nmeshes; m++)
 				itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
@@ -294,7 +285,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::updateItemsAnimations(RenderView& view) {
+	void Renderer11::UpdateItemsAnimations(RenderView& view) {
 		Matrix translation;
 		Matrix rotation;
 
@@ -313,7 +304,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::fromTrAngle(Matrix *matrix, short *frameptr, int index) {
+	void Renderer11::FromTrAngle(Matrix *matrix, short *frameptr, int index) {
 		short *ptr = &frameptr[0];
 
 		ptr += 9;
@@ -357,7 +348,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::buildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode) {
+	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode) {
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
@@ -365,18 +356,18 @@ namespace TEN::Renderer
 
 		for (int j = 0; j < node->Children.size(); j++)
 		{
-			buildHierarchyRecursive(obj, node->Children[j], node);
+			BuildHierarchyRecursive(obj, node->Children[j], node);
 		}
 	}
 
-	void Renderer11::buildHierarchy(RendererObject *obj) {
+	void Renderer11::BuildHierarchy(RendererObject *obj) {
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 
 		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
 		{
-			buildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
+			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
 		}
 	}
 
@@ -473,7 +464,7 @@ namespace TEN::Renderer
 		dxgiFactory->Release();
 	}
 
-	void Renderer11::getVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
+	void Renderer11::GetVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
 	{
 		// Avoid allocations, 1024 should be fine
 		RendererRoomNode nodes[512];
@@ -512,10 +503,10 @@ namespace TEN::Renderer
 
 			if (!onlyRooms)
 			{
-				collectLightsForRoom(node->To, renderView);
-				collectItems(node->To, renderView);
-				collectStatics(node->To, renderView);
-				collectEffects(node->To, renderView);
+				CollectLightsForRoom(node->To, renderView);
+				CollectItems(node->To, renderView);
+				CollectStatics(node->To, renderView);
+				CollectEffects(node->To, renderView);
 			}
 
 			Vector4 clipPort;
@@ -524,7 +515,7 @@ namespace TEN::Renderer
 			{
 				short adjoiningRoom = room->doors[i].room;
 
-				if (node->From != adjoiningRoom && checkPortal(node->To, &room->doors[i], renderView.camera.ViewProjection))
+				if (node->From != adjoiningRoom && CheckPortal(node->To, &room->doors[i], renderView.camera.ViewProjection))
 				{
 					RendererRoomNode *childNode = &nodes[nextNode++];
 					childNode->From = node->To;
@@ -537,7 +528,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::checkPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection)
+	bool Renderer11::CheckPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection)
 	{
 		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
 
@@ -629,7 +620,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	bool Renderer11::sphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 	{
 		Vector3 centre = (boxMin + boxMax) / 2.0f;
 		Vector3 extens = boxMax - centre;

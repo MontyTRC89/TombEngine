@@ -15,7 +15,7 @@ namespace TEN::Renderer
 	using TEN::Memory::LinearArrayBuffer;
 	using std::vector;
 
-	void Renderer11::collectRooms(RenderView &renderView, bool onlyRooms)
+	void Renderer11::CollectRooms(RenderView &renderView, bool onlyRooms)
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
@@ -27,10 +27,10 @@ namespace TEN::Renderer
 			m_rooms[i].Visited = false;
 		}
 
-		getVisibleObjects(-1, baseRoomIndex, renderView, onlyRooms);
+		GetVisibleObjects(-1, baseRoomIndex, renderView, onlyRooms);
 	}
 
-	void Renderer11::collectItems(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectItems(short roomNumber, RenderView &renderView)
 	{
 		if (m_rooms.size() < roomNumber) {
 			return;
@@ -73,13 +73,13 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			collectLightsForItem(item->roomNumber, newItem, renderView);
+			CollectLightsForItem(item->roomNumber, newItem, renderView);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
 	}
 
-	void Renderer11::collectStatics(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectStatics(short roomNumber, RenderView &renderView)
 	{
 		if (m_rooms.size() < roomNumber) {
 			return;
@@ -111,7 +111,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::collectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
+	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
 	{
 		effect->Lights.clear();
 		if (m_rooms.size() < roomNumber) {
@@ -213,7 +213,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::collectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
+	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem *item, RenderView &renderView)
 	{
 		item->LightsToDraw.clear();
 
@@ -422,7 +422,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::collectLightsForRoom(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
 		if (m_rooms.size() < roomNumber){
 			return;
@@ -442,12 +442,12 @@ namespace TEN::Renderer
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
 			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1
-				&& sphereBoxIntersection(boxMin, boxMax, center, light->Out))
+				&& SphereBoxIntersection(boxMin, boxMax, center, light->Out))
 				renderView.lightsToDraw.push_back(light);
 		}
 	}
 
-	void Renderer11::collectEffects(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectEffects(short roomNumber, RenderView &renderView)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -472,7 +472,7 @@ namespace TEN::Renderer
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 			newEffect->Mesh = getMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
-			collectLightsForEffect(fx->roomNumber, newEffect, renderView);
+			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
 
 			room.EffectsToDraw.push_back(newEffect);
 		}
