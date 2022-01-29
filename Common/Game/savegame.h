@@ -1,5 +1,5 @@
 #pragma once
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/ChunkWriter.h"
@@ -45,7 +45,6 @@ class SaveGame
 {
 private:
 	static FileStream* m_stream;
-	static std::vector<LuaVariable> m_luaVariables;
 	
 public:
 	static int LastSaveGame;
