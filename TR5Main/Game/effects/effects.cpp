@@ -18,7 +18,7 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/trmath.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Renderer/Renderer11.h"
 
 using TEN::Renderer::g_Renderer;

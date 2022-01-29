@@ -39,7 +39,7 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
 
