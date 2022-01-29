@@ -35,3 +35,4 @@ public:
 	virtual bool DoGameflow() = 0;
 };
 
+extern ScriptInterfaceFlow* g_GameFlow;
