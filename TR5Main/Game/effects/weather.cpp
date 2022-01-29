@@ -9,7 +9,8 @@
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"
-#include <ScriptInterfaceLevel.h>
+#include "Specific/level.h"
+#include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Math::Random;
 
