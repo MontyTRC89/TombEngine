@@ -7,7 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_collide.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
