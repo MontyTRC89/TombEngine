@@ -8,7 +8,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
