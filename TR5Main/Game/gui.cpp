@@ -17,7 +17,9 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
+#include "Specific/configuration.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
 GuiController g_Gui;

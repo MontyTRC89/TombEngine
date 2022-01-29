@@ -46,6 +46,7 @@
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
 #include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/ScriptInterfaceGame.h"
 
 using std::vector;
 using std::unordered_map;
