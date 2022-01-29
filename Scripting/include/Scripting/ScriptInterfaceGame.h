@@ -35,3 +35,5 @@ public:
 
 	virtual void AssignItemsAndLara() = 0;
 };
+
+extern ScriptInterfaceGame* g_GameScript;

@@ -64,4 +64,3 @@ public:
 	bool DoGameflow() override;
 };
 
-extern ScriptInterfaceGame* g_GameScript;
