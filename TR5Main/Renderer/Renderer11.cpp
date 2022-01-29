@@ -28,7 +28,7 @@ namespace TEN::Renderer
 
 	void Renderer11::freeRendererData()
 	{
-		clearSceneItems();
+		ClearSceneItems();
 
 		m_meshPointersToMesh.clear();
 		m_moveableObjects.clear();
@@ -43,11 +43,10 @@ namespace TEN::Renderer
 		m_animatedTextureSets.clear();
 	}
 
-	void Renderer11::clearSceneItems()
+	void Renderer11::ClearSceneItems()
 	{
 		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
-		m_rects2DToDraw.clear();
 		gameCamera.clear();
 	}
 
@@ -228,7 +227,7 @@ namespace TEN::Renderer
 		return fps;
 	}
 
-	void Renderer11::bindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
+	void Renderer11::BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
 	{
 		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
 

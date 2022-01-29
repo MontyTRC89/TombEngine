@@ -82,7 +82,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	int rate, frac;
 
 	frac = GetFrame(LaraItem, framePtr, &rate);
-	updateAnimation(item, laraObj, framePtr, frac, rate, mask);
+	UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
 	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_HANDS_FREE || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
@@ -90,7 +90,7 @@ void Renderer11::updateLaraAnimations(bool force)
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 		frac = GetFrame(LaraItem, framePtr, &rate);
-		updateAnimation(item, laraObj, framePtr, frac, rate, mask);
+		UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 	}
 	else
 	{
@@ -128,7 +128,7 @@ void Renderer11::updateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 			shotgunFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber];
-			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -136,7 +136,7 @@ void Renderer11::updateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 			shotgunFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber];
-			updateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 		}
 			break;
 		case WEAPON_REVOLVER:
@@ -146,12 +146,12 @@ void Renderer11::updateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			revolverFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber - g_Level.Anims[Lara.leftArm.animNumber].frameBase];
-			updateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			revolverFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber - g_Level.Anims[Lara.rightArm.animNumber].frameBase];
-			updateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 		}
 			break;
 
@@ -165,15 +165,15 @@ void Renderer11::updateLaraAnimations(bool force)
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			pistolFramePtr = &g_Level.Frames[Lara.leftArm.frameBase + Lara.leftArm.frameNumber - g_Level.Anims[Lara.leftArm.animNumber].frameBase];
-			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			pistolFramePtr = &g_Level.Frames[Lara.rightArm.frameBase + Lara.rightArm.frameNumber - g_Level.Anims[Lara.rightArm.animNumber].frameBase];
-			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
-			updateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
+			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
+			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 		}
 
 		break;
@@ -181,14 +181,17 @@ void Renderer11::updateLaraAnimations(bool force)
 		case WEAPON_FLARE:
 		case WEAPON_TORCH:
 			// Left arm
+			LaraItem->animNumber = Lara.leftArm.animNumber;
+			LaraItem->frameNumber = Lara.leftArm.frameNumber;
+
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			frac = getFrame(Lara.leftArm.animNumber, Lara.leftArm.frameNumber, framePtr, &rate);
-			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
+			frac = GetFrame(LaraItem, framePtr, &rate);
+			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
 			frac = GetFrame(LaraItem, framePtr, &rate);
-			updateAnimation(item, laraObj, framePtr, frac, rate, mask);
+			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 			break;
 		}
 	}
@@ -200,7 +203,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	m_items[Lara.itemNumber].DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer11::drawLara(bool shadowMap, RenderView& view)
+void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
@@ -229,8 +232,8 @@ void TEN::Renderer::Renderer11::drawLara(bool shadowMap, RenderView& view)
 	}
 
 	// Set texture
-	bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::LinearClamp);
-	bindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
+	BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::LinearClamp);
+	BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
 
 	m_stMisc.AlphaTest = true;
 	m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -263,7 +266,7 @@ void TEN::Renderer::Renderer11::drawLara(bool shadowMap, RenderView& view)
 		drawMoveableMesh(item, mesh, room, k);
 	}
 
-	drawLaraHolsters();
+	DrawLaraHolsters();
 
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 	{
@@ -304,7 +307,7 @@ void TEN::Renderer::Renderer11::drawLara(bool shadowMap, RenderView& view)
 	}
 }
 
-void Renderer11::drawLaraHolsters()
+void Renderer11::DrawLaraHolsters()
 {
 	RendererItem* item = &m_items[Lara.itemNumber];
 	RendererRoom* room = &m_rooms[LaraItem->roomNumber];

@@ -55,7 +55,7 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	void Renderer11::drawLightning(RenderView& view) 
+	void Renderer11::DrawLightning(RenderView& view) 
 	{
 		for (int i = 0; i < Lightning.size(); i++)
 		{
@@ -136,7 +136,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSmokes(RenderView& view) 
+	void Renderer11::DrawSmokes(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -154,7 +154,7 @@ namespace TEN::Renderer
 	}
 
 
-	void Renderer11::drawFires(RenderView& view) 
+	void Renderer11::DrawFires(RenderView& view) 
 	{
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
@@ -174,7 +174,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSparks(RenderView& view) 
+	void Renderer11::DrawSparks(RenderView& view) 
 	{
 		PHD_VECTOR nodePos;
 
@@ -281,7 +281,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSplahes(RenderView& view) 
+	void Renderer11::DrawSplashes(RenderView& view) 
 	{
 		constexpr size_t NUM_POINTS = 9;
 
@@ -346,7 +346,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawBubbles(RenderView& view) 
+	void Renderer11::DrawBubbles(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_BUBBLES; i++) 
 		{
@@ -362,7 +362,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawDrips(RenderView& view) 
+	void Renderer11::DrawDrips(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_DRIPS; i++) 
 		{
@@ -378,7 +378,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawRipples(RenderView& view) 
+	void Renderer11::DrawRipples(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_RIPPLES; i++) 
 		{
@@ -405,7 +405,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawShockwaves(RenderView& view) 
+	void Renderer11::DrawShockwaves(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
 		{
@@ -470,7 +470,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawBlood(RenderView& view) 
+	void Renderer11::DrawBlood(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -487,7 +487,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawWeatherParticles(RenderView& view) 
+	void Renderer11::DrawWeatherParticles(RenderView& view) 
 	{		
 		for (auto& p : Weather.GetParticles())
 		{
@@ -516,7 +516,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::drawGunFlashes(RenderView& view) 
+	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
 		if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
 			return true;
@@ -632,7 +632,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	void Renderer11::drawBaddieGunflashes(RenderView& view)
+	void Renderer11::DrawBaddieGunflashes(RenderView& view)
 	{
 		for (auto room : view.roomsToDraw)
 		{
@@ -728,7 +728,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawUnderwaterDust(RenderView& view) 
+	void Renderer11::DrawUnderwaterDust(RenderView& view) 
 	{
 		return;
 
@@ -749,7 +749,7 @@ namespace TEN::Renderer
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;
 				FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-				if (!isRoomUnderwater(roomNumber))
+				if (!IsRoomUnderwater(roomNumber))
 					continue;
 
 				if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
@@ -776,7 +776,7 @@ namespace TEN::Renderer
 		return;
 	}
 
-	void Renderer11::drawSprites(RenderView& view)
+	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
@@ -837,7 +837,7 @@ namespace TEN::Renderer
 					setBlendMode(spr.BlendMode);
 				}
 
-				bindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
+				BindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
@@ -984,11 +984,11 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::drawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
+	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
 	{
 		setBlendMode(info->blendMode);
 
-		bindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
+		BindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0; 
@@ -1021,7 +1021,7 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls++;
 	}
 
-	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1066,7 +1066,7 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::drawEffects(RenderView& view, bool transparent) 
+	void Renderer11::DrawEffects(RenderView& view, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1087,12 +1087,12 @@ namespace TEN::Renderer
 				OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
 				if (obj->drawRoutine && obj->loaded)
-					drawEffect(view, effect, transparent);
+					DrawEffect(view, effect, transparent);
 			}
 		}
 	}
 
-	void Renderer11::drawDebris(RenderView& view,bool transparent)
+	void Renderer11::DrawDebris(RenderView& view,bool transparent)
 	{		
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
@@ -1111,11 +1111,11 @@ namespace TEN::Renderer
 
 				if (!deb->isStatic) 
 				{
-					bindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				} 
 				else 
 				{
-					bindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				}
 
 				m_stMisc.AlphaTest = !transparent;
