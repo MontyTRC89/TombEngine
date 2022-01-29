@@ -25,6 +25,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Scripting/ScriptInterfaceLevel.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -42,7 +43,6 @@ GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::m_stream;
-std::vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
 
 void LoadSavegameInfos()
