@@ -323,7 +323,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 		if (lara->airborne)
 		{
 			if (coll->Setup.EnableObjectPush)
-				ItemPushItem(item, lara, coll, coll->Setup.EnableSpaz, 1);
+				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
 			lara->hitPoints -= 100;
 			x = lara->pos.xPos - item->pos.xPos;
 			y = (lara->pos.yPos - 350) - (item->pos.yPos - 512);

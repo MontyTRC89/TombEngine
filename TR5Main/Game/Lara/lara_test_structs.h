@@ -3,8 +3,8 @@
 struct MoveTestSetup
 {
 	short Angle;
-	int LowerBound;
-	int UpperBound;
+	int LowerFloorBound;
+	int UpperFloorBound;
 	bool CheckSlopeDown = true;
 	bool CheckSlopeUp = true;
 	bool CheckDeath = true;
@@ -13,14 +13,14 @@ struct MoveTestSetup
 struct MonkeyMoveTestSetup
 {
 	short Angle;
-	int LowerBound;
-	int UpperBound;
+	int LowerFloorBound;
+	int UpperFloorBound;
 };
 
 struct VaultTestSetup
 {
-	int LowerBound;
-	int UpperBound;
+	int LowerCeilingBound;
+	int UpperCeilingBound;
 	int ClampMin;
 	int ClampMax;
 	int GapMin;
@@ -35,8 +35,8 @@ struct VaultTestResult
 
 struct CrawlVaultTestSetup
 {
-	int LowerBound;
-	int UpperBound;
+	int LowerFloorBound;
+	int UpperFloorBound;
 	int ClampMin;
 	int GapMin;
 	int CrossDist;

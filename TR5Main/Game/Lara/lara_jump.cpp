@@ -119,9 +119,9 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	item->airborne = true;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -167,9 +167,9 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	item->airborne = true;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -248,9 +248,9 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
 
 	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
@@ -383,11 +383,11 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	
 	item->airborne = false;
 	item->fallspeed = 0; // TODO: Check this.
-	coll->Setup.BadFloorHeightDown = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_BAD_POS : STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -659,9 +659,9 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->airborne = true;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = (item->speed >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 	GetCollisionInfo(coll, item);
@@ -755,7 +755,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	info->gunStatus = LG_HANDS_BUSY;
 	info->look = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -796,9 +796,9 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	item->airborne = true;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -837,7 +837,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = item->speed * 0.95f;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (TestLaraLand(item, coll))
 	{

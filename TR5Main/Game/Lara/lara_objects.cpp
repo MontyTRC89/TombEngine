@@ -32,7 +32,7 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -49,7 +49,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	/*collison: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -70,7 +70,7 @@ void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -85,7 +85,7 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -128,7 +128,7 @@ void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -142,7 +142,7 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = WALL_SIZE;
@@ -170,7 +170,7 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
@@ -185,7 +185,7 @@ void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
@@ -197,7 +197,7 @@ void lara_as_ppready(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 38*/
 	/*collision: lara_default_col*/
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(75.0f);
 
 	if (!(TrInput & IN_ACTION))
@@ -217,7 +217,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
 	if (TrInput & IN_ACTION && pulley->triggerFlags)
@@ -397,7 +397,7 @@ void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	lara_trbalance_regen(item);
 	lara_trbalance_mesh(item);
@@ -780,7 +780,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
 	if (item->hitPoints <= 0)
@@ -868,12 +868,12 @@ void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.FloorSlopeIsWall = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: There's a visible snap if Lara hits the ground at a high velocity.
@@ -888,7 +888,7 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (item->hitPoints <= 0)
 	{
@@ -943,7 +943,7 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
 	if (item->hitPoints <= 0)
@@ -997,10 +997,10 @@ void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	GetCollisionInfo(coll, item);
@@ -1031,7 +1031,7 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (item->hitPoints <= 0)
 	{
@@ -1086,7 +1086,7 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (item->hitPoints <= 0)
 	{

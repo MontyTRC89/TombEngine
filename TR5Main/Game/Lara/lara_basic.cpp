@@ -38,11 +38,11 @@ void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = true;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
@@ -58,7 +58,7 @@ void lara_as_special(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 }
 
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
@@ -67,7 +67,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd - 1)
 	{
@@ -84,7 +84,7 @@ void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 }
 
 // ---------------
@@ -153,11 +153,11 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
-	coll->Setup.FloorSlopesArePits = true;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -290,10 +290,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
@@ -603,11 +603,11 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->airborne = false;
 	item->fallspeed = 0;
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadFloorHeightDown = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_BAD_POS : STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -718,10 +718,10 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->fallspeed = 0;
 	item->airborne = false;
-	coll->Setup.FloorSlopesArePits = true;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1189,7 +1189,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	if (BinocularRange)
 	{
@@ -1208,9 +1208,9 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1244,11 +1244,11 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.FloorSlopesAreWalls = true;
-	coll->Setup.FloorSlopesArePits = true;
-	coll->Setup.BadFloorHeightDown = STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1351,11 +1351,11 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : STEPUP_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1669,11 +1669,11 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
-	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.UpperFloorBound = -CLICK(0.8f);
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1754,11 +1754,11 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = (info->waterStatus == LW_WADE) ? NO_BAD_POS : CLICK(0.8f);
-	coll->Setup.BadFloorHeightUp = -CLICK(0.8f);
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesArePits = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.UpperFloorBound = -CLICK(0.8f);
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
@@ -1817,10 +1817,10 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	Camera.laraNode = 0;
 	GetCollisionInfo(coll, item);
@@ -1886,10 +1886,10 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->airborne = false;
 	item->fallspeed = 0;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2009,10 +2009,10 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2122,10 +2122,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2218,10 +2218,10 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 

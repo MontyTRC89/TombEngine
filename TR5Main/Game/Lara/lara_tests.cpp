@@ -444,9 +444,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Setup coll info
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = info->moveAngle;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
@@ -779,9 +779,9 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Setup new GCI call
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -CLICK(2);
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -CLICK(2);
+	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	coll->Setup.ForwardAngle = info->moveAngle;
 
@@ -1453,7 +1453,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 	// Conduct "ray" test at upper floor bound.
 	auto start = GAME_VECTOR(
 		item->pos.xPos,
-		y + testSetup.UpperBound - 1,
+		y + testSetup.UpperFloorBound - 1,
 		item->pos.zPos,
 		item->roomNumber);
 
@@ -1467,9 +1467,9 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 		return false;
 
 	// Assess move feasibility to location ahead.
-	if ((probe.Position.Floor - y) <= testSetup.LowerBound &&						// Lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperBound &&						// Upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Lowest ceiling bound.
+	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&					// Within lower floor bound.
+		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&					// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Within lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height &&	// Space is not a clamp.
 		!isSlopeDown && !isSlopeUp && !isDeath &&									// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
@@ -1482,13 +1482,12 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 
 bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in run state collision function.
+	// Using Lower/UpperFloorBound defined in run state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot,
-		NO_BAD_POS,
-		-STEPUP_HEIGHT,
+		NO_LOWER_BOUND, -STEPUP_HEIGHT,
 		false, true, false
 	};
 
@@ -1497,13 +1496,12 @@ bool TestLaraRunForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in walk state collision function.
+	// Using Lower/UpperFloorBound defined in walk state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot,
-		STEPUP_HEIGHT,
-		-STEPUP_HEIGHT
+		STEPUP_HEIGHT, -STEPUP_HEIGHT
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);
@@ -1511,13 +1509,12 @@ bool TestLaraWalkForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in walk back state collision function.
+	// Using Lower/UpperFloorBound defined in walk back state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(180.0f),
-		STEPUP_HEIGHT,
-		-STEPUP_HEIGHT
+		STEPUP_HEIGHT, -STEPUP_HEIGHT
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);	
@@ -1525,12 +1522,12 @@ bool TestLaraWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in hop back state collision function.
+	// Using Lower/UpperFloorBound defined in hop back state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(180.0f),
-		NO_BAD_POS, -STEPUP_HEIGHT,
+		NO_LOWER_BOUND, -STEPUP_HEIGHT,
 		false, false, false
 	};
 
@@ -1539,13 +1536,12 @@ bool TestLaraRunBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in step left state collision function.
+	// Using Lower/UpperFloorBound defined in step left state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot - ANGLE(90.0f),
-		CLICK(0.8f),
-		-CLICK(0.8f)
+		CLICK(0.8f), -CLICK(0.8f)
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);
@@ -1553,13 +1549,12 @@ bool TestLaraStepLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in step right state collision function.
+	// Using Lower/UpperFloorBound defined in step right state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(90.0f),
-		CLICK(0.8f),
-		-CLICK(0.8f)
+		CLICK(0.8f), -CLICK(0.8f)
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);
@@ -1567,13 +1562,12 @@ bool TestLaraStepRight(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in wade forward state collision function.
+	// Using Lower/UpperFloorBound defined in wade forward state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot,
-		NO_BAD_POS,
-		-STEPUP_HEIGHT,
+		NO_LOWER_BOUND, -STEPUP_HEIGHT,
 		false, false, false
 	};
 
@@ -1582,13 +1576,12 @@ bool TestLaraWadeForwardSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp defined in walk back state collision function.
+	// Using UpperFloorBound defined in walk back state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(180.0f),
-		NO_BAD_POS,
-		-STEPUP_HEIGHT,
+		NO_LOWER_BOUND, -STEPUP_HEIGHT,
 		false, false, false
 	};
 
@@ -1597,13 +1590,12 @@ bool TestLaraWalkBackSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp defined in step left state collision function.
+	// Using UpperFloorBound defined in step left state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot - ANGLE(90.0f),
-		NO_BAD_POS,
-		-CLICK(0.8f),
+		NO_LOWER_BOUND, -CLICK(0.8f),
 		false, false, false
 	};
 
@@ -1612,13 +1604,12 @@ bool TestLaraStepLeftSwamp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp defined in step right state collision function.
+	// Using UpperFloorBound defined in step right state collision function.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(90.0f),
-		NO_BAD_POS,
-		-CLICK(0.8f),
+		NO_LOWER_BOUND, -CLICK(0.8f),
 		false, false, false
 	};
 
@@ -1643,7 +1634,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 	// Conduct "ray" test at upper floor bound.
 	auto start = GAME_VECTOR(
 		item->pos.xPos,
-		y + testSetup.UpperBound - 1,
+		y + testSetup.UpperFloorBound - 1,
 		item->pos.zPos,
 		item->roomNumber);
 
@@ -1657,9 +1648,9 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 		return false;
 
 	// Assess move feasibility to location ahead.
-	if ((probe.Position.Floor - y) <= testSetup.LowerBound &&						// Lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperBound &&						// Upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&						// Lowest ceiling bound.
+	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&					// Within lower floor bound.
+		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&					// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&						// Within lowest ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&	// Space is not a clamp.
 		!isSlopeDown && !isSlopeUp && !isDeath &&									// No slope or death sector (if applicable).
 		probe.Position.Floor != NO_HEIGHT)
@@ -1672,13 +1663,12 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in crawl state collision functions.
+	// Using Lower/UpperFloorBound defined in crawl state collision functions.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot,
-		CLICK(1) - 1,
-		-(CLICK(1) - 1)
+		CLICK(1) - 1, -(CLICK(1) - 1)
 	};
 
 	return TestLaraCrawlMoveTolerance(item, coll, testSetup);
@@ -1686,13 +1676,12 @@ bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Using BadFloorHeightUp/Down defined in crawl state collision functions.
+	// Using Lower/UpperFloorBound defined in crawl state collision functions.
 
 	MoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(180.0f),
-		CLICK(1) - 1,
-		-(CLICK(1) - 1)
+		CLICK(1) - 1, -(CLICK(1) - 1)
 	};
 
 	return TestLaraCrawlMoveTolerance(item, coll, testSetup);
@@ -1742,7 +1731,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	// Conduct "ray" test at lower ceiling bound.
 	auto start = GAME_VECTOR(
 		item->pos.xPos,
-		y + testSetup.LowerBound + 1,
+		y + testSetup.LowerFloorBound + 1,
 		item->pos.zPos,
 		item->roomNumber);
 
@@ -1757,9 +1746,9 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 
 	// Assess move feasibility to location ahead.
 	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
-		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Highest floor boundary.
-		(probe.Position.Ceiling - y) <= testSetup.LowerBound &&						// Lower ceiling boundary.
-		(probe.Position.Ceiling - y) >= testSetup.UpperBound &&						// Lower ceiling boundary. TODO: Not working??
+		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Within highest floor bound.
+		(probe.Position.Ceiling - y) <= testSetup.LowerFloorBound &&				// Within lower ceiling bound.
+		(probe.Position.Ceiling - y) >= testSetup.UpperFloorBound &&				// Within upper ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY &&	// Space is not a clamp.
 		!probe.Position.CeilingSlope &&												// No ceiling slope.
 		probe.Position.Ceiling != NO_HEIGHT)
@@ -1772,11 +1761,12 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 
 bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Using Lower/UpperCeilingBound defined in monkey forward collision function.
+
 	MonkeyMoveTestSetup testSetup
 	{
 		item->pos.yRot,
-		CLICK(1.25f),
-		-CLICK(1.25f)
+		CLICK(1.25f), -CLICK(1.25f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1784,11 +1774,12 @@ bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Using Lower/UpperCeilingBound defined in monkey back collision function.
+
 	MonkeyMoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(180.0f),
-		CLICK(1.25f),
-		-CLICK(1.25f)
+		CLICK(1.25f), -CLICK(1.25f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1796,11 +1787,12 @@ bool TestLaraMonkeyBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Using Lower/UpperCeilingBound defined in monkey shimmy left collision function.
+
 	MonkeyMoveTestSetup testSetup
 	{
 		item->pos.yRot - ANGLE(90.0f),
-		CLICK(0.5f),
-		-CLICK(0.5f)
+		CLICK(0.5f), -CLICK(0.5f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1808,11 +1800,12 @@ bool TestLaraMonkeyShimmyLeft(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// Using Lower/UpperCeilingBound defined in monkey shimmy right collision function.
+
 	MonkeyMoveTestSetup testSetup
 	{
 		item->pos.yRot + ANGLE(90.0f),
-		CLICK(0.5f),
-		-CLICK(0.5f)
+		CLICK(0.5f), -CLICK(0.5f)
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1828,21 +1821,21 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
-	int yOffset = testSetup.LowerBound;
-	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height.
-			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMin ||	// Clamp is too small.
-			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMax) &&	// Clamp is too large.
-		yOffset > (testSetup.UpperBound - coll->Setup.Height))										// Offset is not too high.
+	int yOffset = testSetup.LowerCeilingBound;
+	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height...
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMin ||		// OR clamp is too small
+			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMax) &&		// OR clamp is too large (future-proofing; not possible right now).
+		yOffset > (testSetup.UpperCeilingBound - coll->Setup.Height))								// Offset is not too high.
 	{
 		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), yOffset);
 		yOffset -= std::max<int>(CLICK(0.5f), testSetup.ClampMin);
 	}
 
 	// Assess vault candidate location.
-	if ((probeFront.Position.Floor - y) < testSetup.LowerBound &&								// Lower floor bound.
-		(probeFront.Position.Floor - y) >= testSetup.UpperBound &&								// Upper floor bound.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Lower clamp limit.
-		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMax &&	// Upper clamp limit.
+	if ((probeFront.Position.Floor - y) < testSetup.LowerCeilingBound &&						// Within lower floor bound.
+		(probeFront.Position.Floor - y) >= testSetup.UpperCeilingBound &&						// Within upper floor bound.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Within clamp min.
+		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMax &&	// Within clamp max.
 		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive.
 		!swampTooDeep &&																		// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
@@ -1857,14 +1850,12 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-STEPUP_HEIGHT, -CLICK(2.5f)]
-	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
+	// Clamp range: (-LARA_HEIGHT, -MAX_HEIGHT]
 
 	VaultTestSetup testSetup
 	{
-		-STEPUP_HEIGHT,
-		-CLICK(2.5f),
-		LARA_HEIGHT,
-		-MAX_HEIGHT,
+		-STEPUP_HEIGHT, -CLICK(2.5f),
+		LARA_HEIGHT, -MAX_HEIGHT,
 		CLICK(1)
 	};
 
@@ -1874,14 +1865,12 @@ VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(2.5f), -CLICK(3.5f)]
-	// Clamp range: (-LARA_HEIGHT, MAX_HEIGHT]
+	// Clamp range: (-LARA_HEIGHT, -MAX_HEIGHT]
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(2.5f),
-		-CLICK(3.5f),
-		LARA_HEIGHT,
-		-MAX_HEIGHT,
+		-CLICK(2.5f), -CLICK(3.5f),
+		LARA_HEIGHT, -MAX_HEIGHT,
 		CLICK(1),
 	};
 
@@ -1891,14 +1880,12 @@ VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
-	// Clamp range: (-CLICK(0.1f), MAX_HEIGHT]
+	// Clamp range: (-CLICK(0.1f), -MAX_HEIGHT]
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(3.5f),
-		-CLICK(7.5f),
-		CLICK(0.1f), // TODO: Is this enough hand room?
-		-MAX_HEIGHT,
+		-CLICK(3.5f), -CLICK(7.5f),
+		CLICK(0.1f)/* TODO: Is this enough hand room?*/,-MAX_HEIGHT,
 		CLICK(0.1f),
 		false
 	};
@@ -1913,10 +1900,8 @@ VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 
 	VaultTestSetup testSetup
 	{
-		0,
-		-STEPUP_HEIGHT,
-		LARA_HEIGHT_CRAWL,
-		LARA_HEIGHT,
+		0, -STEPUP_HEIGHT,
+		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
 		CLICK(1),
 	};
 
@@ -1930,10 +1915,8 @@ VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 
 	VaultTestSetup testSetup
 	{
-		-STEPUP_HEIGHT,
-		-CLICK(2.5f),
-		LARA_HEIGHT_CRAWL,
-		LARA_HEIGHT,
+		-STEPUP_HEIGHT, -CLICK(2.5f),
+		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
 		CLICK(1),
 	};
 
@@ -1947,10 +1930,8 @@ VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(2.5f),
-		-CLICK(3.5f),
-		LARA_HEIGHT_CRAWL,
-		LARA_HEIGHT,
+		-CLICK(2.5f), -CLICK(3.5f),
+		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
 		CLICK(1),
 	};
 
@@ -1965,11 +1946,11 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
-	if (TestValidLedgeAngle(item, coll) &&
+	if (TestValidLedgeAngle(item, coll) &&						// Appropriate angle difference from ladder.
 		!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
 		info->climbStatus &&									// Ladder sector flag set.
-		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Lower middle ceiling bound. (Synced with TestLaraLadderMount())
-		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
+		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
 		return VaultTestResult{ true, probeMiddle.Position.Ceiling };
 	}
@@ -1987,9 +1968,9 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedgeAngle(item, coll) &&
 		info->climbStatus &&									// Ladder sector flag set.
-		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Lower middle ceiling bound.
-		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&		// Upper middle floor bound. (Synced with TestLaraAutoJump())
-		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Lower front ceiling bound.
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lower middle ceiling bound.
+		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&		// Within upper middle floor bound. (Synced with TestLaraAutoJump())
+		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
 		return true;
@@ -2007,8 +1988,8 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
 		info->canMonkeySwing &&									// Monkey swing sector flag set.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Lower ceiling bound.
-		(probe.Position.Ceiling - y) >= -CLICK(7))				// Upper ceiling bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
+		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
 		return true;
 	}
@@ -2025,13 +2006,13 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTes
 	bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;
 	bool isDeath = testSetup.CheckDeath ? probeB.Block->Flags.Death : false;
 
-	if ((probeA.Position.Floor - y) <= testSetup.LowerBound &&									// Lower floor bound.
-		(probeA.Position.Floor - y) >= testSetup.UpperBound &&									// Upper floor bound.
+	if ((probeA.Position.Floor - y) <= testSetup.LowerFloorBound &&								// Within lower floor bound.
+		(probeA.Position.Floor - y) >= testSetup.UpperFloorBound &&								// Within upper floor bound.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > testSetup.ClampMin &&			// Crossing clamp limit.
 		abs(probeB.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&			// Destination clamp limit.
 		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= testSetup.GapMin &&		// Gap is optically permissive (going up).
 		abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&		// Gap is optically permissive (going down).
-		abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.ProbeHeightDifMax &&	// Crossing and destination floor height difference suggests continuous crawl surface.
+		abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.ProbeHeightDifMax &&	// Crossing/destination floor height difference suggests continuous crawl surface.
 		(probeA.Position.Ceiling - y) < -testSetup.GapMin &&									// Ceiling height is permissive.
 		!isSlope && !isDeath &&																	// No slope or death sector.
 		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
@@ -2048,8 +2029,7 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	CrawlVaultTestSetup testSetup
 	{
-		-CLICK(1),
-		-STEPUP_HEIGHT,
+		-CLICK(1), -STEPUP_HEIGHT,
 		LARA_HEIGHT_CRAWL,
 		CLICK(0.6f),
 		CLICK(1.2f),
@@ -2066,8 +2046,7 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	CrawlVaultTestSetup testSetup
 	{
-		STEPUP_HEIGHT,
-		CLICK(1),
+		STEPUP_HEIGHT, CLICK(1),
 		LARA_HEIGHT_CRAWL,
 		CLICK(0.6f),
 		CLICK(1.2f),
@@ -2084,8 +2063,7 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	CrawlVaultTestSetup testSetup
 	{
-		STEPUP_HEIGHT,
-		CLICK(1),
+		STEPUP_HEIGHT, CLICK(1),
 		LARA_HEIGHT,
 		CLICK(1.25f),
 		CLICK(1.2f),
@@ -2099,17 +2077,16 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Floor range: [-MAX_HEIGHT, STEPUP_HEIGHT)
+	// Floor range: [NO_LOWER_BOUND, STEPUP_HEIGHT)
 
 	CrawlVaultTestSetup testSetup
 	{
-		-MAX_HEIGHT,
-		STEPUP_HEIGHT + 1,
+		NO_LOWER_BOUND, STEPUP_HEIGHT + 1,
 		LARA_HEIGHT,
 		CLICK(1.25f),
 		CLICK(1.2f),
 		CLICK(1.5f),
-		-MAX_HEIGHT,
+		NO_LOWER_BOUND,
 		false
 	};
 

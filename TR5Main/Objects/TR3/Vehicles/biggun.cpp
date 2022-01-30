@@ -289,7 +289,7 @@ bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	bGunItem->pos.yRot = bGunInfo->startYRot + bGunInfo->yRot;
 	laraItem->pos.yRot = bGunItem->pos.yRot;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
 	DoObjectCollision(laraItem, coll);
