@@ -9,7 +9,7 @@
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
 #include "GameScriptItemInfo.h"
-#include "GameScriptMeshInfo.h"
+#include "Entity/Static/GameScriptMeshInfo.h"
 #include "GameScriptSinkInfo.h"
 #include "GameScriptAIObject.h"
 #include "GameScriptSoundSourceInfo.h"
