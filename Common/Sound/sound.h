@@ -101,13 +101,14 @@ struct SampleInfo
 
 struct SoundTrackInfo
 {
-	std::string Name;
-	SOUNDTRACK_PLAYTYPE Mode;
-	int Mask;
+	std::string Name{};
+	SOUNDTRACK_PLAYTYPE Mode{ SOUNDTRACK_PLAYTYPE::OneShot };
+	int Mask{ 0 };
 };
 
 extern std::map<std::string, int> SoundTrackMap;
-extern std::vector<SoundTrackInfo> SoundTracks;
+extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
+extern int SecretSoundIndex;
 
 long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
@@ -124,6 +125,7 @@ void PlaySecretTrack();
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
+void EnumerateLegacyTracks();
 
 std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE type);
 
