@@ -157,6 +157,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	InitTENLog();
 
+	// Collect numbered tracks
+	EnumerateLegacyTracks();
+
 	// Initialise the new scripting system
 	ScriptInterfaceState::Init();
 
