@@ -11,7 +11,6 @@ namespace sol {
 class GameScriptColor {
 public:
 	GameScriptColor(byte r, byte g, byte b);
-	GameScriptColor(RGBAColor8Byte col);
 	GameScriptColor(byte r, byte g, byte b, byte a);
 	GameScriptColor(Vector3 const &);
 	GameScriptColor(Vector4 const &);

@@ -9,8 +9,7 @@ enum class WeatherType
 	Snow
 };
 
-// todo make this a scoped enum
-enum LaraType
+enum class LaraType
 {
 	Normal = 1,
 	Young = 2,
