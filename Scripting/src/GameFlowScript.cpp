@@ -230,7 +230,7 @@ bool GameFlow::DoGameflow()
 
 		if (CurrentLevel == 0)
 		{
-			status = DoTitle(0);
+			status = DoTitle(0, level->AmbientTrack);
 		}
 		else
 		{

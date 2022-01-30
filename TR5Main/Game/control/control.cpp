@@ -450,7 +450,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GAME_STATUS DoTitle(int index)
+GAME_STATUS DoTitle(int index, std::string const & ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
@@ -499,7 +499,7 @@ GAME_STATUS DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		PlaySoundTrack(83);
+		PlaySoundTrack(ambient);
 
 		// Initialize menu
 		g_Gui.SetMenuToDisplay(Menu::Title);
@@ -560,7 +560,7 @@ GAME_STATUS DoTitle(int index)
 	return GAME_STATUS::GAME_STATUS_NEW_GAME;
 }
 
-GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
+GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
