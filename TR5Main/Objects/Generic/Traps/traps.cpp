@@ -48,7 +48,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		z = l->pos.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
 		damage = item->fallspeed > 0 ? 96 : 0;
-		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpaz, 1))
+		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
 				l->hitPoints = 0;

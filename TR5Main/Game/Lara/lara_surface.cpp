@@ -38,7 +38,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	Lara.moveAngle = item->pos.yRot;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
@@ -228,7 +228,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_HIPS;	//forces the camera to follow Lara instead of snapping
 }

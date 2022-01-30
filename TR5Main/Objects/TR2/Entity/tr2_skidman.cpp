@@ -71,7 +71,7 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (coll->Setup.EnableObjectPush)
 	{
 		if (item->speed > 0)
-			ItemPushItem(item, laraitem, coll, coll->Setup.EnableSpaz, 0);
+			ItemPushItem(item, laraitem, coll, coll->Setup.EnableSpasm, 0);
 		else
 			ItemPushItem(item, laraitem, coll, 0, 0);
 	}

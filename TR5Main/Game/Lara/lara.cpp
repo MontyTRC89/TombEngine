@@ -750,7 +750,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
+	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
@@ -760,10 +760,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldFrameNumber = item->frameNumber;
 
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpaz = true;
-	coll->Setup.FloorSlopesAreWalls = false;
-	coll->Setup.FloorSlopesArePits = false;
-	coll->Setup.CeilingSlopesAreWalls = false;
+	coll->Setup.EnableSpasm = true;
+	coll->Setup.FloorSlopeIsWall = false;
+	coll->Setup.FloorSlopeIsPit = false;
+	coll->Setup.CeilingSlopeIsWall = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
@@ -945,22 +945,22 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.BadFloorHeightDown = -NO_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
-	coll->Setup.BadCeilingHeightDown = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
-	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
+	coll->Setup.LowerCeilingBound = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
+	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Setup.FloorSlopesAreWalls = false;
-	coll->Setup.FloorSlopesArePits = false;
-	coll->Setup.CeilingSlopesAreWalls = false;
+	coll->Setup.FloorSlopeIsWall = false;
+	coll->Setup.FloorSlopeIsPit = false;
+	coll->Setup.CeilingSlopeIsWall = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
@@ -1054,22 +1054,22 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
-	coll->Setup.BadFloorHeightDown = -NO_HEIGHT;
-	coll->Setup.BadFloorHeightUp = -CLICK(0.5f);
-	coll->Setup.BadCeilingHeightDown = LARA_RAD;
-	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -CLICK(0.5f);
+	coll->Setup.LowerCeilingBound = LARA_RAD;
+	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Setup.FloorSlopesAreWalls = false;
-	coll->Setup.FloorSlopesArePits = false;
-	coll->Setup.CeilingSlopesAreWalls = false;
+	coll->Setup.FloorSlopeIsWall = false;
+	coll->Setup.FloorSlopeIsPit = false;
+	coll->Setup.CeilingSlopeIsWall = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 
 	coll->Setup.Radius = LARA_RAD;

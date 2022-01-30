@@ -56,7 +56,7 @@ void lara_col_climbend(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_climbend(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = -ANGLE(45);
@@ -144,7 +144,7 @@ void lara_col_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_climbdown(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetElevation = -ANGLE(45);
 
@@ -226,7 +226,7 @@ void lara_col_climbing(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetElevation = ANGLE(30);
 }
@@ -244,7 +244,7 @@ void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetAngle = ANGLE(30);
 	Camera.targetElevation = -ANGLE(15);
@@ -266,7 +266,7 @@ void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetAngle = -ANGLE(30);
 	Camera.targetElevation = -ANGLE(15);
@@ -378,7 +378,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.isClimbing = true;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
 	Camera.targetElevation = -ANGLE(20);
@@ -419,7 +419,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetAngle = -ANGLE(60.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
@@ -430,7 +430,7 @@ void lara_as_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_stepoff_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 
 	Camera.targetAngle = ANGLE(60.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
