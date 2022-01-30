@@ -38,7 +38,6 @@ public:
 	~GameFlow();
 
 	void							AddLevel(GameScriptLevel const& level);
-	void							SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src);
 	void							LoadGameFlowScript();
 	char const *					GetString(const char* id) const;
 	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
