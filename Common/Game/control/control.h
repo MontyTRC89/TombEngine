@@ -74,8 +74,8 @@ extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase();
 
-GAME_STATUS DoTitle(int index);
-GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
+GAME_STATUS DoTitle(int index, std::string const & ambient);
+GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegame);
 GAME_STATUS ControlPhase(int numFrames, int demoMode);
 
 int GetRandomControl();
