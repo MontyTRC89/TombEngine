@@ -15,7 +15,7 @@ void GameScriptSkyLayer::Register(sol::state* lua)
 
 /// (@{Color}) RGB sky color
 //@mem color
-		"color", sol::property(&GameScriptSkyLayer::SetColor),
+		"color", sol::property(&GameScriptSkyLayer::GetColor, &GameScriptSkyLayer::SetColor),
 
 /*** (int) cloud speed.
 
@@ -51,7 +51,6 @@ void GameScriptSkyLayer::SetColor(GameScriptColor const & col)
 	B = col.GetB();
 }
 
-//todo can this return an RGBAColor8Byte instead?
 GameScriptColor GameScriptSkyLayer::GetColor() const {
 	return GameScriptColor{ R, G, B };
 }
