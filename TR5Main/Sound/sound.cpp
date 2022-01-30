@@ -2,6 +2,7 @@
 #include "Sound/sound.h"
 
 #include <filesystem>
+#include <regex>
 #include "Game/camera.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
@@ -29,7 +30,8 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)REVERB_TYPE::Count] =    // Reverb
 const std::string TRACKS_PATH = "Audio\\";
 
 std::map<std::string, int> SoundTrackMap;
-std::vector<SoundTrackInfo> SoundTracks;
+std::unordered_map<int, SoundTrackInfo> SoundTracks;
+int SecretSoundIndex;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -310,6 +312,35 @@ void FreeSamples()
 		Sound_FreeSample(i);
 }
 
+void EnumerateLegacyTracks()
+{
+	auto dir = std::filesystem::path(TRACKS_PATH);
+	// capture three-digit filenames, or those which start with three digits.
+	std::regex upToThreeDigits("\\\\((\\d{1,3})[^\\.]*)");
+	std::smatch result;
+	for (const auto& file : std::filesystem::directory_iterator{ dir })
+	{
+		std::string fileName = file.path().string();
+		auto bResult = std::regex_search(fileName, result, upToThreeDigits);
+		if (!result.empty())
+		{
+			// result[0] is the whole match including the leading backslash, so ignore it
+			// result[1] is the full file name, not including the extension
+			int index = std::stoi(result[2].str());
+			SoundTrackInfo s;
+			
+			// TRLE default looping tracks
+			if (index >= 98 && index <= 111)
+			{
+				s.Mode = SOUNDTRACK_PLAYTYPE::BGM;
+			}
+			s.Name = result[1];
+			SoundTracks.insert(std::make_pair(index, s));
+			SecretSoundIndex = std::max(SecretSoundIndex, index);
+		}
+	}
+}
+
 void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 {
 	if (track.empty())
@@ -456,7 +487,7 @@ void StopSoundTracks()
 
 void ClearSoundTrackMasks()
 {
-	for (auto& track : SoundTracks) { track.Mask = 0; }
+	for (auto& track : SoundTracks) { track.second.Mask = 0; }
 }
 
 // Returns specified soundtrack type's stem name and playhead position.
@@ -801,7 +832,7 @@ void SayNo()
 void PlaySecretTrack()
 {
 	// Secret soundtrack should be always last one on a list.	
-	PlaySoundTrack(SoundTracks.back().Name, SOUNDTRACK_PLAYTYPE::OneShot);
+	PlaySoundTrack(SoundTracks.at(SecretSoundIndex).Name, SOUNDTRACK_PLAYTYPE::OneShot);
 }
 
 int GetShatterSound(int shatterID)
