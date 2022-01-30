@@ -141,50 +141,6 @@ __(not yet implemented)__
 		);
 }
 
-//todo add bindings and documents for this
-bool GameScriptLevel::GetSkyLayerEnabled(int index) const
-{
-	bool cond = index == 0 || index == 1;
-	std::string msg{ "Index must be 0 or 1." };
-
-	if (index == 0)
-	{
-		return Layer1.Enabled;
-	}
-	else if (index == 1)
-	{
-		return Layer2.Enabled;
-	}
-	else
-	{
-		ScriptAssert(false, msg);
-		ScriptWarn("Returning false.");
-		return false;
-	}
-}
-
-//todo add bindings and documents for this
-short GameScriptLevel::GetSkyLayerSpeed(int index) const
-{
-	bool cond = index == 0 || index == 1;
-	std::string msg{ "Index must be 0 or 1." };
-
-	if (index == 0)
-	{
-		return Layer1.CloudSpeed;
-	}
-	else if (index == 1)
-	{
-		return Layer2.CloudSpeed;
-	}
-	else
-	{
-		ScriptAssert(false, msg);
-		ScriptWarn("Returning 0.");
-		return 0;
-	}
-}
-
 void GameScriptLevel::SetWeatherStrength(float val)
 {
 	bool cond = val <= 1.0f && val >= 0.0f;
@@ -214,25 +170,46 @@ void GameScriptLevel::SetLevelFarView(byte val)
 		LevelFarView = val;
 	}
 }
-// todo test this
+
 RGBAColor8Byte GameScriptLevel::GetSkyLayerColor(int index) const
 {
-	bool cond = index == 0 || index == 1;
-	std::string msg{ "Index must be 0 or 1." };
+	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
 		return Layer1.GetColor();
 	}
-	else if (index == 1)
+	else
 	{
 		return Layer2.GetColor();
 	}
+}
+
+bool GameScriptLevel::GetSkyLayerEnabled(int index) const
+{
+	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+
+	if (index == 0)
+	{
+		return Layer1.Enabled;
+	}
 	else
 	{
-		ScriptAssert(false, msg);
-		ScriptWarn("Returning 0, 0, 0, 0.");
-		return RGBAColor8Byte{ 0 };
+		return Layer2.Enabled;
+	}
+}
+
+short GameScriptLevel::GetSkyLayerSpeed(int index) const
+{
+	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+
+	if (index == 0)
+	{
+		return Layer1.CloudSpeed;
+	}
+	else
+	{
+		return Layer2.CloudSpeed;
 	}
 }
 
