@@ -65,7 +65,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 
 	Camera.targetAngle = 0;
@@ -243,7 +243,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -266,7 +266,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 31*/
 	/*collision: lara_col_hangright*/
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -289,7 +289,7 @@ void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 54*/
 	/*collision: lara_default_col*/
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 }
 
 /*go around corners*/

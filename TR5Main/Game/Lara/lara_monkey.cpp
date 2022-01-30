@@ -33,7 +33,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -124,11 +124,11 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	item->fallspeed = 0;
 	item->airborne = false;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
-	coll->Setup.CeilingSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -163,7 +163,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -216,11 +216,11 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
-	coll->Setup.CeilingSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -253,7 +253,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -299,11 +299,11 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = CLICK(1.25f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(1.25f);
-	coll->Setup.CeilingSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -336,7 +336,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -382,11 +382,11 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
-	coll->Setup.CeilingSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(0.5f);
+	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
+	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -419,7 +419,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -465,11 +465,11 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = 0;
-	coll->Setup.BadCeilingHeightDown = CLICK(0.5f);
-	coll->Setup.BadCeilingHeightUp = -CLICK(0.5f);
-	coll->Setup.CeilingSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(0.5f);
+	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
+	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD;
@@ -497,7 +497,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	item->goalAnimState = LS_MONKEY_IDLE;
@@ -520,7 +520,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)
@@ -590,7 +590,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->torsoYrot = 0;
 	info->torsoZrot = 0;
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
 	if (item->hitPoints <= 0)

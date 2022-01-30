@@ -375,7 +375,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	}
 	if (height != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 
-	if (coll->Setup.FloorSlopesAreWalls && 
+	if (coll->Setup.FloorSlopeIsWall && 
 		coll->Front.FloorSlope && 
 		coll->Front.Floor < coll->Middle.Floor && 
 		coll->Front.Floor < 0 &&
@@ -383,13 +383,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.FloorSlopesArePits && 
+	else if (coll->Setup.FloorSlopeIsPit && 
 			 coll->Front.FloorSlope && 
 			 coll->Front.Floor > coll->Middle.Floor)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.CeilingSlopesAreWalls &&
+	else if (coll->Setup.CeilingSlopeIsWall &&
 			 coll->Front.CeilingSlope)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
@@ -435,19 +435,19 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	if (coll->Setup.FloorSlopesAreWalls && 
+	if (coll->Setup.FloorSlopeIsWall && 
 		coll->MiddleLeft.FloorSlope && 
 		coll->MiddleLeft.Floor < 0)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.FloorSlopesArePits && 
+	else if (coll->Setup.FloorSlopeIsPit && 
 			 coll->MiddleLeft.FloorSlope && 
 			 coll->MiddleLeft.Floor > 0)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.CeilingSlopesAreWalls &&
+	else if (coll->Setup.CeilingSlopeIsWall &&
 			 coll->MiddleLeft.CeilingSlope)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -488,19 +488,19 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	if (coll->Setup.FloorSlopesAreWalls && 
+	if (coll->Setup.FloorSlopeIsWall && 
 		coll->FrontLeft.FloorSlope && 
 		coll->FrontLeft.Floor < 0)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.FloorSlopesArePits && 
+	else if (coll->Setup.FloorSlopeIsPit && 
 			 coll->FrontLeft.FloorSlope && 
 			 coll->FrontLeft.Floor > 0)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.CeilingSlopesAreWalls &&
+	else if (coll->Setup.CeilingSlopeIsWall &&
 			 coll->FrontLeft.CeilingSlope)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -546,19 +546,19 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	if (coll->Setup.FloorSlopesAreWalls && 
+	if (coll->Setup.FloorSlopeIsWall && 
 		coll->MiddleRight.FloorSlope && 
 		coll->MiddleRight.Floor < 0)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.FloorSlopesArePits && 
+	else if (coll->Setup.FloorSlopeIsPit && 
 			 coll->MiddleRight.FloorSlope && 
 			 coll->MiddleRight.Floor > 0)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.CeilingSlopesAreWalls &&
+	else if (coll->Setup.CeilingSlopeIsWall &&
 			 coll->MiddleRight.CeilingSlope)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -599,19 +599,19 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	if (coll->Setup.FloorSlopesAreWalls && 
+	if (coll->Setup.FloorSlopeIsWall && 
 		coll->FrontRight.FloorSlope && 
 		coll->FrontRight.Floor < 0)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.FloorSlopesArePits && 
+	else if (coll->Setup.FloorSlopeIsPit && 
 			 coll->FrontRight.FloorSlope && 
 			 coll->FrontRight.Floor > 0)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.CeilingSlopesAreWalls &&
+	else if (coll->Setup.CeilingSlopeIsWall &&
 			 coll->FrontRight.CeilingSlope)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
@@ -659,10 +659,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		coll->CollisionType = CT_TOP;
 	}
 
-	if (coll->Front.Floor > coll->Setup.BadFloorHeightDown ||
-		coll->Front.Floor < coll->Setup.BadFloorHeightUp ||
-		coll->Front.Ceiling > coll->Setup.BadCeilingHeightDown ||
-		coll->Front.Ceiling < coll->Setup.BadCeilingHeightUp ||
+	if (coll->Front.Floor > coll->Setup.LowerFloorBound ||
+		coll->Front.Floor < coll->Setup.UpperFloorBound ||
+		coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
+		coll->Front.Ceiling < coll->Setup.UpperCeilingBound ||
 		coll->Front.Floor - coll->Front.Ceiling <= 0)
 	{
 		if (coll->Front.HasDiagonalSplit())
@@ -692,8 +692,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->Front.Ceiling > coll->Setup.BadCeilingHeightDown ||
-		coll->Front.Ceiling < coll->Setup.BadCeilingHeightUp)
+	if (coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
+		coll->Front.Ceiling < coll->Setup.UpperCeilingBound)
 	{
 		coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 		coll->Shift.y = coll->Setup.OldPosition.y - yPos;
@@ -702,10 +702,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleLeft.Floor > coll->Setup.BadFloorHeightDown ||
-		coll->MiddleLeft.Floor < coll->Setup.BadFloorHeightUp ||
-		coll->MiddleLeft.Ceiling > coll->Setup.BadCeilingHeightDown ||
-		coll->MiddleLeft.Ceiling < coll->Setup.BadCeilingHeightUp ||
+	if (coll->MiddleLeft.Floor > coll->Setup.LowerFloorBound ||
+		coll->MiddleLeft.Floor < coll->Setup.UpperFloorBound ||
+		coll->MiddleLeft.Ceiling > coll->Setup.LowerCeilingBound ||
+		coll->MiddleLeft.Ceiling < coll->Setup.UpperCeilingBound ||
 		coll->MiddleLeft.Floor - coll->MiddleLeft.Ceiling <= 0)
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
@@ -754,10 +754,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		return;
 	}
 
-	if (coll->MiddleRight.Floor > coll->Setup.BadFloorHeightDown ||
-		coll->MiddleRight.Floor < coll->Setup.BadFloorHeightUp ||
-		coll->MiddleRight.Ceiling > coll->Setup.BadCeilingHeightDown ||
-		coll->MiddleRight.Ceiling < coll->Setup.BadCeilingHeightUp ||
+	if (coll->MiddleRight.Floor > coll->Setup.LowerFloorBound ||
+		coll->MiddleRight.Floor < coll->Setup.UpperFloorBound ||
+		coll->MiddleRight.Ceiling > coll->Setup.LowerCeilingBound ||
+		coll->MiddleRight.Ceiling < coll->Setup.UpperCeilingBound ||
 		coll->MiddleRight.Floor - coll->MiddleRight.Ceiling <= 0)
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)

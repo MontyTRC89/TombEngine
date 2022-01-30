@@ -36,7 +36,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -108,11 +108,11 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
-	coll->Setup.FloorSlopesArePits = true;
+	coll->Setup.LowerFloorBound = STEP_SIZE - 1;
+	coll->Setup.UpperFloorBound = -(STEP_SIZE - 1);
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.FloorSlopeIsPit = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -144,7 +144,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->look = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -180,11 +180,11 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	item->airborne = 0;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.LowerFloorBound = STEP_SIZE - 1;
+	coll->Setup.UpperFloorBound = -(STEP_SIZE - 1);
 	coll->Setup.ForwardAngle = item->pos.yRot;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.FloorSlopeIsWall = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
@@ -231,7 +231,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -287,7 +287,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (item->hitPoints <= 0)
@@ -348,7 +348,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -448,11 +448,11 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;
-	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
-	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopesAreWalls = true;
-	coll->Setup.FloorSlopesArePits = true;
+	coll->Setup.LowerFloorBound = STEP_SIZE - 1;
+	coll->Setup.UpperFloorBound = -(STEP_SIZE - 1);
+	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
+	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.FloorSlopeIsPit = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -483,7 +483,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -547,11 +547,11 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
-	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopesArePits = true;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.UpperFloorBound = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
+	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
+	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
@@ -588,7 +588,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->look = false;
 	info->gunStatus = LG_HANDS_BUSY;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -644,11 +644,11 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.BadFloorHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.BadFloorHeightUp = -(STEP_SIZE - 1);
-	coll->Setup.BadCeilingHeightDown = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopesArePits = true;
-	coll->Setup.FloorSlopesAreWalls = true;
+	coll->Setup.LowerFloorBound = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.UpperFloorBound = -(STEP_SIZE - 1);
+	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
+	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
@@ -684,7 +684,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -744,7 +744,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	Camera.targetElevation = -ANGLE(24.0f);
 
@@ -801,7 +801,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -810,9 +810,9 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		info->moveAngle = item->pos.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-		coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-		coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-		coll->Setup.BadCeilingHeightDown = BAD_JUMP_CEILING;
+		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = info->moveAngle;
 
 		MoveItem(item, item->pos.yRot, -STEP_SIZE);

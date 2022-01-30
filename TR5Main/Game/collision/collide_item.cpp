@@ -737,10 +737,10 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 			lara->hitFrame = 34;
 	}
 
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
-	coll->Setup.BadCeilingHeightUp = MAX_HEIGHT;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	auto facing = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = phd_atan(item2->pos.zPos - coll->Setup.OldPosition.z, item2->pos.xPos - coll->Setup.OldPosition.x);
@@ -814,9 +814,9 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	item->pos.xPos = mesh->pos.xPos + c * rx + s * rz;
 	item->pos.zPos = mesh->pos.zPos + c * rz - s * rx;
 
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = 0;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
 
 	auto oldFacing = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = phd_atan(item->pos.zPos - coll->Setup.OldPosition.z, item->pos.xPos - coll->Setup.OldPosition.x);
@@ -1759,9 +1759,9 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (coll->Setup.EnableObjectPush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
 				{
-					ItemPushItem(item, l, coll, coll->Setup.EnableSpaz, 0);
+					ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 0);
 				}
-				else if (coll->Setup.EnableSpaz)
+				else if (coll->Setup.EnableSpasm)
 				{
 					x = l->pos.xPos - item->pos.xPos;
 					z = l->pos.zPos - item->pos.zPos;

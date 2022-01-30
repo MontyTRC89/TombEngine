@@ -420,17 +420,17 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	SUB_INFO* UPVInfo = UPVItem->data;
 	COLL_INFO cinfo, * coll = &cinfo; // ??
 
-	coll->Setup.BadFloorHeightDown = NO_BAD_POS;
-	coll->Setup.BadFloorHeightUp = -SUB_HEIGHT;
-	coll->Setup.BadCeilingHeightDown = SUB_HEIGHT;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -SUB_HEIGHT;
+	coll->Setup.LowerCeilingBound = SUB_HEIGHT;
 	coll->Setup.OldPosition.x = UPVItem->pos.xPos;
 	coll->Setup.OldPosition.y = UPVItem->pos.yPos;
 	coll->Setup.OldPosition.z = UPVItem->pos.zPos;
 	coll->Setup.Radius = SUB_RADIUS;
-	coll->Setup.FloorSlopesAreWalls = false;
-	coll->Setup.FloorSlopesArePits = false;
+	coll->Setup.FloorSlopeIsWall = false;
+	coll->Setup.FloorSlopeIsPit = false;
 	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
@@ -445,7 +445,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (height < 200)
 		height = 200;
 
-	coll->Setup.BadFloorHeightUp = -height;
+	coll->Setup.UpperFloorBound = -height;
 	coll->Setup.Height = height;
 
 	GetCollisionInfo(coll, UPVItem, PHD_VECTOR(0, height / 2, 0));

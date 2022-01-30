@@ -8,8 +8,8 @@ struct FLOOR_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
 
-constexpr auto NO_BAD_POS = -NO_HEIGHT;	// used by coll->Setup.BadFloorHeightDown
-constexpr auto NO_BAD_NEG = NO_HEIGHT;	// used by coll->Setup.BadFloorHeightUp
+constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// used by coll->Setup.LowerFloorBound
+constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// used by coll->Setup.UpperFloorBound
 constexpr auto COLLISION_CHECK_DISTANCE = WALL_SIZE * 8;
 
 enum COLL_TYPE
@@ -68,21 +68,21 @@ struct COLL_SETUP
 {
 	COLL_PROBE_MODE Mode;		// Probe rotation mode
 
-	bool CeilingSlopesAreWalls;	// Treat steep slopes on ceilings as walls
-	bool FloorSlopesAreWalls;	// Treat steep slopes as walls
-	bool FloorSlopesArePits;	// Treat steep slopes as pits
+	bool CeilingSlopeIsWall;	// Treat steep slopes on ceilings as walls
+	bool FloorSlopeIsWall;		// Treat steep slopes as walls
+	bool FloorSlopeIsPit;		// Treat steep slopes as pits
 	bool DeathFlagIsPit;		// Treat death sectors as pits
 	bool NoMonkeyFlagIsWall;	// Treat non-monkey sectors as walls
 	bool EnableObjectPush;		// Can be pushed by objects
-	bool EnableSpaz;			// Push is treated as hurt
+	bool EnableSpasm;			// Convulse when pushed
 						    
 	int   Radius;				// Collision bounds horizontal size
 	int   Height;				// Collision bounds vertical size
 	short ForwardAngle;			// Forward angle direction
-	int   BadFloorHeightDown;	// Borderline floor step-up height 
-	int   BadFloorHeightUp;		// Borderline floor step-down height
-	int   BadCeilingHeightDown;	// Borderline ceiling step-up height
-	int   BadCeilingHeightUp;	// Borderline ceiling step-down height
+	int   LowerFloorBound;		// Borderline floor step-up height 
+	int   UpperFloorBound;		// Borderline floor step-down height
+	int   LowerCeilingBound;	// Borderline ceiling step-up height
+	int   UpperCeilingBound;	// Borderline ceiling step-down height
 
 	PHD_VECTOR OldPosition;		// Preserve old parameters to restore later
 	short OldAnimState;
