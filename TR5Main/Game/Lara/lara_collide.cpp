@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Scripting/ScriptInterfaceFlow.h"
-#include <ScriptInterfaceLevel.h>
+#include "Scripting/ScriptInterfaceLevel.h"
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
