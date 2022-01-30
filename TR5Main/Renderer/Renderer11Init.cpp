@@ -2,7 +2,7 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/winmain.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Quad/RenderQuad.h"
 #include "Specific/memory/Vector.h"
 #include <string>

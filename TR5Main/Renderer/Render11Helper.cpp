@@ -8,7 +8,7 @@
 #include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/ScriptInterfaceFlow.h"
 #include "Renderer\RenderView\RenderView.h"
 #include "Objects/TR3/Vehicles/quad.h"
 #include "Objects/TR3/Vehicles/rubberboat.h"
