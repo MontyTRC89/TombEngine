@@ -8,13 +8,6 @@ constexpr bool DebugBuild = false;
 #include <string_view>
 #include <iostream>
 
-inline void assertion(const bool& expr, const char* msg) 
-{
-	if constexpr (DebugBuild) {
-		if (!expr) throw std::runtime_error(msg);
-	}
-};
-
 enum class LogLevel
 {
 	Error,
@@ -36,4 +29,15 @@ class TENScriptException : public std::runtime_error
 {
 public:
 	using std::runtime_error::runtime_error;
+};
+
+inline void assertion(const bool& expr, const char* msg) 
+{
+	if constexpr (DebugBuild) {
+		if (!expr)
+		{
+			TENLog(msg, LogLevel::Error);
+			throw std::runtime_error(msg);
+		}
+	}
 };
