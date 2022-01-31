@@ -295,23 +295,10 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
-	{
-		if (TestLaraJumpUp(item, coll))
-		{
-			item->goalAnimState = LS_JUMP_UP;
-			info->jumpDirection = LaraJumpDirection::Up;
-		}
-		else
-		{
-			item->goalAnimState = LS_IDLE;
-			info->jumpDirection = LaraJumpDirection::None;
-		}
-
-		return;
-	}
+		info->jumpDirection = LaraJumpDirection::None;
 
 	if ((TrInput & IN_FORWARD ||
-			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_FORWARD;
@@ -319,16 +306,16 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
 		return;
 	}
-	
+
 	if ((TrInput & IN_LEFT ||
-			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_LEFT;
@@ -336,15 +323,15 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-			!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
 		return;
 	}
-	
-	// No directional key pressed and no directional lock; commit to jump up.
+
+	// No directional key pressed AND no directional lock; commit to jump up.
 	if (TestLaraJumpUp(item, coll))
 	{
 		item->goalAnimState = LS_JUMP_UP;
@@ -380,7 +367,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	default:
 		break;
 	}
-	
+
 	item->airborne = false;
 	item->fallspeed = 0; // TODO: Check this.
 	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
@@ -635,7 +622,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 			item->speed = -5;
 
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->pos.xRot += std::min((short)(LARA_LEAN_RATE / 3), (short)(abs(ANGLE(item->speed) - item->pos.xRot) / 3)) * 1;
+		item->pos.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->speed) - item->pos.xRot) / 3);
 		info->headYrot += (ANGLE(10.0f) - item->pos.zRot) / 3;
 	}
 	else
