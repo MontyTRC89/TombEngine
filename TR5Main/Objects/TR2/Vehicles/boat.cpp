@@ -930,10 +930,7 @@ void SpeedBoatControl(short itemNum)
 	int heightFrontLeft = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, -BOAT_SIDE, &frontLeft);
 	int heightFrontRight = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, BOAT_SIDE, &frontRight);
 
-	auto roomNum = sBoatItem->roomNumber;
-	auto floor = GetFloor(sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos, &roomNum);
-	auto height = GetFloorHeight(floor, sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos);
-	auto ceiling = GetCeiling(floor, sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos);
+	auto probe = GetCollisionResult(sBoatItem);
 
 	if (laraInfo->Vehicle == itemNum)
 	{
@@ -941,7 +938,7 @@ void SpeedBoatControl(short itemNum)
 		TestTriggers(sBoatItem, false);
 	}
 
-	auto water = GetWaterHeight(sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos, roomNum);
+	auto water = GetWaterHeight(sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos, probe.RoomNumber);
 	sBoatInfo->water = water;
 
 	if (laraInfo->Vehicle == itemNum && laraItem->hitPoints > 0)
@@ -977,9 +974,9 @@ void SpeedBoatControl(short itemNum)
 			sBoatInfo->boatTurn = 0;
 	}
 
-	sBoatItem->floor = height - 5;
+	sBoatItem->floor = probe.Position.Floor - 5;
 	if (sBoatInfo->water == NO_HEIGHT)
-		sBoatInfo->water = height;
+		sBoatInfo->water = probe.Position.Floor;
 	else
 		sBoatInfo->water -= 5;
 
@@ -990,14 +987,14 @@ void SpeedBoatControl(short itemNum)
 	if (ofs - sBoatItem->fallspeed > 32 && sBoatItem->fallspeed == 0 && water != NO_HEIGHT)
 		SpeedBoatSplash(sBoatItem, ofs - sBoatItem->fallspeed, water);
 
-	height = (frontLeft.y + frontRight.y);
-	if (height < 0)
-		height = -(abs(height) / 2);
+	probe.Position.Floor = (frontLeft.y + frontRight.y);
+	if (probe.Position.Floor < 0)
+		probe.Position.Floor = -(abs(probe.Position.Floor) / 2);
 	else
-		height /= 2;
+		probe.Position.Floor /= 2;
 
-	short xRot = phd_atan(BOAT_FRONT, sBoatItem->pos.yPos - height);
-	short zRot = phd_atan(BOAT_SIDE, height - frontLeft.y);
+	short xRot = phd_atan(BOAT_FRONT, sBoatItem->pos.yPos - probe.Position.Floor);
+	short zRot = phd_atan(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
 
 	sBoatItem->pos.xRot += ((xRot - sBoatItem->pos.xRot) / 2);
 	sBoatItem->pos.zRot += ((zRot - sBoatItem->pos.zRot) / 2);
@@ -1011,10 +1008,10 @@ void SpeedBoatControl(short itemNum)
 	{
 		SpeedBoatAnimation(laraItem, sBoatItem, collide);
 
-		if (roomNum != sBoatItem->roomNumber)
+		if (probe.RoomNumber != sBoatItem->roomNumber)
 		{
-			ItemNewRoom(laraInfo->Vehicle, roomNum);
-			ItemNewRoom(laraInfo->itemNumber, roomNum);
+			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
+			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
 		}
 
 		sBoatItem->pos.zRot += sBoatInfo->tiltAngle;
@@ -1038,8 +1035,8 @@ void SpeedBoatControl(short itemNum)
 	}
 	else
 	{
-		if (roomNum != sBoatItem->roomNumber)
-			ItemNewRoom(itemNum, roomNum);
+		if (probe.RoomNumber != sBoatItem->roomNumber)
+			ItemNewRoom(itemNum, probe.RoomNumber);
 
 		sBoatItem->pos.zRot += sBoatInfo->tiltAngle;
 	}
