@@ -710,8 +710,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			int waterDepth, waterHeight, heightFromWater;
 			PHD_VECTOR vec = { 0, 0, 0 };
 
-			waterDepth = GetWaterSurface(laraItem->pos.xPos, laraItem->pos.yPos, laraItem->pos.zPos, laraItem->roomNumber);
-			waterHeight = GetWaterHeight(laraItem->pos.xPos, laraItem->pos.yPos, laraItem->pos.zPos, laraItem->roomNumber);
+			waterDepth = GetWaterSurface(laraItem);
+			waterHeight = GetWaterHeight(laraItem);
 
 			if (waterHeight != NO_HEIGHT)
 				heightFromWater = laraItem->pos.yPos - waterHeight;
@@ -936,7 +936,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 
 	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
-	int waterHeight = GetWaterHeight(UPVItem->pos.xPos, UPVItem->pos.yPos, UPVItem->pos.zPos, UPVItem->roomNumber);
+	int waterHeight = GetWaterHeight(UPVItem);
 
 	if ((newHeight - waterHeight) < SUB_HEIGHT || (newHeight < UPVItem->pos.yPos - SUB_HEIGHT / 2))
 	{

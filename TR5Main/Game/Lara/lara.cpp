@@ -450,8 +450,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-	int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int waterDepth = GetWaterDepth(item);
+	int waterHeight = GetWaterHeight(item);
 
 	int heightFromWater;
 	if (waterHeight != NO_HEIGHT)
@@ -520,7 +520,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				info->waterStatus = LW_WADE;
 
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
-				if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
+				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
 					!isSwamp &&
 					item->airborne)
 				{
@@ -547,13 +547,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		case LW_UNDERWATER:
 			if (isWater ||
 				waterDepth == DEEP_WATER ||
-				abs(heightFromWater) >= STEP_SIZE ||
+				abs(heightFromWater) >= CLICK(1) ||
 				item->animNumber == LA_UNDERWATER_RESURFACE ||
 				item->animNumber == LA_ONWATER_DIVE)
 			{
 				if (!isWater)
 				{
-					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= STEP_SIZE)
+					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1))
 					{
 						SetAnimation(item, LA_FALL_START);
 						item->speed = item->fallspeed / 4;
@@ -948,7 +948,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
 	coll->Setup.LowerCeilingBound = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
-	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
+	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
@@ -1057,7 +1057,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(0.5f);
 	coll->Setup.LowerCeilingBound = LARA_RAD;
-	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
+	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;

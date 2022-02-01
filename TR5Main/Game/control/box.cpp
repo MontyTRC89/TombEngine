@@ -310,7 +310,7 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 	}
 	else
 	{
-		wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		wh = GetWaterHeight(item);
 	}
 
 	int y = wh + waterLevel;
@@ -344,7 +344,7 @@ void CreatureFloat(short itemNumber)
 	item->hitPoints = NOT_TARGETABLE;
 	item->pos.xRot = 0;
 
-	waterLevel = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	waterLevel = GetWaterHeight(item);
 
 	y = item->pos.yPos;
 	if (y > waterLevel)

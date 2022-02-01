@@ -1306,10 +1306,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 
 	bool collide = QuadDynamics(lara, quad);
 
-	short roomNumber = quad->roomNumber;
-	FLOOR_INFO* floor = GetFloor(quad->pos.xPos, quad->pos.yPos, quad->pos.zPos, &roomNumber);
-	auto height = GetFloorHeight(floor, quad->pos.xPos, quad->pos.yPos, quad->pos.zPos);
-	auto ceiling = GetCeiling(floor, quad->pos.xPos, quad->pos.yPos, quad->pos.zPos);
+	auto probe = GetCollisionResult(quad);
 
 	PHD_VECTOR frontLeft;
 	PHD_VECTOR frontRight;
@@ -1342,7 +1339,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 			break;
 
 		default:
-			drive = QuadUserControl(quad, height, &pitch);
+			drive = QuadUserControl(quad, probe.Position.Floor, &pitch);
 
 			break;
 		}
@@ -1367,7 +1364,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 		quadInfo->pitch = 0;
 	}
 
-	quad->floor = height;
+	quad->floor = probe.Position.Floor;
 
 	rotadd = quadInfo->velocity / 4;
 	quadInfo->rearRot -= rotadd;
@@ -1376,29 +1373,24 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 
 	quadInfo->leftFallspeed = DoQuadDynamics(floorHeightLeft, quadInfo->leftFallspeed, (int*)&frontLeft.y);
 	quadInfo->rightFallspeed = DoQuadDynamics(floorHeightRight, quadInfo->rightFallspeed, (int*)&frontRight.y);
-	quad->fallspeed = DoQuadDynamics(height, quad->fallspeed, (int*)&quad->pos.yPos);
+	quad->fallspeed = DoQuadDynamics(probe.Position.Floor, quad->fallspeed, (int*)&quad->pos.yPos);
 
-	height = (frontLeft.y + frontRight.y) / 2;
-	xRot = phd_atan(QUAD_FRONT, quad->pos.yPos - height);
-	zRot = phd_atan(QUAD_SIDE, height - frontLeft.y);
+	probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
+	xRot = phd_atan(QUAD_FRONT, quad->pos.yPos - probe.Position.Floor);
+	zRot = phd_atan(QUAD_SIDE, probe.Position.Floor - frontLeft.y);
 
 	quad->pos.xRot += ((xRot - quad->pos.xRot) / 2);
 	quad->pos.zRot += ((zRot - quad->pos.zRot) / 2);
 
 	if (!(quadInfo->flags & QUAD_FLAG_DEAD))
 	{
-		if (roomNumber != quad->roomNumber)
+		if (probe.RoomNumber != quad->roomNumber)
 		{
-			ItemNewRoom(laraInfo->Vehicle, roomNumber);
-			ItemNewRoom(laraInfo->itemNumber, roomNumber);
+			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
+			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
 		}
 
-		lara->pos.xPos = quad->pos.xPos;
-		lara->pos.yPos = quad->pos.yPos;
-		lara->pos.zPos = quad->pos.zPos;
-		lara->pos.xRot = quad->pos.xRot;
-		lara->pos.yRot = quad->pos.yRot;
-		lara->pos.zRot = quad->pos.zRot;
+		lara->pos = quad->pos;
 
 		AnimateQuadBike(lara, quad, collide, dead);
 		AnimateItem(lara);
