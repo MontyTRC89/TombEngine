@@ -274,7 +274,6 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->hitPoints <= 0)
 	{
 		item->goalAnimState = LS_IDLE;
-		info->jumpDirection = LaraJumpDirection::None;
 		return;
 	}
 
@@ -370,11 +369,11 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->airborne = false;
 	item->fallspeed = 0; // TODO: Check this.
-	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;		// Security.
+	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;	// Security.
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -777,12 +776,12 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 	auto bounds = GetBoundsAccurate(item);
-	auto realHeight = bounds->Y2 - bounds->Y1;
+	int realHeight = bounds->Y2 - bounds->Y1;
 
 	info->moveAngle = item->pos.yRot;
 	info->keepLow = TestLaraKeepLow(item, coll);
 	item->airborne = true;
-	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, (int)(realHeight * 0.7f));
+	coll->Setup.Height = std::max<int>(LARA_HEIGHT_CRAWL, realHeight * 0.7f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -828,6 +827,8 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
+		// TODO: Apply fall damage?
+
 		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
 			item->goalAnimState = LS_DEATH;
 		else
@@ -837,10 +838,9 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL &&
-		item->goalAnimState == LS_SWAN_DIVE_END)
+	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		item->goalAnimState = LS_JUMP_ROLL_180; // TODO: New state?
 		return;
 	}
 
