@@ -804,10 +804,10 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
 			if (!info->keepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
-				MoveItem(item, coll->Setup.ForwardAngle, STEP_SIZE / 2);
+				MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
 		}
 		else [[likely]]
-			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
+			SetAnimation(item, LA_SWANDIVE_ROLL);
 
 		item->fallspeed = 0;
 		item->airborne = false;

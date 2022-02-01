@@ -675,6 +675,11 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 }
 
+int GetWaterSurface(ITEM_INFO* item)
+{
+	return GetWaterSurface(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+}
+
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	ROOM_INFO *room = &g_Level.Rooms[roomNumber];
@@ -856,6 +861,11 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 	return 0;
 }
 
+int GetWaterDepth(ITEM_INFO* item)
+{
+	return GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+}
+
 int GetWaterDepth(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor;
@@ -929,6 +939,11 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 
 		return NO_HEIGHT;
 	}
+}
+
+int GetWaterHeight(ITEM_INFO* item)
+{
+	return GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 }
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)
