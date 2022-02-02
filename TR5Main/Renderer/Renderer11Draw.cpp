@@ -23,8 +23,8 @@
 #include "Objects/Effects/tr4_locusts.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
-#include <chrono>
 #include "Objects/Generic/Object/rope.h"
+#include <chrono>
 #include <algorithm>
 #include <execution>
 
@@ -240,7 +240,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = getMesh(Lara.meshPtrs[k]);
+			RendererMesh* mesh = GetMesh(Lara.meshPtrs[k]);
 
 			for (auto& bucket : mesh->buckets)
 			{
@@ -1531,7 +1531,7 @@ namespace TEN::Renderer
 
 				if (rat->on)
 				{
-					RendererMesh* mesh = getMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 					Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot),
 					                                                 TO_RAD(rat->pos.zRot));
@@ -1571,7 +1571,7 @@ namespace TEN::Renderer
 		{
 			OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
-			RendererMesh* mesh = getMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
+			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
 			for (int m = 0; m < 32; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
@@ -1631,7 +1631,7 @@ namespace TEN::Renderer
 
 				if (beetle->on)
 				{
-					RendererMesh* mesh = getMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
 						Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->pos.yRot), TO_RAD(beetle->pos.xRot),
@@ -1682,7 +1682,7 @@ namespace TEN::Renderer
 
 				if (locust->on)
 				{
-					RendererMesh* mesh = getMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
+					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 					Matrix translation =
 						Matrix::CreateTranslation(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos);
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.yRot, locust->pos.xRot,

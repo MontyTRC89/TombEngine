@@ -619,7 +619,7 @@ namespace TEN::Renderer
 		}
 
 	public:
-		RendererMesh* getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints,
+		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints,
 		                                        int isHairs, int* lastVertex, int* lastIndex);
 		void drawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame,
 		             bool poison);
@@ -688,7 +688,7 @@ namespace TEN::Renderer
 		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);
 
-		RendererMesh* getMesh(int meshIndex);
+		RendererMesh* GetMesh(int meshIndex);
 	private:
 		Texture2D createDefaultNormalTexture();
 		void drawFootprints(RenderView& view);
