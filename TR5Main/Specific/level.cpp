@@ -20,6 +20,7 @@
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
 #include "Scripting/ScriptInterfaceLevel.h"
+#include "Scripting/Entity/ScriptInterfaceEntity.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 
@@ -131,7 +132,7 @@ void LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddName(item->luaName, i);
+			g_GameScriptEntities->AddName(item->luaName, i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -374,7 +375,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddName(camera.luaName, camera);
+		g_GameScriptEntities->AddName(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -402,7 +403,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(sink.luaName, sink);
+		g_GameScriptEntities->AddName(sink.luaName, sink);
 	}
 }
 
@@ -740,7 +741,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -881,7 +882,7 @@ void LoadSoundSources()
 		ReadBytes(buffer, numBytes);
 		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(source.luaName, source);
+		g_GameScriptEntities->AddName(source.luaName, source);
 	}
 }
 
@@ -963,7 +964,7 @@ void LoadAIObjects()
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.luaName, obj);
 	}
 }
 
@@ -1096,7 +1097,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	GetCarriedItems();
 	GetAIPickups();
 	Lara.Vehicle = -1;
-	g_GameScript->AssignItemsAndLara();
+	g_GameScriptEntities->AssignLara();
 
 	// Level loaded
 	IsLevelLoading = false;
