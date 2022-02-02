@@ -13,13 +13,13 @@
 #include "Game/effects/effects.h"
 #include "Game/pickup/pickup.h"
 #include "Game/gui.h"
-#include "ObjectIDs.h"
 #include "GameScriptDisplayString.h"
 #include "GameScriptFreeFunctions.h"
 #include "ReservedScriptNames.h"
 #include "Game/camera.h"
 #include <Renderer/Renderer11Enums.h>
 #include "Game/effects/lightning.h"
+#include "ScriptUtil.h"
 
 using namespace TEN::Effects::Lightning;
 
@@ -28,20 +28,6 @@ Functions and callbacks for level-specific logic scripts.
 @files Level-specific
 @pragma nostrip
 */
-
-template <typename funcIndex, typename funcNewindex, typename obj>
-static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
-{
-	std::string metaName{ name + "Meta" };
-	auto meta = sol::table{ *state, sol::create };
-	state->set(metaName, meta);
-	meta.set("__metatable", "\"metatable is protected\"");
-	auto tab = state->create_named_table(name);
-	tab[sol::metatable_key] = meta;
-	state->set(metaName, sol::nil);
-	meta.set_function("__index", fi, objPtr);
-	meta.set_function("__newindex", fni, objPtr);
-}
 
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
@@ -67,7 +53,6 @@ with a call to @{ShowString}, or this function will have no effect.
 */
 	m_lua->set_function(ScriptReserved_HideString, [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
 
-	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
 	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();
