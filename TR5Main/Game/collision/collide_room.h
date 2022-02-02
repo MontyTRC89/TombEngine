@@ -5,6 +5,7 @@
 struct ITEM_INFO;
 struct COLL_INFO;
 struct FLOOR_INFO;
+struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
 
@@ -138,6 +139,7 @@ void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 
-bool TestEnvironment(RoomEnvFlags roomType, int roomNum);
-bool TestEnvironment(RoomEnvFlags roomType, ITEM_INFO* item);
-bool TestEnvironment(RoomEnvFlags roomType, int x, int y, int z, int roomNum);
+bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room);
+bool TestEnvironment(RoomEnvFlags envType, int roomNum);
+bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item);
+bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNum);

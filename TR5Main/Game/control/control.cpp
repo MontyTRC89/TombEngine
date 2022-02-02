@@ -675,42 +675,6 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	}
 }
 
-int GetWaterSurface(ITEM_INFO* item)
-{
-	return GetWaterSurface(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-}
-
-int GetWaterSurface(int x, int y, int z, short roomNumber)
-{
-	ROOM_INFO *room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO *floor = GetSector(room, x - room->x, z - room->z);
-
-	if (room->flags & ENV_FLAG_WATER)
-	{
-		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			if (!(room->flags & ENV_FLAG_WATER))
-				return (floor->CeilingHeight(x, z));
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return NO_HEIGHT;
-	}
-	else
-	{
-		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			if (room->flags & ENV_FLAG_WATER)
-				return (floor->FloorHeight(x, z));
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-	}
-
-	return NO_HEIGHT;
-}
-
 void UpdateShatters()
 {
 	if (!SmashedMeshCount)
@@ -831,94 +795,129 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
 }
 
-int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
+bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 {
-	if (1 << Node & item->meshBits)
+	if (1 << node & item->meshBits)
 	{
-		auto num = bits;
+		int num = bits;
 		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
-		{
 			SoundEffect(SFX_TR5_SMASH_METAL, &item->pos, 0);
-		}
 		else if (num == 256)
-		{
 			num = -64;
-		}
+
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
-		ShatterItem.bit = 1 << Node;
-		ShatterItem.meshp = &g_Level.Meshes[Objects[item->objectNumber].meshIndex + Node];
-		ShatterItem.sphere.x = CreatureSpheres[Node].x;
-		ShatterItem.sphere.y = CreatureSpheres[Node].y;
-		ShatterItem.sphere.z = CreatureSpheres[Node].z;
+		ShatterItem.bit = 1 << node;
+		ShatterItem.meshp = &g_Level.Meshes[Objects[item->objectNumber].meshIndex + node];
+		ShatterItem.sphere.x = CreatureSpheres[node].x;
+		ShatterItem.sphere.y = CreatureSpheres[node].y;
+		ShatterItem.sphere.z = CreatureSpheres[node].z;
 		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, num, item->roomNumber, NoXZVel);
+		ShatterObject(&ShatterItem, NULL, num, item->roomNumber, noXZVel);
 		item->meshBits &= ~ShatterItem.bit;
-		return 1;
+
+		return true;
 	}
-	return 0;
+
+	return false;
 }
 
-int GetWaterDepth(ITEM_INFO* item)
+int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
-	return GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
+	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
+
+	if (TestEnvironment(ENV_FLAG_WATER, room))
+	{
+		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			if (!TestEnvironment(ENV_FLAG_WATER, room))
+				return (floor->CeilingHeight(x, z));
+
+			floor = GetSector(room, x - room->x, z - room->z);
+		}
+
+		return NO_HEIGHT;
+	}
+	else
+	{
+		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		{
+			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			if (TestEnvironment(ENV_FLAG_WATER, room))
+				return (floor->FloorHeight(x, z));
+
+			floor = GetSector(room, x - room->x, z - room->z);
+		}
+	}
+
+	return NO_HEIGHT;
+}
+
+int GetWaterSurface(ITEM_INFO* item)
+{
+	return GetWaterSurface(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 }
 
 int GetWaterDepth(int x, int y, int z, short roomNumber)
 {
 	FLOOR_INFO* floor;
-	ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 
 	short roomIndex = NO_ROOM;
 	do
 	{
-		int zFloor = (z - r->z) / SECTOR(1);
-		int xFloor = (x - r->x) / SECTOR(1);
+		int zFloor = (z - room->z) / SECTOR(1);
+		int xFloor = (x - room->x) / SECTOR(1);
 
 		if (zFloor <= 0)
 		{
 			zFloor = 0;
 			if (xFloor < 1)
 				xFloor = 1;
-			else if (xFloor > r->xSize - 2)
-				xFloor = r->xSize - 2;
+			else if (xFloor > room->xSize - 2)
+				xFloor = room->xSize - 2;
 		}
-		else if (zFloor >= r->zSize - 1)
+		else if (zFloor >= room->zSize - 1)
 		{
-			zFloor = r->zSize - 1;
+			zFloor = room->zSize - 1;
 			if (xFloor < 1)
 				xFloor = 1;
-			else if (xFloor > r->xSize - 2)
-				xFloor = r->xSize - 2;
+			else if (xFloor > room->xSize - 2)
+				xFloor = room->xSize - 2;
 		}
 		else if (xFloor < 0)
 			xFloor = 0;
-		else if (xFloor >= r->xSize)
-			xFloor = r->xSize - 1;
+		else if (xFloor >= room->xSize)
+			xFloor = room->xSize - 1;
 
-		floor = &r->floor[zFloor + xFloor * r->zSize];
+		floor = &room->floor[zFloor + xFloor * room->zSize];
 		roomIndex = floor->WallPortal;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
-			r = &g_Level.Rooms[roomIndex];
+			room = &g_Level.Rooms[roomIndex];
 		}
 	} while (roomIndex != NO_ROOM);
 
-	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	if (TestEnvironment(ENV_FLAG_WATER, room) ||
+		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
+				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
-				int wh = floor->CeilingHeight(x, z);
+				int waterHeight = floor->CeilingHeight(x, z);
 				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - wh);
+				return (GetFloorHeight(floor, x, y, z) - waterHeight);
 			}
-			floor = GetSector(r, x - r->x, z - r->z);
+
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
 		return DEEP_WATER;
@@ -927,79 +926,86 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			if (TestEnvironment(ENV_FLAG_WATER, room) ||
+				TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
-				int wh = floor->FloorHeight(x, z);
+				int waterHeight = floor->FloorHeight(x, z);
 				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - wh);
+				return (GetFloorHeight(floor, x, y, z) - waterHeight);
 			}
-			floor = GetSector(r, x - r->x, z - r->z);
+
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
 		return NO_HEIGHT;
 	}
 }
 
-int GetWaterHeight(ITEM_INFO* item)
+
+int GetWaterDepth(ITEM_INFO* item)
 {
-	return GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	return GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 }
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
-	ROOM_INFO *r = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO *floor;
-	short adjoiningRoom = NO_ROOM;
+	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
+	FLOOR_INFO* floor;
 
+	short adjoiningRoom = NO_ROOM;
 	do
 	{
-		int xBlock = (x - r->x) / SECTOR(1);
-		int zBlock = (z - r->z) / SECTOR(1);
+		int xBlock = (x - room->x) / SECTOR(1);
+		int zBlock = (z - room->z) / SECTOR(1);
 
 		if (zBlock <= 0)
 		{
 			zBlock = 0;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->xSize - 2)
-				xBlock = r->xSize - 2;
+			else if (xBlock > room->xSize - 2)
+				xBlock = room->xSize - 2;
 		}
-		else if (zBlock >= r->zSize - 1)
+		else if (zBlock >= room->zSize - 1)
 		{
-			zBlock = r->zSize - 1;
+			zBlock = room->zSize - 1;
 			if (xBlock < 1)
 				xBlock = 1;
-			else if (xBlock > r->xSize - 2)
-				xBlock = r->xSize - 2;
+			else if (xBlock > room->xSize - 2)
+				xBlock = room->xSize - 2;
 		}
 		else if (xBlock < 0)
 			xBlock = 0;
-		else if (xBlock >= r->xSize)
-			xBlock = r->xSize - 1;
+		else if (xBlock >= room->xSize)
+			xBlock = room->xSize - 1;
 
-		floor = &r->floor[zBlock + xBlock * r->zSize];
+		floor = &room->floor[zBlock + xBlock * room->zSize];
 		adjoiningRoom = floor->WallPortal;
 
 		if (adjoiningRoom != NO_ROOM)
 		{
 			roomNumber = adjoiningRoom;
-			r = &g_Level.Rooms[adjoiningRoom];
+			room = &g_Level.Rooms[adjoiningRoom];
 		}
 	} while (adjoiningRoom != NO_ROOM);
 
 	if (floor->IsWall(x, z))
 		return NO_HEIGHT;
 
-	if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	if (TestEnvironment(ENV_FLAG_WATER, room) ||
+		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
 
-			if (!(r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP)))
+			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
+				!TestEnvironment(ENV_FLAG_SWAMP, room))
+			{
 				return GetCollisionResult(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
+			}
 
 			floor = GetSector(r, x - r->x, z - r->z);
 
@@ -1007,19 +1013,22 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 				break;
 		}
 
-		return r->maxceiling;
+		return room->maxceiling;
 	}
 	else
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			auto room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 
-			if (r->flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
-				return GetCollisionResult(x, r->minfloor, z, floor->RoomBelow(x, r->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, r->minfloor, z);
+			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
+				TestEnvironment(ENV_FLAG_SWAMP, room2))
+			{
+				return GetCollisionResult(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
 				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
+			}
 
-			floor = GetSector(r, x - r->x, z - r->z);
+			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
@@ -1029,20 +1038,25 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
+int GetWaterHeight(ITEM_INFO* item)
+{
+	return GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+}
+
 int GetDistanceToFloor(int itemNumber, bool precise)
 {
 	auto item = &g_Level.Items[itemNumber];
-	auto result = GetCollisionResult(item);
+	auto probe = GetCollisionResult(item);
 
 	// HACK: Remove item from bridge objects temporarily.
-	result.Block->RemoveItem(itemNumber);
-	auto height = GetFloorHeight(result.Block, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	result.Block->AddItem(itemNumber);
+	probe.Block->RemoveItem(itemNumber);
+	auto height = GetFloorHeight(probe.Block, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	probe.Block->AddItem(itemNumber);
 
 	auto bounds = GetBoundsAccurate(item);
 	int minHeight = precise ? bounds->Y2 : 0;
 
-	return minHeight + item->pos.yPos - height;
+	return (minHeight + item->pos.yPos - height);
 }
 
 void CleanUp()
