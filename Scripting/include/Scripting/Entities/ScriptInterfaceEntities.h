@@ -13,13 +13,13 @@ using VarMapVal = std::variant< short,
 
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 
-class ScriptInterfaceEntity {
+class ScriptInterfaceEntities {
 public:
-	virtual ~ScriptInterfaceEntity() = default;
+	virtual ~ScriptInterfaceEntities() = default;
 
 	virtual bool AddName(std::string const& key, VarMapVal val) = 0;
 	virtual void FreeEntities() = 0;
 	virtual void AssignLara() = 0;
 };
 
-extern ScriptInterfaceEntity* g_GameScriptEntities;
+extern ScriptInterfaceEntities* g_GameScriptEntities;

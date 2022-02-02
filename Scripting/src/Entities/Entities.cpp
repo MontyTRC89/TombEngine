@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
-#include "Entity.h"
+#include "Entities.h"
 
 GameEntities::GameEntities(sol::state* lua) : LuaHandler{ lua }
 {
