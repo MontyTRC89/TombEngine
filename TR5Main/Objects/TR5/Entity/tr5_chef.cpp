@@ -29,8 +29,8 @@ void InitialiseChef(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->goalAnimState = STATE_CHEF_COOKING;
-	item->currentAnimState = STATE_CHEF_COOKING;
+	item->targetState = STATE_CHEF_COOKING;
+	item->activeState = STATE_CHEF_COOKING;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->pos.xPos += 192 * phd_sin(item->pos.yRot);
 	item->pos.zPos += 192 * phd_cos(item->pos.yRot);
@@ -51,10 +51,10 @@ void ControlChef(short itemNumber)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != STATE_CHEF_DEATH)
+		if (item->activeState != STATE_CHEF_DEATH)
 		{
 			item->hitPoints = 0;
-			item->currentAnimState = STATE_CHEF_DEATH;
+			item->activeState = STATE_CHEF_DEATH;
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_CHEF_DEATH;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
@@ -105,7 +105,7 @@ void ControlChef(short itemNumber)
 
 		creature->maximumTurn = 0;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_CHEF_COOKING:
 			if (abs(LaraItem->pos.yPos - item->pos.yPos) < 1024
@@ -115,7 +115,7 @@ void ControlChef(short itemNumber)
 					|| item->hitStatus
 					|| TargetVisible(item, &laraInfo)))
 			{
-				item->goalAnimState = STATE_CHEF_TURN_180;
+				item->targetState = STATE_CHEF_TURN_180;
 				creature->alerted = true;
 				item->aiBits = 0;
 			}
@@ -168,16 +168,16 @@ void ControlChef(short itemNumber)
 			{
 				if (info.angle > 20480 || info.angle < -20480)
 				{
-					item->goalAnimState = STATE_CHEF_TURN_180;
+					item->targetState = STATE_CHEF_TURN_180;
 				}
 				else if (creature->mood == ATTACK_MOOD)
 				{
-					item->goalAnimState = STATE_CHEF_WALK;
+					item->targetState = STATE_CHEF_WALK;
 				}
 			}
 			else if (info.bite)
 			{
-				item->goalAnimState = STATE_CHEF_ATTACK;
+				item->targetState = STATE_CHEF_ATTACK;
 			}
 			break;
 
@@ -187,7 +187,7 @@ void ControlChef(short itemNumber)
 				|| info.angle > 20480
 				|| info.angle < -20480
 				|| creature->mood != ATTACK_MOOD)
-				item->goalAnimState = STATE_CHEF_AIM;
+				item->targetState = STATE_CHEF_AIM;
 			break;
 
 		default:

@@ -2039,12 +2039,12 @@ void GuiController::UseCurrentItem()
 		{
 			if (Lara.gunStatus == LG_HANDS_FREE)
 			{
-				if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
-					LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
-					LaraItem->currentAnimState != LS_CRAWL_TURN_LEFT &&
-					LaraItem->currentAnimState != LS_CRAWL_TURN_RIGHT &&
-					LaraItem->currentAnimState != LS_CRAWL_BACK &&
-					LaraItem->currentAnimState != LS_CRAWL_TO_HANG)
+				if (LaraItem->activeState != LS_CRAWL_IDLE &&
+					LaraItem->activeState != LS_CRAWL_FORWARD &&
+					LaraItem->activeState != LS_CRAWL_TURN_LEFT &&
+					LaraItem->activeState != LS_CRAWL_TURN_RIGHT &&
+					LaraItem->activeState != LS_CRAWL_BACK &&
+					LaraItem->activeState != LS_CRAWL_TO_HANG)
 				{
 					if (Lara.gunType != WEAPON_FLARE)
 					{
@@ -2065,7 +2065,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->currentAnimState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
+			if (((LaraItem->activeState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
 				|| (Lara.isLow && !(TrInput & IN_CROUCH)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
@@ -2149,15 +2149,15 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (LaraItem->currentAnimState == LS_CRAWL_IDLE ||
-		LaraItem->currentAnimState == LS_CRAWL_FORWARD ||
-		LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
-		LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
-		LaraItem->currentAnimState == LS_CRAWL_BACK ||
-		LaraItem->currentAnimState == LS_CRAWL_TO_HANG ||
-		LaraItem->currentAnimState == LS_CROUCH_IDLE ||
-		LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
-		LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
+	if (LaraItem->activeState == LS_CRAWL_IDLE ||
+		LaraItem->activeState == LS_CRAWL_FORWARD ||
+		LaraItem->activeState == LS_CRAWL_TURN_LEFT ||
+		LaraItem->activeState == LS_CRAWL_TURN_RIGHT ||
+		LaraItem->activeState == LS_CRAWL_BACK ||
+		LaraItem->activeState == LS_CRAWL_TO_HANG ||
+		LaraItem->activeState == LS_CROUCH_IDLE ||
+		LaraItem->activeState == LS_CROUCH_TURN_LEFT ||
+		LaraItem->activeState == LS_CROUCH_TURN_RIGHT)
 	{
 		SayNo();
 		return;

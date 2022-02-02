@@ -55,10 +55,10 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		}
 
 		grenadeItem->speed = 32;
-		grenadeItem->currentAnimState = grenadeItem->pos.xRot;
+		grenadeItem->activeState = grenadeItem->pos.xRot;
 		grenadeItem->fallspeed = -32 * phd_sin(grenadeItem->pos.xRot);
-		grenadeItem->goalAnimState = grenadeItem->pos.yRot;
-		grenadeItem->requiredAnimState = 0;
+		grenadeItem->targetState = grenadeItem->pos.yRot;
+		grenadeItem->requiredState = 0;
 		grenadeItem->hitPoints = 120;
 
 		AddActiveItem(grenadeItemNumber);
@@ -162,7 +162,7 @@ void EnemyJeepControl(short itemNumber)
 
 		PHD_VECTOR pos;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 0:
 		case 2:
@@ -178,10 +178,10 @@ void EnemyJeepControl(short itemNumber)
 			GetJointAbsPosition(item, &pos, 11);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 			
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (info.distance > SQUARE(1024) || Lara.location >= item->itemFlags[3])
-				item->goalAnimState = 1;
+				item->targetState = 1;
 
 			break;
 
@@ -197,12 +197,12 @@ void EnemyJeepControl(short itemNumber)
 			{
 				if (info.angle < -256)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 
 			break;
@@ -212,7 +212,7 @@ void EnemyJeepControl(short itemNumber)
 			item->itemFlags[0] += 18;
 			if (item->itemFlags[0] > 8704)
 				item->itemFlags[0] = 8704;
-			item->goalAnimState = 1;
+			item->targetState = 1;
 
 			break;
 
@@ -228,13 +228,13 @@ void EnemyJeepControl(short itemNumber)
 
 		if (height3 <= item->floor + 512)
 		{
-			if (height4 > item->floor + 512 && item->currentAnimState != 5)
+			if (height4 > item->floor + 512 && item->activeState != 5)
 			{
 				item->itemFlags[1] = 0;
 				item->animNumber = Objects[item->objectNumber].animIndex + 8;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->currentAnimState = 5;
-				item->goalAnimState = 1;
+				item->activeState = 5;
+				item->targetState = 1;
 			}
 		}
 		else
@@ -255,7 +255,7 @@ void EnemyJeepControl(short itemNumber)
 			if (creature->LOT.requiredBox & 8)
 			{
 				creature->maximumTurn = 0;
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 		}
 
@@ -266,12 +266,12 @@ void EnemyJeepControl(short itemNumber)
 		{
 			TestTriggers(target->pos.xPos,target->pos.yPos,target->pos.zPos,target->roomNumber, true);
 
-			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
+			if (Lara.location < item->itemFlags[3] && item->activeState != 2 && item->targetState != 2)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 1;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->goalAnimState = 2;
-				item->currentAnimState = 2;
+				item->targetState = 2;
+				item->activeState = 2;
 
 				if (target->flags & 4)
 				{

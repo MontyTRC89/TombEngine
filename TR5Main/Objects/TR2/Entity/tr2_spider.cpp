@@ -47,7 +47,7 @@ static void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 2;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = 5;
+	item->activeState = 5;
 
 	CreatureAnimation(itemNum, angle, 0);
 }
@@ -68,11 +68,11 @@ void SmallSpiderControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 7)
+		if (item->activeState != 7)
 		{
 			ExplodingDeath(itemNum, -1, 256);
 			DisableBaddieAI(itemNum);
-			item->currentAnimState = 7;
+			item->activeState = 7;
 			KillItem(itemNum);
 		}
 	}
@@ -83,7 +83,7 @@ void SmallSpiderControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, ANGLE(8));
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			spider->flags = 0;
@@ -91,21 +91,21 @@ void SmallSpiderControl(short itemNum)
 			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
 					break;
 			}
 			else if (info.ahead && item->touchBits)
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			else if (spider->mood == STALK_MOOD)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -113,13 +113,13 @@ void SmallSpiderControl(short itemNum)
 			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
 					break;
 			}
 			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -127,13 +127,13 @@ void SmallSpiderControl(short itemNum)
 			spider->flags = 0;
 
 			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (info.ahead && item->touchBits)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 5))
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			break;
 
 		case 4:
@@ -151,7 +151,7 @@ void SmallSpiderControl(short itemNum)
 	}
 
 
-	if (item->currentAnimState == 5 || item->currentAnimState == 4)
+	if (item->activeState == 5 || item->activeState == 4)
 		CreatureAnimation(itemNum, angle, 0);
 	else
 		SpiderLeap(itemNum, item, angle);
@@ -173,11 +173,11 @@ void BigSpiderControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 7)
+		if (item->activeState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 2;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 7;
+			item->activeState = 7;
 		}
 	}
 	else
@@ -187,7 +187,7 @@ void BigSpiderControl(short itemNum)
 		CreatureMood(item, &info, TRUE);
 		angle = CreatureTurn(item, ANGLE(4));
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			spider->flags = 0;
@@ -195,21 +195,21 @@ void BigSpiderControl(short itemNum)
 			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x200)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
 					break;
 			}
 			else if (info.ahead && info.distance < (SQUARE(STEP_SIZE * 3) + 15))
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			else if (spider->mood == STALK_MOOD)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -217,13 +217,13 @@ void BigSpiderControl(short itemNum)
 			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x200)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
 					break;
 			}
 			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -231,9 +231,9 @@ void BigSpiderControl(short itemNum)
 			spider->flags = 0;
 
 			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (info.ahead && item->touchBits)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 4:

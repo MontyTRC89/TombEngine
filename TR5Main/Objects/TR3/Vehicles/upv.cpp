@@ -461,7 +461,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		{
 			if (abs(UPVInfo->Vel) >= MAX_SPEED)
 			{
-				laraItem->goalAnimState = UPV_STATE_HIT;
+				laraItem->targetState = UPV_STATE_HIT;
 				UPVInfo->Vel = -UPVInfo->Vel / 2;
 			}
 			else
@@ -505,12 +505,12 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	int anim = laraItem->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
 	int frame = laraItem->frameNumber - g_Level.Anims[laraItem->animNumber].frameBase;
 
-	switch (laraItem->currentAnimState)
+	switch (laraItem->activeState)
 	{
 	case UPV_STATE_MOVE:
 		if (laraItem->hitPoints <= 0)
 		{
-			laraItem->goalAnimState = UPV_STATE_DEATH;
+			laraItem->targetState = UPV_STATE_DEATH;
 			break;
 		}
 
@@ -563,14 +563,14 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		}
 
 		else
-			laraItem->goalAnimState = UPV_STATE_IDLE;
+			laraItem->targetState = UPV_STATE_IDLE;
 
 		break;
 
 	case UPV_STATE_IDLE:
 		if (laraItem->hitPoints <= 0)
 		{
-			laraItem->goalAnimState = UPV_STATE_DEATH;
+			laraItem->targetState = UPV_STATE_DEATH;
 			break;
 		}
 
@@ -615,9 +615,9 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			else
 			{
 				if (UPVInfo->Flags & UPV_SURFACE)
-					laraItem->goalAnimState = UPV_STATE_DISMOUNT_SURFACE;
+					laraItem->targetState = UPV_STATE_DISMOUNT_SURFACE;
 				else
-					laraItem->goalAnimState = UPV_STATE_DISMOUNT_UNDERWATER;
+					laraItem->targetState = UPV_STATE_DISMOUNT_UNDERWATER;
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
@@ -635,7 +635,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 				UPVInfo->Flags |= UPV_DIVE;
 			}
 
-			laraItem->goalAnimState = UPV_STATE_MOVE;
+			laraItem->targetState = UPV_STATE_MOVE;
 		}
 
 		break;
@@ -884,15 +884,15 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->pos.zRot = UPVItem->pos.zRot;
 		UPVItem->hitPoints = 1;
 
-		if (laraItem->currentAnimState == LS_ONWATER_STOP || laraItem->currentAnimState == LS_ONWATER_FORWARD)
+		if (laraItem->activeState == LS_ONWATER_STOP || laraItem->activeState == LS_ONWATER_FORWARD)
 		{
 			laraItem->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
-			laraItem->currentAnimState = laraItem->goalAnimState = UPV_STATE_MOUNT;
+			laraItem->activeState = laraItem->targetState = UPV_STATE_MOUNT;
 		}
 		else
 		{
 			laraItem->animNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
-			laraItem->currentAnimState = laraItem->goalAnimState = UPV_STATE_MOUNT;
+			laraItem->activeState = laraItem->targetState = UPV_STATE_MOUNT;
 		}
 		laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
 
@@ -1018,9 +1018,9 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			UPVInfo->Flags & UPV_CONTROL &&
 			!UPVInfo->WeaponTimer)
 		{
-			if (laraItem->currentAnimState != UPV_STATE_DISMOUNT_UNDERWATER &&
-				laraItem->currentAnimState != UPV_STATE_DISMOUNT_SURFACE &&
-				laraItem->currentAnimState != UPV_STATE_MOUNT)
+			if (laraItem->activeState != UPV_STATE_DISMOUNT_UNDERWATER &&
+				laraItem->activeState != UPV_STATE_DISMOUNT_SURFACE &&
+				laraItem->activeState != UPV_STATE_MOUNT)
 			{
 				FireSubHarpoon(laraItem, UPVItem);
 				UPVInfo->WeaponTimer = HARPOON_RELOAD;

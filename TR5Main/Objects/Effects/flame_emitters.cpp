@@ -646,7 +646,7 @@ namespace TEN::Entities::Effects
 			|| Lara.litTorch == (item->status & 1)
 			|| item->timer == -1
 			|| !(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_IDLE
+			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| l->airborne)
 		{
@@ -702,7 +702,7 @@ namespace TEN::Entities::Effects
 					l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
 
-				l->currentAnimState = LS_MISC_CONTROL;
+				l->activeState = LS_MISC_CONTROL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.flareControlLeft = false;
 				Lara.leftArm.lock = 3;
@@ -714,7 +714,7 @@ namespace TEN::Entities::Effects
 
 		if (Lara.interactedItem == itemNumber
 			&& item->status != ITEM_ACTIVE
-			&& l->currentAnimState == LS_MISC_CONTROL)
+			&& l->activeState == LS_MISC_CONTROL)
 		{
 			if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 			{

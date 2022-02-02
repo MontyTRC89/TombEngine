@@ -13,8 +13,8 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		item->animNumber = Objects[item->objectNumber].animIndex + 1;
-		item->goalAnimState = 2;
-		item->currentAnimState = 2;
+		item->targetState = 2;
+		item->activeState = 2;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		item->itemFlags[2] = abs(item->triggerFlags);
 	}
@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			if (item->currentAnimState == 2)
+			if (item->activeState == 2)
 			{
 				if (item->itemFlags[2] > 1)
 				{
@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->itemFlags[2] == 1)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 					item->itemFlags[2] = 0;
 				}
 				else if (item->itemFlags[2] == 0)

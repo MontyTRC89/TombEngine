@@ -20,8 +20,8 @@ void InitialiseWildBoar(short itemNumber)
 
 	item->animNumber = Objects[ID_WILD_BOAR].animIndex + 6;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->targetState = 1;
+	item->activeState = 1;
 }
 
 void WildBoarControl(short itemNumber)
@@ -95,13 +95,13 @@ void WildBoarControl(short itemNumber)
 			joint3 = info.angle / 2;
 		}
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->maximumTurn = 0;
 			if (info.ahead && info.distance || item->flags)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (GetRandomControl() & 0x7F)
 			{
@@ -110,7 +110,7 @@ void WildBoarControl(short itemNumber)
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -118,11 +118,11 @@ void WildBoarControl(short itemNumber)
 			creature->maximumTurn = 0;
 			if (info.ahead && info.distance)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else if (!(GetRandomControl() & 0x7F))
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 
@@ -140,7 +140,7 @@ void WildBoarControl(short itemNumber)
 			}
 			if (!item->flags && (info.distance < 0x10000 && info.bite))
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 				if (creature->enemy == LaraItem)
 				{
 					LaraItem->hitPoints -= 30;
@@ -161,10 +161,10 @@ void WildBoarControl(short itemNumber)
 	else
 	{
 		item->hitPoints = 0;
-		if (item->currentAnimState != 5)
+		if (item->activeState != 5)
 		{
 			item->animNumber = Objects[ID_WILD_BOAR].animIndex + 5;
-			item->currentAnimState = 5;
+			item->activeState = 5;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}

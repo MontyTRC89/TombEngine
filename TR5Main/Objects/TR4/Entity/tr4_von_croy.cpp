@@ -51,8 +51,8 @@ void InitialiseVonCroy(short itemNumber)
 	
 	item->animNumber = Objects[item->objectNumber].animIndex + 11;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
-	item->currentAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
+	item->targetState = STATE_VON_CROY_TOGGLE_KNIFE;
+	item->activeState = STATE_VON_CROY_TOGGLE_KNIFE;
 	item->swapMeshFlags = SWAPMESHFLAGS_VON_CROY;
 
 	memset(VonCroyPassedWaypoints, 0, 128);
@@ -289,9 +289,9 @@ void VonCroyControl(short itemNumber)
 	short rot = 0;
 	int dy, height, ceiling, flags;
 
-	TENLog("State:" + std::to_string(item->currentAnimState), LogLevel::Info);
+	TENLog("State:" + std::to_string(item->activeState), LogLevel::Info);
 	
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case STATE_VON_CROY_STOP:
 		creature->LOT.isMonkeying = false;
@@ -308,13 +308,13 @@ void VonCroyControl(short itemNumber)
 		if (item->aiBits & GUARD)
 		{
 			joint3 = AIGuard(creature);
-			item->goalAnimState = 0;
+			item->targetState = 0;
 			break;
 		}
 
 		if (item->aiBits & MODIFY)
 		{
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			if (item->floor > item->pos.yPos + (STEP_SIZE * 3))
 				item->aiBits &= ~MODIFY;
 			break;
@@ -324,11 +324,11 @@ void VonCroyControl(short itemNumber)
 		{
 			if (item->itemFlags[2] != VON_CROY_FLAG_JUMP && !canJump2blocks)
 			{
-				item->goalAnimState = STATE_VON_CROY_JUMP_BACK;
+				item->targetState = STATE_VON_CROY_JUMP_BACK;
 			}
 			else
 			{
-				item->goalAnimState = STATE_VON_CROY_RUN;
+				item->targetState = STATE_VON_CROY_RUN;
 			}
 			break;
 		}
@@ -337,14 +337,14 @@ void VonCroyControl(short itemNumber)
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 22;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = STATE_VON_CROY_JUMP;
+			item->activeState = STATE_VON_CROY_JUMP;
 			creature->LOT.isJumping = true;
 
 			if (!canJump2blocks && !canJump3blocks)
-				item->goalAnimState = STATE_VON_CROY_JUMP;
+				item->targetState = STATE_VON_CROY_JUMP;
 			else
 			{
-				item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
+				item->targetState = STATE_VON_CROY_JUMP_2BLOCKS;
 			}
 			break;
 		}
@@ -356,9 +356,9 @@ void VonCroyControl(short itemNumber)
 			if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 			{
 				if (item->swapMeshFlags == SWAPMESHFLAGS_VON_CROY)
-					item->goalAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
+					item->targetState = STATE_VON_CROY_TOGGLE_KNIFE;
 				else
-					item->goalAnimState = STATE_VON_CROY_START_MONKEY;
+					item->targetState = STATE_VON_CROY_START_MONKEY;
 				break;
 			}
 		}
@@ -372,16 +372,16 @@ void VonCroyControl(short itemNumber)
 					if (enemy->hitPoints > 0 && info.ahead)
 					{
 						if (abs(enemy->pos.yPos - item->pos.yPos + 512) < 512)
-							item->goalAnimState = STATE_VON_CROY_KNIFE_ATTACK_HIGH;
+							item->targetState = STATE_VON_CROY_KNIFE_ATTACK_HIGH;
 						else
-							item->goalAnimState = STATE_VON_CROY_KNIFE_ATTACK_LOW;
+							item->targetState = STATE_VON_CROY_KNIFE_ATTACK_LOW;
 						break;
 					}
 				}
 			}
 		}
 
-		item->goalAnimState = STATE_VON_CROY_WALK;
+		item->targetState = STATE_VON_CROY_WALK;
 		break;
 
 	case STATE_VON_CROY_WALK:
@@ -402,13 +402,13 @@ void VonCroyControl(short itemNumber)
 		if (canJump1block || canJump2blocks || canJump3blocks)
 		{
 			creature->maximumTurn = 0;
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 
 		if (creature->reachedGoal && creature->monkeyAhead)
 		{
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 
@@ -423,7 +423,7 @@ void VonCroyControl(short itemNumber)
 
 				break;
 			}
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 		else
@@ -438,27 +438,27 @@ void VonCroyControl(short itemNumber)
 						{
 							if (info.distance > 0x1000000)
 							{
-								item->goalAnimState = STATE_VON_CROY_RUN;
+								item->targetState = STATE_VON_CROY_RUN;
 							}
 						}
 						else
 						{
-							item->goalAnimState = STATE_VON_CROY_STOP;
+							item->targetState = STATE_VON_CROY_STOP;
 						}
 					}
 					else if (Lara.location > item->itemFlags[3] && laraInfo.distance > 0x400000)
 					{
-						item->goalAnimState = STATE_VON_CROY_RUN;
+						item->targetState = STATE_VON_CROY_RUN;
 					}
 				}
 				else
 				{
-					item->goalAnimState = STATE_VON_CROY_STOP;
+					item->targetState = STATE_VON_CROY_STOP;
 				}
 			}
 			else
 			{
-				item->goalAnimState = STATE_VON_CROY_STOP;
+				item->targetState = STATE_VON_CROY_STOP;
 			}
 		}
 
@@ -466,7 +466,7 @@ void VonCroyControl(short itemNumber)
 		{
 			if (info.distance < SQUARE(1024))
 			{
-				item->goalAnimState = STATE_VON_CROY_STOP;
+				item->targetState = STATE_VON_CROY_STOP;
 				break;
 			}
 		}
@@ -475,7 +475,7 @@ void VonCroyControl(short itemNumber)
 			!(creature->jumpAhead) &&
 			info.distance > SQUARE(1024))
 		{
-			item->goalAnimState = STATE_VON_CROY_RUN;
+			item->targetState = STATE_VON_CROY_RUN;
 		}
 		break;
 
@@ -488,7 +488,7 @@ void VonCroyControl(short itemNumber)
 		if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
 		{
 			creature->maximumTurn = 0;
-			item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
+			item->targetState = STATE_VON_CROY_JUMP_2BLOCKS;
 			break;
 		}
 
@@ -497,7 +497,7 @@ void VonCroyControl(short itemNumber)
 
 		if (info.distance < SQUARE(2048) || Lara.location < item->locationAI)
 		{
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 
@@ -512,7 +512,7 @@ void VonCroyControl(short itemNumber)
 				break;
 			}
 
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 
@@ -524,13 +524,13 @@ void VonCroyControl(short itemNumber)
 			|| info.distance < SQUARE(1024)
 			|| creature->jumpAhead)
 		{
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 			break;
 		}
 
 		if (info.distance < SQUARE(1024))
 		{
-			item->goalAnimState = STATE_VON_CROY_WALK;
+			item->targetState = STATE_VON_CROY_WALK;
 			break;
 		}
 
@@ -540,7 +540,7 @@ void VonCroyControl(short itemNumber)
 		creature->maximumTurn = 0;
 		if (item->boxNumber != creature->LOT.targetBox && creature->monkeyAhead) 
 		{
-			item->goalAnimState = STATE_VON_CROY_MONKEY;
+			item->targetState = STATE_VON_CROY_MONKEY;
 		}
 		else
 		{
@@ -548,7 +548,7 @@ void VonCroyControl(short itemNumber)
 			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			if (ceiling == height - 1536)
-				item->goalAnimState = STATE_VON_CROY_STOP;
+				item->targetState = STATE_VON_CROY_STOP;
 		}
 
 		break;
@@ -563,7 +563,7 @@ void VonCroyControl(short itemNumber)
 			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 			if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-				item->goalAnimState = STATE_VON_CROY_START_MONKEY;
+				item->targetState = STATE_VON_CROY_START_MONKEY;
 		}
 
 		break;
@@ -595,8 +595,8 @@ void VonCroyControl(short itemNumber)
 			if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
 			{
 				creature->maximumTurn = 0;
-				item->currentAnimState = STATE_VON_CROY_JUMP;
-				item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
+				item->activeState = STATE_VON_CROY_JUMP;
+				item->targetState = STATE_VON_CROY_JUMP_2BLOCKS;
 				item->animNumber = Objects[item->objectNumber].animIndex + 22;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				creature->LOT.isJumping = true;
@@ -620,12 +620,12 @@ void VonCroyControl(short itemNumber)
 		}
 		else if (canJump1block)
 		{
-			item->goalAnimState = STATE_VON_CROY_JUMP;
+			item->targetState = STATE_VON_CROY_JUMP;
 		}
 
 		if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
 		{
-			item->goalAnimState = 33;
+			item->targetState = 33;
 		}
 
 		break;
@@ -710,11 +710,11 @@ void VonCroyControl(short itemNumber)
 
 		/*if (!creature->reachedGoal) 
 		{
-			item->goalAnimState = STATE_VON_CROY_CLIMB_LADDER_RIGHT;
+			item->targetState = STATE_VON_CROY_CLIMB_LADDER_RIGHT;
 		}
 		else
 		{*/
-			item->goalAnimState = STATE_VON_CROY_LADDER_CLIMB_UP;
+			item->targetState = STATE_VON_CROY_LADDER_CLIMB_UP;
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 			item->aiBits = FOLLOW;
@@ -799,7 +799,7 @@ void VonCroyControl(short itemNumber)
 		{
 			if (GetRandomControl() & 0x1F)
 				break;
-			item->goalAnimState = STATE_VON_CROY_STOP;
+			item->targetState = STATE_VON_CROY_STOP;
 		}
 
 		creature->reachedGoal = false;
@@ -817,8 +817,8 @@ void VonCroyControl(short itemNumber)
 			flags = 0;
 		}
 		
-		item->goalAnimState = STATE_VON_CROY_WALK;
-		item->requiredAnimState = STATE_VON_CROY_RUN;
+		item->targetState = STATE_VON_CROY_WALK;
+		item->requiredState = STATE_VON_CROY_RUN;
 		item->itemFlags[2] = 0;
 		//if (sVar3 == -1) goto LAB_0041a991;
 		if (!flags)
@@ -849,63 +849,63 @@ void VonCroyControl(short itemNumber)
 	CreatureJoint(item, 2, joint2);
 	CreatureJoint(item, 3, joint3);
 	
-	if ((item->currentAnimState < 15) && (item->currentAnimState != 5)) 
+	if ((item->activeState < 15) && (item->activeState != 5)) 
 	{
 		switch (CreatureVault(itemNumber, angle, 2, 260)) 
 		{
 		case 2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex+29;
-			item->currentAnimState = 19;
+			item->activeState = 19;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 28;
-			item->currentAnimState = 18;
+			item->activeState = 18;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 27;
-			item->currentAnimState = 17;
+			item->activeState = 17;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 7:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 37;
-			item->currentAnimState = 27;
+			item->activeState = 27;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -7:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 36;
-			item->currentAnimState = 26;
+			item->activeState = 26;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 35;
-			item->currentAnimState = 25;
+			item->activeState = 25;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 41;
-			item->currentAnimState = 24;
+			item->activeState = 24;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -2:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex + 42;
-			item->currentAnimState = 23;
+			item->activeState = 23;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 

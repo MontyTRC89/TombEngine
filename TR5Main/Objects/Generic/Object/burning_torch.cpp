@@ -78,12 +78,12 @@ namespace TEN::Entities::Generic
 			if (TrInput & IN_DRAW
 				&& !(LaraItem->airborne)
 				&& !LaraItem->fallspeed
-				&& LaraItem->currentAnimState != LS_JUMP_PREPARE
-				&& LaraItem->currentAnimState != LS_JUMP_UP
-				&& LaraItem->currentAnimState != LS_JUMP_FORWARD
-				&& LaraItem->currentAnimState != LS_JUMP_BACK
-				&& LaraItem->currentAnimState != LS_JUMP_LEFT
-				&& LaraItem->currentAnimState != LS_JUMP_RIGHT
+				&& LaraItem->activeState != LS_JUMP_PREPARE
+				&& LaraItem->activeState != LS_JUMP_UP
+				&& LaraItem->activeState != LS_JUMP_FORWARD
+				&& LaraItem->activeState != LS_JUMP_BACK
+				&& LaraItem->activeState != LS_JUMP_LEFT
+				&& LaraItem->activeState != LS_JUMP_RIGHT
 				|| Lara.waterStatus == LW_UNDERWATER)
 			{
 				Lara.leftArm.lock = true;
@@ -141,7 +141,7 @@ namespace TEN::Entities::Generic
 			}
 			break;
 		case 3:
-			if (LaraItem->currentAnimState != LS_MISC_CONTROL)
+			if (LaraItem->activeState != LS_MISC_CONTROL)
 			{
 				Lara.leftArm.lock = false;
 				Lara.leftArm.frameNumber = 0;
@@ -294,7 +294,7 @@ namespace TEN::Entities::Generic
 			|| Lara.litTorch == (item->status == ITEM_ACTIVE)
 			|| item->timer == -1
 			|| !(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_IDLE
+			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| l->airborne)
 		{
@@ -347,7 +347,7 @@ namespace TEN::Entities::Generic
 					l->itemFlags[3] = 1;
 					l->animNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
-				l->currentAnimState = LS_MISC_CONTROL;
+				l->activeState = LS_MISC_CONTROL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.flareControlLeft = false;
 				Lara.leftArm.lock = 3;
@@ -356,7 +356,7 @@ namespace TEN::Entities::Generic
 
 			item->pos.yRot = rot;
 		}
-		if (Lara.interactedItem == itemNumber && item->status != ITEM_ACTIVE && l->currentAnimState == LS_MISC_CONTROL)
+		if (Lara.interactedItem == itemNumber && item->status != ITEM_ACTIVE && l->activeState == LS_MISC_CONTROL)
 		{
 			if (l->animNumber >= LA_TORCH_LIGHT_1 && l->animNumber <= LA_TORCH_LIGHT_5)
 			{

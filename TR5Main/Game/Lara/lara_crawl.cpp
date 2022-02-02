@@ -41,12 +41,12 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->goalAnimState == LS_PICKUP)
+	if (item->targetState == LS_PICKUP)
 		return;
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -65,32 +65,32 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 			info->gunStatus == LG_HANDS_FREE &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->goalAnimState = LS_CROUCH_ROLL;
+			item->targetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_CROUCH_TURN_LEFT;
+			item->targetState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
+			item->targetState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_CROUCH_IDLE (71)
@@ -165,7 +165,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	item->goalAnimState = LS_CROUCH_IDLE;
+	item->targetState = LS_CROUCH_IDLE;
 }
 
 // State:		LS_CROUCH_ROLL (72)
@@ -236,7 +236,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -251,27 +251,27 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->goalAnimState = LS_CROUCH_ROLL;
+			item->targetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_CROUCH_TURN_LEFT;
+			item->targetState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (105)
@@ -292,7 +292,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -307,27 +307,27 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->goalAnimState = LS_CROUCH_ROLL;
+			item->targetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
+			item->targetState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
@@ -353,12 +353,12 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->goalAnimState == LS_PICKUP)
+	if (item->targetState == LS_PICKUP)
 		return;
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -379,7 +379,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 			!IsStandingWeapon(info->gunType) &&
 			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
-			item->goalAnimState = LS_CROUCH_IDLE;
+			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_FREE;
 			return;
 		}
@@ -394,7 +394,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
-				item->goalAnimState = LS_CRAWL_FORWARD;
+				item->targetState = LS_CRAWL_FORWARD;
 				return;
 			}
 		}
@@ -402,33 +402,33 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{
-				item->goalAnimState = LS_CRAWL_TO_HANG;
+				item->targetState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
 			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
-				item->goalAnimState = LS_CRAWL_BACK;
+				item->targetState = LS_CRAWL_BACK;
 				return;
 			}
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+			item->targetState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+			item->targetState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_CROUCH_IDLE;
+	item->targetState = LS_CROUCH_IDLE;
 	info->gunStatus = LG_HANDS_FREE;
 }
 
@@ -489,7 +489,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -515,21 +515,21 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			item->targetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE;
+	item->targetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_FORWARD (81)
@@ -594,7 +594,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -620,15 +620,15 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			item->goalAnimState = LS_CRAWL_BACK;
+			item->targetState = LS_CRAWL_BACK;
 			return;
 		}
 
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE;
+	item->targetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_BACK (86)
@@ -690,7 +690,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -701,33 +701,33 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			item->targetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_BACK;
+			item->targetState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+			item->targetState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE;
+	item->targetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
@@ -750,7 +750,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -761,33 +761,33 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_FORWARD;
+			item->targetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->goalAnimState = LS_CRAWL_BACK;
+			item->targetState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+			item->targetState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_CRAWL_IDLE;
+	item->targetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)

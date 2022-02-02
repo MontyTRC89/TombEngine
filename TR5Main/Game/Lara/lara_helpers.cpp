@@ -39,7 +39,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraStepUp(item, coll))
 		{
-			item->goalAnimState = LS_STEP_UP;
+			item->targetState = LS_STEP_UP;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
 				item->pos.yPos += coll->Middle.Floor;
@@ -48,7 +48,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TestLaraStepDown(item, coll))
 		{
-			item->goalAnimState = LS_STEP_DOWN;
+			item->targetState = LS_STEP_DOWN;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
 				item->pos.yPos += coll->Middle.Floor;
@@ -102,9 +102,9 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
 		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
-			item->goalAnimState = LS_CRAWL_STEP_DOWN;
+			item->targetState = LS_CRAWL_STEP_DOWN;
 		else [[likely]]
-			item->goalAnimState = LS_CRAWL_EXIT_STEP_DOWN;
+			item->targetState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		return;
 	}
@@ -112,22 +112,22 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlExitJump(item, coll))
 	{
 		if (TrInput & IN_WALK)
-			item->goalAnimState = LS_CRAWL_EXIT_FLIP;
+			item->targetState = LS_CRAWL_EXIT_FLIP;
 		else [[likely]]
-			item->goalAnimState = LS_CRAWL_EXIT_JUMP;
+			item->targetState = LS_CRAWL_EXIT_JUMP;
 
 		return;
 	}
 
 	if (TestLaraCrawlUpStep(item, coll))
 	{
-		item->goalAnimState = LS_CRAWL_STEP_UP;
+		item->targetState = LS_CRAWL_STEP_UP;
 		return;
 	}
 
 	if (TestLaraCrawlDownStep(item, coll))
 	{
-		item->goalAnimState = LS_CRAWL_STEP_DOWN;
+		item->targetState = LS_CRAWL_STEP_DOWN;
 		return;
 	}
 }
@@ -156,7 +156,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	info->torsoZrot += std::min(abs(rate), abs(maxAngle - info->torsoZrot) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
-		item->currentAnimState != LS_CRAWL_BACK)
+		item->activeState != LS_CRAWL_BACK)
 	{
 		info->headZrot = info->torsoZrot / 2;
 		info->headYrot = info->headZrot;
@@ -246,7 +246,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&										// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		info->runJumpQueued = (item->goalAnimState == LS_RUN_FORWARD);
+		info->runJumpQueued = (item->targetState == LS_RUN_FORWARD);
 	}
 	else
 		info->runJumpQueued = false;
@@ -280,7 +280,7 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 	LaraInfo*& info = item->data;
 
 	// Hack.
-	if (item->currentAnimState == LS_MONKEY_TURN_180)
+	if (item->activeState == LS_MONKEY_TURN_180)
 		return;
 
 	SetAnimation(item, LA_MONKEY_TO_FREEFALL);
@@ -309,7 +309,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
 	{
-		if (item->currentAnimState == LS_SLIDE_BACK && oldAngle == direction)
+		if (item->activeState == LS_SLIDE_BACK && oldAngle == direction)
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
@@ -317,7 +317,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		if (item->currentAnimState == LS_SLIDE_FORWARD && oldAngle == direction)
+		if (item->activeState == LS_SLIDE_FORWARD && oldAngle == direction)
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
@@ -371,17 +371,17 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	// Reset running jump timer.
-	if (item->currentAnimState != LS_RUN_FORWARD &&
-		item->currentAnimState != LS_WALK_FORWARD &&
-		item->currentAnimState != LS_JUMP_FORWARD &&
-		item->currentAnimState != LS_SPRINT &&
-		item->currentAnimState != LS_SPRINT_DIVE)
+	if (item->activeState != LS_RUN_FORWARD &&
+		item->activeState != LS_WALK_FORWARD &&
+		item->activeState != LS_JUMP_FORWARD &&
+		item->activeState != LS_SPRINT &&
+		item->activeState != LS_SPRINT_DIVE)
 	{
 		info->runJumpCount = 0;
 	}
 
 	// Reset running jump action queue.
-	if (item->currentAnimState != LS_RUN_FORWARD)
+	if (item->activeState != LS_RUN_FORWARD)
 		info->runJumpQueued = false;
 
 	// Increment/reset AFK pose timer.

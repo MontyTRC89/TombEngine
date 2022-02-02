@@ -28,16 +28,16 @@ void WorkerDualGunControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 11)
+		if (item->activeState != 11)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 32;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 11;
+			item->activeState = 11;
 		}
 	}
 	else if (LaraItem->hitPoints <= 0)
 	{
-		item->goalAnimState = 2;
+		item->targetState = 2;
 	}
 	else
 	{
@@ -48,7 +48,7 @@ void WorkerDualGunControl(short itemNum)
 
 		angle = CreatureTurn(item, dual->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 		case 2:
@@ -65,9 +65,9 @@ void WorkerDualGunControl(short itemNum)
 				if (Targetable(item, &info))
 				{
 					if (info.distance <= 0x900000)
-						item->goalAnimState = 9;
+						item->targetState = 9;
 					else
-						item->goalAnimState = 3;
+						item->targetState = 3;
 				}
 				else
 				{
@@ -75,27 +75,27 @@ void WorkerDualGunControl(short itemNum)
 					{
 					case ATTACK_MOOD:
 						if (info.distance > 0x19000000 || !info.ahead)
-							item->goalAnimState = 4;
+							item->targetState = 4;
 						else
-							item->goalAnimState = 3;
+							item->targetState = 3;
 						break;
 					case ESCAPE_MOOD:
-						item->goalAnimState = 4;
+						item->targetState = 4;
 						break;
 					case STALK_MOOD:
-						item->goalAnimState = 3;
+						item->targetState = 3;
 						break;
 
 					default:
 						if (!info.ahead)
-							item->goalAnimState = 3;
+							item->targetState = 3;
 						break;
 					}
 				}
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 		case 3:
@@ -111,34 +111,34 @@ void WorkerDualGunControl(short itemNum)
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				else
 				{
 					if (info.angle >= 0)
-						item->goalAnimState = 6;
+						item->targetState = 6;
 					else
-						item->goalAnimState = 5;
+						item->targetState = 5;
 				}
 			}
 
 			if (dual->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			else if (dual->mood == ATTACK_MOOD || dual->mood == STALK_MOOD)
 			{
 				if (info.distance > 0x19000000 || !info.ahead)
-					item->goalAnimState = 4;
+					item->targetState = 4;
 			}
 			else if (LaraItem->hitPoints > 0)
 			{
 				if (info.ahead)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 		case 4:
@@ -157,27 +157,27 @@ void WorkerDualGunControl(short itemNum)
 				if (info.zoneNumber == info.enemyZone)
 				{
 					if (info.angle >= 0)
-						item->goalAnimState = 6;
+						item->targetState = 6;
 					else
-						item->goalAnimState = 5;
+						item->targetState = 5;
 				}
 				else
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 			}
 			else if (dual->mood == ATTACK_MOOD)
 			{
 				if (info.ahead && info.distance < 0x19000000)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else if (LaraItem->hitPoints > 0)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 		case 5:
@@ -190,9 +190,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 		case 6:
 			dual->flags = 0;
@@ -204,9 +204,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 		case 7:
 			if (info.ahead)
@@ -244,9 +244,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 10;
+				item->targetState = 10;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 10:
 			if (info.ahead)

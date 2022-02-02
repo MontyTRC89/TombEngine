@@ -47,7 +47,7 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& item->status != ITEM_ACTIVE
 			&& !(l->hitStatus)
@@ -71,7 +71,7 @@ namespace TEN::Entities::Doors
 					if (MoveLaraPosition(&PullDoorPos, item, l))
 					{
 						SetAnimation(l, LA_DOOR_OPEN_PULL);
-						item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PULL;
+						item->targetState = STATE_PUSHPULL_KICK_DOOR_PULL;
 						openTheDoor = true;
 					}
 					else
@@ -86,7 +86,7 @@ namespace TEN::Entities::Doors
 						if (MoveLaraPosition(&KickDoorPos, item, l))
 						{
 							SetAnimation(l, LA_DOOR_OPEN_KICK);
-							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							item->targetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
@@ -99,7 +99,7 @@ namespace TEN::Entities::Doors
 						if (MoveLaraPosition(&PushDoorPos, item, l))
 						{
 							SetAnimation(l, LA_DOOR_OPEN_PUSH);
-							item->goalAnimState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							item->targetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
@@ -114,8 +114,8 @@ namespace TEN::Entities::Doors
 					AddActiveItem(itemNum);
 
 					item->status = ITEM_ACTIVE;
-					l->currentAnimState = LS_MISC_CONTROL;
-					l->goalAnimState = LS_IDLE;
+					l->activeState = LS_MISC_CONTROL;
+					l->targetState = LS_IDLE;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 				}
@@ -129,7 +129,7 @@ namespace TEN::Entities::Doors
 			if (pull)
 				item->pos.yRot ^= ANGLE(180);
 		}
-		else if (item->currentAnimState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
+		else if (item->activeState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNum, l, coll);
 	}
 

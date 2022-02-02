@@ -89,11 +89,11 @@ void KnifethrowerControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 10)
+		if (item->activeState != 10)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 23;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 10;
+			item->activeState = 10;
 		}
 	}
 	else
@@ -103,7 +103,7 @@ void KnifethrowerControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, knife->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			knife->maximumTurn = 0;
@@ -113,24 +113,24 @@ void KnifethrowerControl(short itemNum)
 
 			if (knife->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (!info.ahead || info.distance > SQUARE(WALL_SIZE*6))
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE*4))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -142,25 +142,25 @@ void KnifethrowerControl(short itemNum)
 
 			if (knife->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE((WALL_SIZE*5)/2) || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 4;
+					item->targetState = 4;
 				else
-					item->goalAnimState = 6;
+					item->targetState = 6;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(WALL_SIZE*6))
-					item->goalAnimState = 1;
+					item->targetState = 1;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE*4))
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -173,18 +173,18 @@ void KnifethrowerControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(WALL_SIZE*6))
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE*4))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 
@@ -195,9 +195,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			else
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 6:
@@ -207,9 +207,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			else
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 8:
@@ -219,9 +219,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->goalAnimState = 9;
+				item->targetState = 9;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 5:

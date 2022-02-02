@@ -30,8 +30,8 @@ void InitialiseSmallScorpion(short itemNumber)
 
 	item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = SMALL_SCORPION_STOP;
-	item->currentAnimState = SMALL_SCORPION_STOP;
+	item->targetState = SMALL_SCORPION_STOP;
+	item->activeState = SMALL_SCORPION_STOP;
 }
 
 void SmallScorpionControl(short itemNumber)
@@ -54,11 +54,11 @@ void SmallScorpionControl(short itemNumber)
 	if (item->hitPoints <= 0)
 	{
 		item->hitPoints = 0;
-		if (item->currentAnimState != SMALL_SCORPION_DEATH1 && item->currentAnimState != SMALL_SCORPION_DEATH2)
+		if (item->activeState != SMALL_SCORPION_DEATH1 && item->activeState != SMALL_SCORPION_DEATH2)
 		{
 			item->animNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = SMALL_SCORPION_DEATH1;
+			item->activeState = SMALL_SCORPION_DEATH1;
 		}
 	}
 	else
@@ -80,30 +80,30 @@ void SmallScorpionControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case SMALL_SCORPION_STOP:
 			creature->maximumTurn = 0;
 			creature->flags = 0;
 			if (info.distance > SQUARE(341))
 			{
-				item->goalAnimState = SMALL_SCORPION_WALK;
+				item->targetState = SMALL_SCORPION_WALK;
 			}
 			else if (info.bite)
 			{
 				creature->maximumTurn = ANGLE(6);
 				if (GetRandomControl() & 1)
 				{
-					item->goalAnimState = SMALL_SCORPION_ATTACK1;
+					item->targetState = SMALL_SCORPION_ATTACK1;
 				}
 				else
 				{
-					item->goalAnimState = SMALL_SCORPION_ATTACK2;
+					item->targetState = SMALL_SCORPION_ATTACK2;
 				}
 			}
 			else if (!info.ahead)
 			{
-				item->goalAnimState = SMALL_SCORPION_RUN;
+				item->targetState = SMALL_SCORPION_RUN;
 			}
 			break;
 
@@ -113,12 +113,12 @@ void SmallScorpionControl(short itemNumber)
 			{
 				if (info.distance > SQUARE(213))
 				{
-					item->goalAnimState = SMALL_SCORPION_RUN;
+					item->targetState = SMALL_SCORPION_RUN;
 				}
 			}
 			else
 			{
-				item->goalAnimState = SMALL_SCORPION_STOP;
+				item->targetState = SMALL_SCORPION_STOP;
 			}
 			break;
 
@@ -126,7 +126,7 @@ void SmallScorpionControl(short itemNumber)
 			creature->maximumTurn = ANGLE(8);
 			if (info.distance < SQUARE(341))
 			{
-				item->goalAnimState = SMALL_SCORPION_STOP;
+				item->targetState = SMALL_SCORPION_STOP;
 			}
 			break;
 
@@ -162,7 +162,7 @@ void SmallScorpionControl(short itemNumber)
 						BITE_INFO* biteInfo;
 						short rot;
 
-						if (item->currentAnimState == SMALL_SCORPION_ATTACK1)
+						if (item->activeState == SMALL_SCORPION_ATTACK1)
 						{
 							rot = item->pos.yRot + -ANGLE(180);
 							biteInfo = &smallScorpionBiteInfo1;

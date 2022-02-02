@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			|| item->flags & 0x100
 			|| CurrentSequence >= 3
 			|| Lara.gunStatus
-			|| l->currentAnimState != LS_IDLE
+			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE)
 			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 		{
@@ -49,13 +49,13 @@ namespace TEN::Entities::Switches
 		{
 			if (MoveLaraPosition(&FullBlockSwitchPos, item, l))
 			{
-				if (item->currentAnimState == 1)
+				if (item->activeState == 1)
 				{
-					l->currentAnimState = LS_SWITCH_DOWN;
+					l->activeState = LS_SWITCH_DOWN;
 					l->animNumber = LA_BUTTON_GIANT_PUSH;
-					item->goalAnimState = 0;
+					item->targetState = 0;
 				}
-				l->goalAnimState = LS_IDLE;
+				l->targetState = LS_IDLE;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				item->status = ITEM_ACTIVE;
 
@@ -92,7 +92,7 @@ namespace TEN::Entities::Switches
 			if (CurrentSequence >= 4)
 			{
 				item->itemFlags[0] = 0;
-				item->goalAnimState = SWITCH_ON;
+				item->targetState = SWITCH_ON;
 				item->status = ITEM_NOT_ACTIVE;
 				if (++CurrentSequence >= 7)
 					CurrentSequence = 0;

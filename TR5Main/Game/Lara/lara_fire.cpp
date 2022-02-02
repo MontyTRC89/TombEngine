@@ -387,9 +387,9 @@ void LaraGun(ITEM_INFO* laraItem)
 		if (TrInput & IN_DRAW ||
 			laraInfo->requestGunType != laraInfo->gunType)
 		{
-			if ((laraItem->currentAnimState == LS_CROUCH_IDLE ||
-				laraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
-				laraItem->currentAnimState == LS_CROUCH_TURN_RIGHT) &&
+			if ((laraItem->activeState == LS_CROUCH_IDLE ||
+				laraItem->activeState == LS_CROUCH_TURN_LEFT ||
+				laraItem->activeState == LS_CROUCH_TURN_RIGHT) &&
 				(laraInfo->requestGunType == WEAPON_HK ||
 					laraInfo->requestGunType == WEAPON_CROSSBOW ||
 					laraInfo->requestGunType == WEAPON_SHOTGUN ||
@@ -447,7 +447,7 @@ void LaraGun(ITEM_INFO* laraItem)
 	}
 	else if (TrInput & IN_FLARE &&
 		laraInfo->gunStatus == LG_HANDS_BUSY &&
-		laraItem->currentAnimState == LS_CRAWL_IDLE &&
+		laraItem->activeState == LS_CRAWL_IDLE &&
 		laraItem->animNumber == LA_CRAWL_IDLE)
 	{
 		laraInfo->requestGunType = WEAPON_FLARE;
@@ -588,7 +588,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		if (laraInfo->gunType == WEAPON_FLARE)
 		{
 			if (laraInfo->Vehicle != NO_ITEM ||
-				CheckForHoldingState(laraItem->currentAnimState))
+				CheckForHoldingState(laraItem->activeState))
 			{
 				if (laraInfo->flareControlLeft)
 				{
@@ -618,7 +618,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		{
 			if (laraInfo->meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				laraInfo->flareControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->currentAnimState));
+				laraInfo->flareControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->activeState));
 				DoFlareInHand(laraItem, laraInfo->flareAge);
 				SetFlareArm(laraItem, laraInfo->leftArm.frameNumber);
 			}
@@ -741,7 +741,7 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 			{
 			case HIT_BLOOD:
 				if (target->objectNumber == ID_BADDY2 &&
-					(target->currentAnimState == 8 || GetRandomControl() & 1) &&
+					(target->activeState == 8 || GetRandomControl() & 1) &&
 					(laraInfo->gunType == WEAPON_PISTOLS ||
 						laraInfo->gunType == WEAPON_SHOTGUN ||
 						laraInfo->gunType == WEAPON_UZI))
@@ -899,7 +899,7 @@ FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_I
 			x = target->pos.xPos - lara_item->pos.xPos;
 			angle = 0x8000 + phd_atan(z, x) - target->pos.yRot;
 
-			if ((target->currentAnimState > 1 && target->currentAnimState < 5) && angle < 0x4000 && angle > -0x4000)
+			if ((target->activeState > 1 && target->activeState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
 				target->hitStatus = true; //need to do this to maintain defence state
 				ricochet_angle = (mGetAngle(lara->pos.zPos, lara->pos.xPos, target->pos.zPos, target->pos.xPos) >> 4) & 4095;

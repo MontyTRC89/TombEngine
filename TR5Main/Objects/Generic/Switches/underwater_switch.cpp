@@ -71,26 +71,26 @@ namespace TEN::Entities::Switches
 			if (item->status == ITEM_NOT_ACTIVE
 				&& Lara.waterStatus == LW_UNDERWATER
 				&& !Lara.gunStatus
-				&& l->currentAnimState == LS_UNDERWATER_STOP)
+				&& l->activeState == LS_UNDERWATER_STOP)
 			{
 				if (TestLaraPosition(&UnderwaterSwitchBounds, item, l))
 				{
-					if (item->currentAnimState == SWITCH_ON
-						|| item->currentAnimState == SWITCH_OFF)
+					if (item->activeState == SWITCH_ON
+						|| item->activeState == SWITCH_OFF)
 					{
 						if (MoveLaraPosition(&UnderwaterSwitchPos, item, l))
 						{
 							l->fallspeed = 0;
-							l->goalAnimState = LS_SWITCH_DOWN;
+							l->targetState = LS_SWITCH_DOWN;
 
 							do
 							{
 								AnimateLara(l);
-							} while (l->goalAnimState != LS_SWITCH_DOWN);
+							} while (l->targetState != LS_SWITCH_DOWN);
 
-							l->goalAnimState = LS_UNDERWATER_STOP;
+							l->targetState = LS_UNDERWATER_STOP;
 							Lara.gunStatus = LG_HANDS_BUSY;
-							item->goalAnimState = item->currentAnimState != SWITCH_ON;
+							item->targetState = item->activeState != SWITCH_ON;
 							item->status = ITEM_ACTIVE;
 							AddActiveItem(itemNum);
 							AnimateItem(item);
@@ -108,10 +108,10 @@ namespace TEN::Entities::Switches
 
 		if (TrInput & IN_ACTION
 			&& Lara.waterStatus == LW_UNDERWATER
-			&& l->currentAnimState == LS_UNDERWATER_STOP
+			&& l->activeState == LS_UNDERWATER_STOP
 			&& l->animNumber == LA_UNDERWATER_IDLE
 			&& !Lara.gunStatus
-			&& (item->currentAnimState == SWITCH_OFF)
+			&& (item->activeState == SWITCH_OFF)
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, item, l))
@@ -138,13 +138,13 @@ namespace TEN::Entities::Switches
 
 			if (flag)
 			{
-				l->currentAnimState = LS_SWITCH_DOWN;
+				l->activeState = LS_SWITCH_DOWN;
 				l->animNumber = LA_UNDERWATER_CEILING_SWITCH_PULL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				l->fallspeed = 0;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
-				item->goalAnimState = SWITCH_ON;
+				item->targetState = SWITCH_ON;
 				item->status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNum);

@@ -29,8 +29,8 @@ void InitialiseHydra(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = 30 * item->triggerFlags + g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = STATE_HYDRA_STOP;
-    item->currentAnimState = STATE_HYDRA_STOP;
+    item->targetState = STATE_HYDRA_STOP;
+    item->activeState = STATE_HYDRA_STOP;
 
     if (item->triggerFlags == 1)
         item->pos.zPos += 384;
@@ -173,9 +173,9 @@ void HydraControl(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		if (item->currentAnimState != 5
-			&& item->currentAnimState != 10
-			&& item->currentAnimState != STATE_HYDRA_DEATH)
+		if (item->activeState != 5
+			&& item->activeState != 10
+			&& item->activeState != STATE_HYDRA_DEATH)
 		{
 			if (abs(info.angle) >= ANGLE(1))
 			{
@@ -199,7 +199,7 @@ void HydraControl(short itemNumber)
 			}
 		}
 
-		if (item->currentAnimState != 12)
+		if (item->activeState != 12)
 		{
 			joint1 = info.angle / 2;
 			joint3 = info.angle / 2;
@@ -214,7 +214,7 @@ void HydraControl(short itemNumber)
 		short roomNumber;
 		PHD_3DPOS pos;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_HYDRA_STOP:
 			creature->maximumTurn = ANGLE(1);
@@ -234,16 +234,16 @@ void HydraControl(short itemNumber)
 				if (info.distance >= SQUARE(2048) && GetRandomControl() & 0x1F)
 				{
 					if (!(GetRandomControl() & 0xF))
-						item->goalAnimState = STATE_HYDRA_AIM;
+						item->targetState = STATE_HYDRA_AIM;
 				}
 				else
 				{
-					item->goalAnimState = STATE_HYDRA_BITE_ATTACK1;
+					item->targetState = STATE_HYDRA_BITE_ATTACK1;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			}
 			break;
 
@@ -274,7 +274,7 @@ void HydraControl(short itemNumber)
 					if (damage > 0)
 					{
 						item->hitPoints -= damage;
-						item->goalAnimState = STATE_HYDRA_HURT;
+						item->targetState = STATE_HYDRA_HURT;
 						CreatureEffect2(item, &HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
 					}
 				}
@@ -298,7 +298,7 @@ void HydraControl(short itemNumber)
 				if ((GetRandomControl() & 0xF) < damage && info.distance < SQUARE(10240) && damage > 0)
 				{
 					item->hitPoints -= damage;
-					item->goalAnimState = 4;
+					item->targetState = 4;
 					CreatureEffect2(item, &HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
 				}
 			}
@@ -369,18 +369,18 @@ void HydraControl(short itemNumber)
 				if (info.distance >= SQUARE(1280))
 				{
 					if (info.distance >= SQUARE(1792))
-						item->goalAnimState = 0;
+						item->targetState = 0;
 					else
-						item->goalAnimState = 9;
+						item->targetState = 9;
 				}
 				else
 				{
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				}
 			}
 			else
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			}
 			break;
 
@@ -393,10 +393,10 @@ void HydraControl(short itemNumber)
 	{
 		item->hitPoints = 0;
 
-		if (item->currentAnimState != STATE_HYDRA_DEATH)
+		if (item->activeState != STATE_HYDRA_DEATH)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 15;
-			item->currentAnimState = STATE_HYDRA_DEATH;
+			item->activeState = STATE_HYDRA_DEATH;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 

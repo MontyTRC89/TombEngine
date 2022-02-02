@@ -190,8 +190,8 @@ namespace TEN::Entities::TR4
 					{
 						LaraItem->animNumber = LA_SPIKE_DEATH;
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-						LaraItem->currentAnimState = LS_DEATH;
-						LaraItem->goalAnimState = LS_DEATH;
+						LaraItem->activeState = LS_DEATH;
+						LaraItem->targetState = LS_DEATH;
 						LaraItem->airborne = false;
 					}
 				}

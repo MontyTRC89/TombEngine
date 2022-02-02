@@ -20,8 +20,8 @@ void InitialiseKnightTemplar(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->animNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->targetState = 1;
+	item->activeState = 1;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->meshBits &= 0xF7FF;
 }
@@ -93,30 +93,30 @@ void KnightTemplarControl(short itemNumber)
 	short frameBase = 0;
 	short frameNumber = 0;
 
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case 1:
 		creature->flags = 0;
 		creature->maximumTurn = ANGLE(2);
 
-		item->goalAnimState = 2;
+		item->targetState = 2;
 
 		if (info.distance > SQUARE(682))
 		{
 			if (Lara.target == item)
-				item->goalAnimState = 6;
+				item->targetState = 6;
 		}
 		else if (GetRandomControl() & 1)
 		{
-			item->goalAnimState = 4;
+			item->targetState = 4;
 		}
 		else if (GetRandomControl() & 1)
 		{
-			item->goalAnimState = 3;
+			item->targetState = 3;
 		}
 		else
 		{
-			item->goalAnimState = 5;
+			item->targetState = 5;
 		}
 
 		break;
@@ -126,7 +126,7 @@ void KnightTemplarControl(short itemNumber)
 
 		if (Lara.target == item || info.distance <= SQUARE(682))
 		{
-			item->goalAnimState = 1;
+			item->targetState = 1;
 		}
 
 		break;
@@ -233,20 +233,20 @@ void KnightTemplarControl(short itemNumber)
 		{
 			if (GetRandomControl() & 1)
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			}
 			else
 			{
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			}
 		}
 		else if (info.distance <= SQUARE(682) || Lara.target != item)
 		{
-			item->goalAnimState = 1;
+			item->targetState = 1;
 		}
 		else
 		{
-			item->goalAnimState = 6;
+			item->targetState = 6;
 		}
 		break;
 

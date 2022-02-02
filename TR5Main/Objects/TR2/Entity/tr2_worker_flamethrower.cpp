@@ -49,7 +49,7 @@ void InitialiseWorkerFlamethrower(short itemNum)
 
 	anim = &g_Level.Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->activeState = anim->activeState;
 }
 
 void WorkerFlamethrower(short itemNum)
@@ -74,16 +74,16 @@ void WorkerFlamethrower(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 7)
+		if (item->activeState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 19;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 7;
+			item->activeState = 7;
 		}
 	}
 	else
 	{
-		if (item->currentAnimState != 5 && item->currentAnimState != 6)
+		if (item->activeState != 5 && item->activeState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
 			AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
@@ -98,7 +98,7 @@ void WorkerFlamethrower(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, flame->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			flame->flags = 0;
@@ -112,25 +112,25 @@ void WorkerFlamethrower(short itemNum)
 
 			if (flame->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (flame->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance <= SQUARE(WALL_SIZE * 2))
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			break;
 
@@ -145,23 +145,23 @@ void WorkerFlamethrower(short itemNum)
 
 			if (flame->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 6;
+					item->targetState = 6;
 			}
 			else if (flame->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance > SQUARE(WALL_SIZE * 2))
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			break;
 
@@ -178,11 +178,11 @@ void WorkerFlamethrower(short itemNum)
 			{
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				else if (flame->mood == BORED_MOOD || flame->mood == STALK_MOOD)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 			}
 			break;
@@ -196,17 +196,17 @@ void WorkerFlamethrower(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			else
 			{
 				if (flame->mood == ATTACK_MOOD)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				else if (!info.ahead)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 			}
 			break;
@@ -219,9 +219,9 @@ void WorkerFlamethrower(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (item->goalAnimState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
+			if (item->targetState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 
@@ -237,11 +237,11 @@ void WorkerFlamethrower(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = (item->currentAnimState == 8) ? 5 : 11;
+				item->targetState = (item->activeState == 8) ? 5 : 11;
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 		}

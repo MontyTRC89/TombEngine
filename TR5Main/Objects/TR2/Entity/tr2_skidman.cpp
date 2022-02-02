@@ -112,7 +112,7 @@ void SkidManControl(short riderNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (rider->currentAnimState != SMAN_DEATH)
+		if (rider->activeState != SMAN_DEATH)
 		{
 			rider->pos.xPos = item->pos.xPos;
 			rider->pos.yPos = item->pos.yPos;
@@ -122,7 +122,7 @@ void SkidManControl(short riderNum)
 
 			rider->animNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_DEATH_ANIM;
 			rider->frameNumber = g_Level.Anims[rider->animNumber].frameBase;
-			rider->currentAnimState = SMAN_DEATH;
+			rider->activeState = SMAN_DEATH;
 
 			if (Lara.target == item)
 				Lara.target = NULL;
@@ -130,10 +130,10 @@ void SkidManControl(short riderNum)
 		else
 			AnimateItem(rider);
 
-		if (item->currentAnimState == SMAN_MOVING || item->currentAnimState == SMAN_WAIT)
-			item->goalAnimState = SMAN_WAIT;
+		if (item->activeState == SMAN_MOVING || item->activeState == SMAN_WAIT)
+			item->targetState = SMAN_WAIT;
 		else
-			item->goalAnimState = SMAN_MOVING;
+			item->targetState = SMAN_MOVING;
 	}
 	else
 	{
@@ -144,46 +144,46 @@ void SkidManControl(short riderNum)
 
 		angle = CreatureTurn(item, ANGLE(6)/2);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case SMAN_WAIT:
 			if (skidman->mood == BORED_MOOD)
 				break;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				break;
-			item->goalAnimState = SMAN_MOVING;
+			item->targetState = SMAN_MOVING;
 			break;
 
 		case SMAN_MOVING:
 			if (skidman->mood == BORED_MOOD)
-				item->goalAnimState = SMAN_WAIT;
+				item->targetState = SMAN_WAIT;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
-				item->goalAnimState = SMAN_WAIT;
+				item->targetState = SMAN_WAIT;
 			else if (angle < -SMAN_MIN_TURN)
-				item->goalAnimState = SMAN_STARTLEFT;
+				item->targetState = SMAN_STARTLEFT;
 			else if (angle > SMAN_MIN_TURN)
-				item->goalAnimState = SMAN_STARTRIGHT;
+				item->targetState = SMAN_STARTRIGHT;
 			break;
 
 		case SMAN_STARTLEFT:
 		case SMAN_LEFT:
 			if (angle < -SMAN_MIN_TURN)
-				item->goalAnimState = SMAN_LEFT;
+				item->targetState = SMAN_LEFT;
 			else
-				item->goalAnimState = SMAN_MOVING;
+				item->targetState = SMAN_MOVING;
 			break;
 
 		case SMAN_STARTRIGHT:
 		case SMAN_RIGHT:
 			if (angle < -SMAN_MIN_TURN)
-				item->goalAnimState = SMAN_LEFT;
+				item->targetState = SMAN_LEFT;
 			else
-				item->goalAnimState = SMAN_MOVING;
+				item->targetState = SMAN_MOVING;
 			break;
 		}
 	}
 
-	if (rider->currentAnimState != SMAN_DEATH)
+	if (rider->activeState != SMAN_DEATH)
 	{
 		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->hitPoints > 0)
 		{
@@ -200,7 +200,7 @@ void SkidManControl(short riderNum)
 		}
 	}
 
-	if (item->currentAnimState == SMAN_WAIT)
+	if (item->activeState == SMAN_WAIT)
 	{
 		SoundEffect(153, &item->pos, 0);
 		skidman->jointRotation[0] = 0;
@@ -214,7 +214,7 @@ void SkidManControl(short riderNum)
 
 	CreatureAnimation(item_number, angle, 0);
 
-	if (rider->currentAnimState != SMAN_DEATH)
+	if (rider->activeState != SMAN_DEATH)
 	{
 		rider->pos.xPos = item->pos.xPos;
 		rider->pos.yPos = item->pos.yPos;

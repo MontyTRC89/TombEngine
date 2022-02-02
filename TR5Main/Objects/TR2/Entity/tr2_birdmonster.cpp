@@ -28,11 +28,11 @@ void BirdMonsterControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
+		if (item->activeState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 9;
+			item->activeState = 9;
 		}
 	}
 	else
@@ -46,7 +46,7 @@ void BirdMonsterControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, monster->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			monster->maximumTurn = 0;
@@ -54,62 +54,62 @@ void BirdMonsterControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				else
-					item->goalAnimState = 10;
+					item->targetState = 10;
 			}
 			else if (info.ahead && (monster->mood == BORED_MOOD || monster->mood == STALK_MOOD))
 			{
 				if (info.zoneNumber != info.enemyZone)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 					monster->mood = ESCAPE_MOOD;
 				}
 				else
-					item->goalAnimState = 8;
+					item->targetState = 8;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 		case 8:
 			monster->maximumTurn = 0;
 
 			if (monster->mood != BORED_MOOD || !info.ahead)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 2:
 			monster->maximumTurn = ANGLE(4);
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			else if ((monster->mood == BORED_MOOD || monster->mood == STALK_MOOD) && info.ahead)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 3:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 5:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 10:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 11;
+				item->targetState = 11;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 		case 4:
 		case 6:

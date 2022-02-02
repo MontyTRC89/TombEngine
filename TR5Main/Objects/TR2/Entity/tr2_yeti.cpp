@@ -19,7 +19,7 @@ void InitialiseYeti(short itemNum)
 	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 19;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState;
+	item->activeState = g_Level.Anims[item->animNumber].activeState;
 }
 
 void YetiControl(short itemNum)
@@ -37,11 +37,11 @@ void YetiControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 8)
+		if (item->activeState != 8)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 31;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 8;
+			item->activeState = 8;
 		}
 	}
 	else
@@ -53,7 +53,7 @@ void YetiControl(short itemNum)
 
 		angle = CreatureTurn(item, yeti->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 2:
 			if (info.ahead)
@@ -64,36 +64,36 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
-			else if (item->requiredAnimState)
+			else if (item->requiredState)
 			{
-				item->goalAnimState = item->requiredAnimState;
+				item->targetState = item->requiredState;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
-					item->goalAnimState = 7;
+					item->targetState = 7;
 				else if (GetRandomControl() < 0x200)
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				else if (GetRandomControl() < 0x300)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2) && GetRandomControl() < 0x4000)
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			else if (yeti->mood == STALK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 		case 7:
@@ -102,7 +102,7 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD || item->hitStatus)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
@@ -110,22 +110,22 @@ void YetiControl(short itemNum)
 				{
 					if (GetRandomControl() < 0x100)
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					}
 					else if (GetRandomControl() < 0x200)
 					{
-						item->goalAnimState = 9;
+						item->targetState = 9;
 					}
 					else if (GetRandomControl() < 0x300)
 					{
-						item->goalAnimState = 2;
-						item->requiredAnimState = 3;
+						item->targetState = 2;
+						item->requiredState = 3;
 					}
 				}
 			}
 			else if (GetRandomControl() < 0x200)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 		case 9:
@@ -134,27 +134,27 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD || item->hitStatus)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
 				{
-					item->goalAnimState = 7;
+					item->targetState = 7;
 				}
 				else if (GetRandomControl() < 0x200)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				else if (GetRandomControl() < 0x300)
 				{
-					item->goalAnimState = 2;
-					item->requiredAnimState = 3;
+					item->targetState = 2;
+					item->requiredState = 3;
 				}
 			}
 			else if (GetRandomControl() < 0x200)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 		case 3:
@@ -165,31 +165,31 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
 				{
-					item->goalAnimState = 2;
-					item->requiredAnimState = 7;
+					item->targetState = 2;
+					item->requiredState = 7;
 				}
 				else if (GetRandomControl() < 0x200)
 				{
-					item->goalAnimState = 2;
-					item->requiredAnimState = 9;
+					item->targetState = 2;
+					item->requiredState = 9;
 				}
 				else if (GetRandomControl() < 0x300)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 			}
 			else if (yeti->mood == ATTACK_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(STEP_SIZE))
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else if (info.distance < SQUARE(WALL_SIZE * 2))
-					item->goalAnimState = 1;
+					item->targetState = 1;
 			}
 			break;
 		case 1:
@@ -206,19 +206,19 @@ void YetiControl(short itemNum)
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			}
 			else if (yeti->mood == STALK_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 		case 4:
@@ -289,29 +289,29 @@ void YetiControl(short itemNum)
 	CreatureJoint(item, 0, torso);
 	CreatureJoint(item, 1, head);
 
-	if (item->currentAnimState < 10)
+	if (item->activeState < 10)
 	{
 		switch (CreatureVault(itemNum, angle, 2, 300))
 		{
 		case 2:
 			item->animNumber = Objects[item->objectNumber].animIndex + 34;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 10;
+			item->activeState = 10;
 			break;
 		case 3:
 			item->animNumber = Objects[item->objectNumber].animIndex + 33;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 11;
+			item->activeState = 11;
 			break;
 		case 4:
 			item->animNumber = Objects[item->objectNumber].animIndex + 32;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 12;
+			item->activeState = 12;
 			break;
 		case -4:
 			item->animNumber = Objects[item->objectNumber].animIndex + 35;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 13;
+			item->activeState = 13;
 			break;
 		}
 	}

@@ -68,7 +68,7 @@ namespace TEN::Entities::Switches
 				&& (TrInput & IN_ACTION
 					&& !Lara.gunStatus
 					&& !item->airborne
-					&& l->currentAnimState == LS_IDLE
+					&& l->activeState == LS_IDLE
 					&& l->animNumber == LA_STAND_IDLE
 					|| Lara.isMoving
 					&& Lara.interactedItem == itemNum))
@@ -85,12 +85,12 @@ namespace TEN::Entities::Switches
 						Lara.gunStatus = LG_HANDS_BUSY;
 						Lara.interactedItem = targetItemNum;
 						l->animNumber = LA_COGWHEEL_GRAB;
-						l->goalAnimState = LS_COGWHEEL;
-						l->currentAnimState = LS_COGWHEEL;
+						l->targetState = LS_COGWHEEL;
+						l->activeState = LS_COGWHEEL;
 						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 
 						AddActiveItem(itemNum);
-						item->goalAnimState = SWITCH_ON;
+						item->targetState = SWITCH_ON;
 						item->status = ITEM_ACTIVE;
 
 						if (door != NULL)
@@ -125,12 +125,12 @@ namespace TEN::Entities::Switches
 
 		AnimateItem(item);
 
-		if (item->currentAnimState == SWITCH_ON)
+		if (item->activeState == SWITCH_ON)
 		{
-			if (item->goalAnimState == SWITCH_ON && !(TrInput & IN_ACTION))
+			if (item->targetState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->goalAnimState = LS_IDLE;
-				item->goalAnimState = SWITCH_OFF;
+				LaraItem->targetState = LS_IDLE;
+				item->targetState = SWITCH_OFF;
 			}
 
 			if (LaraItem->animNumber == LA_COGWHEEL_PULL)
@@ -146,15 +146,15 @@ namespace TEN::Entities::Switches
 		{
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 			{
-				item->currentAnimState = SWITCH_OFF;
+				item->activeState = SWITCH_OFF;
 				item->status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
 
 				LaraItem->animNumber = LA_STAND_SOLID;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = LS_IDLE;
-				LaraItem->currentAnimState = LS_IDLE;
+				LaraItem->targetState = LS_IDLE;
+				LaraItem->activeState = LS_IDLE;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}

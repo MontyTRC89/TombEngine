@@ -37,7 +37,7 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item;
 
 		item = &g_Level.Items[itemNum];
-		item->currentAnimState = STATE_DOG_STOP;
+		item->activeState = STATE_DOG_STOP;
 		item->animNumber = Objects[item->objectNumber].animIndex + 8;
 
 		// OCB 1 makes the dog sitting down until fired
@@ -70,10 +70,10 @@ namespace TEN::Entities::TR4
 			{
 				item->hitPoints = obj->hitPoints;
 			}
-			else if (item->currentAnimState != STATE_DOG_DEATH)
+			else if (item->activeState != STATE_DOG_DEATH)
 			{
 				item->animNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
-				item->currentAnimState = STATE_DOG_DEATH;
+				item->activeState = STATE_DOG_DEATH;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
@@ -124,7 +124,7 @@ namespace TEN::Entities::TR4
 			short random = GetRandomControl();
 			int frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case STATE_DOG_NONE:
 			case STATE_DOG_SLEEP:
@@ -132,22 +132,22 @@ namespace TEN::Entities::TR4
 				joint2 = 0;
 				if (creature->mood && (item->aiBits) != MODIFY)
 				{
-					item->goalAnimState = STATE_DOG_STOP;
+					item->targetState = STATE_DOG_STOP;
 				}
 				else
 				{
 					creature->flags++;
 					creature->maximumTurn = 0;
 					if (creature->flags > 300 && random < 128)
-						item->goalAnimState = STATE_DOG_STOP;
+						item->targetState = STATE_DOG_STOP;
 				}
 				break;
 
 			case STATE_DOG_STOP:
 			case STATE_DOG_CROUCH:
-				if (item->currentAnimState == STATE_DOG_CROUCH && item->requiredAnimState)
+				if (item->activeState == STATE_DOG_CROUCH && item->requiredState)
 				{
-					item->goalAnimState = item->requiredAnimState;
+					item->targetState = item->requiredState;
 					break;
 				}
 
@@ -157,26 +157,26 @@ namespace TEN::Entities::TR4
 					joint1 = AIGuard(creature);
 					if (GetRandomControl())
 						break;
-					if (item->currentAnimState == STATE_DOG_STOP)
+					if (item->activeState == STATE_DOG_STOP)
 					{
-						item->goalAnimState = STATE_DOG_CROUCH;
+						item->targetState = STATE_DOG_CROUCH;
 						break;
 					}
 				}
 				else
 				{
-					if (item->currentAnimState == STATE_DOG_CROUCH && random < 128)
+					if (item->activeState == STATE_DOG_CROUCH && random < 128)
 					{
-						item->goalAnimState = STATE_DOG_STOP;
+						item->targetState = STATE_DOG_STOP;
 						break;
 					}
 
 					if (item->aiBits & PATROL1)
 					{
-						if (item->currentAnimState == STATE_DOG_STOP)
-							item->goalAnimState = STATE_DOG_WALK;
+						if (item->activeState == STATE_DOG_STOP)
+							item->targetState = STATE_DOG_WALK;
 						else
-							item->goalAnimState = STATE_DOG_STOP;
+							item->targetState = STATE_DOG_STOP;
 						break;
 					}
 
@@ -184,21 +184,21 @@ namespace TEN::Entities::TR4
 					{
 						if (Lara.target == item || !info.ahead || item->hitStatus)
 						{
-							item->requiredAnimState = STATE_DOG_RUN;
-							item->goalAnimState = STATE_DOG_CROUCH;
+							item->requiredState = STATE_DOG_RUN;
+							item->targetState = STATE_DOG_CROUCH;
 						}
 						else
 						{
-							item->goalAnimState = STATE_DOG_STOP;
+							item->targetState = STATE_DOG_STOP;
 						}
 						break;
 					}
 
 					if (creature->mood != BORED_MOOD)
 					{
-						item->requiredAnimState = STATE_DOG_RUN;
-						if (item->currentAnimState == STATE_DOG_STOP)
-							item->goalAnimState = STATE_DOG_CROUCH;
+						item->requiredState = STATE_DOG_RUN;
+						if (item->activeState == STATE_DOG_STOP)
+							item->targetState = STATE_DOG_CROUCH;
 						break;
 					}
 
@@ -209,9 +209,9 @@ namespace TEN::Entities::TR4
 					{
 						if (item->aiBits & MODIFY)
 						{
-							if (item->currentAnimState == STATE_DOG_STOP)
+							if (item->activeState == STATE_DOG_STOP)
 							{
-								item->goalAnimState = STATE_DOG_SLEEP;
+								item->targetState = STATE_DOG_SLEEP;
 								creature->flags = 0;
 								break;
 							}
@@ -221,33 +221,33 @@ namespace TEN::Entities::TR4
 					if (random >= 4096)
 					{
 						if (!(random & 0x1F))
-							item->goalAnimState = STATE_DOG_HOWL;
+							item->targetState = STATE_DOG_HOWL;
 						break;
 					}
 
-					if (item->currentAnimState == STATE_DOG_STOP)
+					if (item->activeState == STATE_DOG_STOP)
 					{
-						item->goalAnimState = STATE_DOG_WALK;
+						item->targetState = STATE_DOG_WALK;
 						break;
 					}
 				}
-				item->goalAnimState = STATE_DOG_STOP;
+				item->targetState = STATE_DOG_STOP;
 				break;
 
 			case STATE_DOG_WALK:
 				creature->maximumTurn = ANGLE(3);
 				if (item->aiBits & PATROL1)
 				{
-					item->goalAnimState = STATE_DOG_WALK;
+					item->targetState = STATE_DOG_WALK;
 					break;
 				}
 
 				if (!creature->mood && random < 256)
 				{
-					item->goalAnimState = STATE_DOG_STOP;
+					item->targetState = STATE_DOG_STOP;
 					break;
 				}
-				item->goalAnimState = STATE_DOG_STALK;
+				item->targetState = STATE_DOG_STALK;
 				break;
 
 			case STATE_DOG_RUN:
@@ -255,23 +255,23 @@ namespace TEN::Entities::TR4
 				if (creature->mood == ESCAPE_MOOD)
 				{
 					if (Lara.target != item && info.ahead)
-						item->goalAnimState = STATE_DOG_CROUCH;
+						item->targetState = STATE_DOG_CROUCH;
 				}
 				else if (creature->mood)
 				{
 					if (info.bite && info.distance < SQUARE(1024))
 					{
-						item->goalAnimState = STATE_DOG_JUMP_ATTACK;
+						item->targetState = STATE_DOG_JUMP_ATTACK;
 					}
 					else if (info.distance < SQUARE(1536))
 					{
-						item->requiredAnimState = STATE_DOG_STALK;
-						item->goalAnimState = STATE_DOG_CROUCH;
+						item->requiredState = STATE_DOG_STALK;
+						item->targetState = STATE_DOG_CROUCH;
 					}
 				}
 				else
 				{
-					item->goalAnimState = STATE_DOG_CROUCH;
+					item->targetState = STATE_DOG_CROUCH;
 				}
 				break;
 
@@ -281,21 +281,21 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->mood == ESCAPE_MOOD)
 					{
-						item->goalAnimState = STATE_DOG_RUN;
+						item->targetState = STATE_DOG_RUN;
 					}
 					else if (info.bite && info.distance < SQUARE(341))
 					{
-						item->goalAnimState = STATE_DOG_CROUCH_ATTACK;
-						item->requiredAnimState = STATE_DOG_STALK;
+						item->targetState = STATE_DOG_CROUCH_ATTACK;
+						item->requiredState = STATE_DOG_STALK;
 					}
 					else if (info.distance > SQUARE(1536) || item->hitStatus)
 					{
-						item->goalAnimState = STATE_DOG_RUN;
+						item->targetState = STATE_DOG_RUN;
 					}
 				}
 				else
 				{
-					item->goalAnimState = STATE_DOG_CROUCH;
+					item->targetState = STATE_DOG_CROUCH;
 				}
 				break;
 
@@ -309,7 +309,7 @@ namespace TEN::Entities::TR4
 					LaraItem->hitPoints -= DOG_JUMP_ATTACK_DAMAGE;
 					LaraItem->hitStatus = true;
 				}
-				item->goalAnimState = STATE_DOG_RUN;
+				item->targetState = STATE_DOG_RUN;
 				break;
 
 			case STATE_DOG_HOWL:

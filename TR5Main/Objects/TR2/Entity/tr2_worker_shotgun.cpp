@@ -33,7 +33,7 @@ void InitialiseWorkerShotgun(short itemNum)
 
 	anim = &g_Level.Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->activeState = anim->activeState;
 }
 
 void WorkerShotgunControl(short itemNum)
@@ -52,11 +52,11 @@ void WorkerShotgunControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 7)
+		if (item->activeState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 18;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 7;
+			item->activeState = 7;
 		}
 	}
 	else
@@ -68,7 +68,7 @@ void WorkerShotgunControl(short itemNum)
 
 		angle = CreatureTurn(item, shotgun->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 2:
 			shotgun->flags = 0;
@@ -82,26 +82,26 @@ void WorkerShotgunControl(short itemNum)
 
 			if (shotgun->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance <= 0x900000 || info.zoneNumber != info.enemyZone)
 				{
-					item->goalAnimState = (GetRandomControl() >= 0x4000) ? 9 : 8;
+					item->targetState = (GetRandomControl() >= 0x4000) ? 9 : 8;
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
-				item->goalAnimState = (info.distance <= 0x400000) ? 1 : 5;
+				item->targetState = (info.distance <= 0x400000) ? 1 : 5;
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -114,11 +114,11 @@ void WorkerShotgunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 
@@ -133,23 +133,23 @@ void WorkerShotgunControl(short itemNum)
 
 			if (shotgun->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
-					item->goalAnimState = 6;
+					item->targetState = 6;
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance > 0x400000)
-					item->goalAnimState = 5;
+					item->targetState = 5;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 
@@ -167,11 +167,11 @@ void WorkerShotgunControl(short itemNum)
 			{
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				else if (shotgun->mood == BORED_MOOD || shotgun->mood == STALK_MOOD)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 			}
 			break;
@@ -188,7 +188,7 @@ void WorkerShotgunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = (item->currentAnimState == 8) ? 4 : 10;
+				item->targetState = (item->activeState == 8) ? 4 : 10;
 			}
 			break;
 
@@ -207,9 +207,9 @@ void WorkerShotgunControl(short itemNum)
 				shotgun->flags = 1;
 			}
 
-			if (item->currentAnimState == 4 && item->goalAnimState != 2 && (shotgun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->activeState == 4 && item->targetState != 2 && (shotgun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 

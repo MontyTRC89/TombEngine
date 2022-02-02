@@ -162,8 +162,8 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 		laraItem->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;
 		laraItem->frameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT].frameBase;
-		laraItem->goalAnimState = BGUN_STATE_MOUNT;
-		laraItem->currentAnimState = BGUN_STATE_MOUNT;
+		laraItem->targetState = BGUN_STATE_MOUNT;
+		laraItem->activeState = BGUN_STATE_MOUNT;
 		laraItem->pos = bGunItem->pos;
 		laraItem->airborne = false;
 		laraInfo->gunStatus = LG_HANDS_BUSY;
@@ -242,8 +242,8 @@ bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			laraItem->animNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_DISMOUNT;
 			laraItem->frameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_DISMOUNT].frameBase;
-			laraItem->currentAnimState = BGUN_STATE_DISMOUNT;
-			laraItem->goalAnimState = BGUN_STATE_DISMOUNT;
+			laraItem->activeState = BGUN_STATE_DISMOUNT;
+			laraItem->targetState = BGUN_STATE_DISMOUNT;
 			bGunInfo->flags = BGUN_FLAG_DISMOUNT;
 		}
 		else if (bGunInfo->xRot > BGUN_DISMOUNT_FRAME)
@@ -252,7 +252,7 @@ bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			bGunInfo->xRot++;
 	}
 
-	switch (laraItem->currentAnimState)
+	switch (laraItem->activeState)
 	{
 	case BGUN_STATE_MOUNT:
 	case BGUN_STATE_DISMOUNT:

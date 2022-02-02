@@ -124,7 +124,7 @@ void ApeVault(short item_number, short angle)
 		item->pos.yPos = y;
 		item->animNumber = Objects[ID_APE].animIndex + VAULT_ANIM;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = APE_VAULT;
+		item->activeState = APE_VAULT;
 		break;
 
 	default:
@@ -146,11 +146,11 @@ void ApeControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != APE_DEATH)
+		if (item->activeState != APE_DEATH)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + DIE_ANIM + (short)(GetRandomControl() / 0x4000);
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = APE_DEATH;
+			item->activeState = APE_DEATH;
 		}
 	}
 	else
@@ -168,7 +168,7 @@ void ApeControl(short itemNum)
 		if (item->hitStatus || info.distance < PANIC_RANGE)
 			creature->flags |= ATTACK_FLAG;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case APE_STOP:
 			if (creature->flags & TURNL_FLAG)
@@ -182,62 +182,62 @@ void ApeControl(short itemNum)
 				creature->flags -= TURNR_FLAG;
 			}
 
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (info.bite && info.distance < ATTACK_RANGE)
-				item->goalAnimState = APE_ATTACK1;
+				item->targetState = APE_ATTACK1;
 			else if (!(creature->flags & ATTACK_FLAG) &&
 				info.zoneNumber == info.enemyZone && info.ahead)
 			{
 				random = (short)(GetRandomControl() / 32);
 				if (random < JUMP_CHANCE)
-					item->goalAnimState = APE_JUMP;
+					item->targetState = APE_JUMP;
 				else if (random < WARN1_CHANCE)
-					item->goalAnimState = APE_WARNING;
+					item->targetState = APE_WARNING;
 				else if (random < WARN2_CHANCE)
-					item->goalAnimState = APE_WARNING2;
+					item->targetState = APE_WARNING2;
 				else if (random < RUNLEFT_CHANCE)
 				{
-					item->goalAnimState = APE_RUNLEFT;
+					item->targetState = APE_RUNLEFT;
 					creature->maximumTurn = 0;
 				}
 				else
 				{
-					item->goalAnimState = APE_RUNRIGHT;
+					item->targetState = APE_RUNRIGHT;
 					creature->maximumTurn = 0;
 				}
 			}
 			else
-				item->goalAnimState = APE_RUN;
+				item->targetState = APE_RUN;
 			break;
 
 		case APE_RUN:
 			creature->maximumTurn = RUN_TURN;
 
 			if (creature->flags == 0 && info.angle > -DISPLAY_ANGLE && info.angle < DISPLAY_ANGLE)
-				item->goalAnimState = APE_STOP;
+				item->targetState = APE_STOP;
 			else if (info.ahead && (item->touchBits & TOUCH))
 			{
-				item->requiredAnimState = APE_ATTACK1;
-				item->goalAnimState = APE_STOP;
+				item->requiredState = APE_ATTACK1;
+				item->targetState = APE_STOP;
 			}
 			else if (creature->mood != ESCAPE_MOOD)
 			{
 				random = (short)GetRandomControl();
 				if (random < JUMP_CHANCE)
 				{
-					item->requiredAnimState = APE_JUMP;
-					item->goalAnimState = APE_STOP;
+					item->requiredState = APE_JUMP;
+					item->targetState = APE_STOP;
 				}
 				else if (random < WARN1_CHANCE)
 				{
-					item->requiredAnimState = APE_WARNING;
-					item->goalAnimState = APE_STOP;
+					item->requiredState = APE_WARNING;
+					item->targetState = APE_STOP;
 				}
 				else if (random < WARN2_CHANCE)
 				{
-					item->requiredAnimState = APE_WARNING2;
-					item->goalAnimState = APE_STOP;
+					item->requiredState = APE_WARNING2;
+					item->targetState = APE_STOP;
 				}
 			}
 			break;
@@ -249,7 +249,7 @@ void ApeControl(short itemNum)
 				creature->flags |= TURNR_FLAG;
 			}
 
-			item->goalAnimState = APE_STOP;
+			item->targetState = APE_STOP;
 			break;
 
 		case APE_RUNRIGHT:
@@ -259,18 +259,18 @@ void ApeControl(short itemNum)
 				creature->flags |= TURNL_FLAG;
 			}
 
-			item->goalAnimState = APE_STOP;
+			item->targetState = APE_STOP;
 			break;
 
 		case APE_ATTACK1:
-			if (!item->requiredAnimState && (item->touchBits & TOUCH))
+			if (!item->requiredState && (item->touchBits & TOUCH))
 			{
 				CreatureEffect(item, &apeBite, DoBloodSplat);
 
 				LaraItem->hitPoints -= ATTACK_DAMAGE;
 				LaraItem->hitStatus = true;
 
-				item->requiredAnimState = APE_STOP;
+				item->requiredState = APE_STOP;
 			}
 			break;
 		}
@@ -278,7 +278,7 @@ void ApeControl(short itemNum)
 
 	CreatureJoint(item, 0, head);
 
-	if (item->currentAnimState != APE_VAULT)
+	if (item->activeState != APE_VAULT)
 	{
 		ApeVault(itemNum, angle);
 	}

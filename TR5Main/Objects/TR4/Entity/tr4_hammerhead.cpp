@@ -26,8 +26,8 @@ void InitialiseHammerhead(short itemNumber)
 
     item->animNumber = Objects[item->objectNumber].animIndex + 8;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = STATE_HAMMERHEAD_STOP;
-    item->currentAnimState = STATE_HAMMERHEAD_STOP;
+    item->targetState = STATE_HAMMERHEAD_STOP;
+    item->activeState = STATE_HAMMERHEAD_STOP;
 }
 
 void HammerheadControl(short itemNumber)
@@ -57,10 +57,10 @@ void HammerheadControl(short itemNumber)
 
             short angle = CreatureTurn(item, creature->maximumTurn);
 
-            switch (item->currentAnimState)
+            switch (item->activeState)
             {
             case STATE_HAMMERHEAD_STOP:
-                item->goalAnimState = STATE_HAMMERHEAD_SWIM_SLOW;
+                item->targetState = STATE_HAMMERHEAD_SWIM_SLOW;
                 creature->flags = 0;
                 break;
 
@@ -70,19 +70,19 @@ void HammerheadControl(short itemNumber)
                 {
                     if (info.distance < SQUARE(682))
                     {
-                        item->goalAnimState = STATE_HAMMERHEAD_ATTACK;
+                        item->targetState = STATE_HAMMERHEAD_ATTACK;
                     }
                 }
                 else
                 {
-                    item->goalAnimState = STATE_HAMMERHEAD_SWIM_FAST;
+                    item->targetState = STATE_HAMMERHEAD_SWIM_FAST;
                 }
                 break;
 
             case STATE_HAMMERHEAD_SWIM_FAST:
                 if (info.distance < SQUARE(1024))
                 {
-                    item->goalAnimState = STATE_HAMMERHEAD_SWIM_SLOW;
+                    item->targetState = STATE_HAMMERHEAD_SWIM_SLOW;
                 }
                 break;
 
@@ -112,7 +112,7 @@ void HammerheadControl(short itemNumber)
 
             // NOTE: in TR2 shark there was a call to CreatureKill with special kill anim
             // Hammerhead seems to not have it in original code but this check is still there as a leftover
-            if (item->currentAnimState == STATE_HAMMERHEAD_KILL)
+            if (item->activeState == STATE_HAMMERHEAD_KILL)
             {
                 AnimateItem(item);
             }
@@ -125,10 +125,10 @@ void HammerheadControl(short itemNumber)
         else
         {
             item->hitPoints = 0;
-            if (item->currentAnimState != STATE_HAMMERHEAD_DEATH)
+            if (item->activeState != STATE_HAMMERHEAD_DEATH)
             {
                 item->animNumber = Objects[item->objectNumber].animIndex + 4;
-                item->currentAnimState = STATE_HAMMERHEAD_DEATH;
+                item->activeState = STATE_HAMMERHEAD_DEATH;
                 item->frameNumber = g_Level.Anims[item->frameNumber].frameBase;
             }
 

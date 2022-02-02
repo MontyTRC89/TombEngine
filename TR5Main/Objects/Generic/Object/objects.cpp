@@ -106,15 +106,15 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (((TrInput & IN_ACTION) == 0
-		|| l->currentAnimState != LS_IDLE
+		|| l->activeState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
 		&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 	{
 #ifdef NEW_TIGHTROPE
-		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
-		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		if(l->activeState == LS_TIGHTROPE_FORWARD &&
+		   l->targetState != LS_TIGHTROPE_EXIT &&
 		   !Lara.tightrope.canGoOff)
 		{
 			if(item->pos.yRot == l->pos.yRot)
@@ -124,8 +124,8 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 #else // NEW_TIGHTROPE
-		if(l->currentAnimState == LS_TIGHTROPE_FORWARD &&
-		   l->goalAnimState != LS_TIGHTROPE_EXIT &&
+		if(l->activeState == LS_TIGHTROPE_FORWARD &&
+		   l->targetState != LS_TIGHTROPE_EXIT &&
 		   !Lara.tightRopeOff)
 		{
 			if(item->pos.yRot == l->pos.yRot)
@@ -144,7 +144,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&TightRopePos, item, l))
 			{
-				l->currentAnimState = LS_TIGHTROPE_ENTER;
+				l->activeState = LS_TIGHTROPE_ENTER;
 				l->animNumber = LA_TIGHTROPE_START;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.isMoving = false;
@@ -183,7 +183,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && l->currentAnimState == LS_REACH && l->animNumber == LA_REACH)
+	if (TrInput & IN_ACTION && l->activeState == LS_REACH && l->animNumber == LA_REACH)
 	{
 		int test1 = TestLaraPosition(&ParallelBarsBounds, item, l);
 		int test2 = 0;
@@ -196,7 +196,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 		if (test1 || test2)
 		{
-			l->currentAnimState = LS_MISC_CONTROL;
+			l->activeState = LS_MISC_CONTROL;
 			l->animNumber = LA_SWINGBAR_GRAB;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->fallspeed = false;
@@ -238,7 +238,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			ObjectCollision(itemNumber, l, coll);
 		}
 	}
-	else if (l->currentAnimState != LS_BARS_SWING)
+	else if (l->activeState != LS_BARS_SWING)
 	{
 		ObjectCollision(itemNumber, l, coll);
 	}
@@ -321,7 +321,7 @@ void InitialiseTightRope(short itemNumber)
 void InitialiseAnimating(short itemNumber)
 {
 	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->currentAnimState = 0;
+	item->activeState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
 }

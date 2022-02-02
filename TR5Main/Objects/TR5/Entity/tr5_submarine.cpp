@@ -169,8 +169,8 @@ void InitialiseSubmarine(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 0;
-    item->currentAnimState = 0;
+    item->targetState = 0;
+    item->activeState = 0;
     if (!item->triggerFlags)
         item->triggerFlags = 120;
 }
@@ -258,12 +258,12 @@ void SubmarineControl(short itemNumber)
 
 		if (laraInfo.distance >= SQUARE(3072))
 		{
-			item->goalAnimState = 1;
+			item->targetState = 1;
 			SoundEffect(SFX_TR5_MINI_SUB_LOOP, &item->pos, 2);
 		}
 		else
 		{
-			item->goalAnimState = 0;
+			item->targetState = 0;
 		}
 
 		if (info.distance < SQUARE(1024))
@@ -284,7 +284,7 @@ void SubmarineControl(short itemNumber)
 	}
 	else
 	{
-		item->goalAnimState = 1;
+		item->targetState = 1;
 	}
 
 	creature->enemy = enemy;
@@ -498,15 +498,15 @@ void TorpedoControl(short itemNumber)
 			pos.x = chaffItem->pos.xPos;
 			pos.y = chaffItem->pos.yPos;
 			pos.z = chaffItem->pos.zPos;
-			item->currentAnimState = pos.x / 4;
-			item->goalAnimState = pos.y / 4;
-			item->requiredAnimState = pos.z / 4;
+			item->activeState = pos.x / 4;
+			item->targetState = pos.y / 4;
+			item->requiredState = pos.z / 4;
 		}
 		else
 		{
-			pos.x = 4 * item->currentAnimState;
-			pos.y = 4 * item->goalAnimState;
-			pos.z = 4 * item->requiredAnimState;
+			pos.x = 4 * item->activeState;
+			pos.y = 4 * item->targetState;
+			pos.z = 4 * item->requiredState;
 		}
 	}
 
