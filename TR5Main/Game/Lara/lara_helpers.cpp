@@ -232,7 +232,7 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// runJumpQueued will never reset, and when the sad cloud flies away, Lara will jump. @Sezz 2022.01.22
+// runJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -242,8 +242,8 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item, item->pos.yRot, dist, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.7f)) ||	// OR ceiling height is permissive far ahead
-			(probe.Position.Floor - y) >= CLICK(0.5f)) &&										// OR there is a drop below far ahead.
+			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
+			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		info->runJumpQueued = (item->targetState == LS_RUN_FORWARD);
