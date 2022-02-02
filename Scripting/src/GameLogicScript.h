@@ -8,12 +8,6 @@
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
-#include "GameScriptItemInfo.h"
-#include "Entity/Static/GameScriptMeshInfo.h"
-#include "GameScriptSinkInfo.h"
-#include "GameScriptAIObject.h"
-#include "GameScriptSoundSourceInfo.h"
-#include "GameScriptCameraInfo.h"
 #include "GameScriptDisplayString.h"
 
 struct LuaFunction {
@@ -57,8 +51,6 @@ private:
 	LuaVariables												m_globals{};
 	LuaVariables												m_locals{};
 	DisplayStringMap											m_userDisplayStrings{};
-	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
-	std::unordered_map<std::string, short>						m_itemsMapName{};
 	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
@@ -82,30 +74,10 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
-	void								AssignItemsAndLara() override;
-
-
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name) override;
 	void								MakeItemInvisible(short id);
 
-	template <typename R, char const* S>
-	std::unique_ptr<R> GetByName(std::string const& name)
-	{
-		ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name);
-		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)), false);
-	}
-
-	bool AddName(std::string const& key, VarMapVal val) override
-	{
-		auto p = std::pair<std::string const&, VarMapVal>{ key, val };
-		return m_nameMap.insert(p).second;
-	}
-
-	bool RemoveName(std::string const& key)
-	{
-		return m_nameMap.erase(key);
-	}
 
 	// Variables
 	template <typename T>
