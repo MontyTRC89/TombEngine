@@ -851,6 +851,7 @@ void FreeLevel()
 	}
 	g_Renderer.freeRendererData();
 	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
 }
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)

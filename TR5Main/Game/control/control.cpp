@@ -47,6 +47,7 @@
 #include "Specific/winmain.h"
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Entity/ScriptInterfaceEntity.h"
 
 using std::vector;
 using std::unordered_map;
@@ -546,6 +547,7 @@ GAME_STATUS DoTitle(int index, std::string const & ambient)
 
 	g_GameScript->OnEnd();
 	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
 
 	switch (inventoryResult)
 	{
@@ -671,6 +673,8 @@ GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegam
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
+			g_GameScriptEntities->FreeEntities();
+
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
