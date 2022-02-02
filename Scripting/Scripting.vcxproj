@@ -52,7 +52,6 @@
     <ClInclude Include="include\Scripting\GameScriptDisplayString.h" />
     <ClInclude Include="include\Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="include\Scripting\GameScriptInventoryObject.h" />
-    <ClInclude Include="include\Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptLevel.h" />
     <ClInclude Include="include\Scripting\GameScriptMeshInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptMirror.h" />
@@ -79,6 +78,8 @@
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
     <ClInclude Include="src\Entities\Entities.h" />
+    <ClInclude Include="src\Entities\Moveable\GameScriptItemInfo.h" />
+    <ClInclude Include="src\Entities\ObjectIDs.h" />
     <ClInclude Include="src\Entities\Static\GameScriptMeshInfo.h" />
     <ClInclude Include="src\GameFlowScript.h" />
     <ClInclude Include="src\GameLogicScript.h" />
@@ -90,7 +91,6 @@
     <ClInclude Include="src\GameScriptDisplayString.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptInventoryObject.h" />
-    <ClInclude Include="src\GameScriptItemInfo.h" />
     <ClInclude Include="src\GameScriptLevel.h" />
     <ClInclude Include="src\GameScriptMirror.h" />
     <ClInclude Include="src\GameScriptNamedBase.h" />
@@ -103,7 +103,6 @@
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
     <ClInclude Include="src\LuaHandler.h" />
-    <ClInclude Include="src\ObjectIDs.h" />
     <ClInclude Include="src\ReservedScriptNames.h" />
     <ClInclude Include="src\ScriptAssert.h" />
     <ClInclude Include="src\ScriptInterfaceState.h" />
@@ -116,6 +115,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Entities\Entities.cpp" />
+    <ClCompile Include="src\Entities\Moveable\GameScriptItemInfo.cpp" />
     <ClCompile Include="src\Entities\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\GameFlowScript.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
@@ -128,7 +128,6 @@
     <ClCompile Include="src\GameScriptDisplayString.cpp" />
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
-    <ClCompile Include="src\GameScriptItemInfo.cpp" />
     <ClCompile Include="src\GameScriptLevel.cpp" />
     <ClCompile Include="src\GameScriptMirror.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />

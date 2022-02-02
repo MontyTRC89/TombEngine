@@ -153,9 +153,6 @@
     <ClInclude Include="include\Scripting\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptItemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scripting\GameScriptAnimations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -219,9 +216,6 @@
     <ClInclude Include="src\GameScriptInventoryObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameScriptItemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -258,9 +252,6 @@
     <ClInclude Include="src\LuaHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ObjectIDs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ReservedScriptNames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -273,15 +264,6 @@
     <ClInclude Include="src\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entity\Static\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entity\Entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\Entity\ScriptInterfaceEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Entities\Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -289,6 +271,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Entities\Static\GameScriptMeshInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Moveable\GameScriptItemInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\ObjectIDs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -338,9 +326,6 @@
     <ClCompile Include="src\GameScriptLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameScriptItemInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameScriptAnimations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -362,16 +347,13 @@
     <ClCompile Include="src\ScriptInterfaceState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entity\Static\GameScriptMeshInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entity\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Entities\Entities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Static\GameScriptMeshInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Moveable\GameScriptItemInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
