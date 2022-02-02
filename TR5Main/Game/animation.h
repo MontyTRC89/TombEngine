@@ -14,23 +14,38 @@ struct ANIM_FRAME
 	std::vector<Quaternion> angles;
 };
 
+struct CHANGE_STRUCT
+{
+	int goalAnimState;
+	int numberRanges;
+	int rangeIndex;
+};
+
+struct RANGE_STRUCT
+{
+	int startFrame;
+	int endFrame;
+	int linkAnimNum;
+	int linkFrameNum;
+};
+
 struct ANIM_STRUCT
 {
 	int framePtr;
-	short interpolation;
-	short currentAnimState;
+	int interpolation;
+	int currentAnimState;
 	int velocity;
 	int acceleration;
 	int Xvelocity;
 	int Xacceleration;
-	short frameBase;
-	short frameEnd;
-	short jumpAnimNum;
-	short jumpFrameNum;
-	short numberChanges;
-	short changeIndex;
-	short numberCommands;
-	short commandIndex;
+	int frameBase;
+	int frameEnd;
+	int jumpAnimNum;
+	int jumpFrameNum;
+	int numberChanges;
+	int changeIndex;
+	int numberCommands;
+	int commandIndex;
 };
 
 enum ANIMCOMMAND_TYPES
@@ -55,12 +70,12 @@ struct BONE_MUTATOR
 
 void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
-void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart = 0);
-short GetFrameNumber(ITEM_INFO* item, short frameToStart);
-short GetFrameNumber(short objectID, short animNumber, short frameToStart);
-int GetFrameCount(short animNumber);
+void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart = 0);
+int GetFrameNumber(ITEM_INFO* item, int frameToStart);
+int GetFrameNumber(int objectID, int animNumber, int frameToStart);
+int GetFrameCount(int animNumber);
 int GetNextAnimState(ITEM_INFO* item);
-int GetNextAnimState(short objectID, short animNumber);
+int GetNextAnimState(int objectID, int animNumber);
 bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
@@ -68,6 +83,6 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
 void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint);
 void ClampRotation(PHD_3DPOS* pos, short angle, short rot); 
-bool TestLastFrame(ITEM_INFO* item, short animNumber = -1);
+bool TestLastFrame(ITEM_INFO* item, int animNumber = -1);
 
 void DrawAnimatingItem(ITEM_INFO* item);

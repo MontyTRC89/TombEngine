@@ -76,7 +76,14 @@ void GuideControl(short itemNumber)
 		TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		short random = GetRandomControl();
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 255 - ((random / 16) & 0x1F), 192 - ((random / 64) & 0x1F), random & 0x3F);
+		TriggerDynamicLight(
+			pos.x, 
+			pos.y,
+			pos.z, 
+			15, 
+			255 - ((random >> 4) & 0x1F), 
+			192 - ((random >> 6) & 0x1F), 
+			random & 0x3F);
 
 		if (item->animNumber == obj->animIndex + 61)
 		{
@@ -190,10 +197,8 @@ void GuideControl(short itemNumber)
 	bool someFlag = false;
 	FLOOR_INFO* floor;
 	PHD_VECTOR pos1;
-	short frameNumber;
+	int frameNumber;
 	short random;
-
-	TENLog("Guide state:" + std::to_string(item->currentAnimState), LogLevel::Info);
 
 	switch (item->currentAnimState)
 	{
@@ -481,8 +486,8 @@ void GuideControl(short itemNumber)
 					{
 						TriggerFireFlame(
 							(random & 0x3F) + pos1.x - 64,
-							((random / 32) & 0x3F) + pos1.y - 96,
-							((random / 1024) & 0x3F) + pos1.z - 64,
+							((random >> 5) & 0x3F) + pos1.y - 96,
+							((random >> 10) & 0x3F) + pos1.z - 64,
 							-1,
 							7);
 
@@ -491,8 +496,8 @@ void GuideControl(short itemNumber)
 							pos1.y - 64,
 							pos1.z - 32,
 							10,
-							192 - ((random / 16) & 0x1F),
-							128 - ((random / 64) & 0x1F),
+							-64 - ((random >> 4) & 0x1F),
+							-128 - ((random >> 6) & 0x1F),
 							random & 0x1F);
 
 						item->itemFlags[1] = 2;
@@ -501,24 +506,46 @@ void GuideControl(short itemNumber)
 				else
 				{
 					TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
-					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random / 64) & 0x1F), 128 - ((random / 16) & 0x1F));
+					TriggerDynamicLight(
+						pos1.x,
+						pos1.y, 
+						pos1.z, 
+						10, 
+						random & 0x1F,
+						96 - ((random >> 6) & 0x1F),
+						128 - ((random >> 4) & 0x1F));
 				}
 			}
 			else
 			{
-				TriggerDynamicLight(pos1.x - 32, pos1.y - 64, pos1.z - 32, 10, 192 - ((random / 16) & 0x1F), 128 - ((random / 64) & 0x1F), random & 0x1F);
+				TriggerDynamicLight(
+					pos1.x - 32,
+					pos1.y - 64, 
+					pos1.z - 32, 
+					10, 
+					-64 - ((random >> 4) & 0x1F),
+					-128 - ((random >> 6) & 0x1F),
+					random & 0x1F);
 
 				TriggerFireFlame(
 					(random & 0x3F) + pos1.x - 64,
-					((random / 32) & 0x3F) + pos1.y - 96,
-					((random / 1024) & 0x3F) + pos1.z - 64,
+					((random >> 5) & 0x3F) + pos1.y - 96,
+					((random >> 10) & 0x3F) + pos1.z - 64,
 					-1,
 					7);
 			}
 		}
 		else
 		{
-			TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, random & 0x1F, 96 - ((random / 64) & 0x1F), 128 - ((random / 16) & 0x1F));
+			TriggerDynamicLight(
+				pos1.x, 
+				pos1.y, 
+				pos1.z, 
+				10, 
+				random & 0x1F, 
+				96 - ((random >> 6) & 0x1F),
+				128 - ((random >> 4) & 0x1F));
+
 			TriggerMetalSparks(pos1.x, pos1.y, pos1.z, -1, -1, 0, 1);
 		}
 

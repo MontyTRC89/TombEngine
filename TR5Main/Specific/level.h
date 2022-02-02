@@ -75,21 +75,6 @@ struct AI_OBJECT
 	std::string luaName;
 };
 
-struct CHANGE_STRUCT
-{
-	short goalAnimState;
-	short numberRanges;
-	short rangeIndex;
-};
-
-struct RANGE_STRUCT
-{
-	short startFrame;
-	short endFrame;
-	short linkAnimNum;
-	short linkFrameNum;
-};
-
 struct SPRITE
 {
 	int tile;
@@ -105,6 +90,7 @@ struct SPRITE
 
 struct MESH
 {
+	byte LightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;

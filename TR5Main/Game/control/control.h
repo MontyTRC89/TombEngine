@@ -33,6 +33,13 @@ enum HEADINGS
 	WEST
 };
 
+enum FADE_STATUS
+{
+	FADE_STATUS_NONE,
+	FADE_STATUS_FADEIN,
+	FADE_STATUS_FADEOUT
+};
+
 constexpr int MAX_ROOMS = 1024;
 
 constexpr int WIBBLE_SPEED = 4;

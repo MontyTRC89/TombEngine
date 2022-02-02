@@ -72,6 +72,16 @@ short CurrentFOV;
 int RumbleTimer = 0;
 int RumbleCounter = 0;
 
+bool ScreenFadedOut = false;
+bool ScreenFading = false;
+float ScreenFadeSpeed = 0;
+float ScreenFadeStart = 0;
+float ScreenFadeEnd = 0;
+float ScreenFadeCurrent = 0;
+float CinematicBarsHeight = 0;
+float CinematicBarsDestinationHeight = 0;
+float CinematicBarsSpeed = 0;
+
 void LookAt(CAMERA_INFO* cam, short roll)
 {
 	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
@@ -1968,6 +1978,78 @@ void RumbleScreen()
 		{
 			RumbleCounter++;
 			Camera.bounce = -(GetRandomControl() % RumbleCounter);
+		}
+	}
+}
+
+void SetScreenFadeOut(float speed)
+{
+	if (!ScreenFading)
+	{
+		ScreenFading = true;
+		ScreenFadeStart = 1.0f;
+		ScreenFadeEnd = 0;
+		ScreenFadeSpeed = speed;
+		ScreenFadeCurrent = ScreenFadeStart;
+	}
+}
+
+void SetScreenFadeIn(float speed)
+{
+	if (!ScreenFading)
+	{
+		ScreenFading = true;
+		ScreenFadeStart = 0;
+		ScreenFadeEnd = 1.0f;
+		ScreenFadeSpeed = speed;
+		ScreenFadeCurrent = ScreenFadeStart;
+	}
+}
+
+void SetCinematicBars(float height, float speed)
+{
+	CinematicBarsDestinationHeight = height;
+	CinematicBarsSpeed = speed;
+}
+
+void UpdateFadeScreenAndCinematicBars()
+{
+	if (CinematicBarsDestinationHeight < CinematicBarsHeight)
+	{
+		CinematicBarsHeight -= CinematicBarsSpeed;
+		if (CinematicBarsDestinationHeight > CinematicBarsHeight)
+			CinematicBarsHeight = CinematicBarsDestinationHeight;
+	}
+	else if (CinematicBarsDestinationHeight > CinematicBarsHeight)
+	{
+		CinematicBarsHeight += CinematicBarsSpeed;
+		if (CinematicBarsDestinationHeight < CinematicBarsHeight)
+			CinematicBarsHeight = CinematicBarsDestinationHeight;
+	}
+
+	int oldScreenFadeCurrent = ScreenFadeCurrent;
+
+	if (ScreenFadeEnd != 0 && ScreenFadeEnd >= ScreenFadeCurrent)
+	{
+		ScreenFadeCurrent += ScreenFadeSpeed;
+		if (ScreenFadeCurrent > ScreenFadeEnd)
+		{
+			ScreenFadeCurrent = ScreenFadeEnd;
+			if (oldScreenFadeCurrent >= ScreenFadeCurrent)
+			{
+				ScreenFadedOut = true;
+				ScreenFading = false;
+			}
+
+		}
+	}
+	else if (ScreenFadeEnd < ScreenFadeCurrent)
+	{
+		ScreenFadeCurrent -= ScreenFadeSpeed;
+		if (ScreenFadeCurrent < ScreenFadeEnd)
+		{
+			ScreenFadeCurrent = ScreenFadeEnd;
+			ScreenFading = false;
 		}
 	}
 }

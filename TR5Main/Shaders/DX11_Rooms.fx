@@ -1,19 +1,11 @@
-#include "CameraMatrixBuffer.hlsli"
+#include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
-struct RendererLight {
-	float4 Position;
-	float4 Color;
-	float4 Direction;
-	float Intensity;
-	float In;
-	float Out;
-	float Range;
-};
+#include "./ShaderLight.hlsli"
 
 cbuffer LightsBuffer : register(b1)
 {
-	RendererLight Lights[48];
+	ShaderLight Lights[MAX_LIGHTS];
 	int NumLights;
 	float3 Padding;
 };
@@ -24,9 +16,9 @@ cbuffer MiscBuffer : register(b3)
 	int Caustics;
 };
 
-cbuffer CShadowLightBuffer : register(b4)
+cbuffer ShadowLightBuffer : register(b4)
 {
-	RendererLight Light;
+	ShaderLight Light;
 	float4x4 LightViewProjection;
 	int CastShadows;
 	float3 Padding2;
@@ -37,6 +29,7 @@ cbuffer RoomBuffer : register(b5)
 	float4 AmbientColor;
 	int Water;
 };
+
 struct AnimatedFrameUV
 {
 	float2 topLeft;
@@ -44,10 +37,10 @@ struct AnimatedFrameUV
 	float2 bottomRight;
 	float2 bottomLeft;
 };
+
 cbuffer AnimatedBuffer : register(b6) {
 	AnimatedFrameUV AnimFrames[32];
 	uint numAnimFrames;
-	
 }
 
 struct PixelShaderInput
@@ -59,16 +52,18 @@ struct PixelShaderInput
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
 	float3x3 TBN : TBN;
+	float Fog : FOG;
 };
-Texture2D NormalTexture : register(t3);
+
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
-Texture2D CausticsTexture : register(t1);
+Texture2D NormalTexture : register(t1);
 
-Texture2D ShadowMap : register(t2);
-SamplerComparisonState ShadowMapSampler : register(s1);
+Texture2D CausticsTexture : register(t2);
 
+Texture2D ShadowMap : register(t3);
+SamplerComparisonState ShadowMapSampler : register(s3);
 
 float hash(float3 n)
 {
@@ -86,16 +81,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	// Setting effect weight on TE side prevents portal vertices from moving.
 	// Here we just read weight and decide if we should apply refraction or movement effect.
-	
 	float weight = input.Effects.z;
 	
 	// Wibble effect returns different value depending on vertex hash and frame number.
 	// In theory, hash could be affected by WaterScheme value from room.
-	
 	float wibble = sin((((Frame + input.Hash) % 64) / 64.0) * (PI2)); // sin from -1 to 1 with a period of 64 frames
 	
 	// Glow
-	
 	if (input.Effects.x > 0.0f)
 	{
 		float intensity = input.Effects.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
@@ -103,12 +95,10 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 	
 	// Movement
-	
 	if (input.Effects.y > 0.0f)
         pos.y += wibble * input.Effects.y * weight * 128.0f; // 128 units offset to top and bottom (256 total)
 
 	// Refraction
-	
 	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
 	float2 clipPos = screenPos.xy / screenPos.w;
 	if (CameraUnderwater != Water)
@@ -150,6 +140,14 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
 	output.TBN = TBN;
+
+	// Apply distance fog
+	float4 d = length(CamPositionWS - output.WorldPosition);
+	if (FogMaxDistance == 0)
+		output.Fog = 1;
+	else
+		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+
 	return output;
 }
 
@@ -160,15 +158,14 @@ float2 texOffset(int u, int v) {
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.01f) {
+	if (AlphaTest && output.w < 0.5f) {
 		discard;
 	}
+
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
-	//Normal = float3(0.5, 0.5, 1);
 	Normal = Normal * 2 - 1;
 	Normal = normalize(mul(Normal,input.TBN));
-	//Normal = input.Normal;
-	
+
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
@@ -195,7 +192,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			}
 
 			float shadowFactor = sum / 16.0;
-			lighting = lerp(lighting, min(AmbientColor,lighting), 1-saturate(shadowFactor));
+			lighting = lerp(lighting, min(AmbientColor,lighting), 1 - saturate(shadowFactor));
 		}
 	}
 
@@ -206,21 +203,20 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			float3 lightPos = Lights[i].Position.xyz;
 			float3 color = Lights[i].Color.xyz;
 			float radius = Lights[i].Out;
-			float intensity = Lights[i].Intensity;
 
 			float3 lightVec = (lightPos - input.WorldPosition);
 			float distance = length(lightVec);
-			lightVec = normalize(lightVec);
 			if (distance > radius)
 				continue;
 
-			float d = saturate(dot(Normal,-lightVec ));
+			lightVec = normalize(lightVec);
+			float d = saturate(dot(Normal, -lightVec ));
 			if (d < 0)
 				continue;
 			
 			float attenuation = pow(((radius - distance) / radius), 2);
 
-			lighting += color * intensity * attenuation * d;
+			lighting += color * attenuation * d;
 		}
 	}
 
@@ -249,6 +245,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	}
 	
 	output.xyz = output.xyz * lighting;
+
+	if (FogMaxDistance != 0)
+		output.xyz = lerp(output.xyz, FogColor, input.Fog);
 
 	return output;
 }

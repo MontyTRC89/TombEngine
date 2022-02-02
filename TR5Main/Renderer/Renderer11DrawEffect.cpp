@@ -55,7 +55,7 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Footprints;
 	using std::vector;
 
-	void Renderer11::drawLightning(RenderView& view) 
+	void Renderer11::DrawLightning(RenderView& view) 
 	{
 		for (int i = 0; i < Lightning.size(); i++)
 		{
@@ -136,7 +136,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSmokes(RenderView& view) 
+	void Renderer11::DrawSmokes(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -154,7 +154,7 @@ namespace TEN::Renderer
 	}
 
 
-	void Renderer11::drawFires(RenderView& view) 
+	void Renderer11::DrawFires(RenderView& view) 
 	{
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
@@ -174,7 +174,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSparks(RenderView& view) 
+	void Renderer11::DrawSparks(RenderView& view) 
 	{
 		PHD_VECTOR nodePos;
 
@@ -281,7 +281,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSplahes(RenderView& view) 
+	void Renderer11::DrawSplashes(RenderView& view) 
 	{
 		constexpr size_t NUM_POINTS = 9;
 
@@ -346,7 +346,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawBubbles(RenderView& view) 
+	void Renderer11::DrawBubbles(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_BUBBLES; i++) 
 		{
@@ -362,7 +362,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawDrips(RenderView& view) 
+	void Renderer11::DrawDrips(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_DRIPS; i++) 
 		{
@@ -378,7 +378,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawRipples(RenderView& view) 
+	void Renderer11::DrawRipples(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_RIPPLES; i++) 
 		{
@@ -405,7 +405,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawShockwaves(RenderView& view) 
+	void Renderer11::DrawShockwaves(RenderView& view) 
 	{
 		for (int i = 0; i < MAX_SHOCKWAVE; i++) 
 		{
@@ -470,7 +470,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawBlood(RenderView& view) 
+	void Renderer11::DrawBlood(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -487,7 +487,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawWeatherParticles(RenderView& view) 
+	void Renderer11::DrawWeatherParticles(RenderView& view) 
 	{		
 		for (auto& p : Weather.GetParticles())
 		{
@@ -516,7 +516,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::drawGunFlashes(RenderView& view) 
+	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
 		if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
 			return true;
@@ -538,9 +538,9 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-		m_stLights.NumLights = item->Lights.size();
-		for (int j = 0; j < item->Lights.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
+		m_stLights.NumLights = item->LightsToDraw.size();
+		for (int j = 0; j < item->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
@@ -588,7 +588,7 @@ namespace TEN::Renderer
 
 			for (auto& flashBucket : flashMesh->buckets) 
 			{
-				if (flashBucket.blendMode == BLENDMODE_OPAQUE)
+				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
 				if (flashBucket.Vertices.size() != 0) 
 				{
@@ -632,70 +632,72 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	void Renderer11::drawBaddieGunflashes(RenderView& view)
+	void Renderer11::DrawBaddieGunflashes(RenderView& view)
 	{
-		for (int i = 0; i < view.itemsToDraw.size(); i++) 
+		for (auto room : view.roomsToDraw)
 		{
-			RendererItem* item = view.itemsToDraw[i];
-
-			// Does the item need gunflash?
-			OBJECT_INFO* obj = &Objects[item->Item->objectNumber];
-			if (obj->biteOffset == -1 || !item->Item->firedWeapon)
-				continue;
-
-			RendererRoom const & room = m_rooms[item->Item->roomNumber];
-			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
-
-			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
-
-			m_stLights.NumLights = item->Lights.size();
-			for (int j = 0; j < item->Lights.size(); j++)
-				memcpy(&m_stLights.Lights[j], item->Lights[j], sizeof(ShaderLight));
-			m_cbLights.updateData(m_stLights, m_context.Get());
-			m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
-
-			m_stMisc.AlphaTest = true;
-			m_cbMisc.updateData(m_stMisc, m_context.Get());
-			m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-			BITE_INFO* bites[2] = {
-				&EnemyBites[obj->biteOffset],
-				&EnemyBites[obj->biteOffset + 1]
-			};
-
-			int numBites = (bites[0]->meshNum < 0) + 1;
-
-			for (int k = 0; k < numBites; k++) 
+			for (auto item : room->ItemsToDraw)
 			{
-				int joint = abs(bites[k]->meshNum);
+				// Does the item need gunflash?
+				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+				OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+				if (obj->biteOffset == -1 || !nativeItem->firedWeapon)
+					continue;
 
-				RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+				RendererRoom const& room = m_rooms[nativeItem->roomNumber];
+				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
-				for (auto& flashBucket : flashMesh->buckets) 
+				m_stItem.AmbientLight = room.AmbientLight;
+				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+
+				m_stLights.NumLights = item->LightsToDraw.size();
+				for (int j = 0; j < item->LightsToDraw.size(); j++)
+					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
+				m_cbLights.updateData(m_stLights, m_context.Get());
+				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+
+				m_stMisc.AlphaTest = true;
+				m_cbMisc.updateData(m_stMisc, m_context.Get());
+				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+				BITE_INFO* bites[2] = {
+					&EnemyBites[obj->biteOffset],
+					&EnemyBites[obj->biteOffset + 1]
+				};
+
+				int numBites = (bites[0]->meshNum < 0) + 1;
+
+				for (int k = 0; k < numBites; k++)
 				{
-					if (flashBucket.blendMode == BLENDMODE_OPAQUE)
-						continue;
-					if (flashBucket.Vertices.size() != 0) 
+					int joint = abs(bites[k]->meshNum);
+
+					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+
+					for (auto& flashBucket : flashMesh->buckets)
 					{
-						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
-						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+							continue;
+						if (flashBucket.Vertices.size() != 0)
+						{
+							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
+							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[joint] * item->World;
-						world = rotationX * world;
-						world = offset * world;
-						world = rotationZ * world;
+							Matrix world = item->AnimationTransforms[joint] * item->World;
+							world = rotationX * world;
+							world = offset * world;
+							world = rotationZ * world;
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+							m_stItem.World = world;
+							m_cbItem.updateData(m_stItem, m_context.Get());
+							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
-						m_numDrawCalls++;
+							m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+							m_numDrawCalls++;
+						}
 					}
 				}
 			}
@@ -726,8 +728,10 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawUnderwaterDust(RenderView& view) 
+	void Renderer11::DrawUnderwaterDust(RenderView& view) 
 	{
+		return;
+
 		if (m_firstUnderwaterDustParticles) {
 			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 				m_underwaterDustParticles[i].Reset = true;
@@ -745,7 +749,7 @@ namespace TEN::Renderer
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;
 				FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-				if (!isRoomUnderwater(roomNumber))
+				if (!IsRoomUnderwater(roomNumber))
 					continue;
 
 				if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
@@ -772,185 +776,252 @@ namespace TEN::Renderer
 		return;
 	}
 
-	void Renderer11::drawSprites(RenderView& view)
+	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		int currentBlendMode = -1;
 
 		for (auto& spr : view.spritesToDraw) 
 		{
-			Matrix billboardMatrix;
+			// Calculate matrices for sprites
+			Matrix spriteMatrix;
+			Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 
-			if(spr.BlendMode != currentBlendMode)
+			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				currentBlendMode = spr.BlendMode;
-				setBlendMode(spr.BlendMode);
-			}
-
-			m_context->PSSetShaderResources(0, 1, spr.Sprite->Texture->ShaderResourceView.GetAddressOf());
-			ID3D11SamplerState* sampler = m_states->LinearClamp();
-			m_context->PSSetSamplers(0, 1, &sampler);
-			Matrix scale = Matrix::CreateScale((spr.Width)*spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-
-			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) 
-			{
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
-				//Extract Camera Up Vector and create Billboard matrix.
 				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				billboardMatrix = scale * rotation * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
-			} 
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
+				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
 			{
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation);
+				Matrix rotation = Matrix::CreateRotationY(spr.Rotation);
 				Vector3 quadForward = Vector3(0, 0, 1);
-
-				billboardMatrix = scale * rotation * Matrix::CreateConstrainedBillboard(
+				spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
 					spr.pos,
 					Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
 					spr.ConstrainAxis,
 					nullptr,
 					&quadForward);
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
-			} 
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) 
+			}
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
 			{
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
 				Matrix translation = Matrix::CreateTranslation(spr.pos);
-				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero,spr.LookAtAxis,Vector3::UnitZ);
-
-				billboardMatrix = scale * rotation * translation;
-				m_stSprite.billboardMatrix = billboardMatrix;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = true;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_context->Draw(4, 0);
+				Matrix rotation = Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr.LookAtAxis, Vector3::UnitZ);
+				spriteMatrix = scale * rotation * translation;
 			}
-			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
+			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
 			{
-				UINT stride = sizeof(RendererVertex);
-				UINT offset = 0;
-				m_context->RSSetState(m_states->CullNone());
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
-
-				m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-				m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_context->IASetInputLayout(m_inputLayout.Get());
-				m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-				Vector3 p0t = spr.vtx1;
-				Vector3 p1t = spr.vtx2;
-				Vector3 p2t = spr.vtx3;
-				Vector3 p3t = spr.vtx4;
-
-				RendererVertex v0;
-				v0.Position.x = p0t.x;
-				v0.Position.y = p0t.y;
-				v0.Position.z = p0t.z;
-				v0.UV.x = spr.Sprite->UV[0].x;
-				v0.UV.y = spr.Sprite->UV[0].y;
-				v0.Color = spr.color;
-
-				RendererVertex v1;
-				v1.Position.x = p1t.x;
-				v1.Position.y = p1t.y;
-				v1.Position.z = p1t.z;
-				v1.UV.x = spr.Sprite->UV[1].x;
-				v1.UV.y = spr.Sprite->UV[1].y;
-				v1.Color = spr.color;
-
-				RendererVertex v2;
-				v2.Position.x = p2t.x;
-				v2.Position.y = p2t.y;
-				v2.Position.z = p2t.z;
-				v2.UV.x = spr.Sprite->UV[2].x;
-				v2.UV.y = spr.Sprite->UV[2].y;
-				v2.Color = spr.color;
-
-				RendererVertex v3;
-				v3.Position.x = p3t.x;
-				v3.Position.y = p3t.y;
-				v3.Position.z = p3t.z;
-				v3.UV.x = spr.Sprite->UV[3].x;
-				v3.UV.y = spr.Sprite->UV[3].y;
-				v3.Color = spr.color;
-				m_stSprite.color = spr.color;
-				m_stSprite.isBillboard = false;
-				m_cbSprite.updateData(m_stSprite, m_context.Get());
-				m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-				m_primitiveBatch->Begin();
-				m_primitiveBatch->DrawTriangle(v0, v1, v3);
-				m_primitiveBatch->DrawTriangle(v1, v2, v3);
-				m_primitiveBatch->End();
+				spriteMatrix = Matrix::Identity;
 			}
-			m_numDrawCalls++;
+
+			if (isSortingRequired(spr.BlendMode))
+			{
+				// Collect sprites
+				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				RendererTransparentFace face;
+				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
+				face.info.sprite = &spr;
+				face.distance = distance;
+				face.info.world = spriteMatrix;
+				face.info.blendMode = spr.BlendMode;
+
+				RendererRoom& room = m_rooms[GetRoomNumberForSpriteTest(spr.pos)];
+				room.TransparentFacesToDraw.push_back(face);
+			}
+			else
+			{
+				// Draw sprites immediately
+				if (spr.BlendMode != currentBlendMode)
+				{
+					currentBlendMode = spr.BlendMode;
+					setBlendMode(spr.BlendMode);
+				}
+
+				BindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
+
+				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
+				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+					m_context->RSSetState(m_states->CullNone());
+					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_stMisc.AlphaTest = true;
+					m_cbMisc.updateData(m_stMisc, m_context.Get());
+					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					Vector3 p0t = spr.vtx1;
+					Vector3 p1t = spr.vtx2;
+					Vector3 p2t = spr.vtx3;
+					Vector3 p3t = spr.vtx4;
+
+					RendererVertex v0;
+					v0.Position.x = p0t.x;
+					v0.Position.y = p0t.y;
+					v0.Position.z = p0t.z;
+					v0.UV.x = spr.Sprite->UV[0].x;
+					v0.UV.y = spr.Sprite->UV[0].y;
+					v0.Color = spr.color;
+
+					RendererVertex v1;
+					v1.Position.x = p1t.x;
+					v1.Position.y = p1t.y;
+					v1.Position.z = p1t.z;
+					v1.UV.x = spr.Sprite->UV[1].x;
+					v1.UV.y = spr.Sprite->UV[1].y;
+					v1.Color = spr.color;
+
+					RendererVertex v2;
+					v2.Position.x = p2t.x;
+					v2.Position.y = p2t.y;
+					v2.Position.z = p2t.z;
+					v2.UV.x = spr.Sprite->UV[2].x;
+					v2.UV.y = spr.Sprite->UV[2].y;
+					v2.Color = spr.color;
+
+					RendererVertex v3;
+					v3.Position.x = p3t.x;
+					v3.Position.y = p3t.y;
+					v3.Position.z = p3t.z;
+					v3.UV.x = spr.Sprite->UV[3].x;
+					v3.UV.y = spr.Sprite->UV[3].y;
+					v3.Color = spr.color;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = false;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					m_primitiveBatch->Begin();
+					m_primitiveBatch->DrawTriangle(v0, v1, v3);
+					m_primitiveBatch->DrawTriangle(v1, v2, v3);
+					m_primitiveBatch->End();
+				}
+				m_numDrawCalls++;
+			}
 		}
 		//m_context->RSSetState(m_states->CullCounterClockwise());
 		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	}
 
-	void Renderer11::drawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
+	{
+		setBlendMode(info->blendMode);
+
+		BindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
+
+		UINT stride = sizeof(RendererVertex);
+		UINT offset = 0; 
+		m_context->RSSetState(m_states->CullNone());
+		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+		m_stMisc.AlphaTest = true;
+		m_cbMisc.updateData(m_stMisc, m_context.Get());
+		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+
+		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
+
+		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_stSprite.billboardMatrix = Matrix::Identity;
+		m_stSprite.color = Vector4::One;
+		m_stSprite.isBillboard = false;
+		m_cbSprite.updateData(m_stSprite, m_context.Get());
+		m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+		m_context->Draw(m_transparentFacesVertices.size(), 0);
+
+		m_numDrawCalls++;
+		m_numTransparentDrawCalls++;
+		m_numSpritesTransparentDrawCalls++;
+	}
+
+	void Renderer11::DrawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -983,19 +1054,19 @@ namespace TEN::Renderer
 
 		for (auto& bucket : mesh->buckets) 
 		{
-			if (bucket.Vertices.size() == 0)
+			if (bucket.NumVertices == 0)
 				continue;
-			if (transparent && bucket.blendMode == BLENDMODE_OPAQUE)
+			if (transparent && bucket.BlendMode == BLENDMODE_OPAQUE)
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket.Indices.size(), bucket.StartIndex, 0);
+			m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 			m_numDrawCalls++;
 		}
 
 	}
 
-	void Renderer11::drawEffects(RenderView& view, bool transparent) 
+	void Renderer11::DrawEffects(RenderView& view, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1008,19 +1079,20 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (int i = 0; i < view.effectsToDraw.size(); i++) 
+		for (auto room : view.roomsToDraw)
 		{
-			RendererEffect* effect = view.effectsToDraw[i];
-			RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
-			OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
+			for (auto effect : room->EffectsToDraw)
+			{
+				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
+				OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
 
-			if (obj->drawRoutine && obj->loaded)
-				drawEffect(view,effect, transparent);
+				if (obj->drawRoutine && obj->loaded)
+					DrawEffect(view, effect, transparent);
+			}
 		}
-
 	}
 
-	void Renderer11::drawDebris(RenderView& view,bool transparent)
+	void Renderer11::DrawDebris(RenderView& view,bool transparent)
 	{		
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
@@ -1039,20 +1111,13 @@ namespace TEN::Renderer
 
 				if (!deb->isStatic) 
 				{
-					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_staticsTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
-
+					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				} 
 				else 
 				{
-					m_context->PSSetShaderResources(0, 1, (std::get<0>(m_moveablesTextures[deb->mesh.tex])).ShaderResourceView.GetAddressOf());
+					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
 				}
 
-				ID3D11SamplerState* sampler = m_states->LinearClamp();
-				m_context->PSSetSamplers(0, 1, &sampler);
-				//m_stCameraMatrices.View = View.Transpose();
-				//m_stCameraMatrices.Projection = Projection.Transpose();
-				//updateConstantBuffer(m_cbCameraMatrices, &m_stCameraMatrices, sizeof(CCameraMatrixBuffer));
-				//m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices);
 				m_stMisc.AlphaTest = !transparent;
 				m_cbMisc.updateData(m_stMisc, m_context.Get());
 				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
@@ -1060,12 +1125,25 @@ namespace TEN::Renderer
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
-				RendererVertex vtx0 = deb->mesh.vertices[0];
-				RendererVertex vtx1 = deb->mesh.vertices[1];
-				RendererVertex vtx2 = deb->mesh.vertices[2];
+
+				RendererVertex vtx0;
+				vtx0.Position = deb->mesh.Positions[0];
+				vtx0.UV = deb->mesh.TextureCoordinates[0];
+				vtx0.Normal = deb->mesh.Normals[0];
 				vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
+
+				RendererVertex vtx1;
+				vtx1.Position = deb->mesh.Positions[1];
+				vtx1.UV = deb->mesh.TextureCoordinates[1];
+				vtx1.Normal = deb->mesh.Normals[1];
 				vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
+
+				RendererVertex vtx2;
+				vtx2.Position = deb->mesh.Positions[2];
+				vtx2.UV = deb->mesh.TextureCoordinates[2];
+				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
+
 				m_context->RSSetState(m_states->CullNone());
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				m_numDrawCalls++;
@@ -1172,6 +1250,72 @@ namespace TEN::Renderer
 			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
 
 			break;
+		case BLENDMODE_SCREEN:
+			m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_LIGHTEN:
+			m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
+		case BLENDMODE_EXCLUDE:
+			m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+
+			break;
 		}
+	}
+
+	DebrisFragment* getNewDebrisFragment()
+	{
+		return nullptr;
+
+		/*DebrisFragment* fragment = GetFreeDebrisFragment();
+		if (!fragment)
+		{
+			return nullptr;
+		}
+
+		if (!fragment->active)
+		{
+			Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
+			RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
+			RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
+			RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
+
+			//Take the average of all 3 local positions
+			Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
+			vtx0.Position -= localPos;
+			vtx1.Position -= localPos;
+			vtx2.Position -= localPos;
+
+			Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
+			fragment->worldPosition = worldPos + pos;
+			fragment->mesh.vertices[0] = vtx0;
+			fragment->mesh.vertices[1] = vtx1;
+			fragment->mesh.vertices[2] = vtx2;
+			fragment->mesh.blendMode = renderBucket.BlendMode;
+			fragment->mesh.tex = renderBucket.Texture;
+			fragment->isStatic = isStatic;
+			fragment->active = true;
+			fragment->terminalVelocity = 1024;
+			fragment->gravity = Vector3(0, 7, 0);
+			fragment->restitution = 0.6f;
+			fragment->friction = 0.6f;
+			fragment->linearDrag = .99f;
+			fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
+			fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
+			fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
+			fragment->roomNumber = roomNumber;
+			fragment->numBounces = 0;
+
+			return fragment;
+		}
+		else
+		{
+			return nullptr;
+		}*/
 	}
 }
