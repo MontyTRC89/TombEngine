@@ -185,7 +185,7 @@ int S_UpdateInput()
 	if (Key(KEY_RIGHT))
 		linput |= IN_RIGHT;
 	if (Key(KEY_DUCK))
-		linput |= IN_DUCK;
+		linput |= IN_CROUCH;
 	if (Key(KEY_SPRINT))
 		linput |= IN_SPRINT;
 	if (Key(KEY_WALK))
@@ -213,7 +213,7 @@ int S_UpdateInput()
 		if (Key(opt_JWlk + 256))
 			linput |= IN_WALK;
 		if (Key(opt_JDck + 256))
-			linput |= IN_DUCK;
+			linput |= IN_CROUCH;
 		if (Key(opt_JFlr + 256))
 			flare = true;
 	}*/
