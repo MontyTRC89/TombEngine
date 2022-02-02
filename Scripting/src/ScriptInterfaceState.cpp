@@ -2,7 +2,7 @@
 #include "ScriptInterfaceState.h"
 #include "GameLogicScript.h"
 #include "GameFlowScript.h"
-#include "Entity/Entity.h"
+#include "Entities/Entities.h"
 
 sol::state g_solState;
 
@@ -21,7 +21,7 @@ ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
 	return new GameFlow(&g_solState);
 }
 
-ScriptInterfaceEntity* CreateEntities()
+ScriptInterfaceEntities* CreateEntities()
 {
 	return new GameEntities(&g_solState);
 }
