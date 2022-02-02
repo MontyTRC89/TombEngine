@@ -194,9 +194,9 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	float c = phd_cos(item->pos.yRot);
 	float s = phd_sin(item->pos.yRot);
 
-	item->pos.xPos += c * x + s * z;
+	item->pos.xPos += roundf(c * x + s * z);
 	item->pos.yPos += y;
-	item->pos.zPos += -s * x + c * z;
+	item->pos.zPos += roundf(-s * x + c * z);
 }
 
 bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)

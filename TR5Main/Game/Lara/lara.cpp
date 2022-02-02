@@ -1167,7 +1167,7 @@ void AnimateLara(ITEM_INFO* item)
 				{
 				case COMMAND_MOVE_ORIGIN:
 					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
-					UpdateItemRoom(item, -LARA_HEIGHT / 2);
+					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
 					cmd += 3;
 					break;
 

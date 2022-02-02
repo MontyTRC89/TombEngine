@@ -498,11 +498,16 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	return changed;
 }
 
-void UpdateItemRoom(ITEM_INFO* item, int height)
+// Offset values are used to account for the fact that room traversal can ONLY occur at portals.
+// TODO: There is one edge case offsets don't fix. @Sezz 2022.02.02
+void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
 {
-	int x = item->pos.xPos;
+	float c = phd_cos(item->pos.yRot);
+	float s = phd_sin(item->pos.yRot);
+
+	int x = item->pos.xPos + roundf(c * xOffset + s * zOffset);
 	int y = height + item->pos.yPos;
-	int z = item->pos.zPos;
+	int z = item->pos.zPos + roundf(-s * xOffset + c * zOffset);
 	item->location = GetRoom(item->location, x, y, z);
 	item->floor = GetFloorHeight(item->location, x, z).value_or(NO_HEIGHT);
 
