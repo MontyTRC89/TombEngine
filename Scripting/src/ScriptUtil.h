@@ -11,3 +11,17 @@
 	ScriptAssert(false, err);\
 }
 
+template <typename funcIndex, typename funcNewindex, typename obj>
+static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
+{
+	std::string metaName{ name + "Meta" };
+	auto meta = sol::table{ *state, sol::create };
+	state->set(metaName, meta);
+	meta.set("__metatable", "\"metatable is protected\"");
+	auto tab = state->create_named_table(name);
+	tab[sol::metatable_key] = meta;
+	state->set(metaName, sol::nil);
+	meta.set_function("__index", fi, objPtr);
+	meta.set_function("__newindex", fni, objPtr);
+}
+
