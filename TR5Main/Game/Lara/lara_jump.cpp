@@ -118,7 +118,6 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
-	item->airborne = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -173,7 +172,6 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->airborne = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -388,7 +386,6 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	item->airborne = false;
 	item->fallspeed = 0; // TODO: Check this.
 	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -665,7 +662,6 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->airborne = true;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -676,6 +672,13 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraHangJumpUp(item, coll))
 		return;
+
+	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+		SetLaraLand(item, coll);
+		return;
+	}
 
 	if (coll->Middle.Ceiling >= 0 ||
 		coll->CollisionType == CT_TOP ||
@@ -802,7 +805,6 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->moveAngle = item->pos.yRot;
 	info->keepLow = TestLaraKeepLow(item, coll);
-	item->airborne = true;
 	coll->Setup.Height = std::max<int>(LARA_HEIGHT_CRAWL, realHeight * 0.7f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -818,10 +820,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 
 		if (TestLaraSlide(item, coll))
-		{
 			SetLaraSlideState(item, coll);
-			SetLaraLand(item, coll);
-		}
 		else if (info->keepLow ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
@@ -834,8 +833,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		else [[likely]]
 			SetAnimation(item, LA_SWANDIVE_ROLL);
 
-		item->fallspeed = 0;
-		item->airborne = false;
+		SetLaraLand(item, coll);
 		info->gunStatus = LG_HANDS_FREE;
 
 		LaraSnapToHeight(item, coll);
