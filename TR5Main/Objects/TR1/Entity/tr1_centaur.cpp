@@ -70,7 +70,7 @@ void ControlCentaurBomb(short itemNumber)
 		if (item->speed)
 		{
 			item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
-			if (item->requiredAnimState)
+			if (item->requiredState)
 				item->pos.yRot += (((item->speed / 2) + 7) * ANGLE(1));
 			else
 				item->pos.xRot += (((item->speed / 2) + 7) * ANGLE(1));
@@ -200,11 +200,11 @@ void CentaurControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != CENTAUR_DEATH)
+		if (item->activeState != CENTAUR_DEATH)
 		{
 			item->animNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_DIE_ANIM;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = CENTAUR_DEATH;
+			item->activeState = CENTAUR_DEATH;
 		}
 	}
 	else
@@ -218,64 +218,64 @@ void CentaurControl(short itemNum)
 
 		angle = CreatureTurn(item, CENTAUR_TURN);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case CENTAUR_STOP:
 			CreatureJoint(item, 17, 0);
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (info.bite && info.distance < CENTAUR_REAR_RANGE)
-				item->goalAnimState = CENTAUR_RUN;
+				item->targetState = CENTAUR_RUN;
 			else if (Targetable(item, &info))
-				item->goalAnimState = CENTAUR_AIM;
+				item->targetState = CENTAUR_AIM;
 			else
-				item->goalAnimState = CENTAUR_RUN;
+				item->targetState = CENTAUR_RUN;
 			break;
 
 		case CENTAUR_RUN:
 			if (info.bite && info.distance < CENTAUR_REAR_RANGE)
 			{
-				item->requiredAnimState = CENTAUR_WARNING;
-				item->goalAnimState = CENTAUR_STOP;
+				item->requiredState = CENTAUR_WARNING;
+				item->targetState = CENTAUR_STOP;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->requiredAnimState = CENTAUR_AIM;
-				item->goalAnimState = CENTAUR_STOP;
+				item->requiredState = CENTAUR_AIM;
+				item->targetState = CENTAUR_STOP;
 			}
 			else if (GetRandomControl() < CENTAUR_REAR_CHANCE)
 			{
-				item->requiredAnimState = CENTAUR_WARNING;
-				item->goalAnimState = CENTAUR_STOP;
+				item->requiredState = CENTAUR_WARNING;
+				item->targetState = CENTAUR_STOP;
 			}
 			break;
 
 		case CENTAUR_AIM:
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (Targetable(item, &info))
-				item->goalAnimState = CENTAUR_SHOOT;
+				item->targetState = CENTAUR_SHOOT;
 			else
-				item->goalAnimState = CENTAUR_STOP;
+				item->targetState = CENTAUR_STOP;
 			break;
 
 		case CENTAUR_SHOOT:
-			if (!item->requiredAnimState)
+			if (!item->requiredState)
 			{
-				item->requiredAnimState = CENTAUR_AIM;
+				item->requiredState = CENTAUR_AIM;
 				RocketGun(item);
 			}
 			break;
 
 		case CENTAUR_WARNING:
-			if (!item->requiredAnimState && (item->touchBits & CENTAUR_TOUCH))
+			if (!item->requiredState && (item->touchBits & CENTAUR_TOUCH))
 			{
 				CreatureEffect(item, &centaur_rear, DoBloodSplat);
 
 				LaraItem->hitPoints -= CENTAUR_REAR_DAMAGE;
 				LaraItem->hitStatus = 1;
 
-				item->requiredAnimState = CENTAUR_STOP;
+				item->requiredState = CENTAUR_STOP;
 			}
 			break;
 		}

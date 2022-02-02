@@ -269,13 +269,13 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 {
 	LaraInfo*& laraInfo = laraItem->data;
 
-	if ((laraItem->currentAnimState == SBOAT_STATE_DISMOUNT_LEFT ||
-		laraItem->currentAnimState == SBOAT_STATE_DISMOUNT_RIGHT) &&
+	if ((laraItem->activeState == SBOAT_STATE_DISMOUNT_LEFT ||
+		laraItem->activeState == SBOAT_STATE_DISMOUNT_RIGHT) &&
 		TestLastFrame(laraItem, laraItem->animNumber))
 	{
-		if (laraItem->currentAnimState == SBOAT_STATE_DISMOUNT_LEFT)
+		if (laraItem->activeState == SBOAT_STATE_DISMOUNT_LEFT)
 			laraItem->pos.yRot -= ANGLE(90.0f);
-		else if(laraItem->currentAnimState == SBOAT_STATE_DISMOUNT_RIGHT)
+		else if(laraItem->activeState == SBOAT_STATE_DISMOUNT_RIGHT)
 			laraItem->pos.yRot += ANGLE(90.0f);
 
 		SetAnimation(laraItem, LA_JUMP_FORWARD);
@@ -741,34 +741,34 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 
 	if (laraItem->hitPoints <= 0)
 	{
-		if (laraItem->currentAnimState != SBOAT_STATE_DEATH)
+		if (laraItem->activeState != SBOAT_STATE_DEATH)
 		{
 			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_DEATH;
 			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->currentAnimState = laraItem->goalAnimState = SBOAT_STATE_DEATH;
+			laraItem->activeState = laraItem->targetState = SBOAT_STATE_DEATH;
 		}
 	}
 	else if (sBoatItem->pos.yPos < sBoatInfo->water - CLICK(0.5f) && sBoatItem->fallspeed > 0)
 	{
-		if (laraItem->currentAnimState != SBOAT_STATE_FALL)
+		if (laraItem->activeState != SBOAT_STATE_FALL)
 		{
 			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_LEAP_START;
 			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->currentAnimState = laraItem->goalAnimState = SBOAT_STATE_FALL;
+			laraItem->activeState = laraItem->targetState = SBOAT_STATE_FALL;
 		}
 	}
 	else if (collide)
 	{
-		if (laraItem->currentAnimState != SBOAT_STATE_HIT)
+		if (laraItem->activeState != SBOAT_STATE_HIT)
 		{
 			laraItem->animNumber = (short)(Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide);
 			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->currentAnimState = laraItem->goalAnimState = SBOAT_STATE_HIT;
+			laraItem->activeState = laraItem->targetState = SBOAT_STATE_HIT;
 		}
 	}
 	else
 	{
-		switch (laraItem->currentAnimState)
+		switch (laraItem->activeState)
 		{
 		case SBOAT_STATE_IDLE:
 			if (TrInput & SBOAT_IN_DISMOUNT)
@@ -776,14 +776,14 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 				if (sBoatItem->speed == 0)
 				{
 					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->pos.yRot + ANGLE(90.0f)))
-						laraItem->goalAnimState = SBOAT_STATE_DISMOUNT_RIGHT;
+						laraItem->targetState = SBOAT_STATE_DISMOUNT_RIGHT;
 					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->pos.yRot - ANGLE(90.0f)))
-						laraItem->goalAnimState = SBOAT_STATE_DISMOUNT_LEFT;
+						laraItem->targetState = SBOAT_STATE_DISMOUNT_LEFT;
 				}
 			}
 
 			if (sBoatItem->speed > 0)
-				laraItem->goalAnimState = SBOAT_STATE_MOVING;
+				laraItem->targetState = SBOAT_STATE_MOVING;
 
 			break;
 
@@ -791,32 +791,32 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 			if (TrInput & SBOAT_IN_DISMOUNT)
 			{
 				if (TrInput & SBOAT_IN_RIGHT)
-					laraItem->goalAnimState = SBOAT_STATE_DISMOUNT_RIGHT;
+					laraItem->targetState = SBOAT_STATE_DISMOUNT_RIGHT;
 				else if (TrInput & SBOAT_IN_RIGHT)
-					laraItem->goalAnimState = SBOAT_STATE_DISMOUNT_LEFT;
+					laraItem->targetState = SBOAT_STATE_DISMOUNT_LEFT;
 			}
 			else if (sBoatItem->speed <= 0)
-				laraItem->goalAnimState = SBOAT_STATE_IDLE;
+				laraItem->targetState = SBOAT_STATE_IDLE;
 
 			break;
 
 		case SBOAT_STATE_FALL:
-			laraItem->goalAnimState = SBOAT_STATE_MOVING;
+			laraItem->targetState = SBOAT_STATE_MOVING;
 			break;
 
 		//case BOAT_TURNR:
 			if (sBoatItem->speed <= 0)
-				laraItem->goalAnimState = SBOAT_STATE_IDLE;
+				laraItem->targetState = SBOAT_STATE_IDLE;
 			else if (!(TrInput & SBOAT_IN_RIGHT))
-				laraItem->goalAnimState = SBOAT_STATE_MOVING;
+				laraItem->targetState = SBOAT_STATE_MOVING;
 
 			break;
 
 		case SBOAT_STATE_TURN_LEFT:
 			if (sBoatItem->speed <= 0)
-				laraItem->goalAnimState = SBOAT_STATE_IDLE;
+				laraItem->targetState = SBOAT_STATE_IDLE;
 			else if (!(TrInput & SBOAT_IN_LEFT))
-				laraItem->goalAnimState = SBOAT_STATE_MOVING;
+				laraItem->targetState = SBOAT_STATE_MOVING;
 
 			break;
 		}
@@ -897,8 +897,8 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	laraItem->speed = 0;
 	laraItem->fallspeed = 0;
 	laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-	laraItem->currentAnimState = SBOAT_STATE_MOUNT;
-	laraItem->goalAnimState = SBOAT_STATE_MOUNT;
+	laraItem->activeState = SBOAT_STATE_MOUNT;
+	laraItem->targetState = SBOAT_STATE_MOUNT;
 
 	if (laraItem->roomNumber != sBoatItem->roomNumber)
 		ItemNewRoom(laraInfo->itemNumber, sBoatItem->roomNumber);
@@ -943,7 +943,7 @@ void SpeedBoatControl(short itemNum)
 
 	if (laraInfo->Vehicle == itemNum && laraItem->hitPoints > 0)
 	{
-		switch (laraItem->currentAnimState)
+		switch (laraItem->activeState)
 		{
 		case SBOAT_STATE_MOUNT:
 		case SBOAT_STATE_DISMOUNT_RIGHT:

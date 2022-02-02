@@ -128,8 +128,8 @@ void DoppelgangerControl(short itemNum)
 
 			item->airborne = false;
 			item->fallspeed = 0;
-			item->goalAnimState = LS_DEATH;
-			item->requiredAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
+			item->requiredState = LS_DEATH;
 		}
 	}
 }

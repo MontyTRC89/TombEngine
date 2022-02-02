@@ -394,15 +394,15 @@ void InitialiseJeep(short itemNum)
 
 static int JeepCheckGetOff()
 {
-	if (LaraItem->currentAnimState == JS_GETOFF)
+	if (LaraItem->activeState == JS_GETOFF)
 	{
 		if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 		{
 			LaraItem->pos.yRot += ANGLE(90);
 			LaraItem->animNumber = LA_STAND_SOLID;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = LS_IDLE;
-			LaraItem->currentAnimState = LS_IDLE;
+			LaraItem->targetState = LS_IDLE;
+			LaraItem->activeState = LS_IDLE;
 			LaraItem->pos.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->pos.yRot);
 			LaraItem->pos.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->pos.yRot);
 			LaraItem->pos.xRot = 0;
@@ -429,7 +429,7 @@ static int GetOnJeep(int itemNumber)
 	if (Lara.gunStatus)
 		return 0;
 
-	if (LaraItem->currentAnimState != LS_IDLE)
+	if (LaraItem->activeState != LS_IDLE)
 		return 0;
 
 	if (LaraItem->animNumber != LA_STAND_IDLE)
@@ -878,7 +878,7 @@ int JeepDynamics(ITEM_INFO* item)
 
 static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 {
-	if (LaraItem->currentAnimState == JS_GETOFF || LaraItem->goalAnimState == JS_GETOFF)
+	if (LaraItem->activeState == JS_GETOFF || LaraItem->targetState == JS_GETOFF)
 		TrInput = 0;
 	
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
@@ -1028,8 +1028,8 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 	JEEP_INFO* jeep = (JEEP_INFO*)item->data;
 	bool dismount;
 	if (item->pos.yPos != item->floor && 
-		LaraItem->currentAnimState != JS_JUMP && 
-		LaraItem->currentAnimState != JS_LAND && 
+		LaraItem->activeState != JS_JUMP && 
+		LaraItem->activeState != JS_LAND && 
 		!dead)
 	{
 		if (jeep->unknown2 == 1)
@@ -1037,16 +1037,16 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 		else
 			LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_FWD_JUMP_START;
 
-		LaraItem->currentAnimState = JS_JUMP;
-		LaraItem->goalAnimState = JS_JUMP;
+		LaraItem->activeState = JS_JUMP;
+		LaraItem->targetState = JS_JUMP;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 	else if  ( (collide) && 
-		(LaraItem->currentAnimState != 4) && 
-		(LaraItem->currentAnimState != 5) && 
-		(LaraItem->currentAnimState != 2) &&
-		(LaraItem->currentAnimState != 3) &&
-		(LaraItem->currentAnimState != JS_JUMP) &&
+		(LaraItem->activeState != 4) && 
+		(LaraItem->activeState != 5) && 
+		(LaraItem->activeState != 2) &&
+		(LaraItem->activeState != 3) &&
+		(LaraItem->activeState != JS_JUMP) &&
 		(0x2AAA < (short)jeep->velocity) &&
 		(!dead) )
 	{
@@ -1074,17 +1074,17 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 			break;
 		}
 
-		LaraItem->currentAnimState = state;
-		LaraItem->goalAnimState = state;
+		LaraItem->activeState = state;
+		LaraItem->targetState = state;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	}
 	else
 	{
-		switch (LaraItem->currentAnimState)
+		switch (LaraItem->activeState)
 		{
 		case JS_STOP:
 			if (dead)
-				LaraItem->goalAnimState = JS_DEATH;
+				LaraItem->targetState = JS_DEATH;
 			else
 			{
 				dismount = ((TrInput & JEEP_IN_BRAKE) && (TrInput & IN_LEFT)) ? true : false;
@@ -1093,7 +1093,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					!JeepNoGetOff)
 				{
 					if (JeepCanGetOff())
-						LaraItem->goalAnimState = JS_GETOFF;
+						LaraItem->targetState = JS_GETOFF;
 					break;
 				}
 
@@ -1109,7 +1109,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					{
 						jeep->unknown2++;
 						if (jeep->unknown2 == 1)
-							LaraItem->goalAnimState = JS_DRIVE_BACK;
+							LaraItem->targetState = JS_DRIVE_BACK;
 						break;
 					}
 				}
@@ -1117,13 +1117,13 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 				{
 					if ((TrInput & JEEP_IN_ACCELERATE) && !(TrInput & JEEP_IN_BRAKE))
 					{
-						LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+						LaraItem->targetState = JS_DRIVE_FORWARD;
 						break;
 					}
 					else if (TrInput & (IN_LEFT | IN_LSTEP))
-						LaraItem->goalAnimState = JS_FWD_LEFT;
+						LaraItem->targetState = JS_FWD_LEFT;
 					else if (TrInput & (IN_RIGHT | IN_RSTEP))
-						LaraItem->goalAnimState = JS_FWD_RIGHT;
+						LaraItem->targetState = JS_FWD_RIGHT;
 				}
 
 /*				if (!(DbInput & IN_WALK))
@@ -1132,19 +1132,19 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					{
 						if ((TrInput & JEEP_IN_ACCELERATE) && !(TrInput & JEEP_IN_BRAKE))
 						{
-							LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+							LaraItem->targetState = JS_DRIVE_FORWARD;
 							break;
 						}
 						else if (TrInput & (IN_LEFT | IN_LSTEP))
-							LaraItem->goalAnimState = JS_FWD_LEFT;
+							LaraItem->targetState = JS_FWD_LEFT;
 						else if (TrInput & (IN_RIGHT | IN_RSTEP))
-							LaraItem->goalAnimState = JS_FWD_RIGHT;
+							LaraItem->targetState = JS_FWD_RIGHT;
 					}
 					else if (jeep->unknown2 < 1)
 					{
 						jeep->unknown2++;
 						if (jeep->unknown2 == 1)
-							LaraItem->goalAnimState = JS_DRIVE_BACK;
+							LaraItem->targetState = JS_DRIVE_BACK;
 
 					}
 				}
@@ -1159,7 +1159,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 		case JS_DRIVE_FORWARD:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			else
 			{
 				if (jeep->velocity & 0xFFFFFF00 ||
@@ -1168,20 +1168,20 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					if (TrInput & JEEP_IN_BRAKE)
 					{
 						if (jeep->velocity <= 21844)
-							LaraItem->goalAnimState = JS_STOP;
+							LaraItem->targetState = JS_STOP;
 						else
-							LaraItem->goalAnimState = JS_BRAKE;
+							LaraItem->targetState = JS_BRAKE;
 					}
 					else
 					{
 						if (TrInput & (IN_LEFT | IN_LSTEP))
-							LaraItem->goalAnimState = JS_FWD_LEFT;
+							LaraItem->targetState = JS_FWD_LEFT;
 						else if (TrInput & (IN_RIGHT | IN_RSTEP))
-							LaraItem->goalAnimState = JS_FWD_RIGHT;
+							LaraItem->targetState = JS_FWD_RIGHT;
 					}
 				}
 				else
-					LaraItem->goalAnimState = JS_STOP;
+					LaraItem->targetState = JS_STOP;
 			}
 
 			break;
@@ -1191,28 +1191,28 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 		case 4:
 		case 5:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			else if (TrInput & (JEEP_IN_ACCELERATE | JEEP_IN_BRAKE))
-				LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+				LaraItem->targetState = JS_DRIVE_FORWARD;
 			break;
 
 		case JS_BRAKE:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			else if (jeep->velocity & 0xFFFFFF00)
 			{
 				if (TrInput & (IN_LEFT | IN_LSTEP))
-					LaraItem->goalAnimState = JS_FWD_LEFT;
+					LaraItem->targetState = JS_FWD_LEFT;
 				else if (TrInput & (IN_RIGHT | IN_RSTEP))
-					LaraItem->goalAnimState = JS_FWD_RIGHT;
+					LaraItem->targetState = JS_FWD_RIGHT;
 			}
 			else
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			break;
 
 		case JS_FWD_LEFT:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			else if (!(DbInput & IN_WALK))
 			{
 				if (DbInput & IN_SPRINT)
@@ -1222,8 +1222,8 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 						jeep->unknown2++;
 						if (jeep->unknown2 == 1)
 						{
-							LaraItem->goalAnimState = JS_BACK_RIGHT;
-							LaraItem->currentAnimState = JS_BACK_RIGHT;
+							LaraItem->targetState = JS_BACK_RIGHT;
+							LaraItem->activeState = JS_BACK_RIGHT;
 							LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE_REVERSE_RIGHT;
 							LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 							break;
@@ -1231,13 +1231,13 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					}
 				}
 				else if (TrInput & (IN_RIGHT | IN_RSTEP))
-					LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+					LaraItem->targetState = JS_DRIVE_FORWARD;
 				else if (TrInput & (IN_LEFT | IN_LSTEP))
-					LaraItem->goalAnimState = JS_FWD_LEFT;
+					LaraItem->targetState = JS_FWD_LEFT;
 				else if (jeep->velocity)
-					LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+					LaraItem->targetState = JS_DRIVE_FORWARD;
 				else
-					LaraItem->goalAnimState = JS_STOP;
+					LaraItem->targetState = JS_STOP;
 			}
 			else
 			{
@@ -1264,7 +1264,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 		case JS_FWD_RIGHT:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			if (!(DbInput & IN_WALK))
 			{
 				if (DbInput & IN_SPRINT)
@@ -1274,8 +1274,8 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 						jeep->unknown2++;
 						if (jeep->unknown2 == 1)
 						{
-							LaraItem->goalAnimState = JS_BACK_LEFT;
-							LaraItem->currentAnimState = JS_BACK_LEFT;
+							LaraItem->targetState = JS_BACK_LEFT;
+							LaraItem->activeState = JS_BACK_LEFT;
 							LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE_REVERSE_LEFT;
 							LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 							break;
@@ -1283,13 +1283,13 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					}
 				}
 				else if (TrInput & (IN_LEFT | IN_LSTEP))
-					LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+					LaraItem->targetState = JS_DRIVE_FORWARD;
 				else if (TrInput & (IN_RIGHT | IN_RSTEP))
-					LaraItem->goalAnimState = JS_FWD_RIGHT;
+					LaraItem->targetState = JS_FWD_RIGHT;
 				else if (jeep->velocity)
-					LaraItem->goalAnimState = JS_DRIVE_FORWARD;
+					LaraItem->targetState = JS_DRIVE_FORWARD;
 				else
-					LaraItem->goalAnimState = JS_STOP;
+					LaraItem->targetState = JS_STOP;
 			}
 			else
 			{
@@ -1315,29 +1315,29 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 		case JS_JUMP:
 			if (item->pos.yPos == item->floor)
-				LaraItem->goalAnimState = JS_LAND;
+				LaraItem->targetState = JS_LAND;
 			else if (item->fallspeed > 300)
 				jeep->flags |= JF_FALLING;
 			break;
 
 		case JS_BACK:
 			if (dead)
-				LaraItem->goalAnimState = JS_DRIVE_BACK;
+				LaraItem->targetState = JS_DRIVE_BACK;
 			else if (abs(jeep->velocity) & 0xFFFFFF00)
 			{
 				if (TrInput & (IN_LEFT | IN_LSTEP))
-					LaraItem->goalAnimState = JS_BACK_RIGHT;
+					LaraItem->targetState = JS_BACK_RIGHT;
 				else if (TrInput & (IN_RIGHT | IN_RSTEP))
-					LaraItem->goalAnimState = JS_BACK_LEFT;
+					LaraItem->targetState = JS_BACK_LEFT;
 			}
 			else
-				LaraItem->goalAnimState = JS_DRIVE_BACK;
+				LaraItem->targetState = JS_DRIVE_BACK;
 
 			break;
 
 		case JS_BACK_LEFT:
 			if (dead)
-				LaraItem->goalAnimState = JS_DRIVE_BACK;
+				LaraItem->targetState = JS_DRIVE_BACK;
 			else if (!(DbInput & IN_WALK))
 			{
 				if (DbInput & IN_SPRINT)
@@ -1346,9 +1346,9 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 						jeep->unknown2++;
 				}
 				else if (TrInput & (IN_RIGHT | IN_RSTEP))
-					LaraItem->goalAnimState = JS_BACK_LEFT;
+					LaraItem->targetState = JS_BACK_LEFT;
 				else
-					LaraItem->goalAnimState = JS_BACK;
+					LaraItem->targetState = JS_BACK;
 			}
 			else
 			{
@@ -1357,8 +1357,8 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					jeep->unknown2--;
 					if (!jeep->unknown2)
 					{
-						LaraItem->goalAnimState = JS_FWD_RIGHT;
-						LaraItem->currentAnimState = JS_FWD_RIGHT;
+						LaraItem->targetState = JS_FWD_RIGHT;
+						LaraItem->activeState = JS_FWD_RIGHT;
 						LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE_FWD_RIGHT;
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 						break;
@@ -1385,7 +1385,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 		case JS_BACK_RIGHT:
 			if (dead)
 			{
-				LaraItem->goalAnimState = JS_DRIVE_BACK;
+				LaraItem->targetState = JS_DRIVE_BACK;
 			}
 			else if (!(DbInput & IN_WALK))
 			{
@@ -1395,9 +1395,9 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 						jeep->unknown2++;
 				}
 				else if (TrInput & (IN_LEFT | IN_LSTEP))
-					LaraItem->goalAnimState = JS_BACK_RIGHT;
+					LaraItem->targetState = JS_BACK_RIGHT;
 				else
-					LaraItem->goalAnimState = JS_BACK;
+					LaraItem->targetState = JS_BACK;
 
 				if (LaraItem->animNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_BACK_RIGHT && !jeep->velocity)
 				{
@@ -1432,8 +1432,8 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 				break;
 			}
 
-			LaraItem->goalAnimState = JS_FWD_LEFT;
-			LaraItem->currentAnimState = JS_FWD_LEFT;
+			LaraItem->targetState = JS_FWD_LEFT;
+			LaraItem->activeState = JS_FWD_LEFT;
 			LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE_FWD_RIGHT;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 
@@ -1441,7 +1441,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 
 		case JS_DRIVE_BACK:
 			if (dead)
-				LaraItem->goalAnimState = JS_STOP;
+				LaraItem->targetState = JS_STOP;
 			else
 //			if (jeep->velocity || JeepNoGetOff)
 			{
@@ -1455,12 +1455,12 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					else if (!(TrInput & JEEP_IN_ACCELERATE) || TrInput & JEEP_IN_BRAKE)
 					{
 						if (TrInput & (IN_LEFT | IN_LSTEP))
-							LaraItem->goalAnimState = JS_BACK_RIGHT;
+							LaraItem->targetState = JS_BACK_RIGHT;
 						else if (TrInput & (IN_LEFT | IN_LSTEP))
-							LaraItem->goalAnimState = JS_BACK_LEFT;
+							LaraItem->targetState = JS_BACK_LEFT;
 					}
 					else
-						LaraItem->goalAnimState = JS_BACK;
+						LaraItem->targetState = JS_BACK;
 				}
 				else
 				{
@@ -1468,7 +1468,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 					{
 						jeep->unknown2--;
 						if (!jeep->unknown2)
-							LaraItem->goalAnimState = JS_STOP;
+							LaraItem->targetState = JS_STOP;
 					}
 				}
 			}
@@ -1480,7 +1480,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 	}
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		LaraItem->goalAnimState = JS_JUMP;
+		LaraItem->targetState = JS_JUMP;
 		LaraItem->hitPoints = 0;
 		JeepExplode(item);
 	}
@@ -1537,8 +1537,8 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			else
 				LaraItem->animNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_RIGHT;
 
-			LaraItem->goalAnimState = JS_GETIN;
-			LaraItem->currentAnimState = JS_GETIN;
+			LaraItem->targetState = JS_GETIN;
+			LaraItem->activeState = JS_GETIN;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 
 			item->hitPoints = 1;
@@ -1608,7 +1608,7 @@ int JeepControl(void)
 	int pitch = 0;
 	if (jeep->flags)
 		collide = 0;
-	else if (LaraItem->currentAnimState == JS_GETIN)
+	else if (LaraItem->activeState == JS_GETIN)
 	{
 		drive = -1;
 		collide = 0;
@@ -1728,8 +1728,8 @@ int JeepControl(void)
 		}
 	}
 
-	if (LaraItem->currentAnimState == JS_GETIN ||
-		LaraItem->currentAnimState == JS_GETOFF)
+	if (LaraItem->activeState == JS_GETIN ||
+		LaraItem->activeState == JS_GETOFF)
 		JeepSmokeStart = 0;
 	else
 	{

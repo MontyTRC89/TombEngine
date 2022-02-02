@@ -244,7 +244,7 @@ void PushableBlockControl(short itemNumber)
 					MoveStackXZ(itemNumber);
 					//SoundEffect(pushable->stopSound, &item->pos, 2);
 					DoPushPull = 0;
-					LaraItem->goalAnimState = LS_IDLE;
+					LaraItem->targetState = LS_IDLE;
 
 					item->airborne = true; // do fall
 					return;
@@ -256,7 +256,7 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPush(item, blockHeight, quadrant))
 				{
-					LaraItem->goalAnimState = LS_IDLE;
+					LaraItem->targetState = LS_IDLE;
 				}
 				else
 				{
@@ -267,7 +267,7 @@ void PushableBlockControl(short itemNumber)
 			}
 			else
 			{
-				LaraItem->goalAnimState = LS_IDLE;
+				LaraItem->targetState = LS_IDLE;
 			}
 		}
 		break;
@@ -318,7 +318,7 @@ void PushableBlockControl(short itemNumber)
 			{
 				if (!TestBlockPull(item, blockHeight, quadrant))
 				{
-					LaraItem->goalAnimState = LS_IDLE;
+					LaraItem->targetState = LS_IDLE;
 				}
 				else
 				{
@@ -329,7 +329,7 @@ void PushableBlockControl(short itemNumber)
 			}
 			else
 			{
-				LaraItem->goalAnimState = LS_IDLE;
+				LaraItem->targetState = LS_IDLE;
 			}
 		}
 		break;
@@ -376,7 +376,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int blockHeight = GetStackHeight(item);
 	
 	if ((!(TrInput & IN_ACTION)
-		|| l->currentAnimState != LS_IDLE
+		|| l->activeState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
 		|| l->airborne
 		|| Lara.gunStatus
@@ -384,7 +384,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| item->triggerFlags < 0)
 		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
-		if ((l->currentAnimState != LS_PUSHABLE_GRAB
+		if ((l->activeState != LS_PUSHABLE_GRAB
 			|| (l->frameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
 			|| Lara.nextCornerPos.xPos != itemNum))
 		{
@@ -425,13 +425,13 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (!TestBlockPush(item, blockHeight, quadrant) || pushable->disablePush)
 				return;
-			l->goalAnimState = LS_PUSHABLE_PUSH;
+			l->targetState = LS_PUSHABLE_PUSH;
 		}
 		else if (TrInput & IN_BACK)
 		{
 			if (!TestBlockPull(item, blockHeight, quadrant) || pushable->disablePull)
 				return;
-			l->goalAnimState = LS_PUSHABLE_PULL;
+			l->targetState = LS_PUSHABLE_PULL;
 		}
 		else
 		{
@@ -484,8 +484,8 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 				l->animNumber = LA_PUSHABLE_GRAB;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->currentAnimState = LS_PUSHABLE_GRAB;
-				l->goalAnimState = LS_PUSHABLE_GRAB;
+				l->activeState = LS_PUSHABLE_GRAB;
+				l->targetState = LS_PUSHABLE_GRAB;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.nextCornerPos.xPos = itemNum;
@@ -497,8 +497,8 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				{
 					l->animNumber = LA_PUSHABLE_GRAB;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->currentAnimState = LS_PUSHABLE_GRAB;
-					l->goalAnimState = LS_PUSHABLE_GRAB;
+					l->activeState = LS_PUSHABLE_GRAB;
+					l->targetState = LS_PUSHABLE_GRAB;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.nextCornerPos.xPos = itemNum;

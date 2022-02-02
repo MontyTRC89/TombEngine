@@ -186,7 +186,7 @@ void InitialiseLaserHead(short itemNumber)
 	int y = item->pos.yPos - 640;
 	item->pos.yPos = y;
 	item->itemFlags[1] = y - 640;
-	item->currentAnimState = 0;
+	item->activeState = 0;
 	item->itemFlags[3] = 90;
 
 	ZeroMemory(&LaserHeadData, sizeof(LASER_HEAD_STRUCT));
@@ -209,16 +209,16 @@ void LaserHeadControl(short itemNumber)
 		{
 			if (!(GlobalCounter & 7))
 			{
-				if (item->currentAnimState < 8)
+				if (item->activeState < 8)
 				{
-					short tentacleNumber = creature->tentacles[item->currentAnimState];
-					g_Level.Items[tentacleNumber].goalAnimState = 2;
-					item->currentAnimState++;
+					short tentacleNumber = creature->tentacles[item->activeState];
+					g_Level.Items[tentacleNumber].targetState = 2;
+					item->activeState++;
 				}
 			}
 
 			// Destroy tentacle items
-			if (item->currentAnimState > 0)
+			if (item->activeState > 0)
 			{
 				for (int i = 0; i < 8; i++)
 				{

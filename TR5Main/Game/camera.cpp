@@ -29,8 +29,8 @@ constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 struct OLD_CAMERA
 {
-	short currentAnimState;
-	short goalAnimState;
+	short activeState;
+	short targetState;
 	int targetDistance;
 	short actualElevation;
 	short targetElevation;
@@ -145,8 +145,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos != LaraItem->pos.xPos ||
 		OldCam.pos.yPos != LaraItem->pos.yPos ||
 		OldCam.pos.zPos != LaraItem->pos.zPos ||
-		OldCam.currentAnimState != LaraItem->currentAnimState ||
-		OldCam.goalAnimState != LaraItem->goalAnimState ||
+		OldCam.activeState != LaraItem->activeState ||
+		OldCam.targetState != LaraItem->targetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
@@ -167,8 +167,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos = LaraItem->pos.xPos;
 		OldCam.pos.yPos = LaraItem->pos.yPos;
 		OldCam.pos.zPos = LaraItem->pos.zPos;
-		OldCam.currentAnimState = LaraItem->currentAnimState;
-		OldCam.goalAnimState = LaraItem->goalAnimState;
+		OldCam.activeState = LaraItem->activeState;
+		OldCam.targetState = LaraItem->targetState;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
@@ -891,8 +891,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos == item->pos.xPos &&
 		OldCam.pos.yPos == item->pos.yPos &&
 		OldCam.pos.zPos == item->pos.zPos &&
-		OldCam.currentAnimState == item->currentAnimState &&
-		OldCam.goalAnimState == item->goalAnimState &&
+		OldCam.activeState == item->activeState &&
+		OldCam.targetState == item->targetState &&
 		Camera.oldType == CAMERA_TYPE::LOOK_CAMERA)
 	{
 		ideal.x = LookCamPosition.x;
@@ -910,8 +910,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos = item->pos.xPos;
 		OldCam.pos.yPos = item->pos.yPos;
 		OldCam.pos.zPos = item->pos.zPos;
-		OldCam.currentAnimState = item->currentAnimState;
-		OldCam.goalAnimState = item->goalAnimState;
+		OldCam.activeState = item->activeState;
+		OldCam.targetState = item->targetState;
 		LookCamPosition.x = ideal.x;
 		LookCamPosition.y = ideal.y;
 		LookCamPosition.z = ideal.z;

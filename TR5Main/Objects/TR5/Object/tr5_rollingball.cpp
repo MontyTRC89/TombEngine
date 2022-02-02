@@ -26,8 +26,8 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				LaraItem->animNumber = LA_BOULDER_DEATH;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = LS_DEATH;
-				LaraItem->currentAnimState = LS_DEATH;
+				LaraItem->targetState = LS_DEATH;
+				LaraItem->activeState = LS_DEATH;
 				LaraItem->airborne = false;
 			}
 			else
@@ -348,8 +348,8 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 
 				lara->animNumber = LA_BOULDER_DEATH;
 				lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-				lara->currentAnimState = LS_BOULDER_DEATH;
-				lara->goalAnimState = LS_BOULDER_DEATH;
+				lara->activeState = LS_BOULDER_DEATH;
+				lara->targetState = LS_BOULDER_DEATH;
 						
 				Camera.flags = CF_FOLLOW_CENTER;
 				Camera.targetAngle = ANGLE(170);
@@ -382,7 +382,7 @@ void ClassicRollingBallControl(short itemNum)
 	item = &g_Level.Items[itemNum];
 	if (item->status == ITEM_ACTIVE)
 	{
-		if (item->goalAnimState == 2)
+		if (item->targetState == 2)
 		{
 			AnimateItem(item);
 			return;
@@ -396,8 +396,8 @@ void ClassicRollingBallControl(short itemNum)
 				item->fallspeed = -10;
 			}
 		}
-		else if (item->currentAnimState == 0)
-			item->goalAnimState = 1;
+		else if (item->activeState == 0)
+			item->targetState = 1;
 
 		oldx = item->pos.xPos;
 		oldz = item->pos.zPos;
@@ -478,13 +478,13 @@ void ClassicRollingBallControl(short itemNum)
 				r->itemNumber = itemNum;
 				item->roomNumber = old->roomNumber;
 			}
-			item->currentAnimState = 0;
-			item->goalAnimState = 0;
+			item->activeState = 0;
+			item->targetState = 0;
 			item->animNumber = Objects[item->objectNumber].animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState; 
-			item->goalAnimState = g_Level.Anims[item->animNumber].currentAnimState;
-			item->requiredAnimState = 0;
+			item->activeState = g_Level.Anims[item->animNumber].activeState; 
+			item->targetState = g_Level.Anims[item->animNumber].activeState;
+			item->requiredState = 0;
 			RemoveActiveItem(itemNum);
 		}
 	}

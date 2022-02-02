@@ -434,15 +434,15 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Set hands free failsafe.
 	if (info->gunStatus == LG_HANDS_BUSY &&
-		item->currentAnimState == LS_IDLE &&
-		item->goalAnimState == LS_IDLE &&
+		item->activeState == LS_IDLE &&
+		item->targetState == LS_IDLE &&
 		item->animNumber == LA_STAND_IDLE &&
 		!item->airborne)
 	{
 		info->gunStatus = LG_HANDS_FREE;
 	}
 
-	if (item->currentAnimState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
+	if (item->activeState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
 		info->sprintTimer++;
 
 	info->isLow = false;
@@ -487,19 +487,19 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					UpdateItemRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
-					if (item->currentAnimState == LS_SWAN_DIVE_START)
+					if (item->activeState == LS_SWAN_DIVE_START)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(45.0f);
-						item->goalAnimState = LS_FREEFALL_DIVE;
+						item->targetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
 						item->fallspeed *= 2;
 					}
-					else if (item->currentAnimState == LS_SWAN_DIVE_END)
+					else if (item->activeState == LS_SWAN_DIVE_END)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(85.0f);
-						item->goalAnimState = LS_FREEFALL_DIVE;
+						item->targetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
 						item->fallspeed *= 2;
 					}
@@ -525,15 +525,15 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->airborne)
 				{
 					Splash(item);
-					item->goalAnimState = LS_IDLE;
+					item->targetState = LS_IDLE;
 				}
 				// Lara is grounded; don't splash again.
 				else if (!item->airborne)
-					item->goalAnimState = LS_IDLE;
+					item->targetState = LS_IDLE;
 				else if (isSwamp)
 				{
-					if (item->currentAnimState == LS_SWAN_DIVE_START ||
-						item->currentAnimState == LS_SWAN_DIVE_END)
+					if (item->activeState == LS_SWAN_DIVE_START ||
+						item->activeState == LS_SWAN_DIVE_END)
 					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
 					}
@@ -609,7 +609,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				else
 				{
 					SetAnimation(item, LA_STAND_IDLE);
-					item->goalAnimState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
+					item->targetState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
 					info->waterStatus = LW_WADE;
 
 					AnimateItem(item);
@@ -648,8 +648,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				info->waterStatus = LW_ABOVE_WATER;
 
-				if (item->currentAnimState == LS_WADE_FORWARD)
-					item->goalAnimState = LS_RUN_FORWARD;
+				if (item->activeState == LS_WADE_FORWARD)
+					item->targetState = LS_RUN_FORWARD;
 			}
 
 			break;
@@ -755,7 +755,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
-	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.OldAnimState = item->activeState;
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 
@@ -907,7 +907,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (doRoutines || KeyMap[DIK_U] && !dbU)
 	{
 		// Handle current Lara status.
-		lara_control_routines[item->currentAnimState](item, coll);
+		lara_control_routines[item->activeState](item, coll);
 
 		HandleLaraMovementParameters(item, coll);
 
@@ -921,7 +921,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 			// Handle Lara collision.
 			if (info->Vehicle == NO_ITEM)
-				lara_collision_routines[item->currentAnimState](item, coll);
+				lara_collision_routines[item->activeState](item, coll);
 		}
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
@@ -974,7 +974,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = true;
 	info->poseCount = 0;
 
-	lara_control_routines[item->currentAnimState](item, coll);
+	lara_control_routines[item->activeState](item, coll);
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1037,7 +1037,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	DoObjectCollision(item, coll);
 
 	if (/*info->ExtraAnim == -1 &&*/ info->Vehicle == NO_ITEM)
-		lara_collision_routines[item->currentAnimState](item, coll);
+		lara_collision_routines[item->activeState](item, coll);
 
 	UpdateItemRoom(item, 0);
 
@@ -1083,7 +1083,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = true;
 	info->poseCount = 0;
 
-	lara_control_routines[item->currentAnimState](item, coll);
+	lara_control_routines[item->activeState](item, coll);
 
 	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
@@ -1102,7 +1102,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	DoObjectCollision(item, coll);
 
 	if (info->Vehicle == NO_ITEM)
-		lara_collision_routines[item->currentAnimState](item, coll);
+		lara_collision_routines[item->activeState](item, coll);
 
 	UpdateItemRoom(item, LARA_RAD);
 
@@ -1153,7 +1153,7 @@ void AnimateLara(ITEM_INFO* item)
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
 		anim = &g_Level.Anims[item->animNumber];
-		item->currentAnimState = anim->currentAnimState;
+		item->activeState = anim->activeState;
 	}
 
 	if (item->frameNumber > anim->frameEnd)
@@ -1202,7 +1202,7 @@ void AnimateLara(ITEM_INFO* item)
 		item->frameNumber = anim->jumpFrameNum;
 
 		anim = &g_Level.Anims[item->animNumber];
-		item->currentAnimState = anim->currentAnimState;
+		item->activeState = anim->activeState;
 	}
 
 	if (anim->numberCommands > 0)

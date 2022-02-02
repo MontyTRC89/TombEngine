@@ -31,11 +31,11 @@ void MonkControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
+		if (item->activeState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 9;
+			item->activeState = 9;
 		}
 	}
 	else
@@ -55,7 +55,7 @@ void MonkControl(short itemNum)
 		if (info.ahead)
 			torso = info.angle;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			monk->flags &= 0x0FFF;
@@ -66,30 +66,30 @@ void MonkControl(short itemNum)
 			}
 			else if (monk->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x7000)
-					item->goalAnimState = 4;
+					item->targetState = 4;
 				else
-					item->goalAnimState = 11;
+					item->targetState = 11;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -102,29 +102,29 @@ void MonkControl(short itemNum)
 			}
 			else if (monk->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				random = GetRandomControl();
 				if (random < 0x3000)
-					item->goalAnimState = 5;
+					item->targetState = 5;
 				else if (random < 0x6000)
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				else
-					item->goalAnimState = 1;
+					item->targetState = 1;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -136,25 +136,25 @@ void MonkControl(short itemNum)
 				if (!MonksAttackLara && info.ahead && Lara.target == item)
 				{
 					if (GetRandomControl() < 0x4000)
-						item->goalAnimState = 1;
+						item->targetState = 1;
 					else
-						item->goalAnimState = 11;
+						item->targetState = 11;
 				}
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 11;
+					item->targetState = 11;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -169,7 +169,7 @@ void MonkControl(short itemNum)
 
 			if (monk->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
@@ -178,28 +178,28 @@ void MonkControl(short itemNum)
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 11;
+					item->targetState = 11;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 3))
 			{
-				item->goalAnimState = 10;
+				item->targetState = 10;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 11;
+					item->targetState = 11;
 			}
 			break;
 
 		case 8:
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE / 2))
-				item->goalAnimState = 11;
+				item->targetState = 11;
 			else
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			break;
 
 		case 4:

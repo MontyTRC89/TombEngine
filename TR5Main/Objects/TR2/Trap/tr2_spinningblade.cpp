@@ -16,7 +16,7 @@ void InitialiseSpinningBlade(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 3;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = 1;
+	item->activeState = 1;
 }
 
 void SpinningBladeControl(short itemNumber)
@@ -24,9 +24,9 @@ void SpinningBladeControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	bool spinning = false;
 
-	if (item->currentAnimState == 2)
+	if (item->activeState == 2)
 	{
-		if (item->goalAnimState != 1)
+		if (item->targetState != 1)
 		{
 			int x = item->pos.xPos + WALL_SIZE * 3 * phd_sin(item->pos.yRot) / 2;
 			int z = item->pos.zPos + WALL_SIZE * 3 * phd_cos(item->pos.yRot) / 2;
@@ -36,7 +36,7 @@ void SpinningBladeControl(short itemNumber)
 			int height = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 			if (height == NO_HEIGHT)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 		}
 
 		spinning = true;
@@ -54,7 +54,7 @@ void SpinningBladeControl(short itemNumber)
 	else
 	{
 		if (TriggerActive(item))
-			item->goalAnimState = 2;
+			item->targetState = 2;
 		spinning = false;
 	}
 
@@ -66,6 +66,6 @@ void SpinningBladeControl(short itemNumber)
 	if (roomNumber != item->roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if (spinning && item->currentAnimState == 1)
+	if (spinning && item->activeState == 1)
 		item->pos.yRot += -ANGLE(180);
 }

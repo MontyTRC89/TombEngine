@@ -35,7 +35,7 @@ namespace TEN::Entities::Generic
 		if (isLara &&
 			TrInput & IN_ACTION && 
 			!Lara.gunStatus && 
-			l->currentAnimState == LS_IDLE && 
+			l->activeState == LS_IDLE && 
 			l->animNumber == LA_STAND_IDLE || Lara.isMoving &&
 			Lara.interactedItem == itemNumber)
 		{
@@ -47,7 +47,7 @@ namespace TEN::Entities::Generic
 				if (MoveLaraPosition(&PolePos, item, l))
 				{
 					l->animNumber = LA_STAND_TO_POLE;
-					l->currentAnimState = LS_POLE_IDLE;
+					l->activeState = LS_POLE_IDLE;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
@@ -73,7 +73,7 @@ namespace TEN::Entities::Generic
 			     !Lara.gunStatus && 
 				 l->airborne && 
 				 l->fallspeed > Lara.gunStatus && 
-				 l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
+				 l->activeState == LS_REACH || l->activeState == LS_JUMP_UP)
 		{
 			if (TestBoundsCollide(item, l, 100) &&
 				TestLaraPoleCollision(l, coll, true, -STEP_SIZE) &&
@@ -83,7 +83,7 @@ namespace TEN::Entities::Generic
 				{
 					short rot = item->pos.yRot;
 					item->pos.yRot = l->pos.yRot;
-					if (l->currentAnimState == LS_REACH)
+					if (l->activeState == LS_REACH)
 					{
 						PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
 						AlignLaraPosition(&PolePosR, item, l);
@@ -99,7 +99,7 @@ namespace TEN::Entities::Generic
 					}
 					l->airborne = false;
 					l->fallspeed = false;
-					l->currentAnimState = LS_POLE_IDLE;
+					l->activeState = LS_POLE_IDLE;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					item->pos.yRot = rot;
 				}
@@ -108,7 +108,7 @@ namespace TEN::Entities::Generic
 		else
 		{
 			if (!isLara || 
-				((l->currentAnimState < LS_POLE_IDLE || l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->currentAnimState != LS_JUMP_BACK))
+				((l->activeState < LS_POLE_IDLE || l->activeState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->activeState != LS_JUMP_BACK))
 				ObjectCollision(itemNumber, l, coll);
 		}
 	}

@@ -40,7 +40,7 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((!(TrInput & IN_ACTION)
-			|| l->currentAnimState != LS_IDLE
+			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus)
 			&& (!Lara.isMoving
@@ -48,9 +48,9 @@ namespace TEN::Entities::Switches
 		{
 			ObjectCollision(itemNum, l, coll);
 		}
-		else if (item->currentAnimState)
+		else if (item->activeState)
 		{
-			if (item->currentAnimState == SWITCH_ON)
+			if (item->activeState == SWITCH_ON)
 			{
 				l->pos.yRot ^= (short)ANGLE(180);
 
@@ -58,7 +58,7 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(&RailSwitchPos2, item, l))
 					{
-						item->goalAnimState = SWITCH_OFF;
+						item->targetState = SWITCH_OFF;
 						flag = 1;
 					}
 					else
@@ -78,8 +78,8 @@ namespace TEN::Entities::Switches
 				{
 					l->animNumber = LA_LEVER_PUSH;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->goalAnimState = LS_LEVERSWITCH_PUSH;
-					l->currentAnimState = LS_LEVERSWITCH_PUSH;
+					l->targetState = LS_LEVERSWITCH_PUSH;
+					l->activeState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;
@@ -103,11 +103,11 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&RailSwitchPos, item, l))
 				{
-					item->goalAnimState = SWITCH_ON;
+					item->targetState = SWITCH_ON;
 					l->animNumber = LA_LEVER_PUSH;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->goalAnimState = LS_LEVERSWITCH_PUSH;
-					l->currentAnimState = LS_LEVERSWITCH_PUSH;
+					l->targetState = LS_LEVERSWITCH_PUSH;
+					l->activeState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
 					Lara.headYrot = 0;
 					Lara.headXrot = 0;

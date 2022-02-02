@@ -289,10 +289,10 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 
 	if (laraInfo->Vehicle != NO_ITEM)
 	{
-		if ((lara->currentAnimState == SKIDOO_STATE_DISMOUNT_RIGHT || lara->currentAnimState == SKIDOO_STATE_DISMOUNT_RIGHT_LEFT) &&
+		if ((lara->activeState == SKIDOO_STATE_DISMOUNT_RIGHT || lara->activeState == SKIDOO_STATE_DISMOUNT_RIGHT_LEFT) &&
 			lara->frameNumber == g_Level.Anims[lara->animNumber].frameEnd)
 		{
-			if (lara->currentAnimState == SKIDOO_STATE_DISMOUNT_RIGHT_LEFT)
+			if (lara->activeState == SKIDOO_STATE_DISMOUNT_RIGHT_LEFT)
 				lara->pos.yRot += ANGLE(90.0f);
 			else
 				lara->pos.yRot -= ANGLE(90.0f);
@@ -305,21 +305,21 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			laraInfo->Vehicle = NO_ITEM;
 			laraInfo->gunStatus = LG_HANDS_FREE;
 		}
-		else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF &&
+		else if (lara->activeState == SKIDOO_STATE_JUMP_OFF &&
 			(skidoo->pos.yPos == skidoo->floor || TestLastFrame(lara)))
 		{
 			SetAnimation(lara, LA_FREEFALL);
 
 			if (skidoo->pos.yPos == skidoo->floor)
 			{
-				lara->goalAnimState = LS_DEATH;
+				lara->targetState = LS_DEATH;
 				lara->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 				lara->speed = 0;
 				SkidooExplode(lara, skidoo);
 			}
 			else
 			{
-				lara->goalAnimState = LS_FREEFALL;
+				lara->targetState = LS_FREEFALL;
 				lara->pos.yPos -= 200;
 				lara->fallspeed = skidoo->fallspeed;
 				lara->speed = skidoo->speed;
@@ -358,19 +358,19 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 
 	if (skidoo->pos.yPos != skidoo->floor &&
 		skidoo->fallspeed > 0 &&
-		lara->currentAnimState != SKIDOO_STATE_FALL &&
+		lara->activeState != SKIDOO_STATE_FALL &&
 		!dead)
 	{
 		lara->animNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_LEAP_START;
 		lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-		lara->currentAnimState = SKIDOO_STATE_FALL;
-		lara->goalAnimState = SKIDOO_STATE_FALL;
+		lara->activeState = SKIDOO_STATE_FALL;
+		lara->targetState = SKIDOO_STATE_FALL;
 	}
 	else if (collide &&
 		!dead &&
-		lara->currentAnimState != SKIDOO_STATE_FALL)
+		lara->activeState != SKIDOO_STATE_FALL)
 	{
-		if (lara->currentAnimState != SKIDOO_STATE_HIT)
+		if (lara->activeState != SKIDOO_STATE_HIT)
 		{
 			if (collide == SKIDOO_ANIM_HIT_FRONT)
 				SoundEffect(SFX_TR2_CLATTER_1, &skidoo->pos, 0);
@@ -379,70 +379,70 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 
 			lara->animNumber = (short)(Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide);
 			lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-			lara->currentAnimState = lara->goalAnimState = SKIDOO_STATE_HIT;
+			lara->activeState = lara->targetState = SKIDOO_STATE_HIT;
 		}
 	}
 	else
 	{
-		switch (lara->currentAnimState)
+		switch (lara->activeState)
 		{
 		case SKIDOO_STATE_IDLE:
 
 			if (dead)
 			{
-				lara->goalAnimState = SKIDOO_STATE_DEATH;
+				lara->targetState = SKIDOO_STATE_DEATH;
 
 				break;
 			}
 
-			lara->goalAnimState = SKIDOO_STATE_IDLE; 
+			lara->targetState = SKIDOO_STATE_IDLE; 
 
 			if (TrInput & SKIDOO_IN_DISMOUNT)
 			{
 				if (TrInput & SKIDOO_IN_RIGHT &&
 					SkidooCheckGetOffOK(skidoo, SKIDOO_STATE_DISMOUNT_RIGHT))
 				{
-					lara->goalAnimState = SKIDOO_STATE_DISMOUNT_RIGHT;
+					lara->targetState = SKIDOO_STATE_DISMOUNT_RIGHT;
 					skidoo->speed = 0;
 				}
 				else if (TrInput & SKIDOO_IN_LEFT &&
 					SkidooCheckGetOffOK(skidoo, SKIDOO_STATE_DISMOUNT_RIGHT_LEFT))
 				{
-					lara->goalAnimState = SKIDOO_STATE_DISMOUNT_RIGHT_LEFT;
+					lara->targetState = SKIDOO_STATE_DISMOUNT_RIGHT_LEFT;
 					skidoo->speed = 0;
 				}
 			}
 			else if (TrInput & SKIDOO_IN_LEFT)
-				lara->goalAnimState = SKIDOO_STATE_LEFT;
+				lara->targetState = SKIDOO_STATE_LEFT;
 			else if (TrInput & SKIDOO_IN_RIGHT)
-				lara->goalAnimState = SKIDOO_STATE_RIGHT;
+				lara->targetState = SKIDOO_STATE_RIGHT;
 			else if (TrInput & (SKIDOO_IN_ACCELERATE | SKIDOO_IN_BRAKE))
-				lara->goalAnimState = SKIDOO_STATE_SIT;
+				lara->targetState = SKIDOO_STATE_SIT;
 
 			break;
 
 		case SKIDOO_STATE_SIT:
 			if (skidoo->speed == 0)
-				lara->goalAnimState = SKIDOO_STATE_IDLE;
+				lara->targetState = SKIDOO_STATE_IDLE;
 
 			if (dead)
-				lara->goalAnimState = SKIDOO_STATE_FALLOFF;
+				lara->targetState = SKIDOO_STATE_FALLOFF;
 			else if (TrInput & SKIDOO_IN_LEFT)
-				lara->goalAnimState = SKIDOO_STATE_LEFT;
+				lara->targetState = SKIDOO_STATE_LEFT;
 			else if (TrInput & SKIDOO_IN_RIGHT)
-				lara->goalAnimState = SKIDOO_STATE_RIGHT;
+				lara->targetState = SKIDOO_STATE_RIGHT;
 
 			break;
 
 		case SKIDOO_STATE_LEFT:
 			if (!(TrInput & SKIDOO_IN_LEFT))
-				lara->goalAnimState = SKIDOO_STATE_SIT;
+				lara->targetState = SKIDOO_STATE_SIT;
 
 			break;
 
 		case SKIDOO_STATE_RIGHT:
 			if (!(TrInput & SKIDOO_IN_RIGHT))
-				lara->goalAnimState = SKIDOO_STATE_SIT;
+				lara->targetState = SKIDOO_STATE_SIT;
 
 			break;
 
@@ -451,11 +451,11 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 				skidooInfo->leftFallspeed <= 0 ||
 				skidooInfo->rightFallspeed <= 0)
 			{
-				lara->goalAnimState = SKIDOO_STATE_SIT;
+				lara->targetState = SKIDOO_STATE_SIT;
 				SoundEffect(SFX_TR2_CLATTER_3, &skidoo->pos, 0);
 			}
 			else if (skidoo->fallspeed > (DAMAGE_START + DAMAGE_LENGTH))
-				lara->goalAnimState = SKIDOO_STATE_JUMP_OFF;
+				lara->targetState = SKIDOO_STATE_JUMP_OFF;
 
 			break;
 		}
@@ -464,7 +464,7 @@ void SkidooAnimation(ITEM_INFO* lara, ITEM_INFO* skidoo, int collide, bool dead)
 	if (TestEnvironment(ENV_FLAG_WATER, skidoo) ||
 		TestEnvironment(ENV_FLAG_SWAMP, skidoo))
 	{
-		lara->goalAnimState = SKIDOO_STATE_JUMP_OFF;
+		lara->targetState = SKIDOO_STATE_JUMP_OFF;
 		lara->hitPoints = 0;
 		lara->roomNumber = skidoo->roomNumber;
 		SkidooExplode(lara, skidoo);
@@ -679,7 +679,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 		lara->animNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_LEFT;
 
 	lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-	lara->currentAnimState = SKIDOO_STATE_MOUNT;
+	lara->activeState = SKIDOO_STATE_MOUNT;
 	lara->pos.yRot = skidoo->pos.yRot;
 	lara->pos.xPos = skidoo->pos.xPos;
 	lara->pos.yPos = skidoo->pos.yPos;
@@ -968,7 +968,7 @@ bool SkidooControl(ITEM_INFO* lara, COLL_INFO* coll)
 		TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 		dead = true;
 	}
-	else if (lara->currentAnimState == SKIDOO_STATE_JUMP_OFF)
+	else if (lara->activeState == SKIDOO_STATE_JUMP_OFF)
 	{
 		dead = true;
 		collide = 0;
@@ -983,7 +983,7 @@ bool SkidooControl(ITEM_INFO* lara, COLL_INFO* coll)
 	}
 	else
 	{
-		switch (lara->currentAnimState)
+		switch (lara->activeState)
 		{
 		case SKIDOO_STATE_MOUNT:
 		case SKIDOO_STATE_DISMOUNT_RIGHT:
@@ -1053,7 +1053,7 @@ bool SkidooControl(ITEM_INFO* lara, COLL_INFO* coll)
 		ItemNewRoom(laraInfo->itemNumber, roomNumber);
 	}
 
-	if (lara->currentAnimState != SKIDOO_STATE_FALLOFF)
+	if (lara->activeState != SKIDOO_STATE_FALLOFF)
 	{
 		lara->pos.xPos = skidoo->pos.xPos;
 		lara->pos.yPos = skidoo->pos.yPos;

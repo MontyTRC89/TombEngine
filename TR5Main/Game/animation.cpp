@@ -27,10 +27,10 @@ void AnimateItem(ITEM_INFO* item)
 	{
 		anim = &g_Level.Anims[item->animNumber];
 
-		item->currentAnimState = anim->currentAnimState;
+		item->activeState = anim->activeState;
 
-		if (item->requiredAnimState == item->currentAnimState)
-			item->requiredAnimState = 0;
+		if (item->requiredState == item->activeState)
+			item->requiredState = 0;
 	}
 
 	if (item->frameNumber > anim->frameEnd)
@@ -74,14 +74,14 @@ void AnimateItem(ITEM_INFO* item)
 
 		anim = &g_Level.Anims[item->animNumber];
 
-		if (item->currentAnimState != anim->currentAnimState)
+		if (item->activeState != anim->activeState)
 		{
-			item->currentAnimState = anim->currentAnimState;
-			item->goalAnimState = anim->currentAnimState;
+			item->activeState = anim->activeState;
+			item->targetState = anim->activeState;
 		}
 
-		if (item->requiredAnimState == item->currentAnimState)
-			item->requiredAnimState = 0;
+		if (item->requiredState == item->activeState)
+			item->requiredState = 0;
 	}
 
 	if (anim->numberCommands > 0)
@@ -201,7 +201,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 
 bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 {
-	if (item->currentAnimState == item->goalAnimState)
+	if (item->activeState == item->targetState)
 		return false;
 
 	if (anim->numberChanges <= 0)
@@ -210,7 +210,7 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
 		CHANGE_STRUCT* change = &g_Level.Changes[anim->changeIndex + i];
-		if (change->goalAnimState == item->goalAnimState)
+		if (change->targetState == item->targetState)
 		{
 			for (int j = 0; j < change->numberRanges; j++)
 			{
@@ -320,7 +320,7 @@ int GetNextAnimState(ITEM_INFO* item)
 int GetNextAnimState(short objectID, short animNumber)
 {
 	auto nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
-	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].currentAnimState;
+	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].activeState;
 }
 
 void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
@@ -338,8 +338,8 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 
 	item->animNumber = index;
 	item->frameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->currentAnimState = g_Level.Anims[index].currentAnimState;
-	item->goalAnimState = item->currentAnimState;
+	item->activeState = g_Level.Anims[index].activeState;
+	item->targetState = item->activeState;
 }
 
 bool TestLastFrame(ITEM_INFO* item, short animNumber)

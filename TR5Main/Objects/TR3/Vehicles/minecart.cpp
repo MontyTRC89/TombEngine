@@ -205,7 +205,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 						{
 							if (item->objectNumber == ID_ANIMATING2)
 							{
-								if ((item->frameNumber == g_Level.Anims[item->animNumber].frameBase) && (LaraItem->currentAnimState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
+								if ((item->frameNumber == g_Level.Anims[item->animNumber].frameBase) && (LaraItem->activeState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
 								{
 									FLOOR_INFO* floor;
 									short frame, roomNumber;
@@ -456,72 +456,72 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 {
 	short fh, ch;
 
-	switch (l->currentAnimState)
+	switch (l->activeState)
 	{
 	case CART_MOVE:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 		else if ((cart->Speed == CART_MIN_VEL) || (cart->Flags & CF_STOPPED))
-			l->goalAnimState = CART_STILL;
+			l->targetState = CART_STILL;
 		else if (cart->Gradient < CART_FWD_GRAD)
-			l->goalAnimState = CART_FWD;
+			l->targetState = CART_FWD;
 		else if (cart->Gradient > CART_BACK_GRAD)
-			l->goalAnimState = CART_BACK;
+			l->targetState = CART_BACK;
 		else if (TrInput & IN_LEFT)
-			l->goalAnimState = CART_LEFT;
+			l->targetState = CART_LEFT;
 		else if (TrInput & IN_RIGHT)
-			l->goalAnimState = CART_RIGHT;
+			l->targetState = CART_RIGHT;
 		break;
 
 	case CART_FWD:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 		else if (cart->Gradient > CART_FWD_GRAD)
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 		break;
 
 	case CART_BACK:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 		else if (cart->Gradient < CART_BACK_GRAD)
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 		break;
 
 	case CART_LEFT:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 
 		if (!(TrInput & IN_LEFT))
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 
 		break;
 
 	case CART_RIGHT:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 
 		if (!(TrInput & IN_RIGHT))
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 		break;
 
 	case CART_STILL:
@@ -536,44 +536,44 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			if ((TrInput & IN_LEFT) && (CanGetOut(-1)))
 			{
-				l->goalAnimState = CART_GETOUT;
+				l->targetState = CART_GETOUT;
 				cart->Flags &= ~CF_RDIR;
 			}
 			else if ((TrInput & IN_RIGHT) && (CanGetOut(1)))
 			{
-				l->goalAnimState = CART_GETOUT;
+				l->targetState = CART_GETOUT;
 				cart->Flags |= CF_RDIR;
 			}
 		}
 
 		if (TrInput & IN_CROUCH)
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 		else if (cart->Speed > CART_MIN_VEL)
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 		break;
 
 	case CART_DUCK:
 		if (TrInput & IN_ACTION)
-			l->goalAnimState = CART_USE;
+			l->targetState = CART_USE;
 		else if (TrInput & IN_JUMP)
-			l->goalAnimState = CART_BRAKE;
+			l->targetState = CART_BRAKE;
 		else if (!(TrInput & IN_CROUCH))
-			l->goalAnimState = CART_STILL;
+			l->targetState = CART_STILL;
 		break;
 
 	case CART_USE:
-		l->goalAnimState = CART_MOVE;
+		l->targetState = CART_MOVE;
 		break;
 
 	case CART_BRAKING:
 		if (TrInput & IN_CROUCH)
 		{
-			l->goalAnimState = CART_DUCK;
+			l->targetState = CART_DUCK;
 			StopSoundEffect(219);
 		}
 		else if ((!(TrInput & IN_JUMP)) || (cart->Flags & CF_STOPPED))
 		{
-			l->goalAnimState = CART_MOVE;
+			l->targetState = CART_MOVE;
 			StopSoundEffect(219);
 		}
 		else
@@ -584,7 +584,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_BRAKE:
-		l->goalAnimState = CART_BRAKING;
+		l->targetState = CART_BRAKING;
 		break;
 
 	case CART_GETOUT:
@@ -598,9 +598,9 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			}
 
 			if (cart->Flags & CF_RDIR)
-				l->goalAnimState = CART_GETOUTR;
+				l->targetState = CART_GETOUTR;
 			else
-				l->goalAnimState = CART_GETOUTL;
+				l->targetState = CART_GETOUTL;
 		}
 		break;
 
@@ -700,13 +700,13 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		v->animNumber = Objects[ID_MINECART].animIndex + (l->animNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
 		v->frameNumber = g_Level.Anims[v->animNumber].frameBase + (l->frameNumber - g_Level.Anims[l->animNumber].frameBase);
 	}
-	if ((l->currentAnimState != CART_TURNDEATH) && (l->currentAnimState != CART_WALLDEATH) && (l->hitPoints > 0))
+	if ((l->activeState != CART_TURNDEATH) && (l->activeState != CART_WALLDEATH) && (l->hitPoints > 0))
 	{
 		if ((v->pos.zRot > TERMINAL_ANGLE) || (v->pos.zRot < -TERMINAL_ANGLE))
 		{
 			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-			l->currentAnimState = l->goalAnimState = CART_TURNDEATH;
+			l->activeState = l->targetState = CART_TURNDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | CF_STOPPED | CF_DEAD;
 			cart->Speed = v->speed = 0;
 			return;
@@ -717,14 +717,14 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 23;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-			l->currentAnimState = l->goalAnimState = CART_WALLDEATH;
+			l->activeState = l->targetState = CART_WALLDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | (CF_STOPPED | CF_DEAD);
 			cart->Speed = v->speed = 0;
 			l->hitPoints = -1;
 			return;
 		}
 
-		if ((l->currentAnimState != CART_DUCK) && (l->currentAnimState != CART_HIT))
+		if ((l->activeState != CART_DUCK) && (l->activeState != CART_HIT))
 		{
 			COLL_INFO coll;
 			coll.Setup.Radius = CART_RADIUS;
@@ -737,7 +737,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 				l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->currentAnimState = l->goalAnimState = CART_HIT;
+				l->activeState = l->targetState = CART_HIT;
 				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->speed, v->pos.yRot, l->roomNumber, 3);
 
 				hits = (CART_NHITS * short((cart->Speed) / 2048));
@@ -804,7 +804,7 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 0;
 
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-		l->currentAnimState = l->goalAnimState = CART_GETIN;
+		l->activeState = l->targetState = CART_GETIN;
 
 		l->pos.xPos = v->pos.xPos;
 		l->pos.yPos = v->pos.yPos;

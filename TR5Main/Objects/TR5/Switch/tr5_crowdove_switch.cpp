@@ -39,12 +39,12 @@ namespace TEN::Entities::TR5
 			|| !(item->meshBits & 4)
 			|| (!(TrInput & IN_ACTION)
 				|| Lara.gunStatus
-				|| l->currentAnimState != LS_IDLE
+				|| l->activeState != LS_IDLE
 				|| l->animNumber != LA_STAND_IDLE
 				|| l->airborne)
 			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 		{
-			if (l->currentAnimState != LS_DOVESWITCH)
+			if (l->activeState != LS_DOVESWITCH)
 				ObjectCollision(itemNum, l, coll);
 		}
 		else
@@ -56,7 +56,7 @@ namespace TEN::Entities::TR5
 				if (MoveLaraPosition(&CrowDovePos, item, l))
 				{
 					l->animNumber = LA_DOVESWITCH_TURN;
-					l->currentAnimState = LS_DOVESWITCH;
+					l->activeState = LS_DOVESWITCH;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 
 					AddActiveItem(itemNum);
@@ -110,12 +110,12 @@ namespace TEN::Entities::TR5
 		}
 		else if (item->itemFlags[0] == 0)
 		{
-			if (item->currentAnimState == SWITCH_OFF)
-				item->goalAnimState = SWITCH_ON;
+			if (item->activeState == SWITCH_OFF)
+				item->targetState = SWITCH_ON;
 
 			AnimateItem(item);
 
-			if (item->currentAnimState == SWITCH_OFF)
+			if (item->activeState == SWITCH_OFF)
 				item->pos.yRot += ANGLE(90);
 		}
 	}

@@ -51,8 +51,8 @@ void InitialiseImp(short itemNum)
         stateid = 1;
         item->animNumber = Objects[ID_IMP].animIndex + 1;
     }
-    item->goalAnimState = stateid;
-    item->currentAnimState = stateid;
+    item->targetState = stateid;
+    item->activeState = stateid;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
@@ -148,12 +148,12 @@ void ImpControl(short itemNumber)
 
 			int d1 = item->pos.yPos - LaraItem->pos.yPos + 384;
 
-			if (LaraItem->currentAnimState == LS_CROUCH_IDLE
-				|| LaraItem->currentAnimState == LS_CROUCH_ROLL
-				|| LaraItem->currentAnimState > LS_MONKEY_TURN_180
-				&& LaraItem->currentAnimState < LS_HANG_TO_CRAWL
-				|| LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT
-				|| LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->activeState == LS_CROUCH_IDLE
+				|| LaraItem->activeState == LS_CROUCH_ROLL
+				|| LaraItem->activeState > LS_MONKEY_TURN_180
+				&& LaraItem->activeState < LS_HANG_TO_CRAWL
+				|| LaraItem->activeState == LS_CROUCH_TURN_LEFT
+				|| LaraItem->activeState == LS_CROUCH_TURN_RIGHT)
 			{
 				d1 = item->pos.yPos - LaraItem->pos.yPos;
 			}
@@ -163,7 +163,7 @@ void ImpControl(short itemNumber)
 			info.xAngle = phd_atan(d2, d1);
 
 			GetCreatureMood(item, &info, VIOLENT);
-			if (item->currentAnimState == STATE_IMP_SCARED)
+			if (item->activeState == STATE_IMP_SCARED)
 				creature->mood = ESCAPE_MOOD;
 
 			CreatureMood(item, &info, VIOLENT);
@@ -179,18 +179,18 @@ void ImpControl(short itemNumber)
 			else
 				item->swapMeshFlags = 0;
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case STATE_IMP_WALK:
 				creature->maximumTurn = ANGLE(7);
 				if (info.distance <= SQUARE(2048))
 				{
 					if (info.distance < SQUARE(2048))
-						item->goalAnimState = STATE_IMP_STOP;
+						item->targetState = STATE_IMP_STOP;
 				}
 				else
 				{
-					item->goalAnimState = STATE_IMP_RUN;
+					item->targetState = STATE_IMP_RUN;
 				}
 				break;
 
@@ -200,28 +200,28 @@ void ImpControl(short itemNumber)
 				if (info.bite && info.distance < SQUARE(170) && item->triggerFlags < 10)
 				{
 					if (GetRandomControl() & 1)
-						item->goalAnimState = STATE_IMP_ATTACK1;
+						item->targetState = STATE_IMP_ATTACK1;
 					else
-						item->goalAnimState = STATE_IMP_ATTACK2;
+						item->targetState = STATE_IMP_ATTACK2;
 				}
 				else if (item->aiBits & FOLLOW)
 				{
-					item->goalAnimState = STATE_IMP_WALK;
+					item->targetState = STATE_IMP_WALK;
 				}
 				else
 				{
 					if (item->triggerFlags == 3)
 					{
-						item->goalAnimState = STATE_IMP_THROW_STONES;
+						item->targetState = STATE_IMP_THROW_STONES;
 					}
 					else if (info.distance <= SQUARE(2048))
 					{
 						if (info.distance > SQUARE(512) || item->triggerFlags < 10)
-							item->goalAnimState = STATE_IMP_WALK;
+							item->targetState = STATE_IMP_WALK;
 					}
 					else
 					{
-						item->goalAnimState = STATE_IMP_RUN;
+						item->targetState = STATE_IMP_RUN;
 					}
 				}
 				break;
@@ -231,11 +231,11 @@ void ImpControl(short itemNumber)
 				if (info.distance >= SQUARE(512))
 				{
 					if (info.distance < SQUARE(2048))
-						item->goalAnimState = STATE_IMP_WALK;
+						item->targetState = STATE_IMP_WALK;
 				}
 				else
 				{
-					item->goalAnimState = STATE_IMP_STOP;
+					item->targetState = STATE_IMP_STOP;
 				}
 				break;
 
@@ -274,10 +274,10 @@ void ImpControl(short itemNumber)
 		else
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != STATE_IMP_DEATH)
+			if (item->activeState != STATE_IMP_DEATH)
 			{
 				item->animNumber = Objects[ID_IMP].animIndex + ANIMATION_IMP_DEATH;
-				item->currentAnimState = STATE_IMP_DEATH;
+				item->activeState = STATE_IMP_DEATH;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}

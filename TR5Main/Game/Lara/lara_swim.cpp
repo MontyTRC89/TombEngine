@@ -100,7 +100,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -122,7 +122,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		SwimTurn(item, coll);
 
 	if (TrInput & IN_JUMP)
-		item->goalAnimState = LS_UNDERWATER_FORWARD;
+		item->targetState = LS_UNDERWATER_FORWARD;
 
 	item->fallspeed -= 6;
 
@@ -137,7 +137,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -156,21 +156,21 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 		SwimTurnSubsuit(item);
 
 	if (TrInput & IN_JUMP)
-		item->goalAnimState = LS_UNDERWATER_FORWARD;
+		item->targetState = LS_UNDERWATER_FORWARD;
 
 	item->fallspeed -= 6;
 	if (item->fallspeed < 0)
 		item->fallspeed = 0;
 
 	if (item->fallspeed <= 133)
-		item->goalAnimState = LS_UNDERWATER_STOP;
+		item->targetState = LS_UNDERWATER_STOP;
 }
 
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -194,7 +194,7 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 		item->fallspeed = 200;
 
 	if (!(TrInput & IN_JUMP))
-		item->goalAnimState = LS_UNDERWATER_INERTIA;
+		item->targetState = LS_UNDERWATER_INERTIA;
 }
 
 void UpdateSubsuitAngles()
@@ -325,7 +325,7 @@ void SwimDive(ITEM_INFO* item)
 {
 
 	SetAnimation(item, LA_ONWATER_DIVE);
-	item->goalAnimState = LS_UNDERWATER_FORWARD;
+	item->targetState = LS_UNDERWATER_FORWARD;
 	item->pos.xRot = ANGLE(-45.0f);
 	item->fallspeed = 80;
 	Lara.waterStatus = LW_UNDERWATER;

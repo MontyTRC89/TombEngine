@@ -87,8 +87,8 @@ namespace TEN::Entities::TR4
         InitialiseCreature(itemNumber);
         item->animNumber = Objects[item->objectNumber].animIndex;
         item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->goalAnimState = STATE_AHMET_IDLE;
-        item->currentAnimState = STATE_AHMET_IDLE;
+        item->targetState = STATE_AHMET_IDLE;
+        item->activeState = STATE_AHMET_IDLE;
         item->itemFlags[0] = item->pos.xPos / SECTOR(1);
         item->itemFlags[1] = item->pos.yPos * 4 / SECTOR(1);
         item->itemFlags[2] = item->pos.zPos / SECTOR(1);
@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 
         if (item->hitPoints <= 0)
         {
-            if (item->currentAnimState == STATE_AHMET_DIE)
+            if (item->activeState == STATE_AHMET_DIE)
             {
                 // dont clear it !
                 if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
@@ -130,8 +130,8 @@ namespace TEN::Entities::TR4
             {
                 item->animNumber = Objects[item->objectNumber].animIndex + AHMET_DIE_ANIM;
                 item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                item->currentAnimState = STATE_AHMET_DIE;
-                item->goalAnimState = STATE_AHMET_DIE;
+                item->activeState = STATE_AHMET_DIE;
+                item->targetState = STATE_AHMET_DIE;
                 Lara.interactedItem = itemNumber;
             }
 
@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
             if (info.ahead)
                 head_y = info.angle;
 
-            switch (item->currentAnimState)
+            switch (item->activeState)
             {
             case STATE_AHMET_IDLE:
                 ahmet->maximumTurn = 0;
@@ -183,48 +183,48 @@ namespace TEN::Entities::TR4
                 if (item->aiBits & GUARD)
                 {
                     head_y = AIGuard(ahmet);
-                    item->goalAnimState = STATE_AHMET_IDLE;
+                    item->targetState = STATE_AHMET_IDLE;
                 }
                 else if (item->aiBits & PATROL1)
                 {
-                    item->goalAnimState = STATE_AHMET_WALK;
+                    item->targetState = STATE_AHMET_WALK;
                     head_y = 0;
                 }
                 else if (ahmet->mood == ATTACK_MOOD && ahmet->mood != ESCAPE_MOOD)
                 {
                     if (info.bite && info.distance < AHMET_STAND_DUALATK_RANGE)
                     {
-                        item->goalAnimState = STATE_AHMET_STAND_DUALATK;
+                        item->targetState = STATE_AHMET_STAND_DUALATK;
                     }
                     else if ((info.angle >= AHMET_VIEW_ANGLE || info.angle <= -AHMET_VIEW_ANGLE) || info.distance >= AHMET_IDLE_RANGE)
                     {
-                        if (item->requiredAnimState)
+                        if (item->requiredState)
                         {
-                            item->goalAnimState = item->requiredAnimState;
+                            item->targetState = item->requiredState;
                         }
                         else
                         {
                             if (!info.ahead || info.distance >= AHMET_RUN_RANGE)
-                                item->goalAnimState = STATE_AHMET_RUN;
+                                item->targetState = STATE_AHMET_RUN;
                             else
-                                item->goalAnimState = STATE_AHMET_WALK;
+                                item->targetState = STATE_AHMET_WALK;
                         }
                     }
                     else if (GetRandomControl() & 1)
                     {
-                        item->goalAnimState = STATE_AHMET_JUMP_BITE;
+                        item->targetState = STATE_AHMET_JUMP_BITE;
                     }
                     else
                     {
-                        item->goalAnimState = STATE_AHMET_JUMP_DUALATK;
+                        item->targetState = STATE_AHMET_JUMP_DUALATK;
                     }
                 }
                 else
                 {
                     if (Lara.target == item || !info.ahead)
-                        item->goalAnimState = STATE_AHMET_RUN;
+                        item->targetState = STATE_AHMET_RUN;
                     else
-                        item->goalAnimState = STATE_AHMET_IDLE;
+                        item->targetState = STATE_AHMET_IDLE;
                 }
                 break;
 
@@ -233,16 +233,16 @@ namespace TEN::Entities::TR4
 
                 if (item->aiBits & PATROL1)
                 {
-                    item->goalAnimState = STATE_AHMET_WALK;
+                    item->targetState = STATE_AHMET_WALK;
                     head_y = 0;
                 }
                 else if (info.bite && info.distance < AHMET_IDLE_RANGE)
                 {
-                    item->goalAnimState = STATE_AHMET_IDLE;
+                    item->targetState = STATE_AHMET_IDLE;
                 }
                 else if (ahmet->mood == ESCAPE_MOOD || info.distance > AHMET_RUN_RANGE || !info.ahead || (info.enemyFacing > -AHMET_ENEMY_ANGLE || info.enemyFacing < AHMET_ENEMY_ANGLE))
                 {
-                    item->goalAnimState = STATE_AHMET_RUN;
+                    item->targetState = STATE_AHMET_RUN;
                 }
                 break;
 
@@ -251,9 +251,9 @@ namespace TEN::Entities::TR4
                 ahmet->flags = 0;
 
                 if (item->aiBits & GUARD || (ahmet->mood == BORED_MOOD || ahmet->mood == ESCAPE_MOOD) && (Lara.target == item && info.ahead) || (info.bite && info.distance < AHMET_IDLE_RANGE))
-                    item->goalAnimState = STATE_AHMET_IDLE;
+                    item->targetState = STATE_AHMET_IDLE;
                 else if (info.ahead && info.distance < AHMET_RUN_RANGE && (info.enemyFacing < -AHMET_ENEMY_ANGLE || info.enemyFacing > AHMET_ENEMY_ANGLE))
-                    item->goalAnimState = STATE_AHMET_WALK;
+                    item->targetState = STATE_AHMET_WALK;
                 break;
 
             case STATE_AHMET_STAND_DUALATK:
@@ -367,7 +367,7 @@ namespace TEN::Entities::TR4
     {
         ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-        if (item->currentAnimState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
+        if (item->activeState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
             return false;
 
 		Weather.Flash(255, 64, 0, 0.03f);
@@ -381,9 +381,9 @@ namespace TEN::Entities::TR4
             ItemNewRoom(itemNumber, outsideRoom);
 
         item->animNumber = Objects[item->objectNumber].animIndex;
-        item->goalAnimState = 1;
+        item->targetState = 1;
         item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->currentAnimState = 1;
+        item->activeState = 1;
         item->hitPoints = Objects[item->objectNumber].hitPoints;
 
         AddActiveItem(itemNumber);

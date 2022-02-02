@@ -112,8 +112,8 @@ namespace TEN::Entities::TR4
 
 		item->animNumber = obj->animIndex + 2;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
-		item->currentAnimState = STATE_HORSEMAN_HORSE_RUN;
+		item->targetState = STATE_HORSEMAN_HORSE_RUN;
+		item->activeState = STATE_HORSEMAN_HORSE_RUN;
 	}
 
 	void InitialiseHorseman(short itemNumber)
@@ -125,8 +125,8 @@ namespace TEN::Entities::TR4
 
 		item->animNumber = obj->animIndex + 8;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = 9;
-		item->currentAnimState = 9;
+		item->targetState = 9;
+		item->activeState = 9;
 		item->itemFlags[0] = NO_ITEM; // No horse yet
 	}
 
@@ -200,10 +200,10 @@ namespace TEN::Entities::TR4
 			item->hitPoints = 0;
 			if (item->itemFlags[1] == 0)
 			{
-				if (item->currentAnimState != 16)
+				if (item->activeState != 16)
 				{
 					item->animNumber = Objects[ID_HORSEMAN].animIndex + 21;
-					item->currentAnimState = 16;
+					item->activeState = 16;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 					if (item->itemFlags[0])
@@ -219,12 +219,12 @@ namespace TEN::Entities::TR4
 				item->aiBits = 0;
 				item->itemFlags[1] = 0;
 				item->animNumber = Objects[ID_HORSEMAN].animIndex + 3;
-				item->currentAnimState = 8;
+				item->activeState = 8;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 				creature->enemy = NULL;
 
-				horseItem->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
+				horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
 			}
 		}
 		else
@@ -264,7 +264,7 @@ namespace TEN::Entities::TR4
 				&& laraInfo.angle > -12288
 				&& laraInfo.distance < SQUARE(2048))
 			{
-				if (item->currentAnimState != 15)
+				if (item->activeState != 15)
 				{
 					if (laraInfo.angle <= 0)
 					{
@@ -274,7 +274,7 @@ namespace TEN::Entities::TR4
 							{
 								if (item->meshBits & 0x400)
 								{
-									item->requiredAnimState = 15;  
+									item->requiredState = 15;  
 								}
 							}
 						}
@@ -310,9 +310,9 @@ namespace TEN::Entities::TR4
 							}
 							else if (!(GetRandomControl() & 7))
 							{
-								if (item->currentAnimState == 15)
+								if (item->activeState == 15)
 								{
-									item->goalAnimState = 9;
+									item->targetState = 9;
 								}
 								ExplodeItemNode(item, 10, 1, -24);
 							}
@@ -328,15 +328,15 @@ namespace TEN::Entities::TR4
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case STATE_HORSEMAN_HORSE_RUN:
 				creature->maximumTurn = ANGLE(3);
-				horseItem->goalAnimState = STATE_HORSEMAN_HORSE_WALK;
-				if (item->requiredAnimState)
+				horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
+				if (item->requiredState)
 				{
-					item->goalAnimState = 17;
-					horseItem->goalAnimState = STATE_HORSEMAN_GET_ON_HORSE;
+					item->targetState = 17;
+					horseItem->targetState = STATE_HORSEMAN_GET_ON_HORSE;
 				}
 				else if (creature->flags
 					|| creature->reachedGoal
@@ -350,8 +350,8 @@ namespace TEN::Entities::TR4
 						creature->enemy = LaraItem;
 						if (laraInfo.angle > -8192 && laraInfo.angle < 0x2000)
 						{
-							item->goalAnimState = STATE_HORSEMAN_HORSE_STOP;
-							horseItem->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
+							item->targetState = STATE_HORSEMAN_HORSE_STOP;
+							horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
 						}
 					}
 					else
@@ -376,13 +376,13 @@ namespace TEN::Entities::TR4
 									info.angle < ANGLE(20)))
 							{
 								creature->maximumTurn = 0;
-								item->goalAnimState = 6;
+								item->targetState = 6;
 							}
 						}
 						else
 						{
 							creature->maximumTurn = 0;
-							item->goalAnimState = 7;
+							item->targetState = 7;
 						}
 					}
 				}
@@ -404,13 +404,13 @@ namespace TEN::Entities::TR4
 										info.angle < ANGLE(20)))
 								{
 									creature->maximumTurn = 0;
-									item->goalAnimState = 6;
+									item->targetState = 6;
 								}
 							}
 							else
 							{
 								creature->maximumTurn = 0;
-								item->goalAnimState = 7;
+								item->targetState = 7;
 							}
 						}
 					}
@@ -425,8 +425,8 @@ namespace TEN::Entities::TR4
 				{
 					creature->reachedGoal = false;
 					creature->flags = 0;
-					item->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->goalAnimState = STATE_HORSEMAN_HORSE_WALK;
+					item->targetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
 					creature->enemy = LaraItem;
 				}
 
@@ -434,7 +434,7 @@ namespace TEN::Entities::TR4
 
 			case 3:
 				creature->maximumTurn = 0;
-				horseItem->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
+				horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
 
 				if (creature->flags)
 				{
@@ -446,10 +446,10 @@ namespace TEN::Entities::TR4
 					creature->flags = 0;
 				}
 
-				if (item->requiredAnimState)
+				if (item->requiredState)
 				{
-					item->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->goalAnimState = STATE_HORSEMAN_HORSE_WALK;
+					item->targetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
 					horseItem->flags = 0;
 				}
 				else if (creature->reachedGoal
@@ -459,17 +459,17 @@ namespace TEN::Entities::TR4
 					&& info.angle < ANGLE(10)
 					&& info.angle > -ANGLE(10))
 				{
-					item->goalAnimState = STATE_HORSEMAN_HORSE_REARING;
+					item->targetState = STATE_HORSEMAN_HORSE_REARING;
 					if (creature->reachedGoal)
 					{
-						item->requiredAnimState = 17;
+						item->requiredState = 17;
 					}
 					horseItem->flags = 0;
 				}
 				else
 				{
-					item->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->goalAnimState = STATE_HORSEMAN_HORSE_WALK;
+					item->targetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
 					horseItem->flags = 0;
 				}
 
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 				if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 				{
 					horseItem->animNumber = Objects[ID_HORSE].animIndex + 1;
-					horseItem->currentAnimState = STATE_HORSEMAN_HORSE_REARING;
+					horseItem->activeState = STATE_HORSEMAN_HORSE_REARING;
 					horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
 				}
 
@@ -537,7 +537,7 @@ namespace TEN::Entities::TR4
 				}
 				if (item->hitStatus)
 				{
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				}
 
 				break;
@@ -569,22 +569,22 @@ namespace TEN::Entities::TR4
 
 				if (!item->aiBits || item->itemFlags[3])
 				{
-					if (item->requiredAnimState)
+					if (item->requiredState)
 					{
-						item->goalAnimState = item->requiredAnimState;
+						item->targetState = item->requiredState;
 					}
 					else if (info.bite && info.distance < SQUARE(682))
 					{
-						item->goalAnimState = 14;
+						item->targetState = 14;
 					}
 					else if (info.distance < SQUARE(6144) && info.distance > SQUARE(682))
 					{
-						item->goalAnimState = 10;
+						item->targetState = 10;
 					}
 				}
 				else
 				{
-					item->goalAnimState = 10;
+					item->targetState = 10;
 				}
 
 				break;
@@ -609,7 +609,7 @@ namespace TEN::Entities::TR4
 					creature->enemy = NULL;
 
 					item->animNumber = Objects[ID_HORSEMAN].animIndex + 14;
-					item->currentAnimState = STATE_HORSEMAN_GET_ON_HORSE;
+					item->activeState = STATE_HORSEMAN_GET_ON_HORSE;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
 					creature->maximumTurn = 0;
@@ -619,26 +619,26 @@ namespace TEN::Entities::TR4
 
 				if (item->hitStatus)
 				{
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				}
 				else if (info.bite && info.distance < SQUARE(682))
 				{
 					if (GetRandomControl() & 1)
 					{
-						item->goalAnimState = 12;
+						item->targetState = 12;
 					}
 					else if (GetRandomControl() & 1)
 					{
-						item->goalAnimState = 13;
+						item->targetState = 13;
 					}
 					else
 					{
-						item->goalAnimState = 9;
+						item->targetState = 9;
 					}
 				}
 				else if (info.distance < SQUARE(5120) && info.distance > SQUARE(1365))
 				{
-					item->goalAnimState = 11;
+					item->targetState = 11;
 				}
 
 				break;
@@ -646,7 +646,7 @@ namespace TEN::Entities::TR4
 			case 11:
 				if (info.distance < SQUARE(1365))
 				{
-					item->goalAnimState = 10;
+					item->targetState = 10;
 				}
 
 				break;
@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 			case 15:
 				if (Lara.target != item || info.bite && info.distance < SQUARE(682))
 				{
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				}
 
 				break;
@@ -790,8 +790,8 @@ namespace TEN::Entities::TR4
 				}
 				else if (!info.ahead)
 				{
-					item->goalAnimState = STATE_HORSEMAN_HORSE_STOP;
-					horseItem->goalAnimState = STATE_HORSEMAN_HORSE_RUN;
+					item->targetState = STATE_HORSEMAN_HORSE_STOP;
+					horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
 				}
 				break;
 

@@ -47,8 +47,8 @@ namespace TEN::Entities::TR4
 
         item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_IDLE;
         item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->goalAnimState = STATE_BAT_IDLE;
-        item->currentAnimState = STATE_BAT_IDLE;
+        item->targetState = STATE_BAT_IDLE;
+        item->activeState = STATE_BAT_IDLE;
     }
 
     void BatControl(short itemNumber)
@@ -120,13 +120,13 @@ namespace TEN::Entities::TR4
 
             angle = CreatureTurn(item, BAT_ANGLE);
 
-            switch (item->currentAnimState)
+            switch (item->activeState)
             {
             case STATE_BAT_IDLE:
                 if (info.distance < BAT_TARGETING_RANGE
                     || item->hitStatus
                     || bat->hurtByLara)
-                    item->goalAnimState = STATE_BAT_START;
+                    item->targetState = STATE_BAT_START;
                 break;
 
             case STATE_BAT_FLY:
@@ -141,7 +141,7 @@ namespace TEN::Entities::TR4
                         && info.ahead
                         && abs(item->pos.yPos - bat->enemy->pos.yPos) < BAT_TARGET_YPOS)
                     {
-                        item->goalAnimState = STATE_BAT_ATK;
+                        item->targetState = STATE_BAT_ATK;
                     }
                 }
                 break;
@@ -164,24 +164,24 @@ namespace TEN::Entities::TR4
                 }
                 else
                 {
-                    item->goalAnimState = STATE_BAT_FLY;
+                    item->targetState = STATE_BAT_FLY;
                     bat->mood = BORED_MOOD;
                 }
                 break;
             }
         }
-        else if (item->currentAnimState == STATE_BAT_ATK)
+        else if (item->activeState == STATE_BAT_ATK)
         {
             item->animNumber = Objects[item->objectNumber].animIndex + 1;
             item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-            item->goalAnimState = STATE_BAT_FLY;
-            item->currentAnimState = STATE_BAT_FLY;
+            item->targetState = STATE_BAT_FLY;
+            item->activeState = STATE_BAT_FLY;
         }
         else
         {
             if (item->pos.yPos >= item->floor)
             {
-                item->goalAnimState = STATE_BAT_DEATH;
+                item->targetState = STATE_BAT_DEATH;
                 item->pos.yPos = item->floor;
                 item->airborne = false;
             }
@@ -190,8 +190,8 @@ namespace TEN::Entities::TR4
                 item->airborne = true;
                 item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_FALLING;
                 item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                item->goalAnimState = STATE_BAT_FALLING;
-                item->currentAnimState = STATE_BAT_FALLING;
+                item->targetState = STATE_BAT_FALLING;
+                item->activeState = STATE_BAT_FALLING;
                 item->speed = 0;
             }
         }

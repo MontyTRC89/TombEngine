@@ -48,7 +48,7 @@ void InitialiseSpearGuardian(short itemNum)
 	anim = &g_Level.Anims[item->animNumber];
 
 	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->activeState = anim->activeState;
 }
 
 void SpearGuardianControl(short itemNum)
@@ -69,7 +69,7 @@ void SpearGuardianControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		item->currentAnimState = 17;
+		item->activeState = 17;
 		item->meshBits /= 2;
 
 		if (!item->meshBits)
@@ -88,10 +88,10 @@ void SpearGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, xian->maximumTurn);
 
-		if (item->currentAnimState != 18)
+		if (item->activeState != 18)
 			item->meshBits = 0xFFFFFFFF;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 18:
 			if (!xian->flags)
@@ -113,14 +113,14 @@ void SpearGuardianControl(short itemNum)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else if (random < 0x400)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 2:
@@ -130,19 +130,19 @@ void SpearGuardianControl(short itemNum)
 			xian->maximumTurn = 0;
 
 			if (xian->mood == ESCAPE_MOOD)
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else if (xian->mood == BORED_MOOD)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else if (random < 0x400)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 13;
+				item->targetState = 13;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 3:
@@ -152,26 +152,26 @@ void SpearGuardianControl(short itemNum)
 			xian->maximumTurn = ANGLE(3);
 
 			if (xian->mood == ESCAPE_MOOD)
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			else if (xian->mood == BORED_MOOD)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else if (random < 0x400)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 3 / 2))
-					item->goalAnimState = 7;
+					item->targetState = 7;
 				else if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				else
-					item->goalAnimState = 11;
+					item->targetState = 11;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3))
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			break;
 
 		case 4:
@@ -185,12 +185,12 @@ void SpearGuardianControl(short itemNum)
 			else if (xian->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 15;
+				item->targetState = 15;
 			break;
 
 		case 5:
@@ -199,9 +199,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			break;
 
 		case 7:
@@ -210,9 +210,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3 / 2))
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			break;
 
 		case 9:
@@ -221,9 +221,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			break;
 
 		case 11:
@@ -232,9 +232,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			break;
 
 		case 13:
@@ -243,9 +243,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else
-				item->goalAnimState = 14;
+				item->targetState = 14;
 			break;
 
 		case 15:
@@ -254,9 +254,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			else
-				item->goalAnimState = 16;
+				item->targetState = 16;
 			break;
 
 		case 6:
@@ -274,12 +274,12 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 14:
@@ -289,9 +289,9 @@ void SpearGuardianControl(short itemNum)
 			XianDamage(item, xian, 75);
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 16:
@@ -303,14 +303,14 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			break;
 		}
 	}

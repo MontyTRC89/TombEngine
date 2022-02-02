@@ -22,8 +22,8 @@ namespace TEN::Entities::TR4
 
 		item->animNumber = Objects[item->objectNumber].animIndex + 3;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
+		item->targetState = 1;
+		item->activeState = 1;
 	}
 
 	void BigBeetleControl(short itemNumber)
@@ -38,11 +38,11 @@ namespace TEN::Entities::TR4
 
 		if (item->hitPoints <= 0)
 		{
-			if (item->currentAnimState != 6)
+			if (item->activeState != 6)
 			{
-				if (item->currentAnimState != 7)
+				if (item->activeState != 7)
 				{
-					if (item->currentAnimState == 8)
+					if (item->activeState == 8)
 					{
 						item->pos.xRot = 0;
 						item->pos.yPos = item->floor;
@@ -52,7 +52,7 @@ namespace TEN::Entities::TR4
 						item->animNumber = Objects[item->objectNumber].animIndex + 5;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						item->airborne = true;
-						item->currentAnimState = 6;
+						item->activeState = 6;
 						item->speed = 0;
 						item->pos.xRot = 0;
 					}
@@ -62,7 +62,7 @@ namespace TEN::Entities::TR4
 					item->pos.yPos = item->floor;
 					item->airborne = false;
 					item->fallspeed = 0;
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				}
 			}
 			item->pos.xRot = 0;
@@ -86,7 +86,7 @@ namespace TEN::Entities::TR4
 				creature->flags = 0;
 			}
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case 1:
 				item->pos.yPos = item->floor;
@@ -97,7 +97,7 @@ namespace TEN::Entities::TR4
 					|| creature->hurtByLara
 					|| item->aiBits == MODIFY)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 
 				break;
@@ -105,15 +105,15 @@ namespace TEN::Entities::TR4
 			case 3:
 				creature->maximumTurn = ANGLE(7);
 
-				if (item->requiredAnimState)
+				if (item->requiredState)
 				{
-					item->goalAnimState = item->requiredAnimState;
+					item->targetState = item->requiredState;
 				}
 				else if (info.ahead)
 				{
 					if (info.distance < SQUARE(256))
 					{
-						item->goalAnimState = 9;
+						item->targetState = 9;
 					}
 				}
 
@@ -126,17 +126,17 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(256))
 					{
-						item->goalAnimState = 4;
+						item->targetState = 4;
 					}
 				}
 				else if (info.distance < SQUARE(256))
 				{
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				}
 				else
 				{
-					item->requiredAnimState = 3;
-					item->goalAnimState = 9;
+					item->requiredState = 3;
+					item->targetState = 9;
 				}
 
 				if (!creature->flags)
@@ -169,9 +169,9 @@ namespace TEN::Entities::TR4
 			case 9u:
 				creature->maximumTurn = ANGLE(7);
 
-				if (item->requiredAnimState)
+				if (item->requiredState)
 				{
-					item->goalAnimState = item->requiredAnimState;
+					item->targetState = item->requiredState;
 				}
 				else if (!item->hitStatus
 					&& GetRandomControl() >= 384
@@ -184,13 +184,13 @@ namespace TEN::Entities::TR4
 					{
 						if (info.distance < SQUARE(256) && !creature->flags)
 						{
-							item->goalAnimState = 4;
+							item->targetState = 4;
 						}
 					}
 				}
 				else
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 
 				break;

@@ -19,8 +19,8 @@ void InitialiseInvisibleGhost(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->targetState = 1;
+    item->activeState = 1;
     item->pos.yPos += CLICK(2);
 }
 
@@ -70,19 +70,19 @@ void InvisibleGhostControl(short itemNumber)
 
 		creature->maximumTurn = 0;
 		
-		if (item->currentAnimState == 1)
+		if (item->activeState == 1)
 		{
 			creature->flags = 0;
 			if (info.distance < SQUARE(614))
 			{
 				if (GetRandomControl() & 1)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 		}
-		else if (item->currentAnimState > 1
-			&& item->currentAnimState <= 3
+		else if (item->activeState > 1
+			&& item->activeState <= 3
 			&& !creature->flags
 			&& item->touchBits & 0x9470
 			&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 18)

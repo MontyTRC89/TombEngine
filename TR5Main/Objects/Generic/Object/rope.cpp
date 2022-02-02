@@ -188,8 +188,8 @@ namespace TEN::Entities::Generic
 		
 		if (TrInput & IN_ACTION 
 			&& Lara.gunStatus == LG_HANDS_FREE 
-			&& (l->currentAnimState == LS_REACH
-				|| l->currentAnimState == LS_JUMP_UP) 
+			&& (l->activeState == LS_REACH
+				|| l->activeState == LS_JUMP_UP) 
 			&& l->airborne 
 			&& l->fallspeed > 0
 			&& rope->active)
@@ -201,21 +201,21 @@ namespace TEN::Entities::Generic
 				l->pos.xPos,
 				l->pos.yPos + frame->Y1 + 512,
 				l->pos.zPos + frame->Z2 * phd_cos(l->pos.yRot),
-				l->currentAnimState == LS_REACH ? 128 : 320);
+				l->activeState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
 			{
-				if (l->currentAnimState == LS_REACH)
+				if (l->activeState == LS_REACH)
 				{
 					l->animNumber = LA_REACH_TO_ROPE_SWING;
-					l->currentAnimState = LS_ROPE_SWING;
+					l->activeState = LS_ROPE_SWING;
 					Lara.ropeFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
 					Lara.ropeDFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
 				}
 				else
 				{
 					l->animNumber = LA_JUMP_UP_TO_ROPE_START;
-					l->currentAnimState = LS_ROPE_IDLE;
+					l->activeState = LS_ROPE_IDLE;
 				}
 
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
@@ -659,8 +659,8 @@ namespace TEN::Entities::Generic
 			}
 
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = LS_REACH;
-			item->goalAnimState = LS_REACH;
+			item->activeState = LS_REACH;
+			item->targetState = LS_REACH;
 
 			Lara.ropePtr = -1;
 		}
@@ -674,8 +674,8 @@ namespace TEN::Entities::Generic
 
 		item->animNumber = LA_FALL_START;
 		item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-		item->currentAnimState = LS_JUMP_FORWARD;
-		item->goalAnimState = LS_JUMP_FORWARD;
+		item->activeState = LS_JUMP_FORWARD;
+		item->targetState = LS_JUMP_FORWARD;
 
 		item->fallspeed = 0;
 		item->airborne = true;
@@ -728,7 +728,7 @@ namespace TEN::Entities::Generic
 			}
 
 			if (!(TrInput & IN_BACK) || Lara.ropeSegment >= 21)
-				item->goalAnimState = LS_ROPE_IDLE;
+				item->targetState = LS_ROPE_IDLE;
 		}
 	}
 

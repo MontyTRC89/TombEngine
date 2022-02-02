@@ -26,7 +26,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->airborne || Lara.gunStatus != LG_HANDS_FREE || l->currentAnimState != LS_IDLE)
+	if (!(TrInput & IN_ACTION) || l->airborne || Lara.gunStatus != LG_HANDS_FREE || l->activeState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -38,10 +38,10 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
 		Lara.gunStatus = LG_HANDS_BUSY;
 
-		l->goalAnimState = LS_ZIPLINE_RIDE;
+		l->targetState = LS_ZIPLINE_RIDE;
 		do
 			AnimateItem(l);
-		while (l->currentAnimState != LS_GRABBING);
+		while (l->activeState != LS_GRABBING);
 
 		if (!item->active)
 			AddActiveItem(itemNumber);
@@ -69,7 +69,7 @@ void ControlDeathSlide(short itemNumber)
 				ItemNewRoom(itemNumber, old->roomNumber);
 
 			item->status = ITEM_NOT_ACTIVE;
-			item->currentAnimState = item->goalAnimState = 1;
+			item->activeState = item->targetState = 1;
 			item->animNumber = Objects[item->objectNumber].animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
@@ -78,7 +78,7 @@ void ControlDeathSlide(short itemNumber)
 			return;
 		}
 
-		if (item->currentAnimState == 1)
+		if (item->activeState == 1)
 		{
 			AnimateItem(item);
 			return;
@@ -101,7 +101,7 @@ void ControlDeathSlide(short itemNumber)
 		if (roomNumber != item->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (LaraItem->currentAnimState == LS_ZIPLINE_RIDE)
+		if (LaraItem->activeState == LS_ZIPLINE_RIDE)
 		{
 			LaraItem->pos.xPos = item->pos.xPos;
 			LaraItem->pos.yPos = item->pos.yPos;
@@ -116,9 +116,9 @@ void ControlDeathSlide(short itemNumber)
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
-			if (LaraItem->currentAnimState == LS_ZIPLINE_RIDE)
+			if (LaraItem->activeState == LS_ZIPLINE_RIDE)
 			{
-				LaraItem->goalAnimState = LS_JUMP_FORWARD;
+				LaraItem->targetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
 				LaraItem->airborne = true;
 				LaraItem->speed = item->fallspeed;

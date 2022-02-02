@@ -77,7 +77,7 @@ struct AI_OBJECT
 
 struct CHANGE_STRUCT
 {
-	short goalAnimState;
+	short targetState;
 	short numberRanges;
 	short rangeIndex;
 };

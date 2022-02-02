@@ -185,8 +185,8 @@ void ControlTeleporter(short itemNumber)
 
 		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->goalAnimState = LS_MISC_CONTROL;
-		LaraItem->currentAnimState = LS_MISC_CONTROL;
+		LaraItem->targetState = LS_MISC_CONTROL;
+		LaraItem->activeState = LS_MISC_CONTROL;
 
 		item->itemFlags[0]++;
 		if (item->itemFlags[0] >= 150)

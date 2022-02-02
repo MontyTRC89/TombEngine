@@ -234,7 +234,7 @@ void LoadObjects()
 
 		anim->framePtr = ReadInt32();
 		anim->interpolation = ReadInt16();
-		anim->currentAnimState = ReadInt16();
+		anim->activeState = ReadInt16();
 		anim->velocity = ReadInt32();
 		anim->acceleration = ReadInt32();
 		anim->Xvelocity = ReadInt32();

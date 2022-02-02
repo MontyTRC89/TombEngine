@@ -257,8 +257,8 @@ void InitialiseHarpy(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 4;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = STATE_HARPY_STOP;
-	item->currentAnimState = STATE_HARPY_STOP;
+	item->targetState = STATE_HARPY_STOP;
+	item->activeState = STATE_HARPY_STOP;
 }
 
 void HarpyControl(short itemNumber)
@@ -278,7 +278,7 @@ void HarpyControl(short itemNumber)
 
 	if (item->hitPoints <= 0)
 	{
-		short state = item->currentAnimState - 9;
+		short state = item->activeState - 9;
 		item->hitPoints = 0;
 
 		if (state)
@@ -295,7 +295,7 @@ void HarpyControl(short itemNumber)
 				{
 					item->animNumber = obj->animIndex + 5;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->currentAnimState = 9;
+					item->activeState = 9;
 					item->speed = 0;
 					item->airborne = true;
 					item->pos.xRot = 0;
@@ -314,14 +314,14 @@ void HarpyControl(short itemNumber)
 		}
 		else
 		{
-			item->goalAnimState = STATE_HARPY_FALLING;
+			item->targetState = STATE_HARPY_FALLING;
 		}
 
 		if (item->pos.yPos >= item->floor)
 		{
 			item->pos.yPos = item->floor;
 			item->fallspeed = 0;
-			item->goalAnimState = STATE_HARPY_DEATH;
+			item->targetState = STATE_HARPY_DEATH;
 			item->airborne = false;
 		}
 
@@ -383,7 +383,7 @@ void HarpyControl(short itemNumber)
 		int height = 0;
 		int dy = 0;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_HARPY_STOP:
 			creature->flags = 0;
@@ -394,7 +394,7 @@ void HarpyControl(short itemNumber)
 				height = item->pos.yPos + 2048;
 				if (creature->enemy->pos.yPos > height&& item->floor > height)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 					break;
 				}
 			}
@@ -405,12 +405,12 @@ void HarpyControl(short itemNumber)
 				{
 					if (info.distance < SQUARE(341))
 					{
-						item->goalAnimState = STATE_HARPY_POISON_ATTACK;
+						item->targetState = STATE_HARPY_POISON_ATTACK;
 						break;
 					}
 					if (dy <= 1024 && info.distance < SQUARE(2048))
 					{
-						item->goalAnimState = 4;
+						item->targetState = 4;
 						break;
 					}
 				}
@@ -421,11 +421,11 @@ void HarpyControl(short itemNumber)
 				|| info.distance <= SQUARE(3584)
 				|| !(GetRandomControl() & 1))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 				break;
 			}
 
-			item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
+			item->targetState = STATE_HARPY_FLAME_ATTACK;
 			item->itemFlags[0] = 0;
 			break;
 
@@ -433,10 +433,10 @@ void HarpyControl(short itemNumber)
 			creature->maximumTurn = ANGLE(7);
 			creature->flags = 0;
 
-			if (item->requiredAnimState)
+			if (item->requiredState)
 			{
-				item->goalAnimState = item->requiredAnimState;
-				if (item->requiredAnimState == 8)
+				item->targetState = item->requiredState;
+				if (item->requiredState == 8)
 				{
 					item->itemFlags[0] = 0;
 				}
@@ -444,7 +444,7 @@ void HarpyControl(short itemNumber)
 			}
 			if (item->hitStatus)
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 				break;
 			}
 			if (info.ahead)
@@ -456,29 +456,29 @@ void HarpyControl(short itemNumber)
 						&& info.distance > SQUARE(3584) 
 						&& GetRandomControl() & 1)
 					{
-						item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
+						item->targetState = STATE_HARPY_FLAME_ATTACK;
 						item->itemFlags[0] = 0;
 					}
 					else
 					{
-						item->goalAnimState = 4;
+						item->targetState = 4;
 					}
 				}
 				else
 				{
-					item->goalAnimState = STATE_HARPY_POISON_ATTACK;
+					item->targetState = STATE_HARPY_POISON_ATTACK;
 				}
 
 				break;
 			}
 			if (GetRandomControl() & 1)
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 				break;
 			}
 			if (!info.ahead)
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 				break;
 			}
 			if (info.distance >= SQUARE(341))
@@ -486,17 +486,17 @@ void HarpyControl(short itemNumber)
 				if (info.ahead && info.distance >= SQUARE(2048) &&
 					info.distance > SQUARE(3584) && GetRandomControl() & 1)
 				{
-					item->goalAnimState = STATE_HARPY_FLAME_ATTACK;
+					item->targetState = STATE_HARPY_FLAME_ATTACK;
 					item->itemFlags[0] = 0;
 				}
 				else
 				{
-					item->goalAnimState = 4;
+					item->targetState = 4;
 				}
 			}
 			else
 			{
-				item->goalAnimState = STATE_HARPY_POISON_ATTACK;
+				item->targetState = STATE_HARPY_POISON_ATTACK;
 			}
 
 			break;
@@ -505,7 +505,7 @@ void HarpyControl(short itemNumber)
 			if (!creature->enemy 
 				|| creature->enemy->pos.yPos < item->pos.yPos + 2048)
 			{
-				item->goalAnimState = STATE_HARPY_STOP;
+				item->targetState = STATE_HARPY_STOP;
 			}
 
 			break;
@@ -515,18 +515,18 @@ void HarpyControl(short itemNumber)
 
 			if (info.ahead && info.distance < SQUARE(2048))
 			{
-				item->goalAnimState = STATE_HARPY_ATTACK;
+				item->targetState = STATE_HARPY_ATTACK;
 			}
 			else
 			{
-				item->goalAnimState = 13;
+				item->targetState = 13;
 			}
 
 			break;
 
 		case STATE_HARPY_ATTACK:
 			creature->maximumTurn = ANGLE(2);
-			item->goalAnimState = 2;
+			item->targetState = 2;
 
 			if (item->touchBits & 0x14
 				|| creature->enemy && creature->enemy != LaraItem &&
@@ -594,18 +594,18 @@ void HarpyControl(short itemNumber)
 		case 12:
 			if (info.ahead && info.distance > SQUARE(3584))
 			{
-				item->goalAnimState = 2;
-				item->requiredAnimState = STATE_HARPY_FLAME_ATTACK;
+				item->targetState = 2;
+				item->requiredState = STATE_HARPY_FLAME_ATTACK;
 			}
 			else if (GetRandomControl() & 1)
 			{
-				item->goalAnimState = STATE_HARPY_STOP;
+				item->targetState = STATE_HARPY_STOP;
 			}
 
 			break;
 
 		case 13:
-			item->goalAnimState = 2;
+			item->targetState = 2;
 			break;
 
 		default:

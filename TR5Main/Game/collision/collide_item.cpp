@@ -1551,7 +1551,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					item->fallspeed = 0;
 					if (item->objectNumber == ID_GRENADE)
 					{
-						item->requiredAnimState = 1;
+						item->requiredState = 1;
 						item->pos.xRot = 0;
 						item->speed--;
 					}
@@ -1600,7 +1600,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->fallspeed = 0;
 						if (item->objectNumber == ID_GRENADE)
 						{
-							item->requiredAnimState = 1;
+							item->requiredState = 1;
 							item->pos.xRot = 0;
 							item->speed--;
 						}
@@ -1751,7 +1751,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	int x, z, rx, rz;
 	ANIM_FRAME* frame;
 
-	if (item->objectNumber != ID_HITMAN || item->currentAnimState != LS_INSERT_PUZZLE)
+	if (item->objectNumber != ID_HITMAN || item->activeState != LS_INSERT_PUZZLE)
 	{
 		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{

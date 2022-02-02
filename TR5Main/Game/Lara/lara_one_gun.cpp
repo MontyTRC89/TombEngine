@@ -329,9 +329,9 @@ void FireGrenade()
 
 		item->speed = GRENADE_SPEED;
 		item->fallspeed = -512 * phd_sin(item->pos.xRot);
-		item->currentAnimState = item->pos.xRot;
-		item->goalAnimState = item->pos.yRot;
-		item->requiredAnimState = 0;
+		item->activeState = item->pos.xRot;
+		item->targetState = item->pos.yRot;
+		item->requiredState = 0;
 		item->hitPoints = 120;	
 		item->itemFlags[0] = WEAPON_AMMO2;
 
@@ -400,9 +400,9 @@ void GrenadeControl(short itemNumber)
 					newGrenade->pos.zRot = 0;
 					newGrenade->speed = 64;
 					newGrenade->fallspeed = -64 * phd_sin(newGrenade->pos.xRot);
-					newGrenade->currentAnimState = newGrenade->pos.xRot;
-					newGrenade->goalAnimState = newGrenade->pos.yRot;
-					newGrenade->requiredAnimState = 0;
+					newGrenade->activeState = newGrenade->pos.xRot;
+					newGrenade->targetState = newGrenade->pos.yRot;
+					newGrenade->requiredState = 0;
 					
 					AddActiveItem(newGrenadeItemNumber);
 					
@@ -446,7 +446,7 @@ void GrenadeControl(short itemNumber)
 		if (item->speed)
 		{
 			item->pos.zRot += (((item->speed >> 4) + 3) * ANGLE(1));
-			if (item->requiredAnimState)
+			if (item->requiredState)
 				item->pos.yRot += (((item->speed >> 2) + 3) * ANGLE(1));
 			else
 				item->pos.xRot += (((item->speed >> 2) + 3) * ANGLE(1));
@@ -460,7 +460,7 @@ void GrenadeControl(short itemNumber)
 		if (item->speed)
 		{
 			item->pos.zRot += (((item->speed >> 2) + 7) * ANGLE(1));
-			if (item->requiredAnimState)
+			if (item->requiredState)
 				item->pos.yRot += (((item->speed >> 1) + 7) * ANGLE(1));
 			else
 				item->pos.xRot += (((item->speed >> 1) + 7) * ANGLE(1));
@@ -486,9 +486,9 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Update grenade position
-	xv = item->speed * phd_sin(item->goalAnimState);
+	xv = item->speed * phd_sin(item->targetState);
 	yv = item->fallspeed;
-	zv = item->speed * phd_cos(item->goalAnimState);
+	zv = item->speed * phd_cos(item->targetState);
 
 	item->pos.xPos += xv;
 	item->pos.yPos += yv;
@@ -515,11 +515,11 @@ void GrenadeControl(short itemNumber)
 	{
 		// Do grenade's physics
 		short sYrot = item->pos.yRot;
-		item->pos.yRot = item->goalAnimState;
+		item->pos.yRot = item->targetState;
 
 		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
 
-		item->goalAnimState = item->pos.yRot;
+		item->targetState = item->pos.yRot;
 		item->pos.yRot = sYrot;
 	}
 
@@ -973,8 +973,8 @@ void draw_shotgun(int weaponType)
 			item->animNumber = Objects[item->objectNumber].animIndex + 1;
 		
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = WSTATE_DRAW;
-		item->currentAnimState = WSTATE_DRAW;
+		item->targetState = WSTATE_DRAW;
+		item->activeState = WSTATE_DRAW;
 		item->status = ITEM_ACTIVE;
 		item->roomNumber = NO_ROOM;
 		
@@ -988,12 +988,12 @@ void draw_shotgun(int weaponType)
 
 	AnimateItem(item);
 
-	if (item->currentAnimState != 0 && item->currentAnimState != 6)
+	if (item->activeState != 0 && item->activeState != 6)
 	{
 		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
 			draw_shotgun_meshes(weaponType);
 		else if (Lara.waterStatus == LW_UNDERWATER)
-			item->goalAnimState = 6;
+			item->targetState = 6;
 	}
 	else
 	{
@@ -1052,7 +1052,7 @@ void AnimateShotgun(int weaponType)
 	bool running = (weaponType == WEAPON_HK && LaraItem->speed != 0);
 	bool harpoonFired = false;
 
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case WSTATE_AIM:
 //		HKFlag = 0;
@@ -1060,11 +1060,11 @@ void AnimateShotgun(int weaponType)
 //		HKFlag2 = 0;
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
-			item->goalAnimState = WSTATE_UW_AIM;
+			item->targetState = WSTATE_UW_AIM;
 		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
-			item->goalAnimState = WSTATE_UNAIM;
+			item->targetState = WSTATE_UNAIM;
 		else
-			item->goalAnimState = WSTATE_RECOIL;
+			item->targetState = WSTATE_RECOIL;
 
 		break;
 
@@ -1076,19 +1076,19 @@ void AnimateShotgun(int weaponType)
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 		{
 			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
-				item->goalAnimState = WSTATE_UW_UNAIM;
+				item->targetState = WSTATE_UW_UNAIM;
 			else
-				item->goalAnimState = WSTATE_UW_RECOIL;
+				item->targetState = WSTATE_UW_RECOIL;
 		}
 		else
-			item->goalAnimState = WSTATE_AIM;
+			item->targetState = WSTATE_AIM;
 		
 		break;
 
 	case WSTATE_RECOIL:
 		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			item->goalAnimState = WSTATE_UNAIM;
+			item->targetState = WSTATE_UNAIM;
 			
 			if (Lara.waterStatus != LW_UNDERWATER && !running && !harpoonFired)
 			{
@@ -1130,13 +1130,13 @@ void AnimateShotgun(int weaponType)
 					else
 						FireShotgun();
 
-					item->goalAnimState = WSTATE_RECOIL;
+					item->targetState = WSTATE_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
-					item->goalAnimState = 0; 
+					item->targetState = 0; 
 			}
 
-			if (item->goalAnimState != WSTATE_RECOIL 
+			if (item->targetState != WSTATE_RECOIL 
 //				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
@@ -1159,7 +1159,7 @@ void AnimateShotgun(int weaponType)
 		}*/
 		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.leftArm.lock)
 		{
-			item->goalAnimState = WSTATE_UNAIM;
+			item->targetState = WSTATE_UNAIM;
 		}
 
 		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 12 
@@ -1170,7 +1170,7 @@ void AnimateShotgun(int weaponType)
 	case WSTATE_UW_RECOIL:
 		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 0)
 		{
-			item->goalAnimState = WSTATE_UW_UNAIM;
+			item->targetState = WSTATE_UW_UNAIM;
 
 			if ((Lara.waterStatus == LW_UNDERWATER || running)
 				&& !harpoonFired)
@@ -1189,7 +1189,7 @@ void AnimateShotgun(int weaponType)
 					{
 						FireHK(1);
 //						HKFlag = 1;
-						item->goalAnimState = 8;
+						item->targetState = 8;
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
@@ -1202,15 +1202,15 @@ void AnimateShotgun(int weaponType)
 					}
 					else
 					{
-						item->goalAnimState = WSTATE_UW_AIM;
+						item->targetState = WSTATE_UW_AIM;
 					}
 
-					item->goalAnimState = WSTATE_UW_RECOIL;
+					item->targetState = WSTATE_UW_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
-					item->goalAnimState = WSTATE_UW_AIM;
+					item->targetState = WSTATE_UW_AIM;
 			}
-			else if (item->goalAnimState != WSTATE_UW_RECOIL 
+			else if (item->targetState != WSTATE_UW_RECOIL 
 //				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
@@ -1819,7 +1819,7 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
 void undraw_shotgun(int weapon)
 {
 	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
-	item->goalAnimState = 3;
+	item->targetState = 3;
 	
 	AnimateItem(item);
 
@@ -1834,7 +1834,7 @@ void undraw_shotgun(int weapon)
 		Lara.rightArm.frameNumber = 0;
 		Lara.leftArm.frameNumber = 0;
 	}
-	else if (item->currentAnimState == 3 && item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 21)
+	else if (item->activeState == 3 && item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 21)
 	{
 		undraw_shotgun_meshes(weapon);
 	}

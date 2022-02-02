@@ -374,7 +374,7 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 				{
 					TranslateItem(lara, 0, -CLICK(1), -CLICK(1));
 					SetAnimation(lara, lara->animNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
-					//lara->goalAnimState = 62;
+					//lara->targetState = 62;
 				}
 			}
 
@@ -840,7 +840,7 @@ void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll)
 	auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = lara->roomNumber));
 	int ceilDist = lara->pos.yPos - GetCeiling(floorNext, down.x, down.y, down.z);
 
-	if (lara->goalAnimState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
+	if (lara->targetState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
 	{
 		if (ceilDist >= CLICK(1) && ceilDist < CLICK(2))
 		{
@@ -848,7 +848,7 @@ void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll)
 
 			if ((slope.x / 3) == (goal.x / 3) || (slope.y / 3) == (goal.y / 3))
 			{
-				lara->goalAnimState = LS_HANG;
+				lara->targetState = LS_HANG;
 				if (TrInput & IN_FORWARD)
 					SetAnimation(lara, LA_LADDER_SHIMMY_UP);
 				/*else if (TrInput & IN_BACK)
@@ -856,7 +856,7 @@ void SlopeHangExtra(ITEM_INFO* lara, COLL_INFO* coll)
 			}
 		}
 	}
-	/*else if (lara->goalAnimState == AS_HANG)
+	/*else if (lara->targetState == AS_HANG)
 	{
 		if (lara->animNumber == LA_LADDER_SHIMMY_DOWN)
 		{
@@ -1000,7 +1000,7 @@ void LadderMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 		return;
 
 	if (result.BottomBlock->Flags.Monkeyswing && (lara->pos.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
-		lara->goalAnimState = LS_MONKEY_IDLE;
+		lara->targetState = LS_MONKEY_IDLE;
 }
 
 // Extends state 61 (AS_CLIMBDOWN)
@@ -1044,7 +1044,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 				{
 					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(3), CLICK(4)); 
 					if (ceilDist < CLICK(1) && (bridge1 >= 0 || SlopeCheck(slope, goal)))
-						lara->goalAnimState = LS_LADDER_IDLE;
+						lara->targetState = LS_LADDER_IDLE;
 				}
 				else if (GetFrameNumber(lara, 0) == midpoint)
 				{
@@ -1052,7 +1052,7 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
 						lara->pos.yPos += CLICK(1); // Do midpoint Y translation
-						lara->goalAnimState = LS_LADDER_IDLE;
+						lara->targetState = LS_LADDER_IDLE;
 					}
 				}
 			}
@@ -1168,10 +1168,10 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 
 				if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
 				{
-					if (lara->goalAnimState != LS_LADDER_IDLE)
+					if (lara->targetState != LS_LADDER_IDLE)
 					{
 						SnapItemToLedge(lara, coll);
-						lara->goalAnimState = LS_LADDER_IDLE;
+						lara->targetState = LS_LADDER_IDLE;
 					}
 				}
 			}

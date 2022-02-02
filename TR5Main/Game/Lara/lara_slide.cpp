@@ -27,7 +27,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH; //
+		item->targetState = LS_DEATH; //
 		return;
 	}
 
@@ -56,19 +56,19 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP)
 		{
-			item->goalAnimState = LS_JUMP_FORWARD;
+			item->targetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->goalAnimState = LS_SLIDE_FORWARD;
+		item->targetState = LS_SLIDE_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD)
-		item->goalAnimState = LS_RUN_FORWARD;
+		item->targetState = LS_RUN_FORWARD;
 	else
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
@@ -124,7 +124,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH; //
+		item->targetState = LS_DEATH; //
 		return;
 	}
 
@@ -153,16 +153,16 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP)
 		{
-			item->goalAnimState = LS_JUMP_BACK;
+			item->targetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->goalAnimState = LS_SLIDE_BACK;
+		item->targetState = LS_SLIDE_BACK;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
 }

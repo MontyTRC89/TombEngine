@@ -341,9 +341,9 @@ void InitialiseItem(short itemNum)
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
-	item->requiredAnimState = 0;
-	item->goalAnimState = g_Level.Anims[item->animNumber].currentAnimState;
-	item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState;
+	item->requiredState = 0;
+	item->targetState = g_Level.Anims[item->animNumber].activeState;
+	item->activeState = g_Level.Anims[item->animNumber].activeState;
 
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;

@@ -43,13 +43,13 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((((TrInput & IN_ACTION) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& Lara.gunStatus == LG_HANDS_FREE
 			&& item->itemFlags[0] == 0)
 			|| (Lara.isMoving && Lara.interactedItem == itemNum))
 		{
-			if (item->currentAnimState == SWITCH_ON)
+			if (item->activeState == SWITCH_ON)
 			{
 				l->pos.yRot ^= (short)ANGLE(180);
 
@@ -62,7 +62,7 @@ namespace TEN::Entities::Switches
 							doSwitch = 1;
 							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
 							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-							item->goalAnimState = SWITCH_OFF;
+							item->targetState = SWITCH_OFF;
 						}
 						else
 						{
@@ -94,7 +94,7 @@ namespace TEN::Entities::Switches
 							doSwitch = 1;
 							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
 							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-							item->goalAnimState = SWITCH_ON;
+							item->targetState = SWITCH_ON;
 						}
 						else
 						{
@@ -135,8 +135,8 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				l->goalAnimState = LS_SWITCH_DOWN;
-				l->currentAnimState = LS_SWITCH_DOWN;
+				l->targetState = LS_SWITCH_DOWN;
+				l->activeState = LS_SWITCH_DOWN;
 				Lara.isMoving = false;
 				Lara.headYrot = 0;
 				Lara.headXrot = 0;

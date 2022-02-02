@@ -103,7 +103,7 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -132,16 +132,16 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		if (info->waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
+			item->targetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK) [[likely]]
-			item->goalAnimState = LS_WALK_FORWARD;
+			item->targetState = LS_WALK_FORWARD;
 		else
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LA_WALK_FORWARD (0)
@@ -185,7 +185,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->goalAnimState = LS_SPLAT;
+		item->targetState = LS_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			return;
 
@@ -211,7 +211,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -238,7 +238,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->runJumpCount >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
 		{
-			item->goalAnimState = LS_JUMP_FORWARD;
+			item->targetState = LS_JUMP_FORWARD;
 			return;
 		}
 
@@ -248,7 +248,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_SPRINT && info->sprintTimer &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_SPRINT;
+		item->targetState = LS_SPRINT;
 		return;
 	}
 
@@ -256,7 +256,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->runJumpQueued &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
@@ -264,23 +264,23 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD)
 	{
 		if (info->waterStatus == LW_WADE)
-			item->goalAnimState = LS_WADE_FORWARD;
+			item->targetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
+			item->targetState = LS_WALK_FORWARD;
 		else [[likely]]
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_RUN_FORWARD (1)
@@ -325,10 +325,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->HitTallObject || TestLaraSplat(item, coll->Setup.Radius * sqrt(2) + 4, -CLICK(2.5f)))
 		{
-			item->goalAnimState = LS_SPLAT;
+			item->targetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->currentAnimState = LS_SPLAT;
+				item->activeState = LS_SPLAT;
 				return;
 			}
 		}
@@ -353,7 +353,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -394,21 +394,21 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
-			item->goalAnimState = LS_JUMP_PREPARE;
+			item->targetState = LS_JUMP_PREPARE;
 
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -418,18 +418,18 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
-				item->goalAnimState = LS_WALK_FORWARD;
+				item->targetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
 		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 			return;
 		}
 	}
@@ -439,25 +439,25 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
-				item->goalAnimState = LS_WALK_BACK;
+				item->targetState = LS_WALK_BACK;
 				return;
 			}
 		}
 		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_BACK;
+			item->targetState = LS_RUN_BACK;
 			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -468,10 +468,10 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
-			item->goalAnimState = LS_TURN_LEFT_FAST;
+			item->targetState = LS_TURN_LEFT_FAST;
 		}
 		else [[likely]]
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
+			item->targetState = LS_TURN_LEFT_SLOW;
 
 		return;
 	}
@@ -482,10 +482,10 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
 			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
 		{
-			item->goalAnimState = LS_TURN_RIGHT_FAST;
+			item->targetState = LS_TURN_RIGHT_FAST;
 		}
 		else [[likely]]
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+			item->targetState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
@@ -496,11 +496,11 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->poseCount >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		g_GameFlow->Animations.Pose)
 	{
-		item->goalAnimState = LS_POSE;
+		item->targetState = LS_POSE;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // TODO: Future-proof for rising water.
@@ -512,46 +512,46 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
+		item->targetState = LS_JUMP_PREPARE;
 		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
+		item->targetState = LS_TURN_LEFT_SLOW;
 		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		item->targetState = LS_TURN_RIGHT_SLOW;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for idling in swamps.
@@ -559,39 +559,39 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
+		item->targetState = LS_TURN_LEFT_SLOW;
 		return;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		item->targetState = LS_TURN_RIGHT_SLOW;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeftSwamp(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRightSwamp(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_IDLE (2)
@@ -649,7 +649,7 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -660,21 +660,21 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_ROLL)
 		{
-			item->goalAnimState = LS_ROLL_FORWARD;
+			item->targetState = LS_ROLL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_WAKE)
 		{
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 			return;
 		}
 
-		item->goalAnimState = LS_POSE;
+		item->targetState = LS_POSE;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_RUN_BACK (5)
@@ -702,11 +702,11 @@ void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_RUN_BACK (5)
@@ -763,7 +763,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -788,21 +788,21 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
 		{
-			item->goalAnimState = LS_JUMP_PREPARE;
+			item->targetState = LS_JUMP_PREPARE;
 			return;
 		}
 	}
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -812,18 +812,18 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
-				item->goalAnimState = LS_WALK_FORWARD;
+				item->targetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
 		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 			return;
 		}
 	}
@@ -833,25 +833,25 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
-				item->goalAnimState = LS_WALK_BACK;
+				item->targetState = LS_WALK_BACK;
 				return;
 			}
 		}
 		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_BACK;
+			item->targetState = LS_RUN_BACK;
 			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -859,20 +859,20 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_WALK) // TODO: This hasn't worked since TR1.
 		{
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+			item->targetState = LS_TURN_RIGHT_SLOW;
 
 			if (info->turnRate > LARA_SLOW_TURN_MAX)
 				info->turnRate = LARA_SLOW_TURN_MAX;
 		}
 		else if (info->turnRate > LARA_SLOW_MED_TURN_MAX)
-			item->goalAnimState = LS_TURN_RIGHT_FAST;
+			item->targetState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+			item->targetState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for turning right slowly in wade-height water.
@@ -885,40 +885,40 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
+		item->targetState = LS_JUMP_PREPARE;
 		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	if (TrInput & IN_RIGHT)
 	{
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		item->targetState = LS_TURN_RIGHT_SLOW;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for turning right slowly in swamps.
@@ -931,33 +931,33 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeftSwamp(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRightSwamp(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	if (TrInput & IN_RIGHT)
 	{
-		item->goalAnimState = LS_TURN_RIGHT_SLOW;
+		item->targetState = LS_TURN_RIGHT_SLOW;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_TURN_RIGHT_SLOW (6)
@@ -977,7 +977,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1002,21 +1002,21 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
 		{
-			item->goalAnimState = LS_JUMP_PREPARE;
+			item->targetState = LS_JUMP_PREPARE;
 			return;
 		}
 	}
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -1026,18 +1026,18 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
-				item->goalAnimState = LS_WALK_FORWARD;
+				item->targetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
 		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 			return;
 		}
 	}
@@ -1047,25 +1047,25 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
-				item->goalAnimState = LS_WALK_BACK;
+				item->targetState = LS_WALK_BACK;
 				return;
 			}
 		}
 		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_BACK;
+			item->targetState = LS_RUN_BACK;
 			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1073,20 +1073,20 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_WALK)
 		{
-			item->goalAnimState = LS_TURN_LEFT_SLOW;
+			item->targetState = LS_TURN_LEFT_SLOW;
 
 			if (info->turnRate < -LARA_SLOW_TURN_MAX)
 				info->turnRate = -LARA_SLOW_TURN_MAX;
 		}
 		else if (info->turnRate < -LARA_SLOW_MED_TURN_MAX)
-			item->goalAnimState = LS_TURN_LEFT_FAST;
+			item->targetState = LS_TURN_LEFT_FAST;
 		else [[likely]]
-			item->goalAnimState = LS_TURN_RIGHT_SLOW;
+			item->targetState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for turning left slowly in wade-height water.
@@ -1099,40 +1099,40 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_PREPARE;
+		item->targetState = LS_JUMP_PREPARE;
 		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
+		item->targetState = LS_TURN_LEFT_SLOW;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for turning left slowly in swamps.
@@ -1145,33 +1145,33 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		item->goalAnimState = LS_TURN_LEFT_SLOW;
+		item->targetState = LS_TURN_LEFT_SLOW;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_TURN_LEFT_SLOW (7)
@@ -1268,7 +1268,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1303,11 +1303,11 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_BACK &&
 		(TrInput & IN_WALK || info->waterStatus == LW_WADE))
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for walking back in swamps.
@@ -1335,11 +1335,11 @@ void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_BACK)
 	{
-		item->goalAnimState = LS_WALK_BACK;
+		item->targetState = LS_WALK_BACK;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_WALK_BACK (16)
@@ -1396,7 +1396,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1411,7 +1411,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
 		{
-			item->goalAnimState = LS_JUMP_PREPARE;
+			item->targetState = LS_JUMP_PREPARE;
 			return;
 		}
 	}
@@ -1419,7 +1419,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
@@ -1427,7 +1427,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -1437,7 +1437,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
-				item->goalAnimState = LS_WADE_FORWARD;
+				item->targetState = LS_WADE_FORWARD;
 				return;
 			}
 		}
@@ -1445,18 +1445,18 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
-				item->goalAnimState = LS_WALK_FORWARD;
+				item->targetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
 		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 			return;
 		}
 	}
@@ -1466,36 +1466,36 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
-				item->goalAnimState = LS_WALK_BACK;
+				item->targetState = LS_WALK_BACK;
 				return;
 			}
 		}
 		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_BACK;
+			item->targetState = LS_RUN_BACK;
 			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	// TODO: Hold WALK to slow down again.
 	if (TrInput & IN_RIGHT)
 	{
-		item->goalAnimState = LS_TURN_RIGHT_FAST;
+		item->targetState = LS_TURN_RIGHT_FAST;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_TURN_RIGHT_FAST (20)
@@ -1513,7 +1513,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1528,7 +1528,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraJumpDirection(item, coll);
 		if (info->jumpDirection != LaraJumpDirection::None)
 		{
-			item->goalAnimState = LS_JUMP_PREPARE;
+			item->targetState = LS_JUMP_PREPARE;
 			return;
 		}
 	}
@@ -1536,7 +1536,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ROLL &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
@@ -1544,7 +1544,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
 		info->waterStatus != LW_WADE)
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -1554,7 +1554,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
-				item->goalAnimState = LS_WADE_FORWARD;
+				item->targetState = LS_WADE_FORWARD;
 				return;
 			}
 		}
@@ -1562,18 +1562,18 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
-				item->goalAnimState = LS_WALK_FORWARD;
+				item->targetState = LS_WALK_FORWARD;
 				return;
 			}
 		}
 		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
 		{
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 			return;
 		}
 	}
@@ -1583,35 +1583,35 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
-				item->goalAnimState = LS_WALK_BACK;
+				item->targetState = LS_WALK_BACK;
 				return;
 			}
 		}
 		else if (TestLaraRunBack(item, coll)) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_BACK;
+			item->targetState = LS_RUN_BACK;
 			return;
 		}
 	}
 
 	if (TrInput & IN_LSTEP && 	TestLaraStepLeft(item, coll))
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		item->goalAnimState = LS_TURN_LEFT_FAST;
+		item->targetState = LS_TURN_LEFT_FAST;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_TURN_LEFT_FAST (152)
@@ -1631,7 +1631,7 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1653,11 +1653,11 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_RSTEP)
 	{
-		item->goalAnimState = LS_STEP_RIGHT;
+		item->targetState = LS_STEP_RIGHT;
 		return;
 	}
 	
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_STEP_RIGHT (21)
@@ -1716,7 +1716,7 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -1738,11 +1738,11 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LSTEP)
 	{
-		item->goalAnimState = LS_STEP_LEFT;
+		item->targetState = LS_STEP_LEFT;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_STEP_LEFT (22)
@@ -1801,11 +1801,11 @@ void lara_as_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_BACK;
+		item->targetState = LS_ROLL_BACK;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_ROLL_BACK (23)
@@ -1864,17 +1864,17 @@ void lara_as_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD &&
 		item->animNumber == LA_SWANDIVE_ROLL) // Hack.
 	{
-		item->goalAnimState = LS_RUN_FORWARD;
+		item->targetState = LS_RUN_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_ROLL_FORWARD (45)
@@ -1931,7 +1931,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		return;
 	}
 
@@ -1961,14 +1961,14 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		if (info->waterStatus == LW_ABOVE_WATER)
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 		else [[likely]]
-			item->goalAnimState = LS_WADE_FORWARD;
+			item->targetState = LS_WADE_FORWARD;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // Pseudo-state for wading in swamps.
@@ -1995,11 +1995,11 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->goalAnimState = LS_WADE_FORWARD;
+		item->targetState = LS_WADE_FORWARD;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_WADE_FORWARD (65)
@@ -2033,7 +2033,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 			!coll->Front.FloorSlope &&
 			!TestEnvironment(ENV_FLAG_SWAMP, item)) // TODO: Check this.
 		{
-			item->goalAnimState = LS_SPLAT;
+			item->targetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 				return;
 		}
@@ -2062,7 +2062,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		return;
 	}
 
@@ -2085,14 +2085,14 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->goalAnimState = LS_SPRINT_DIVE;
+		item->targetState = LS_SPRINT_DIVE;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
 		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
 	{
-		item->goalAnimState = LS_CROUCH_IDLE;
+		item->targetState = LS_CROUCH_IDLE;
 		return;
 	}
 
@@ -2101,18 +2101,18 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		if (info->waterStatus == LW_WADE)
-			item->goalAnimState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
+			item->targetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
-			item->goalAnimState = LS_WALK_FORWARD;
+			item->targetState = LS_WALK_FORWARD;
 		else if (TrInput & IN_SPRINT && info->sprintTimer > 0) [[likely]]
-			item->goalAnimState = LS_SPRINT;
+			item->targetState = LS_SPRINT;
 		else
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 }
 
 // State:		LS_SPRINT (73)
@@ -2153,10 +2153,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->HitTallObject || TestLaraSplat(item, coll->Setup.Radius * sqrt(2) + 4, -CLICK(2.5f)))
 		{
-			item->goalAnimState = LS_SPLAT;
+			item->targetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->currentAnimState = LS_SPLAT;
+				item->activeState = LS_SPLAT;
 				return;
 			}
 		}
@@ -2202,12 +2202,12 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Make this state a true jump?
-	if (item->goalAnimState != LS_DEATH &&
-		item->goalAnimState != LS_IDLE &&
-		item->goalAnimState != LS_RUN_FORWARD &&
+	if (item->targetState != LS_DEATH &&
+		item->targetState != LS_IDLE &&
+		item->targetState != LS_RUN_FORWARD &&
 		item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 	}
 }
 
@@ -2241,11 +2241,11 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->waterStatus == LW_WADE)
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 		else
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 
 		item->airborne = false;
 		item->fallspeed = 0;

@@ -271,8 +271,8 @@ void InitialiseRomanStatue(short itemNum)
 	ClearItem(itemNum);
     
     item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
-    item->goalAnimState = 13;
-    item->currentAnimState = 13;
+    item->targetState = 13;
+    item->activeState = 13;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	item->status = ITEM_NOT_ACTIVE;
 	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f));
@@ -326,8 +326,8 @@ void RomanStatueControl(short itemNumber)
 	// Play hit animation
 	if (oldSwapMeshFlags != item->swapMeshFlags)
 	{
-		item->goalAnimState = STATE_ROMAN_STATUE_HIT;
-		item->currentAnimState = STATE_ROMAN_STATUE_HIT;
+		item->targetState = STATE_ROMAN_STATUE_HIT;
+		item->activeState = STATE_ROMAN_STATUE_HIT;
 		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_HIT;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	}
@@ -369,7 +369,7 @@ void RomanStatueControl(short itemNumber)
 		LIGHTNING_INFO* arc;
 		short random;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_ROMAN_STATUE_STOP:    
 			creature->flags = 0;
@@ -381,7 +381,7 @@ void RomanStatueControl(short itemNumber)
 			else
 			{
 				creature->maximumTurn = 0;
-				item->goalAnimState = STATE_ROMAN_STATUE_WALK;
+				item->targetState = STATE_ROMAN_STATUE_WALK;
 			}
 			
 			joint2 = info.angle;
@@ -395,28 +395,28 @@ void RomanStatueControl(short itemNumber)
 			}
 			else if (info.angle > 20480 || info.angle < -20480)
 			{
-				item->goalAnimState = STATE_ROMAN_STATUE_TURN_180;
+				item->targetState = STATE_ROMAN_STATUE_TURN_180;
 			}
 			else if (info.ahead && info.distance < SQUARE(1024))
 			{
 				if (info.bite & ((GetRandomControl() & 3) == 0))
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_ATTACK1;
+					item->targetState = STATE_ROMAN_STATUE_ATTACK1;
 				}
 				else if (GetRandomControl() & 1)
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_ATTACK2;
+					item->targetState = STATE_ROMAN_STATUE_ATTACK2;
 				}
 				else
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_ATTACK3;
+					item->targetState = STATE_ROMAN_STATUE_ATTACK3;
 				}
 			}
 			else
 			{
 				if (!item->itemFlags[0])
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_SCREAMING;
+					item->targetState = STATE_ROMAN_STATUE_SCREAMING;
 					item->itemFlags[0] = 5;
 					break;
 				}
@@ -424,16 +424,16 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (Targetable(item, &info) && GetRandomControl() & 1)
 					{
-						item->goalAnimState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
+						item->targetState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
 						break;
 					}
 				}
 				if (item->triggerFlags || info.distance >= SQUARE(2560) || !info.bite)
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_WALK;
+					item->targetState = STATE_ROMAN_STATUE_WALK;
 					break;
 				}
-				item->goalAnimState = STATE_ROMAN_STATUE_ATTACK1;
+				item->targetState = STATE_ROMAN_STATUE_ATTACK1;
 			}
 			
 			break;
@@ -649,7 +649,7 @@ void RomanStatueControl(short itemNumber)
 
 					pos1.y = item->pos.yPos - 64;
 					
-					if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 34 && item->currentAnimState == 3)
+					if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 34 && item->activeState == 3)
 					{
 						if (item->itemFlags[0])
 							item->itemFlags[0]--;
@@ -704,13 +704,13 @@ void RomanStatueControl(short itemNumber)
 
 			if (info.distance < SQUARE(1024))
 			{
-				item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+				item->targetState = STATE_ROMAN_STATUE_STOP;
 				break;
 			}
 
 			if (info.bite && info.distance < SQUARE(1792))
 			{
-				item->goalAnimState = 9;
+				item->targetState = 9;
 				break;
 			}
 
@@ -718,15 +718,15 @@ void RomanStatueControl(short itemNumber)
 			{
 				if (Targetable(item, &info) && !(GetRandomControl() & 3))
 				{
-					item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+					item->targetState = STATE_ROMAN_STATUE_STOP;
 					break;
 				}
 			}
 
 			if (item->triggerFlags || info.distance >= SQUARE(2560))
-				item->goalAnimState = STATE_ROMAN_STATUE_WALK;
+				item->targetState = STATE_ROMAN_STATUE_WALK;
 			else
-				item->goalAnimState = STATE_ROMAN_STATUE_STOP;
+				item->targetState = STATE_ROMAN_STATUE_STOP;
 
 			break;
 
@@ -892,7 +892,7 @@ void RomanStatueControl(short itemNumber)
 	{
 		item->hitPoints = 0;
 
-		if (item->currentAnimState == STATE_ROMAN_STATUE_DEATH)
+		if (item->activeState == STATE_ROMAN_STATUE_DEATH)
 		{
 			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 54
 				&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 74
@@ -918,7 +918,7 @@ void RomanStatueControl(short itemNumber)
 		else
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
-			item->currentAnimState = STATE_ROMAN_STATUE_DEATH;
+			item->activeState = STATE_ROMAN_STATUE_DEATH;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 	}

@@ -28,7 +28,7 @@ void ScalesControl(short itemNum)
 		return;
 	}
 
-	if (item->currentAnimState == 1 || item->itemFlags[1])
+	if (item->activeState == 1 || item->itemFlags[1])
 	{
 		if (Objects[item->objectNumber].animIndex)
 		{
@@ -55,7 +55,7 @@ void ScalesControl(short itemNum)
 				g_Level.Items[itemNos[sw]].flags = 1024;
 			}
 
-			item->goalAnimState = 1;
+			item->targetState = 1;
 		}
 
 		AnimateItem(item);
@@ -63,7 +63,7 @@ void ScalesControl(short itemNum)
 
 	int flags = 0;
 
-	if (item->currentAnimState == 2)
+	if (item->activeState == 2)
 	{
 		flags = -512;
 		RemoveActiveItem(itemNum);
@@ -85,7 +85,7 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TestBoundsCollide(item, l, LARA_RAD))
 	{
-		if (l->animNumber != LA_WATERSKIN_POUR_LOW && l->animNumber != LA_WATERSKIN_POUR_HIGH || item->currentAnimState != 1)
+		if (l->animNumber != LA_WATERSKIN_POUR_LOW && l->animNumber != LA_WATERSKIN_POUR_HIGH || item->activeState != 1)
 		{
 			GlobalCollisionBounds.X1 = 640;
 			GlobalCollisionBounds.X2 = 1280;
@@ -134,17 +134,17 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 				if (l->itemFlags[3] < item->triggerFlags)
 				{
-					item->goalAnimState = 4;
+					item->targetState = 4;
 					item->pos.yRot = rotY;
 				}
 				else if (l->itemFlags[3] == item->triggerFlags)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 					item->pos.yRot = rotY;
 				}
 				else
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 			}
 			else

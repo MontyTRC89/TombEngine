@@ -232,8 +232,8 @@ namespace TEN::Entities::TR4
         item = &g_Level.Items[itemNumber];
         item->animNumber = Objects[item->objectNumber].animIndex + MUTANT_ANIM_APPEAR;
         item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->currentAnimState = STATE_MUTANT_APPEAR;
-        item->goalAnimState = STATE_MUTANT_APPEAR;
+        item->activeState = STATE_MUTANT_APPEAR;
+        item->targetState = STATE_MUTANT_APPEAR;
     }
 
     void CrocgodControl(short itemNumber)
@@ -268,18 +268,18 @@ namespace TEN::Entities::TR4
         mutant->maximumTurn = 0;
         angle = CreatureTurn(item, 0);
 
-        switch (item->currentAnimState)
+        switch (item->activeState)
         {
         case STATE_MUTANT_IDLE:
             if (info.ahead)
             {
                 int random = GetRandomControl() & 31;
                 if ((random > 0 && random < 10) && info.distance <= MUTANT_SHOOT_RANGE)
-                    item->goalAnimState = STATE_MUTANT_SHOOT;
+                    item->targetState = STATE_MUTANT_SHOOT;
                 else if ((random > 10 && random < 20) && info.distance <= MUTANT_LOCUST1_RANGE)
-                    item->goalAnimState = STATE_MUTANT_LOCUST1;
+                    item->targetState = STATE_MUTANT_LOCUST1;
                 else if ((random > 20 && random < 30) && info.distance <= MUTANT_LOCUST2_RANGE)
-                    item->goalAnimState = STATE_MUTANT_LOCUST2;
+                    item->targetState = STATE_MUTANT_LOCUST2;
             }
             break;
 
@@ -322,7 +322,7 @@ namespace TEN::Entities::TR4
             break;
         }
 
-        if (item->currentAnimState != STATE_MUTANT_LOCUST1)
+        if (item->activeState != STATE_MUTANT_LOCUST1)
             mutant_joint = OBJECT_BONES(headY, info.xAngle, true);
         else
             mutant_joint = OBJECT_BONES(0);

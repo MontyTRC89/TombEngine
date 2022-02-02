@@ -667,8 +667,8 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 	lara->fallspeed = 0;
 	lara->speed = 0;
 	lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-	lara->currentAnimState = 0;
-	lara->goalAnimState = 0;
+	lara->activeState = 0;
+	lara->targetState = 0;
 
 	if (lara->roomNumber != item->roomNumber)
 		ItemNewRoom(Lara.itemNumber, item->roomNumber);
@@ -717,37 +717,37 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 
 	if (LaraItem->hitPoints <= 0)
 	{
-		if (LaraItem->currentAnimState!= RBOAT_STATE_DEATH)
+		if (LaraItem->activeState!= RBOAT_STATE_DEATH)
 		{
 			LaraItem->animNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE_DEATH;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = RBOAT_STATE_DEATH;
-			LaraItem->currentAnimState = RBOAT_STATE_DEATH;
+			LaraItem->targetState = RBOAT_STATE_DEATH;
+			LaraItem->activeState = RBOAT_STATE_DEATH;
 		}
 	}
 	else if (boat->pos.yPos < binfo->water - 128 && boat->fallspeed > 0)
 	{
-		if (LaraItem->currentAnimState != RBOAT_STATE_FALL)
+		if (LaraItem->activeState != RBOAT_STATE_FALL)
 		{
 			LaraItem->animNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_LEAP_START;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = RBOAT_STATE_FALL;
-			LaraItem->currentAnimState = RBOAT_STATE_FALL;
+			LaraItem->targetState = RBOAT_STATE_FALL;
+			LaraItem->activeState = RBOAT_STATE_FALL;
 		}
 	}
 	else if (collide)
 	{
-		if (LaraItem->currentAnimState != RBOAT_STATE_HIT)
+		if (LaraItem->activeState != RBOAT_STATE_HIT)
 		{
 			LaraItem->animNumber = (short)(Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide);
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-			LaraItem->goalAnimState = RBOAT_STATE_HIT;
-			LaraItem->currentAnimState = RBOAT_STATE_HIT;
+			LaraItem->targetState = RBOAT_STATE_HIT;
+			LaraItem->activeState = RBOAT_STATE_HIT;
 		}
 	}
 	else
 	{
-		switch (LaraItem->currentAnimState)
+		switch (LaraItem->activeState)
 		{
 		case RBOAT_STATE_IDLE:
 			if (TrInput & IN_ROLL)
@@ -755,39 +755,39 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 				if (boat->speed == 0)
 				{
 					if ((TrInput & IN_RIGHT) && CanGetOffRubberBoat(boat->pos.yRot + ANGLE(90)))
-						LaraItem->goalAnimState = RBOAT_STATE_JUMP_RIGHT;
+						LaraItem->targetState = RBOAT_STATE_JUMP_RIGHT;
 					else if ((TrInput & IN_LEFT) && CanGetOffRubberBoat(boat->pos.yRot - ANGLE(90)))
-						LaraItem->goalAnimState = RBOAT_STATE_JUMP_LEFT;
+						LaraItem->targetState = RBOAT_STATE_JUMP_LEFT;
 				}
 			}
 
 			if (boat->speed > 0)
-				LaraItem->goalAnimState = RBOAT_STATE_MOVING;
+				LaraItem->targetState = RBOAT_STATE_MOVING;
 
 			break;
 		case RBOAT_STATE_MOVING:
 			if (boat->speed <= 0)
-				LaraItem->goalAnimState = RBOAT_STATE_IDLE;
+				LaraItem->targetState = RBOAT_STATE_IDLE;
 			if (TrInput & IN_RIGHT)
-				LaraItem->goalAnimState = RBOAT_STATE_TURN_RIGHT;
+				LaraItem->targetState = RBOAT_STATE_TURN_RIGHT;
 			else if (TrInput & IN_LEFT)
-				LaraItem->goalAnimState = RBOAT_STATE_TURN_LEFT;
+				LaraItem->targetState = RBOAT_STATE_TURN_LEFT;
 			
 			break;
 		case RBOAT_STATE_FALL:
-			LaraItem->goalAnimState = RBOAT_STATE_MOVING;
+			LaraItem->targetState = RBOAT_STATE_MOVING;
 			break;
 		case RBOAT_STATE_TURN_RIGHT:
 			if (boat->speed <= 0)
-				LaraItem->goalAnimState = RBOAT_STATE_IDLE;
+				LaraItem->targetState = RBOAT_STATE_IDLE;
 			else if (!(TrInput & IN_RIGHT))
-				LaraItem->goalAnimState = RBOAT_STATE_MOVING;
+				LaraItem->targetState = RBOAT_STATE_MOVING;
 			break;
 		case RBOAT_STATE_TURN_LEFT:
 			if (boat->speed <= 0)
-				LaraItem->goalAnimState = RBOAT_STATE_IDLE;
+				LaraItem->targetState = RBOAT_STATE_IDLE;
 			else if (!(TrInput & IN_LEFT))
-				LaraItem->goalAnimState = RBOAT_STATE_MOVING;
+				LaraItem->targetState = RBOAT_STATE_MOVING;
 			break;
 		}
 	}
@@ -860,22 +860,22 @@ static void TriggerRubberBoatMist(long x, long y, long z, long speed, short angl
 
 void RubberBoatDoGetOff(ITEM_INFO* boat)
 {
-	if ((LaraItem->currentAnimState == RBOAT_STATE_JUMP_RIGHT || LaraItem->currentAnimState == RBOAT_STATE_JUMP_LEFT) 
+	if ((LaraItem->activeState == RBOAT_STATE_JUMP_RIGHT || LaraItem->activeState == RBOAT_STATE_JUMP_LEFT) 
 		&& LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameEnd)
 	{
 		short roomNum;
 		int x, y, z;
 		FLOOR_INFO *floor;
 
-		if (LaraItem->currentAnimState == 4)
+		if (LaraItem->activeState == 4)
 			LaraItem->pos.yRot -= ANGLE(90);
 		else
 			LaraItem->pos.yRot += ANGLE(90);
 
 		LaraItem->animNumber = LA_JUMP_FORWARD;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->goalAnimState = LS_JUMP_FORWARD;
-		LaraItem->currentAnimState = LS_JUMP_FORWARD;
+		LaraItem->targetState = LS_JUMP_FORWARD;
+		LaraItem->activeState = LS_JUMP_FORWARD;
 		LaraItem->airborne = true;
 		LaraItem->fallspeed = -40;
 		LaraItem->speed = 20;
@@ -933,7 +933,7 @@ void RubberBoatControl(short itemNum)
 
 	if (Lara.Vehicle == itemNum && LaraItem->hitPoints > 0)
 	{
-		switch (LaraItem->currentAnimState)
+		switch (LaraItem->activeState)
 		{
 		case RBOAT_STATE_MOUNT:
 		case RBOAT_STATE_JUMP_RIGHT:

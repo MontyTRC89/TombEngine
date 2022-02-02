@@ -18,7 +18,7 @@ struct ANIM_STRUCT
 {
 	int framePtr;
 	short interpolation;
-	short currentAnimState;
+	short activeState;
 	int velocity;
 	int acceleration;
 	int Xvelocity;

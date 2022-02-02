@@ -51,9 +51,9 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 		int doSwitch = 0;
 
-		if (item->currentAnimState == TURN_SWITCH_STOP
+		if (item->activeState == TURN_SWITCH_STOP
 			&& TrInput & IN_ACTION
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& l->airborne == false
 			&& Lara.gunStatus == LG_HANDS_FREE
@@ -116,7 +116,7 @@ namespace TEN::Entities::Switches
 			Lara.torsoYrot = 0;
 			Lara.torsoXrot = 0;
 			Lara.gunStatus = LG_HANDS_BUSY;
-			l->currentAnimState = LA_REACH;
+			l->activeState = LA_REACH;
 
 			UseForcedFixedCamera = true;
 			ForcedFixedCamera.y = item->pos.yPos - 2048;
@@ -226,7 +226,7 @@ namespace TEN::Entities::Switches
 		if (item->itemFlags[1] == 1)
 		{
 			l->animNumber = LA_STAND_IDLE;
-			l->currentAnimState = LS_IDLE;
+			l->activeState = LS_IDLE;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			item->animNumber = Objects[item->objectNumber].animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;

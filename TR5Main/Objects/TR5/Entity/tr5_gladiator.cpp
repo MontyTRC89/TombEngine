@@ -22,8 +22,8 @@ void InitialiseGladiator(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->targetState = 1;
+    item->activeState = 1;
     if (item->triggerFlags == 1)
         item->swapMeshFlags = -1;
 }
@@ -50,10 +50,10 @@ void ControlGladiator(short itemNumber)
 		if (item->hitPoints <= 0)
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != 6)
+			if (item->activeState != 6)
 			{
 				item->animNumber = Objects[ID_GLADIATOR].animIndex + 16;
-				item->currentAnimState = 6;
+				item->activeState = 6;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
@@ -106,7 +106,7 @@ void ControlGladiator(short itemNumber)
 				joint1 = info.xAngle;
 			}
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case 1:
 				creature->flags = 0;
@@ -124,7 +124,7 @@ void ControlGladiator(short itemNumber)
 
 				if (item->aiBits & PATROL1)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				else
 				{
@@ -134,7 +134,7 @@ void ControlGladiator(short itemNumber)
 							&& info.ahead
 							&& !item->hitStatus)
 						{
-							item->goalAnimState = 1;
+							item->targetState = 1;
 							break;
 						}
 					}
@@ -145,13 +145,13 @@ void ControlGladiator(short itemNumber)
 							&& (creature->reachedGoal 
 								|| distance > SQUARE(2048)))
 						{
-							if (item->requiredAnimState)
+							if (item->requiredState)
 							{
-								item->goalAnimState = item->requiredAnimState;
+								item->targetState = item->requiredState;
 							}
 							else if (!(GetRandomControl() & 0x3F))
 							{
-								item->goalAnimState = 2;
+								item->targetState = 2;
 							}
 							break;
 						}
@@ -164,20 +164,20 @@ void ControlGladiator(short itemNumber)
 								|| !(GetRandomControl() & 0xF))
 							&& item->meshBits == -1)
 						{
-							item->goalAnimState = 4;
+							item->targetState = 4;
 							break;
 						}
 						
 						if (info.bite && info.distance < SQUARE(819))
 						{
 							if (GetRandomControl() & 1)
-								item->goalAnimState = 8;
+								item->targetState = 8;
 							else
-								item->goalAnimState = 9;
+								item->targetState = 9;
 							break;
 						}
 					}
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				break;
 
@@ -188,33 +188,33 @@ void ControlGladiator(short itemNumber)
 
 				if (item->aiBits & PATROL1)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 					joint2 = 0;
 				}
 				else if (creature->mood == ESCAPE_MOOD)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 				else if (creature->mood)
 				{
 					if (info.distance < SQUARE(1024))
 					{
-						item->goalAnimState = 1;
+						item->targetState = 1;
 						break;
 					}
 
 					if (info.bite && info.distance < SQUARE(2048))
 					{
-						item->goalAnimState = 11;
+						item->targetState = 11;
 					}
 					else if (!info.ahead || info.distance > SQUARE(1536))
 					{
-						item->goalAnimState = 3;
+						item->targetState = 3;
 					}
 				}
 				else if (!(GetRandomControl() & 0x3F))
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 					break;
 				}
 				
@@ -230,7 +230,7 @@ void ControlGladiator(short itemNumber)
 				if (item->aiBits & GUARD)
 				{
 					creature->maximumTurn = 0;
-					item->goalAnimState = 1;
+					item->targetState = 1;
 					break;
 				}
 
@@ -238,7 +238,7 @@ void ControlGladiator(short itemNumber)
 				{
 					if (Lara.target != item && info.ahead)
 					{
-						item->goalAnimState = 1;
+						item->targetState = 1;
 						break;
 					}
 					break;
@@ -248,22 +248,22 @@ void ControlGladiator(short itemNumber)
 					&& (creature->reachedGoal 
 						|| distance > SQUARE(2048)))
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 					break;
 				}
 
 				if (!creature->mood)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 					break;
 				}
 
 				if (info.distance < SQUARE(1536))
 				{
 					if (info.bite)
-						item->goalAnimState = 10;
+						item->targetState = 10;
 					else
-						item->goalAnimState = 2;
+						item->targetState = 2;
 				}
 				break;
 
@@ -272,21 +272,21 @@ void ControlGladiator(short itemNumber)
 				{
 					if (!unknown)
 					{
-						item->goalAnimState = 1;
+						item->targetState = 1;
 						break;
 					}
 				}
 				else if (Lara.target != item 
 					|| !(GetRandomControl() & 0x7F))
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 					break;
 				}
 				break;
 
 			case 5:
 				if (Lara.target != item)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				break;
 
 			case 8:

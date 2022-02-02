@@ -24,7 +24,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION &&
 		item->status != ITEM_ACTIVE &&
-		l->currentAnimState == LS_IDLE &&
+		l->activeState == LS_IDLE &&
 		l->animNumber == LA_STAND_IDLE &&
 		Lara.gunStatus == LG_HANDS_FREE ||
 		Lara.isMoving && Lara.interactedItem == itemNum)
@@ -34,7 +34,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{
 				l->animNumber = LA_PICKUP_SARCOPHAGUS;
-				l->currentAnimState = LS_MISC_CONTROL;
+				l->activeState = LS_MISC_CONTROL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				item->flags |= IFLAG_ACTIVATION_MASK;
 

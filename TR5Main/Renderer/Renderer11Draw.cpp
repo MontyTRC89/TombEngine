@@ -2107,9 +2107,9 @@ namespace TEN::Renderer
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
 				printDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
 				printDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
-				printDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
-				printDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
-				printDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
+				printDebugMessage("Lara.activeState: %d", LaraItem->activeState);
+				printDebugMessage("Lara.requiredState: %d", LaraItem->requiredState);
+				printDebugMessage("Lara.targetState: %d", LaraItem->targetState);
 				printDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
 				printDebugMessage("Lara.gunType: %d", Lara.gunType);
 				printDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);

@@ -137,7 +137,7 @@ void InitialiseShiva(short itemNum)
 	anim = &g_Level.Anims[item->animNumber];
 
 	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->activeState = anim->activeState;
 }
 
 void ShivaControl(short itemNum)
@@ -165,11 +165,11 @@ void ShivaControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
+		if (item->activeState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 22;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 9;
+			item->activeState = 9;
 		}
 	}
 	else
@@ -187,10 +187,10 @@ void ShivaControl(short itemNum)
 
 		angle = CreatureTurn(item, shiva->maximumTurn);
 
-		if (item->currentAnimState != 4)
+		if (item->activeState != 4)
 			item->meshBits = 0xFFFFFFFF;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 4:
 			shiva->maximumTurn = 0;
@@ -214,7 +214,7 @@ void ShivaControl(short itemNum)
 
 			if (item->meshBits == 0x7FFFFFFF)
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 				effect_mesh = 0;
 				shiva->flags = -45;
 			}
@@ -244,34 +244,34 @@ void ShivaControl(short itemNum)
 				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 
 				if (!shiva->flags && floor->Box != NO_BOX && !(g_Level.Boxes[floor->Box].flags & BLOCKABLE))
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (shiva->mood == BORED_MOOD)
 			{
 				random = GetRandomControl();
 				if (random < 0x400)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 			}
 			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4))
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 				shiva->flags = 0;
 			}
 			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3))
 			{
-				item->goalAnimState = 7;
+				item->targetState = 7;
 				shiva->flags = 0;
 			}
 			else if (item->hitStatus && info.ahead)
 			{
 				shiva->flags = 4;
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 
@@ -285,12 +285,12 @@ void ShivaControl(short itemNum)
 
 			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags) || !info.ahead)
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 				shiva->flags = 0;
 			}
 			else if (shiva->flags)
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && shiva->flags > 1)
@@ -305,21 +305,21 @@ void ShivaControl(short itemNum)
 
 			if (shiva->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 			}
 			else if (shiva->mood == BORED_MOOD)
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 			}
 			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3))
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 				shiva->flags = 0;
 			}
 			else if (item->hitStatus)
 			{
 				shiva->flags = 4;
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -334,12 +334,12 @@ void ShivaControl(short itemNum)
 
 			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 				shiva->flags = 0;
 			}
 			else if (shiva->flags)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 
 			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
@@ -355,12 +355,12 @@ void ShivaControl(short itemNum)
 			shiva->maximumTurn = ANGLE(4);
 			if ((info.ahead && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 			}
 			else if (item->hitStatus)
 			{
 				shiva->flags = 4;
-				item->goalAnimState = 0;
+				item->targetState = 0;
 			}
 			break;
 

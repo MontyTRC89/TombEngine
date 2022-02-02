@@ -29,9 +29,9 @@ void HammerControl(short itemNumber)
         *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0xE0);
         AnimateItem((int)item);
     }
-    else if (item->currentAnimState != 1 || item->goalAnimState != 1)
+    else if (item->activeState != 1 || item->targetState != 1)
     {
-        item->goalAnimState = 1;
+        item->targetState = 1;
         *((int*)&item->itemFlags[0]) = (frameNumber >= 52 ? 0 : 0x7E0);
 
         if (frameNumber == 8)
@@ -152,8 +152,8 @@ void HammerControl(short itemNumber)
         v7 = Objects[138].animIndex + 1;
         item->animNumber = Objects[138].animIndex + 1;
         item->frameNumber = *(_WORD*)(Anims + 40 * v7 + 24);
-        item->goalAnimState = 2;
-        item->currentAnimState = 2;
+        item->targetState = 2;
+        item->activeState = 2;
         item->itemFlags[2] = 60;
         result = AnimateItem((int)item);
     }

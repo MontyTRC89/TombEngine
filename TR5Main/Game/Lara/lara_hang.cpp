@@ -57,7 +57,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		return;
 	}
 
@@ -87,18 +87,18 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
 			{
-				item->goalAnimState = LS_SHIMMY_LEFT;
+				item->targetState = LS_SHIMMY_LEFT;
 				return;
 			}
 
 			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_INNER_LEFT;
+				item->targetState = LS_SHIMMY_INNER_LEFT;
 				return;
 			
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_OUTER_LEFT;
+				item->targetState = LS_SHIMMY_OUTER_LEFT;
 				return;
 			
 			default:
@@ -108,11 +108,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, -45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_45_INNER_LEFT;
+				item->targetState = LS_SHIMMY_45_INNER_LEFT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_45_OUTER_LEFT;
+				item->targetState = LS_SHIMMY_45_OUTER_LEFT;
 				return;
 
 			default:
@@ -124,18 +124,18 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
 			{
-				item->goalAnimState = LS_SHIMMY_RIGHT;
+				item->targetState = LS_SHIMMY_RIGHT;
 				return;
 			}
 
 			switch (TestLaraHangCorner(item, coll, 90.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_INNER_RIGHT;
+				item->targetState = LS_SHIMMY_INNER_RIGHT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_OUTER_RIGHT;
+				item->targetState = LS_SHIMMY_OUTER_RIGHT;
 				return;
 
 			default:
@@ -145,11 +145,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, 45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->goalAnimState = LS_SHIMMY_45_INNER_RIGHT;
+				item->targetState = LS_SHIMMY_45_INNER_RIGHT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->goalAnimState = LS_SHIMMY_45_OUTER_RIGHT;
+				item->targetState = LS_SHIMMY_45_OUTER_RIGHT;
 				return;
 
 			default:
@@ -177,16 +177,16 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (TrInput & IN_WALK)
 					{
-						item->goalAnimState = LS_HANDSTAND;
+						item->targetState = LS_HANDSTAND;
 					}
 					else if (TrInput & IN_CROUCH)
 					{
-						item->goalAnimState = LS_HANG_TO_CRAWL;
-						item->requiredAnimState = LS_CROUCH_IDLE;
+						item->targetState = LS_HANG_TO_CRAWL;
+						item->requiredState = LS_CROUCH_IDLE;
 					}
 					else
 					{
-						item->goalAnimState = LS_GRABBING;
+						item->targetState = LS_GRABBING;
 					}
 
 					return;
@@ -197,8 +197,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -256 &&
 					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -256)
 				{
-					item->goalAnimState = LS_HANG_TO_CRAWL;
-					item->requiredAnimState = LS_CROUCH_IDLE;
+					item->targetState = LS_HANG_TO_CRAWL;
+					item->requiredState = LS_CROUCH_IDLE;
 
 					return;
 			}
@@ -210,7 +210,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
-					item->goalAnimState = LS_LADDER_IDLE;
+					item->targetState = LS_LADDER_IDLE;
 				}
 				else if (TestLastFrame(item))
 				{
@@ -228,7 +228,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraClimbStance(item, coll))
 			{
-				item->goalAnimState = LS_LADDER_IDLE;
+				item->targetState = LS_LADDER_IDLE;
 			}
 			else if (TestLastFrame(item))
 			{
@@ -248,7 +248,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
-		item->goalAnimState = LS_HANG;
+		item->targetState = LS_HANG;
 }
 
 void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
@@ -271,7 +271,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
-		item->goalAnimState = LS_HANG;
+		item->targetState = LS_HANG;
 }
 
 void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
