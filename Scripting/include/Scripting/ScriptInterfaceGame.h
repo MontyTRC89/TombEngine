@@ -29,11 +29,9 @@ public:
 
 	virtual void SetCallbackDrawString(CallbackDrawString) = 0;
 	virtual void FreeLevelScripts() = 0;
-	virtual bool AddName(std::string const& key, VarMapVal val) = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
 	virtual void ExecuteFunction(std::string const& luaFileName) = 0;
 
-	virtual void AssignItemsAndLara() = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

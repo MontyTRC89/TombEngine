@@ -9,6 +9,7 @@
 #include "GameScriptAnimations.h"
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceFlow.h"
+#include "Entity/Entity.h"
 
 class GameFlow : public LuaHandler, public ScriptInterfaceFlow
 {
