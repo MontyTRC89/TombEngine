@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 
     static bool ShootFrame(ITEM_INFO* item)
     {
-        short frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
+		int frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
         if (frameNumber == 45
             //||  frameNumber == 50
             //||  frameNumber == 55
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
         CREATURE_INFO* mutant;
         AI_INFO info;
         OBJECT_BONES mutant_joint;
-        short frameNumber;
+		int frameNumber;
         short headY;
         short angle;
 

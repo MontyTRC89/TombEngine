@@ -7,7 +7,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Specific/setup.h"
-#include "Renderer/RenderEnums.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Renderer/Renderer11.h"
 
 

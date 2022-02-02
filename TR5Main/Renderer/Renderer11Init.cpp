@@ -48,7 +48,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	std::string shadowSizeString = std::to_string(g_Configuration.shadowMapSize);
 	const D3D_SHADER_MACRO roomDefines[] = {"SHADOW_MAP_SIZE",shadowSizeString.c_str(),nullptr,nullptr};
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "SHADOW_MAP_SIZE",shadowSizeString.c_str(),"ANIMATED" ,"",nullptr,nullptr };
-
+	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefines[0], blob);
 	// Initialise input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -91,6 +91,9 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSColored", "ps_4_0", nullptr, blob);
 	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUD.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
 	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl", "PSTextured", "ps_4_0", nullptr, blob);
+	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
+	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
+	
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
@@ -102,31 +105,34 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
 	m_cbRoom = createConstantBuffer<CRoomBuffer>();
 	m_cbAnimated = createConstantBuffer<CAnimatedBuffer>();
+	m_cbPostProcessBuffer = createConstantBuffer<CPostProcessBuffer>();
 
 	//Prepare HUD Constant buffer
 	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();
 	m_cbHUD = createConstantBuffer<CHUDBuffer>();
 	m_cbSprite = createConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection =Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 	m_firstWeather = true;
 
 	// Preallocate lists
-	m_dynamicLights = createVector<RendererLight*>(MAX_DYNAMIC_LIGHTS);
-	m_lines3DToDraw = createVector<RendererLine3D*>(MAX_LINES_3D);
-	m_lines2DToDraw = createVector<RendererLine2D*>(MAX_LINES_2D);
-
-	m_lines3DBuffer = (RendererLine3D*)malloc(sizeof(RendererLine3D) * MAX_LINES_3D);
-	m_lines2DBuffer = (RendererLine2D*)malloc(sizeof(RendererLine2D) * MAX_LINES_2D);
-	m_rects2DBuffer = (RendererRect2D*)malloc(sizeof(RendererRect2D) * MAX_RECTS_2D);
+	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
+	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
+	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
+	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
+	m_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);
 
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
-		m_items[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
+
+	m_transparentFacesVertexBuffer = VertexBuffer(m_device.Get(), TRANSPARENT_BUCKET_SIZE);
+	m_transparentFacesIndexBuffer = IndexBuffer(m_device.Get(), TRANSPARENT_BUCKET_SIZE);
 
 	D3D11_BLEND_DESC blendStateDesc{};
 	blendStateDesc.AlphaToCoverageEnable = false;
@@ -140,6 +146,43 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_subtractiveBlendState.GetAddressOf()));
+	
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_DEST_COLOR;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_screenBlendState.GetAddressOf()));
+
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_MAX;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_lightenBlendState.GetAddressOf()));
+
+	blendStateDesc.AlphaToCoverageEnable = false;
+	blendStateDesc.IndependentBlendEnable = false;
+	blendStateDesc.RenderTarget[0].BlendEnable = true;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_excludeBlendState.GetAddressOf()));
+
 	D3D11_SAMPLER_DESC shadowSamplerDesc = {};
 	shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -159,11 +202,11 @@ void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
 	sd.BufferDesc.Height = h;
-	sd.BufferDesc.RefreshRate.Numerator = refreshRate;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.RefreshRate.Numerator = 0;
+	sd.BufferDesc.RefreshRate.Denominator = 0;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	sd.Windowed = windowed;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -275,7 +318,7 @@ void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	if (FAILED(res))
 		return false;*/
 
-		// Initialise viewport
+	// Initialise viewport
 	m_viewport.TopLeftX = 0;
 	m_viewport.TopLeftY = 0;
 	m_viewport.Width = w;

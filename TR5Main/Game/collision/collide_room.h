@@ -87,9 +87,9 @@ struct COLL_SETUP
 	int   BadCeilingHeight; // Borderline ceiling height
 
 	PHD_VECTOR OldPosition; // Preserve old parameters to restore later
-	short OldAnimState;
-	short OldAnimNumber;
-	short OldFrameNumber;
+	int OldAnimState;
+	int OldAnimNumber;
+	int OldFrameNumber;
 };
 
 struct COLL_INFO

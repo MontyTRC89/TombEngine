@@ -100,7 +100,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 	}
 
 	// Shooting action for right arm.
-	short frameRight = Lara.rightArm.frameNumber;  // frame number of DRAW_END?
+	int frameRight = Lara.rightArm.frameNumber;  // frame number of DRAW_END?
 	if (Lara.rightArm.lock || (TrInput & IN_ACTION && !Lara.target))
 	{
 		// POINT ARMS FORWARD
@@ -195,7 +195,7 @@ void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 	set_arm_info(&Lara.rightArm, frameRight);
 
 	// Shooting for left arm.
-	short frameLeft = Lara.leftArm.frameNumber;
+	int frameLeft = Lara.leftArm.frameNumber;
 	if (Lara.leftArm.lock || (TrInput & IN_ACTION && !Lara.target))
 	{
 		if ((frameLeft >= 0) && (frameLeft < p->draw1Anim2))
@@ -396,7 +396,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
-	short frameLeft = Lara.leftArm.frameNumber;
+	int frameLeft = Lara.leftArm.frameNumber;
 
 	// To go along with the rapid-fire BUGFIX, finish recoil anim before holstering weapon too. -Sezz
 	if ((frameLeft >= p->recoilAnim) && (frameLeft < p->recoilAnim + weapon->recoilFrame))
@@ -434,7 +434,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 	}
 	set_arm_info(&Lara.leftArm, frameLeft);
 
-	short frameRight = Lara.rightArm.frameNumber;
+	int frameRight = Lara.rightArm.frameNumber;
 
 	if ((frameRight >= p->recoilAnim) && (frameRight < p->recoilAnim + weapon->recoilFrame))
 		frameRight++;
@@ -477,8 +477,8 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 		Lara.leftArm.frameNumber = 0;
 		Lara.rightArm.frameNumber = 0;
 		Lara.target = NULL;
-		Lara.rightArm.lock = 0;
-		Lara.leftArm.lock = 0;
+		Lara.rightArm.lock = false;
+		Lara.leftArm.lock = false;
 	}
 
 	if (!(TrInput & IN_LOOK))
@@ -493,7 +493,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 void set_arm_info(LARA_ARM* arm, int frame)
 {
 	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
-	short animBase = Objects[p->objectNum].animIndex;
+	int animBase = Objects[p->objectNum].animIndex;
 	
 	if (frame < p->draw1Anim)
 		arm->animNumber = animBase;
@@ -510,7 +510,7 @@ void set_arm_info(LARA_ARM* arm, int frame)
 
 void draw_pistols(LARA_WEAPON_TYPE weaponType)
 {
-	short frame = Lara.leftArm.frameNumber + 1;
+	int frame = Lara.leftArm.frameNumber + 1;
 	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
 
 	if (frame < p->draw1Anim || frame > p->recoilAnim - 1)

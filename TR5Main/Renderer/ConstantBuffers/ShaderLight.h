@@ -2,9 +2,12 @@
 
 struct alignas(16) ShaderLight
 {
-	Vector4 Position;
-	Vector4 Color;
-	Vector4 Direction;
+	Vector3 Position;
+	int Type;
+	Vector3 Color;
+	int LocalIntensity;
+	Vector3 Direction;
+	float Distance;
 	float Intensity;
 	float In;
 	float Out;

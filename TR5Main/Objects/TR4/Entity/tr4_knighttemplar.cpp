@@ -90,8 +90,8 @@ void KnightTemplarControl(short itemNumber)
 		joint1 = info.xAngle;
 	}
 
-	short frameBase = 0;
-	short frameNumber = 0;
+	int frameBase = 0;
+	int frameNumber = 0;
 
 	switch (item->currentAnimState)
 	{
