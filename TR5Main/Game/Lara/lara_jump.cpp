@@ -44,7 +44,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -69,14 +69,14 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
 			info->waterStatus != LW_WADE) [[likely]]
 		{
-			item->goalAnimState = LS_RUN_FORWARD;
+			item->targetState = LS_RUN_FORWARD;
 		}
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -85,30 +85,30 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
-		item->goalAnimState = LS_REACH;
+		item->targetState = LS_REACH;
 		return;
 	}
 
 	if (TrInput & (IN_ROLL | IN_BACK))
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		item->targetState = LS_JUMP_ROLL_180;
 		return;
 	}
 
 	if (TrInput & IN_WALK &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
-		item->goalAnimState = LS_SWAN_DIVE_START;
+		item->targetState = LS_SWAN_DIVE_START;
 		return;
 	}
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_FORWARD;
+	item->targetState = LS_JUMP_FORWARD;
 }
 
 // State:		LS_JUMP_FORWARD (3)
@@ -148,16 +148,16 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		StopSoundEffect(SFX_TR4_LARA_FALL);
 		return;
 	}
 
-	item->goalAnimState = LS_FREEFALL;
+	item->targetState = LS_FREEFALL;
 }
 
 // State:		LS_FREEFALL (9)
@@ -188,7 +188,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -213,9 +213,9 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -223,11 +223,11 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_REACH;
+	item->targetState = LS_REACH;
 	// TODO: overhang
 	//SlopeReachExtra(item, coll);
 }
@@ -273,7 +273,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		return;
 	}
 
@@ -300,7 +300,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_FORWARD;
+		item->targetState = LS_JUMP_FORWARD;
 		info->jumpDirection = LaraJumpDirection::Forward;
 		return;
 	}
@@ -308,7 +308,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_BACK;
+		item->targetState = LS_JUMP_BACK;
 		info->jumpDirection = LaraJumpDirection::Back;
 		return;
 	}
@@ -317,7 +317,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_LEFT;
+		item->targetState = LS_JUMP_LEFT;
 		info->jumpDirection = LaraJumpDirection::Left;
 		return;
 	}
@@ -325,7 +325,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_RIGHT;
+		item->targetState = LS_JUMP_RIGHT;
 		info->jumpDirection = LaraJumpDirection::Right;
 		return;
 	}
@@ -333,12 +333,12 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	// No directional key pressed AND no directional lock; commit to jump up.
 	if (TestLaraJumpUp(item, coll))
 	{
-		item->goalAnimState = LS_JUMP_UP;
+		item->targetState = LS_JUMP_UP;
 		info->jumpDirection = LaraJumpDirection::Up;
 		return;
 	}
 
-	item->goalAnimState = LS_IDLE;
+	item->targetState = LS_IDLE;
 	info->jumpDirection = LaraJumpDirection::None;
 }
 
@@ -417,7 +417,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -442,9 +442,9 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -452,17 +452,17 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & (IN_ROLL | IN_FORWARD))
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		item->targetState = LS_JUMP_ROLL_180;
 		return;
 	}
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_BACK;
+	item->targetState = LS_JUMP_BACK;
 }
 
 // State:		LS_JUMP_BACK (25)
@@ -484,7 +484,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -496,9 +496,9 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -507,17 +507,17 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Core appears to have planned this feature. Add an animation to make it possible.
 	/*if (TrInput & (IN_ROLL | IN_LEFT))
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		item->targetState = LS_JUMP_ROLL_180;
 		return;
 	}*/
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_RIGHT;
+	item->targetState = LS_JUMP_RIGHT;
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -539,7 +539,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -551,9 +551,9 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -562,17 +562,17 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Core appears to have planned this feature. Add an animation to make it possible.
 	/*if (TrInput & (IN_ROLL | IN_RIGHT))
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180;
+		item->targetState = LS_JUMP_ROLL_180;
 		return;
 	}*/
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_LEFT;
+	item->targetState = LS_JUMP_LEFT;
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -594,7 +594,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -603,7 +603,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		SetLaraLand(item, coll);
 		return;
 	}
@@ -629,11 +629,11 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 }
 
 // State:		LS_JUMP_UP (28)
@@ -676,7 +676,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraLand(item, coll))
 		{
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 			SetLaraLand(item, coll);
 		}
 
@@ -701,9 +701,9 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraFallDamage(item);
 
 		if (item->hitPoints <= 0)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -712,17 +712,17 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
-		item->goalAnimState = LS_REACH;
+		item->targetState = LS_REACH;
 		return;
 	}
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->goalAnimState = LS_FREEFALL;
+		item->targetState = LS_FREEFALL;
 		return;
 	}
 
-	item->goalAnimState = LS_FALL_BACK;
+	item->targetState = LS_FALL_BACK;
 }
 
 // State:		LS_FALL_BACK (29)
@@ -761,13 +761,13 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (item->fallspeed >= LARA_FREEFALL_SPEED &&
-		item->goalAnimState != LS_FREEFALL_DIVE) // Hack?
+		item->targetState != LS_FREEFALL_DIVE) // Hack?
 	{
-		item->goalAnimState = LS_SWAN_DIVE_END;
+		item->targetState = LS_SWAN_DIVE_END;
 		return;
 	}
 
-	item->goalAnimState = LS_SWAN_DIVE_START;
+	item->targetState = LS_SWAN_DIVE_START;
 }
 
 // State:		LS_SWAN_DIVE_START (52)
@@ -830,9 +830,9 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Apply fall damage?
 
 		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
-			item->goalAnimState = LS_DEATH;
+			item->targetState = LS_DEATH;
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		return;
@@ -840,11 +840,11 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_JUMP_ROLL_180; // TODO: New state?
+		item->targetState = LS_JUMP_ROLL_180; // TODO: New state?
 		return;
 	}
 
-	item->goalAnimState = LS_FREEFALL_DIVE;
+	item->targetState = LS_FREEFALL_DIVE;
 }
 
 // State:		LS_FREEFALL_DIVE (53)

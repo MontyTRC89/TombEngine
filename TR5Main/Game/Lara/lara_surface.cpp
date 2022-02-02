@@ -53,7 +53,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -74,27 +74,27 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->goalAnimState = LS_ONWATER_FORWARD;
+		item->targetState = LS_ONWATER_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->goalAnimState = LS_ONWATER_BACK;
+		item->targetState = LS_ONWATER_BACK;
 		return;
 	}
 	else if (TrInput & IN_ROLL)
 	{
-		item->goalAnimState = LS_ROLL_FORWARD;
+		item->targetState = LS_ROLL_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_LSTEP)
 	{
-		item->goalAnimState = LS_ONWATER_LEFT;
+		item->targetState = LS_ONWATER_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
-		item->goalAnimState = LS_ONWATER_RIGHT;
+		item->targetState = LS_ONWATER_RIGHT;
 		return;
 	}
 	else if (TrInput & IN_JUMP)
@@ -106,14 +106,14 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	Lara.diveCount = 0;
-	item->goalAnimState = LS_ONWATER_STOP;
+	item->targetState = LS_ONWATER_STOP;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -130,7 +130,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!(TrInput & IN_RSTEP))
 	{
-		item->goalAnimState = LS_ONWATER_STOP;
+		item->targetState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -142,7 +142,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -159,7 +159,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!(TrInput & IN_LSTEP))
 	{
-		item->goalAnimState = LS_ONWATER_STOP;
+		item->targetState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -171,7 +171,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -188,7 +188,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!(TrInput & IN_BACK))
 	{
-		item->goalAnimState = LS_ONWATER_STOP;
+		item->targetState = LS_ONWATER_STOP;
 	}
 
 	item->fallspeed += 8;
@@ -200,7 +200,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_WATER_DEATH;
+		item->targetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -216,9 +216,9 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (!(TrInput & IN_FORWARD))
-		item->goalAnimState = LS_ONWATER_STOP;
+		item->targetState = LS_ONWATER_STOP;
 	if (TrInput & IN_JUMP)
-		item->goalAnimState = LS_ONWATER_STOP;
+		item->targetState = LS_ONWATER_STOP;
 
 	item->fallspeed += 8;
 	if (item->fallspeed > 60)

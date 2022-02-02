@@ -244,10 +244,10 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 	if (laraInfo->Vehicle == NO_ITEM)
 		return true;
 
-	if ((lara->currentAnimState == QUAD_STATE_DISMOUNT_RIGHT || lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT) &&
+	if ((lara->activeState == QUAD_STATE_DISMOUNT_RIGHT || lara->activeState == QUAD_STATE_DISMOUNT_LEFT) &&
 		TestLastFrame(lara))
 	{
-		if (lara->currentAnimState == QUAD_STATE_DISMOUNT_LEFT)
+		if (lara->activeState == QUAD_STATE_DISMOUNT_LEFT)
 			lara->pos.yRot += ANGLE(90.0f);
 		else
 			lara->pos.yRot -= ANGLE(90.0f);
@@ -260,7 +260,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		laraInfo->Vehicle = NO_ITEM;
 		laraInfo->gunStatus = LG_HANDS_FREE;
 
-		if (lara->currentAnimState == QUAD_STATE_FALL_OFF)
+		if (lara->activeState == QUAD_STATE_FALL_OFF)
 		{
 			PHD_VECTOR pos = { 0, 0, 0 };
 
@@ -280,10 +280,10 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 
 			return false;
 		}
-		else if (lara->currentAnimState == QUAD_STATE_FALL_DEATH)
+		else if (lara->activeState == QUAD_STATE_FALL_DEATH)
 		{
 			quadInfo->flags |= QUAD_FLAG_DEAD;
-			lara->goalAnimState = LS_DEATH;
+			lara->targetState = LS_DEATH;
 			lara->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
 			lara->speed = 0;
 
@@ -795,9 +795,9 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 	auto quadInfo = (QUAD_INFO*)quad->data;
 
 	if (quad->pos.yPos != quad->floor &&
-		lara->currentAnimState != QUAD_STATE_FALL &&
-		lara->currentAnimState != QUAD_STATE_LAND &&
-		lara->currentAnimState != QUAD_STATE_FALL_OFF &&
+		lara->activeState != QUAD_STATE_FALL &&
+		lara->activeState != QUAD_STATE_LAND &&
+		lara->activeState != QUAD_STATE_FALL_OFF &&
 		!dead)
 	{
 		if (quadInfo->velocity < 0)
@@ -806,41 +806,41 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_LEAP_START2;
 
 		lara->frameNumber = GetFrameNumber(lara, lara->animNumber);
-		lara->currentAnimState = QUAD_STATE_FALL;
-		lara->goalAnimState = QUAD_STATE_FALL;
+		lara->activeState = QUAD_STATE_FALL;
+		lara->targetState = QUAD_STATE_FALL;
 	}
 	else if (collide &&
-		lara->currentAnimState != QUAD_STATE_HIT_FRONT &&
-		lara->currentAnimState != QUAD_STATE_HIT_BACK &&
-		lara->currentAnimState != QUAD_STATE_HIT_LEFT &&
-		lara->currentAnimState != QUAD_STATE_HIT_RIGHT &&
-		lara->currentAnimState != QUAD_STATE_FALL_OFF &&
+		lara->activeState != QUAD_STATE_HIT_FRONT &&
+		lara->activeState != QUAD_STATE_HIT_BACK &&
+		lara->activeState != QUAD_STATE_HIT_LEFT &&
+		lara->activeState != QUAD_STATE_HIT_RIGHT &&
+		lara->activeState != QUAD_STATE_FALL_OFF &&
 		quadInfo->velocity > (MAX_VELOCITY / 3) &&
 		!dead)
 	{
 		if (collide == QUAD_HIT_FRONT)
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_BACK;
-			lara->currentAnimState = QUAD_STATE_HIT_FRONT;
-			lara->goalAnimState = QUAD_STATE_HIT_FRONT;
+			lara->activeState = QUAD_STATE_HIT_FRONT;
+			lara->targetState = QUAD_STATE_HIT_FRONT;
 		}
 		else if (collide == QUAD_HIT_BACK)
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_FRONT;
-			lara->currentAnimState = QUAD_STATE_HIT_BACK;
-			lara->goalAnimState = QUAD_STATE_HIT_BACK;
+			lara->activeState = QUAD_STATE_HIT_BACK;
+			lara->targetState = QUAD_STATE_HIT_BACK;
 		}
 		else if (collide == QUAD_HIT_LEFT)
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_RIGHT;
-			lara->currentAnimState = QUAD_STATE_HIT_LEFT;
-			lara->goalAnimState = QUAD_STATE_HIT_LEFT;
+			lara->activeState = QUAD_STATE_HIT_LEFT;
+			lara->targetState = QUAD_STATE_HIT_LEFT;
 		}
 		else
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_LEFT;
-			lara->currentAnimState = QUAD_STATE_HIT_RIGHT;
-			lara->goalAnimState = QUAD_STATE_HIT_RIGHT;
+			lara->activeState = QUAD_STATE_HIT_RIGHT;
+			lara->targetState = QUAD_STATE_HIT_RIGHT;
 		}
 
 		lara->frameNumber = GetFrameNumber(lara, lara->animNumber);
@@ -848,22 +848,22 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 	}
 	else
 	{
-		switch (lara->currentAnimState)
+		switch (lara->activeState)
 		{
 		case QUAD_STATE_IDLE:
 			if (dead)
-				lara->goalAnimState = QUAD_STATE_BIKE_DEATH;
+				lara->targetState = QUAD_STATE_BIKE_DEATH;
 			else if (TrInput & QUAD_IN_DISMOUNT &&
 				quadInfo->velocity == 0 &&
 				!QuadNoGetOff)
 			{
 				if (TrInput & QUAD_IN_LEFT && CanQuadbikeGetOff(-1))
-					lara->goalAnimState = QUAD_STATE_DISMOUNT_LEFT;
+					lara->targetState = QUAD_STATE_DISMOUNT_LEFT;
 				else if (TrInput & QUAD_IN_RIGHT && CanQuadbikeGetOff(1))
-					lara->goalAnimState = QUAD_STATE_DISMOUNT_RIGHT;
+					lara->targetState = QUAD_STATE_DISMOUNT_RIGHT;
 			}
 			else if (TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE))
-				lara->goalAnimState = QUAD_STATE_DRIVE;
+				lara->targetState = QUAD_STATE_DRIVE;
 
 			break;
 
@@ -871,31 +871,31 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 			if (dead)
 			{
 				if (quadInfo->velocity > (MAX_VELOCITY / 2))
-					lara->goalAnimState = QUAD_STATE_FALL_DEATH;
+					lara->targetState = QUAD_STATE_FALL_DEATH;
 				else
-					lara->goalAnimState = QUAD_STATE_BIKE_DEATH;
+					lara->targetState = QUAD_STATE_BIKE_DEATH;
 			}
 			else if (!(TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE)) &&
 				(quadInfo->velocity / 256) == 0)
 			{
-				lara->goalAnimState = QUAD_STATE_IDLE;
+				lara->targetState = QUAD_STATE_IDLE;
 			}
 			else if (TrInput & QUAD_IN_LEFT &&
 				!QuadDriftStarting)
 			{
-				lara->goalAnimState = QUAD_STATE_TURN_LEFT;
+				lara->targetState = QUAD_STATE_TURN_LEFT;
 			}
 			else if (TrInput & QUAD_IN_RIGHT &&
 				!QuadDriftStarting)
 			{
-				lara->goalAnimState = QUAD_STATE_TURN_RIGHT;
+				lara->targetState = QUAD_STATE_TURN_RIGHT;
 			}
 			else if (TrInput & QUAD_IN_BRAKE)
 			{
 				if (quadInfo->velocity > (MAX_VELOCITY / 3 * 2))
-					lara->goalAnimState = QUAD_STATE_BRAKE;
+					lara->targetState = QUAD_STATE_BRAKE;
 				else
-					lara->goalAnimState = QUAD_STATE_SLOW;
+					lara->targetState = QUAD_STATE_SLOW;
 			}
 
 			break;
@@ -904,47 +904,47 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 		case QUAD_STATE_SLOW:
 		case QUAD_STATE_STOP_SLOWLY:
 			if ((quadInfo->velocity / 256) == 0)
-				lara->goalAnimState = QUAD_STATE_IDLE;
+				lara->targetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_LEFT)
-				lara->goalAnimState = QUAD_STATE_TURN_LEFT;
+				lara->targetState = QUAD_STATE_TURN_LEFT;
 			else if (TrInput & QUAD_IN_RIGHT)
-				lara->goalAnimState = QUAD_STATE_TURN_RIGHT;
+				lara->targetState = QUAD_STATE_TURN_RIGHT;
 
 			break;
 
 		case QUAD_STATE_TURN_LEFT:
 			if ((quadInfo->velocity / 256) == 0)
-				lara->goalAnimState = QUAD_STATE_IDLE;
+				lara->targetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_RIGHT)
 			{
 				lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_RIGHT_START;
 				lara->frameNumber = GetFrameNumber(lara, lara->animNumber);
-				lara->currentAnimState = QUAD_STATE_TURN_RIGHT;
-				lara->goalAnimState = QUAD_STATE_TURN_RIGHT;
+				lara->activeState = QUAD_STATE_TURN_RIGHT;
+				lara->targetState = QUAD_STATE_TURN_RIGHT;
 			}
 			else if (!(TrInput & QUAD_IN_LEFT))
-				lara->goalAnimState = QUAD_STATE_DRIVE;
+				lara->targetState = QUAD_STATE_DRIVE;
 
 			break;
 
 		case QUAD_STATE_TURN_RIGHT:
 			if ((quadInfo->velocity / 256) == 0)
-				lara->goalAnimState = QUAD_STATE_IDLE;
+				lara->targetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_LEFT)
 			{
 				lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_LEFT_START;
 				lara->frameNumber = GetFrameNumber(lara, lara->animNumber);
-				lara->currentAnimState = QUAD_STATE_TURN_LEFT;
-				lara->goalAnimState = QUAD_STATE_TURN_LEFT;
+				lara->activeState = QUAD_STATE_TURN_LEFT;
+				lara->targetState = QUAD_STATE_TURN_LEFT;
 			}
 			else if (!(TrInput & QUAD_IN_RIGHT))
-				lara->goalAnimState = QUAD_STATE_DRIVE;
+				lara->targetState = QUAD_STATE_DRIVE;
 
 			break;
 
 		case QUAD_STATE_FALL:
 			if (quad->pos.yPos == quad->floor)
-				lara->goalAnimState = QUAD_STATE_LAND;
+				lara->targetState = QUAD_STATE_LAND;
 			else if (quad->fallspeed > TERMINAL_FALLSPEED)
 				quadInfo->flags |= QUAD_FLAG_IS_FALLING;
 
@@ -958,7 +958,7 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 		case QUAD_STATE_HIT_LEFT:
 		case QUAD_STATE_HIT_RIGHT:
 			if (TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE))
-				lara->goalAnimState = QUAD_STATE_DRIVE;
+				lara->targetState = QUAD_STATE_DRIVE;
 
 			break;
 		}
@@ -966,7 +966,7 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 		if (TestEnvironment(ENV_FLAG_WATER, quad) ||
 			TestEnvironment(ENV_FLAG_SWAMP, quad))
 		{
-			lara->goalAnimState = QUAD_STATE_FALL_OFF;
+			lara->targetState = QUAD_STATE_FALL_OFF;
 			lara->pos.yPos = quad->pos.yPos + 700;
 			lara->roomNumber = quad->roomNumber;
 			lara->hitPoints = 0;
@@ -1203,12 +1203,12 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 		if (ang > -ANGLE(45.0f) && ang < ANGLE(135.0f))
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_LEFT;
-			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_MOUNT_LEFT;
+			lara->activeState = lara->targetState = QUAD_STATE_MOUNT_LEFT;
 		}
 		else
 		{
 			lara->animNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_RIGHT;
-			lara->currentAnimState = lara->goalAnimState = QUAD_STATE_MOUNT_RIGHT;
+			lara->activeState = lara->targetState = QUAD_STATE_MOUNT_RIGHT;
 		}
 
 		lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
@@ -1327,7 +1327,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 		collide = false;
 	else
 	{
-		switch (lara->currentAnimState)
+		switch (lara->activeState)
 		{
 		case QUAD_STATE_MOUNT_LEFT:
 		case QUAD_STATE_MOUNT_RIGHT:
@@ -1414,10 +1414,10 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 		}
 	}
 
-	if (lara->currentAnimState != QUAD_STATE_MOUNT_RIGHT &&
-		lara->currentAnimState != QUAD_STATE_MOUNT_LEFT &&
-		lara->currentAnimState != QUAD_STATE_DISMOUNT_RIGHT &&
-		lara->currentAnimState != QUAD_STATE_DISMOUNT_LEFT)
+	if (lara->activeState != QUAD_STATE_MOUNT_RIGHT &&
+		lara->activeState != QUAD_STATE_MOUNT_LEFT &&
+		lara->activeState != QUAD_STATE_DISMOUNT_RIGHT &&
+		lara->activeState != QUAD_STATE_DISMOUNT_LEFT)
 	{
 		PHD_VECTOR pos;
 		int speed = 0;

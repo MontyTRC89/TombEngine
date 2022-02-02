@@ -10,9 +10,9 @@ void FallingCeilingControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->currentAnimState)
+	if (item->activeState)
 	{
-		if (item->currentAnimState == 1 && item->touchBits)
+		if (item->activeState == 1 && item->touchBits)
 		{
 			LaraItem->hitPoints -= 300;
 			LaraItem->hitStatus = true;
@@ -20,7 +20,7 @@ void FallingCeilingControl(short itemNumber)
 	}
 	else
 	{
-		item->goalAnimState = 1;
+		item->targetState = 1;
 		item->airborne = true;;
 	}
 
@@ -39,13 +39,13 @@ void FallingCeilingControl(short itemNumber)
 		if (roomNumber != item->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (item->currentAnimState == 1)
+		if (item->activeState == 1)
 		{
 			if (item->pos.yPos >= item->floor)
 			{
 				item->pos.yPos = item->floor;
 				item->airborne = false;
-				item->goalAnimState = 2;
+				item->targetState = 2;
 				item->fallspeed = 0;
 			}
 		}

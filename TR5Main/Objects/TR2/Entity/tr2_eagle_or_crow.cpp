@@ -21,13 +21,13 @@ void InitialiseEagle(short itemNum)
 	{
 		item->animNumber = Objects[ID_CROW].animIndex + 14;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = item->goalAnimState = 7;
+		item->activeState = item->targetState = 7;
 	}
 	else
 	{
 		item->animNumber = Objects[ID_EAGLE].animIndex + 5;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = item->goalAnimState = 2;
+		item->activeState = item->targetState = 2;
 	}
 }
 
@@ -43,7 +43,7 @@ void EagleControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 4:
 			if (item->pos.yPos > item->floor)
@@ -51,7 +51,7 @@ void EagleControl(short itemNum)
 				item->pos.yPos = item->floor;
 				item->airborne = 0;
 				item->fallspeed = 0;
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			break;
 
@@ -66,7 +66,7 @@ void EagleControl(short itemNum)
 				item->animNumber = Objects[ID_EAGLE].animIndex + 8;
 
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 4;
+			item->activeState = 4;
 			item->airborne = 1;
 			item->speed = 0;
 			break;
@@ -83,12 +83,12 @@ void EagleControl(short itemNum)
 
 		angle = CreatureTurn(item, ANGLE(3));
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 7:
 			item->pos.yPos = item->floor;
 			if (creature->mood != BORED_MOOD)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 2:
@@ -96,30 +96,30 @@ void EagleControl(short itemNum)
 			if (creature->mood == BORED_MOOD)
 				break;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 1:
 			creature->flags = 0;
 
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (info.ahead && info.distance < SQUARE(512))
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 3:
 			if (creature->mood == BORED_MOOD)
 			{
-				item->requiredAnimState = 2;
-				item->goalAnimState = 1;
+				item->requiredState = 2;
+				item->targetState = 1;
 			}
 			else if (info.ahead && info.distance < SQUARE(512))
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			break;
 
 		case 6:

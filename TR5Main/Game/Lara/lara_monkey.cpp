@@ -38,7 +38,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -50,7 +50,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	//SlopeMonkeyExtra(item, coll);
 
 	// This check is needed to prevent stealing goal state from previously set.
-	//if (item->goalAnimState == LS_MONKEYSWING_IDLE)
+	//if (item->targetState == LS_MONKEYSWING_IDLE)
 	//	return;
 
 	if (TrInput & IN_LEFT)
@@ -70,48 +70,48 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_ROLL)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_180;
+			item->targetState = LS_MONKEY_TURN_180;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_FORWARD;
+			item->targetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_BACK;
+			item->targetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			item->targetState = LS_MONKEY_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+			item->targetState = LS_MONKEY_TURN_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			item->targetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			item->targetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -168,7 +168,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -191,21 +191,21 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO
 		/*if (TrInput & IN_ROLL | IN_BACK)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_180;
+			item->targetState = LS_MONKEY_TURN_180;
 			return;
 		}*/
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->goalAnimState = LS_MONKEY_FORWARD;
+			item->targetState = LS_MONKEY_FORWARD;
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -258,7 +258,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -280,15 +280,15 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			item->goalAnimState = LS_MONKEY_BACK;
+			item->targetState = LS_MONKEY_BACK;
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -341,7 +341,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -363,15 +363,15 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LSTEP)
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			item->targetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -424,7 +424,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -446,15 +446,15 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_RSTEP)
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			item->targetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -500,7 +500,7 @@ void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
-	item->goalAnimState = LS_MONKEY_IDLE;
+	item->targetState = LS_MONKEY_IDLE;
 }
 
 // State:		LS_MONKEY_TURN_180 (79)
@@ -525,7 +525,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -534,29 +534,29 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_FORWARD;
+			item->targetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_BACK;
+			item->targetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			item->targetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			item->targetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			item->targetState = LS_MONKEY_TURN_LEFT;
 
 			info->turnRate -= LARA_TURN_RATE;
 			if (info->turnRate < -LARA_SLOW_TURN_MAX)
@@ -565,11 +565,11 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -595,7 +595,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->goalAnimState = LS_DEATH;
+		item->targetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -604,29 +604,29 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_FORWARD;
+			item->targetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_BACK;
+			item->targetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_LEFT;
+			item->targetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->goalAnimState = LS_MONKEY_SHIMMY_RIGHT;
+			item->targetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+			item->targetState = LS_MONKEY_TURN_RIGHT;
 
 			info->turnRate += LARA_TURN_RATE;
 			if (info->turnRate > LARA_SLOW_TURN_MAX)
@@ -635,11 +635,11 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->goalAnimState = LS_JUMP_UP;
+	item->targetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 

@@ -118,7 +118,7 @@ int SwitchTrigger(short itemNum, short timer)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (item->status == ITEM_DEACTIVATED)
 	{
-		if ((!item->currentAnimState && item->objectNumber != ID_JUMP_SWITCH || item->currentAnimState == 1 && item->objectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item->activeState && item->objectNumber != ID_JUMP_SWITCH || item->activeState == 1 && item->objectNumber == ID_JUMP_SWITCH) && timer > 0)
 		{
 			item->timer = timer;
 			item->status = ITEM_ACTIVE;
@@ -126,14 +126,14 @@ int SwitchTrigger(short itemNum, short timer)
 				item->timer = 30 * timer;
 			return 1;
 		}
-		if (item->triggerFlags != 6 || item->currentAnimState)
+		if (item->triggerFlags != 6 || item->activeState)
 		{
 			RemoveActiveItem(itemNum);
 
 			item->status = ITEM_NOT_ACTIVE;
 			if (!item->itemFlags[0] == 0)
 				item->flags |= ONESHOT;
-			if (item->currentAnimState != 1)
+			if (item->activeState != 1)
 				return 1;
 			if (item->triggerFlags != 5 && item->triggerFlags != 6)
 				return 1;
@@ -332,47 +332,47 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].triggerFlags == 5)
 				switchFlag = 1;
 
-			switchOff = (g_Level.Items[value].currentAnimState == 1);
+			switchOff = (g_Level.Items[value].activeState == 1);
 
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->currentAnimState >= LS_MONKEY_IDLE &&
-				(LaraItem->currentAnimState <= LS_MONKEY_TURN_180 ||
-					LaraItem->currentAnimState == LS_MONKEY_TURN_LEFT ||
-					LaraItem->currentAnimState == LS_MONKEY_TURN_RIGHT))
+			if (LaraItem->activeState >= LS_MONKEY_IDLE &&
+				(LaraItem->activeState <= LS_MONKEY_TURN_180 ||
+					LaraItem->activeState == LS_MONKEY_TURN_LEFT ||
+					LaraItem->activeState == LS_MONKEY_TURN_RIGHT))
 				break;
 			return;
 
 		case TRIGGER_TYPES::TIGHTROPE_T:
-			if (LaraItem->currentAnimState >= LS_TIGHTROPE_IDLE &&
-				LaraItem->currentAnimState <= LS_TIGHTROPE_RECOVER_BALANCE &&
-				LaraItem->currentAnimState != LS_DOVESWITCH)
+			if (LaraItem->activeState >= LS_TIGHTROPE_IDLE &&
+				LaraItem->activeState <= LS_TIGHTROPE_RECOVER_BALANCE &&
+				LaraItem->activeState != LS_DOVESWITCH)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->currentAnimState == LS_DOVESWITCH ||
-				LaraItem->currentAnimState == LS_CRAWL_IDLE ||
-				LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->currentAnimState == LS_CRAWL_BACK ||
-				LaraItem->currentAnimState == LS_CROUCH_IDLE ||
-				LaraItem->currentAnimState == LS_CROUCH_ROLL ||
-				LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
-				LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->activeState == LS_DOVESWITCH ||
+				LaraItem->activeState == LS_CRAWL_IDLE ||
+				LaraItem->activeState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->activeState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->activeState == LS_CRAWL_BACK ||
+				LaraItem->activeState == LS_CROUCH_IDLE ||
+				LaraItem->activeState == LS_CROUCH_ROLL ||
+				LaraItem->activeState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->activeState == LS_CROUCH_TURN_RIGHT)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->currentAnimState == LS_HANG ||
-				LaraItem->currentAnimState == LS_LADDER_IDLE ||
-				LaraItem->currentAnimState == LS_LADDER_UP ||
-				LaraItem->currentAnimState == LS_LADDER_LEFT ||
-				LaraItem->currentAnimState == LS_LADDER_STOP ||
-				LaraItem->currentAnimState == LS_LADDER_RIGHT ||
-				LaraItem->currentAnimState == LS_LADDER_DOWN ||
-				LaraItem->currentAnimState == LS_MONKEY_IDLE)
+			if (LaraItem->activeState == LS_HANG ||
+				LaraItem->activeState == LS_LADDER_IDLE ||
+				LaraItem->activeState == LS_LADDER_UP ||
+				LaraItem->activeState == LS_LADDER_LEFT ||
+				LaraItem->activeState == LS_LADDER_STOP ||
+				LaraItem->activeState == LS_LADDER_RIGHT ||
+				LaraItem->activeState == LS_LADDER_DOWN ||
+				LaraItem->activeState == LS_MONKEY_IDLE)
 				break;
 			return;
 

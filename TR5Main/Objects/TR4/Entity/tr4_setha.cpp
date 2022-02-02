@@ -24,8 +24,8 @@ void InitialiseSetha(short itemNumber)
 	
 	item->animNumber = Objects[item->objectNumber].animIndex + 4;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 12;
-	item->currentAnimState = 12;
+	item->targetState = 12;
+	item->activeState = 12;
 }
 
 void SethaControl(short itemNumber)
@@ -95,20 +95,20 @@ void SethaControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->LOT.isJumping = false;
 			creature->flags = 0;
 
-			if (item->requiredAnimState)
+			if (item->requiredState)
 			{
-				item->goalAnimState = item->requiredAnimState;
+				item->targetState = item->requiredState;
 				break;
 			}
 			else if (info.distance < SQUARE(1024) && info.bite)
 			{
-				item->goalAnimState = 8;
+				item->targetState = 8;
 				break;
 			}
 			else if (LaraItem->pos.yPos >= item->pos.yPos - 1024)
@@ -119,7 +119,7 @@ void SethaControl(short itemNumber)
 					&& Targetable(item, &info))
 				{
 					item->itemFlags[0] = 0;
-					item->goalAnimState = 11;
+					item->targetState = 11;
 					break;
 				}
 				else if (ceiling != NO_HEIGHT
@@ -133,11 +133,11 @@ void SethaControl(short itemNumber)
 					{
 						item->itemFlags[0] = 0;
 						item->pos.yPos += 1536;
-						item->goalAnimState = 12;
+						item->targetState = 12;
 					}
 					else
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 						item->pos.yPos += 1536;
 					}
 					break;
@@ -148,7 +148,7 @@ void SethaControl(short itemNumber)
 					{
 						if (Targetable(item, &info))
 						{
-							item->goalAnimState = 4;
+							item->targetState = 4;
 							break;
 						}
 					}
@@ -160,12 +160,12 @@ void SethaControl(short itemNumber)
 						&& Targetable(item, &info))
 					{
 						item->itemFlags[0] = 0;
-						item->goalAnimState = 13;
+						item->targetState = 13;
 						break;
 					}
 					else if (canJump)
 					{
-						item->goalAnimState = 5;
+						item->targetState = 5;
 						break;
 					}
 				}
@@ -174,7 +174,7 @@ void SethaControl(short itemNumber)
 			{
 				if (creature->reachedGoal)
 				{
-					item->goalAnimState = 14;
+					item->targetState = 14;
 					break;
 				}
 				else
@@ -184,7 +184,7 @@ void SethaControl(short itemNumber)
 				}
 			}
 
-			item->goalAnimState = 2;
+			item->targetState = 2;
 
 			break;
 
@@ -195,11 +195,11 @@ void SethaControl(short itemNumber)
 				|| canJump 
 				|| creature->reachedGoal)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else if (info.distance > SQUARE(3072))
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			break;
 
@@ -210,11 +210,11 @@ void SethaControl(short itemNumber)
 				|| canJump 
 				|| creature->reachedGoal)
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			else if (info.distance < SQUARE(3072))
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 
@@ -277,7 +277,7 @@ void SethaControl(short itemNumber)
 			{
 				if (GetRandomControl() & 1)
 				{
-					item->requiredAnimState = 10;
+					item->requiredState = 10;
 				}
 			}
 		
@@ -335,7 +335,7 @@ void SethaControl(short itemNumber)
 		case 12:
 		case 13:
 		case 15:
-			if (item->currentAnimState==15)
+			if (item->activeState==15)
 				creature->target.y = LaraItem->pos.yPos;
 		
 			creature->maximumTurn = 0;
@@ -390,7 +390,7 @@ void SethaControl(short itemNumber)
 				if (Targetable(item, &info))
 				{
 					item->itemFlags[0] = 0;
-					item->goalAnimState = 15;
+					item->targetState = 15;
 				}
 			}
 			else
@@ -399,7 +399,7 @@ void SethaControl(short itemNumber)
 				item->airborne = true;
 				if (item->pos.yPos - item->floor > 0)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 			}
 
@@ -417,28 +417,28 @@ void SethaControl(short itemNumber)
 			&& info.distance < SQUARE(2048)
 			&& !(creature->LOT.isJumping))
 		{
-			if (item->currentAnimState != 12)
+			if (item->activeState != 12)
 			{
-				if (item->currentAnimState <= 13)
+				if (item->activeState <= 13)
 				{
 					if (abs(height4 - item->pos.yPos) >= 512)
 					{
 						item->animNumber = Objects[item->objectNumber].animIndex + 11;
-						item->goalAnimState = 6;
-						item->currentAnimState = 6;
+						item->targetState = 6;
+						item->activeState = 6;
 					}
 					else
 					{
 						item->animNumber = Objects[item->objectNumber].animIndex + 17;
-						item->goalAnimState = 7;
-						item->currentAnimState = 7;
+						item->targetState = 7;
+						item->activeState = 7;
 					}
 				}
 				else
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + 25;
-					item->goalAnimState = 16;
-					item->currentAnimState = 16;
+					item->targetState = 16;
+					item->activeState = 16;
 				}
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
@@ -576,7 +576,7 @@ void SethaAttack(int itemNumber)
 	short angles[2];
 	PHD_3DPOS attackPos;
 
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case 11:
 	case 15:

@@ -216,9 +216,9 @@ void WreckingBallControl(short itemNumber)
 		{
 			--item->triggerFlags;
 		}
-		else if (!item->currentAnimState)
+		else if (!item->activeState)
 		{
-			item->goalAnimState = 1;
+			item->targetState = 1;
 		}
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
@@ -248,9 +248,9 @@ void WreckingBallControl(short itemNumber)
 				item->fallspeed = 0;
 			}
 		}
-		else if (height - item->pos.yPos < 1536 && item->currentAnimState)
+		else if (height - item->pos.yPos < 1536 && item->activeState)
 		{
-			item->goalAnimState = 0;
+			item->targetState = 0;
 		}
 	}
 	else if (item->itemFlags[1] == 3)

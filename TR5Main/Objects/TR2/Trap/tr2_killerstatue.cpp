@@ -15,7 +15,7 @@ void InitialiseKillerStatue(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 3;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = 1;
+	item->activeState = 1;
 }
 
 void KillerStatueControl(short itemNumber)
@@ -26,12 +26,12 @@ void KillerStatueControl(short itemNumber)
 
 	item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->currentAnimState == 1)
-		item->goalAnimState = 2;
+	if (TriggerActive(item) && item->activeState == 1)
+		item->targetState = 2;
 	else
-		item->goalAnimState = 1;
+		item->targetState = 1;
 
-	if ((item->touchBits & 0x80) && item->currentAnimState == 2)
+	if ((item->touchBits & 0x80) && item->activeState == 2)
 	{
 		LaraItem->hitStatus = 1;
 		LaraItem->hitPoints -= 20;

@@ -89,29 +89,29 @@ namespace TEN::Entities::TR4
 		switch (item->triggerFlags)
 		{
 		case 0:
-			item->goalAnimState = 0;
-			item->currentAnimState = 0;
+			item->targetState = 0;
+			item->activeState = 0;
 			item->animNumber = obj->animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 1:
-			item->goalAnimState = STATE_SKELETON_JUMP_RIGHT;
-			item->currentAnimState = STATE_SKELETON_JUMP_RIGHT;
+			item->targetState = STATE_SKELETON_JUMP_RIGHT;
+			item->activeState = STATE_SKELETON_JUMP_RIGHT;
 			item->animNumber = obj->animIndex + 37;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 2:
-			item->goalAnimState = STATE_SKELETON_JUMP_LEFT;
-			item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
+			item->targetState = STATE_SKELETON_JUMP_LEFT;
+			item->activeState = STATE_SKELETON_JUMP_LEFT;
 			item->animNumber = obj->animIndex + 34;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 3:
-			item->goalAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
-			item->currentAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
+			item->targetState = STATE_SKELETON_JUMP_LIE_DOWN;
+			item->activeState = STATE_SKELETON_JUMP_LIE_DOWN;
 			item->animNumber = obj->animIndex;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			//item->status = ITEM_DEACTIVATED;
@@ -200,21 +200,21 @@ namespace TEN::Entities::TR4
 		if (item->hitStatus
 			&& Lara.gunType == WEAPON_SHOTGUN
 			&& info.distance < SQUARE(3584)
-			&& item->currentAnimState != 7
-			&& item->currentAnimState != 17
-			&& item->currentAnimState != STATE_SKELETON_HURT_BY_SHOTGUN1
-			&& item->currentAnimState != STATE_SKELETON_HURT_BY_SHOTGUN2
-			&& item->currentAnimState != 25)
+			&& item->activeState != 7
+			&& item->activeState != 17
+			&& item->activeState != STATE_SKELETON_HURT_BY_SHOTGUN1
+			&& item->activeState != STATE_SKELETON_HURT_BY_SHOTGUN2
+			&& item->activeState != 25)
 		{
 			if (info.angle >= 12288 || info.angle <= -12288)
 			{
-				item->currentAnimState = STATE_SKELETON_HURT_BY_SHOTGUN2;
+				item->activeState = STATE_SKELETON_HURT_BY_SHOTGUN2;
 				item->animNumber = Objects[ID_SKELETON].animIndex + 33;
 				item->pos.yRot += info.angle + -32768;
 			}
 			else
 			{
-				item->currentAnimState = STATE_SKELETON_HURT_BY_SHOTGUN1;
+				item->activeState = STATE_SKELETON_HURT_BY_SHOTGUN1;
 				item->animNumber = Objects[ID_SKELETON].animIndex + 17;
 				item->pos.yRot += info.angle;
 			}
@@ -322,12 +322,12 @@ namespace TEN::Entities::TR4
 
 			}
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case STATE_SKELETON_STOP:
 				if (!(GetRandomControl() & 0xF))
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				break;
 
@@ -344,11 +344,11 @@ namespace TEN::Entities::TR4
 					{
 						if (GetRandomControl() & 1)
 						{
-							item->goalAnimState = 3;
+							item->targetState = 3;
 						}
 						else
 						{
-							item->goalAnimState = 4;
+							item->targetState = 4;
 						}
 					}
 				}
@@ -356,22 +356,22 @@ namespace TEN::Entities::TR4
 				{
 					if (item->aiBits & PATROL1)
 					{
-						item->goalAnimState = 15;
+						item->targetState = 15;
 					}
 					else if (canJump1sector || canJump2sectors)
 					{
 						creature->maximumTurn = 0;
 						item->animNumber = Objects[ID_SKELETON].animIndex + 40;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
+						item->activeState = STATE_SKELETON_JUMP_LEFT;
 						if (!canJump2sectors)
 						{
-							item->goalAnimState = STATE_SKELETON_JUMP_1SECTOR;
+							item->targetState = STATE_SKELETON_JUMP_1SECTOR;
 							creature->LOT.isJumping = true;
 						}
 						else
 						{
-							item->goalAnimState = STATE_SKELETON_JUMP_2SECTORS;
+							item->targetState = STATE_SKELETON_JUMP_2SECTORS;
 							creature->LOT.isJumping = true;
 						}
 					}
@@ -379,15 +379,15 @@ namespace TEN::Entities::TR4
 					{
 						item->animNumber = Objects[ID_SKELETON].animIndex + 34;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_SKELETON_JUMP_LEFT;
-						item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
+						item->targetState = STATE_SKELETON_JUMP_LEFT;
+						item->activeState = STATE_SKELETON_JUMP_LEFT;
 					}
 					else if (jumpRight)
 					{
 						item->animNumber = Objects[ID_SKELETON].animIndex + 37;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_SKELETON_JUMP_RIGHT;
-						item->currentAnimState = STATE_SKELETON_JUMP_RIGHT;
+						item->targetState = STATE_SKELETON_JUMP_RIGHT;
+						item->activeState = STATE_SKELETON_JUMP_RIGHT;
 					}
 					else
 					{
@@ -398,23 +398,23 @@ namespace TEN::Entities::TR4
 								|| item->hitStatus 
 								|| !(item->meshBits & 0x200))
 							{
-								item->goalAnimState = 15;
+								item->targetState = 15;
 								break;
 							}
-							item->goalAnimState = 2;
+							item->targetState = 2;
 						}
 						else if (creature->mood == BORED_MOOD ||
 							item->aiBits & FOLLOW &&
 							(creature->reachedGoal ||
 								laraInfo.distance > SQUARE(2048)))
 						{
-							if (item->requiredAnimState)
+							if (item->requiredState)
 							{
-								item->goalAnimState = item->requiredAnimState;
+								item->targetState = item->requiredState;
 							}
 							else if (!(GetRandomControl() & 0x3F))
 							{
-								item->goalAnimState = 15;
+								item->targetState = 15;
 							}
 						}
 						else if (Lara.target == item
@@ -424,7 +424,7 @@ namespace TEN::Entities::TR4
 							&& (Lara.gunType == WEAPON_SHOTGUN || !(GetRandomControl() & 0xF))
 							&& item->meshBits == -1)
 						{
-							item->goalAnimState = STATE_SKELETON_USE_SHIELD;
+							item->targetState = STATE_SKELETON_USE_SHIELD;
 						}
 						else if (info.bite && info.distance < SQUARE(682))
 						{
@@ -432,34 +432,34 @@ namespace TEN::Entities::TR4
 							{
 								if (GetRandomControl() & 1)
 								{
-									item->goalAnimState = STATE_SKELETON_ATTACK1;
+									item->targetState = STATE_SKELETON_ATTACK1;
 								}
 								else
 								{
-									item->goalAnimState = STATE_SKELETON_ATTACK2;
+									item->targetState = STATE_SKELETON_ATTACK2;
 								}
 							}
 							else
 							{
-								item->goalAnimState = STATE_SKELETON_ATTACK3;
+								item->targetState = STATE_SKELETON_ATTACK3;
 							}
 						}
-						else if (item->hitStatus || item->requiredAnimState)
+						else if (item->hitStatus || item->requiredState)
 						{
 							if (GetRandomControl() & 1)
 							{
-								item->goalAnimState = STATE_SKELETON_AVOID_ATTACK1;
-								item->requiredAnimState = item->goalAnimState;
+								item->targetState = STATE_SKELETON_AVOID_ATTACK1;
+								item->requiredState = item->targetState;
 							}
 							else
 							{
-								item->goalAnimState = STATE_SKELETON_AVOID_ATTACK2;
-								item->requiredAnimState = item->goalAnimState;
+								item->targetState = STATE_SKELETON_AVOID_ATTACK2;
+								item->requiredState = item->targetState;
 							}
 						}
 						else
 						{
-							item->goalAnimState = 15;
+							item->targetState = 15;
 						}
 					}
 				}
@@ -471,30 +471,30 @@ namespace TEN::Entities::TR4
 				creature->maximumTurn = creature->mood != BORED_MOOD ? 1092 : 364;
 				if (item->aiBits & PATROL1)
 				{
-					item->goalAnimState = 15;
+					item->targetState = 15;
 				}
 				else if (item->hitStatus)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 					if (GetRandomControl() & 1)
 					{
-						item->requiredAnimState = 5;
+						item->requiredState = 5;
 					}
 					else
 					{
-						item->requiredAnimState = 6;
+						item->requiredState = 6;
 					}
 				}
 				else
 				{
 					if (jumpLeft || jumpRight)
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 						break;
 					}
 					if (creature->mood == ESCAPE_MOOD)
 					{
-						item->goalAnimState = 16;
+						item->targetState = 16;
 					}
 					else if (creature->mood != BORED_MOOD)
 					{
@@ -502,26 +502,26 @@ namespace TEN::Entities::TR4
 						{
 							if (info.bite && info.distance < SQUARE(1024))
 							{
-								item->goalAnimState = 18;
+								item->targetState = 18;
 							}
 							else if (canJump1sector || canJump2sectors)
 							{
 								creature->maximumTurn = 0;
-								item->goalAnimState = 2;
+								item->targetState = 2;
 							}
 							else if (!info.ahead || info.distance > SQUARE(2048))
 							{
-								item->goalAnimState = 16;
+								item->targetState = 16;
 							}
 						}
 						else
 						{
-							item->goalAnimState = 2;
+							item->targetState = 2;
 						}
 					}
 					else if (!(GetRandomControl() & 0x3F))
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					}
 				}
 				break;
@@ -535,7 +535,7 @@ namespace TEN::Entities::TR4
 					if (item->meshBits & 0x200)
 					{
 						creature->maximumTurn = 0;
-						item->goalAnimState = 2;
+						item->targetState = 2;
 						break;
 					}
 
@@ -545,7 +545,7 @@ namespace TEN::Entities::TR4
 					{
 						creature->maximumTurn = 0;
 						item->animNumber = Objects[ID_SKELETON].animIndex + 44;
-						item->currentAnimState = 23;
+						item->activeState = 23;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						creature->LOT.isJumping = false;
 						item->airborne = true;
@@ -556,22 +556,22 @@ namespace TEN::Entities::TR4
 					if (creature->mood == ESCAPE_MOOD)
 					{
 						if (Lara.target != item && info.ahead && (item->meshBits & 0x200))
-							item->goalAnimState = 2;
+							item->targetState = 2;
 					}
 					else if (item->aiBits & FOLLOW && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					}
 					else if (creature->mood != BORED_MOOD)
 					{
 						if (info.ahead && info.distance < SQUARE(2048))
 						{
-							item->goalAnimState = 15;
+							item->targetState = 15;
 						}
 					}
 					else
 					{
-						item->goalAnimState = 15;
+						item->targetState = 15;
 					}
 				}
 				break;
@@ -607,7 +607,7 @@ namespace TEN::Entities::TR4
 				}
 				if (!(GetRandomControl() & 0x3F) || LaraItem->hitPoints <= 0)
 				{
-					item->goalAnimState = 11;
+					item->targetState = 11;
 				}
 				break;
 
@@ -679,7 +679,7 @@ namespace TEN::Entities::TR4
 					{
 						if (GetRandomControl() & 3)
 						{
-							item->goalAnimState = 17;
+							item->targetState = 17;
 						}
 						else
 						{
@@ -688,12 +688,12 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					}
 				}
 				else if (Lara.target != item || item->meshBits != -1 || Lara.gunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				break;
 
@@ -707,7 +707,7 @@ namespace TEN::Entities::TR4
 						creature->maximumTurn = 0;
 						item->animNumber = Objects[item->objectNumber].animIndex + 44;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = 23;
+						item->activeState = 23;
 						creature->LOT.isJumping = false;
 						item->airborne = true;
 					}
@@ -734,15 +734,15 @@ namespace TEN::Entities::TR4
 			case 11:
 			case STATE_SKELETON_HURT_BY_SHOTGUN1:
 			case STATE_SKELETON_HURT_BY_SHOTGUN2:
-				if ((item->currentAnimState == STATE_SKELETON_HURT_BY_SHOTGUN1 
-					|| item->currentAnimState == STATE_SKELETON_HURT_BY_SHOTGUN2) &&
+				if ((item->activeState == STATE_SKELETON_HURT_BY_SHOTGUN1 
+					|| item->activeState == STATE_SKELETON_HURT_BY_SHOTGUN2) &&
 					item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 20)
 				{
 					item->hitPoints = 25;
 					creature->maximumTurn = 0;
 					break;
 				}
-				if (item->currentAnimState == 11)
+				if (item->activeState == 11)
 				{
 					creature->maximumTurn = 0;
 					break;
@@ -757,7 +757,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!(GetRandomControl() & 0x1F))
 					{
-						item->goalAnimState = 14;
+						item->targetState = 14;
 					}
 				}
 				else
@@ -765,7 +765,7 @@ namespace TEN::Entities::TR4
 					creature->maximumTurn = 0;
 					item->animNumber = Objects[item->objectNumber].animIndex + 47;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->currentAnimState = 24;
+					item->activeState = 24;
 					item->airborne = true;
 				}
 				break;

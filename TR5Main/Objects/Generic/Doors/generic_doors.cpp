@@ -168,7 +168,7 @@ namespace TEN::Entities::Doors
 		if (item->triggerFlags == 2
 			&& item->status == ITEM_NOT_ACTIVE && !item->airborne // CHECK
 			&& ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-				&& l->currentAnimState == LS_IDLE
+				&& l->activeState == LS_IDLE
 				&& l->animNumber == LA_STAND_IDLE
 				&& !l->hitStatus
 				&& Lara.gunStatus == LG_HANDS_FREE
@@ -218,7 +218,7 @@ namespace TEN::Entities::Doors
 
 					item->flags |= IFLAG_ACTIVATION_MASK;
 					item->status = ITEM_ACTIVE;
-					item->goalAnimState = LS_RUN_FORWARD;
+					item->targetState = LS_RUN_FORWARD;
 					Lara.isMoving = 0;
 					Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -306,9 +306,9 @@ namespace TEN::Entities::Doors
 		{
 			if (TriggerActive(item))
 			{
-				if (item->currentAnimState == 0)
+				if (item->activeState == 0)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				else if (!door->opened)
 				{
@@ -323,9 +323,9 @@ namespace TEN::Entities::Doors
 			{
 				item->status = ITEM_ACTIVE;
 
-				if (item->currentAnimState == 1)
+				if (item->activeState == 1)
 				{
-					item->goalAnimState = 0;
+					item->targetState = 0;
 				}
 				else if (door->opened)
 				{

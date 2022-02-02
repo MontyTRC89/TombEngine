@@ -25,11 +25,11 @@ void RatControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 6)
+		if (item->activeState != 6)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 9;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 6;
+			item->activeState = 6;
 		}
 	}
 	else
@@ -45,31 +45,31 @@ void RatControl(short itemNum)
 
 		angle = CreatureTurn(item, ANGLE(6));
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 4:
 			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
-					item->requiredAnimState = 3;
+					item->requiredState = 3;
 				else if (random > 0xA00)
-					item->requiredAnimState = 1;
+					item->requiredState = 1;
 			}
 			else if (info.distance < SQUARE(340))
-				item->requiredAnimState = 5;
+				item->requiredState = 5;
 			else
-				item->requiredAnimState = 1;
+				item->requiredState = 1;
 
-			if (item->requiredAnimState)
-				item->goalAnimState = 2;
+			if (item->requiredState)
+				item->targetState = 2;
 			break;
 
 		case 2:
 			creature->maximumTurn = 0;
 
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			break;
 
 		case 1:
@@ -80,29 +80,29 @@ void RatControl(short itemNum)
 				random = (short)GetRandomControl();
 				if (random < 0x500)
 				{
-					item->requiredAnimState = 3;
-					item->goalAnimState = 2;
+					item->requiredState = 3;
+					item->targetState = 2;
 				}
 				else if (random < 0xA00)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(340))
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 5:
-			if (!item->requiredAnimState && (item->touchBits & 0x7F))
+			if (!item->requiredState && (item->touchBits & 0x7F))
 			{
 				CreatureEffect(item, &ratBite, DoBloodSplat);
 				LaraItem->hitPoints -= 20;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = 2;
+				item->requiredState = 2;
 			}
 			break;
 
 		case 3:
 			if (GetRandomControl() < 0x500)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 		}
 	}

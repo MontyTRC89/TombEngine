@@ -71,11 +71,11 @@ void WolfControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != STATE_DEATH)
+		if (item->activeState != STATE_DEATH)
 		{
 			item->animNumber = Objects[ID_WOLF].animIndex + DIE_ANIM + (short)(GetRandomControl() / 11000);
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = STATE_DEATH;
+			item->activeState = STATE_DEATH;
 		}
 	}
 	else
@@ -90,28 +90,28 @@ void WolfControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_SLEEP:
 			head = 0;
 
 			if (creature->mood == ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
 			{
-				item->requiredAnimState = STATE_CROUCH;
-				item->goalAnimState = STATE_STOP;
+				item->requiredState = STATE_CROUCH;
+				item->targetState = STATE_STOP;
 			}
 			else if (GetRandomControl() < WAKE_CHANCE)
 			{
-				item->requiredAnimState = STATE_WALK;
-				item->goalAnimState = STATE_STOP;
+				item->requiredState = STATE_WALK;
+				item->targetState = STATE_STOP;
 			}
 			break;
 
 		case STATE_STOP:
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else
-				item->goalAnimState = STATE_WALK;
+				item->targetState = STATE_WALK;
 			break;
 
 		case STATE_WALK:
@@ -119,53 +119,53 @@ void WolfControl(short itemNum)
 
 			if (creature->mood != BORED_MOOD)
 			{
-				item->goalAnimState = STATE_STALK;
-				item->requiredAnimState = STATE_EMPTY;
+				item->targetState = STATE_STALK;
+				item->requiredState = STATE_EMPTY;
 			}
 			else if (GetRandomControl() < SLEEP_CHANCE)
 			{
-				item->requiredAnimState = STATE_SLEEP;
-				item->goalAnimState = STATE_STOP;
+				item->requiredState = STATE_SLEEP;
+				item->targetState = STATE_STOP;
 			}
 			break;
 
 		case STATE_CROUCH:
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (creature->mood == ESCAPE_MOOD)
-				item->goalAnimState = STATE_RUN;
+				item->targetState = STATE_RUN;
 			else if (info.distance < SQUARE(345) && info.bite)
-				item->goalAnimState = STATE_BITE;
+				item->targetState = STATE_BITE;
 			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = STATE_STALK;
+				item->targetState = STATE_STALK;
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = STATE_STOP;
+				item->targetState = STATE_STOP;
 			else
-				item->goalAnimState = STATE_RUN;
+				item->targetState = STATE_RUN;
 			break;
 
 		case STATE_STALK:
 			creature->maximumTurn = STALK_TURN;
 
 			if (creature->mood == ESCAPE_MOOD)
-				item->goalAnimState = STATE_RUN;
+				item->targetState = STATE_RUN;
 			else if (info.distance < SQUARE(345) && info.bite)
-				item->goalAnimState = STATE_BITE;
+				item->targetState = STATE_BITE;
 			else if (info.distance > SQUARE(3072))
-				item->goalAnimState = STATE_RUN;
+				item->targetState = STATE_RUN;
 			else if (creature->mood == ATTACK_MOOD)
 			{
 				if (!info.ahead || info.distance > SQUARE(1536) ||
 					(info.enemyFacing < FRONT_ARC && info.enemyFacing > -FRONT_ARC))
-					item->goalAnimState = STATE_RUN;
+					item->targetState = STATE_RUN;
 			}
 			else if (GetRandomControl() < HOWL_CHANCE)
 			{
-				item->requiredAnimState = STATE_HOWL;
-				item->goalAnimState = STATE_CROUCH;
+				item->requiredState = STATE_HOWL;
+				item->targetState = STATE_CROUCH;
 			}
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = STATE_CROUCH;
+				item->targetState = STATE_CROUCH;
 			break;
 
 		case 3:
@@ -177,43 +177,43 @@ void WolfControl(short itemNum)
 				if (info.distance > (ATTACK_RANGE / 2) &&
 					(info.enemyFacing > FRONT_ARC || info.enemyFacing < -FRONT_ARC))
 				{
-					item->requiredAnimState = STATE_STALK;
-					item->goalAnimState = STATE_CROUCH;
+					item->requiredState = STATE_STALK;
+					item->targetState = STATE_CROUCH;
 				}
 				else
 				{
-					item->goalAnimState = STATE_ATTACK;
-					item->requiredAnimState = STATE_EMPTY;
+					item->targetState = STATE_ATTACK;
+					item->requiredState = STATE_EMPTY;
 				}
 			}
 			else if (creature->mood == STALK_MOOD && info.distance < STALK_RANGE)
 			{
-				item->requiredAnimState = STATE_STALK;
-				item->goalAnimState = STATE_CROUCH;
+				item->requiredState = STATE_STALK;
+				item->targetState = STATE_CROUCH;
 			}
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = STATE_CROUCH;
+				item->targetState = STATE_CROUCH;
 			break;
 
 		case STATE_ATTACK:
 			tilt = angle;
-			if (!item->requiredAnimState && (item->touchBits & TOUCH))
+			if (!item->requiredState && (item->touchBits & TOUCH))
 			{
 				CreatureEffect(item, &wolfBite, DoBloodSplat);
 				LaraItem->hitPoints -= LUNGE_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = STATE_RUN;
+				item->requiredState = STATE_RUN;
 			}
-			item->goalAnimState = STATE_RUN;
+			item->targetState = STATE_RUN;
 			break;
 
 		case 12:
-			if (!item->requiredAnimState && (item->touchBits & TOUCH) && info.ahead)
+			if (!item->requiredState && (item->touchBits & TOUCH) && info.ahead)
 			{
 				CreatureEffect(item, &wolfBite, DoBloodSplat);
 				LaraItem->hitPoints -= BITE_DAMAGE;
 				LaraItem->hitStatus = true;
-				item->requiredAnimState = STATE_CROUCH;
+				item->requiredState = STATE_CROUCH;
 			}
 			break;
 		}

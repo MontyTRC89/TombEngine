@@ -73,9 +73,9 @@ takes no arguments.
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
 	@tparam int room room ID item is in
-	@tparam int currentAnimState current animation state
-	@tparam int requiredAnimState required animation state
-	@tparam int goalAnimState goal animation state
+	@tparam int activeState current animation state
+	@tparam int requiredState required animation state
+	@tparam int targetState goal animation state
 	@tparam int animNumber anim number
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
@@ -93,9 +93,9 @@ takes no arguments.
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
 		0, -- room
-		0, -- currentAnimState
-		0, -- requiredAnimState
-		0, -- goalAnimState
+		0, -- activeState
+		0, -- requiredState
+		0, -- targetState
 		0, -- animNumber
 		0, -- frameNumber
 		0, -- HP
@@ -121,9 +121,9 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
-	short currentAnimState,
-	short requiredAnimState,
-	short goalAnimState,
+	short activeState,
+	short requiredState,
+	short targetState,
 	short animNumber,
 	short frameNumber,
 	short hp,
@@ -146,9 +146,9 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	InitialiseItem(num);
 
 	ptr->SetName(name);
-	ptr->SetCurrentAnimState(currentAnimState);
-	ptr->SetRequiredAnimState(requiredAnimState);
-	ptr->SetGoalAnimState(goalAnimState);
+	ptr->SetCurrentAnimState(activeState);
+	ptr->SetRequiredAnimState(requiredState);
+	ptr->SetGoalAnimState(targetState);
 	ptr->SetAnimNumber(animNumber);
 	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
@@ -191,17 +191,17 @@ void GameScriptItemInfo::Register(sol::state* state)
 
 The state number of the animation the object is currently doing.
 This corresponds to "state" number shown in the animation editor of WadTool.
-@mem currentAnimState
+@mem activeState
 */
-		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
+		"activeState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
 
 /// (int) State of required animation
-// @mem requiredAnimState
-		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
+// @mem requiredState
+		"requiredState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
 
 /// (int) State of goal animation
-// @mem goalAnimState
-		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
+// @mem targetState
+		"targetState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
 
 /*** (int) animation number
 
@@ -412,32 +412,32 @@ void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> cons
 
 short GameScriptItemInfo::GetCurrentAnimState() const
 {
-	return m_item->currentAnimState;
+	return m_item->activeState;
 }
 
 void GameScriptItemInfo::SetCurrentAnimState(short animState)
 {
-	m_item->currentAnimState = animState;
+	m_item->activeState = animState;
 }
 
 short GameScriptItemInfo::GetRequiredAnimState() const
 {
-	return m_item->requiredAnimState;
+	return m_item->requiredState;
 }
 
 void GameScriptItemInfo::SetRequiredAnimState(short animState)
 {
-	m_item->requiredAnimState = animState;
+	m_item->requiredState = animState;
 }
 
 short GameScriptItemInfo::GetGoalAnimState() const
 {
-	return m_item->goalAnimState;
+	return m_item->targetState;
 }
 
 void GameScriptItemInfo::SetGoalAnimState(short state)
 {
-	m_item->goalAnimState = state;
+	m_item->targetState = state;
 }
 
 short GameScriptItemInfo::GetAnimNumber() const

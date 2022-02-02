@@ -22,8 +22,8 @@ void InitialiseLion(short itemNum)
 
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->targetState = 1;
+	item->activeState = 1;
 }
 
 void LionControl(short itemNum)
@@ -42,10 +42,10 @@ void LionControl(short itemNum)
 		if (item->hitPoints <= 0)
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != 5)
+			if (item->activeState != 5)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + (GetRandomControl() & 1) + 7;
-				item->currentAnimState = 5;
+				item->activeState = 5;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
@@ -63,35 +63,35 @@ void LionControl(short itemNum)
 			angle = CreatureTurn(item, creature->maximumTurn);
 			joint0 = -16 * angle;
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case 1:
 				creature->maximumTurn = 0;
-				if (item->requiredAnimState)
+				if (item->requiredState)
 				{
-					item->goalAnimState = item->requiredAnimState;
+					item->targetState = item->requiredState;
 					break;
 				}
 				if (!creature->mood)
 				{
 					if (!(GetRandomControl() & 0x3F))
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					break;
 				}
 				if (info.ahead)
 				{
 					if (item->touchBits & 0x200048)
 					{
-						item->goalAnimState = 7;
+						item->targetState = 7;
 						break;
 					}
 					if (info.distance < SQUARE(1024))
 					{
-						item->goalAnimState = 4;
+						item->targetState = 4;
 						break;
 					}
 				}
-				item->goalAnimState = 3;
+				item->targetState = 3;
 				break;
 
 			case 2:
@@ -100,12 +100,12 @@ void LionControl(short itemNum)
 				{
 					if (GetRandomControl() < 128)
 					{
-						item->requiredAnimState = 6;
-						item->goalAnimState = 1;
+						item->requiredState = 6;
+						item->targetState = 1;
 					}
 				}
 				else
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				break;
 
 			case 3:
@@ -115,44 +115,44 @@ void LionControl(short itemNum)
 				{
 					if (info.ahead && info.distance < SQUARE(1024))
 					{
-						item->goalAnimState = 1;
+						item->targetState = 1;
 					}
 					else if (item->touchBits & 0x200048 && info.ahead)
 					{
-						item->goalAnimState = 1;
+						item->targetState = 1;
 					}
 					else if (creature->mood != ESCAPE_MOOD)
 					{
 						if (GetRandomControl() < 128)
 						{
-							item->requiredAnimState = 6;
-							item->goalAnimState = 1;
+							item->requiredState = 6;
+							item->targetState = 1;
 						}
 					}
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				break;
 
 			case 4:
-				if (!item->requiredAnimState && item->touchBits & 0x200048)
+				if (!item->requiredState && item->touchBits & 0x200048)
 				{
 					LaraItem->hitPoints -= 200;
 					LaraItem->hitStatus = true;
 					CreatureEffect2(item, &LionBite1, 10, item->pos.yRot, DoBloodSplat);
-					item->requiredAnimState = 1;
+					item->requiredState = 1;
 				}
 				break;
 			case 7:
 				creature->maximumTurn = ANGLE(1);
-				if (!item->requiredAnimState && item->touchBits & 0x200048)
+				if (!item->requiredState && item->touchBits & 0x200048)
 				{
 					CreatureEffect2(item, &LionBite2, 10, item->pos.yRot, DoBloodSplat);
 					LaraItem->hitPoints -= 60;
 					LaraItem->hitStatus = true;
-					item->requiredAnimState = 1;
+					item->requiredState = 1;
 				}
 				break;
 			}

@@ -119,9 +119,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos = vaultResult.Height + CLICK(1);
 			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
-			item->currentAnimState = LS_GRABBING;
+			item->activeState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->goalAnimState = LS_CROUCH_IDLE;
+			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
 		}
@@ -132,9 +132,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos = vaultResult.Height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
-			item->currentAnimState = LS_GRABBING;
+			item->activeState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
 		}
@@ -146,8 +146,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.yPos = vaultResult.Height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->currentAnimState = LS_GRABBING;
-			item->goalAnimState = LS_CROUCH_IDLE;
+			item->activeState = LS_GRABBING;
+			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
 		}
@@ -158,9 +158,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->pos.yPos = vaultResult.Height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
-			item->currentAnimState = LS_GRABBING;
+			item->activeState = LS_GRABBING;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
 		}
@@ -172,8 +172,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.yPos = vaultResult.Height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->currentAnimState = LS_GRABBING;
-			item->goalAnimState = LS_CROUCH_IDLE;
+			item->activeState = LS_GRABBING;
+			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
 		}
@@ -185,8 +185,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (vaultResult.Height - item->pos.yPos));
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->goalAnimState = LS_JUMP_UP;
-			item->currentAnimState = LS_IDLE;
+			item->targetState = LS_JUMP_UP;
+			item->activeState = LS_IDLE;
 			AnimateLara(item);
 			success = true;
 		}
@@ -206,8 +206,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.Height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
-		item->goalAnimState = LS_JUMP_UP;
-		item->currentAnimState = LS_IDLE;
+		item->targetState = LS_JUMP_UP;
+		item->activeState = LS_IDLE;
 		info->gunStatus = LG_HANDS_BUSY;
 		info->turnRate = 0;
 
@@ -223,8 +223,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
-		item->goalAnimState = LS_LADDER_IDLE;
-		item->currentAnimState = LS_IDLE;
+		item->targetState = LS_LADDER_IDLE;
+		item->activeState = LS_IDLE;
 		info->gunStatus = LG_HANDS_BUSY;
 		info->turnRate = 0;
 
@@ -241,8 +241,8 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->animNumber = LA_STAND_IDLE;
 		item->frameNumber = GetFrameNumber(item, 0);
-		item->goalAnimState = LS_JUMP_UP;
-		item->currentAnimState = LS_MONKEY_VAULT;
+		item->targetState = LS_JUMP_UP;
+		item->activeState = LS_MONKEY_VAULT;
 		return true;
 	}
 
@@ -254,9 +254,9 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Temporary. coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
-	auto radius = (item->currentAnimState == LS_CROUCH_IDLE ||
-		item->currentAnimState == LS_CROUCH_TURN_LEFT ||
-		item->currentAnimState == LS_CROUCH_TURN_RIGHT)
+	auto radius = (item->activeState == LS_CROUCH_IDLE ||
+		item->activeState == LS_CROUCH_TURN_LEFT ||
+		item->activeState == LS_CROUCH_TURN_RIGHT)
 		? LARA_RAD : LARA_RAD_CRAWL;
 
 	auto y = item->pos.yPos;
@@ -484,7 +484,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				if (item->animNumber == LA_REACH_TO_HANG && item->frameNumber == GetFrameNumber(item, 21) &&
 					TestLaraClimbStance(item, coll))
 				{
-					item->goalAnimState = LS_LADDER_IDLE;
+					item->targetState = LS_LADDER_IDLE;
 				}
 			}
 		}
@@ -550,8 +550,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				item->pos.yPos = coll->Setup.OldPosition.y;
 				item->pos.zPos = coll->Setup.OldPosition.z;
 
-				if (item->currentAnimState == LS_SHIMMY_LEFT || 
-					item->currentAnimState == LS_SHIMMY_RIGHT)
+				if (item->activeState == LS_SHIMMY_LEFT || 
+					item->activeState == LS_SHIMMY_RIGHT)
 				{
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
@@ -1126,7 +1126,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK);
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 	}
 
 	item->pos.yPos += coll->Middle.Floor + CLICK(2.75f) - 9;
@@ -1213,7 +1213,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->pos.yPos += frontFloor - 5;
-	item->currentAnimState = LS_ONWATER_EXIT;
+	item->activeState = LS_ONWATER_EXIT;
 	item->airborne = false;
 	item->speed = 0;
 	item->fallspeed = 0;
@@ -1277,7 +1277,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	}
 
 	SetAnimation(item, LA_ONWATER_IDLE);
-	item->goalAnimState = LS_LADDER_IDLE;
+	item->targetState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
 	item->pos.yRot = rot;
@@ -1313,7 +1313,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 	else if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
 		item->speed = 0;

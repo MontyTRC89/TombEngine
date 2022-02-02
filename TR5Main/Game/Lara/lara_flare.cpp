@@ -120,7 +120,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 	laraInfo->flareControlLeft = true;
 
-	if (laraItem->goalAnimState == LS_IDLE &&
+	if (laraItem->targetState == LS_IDLE &&
 		laraInfo->Vehicle == NO_ITEM)
 	{
 		if (laraItem->animNumber == LA_STAND_IDLE)
@@ -224,8 +224,8 @@ void DrawFlare(ITEM_INFO* laraItem)
 {
 	LaraInfo*& laraInfo = laraItem->data;
 
-	if (laraItem->currentAnimState == LS_PICKUP_FLARE ||
-		laraItem->currentAnimState == LS_PICKUP)
+	if (laraItem->activeState == LS_PICKUP_FLARE ||
+		laraItem->activeState == LS_PICKUP)
 	{
 		DoFlareInHand(laraItem, laraInfo->flareAge);
 		laraInfo->flareControlLeft = false;

@@ -42,7 +42,7 @@ void InitialiseMPStick(short itemNumber)
 
 	item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = item->goalAnimState = BATON_STOP;
+	item->activeState = item->targetState = BATON_STOP;
 }
 
 void MPStickControl(short itemNumber)
@@ -76,11 +76,11 @@ void MPStickControl(short itemNumber)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != BATON_DEATH)
+		if (item->activeState != BATON_DEATH)
 		{
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = BATON_DEATH;
+			item->activeState = BATON_DEATH;
 			creature->LOT.step = 256;
 		}
 	}
@@ -153,12 +153,12 @@ void MPStickControl(short itemNumber)
 		}
 		creature->enemy = enemy;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case BATON_WAIT:
-			if (creature->alerted || item->goalAnimState == BATON_RUN)
+			if (creature->alerted || item->targetState == BATON_RUN)
 			{
-				item->goalAnimState = BATON_STOP;
+				item->targetState = BATON_STOP;
 				break;
 			}
 
@@ -172,41 +172,41 @@ void MPStickControl(short itemNumber)
 				head = AIGuard(creature);
 				if (!(GetRandomControl() & 0xFF))
 				{
-					if (item->currentAnimState == BATON_STOP)
-						item->goalAnimState = BATON_WAIT;
+					if (item->activeState == BATON_STOP)
+						item->targetState = BATON_WAIT;
 					else
-						item->goalAnimState = BATON_STOP;
+						item->targetState = BATON_STOP;
 				}
 				break;
 			}
 
 			else if (item->aiBits & PATROL1)
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 
 			else if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead && !item->hitStatus)
-					item->goalAnimState = BATON_STOP;
+					item->targetState = BATON_STOP;
 				else
-					item->goalAnimState = BATON_RUN;
+					item->targetState = BATON_RUN;
 			}
 			else if (creature->mood == BORED_MOOD || ((item->aiBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
 			{
-				if (item->requiredAnimState)
-					item->goalAnimState = item->requiredAnimState;
+				if (item->requiredState)
+					item->targetState = item->requiredState;
 				else if (info.ahead)
-					item->goalAnimState = BATON_STOP;
+					item->targetState = BATON_STOP;
 				else
-					item->goalAnimState = BATON_RUN;
+					item->targetState = BATON_RUN;
 			}
 			else if (info.bite && info.distance < SQUARE(512))
-				item->goalAnimState = BATON_AIM0;
+				item->targetState = BATON_AIM0;
 			else if (info.bite && info.distance < SQUARE(1024))
-				item->goalAnimState = BATON_AIM1;
+				item->targetState = BATON_AIM1;
 			else if (info.bite && info.distance < SQUARE(1024))
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 			else
-				item->goalAnimState = BATON_RUN;
+				item->targetState = BATON_RUN;
 			break;
 		case BATON_WALK:
 			head = laraInfo.angle;
@@ -216,27 +216,27 @@ void MPStickControl(short itemNumber)
 
 			if (item->aiBits & PATROL1)
 			{
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 				head = 0;
 			}
 			else if (creature->mood == ESCAPE_MOOD)
-				item->goalAnimState = BATON_RUN;
+				item->targetState = BATON_RUN;
 			else if (creature->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100)
 				{
-					item->requiredAnimState = BATON_WAIT;
-					item->goalAnimState = BATON_STOP;
+					item->requiredState = BATON_WAIT;
+					item->targetState = BATON_STOP;
 				}
 			}
 			else if (info.bite && info.distance < SQUARE(1536) && info.xAngle < 0)
-				item->goalAnimState = BATON_KICK;
+				item->targetState = BATON_KICK;
 			else if (info.bite && info.distance < SQUARE(512))
-				item->goalAnimState = BATON_STOP;
+				item->targetState = BATON_STOP;
 			else if (info.bite && info.distance < SQUARE(1280))
-				item->goalAnimState = BATON_AIM2;
+				item->targetState = BATON_AIM2;
 			else
-				item->goalAnimState = BATON_RUN;
+				item->targetState = BATON_RUN;
 			break;
 
 		case BATON_RUN:
@@ -247,19 +247,19 @@ void MPStickControl(short itemNumber)
 			tilt = angle / 2;
 
 			if (item->aiBits & GUARD)
-				item->goalAnimState = BATON_WAIT;
+				item->targetState = BATON_WAIT;
 			else if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
-					item->goalAnimState = BATON_STOP;
+					item->targetState = BATON_STOP;
 				break;
 			}
 			else if ((item->aiBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
-				item->goalAnimState = BATON_STOP;
+				item->targetState = BATON_STOP;
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 			else if (info.ahead && info.distance < SQUARE(1024))
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 			break;
 
 		case BATON_AIM0:
@@ -272,9 +272,9 @@ void MPStickControl(short itemNumber)
 
 			creature->flags = 0;
 			if (info.bite && info.distance < SQUARE(512))
-				item->goalAnimState = BATON_PUNCH0;
+				item->targetState = BATON_PUNCH0;
 			else
-				item->goalAnimState = BATON_STOP;
+				item->targetState = BATON_STOP;
 			break;
 
 		case BATON_AIM1:
@@ -287,9 +287,9 @@ void MPStickControl(short itemNumber)
 
 			creature->flags = 0;
 			if (info.ahead && info.distance < SQUARE(1024))
-				item->goalAnimState = BATON_PUNCH1;
+				item->targetState = BATON_PUNCH1;
 			else
-				item->goalAnimState = BATON_STOP;
+				item->targetState = BATON_STOP;
 			break;
 
 		case BATON_AIM2:
@@ -302,9 +302,9 @@ void MPStickControl(short itemNumber)
 
 			creature->flags = 0;
 			if (info.bite && info.distance < SQUARE(1280))
-				item->goalAnimState = BATON_PUNCH2;
+				item->targetState = BATON_PUNCH2;
 			else
-				item->goalAnimState = BATON_WALK;
+				item->targetState = BATON_WALK;
 			break;
 
 		case BATON_PUNCH0:
@@ -386,7 +386,7 @@ void MPStickControl(short itemNumber)
 
 
 			if (info.ahead && info.distance > SQUARE(1024) && info.distance < SQUARE(1280))
-				item->goalAnimState = BATON_PUNCH2;
+				item->targetState = BATON_PUNCH2;
 			break;
 
 		case BATON_PUNCH2:
@@ -471,7 +471,7 @@ void MPStickControl(short itemNumber)
 	CreatureJoint(item, 1, torsoX);
 	CreatureJoint(item, 2, head);
 
-	if (item->currentAnimState < BATON_DEATH)
+	if (item->activeState < BATON_DEATH)
 	{
 		switch (CreatureVault(itemNumber, angle, 2, 260))
 		{
@@ -479,27 +479,27 @@ void MPStickControl(short itemNumber)
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = BATON_CLIMB1;
+			item->activeState = BATON_CLIMB1;
 			break;
 
 		case 3:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = BATON_CLIMB2;
+			item->activeState = BATON_CLIMB2;
 			break;
 
 		case 4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = BATON_CLIMB3;
+			item->activeState = BATON_CLIMB3;
 			break;
 		case -4:
 			creature->maximumTurn = 0;
 			item->animNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = BATON_FALL3;
+			item->activeState = BATON_FALL3;
 			break;
 		}
 	}

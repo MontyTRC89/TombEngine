@@ -44,7 +44,7 @@ namespace TEN::Entities::Switches
 
 		if ((TrInput & IN_ACTION)
 			&& Lara.gunStatus == LG_HANDS_FREE
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& l->airborne == false
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
@@ -66,7 +66,7 @@ namespace TEN::Entities::Switches
 				else if (MoveLaraPosition(&PulleyPos, item, l))
 				{
 					l->animNumber = LA_PULLEY_GRAB;
-					l->currentAnimState = LS_PULLEY;
+					l->activeState = LS_PULLEY;
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 
 					AddActiveItem(itemNum);
@@ -98,7 +98,7 @@ namespace TEN::Entities::Switches
 				item->pos.yRot = oldYrot;
 			}
 		}
-		else if (l->currentAnimState != LS_PULLEY)
+		else if (l->activeState != LS_PULLEY)
 		{
 			ObjectCollision(itemNum, l, coll);
 		}

@@ -164,7 +164,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (!TestCollision(item, laraitem))
 		return;
 
-	if (item->currentAnimState == DRAGON_DEATH)
+	if (item->activeState == DRAGON_DEATH)
 	{
 		rx = laraitem->pos.xPos - item->pos.xPos;
 		rz = laraitem->pos.zPos - item->pos.zPos;
@@ -189,8 +189,8 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			{
 				laraitem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
-				laraitem->currentAnimState = 0;
-				laraitem->goalAnimState = 7;
+				laraitem->activeState = 0;
+				laraitem->targetState = 7;
 
 				laraitem->pos.xPos = item->pos.xPos;
 				laraitem->pos.yPos = item->pos.yPos;
@@ -256,11 +256,11 @@ void DragonControl(short backNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != DRAGON_DEATH)
+		if (item->activeState != DRAGON_DEATH)
 		{
 			item->animNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = item->goalAnimState = DRAGON_DEATH;
+			item->activeState = item->targetState = DRAGON_DEATH;
 			dragon->flags = 0;
 		}
 		else if (dragon->flags >= 0)
@@ -268,7 +268,7 @@ void DragonControl(short backNum)
 			createBartoliLight(itemNum, 1);
 			dragon->flags++;
 			if (dragon->flags == DRAGON_LIVE_TIME)
-				item->goalAnimState = DRAGON_STOP;
+				item->targetState = DRAGON_STOP;
 			if (dragon->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 				item->hitPoints = Objects[ID_DRAGON_FRONT].hitPoints / 2;
 		}
@@ -316,7 +316,7 @@ void DragonControl(short backNum)
 			LaraItem->hitPoints -= DRAGON_TOUCH_DAMAGE;
 		}
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case DRAGON_STOP:
 			item->pos.yRot -= angle;
@@ -324,22 +324,22 @@ void DragonControl(short backNum)
 			if (!ahead)
 			{
 				if (info.distance > DRAGON_STOP_RANGE || !info.ahead)
-					item->goalAnimState = DRAGON_WALK;
+					item->targetState = DRAGON_WALK;
 				else if (info.ahead && info.distance < DRAGON_CLOSE_RANGE && !dragon->flags)
 				{
 					dragon->flags = 1;
 					if (info.angle < 0)
-						item->goalAnimState = DRAGON_SWIPELEFT;
+						item->targetState = DRAGON_SWIPELEFT;
 					else
-						item->goalAnimState = DRAGON_SWIPERIGHT;
+						item->targetState = DRAGON_SWIPERIGHT;
 				}
 				else if (info.angle < 0)
-					item->goalAnimState = DRAGON_TURNLEFT;
+					item->targetState = DRAGON_TURNLEFT;
 				else
-					item->goalAnimState = DRAGON_TURNRIGHT;
+					item->targetState = DRAGON_TURNRIGHT;
 			}
 			else
-				item->goalAnimState = DRAGON_AIM1;
+				item->targetState = DRAGON_AIM1;
 			break;
 
 		case DRAGON_SWIPELEFT:
@@ -364,31 +364,31 @@ void DragonControl(short backNum)
 			dragon->flags = 0;
 
 			if (ahead)
-				item->goalAnimState = DRAGON_STOP;
+				item->targetState = DRAGON_STOP;
 			else if (angle < -DRAGON_NEED_TURN)
 			{
 				if (info.distance < DRAGON_STOP_RANGE && info.ahead)
-					item->goalAnimState = DRAGON_STOP;
+					item->targetState = DRAGON_STOP;
 				else
-					item->goalAnimState = DRAGON_LEFT;
+					item->targetState = DRAGON_LEFT;
 			}
 			else if (angle > DRAGON_NEED_TURN)
 			{
 				if (info.distance < DRAGON_STOP_RANGE && info.ahead)
-					item->goalAnimState = DRAGON_STOP;
+					item->targetState = DRAGON_STOP;
 				else
-					item->goalAnimState = DRAGON_RIGHT;
+					item->targetState = DRAGON_RIGHT;
 			}
 			break;
 
 		case DRAGON_LEFT:
 			if (angle > -DRAGON_NEED_TURN || ahead)
-				item->goalAnimState = DRAGON_WALK;
+				item->targetState = DRAGON_WALK;
 			break;
 
 		case DRAGON_RIGHT:
 			if (angle < DRAGON_NEED_TURN || ahead)
-				item->goalAnimState = DRAGON_WALK;
+				item->targetState = DRAGON_WALK;
 			break;
 
 		case DRAGON_TURNLEFT:
@@ -409,12 +409,12 @@ void DragonControl(short backNum)
 			if (ahead)
 			{
 				dragon->flags = 30;
-				item->goalAnimState = DRAGON_FIRE1;
+				item->targetState = DRAGON_FIRE1;
 			}
 			else
 			{
 				dragon->flags = 0;
-				item->goalAnimState = DRAGON_AIM1;
+				item->targetState = DRAGON_AIM1;
 			}
 			break;
 
@@ -432,7 +432,7 @@ void DragonControl(short backNum)
 				dragon->flags--;
 			}
 			else
-				item->goalAnimState = DRAGON_STOP;
+				item->targetState = DRAGON_STOP;
 			break;
 		}
 	}
@@ -440,7 +440,7 @@ void DragonControl(short backNum)
 	CreatureJoint(item, 0, head);
 	CreatureAnimation(itemNum, angle, 0);
 
-	back->currentAnimState = item->currentAnimState;
+	back->activeState = item->activeState;
 	back->animNumber = Objects[ID_DRAGON_BACK].animIndex + (item->animNumber - Objects[ID_DRAGON_FRONT].animIndex);
 	back->frameNumber = g_Level.Anims[back->animNumber].frameBase + (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
 	back->pos.xPos = item->pos.xPos;

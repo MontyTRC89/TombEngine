@@ -32,13 +32,13 @@ namespace TEN::Entities::Switches
 		{
 			if (item->objectNumber == ID_JUMP_SWITCH)
 			{
-				item->goalAnimState = SWITCH_OFF;
+				item->targetState = SWITCH_OFF;
 				item->timer = 0;
 				AnimateItem(item);
 			}
 			else
 			{
-				item->goalAnimState = SWITCH_ON;
+				item->targetState = SWITCH_ON;
 				item->timer = 0;
 			}
 		}
@@ -50,7 +50,7 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& !Lara.gunStatus
 			&& item->status == ITEM_NOT_ACTIVE
@@ -60,9 +60,9 @@ namespace TEN::Entities::Switches
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-			if (item->triggerFlags == 3 && item->currentAnimState == SWITCH_ON
+			if (item->triggerFlags == 3 && item->activeState == SWITCH_ON
 				|| item->triggerFlags >= 5 && item->triggerFlags <= 7 
-					&& item->currentAnimState == SWITCH_OFF)
+					&& item->activeState == SWITCH_OFF)
 				return;
 
 			SwitchBounds.boundingBox.X1 = bounds->X1 - 256;
@@ -93,20 +93,20 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&SwitchPos, item, l))
 				{
-					if (item->currentAnimState == SWITCH_ON) /* Switch down */
+					if (item->activeState == SWITCH_ON) /* Switch down */
 					{
 						if (item->triggerFlags)
 						{
 							l->animNumber = LA_HOLESWITCH_ACTIVATE;
-							l->currentAnimState = LS_HOLE;
+							l->activeState = LS_HOLE;
 						}
 						else
 						{
-							l->currentAnimState = LS_SWITCH_UP;
+							l->activeState = LS_SWITCH_UP;
 							l->animNumber = LA_WALLSWITCH_DOWN;
 						}
 						
-						item->goalAnimState = SWITCH_OFF;
+						item->targetState = SWITCH_OFF;
 					}
 					else /* Switch up */
 					{
@@ -119,16 +119,16 @@ namespace TEN::Entities::Switches
 							else
 							{
 								l->animNumber = LA_HOLESWITCH_ACTIVATE;
-								l->currentAnimState = LS_HOLE;
+								l->activeState = LS_HOLE;
 							}
 						}
 						else
 						{
-							l->currentAnimState = LS_SWITCH_DOWN;
+							l->activeState = LS_SWITCH_DOWN;
 							l->animNumber = LA_WALLSWITCH_UP;
 						}
 
-						item->goalAnimState = SWITCH_ON;
+						item->targetState = SWITCH_ON;
 					}
 
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
@@ -157,7 +157,7 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (l->currentAnimState != LS_SWITCH_DOWN && l->currentAnimState != LS_SWITCH_UP)
+		if (l->activeState != LS_SWITCH_DOWN && l->activeState != LS_SWITCH_UP)
 			ObjectCollision(itemNum, l, coll);
 	}
 }

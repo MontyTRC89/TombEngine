@@ -32,10 +32,10 @@ namespace TEN::Entities::Doors
 		{
 			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == item->triggerFlags)
 			{
-				if (item->currentAnimState == 1)
-					item->goalAnimState = 1;
+				if (item->activeState == 1)
+					item->targetState = 1;
 				else
-					item->goalAnimState = 0;
+					item->targetState = 0;
 
 				TestTriggers(item, true);
 			}
@@ -43,9 +43,9 @@ namespace TEN::Entities::Doors
 			CurrentSequence = 4;
 		}
 
-		if (item->currentAnimState == item->goalAnimState)
+		if (item->activeState == item->targetState)
 		{
-			if (item->currentAnimState == 1)
+			if (item->activeState == 1)
 			{
 				if (!door->opened)
 				{

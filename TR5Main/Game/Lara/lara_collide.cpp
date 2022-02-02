@@ -28,7 +28,7 @@ bool LaraDeflectEdge(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 		item->speed = 0;
 		item->airborne = false;
 
@@ -168,7 +168,7 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 		item->speed = 0;
 		item->airborne = false;
 
@@ -220,40 +220,40 @@ void LaraCollideStop(ITEM_INFO* item, COLL_INFO* coll)
 	case LS_TURN_LEFT_SLOW:
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
-		item->currentAnimState = coll->Setup.OldAnimState;
+		item->activeState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
 
 		if (TrInput & IN_LEFT)
 		{
 			// Prevent turn lock against walls.
-			if (item->currentAnimState == LS_TURN_RIGHT_SLOW ||
-				item->currentAnimState == LS_TURN_RIGHT_FAST)
+			if (item->activeState == LS_TURN_RIGHT_SLOW ||
+				item->activeState == LS_TURN_RIGHT_FAST)
 			{
-				item->goalAnimState = LS_IDLE;
+				item->targetState = LS_IDLE;
 			}
 			else
-				item->goalAnimState = LS_TURN_LEFT_SLOW;
+				item->targetState = LS_TURN_LEFT_SLOW;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			if (item->currentAnimState == LS_TURN_LEFT_SLOW ||
-				item->currentAnimState == LS_TURN_LEFT_FAST)
+			if (item->activeState == LS_TURN_LEFT_SLOW ||
+				item->activeState == LS_TURN_LEFT_FAST)
 			{
-				item->goalAnimState = LS_IDLE;
+				item->targetState = LS_IDLE;
 			}
 			else
-				item->goalAnimState = LS_TURN_RIGHT_SLOW;
+				item->targetState = LS_TURN_RIGHT_SLOW;
 		}
 		else
-			item->goalAnimState = LS_IDLE;
+			item->targetState = LS_IDLE;
 
 		AnimateLara(item);
 
 		break;
 
 	default:
-		item->goalAnimState = LS_IDLE;
+		item->targetState = LS_IDLE;
 
 		if (item->animNumber != LA_STAND_SOLID)
 			SetAnimation(item, LA_STAND_SOLID);
@@ -269,23 +269,23 @@ void LaraCollideStopCrawl(ITEM_INFO* item, COLL_INFO* coll)
 	case LS_CRAWL_IDLE:
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
-		item->currentAnimState = coll->Setup.OldAnimState;
+		item->activeState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
 
 		if (TrInput & IN_LEFT)
-			item->goalAnimState = LS_CRAWL_TURN_LEFT;
+			item->targetState = LS_CRAWL_TURN_LEFT;
 		else if (TrInput & IN_RIGHT)
-			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
+			item->targetState = LS_CRAWL_TURN_RIGHT;
 		else
-			item->goalAnimState = LS_CRAWL_IDLE;
+			item->targetState = LS_CRAWL_IDLE;
 
 		AnimateLara(item);
 		break;
 
 	default:
-		item->currentAnimState = LS_CRAWL_IDLE;
-		item->goalAnimState = LS_CRAWL_IDLE;
+		item->activeState = LS_CRAWL_IDLE;
+		item->targetState = LS_CRAWL_IDLE;
 
 		if (item->animNumber != LA_CRAWL_IDLE)
 		{
@@ -304,23 +304,23 @@ void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll)
 	case LS_MONKEY_IDLE:
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
-		item->currentAnimState = coll->Setup.OldAnimState;
+		item->activeState = coll->Setup.OldAnimState;
 		item->animNumber = coll->Setup.OldAnimNumber;
 		item->frameNumber = coll->Setup.OldFrameNumber;
 
 		if (TrInput & IN_LEFT)
-			item->goalAnimState = LS_MONKEY_TURN_LEFT;
+			item->targetState = LS_MONKEY_TURN_LEFT;
 		else if (TrInput & IN_RIGHT)
-			item->goalAnimState = LS_MONKEY_TURN_RIGHT;
+			item->targetState = LS_MONKEY_TURN_RIGHT;
 		else
-			item->goalAnimState = LS_MONKEY_IDLE;
+			item->targetState = LS_MONKEY_IDLE;
 
 		AnimateLara(item);
 		break;
 
 	default:
-		item->currentAnimState = LS_MONKEY_IDLE;
-		item->goalAnimState = LS_MONKEY_IDLE;
+		item->activeState = LS_MONKEY_IDLE;
+		item->targetState = LS_MONKEY_IDLE;
 
 		if (item->animNumber != LA_MONKEY_IDLE)
 		{
@@ -334,7 +334,7 @@ void LaraCollideStopMonkey(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
-	if (item->currentAnimState == LS_SHIMMY_RIGHT)
+	if (item->activeState == LS_SHIMMY_RIGHT)
 	{
 		switch (angle)
 		{
@@ -354,7 +354,7 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, COLL_INFO* coll, short angle)
 		}
 	}
 
-	if (item->currentAnimState == LS_SHIMMY_LEFT)
+	if (item->activeState == LS_SHIMMY_LEFT)
 	{
 		switch (angle)
 		{

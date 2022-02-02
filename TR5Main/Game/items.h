@@ -46,9 +46,9 @@ struct ITEM_INFO
 	uint32_t touchBits;
 	uint32_t meshBits;
 	GAME_OBJECT_ID objectNumber;
-	short currentAnimState;
-	short goalAnimState;
-	short requiredAnimState;
+	short activeState;
+	short targetState;
+	short requiredState;
 	short animNumber;
 	short frameNumber;
 	std::vector<BONE_MUTATOR> mutator;

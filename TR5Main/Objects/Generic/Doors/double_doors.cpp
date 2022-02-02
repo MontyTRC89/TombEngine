@@ -37,7 +37,7 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_IDLE
+			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
 			&& !(item->status && item->airborne)
 			&& !(l->hitStatus)

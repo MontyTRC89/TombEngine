@@ -34,14 +34,14 @@ void InitialiseScorpion(short itemNumber)
 
 	if (item->triggerFlags == 1)
 	{
-		item->goalAnimState = STATE_SCORPION_TROOPS_ATTACK;
-		item->currentAnimState = STATE_SCORPION_TROOPS_ATTACK;
+		item->targetState = STATE_SCORPION_TROOPS_ATTACK;
+		item->activeState = STATE_SCORPION_TROOPS_ATTACK;
 		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
 	}
 	else
 	{
-		item->goalAnimState = STATE_SCORPION_STOP;
-		item->currentAnimState = STATE_SCORPION_STOP;
+		item->targetState = STATE_SCORPION_STOP;
+		item->activeState = STATE_SCORPION_STOP;
 		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
@@ -104,14 +104,14 @@ void ScorpionControl(short itemNumber)
 	if (item->hitPoints <= 0)
 	{
 		item->hitPoints = 0;
-		if (item->currentAnimState != STATE_SCORPION_DEATH)
+		if (item->activeState != STATE_SCORPION_DEATH)
 		{
 			if (item->triggerFlags > 0 && item->triggerFlags < 7)
 			{
 				CutSeqNum = 4;
 
 				item->animNumber = Objects[item->animNumber].animIndex + 5;
-				item->currentAnimState = STATE_SCORPION_DEATH;
+				item->activeState = STATE_SCORPION_DEATH;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->status = ITEM_INVISIBLE;
 				creature->maximumTurn = 0;
@@ -133,10 +133,10 @@ void ScorpionControl(short itemNumber)
 					}
 				}
 			}
-			else if (item->currentAnimState != STATE_SCORPION_DEATH && item->currentAnimState != STATE_SCORPION_SPECIAL_DEATH)
+			else if (item->activeState != STATE_SCORPION_DEATH && item->activeState != STATE_SCORPION_SPECIAL_DEATH)
 			{
 				item->animNumber = Objects[item->objectNumber].animIndex + 5;
-				item->currentAnimState = STATE_SCORPION_DEATH;
+				item->activeState = STATE_SCORPION_DEATH;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
@@ -145,7 +145,7 @@ void ScorpionControl(short itemNumber)
 			item->frameNumber = g_Level.Anims[item->animNumber].frameEnd - 1;
 			item->status = ITEM_INVISIBLE;
 		}
-		else if (item->currentAnimState == STATE_SCORPION_DEATH)
+		else if (item->activeState == STATE_SCORPION_DEATH)
 		{
 			if (item->status == ITEM_INVISIBLE)
 			{
@@ -160,7 +160,7 @@ void ScorpionControl(short itemNumber)
 		else
 		{
 			if (creature->hurtByLara 
-				&& item->currentAnimState != STATE_SCORPION_TROOPS_ATTACK)
+				&& item->activeState != STATE_SCORPION_TROOPS_ATTACK)
 			{
 				creature->enemy = LaraItem;
 			}
@@ -209,7 +209,7 @@ void ScorpionControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case STATE_SCORPION_STOP:
 			creature->maximumTurn = 0;
@@ -217,7 +217,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance > SQUARE(1365))
 			{
-				item->goalAnimState = STATE_SCORPION_WALK;
+				item->targetState = STATE_SCORPION_WALK;
 				break;
 			}
 
@@ -229,16 +229,16 @@ void ScorpionControl(short itemNumber)
 					&& creature->enemy->hitPoints <= 15
 					&& creature->enemy->objectNumber == ID_TROOPS)
 				{
-					item->goalAnimState = STATE_SCORPION_ATTACK1;
+					item->targetState = STATE_SCORPION_ATTACK1;
 				}
 				else
 				{
-					item->goalAnimState = STATE_SCORPION_ATTACK2;
+					item->targetState = STATE_SCORPION_ATTACK2;
 				}
 			}
 			else if (!info.ahead)
 			{
-				item->goalAnimState = STATE_SCORPION_WALK;
+				item->targetState = STATE_SCORPION_WALK;
 			}
 
 			break;
@@ -248,11 +248,11 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance < SQUARE(1365))
 			{
-				item->goalAnimState = STATE_SCORPION_STOP;
+				item->targetState = STATE_SCORPION_STOP;
 			}
 			else if (info.distance > SQUARE(853))
 			{
-				item->goalAnimState = STATE_SCORPION_RUN;
+				item->targetState = STATE_SCORPION_RUN;
 			}
 
 			break;
@@ -262,7 +262,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance < SQUARE(1365))
 			{
-				item->goalAnimState = STATE_SCORPION_STOP;
+				item->targetState = STATE_SCORPION_STOP;
 			}
 
 			break;
@@ -299,7 +299,7 @@ void ScorpionControl(short itemNumber)
 				creature->enemy->hitPoints -= 15;
 				if (creature->enemy->hitPoints <= 0)
 				{
-					item->goalAnimState = STATE_SCORPION_SPECIAL_DEATH;
+					item->targetState = STATE_SCORPION_SPECIAL_DEATH;
 					creature->maximumTurn = 0;
 				}
 
@@ -318,7 +318,7 @@ void ScorpionControl(short itemNumber)
 				LaraItem->hitPoints -= 120;
 				LaraItem->hitStatus = true;
 
-				if (item->currentAnimState == 5)
+				if (item->activeState == 5)
 				{
 					Lara.poisoned += 2048;
 
@@ -360,7 +360,7 @@ void ScorpionControl(short itemNumber)
 				&& creature->enemy->hitPoints <= 0 
 				|| item->triggerFlags > 6)
 			{
-				item->goalAnimState = STATE_SCORPION_SPECIAL_DEATH;
+				item->targetState = STATE_SCORPION_SPECIAL_DEATH;
 				creature->enemy->hitPoints = 0;
 			}
 

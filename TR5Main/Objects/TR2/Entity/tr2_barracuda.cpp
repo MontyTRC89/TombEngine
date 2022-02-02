@@ -23,11 +23,11 @@ void BarracudaControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 6)
+		if (item->activeState != 6)
 		{
 			item->animNumber = Objects[ID_BARRACUDA].animIndex + 6;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 6;
+			item->activeState = 6;
 		}
 
 		CreatureFloat(itemNum);
@@ -43,19 +43,19 @@ void BarracudaControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->flags = 0;
 
 			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (info.ahead && info.distance < 680)
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 2:
@@ -64,9 +64,9 @@ void BarracudaControl(short itemNum)
 			if (creature->mood == BORED_MOOD)
 				break;
 			else if (info.ahead && (item->touchBits & 0xE0))
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->mood != STALK_MOOD)
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 3:
@@ -74,13 +74,13 @@ void BarracudaControl(short itemNum)
 			creature->flags = 0;
 
 			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (info.ahead && info.distance < 340)
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			else if (info.ahead && info.distance < 680)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 4:

@@ -83,11 +83,11 @@ void ScubaControl(short itemNumber)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
+		if (item->activeState != 9)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 16;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 9;
+			item->activeState = 9;
 		}
 
 		CreatureFloat(itemNumber);
@@ -146,7 +146,7 @@ void ScubaControl(short itemNumber)
 		angle = CreatureTurn(item, creature->maximumTurn);
 		waterHeight = GetWaterSurface(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber) + WALL_SIZE / 2;
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->maximumTurn = ANGLE(3);
@@ -154,11 +154,11 @@ void ScubaControl(short itemNumber)
 				neck = -info.angle;
 
 			if (creature->target.y < waterHeight && item->pos.yPos < waterHeight + creature->LOT.fly)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (shoot)
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			break;
 
 		case 4:
@@ -168,9 +168,9 @@ void ScubaControl(short itemNumber)
 				neck = -info.angle;
 
 			if (!shoot || creature->mood == ESCAPE_MOOD || (creature->target.y < waterHeight && item->pos.yPos < waterHeight + creature->LOT.fly))
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 3:
@@ -192,11 +192,11 @@ void ScubaControl(short itemNumber)
 				head = info.angle;
 
 			if (creature->target.y > waterHeight)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (shoot)
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			break;
 
 		case 6:
@@ -206,9 +206,9 @@ void ScubaControl(short itemNumber)
 				head = info.angle;
 
 			if (!shoot || creature->mood == ESCAPE_MOOD || creature->target.y > waterHeight)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else
-				item->goalAnimState = 7;
+				item->targetState = 7;
 			break;
 
 		case 7:
@@ -229,7 +229,7 @@ void ScubaControl(short itemNumber)
 	CreatureJoint(item, 1, neck);
 	CreatureAnimation(itemNumber, angle, 0);
 
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case 1:
 	case 4:

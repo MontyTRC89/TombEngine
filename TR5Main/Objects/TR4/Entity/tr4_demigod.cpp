@@ -319,9 +319,9 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->animNumber = Objects[item->objectNumber].animIndex;
-		item->goalAnimState = STATE_DEMIGOD_STOP;
+		item->targetState = STATE_DEMIGOD_STOP;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = STATE_DEMIGOD_STOP;
+		item->activeState = STATE_DEMIGOD_STOP;
 
 		/*if (g_Level.NumItems > 0)
 		{
@@ -365,20 +365,20 @@ namespace TEN::Entities::TR4
 		if (item->hitPoints <= 0)
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != STATE_DEMIGOD_DEATH1 
-				&& item->currentAnimState != STATE_DEMIGOD_DEATH2)
+			if (item->activeState != STATE_DEMIGOD_DEATH1 
+				&& item->activeState != STATE_DEMIGOD_DEATH2)
 			{
-				if (item->currentAnimState == STATE_DEMIGOD_WALK 
-					|| item->currentAnimState == STATE_DEMIGOD_RUN)
+				if (item->activeState == STATE_DEMIGOD_WALK 
+					|| item->activeState == STATE_DEMIGOD_RUN)
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + 27;
-					item->currentAnimState = STATE_DEMIGOD_DEATH2;
+					item->activeState = STATE_DEMIGOD_DEATH2;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				}
 				else
 				{
 					item->animNumber = Objects[item->objectNumber].animIndex + 12;
-					item->currentAnimState = STATE_DEMIGOD_DEATH1;
+					item->activeState = STATE_DEMIGOD_DEATH1;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				}
 			}
@@ -444,7 +444,7 @@ namespace TEN::Entities::TR4
 				joint3 = info.angle >> 1;
 			}
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case STATE_DEMIGOD_STOP:
 				creature->maximumTurn = 0;
@@ -456,15 +456,15 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance >= SQUARE(3072))
 					{
-						item->goalAnimState = STATE_DEMIGOD_WALK;
+						item->targetState = STATE_DEMIGOD_WALK;
 						break;
 					}
 					if (info.bite
-						|| LaraItem->currentAnimState >= LS_LADDER_IDLE
-						&& LaraItem->currentAnimState <= LS_LADDER_DOWN
+						|| LaraItem->activeState >= LS_LADDER_IDLE
+						&& LaraItem->activeState <= LS_LADDER_DOWN
 						&& !Lara.location)
 					{
-						item->goalAnimState = STATE_DEMIGOD_HAMMER_AIM;
+						item->targetState = STATE_DEMIGOD_HAMMER_AIM;
 						break;
 					}
 				}
@@ -474,9 +474,9 @@ namespace TEN::Entities::TR4
 					{
 						creature->flags = 1;
 						if (item->objectNumber == ID_DEMIGOD2)
-							item->goalAnimState = STATE_DEMIGOD_AIM;
+							item->targetState = STATE_DEMIGOD_AIM;
 						else
-							item->goalAnimState = STATE_DEMIGOD_GROUND_AIM;
+							item->targetState = STATE_DEMIGOD_GROUND_AIM;
 						break;
 					}
 
@@ -484,12 +484,12 @@ namespace TEN::Entities::TR4
 					{
 						if (info.distance <= SQUARE(2048) || info.distance >= SQUARE(5120))
 						{
-							item->goalAnimState = STATE_DEMIGOD_WALK;
+							item->targetState = STATE_DEMIGOD_WALK;
 							break;
 						}
 						if (!(GetRandomControl() & 3))
 						{
-							item->goalAnimState = STATE_DEMIGOD_CIRCLE_AIM;
+							item->targetState = STATE_DEMIGOD_CIRCLE_AIM;
 							break;
 						}
 					}
@@ -497,11 +497,11 @@ namespace TEN::Entities::TR4
 
 				if (info.distance <= SQUARE(3072) || item->objectNumber != ID_DEMIGOD2)
 				{
-					item->goalAnimState = STATE_DEMIGOD_WALK;
+					item->targetState = STATE_DEMIGOD_WALK;
 					break;
 				}
 
-				item->goalAnimState = STATE_DEMIGOD_FLY;
+				item->targetState = STATE_DEMIGOD_FLY;
 
 				break;
 
@@ -510,7 +510,7 @@ namespace TEN::Entities::TR4
 
 				if (info.distance < SQUARE(2048))
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 					break;
 				}
 
@@ -518,7 +518,7 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(3072))
 					{
-						item->goalAnimState = STATE_DEMIGOD_STOP;
+						item->targetState = STATE_DEMIGOD_STOP;
 						break;
 					}
 				}
@@ -526,7 +526,7 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &info))
 					{
-						item->goalAnimState = STATE_DEMIGOD_STOP;
+						item->targetState = STATE_DEMIGOD_STOP;
 						break;
 					}
 
@@ -536,11 +536,11 @@ namespace TEN::Entities::TR4
 				{
 					if (item->objectNumber == ID_DEMIGOD2)
 					{
-						item->goalAnimState = STATE_DEMIGOD_FLY;
+						item->targetState = STATE_DEMIGOD_FLY;
 					}
 					else
 					{
-						item->goalAnimState = STATE_DEMIGOD_RUN;
+						item->targetState = STATE_DEMIGOD_RUN;
 					}
 				}
 
@@ -551,14 +551,14 @@ namespace TEN::Entities::TR4
 
 				if (info.distance < SQUARE(2048))
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 					break;
 				}
 				if (item->objectNumber == ID_DEMIGOD1)
 				{
 					if (info.distance < SQUARE(3072))
 					{
-						item->goalAnimState = STATE_DEMIGOD_STOP;
+						item->targetState = STATE_DEMIGOD_STOP;
 						break;
 					}
 				}
@@ -566,13 +566,13 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &info) || item->objectNumber == ID_DEMIGOD3 && info.distance > SQUARE(2048))
 					{
-						item->goalAnimState = STATE_DEMIGOD_STOP;
+						item->targetState = STATE_DEMIGOD_STOP;
 						break;
 					}
 
 					if (info.distance < SQUARE(3072))
 					{
-						item->goalAnimState = STATE_DEMIGOD_WALK;
+						item->targetState = STATE_DEMIGOD_WALK;
 					}
 				}
 
@@ -598,12 +598,12 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &info) || creature->flags)
 				{
-					item->goalAnimState = STATE_DEMIGOD_ATTACK;
+					item->targetState = STATE_DEMIGOD_ATTACK;
 					creature->flags = 0;
 				}
 				else
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 					creature->flags = 0;
 				}
 
@@ -619,7 +619,7 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP_FLY;
+					item->targetState = STATE_DEMIGOD_STOP_FLY;
 				}
 
 				break;
@@ -628,7 +628,7 @@ namespace TEN::Entities::TR4
 				creature->maximumTurn = ANGLE(7);
 				if (!Targetable(item, &info) && info.distance < SQUARE(5120))
 				{
-					item->goalAnimState = STATE_DEMIGOD_CIRCLE_ATTACK;
+					item->targetState = STATE_DEMIGOD_CIRCLE_ATTACK;
 				}
 
 				break;
@@ -640,7 +640,7 @@ namespace TEN::Entities::TR4
 
 				if (!Targetable(item, &info) || info.distance < SQUARE(5120) || !GetRandomControl())
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 					break;
 				}
 
@@ -669,12 +669,12 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &info) || creature->flags)
 				{
-					item->goalAnimState = STATE_DEMIGOD_GROUND_ATTACK;
+					item->targetState = STATE_DEMIGOD_GROUND_ATTACK;
 					creature->flags = 0;
 				}
 				else
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 					creature->flags = 0;
 				}
 
@@ -694,15 +694,15 @@ namespace TEN::Entities::TR4
 
 				if (info.distance >= SQUARE(3072)
 					|| !info.bite
-					&& (LaraItem->currentAnimState < LS_LADDER_IDLE
-						|| LaraItem->currentAnimState > LS_LADDER_DOWN 
+					&& (LaraItem->activeState < LS_LADDER_IDLE
+						|| LaraItem->activeState > LS_LADDER_DOWN 
 						|| Lara.location))
 				{
-					item->goalAnimState = STATE_DEMIGOD_STOP;
+					item->targetState = STATE_DEMIGOD_STOP;
 				}
 				else
 				{
-					item->goalAnimState = STATE_DEMIGOD_HAMMER_ATTACK;
+					item->targetState = STATE_DEMIGOD_HAMMER_ATTACK;
 				}
 
 				break;
@@ -735,14 +735,14 @@ namespace TEN::Entities::TR4
 
 					Camera.bounce = -128;
 
-					if (LaraItem->currentAnimState >= 56 && LaraItem->currentAnimState <= 61 && !Lara.location)
+					if (LaraItem->activeState >= 56 && LaraItem->activeState <= 61 && !Lara.location)
 					{
 						Lara.torsoXrot = 0; 
 						Lara.torsoYrot = 0;
 						Lara.headXrot = 0;
 						Lara.headYrot = 0;
-						LaraItem->goalAnimState = 3;
-						LaraItem->currentAnimState = 3;
+						LaraItem->targetState = 3;
+						LaraItem->activeState = 3;
 						LaraItem->animNumber = 34;
 						LaraItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						LaraItem->hitStatus = true;

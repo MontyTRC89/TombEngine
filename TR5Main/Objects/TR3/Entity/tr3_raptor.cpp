@@ -29,14 +29,14 @@ void RaptorControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 5)
+		if (item->activeState != 5)
 		{
 			if (GetRandomControl() > 0x4000)
 				item->animNumber = Objects[item->objectNumber].animIndex + 9;
 			else
 				item->animNumber = Objects[item->objectNumber].animIndex + 10;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 5;
+			item->activeState = 5;
 		}
 	}
 	else
@@ -97,29 +97,29 @@ void RaptorControl(short itemNum)
 		angle = CreatureTurn(item, creature->maximumTurn);
 		neck = -(angle * 6);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->maximumTurn = 0;
 			creature->flags &= ~1;
 
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
+			if (item->requiredState)
+				item->targetState = item->requiredState;
 			else if (creature->flags & 2)
 			{
 				creature->flags &= ~2;
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			}
 			else if ((item->touchBits & 0xFF7C00) || (info.distance < SQUARE(585) && info.bite))
-				item->goalAnimState = 8;
+				item->targetState = 8;
 			else if (info.bite && info.distance < SQUARE(1536))
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead && !item->hitStatus)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			else
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			break;
 
 		case 2:
@@ -127,11 +127,11 @@ void RaptorControl(short itemNum)
 			creature->flags &= ~1;
 
 			if (creature->mood != BORED_MOOD)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (info.ahead && GetRandomControl() < 0x80)
 			{
-				item->requiredAnimState = 6;
-				item->goalAnimState = 1;
+				item->requiredState = 6;
+				item->targetState = 1;
 				creature->flags &= ~2;
 			}
 			break;
@@ -142,30 +142,30 @@ void RaptorControl(short itemNum)
 			creature->flags &= ~1;
 
 			if (item->touchBits & 0xFF7C00)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->flags & 2)
 			{
-				item->requiredAnimState = 6;
-				item->goalAnimState = 1;
+				item->requiredState = 6;
+				item->targetState = 1;
 				creature->flags &= ~2;
 			}
 			else if (info.bite && info.distance < SQUARE(1536))
 			{
-				if (item->goalAnimState == 3)
+				if (item->targetState == 3)
 				{
 					if (GetRandomControl() < 0x2000)
-						item->goalAnimState = 1;
+						item->targetState = 1;
 					else
-						item->goalAnimState = 7;
+						item->targetState = 7;
 				}
 			}
 			else if (info.ahead && creature->mood != ESCAPE_MOOD && GetRandomControl() < 0x80)
 			{
-				item->requiredAnimState = 6;
-				item->goalAnimState = 1;
+				item->requiredState = 6;
+				item->targetState = 1;
 			}
 			else if (creature->mood == BORED_MOOD || (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead))
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 4:
@@ -181,7 +181,7 @@ void RaptorControl(short itemNum)
 						creature->flags |= 2;
 					LaraItem->hitPoints -= 100;
 					LaraItem->hitStatus = 1;
-					item->requiredAnimState = 1;
+					item->requiredState = 1;
 				}
 			}
 			else
@@ -219,7 +219,7 @@ void RaptorControl(short itemNum)
 					LaraItem->hitPoints -= 100;
 					LaraItem->hitStatus = 1;
 
-					item->requiredAnimState = 1;
+					item->requiredState = 1;
 				}
 			}
 			else
@@ -257,7 +257,7 @@ void RaptorControl(short itemNum)
 					LaraItem->hitStatus = 1;
 					if (LaraItem->hitPoints <= 0)
 						creature->flags |= 2;
-					item->requiredAnimState = 3;
+					item->requiredState = 3;
 				}
 			}
 			else

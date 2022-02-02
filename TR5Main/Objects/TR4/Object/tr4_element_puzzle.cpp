@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
                 || !(TrInput & IN_ACTION)
                 || item->triggerFlags != 1 
                 || item->itemFlags[0] != 1
-                || l->currentAnimState != LS_IDLE
+                || l->activeState != LS_IDLE
                 || l->animNumber != LA_STAND_IDLE
                 || !Lara.litTorch
                 || l->airborne)
@@ -281,7 +281,7 @@ namespace TEN::Entities::TR4
                 {
                     l->animNumber = (abs(item->pos.yPos - l->pos.yPos) >> 8) + LA_TORCH_LIGHT_3;
                     l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                    l->currentAnimState = LS_MISC_CONTROL;
+                    l->activeState = LS_MISC_CONTROL;
                     Lara.flareControlLeft = false;
                     Lara.leftArm.lock = 3;
                     item->itemFlags[0] = 2;

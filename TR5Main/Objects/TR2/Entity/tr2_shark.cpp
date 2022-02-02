@@ -24,11 +24,11 @@ void SharkControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 5)
+		if (item->activeState != 5)
 		{
 			item->animNumber = Objects[ID_SHARK].animIndex + 4;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 5;
+			item->activeState = 5;
 		}
 		CreatureFloat(itemNum);
 		return;
@@ -43,16 +43,16 @@ void SharkControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 0:
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 
 			if (info.ahead && info.distance < SQUARE(768) && info.zoneNumber == info.enemyZone)
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			break;
 
 		case 1:
@@ -60,9 +60,9 @@ void SharkControl(short itemNum)
 			if (creature->mood == BORED_MOOD)
 				break;
 			else if (info.ahead && info.distance < SQUARE(768))
-				item->goalAnimState = 0;
+				item->targetState = 0;
 			else if (creature->mood == ESCAPE_MOOD || info.distance > SQUARE(3072) || !info.ahead)
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 2:
@@ -70,15 +70,15 @@ void SharkControl(short itemNum)
 			creature->maximumTurn = ANGLE(2);
 
 			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (info.ahead && info.distance < SQUARE(1365) && info.zoneNumber == info.enemyZone)
 			{
 				if (GetRandomControl() < 0x800)
-					item->goalAnimState = 0;
+					item->targetState = 0;
 				else if (info.distance < SQUARE(768))
-					item->goalAnimState = 4;
+					item->targetState = 4;
 			}
 			break;
 
@@ -99,7 +99,7 @@ void SharkControl(short itemNum)
 		}
 	}
 
-	if (item->currentAnimState != 6)
+	if (item->activeState != 6)
 	{
 		CreatureJoint(item, 0, head);
 		CreatureAnimation(itemNum, angle, 0);

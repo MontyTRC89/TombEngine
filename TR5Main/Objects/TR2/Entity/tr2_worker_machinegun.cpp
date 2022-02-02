@@ -23,7 +23,7 @@ void InitialiseWorkerMachineGun(short itemNum)
 
 	anim = &g_Level.Anims[item->animNumber];
 	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->activeState = anim->activeState;
 }
 
 void WorkerMachineGunControl(short itemNum)
@@ -42,11 +42,11 @@ void WorkerMachineGunControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 7)
+		if (item->activeState != 7)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 19;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 7;
+			item->activeState = 7;
 		}
 	}
 	else
@@ -56,7 +56,7 @@ void WorkerMachineGunControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, machinegun->maximumTurn);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			machinegun->flags = 0;
@@ -70,25 +70,25 @@ void WorkerMachineGunControl(short itemNum)
 
 			if (machinegun->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = (GetRandomControl() < 0x4000) ? 8 : 10;
+					item->targetState = (GetRandomControl() < 0x4000) ? 8 : 10;
 				else
-					item->goalAnimState = 2;
+					item->targetState = 2;
 			}
 			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance <= 0x400000)
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				else
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			break;
 
@@ -103,23 +103,23 @@ void WorkerMachineGunControl(short itemNum)
 
 			if (machinegun->mood == ESCAPE_MOOD)
 			{
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				else
-					item->goalAnimState = 6;
+					item->targetState = 6;
 			}
 			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance > 0x400000)
-					item->goalAnimState = 3;
+					item->targetState = 3;
 			}
 			else
 			{
-				item->goalAnimState = 4;
+				item->targetState = 4;
 			}
 			break;
 
@@ -136,11 +136,11 @@ void WorkerMachineGunControl(short itemNum)
 			{
 				if (Targetable(item, &info))
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				else if (machinegun->mood == BORED_MOOD || machinegun->mood == STALK_MOOD)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 			}
 			break;
@@ -154,17 +154,17 @@ void WorkerMachineGunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 5;
+				item->targetState = 5;
 			}
 			else
 			{
 				if (machinegun->mood == ATTACK_MOOD)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				else if (!info.ahead)
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 			}
 			break;
@@ -181,11 +181,11 @@ void WorkerMachineGunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = (item->currentAnimState == 8) ? 5 : 11;
+				item->targetState = (item->activeState == 8) ? 5 : 11;
 			}
 			else
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 
@@ -200,11 +200,11 @@ void WorkerMachineGunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->goalAnimState = 6;
+				item->targetState = 6;
 			}
 			else
 			{
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			}
 			break;
 
@@ -227,9 +227,9 @@ void WorkerMachineGunControl(short itemNum)
 				machinegun->flags = 5;
 			}
 
-			if (item->goalAnimState != 1 && (machinegun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->targetState != 1 && (machinegun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
 			{
-				item->goalAnimState = 1;
+				item->targetState = 1;
 			}
 			break;
 

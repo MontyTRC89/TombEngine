@@ -17,7 +17,7 @@ void InitialiseCobra(short itemNum)
 	ClearItem(itemNum);
 	item->animNumber = Objects[item->objectNumber].animIndex + 2;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 45;
-	item->currentAnimState = item->goalAnimState = 3;
+	item->activeState = item->targetState = 3;
 	item->itemFlags[2] = item->hitStatus;
 }
 
@@ -34,11 +34,11 @@ void CobraControl(short itemNum)
 
 	if (item->hitPoints <= 0)
 	{
-		if (item->currentAnimState != 4)
+		if (item->activeState != 4)
 		{
 			item->animNumber = Objects[item->objectNumber].animIndex + 4;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 4;
+			item->activeState = 4;
 		}
 	}
 	else
@@ -65,14 +65,14 @@ void CobraControl(short itemNum)
 		else
 			item->pos.yRot += ANGLE(10);
 
-		switch (item->currentAnimState)
+		switch (item->activeState)
 		{
 		case 1:
 			creature->flags = 0;
 			if (info.distance > SQUARE(2560))
-				item->goalAnimState = 3;
+				item->targetState = 3;
 			else if ((LaraItem->hitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->hitStatus || (LaraItem->speed > 15)))
-				item->goalAnimState = 2;
+				item->targetState = 2;
 			break;
 
 		case 3:
@@ -84,7 +84,7 @@ void CobraControl(short itemNum)
 			}
 			if (info.distance < SQUARE(1536) && LaraItem->hitPoints > 0)
 			{
-				item->goalAnimState = 0;
+				item->targetState = 0;
 				item->hitPoints = item->itemFlags[2];
 			}
 			break;

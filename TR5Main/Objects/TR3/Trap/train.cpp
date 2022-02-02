@@ -121,8 +121,8 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 
 	larA->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
 	larA->frameNumber = g_Level.Anims[larA->animNumber].frameBase;
-//	larA->currentAnimState = EXTRA_TRAINKILL;
-//	larA->goalAnimState = EXTRA_TRAINKILL;
+//	larA->activeState = EXTRA_TRAINKILL;
+//	larA->targetState = EXTRA_TRAINKILL;
 	larA->hitPoints = 0;
 
 	larA->pos.yRot = train->pos.yRot;

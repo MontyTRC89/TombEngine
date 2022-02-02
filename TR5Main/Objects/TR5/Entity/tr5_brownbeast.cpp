@@ -21,8 +21,8 @@ void InitialiseBrownBeast(short itemNum)
     ClearItem(itemNum);
     item->animNumber = Objects[item->objectNumber].animIndex;
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+    item->targetState = 1;
+    item->activeState = 1;
 }
 
 void ControlBrowsBeast(short itemNumber)
@@ -37,10 +37,10 @@ void ControlBrowsBeast(short itemNumber)
 		if (item->hitPoints <= 0)
 		{
 			item->hitPoints = 0;
-			if (item->currentAnimState != 7)
+			if (item->activeState != 7)
 			{
 				item->animNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
-				item->currentAnimState = 7;
+				item->activeState = 7;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
@@ -77,7 +77,7 @@ void ControlBrowsBeast(short itemNumber)
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 			creature->maximumTurn = ANGLE(7);
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case 1:
 				creature->flags = 0;
@@ -86,29 +86,29 @@ void ControlBrowsBeast(short itemNumber)
 					if (distance <= SQUARE(1024))
 					{
 						if (GetRandomControl() & 1)
-							item->goalAnimState = 4;
+							item->targetState = 4;
 						else
-							item->goalAnimState = 6;
+							item->targetState = 6;
 					}
 					else if (GetRandomControl() & 1)
 					{
-						item->goalAnimState = 2;
+						item->targetState = 2;
 					}
 					else
 					{
-						item->goalAnimState = 3;
+						item->targetState = 3;
 					}
 				}
 				else
 				{
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				}
 				break;
 
 			case 2:
 			case 3:
 				if (distance < SQUARE(1024) || creature->mood != ATTACK_MOOD)
-					item->goalAnimState = 1;
+					item->targetState = 1;
 				SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->pos, 0);
 				break;
 

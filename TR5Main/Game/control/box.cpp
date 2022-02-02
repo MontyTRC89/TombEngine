@@ -228,12 +228,12 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 {
 	item->animNumber = Objects[item->objectNumber].animIndex + killAnim;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->currentAnimState = killState;
+	item->activeState = killState;
 
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-	LaraItem->currentAnimState = 0;
-	LaraItem->goalAnimState = laraKillState;
+	LaraItem->activeState = 0;
+	LaraItem->targetState = laraKillState;
 
 	LaraItem->pos.xPos = item->pos.xPos;
 	LaraItem->pos.yPos = item->pos.yPos;

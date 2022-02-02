@@ -37,7 +37,7 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_UNDERWATER_STOP
+			&& l->activeState == LS_UNDERWATER_STOP
 			&& !(item->status && item->airborne)
 			&& Lara.waterStatus == LW_UNDERWATER
 			&& !Lara.gunStatus
@@ -55,7 +55,7 @@ namespace TEN::Entities::Doors
 
 					AddActiveItem(itemNum);
 
-					item->goalAnimState = LS_RUN_FORWARD;
+					item->targetState = LS_RUN_FORWARD;
 
 					AnimateItem(item);
 

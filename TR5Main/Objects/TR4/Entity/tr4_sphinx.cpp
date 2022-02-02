@@ -33,8 +33,8 @@ void InitialiseSphinx(short itemNumber)
 
 	item->animNumber = Objects[item->objectNumber].animIndex + 1;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = SPHINX_SLEEPING;
-	item->currentAnimState = SPHINX_SLEEPING;
+	item->targetState = SPHINX_SLEEPING;
+	item->activeState = SPHINX_SLEEPING;
 }
 
 void SphinxControl(short itemNumber)
@@ -54,7 +54,7 @@ void SphinxControl(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, y, z);
 
-	if (item->currentAnimState == 5 && floor->Stopper)
+	if (item->activeState == 5 && floor->Stopper)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
@@ -107,19 +107,19 @@ void SphinxControl(short itemNumber)
 	int dx = abs(item->itemFlags[2] - (short)item->pos.xPos);
 	int dz = abs(item->itemFlags[3] - (short)item->pos.zPos);
 
-	switch (item->currentAnimState)
+	switch (item->activeState)
 	{
 	case SPHINX_SLEEPING:
 		creature->maximumTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->triggerFlags)
 		{
-			item->goalAnimState = SPHINX_WAKING_UP;
+			item->targetState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->goalAnimState = SPHINX_ALERTED;
+			item->targetState = SPHINX_ALERTED;
 		}
 
 		break;
@@ -129,12 +129,12 @@ void SphinxControl(short itemNumber)
 
 		if (info.distance < SQUARE(1024) || item->triggerFlags)
 		{
-			item->goalAnimState = SPHINX_WAKING_UP;
+			item->targetState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->goalAnimState = SPHINX_SLEEPING;
+			item->targetState = SPHINX_SLEEPING;
 		}
 
 		break;
@@ -142,16 +142,16 @@ void SphinxControl(short itemNumber)
 	case SPHINX_WALK:
 		creature->maximumTurn = ANGLE(3);
 
-		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredAnimState == SPHINX_RUN)
+		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredState == SPHINX_RUN)
 		{
-			item->goalAnimState = SPHINX_RUN;
+			item->targetState = SPHINX_RUN;
 		}
-		else if (info.distance < SQUARE(2048) && item->goalAnimState != SPHINX_RUN)
+		else if (info.distance < SQUARE(2048) && item->targetState != SPHINX_RUN)
 		{
 			if (height2 <= item->pos.yPos + 256 && height2 >= item->pos.yPos - 256)
 			{
-				item->goalAnimState = SPHINX_STOP;
-				item->requiredAnimState = SPHINX_WALK_BACK;
+				item->targetState = SPHINX_STOP;
+				item->requiredState = SPHINX_WALK_BACK;
 			}
 		}
 
@@ -180,13 +180,13 @@ void SphinxControl(short itemNumber)
 		{
 			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
 			{
-				item->goalAnimState = SPHINX_STOP;
+				item->targetState = SPHINX_STOP;
 			}
 		}
 		else
 		{
-			item->goalAnimState = SPHINX_HIT;
-			item->requiredAnimState = SPHINX_WALK_BACK;
+			item->targetState = SPHINX_HIT;
+			item->requiredState = SPHINX_WALK_BACK;
 			creature->maximumTurn = 0;
 		}
 
@@ -196,8 +196,8 @@ void SphinxControl(short itemNumber)
 		creature->maximumTurn = ANGLE(3);
 		if (info.distance > SQUARE(2048) || height2 > item->pos.yPos + 256 || height2 < item->pos.yPos - 256)
 		{
-			item->goalAnimState = SPHINX_STOP;
-			item->requiredAnimState = SPHINX_RUN;
+			item->targetState = SPHINX_STOP;
+			item->requiredState = SPHINX_RUN;
 		}
 
 		break;
@@ -225,13 +225,13 @@ void SphinxControl(short itemNumber)
 	case SPHINX_STOP:
 		creature->flags = 0;
 
-		if (item->requiredAnimState == SPHINX_WALK_BACK)
+		if (item->requiredState == SPHINX_WALK_BACK)
 		{
-			item->goalAnimState = SPHINX_WALK_BACK;
+			item->targetState = SPHINX_WALK_BACK;
 		}
 		else
 		{
-			item->goalAnimState = SPHINX_WALK;
+			item->targetState = SPHINX_WALK;
 		}
 
 		break;

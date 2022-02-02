@@ -18,13 +18,13 @@ void InitialiseDoberman(short itemNum)
     item = &g_Level.Items[itemNum];
     if (item->triggerFlags)
     {
-        item->currentAnimState = 5;
+        item->activeState = 5;
         item->animNumber = Objects[item->objectNumber].animIndex + 6;
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
     }
     else
     {
-        item->currentAnimState = 6;
+        item->activeState = 6;
         item->animNumber = Objects[item->objectNumber].animIndex + 10;
     }
     item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
@@ -56,32 +56,32 @@ void DobermanControl(short itemNumber)
 		
 			int random;
 
-			switch (item->currentAnimState)
+			switch (item->activeState)
 			{
 			case 1:
 				creature->maximumTurn = ANGLE(3);
 				if (creature->mood)
 				{
-					item->goalAnimState = 2;
+					item->targetState = 2;
 				}
 				else
 				{
 					random = GetRandomControl();
 					if (random < 768)
 					{
-						item->requiredAnimState = 4;
-						item->goalAnimState = 3;
+						item->requiredState = 4;
+						item->targetState = 3;
 						break;
 					}
 					if (random < 1536)
 					{
-						item->requiredAnimState = 5;
-						item->goalAnimState = 3;
+						item->requiredState = 5;
+						item->targetState = 3;
 						break;
 					}
 					if (random < 2816)
 					{
-						item->goalAnimState = 3;
+						item->targetState = 3;
 						break;
 					}
 				}
@@ -92,11 +92,11 @@ void DobermanControl(short itemNumber)
 				creature->maximumTurn = ANGLE(6);
 				if (!creature->mood)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 					break;
 				}
 				if (info.distance < SQUARE(768))
-					item->goalAnimState = 8;
+					item->targetState = 8;
 				break;
 
 			case 3:
@@ -107,15 +107,15 @@ void DobermanControl(short itemNumber)
 					if (creature->mood != ESCAPE_MOOD 
 						&& info.distance < SQUARE(341)
 						&& info.ahead)
-						item->goalAnimState = 7;
+						item->targetState = 7;
 					else
-						item->goalAnimState = 2;
+						item->targetState = 2;
 				}
 				else
 				{
-					if (item->requiredAnimState)
+					if (item->requiredState)
 					{
-						item->goalAnimState = item->requiredAnimState;
+						item->targetState = item->requiredState;
 					}
 					else
 					{
@@ -125,16 +125,16 @@ void DobermanControl(short itemNumber)
 							if (random >= 1536)
 							{
 								if (random < 9728)
-									item->goalAnimState = 1;
+									item->targetState = 1;
 							}
 							else
 							{
-								item->goalAnimState = 5;
+								item->targetState = 5;
 							}
 						}
 						else
 						{
-							item->goalAnimState = 4;
+							item->targetState = 4;
 						}
 					}
 				}
@@ -143,21 +143,21 @@ void DobermanControl(short itemNumber)
 			case 4:
 				if (creature->mood || GetRandomControl() < 1280)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 				break;
 
 			case 5:
 				if (creature->mood || GetRandomControl() < 256)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 				break;
 
 			case 6:
 				if (creature->mood || GetRandomControl() < 512)
 				{
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				}
 				break;
 
@@ -174,9 +174,9 @@ void DobermanControl(short itemNumber)
 				}
 
 				if (info.distance <= SQUARE(341) || info.distance >= SQUARE(682))
-					item->goalAnimState = 3;
+					item->targetState = 3;
 				else
-					item->goalAnimState = 9;
+					item->targetState = 9;
 				break;
 
 			case 8:
@@ -190,11 +190,11 @@ void DobermanControl(short itemNumber)
 				if (info.distance >= SQUARE(341))
 				{
 					if (info.distance < SQUARE(682))
-						item->goalAnimState = 9;
+						item->targetState = 9;
 				}
 				else
 				{
-					item->goalAnimState = 7;
+					item->targetState = 7;
 				}
 				break;
 			case 9:
@@ -207,16 +207,16 @@ void DobermanControl(short itemNumber)
 					creature->flags = 3;
 				}
 				if (info.distance < SQUARE(341))
-					item->goalAnimState = 7;
+					item->targetState = 7;
 				break;
 			default:
 				break;
 			}
 		}
-		else if (item->currentAnimState != 10)
+		else if (item->activeState != 10)
 		{
 			item->animNumber = Objects[ID_DOG].animIndex + 13;
-			item->currentAnimState = 10;
+			item->activeState = 10;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
