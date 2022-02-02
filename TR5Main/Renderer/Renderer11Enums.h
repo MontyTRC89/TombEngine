@@ -98,6 +98,46 @@ enum RENDERER_DEBUG_PAGE
 	LOGIC_STATS
 };
 
+enum RendererTransparentFaceType
+{
+	TRANSPARENT_FACE_ROOM,
+	TRANSPARENT_FACE_MOVEABLE,
+	TRANSPARENT_FACE_STATIC,
+	TRANSPARENT_FACE_SPRITE,
+	TRANSPARENT_FACE_NONE
+};
+
+enum ConstantBufferRegister
+{
+	CameraBuffer = 0,
+	ItemBuffer = 1,
+	LightBuffer = 2,
+	MiscBuffer = 3,
+	ShadowLightBuffer = 4,
+	RoomBuffer = 5,
+	AnimatedTexturesBuffer = 6
+};
+
+enum TextureRegister
+{
+	MainTexture = 0,
+	NormalMapTexture = 1,
+	CausticsTexture = 2,
+	ShadowMapTexture = 3,
+	ReflectionMapTexture = 4,
+};
+
+enum SamplerStateType
+{
+	None = 0,
+	PointWrap = 1,
+	LinearWrap = 2,
+	LinearClamp = 3,
+	AnisotropicWrap = 4,
+	AnisotropicClamp = 5,
+	ShadowMap = 6
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
@@ -150,8 +190,22 @@ constexpr auto ASSUMED_HEIGHT_FOR_TEXT_DRAWING = 600.0f;
 #define PRINTSTRING_COLOR_WHITE D3DCOLOR_ARGB(255, 255, 255, 255)
 #define PRINTSTRING_COLOR_BLACK D3DCOLOR_ARGB(255, 0, 0, 0)
 #define PRINTSTRING_COLOR_YELLOW D3DCOLOR_ARGB(255, 240, 220, 32)
-#define FADE_FRAMES_COUNT 16
-#define FADE_FACTOR 0.0625f
-#define NUM_LIGHTS_PER_BUFFER 48
-#define MAX_LIGHTS_PER_ITEM 8
-#define MAX_LIGHTS 100
+
+constexpr auto FADE_FRAMES_COUNT = 16;
+constexpr auto FADE_FACTOR = 0.0625f;
+constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
+constexpr auto MAX_LIGHTS_PER_ITEM = 48;
+constexpr auto MAX_LIGHTS = 100;
+constexpr auto MAX_TRANSPARENT_FACES = 16384;
+constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);
+constexpr auto MAX_TRANSPARENT_FACES_PER_ROOM = 16384;
+constexpr auto TRANSPARENT_BUCKET_SIZE = (3840 * 16);
+constexpr auto MAX_BONES = 32;
+constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
+constexpr auto REFERENCE_RES_WIDTH = 800;
+constexpr auto REFERENCE_RES_HEIGHT = 450;
+constexpr auto HUD_UNIT_X = 1.0f / REFERENCE_RES_WIDTH;
+constexpr auto HUD_UNIT_Y = 1.0f / REFERENCE_RES_HEIGHT;
+constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
+constexpr auto MAX_DYNAMIC_SHADOWS = 1;
+constexpr auto MAX_DYNAMIC_LIGHTS = 1024;

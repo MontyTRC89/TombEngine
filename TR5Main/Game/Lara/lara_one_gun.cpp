@@ -1061,7 +1061,7 @@ void AnimateShotgun(int weaponType)
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 			item->goalAnimState = WSTATE_UW_AIM;
-		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
+		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == false)
 			item->goalAnimState = WSTATE_UNAIM;
 		else
 			item->goalAnimState = WSTATE_RECOIL;
@@ -1075,7 +1075,7 @@ void AnimateShotgun(int weaponType)
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 		{
-			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == 0)
+			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == false)
 				item->goalAnimState = WSTATE_UW_UNAIM;
 			else
 				item->goalAnimState = WSTATE_UW_RECOIL;

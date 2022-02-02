@@ -287,17 +287,17 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 	return(interp);
 }
 
-short GetFrameNumber(ITEM_INFO* item, short frameToStart)
+int GetFrameNumber(ITEM_INFO* item, int frameToStart)
 {
 	return GetFrameNumber(item->objectNumber, item->animNumber, frameToStart);
 }
 
-short GetFrameNumber(short objectID, short animNumber, short frameToStart)
+int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 {
 	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
 }
 
-int GetFrameCount(short animNumber)
+int GetFrameCount(int animNumber)
 {
 	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
 		return 0;
@@ -310,13 +310,13 @@ int GetNextAnimState(ITEM_INFO* item)
 	return GetNextAnimState(item->objectNumber, item->animNumber);
 }
 
-int GetNextAnimState(short objectID, short animNumber)
+int GetNextAnimState(int objectID, int animNumber)
 {
 	auto nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
 	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].currentAnimState;
 }
 
-void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
+void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
 {
 	auto index = Objects[item->objectNumber].animIndex + animIndex;
 
@@ -335,7 +335,7 @@ void SetAnimation(ITEM_INFO* item, short animIndex, short frameToStart)
 	item->goalAnimState = item->currentAnimState;
 }
 
-bool TestLastFrame(ITEM_INFO* item, short animNumber)
+bool TestLastFrame(ITEM_INFO* item, int animNumber)
 {
 	if (animNumber < 0)
 		animNumber = item->animNumber;

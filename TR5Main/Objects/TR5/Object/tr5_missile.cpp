@@ -220,10 +220,8 @@ void MissileControl(short itemNumber)
 
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 {
-	MESH* meshpp = &g_Level.Meshes[fx->frameNumber];
-
 	ShatterItem.yRot = fx->pos.yRot;
-	ShatterItem.meshp = meshpp;
+	ShatterItem.meshIndex = fx->frameNumber;
 	ShatterItem.sphere.x = fx->pos.xPos;
 	ShatterItem.sphere.y = fx->pos.yPos;
 	ShatterItem.sphere.z = fx->pos.zPos;

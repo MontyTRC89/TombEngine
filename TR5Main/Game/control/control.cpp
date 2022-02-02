@@ -401,6 +401,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect);
 
+		UpdateFadeScreenAndCinematicBars();
+
 		// Clear savegame loaded flag
 		JustLoaded = false;
 
@@ -508,6 +510,8 @@ GAME_STATUS DoTitle(int index)
 		InitialiseItemBoxData();
 
 		g_GameScript->OnStart();
+
+		SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 		ControlPhase(2, 0);
 
@@ -651,7 +655,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen
-	g_Renderer.fadeIn();
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 	// The game loop, finally!
 	while (true)
@@ -842,7 +846,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->pos.yRot;
 		ShatterItem.bit = 1 << Node;
-		ShatterItem.meshp = &g_Level.Meshes[Objects[item->objectNumber].meshIndex + Node];
+		ShatterItem.meshIndex = Objects[item->objectNumber].meshIndex + Node;
 		ShatterItem.sphere.x = CreatureSpheres[Node].x;
 		ShatterItem.sphere.y = CreatureSpheres[Node].y;
 		ShatterItem.sphere.z = CreatureSpheres[Node].z;
