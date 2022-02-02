@@ -58,7 +58,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 		info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -245,7 +245,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -301,7 +301,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -370,7 +370,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 		info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		// TODO: Flare not working.
@@ -510,7 +510,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -615,7 +615,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
@@ -696,7 +696,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -756,7 +756,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_DUCK || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->keepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))

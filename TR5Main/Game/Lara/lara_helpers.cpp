@@ -101,7 +101,7 @@ void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
-		if (TrInput & IN_DUCK && TestLaraCrawlDownStep(item, coll))
+		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
 			item->goalAnimState = LS_CRAWL_STEP_DOWN;
 		else [[likely]]
 			item->goalAnimState = LS_CRAWL_EXIT_STEP_DOWN;

@@ -68,7 +68,7 @@ using namespace TEN::Math::Random;
 // TODO: Common controls for all vehicles + unique settings page to set them. @Sezz 2021.11.14
 #define QUAD_IN_ACCELERATE	IN_ACTION
 #define QUAD_IN_BRAKE		IN_JUMP
-#define QUAD_IN_DRIFT		(IN_DUCK | IN_SPRINT)
+#define QUAD_IN_DRIFT		(IN_CROUCH | IN_SPRINT)
 #define QUAD_IN_DISMOUNT	IN_ROLL
 #define QUAD_IN_LEFT		IN_LEFT
 #define QUAD_IN_RIGHT		IN_RIGHT
