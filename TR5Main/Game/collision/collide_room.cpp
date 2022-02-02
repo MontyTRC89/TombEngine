@@ -63,15 +63,15 @@ void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offset
 	coll->Setup.ForwardAngle = angle;
 
 	float dist;
-	auto ang = GetNearestLedgeAngle(item, coll, dist);
+	auto angle2 = GetNearestLedgeAngle(item, coll, dist);
 
 	coll->Setup.ForwardAngle = backup;
 
 	item->pos.xRot = 0;
-	item->pos.yRot = ang;
+	item->pos.yRot = angle2;
 	item->pos.zRot = 0;
-	item->pos.xPos += round(phd_sin(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
-	item->pos.zPos += round(phd_cos(ang) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+	item->pos.xPos += round(phd_sin(angle2) * (dist + (coll->Setup.Radius * offsetMultiplier)));
+	item->pos.zPos += round(phd_cos(angle2) * (dist + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll)
@@ -144,7 +144,7 @@ COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber)
 	auto room = roomNumber;
 	auto floor = GetFloor(x, y, z, &room);
 	auto result = GetCollisionResult(floor, x, y, z);
-	
+
 	result.RoomNumber = room;
 	return result;
 }
@@ -1125,17 +1125,22 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 	return finalResult[usedProbe];
 }
 
-bool TestEnvironment(RoomEnvFlags roomType, int roomNum)
+bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room)
 {
-	return (g_Level.Rooms[roomNum].flags & roomType);
+	return (room->flags & envType);
 }
 
-bool TestEnvironment(RoomEnvFlags roomType, ITEM_INFO* item)
+bool TestEnvironment(RoomEnvFlags envType, int roomNum)
 {
-	return TestEnvironment(roomType, item->roomNumber);
+	return TestEnvironment(envType, &g_Level.Rooms[roomNum]);
 }
 
-bool TestEnvironment(RoomEnvFlags roomType, int x, int y, int z, int roomNum)
+bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item)
 {
-	return TestEnvironment(roomType, GetCollisionResult(x, y, z, roomNum).RoomNumber);
+	return TestEnvironment(envType, item->roomNumber);
+}
+
+bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNum)
+{
+	return TestEnvironment(envType, GetCollisionResult(x, y, z, roomNum).RoomNumber);
 }
