@@ -199,8 +199,6 @@ void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 {
 	HRESULT res;
 
-	windowed = true;
-
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
 	sd.BufferDesc.Height = h;
