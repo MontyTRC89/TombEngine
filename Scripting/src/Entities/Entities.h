@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "LuaHandler.h"
 #include "Scripting/Entities/ScriptInterfaceEntities.h"
-#include "GameScriptItemInfo.h"
+#include "Entities/Moveable/GameScriptItemInfo.h"
 #include "Entities/Static/GameScriptMeshInfo.h"
 #include "GameScriptSinkInfo.h"
 #include "GameScriptAIObject.h"

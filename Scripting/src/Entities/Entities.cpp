@@ -2,6 +2,8 @@
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
 #include "Entities.h"
+#include "ReservedScriptNames.h"
+#include "ObjectIDs.h"
 
 GameEntities::GameEntities(sol::state* lua) : LuaHandler{ lua }
 {
@@ -81,6 +83,7 @@ GameEntities::GameEntities(sol::state* lua) : LuaHandler{ lua }
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
+	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
 }
 
 void GameEntities::AssignLara()

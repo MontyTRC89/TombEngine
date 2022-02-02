@@ -21,7 +21,7 @@ ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
 	return new GameFlow(&g_solState);
 }
 
-ScriptInterfaceEntities* CreateEntities()
+ScriptInterfaceEntities* ScriptInterfaceState::CreateEntities()
 {
 	return new GameEntities(&g_solState);
 }
