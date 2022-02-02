@@ -1107,7 +1107,7 @@ namespace TEN::Renderer
         if (TrInput & IN_SPRINT)
             scaler += 0.03f;
 
-        if (TrInput & IN_DUCK)
+        if (TrInput & IN_CROUCH)
             scaler -= 0.03f;
 
         if (scaler > 1.6f)

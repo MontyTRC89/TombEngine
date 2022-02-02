@@ -1202,7 +1202,7 @@ void BinocularCamera(ITEM_INFO* item)
 		else 
 			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
 	}
-	else if (InputBusy & IN_DUCK)
+	else if (InputBusy & IN_CROUCH)
 	{
 		BinocularRange += range;
 		if (BinocularRange > 1536)

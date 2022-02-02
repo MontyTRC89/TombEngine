@@ -461,7 +461,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_MOVE:
 		if (TrInput & IN_ACTION)
 			l->goalAnimState = CART_USE;
-		else if (TrInput & IN_DUCK)
+		else if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
@@ -480,7 +480,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_FWD:
 		if (TrInput & IN_ACTION)
 			l->goalAnimState = CART_USE;
-		else if (TrInput & IN_DUCK)
+		else if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
@@ -491,7 +491,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_BACK:
 		if (TrInput & IN_ACTION)
 			l->goalAnimState = CART_USE;
-		else if (TrInput & IN_DUCK)
+		else if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
@@ -502,7 +502,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_LEFT:
 		if (TrInput & IN_ACTION)
 			l->goalAnimState = CART_USE;
-		else if (TrInput & IN_DUCK)
+		else if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
@@ -515,7 +515,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_RIGHT:
 		if (TrInput & IN_ACTION)
 			l->goalAnimState = CART_USE;
-		else if (TrInput & IN_DUCK)
+		else if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
@@ -546,7 +546,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			}
 		}
 
-		if (TrInput & IN_DUCK)
+		if (TrInput & IN_CROUCH)
 			l->goalAnimState = CART_DUCK;
 		else if (cart->Speed > CART_MIN_VEL)
 			l->goalAnimState = CART_MOVE;
@@ -557,7 +557,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->goalAnimState = CART_USE;
 		else if (TrInput & IN_JUMP)
 			l->goalAnimState = CART_BRAKE;
-		else if (!(TrInput & IN_DUCK))
+		else if (!(TrInput & IN_CROUCH))
 			l->goalAnimState = CART_STILL;
 		break;
 
@@ -566,7 +566,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		break;
 
 	case CART_BRAKING:
-		if (TrInput & IN_DUCK)
+		if (TrInput & IN_CROUCH)
 		{
 			l->goalAnimState = CART_DUCK;
 			StopSoundEffect(219);

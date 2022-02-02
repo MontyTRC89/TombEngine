@@ -179,7 +179,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					{
 						item->goalAnimState = LS_HANDSTAND;
 					}
-					else if (TrInput & IN_DUCK)
+					else if (TrInput & IN_CROUCH)
 					{
 						item->goalAnimState = LS_HANG_TO_CRAWL;
 						item->requiredAnimState = LS_CROUCH_IDLE;
