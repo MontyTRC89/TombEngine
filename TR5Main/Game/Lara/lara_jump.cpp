@@ -125,10 +125,17 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
 
+	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+		SetLaraLand(item, coll);
+		return;
+	}
+
 	LaraDeflectEdgeJump(item, coll);
 
-	if (item->speed < 0)
-		info->moveAngle = item->pos.yRot;
+	// TODO: Why??
+	info->moveAngle = (item->speed < 0) ? item->pos.yRot : info->moveAngle;
 }
 
 // State:		LS_FREEFALL (9)
@@ -172,6 +179,13 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item);
+
+	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+		SetLaraLand(item, coll);
+		return;
+	}
 
 	LaraSlideEdgeJump(item, coll);
 }
@@ -258,6 +272,13 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraHangJump(item, coll))
 		return;
+
+	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
+	{
+		SetLaraSlideState(item, coll);
+		SetLaraLand(item, coll);
+		return;
+	}
 
 	LaraSlideEdgeJump(item, coll);
 
@@ -392,6 +413,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		SetLaraSlideState(item, coll);
+		SetLaraLand(item, coll);
 		return;
 	}
 
@@ -796,7 +818,10 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 
 		if (TestLaraSlide(item, coll))
+		{
 			SetLaraSlideState(item, coll);
+			SetLaraLand(item, coll);
+		}
 		else if (info->keepLow ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
