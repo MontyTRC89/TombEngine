@@ -323,7 +323,7 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraSplat(item, coll->Setup.Radius * sqrt(2) + 4, -CLICK(2.5f)))
+		if (coll->HitTallObject || TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)))
 		{
 			item->targetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
@@ -2151,7 +2151,7 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->pos.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraSplat(item, coll->Setup.Radius * sqrt(2) + 4, -CLICK(2.5f)))
+		if (coll->HitTallObject || TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)))
 		{
 			item->targetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))

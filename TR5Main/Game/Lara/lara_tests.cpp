@@ -1096,10 +1096,10 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Shifts may interfere.
+	int heightToFloor = GetCollisionResult(item).Position.Floor - item->pos.yPos;
 	
-	if (item->airborne && item->fallspeed >= 0 &&
-		(coll->Middle.Floor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
+	if (item->airborne && item->fallspeed > 0 &&
+		(heightToFloor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 20, 0, 50, 0);
@@ -2140,14 +2140,13 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 
 	bool isWading = testSetup.CheckWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
-	if (((probe.Position.Floor - y) >= -STEPUP_HEIGHT ||									// Within highest floor bound...
-			probe.Position.FloorSlope) &&														// OR surface is a slope. TODO: May fail when coming to a slope from the side.
-		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Ceiling height is permissive... 
+	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Dist) &&						// Avoid jumping through corners.
+		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
+		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
 				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
 		!isWading &&																		// Not wading in water (if applicable).
 		!TestEnvironment(ENV_FLAG_SWAMP, item) &&											// No swamp.
-		!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Dist) &&						// Avoid jumping through corners.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;
