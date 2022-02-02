@@ -202,11 +202,11 @@ void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, 
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
 	sd.BufferDesc.Height = h;
-	sd.BufferDesc.RefreshRate.Numerator = refreshRate;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.RefreshRate.Numerator = 0;
+	sd.BufferDesc.RefreshRate.Denominator = 0;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	sd.Windowed = windowed;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;

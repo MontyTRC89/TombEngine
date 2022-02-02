@@ -3469,7 +3469,7 @@ namespace TEN::Renderer
 		//renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
 		renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
 		m_context->ClearState();
-		m_swapChain->Present(0, 0);
+		m_swapChain->Present(1, 0);
 	}
 
 	void Renderer11::drawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex)
