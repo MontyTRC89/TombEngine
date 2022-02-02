@@ -1125,12 +1125,25 @@ namespace TEN::Renderer
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
-				RendererVertex vtx0 = deb->mesh.vertices[0];
-				RendererVertex vtx1 = deb->mesh.vertices[1];
-				RendererVertex vtx2 = deb->mesh.vertices[2];
+
+				RendererVertex vtx0;
+				vtx0.Position = deb->mesh.Positions[0];
+				vtx0.UV = deb->mesh.TextureCoordinates[0];
+				vtx0.Normal = deb->mesh.Normals[0];
 				vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
+
+				RendererVertex vtx1;
+				vtx1.Position = deb->mesh.Positions[1];
+				vtx1.UV = deb->mesh.TextureCoordinates[1];
+				vtx1.Normal = deb->mesh.Normals[1];
 				vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
+
+				RendererVertex vtx2;
+				vtx2.Position = deb->mesh.Positions[2];
+				vtx2.UV = deb->mesh.TextureCoordinates[2];
+				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
+
 				m_context->RSSetState(m_states->CullNone());
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				m_numDrawCalls++;

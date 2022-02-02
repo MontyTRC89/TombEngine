@@ -639,7 +639,7 @@ namespace TEN::Renderer
 		m_rooms[roomNumber2].RoomNumber = roomNumber2;
 	}
 
-	RendererMesh* Renderer11::getMesh(int meshIndex)
+	RendererMesh* Renderer11::GetMesh(int meshIndex)
 	{
 		return m_meshes[meshIndex];
 	}

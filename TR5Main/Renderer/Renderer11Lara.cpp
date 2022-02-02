@@ -262,7 +262,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		RendererMesh *mesh = getMesh(Lara.meshPtrs[k]);
+		RendererMesh *mesh = GetMesh(Lara.meshPtrs[k]);
 		drawMoveableMesh(item, mesh, room, k);
 	}
 

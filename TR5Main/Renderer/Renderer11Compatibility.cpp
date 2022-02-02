@@ -362,7 +362,7 @@ namespace TEN::Renderer
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10
-					RendererMesh *mesh = getRendererMeshFromTrMesh(&moveable,
+					RendererMesh *mesh = GetRendererMeshFromTrMesh(&moveable,
 																   &g_Level.Meshes[obj->meshIndex + j],
 																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
 																   MoveablesIds[i] == ID_LARA_HAIR, &lastVertex, &lastIndex);
@@ -647,7 +647,7 @@ namespace TEN::Renderer
 			staticObject.Type = 1;
 			staticObject.Id = StaticObjectsIds[i];
 
-			RendererMesh *mesh = getRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
 			staticObject.ObjectMeshes.push_back(mesh);
 
@@ -714,7 +714,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	RendererMesh* Renderer11::getRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex)
+	RendererMesh* Renderer11::GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex)
 	{
 		RendererMesh* mesh = new RendererMesh();
 

@@ -470,7 +470,7 @@ namespace TEN::Renderer
 			newEffect->Effect = fx;
 			newEffect->Id = fxNum;
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-			newEffect->Mesh = getMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
+			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
 
