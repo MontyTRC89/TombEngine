@@ -41,6 +41,7 @@
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
+    <ClInclude Include="include\Scripting\Entities\ScriptInterfaceEntities.h" />
     <ClInclude Include="include\Scripting\Entity\ScriptInterfaceEntity.h" />
     <ClInclude Include="include\Scripting\GameFlowScript.h" />
     <ClInclude Include="include\Scripting\GameLogicScript.h" />
@@ -78,6 +79,8 @@
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
+    <ClInclude Include="src\Entities\Entities.h" />
+    <ClInclude Include="src\Entities\Static\GameScriptMeshInfo.h" />
     <ClInclude Include="src\Entity\Entity.h" />
     <ClInclude Include="src\Entity\Static\GameScriptMeshInfo.h" />
     <ClInclude Include="src\GameFlowScript.h" />
@@ -115,6 +118,8 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Entities\Entities.cpp" />
+    <ClCompile Include="src\Entities\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\Entity\Entity.cpp" />
     <ClCompile Include="src\Entity\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\GameFlowScript.cpp" />

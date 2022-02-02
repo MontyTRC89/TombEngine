@@ -47,7 +47,7 @@
 #include "Specific/winmain.h"
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Entity/ScriptInterfaceEntity.h"
+#include "Scripting/Entities/ScriptInterfaceEntities.h"
 
 using std::vector;
 using std::unordered_map;
