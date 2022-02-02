@@ -1098,15 +1098,13 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int heightToFloor = GetCollisionResult(item).Position.Floor - item->pos.yPos;
 	
-	if (item->airborne && item->fallspeed > 0 &&
+	if (item->airborne && item->fallspeed >= 0 &&
 		(heightToFloor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
-		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 20, 0, 50, 0);
-
 		return true;
 	}
-	TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 20, 50, 0, 50);
+
 	return false;
 }
 
@@ -1345,6 +1343,25 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 		gunType == LARA_WEAPON_TYPE::WEAPON_HARPOON_GUN ||
 		gunType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER ||
 		gunType == LARA_WEAPON_TYPE::WEAPON_SNOWMOBILE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool IsJumpState(LARA_STATE state)
+{
+	if (state == LS_JUMP_FORWARD ||
+		state == LS_JUMP_BACK ||
+		state == LS_JUMP_LEFT ||
+		state == LS_JUMP_RIGHT ||
+		state == LS_JUMP_UP ||
+		state == LS_REACH ||
+		state == LS_FREEFALL ||
+		state == LS_FALL_BACK ||
+		state == LS_SWAN_DIVE_START ||
+		state == LS_FREEFALL_DIVE)
 	{
 		return true;
 	}

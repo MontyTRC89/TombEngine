@@ -9,6 +9,7 @@
 #include "Game/effects/lara_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
@@ -371,8 +372,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				LaraItem->activeState == LS_LADDER_LEFT ||
 				LaraItem->activeState == LS_LADDER_STOP ||
 				LaraItem->activeState == LS_LADDER_RIGHT ||
-				LaraItem->activeState == LS_LADDER_DOWN ||
-				LaraItem->activeState == LS_MONKEY_IDLE)
+				LaraItem->activeState == LS_LADDER_DOWN)
 				break;
 			return;
 
@@ -728,7 +728,7 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
 
 	// Burn Lara
-	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor && !LaraItem->airborne || Lara.waterStatus))
+	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor && !IsJumpState((LARA_STATE)LaraItem->activeState) || Lara.waterStatus))
 		LavaBurn(LaraItem);
 
 	// Set climb status
