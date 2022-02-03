@@ -846,7 +846,7 @@ void FreeLevel()
 			g_Level.Zones[j][i].clear();
 		}
 	}
-	g_Renderer.freeRendererData();
+	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
 
@@ -1017,7 +1017,7 @@ unsigned CALLBACK LoadLevel(void* data)
 	LevelFilePtr = NULL;
 	char* baseLevelDataPtr = NULL;
 
-	g_Renderer.updateProgress(0);
+	g_Renderer.UpdateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -1045,21 +1045,21 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadTextures();
 
-		g_Renderer.updateProgress(20);
+		g_Renderer.UpdateProgress(20);
 
 		ReadInt8(); // TODO: Remove!
 		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
-		g_Renderer.updateProgress(40);
+		g_Renderer.UpdateProgress(40);
 
 		LoadObjects();
-		g_Renderer.updateProgress(50);
+		g_Renderer.UpdateProgress(50);
 
 		LoadSprites();
 		LoadCameras();
 		LoadSoundSources();
-		g_Renderer.updateProgress(60);
+		g_Renderer.UpdateProgress(60);
 
 		LoadBoxes();
 
@@ -1067,12 +1067,12 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();
-		g_Renderer.updateProgress(70);
+		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
 		LoadSamples();
-		g_Renderer.updateProgress(80);
+		g_Renderer.UpdateProgress(80);
 
 		free(baseLevelDataPtr);
 		LevelDataPtr = NULL;
@@ -1083,7 +1083,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		return false;
 	}
 
-	g_Renderer.updateProgress(90);
+	g_Renderer.UpdateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
@@ -1098,7 +1098,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 	// Level loaded
 	IsLevelLoading = false;
-	g_Renderer.updateProgress(100);
+	g_Renderer.UpdateProgress(100);
 
 	_endthreadex(1);
 
@@ -1200,7 +1200,7 @@ int LoadLevelFile(int levelIndex)
 	wchar_t loadscreenFileName[80];
 	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
 	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.renderLoadingScreen(loadScreenFile);
+	g_Renderer.RenderLoadingScreen(loadScreenFile);
 
 	while (IsLevelLoading);
 

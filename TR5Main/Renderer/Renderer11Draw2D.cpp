@@ -16,7 +16,7 @@ TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 
 namespace TEN::Renderer {
 
-	void Renderer11::initialiseBars()
+	void Renderer11::InitialiseBars()
 	{
 		std::array<Vector4, 5> healthColors = {
 			//top
@@ -66,7 +66,7 @@ namespace TEN::Renderer {
 		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 194, 150, 8, 1, soundSettingColors);
 		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
 	}
-	void Renderer11::drawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison) {
+	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison) {
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
@@ -107,7 +107,7 @@ namespace TEN::Renderer {
 		m_context->DrawIndexed(12, 0, 0);
 	}
 
-	void Renderer11::addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
+	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
 		RendererLine2D line;
 
 		line.Vertices[0] = Vector2(x1, y1);

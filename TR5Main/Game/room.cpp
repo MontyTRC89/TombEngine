@@ -42,7 +42,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(r);
 
-			g_Renderer.flipRooms(static_cast<short>(i), r->flippedRoom);
+			g_Renderer.FlipRooms(static_cast<short>(i), r->flippedRoom);
 
 			for (auto& fd : r->floor)
 				fd.Room = i;

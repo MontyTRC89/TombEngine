@@ -1227,7 +1227,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				Matrix boneMatrix;
-				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
+				g_Renderer.GetBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
 				fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
@@ -1268,7 +1268,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	for (int i = 1; i < obj->nmeshes; i++)
 	{
 		Matrix boneMatrix;
-		g_Renderer.getBoneMatrix(itemNumber, i, &boneMatrix);
+		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
 		boneMatrix = world * boneMatrix;
 
 		bit <<= 1;

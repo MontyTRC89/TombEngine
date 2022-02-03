@@ -39,7 +39,7 @@ namespace TEN::Renderer
 		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
 	}
 
-	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
+	bool Renderer11::IsInRoom(int x, int y, int z, short roomNumber)
 	{
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
@@ -48,7 +48,7 @@ namespace TEN::Renderer
 				z >= r->z && z <= r->z + r->zSize * 1024.0f);
 	}
 
-	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
+	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::GetAdapters()
 {
 		return &m_adapters;
 	}
@@ -175,7 +175,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::updateItemAnimations(int itemNumber, bool force)
+	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 	{
 		RendererItem* itemToDraw = &m_items[itemNumber];
 		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
@@ -299,7 +299,7 @@ namespace TEN::Renderer
 				if (nativeItem->objectNumber == ID_LARA)
 					continue;
 
-				updateItemAnimations(itemToDraw->ItemNumber, false);
+				UpdateItemAnimations(itemToDraw->ItemNumber, false);
 			}
 		}
 	}
@@ -371,13 +371,8 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::isFullsScreen() {
+	bool Renderer11::IsFullsScreen() {
 		return (!Windowed);
-	}
-	bool Renderer11::isFading()
-	{
-		return false;
-		return (m_fadeStatus != RENDERER_FADE_STATUS::NO_FADE);
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
@@ -629,9 +624,9 @@ namespace TEN::Renderer
 		return box.Intersects(sphere);
 	}
 
-	void Renderer11::getLaraBonePosition(Vector3 *pos, int bone) {}
+	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}
 
-	void Renderer11::flipRooms(short roomNumber1, short roomNumber2)
+	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
 	{
 		std::swap(m_rooms[roomNumber1], m_rooms[roomNumber2]);
 
@@ -644,14 +639,14 @@ namespace TEN::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::getLaraAbsBonePosition(Vector3 *pos, int joint)
+	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
 	{
 		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
 		world = world * m_LaraWorldMatrix;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	void Renderer11::getItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
@@ -664,9 +659,9 @@ namespace TEN::Renderer
 		if (!rendererItem->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				updateLaraAnimations(false);
+				UpdateLaraAnimations(false);
 			else
-				updateItemAnimations(itemNumber, false);
+				UpdateItemAnimations(itemNumber, false);
 		}
 
 		Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
@@ -686,9 +681,9 @@ namespace TEN::Renderer
 		if (!itemToDraw->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				updateLaraAnimations(false);
+				UpdateLaraAnimations(false);
 			else
-				updateItemAnimations(itemNumber, false);
+				UpdateItemAnimations(itemNumber, false);
 		}
 
 		Matrix world;
@@ -719,13 +714,13 @@ namespace TEN::Renderer
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// addLine3D(v1, v2, Vector4::One);
+			// AddLine3D(v1, v2, Vector4::One);
 		}
 
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::getBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
 	{
 		if (itemNumber == Lara.itemNumber)
 		{
@@ -734,7 +729,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			updateItemAnimations(itemNumber, true);
+			UpdateItemAnimations(itemNumber, true);
 			
 			RendererItem* rendererItem = &m_items[itemNumber];
 			ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];

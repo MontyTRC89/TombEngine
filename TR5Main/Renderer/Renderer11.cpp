@@ -23,10 +23,10 @@ namespace TEN::Renderer
 
 	Renderer11::~Renderer11()
 	{
-		freeRendererData();
+		FreeRendererData();
 	}
 
-	void Renderer11::freeRendererData()
+	void Renderer11::FreeRendererData()
 	{
 		ClearSceneItems();
 
@@ -69,19 +69,19 @@ namespace TEN::Renderer
 		return nf;
 	}
 
-	void Renderer11::updateProgress(float value)
+	void Renderer11::UpdateProgress(float value)
 	{
 		m_progress = value;
 	}
 
-	void Renderer11::renderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumer)
+	void Renderer11::RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumer)
 	{
 		for (int i = 0; i < 6; i++)
 		{
 			auto renderView = RenderView(pos, RenderTargetCube::forwardVectors[i], RenderTargetCube::upVectors[i],
 			                             dest.resolution, dest.resolution, Camera.pos.roomNumber, 10, 20480,
 			                             90 * RADIAN);
-			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			RenderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
 	}
@@ -204,7 +204,7 @@ namespace TEN::Renderer
 		IndexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
 	}
 
-	float Renderer11::calculateFrameRate()
+	float Renderer11::CalculateFrameRate()
 	{
 		static int last_time = clock();
 		static int count = 0;
