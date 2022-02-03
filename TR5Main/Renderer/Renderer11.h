@@ -36,6 +36,8 @@
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererVideoAdapter.h"
 #include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererStringToDraw.h"
+#include "Renderer/Structures/RendererRoom.h"
 
 struct CAMERA_INFO;
 
@@ -62,15 +64,6 @@ namespace TEN::Renderer
 		               std::array<Vector4, 5> colors);
 	};
 
-	struct RendererStringToDraw
-	{
-		float X;
-		float Y;
-		int Flags;
-		std::wstring String;
-		Vector3 Color;
-	};
-
 	struct RendererAnimatedTexture
 	{
 		Vector2 UV[4];
@@ -88,20 +81,6 @@ namespace TEN::Renderer
 		short RoomIndex;
 		MESH_INFO* Mesh;
 		Matrix World;
-	};
-
-	struct RendererRoom
-	{
-		bool Visited;
-		int Distance;
-		short RoomNumber;
-		Vector4 AmbientLight;
-		std::vector<RendererBucket> Buckets;
-		std::vector<RendererLight> Lights;
-		std::vector<RendererItem*> ItemsToDraw;
-		std::vector<RendererEffect*> EffectsToDraw;
-		std::vector<MESH_INFO*> StaticsToDraw;
-		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 	};
 
 	struct RendererRoomNode
