@@ -58,7 +58,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
-	// TODO: This approach might cause underirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
+	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	constexpr int rate = 50;
 	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
 	int sign = std::copysign(1, coll->Middle.Floor);
