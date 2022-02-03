@@ -232,7 +232,6 @@
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
@@ -616,7 +615,6 @@
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
-    <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
     <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
@@ -719,6 +717,10 @@
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
+    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Renderer\Structures\RendererLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
