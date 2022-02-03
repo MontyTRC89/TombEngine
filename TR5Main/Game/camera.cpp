@@ -1910,7 +1910,7 @@ void ItemsCollideCamera()
 			ItemPushCamera(bounds, &item->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->pos, bounds),
+		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(item->pos, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
@@ -1941,7 +1941,7 @@ void ItemsCollideCamera()
 			ItemPushCamera(bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(mesh->pos, bounds),
+		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(mesh->pos, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}

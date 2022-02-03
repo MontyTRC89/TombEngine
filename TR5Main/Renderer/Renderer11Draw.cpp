@@ -42,11 +42,11 @@ namespace TEN::Renderer
 
 	void Renderer11::drawPickup(short objectNum)
 	{
-		drawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
+		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
+	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 	                                        float scale1)
 	{
 		Matrix translation;
@@ -148,7 +148,7 @@ namespace TEN::Renderer
 				if (bucket.NumVertices == 0)
 					continue;
 
-				setBlendMode(bucket.BlendMode);
+				SetBlendMode(bucket.BlendMode);
 
 				BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]),
 				            SamplerStateType::AnisotropicClamp);
@@ -324,7 +324,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::renderTitleImage()
+	void Renderer11::RenderTitleImage()
 	{
 		wchar_t introFileChars[255];
 
@@ -425,41 +425,41 @@ namespace TEN::Renderer
 		case Menu::Title:
 		a:
 			if (title_option == 0)
-				drawString(400, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (title_option == 1)
-				drawString(400, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (title_option == 2)
-				drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+				DrawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (title_option == 3)
-				drawString(400, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER);
 			break;
 
 		case Menu::SelectLevel:
 			lastY = 50;
 
-			drawString(400, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_WHITE,
+			DrawString(400, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_WHITE,
 			           PRINTSTRING_CENTER);
 
 			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
@@ -467,7 +467,7 @@ namespace TEN::Renderer
 				int i2 = i - 1;
 				GameScriptLevel* levelScript = g_GameFlow->GetLevel(i);
 
-				drawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringKey.c_str()),
+				DrawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringKey.c_str()),
 				           D3DCOLOR_ARGB(255, 255, 255, 255),
 				           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (i - 1)
 					                                                       ? PRINTSTRING_BLINK
@@ -486,19 +486,19 @@ namespace TEN::Renderer
 				for (int n = 1; n < SAVEGAME_MAX + 1; n++)
 				{
 					if (!SavegameInfos[n - 1].Present)
-						drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
+						DrawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
 						           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (n - 1)
 							                                                       ? PRINTSTRING_BLINK
 							                                                       : 0));
 					else
 					{
 						sprintf(stringBuffer, "%05d", SavegameInfos[n - 1].Count);
-						drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+						DrawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 						           PRINTSTRING_OUTLINE | (title_option == (n - 1)
 							                                  ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK
 							                                  : 0));
 
-						drawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(),
+						DrawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(),
 						           D3DCOLOR_ARGB(255, 255, 255, 255),
 						           PRINTSTRING_OUTLINE | (title_option == (n - 1)
 							                                  ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK
@@ -507,7 +507,7 @@ namespace TEN::Renderer
 						sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP),
 						        SavegameInfos[n - 1].Days, SavegameInfos[n - 1].Hours, SavegameInfos[n - 1].Minutes,
 						        SavegameInfos[n - 1].Seconds);
-						drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+						DrawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 						           PRINTSTRING_OUTLINE | (title_option == (n - 1) ? PRINTSTRING_BLINK : 0));
 					}
 
@@ -522,39 +522,39 @@ namespace TEN::Renderer
 			y = 350;
 
 			if (title_option == 0)
-				drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (title_option == 1)
-				drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (title_option == 2)
-				drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			break;
 
 		case Menu::Display:
 			y = 200;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 		// Screen resolution
-			drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 0 ? PRINTSTRING_BLINK : 0));
@@ -562,17 +562,17 @@ namespace TEN::Renderer
 			ZeroMemory(stringBuffer, 255);
 			sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-			drawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
+			DrawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
 			           PRINTSTRING_OUTLINE | (title_option == 0 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
 		// Windowed mode
-			drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
+			DrawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 1 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.Windowed
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.Windowed
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -581,11 +581,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable dynamic shadows
-			drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 2 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableShadows
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableShadows
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -594,11 +594,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable caustics
-			drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
+			DrawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 3 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableCaustics
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableCaustics
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -607,11 +607,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable volumetric fog
-			drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
+			DrawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 4 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -620,14 +620,14 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Apply
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 5 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
 		//cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 6 ? PRINTSTRING_BLINK : 0));
 			break;
@@ -635,27 +635,27 @@ namespace TEN::Renderer
 		case Menu::Controls:
 			y = 40;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 			for (int k = 0; k < 16; k++)
 			{
-				drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
+				DrawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
 				           PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_OUTLINE | (title_option == k ? PRINTSTRING_BLINK : 0) |
 				           (g_Gui.GetCurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
 				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
 				{
-					drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
+					DrawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
 					           PRINTSTRING_COLOR_YELLOW,
 					           PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
 				}
 				else
 				{
-					drawString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
+					DrawString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
 					           PRINTSTRING_COLOR_ORANGE,
 					           PRINTSTRING_OUTLINE);
 				}
@@ -664,13 +664,13 @@ namespace TEN::Renderer
 			}
 
 		// Apply and cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 16 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 17 ? PRINTSTRING_BLINK : 0));
 			break;
@@ -678,17 +678,17 @@ namespace TEN::Renderer
 		case Menu::Sound:
 			y = 200;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
+			DrawString(400, y, g_GameFlow->GetString(STRING_SOUND),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 		// Enable sound special effects
-			drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           title_option == 0 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -697,29 +697,29 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Music volume
-			drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
+			DrawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_OUTLINE | (title_option == 1 ? PRINTSTRING_BLINK : 0));
-			drawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0,
+			DrawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0,
 			        false);
 
 			y += 25;
 
 		// Sound FX volume
-			drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_OUTLINE | (title_option == 2 ? PRINTSTRING_BLINK : 0));
-			drawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			y += 25;
 
 		// Apply and cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 3 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == 4 ? PRINTSTRING_BLINK : 0));
 			break;
@@ -741,24 +741,24 @@ namespace TEN::Renderer
 			y = 275;
 
 			if (pause_option == 0)
-				drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+				DrawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, "Statistics", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (pause_option == 1)
-				drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
+				DrawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, "Options", PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (pause_option == 2)
-				drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER);
 
 			break;
@@ -771,39 +771,39 @@ namespace TEN::Renderer
 			y = 275;
 
 			if (pause_option == 0)
-				drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (pause_option == 1)
-				drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			y += 25;
 
 			if (pause_option == 2)
-				drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE,
+				DrawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_CENTER | PRINTSTRING_BLINK);
 			else
-				drawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+				DrawString(400, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 
 			break;
 
 		case Menu::Display:
 			y = 200;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_DISPLAY),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 		// Screen resolution
-			drawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 0 ? PRINTSTRING_BLINK : 0));
@@ -811,17 +811,17 @@ namespace TEN::Renderer
 			ZeroMemory(stringBuffer, 255);
 			sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
 
-			drawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
+			DrawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
 			           PRINTSTRING_OUTLINE | (pause_option == 0 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
 		// Windowed mode
-			drawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
+			DrawString(200, y, g_GameFlow->GetString(STRING_WINDOWED),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 1 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.Windowed
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.Windowed
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -830,11 +830,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable dynamic shadows
-			drawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SHADOWS),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 2 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableShadows
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableShadows
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -843,11 +843,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable caustics
-			drawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
+			DrawString(200, y, g_GameFlow->GetString(STRING_CAUSTICS),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 3 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableCaustics
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableCaustics
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -856,11 +856,11 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Enable volumetric fog
-			drawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
+			DrawString(200, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 4 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -869,14 +869,14 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Apply
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 5 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
 		//cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 6 ? PRINTSTRING_BLINK : 0));
 			break;
@@ -884,27 +884,27 @@ namespace TEN::Renderer
 		case Menu::Controls:
 			y = 40;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CONTROLS),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 			for (int k = 0; k < 16; k++)
 			{
-				drawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
+				DrawString(200, y, g_GameFlow->GetString(controlmsgs[k]),
 				           PRINTSTRING_COLOR_WHITE,
 				           PRINTSTRING_OUTLINE | (pause_option == k ? PRINTSTRING_BLINK : 0) |
 				           (g_Gui.GetCurrentSettings().waitingForkey ? PRINTSTRING_DONT_UPDATE_BLINK : 0));
 
 				if (g_Gui.GetCurrentSettings().waitingForkey && pause_option == k)
 				{
-					drawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
+					DrawString(400, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY),
 					           PRINTSTRING_COLOR_YELLOW,
 					           PRINTSTRING_OUTLINE | PRINTSTRING_BLINK);
 				}
 				else
 				{
-					drawString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
+					DrawString(400, y, (char*)g_KeyNames[KeyboardLayout[1][k]],
 					           PRINTSTRING_COLOR_ORANGE,
 					           PRINTSTRING_OUTLINE);
 				}
@@ -913,13 +913,13 @@ namespace TEN::Renderer
 			}
 
 		// Apply and cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 16 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 17 ? PRINTSTRING_BLINK : 0));
 
@@ -928,17 +928,17 @@ namespace TEN::Renderer
 		case Menu::Sound:
 			y = 200;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_SOUND),
+			DrawString(400, y, g_GameFlow->GetString(STRING_SOUND),
 			           PRINTSTRING_COLOR_YELLOW, PRINTSTRING_OUTLINE | PRINTSTRING_CENTER);
 
 			y += 25;
 
 		// Enable sound special effects
-			drawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_DONT_UPDATE_BLINK | PRINTSTRING_OUTLINE | (
 				           pause_option == 0 ? PRINTSTRING_BLINK : 0));
-			drawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects
+			DrawString(400, y, g_GameFlow->GetString(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects
 				                                         ? STRING_ENABLED
 				                                         : STRING_DISABLED),
 			           PRINTSTRING_COLOR_WHITE,
@@ -947,28 +947,28 @@ namespace TEN::Renderer
 			y += 25;
 
 		// Music volume
-			drawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
+			DrawString(200, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_OUTLINE | (pause_option == 1 ? PRINTSTRING_BLINK : 0));
-			drawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, 0);
+			DrawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, 0);
 
 			y += 25;
 
 		// Sound FX volume
-			drawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
+			DrawString(200, y, g_GameFlow->GetString(STRING_SFX_VOLUME),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_OUTLINE | (pause_option == 2 ? PRINTSTRING_BLINK : 0));
-			drawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, 0);
+			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, 0);
 			y += 25;
 
 		// Apply and cancel
-			drawString(400, y, g_GameFlow->GetString(STRING_APPLY),
+			DrawString(400, y, g_GameFlow->GetString(STRING_APPLY),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 3 ? PRINTSTRING_BLINK : 0));
 
 			y += 25;
 
-			drawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
+			DrawString(400, y, g_GameFlow->GetString(STRING_CANCEL),
 			           PRINTSTRING_COLOR_ORANGE,
 			           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (pause_option == 4 ? PRINTSTRING_BLINK : 0));
 			break;
@@ -991,33 +991,33 @@ namespace TEN::Renderer
 		LoadSavegameInfos();
 
 		if (g_Gui.GetInventoryMode() == InventoryMode::Load)
-			drawString(400, 40, "Load Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			DrawString(400, 40, "Load Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 		else
-			drawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			DrawString(400, 40, "Save Game", D3DCOLOR_ARGB(255, 255, 140, 0), PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 		for (int n = 1; n < SAVEGAME_MAX + 1; n++)
 		{
 			int n2 = n - 1;
 
 			if (!SavegameInfos[n - 1].Present)
-				drawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
+				DrawString(400, y, g_GameFlow->GetString(STRING_UNUSED), D3DCOLOR_ARGB(255, 255, 255, 255),
 				           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
 			else
 			{
 				sprintf(stringBuffer, "%05d", SavegameInfos[n - 1].Count);
-				drawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+				DrawString(200, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 				           PRINTSTRING_OUTLINE | (selection == n2
 					                                  ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK
 					                                  : 0));
 
-				drawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255),
+				DrawString(250, y, (char*)SavegameInfos[n - 1].LevelName.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255),
 				           PRINTSTRING_OUTLINE | (selection == n2
 					                                  ? PRINTSTRING_BLINK | PRINTSTRING_DONT_UPDATE_BLINK
 					                                  : 0));
 
 				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), SavegameInfos[n - 1].Days,
 				        SavegameInfos[n - 1].Hours, SavegameInfos[n - 1].Minutes, SavegameInfos[n - 1].Seconds);
-				drawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
+				DrawString(475, y, stringBuffer, D3DCOLOR_ARGB(255, 255, 255, 255),
 				           PRINTSTRING_OUTLINE | (selection == n2 ? PRINTSTRING_BLINK : 0));
 			}
 
@@ -1051,14 +1051,14 @@ namespace TEN::Renderer
 		GameScriptLevel* lvl = g_GameFlow->GetLevel(CurrentLevel);
 
 		ypos = 150;
-		drawString(400, ypos, STRING_STATISTICS, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
-		drawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringKey.c_str()), PRINTSTRING_COLOR_WHITE,
+		DrawString(400, ypos, STRING_STATISTICS, PRINTSTRING_COLOR_ORANGE, PRINTSTRING_CENTER);
+		DrawString(400, ypos + 2 * 25, g_GameFlow->GetString(lvl->NameStringKey.c_str()), PRINTSTRING_COLOR_WHITE,
 		           PRINTSTRING_CENTER);
-		drawString(200, ypos + 3 * 25, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, 0);
-		drawString(200, ypos + 4 * 25, g_GameFlow->GetString(STRING_DISTANCE_TRAVELLED), PRINTSTRING_COLOR_WHITE, 0);
-		drawString(200, ypos + 5 * 25, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, 0);
-		drawString(200, ypos + 6 * 25, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, 0);
-		drawString(200, ypos + 7 * 25, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(200, ypos + 3 * 25, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(200, ypos + 4 * 25, g_GameFlow->GetString(STRING_DISTANCE_TRAVELLED), PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(200, ypos + 5 * 25, g_GameFlow->GetString(STRING_USED_AMMOS), PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(200, ypos + 6 * 25, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(200, ypos + 7 * 25, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, 0);
 
 		seconds = GameTimer / 30;
 		Days = seconds / (24 * 60 * 60);
@@ -1067,15 +1067,15 @@ namespace TEN::Renderer
 		Sec = (seconds % 60);
 
 		sprintf(buffer, "%02d:%02d:%02d", (Days * 24) + Hours, Min, Sec);
-		drawString(500, ypos + 3 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(500, ypos + 3 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 		sprintf(buffer, "%dm", Statistics.Game.Distance / 419);
-		drawString(500, ypos + 4 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(500, ypos + 4 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
-		drawString(500, ypos + 5 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(500, ypos + 5 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 		sprintf(buffer, "%d", Statistics.Game.HealthUsed);
-		drawString(500, ypos + 6 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(500, ypos + 6 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 		sprintf(buffer, "%d / 36", Statistics.Game.Secrets);
-		drawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
+		DrawString(500, ypos + 7 * 25, buffer, PRINTSTRING_COLOR_WHITE, 0);
 
 		DrawAllStrings();
 	}
@@ -1115,7 +1115,7 @@ namespace TEN::Renderer
 
 		saved_scale = obj->scale1;
 		obj->scale1 = scaler;
-		drawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->scale1);
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->scale1);
 		obj->scale1 = saved_scale;
 	}
 
@@ -1123,7 +1123,7 @@ namespace TEN::Renderer
 	{
 		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
 		short currentPage = Lara.Diary.currentPage;
-		drawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
 		                       obj->yrot, obj->zrot, obj->scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
@@ -1132,7 +1132,7 @@ namespace TEN::Renderer
 				Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
 				break;
 
-			//drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
+			//DrawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
 		}
 
 		DrawAllStrings();
@@ -1381,7 +1381,7 @@ namespace TEN::Renderer
 
 				for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
 				{
-					addLine3D(absolute[n], absolute[n + 1], Vector4::One);
+					AddLine3D(absolute[n], absolute[n + 1], Vector4::One);
 				}
 			}
 		}
@@ -1744,7 +1744,7 @@ namespace TEN::Renderer
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	}
 
-	void Renderer11::addLine3D(Vector3 start, Vector3 end, Vector4 color)
+	void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
 	{
 		RendererLine3D line;
 
@@ -1755,7 +1755,7 @@ namespace TEN::Renderer
 		m_lines3DToDraw.push_back(line);
 	}
 
-	void Renderer11::addSphere(Vector3 center, float radius, Vector4 color)
+	void Renderer11::AddSphere(Vector3 center, float radius, Vector4 color)
 	{
 		constexpr auto subdivisions = 10;
 		constexpr auto steps = 6;
@@ -1780,7 +1780,7 @@ namespace TEN::Renderer
 
 				if (i > 0)
 					for (int p = 0; p < 3; p++)
-						addLine3D(prevPoint[p], point[p], color);
+						AddLine3D(prevPoint[p], point[p], color);
 
 				prevPoint = point;
 				currAngle += ((PI * 2) / (subdivisions - 1));
@@ -1788,17 +1788,17 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::addDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
 #ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
 
-		addSphere(center, radius, color);
+		AddSphere(center, radius, color);
 #endif _DEBUG
 	}
 
-	void Renderer11::addBox(Vector3* corners, Vector4 color)
+	void Renderer11::AddBox(Vector3* corners, Vector4 color)
 	{
 		for (int i = 0; i < 12; i++)
 		{
@@ -1853,7 +1853,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::addBox(Vector3 min, Vector3 max, Vector4 color)
+	void Renderer11::AddBox(Vector3 min, Vector3 max, Vector4 color)
 	{
 		for (int i = 0; i < 12; i++)
 		{
@@ -1906,7 +1906,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::addDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
 #ifdef _DEBUG
 		if (m_numDebugPage != page)
@@ -1914,20 +1914,20 @@ namespace TEN::Renderer
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
-		addBox(corners, color);
+		AddBox(corners, color);
 #endif _DEBUG
 	}
 
-	void Renderer11::addDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
 	{
 #ifdef _DEBUG
 		if (m_numDebugPage != page)
 			return;
-		addBox(min, max, color);
+		AddBox(min, max, color);
 #endif _DEBUG
 	}
 
-	void Renderer11::renderLoadingScreen(std::wstring& fileName)
+	void Renderer11::RenderLoadingScreen(std::wstring& fileName)
 	{
 		return;
 		/*
@@ -1980,7 +1980,7 @@ namespace TEN::Renderer
 		*/
 	}
 
-	void Renderer11::addDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
 		RendererLight dynamicLight;
 
@@ -2004,7 +2004,7 @@ namespace TEN::Renderer
 		dynamicLights.push_back(dynamicLight);
 	}
 
-	void Renderer11::clearDynamicLights()
+	void Renderer11::ClearDynamicLights()
 	{
 		dynamicLights.clear();
 	}
@@ -2021,7 +2021,7 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
 	}
 
-	void Renderer11::renderInventory()
+	void Renderer11::RenderInventory()
 	{
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
@@ -2029,17 +2029,17 @@ namespace TEN::Renderer
 		m_swapChain->Present(0, 0);
 	}
 
-	void Renderer11::renderTitle()
+	void Renderer11::RenderTitle()
 	{
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
 
-		renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+		RenderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
 #if _DEBUG
-		drawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
+		DrawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 		DrawAllStrings();
 #else
         DrawAllStrings();
@@ -2047,14 +2047,14 @@ namespace TEN::Renderer
 		m_swapChain->Present(0, 0);
 	}
 
-	void Renderer11::clearScene()
+	void Renderer11::ClearScene()
 	{
-		resetAnimations();
+		ResetAnimations();
 
 		// Clear dynamic lights
 		ClearFires();
 
-		clearDynamicLights();
+		ClearDynamicLights();
 		ClearSceneItems();
 
 		m_strings.clear();
@@ -2062,10 +2062,10 @@ namespace TEN::Renderer
 		m_currentCausticsFrame++;
 		m_currentCausticsFrame %= 32;
 
-		calculateFrameRate();
+		CalculateFrameRate();
 	}
 
-	void Renderer11::drawDebugInfo()
+	void Renderer11::DrawDebugInfo()
 	{
 		if (CurrentLevel != 0)
 		{
@@ -2128,7 +2128,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::switchDebugPage(bool back)
+	void Renderer11::SwitchDebugPage(bool back)
 	{
 		auto index = (int)m_numDebugPage;
 
@@ -2476,7 +2476,7 @@ namespace TEN::Renderer
 			            SamplerStateType::None);
 		}
 
-		setBlendMode(info->blendMode);
+		SetBlendMode(info->blendMode);
 
 		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
 
@@ -2533,7 +2533,7 @@ namespace TEN::Renderer
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
 		m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-		setBlendMode(info->blendMode);
+		SetBlendMode(info->blendMode);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -2560,7 +2560,7 @@ namespace TEN::Renderer
 	void Renderer11::DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 	                                          RenderView& view)
 	{
-		setBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BLENDMODE_OPAQUE);
 		m_context->RSSetState(m_states->CullCounterClockwise());
 
 		m_context->ClearRenderTargetView(target, Colors::Black);
@@ -2618,7 +2618,7 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::renderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
+	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		m_timeUpdate = 0;
 		m_timeDraw = 0;
@@ -2644,7 +2644,7 @@ namespace TEN::Renderer
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
-		updateLaraAnimations(false);
+		UpdateLaraAnimations(false);
 		UpdateItemsAnimations(view);
 		UpdateEffects(view);
 
@@ -2661,7 +2661,7 @@ namespace TEN::Renderer
 		time1 = time2;
 
 		// Reset GPU state
-		setBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BLENDMODE_OPAQUE);
 		m_context->RSSetState(m_states->CullCounterClockwise());
 
 		// Bind and clear render target
@@ -2715,12 +2715,12 @@ namespace TEN::Renderer
 		// NOTE: functions here just fill the sprites to draw array
 		DrawFires(view);
 		DrawSmokes(view);
-		drawSmokeParticles(view);
-		drawSimpleParticles(view);
-		drawSparkParticles(view);
-		drawExplosionParticles(view);
-		drawFootprints(view);
-		drawDripParticles(view);
+		DrawSmokeParticles(view);
+		DrawSimpleParticles(view);
+		DrawSparkParticles(view);
+		DrawExplosionParticles(view);
+		DrawFootprints(view);
+		DrawDripParticles(view);
 		DrawBlood(view);
 		DrawWeatherParticles(view);
 		DrawSparks(view);
@@ -2758,12 +2758,12 @@ namespace TEN::Renderer
 
 		DoFadingAndCinematicBars(target, depthTarget, view);
 
-		drawDebugInfo();
+		DrawDebugInfo();
 		DrawAllStrings();
-		clearScene();
+		ClearScene();
 	}
 
-	void Renderer11::renderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
+	void Renderer11::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 	                                   RenderView& view)
 	{
 		GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -2797,7 +2797,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DumpGameScene()
 	{
-		renderScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(),
+		RenderScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(),
 		            gameCamera);
 	}
 
@@ -2890,7 +2890,7 @@ namespace TEN::Renderer
 					mesh = swapMeshObj.ObjectMeshes[k];
 			}
 
-			drawMoveableMesh(item, mesh, room, k);
+			DrawMoveableMesh(item, mesh, room, k);
 		}
 	}
 
@@ -2939,7 +2939,7 @@ namespace TEN::Renderer
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
 		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-		setBlendMode(info->blendMode);
+		SetBlendMode(info->blendMode);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -2979,7 +2979,7 @@ namespace TEN::Renderer
 			nativeItem->pos.yPos + 96 * phd_sin(TO_RAD(nativeItem->pos.xRot)),
 			nativeItem->pos.zPos + speed * phd_cos(TO_RAD(nativeItem->pos.yRot)));
 
-		addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
+		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
 
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
@@ -3017,7 +3017,7 @@ namespace TEN::Renderer
 				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
 				Vector3 p2 = Vector3(info[i + 1].xPos, info[i + 1].yPos, info[i + 1].zPos);
 
-				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
+				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
 		}
 	}
@@ -3066,7 +3066,7 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						if (isSortingRequired(bucket.BlendMode))
+						if (DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
 							// Collect transparent faces
 							for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3105,7 +3105,7 @@ namespace TEN::Renderer
 									m_cbMisc.updateData(m_stMisc, m_context.Get());
 									m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-									setBlendMode(bucket.BlendMode);
+									SetBlendMode(bucket.BlendMode);
 								}
 								else
 								{
@@ -3113,7 +3113,7 @@ namespace TEN::Renderer
 									m_cbMisc.updateData(m_stMisc, m_context.Get());
 									m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-									setBlendMode(BLENDMODE_ALPHABLEND);
+									SetBlendMode(BLENDMODE_ALPHABLEND);
 								}
 
 								BindTexture(TextureRegister::MainTexture,
@@ -3215,7 +3215,7 @@ namespace TEN::Renderer
 					if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
 						continue;
 
-					if (isSortingRequired(bucket.BlendMode))
+					if (DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
 						for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3262,7 +3262,7 @@ namespace TEN::Renderer
 								m_cbMisc.updateData(m_stMisc, m_context.Get());
 								m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-								setBlendMode(bucket.BlendMode);
+								SetBlendMode(bucket.BlendMode);
 							}
 							else
 							{
@@ -3270,7 +3270,7 @@ namespace TEN::Renderer
 								m_cbMisc.updateData(m_stMisc, m_context.Get());
 								m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-								setBlendMode(BLENDMODE_ALPHABLEND);
+								SetBlendMode(BLENDMODE_ALPHABLEND);
 							}
 
 							// Draw geometry
@@ -3394,7 +3394,7 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		setBlendMode(BLEND_MODES::BLENDMODE_ADDITIVE);
+		SetBlendMode(BLEND_MODES::BLENDMODE_ADDITIVE);
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -3451,7 +3451,7 @@ namespace TEN::Renderer
 					BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 					            SamplerStateType::None);
 
-					setBlendMode(bucket.BlendMode);
+					SetBlendMode(bucket.BlendMode);
 
 					// Draw vertices
 					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
@@ -3466,13 +3466,13 @@ namespace TEN::Renderer
 
 	void Renderer11::Draw()
 	{
-		//renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
-		renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
+		//RenderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+		RenderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
 		m_context->ClearState();
 		m_swapChain->Present(1, 0);
 	}
 
-	void Renderer11::drawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex)
+	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex)
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -3481,7 +3481,7 @@ namespace TEN::Renderer
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (isSortingRequired(bucket.BlendMode))
+			if (DoesBlendModeRequireSorting(bucket.BlendMode))
 			{
 				// Collect transparent faces
 				for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3523,7 +3523,7 @@ namespace TEN::Renderer
 						m_cbMisc.updateData(m_stMisc, m_context.Get());
 						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-						setBlendMode(bucket.BlendMode);
+						SetBlendMode(bucket.BlendMode);
 					}
 					else
 					{
@@ -3531,7 +3531,7 @@ namespace TEN::Renderer
 						m_cbMisc.updateData(m_stMisc, m_context.Get());
 						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-						setBlendMode(BLENDMODE_ALPHABLEND);
+						SetBlendMode(BLENDMODE_ALPHABLEND);
 					}
 
 					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);

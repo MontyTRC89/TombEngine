@@ -61,10 +61,10 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 		if (!IsLevelLoading)
 		{
 			SuspendThread((HANDLE)ThreadHandle);
-			g_Renderer.toggleFullScreen();
+			g_Renderer.ToggleFullScreen();
 			ResumeThread((HANDLE)ThreadHandle);
 
-			if (g_Renderer.isFullsScreen())
+			if (g_Renderer.IsFullsScreen())
 			{
 				SetCursor(0);
 				ShowCursor(false);

@@ -48,7 +48,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -70,7 +70,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.AnimatedTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			}
 			else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
@@ -85,7 +85,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -107,7 +107,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}

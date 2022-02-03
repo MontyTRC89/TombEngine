@@ -478,7 +478,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::resetAnimations()
+	void Renderer11::ResetAnimations()
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
 		{
