@@ -1325,8 +1325,8 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
 
         if (LaraItem->activeState == BIKE_MOVING_BACK)
         {
-            short framenow = LaraItem->frameNumber;
-            short framebase = g_Level.Anims[LaraItem->animNumber].frameBase;
+			int framenow = LaraItem->frameNumber;
+			int framebase = g_Level.Anims[LaraItem->animNumber].frameBase;
 
             if (framenow >= framebase + 24 && framenow <= framebase + 29)
             {

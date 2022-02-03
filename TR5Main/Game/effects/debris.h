@@ -5,7 +5,7 @@
 #include "Renderer/Renderer11.h"
 #include "Renderer/RendererVertex.h"
 
-#define MAX_DEBRIS 256
+constexpr int MAX_DEBRIS = 2048;
 
 struct ILIGHT
 {
@@ -28,7 +28,7 @@ struct SHATTER_ITEM
 {
 	SPHERE sphere;
 	ITEM_LIGHT* il;
-	MESH* meshp;
+	int meshIndex;
 	int bit;
 	short yRot;
 	short flags;
@@ -43,7 +43,10 @@ struct ShatterImpactInfo
 struct DebrisMesh
 {
 	BLEND_MODES blendMode;
-	std::array<TEN::Renderer::RendererVertex, 3> vertices;
+	std::array<Vector3, 3> Positions;
+	std::array<Vector2, 3> TextureCoordinates;
+	std::array<Vector3, 3> Normals;
+	std::array<Vector3, 3> Colors;
 	int tex;
 };
 

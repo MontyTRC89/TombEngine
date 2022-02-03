@@ -4,6 +4,7 @@
 #include "GameScriptMirror.h"
 #include "GameScriptColor.h"
 #include "GameScriptInventoryObject.h"
+#include <GameScriptFog.h>
 
 enum class WeatherType
 {
@@ -50,7 +51,7 @@ struct GameScriptLevel
 	GameScriptSkyLayer Layer2;
 	bool Horizon{ false };
 	bool ColAddHorizon{ false };
-	GameScriptColor Fog{ 0, 0, 0 };
+	GameScriptFog Fog;
 	bool Storm{ false };
 	WeatherType Weather{ WeatherType::None };
 	float WeatherStrength{ 1.0f };

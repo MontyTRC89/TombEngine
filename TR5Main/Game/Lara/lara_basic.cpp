@@ -393,7 +393,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->jumpDirection != LaraJumpDirection::None)
+		if (info->jumpDirection != JumpDirection::NoDirection)
 			item->targetState = LS_JUMP_PREPARE;
 
 		return;
@@ -513,7 +513,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->targetState = LS_JUMP_PREPARE;
-		info->jumpDirection = LaraJumpDirection::Up;
+		info->jumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -784,7 +784,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->jumpDirection != LaraJumpDirection::None)
+		if (info->jumpDirection != JumpDirection::NoDirection)
 		{
 			item->targetState = LS_JUMP_PREPARE;
 			return;
@@ -884,7 +884,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->targetState = LS_JUMP_PREPARE;
-		info->jumpDirection = LaraJumpDirection::Up;
+		info->jumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -998,7 +998,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->jumpDirection != LaraJumpDirection::None)
+		if (info->jumpDirection != JumpDirection::NoDirection)
 		{
 			item->targetState = LS_JUMP_PREPARE;
 			return;
@@ -1098,7 +1098,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->targetState = LS_JUMP_PREPARE;
-		info->jumpDirection = LaraJumpDirection::Up;
+		info->jumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -1407,7 +1407,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->jumpDirection != LaraJumpDirection::None)
+		if (info->jumpDirection != JumpDirection::NoDirection)
 		{
 			item->targetState = LS_JUMP_PREPARE;
 			return;
@@ -1524,7 +1524,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->jumpDirection != LaraJumpDirection::None)
+		if (info->jumpDirection != JumpDirection::NoDirection)
 		{
 			item->targetState = LS_JUMP_PREPARE;
 			return;

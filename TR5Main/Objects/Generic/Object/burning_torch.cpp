@@ -69,7 +69,7 @@ namespace TEN::Entities::Generic
 		case 0:
 			if (Lara.requestGunType != Lara.gunType)
 			{
-				Lara.leftArm.lock = 2;
+				Lara.leftArm.lock = true;
 				Lara.leftArm.frameNumber = 31;
 				Lara.leftArm.animNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 2;
 				break;
@@ -350,7 +350,7 @@ namespace TEN::Entities::Generic
 				l->activeState = LS_MISC_CONTROL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.flareControlLeft = false;
-				Lara.leftArm.lock = 3;
+				Lara.leftArm.lock = true;
 				Lara.interactedItem = itemNumber;
 			}
 

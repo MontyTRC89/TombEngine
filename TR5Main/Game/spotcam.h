@@ -2,6 +2,8 @@
 #include "Specific/phd_global.h"
 
 constexpr auto MAX_SPOTCAMS = 256;
+constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 16.0f / 256.0f;
+constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / 256.0f;
 
 struct QUAKE_CAMERA
 {

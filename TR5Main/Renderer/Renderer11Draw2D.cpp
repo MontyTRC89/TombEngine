@@ -72,9 +72,9 @@ namespace TEN::Renderer {
 		float color[] = { 0,0,0,1.0f };
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetVertexBuffers(0, 1, bar->vertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
+		m_context->IASetVertexBuffers(0, 1, bar->VertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetIndexBuffer(bar->indexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		m_context->IASetIndexBuffer(bar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
 		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
 		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture->ShaderResourceView.GetAddressOf());
@@ -90,9 +90,9 @@ namespace TEN::Renderer {
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetVertexBuffers(0, 1, bar->vertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
+		m_context->IASetVertexBuffers(0, 1, bar->InnerVertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetIndexBuffer(bar->indexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		m_context->IASetIndexBuffer(bar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_stHUDBar.Percent = percent;
 		m_stHUDBar.Poisoned = poison;
 		m_stHUDBar.Frame = frame;
@@ -108,32 +108,22 @@ namespace TEN::Renderer {
 	}
 
 	void Renderer11::addLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
-		RendererLine2D* line = &m_lines2DBuffer[m_nextLine2D++];
+		RendererLine2D line;
 
-		line->Vertices[0] = Vector2(x1, y1);
-		line->Vertices[1] = Vector2(x2, y2);
-		line->Color = Vector4(r, g, b, a);
+		line.Vertices[0] = Vector2(x1, y1);
+		line.Vertices[1] = Vector2(x2, y2);
+		line.Color = Vector4(r, g, b, a);
 
 		m_lines2DToDraw.push_back(line);
 	}
 
-	void Renderer11::addQuad2D(RECT rect, byte r, byte g, byte b, byte a) 
-	{
-		RendererRect2D* quad = &m_rects2DBuffer[m_nextRect2D++];
-
-		quad->Rectangle = rect;
-		quad->Color = Vector4(r, g, b, a);
-
-		m_rects2DToDraw.push_back(quad);
-	}
-
-	void Renderer11::drawOverlays(RenderView& view)
+	void Renderer11::DrawOverlays(RenderView& view)
 	{
 		auto flashColor = Weather.FlashColor();
 		if (flashColor != Vector3::Zero)
 		{
 			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-			drawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor, false);
+			DrawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor, false);
 		}
 
 		if (CurrentLevel == 0)
@@ -146,11 +136,11 @@ namespace TEN::Renderer {
 
 		if (BinocularRange && !LaserSight)
 		{
-			drawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
 		}
 		else if (BinocularRange && LaserSight)
 		{
-			drawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+			DrawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
 
 			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 

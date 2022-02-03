@@ -60,7 +60,7 @@ namespace TEN::Renderer {
 		m_strings.push_back(str);
 	}
 
-	void Renderer11::drawAllStrings()
+	void Renderer11::DrawAllStrings()
 {
 		m_spriteBatch->Begin();
 

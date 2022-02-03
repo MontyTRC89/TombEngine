@@ -300,8 +300,8 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
-	// g_Renderer.printDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
-	// g_Renderer.printDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
+	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
+	// g_Renderer.PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
 	
 	// TEST 2: CENTERPOINT PROBE
 

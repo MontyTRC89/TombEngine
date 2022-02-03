@@ -20,8 +20,10 @@ vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
 
 DebrisFragment* GetFreeDebrisFragment()
 {
-	for (auto& frag : DebrisFragments) {
-		if (!frag.active) {
+	for (auto& frag : DebrisFragments) 
+	{
+		if (!frag.active)
+		{
 			return &frag;
 		}
 	}
@@ -30,71 +32,112 @@ DebrisFragment* GetFreeDebrisFragment()
 
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
-	MESH* meshPtr = nullptr;
-	RendererMesh* fragmentsMesh;
+	int meshIndex = 0;
+	MESH* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
 	bool isStatic;
-	if (mesh) 
+
+	if (mesh)
 	{
-		isStatic = false;
-		meshPtr = &g_Level.Meshes[StaticObjects[mesh->staticNumber].meshNumber];
+		isStatic = true;
+		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.yRot;
 		pos = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
 	}
-	else 
+	else
 	{
-		isStatic = true;
-		meshPtr = item->meshp;
+		isStatic = false;
+		meshIndex = item->meshIndex;
 		yRot = item->yRot;
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
-	fragmentsMesh = g_Renderer.getRendererMeshFromTrMesh(nullptr, meshPtr, num, 0, 0);
-	for (auto& renderBucket : fragmentsMesh->buckets) {
-		vector<RendererVertex>& meshVertices = renderBucket.Vertices;
-		for (int i = 0; i < renderBucket.Indices.size(); i += 3)
+
+	fragmentsMesh = &g_Level.Meshes[meshIndex];
+
+	for (auto& renderBucket : fragmentsMesh->buckets)
+	{
+		for (int i = 0; i < renderBucket.polygons.size(); i++)
 		{
-			DebrisFragment* fragment = GetFreeDebrisFragment();
-			if (!fragment) 
+			POLYGON* poly = &renderBucket.polygons[i];
+			int indices[6];
+
+			if (poly->shape == SHAPE_RECTANGLE)
 			{
-				break;
+				indices[0] = 0;
+				indices[1] = 1;
+				indices[2] = 3;
+				indices[3] = 2;
+				indices[4] = 3;
+				indices[5] = 1;
 			}
-			if (!fragment->active) 
+			else
 			{
-				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
-				RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
-				RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
-				RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);
+				indices[0] = 0;
+				indices[1] = 1;
+				indices[2] = 2;
+				indices[3] = -1;
+				indices[4] = -1;
+				indices[5] = -1;
+			}
 
-				//Take the average of all 3 local positions
-				Vector3 localPos = (vtx0.Position + vtx1.Position + vtx2.Position) / 3;
-				vtx0.Position -= localPos;
-				vtx1.Position -= localPos;
-				vtx2.Position -= localPos;
+			for (int j = 0; j < (poly->shape == SHAPE_RECTANGLE ? 2 : 1); j++)
+			{
+				DebrisFragment* fragment = GetFreeDebrisFragment();
 
-				Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
-				fragment->worldPosition = worldPos + pos;
-				fragment->mesh.vertices[0] = vtx0;
-				fragment->mesh.vertices[1] = vtx1;
-				fragment->mesh.vertices[2] = vtx2;
-				fragment->mesh.blendMode = renderBucket.blendMode;
-				fragment->mesh.tex = renderBucket.texture;
-				fragment->isStatic = isStatic;
-				fragment->active = true;
-				fragment->terminalVelocity = 1024;
-				fragment->gravity = Vector3(0, 7, 0);
-				fragment->restitution = 0.6f;
-				fragment->friction = 0.6f;
-				fragment->linearDrag = .99f;
-				fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
-				fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
-				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
-				fragment->roomNumber = roomNumber;
-				fragment->numBounces = 0;
+				if (!fragment->active)
+				{
+					Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
+
+					Vector3 pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]];
+					Vector3 pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]];
+					Vector3 pos3 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 2]]];
+
+					Vector2 uv1 = poly->textureCoordinates[indices[j * 3 + 0]];
+					Vector2 uv2 = poly->textureCoordinates[indices[j * 3 + 1]];
+					Vector2 uv3 = poly->textureCoordinates[indices[j * 3 + 2]];
+
+					Vector3 normal1 = poly->normals[indices[j * 3 + 0]];
+					Vector3 normal2 = poly->normals[indices[j * 3 + 1]];
+					Vector3 normal3 = poly->normals[indices[j * 3 + 2]];
+
+					//Take the average of all 3 local positions
+					Vector3 localPos = (pos1 + pos2 + pos3) / 3;
+					Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
+
+					fragment->worldPosition = worldPos + pos;
+
+					fragment->mesh.Positions[0] = pos1 - localPos;
+					fragment->mesh.Positions[1] = pos2 - localPos;
+					fragment->mesh.Positions[2] = pos3 - localPos;
+
+					fragment->mesh.TextureCoordinates[0] = uv1;
+					fragment->mesh.TextureCoordinates[1] = uv2;
+					fragment->mesh.TextureCoordinates[2] = uv3;
+
+					fragment->mesh.Normals[0] = normal1;
+					fragment->mesh.Normals[1] = normal2;
+					fragment->mesh.Normals[2] = normal3;
+
+					fragment->mesh.blendMode = BLENDMODE_OPAQUE;
+					fragment->mesh.tex = renderBucket.texture;
+
+					fragment->isStatic = isStatic;
+					fragment->active = true;
+					fragment->terminalVelocity = 1024;
+					fragment->gravity = Vector3(0, 7, 0);
+					fragment->restitution = 0.6f;
+					fragment->friction = 0.6f;
+					fragment->linearDrag = .99f;
+					fragment->angularVelocity = Vector3(GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39, GenerateFloat(-1, 1) * 0.39);
+					fragment->angularDrag = GenerateFloat(0.9f, 0.999f);
+					fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
+					fragment->roomNumber = roomNumber;
+					fragment->numBounces = 0;
+				}
 			}
 		}
 	}
-	delete fragmentsMesh;
 }
 
 Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 impactDirection, Vector3 impactLocation)

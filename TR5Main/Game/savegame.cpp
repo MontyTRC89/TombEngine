@@ -1201,7 +1201,7 @@ bool SaveGame::Load(int slot)
 	Lara.isLow = s->lara()->is_low();
 	Lara.isMoving = s->lara()->is_moving();
 	Lara.itemNumber = s->lara()->item_number();
-	Lara.jumpDirection = (LaraJumpDirection)s->lara()->jump_direction();
+	Lara.jumpDirection = (JumpDirection)s->lara()->jump_direction();
 	Lara.keepLow = s->lara()->keep_low();
 	Lara.Lasersight = s->lara()->lasersight();
 	Lara.lastGunType = (LARA_WEAPON_TYPE)s->lara()->last_gun_type();

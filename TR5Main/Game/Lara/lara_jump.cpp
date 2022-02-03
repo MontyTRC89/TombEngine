@@ -314,39 +314,39 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
-		info->jumpDirection = LaraJumpDirection::None;
+		info->jumpDirection = JumpDirection::NoDirection;
 
 	if ((TrInput & IN_FORWARD ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Forward) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		item->targetState = LS_JUMP_FORWARD;
-		info->jumpDirection = LaraJumpDirection::Forward;
+		info->jumpDirection = JumpDirection::Forward;
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Back) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		item->targetState = LS_JUMP_BACK;
-		info->jumpDirection = LaraJumpDirection::Back;
+		info->jumpDirection = JumpDirection::Back;
 		return;
 	}
 
 	if ((TrInput & IN_LEFT ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Left) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		item->targetState = LS_JUMP_LEFT;
-		info->jumpDirection = LaraJumpDirection::Left;
+		info->jumpDirection = JumpDirection::Left;
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == LaraJumpDirection::Right) &&
+		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		item->targetState = LS_JUMP_RIGHT;
-		info->jumpDirection = LaraJumpDirection::Right;
+		info->jumpDirection = JumpDirection::Right;
 		return;
 	}
 
@@ -354,12 +354,12 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraJumpUp(item, coll))
 	{
 		item->targetState = LS_JUMP_UP;
-		info->jumpDirection = LaraJumpDirection::Up;
+		info->jumpDirection = JumpDirection::Up;
 		return;
 	}
 
 	item->targetState = LS_IDLE;
-	info->jumpDirection = LaraJumpDirection::None;
+	info->jumpDirection = JumpDirection::NoDirection;
 }
 
 // State:		LS_JUMP_PREPARE (15)
@@ -371,15 +371,15 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	info->moveAngle = item->pos.yRot;
 	switch (info->jumpDirection)
 	{
-	case LaraJumpDirection::Back:
+	case JumpDirection::Back:
 		info->moveAngle += ANGLE(180.0f);
 		break;
 
-	case LaraJumpDirection::Left:
+	case JumpDirection::Left:
 		info->moveAngle -= ANGLE(90.0f);
 		break;
 
-	case LaraJumpDirection::Right:
+	case JumpDirection::Right:
 		info->moveAngle += ANGLE(90.0f);
 		break;
 
