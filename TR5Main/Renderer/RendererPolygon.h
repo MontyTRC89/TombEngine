@@ -1,10 +1,9 @@
 #pragma once
 namespace TEN::Renderer {
 	struct RendererPolygon {
-		unsigned char Shape;
-		int AnimatedSet;
-		int TextureId;
-		int Distance;
-		int Indices[4];
+		Vector3 centre;
+		Vector3 Normal;
+		unsigned char shape;
+		int baseIndex;
 	};
 }

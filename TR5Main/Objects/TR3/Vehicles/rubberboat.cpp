@@ -739,7 +739,7 @@ void RubberBoatAnimation(ITEM_INFO *boat, int collide)
 	{
 		if (LaraItem->activeState != RBOAT_STATE_HIT)
 		{
-			LaraItem->animNumber = (short)(Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide);
+			LaraItem->animNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide;
 			LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 			LaraItem->targetState = RBOAT_STATE_HIT;
 			LaraItem->activeState = RBOAT_STATE_HIT;

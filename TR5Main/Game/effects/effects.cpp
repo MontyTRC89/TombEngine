@@ -1518,7 +1518,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 		}
 		else
 		{
-			if (type == -2)
+			if (type == 254)
 			{
 				spark->sR = 48;
 				spark->sG = 255;

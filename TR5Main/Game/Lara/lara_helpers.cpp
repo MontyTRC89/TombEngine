@@ -208,27 +208,27 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
 	{
-		info->jumpDirection = LaraJumpDirection::Forward;
+		info->jumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
 		TestLaraJumpBack(item, coll))
 	{
-		info->jumpDirection = LaraJumpDirection::Back;
+		info->jumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
 		TestLaraJumpLeft(item, coll))
 	{
-		info->jumpDirection = LaraJumpDirection::Left;
+		info->jumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
 		TestLaraJumpRight(item, coll))
 	{
-		info->jumpDirection = LaraJumpDirection::Right;
+		info->jumpDirection = JumpDirection::Right;
 	}
 	else if (TestLaraJumpUp(item, coll)) [[likely]]
-		info->jumpDirection = LaraJumpDirection::Up;
+		info->jumpDirection = JumpDirection::Up;
 	else
-		info->jumpDirection = LaraJumpDirection::None;
+		info->jumpDirection = JumpDirection::NoDirection;
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.

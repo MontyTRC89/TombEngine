@@ -152,6 +152,8 @@ void LoadObjects()
 	{
 		MESH mesh;
 
+		mesh.LightMode = ReadInt8();
+
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
 		mesh.sphere.Center.z = ReadFloat();
@@ -233,20 +235,20 @@ void LoadObjects()
 		ANIM_STRUCT* anim = &g_Level.Anims[i];
 
 		anim->framePtr = ReadInt32();
-		anim->interpolation = ReadInt16();
-		anim->activeState = ReadInt16();
+		anim->interpolation = ReadInt32();
+		anim->activeState = ReadInt32();
 		anim->velocity = ReadInt32();
 		anim->acceleration = ReadInt32();
 		anim->Xvelocity = ReadInt32();
 		anim->Xacceleration = ReadInt32();
-		anim->frameBase = ReadInt16();
-		anim->frameEnd = ReadInt16();
-		anim->jumpAnimNum = ReadInt16();
-		anim->jumpFrameNum = ReadInt16();
-		anim->numberChanges = ReadInt16();
-		anim->changeIndex = ReadInt16();
-		anim->numberCommands = ReadInt16();
-		anim->commandIndex = ReadInt16();
+		anim->frameBase = ReadInt32();
+		anim->frameEnd = ReadInt32();
+		anim->jumpAnimNum = ReadInt32();
+		anim->jumpFrameNum = ReadInt32();
+		anim->numberChanges = ReadInt32();
+		anim->changeIndex = ReadInt32();
+		anim->numberCommands = ReadInt32();
+		anim->commandIndex = ReadInt32();
 	}
 
 	int numChanges = ReadInt32();
@@ -301,11 +303,11 @@ void LoadObjects()
 		MoveablesIds.push_back(objNum);
 
 		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = (short)ReadInt16();
-		Objects[objNum].meshIndex = (short)ReadInt16();
+		Objects[objNum].nmeshes = ReadInt32();
+		Objects[objNum].meshIndex = ReadInt32();
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();
-		Objects[objNum].animIndex = (short)ReadInt16();
+		Objects[objNum].animIndex = ReadInt32();
 
 		ReadInt16();
 

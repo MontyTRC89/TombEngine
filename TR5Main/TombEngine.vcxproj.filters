@@ -213,7 +213,7 @@
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp" />
-    <ClCompile Include="Renderer\Render11Helper.cpp" />
+    <ClCompile Include="Renderer\Renderer11Helper.cpp" />
     <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
     <ClCompile Include="Renderer\Renderer11Debug.cpp" />
     <ClCompile Include="Renderer\Renderer11Draw.cpp" />
@@ -305,6 +305,7 @@
     <ClCompile Include="Scripting\LuaHandler.cpp" />
     <ClCompile Include="Scripting\ScriptAssert.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
+    <ClCompile Include="Scripting\GameScriptFog.cpp" />
     <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
@@ -558,7 +559,7 @@
     <ClInclude Include="Objects\TR5\Entity\tr5_willowwisp.h" />
     <ClInclude Include="Objects\TR5\Shatter\tr5_smashobject.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
-    <ClInclude Include="Renderer\RenderEnums.h" />
+    <ClInclude Include="Renderer\Renderer11Enums.h" />
     <ClInclude Include="Libs\fixedpoint\fixed_point.hpp" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
@@ -698,11 +699,15 @@
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
+    <ClInclude Include="Renderer\RendererTransparentFace.h" />
+    <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Scripting\GameScriptAnimations.h" />
+    <ClInclude Include="Renderer\TextureBase.h" />
+    <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\collision\floordata.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
@@ -716,6 +721,7 @@
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
@@ -738,10 +744,6 @@
     <None Include="Shaders\HUD\DX11_PS_HUD.hlsl" />
     <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl" />
     <None Include="Shaders\HUD\DX11_VS_HUD.hlsl" />
-    <None Include="Shaders\Basic.fx" />
-    <None Include="Shaders\ClearGBuffer.fx" />
-    <None Include="Shaders\CombineFinal.fx" />
-    <None Include="Shaders\Depth.fx" />
     <None Include="Shaders\DX11_AmbientCubeMap.fx" />
     <None Include="Shaders\DX11_FinalPass.fx" />
     <None Include="Shaders\DX11_FullscreenQuad.fx" />
@@ -754,18 +756,6 @@
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
-    <None Include="Shaders\FillGBuffer.fx" />
-    <None Include="Shaders\FinalPass.fx" />
-    <None Include="Shaders\FXAA.fx" />
-    <None Include="Shaders\Horizon.fx" />
-    <None Include="Shaders\Items.fx" />
-    <None Include="Shaders\Light.fx" />
-    <None Include="Shaders\Rain.fx" />
-    <None Include="Shaders\ReconstructZBuffer.fx" />
-    <None Include="Shaders\Rooms.fx" />
-    <None Include="Shaders\Shader.fx" />
-    <None Include="Shaders\Sprites.fx" />
-    <None Include="Shaders\SSAO.fx" />
-    <None Include="Shaders\Transparent.fx" />
+    <None Include="Shaders\ShaderLight.hlsli" />
   </ItemGroup>
 </Project>
