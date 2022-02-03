@@ -634,8 +634,6 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	ShiftItem(item, coll);
 
-	// TODO: Vaulting from this state.
-
 	if (TestLaraStep(item, coll))
 	{
 		DoLaraStep(item, coll);

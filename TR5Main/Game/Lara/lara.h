@@ -5,7 +5,7 @@ struct ITEM_INFO;
 struct COLL_INFO;
 
 #define LARA_GRAB_THRESHOLD ANGLE(35.0f)
-#define FRONT_ARC ANGLE(90.0f)		// TODO: Check use.
+#define FRONT_ARC ANGLE(90.0f)	// TODO: Check use.
 
 // Lean rates
 #define LARA_LEAN_RATE ANGLE(1.5f)
@@ -35,16 +35,16 @@ struct COLL_INFO;
 
 // Flex rates
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
-#define LARA_CRAWL_FLEX_MAX ANGLE(45.0f) / 2		// 2 = hardcoded number of bones to flex (head and torso).
+#define LARA_CRAWL_FLEX_MAX ANGLE(45.0f) / 2	// 2 = hardcoded number of bones to flex (head and torso).
 
-constexpr auto LARA_HEIGHT = CLICK(3) - 1;		// Lara height in standard states.
-constexpr auto LARA_HEIGHT_CRAWL = 350;			// Lara height in crawl states.
-constexpr auto LARA_HEIGHT_MONKEY = 850;		// Lara height in monkey swing states.
-constexpr auto LARA_HEIGHT_SURFSWIM = 700;		// Lara height in water treading states.
-constexpr auto LARA_HEIGHT_STRETCH = 870;		// Lara height in jump-up and ledge hanging states.
-constexpr auto LARA_HEIGHT_REACH = 820;			// Lara height in reach state.
-constexpr auto LARA_HEIGHT_SURFACE = 800;		// Lara height when surfacing water.
-constexpr auto LARA_HEADROOM = 160;				// Amount of reasonable space above Lara's head.
+constexpr auto LARA_HEIGHT = CLICK(3) - 1;	// Lara height in standard states.
+constexpr auto LARA_HEIGHT_CRAWL = 350;		// Lara height in crawl states.
+constexpr auto LARA_HEIGHT_MONKEY = 850;	// Lara height in monkey swing states.
+constexpr auto LARA_HEIGHT_SURFSWIM = 700;	// Lara height in water treading states.
+constexpr auto LARA_HEIGHT_STRETCH = 870;	// Lara height in jump-up and ledge hanging states.
+constexpr auto LARA_HEIGHT_REACH = 820;		// Lara height in reach state.
+constexpr auto LARA_HEIGHT_SURFACE = 800;	// Lara height when surfacing water.
+constexpr auto LARA_HEADROOM = 160;			// Amount of reasonable space above Lara's head.
 constexpr auto LARA_RAD = 100;
 constexpr auto LARA_RAD_CRAWL = 200;
 constexpr auto LARA_RAD_UNDERWATER = 300;
@@ -54,10 +54,9 @@ constexpr auto LARA_VELOCITY = 12;
 constexpr auto LARA_FREEFALL_SPEED = 131;
 constexpr auto LARA_FREEFALL_SCREAM_SPEED = 154;
 constexpr auto LARA_FREEFALL_DIVE_DEATH_SPEED = 154;
-constexpr auto LARA_TERMINAL_VELOCITY = 0; // TODO
 
-constexpr auto LARA_RUN_JUMP_TIME = 22;				// Frames to count before running jump is possible.
-constexpr auto LARA_POSE_TIME = 30 * 30;		// 30 frames * 30 = 30 seconds to AFK pose.
+constexpr auto LARA_RUN_JUMP_TIME = 22;		// Frames to count before a running jump is possible.
+constexpr auto LARA_POSE_TIME = 30 * 30;	// 30 frames * 30 = 30 seconds to AFK pose.
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
 constexpr auto LARA_AIR_MAX = 1800.0f;
