@@ -25,7 +25,7 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	LaraItem->pos.zRot = 0;
 	LaraItem->gravityStatus = false;
 
-	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
+	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 4;
 	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 	LaraItem->currentAnimState = LS_DEATH;
 	LaraItem->goalAnimState = LS_DEATH;
@@ -35,9 +35,8 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	Lara.gunStatus = LG_HANDS_BUSY;
 	Lara.gunType = WEAPON_NONE;
 
-	Camera.flags = 1;
-	Camera.targetAngle = ANGLE(170);
-	Camera.targetElevation = -ANGLE(25);
+	Camera.targetDistance = SECTOR(2);
+	Camera.flags = CF_CHASE_OBJECT;
 }
 
 void TyrannosaurControl(short itemNum)
