@@ -193,6 +193,8 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
