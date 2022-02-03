@@ -1096,10 +1096,10 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int heightToFloor = GetCollisionResult(item).Position.Floor - item->pos.yPos;
+	int heightFromFloor = GetCollisionResult(item).Position.Floor - item->pos.yPos;
 	
 	if (item->airborne && item->fallspeed >= 0 &&
-		(heightToFloor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
+		(heightFromFloor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
@@ -1357,11 +1357,11 @@ bool IsJumpState(LARA_STATE state)
 		state == LS_JUMP_LEFT ||
 		state == LS_JUMP_RIGHT ||
 		state == LS_JUMP_UP ||
-		state == LS_REACH ||
-		state == LS_FREEFALL ||
 		state == LS_FALL_BACK ||
-		state == LS_SWAN_DIVE_START ||
-		state == LS_FREEFALL_DIVE)
+		state == LS_REACH ||
+		state == LS_SWAN_DIVE ||
+		state == LS_FREEFALL_DIVE ||
+		state == LS_FREEFALL)
 	{
 		return true;
 	}

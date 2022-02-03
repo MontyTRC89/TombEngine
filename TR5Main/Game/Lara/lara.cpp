@@ -487,7 +487,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					UpdateItemRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
-					if (item->activeState == LS_SWAN_DIVE_START)
+					if (item->activeState == LS_SWAN_DIVE)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(45.0f);
@@ -495,7 +495,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						AnimateLara(item);
 						item->fallspeed *= 2;
 					}
-					else if (item->activeState == LS_SWAN_DIVE_END)
+					else if (item->activeState == LS_FREEFALL_DIVE)
 					{
 						info->gunStatus = LG_HANDS_FREE;
 						item->pos.xRot = -ANGLE(85.0f);
@@ -532,8 +532,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->targetState = LS_IDLE;
 				else if (isSwamp)
 				{
-					if (item->activeState == LS_SWAN_DIVE_START ||
-						item->activeState == LS_SWAN_DIVE_END)
+					if (item->activeState == LS_SWAN_DIVE ||
+						item->activeState == LS_FREEFALL_DIVE)
 					{
 						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
 					}

@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
@@ -133,7 +134,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier, float gainMultiplier)
+long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier, float gainMultiplier)
 {
 	if (effectID >= g_Level.SoundMap.size())
 		return 0;
@@ -141,10 +142,10 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	if (BASS_GetDevice() == -1)
 		return 0;
 
-	if (!(env_flags & SFX_ALWAYS))
+	if (!(envFlags & SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if ((env_flags & ENV_FLAG_WATER) != (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+		if (envFlags & ENV_FLAG_WATER != TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 			return 0;
 	}
 

@@ -21,11 +21,11 @@
 // Control & Collision Functions
 // -----------------------------
 
-// TODO: Unused? Naming is also completely mismatched; enum calls it LS_GRAB_TO_FALL.
+// TODO: Unused? Naming is also completely mismatched.
+// State:		LS_GRAB_TO_FALL
+// Collision:	lara_void_func()
 void lara_col_land(ITEM_INFO* item, COLL_INFO* coll)
 {
-	/*state 14*/
-	/*state code: lara_void_func*/
 	lara_col_idle(item, coll);
 }
 
@@ -98,7 +98,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_WALK &&
 		info->gunStatus == LG_HANDS_FREE)
 	{
-		item->targetState = LS_SWAN_DIVE_START;
+		item->targetState = LS_SWAN_DIVE;
 		return;
 	}
 
@@ -296,19 +296,20 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT &&
-		TrInput & (IN_FORWARD | IN_BACK))
+	if (TrInput & (IN_FORWARD | IN_BACK))
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT &&
-		TrInput & (IN_FORWARD | IN_BACK))
-	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			info->turnRate -= LARA_TURN_RATE;
+			if (info->turnRate < -LARA_SLOW_TURN_MAX)
+				info->turnRate = -LARA_SLOW_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			info->turnRate += LARA_TURN_RATE;
+			if (info->turnRate > LARA_SLOW_TURN_MAX)
+				info->turnRate = LARA_SLOW_TURN_MAX;
+		}
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
@@ -754,10 +755,10 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_fall_back()
 void lara_col_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraJumpCollision(item, coll, item->pos.yRot + ANGLE(180.0f));
+	lara_col_jump_back(item, coll);
 }
 
-// State:		LS_SWAN_DIVE_START (52)
+// State:		LS_SWAN_DIVE (52)
 // Collision:	lara_col_swan_dive()
 void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -785,17 +786,16 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED &&
-		item->targetState != LS_FREEFALL_DIVE) // Hack?
+	if (item->fallspeed >= LARA_FREEFALL_SPEED)
 	{
-		item->targetState = LS_SWAN_DIVE_END;
+		item->targetState = LS_FREEFALL_DIVE;
 		return;
 	}
 
-	item->targetState = LS_SWAN_DIVE_START;
+	item->targetState = LS_SWAN_DIVE;
 }
 
-// State:		LS_SWAN_DIVE_START (52)
+// State:		LS_SWAN_DIVE (52)
 // Control:		lara_as_swan_dive()
 void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -850,9 +850,9 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		// TODO: Apply fall damage?
+		DoLaraFallDamage(item);	// Should never occur before fall speed reaches death speed, but here for extendability.
 
-		if (item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
+		if (item->hitPoints <= 0 || item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
 			item->targetState = LS_DEATH;
 		else
 			item->targetState = LS_IDLE;
@@ -874,5 +874,5 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_freefall_dive()
 void lara_col_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraJumpCollision(item, coll, item->pos.yRot);
+	lara_col_jump_forward(item, coll);
 }

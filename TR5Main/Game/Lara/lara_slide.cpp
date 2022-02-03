@@ -27,7 +27,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->targetState = LS_DEATH; //
+		item->targetState = LS_DEATH; // TODO
 		return;
 	}
 
@@ -124,7 +124,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->hitPoints <= 0)
 	{
-		item->targetState = LS_DEATH; //
+		item->targetState = LS_DEATH; // TODO
 		return;
 	}
 
