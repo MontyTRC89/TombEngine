@@ -7,6 +7,7 @@
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Specific/memory/LinearArrayBuffer.h"
 #include "RendererSprites.h"
+#include "RendererTransparentFace.h"
 
 namespace TEN::Renderer 
 {
@@ -15,6 +16,7 @@ namespace TEN::Renderer
 	struct RendererLight;
 	struct RendererEffect;
 	struct RendererRoom;
+	struct RendererTransparentFace;
 	constexpr auto MAX_ROOMS_DRAW = 256;
 	constexpr auto MAX_STATICS_DRAW = 128;
 	constexpr auto MAX_EFFECTS_DRAW = 16;
@@ -41,9 +43,6 @@ namespace TEN::Renderer
 		RenderViewCamera camera;
 		D3D11_VIEWPORT viewport;
 		std::vector<RendererRoom*> roomsToDraw;
-		std::vector<RendererStatic*> staticsToDraw;
-		std::vector<RendererEffect*> effectsToDraw;
-		std::vector<RendererItem*> itemsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
 		std::vector<RendererSpriteToDraw> spritesToDraw;
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);

@@ -58,7 +58,7 @@ struct FX_INFO
 	short nextActive;
 	short speed;
 	short fallspeed;
-	short frameNumber;
+	int frameNumber;
 	short counter;
 	short shade;
 	short flag1;

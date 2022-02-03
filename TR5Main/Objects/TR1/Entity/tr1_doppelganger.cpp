@@ -134,7 +134,7 @@ void DoppelgangerControl(short itemNum)
 	}
 }
 
-// TODO: drawLara not exist ! use Renderer11.cpp drawLara instead or create DrawLara() function with old behaviour.
+// TODO: DrawLara not exist ! use Renderer11.cpp DrawLara instead or create DrawLara() function with old behaviour.
 void DrawEvilLara(ITEM_INFO* item)
 {
 	/*
@@ -149,7 +149,7 @@ void DrawEvilLara(ITEM_INFO* item)
 		Lara.meshPtrs[i] = *(meshpp++);
 	}
 
-	drawLara(item);
+	DrawLara(item);
 
 	for (i = 0; i < 15; i++)
 		Lara.meshPtrs[i] = meshstore[i];*/

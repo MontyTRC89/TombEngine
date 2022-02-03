@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 namespace  TEN::Renderer {
-	bool Renderer11::printDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message) {
+	bool Renderer11::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message) {
 		return true;
 	}
 
-	void Renderer11::printDebugMessage(LPCSTR message, ...) {
+	void Renderer11::PrintDebugMessage(LPCSTR message, ...) {
 		char buffer[255];
 		ZeroMemory(buffer, 255);
 
