@@ -24,7 +24,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
-	initialiseScreen(w, h, refreshRate, windowed, handle, false);
+	InitialiseScreen(w, h, refreshRate, windowed, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
@@ -97,20 +97,20 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
-	m_cbCameraMatrices = createConstantBuffer<CCameraMatrixBuffer>();
-	m_cbItem = createConstantBuffer<CItemBuffer>();
-	m_cbStatic = createConstantBuffer<CStaticBuffer>();
-	m_cbLights = createConstantBuffer<CLightBuffer>();
-	m_cbMisc = createConstantBuffer<CMiscBuffer>();
-	m_cbShadowMap = createConstantBuffer<CShadowLightBuffer>();
-	m_cbRoom = createConstantBuffer<CRoomBuffer>();
-	m_cbAnimated = createConstantBuffer<CAnimatedBuffer>();
-	m_cbPostProcessBuffer = createConstantBuffer<CPostProcessBuffer>();
+	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
+	m_cbItem = CreateConstantBuffer<CItemBuffer>();
+	m_cbStatic = CreateConstantBuffer<CStaticBuffer>();
+	m_cbLights = CreateConstantBuffer<CLightBuffer>();
+	m_cbMisc = CreateConstantBuffer<CMiscBuffer>();
+	m_cbShadowMap = CreateConstantBuffer<CShadowLightBuffer>();
+	m_cbRoom = CreateConstantBuffer<CRoomBuffer>();
+	m_cbAnimated = CreateConstantBuffer<CAnimatedBuffer>();
+	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
 
 	//Prepare HUD Constant buffer
-	m_cbHUDBar = createConstantBuffer<CHUDBarBuffer>();
-	m_cbHUD = createConstantBuffer<CHUDBuffer>();
-	m_cbSprite = createConstantBuffer<CSpriteBuffer>();
+	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
+	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
+	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
 	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
@@ -191,11 +191,11 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 	Utils::throwIfFailed(m_device->CreateSamplerState(&shadowSamplerDesc,m_shadowSampler.GetAddressOf()));
 	m_shadowSampler->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof("ShadowSampler") + 1, "ShadowSampler");
-	initialiseBars();
+	InitialiseBars();
 	initQuad(m_device.Get());
 }
 
-void TEN::Renderer::Renderer11::initialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 

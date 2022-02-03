@@ -2,12 +2,12 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/winmain.h"
 namespace TEN::Renderer {
-	void Renderer11::toggleFullScreen()
+	void Renderer11::ToggleFullScreen()
 {
 		
 	}
 
-	void Renderer11::changeScreenResolution(int width, int height, int frequency, bool windowed) {
+	void Renderer11::ChangeScreenResolution(int width, int height, int frequency, bool windowed) {
 		HRESULT res;
 
 		/*if (windowed && !Windowed)
@@ -165,7 +165,7 @@ namespace TEN::Renderer {
 
 		Utils::throwIfFailed( m_swapChain->ResizeTarget(mode));
 
-		initialiseScreen(width, height, frequency, windowed, WindowsHandle, true);
+		InitialiseScreen(width, height, frequency, windowed, WindowsHandle, true);
 
 		ScreenWidth = width;
 		ScreenHeight = height;

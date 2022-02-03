@@ -121,7 +121,7 @@ namespace TEN::Renderer
 
 						Vector3 c = (pos1 + pos2) / 2.0f;
 
-						addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 							c,
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
 							(PI / 2),
@@ -144,7 +144,7 @@ namespace TEN::Renderer
 
 			if (spark->on) 
 			{
-				addSpriteBillboard(&m_sprites[spark->def],
+				AddSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
@@ -164,7 +164,7 @@ namespace TEN::Renderer
 				{
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
+						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
 																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
 																   TO_RAD(spark->rotAng), 
 																   spark->scalar,
@@ -258,7 +258,7 @@ namespace TEN::Renderer
 						}
 					}
 
-					addSpriteBillboard(&m_sprites[spark->def],
+					AddSpriteBillboard(&m_sprites[spark->def],
 									   pos,
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, 
@@ -270,7 +270,7 @@ namespace TEN::Renderer
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 					v.Normalize();
-					addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
 						pos, 
 						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
 						TO_RAD(spark->rotAng), 
@@ -353,7 +353,7 @@ namespace TEN::Renderer
 			BUBBLE_STRUCT* bubble = &Bubbles[i];
 			if (bubble->active)
 			{
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
 					Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z),
 					bubble->color,
 					bubble->rotation,
@@ -370,7 +370,7 @@ namespace TEN::Renderer
 
 			if (drip->on) 
 			{
-				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 					Vector3(drip->x, drip->y, drip->z),
 					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, view);
@@ -389,11 +389,11 @@ namespace TEN::Renderer
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) 
 				{
-					addSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
+					AddSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
 				} 
 				else 
 				{
-					addSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
+					AddSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
 						ripple->worldPos, 
 						ripple->currentColor, 
 						ripple->rotation, 
@@ -478,7 +478,7 @@ namespace TEN::Renderer
 
 			if (blood->on) 
 			{
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
@@ -497,7 +497,7 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::Snow:
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
@@ -507,7 +507,7 @@ namespace TEN::Renderer
 			case WeatherType::Rain:
 				Vector3 v;
 				p.Velocity.Normalize(v);
-				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
+				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, view);
@@ -708,13 +708,13 @@ namespace TEN::Renderer
 
 	}
 
-	Texture2D Renderer11::createDefaultNormalTexture() 
+	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
 		vector<byte> data = {128,128,255,1};
 		return Texture2D(m_device.Get(),1,1,data.data());
 	}
 
-	void Renderer11::drawFootprints(RenderView& view) 
+	void Renderer11::DrawFootprints(RenderView& view) 
 	{
 		for (auto i = footprints.begin(); i != footprints.end(); i++) 
 		{
@@ -752,7 +752,7 @@ namespace TEN::Renderer
 				if (!IsRoomUnderwater(roomNumber))
 					continue;
 
-				if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
+				if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
 				{
 					dust->Reset = true;
 					continue;
@@ -765,7 +765,7 @@ namespace TEN::Renderer
 			dust->Life++;
 			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-			addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, { 12, 12 }, BLENDMODE_ADDITIVE,view);
+			AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, { 12, 12 }, BLENDMODE_ADDITIVE,view);
 
 			if (dust->Life >= 32)
 				dust->Reset = true;
@@ -814,7 +814,7 @@ namespace TEN::Renderer
 				spriteMatrix = Matrix::Identity;
 			}
 
-			if (isSortingRequired(spr.BlendMode))
+			if (DoesBlendModeRequireSorting(spr.BlendMode))
 			{
 				// Collect sprites
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
@@ -834,7 +834,7 @@ namespace TEN::Renderer
 				if (spr.BlendMode != currentBlendMode)
 				{
 					currentBlendMode = spr.BlendMode;
-					setBlendMode(spr.BlendMode);
+					SetBlendMode(spr.BlendMode);
 				}
 
 				BindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
@@ -986,7 +986,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
 	{
-		setBlendMode(info->blendMode);
+		SetBlendMode(info->blendMode);
 
 		BindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
 
@@ -1152,7 +1152,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSmokeParticles(RenderView& view)
+	void Renderer11::DrawSmokeParticles(RenderView& view)
 	{
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
@@ -1161,11 +1161,11 @@ namespace TEN::Renderer
 		{
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, view);
+			AddSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, view);
 		}
 	}
 
-	void Renderer11::drawSparkParticles(RenderView& view)
+	void Renderer11::DrawSparkParticles(RenderView& view)
 	{
 		using TEN::Effects::Spark::SparkParticle;
 		using TEN::Effects::Spark::SparkParticles;
@@ -1178,11 +1178,11 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
-	void Renderer11::drawDripParticles(RenderView& view)
+	void Renderer11::DrawDripParticles(RenderView& view)
 	{
 		using TEN::Effects::Drip::DripParticle;
 		using TEN::Effects::Drip::dripParticles;
@@ -1194,11 +1194,11 @@ namespace TEN::Renderer
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
-	void Renderer11::drawExplosionParticles(RenderView& view)
+	void Renderer11::DrawExplosionParticles(RenderView& view)
 	{
 		using TEN::Effects::Explosion::explosionParticles;
 		using TEN::Effects::Explosion::ExplosionParticle;
@@ -1207,22 +1207,22 @@ namespace TEN::Renderer
 		{
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE,view);
+			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE,view);
 		}
 	}
 
-	void Renderer11::drawSimpleParticles(RenderView& view)
+	void Renderer11::DrawSimpleParticles(RenderView& view)
 	{
 		using namespace TEN::Effects;
 
 		for(SimpleParticle& s : simpleParticles)
 		{
 			if(!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
+			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
 		}
 	}
 
-	void Renderer11::setBlendMode(BLEND_MODES blendMode)
+	void Renderer11::SetBlendMode(BLEND_MODES blendMode)
 	{
 		switch (blendMode)
 		{
