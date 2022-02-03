@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_shiva.h"
-
-#include "Game/animation.h"
-#include "Game/control/box.h"
+#include "Objects/TR3/Entity/TR3_shiva.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/camera.h"
+#include "Game/control/box.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
@@ -99,7 +99,7 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 	size += (GetRandomControl() & 31) + 32;
-	sptr->size = sptr->sSize = size / 8;
+	sptr->size = sptr->sSize = size / 100;
 	sptr->dSize = size;
 }
 
@@ -111,7 +111,7 @@ static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaRightBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		//SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
 	}
 
 	if (!(shiva->flags) && (item->touchBits & 0x2400))
@@ -120,7 +120,7 @@ static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
 		LaraItem->hitStatus = true;
 		CreatureEffect(item, &shivaLeftBite, DoBloodSplat);
 		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		//SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
 	}
 }
 
@@ -285,7 +285,7 @@ void ShivaControl(short itemNum)
 
 			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags) || !info.ahead)
 			{
-				item->goalAnimState = 0;
+				item->goalAnimState = 9;
 				shiva->flags = 0;
 			}
 			else if (shiva->flags)
@@ -404,6 +404,44 @@ void ShivaControl(short itemNum)
 	{
 		CreatureKill(item, 18, 6, 2);
 		return;
+	}
+
+	CreatureTilt(item, tilt);
+	head_y -= torso_y;
+	CreatureJoint(item, 0, torso_y);
+	CreatureJoint(item, 1, torso_x);
+	CreatureJoint(item, 2, head_y);
+	CreatureJoint(item, 3, head_x);
+	CreatureAnimation(itemNum, angle, tilt);
+}
+
+void LaraShivaDeath(ITEM_INFO* item)
+{
+	item->goalAnimState = 6;
+
+	if (LaraItem->roomNumber != item->roomNumber)
+		ItemNewRoom(Lara.itemNumber, item->roomNumber);
+
+	LaraItem->pos.xPos = item->pos.xPos;
+	LaraItem->pos.yPos = item->pos.yPos;
+	LaraItem->pos.zPos = item->pos.zPos;
+	LaraItem->pos.yRot = item->pos.yRot;
+	LaraItem->pos.xRot = 0;
+	LaraItem->pos.zRot = 0;
+	LaraItem->gravityStatus = false;
+
+	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 9;
+	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+	LaraItem->currentAnimState = LS_DEATH;
+	LaraItem->goalAnimState = LS_DEATH;
+
+	LaraItem->hitPoints = -16384;
+	Lara.air = -1;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.gunType = WEAPON_NONE;
+
+	Camera.targetDistance = SECTOR(2);
+	Camera.flags = CF_CHASE_OBJECT;
 	}
 
 	CreatureTilt(item, tilt);
