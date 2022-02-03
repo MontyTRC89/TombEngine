@@ -33,26 +33,15 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include "Renderer/Structures/RendererBone.h"
+#include "Renderer/Structures/RendererVideoAdapter.h"
+#include "Renderer/Structures/RendererLight.h"
 
 struct CAMERA_INFO;
 
 namespace TEN::Renderer
 {
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
-
-	struct RendererDisplayMode
-	{
-		int Width;
-		int Height;
-		int RefreshRate;
-	};
-
-	struct RendererVideoAdapter
-	{
-		std::string Name;
-		int Index;
-		std::vector<RendererDisplayMode> DisplayModes;
-	};
 
 	struct RendererHUDBar
 	{
@@ -80,42 +69,6 @@ namespace TEN::Renderer
 		int Flags;
 		std::wstring String;
 		Vector3 Color;
-	};
-
-	struct RendererBone
-	{
-		Vector3 Translation;
-		Matrix GlobalTransform;
-		Matrix Transform;
-		Vector3 GlobalTranslation;
-		std::vector<RendererBone*> Children;
-		RendererBone* Parent;
-		int Index;
-		Vector3 ExtraRotation;
-		byte ExtraRotationFlags;
-
-		RendererBone(int index)
-		{
-			Index = index;
-			ExtraRotationFlags = 0;
-			Translation = Vector3(0, 0, 0);
-			ExtraRotation = Vector3(0, 0, 0);
-		}
-	};
-
-	struct RendererLight
-	{
-		Vector3 Position;
-		int Type;
-		Vector3 Color;
-		float LocalIntensity;
-		Vector3 Direction;
-		float Distance;
-		float Intensity;
-		float In;
-		float Out;
-		float Range;
-		bool AffectNeighbourRooms;
 	};
 
 	struct RendererAnimatedTexture
