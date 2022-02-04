@@ -386,10 +386,14 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
+			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
+
+			if (TrInput & (IN_ACTION | IN_JUMP) &&
+				crawlVaultResult.Success &&
 				g_GameFlow->Animations.CrawlExtended)
 			{
-				DoLaraCrawlVault(item, coll);
+				item->targetState = crawlVaultResult.TargetState;
+				ResetLaraFlex(item);
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) [[likely]]
