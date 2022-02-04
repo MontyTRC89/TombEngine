@@ -1,0 +1,78 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Debug" Condition="'$(Configuration.ToLower())' == 'debug'">
+    <NuGetConfiguration>Debug</NuGetConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Non_Debug" Condition="'$(Configuration.ToLower())' != 'debug'">
+    <NuGetConfiguration>Release</NuGetConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <NuGetPlatform>x86</NuGetPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'!='Win32'">
+    <NuGetPlatform>x64</NuGetPlatform>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <!-- By default, the project links with xapobaseredist.lib which depends on the static runtime library.
+         An alternate version of the library, xapobaseredist_md.lib is provided if the dynamic runtime library is preferred.
+         To make the project link with it, set the environment variable XAPODynamicCRT to 1. Or you can do it by adding the
+         following to your .vcxproj file:
+           <PropertyGroup>
+             <XAPODynamicCRT>1</XAPODynamicCRT>
+           </PropertyGroup>
+    -->
+    <Link Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Debug|x64'">
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)release\lib\x64\xaudio2_9redist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'=='1'">$(MSBuildThisFileDirectory)debug\lib\x64\xapobaseredist_md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'!='1'">$(MSBuildThisFileDirectory)debug\lib\x64\xapobaseredist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Release|x64'">
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)release\lib\x64\xaudio2_9redist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'=='1'">$(MSBuildThisFileDirectory)release\lib\x64\xapobaseredist_md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'!='1'">$(MSBuildThisFileDirectory)release\lib\x64\xapobaseredist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Debug|x86'">
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)release\lib\x86\xaudio2_9redist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'=='1'">$(MSBuildThisFileDirectory)debug\lib\x86\xapobaseredist_md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'!='1'">$(MSBuildThisFileDirectory)debug\lib\x86\xapobaseredist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Release|x86'">
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)release\lib\x86\xaudio2_9redist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'=='1'">$(MSBuildThisFileDirectory)release\lib\x86\xapobaseredist_md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(XAPODynamicCRT)'!='1'">$(MSBuildThisFileDirectory)release\lib\x86\xapobaseredist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>USING_XAUDIO2_REDIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Debug|x64'">
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'=='1'" Include="$(MSBuildThisFileDirectory)debug\lib\x64\xapobaseredist_md.pdb" />
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'!='1'" Include="$(MSBuildThisFileDirectory)debug\lib\x64\xapobaseredist.pdb" />
+    <!-- While a Debug version of xaudio2_9redist.dll is included in the NuGet package, the Debug version is not fully tested. For that reason,
+         we deploy the Release version of xaudio2_9redist.dll even when building a Debug version of the app.
+         You can modify the below statements to deploy the debug version if there is a special need to use it. -->
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\lib\x64\xaudio2_9redist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\bin\x64\xaudio2_9redist.dll" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Release|x64'">
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'=='1'" Include="$(MSBuildThisFileDirectory)release\lib\x64\xapobaseredist_md.pdb" />
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'!='1'" Include="$(MSBuildThisFileDirectory)release\lib\x64\xapobaseredist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\lib\x64\xaudio2_9redist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\bin\x64\xaudio2_9redist.dll" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Debug|x86'">
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'=='1'" Include="$(MSBuildThisFileDirectory)debug\lib\x86\xapobaseredist_md.pdb" />
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'!='1'" Include="$(MSBuildThisFileDirectory)debug\lib\x86\xapobaseredist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\lib\x86\xaudio2_9redist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\bin\x86\xaudio2_9redist.dll" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NuGetConfiguration)|$(NuGetPlatform)'=='Release|x86'">
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'=='1'" Include="$(MSBuildThisFileDirectory)release\lib\x86\xapobaseredist_md.pdb" />
+    <ReferenceCopyLocalPaths Condition="'$(XAPODynamicCRT)'!='1'" Include="$(MSBuildThisFileDirectory)release\lib\x86\xapobaseredist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\lib\x86\xaudio2_9redist.pdb" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)release\bin\x86\xaudio2_9redist.dll" />
+  </ItemGroup>
+  <Target Name="ValidateXAudio2RedistSupported" BeforeTargets="PrepareForBuild">
+    <Error Condition="$(Platform.Contains('Gaming.Xbox'))" Text="The XAudio2Redist NuGet package is not supported for Xbox. Use XAudio 2.9 from the Microsoft GDK instead." />
+  </Target>
+</Project>
