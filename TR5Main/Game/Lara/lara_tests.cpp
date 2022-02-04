@@ -1369,6 +1369,20 @@ bool IsJumpState(LARA_STATE state)
 	return false;
 }
 
+bool IsRunJumpCountState(LARA_STATE state)
+{
+	if (state == LS_RUN_FORWARD ||
+		state == LS_WALK_FORWARD ||
+		state == LS_JUMP_FORWARD ||
+		state == LS_SPRINT ||
+		state == LS_SPRINT_DIVE)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
 {
 	auto start = GAME_VECTOR(

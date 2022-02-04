@@ -51,6 +51,7 @@ void GetTighRopeFallOff(int Regularity);
 
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 bool IsJumpState(LARA_STATE state);
+bool IsRunJumpCountState(LARA_STATE state);
 
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side = 0);
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
