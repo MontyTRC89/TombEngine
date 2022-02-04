@@ -13,7 +13,6 @@
 #include "Game/effects/effects.h"
 #include "Game/pickup/pickup.h"
 #include "Game/gui.h"
-#include "GameScriptDisplayString.h"
 #include "GameScriptFreeFunctions.h"
 #include "ReservedScriptNames.h"
 #include "Game/camera.h"
@@ -33,25 +32,6 @@ Functions and callbacks for level-specific logic scripts.
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
 
-/***
-Show some text on-screen.
-@tparam DisplayString str the string object to draw
-@function ShowString
-@tparam float time the time in seconds for which to show the string.
-If not given, the string will have an "infinite" life, and will show
-until @{HideString} is called or until the level is finished.
-Default: nil (i.e. infinite)
-*/
-
-	m_lua->set_function(ScriptReserved_ShowString, &GameScript::ShowString, this);
-
-/***
-Hide some on-screen text.
-@function HideString
-@tparam DisplayString str the string object to hide. Must previously have been shown
-with a call to @{ShowString}, or this function will have no effect.
-*/
-	m_lua->set_function(ScriptReserved_HideString, [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
 
 	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
@@ -60,12 +40,6 @@ with a call to @{ShowString}, or this function will have no effect.
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
 
 	
-	GameScriptDisplayString::Register(m_lua);
-	GameScriptDisplayString::SetCallbacks(
-		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
-		);
 	GameScriptPosition::Register(m_lua);
 	GameScriptFreeFunctions::Register(m_lua);
 
@@ -108,35 +82,6 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 		return ScriptAssert(false, error);
 	}
 	return true;
-}
-
-std::optional<std::reference_wrapper<UserDisplayString>> GameScript::GetDisplayString(DisplayStringIDType id)
-{
-	auto it = m_userDisplayStrings.find(id);
-	if (std::cend(m_userDisplayStrings) == it)
-		return std::nullopt;
-	return std::ref(m_userDisplayStrings.at(id));
-}
-
-bool GameScript::ScheduleRemoveDisplayString(DisplayStringIDType id)
-{
-	auto it = m_userDisplayStrings.find(id);
-	if (std::cend(m_userDisplayStrings) == it)
-		return false;
-
-	it->second.m_deleteWhenZero = true;
-	return true;
-}
-
-bool GameScript::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
-{
-	return m_userDisplayStrings.insert_or_assign(id, ds).second;
-}
-
-
-void GameScript::SetCallbackDrawString(CallbackDrawString cb)
-{
-	m_callbackDrawSring = cb;
 }
 
 void GameScript::FreeLevelScripts()
@@ -266,46 +211,6 @@ void GameScript::ResetVariables()
 	(*m_lua)["Lara"] = NULL;
 }
 
-void GameScript::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
-{
-	auto it = m_userDisplayStrings.find(str.GetID());
-	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
-	it->second.m_isInfinite = !nSeconds.has_value();
-}
-
-void GameScript::ProcessDisplayStrings(float dt)
-{
-	auto it = std::begin(m_userDisplayStrings);
-	while (it != std::end(m_userDisplayStrings))
-	{
-		auto& str = it->second;
-		bool endOfLife = (0.0f >= str.m_timeRemaining);
-		if (str.m_deleteWhenZero && endOfLife)
-		{
-			ScriptAssertF(!str.m_isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str.m_key);
-			it = m_userDisplayStrings.erase(it);
-		}
-		else
-		{
-			if (!endOfLife || str.m_isInfinite)
-			{
-				char const* cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
-				int flags = 0;
-
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])
-					flags |= PRINTSTRING_CENTER;
-
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
-					flags |= PRINTSTRING_OUTLINE;
-
-				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
-
-				str.m_timeRemaining -= dt;
-			}
-			++it;
-		}
-	}
-}
 
 sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
 {
