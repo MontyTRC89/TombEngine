@@ -46,6 +46,12 @@ struct CrawlVaultTestSetup
 	bool CheckDeath = true;
 };
 
+struct CrawlVaultTestResult
+{
+	bool Success;
+	LARA_STATE TargetState;
+};
+
 struct JumpTestSetup
 {
 	short Angle;

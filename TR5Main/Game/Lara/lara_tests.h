@@ -101,8 +101,8 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll);
+CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testSetup);
 bool TestLaraRunJumpForward(ITEM_INFO* item, COLL_INFO* coll);
