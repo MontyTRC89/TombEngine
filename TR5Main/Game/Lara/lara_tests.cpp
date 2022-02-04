@@ -2116,19 +2116,6 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
 }
 
-bool TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
-{
-	if (TestLaraCrawlExitJump(item, coll) ||
-		TestLaraCrawlExitDownStep(item, coll) ||
-		TestLaraCrawlUpStep(item, coll) ||
-		TestLaraCrawlDownStep(item, coll))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int y = item->pos.yPos;
@@ -2146,6 +2133,37 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
+}
+
+CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// Input check is redundant, but provides for a slight optimisation.
+	if (!(TrInput & (IN_ACTION | IN_JUMP)))
+		return CrawlVaultTestResult { false, (LARA_STATE)-1 };
+
+	if (TestLaraCrawlExitDownStep(item, coll))
+	{
+		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
+			return CrawlVaultTestResult { true, LS_CRAWL_STEP_DOWN };
+		else [[likely]]
+			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_STEP_DOWN };
+	}
+
+	if (TestLaraCrawlExitJump(item, coll))
+	{
+		if (TrInput & IN_WALK)
+			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_FLIP };
+		else [[likely]]
+			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_JUMP };
+	}
+
+	if (TestLaraCrawlUpStep(item, coll))
+		return CrawlVaultTestResult { true, LS_CRAWL_STEP_UP };
+
+	if (TestLaraCrawlDownStep(item, coll))
+		return CrawlVaultTestResult { true, LS_CRAWL_STEP_DOWN };
+
+	return CrawlVaultTestResult { false, (LARA_STATE)-1 };
 }
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testSetup)

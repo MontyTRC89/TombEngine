@@ -101,45 +101,6 @@ void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yPos += coll->Middle.Ceiling;
 }
 
-void DoLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	ResetLaraFlex(item);
-
-	if (TestLaraCrawlExitDownStep(item, coll))
-	{
-		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
-			item->targetState = LS_CRAWL_STEP_DOWN;
-		else [[likely]]
-			item->targetState = LS_CRAWL_EXIT_STEP_DOWN;
-
-		return;
-	}
-
-	if (TestLaraCrawlExitJump(item, coll))
-	{
-		if (TrInput & IN_WALK)
-			item->targetState = LS_CRAWL_EXIT_FLIP;
-		else [[likely]]
-			item->targetState = LS_CRAWL_EXIT_JUMP;
-
-		return;
-	}
-
-	if (TestLaraCrawlUpStep(item, coll))
-	{
-		item->targetState = LS_CRAWL_STEP_UP;
-		return;
-	}
-
-	if (TestLaraCrawlDownStep(item, coll))
-	{
-		item->targetState = LS_CRAWL_STEP_DOWN;
-		return;
-	}
-}
-
 // TODO: Doesn't always work on bridges.
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -392,7 +353,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->activeState != LS_RUN_FORWARD)
 		info->runJumpQueued = false;
 
-	// Reset projected height value.
+	// Reset projected height value used by step function.
 	if (item->activeState != LS_VAULT)
 		info->projectedFloorHeight = NO_HEIGHT;
 
