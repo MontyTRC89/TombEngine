@@ -224,7 +224,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_sclimbend,
 	lara_as_null,//161
 	lara_as_null,//162
-	lara_as_monkey_back//163
+	lara_as_monkey_back,//163
+	lara_as_null//164
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -392,7 +393,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,	  // lara_col_sclimbend
 	lara_void_func,//161
 	lara_void_func,//162
-	lara_col_monkey_back//163
+	lara_col_monkey_back,//163
+	lara_col_vault//164
 };
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)

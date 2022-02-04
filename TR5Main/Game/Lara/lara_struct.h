@@ -198,6 +198,7 @@ enum LARA_STATE
 	LS_CRAWL_STEP_UP = 161,
 	LS_CRAWL_STEP_DOWN = 162,
 	LS_MONKEY_BACK = 163,
+	LS_VAULT = 164,
 
 	NUM_LARA_STATES
 };
@@ -1073,6 +1074,7 @@ struct LaraInfo
 	LARA_WATER_STATUS waterStatus; // LW_enum
 	short climbStatus;
 	int poseCount;
+	int projectedFloorHeight;
 	JumpDirection jumpDirection;
 	int runJumpCount;
 	bool runJumpQueued;
