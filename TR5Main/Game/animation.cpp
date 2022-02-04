@@ -121,21 +121,17 @@ void AnimateItem(ITEM_INFO* item)
 
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
 					}
-					else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
-						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER || Objects[item->objectNumber].intelligent))
-						{
+						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)  || Objects[item->objectNumber].intelligent))
 							SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
-						}
 					}
-					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !(g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
-					{
+					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
-					}
 				}
 				else
 				{
-					if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+					if (TestEnvironment(ENV_FLAG_WATER, item))
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 1);
 					else
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 0);

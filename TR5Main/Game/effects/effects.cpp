@@ -2,6 +2,7 @@
 #include "Game/effects/effects.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/effects/lara_fx.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/bubble.h"
@@ -1221,7 +1222,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-	if (!(room->flags & ENV_FLAG_WATER))
+	if (!TestEnvironment(ENV_FLAG_WATER, room))
 		return;
 
 	short roomNumber2 = item->roomNumber;
@@ -1229,7 +1230,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 
 	ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
 
-	if (room2->flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, room2))
 		return;
 
 	ANIM_FRAME* frame = GetBestFrame(item);
@@ -1270,15 +1271,15 @@ void Splash(ITEM_INFO* item)
 	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-	if (room->flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
-		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
-		SplashSetup.y = wh - 1;
+		int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+		SplashSetup.y = waterHeight - 1;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.splashPower = item->fallspeed;
 		SplashSetup.innerRadius = 64;
-		SetupSplash(&SplashSetup,roomNumber);
+		SetupSplash(&SplashSetup, roomNumber);
 	}
 }
 
