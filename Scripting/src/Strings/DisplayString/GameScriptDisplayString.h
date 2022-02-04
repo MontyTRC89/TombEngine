@@ -1,5 +1,7 @@
 #pragma once
 #include "GameScriptColor.h"
+#include <functional>
+#include <array>
 
 enum class DisplayStringOptions : size_t
 {
@@ -36,7 +38,7 @@ private:
 	float m_timeRemaining{ 0.0f };
 	bool m_isInfinite{ false };
 	bool m_isTranslated{ false };
-	friend class GameScript;
+	friend class StringsHandler;
 	friend class GameScriptDisplayString;
 };
 

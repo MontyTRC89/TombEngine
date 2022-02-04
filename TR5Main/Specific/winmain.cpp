@@ -170,6 +170,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		g_GameFlow->LoadGameFlowScript();
 		g_GameScript = ScriptInterfaceState::CreateGame();
 		g_GameScriptEntities = ScriptInterfaceState::CreateEntities();
+		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 	}
 	catch (TENScriptException const& e)
 	{
@@ -290,6 +291,8 @@ void WinClose()
 	
 	delete g_GameScript;
 	delete g_GameFlow;
+	delete g_GameScriptEntities;
+	delete g_GameStringsHandler;
 
 	ShutdownTENLog();
 }

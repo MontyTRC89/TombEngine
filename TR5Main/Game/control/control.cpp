@@ -48,6 +48,7 @@
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
 #include "Scripting/Entities/ScriptInterfaceEntities.h"
+#include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -113,7 +114,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	g_GameScript->ProcessDisplayStrings(DELTA_TIME);
+	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int framesCount = 0;
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
@@ -478,7 +479,7 @@ GAME_STATUS DoTitle(int index, std::string const & ambient)
 		{
 			g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
-			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
 				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 			});
@@ -593,7 +594,7 @@ GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegam
 	{
 		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
 			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 		});

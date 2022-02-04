@@ -17,7 +17,6 @@ using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int,
 class ScriptInterfaceGame {
 public:
 	virtual ~ScriptInterfaceGame() = default;
-	virtual void ProcessDisplayStrings(float dt) = 0;
 	
 	virtual void InitCallbacks() = 0;
 
@@ -27,11 +26,9 @@ public:
 	virtual void OnSave() = 0;
 	virtual void OnEnd() = 0;
 
-	virtual void SetCallbackDrawString(CallbackDrawString) = 0;
 	virtual void FreeLevelScripts() = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
 	virtual void ExecuteFunction(std::string const& luaFileName) = 0;
-
 };
 
 extern ScriptInterfaceGame* g_GameScript;
