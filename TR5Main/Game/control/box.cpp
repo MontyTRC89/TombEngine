@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/tomb4fx.h"
@@ -706,7 +707,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			else
 			{
 				floor = GetFloor(item->pos.xPos, y + STEP_SIZE, item->pos.zPos, &roomNumber);
-				if (g_Level.Rooms[roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+				if (TestEnvironment(ENV_FLAG_WATER, roomNumber) ||
+					TestEnvironment(ENV_FLAG_SWAMP, roomNumber))
 				{
 					dy = -LOT->fly;
 				}

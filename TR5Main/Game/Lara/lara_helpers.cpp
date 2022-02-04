@@ -246,8 +246,6 @@ void SetLaraFallBackState(ITEM_INFO* item)
 
 void SetLaraMonkeyFallState(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->data;
-
 	// Hack.
 	if (item->activeState == LS_MONKEY_TURN_180)
 		return;
@@ -340,14 +338,9 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	// Reset running jump timer.
-	if (item->activeState != LS_RUN_FORWARD &&
-		item->activeState != LS_WALK_FORWARD &&
-		item->activeState != LS_JUMP_FORWARD &&
-		item->activeState != LS_SPRINT &&
-		item->activeState != LS_SPRINT_DIVE)
-	{
+	if (!IsRunJumpCountState((LARA_STATE)item->activeState))
 		info->runJumpCount = 0;
-	}
+
 
 	// Reset running jump action queue.
 	if (item->activeState != LS_RUN_FORWARD)
