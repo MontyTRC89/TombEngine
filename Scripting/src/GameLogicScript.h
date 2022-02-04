@@ -8,7 +8,7 @@
 #include "GameScriptColor.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
-#include "GameScriptDisplayString.h"
+#include "Strings/StringsHandler.h"
 
 struct LuaFunction {
 	std::string Name;
@@ -43,14 +43,11 @@ struct LuaVariable
 	bool BoolValue;
 };
 
-using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
 class GameScript : public LuaHandler, public ScriptInterfaceGame
 {
 private:
-
 	LuaVariables												m_globals{};
 	LuaVariables												m_locals{};
-	DisplayStringMap											m_userDisplayStrings{};
 	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
@@ -60,16 +57,10 @@ private:
 
 	void ResetLevelTables();
 
-	CallbackDrawString							m_callbackDrawSring;
 public:	
 	GameScript(sol::state* lua);
 
 	void								FreeLevelScripts() override;
-
-	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds);
-	
-std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(DisplayStringIDType id);
-	bool								ScheduleRemoveDisplayString(DisplayStringIDType id);
 
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
@@ -86,10 +77,6 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
 	void								ResetVariables();
 
-	void								SetCallbackDrawString(CallbackDrawString cb) override;
-
-	void								ShowString(GameScriptDisplayString const&, sol::optional<float> nSeconds);
-	void								ProcessDisplayStrings(float dt) override;
 	void								InitCallbacks() override;
 	void								OnStart() override;
 	void								OnLoad() override;
