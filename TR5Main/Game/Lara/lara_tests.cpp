@@ -117,9 +117,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		auto vaultResult = TestLaraVault1StepToCrouch(item, coll);
 		if (vaultResult.Success && !success)
 		{
-			item->pos.yPos = vaultResult.Height + CLICK(1);
+			info->projectedFloorHeight = vaultResult.Height + CLICK(1);
 			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
-			item->activeState = LS_GRABBING;
+			item->activeState = LS_VAULT;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
@@ -130,9 +130,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		vaultResult = TestLaraVault2Steps(item, coll);
 		if (vaultResult.Success && !success)
 		{
-			item->pos.yPos = vaultResult.Height + CLICK(2);
+			info->projectedFloorHeight = vaultResult.Height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
-			item->activeState = LS_GRABBING;
+			item->activeState = LS_VAULT;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->targetState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
@@ -143,10 +143,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success && !success &&
 			g_GameFlow->Animations.CrawlExtended)
 		{
-			item->pos.yPos = vaultResult.Height + CLICK(2);
+			info->projectedFloorHeight = vaultResult.Height + CLICK(2);
 			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->activeState = LS_GRABBING;
+			item->activeState = LS_VAULT;
 			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
@@ -156,9 +156,9 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		vaultResult = TestLaraVault3Steps(item, coll);
 		if (vaultResult.Success && !success)
 		{
-			item->pos.yPos = vaultResult.Height + CLICK(3);
+			info->projectedFloorHeight = vaultResult.Height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
-			item->activeState = LS_GRABBING;
+			item->activeState = LS_VAULT;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->targetState = LS_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
@@ -169,10 +169,10 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success && !success &&
 			g_GameFlow->Animations.CrawlExtended)
 		{
-			item->pos.yPos = vaultResult.Height + CLICK(3);
+			info->projectedFloorHeight = vaultResult.Height + CLICK(3);
 			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
 			item->frameNumber = GetFrameNumber(item, 0);
-			item->activeState = LS_GRABBING;
+			item->activeState = LS_VAULT;
 			item->targetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_BUSY;
 			success = true;
@@ -245,7 +245,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		item->activeState = LS_MONKEY_VAULT;
 		return true;
 	}
-
+	
 	return false;
 }
 

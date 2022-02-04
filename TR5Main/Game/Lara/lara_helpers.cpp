@@ -33,8 +33,11 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll, int deltaHeight)
 {
+	if (deltaHeight == NO_HEIGHT)
+		return;
+
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		if (TestLaraStepUp(item, coll))
@@ -42,7 +45,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 			item->targetState = LS_STEP_UP;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->pos.yPos += coll->Middle.Floor;
+				item->pos.yPos += deltaHeight;
 				return;
 			}
 		}
@@ -51,7 +54,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 			item->targetState = LS_STEP_DOWN;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->pos.yPos += coll->Middle.Floor;
+				item->pos.yPos += deltaHeight;
 				return;
 			}
 		}
@@ -61,19 +64,24 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	constexpr int rate = 50;
 	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
-	int sign = std::copysign(1, coll->Middle.Floor);
+	int sign = std::copysign(1, deltaHeight);
 	
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && deltaHeight > 0)
 		item->pos.yPos += SWAMP_GRAVITY;
-	else if (abs(coll->Middle.Floor) > (STEPUP_HEIGHT / 2))		// Outer range.
+	else if (abs(deltaHeight) > (STEPUP_HEIGHT / 2))		// Outer range.
 		item->pos.yPos += rate * sign;
-	else if (abs(coll->Middle.Floor) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
-		abs(coll->Middle.Floor) >= threshold)
+	else if (abs(deltaHeight) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
+		abs(deltaHeight) >= threshold)
 	{
-		item->pos.yPos += std::max<int>(abs(coll->Middle.Floor / 2.75), threshold) * sign;
+		item->pos.yPos += std::max<int>(abs(deltaHeight / 2.75), threshold) * sign;
 	}
 	else
-		item->pos.yPos += coll->Middle.Floor;
+		item->pos.yPos += deltaHeight;
+}
+
+void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+{
+	DoLaraStep(item, coll, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
@@ -383,6 +391,10 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	// Reset running jump action queue.
 	if (item->activeState != LS_RUN_FORWARD)
 		info->runJumpQueued = false;
+
+	// Reset projected height value.
+	if (item->activeState != LS_VAULT)
+		info->projectedFloorHeight = NO_HEIGHT;
 
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&

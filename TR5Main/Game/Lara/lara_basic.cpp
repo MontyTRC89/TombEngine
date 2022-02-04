@@ -87,6 +87,21 @@ void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 }
 
+// State:	LS_VAULT (164)
+// Control:	lara_as_null()
+void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	item->activeState = LS_VAULT; // temp.
+
+	info->look = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+
+	DoLaraStep(item, coll, info->projectedFloorHeight - item->pos.yPos);
+}
+
 // ---------------
 // BASIC MOVEMENT:
 // ---------------
