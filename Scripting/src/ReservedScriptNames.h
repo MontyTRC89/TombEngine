@@ -2,6 +2,7 @@
 
 // Tables
 static constexpr char const ScriptReserved_TEN[]				= "TEN";
+static constexpr char const ScriptReserved_Flow[]			= "Flow";
 static constexpr char const ScriptReserved_Objects[]			= "Objects";
 static constexpr char const ScriptReserved_Strings[]			= "Strings";
 
@@ -26,6 +27,13 @@ static constexpr char const ScriptReserved_SetAnimations[]	= "SetAnimations";
 static constexpr char const ScriptReserved_SetStrings[]	= "SetStrings";
 static constexpr char const ScriptReserved_SetLanguageNames[]	= "SetLanguageNames";
 
+// Flow Tables
+static constexpr char const ScriptReserved_WeatherType[]	= "WeatherType";
+static constexpr char const ScriptReserved_LaraType[]	= "LaraType";
+static constexpr char const ScriptReserved_InvItem[]	= "InvItem";
+static constexpr char const ScriptReserved_RotationAxis[]	= "RotationAxis";
+static constexpr char const ScriptReserved_ItemAction[]	= "ItemAction";
+static constexpr char const ScriptReserved_ErrorMode[]	= "ErrorMode";
 
 // Functions
 static constexpr char const ScriptReserved_ShowString[]			= "ShowString";

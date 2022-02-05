@@ -19,7 +19,7 @@ public:
 	TITLE_TYPE TitleType{ TITLE_TYPE::FLYBY };
 
 	virtual ~ScriptInterfaceFlow() = default;
-	virtual void LoadGameFlowScript() = 0;
+	virtual void LoadFlowScript() = 0;
 	virtual int	GetNumLevels() const = 0;
 	virtual char const* GetString(const char* id) const = 0;
 	virtual bool IsFlyCheatEnabled() const = 0;
@@ -32,7 +32,7 @@ public:
 	virtual bool HasAFKPose() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual bool CanPlayAnyLevel() const = 0;
-	virtual bool DoGameflow() = 0;
+	virtual bool DoFlow() = 0;
 };
 
 extern ScriptInterfaceFlow* g_GameFlow;
