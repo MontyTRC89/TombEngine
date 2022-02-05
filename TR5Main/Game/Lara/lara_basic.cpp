@@ -93,13 +93,25 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->activeState = LS_VAULT; // temp.
-
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
 	DoLaraStep(item, coll, info->projectedFloorHeight - item->pos.yPos);
+}
+
+// State:	LS_AUTO_JUMP (62)
+// Control:	lara_as_null()
+void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	info->look = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	item->activeState = LS_AUTO_JUMP;
+
+	info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->projectedFloorHeight - item->pos.yPos, -CLICK(7.5f)));
 }
 
 // ---------------
@@ -195,7 +207,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestAndSetLaraLadder(item, coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -331,7 +343,7 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestAndSetLaraLadder(item, coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -429,7 +441,16 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (TrInput & IN_WALK)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+			vaultResult.Success)
+		{
+			item->targetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TrInput & IN_WALK)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -532,10 +553,22 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD)
 	{
-		item->targetState = LS_WADE_FORWARD;
-		return;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+			vaultResult.Success)
+		{
+			item->targetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
+			item->targetState = LS_WADE_FORWARD;
+			return;
+		}
 	}
 
 	if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
@@ -572,10 +605,24 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
+	LaraInfo*& info = item->data;
+
+	if (TrInput & IN_FORWARD)
 	{
-		item->targetState = LS_WADE_FORWARD;
-		return;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+			vaultResult.Success)
+		{
+			item->targetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraWadeForwardSwamp(item, coll))
+		{
+			item->targetState = LS_WADE_FORWARD;
+			return;
+		}
 	}
 
 	if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
@@ -644,7 +691,7 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestAndSetLaraLadder(item, coll))
 		return;
 
 	ShiftItem(item, coll);
@@ -2035,7 +2082,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestAndSetLaraLadder(item, coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -2177,7 +2224,7 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraVault(item, coll))
+	if (TestAndSetLaraLadder(item, coll))
 		return;
 
 	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)

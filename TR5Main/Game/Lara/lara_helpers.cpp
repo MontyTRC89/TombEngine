@@ -221,6 +221,16 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 		info->runJumpQueued = false;
 }
 
+void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
+{
+	LaraInfo*& info = item->data;
+
+	info->projectedFloorHeight = vaultResult.Height;
+	info->gunStatus = LG_HANDS_BUSY;
+	info->turnRate = 0;
+	SnapItemToLedge(item, coll, 0.2f);
+}
+
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->speed = 0;
@@ -341,14 +351,17 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (!IsRunJumpCountState((LARA_STATE)item->activeState))
 		info->runJumpCount = 0;
 
-
 	// Reset running jump action queue.
 	if (item->activeState != LS_RUN_FORWARD)
 		info->runJumpQueued = false;
 
 	// Reset projected height value used by step function.
-	if (item->activeState != LS_VAULT)
-		info->projectedFloorHeight = NO_HEIGHT;
+	//if (!IsVaultState((LARA_STATE)item->activeState))
+	//	info->projectedFloorHeight = NO_HEIGHT;
+
+	// Reset calculated auto jump velocity.
+	//if (item->activeState != LS_AUTO_JUMP)
+	//	info->calcJumpVelocity = 0;
 
 	// Increment/reset AFK pose timer.
 	if (info->poseCount < LARA_POSE_TIME &&
