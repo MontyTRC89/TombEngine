@@ -95,9 +95,9 @@ table Lara {
 	hit_points: int32;
 	speed: int32;
 	fall_speed: int32;
-	calc_fall_speed: int32;
+	calc_jump_velocity: int32;
 	water_status: int32;
-	climb_status: int32;
+	climb_status: bool;
 	pose_count: int32;
 	jump_direction: int32;
 	run_jump_count: int32;
@@ -112,7 +112,7 @@ table Lara {
 	current_x_vel: int32;
 	current_y_vel: int32;
 	current_z_vel: int32;
-	spaz_effect_count: int32;
+	spasm_effect_count: int32;
 	flare_age: int32;
 	burn_count: int32;
 	weapon_item: int32;

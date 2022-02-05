@@ -249,7 +249,7 @@ bool SaveGame::Save(int slot)
 	lara.add_burn_count(Lara.burnCount);
 	lara.add_burn_smoke(Lara.burnSmoke);
 	lara.add_busy(Lara.busy);
-	lara.add_calc_fall_speed(Lara.calcFallSpeed);
+	lara.add_calc_jump_velocity(Lara.calcJumpVelocity);
 	lara.add_can_monkey_swing(Lara.canMonkeySwing);
 	lara.add_climb_status(Lara.climbStatus);
 	lara.add_next_corner_position(&nextCornerPos);
@@ -334,7 +334,7 @@ bool SaveGame::Save(int slot)
 	lara.add_secrets(Lara.Secrets);
 	lara.add_silencer(Lara.Silencer);
 	lara.add_small_waterskin(Lara.small_waterskin);
-	lara.add_spaz_effect_count(Lara.spazEffectCount);
+	lara.add_spasm_effect_count(Lara.spasmEffectCount);
 	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
@@ -1164,7 +1164,7 @@ bool SaveGame::Load(int slot)
 	Lara.burnCount = s->lara()->burn_count();
 	Lara.burnSmoke = s->lara()->burn_smoke();
 	Lara.busy = s->lara()->busy();
-	Lara.calcFallSpeed = s->lara()->calc_fall_speed();
+	Lara.calcJumpVelocity = s->lara()->calc_jump_velocity();
 	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
 	Lara.climbStatus = s->lara()->climb_status();
 	Lara.nextCornerPos = PHD_3DPOS(
@@ -1261,7 +1261,7 @@ bool SaveGame::Load(int slot)
 	Lara.Secrets = s->lara()->secrets();
 	Lara.Silencer = s->lara()->silencer();
 	Lara.small_waterskin = s->lara()->small_waterskin();
-	Lara.spazEffectCount = s->lara()->spaz_effect_count();
+	Lara.spasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.sprintTimer = s->lara()->sprint_timer();
 	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
 	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
