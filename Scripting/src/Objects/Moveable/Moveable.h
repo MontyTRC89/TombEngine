@@ -12,15 +12,15 @@ struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
 
-class GameScriptItemInfo : public GameScriptNamedBase<GameScriptItemInfo, short>
+class Moveable : public GameScriptNamedBase<Moveable, short>
 {
 public:
 	using IdentifierType = short;
-	GameScriptItemInfo(short num, bool temporary);
-	~GameScriptItemInfo();
-	GameScriptItemInfo& operator=(GameScriptItemInfo const& other) = delete;
-	GameScriptItemInfo(GameScriptItemInfo const& other) = delete;
-	GameScriptItemInfo(GameScriptItemInfo && other) noexcept;
+	Moveable(short num, bool temporary);
+	~Moveable();
+	Moveable& operator=(Moveable const& other) = delete;
+	Moveable(Moveable const& other) = delete;
+	Moveable(Moveable && other) noexcept;
 
 	static void Register(sol::state *);
 
