@@ -9,11 +9,11 @@
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptCameraInfo.h"
 
-class GameEntities : public ScriptInterfaceObjectsHandler, public LuaHandler
+class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler
 {
 
 public:
-	GameEntities::GameEntities(sol::state* lua);
+	ObjectsHandler::ObjectsHandler(sol::state* lua);
 
 private:
 	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
