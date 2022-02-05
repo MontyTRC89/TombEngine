@@ -261,15 +261,6 @@
     <ClInclude Include="src\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scripting\Entities\ScriptInterfaceEntities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entities\Static\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entities\Moveable\GameScriptItemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Strings\DisplayString\GameScriptDisplayString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -279,16 +270,7 @@
     <ClInclude Include="include\Scripting\Strings\ScriptInterfaceStringsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scripting\Objects\ScriptInterfaceEntities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Moveable\GameScriptItemInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Objects\Static\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Objects\ObjectIDs.h">
@@ -298,6 +280,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\Objects\ScriptInterfaceObjectsHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Moveable\Moveable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flow\Flow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -356,9 +344,6 @@
     <ClCompile Include="src\LuaHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameFlowScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ScriptAssert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -371,16 +356,16 @@
     <ClCompile Include="src\Strings\StringsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Moveable\GameScriptItemInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Objects\Static\GameScriptMeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Entities.cpp">
+    <ClCompile Include="src\Objects\ObjectsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\ObjectsHandler.cpp">
+    <ClCompile Include="src\Objects\Moveable\Moveable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flow\Flow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
