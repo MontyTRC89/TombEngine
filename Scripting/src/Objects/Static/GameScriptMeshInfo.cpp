@@ -8,7 +8,7 @@
 /***
 Mesh info
 
-@entityclass MeshInfo
+@tenclass Objects.Static
 @pragma nostrip
 */
 
