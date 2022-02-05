@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
-#include "Entities.h"
+#include "ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 #include "ObjectIDs.h"
 
