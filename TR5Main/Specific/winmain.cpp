@@ -169,7 +169,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameFlow->LoadGameFlowScript();
 		g_GameScript = ScriptInterfaceState::CreateGame();
-		g_GameScriptEntities = ScriptInterfaceState::CreateEntities();
+		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 	}
 	catch (TENScriptException const& e)
