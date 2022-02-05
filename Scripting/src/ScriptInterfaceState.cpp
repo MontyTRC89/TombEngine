@@ -2,7 +2,7 @@
 #include "ScriptInterfaceState.h"
 #include "GameLogicScript.h"
 #include "GameFlowScript.h"
-#include "Entities/Entities.h"
+#include "Objects/ObjectsHandler.h"
 #include "Strings/StringsHandler.h"
 
 sol::state g_solState;
@@ -22,7 +22,7 @@ ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
 	return new GameFlow(&g_solState);
 }
 
-ScriptInterfaceEntities* ScriptInterfaceState::CreateEntities()
+ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateEntities()
 {
 	return new GameEntities(&g_solState);
 }
