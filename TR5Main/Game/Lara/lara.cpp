@@ -1177,10 +1177,10 @@ void AnimateLara(ITEM_INFO* item)
 					item->fallspeed = *(cmd++);
 					item->speed = *(cmd++);
 					item->airborne = true;
-					if (info->calcFallSpeed)
+					if (info->calcJumpVelocity)
 					{
-						item->fallspeed = info->calcFallSpeed;
-						info->calcFallSpeed = 0;
+						item->fallspeed = info->calcJumpVelocity;
+						info->calcJumpVelocity = 0;
 					}
 					break;
 

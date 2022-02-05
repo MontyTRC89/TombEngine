@@ -1385,9 +1385,9 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t hit_points = 0;
   int32_t speed = 0;
   int32_t fall_speed = 0;
-  int32_t calc_fall_speed = 0;
+  int32_t calc_jump_velocity = 0;
   int32_t water_status = 0;
-  int32_t climb_status = 0;
+  bool climb_status = false;
   int32_t pose_count = 0;
   int32_t jump_direction = 0;
   int32_t run_jump_count = 0;
@@ -1402,7 +1402,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t current_x_vel = 0;
   int32_t current_y_vel = 0;
   int32_t current_z_vel = 0;
-  int32_t spaz_effect_count = 0;
+  int32_t spasm_effect_count = 0;
   int32_t flare_age = 0;
   int32_t burn_count = 0;
   int32_t weapon_item = 0;
@@ -1506,7 +1506,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HIT_POINTS = 14,
     VT_SPEED = 16,
     VT_FALL_SPEED = 18,
-    VT_CALC_FALL_SPEED = 20,
+    VT_CALC_JUMP_VELOCITY = 20,
     VT_WATER_STATUS = 22,
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
@@ -1523,7 +1523,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CURRENT_X_VEL = 48,
     VT_CURRENT_Y_VEL = 50,
     VT_CURRENT_Z_VEL = 52,
-    VT_SPAZ_EFFECT_COUNT = 54,
+    VT_SPASM_EFFECT_COUNT = 54,
     VT_FLARE_AGE = 56,
     VT_BURN_COUNT = 58,
     VT_WEAPON_ITEM = 60,
@@ -1637,14 +1637,14 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t fall_speed() const {
     return GetField<int32_t>(VT_FALL_SPEED, 0);
   }
-  int32_t calc_fall_speed() const {
-    return GetField<int32_t>(VT_CALC_FALL_SPEED, 0);
+  int32_t calc_jump_velocity() const {
+    return GetField<int32_t>(VT_CALC_JUMP_VELOCITY, 0);
   }
   int32_t water_status() const {
     return GetField<int32_t>(VT_WATER_STATUS, 0);
   }
-  int32_t climb_status() const {
-    return GetField<int32_t>(VT_CLIMB_STATUS, 0);
+  bool climb_status() const {
+    return GetField<uint8_t>(VT_CLIMB_STATUS, 0) != 0;
   }
   int32_t pose_count() const {
     return GetField<int32_t>(VT_POSE_COUNT, 0);
@@ -1688,8 +1688,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t current_z_vel() const {
     return GetField<int32_t>(VT_CURRENT_Z_VEL, 0);
   }
-  int32_t spaz_effect_count() const {
-    return GetField<int32_t>(VT_SPAZ_EFFECT_COUNT, 0);
+  int32_t spasm_effect_count() const {
+    return GetField<int32_t>(VT_SPASM_EFFECT_COUNT, 0);
   }
   int32_t flare_age() const {
     return GetField<int32_t>(VT_FLARE_AGE, 0);
@@ -1965,9 +1965,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_SPEED) &&
            VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_CALC_FALL_SPEED) &&
+           VerifyField<int32_t>(verifier, VT_CALC_JUMP_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
-           VerifyField<int32_t>(verifier, VT_CLIMB_STATUS) &&
+           VerifyField<uint8_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_RUN_JUMP_COUNT) &&
@@ -1982,7 +1982,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_CURRENT_X_VEL) &&
            VerifyField<int32_t>(verifier, VT_CURRENT_Y_VEL) &&
            VerifyField<int32_t>(verifier, VT_CURRENT_Z_VEL) &&
-           VerifyField<int32_t>(verifier, VT_SPAZ_EFFECT_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_FLARE_AGE) &&
            VerifyField<int32_t>(verifier, VT_BURN_COUNT) &&
            VerifyField<int32_t>(verifier, VT_WEAPON_ITEM) &&
@@ -2123,14 +2123,14 @@ struct LaraBuilder {
   void add_fall_speed(int32_t fall_speed) {
     fbb_.AddElement<int32_t>(Lara::VT_FALL_SPEED, fall_speed, 0);
   }
-  void add_calc_fall_speed(int32_t calc_fall_speed) {
-    fbb_.AddElement<int32_t>(Lara::VT_CALC_FALL_SPEED, calc_fall_speed, 0);
+  void add_calc_jump_velocity(int32_t calc_jump_velocity) {
+    fbb_.AddElement<int32_t>(Lara::VT_CALC_JUMP_VELOCITY, calc_jump_velocity, 0);
   }
   void add_water_status(int32_t water_status) {
     fbb_.AddElement<int32_t>(Lara::VT_WATER_STATUS, water_status, 0);
   }
-  void add_climb_status(int32_t climb_status) {
-    fbb_.AddElement<int32_t>(Lara::VT_CLIMB_STATUS, climb_status, 0);
+  void add_climb_status(bool climb_status) {
+    fbb_.AddElement<uint8_t>(Lara::VT_CLIMB_STATUS, static_cast<uint8_t>(climb_status), 0);
   }
   void add_pose_count(int32_t pose_count) {
     fbb_.AddElement<int32_t>(Lara::VT_POSE_COUNT, pose_count, 0);
@@ -2174,8 +2174,8 @@ struct LaraBuilder {
   void add_current_z_vel(int32_t current_z_vel) {
     fbb_.AddElement<int32_t>(Lara::VT_CURRENT_Z_VEL, current_z_vel, 0);
   }
-  void add_spaz_effect_count(int32_t spaz_effect_count) {
-    fbb_.AddElement<int32_t>(Lara::VT_SPAZ_EFFECT_COUNT, spaz_effect_count, 0);
+  void add_spasm_effect_count(int32_t spasm_effect_count) {
+    fbb_.AddElement<int32_t>(Lara::VT_SPASM_EFFECT_COUNT, spasm_effect_count, 0);
   }
   void add_flare_age(int32_t flare_age) {
     fbb_.AddElement<int32_t>(Lara::VT_FLARE_AGE, flare_age, 0);
@@ -2462,9 +2462,9 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t hit_points = 0,
     int32_t speed = 0,
     int32_t fall_speed = 0,
-    int32_t calc_fall_speed = 0,
+    int32_t calc_jump_velocity = 0,
     int32_t water_status = 0,
-    int32_t climb_status = 0,
+    bool climb_status = false,
     int32_t pose_count = 0,
     int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
@@ -2479,7 +2479,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t current_x_vel = 0,
     int32_t current_y_vel = 0,
     int32_t current_z_vel = 0,
-    int32_t spaz_effect_count = 0,
+    int32_t spasm_effect_count = 0,
     int32_t flare_age = 0,
     int32_t burn_count = 0,
     int32_t weapon_item = 0,
@@ -2636,7 +2636,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_weapon_item(weapon_item);
   builder_.add_burn_count(burn_count);
   builder_.add_flare_age(flare_age);
-  builder_.add_spaz_effect_count(spaz_effect_count);
+  builder_.add_spasm_effect_count(spasm_effect_count);
   builder_.add_current_z_vel(current_z_vel);
   builder_.add_current_y_vel(current_y_vel);
   builder_.add_current_x_vel(current_x_vel);
@@ -2650,9 +2650,8 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_run_jump_count(run_jump_count);
   builder_.add_jump_direction(jump_direction);
   builder_.add_pose_count(pose_count);
-  builder_.add_climb_status(climb_status);
   builder_.add_water_status(water_status);
-  builder_.add_calc_fall_speed(calc_fall_speed);
+  builder_.add_calc_jump_velocity(calc_jump_velocity);
   builder_.add_fall_speed(fall_speed);
   builder_.add_speed(speed);
   builder_.add_hit_points(hit_points);
@@ -2683,6 +2682,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_burn(burn);
   builder_.add_look(look);
   builder_.add_run_jump_queued(run_jump_queued);
+  builder_.add_climb_status(climb_status);
   return builder_.Finish();
 }
 
@@ -2701,9 +2701,9 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t hit_points = 0,
     int32_t speed = 0,
     int32_t fall_speed = 0,
-    int32_t calc_fall_speed = 0,
+    int32_t calc_jump_velocity = 0,
     int32_t water_status = 0,
-    int32_t climb_status = 0,
+    bool climb_status = false,
     int32_t pose_count = 0,
     int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
@@ -2718,7 +2718,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t current_x_vel = 0,
     int32_t current_y_vel = 0,
     int32_t current_z_vel = 0,
-    int32_t spaz_effect_count = 0,
+    int32_t spasm_effect_count = 0,
     int32_t flare_age = 0,
     int32_t burn_count = 0,
     int32_t weapon_item = 0,
@@ -2829,7 +2829,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       hit_points,
       speed,
       fall_speed,
-      calc_fall_speed,
+      calc_jump_velocity,
       water_status,
       climb_status,
       pose_count,
@@ -2846,7 +2846,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       current_x_vel,
       current_y_vel,
       current_z_vel,
-      spaz_effect_count,
+      spasm_effect_count,
       flare_age,
       burn_count,
       weapon_item,
@@ -5119,7 +5119,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = speed(); _o->speed = _e; }
   { auto _e = fall_speed(); _o->fall_speed = _e; }
-  { auto _e = calc_fall_speed(); _o->calc_fall_speed = _e; }
+  { auto _e = calc_jump_velocity(); _o->calc_jump_velocity = _e; }
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
@@ -5136,7 +5136,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = current_x_vel(); _o->current_x_vel = _e; }
   { auto _e = current_y_vel(); _o->current_y_vel = _e; }
   { auto _e = current_z_vel(); _o->current_z_vel = _e; }
-  { auto _e = spaz_effect_count(); _o->spaz_effect_count = _e; }
+  { auto _e = spasm_effect_count(); _o->spasm_effect_count = _e; }
   { auto _e = flare_age(); _o->flare_age = _e; }
   { auto _e = burn_count(); _o->burn_count = _e; }
   { auto _e = weapon_item(); _o->weapon_item = _e; }
@@ -5243,7 +5243,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _hit_points = _o->hit_points;
   auto _speed = _o->speed;
   auto _fall_speed = _o->fall_speed;
-  auto _calc_fall_speed = _o->calc_fall_speed;
+  auto _calc_jump_velocity = _o->calc_jump_velocity;
   auto _water_status = _o->water_status;
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
@@ -5260,7 +5260,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _current_x_vel = _o->current_x_vel;
   auto _current_y_vel = _o->current_y_vel;
   auto _current_z_vel = _o->current_z_vel;
-  auto _spaz_effect_count = _o->spaz_effect_count;
+  auto _spasm_effect_count = _o->spasm_effect_count;
   auto _flare_age = _o->flare_age;
   auto _burn_count = _o->burn_count;
   auto _weapon_item = _o->weapon_item;
@@ -5359,7 +5359,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _hit_points,
       _speed,
       _fall_speed,
-      _calc_fall_speed,
+      _calc_jump_velocity,
       _water_status,
       _climb_status,
       _pose_count,
@@ -5376,7 +5376,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _current_x_vel,
       _current_y_vel,
       _current_z_vel,
-      _spaz_effect_count,
+      _spasm_effect_count,
       _flare_age,
       _burn_count,
       _weapon_item,

@@ -723,14 +723,14 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 
 		lara->hitDirection = (item2->pos.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
-		if ((!lara->hitFrame) && (!lara->spazEffectCount))
+		if ((!lara->hitFrame) && (!lara->spasmEffectCount))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &item2->pos, 0);
-			lara->spazEffectCount = GenerateInt(15, 35);
+			lara->spasmEffectCount = GenerateInt(15, 35);
 		}
 
-		if (lara->spazEffectCount)
-			lara->spazEffectCount--;
+		if (lara->spasmEffectCount)
+			lara->spasmEffectCount--;
 
 		lara->hitFrame++;
 		if (lara->hitFrame > 34)

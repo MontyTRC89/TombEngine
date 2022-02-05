@@ -1070,30 +1070,30 @@ struct LaraInfo
 	LARA_WEAPON_TYPE gunType; // WEAPON_enum
 	LARA_WEAPON_TYPE requestGunType; // WEAPON_enum
 	LARA_WEAPON_TYPE lastGunType; // WEAPON_enum
-	short calcFallSpeed;
+	int calcJumpVelocity;
 	LARA_WATER_STATUS waterStatus; // LW_enum
-	short climbStatus;
+	bool climbStatus;
 	int poseCount;
 	int projectedFloorHeight;
 	JumpDirection jumpDirection;
 	int runJumpCount;
 	bool runJumpQueued;
-	short hitFrame;
-	short hitDirection;
+	int hitFrame;
+	int hitDirection;
 	int sprintTimer;
-	short air;
-	short diveCount;
-	short deathCount;
+	int air;
+	int diveCount;
+	int deathCount;
 	short currentActive;
-	short currentXvel;
-	short currentYvel;
-	short currentZvel;
-	short spazEffectCount;
-	short flareAge;
-	short burnCount;
+	int currentXvel;
+	int currentYvel;
+	int currentZvel;
+	int spasmEffectCount;
+	int flareAge;
+	int burnCount;
 	short weaponItem;
 	HolsterInfo holsterInfo;
-	short flareFrame;
+	int flareFrame;
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
 	bool flareControlLeft;

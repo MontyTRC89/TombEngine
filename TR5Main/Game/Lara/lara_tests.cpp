@@ -182,7 +182,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		vaultResult = TestLaraVaultAutoJump(item, coll);
 		if (vaultResult.Success && !success)
 		{
-			info->calcFallSpeed = -3 - sqrt(-9600 - 12 * (vaultResult.Height - item->pos.yPos));
+			info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * (vaultResult.Height - item->pos.yPos));
 			item->animNumber = LA_STAND_SOLID;
 			item->frameNumber = GetFrameNumber(item, 0);
 			item->targetState = LS_JUMP_UP;
@@ -203,7 +203,7 @@ bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	auto ladderAutoJumpResult = TestLaraLadderAutoJump(item, coll);
 	if (ladderAutoJumpResult.Success)
 	{
-		info->calcFallSpeed = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.Height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
+		info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.Height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->animNumber = LA_STAND_SOLID;
 		item->frameNumber = GetFrameNumber(item, 0);
 		item->targetState = LS_JUMP_UP;
@@ -833,7 +833,7 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 	int shift, result;
 
-	if (info->climbStatus == 0)
+	if (!info->climbStatus)
 		return false;
 
 	if (item->fallspeed < 0)
