@@ -22,9 +22,9 @@ ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
 	return new GameFlow(&g_solState);
 }
 
-ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateEntities()
+ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateObjectsHandler()
 {
-	return new GameEntities(&g_solState);
+	return new ObjectsHandler(&g_solState);
 }
 
 ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()

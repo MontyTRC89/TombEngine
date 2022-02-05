@@ -9,7 +9,7 @@ class ScriptInterfaceState
 public:
 	static ScriptInterfaceGame* CreateGame();
 	static ScriptInterfaceFlow* CreateFlow();
-	static ScriptInterfaceObjectsHandler* CreateEntities();
+	static ScriptInterfaceObjectsHandler* CreateObjectsHandler();
 	static ScriptInterfaceStringsHandler* CreateStringsHandler();
 	static void ScriptInterfaceState::Init();
 };
