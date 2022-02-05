@@ -1623,27 +1623,39 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	int dist = OFFSET_RADIUS(coll->Setup.Radius);
 	auto probe = GetCollisionResult(item, testSetup.Angle, dist);
 
+	auto start1 = GAME_VECTOR(item->pos.xPos,
+							  y + testSetup.LowerCeilingBound + 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end1 = GAME_VECTOR(probe.Coordinates.x,
+							probe.Coordinates.y - LARA_HEIGHT_MONKEY + testSetup.LowerCeilingBound + 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
+	auto start2 = GAME_VECTOR(item->pos.xPos,
+							  y + LARA_HEIGHT_MONKEY - 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end2 = GAME_VECTOR(probe.Coordinates.x,
+							probe.Coordinates.y - 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
 	// Conduct "ray" test at lower ceiling bound.
-	auto start = GAME_VECTOR(
-		item->pos.xPos,
-		y + testSetup.LowerFloorBound + 1,
-		item->pos.zPos,
-		item->roomNumber);
+	if (!LOS(&start1, &end1))
+		return false;
 
-	auto end = GAME_VECTOR(
-		probe.Coordinates.x,
-		probe.Coordinates.y + 1,
-		probe.Coordinates.z,
-		item->roomNumber);
-
-	if (!LOS(&start, &end))
+	// Conduct "ray" test at lowest floor bound.
+	if (!LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
 	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Within highest floor bound.
-		(probe.Position.Ceiling - y) <= testSetup.LowerFloorBound &&				// Within lower ceiling bound.
-		(probe.Position.Ceiling - y) >= testSetup.UpperFloorBound &&				// Within upper ceiling bound.
+		(probe.Position.Ceiling - y) <= testSetup.LowerCeilingBound &&				// Within lower ceiling bound.
+		(probe.Position.Ceiling - y) >= testSetup.UpperCeilingBound &&				// Within upper ceiling bound.
 		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY &&	// Space is not a clamp.
 		!probe.Position.CeilingSlope &&												// No ceiling slope.
 		probe.Position.Ceiling != NO_HEIGHT)
@@ -1984,7 +1996,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Temporary solution to ladder mounts until ladders stop breaking whenever you try to do anything with them. @Sezz 2022.02.05
-bool TestAndSetLaraLadder(ITEM_INFO* item, COLL_INFO* coll)
+bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -2153,31 +2165,31 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & (IN_ACTION | IN_JUMP)))
-		return CrawlVaultTestResult { false, (LARA_STATE)-1 };
+		return CrawlVaultTestResult{ false, (LARA_STATE)-1 };
 
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
 		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
-			return CrawlVaultTestResult { true, LS_CRAWL_STEP_DOWN };
+			return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
 		else [[likely]]
-			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_STEP_DOWN };
+			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_STEP_DOWN };
 	}
 
 	if (TestLaraCrawlExitJump(item, coll))
 	{
 		if (TrInput & IN_WALK)
-			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_FLIP };
+			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_FLIP };
 		else [[likely]]
-			return CrawlVaultTestResult { true, LS_CRAWL_EXIT_JUMP };
+			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_JUMP };
 	}
 
 	if (TestLaraCrawlUpStep(item, coll))
-		return CrawlVaultTestResult { true, LS_CRAWL_STEP_UP };
+		return CrawlVaultTestResult{ true, LS_CRAWL_STEP_UP };
 
 	if (TestLaraCrawlDownStep(item, coll))
-		return CrawlVaultTestResult { true, LS_CRAWL_STEP_DOWN };
+		return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
 
-	return CrawlVaultTestResult { false, (LARA_STATE)-1 };
+	return CrawlVaultTestResult{ false, (LARA_STATE)-1 };
 }
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testSetup)
