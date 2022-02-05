@@ -13,7 +13,7 @@ class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler
 {
 
 public:
-	ObjectsHandler::ObjectsHandler(sol::state* lua);
+	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent);
 
 private:
 	std::unordered_map<std::string, VarMapVal>					m_nameMap{};

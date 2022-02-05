@@ -11,8 +11,11 @@ Scripts that will be run on game startup.
 @pragma nostrip
 */
 
-ObjectsHandler::ObjectsHandler(sol::state* lua) : LuaHandler{ lua }
+ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
+	sol::table table_objects{ m_lua->lua_state(), sol::create };
+	parent.set(ScriptReserved_Objects, table_objects);
+
 	/***
 	Get an ItemInfo by its name.
 	@function GetItemByName
