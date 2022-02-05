@@ -1,15 +1,15 @@
 #pragma once
 #include <unordered_map>
 #include "LuaHandler.h"
-#include "Scripting/Entities/ScriptInterfaceEntities.h"
-#include "Entities/Moveable/GameScriptItemInfo.h"
-#include "Entities/Static/GameScriptMeshInfo.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/Moveable/GameScriptItemInfo.h"
+#include "Objects/Static/GameScriptMeshInfo.h"
 #include "GameScriptSinkInfo.h"
 #include "GameScriptAIObject.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptCameraInfo.h"
 
-class GameEntities : public ScriptInterfaceEntities, public LuaHandler
+class GameEntities : public ScriptInterfaceObjectsHandler, public LuaHandler
 {
 
 public:

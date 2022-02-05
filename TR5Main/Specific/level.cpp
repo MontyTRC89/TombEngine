@@ -20,7 +20,7 @@
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
 #include "Scripting/ScriptInterfaceLevel.h"
-#include "Scripting/Entities/ScriptInterfaceEntities.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 
