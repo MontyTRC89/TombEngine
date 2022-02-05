@@ -434,7 +434,7 @@ unsigned CALLBACK GameMain(void *)
 		g_Renderer.renderTitleImage();
 
 		// Execute the LUA gameflow and play the game
-		g_GameFlow->DoGameflow();
+		g_GameFlow->DoFlow();
 
 		DoTheGame = false;
 

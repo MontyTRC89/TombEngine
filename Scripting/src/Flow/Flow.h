@@ -10,7 +10,7 @@
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceFlow.h"
 
-class GameFlow : public LuaHandler, public ScriptInterfaceFlow
+class Flow : public LuaHandler, public ScriptInterfaceFlow
 {
 private:
 	GameScriptSettings				m_settings;
@@ -34,11 +34,11 @@ public:
 	// Selected language set
 	std::vector<GameScriptLevel*>	Levels;
 
-	GameFlow(sol::state* lua);
-	~GameFlow();
+	Flow(sol::state* lua, sol::table & parent);
+	~Flow();
 
 	void							AddLevel(GameScriptLevel const& level);
-	void							LoadGameFlowScript();
+	void							LoadFlowScript();
 	char const *					GetString(const char* id) const;
 	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
@@ -60,6 +60,6 @@ public:
 	bool HasMonkeyAutoJump() const override { return Animations.MonkeyAutoJump; }
 	bool HasOscillateHang() const override { return Animations.OscillateHang; }
 	bool HasAFKPose() const override { return Animations.Pose; }
-	bool DoGameflow() override;
+	bool DoFlow() override;
 };
 
