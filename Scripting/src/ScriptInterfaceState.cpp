@@ -1,11 +1,13 @@
 #include "frameworkandsol.h"
 #include "ScriptInterfaceState.h"
 #include "GameLogicScript.h"
-#include "GameFlowScript.h"
+#include "Flow/Flow.h"
 #include "Objects/ObjectsHandler.h"
 #include "Strings/StringsHandler.h"
+#include "ReservedScriptNames.h"
 
-sol::state g_solState;
+static sol::state g_solState;
+static sol::table s_rootTable;
 
 int lua_exception_handler(lua_State* L, sol::optional<std::exception const &> maybe_exception, sol::string_view description)
 {
@@ -19,12 +21,12 @@ ScriptInterfaceGame* ScriptInterfaceState::CreateGame()
 
 ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
 {
-	return new GameFlow(&g_solState);
+	return new Flow(&g_solState, s_rootTable);
 }
 
 ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateObjectsHandler()
 {
-	return new ObjectsHandler(&g_solState);
+	return new ObjectsHandler(&g_solState, s_rootTable);
 }
 
 ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
@@ -36,5 +38,8 @@ void ScriptInterfaceState::Init()
 {
 	g_solState.open_libraries(sol::lib::base, sol::lib::math);
 	g_solState.set_exception_handler(lua_exception_handler);
+
+	s_rootTable = sol::table{ g_solState.lua_state(), sol::create };
+	g_solState.set(ScriptReserved_TEN, s_rootTable);
 }
 
