@@ -112,16 +112,16 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_swan_dive,//52
 	lara_as_freefall_dive,//53
 	lara_as_gymnast,//54
-	lara_as_waterout,
-	lara_as_climbstnc,
-	lara_as_climbing,
-	lara_as_climbleft,
-	lara_as_climbend,
-	lara_as_climbright,
-	lara_as_climbdown,//
-	lara_void_func,
-	lara_void_func,
-	lara_void_func,
+	lara_as_waterout,//55
+	lara_as_climbstnc,//56
+	lara_as_climbing,//57
+	lara_as_climbleft,//58
+	lara_as_climbend,//59
+	lara_as_climbright,//60
+	lara_as_climbdown,//61
+	lara_void_func,//62
+	lara_void_func,//63
+	lara_void_func,//64
 	lara_as_wade_forward,//65
 	lara_as_waterroll,//66
 	lara_as_pickupflare,//67
@@ -130,9 +130,9 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_deathslide,//70
 	lara_as_crouch_idle,//71
 	lara_as_crouch_roll,//72
-	lara_as_sprint,
-	lara_as_sprint_dive,
-	lara_as_monkey_idle,
+	lara_as_sprint,//73
+	lara_as_sprint_dive,//74
+	lara_as_monkey_idle,//75
 	lara_as_monkey_forward,//76
 	lara_as_monkey_shimmy_left,//77
 	lara_as_monkey_shimmy_right,//78
@@ -207,9 +207,9 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_slopeclimb,//143
 	lara_as_slopeclimbup,//144
 	lara_as_slopeclimbdown,//145
-	lara_as_controlled_no_look,
-	lara_as_null,
-	lara_as_null,
+	lara_as_controlled_no_look,//146
+	lara_as_null,//147
+	lara_as_null,//148
 	lara_as_slopefall,//149
 	lara_as_stepoff_left,
 	lara_as_stepoff_right,
@@ -225,7 +225,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//161
 	lara_as_null,//162
 	lara_as_monkey_back,//163
-	lara_as_null//164
+	lara_as_null,//164
+	lara_as_null,//165
+	lara_as_null,//166
+	lara_as_null,//167
+	lara_as_null,//168
+	lara_as_null,//169
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -292,7 +297,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_climbend,
 	lara_col_climbright,
 	lara_col_climbdown,
-	lara_void_func,
+	lara_col_auto_jump,//62
 	lara_void_func,
 	lara_void_func,
 	lara_col_wade_forward,
@@ -394,7 +399,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//161
 	lara_void_func,//162
 	lara_col_monkey_back,//163
-	lara_col_vault//164
+	lara_col_vault,//164
+	lara_col_vault,//165
+	lara_col_vault,//166
+	lara_col_vault,//167
+	lara_col_vault,//168
+	lara_col_vault,//169
 };
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)

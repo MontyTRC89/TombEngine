@@ -13,7 +13,6 @@ struct COLL_INFO;
 
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll);
@@ -52,6 +51,7 @@ void GetTighRopeFallOff(int Regularity);
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
 bool IsJumpState(LARA_STATE state);
 bool IsRunJumpCountState(LARA_STATE state);
+bool IsVaultState(LARA_STATE state);
 
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side = 0);
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
@@ -88,14 +88,15 @@ bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestSetup testSetup);
 VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-
+VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
+bool TestAndSetLaraLadder(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestSetup testSetup);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
