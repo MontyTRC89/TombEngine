@@ -10,6 +10,12 @@
 #include "pickup.h"
 #include "ItemEnumPair.h"
 
+/***
+Scripts that will be run on game startup.
+@tentable Misc 
+@pragma nostrip
+*/
+
 using namespace TEN::Effects::Lightning;
 
 namespace GameScriptFreeFunctions {
