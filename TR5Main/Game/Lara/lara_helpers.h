@@ -3,6 +3,7 @@
 
 struct ITEM_INFO;
 struct COLL_INFO;
+struct VaultTestResult;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -21,6 +22,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
+void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult);
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraFallState(ITEM_INFO* item);
 void SetLaraFallBackState(ITEM_INFO* item);

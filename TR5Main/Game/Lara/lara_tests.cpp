@@ -93,160 +93,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return abs((short) (coll->NearestLedgeAngle - item->pos.yRot)) <= LARA_GRAB_THRESHOLD;
-}
-
-bool TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
-{
-	LaraInfo*& info = item->data;
-
-	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) ||
-		info->gunStatus != LG_HANDS_FREE)
-	{
-		return false;
-	}
-
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
-		return false;
-	
-	if (TestValidLedge(item, coll))
-	{
-		bool success = false;
-
-		// Vault to crouch up one step.
-		auto vaultResult = TestLaraVault1StepToCrouch(item, coll);
-		if (vaultResult.Success && !success)
-		{
-			info->projectedFloorHeight = vaultResult.Height + CLICK(1);
-			item->animNumber = LA_VAULT_TO_CROUCH_1CLICK;
-			item->activeState = LS_VAULT;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->targetState = LS_CROUCH_IDLE;
-			info->gunStatus = LG_HANDS_BUSY;
-			success = true;
-		}
-		
-		// Vault to stand up two steps.
-		vaultResult = TestLaraVault2Steps(item, coll);
-		if (vaultResult.Success && !success)
-		{
-			info->projectedFloorHeight = vaultResult.Height + CLICK(2);
-			item->animNumber = LA_VAULT_TO_STAND_2CLICK_START;
-			item->activeState = LS_VAULT;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->targetState = LS_IDLE;
-			info->gunStatus = LG_HANDS_BUSY;
-			success = true;
-		}
-		// Vault to crouch up two steps.
-		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
-		if (vaultResult.Success && !success &&
-			g_GameFlow->Animations.CrawlExtended)
-		{
-			info->projectedFloorHeight = vaultResult.Height + CLICK(2);
-			item->animNumber = LA_VAULT_TO_CROUCH_2CLICK;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->activeState = LS_VAULT;
-			item->targetState = LS_CROUCH_IDLE;
-			info->gunStatus = LG_HANDS_BUSY;
-			success = true;
-		}
-
-		// Vault to stand up three steps.
-		vaultResult = TestLaraVault3Steps(item, coll);
-		if (vaultResult.Success && !success)
-		{
-			info->projectedFloorHeight = vaultResult.Height + CLICK(3);
-			item->animNumber = LA_VAULT_TO_STAND_3CLICK;
-			item->activeState = LS_VAULT;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->targetState = LS_IDLE;
-			info->gunStatus = LG_HANDS_BUSY;
-			success = true;
-		}
-		// Vault to crouch up three steps.
-		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
-		if (vaultResult.Success && !success &&
-			g_GameFlow->Animations.CrawlExtended)
-		{
-			info->projectedFloorHeight = vaultResult.Height + CLICK(3);
-			item->animNumber = LA_VAULT_TO_CROUCH_3CLICK;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->activeState = LS_VAULT;
-			item->targetState = LS_CROUCH_IDLE;
-			info->gunStatus = LG_HANDS_BUSY;
-			success = true;
-		}
-
-		// Auto jump to hang.
-		vaultResult = TestLaraVaultAutoJump(item, coll);
-		if (vaultResult.Success && !success)
-		{
-			info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * (vaultResult.Height - item->pos.yPos));
-			item->animNumber = LA_STAND_SOLID;
-			item->frameNumber = GetFrameNumber(item, 0);
-			item->targetState = LS_JUMP_UP;
-			item->activeState = LS_IDLE;
-			AnimateLara(item);
-			success = true;
-		}
-
-		if (success)
-		{
-			info->turnRate = 0;
-			SnapItemToLedge(item, coll, 0.2f);
-			return true;
-		}
-	}
-	
-	// Auto jump to ladder.
-	auto ladderAutoJumpResult = TestLaraLadderAutoJump(item, coll);
-	if (ladderAutoJumpResult.Success)
-	{
-		info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((ladderAutoJumpResult.Height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = GetFrameNumber(item, 0);
-		item->targetState = LS_JUMP_UP;
-		item->activeState = LS_IDLE;
-		info->gunStatus = LG_HANDS_BUSY;
-		info->turnRate = 0;
-
-		ShiftItem(item, coll);
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		AnimateLara(item);
-
-		return true;
-	}
-	// Mount ladder.
-	else if (TestLaraLadderMount(item, coll) &&
-		TestLaraClimbStance(item, coll))
-	{
-		item->animNumber = LA_STAND_SOLID;
-		item->frameNumber = GetFrameNumber(item, 0);
-		item->targetState = LS_LADDER_IDLE;
-		item->activeState = LS_IDLE;
-		info->gunStatus = LG_HANDS_BUSY;
-		info->turnRate = 0;
-
-		ShiftItem(item, coll);
-		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		AnimateLara(item);
-
-		return true;
-	}
-
-	// Auto jump to monkey swing.
-	if (TestLaraMonkeyAutoJump(item, coll) &&
-		g_GameFlow->Animations.MonkeyAutoJump)
-	{
-		item->animNumber = LA_STAND_IDLE;
-		item->frameNumber = GetFrameNumber(item, 0);
-		item->targetState = LS_JUMP_UP;
-		item->activeState = LS_MONKEY_VAULT;
-		return true;
-	}
-	
-	return false;
+	return abs((short)(coll->NearestLedgeAngle - item->pos.yRot)) <= LARA_GRAB_THRESHOLD;
 }
 
 bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
@@ -1383,6 +1230,22 @@ bool IsRunJumpCountState(LARA_STATE state)
 	return false;
 }
 
+bool IsVaultState(LARA_STATE state)
+{
+	if (state == LS_VAULT ||
+		state == LS_VAULT_2_STEPS ||
+		state == LS_VAULT_3_STEPS ||
+		state == LS_VAULT_1_STEP_CROUCH ||
+		state == LS_VAULT_2_STEPS_CROUCH ||
+		state == LS_VAULT_3_STEPS_CROUCH ||
+		state == LS_AUTO_JUMP)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
 {
 	auto start = GAME_VECTOR(
@@ -1874,11 +1737,10 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 		!swampTooDeep &&																		// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-
-		return VaultTestResult { true, probeFront.Position.Floor };
+		return VaultTestResult { true, probeFront.Position.Floor, (LARA_STATE)-1 };
 	}
 
-	return VaultTestResult { false, NO_HEIGHT };
+	return VaultTestResult { false, NO_HEIGHT, (LARA_STATE)-1 };
 }
 
 VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
@@ -1906,22 +1768,6 @@ VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 		-CLICK(2.5f), -CLICK(3.5f),
 		LARA_HEIGHT, -MAX_HEIGHT,
 		CLICK(1),
-	};
-
-	return TestLaraVaultTolerance(item, coll, testSetup);
-}
-
-VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
-	// Clamp range: (-CLICK(0.1f), -MAX_HEIGHT]
-
-	VaultTestSetup testSetup
-	{
-		-CLICK(3.5f), -CLICK(7.5f),
-		CLICK(0.1f)/* TODO: Is this enough hand room?*/,-MAX_HEIGHT,
-		CLICK(0.1f),
-		false
 	};
 
 	return TestLaraVaultTolerance(item, coll, testSetup);
@@ -1972,6 +1818,22 @@ VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraVaultTolerance(item, coll, testSetup);
 }
 
+VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// Floor range: (-CLICK(3.5f), -CLICK(7.5f)]
+	// Clamp range: (-CLICK(0.1f), -MAX_HEIGHT]
+
+	VaultTestSetup testSetup
+	{
+		-CLICK(3.5f), -CLICK(7.5f),
+		CLICK(0.1f)/* TODO: Is this enough hand room?*/,-MAX_HEIGHT,
+		CLICK(0.1f),
+		false
+	};
+
+	return TestLaraVaultTolerance(item, coll, testSetup);
+}
+
 VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
@@ -1987,13 +1849,13 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
-		return VaultTestResult{ true, probeMiddle.Position.Ceiling };
+		return VaultTestResult{ true, probeMiddle.Position.Ceiling, (LARA_STATE)-1 };
 	}
 
-	return VaultTestResult{ false, NO_HEIGHT };
+	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
 }
 
-bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -2009,13 +1871,13 @@ bool TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
-		return true;
+		return VaultTestResult{ true, NO_HEIGHT, (LARA_STATE)-1 };
 	}
 
-	return false;
+	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
 }
 
-bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
+VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
@@ -2027,10 +1889,148 @@ bool TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
+		return VaultTestResult{ true, probe.Position.Ceiling, (LARA_STATE)-1 };
+	}
+
+	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+}
+
+VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	// This check is redundant, but provides for a slight optimisation.
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+		return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
+		return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+
+	VaultTestResult vaultResult;
+
+	// Attempt ledge vault.
+	if (TestValidLedge(item, coll))
+	{
+		// Vault to crouch up one step.
+		vaultResult = TestLaraVault1StepToCrouch(item, coll);
+		if (vaultResult.Success)
+		{
+			vaultResult.TargetState = LS_VAULT_1_STEP_CROUCH;
+			vaultResult.Height += CLICK(1);
+			return vaultResult;
+		}
+
+		// Vault to stand up two steps.
+		vaultResult = TestLaraVault2Steps(item, coll);
+		if (vaultResult.Success)
+		{
+			vaultResult.TargetState = LS_VAULT_2_STEPS;
+			vaultResult.Height += CLICK(2);
+			return vaultResult;
+		}
+
+		// Vault to crouch up two steps.
+		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
+		if (vaultResult.Success &&
+			g_GameFlow->Animations.CrawlExtended)
+		{
+			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
+			vaultResult.Height += CLICK(2);
+			return vaultResult;
+		}
+
+		// Vault to stand up three steps.
+		vaultResult = TestLaraVault3Steps(item, coll);
+		if (vaultResult.Success)
+		{
+			vaultResult.TargetState = LS_VAULT_3_STEPS;
+			vaultResult.Height += CLICK(3);
+			return vaultResult;
+		}
+
+		// Vault to crouch up three steps.
+		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
+		if (vaultResult.Success &&
+			g_GameFlow->Animations.CrawlExtended)
+		{
+			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
+			vaultResult.Height += CLICK(3);
+			return vaultResult;
+		}
+
+		// Auto jump to ledge.
+		vaultResult = TestLaraVaultAutoJump(item, coll);
+		if (vaultResult.Success)
+		{
+			vaultResult.TargetState = LS_AUTO_JUMP;
+			return vaultResult;
+		}
+	}
+
+	// TODO: Move ladder checks here when ladders are less prone to breaking.
+	// In this case, they fail due to a reliance on ShiftItem(). @Sezz 2021.02.05
+
+	// TODO: calcJumpVelocity not getting set?
+	// Auto jump to monkey swing.
+	vaultResult = TestLaraMonkeyAutoJump(item, coll);
+	if (vaultResult.Success &&
+		g_GameFlow->Animations.MonkeyAutoJump)
+	{
+		vaultResult.TargetState = LS_AUTO_JUMP;
+		return vaultResult;
+	}
+	
+	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+}
+
+// Temporary solution to ladder mounts until ladders stop breaking whenever you try to do anything with them. @Sezz 2022.02.05
+bool TestAndSetLaraLadder(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+		return false;
+
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
+		return false;
+
+	// Auto jump to ladder.
+	auto vaultResult = TestLaraLadderAutoJump(item, coll);
+	if (vaultResult.Success)
+	{
+		info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult.Height - item->pos.yPos + CLICK(0.2f)), -CLICK(7.1f)));
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = GetFrameNumber(item, 0);
+		item->targetState = LS_JUMP_UP;
+		item->activeState = LS_IDLE;
+		info->gunStatus = LG_HANDS_BUSY;
+		info->turnRate = 0;
+
+		ShiftItem(item, coll);
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		AnimateLara(item);
+
 		return true;
 	}
 
-	return false;
+	// Mount ladder.
+	vaultResult = TestLaraLadderMount(item, coll);
+	if (vaultResult.Success &&
+		TestLaraClimbStance(item, coll))
+	{
+		item->animNumber = LA_STAND_SOLID;
+		item->frameNumber = GetFrameNumber(item, 0);
+		item->targetState = LS_LADDER_IDLE;
+		item->activeState = LS_IDLE;
+		info->gunStatus = LG_HANDS_BUSY;
+		info->turnRate = 0;
+
+		ShiftItem(item, coll);
+		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		AnimateLara(item);
+
+		return true;
+	}
 }
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestSetup testSetup)
@@ -2151,7 +2151,7 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// Input check is redundant, but provides for a slight optimisation.
+	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & (IN_ACTION | IN_JUMP)))
 		return CrawlVaultTestResult { false, (LARA_STATE)-1 };
 
