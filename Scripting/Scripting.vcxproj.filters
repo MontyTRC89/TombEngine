@@ -186,9 +186,6 @@
     <ClInclude Include="src\AudioTracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameFlowScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameLogicScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
