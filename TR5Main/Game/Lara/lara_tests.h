@@ -96,7 +96,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll);
-bool TestAndSetLaraLadder(ITEM_INFO* item, COLL_INFO* coll);
+bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestSetup testSetup);
 bool TestLaraCrawlUpStep(ITEM_INFO* item, COLL_INFO* coll);
