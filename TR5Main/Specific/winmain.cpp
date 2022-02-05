@@ -167,7 +167,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		// todo make sure the right objects are deleted at the end
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
-		g_GameFlow->LoadGameFlowScript();
+		g_GameFlow->LoadFlowScript();
 		g_GameScript = ScriptInterfaceState::CreateGame();
 		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
 		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
