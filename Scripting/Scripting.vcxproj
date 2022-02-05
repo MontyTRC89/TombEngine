@@ -163,7 +163,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -247,6 +247,7 @@
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting;$(SolutionDir)Scripting\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>
