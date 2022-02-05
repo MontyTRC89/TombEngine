@@ -13,8 +13,8 @@ struct MoveTestSetup
 struct MonkeyMoveTestSetup
 {
 	short Angle;
-	int LowerFloorBound;
-	int UpperFloorBound;
+	int LowerCeilingBound;
+	int UpperCeilingBound;
 };
 
 struct VaultTestSetup
