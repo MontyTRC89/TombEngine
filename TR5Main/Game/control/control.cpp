@@ -47,7 +47,7 @@
 #include "Specific/winmain.h"
 #include "Scripting/ScriptInterfaceFlow.h"
 #include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Entities/ScriptInterfaceEntities.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;

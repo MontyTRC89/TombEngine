@@ -41,7 +41,6 @@
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
-    <ClInclude Include="include\Scripting\Entities\ScriptInterfaceEntities.h" />
     <ClInclude Include="include\Scripting\GameFlowScript.h" />
     <ClInclude Include="include\Scripting\GameLogicScript.h" />
     <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
@@ -66,6 +65,7 @@
     <ClInclude Include="include\Scripting\ItemEnumPair.h" />
     <ClInclude Include="include\Scripting\LuaHandler.h" />
     <ClInclude Include="include\Scripting\ObjectIDs.h" />
+    <ClInclude Include="include\Scripting\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="include\Scripting\ReservedScriptNames.h" />
     <ClInclude Include="include\Scripting\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceFlow.h" />
@@ -78,10 +78,6 @@
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
-    <ClInclude Include="src\Entities\Entities.h" />
-    <ClInclude Include="src\Entities\Moveable\GameScriptItemInfo.h" />
-    <ClInclude Include="src\Entities\ObjectIDs.h" />
-    <ClInclude Include="src\Entities\Static\GameScriptMeshInfo.h" />
     <ClInclude Include="src\GameFlowScript.h" />
     <ClInclude Include="src\GameLogicScript.h" />
     <ClInclude Include="src\GameScriptAIObject.h" />
@@ -103,6 +99,10 @@
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
     <ClInclude Include="src\LuaHandler.h" />
+    <ClInclude Include="src\Objects\Moveable\GameScriptItemInfo.h" />
+    <ClInclude Include="src\Objects\ObjectIDs.h" />
+    <ClInclude Include="src\Objects\ObjectsHandler.h" />
+    <ClInclude Include="src\Objects\Static\GameScriptMeshInfo.h" />
     <ClInclude Include="src\ReservedScriptNames.h" />
     <ClInclude Include="src\ScriptAssert.h" />
     <ClInclude Include="src\ScriptInterfaceState.h" />
@@ -116,10 +116,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Entities\Entities.cpp" />
-    <ClCompile Include="src\Entities\Moveable\GameScriptItemInfo.cpp" />
-    <ClCompile Include="src\Entities\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\GameFlowScript.cpp" />
+    <ClCompile Include="src\Objects\Moveable\GameScriptItemInfo.cpp" />
+    <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
+    <ClCompile Include="src\Objects\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameLogicScript.cpp" />
     <ClCompile Include="src\GameScriptAIObject.cpp" />
