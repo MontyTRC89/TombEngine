@@ -5,6 +5,12 @@
 #include "ReservedScriptNames.h"
 #include "ObjectIDs.h"
 
+/***
+Scripts that will be run on game startup.
+@tentable Objects 
+@pragma nostrip
+*/
+
 ObjectsHandler::ObjectsHandler(sol::state* lua) : LuaHandler{ lua }
 {
 	/***

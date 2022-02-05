@@ -1,10 +1,12 @@
-file = "TR5Main/Scripting/"
+file = "Scripting/src"
 new_type("mem", "Members", false)
 new_type("files", "Script Files", true)
-new_type("enum", "Enums", true)
 new_type("entityclass", "Entity classes", true)
 new_type("pregameclass", "Pre-game script classes", true)
 new_type("miscclass", "Misc classes", true)
+new_type("tentable", "1 Modules", true)
+new_type("tenclass", "2 Classes", true)
+new_type("enum", "3 Enums", true)
 project = "TombEngine"
 title = "TombEngine Lua API"
 description = "TombEngine scripting interface"
