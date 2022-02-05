@@ -12,7 +12,7 @@ Mesh info
 @pragma nostrip
 */
 
-constexpr auto LUA_CLASS_NAME{ "MeshInfo" };
+constexpr auto LUA_CLASS_NAME{ "Static" };
 
 static auto index_error = index_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);

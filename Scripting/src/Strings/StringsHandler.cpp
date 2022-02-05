@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "StringsHandler.h"
 #include "ScriptAssert.h"
-#include "GameFlowScript.h"
+#include "Flow/Flow.h"
 #include <Renderer/RenderEnums.h>
 #include "ReservedScriptNames.h"
 
