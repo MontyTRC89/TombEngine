@@ -1,5 +1,6 @@
 #include "frameworkandsol.h"
 #include "GameFlowScript.h"
+#include "ReservedScriptNames.h"
 #include "Sound/sound.h"
 #include "Game/savegame.h"
 #include "GameScriptInventoryObject.h"
@@ -8,8 +9,8 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 /***
-Scripts that will be run on game startup.
-@files Pre-game
+Functions for use in gameflow.lua, settings.lua and strings.lua
+@tentable Flow 
 @pragma nostrip
 */
 

@@ -5,6 +5,12 @@
 #include <Renderer/RenderEnums.h>
 #include "ReservedScriptNames.h"
 
+/***
+Scripts that will be run on game startup.
+@tentable Strings 
+@pragma nostrip
+*/
+
 StringsHandler::StringsHandler(sol::state* lua) : LuaHandler{ lua }
 {
 /***

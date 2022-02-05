@@ -1,5 +1,10 @@
 #pragma once
 
+// Tables
+static constexpr char const ScriptReserved_TEN[]				= "TEN";
+static constexpr char const ScriptReserved_Objects[]			= "Objects";
+static constexpr char const ScriptReserved_Strings[]			= "Strings";
+
 // Classes
 static constexpr char const ScriptReserved_ItemInfo[]			= "ItemInfo";
 static constexpr char const ScriptReserved_MeshInfo[]			= "MeshInfo";
@@ -8,6 +13,19 @@ static constexpr char const ScriptReserved_SinkInfo[]			= "SinkInfo";
 static constexpr char const ScriptReserved_SoundSourceInfo[]	= "SoundSourceInfo";
 static constexpr char const ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char const ScriptReserved_DisplayString[]		= "DisplayString";
+
+// Flow Functions
+static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
+static constexpr char const ScriptReserved_SetIntroImagePath[]	= "SetIntroImagePath";
+static constexpr char const ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
+static constexpr char const ScriptReserved_SetFarView[]	= "SetFarView";
+static constexpr char const ScriptReserved_SetSettings[]	= "SetSettings";
+static constexpr char const ScriptReserved_SetAnimations[]	= "SetAnimations";
+
+// Flow Functions
+static constexpr char const ScriptReserved_SetStrings[]	= "SetStrings";
+static constexpr char const ScriptReserved_SetLanguageNames[]	= "SetLanguageNames";
+
 
 // Functions
 static constexpr char const ScriptReserved_ShowString[]			= "ShowString";

@@ -24,15 +24,13 @@ using namespace TEN::Effects::Lightning;
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@files Level-specific
+@tentable Logic
 @pragma nostrip
 */
 
 
 GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 {
-
-
 	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();

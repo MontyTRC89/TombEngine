@@ -13,7 +13,7 @@ Since different players will have different resolutions, you should work in term
 and use @{Level-specific.ScreenToPercent|ScreenToPercent} and @{Level-specific.PercentToScreen|PercentToScreen}
 when you need to use screen-space coordinates.
 
-@miscclass DisplayString
+@tenclass Strings.DisplayString
 @pragma nostrip
 */
 
