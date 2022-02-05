@@ -204,7 +204,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			}
 
-			if (Lara.climbStatus != 0 &&
+			if (Lara.climbStatus &&
 				coll->Middle.Ceiling <= -256 &&
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
