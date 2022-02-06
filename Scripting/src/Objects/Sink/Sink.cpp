@@ -8,7 +8,7 @@
 /***
 Sink
 
-@tenclass Sink
+@tenclass Objects.Sink
 @pragma nostrip
 */
 
