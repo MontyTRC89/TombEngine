@@ -5,7 +5,7 @@
 #include "resource.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/LanguageScript.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"

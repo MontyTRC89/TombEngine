@@ -8,14 +8,14 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Specific/level.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include <Specific\setup.h>
 #include "Game/Lara/lara_fire.h"
 #include "Game/items.h"
 
 using namespace TEN::Renderer;
 
-extern ScriptInterfaceFlow *g_GameFlow;
+extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 	ITEM_INFO& laraItem = *LaraItem;

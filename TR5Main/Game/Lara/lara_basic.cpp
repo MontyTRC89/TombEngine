@@ -17,7 +17,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
