@@ -40,6 +40,7 @@
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
+    <ClInclude Include="include\Scripting\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="include\Scripting\GameFlowScript.h" />
     <ClInclude Include="include\Scripting\GameLogicScript.h" />
     <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
@@ -66,7 +67,6 @@
     <ClInclude Include="include\Scripting\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="include\Scripting\ReservedScriptNames.h" />
     <ClInclude Include="include\Scripting\ScriptAssert.h" />
-    <ClInclude Include="include\Scripting\ScriptInterfaceFlow.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\Scripting\ScriptInterfaceState.h" />
@@ -76,7 +76,7 @@
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
-    <ClInclude Include="src\Flow\Flow.h" />
+    <ClInclude Include="src\Flow\FlowHandler.h" />
     <ClInclude Include="src\GameScriptAnimations.h" />
     <ClInclude Include="src\GameScriptAudioTrack.h" />
     <ClInclude Include="src\GameScriptColor.h" />
@@ -114,7 +114,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Flow\Flow.cpp" />
+    <ClCompile Include="src\Flow\FlowHandler.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="src\Objects\Camera\Camera.cpp" />
