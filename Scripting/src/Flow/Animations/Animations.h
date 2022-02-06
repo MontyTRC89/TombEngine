@@ -7,7 +7,7 @@ namespace sol {
 	class state;
 }
 
-struct GameScriptAnimations
+struct Animations
 {
 	bool CrawlExtended;				// Extended crawl moveset
 	bool CrouchRoll;				// Crouch roll
@@ -17,5 +17,5 @@ struct GameScriptAnimations
 	bool OscillateHang;				// Grab thin ledge animation from TR1 and 2
 	bool Pose;						// Crossed arms AFK posing
 
-	static void Register(sol::state* lua);
+	static void Register(sol::table &);
 };
