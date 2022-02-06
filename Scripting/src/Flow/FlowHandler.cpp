@@ -102,7 +102,7 @@ Specify which translations in the strings table correspond to which languages.
 	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	Level::Register(table_flow);
-	SkyLayer::Register(m_lua);
+	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
 	InventoryItem::Register(table_flow);
 	GameScriptSettings::Register(m_lua);
