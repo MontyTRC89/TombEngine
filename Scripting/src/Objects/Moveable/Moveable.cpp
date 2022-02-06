@@ -162,9 +162,9 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	return ptr;
 }
 
-void Moveable::Register(sol::state* state)
+void Moveable::Register(sol::state* state, sol::table & parent)
 {
-	state->new_usertype<Moveable>(LUA_CLASS_NAME,
+	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		"new", sol::overload(Create<false>, CreateEmpty<false>),
 		"newTemporary", sol::overload(Create<true>, CreateEmpty<true>),
 		sol::meta_function::index, index_error,

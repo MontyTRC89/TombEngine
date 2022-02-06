@@ -13,7 +13,7 @@ private:
 	CallbackDrawString					m_callbackDrawSring;
 
 public:
-	StringsHandler(sol::state* lua);
+	StringsHandler(sol::state* lua, sol::table & parent);
 	void								SetCallbackDrawString(CallbackDrawString cb) override;
 	void								ProcessDisplayStrings(float dt) override;
 	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const& ds);

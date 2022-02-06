@@ -22,7 +22,7 @@ public:
 	Moveable(Moveable const& other) = delete;
 	Moveable(Moveable && other) noexcept;
 
-	static void Register(sol::state *);
+	static void Register(sol::state *, sol::table & parent);
 
 	GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
