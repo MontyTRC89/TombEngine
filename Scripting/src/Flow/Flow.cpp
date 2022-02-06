@@ -36,8 +36,8 @@ Flow::Flow(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 	GameScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 
-/*** Flow.lua.
-These functions are called in Flow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
+/*** gameflow.lua.
+These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
 They handle a game's 'metadata'; i.e., things such as level titles, loading screen paths, and default
 ambient tracks.
 @section Flowlua
@@ -180,7 +180,7 @@ void Flow::SetGameFarView(byte val)
 void Flow::LoadFlowScript()
 {
 	ExecuteScript("Scripts/Enums.lua");
-	ExecuteScript("Scripts/Flow.lua");
+	ExecuteScript("Scripts/Gameflow.lua");
 	ExecuteScript("Scripts/Strings.lua");
 	ExecuteScript("Scripts/Settings.lua");
 

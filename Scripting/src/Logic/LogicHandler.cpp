@@ -29,14 +29,16 @@ Functions and callbacks for level-specific logic scripts.
 */
 
 
-GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
+LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
+	sol::table table_logic{ m_lua->lua_state(), sol::create };
+	parent.set(ScriptReserved_Strings, table_logic);
+
 	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();
 
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
-
 	
 	GameScriptPosition::Register(m_lua);
 	GameScriptFreeFunctions::Register(m_lua);
@@ -46,13 +48,13 @@ GameScript::GameScript(sol::state* lua) : LuaHandler{ lua }
 		});
 }
 
-void GameScript::ResetLevelTables()
+void LogicHandler::ResetLevelTables()
 {
-	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &GameScript::GetLevelFunc, &GameScript::SetLevelFunc, this);
+	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
 	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
 }
 
-sol::protected_function GameScript::GetLevelFunc(sol::table tab, std::string const& luaName)
+sol::protected_function LogicHandler::GetLevelFunc(sol::table tab, std::string const& luaName)
 {
 	if (m_levelFuncs.find(luaName) == m_levelFuncs.end())
 		return sol::lua_nil;
@@ -60,7 +62,7 @@ sol::protected_function GameScript::GetLevelFunc(sol::table tab, std::string con
 	return m_levelFuncs.at(luaName);
 }
 
-bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
+bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol::object value)
 {
 	switch (value.get_type())
 	{
@@ -82,7 +84,7 @@ bool GameScript::SetLevelFunc(sol::table tab, std::string const& luaName, sol::o
 	return true;
 }
 
-void GameScript::FreeLevelScripts()
+void LogicHandler::FreeLevelScripts()
 {
 	m_levelFuncs.clear();
 	m_locals = LuaVariables{};
@@ -123,7 +125,7 @@ void AddOneSecret()
 }
 
 /*
-void GameScript::MakeItemInvisible(short id)
+void LogicHandler::MakeItemInvisible(short id)
 {
 	if (m_itemsMap.find(id) == m_itemsMap.end())
 		return;
@@ -152,7 +154,7 @@ void GameScript::MakeItemInvisible(short id)
 }
 */
 template <typename T>
-void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
+void LogicHandler::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	for (const auto& it : m_locals.variables)
 	{
@@ -166,12 +168,12 @@ void GameScript::GetVariables(std::map<std::string, T>& locals, std::map<std::st
 	}
 }
 
-template void GameScript::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-template void GameScript::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-template void GameScript::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
+template void LogicHandler::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void LogicHandler::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void LogicHandler::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
 template <typename T>
-void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
+void LogicHandler::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {
 	//TODO Look into serialising tables from these maps, too -- squidshire, 24/08/2021
 	m_locals.variables.clear();
@@ -185,9 +187,9 @@ void GameScript::SetVariables(std::map<std::string, T>& locals, std::map<std::st
 	}
 }
 
-template void GameScript::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-template void GameScript::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-template void GameScript::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
+template void LogicHandler::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
+template void LogicHandler::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
+template void LogicHandler::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
 
 template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
@@ -204,7 +206,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 /*** An @{ItemInfo} representing Lara herself.
 @table Lara
 */
-void GameScript::ResetVariables()
+void LogicHandler::ResetVariables()
 {
 	(*m_lua)["Lara"] = NULL;
 }
@@ -235,12 +237,12 @@ void LuaVariables::SetVariable(sol::table tab, std::string key, sol::object valu
 	}
 }
 
-void GameScript::ExecuteScriptFile(const std::string & luaFilename)
+void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
 	ExecuteScript(luaFilename);
 }
 
-void GameScript::ExecuteFunction(std::string const & name)
+void LogicHandler::ExecuteFunction(std::string const & name)
 {
 	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];
 	auto r = func();
@@ -261,31 +263,31 @@ static void doCallback(sol::protected_function const & func, std::optional<float
 	}
 }
 
-void GameScript::OnStart()
+void LogicHandler::OnStart()
 {
 	if (m_onStart.valid())
 		doCallback(m_onStart);
 }
 
-void GameScript::OnLoad()
+void LogicHandler::OnLoad()
 {
 	if(m_onLoad.valid())
 		doCallback(m_onLoad);
 }
 
-void GameScript::OnControlPhase(float dt)
+void LogicHandler::OnControlPhase(float dt)
 {
 	if(m_onControlPhase.valid())
 		doCallback(m_onControlPhase, dt);
 }
 
-void GameScript::OnSave()
+void LogicHandler::OnSave()
 {
 	if(m_onSave.valid())
 		doCallback(m_onSave);
 }
 
-void GameScript::OnEnd()
+void LogicHandler::OnEnd()
 {
 	if(m_onEnd.valid())
 		doCallback(m_onEnd);
@@ -361,7 +363,7 @@ and provides the delta time (a float representing game time since last call) via
 @table LevelFuncs
 */
 
-void GameScript::InitCallbacks()
+void LogicHandler::InitCallbacks()
 {
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
 		std::string fullName = "LevelFuncs." + luaFunc;
