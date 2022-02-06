@@ -3,7 +3,7 @@
 #include "ReservedScriptNames.h"
 #include "Sound/sound.h"
 #include "Game/savegame.h"
-#include "GameScriptInventoryObject.h"
+#include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
@@ -104,7 +104,7 @@ Specify which translations in the strings table correspond to which languages.
 	GameScriptLevel::Register(m_lua);
 	GameScriptSkyLayer::Register(m_lua);
 	GameScriptMirror::Register(m_lua);
-	GameScriptInventoryObject::Register(m_lua);
+	InventoryItem::Register(table_flow);
 	GameScriptSettings::Register(m_lua);
 	Animations::Register(table_flow);
 	GameScriptColor::Register(m_lua);
@@ -244,7 +244,7 @@ bool FlowHandler::DoFlow()
 			// Prepare inventory objects table
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
-				GameScriptInventoryObject* obj = &level->InventoryObjects[i];
+				InventoryItem* obj = &level->InventoryObjects[i];
 				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
 				{
 					InventoryObject* invObj = &inventry_objects_list[obj->slot];
