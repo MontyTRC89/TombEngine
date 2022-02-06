@@ -6,7 +6,7 @@
 #include "Objects/Static/Static.h"
 #include "Sink/Sink.h"
 #include "Objects/AIObject/AIObject.h"
-#include "GameScriptSoundSourceInfo.h"
+#include "Objects/SoundSource/SoundSource.h"
 #include "Camera/Camera.h"
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler

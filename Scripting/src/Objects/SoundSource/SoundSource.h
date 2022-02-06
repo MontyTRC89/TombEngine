@@ -8,17 +8,17 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptSoundSourceInfo : public NamedBase<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>
+class SoundSource : public NamedBase<SoundSource, SOUND_SOURCE_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SOUND_SOURCE_INFO>;
-	GameScriptSoundSourceInfo(SOUND_SOURCE_INFO& ref, bool temp);
-	~GameScriptSoundSourceInfo();
+	SoundSource(SOUND_SOURCE_INFO& ref, bool temp);
+	~SoundSource();
 
-	GameScriptSoundSourceInfo& operator=(GameScriptSoundSourceInfo const& other) = delete;
-	GameScriptSoundSourceInfo(GameScriptSoundSourceInfo const& other) = delete;
+	SoundSource& operator=(SoundSource const& other) = delete;
+	SoundSource(SoundSource const& other) = delete;
 
-	static void Register(sol::state *);
+	static void Register(sol::table &);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
 
