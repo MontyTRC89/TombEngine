@@ -27,7 +27,7 @@ AIObject::~AIObject() {
 	}
 }
 
-void AIObject::Register(sol::state* state, sol::table & parent)
+void AIObject::Register(sol::table & parent)
 {
 	parent.new_usertype<AIObject>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
