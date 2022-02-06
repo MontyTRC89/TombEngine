@@ -226,9 +226,11 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	LaraInfo*& info = item->data;
 
 	info->projectedFloorHeight = vaultResult.Height;
-	info->gunStatus = LG_HANDS_BUSY;
+	info->gunStatus = vaultResult.SetBusyHands ? LG_HANDS_BUSY : info->gunStatus;
 	info->turnRate = 0;
-	SnapItemToLedge(item, coll, 0.2f);
+
+	if (vaultResult.SnapToLedge)
+		SnapItemToLedge(item, coll, 0.2f);
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)

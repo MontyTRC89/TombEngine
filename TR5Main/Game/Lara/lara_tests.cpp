@@ -1785,10 +1785,10 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 		!swampTooDeep &&																		// Swamp depth is permissive.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
-		return VaultTestResult { true, probeFront.Position.Floor, (LARA_STATE)-1 };
+		return VaultTestResult{ true, probeFront.Position.Floor };
 	}
 
-	return VaultTestResult { false, NO_HEIGHT, (LARA_STATE)-1 };
+	return VaultTestResult{ false };
 }
 
 VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
@@ -1897,10 +1897,10 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
-		return VaultTestResult{ true, probeMiddle.Position.Ceiling, (LARA_STATE)-1 };
+		return VaultTestResult{ true, probeMiddle.Position.Ceiling };
 	}
 
-	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+	return VaultTestResult{ false };
 }
 
 VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
@@ -1919,10 +1919,10 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
-		return VaultTestResult{ true, NO_HEIGHT, (LARA_STATE)-1 };
+		return VaultTestResult{ true, NO_HEIGHT };
 	}
 
-	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+	return VaultTestResult{ false };
 }
 
 VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1937,10 +1937,10 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
-		return VaultTestResult{ true, probe.Position.Ceiling, (LARA_STATE)-1 };
+		return VaultTestResult{ true, probe.Position.Ceiling };
 	}
 
-	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+	return VaultTestResult{ false };
 }
 
 VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
@@ -1949,10 +1949,10 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
-		return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+		return VaultTestResult{ false };
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
-		return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+		return VaultTestResult{ false };
 
 	VaultTestResult vaultResult;
 
@@ -1965,6 +1965,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			vaultResult.TargetState = LS_VAULT_1_STEP_CROUCH;
 			vaultResult.Height += CLICK(1);
+			vaultResult.SetBusyHands = true;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1974,6 +1976,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS;
 			vaultResult.Height += CLICK(2);
+			vaultResult.SetBusyHands = true;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1984,6 +1988,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
 			vaultResult.Height += CLICK(2);
+			vaultResult.SetBusyHands = true;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1993,6 +1999,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS;
 			vaultResult.Height += CLICK(3);
+			vaultResult.SetBusyHands = true;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -2003,6 +2011,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
 			vaultResult.Height += CLICK(3);
+			vaultResult.SetBusyHands = true;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -2011,6 +2021,8 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_AUTO_JUMP;
+			vaultResult.SetBusyHands = false;
+			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 	}
@@ -2021,14 +2033,16 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: calcJumpVelocity not getting set?
 	// Auto jump to monkey swing.
 	vaultResult = TestLaraMonkeyAutoJump(item, coll);
-	if (vaultResult.Success &&
-		g_GameFlow->Animations.MonkeyAutoJump)
+	if (vaultResult.Success/* &&
+		g_GameFlow->Animations.MonkeyAutoJump*/)
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
+		vaultResult.SetBusyHands = false;
+		vaultResult.SnapToLedge = false;
 		return vaultResult;
 	}
 	
-	return VaultTestResult{ false, NO_HEIGHT, (LARA_STATE)-1 };
+	return VaultTestResult{ false };
 }
 
 // Temporary solution to ladder mounts until ladders stop breaking whenever you try to do anything with them. @Sezz 2022.02.05
