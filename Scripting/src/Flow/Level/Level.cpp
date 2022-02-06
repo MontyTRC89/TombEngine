@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptLevel.h"
+#include "Level.h"
 #include "ScriptAssert.h"
 
 /***
@@ -14,44 +14,44 @@ These are things things which aren't present in the compiled level file itself.
 	@function Level.new
 	@return a Level object
 	*/
-void GameScriptLevel::Register(sol::state* state)
+void Level::Register(sol::table & parent)
 {
-	state->new_usertype<GameScriptLevel>("Level",
-		sol::constructors<GameScriptLevel()>(),
+	parent.new_usertype<Level>("Level",
+		sol::constructors<Level()>(),
 
 /// (string) string key for the level's (localised) name.
 // Corresponds to an entry in strings.lua.
 //@mem nameKey
-		"nameKey", &GameScriptLevel::NameStringKey,
+		"nameKey", &Level::NameStringKey,
 
 /// (string) Level-specific Lua script file.
 // Path of the Lua file holding the level's logic script, relative to the location of the tombengine executable
 //@mem scriptFile
-		"scriptFile", &GameScriptLevel::ScriptFileName,
+		"scriptFile", &Level::ScriptFileName,
 
 /// (string) Compiled file path.
 // This path is relative to the location of the TombEngine executable.
 //@mem levelFile
-		"levelFile", &GameScriptLevel::FileName,
+		"levelFile", &Level::FileName,
 
 /// (string) Load screen image.
 // Path of the level's load screen file (.png or .jpg), relative to the location of the tombengine executable
 //@mem loadScreenFile
-		"loadScreenFile", &GameScriptLevel::LoadScreenFileName,
+		"loadScreenFile", &Level::LoadScreenFileName,
 		
 /// (string) initial ambient sound track to play.
 // This is the filename of the track __without__ the .wav extension.
 //@mem ambientTrack
-		"ambientTrack", &GameScriptLevel::AmbientTrack,
+		"ambientTrack", &Level::AmbientTrack,
 
 /// (@{SkyLayer}) Primary sky layer  
 //@mem layer1
-		"layer1", &GameScriptLevel::Layer1,
+		"layer1", &Level::Layer1,
 
 /// (@{SkyLayer}) Secondary sky layer
 // __(not yet implemented)__
 //@mem layer2
-		"layer2", &GameScriptLevel::Layer2,
+		"layer2", &Level::Layer2,
 
 /// (@{Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
@@ -59,36 +59,36 @@ void GameScriptLevel::Register(sol::state* state)
 //
 // __(not yet implemented)__
 //@mem fog
-		"fog", &GameScriptLevel::Fog,
+		"fog", &Level::Fog,
 
 /// (bool) Draw sky layer? (default: false)
 //@mem horizon
-		"horizon", &GameScriptLevel::Horizon,
+		"horizon", &Level::Horizon,
 
 /// (bool) Enable smooth transition from horizon graphic to sky layer.
 // If set to false, there will be a black band between the two.
 //
 // __(not yet implemented)__
 //@mem colAddHorizon
-		"colAddHorizon", &GameScriptLevel::ColAddHorizon,
+		"colAddHorizon", &Level::ColAddHorizon,
 
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
 //
 //@mem storm
-		"storm", &GameScriptLevel::Storm,
+		"storm", &Level::Storm,
 
 /// (WeatherType) Choose weather effect.
 // Must be one of the values `WeatherType.None`, `WeatherType.Rain`, or `WeatherType.Snow`.
 //
 //@mem weather
-		"weather", &GameScriptLevel::Weather,
+		"weather", &Level::Weather,
 
 /// (float) Choose weather strength.
 // Must be value between `0.1` and `1.0`.
 //
 //@mem weatherStrength
-		"weatherStrength", sol::property(&GameScriptLevel::SetWeatherStrength),
+		"weatherStrength", sol::property(&Level::SetWeatherStrength),
 
 /*** (LaraType) Must be one of the LaraType values.
 These are:
@@ -104,18 +104,18 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
  __(not yet fully implemented)__
  @mem laraType*/
-		"laraType", &GameScriptLevel::Type,
+		"laraType", &Level::Type,
 
 /// (bool) Enable occasional screen shake effect.
 // As seen in TRC's Sinking Submarine.
 //@mem rumble
-		"rumble", &GameScriptLevel::Rumble,
+		"rumble", &Level::Rumble,
 
 /// (@{Mirror}) Location and size of the level's mirror, if present.
 //
 // __(not yet implemented)__
 //@mem mirror
-		"mirror", &GameScriptLevel::Mirror,
+		"mirror", &Level::Mirror,
 
 /*** (byte) The maximum draw distance for level.
 Given in sectors (blocks).
@@ -126,22 +126,22 @@ This is equivalent to TRNG's LevelFarView variable.
 __(not yet implemented)__
 @mem farView
 */
-		"farView", sol::property(&GameScriptLevel::SetLevelFarView),
+		"farView", sol::property(&Level::SetLevelFarView),
 
 /*** (bool) Enable unlimited oxygen supply when in water.
 
  __(not yet implemented)__
 @mem unlimitedAir
 */
-		"unlimitedAir", &GameScriptLevel::UnlimitedAir,
+		"unlimitedAir", &Level::UnlimitedAir,
 
 /// (table of @{InventoryObject}s) table of inventory object overrides
 //@mem objects
-		"objects", &GameScriptLevel::InventoryObjects
+		"objects", &Level::InventoryObjects
 		);
 }
 
-void GameScriptLevel::SetWeatherStrength(float val)
+void Level::SetWeatherStrength(float val)
 {
 	bool cond = val <= 1.0f && val >= 0.0f;
 	std::string msg{ "weatherStrength value must be in the range [0.1, 1.0]." };
@@ -156,7 +156,7 @@ void GameScriptLevel::SetWeatherStrength(float val)
 	}
 }
 
-void GameScriptLevel::SetLevelFarView(byte val)
+void Level::SetLevelFarView(byte val)
 {
 	bool cond = val <= 127 && val >= 1;
 	std::string msg{ "levelFarView value must be in the range [1, 127]." };
@@ -171,7 +171,7 @@ void GameScriptLevel::SetLevelFarView(byte val)
 	}
 }
 
-RGBAColor8Byte GameScriptLevel::GetSkyLayerColor(int index) const
+RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 {
 	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
@@ -185,7 +185,7 @@ RGBAColor8Byte GameScriptLevel::GetSkyLayerColor(int index) const
 	}
 }
 
-bool GameScriptLevel::GetSkyLayerEnabled(int index) const
+bool Level::GetSkyLayerEnabled(int index) const
 {
 	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
@@ -199,7 +199,7 @@ bool GameScriptLevel::GetSkyLayerEnabled(int index) const
 	}
 }
 
-short GameScriptLevel::GetSkyLayerSpeed(int index) const
+short Level::GetSkyLayerSpeed(int index) const
 {
 	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
@@ -213,27 +213,27 @@ short GameScriptLevel::GetSkyLayerSpeed(int index) const
 	}
 }
 
-LaraType GameScriptLevel::GetLaraType() const
+LaraType Level::GetLaraType() const
 {
 	return Type;
 }
 
-bool GameScriptLevel::HasStorm() const
+bool Level::HasStorm() const
 {
 	return Storm;
 }
 
-float GameScriptLevel::GetWeatherStrength() const
+float Level::GetWeatherStrength() const
 {
 	return WeatherStrength;
 }
 
-WeatherType GameScriptLevel::GetWeatherType() const
+WeatherType Level::GetWeatherType() const
 {
 	return Weather;
 }
 
-short GameScriptLevel::GetMirrorRoom() const
+short Level::GetMirrorRoom() const
 {
 	return Mirror.Room;
 }
