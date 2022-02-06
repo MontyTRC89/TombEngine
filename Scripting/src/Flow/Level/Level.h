@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "GameScriptSkyLayer.h"
-#include "GameScriptMirror.h"
+#include "Flow/Mirror/Mirror.h"
 #include "GameScriptColor.h"
 #include <GameScriptFog.h>
 #include "ScriptInterfaceLevel.h"
@@ -36,7 +36,7 @@ struct Level : public ScriptInterfaceLevel
 	WeatherType Weather{ WeatherType::None };
 	float WeatherStrength{ 1.0f };
 	LaraType Type{ LaraType::Normal };
-	GameScriptMirror Mirror;
+	Mirror Mirror;
 	int LevelFarView{ 0 };
 	bool UnlimitedAir{ false };
 	std::vector<InventoryItem> InventoryObjects;

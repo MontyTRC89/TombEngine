@@ -103,7 +103,7 @@ Specify which translations in the strings table correspond to which languages.
 
 	Level::Register(table_flow);
 	GameScriptSkyLayer::Register(m_lua);
-	GameScriptMirror::Register(m_lua);
+	Mirror::Register(m_lua);
 	InventoryItem::Register(table_flow);
 	GameScriptSettings::Register(m_lua);
 	Animations::Register(table_flow);
