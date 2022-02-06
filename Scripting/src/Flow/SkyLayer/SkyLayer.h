@@ -19,6 +19,6 @@ struct SkyLayer
 	void SetColor(GameScriptColor const & col);
 	GameScriptColor GetColor() const;
 
-	static void Register(sol::state *);
+	static void Register(sol::table &);
 };
 
