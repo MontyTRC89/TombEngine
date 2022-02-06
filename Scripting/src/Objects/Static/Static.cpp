@@ -5,6 +5,7 @@
 #include "GameScriptPosition.h"
 #include "GameScriptColor.h"
 #include "ScriptUtil.h"
+#include "ReservedScriptNames.h"
 /***
 Mesh info
 
@@ -12,10 +13,8 @@ Mesh info
 @pragma nostrip
 */
 
-constexpr auto LUA_CLASS_NAME{ "Static" };
-
-static auto index_error = index_error_maker(Static, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(Static, LUA_CLASS_NAME);
+static auto index_error = index_error_maker(Static, ScriptReserved_Static);
+static auto newindex_error = newindex_error_maker(Static, ScriptReserved_Static);
 
 Static::Static(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
 {};
@@ -27,9 +26,9 @@ Static::~Static() {
 	}
 }
 
-void Static::Register(sol::state* state)
+void Static::Register(sol::state* state, sol::table & parent)
 {
-	state->new_usertype<Static>(LUA_CLASS_NAME,
+	parent.new_usertype<Static>(ScriptReserved_Static,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
