@@ -5,7 +5,7 @@
 #include "GameScriptColor.h"
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
-#include "GameScriptAnimations.h"
+#include "Flow/Animations/Animations.h"
 #include "ScriptInterfaceGame.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
@@ -28,7 +28,7 @@ public:
 	byte							GameFarView{ 0 };
 
 	// New animation flag table
-	GameScriptAnimations			Animations{};
+	Animations			Anims{};
 
 	// Selected language set
 	std::vector<GameScriptLevel*>	Levels;
@@ -41,7 +41,7 @@ public:
 	char const *					GetString(const char* id) const;
 	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
 	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
-	void							SetAnimations(GameScriptAnimations const & src);
+	void							SetAnimations(Animations const & src);
 	void							SetSettings(GameScriptSettings const & src);
 	GameScriptSettings*				GetSettings();
 	GameScriptLevel*				GetLevel(int id);
@@ -52,13 +52,13 @@ public:
 	bool							IsFlyCheatEnabled() const;
 	bool							CanPlayAnyLevel() const;
 
-	bool HasCrawlExtended() const override { return Animations.CrawlExtended; }
-	bool HasCrouchRoll() const override { return Animations.CrouchRoll; }
-	bool HasCrawlspaceSwandive() const override { return Animations.CrawlspaceSwandive; }
-	bool HasMonkeyTurn180() const override { return Animations.MonkeyTurn180; }
-	bool HasMonkeyAutoJump() const override { return Animations.MonkeyAutoJump; }
-	bool HasOscillateHang() const override { return Animations.OscillateHang; }
-	bool HasAFKPose() const override { return Animations.Pose; }
+	bool HasCrawlExtended() const override { return Anims.CrawlExtended; }
+	bool HasCrouchRoll() const override { return Anims.CrouchRoll; }
+	bool HasCrawlspaceSwandive() const override { return Anims.CrawlspaceSwandive; }
+	bool HasMonkeyTurn180() const override { return Anims.MonkeyTurn180; }
+	bool HasMonkeyAutoJump() const override { return Anims.MonkeyAutoJump; }
+	bool HasOscillateHang() const override { return Anims.OscillateHang; }
+	bool HasAFKPose() const override { return Anims.Pose; }
 	bool DoFlow() override;
 };
 
