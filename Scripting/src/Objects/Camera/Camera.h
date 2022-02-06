@@ -8,17 +8,17 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptCameraInfo : public GameScriptNamedBase<GameScriptCameraInfo, LEVEL_CAMERA_INFO &>
+class Camera : public GameScriptNamedBase<Camera, LEVEL_CAMERA_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<LEVEL_CAMERA_INFO>;
-	GameScriptCameraInfo(LEVEL_CAMERA_INFO& ref, bool temp);
-	~GameScriptCameraInfo();
+	Camera(LEVEL_CAMERA_INFO& ref, bool temp);
+	~Camera();
 
-	GameScriptCameraInfo& operator=(GameScriptCameraInfo const& other) = delete;
-	GameScriptCameraInfo(GameScriptCameraInfo const& other) = delete;
+	Camera& operator=(Camera const& other) = delete;
+	Camera(Camera const& other) = delete;
 
-	static void Register(sol::state *);
+	static void Register(sol::table &);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
 

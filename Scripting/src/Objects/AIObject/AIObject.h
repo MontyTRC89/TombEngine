@@ -17,7 +17,7 @@ public:
 	AIObject& operator=(AIObject const& other) = delete;
 	AIObject(AIObject const& other) = delete;
 
-	static void Register(sol::state *, sol::table & parent);
+	static void Register(sol::table & parent);
 
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
