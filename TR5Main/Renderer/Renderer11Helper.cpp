@@ -8,7 +8,7 @@
 #include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer\RenderView\RenderView.h"
 #include "Objects/TR3/Vehicles/quad.h"
 #include "Objects/TR3/Vehicles/rubberboat.h"
@@ -27,7 +27,7 @@
 #include "Game/items.h"
 
 extern GameConfiguration g_Configuration;
-extern ScriptInterfaceFlow *g_GameFlow;
+extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {

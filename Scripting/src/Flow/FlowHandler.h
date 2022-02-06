@@ -8,9 +8,9 @@
 #include "GameScriptAudioTrack.h"
 #include "GameScriptAnimations.h"
 #include "ScriptInterfaceGame.h"
-#include "ScriptInterfaceFlow.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
-class FlowHandler : public LuaHandler, public ScriptInterfaceFlow
+class FlowHandler : public LuaHandler, public ScriptInterfaceFlowHandler
 {
 private:
 	GameScriptSettings				m_settings;

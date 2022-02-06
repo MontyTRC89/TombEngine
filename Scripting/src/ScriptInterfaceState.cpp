@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ScriptInterfaceState.h"
 #include "Logic/LogicHandler.h"
-#include "Flow/Flow.h"
+#include "Flow/FlowHandler.h"
 #include "Objects/ObjectsHandler.h"
 #include "Strings/StringsHandler.h"
 #include "ReservedScriptNames.h"
@@ -19,9 +19,9 @@ ScriptInterfaceGame* ScriptInterfaceState::CreateGame()
 	return new LogicHandler(&g_solState, s_rootTable);
 }
 
-ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
+ScriptInterfaceFlowHandler* ScriptInterfaceState::CreateFlow()
 {
-	return new Flow(&g_solState, s_rootTable);
+	return new FlowHandler(&g_solState, s_rootTable);
 }
 
 ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateObjectsHandler()
