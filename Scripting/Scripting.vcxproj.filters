@@ -210,9 +210,6 @@
     <ClInclude Include="src\GameScriptSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameScriptSinkInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptSkyLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -276,6 +273,12 @@
     <ClInclude Include="src\Objects\Camera\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Objects\NamedBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Sink\Sink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -297,9 +300,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptSkyLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameScriptSinkInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptMirror.cpp">
@@ -354,6 +354,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\Camera\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Sink\Sink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
