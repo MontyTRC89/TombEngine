@@ -25,15 +25,6 @@ ScriptInterfaceFlowHandler* g_GameFlow;
 
 FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
-	GameScriptLevel::Register(m_lua);
-	GameScriptSkyLayer::Register(m_lua);
-	GameScriptFog::Register(m_lua);
-	GameScriptMirror::Register(m_lua);
-	GameScriptInventoryObject::Register(m_lua);
-	GameScriptSettings::Register(m_lua);
-	GameScriptAnimations::Register(m_lua);
-	GameScriptColor::Register(m_lua);
-	GameScriptRotation::Register(m_lua);
 
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -110,6 +101,16 @@ Specify which translations in the strings table correspond to which languages.
 */
 	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
+	GameScriptLevel::Register(m_lua);
+	GameScriptSkyLayer::Register(m_lua);
+	GameScriptMirror::Register(m_lua);
+	GameScriptInventoryObject::Register(m_lua);
+	GameScriptSettings::Register(m_lua);
+	Animations::Register(table_flow);
+	GameScriptColor::Register(m_lua);
+	GameScriptRotation::Register(m_lua);
+	GameScriptFog::Register(m_lua);
+
 	MakeReadOnlyTable(ScriptReserved_WeatherType, kWeatherTypes);
 	MakeReadOnlyTable(ScriptReserved_LaraType, kLaraTypes);
 	MakeReadOnlyTable(ScriptReserved_InvItem, kInventorySlots);
@@ -141,9 +142,9 @@ void FlowHandler::SetSettings(GameScriptSettings const & src)
 	m_settings = src;
 }
 
-void FlowHandler::SetAnimations(GameScriptAnimations const& src)
+void FlowHandler::SetAnimations(Animations const& src)
 {
-	Animations = src;
+	Anims = src;
 }
 
 void FlowHandler::AddLevel(GameScriptLevel const& level)
