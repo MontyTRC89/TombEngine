@@ -32,7 +32,6 @@ FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua
 	GameScriptInventoryObject::Register(m_lua);
 	GameScriptSettings::Register(m_lua);
 	GameScriptAnimations::Register(m_lua);
-	GameScriptAudioTrack::Register(m_lua);
 	GameScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 

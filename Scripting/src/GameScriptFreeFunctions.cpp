@@ -6,9 +6,8 @@
 #include "Game\effects\lightning.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
+#include "Specific/configuration.h"
 #include "camera.h"
-#include "pickup.h"
-#include "ItemEnumPair.h"
 
 /***
 Scripts that will be run on game startup.
@@ -98,41 +97,6 @@ namespace GameScriptFreeFunctions {
 	{
 		PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
 	}
-	static void InventoryAdd(ItemEnumPair slot, sol::optional<int> count)
-	{
-		// If 0 is passed in, then the amount added will be the default amount
-		// for that pickup - i.e. the amount you would get from picking up the
-		// item in-game (e.g. 1 for medipacks, 12 for flares).
-		PickedUpObject(slot.m_pair.first, count.value_or(0));
-	}
-
-	static void InventoryRemove(ItemEnumPair slot, sol::optional<int> count)
-	{
-		// 0 is default for the same reason as in InventoryAdd.
-		RemoveObjectFromInventory(slot.m_pair.first, count.value_or(0));
-	}
-
-	static int InventoryGetCount(ItemEnumPair slot)
-	{
-		return GetInventoryCount(slot.m_pair.first);
-	}
-
-	static void InventorySetCount(ItemEnumPair slot, int count)
-	{
-		// add the amount we'd need to add to get to count
-		int currAmt = GetInventoryCount(slot.m_pair.first);
-		InventoryAdd(slot, count - currAmt);
-	}
-
-	static void InventoryCombine(int slot1, int slot2)
-	{
-
-	}
-
-	static void InventorySeparate(int slot)
-	{
-
-	}
 
 	static int CalculateDistance(GameScriptPosition const& pos1, GameScriptPosition const& pos2)
 	{
@@ -179,41 +143,7 @@ namespace GameScriptFreeFunctions {
 		//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
 		lua->set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 
-		///Add x of an item to the inventory.
-		//A count of 0 will add the "default" amount of that item
-		//(i.e. the amount the player would get from a pickup of that type).
-		//For example, giving "zero" crossbow ammo would give the player
-		//10 instead, whereas giving "zero" medkits would give the player 1 medkit.
-		//@function GiveInvItem
-		//@tparam InvItem item the item to be added
-		//@tparam int count the number of items to add (default: 0)
-		lua->set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
-
 		
-		//Remove x of a certain item from the inventory.
-		//As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item.
-		//@function TakeInvItem
-		//@tparam InvItem item the item to be removed
-		//@tparam int count the number of items to remove (default: 0)
-		
-		lua->set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
-
-		
-		///Get the amount the player holds of an item.
-		//@function GetInvItemCount
-		//@tparam InvItem item the item to check
-		//@treturn int the amount of the item the player has in the inventory
-		
-		lua->set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
-
-
-		///Set the amount of a certain item the player has in the inventory.
-		//Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
-		//@function SetInvItemCount
-		//@tparam @{InvItem} item the item to be set
-		//@tparam int count the number of items the player will have
-		lua->set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
-
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
