@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 
 namespace sol {
 	class state;
@@ -12,7 +12,7 @@ struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
 
-class Moveable : public GameScriptNamedBase<Moveable, short>
+class Moveable : public NamedBase<Moveable, short>
 {
 public:
 	using IdentifierType = short;
