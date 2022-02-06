@@ -30,9 +30,6 @@
     <ClInclude Include="include\GameScriptColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameScriptCameraInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -91,9 +88,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\GameScriptAudioTrack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptCameraInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\GameScriptColor.h">
@@ -192,9 +186,6 @@
     <ClInclude Include="src\GameScriptAudioTrack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameScriptCameraInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -208,9 +199,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GameScriptMirror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GameScriptNamedBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GameScriptPosition.h">
@@ -297,9 +285,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptRotation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameScriptCameraInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptColor.cpp">

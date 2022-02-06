@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 #include "Specific/level.h"
 
 namespace sol {
@@ -8,7 +8,7 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class AIObject : public GameScriptNamedBase<AIObject, AI_OBJECT&>
+class AIObject : public NamedBase<AIObject, AI_OBJECT&>
 {
 public:
 	AIObject(AI_OBJECT& ref, bool temp);

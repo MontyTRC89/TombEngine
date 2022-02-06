@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 #include "Game/room.h"
 
 namespace sol {
@@ -10,7 +10,7 @@ namespace sol {
 class GameScriptPosition;
 class GameScriptColor;
 
-class Static : public GameScriptNamedBase<Static, MESH_INFO &>
+class Static : public NamedBase<Static, MESH_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<MESH_INFO>;

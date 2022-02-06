@@ -84,7 +84,6 @@
     <ClInclude Include="src\GameScriptInventoryObject.h" />
     <ClInclude Include="src\GameScriptLevel.h" />
     <ClInclude Include="src\GameScriptMirror.h" />
-    <ClInclude Include="src\GameScriptNamedBase.h" />
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
     <ClInclude Include="src\GameScriptSettings.h" />
