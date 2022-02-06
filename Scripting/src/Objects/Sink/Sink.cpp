@@ -1,76 +1,75 @@
 #pragma once
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
-#include "GameScriptSinkInfo.h"
+#include "Sink.h"
 #include "GameScriptPosition.h"
 #include "ScriptUtil.h"
+#include "ReservedScriptNames.h"
 /***
-Sink info
+Sink
 
-@entityclass SinkInfo
+@tenclass Sink
 @pragma nostrip
 */
 
-constexpr auto LUA_CLASS_NAME{ "SinkInfo" };
+static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
+static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
 
-static auto index_error = index_error_maker(GameScriptSinkInfo, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(GameScriptSinkInfo, LUA_CLASS_NAME);
-
-GameScriptSinkInfo::GameScriptSinkInfo(SINK_INFO & ref, bool temp) : m_sink{ref}, m_temporary{ temp }
+Sink::Sink(SINK_INFO & ref, bool temp) : m_sink{ref}, m_temporary{ temp }
 {};
 
-GameScriptSinkInfo::~GameScriptSinkInfo() {
+Sink::~Sink() {
 	if (m_temporary)
 	{
 		s_callbackRemoveName(m_sink.luaName);
 	}
 }
 
-void GameScriptSinkInfo::Register(sol::state* state)
+void Sink::Register(sol::table& parent)
 {
-	state->new_usertype<GameScriptSinkInfo>(LUA_CLASS_NAME,
+	parent.new_usertype<Sink>(ScriptReserved_Sink,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos
-		"pos", sol::property(&GameScriptSinkInfo::GetPos, &GameScriptSinkInfo::SetPos),
+		"pos", sol::property(&Sink::GetPos, &Sink::SetPos),
 
 		/// (string) unique string identifier.
 		// e.g. "strong\_river\_current" or "propeller\_death\_sink"
 		// @mem name
-		"name", sol::property(&GameScriptSinkInfo::GetName, &GameScriptSinkInfo::SetName),
+		"name", sol::property(&Sink::GetName, &Sink::SetName),
 
 		/// (int) strength.
 		// Strength of the sink, with higher numbers providing stronger currents. Will be clamped to [1, 32].
 		// @mem strength
-		"strength", sol::property(&GameScriptSinkInfo::GetStrength, &GameScriptSinkInfo::SetStrength),
+		"strength", sol::property(&Sink::GetStrength, &Sink::SetStrength),
 
 		/// (int) box index.
 		// I don't know what this does and it's not actually in the engine yet
 		// @mem boxIndex
-		"boxIndex", sol::property(&GameScriptSinkInfo::GetBoxIndex, &GameScriptSinkInfo::SetBoxIndex)
+		"boxIndex", sol::property(&Sink::GetBoxIndex, &Sink::SetBoxIndex)
 		);
 }
 
-GameScriptPosition GameScriptSinkInfo::GetPos() const
+GameScriptPosition Sink::GetPos() const
 {
 	return GameScriptPosition{ m_sink.x, m_sink.y, m_sink.z };
 }
 
-void GameScriptSinkInfo::SetPos(GameScriptPosition const& pos)
+void Sink::SetPos(GameScriptPosition const& pos)
 {
 	m_sink.x = pos.x;
 	m_sink.y = pos.y;
 	m_sink.z = pos.z;
 }
 
-std::string GameScriptSinkInfo::GetName() const
+std::string Sink::GetName() const
 {
 	return m_sink.luaName;
 }
 
-void GameScriptSinkInfo::SetName(std::string const & id) 
+void Sink::SetName(std::string const & id) 
 {
 	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
@@ -86,23 +85,23 @@ void GameScriptSinkInfo::SetName(std::string const & id)
 	s_callbackSetName(id, m_sink);
 }
 
-int GameScriptSinkInfo::GetStrength() const
+int Sink::GetStrength() const
 {
 	return m_sink.strength;
 }
 
-void GameScriptSinkInfo::SetStrength(int str)
+void Sink::SetStrength(int str)
 {
 	m_sink.strength = std::clamp(str, 1, 32);
 }
 
-int GameScriptSinkInfo::GetBoxIndex() const
+int Sink::GetBoxIndex() const
 {
 
 	return m_sink.boxIndex;
 }
 
-void GameScriptSinkInfo::SetBoxIndex(int b)
+void Sink::SetBoxIndex(int b)
 {
 	m_sink.boxIndex = b;
 }
