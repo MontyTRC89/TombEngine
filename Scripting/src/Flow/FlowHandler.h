@@ -10,7 +10,7 @@
 #include "ScriptInterfaceGame.h"
 #include "ScriptInterfaceFlow.h"
 
-class Flow : public LuaHandler, public ScriptInterfaceFlow
+class FlowHandler : public LuaHandler, public ScriptInterfaceFlow
 {
 private:
 	GameScriptSettings				m_settings;
@@ -34,8 +34,8 @@ public:
 	// Selected language set
 	std::vector<GameScriptLevel*>	Levels;
 
-	Flow(sol::state* lua, sol::table & parent);
-	~Flow();
+	FlowHandler(sol::state* lua, sol::table & parent);
+	~FlowHandler();
 
 	void							AddLevel(GameScriptLevel const& level);
 	void							LoadFlowScript();
