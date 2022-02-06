@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptDisplayString.h"
+#include "DisplayString.h"
 #include "ScriptAssert.h"
 #include "ReservedScriptNames.h"
 
@@ -27,7 +27,7 @@ UserDisplayString::UserDisplayString(std::string const& key, int x, int y, D3DCO
 {
 }
 
-GameScriptDisplayString::GameScriptDisplayString() {
+DisplayString::DisplayString() {
 	// We don't ever dereference this pointer; it's just
 	// a handy way to get a unique key for a hash map.
 
@@ -70,9 +70,9 @@ If true, the str argument will be the key of a translated string specified in
 strings.lua. __Default: false__.
 @return A new DisplayString object.
 */
-std::unique_ptr<GameScriptDisplayString> CreateString(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
+std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
 {
-	auto ptr = std::make_unique<GameScriptDisplayString>();
+	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
 	FlagArray f{};
 	if (std::holds_alternative<sol::table>(flags))
@@ -97,66 +97,66 @@ std::unique_ptr<GameScriptDisplayString> CreateString(std::string const & key, i
 
 	UserDisplayString ds{ key, x, y, col, f, translated};
 
-	GameScriptDisplayString::s_setItemCallback(id, ds);
+	DisplayString::s_setItemCallback(id, ds);
 	return ptr;
 }
 
-GameScriptDisplayString::~GameScriptDisplayString()
+DisplayString::~DisplayString()
 {
 	s_removeItemCallback(m_id);
 }
 
-void GameScriptDisplayString::Register(sol::state* state)
+void DisplayString::Register(sol::state* state)
 {
-	state->new_usertype<GameScriptDisplayString>(
+	state->new_usertype<DisplayString>(
 		"DisplayString",
 		"new", &CreateString,
 
 		/// (@{Color}) RBG color
 		// @mem col
-		"col", sol::property(&GameScriptDisplayString::GetCol, &GameScriptDisplayString::SetCol),
+		"col", sol::property(&DisplayString::GetCol, &DisplayString::SetCol),
 
 		/// (string) String key to use. If `translated` is true when @{DisplayString.new}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @mem key
-		"key", sol::property(&GameScriptDisplayString::SetKey, &GameScriptDisplayString::GetKey),
+		"key", sol::property(&DisplayString::SetKey, &DisplayString::GetKey),
 
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
 		// @function DisplayString:SetPos
 		// @tparam int x x-coordinate of the string
 		// @tparam int y y-coordinate of the string
-		"SetPos", &GameScriptDisplayString::SetPos,
+		"SetPos", &DisplayString::SetPos,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPos
 		// @treturn int x x-coordinate of the string
 		// @treturn int y y-coordinate of the string
-		"GetPos", &GameScriptDisplayString::GetPos
+		"GetPos", &DisplayString::GetPos
 	);
 }
 
-DisplayStringIDType GameScriptDisplayString::GetID() const
+DisplayStringIDType DisplayString::GetID() const
 {
 	return m_id;
 }
 
-void GameScriptDisplayString::SetPos(int x, int y)
+void DisplayString::SetPos(int x, int y)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	s.m_x = x;
 	s.m_y = y;
 }
 
-std::tuple<int, int> GameScriptDisplayString::GetPos() const
+std::tuple<int, int> DisplayString::GetPos() const
 {	
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return std::make_tuple(s.m_x, s.m_y);
 }
 	
-void GameScriptDisplayString::SetCol(GameScriptColor const & col)
+void DisplayString::SetCol(GameScriptColor const & col)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	s.m_color = col;
@@ -165,25 +165,25 @@ void GameScriptDisplayString::SetCol(GameScriptColor const & col)
 	//s_addItemCallback(m_id, s);
 }
 
-GameScriptColor GameScriptDisplayString::GetCol() 
+GameScriptColor DisplayString::GetCol() 
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return s.m_color;
 }
 
-void GameScriptDisplayString::SetKey(std::string const & key)
+void DisplayString::SetKey(std::string const & key)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	s.m_key = key;
 }
 
-std::string GameScriptDisplayString::GetKey() const
+std::string DisplayString::GetKey() const
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return s.m_key;
 }
 
-SetItemCallback GameScriptDisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
+SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
 {
 	std::string err = "\"Set string\" callback is not set.";
 	throw TENScriptException(err);
@@ -192,14 +192,14 @@ SetItemCallback GameScriptDisplayString::s_setItemCallback = [](DisplayStringIDT
 
 // This is called by a destructor (or will be if we forget to assign it during a refactor)
 // and destructors "must never throw", so we terminate instead.
-RemoveItemCallback GameScriptDisplayString::s_removeItemCallback = [](DisplayStringIDType)
+RemoveItemCallback DisplayString::s_removeItemCallback = [](DisplayStringIDType)
 {
 	TENLog("\"Remove string\" callback is not set.", LogLevel::Error);
 	std::terminate();
 	return false;
 };
 
-GetItemCallback GameScriptDisplayString::s_getItemCallback = [](DisplayStringIDType)
+GetItemCallback DisplayString::s_getItemCallback = [](DisplayStringIDType)
 {
 	std::string err = "\"Get string\" callback is not set.";
 	throw TENScriptException(err);
