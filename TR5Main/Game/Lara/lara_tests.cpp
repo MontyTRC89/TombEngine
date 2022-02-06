@@ -1803,7 +1803,12 @@ VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1)
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.Height += CLICK(2);
+	testResult.SetBusyHands = true;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
@@ -1818,7 +1823,12 @@ VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.Height += CLICK(3);
+	testResult.SetBusyHands = true;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
@@ -1833,7 +1843,12 @@ VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.Height += CLICK(1);
+	testResult.SetBusyHands = true;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
@@ -1848,7 +1863,12 @@ VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.Height += CLICK(2);
+	testResult.SetBusyHands = true;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
@@ -1863,7 +1883,12 @@ VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1),
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.Height += CLICK(3);
+	testResult.SetBusyHands = true;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1879,7 +1904,11 @@ VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		false
 	};
 
-	return TestLaraVaultTolerance(item, coll, testSetup);
+	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
+	testResult.SetBusyHands = false;
+	testResult.SnapToLedge = true;
+
+	return testResult;
 }
 
 VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
@@ -1897,7 +1926,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
-		return VaultTestResult{ true, probeMiddle.Position.Ceiling };
+		return VaultTestResult{ true, probeMiddle.Position.Ceiling, false, true };
 	}
 
 	return VaultTestResult{ false };
@@ -1919,7 +1948,7 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
-		return VaultTestResult{ true, NO_HEIGHT };
+		return VaultTestResult{ true, NO_HEIGHT, true, true };
 	}
 
 	return VaultTestResult{ false };
@@ -1937,7 +1966,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
-		return VaultTestResult{ true, probe.Position.Ceiling };
+		return VaultTestResult{ true, probe.Position.Ceiling, false, false };
 	}
 
 	return VaultTestResult{ false };
@@ -1964,9 +1993,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_1_STEP_CROUCH;
-			vaultResult.Height += CLICK(1);
-			vaultResult.SetBusyHands = true;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1975,9 +2001,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS;
-			vaultResult.Height += CLICK(2);
-			vaultResult.SetBusyHands = true;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1987,9 +2010,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			g_GameFlow->Animations.CrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
-			vaultResult.Height += CLICK(2);
-			vaultResult.SetBusyHands = true;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -1998,9 +2018,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS;
-			vaultResult.Height += CLICK(3);
-			vaultResult.SetBusyHands = true;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -2010,9 +2027,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 			g_GameFlow->Animations.CrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
-			vaultResult.Height += CLICK(3);
-			vaultResult.SetBusyHands = true;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 
@@ -2021,8 +2035,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_AUTO_JUMP;
-			vaultResult.SetBusyHands = false;
-			vaultResult.SnapToLedge = true;
 			return vaultResult;
 		}
 	}
@@ -2033,12 +2045,10 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: calcJumpVelocity not getting set?
 	// Auto jump to monkey swing.
 	vaultResult = TestLaraMonkeyAutoJump(item, coll);
-	if (vaultResult.Success/* &&
-		g_GameFlow->Animations.MonkeyAutoJump*/)
+	if (vaultResult.Success &&
+		g_GameFlow->Animations.MonkeyAutoJump)
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
-		vaultResult.SetBusyHands = false;
-		vaultResult.SnapToLedge = false;
 		return vaultResult;
 	}
 	
@@ -2050,7 +2060,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || info->gunStatus != LG_HANDS_FREE)
 		return false;
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
