@@ -8,16 +8,16 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptSinkInfo : public NamedBase<GameScriptSinkInfo, SINK_INFO &>
+class Sink : public NamedBase<Sink, SINK_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SINK_INFO>;
-	GameScriptSinkInfo(SINK_INFO& ref, bool temp);
-	~GameScriptSinkInfo();
-	GameScriptSinkInfo& operator=(GameScriptSinkInfo const& other) = delete;
-	GameScriptSinkInfo(GameScriptSinkInfo const& other) = delete;
+	Sink(SINK_INFO& ref, bool temp);
+	~Sink();
+	Sink& operator=(Sink const& other) = delete;
+	Sink(Sink const& other) = delete;
 
-	static void Register(sol::state *);
+	static void Register(sol::table &);
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
 
