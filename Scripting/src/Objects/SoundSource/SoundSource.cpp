@@ -7,7 +7,7 @@
 /***
 Sound source
 
-@tenclass SoundSource
+@tenclass Objects.SoundSource
 @pragma nostrip
 */
 
