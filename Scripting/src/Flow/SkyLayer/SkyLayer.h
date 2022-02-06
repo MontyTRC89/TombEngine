@@ -6,7 +6,7 @@ namespace sol {
 	class state;
 }
 
-struct GameScriptSkyLayer
+struct SkyLayer
 {
 	bool Enabled{ false };
 	byte R{ 0 };
@@ -14,8 +14,8 @@ struct GameScriptSkyLayer
 	byte B{ 0 };
 	short CloudSpeed{ 0 };
 
-	GameScriptSkyLayer() = default;
-	GameScriptSkyLayer(GameScriptColor const & col, short speed);
+	SkyLayer() = default;
+	SkyLayer(GameScriptColor const & col, short speed);
 	void SetColor(GameScriptColor const & col);
 	GameScriptColor GetColor() const;
 

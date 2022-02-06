@@ -81,12 +81,12 @@
     <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="src\Flow\Level\Level.h" />
     <ClInclude Include="src\Flow\Mirror\Mirror.h" />
+    <ClInclude Include="src\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="src\GameScriptColor.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
     <ClInclude Include="src\GameScriptSettings.h" />
-    <ClInclude Include="src\GameScriptSkyLayer.h" />
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
@@ -119,6 +119,7 @@
     <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp" />
     <ClCompile Include="src\Flow\Level\Level.cpp" />
     <ClCompile Include="src\Flow\Mirror\Mirror.cpp" />
+    <ClCompile Include="src\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="src\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
@@ -134,7 +135,6 @@
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
     <ClCompile Include="src\GameScriptSettings.cpp" />
-    <ClCompile Include="src\GameScriptSkyLayer.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
     <ClCompile Include="src\ScriptAssert.cpp" />
     <ClCompile Include="src\Strings\DisplayString\DisplayString.cpp" />
