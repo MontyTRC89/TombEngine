@@ -102,7 +102,7 @@
     <ClInclude Include="src\Objects\Moveable\Moveable.h" />
     <ClInclude Include="src\Objects\ObjectIDs.h" />
     <ClInclude Include="src\Objects\ObjectsHandler.h" />
-    <ClInclude Include="src\Objects\Static\GameScriptMeshInfo.h" />
+    <ClInclude Include="src\Objects\Static\Static.h" />
     <ClInclude Include="src\ReservedScriptNames.h" />
     <ClInclude Include="src\ScriptAssert.h" />
     <ClInclude Include="src\ScriptInterfaceState.h" />
@@ -120,7 +120,7 @@
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
     <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
-    <ClCompile Include="src\Objects\Static\GameScriptMeshInfo.cpp" />
+    <ClCompile Include="src\Objects\Static\Static.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameLogicScript.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
