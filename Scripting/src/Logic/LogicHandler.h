@@ -43,7 +43,7 @@ struct LuaVariable
 	bool BoolValue;
 };
 
-class GameScript : public LuaHandler, public ScriptInterfaceGame
+class LogicHandler : public LuaHandler, public ScriptInterfaceGame
 {
 private:
 	LuaVariables												m_globals{};
@@ -58,7 +58,7 @@ private:
 	void ResetLevelTables();
 
 public:	
-	GameScript(sol::state* lua);
+	LogicHandler(sol::state* lua, sol::table & parent);
 
 	void								FreeLevelScripts() override;
 
