@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 #include "Specific/phd_global.h"
 
 namespace sol {
@@ -8,7 +8,7 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptSinkInfo : public GameScriptNamedBase<GameScriptSinkInfo, SINK_INFO &>
+class GameScriptSinkInfo : public NamedBase<GameScriptSinkInfo, SINK_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SINK_INFO>;

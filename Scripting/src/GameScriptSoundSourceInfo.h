@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 #include "Specific/phd_global.h"
 
 namespace sol {
@@ -8,7 +8,7 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptSoundSourceInfo : public GameScriptNamedBase<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>
+class GameScriptSoundSourceInfo : public NamedBase<GameScriptSoundSourceInfo, SOUND_SOURCE_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SOUND_SOURCE_INFO>;
