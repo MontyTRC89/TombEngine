@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameLogicScript.h"
+#include "LogicHandler.h"
 #include "ScriptAssert.h"
 #include "Game/items.h"
 #include "Game/control/box.h"
