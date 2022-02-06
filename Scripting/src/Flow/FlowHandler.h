@@ -3,7 +3,7 @@
 #include "LuaHandler.h"
 #include "Logic/LogicHandler.h"
 #include "GameScriptColor.h"
-#include "GameScriptLevel.h"
+#include "Flow/Level/Level.h"
 #include "GameScriptSettings.h"
 #include "Flow/Animations/Animations.h"
 #include "ScriptInterfaceGame.h"
@@ -31,26 +31,26 @@ public:
 	Animations			Anims{};
 
 	// Selected language set
-	std::vector<GameScriptLevel*>	Levels;
+	std::vector<Level*>	Levels;
 
 	FlowHandler(sol::state* lua, sol::table & parent);
 	~FlowHandler();
 
-	void							AddLevel(GameScriptLevel const& level);
-	void							LoadFlowScript();
-	char const *					GetString(const char* id) const;
-	void							SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
-	void							SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
-	void							SetAnimations(Animations const & src);
-	void							SetSettings(GameScriptSettings const & src);
-	GameScriptSettings*				GetSettings();
-	GameScriptLevel*				GetLevel(int id);
-	int								GetNumLevels() const;
-	void							SetIntroImagePath(std::string const& path);
-	void							SetTitleScreenImagePath(std::string const& path);
-	void							SetGameFarView(byte val);
-	bool							IsFlyCheatEnabled() const;
-	bool							CanPlayAnyLevel() const;
+	void				AddLevel(Level const& level);
+	void				LoadFlowScript();
+	char const *		GetString(const char* id) const;
+	void				SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
+	void				SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
+	void				SetAnimations(Animations const & src);
+	void				SetSettings(GameScriptSettings const & src);
+	GameScriptSettings*	GetSettings();
+	Level*				GetLevel(int id);
+	int					GetNumLevels() const;
+	void				SetIntroImagePath(std::string const& path);
+	void				SetTitleScreenImagePath(std::string const& path);
+	void				SetGameFarView(byte val);
+	bool				IsFlyCheatEnabled() const;
+	bool				CanPlayAnyLevel() const;
 
 	bool HasCrawlExtended() const override { return Anims.CrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.CrouchRoll; }
