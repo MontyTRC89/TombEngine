@@ -1,69 +1,69 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
-#include "GameScriptCameraInfo.h"
+#include "Objects/Camera/Camera.h"
 #include "GameScriptPosition.h"
 #include "ScriptUtil.h"
+#include "ReservedScriptNames.h"
+
 /***
 Camera info
 
-@entityclass CameraInfo
+@tenclass Object.Camera
 @pragma nostrip
 */
 
-static constexpr auto LUA_CLASS_NAME{ "CameraInfo" };
+static auto index_error = index_error_maker(Camera, ScriptReserved_Camera);
+static auto newindex_error = newindex_error_maker(Camera, ScriptReserved_Camera);
 
-static auto index_error = index_error_maker(GameScriptCameraInfo, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(GameScriptCameraInfo, LUA_CLASS_NAME);
-
-GameScriptCameraInfo::GameScriptCameraInfo(LEVEL_CAMERA_INFO & ref, bool temp) : m_camera{ref}, m_temporary{ temp }
+Camera::Camera(LEVEL_CAMERA_INFO & ref, bool temp) : m_camera{ref}, m_temporary{ temp }
 {};
 
-GameScriptCameraInfo::~GameScriptCameraInfo() {
+Camera::~Camera() {
 	if (m_temporary)
 	{
 		s_callbackRemoveName(m_camera.luaName);
 	}
 }
 
-void GameScriptCameraInfo::Register(sol::state* state)
+void Camera::Register(sol::table & parent)
 {
-	state->new_usertype<GameScriptCameraInfo>(LUA_CLASS_NAME,
+	parent.new_usertype<Camera>(ScriptReserved_Camera,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos
-		"pos", sol::property(&GameScriptCameraInfo::GetPos, &GameScriptCameraInfo::SetPos),
+		"pos", sol::property(&Camera::GetPos, &Camera::SetPos),
 
 		/// (string) unique string identifier.
 		// e.g. "flyby\_start" or "big\_door\_hint"
 		// @mem name
-		"name", sol::property(&GameScriptCameraInfo::GetName, &GameScriptCameraInfo::SetName),
+		"name", sol::property(&Camera::GetName, &Camera::SetName),
 
 		/// (string) room number
 		// @mem room
-		"room", sol::property(&GameScriptCameraInfo::GetRoom, &GameScriptCameraInfo::SetRoom)
+		"room", sol::property(&Camera::GetRoom, &Camera::SetRoom)
 		);
 }
 
-GameScriptPosition GameScriptCameraInfo::GetPos() const
+GameScriptPosition Camera::GetPos() const
 {
 	return GameScriptPosition{ m_camera.x, m_camera.y, m_camera.z };
 }
 
-void GameScriptCameraInfo::SetPos(GameScriptPosition const& pos)
+void Camera::SetPos(GameScriptPosition const& pos)
 {
 	m_camera.x = pos.x;
 	m_camera.y = pos.y;
 	m_camera.z = pos.z;
 }
 
-std::string GameScriptCameraInfo::GetName() const
+std::string Camera::GetName() const
 {
 	return m_camera.luaName;
 }
 
-void GameScriptCameraInfo::SetName(std::string const & id) 
+void Camera::SetName(std::string const & id) 
 {
 	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
@@ -79,12 +79,12 @@ void GameScriptCameraInfo::SetName(std::string const & id)
 	s_callbackSetName(id, m_camera);
 }
 
-short GameScriptCameraInfo::GetRoom() const
+short Camera::GetRoom() const
 {
 	return m_camera.roomNumber;
 }
 
-void GameScriptCameraInfo::SetRoom(short room)
+void Camera::SetRoom(short room)
 {	
 	m_camera.roomNumber = room;
 }
