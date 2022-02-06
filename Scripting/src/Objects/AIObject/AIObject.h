@@ -8,14 +8,14 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class GameScriptAIObject : public GameScriptNamedBase<GameScriptAIObject, AI_OBJECT&>
+class AIObject : public GameScriptNamedBase<AIObject, AI_OBJECT&>
 {
 public:
-	GameScriptAIObject(AI_OBJECT& ref, bool temp);
-	~GameScriptAIObject();
+	AIObject(AI_OBJECT& ref, bool temp);
+	~AIObject();
 
-	GameScriptAIObject& operator=(GameScriptAIObject const& other) = delete;
-	GameScriptAIObject(GameScriptAIObject const& other) = delete;
+	AIObject& operator=(AIObject const& other) = delete;
+	AIObject(AIObject const& other) = delete;
 
 	static void Register(sol::state *);
 
