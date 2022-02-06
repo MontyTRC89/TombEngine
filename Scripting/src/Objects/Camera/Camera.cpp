@@ -8,7 +8,7 @@
 /***
 Camera info
 
-@tenclass Object.Camera
+@tenclass Objects.Camera
 @pragma nostrip
 */
 

@@ -7,7 +7,7 @@
 /***
 AI object
 
-@entityclass AIObject
+@tenclass Objects.AIObject
 @pragma nostrip
 */
 
