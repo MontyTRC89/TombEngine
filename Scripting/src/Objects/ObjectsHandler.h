@@ -3,7 +3,7 @@
 #include "LuaHandler.h"
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/Moveable.h"
-#include "Objects/Static/GameScriptMeshInfo.h"
+#include "Objects/Static/Static.h"
 #include "GameScriptSinkInfo.h"
 #include "Objects/AIObject/AIObject.h"
 #include "GameScriptSoundSourceInfo.h"

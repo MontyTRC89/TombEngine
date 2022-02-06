@@ -1,7 +1,7 @@
 #pragma once
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
-#include "GameScriptMeshInfo.h"
+#include "Static.h"
 #include "GameScriptPosition.h"
 #include "GameScriptColor.h"
 #include "ScriptUtil.h"
@@ -14,80 +14,80 @@ Mesh info
 
 constexpr auto LUA_CLASS_NAME{ "Static" };
 
-static auto index_error = index_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(GameScriptMeshInfo, LUA_CLASS_NAME);
+static auto index_error = index_error_maker(Static, LUA_CLASS_NAME);
+static auto newindex_error = newindex_error_maker(Static, LUA_CLASS_NAME);
 
-GameScriptMeshInfo::GameScriptMeshInfo(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
+Static::Static(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
 {};
 
-GameScriptMeshInfo::~GameScriptMeshInfo() {
+Static::~Static() {
 	if (m_temporary)
 	{
 		s_callbackRemoveName(m_mesh.luaName);
 	}
 }
 
-void GameScriptMeshInfo::Register(sol::state* state)
+void Static::Register(sol::state* state)
 {
-	state->new_usertype<GameScriptMeshInfo>(LUA_CLASS_NAME,
+	state->new_usertype<Static>(LUA_CLASS_NAME,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
 		/// (@{Position}) position in level
 		// @mem pos
-		"pos", sol::property(&GameScriptMeshInfo::GetPos, &GameScriptMeshInfo::SetPos),
+		"pos", sol::property(&Static::GetPos, &Static::SetPos),
 
 		/// (int) y-axis rotation
 		// @mem yRot
-		"yRot", sol::property(&GameScriptMeshInfo::GetRot, &GameScriptMeshInfo::SetRot),
+		"yRot", sol::property(&Static::GetRot, &Static::SetRot),
 
 		/// (string) unique string identifier.
 		// e.g. "my\_vase" or "oldrubble"
 		// @mem name
-		"name", sol::property(&GameScriptMeshInfo::GetName, &GameScriptMeshInfo::SetName),
+		"name", sol::property(&Static::GetName, &Static::SetName),
 
 		/// (int) static number
 		// @mem staticNumber
-		"staticNumber", sol::property(&GameScriptMeshInfo::GetStaticNumber, &GameScriptMeshInfo::SetStaticNumber),
+		"staticNumber", sol::property(&Static::GetStaticNumber, &Static::SetStaticNumber),
 
 		/// (@{Color}) color of mesh
 		// @mem color
-		"color", sol::property(&GameScriptMeshInfo::GetColor, &GameScriptMeshInfo::SetColor),
+		"color", sol::property(&Static::GetColor, &Static::SetColor),
 
 		/// (int) hp
 		// @mem HP
-		"HP", sol::property(&GameScriptMeshInfo::GetHP, &GameScriptMeshInfo::SetHP)
+		"HP", sol::property(&Static::GetHP, &Static::SetHP)
 		);
 }
 
-GameScriptPosition GameScriptMeshInfo::GetPos() const
+GameScriptPosition Static::GetPos() const
 {
 	return GameScriptPosition{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
 }
 
-void GameScriptMeshInfo::SetPos(GameScriptPosition const& pos)
+void Static::SetPos(GameScriptPosition const& pos)
 {
 	m_mesh.pos.xPos = pos.x;
 	m_mesh.pos.yPos = pos.y;
 	m_mesh.pos.zPos = pos.z;
 }
 
-int GameScriptMeshInfo::GetRot() const
+int Static::GetRot() const
 {
 	return m_mesh.pos.yRot;
 }
 
-void GameScriptMeshInfo::SetRot(int yRot)
+void Static::SetRot(int yRot)
 {
 	m_mesh.pos.yRot = yRot;
 }
 
-std::string GameScriptMeshInfo::GetName() const
+std::string Static::GetName() const
 {
 	return m_mesh.luaName;
 }
 
-void GameScriptMeshInfo::SetName(std::string const & id) 
+void Static::SetName(std::string const & id) 
 {
 	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
@@ -103,32 +103,32 @@ void GameScriptMeshInfo::SetName(std::string const & id)
 	s_callbackSetName(id, m_mesh);
 }
 
-int GameScriptMeshInfo::GetStaticNumber() const
+int Static::GetStaticNumber() const
 {
 	return m_mesh.staticNumber;
 }
 
-void GameScriptMeshInfo::SetStaticNumber(int staticNumber)
+void Static::SetStaticNumber(int staticNumber)
 {
 	m_mesh.staticNumber = staticNumber;
 }
 
-GameScriptColor GameScriptMeshInfo::GetColor() const
+GameScriptColor Static::GetColor() const
 {
 	return GameScriptColor{ m_mesh.color };
 }
 
-void GameScriptMeshInfo::SetColor(GameScriptColor const & col)
+void Static::SetColor(GameScriptColor const & col)
 {
 	m_mesh.color = col;
 }
 
-int GameScriptMeshInfo::GetHP() const
+int Static::GetHP() const
 {
 	return m_mesh.hitPoints;
 }
 
-void GameScriptMeshInfo::SetHP(int hp)
+void Static::SetHP(int hp)
 {
 	m_mesh.hitPoints = hp;
 }

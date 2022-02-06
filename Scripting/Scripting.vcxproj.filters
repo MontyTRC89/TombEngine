@@ -264,9 +264,6 @@
     <ClInclude Include="include\Scripting\Strings\ScriptInterfaceStringsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\Static\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Objects\ObjectIDs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -283,6 +280,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Objects\AIObject\AIObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Static\Static.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -350,9 +350,6 @@
     <ClCompile Include="src\Strings\StringsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Static\GameScriptMeshInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Objects\ObjectsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -363,6 +360,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Static\Static.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
