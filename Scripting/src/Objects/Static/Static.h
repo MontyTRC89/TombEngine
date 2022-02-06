@@ -10,14 +10,14 @@ namespace sol {
 class GameScriptPosition;
 class GameScriptColor;
 
-class GameScriptMeshInfo : public GameScriptNamedBase<GameScriptMeshInfo, MESH_INFO &>
+class Static : public GameScriptNamedBase<Static, MESH_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<MESH_INFO>;
-	GameScriptMeshInfo(MESH_INFO & id, bool temporary);
-	~GameScriptMeshInfo();
-	GameScriptMeshInfo& operator=(GameScriptMeshInfo const& other) = delete;
-	GameScriptMeshInfo(GameScriptMeshInfo const& other) = delete;
+	Static(MESH_INFO & id, bool temporary);
+	~Static();
+	Static& operator=(Static const& other) = delete;
+	Static(Static const& other) = delete;
 
 	static void Register(sol::state *);
 
