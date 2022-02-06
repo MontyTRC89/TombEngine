@@ -1,12 +1,12 @@
 #include "frameworkandsol.h"
-#include "GameScriptInventoryObject.h"
+#include "InventoryItem.h"
 #include "ScriptAssert.h"
 #include <string>
 
 /***
 Represents the properties of an object as it appears in the inventory.
 
-@pregameclass InventoryObject
+@tenclass Flow.InventoryItem
 @pragma nostrip
 */
 
@@ -29,7 +29,7 @@ associated getters and setters.
 	@tparam ItemAction action is this usable, equippable, or examinable?
 	@return an InventoryObject
 */
-GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
+InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
@@ -41,37 +41,37 @@ GameScriptInventoryObject::GameScriptInventoryObject(std::string const& a_name, 
 	SetAction(a_action);
 }
 
-void GameScriptInventoryObject::Register(sol::state * lua)
+void InventoryItem::Register(sol::table & parent)
 {
-	lua->new_usertype<GameScriptInventoryObject>("InventoryObject",
-		sol::constructors<GameScriptInventoryObject(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, RotationFlags, int, ItemOptions), GameScriptInventoryObject()>(),
+	parent.new_usertype<InventoryItem>("InventoryObject",
+		sol::constructors<InventoryItem(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, RotationFlags, int, ItemOptions), InventoryItem()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
 */
-		"nameKey", &GameScriptInventoryObject::name,
+		"nameKey", &InventoryItem::name,
 
 /*** (@{InvItem}) slot of item whose inventory display properties you wish to change
 @mem slot
 */
-		"slot", sol::property(&GameScriptInventoryObject::SetSlot),
+		"slot", sol::property(&InventoryItem::SetSlot),
 
 /*** (float) y-axis offset (positive values will move the item lower).
 A value of about 100 will cause the item to display directly below its usual position.
 @mem yOffset
 */
-		"yOffset", &GameScriptInventoryObject::yOffset,
+		"yOffset", &InventoryItem::yOffset,
 
 /*** (float) Item's size when displayed in the inventory as a multiple of its "regular" size.
 A value of 0.5 will cause the item to render at half the size,
 and a value of 2 will cause the item to render at twice the size.
 @mem scale
 */
-		"scale", &GameScriptInventoryObject::scale,
+		"scale", &InventoryItem::scale,
 
 /*** (@{Rotation}) Item's rotation about its origin when displayed in the inventory.
 @mem rot
 */
-		"rot", &GameScriptInventoryObject::rot,
+		"rot", &InventoryItem::rot,
 
 /*** (RotationAxis) Axis to rotate about when the item is being looked at in the inventory.
 Note that this is entirely separate from the `rot` field described above.
@@ -79,12 +79,12 @@ Must be RotationAxis.X, RotationAxis.Y or RotationAxis.Z.
 e.g. `myItem.rotAxisWhenCurrent = RotationAxis.X`
 @mem rotAxisWhenCurrent
 */
-		"rotAxisWhenCurrent", &GameScriptInventoryObject::rotationFlags,
+		"rotAxisWhenCurrent", &InventoryItem::rotationFlags,
 
 /*** (int) __Not currently implemented__ (will have no effect regardless of what you set it to)
 @mem meshBits
 */
-		"meshBits", &GameScriptInventoryObject::meshBits,
+		"meshBits", &InventoryItem::meshBits,
 
 /*** (ItemAction) What can the player do with the item?
 Must be one of:
@@ -94,12 +94,12 @@ Must be one of:
 e.g. `myItem.action = ItemAction.EXAMINE`
 @mem action
 */
-		"action", sol::property(&GameScriptInventoryObject::SetAction)
+		"action", sol::property(&InventoryItem::SetAction)
 		);
 }
 
 // Add validation so the user can't choose something unimplemented
-void GameScriptInventoryObject::SetAction(ItemOptions a_action)
+void InventoryItem::SetAction(ItemOptions a_action)
 {
 	bool isSupported = (a_action == ItemOptions::OPT_EQUIP) ||
 		(a_action == ItemOptions::OPT_USE) ||
@@ -117,7 +117,7 @@ void GameScriptInventoryObject::SetAction(ItemOptions a_action)
 	}
 }
 
-void GameScriptInventoryObject::SetSlot(ItemEnumPair a_slot)
+void InventoryItem::SetSlot(ItemEnumPair a_slot)
 {
 	slot = a_slot.m_pair.second;
 }
