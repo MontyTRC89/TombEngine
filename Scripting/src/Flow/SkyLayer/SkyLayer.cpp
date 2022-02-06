@@ -8,9 +8,9 @@ As seen in TR4's City of the Dead.
 @pragma nostrip
 */
 
-void SkyLayer::Register(sol::state* lua)
+void SkyLayer::Register(sol::table & parent)
 {
-	lua->new_usertype<SkyLayer>("SkyLayer",
+	parent.new_usertype<SkyLayer>("SkyLayer",
 		sol::constructors<SkyLayer(GameScriptColor const &, short)>(),
 
 /// (@{Color}) RGB sky color
