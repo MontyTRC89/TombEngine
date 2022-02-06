@@ -19,7 +19,7 @@ public:
 	Static& operator=(Static const& other) = delete;
 	Static(Static const& other) = delete;
 
-	static void Register(sol::state *, sol::table & parent);
+	static void Register(sol::table & parent);
 
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const & pos);
