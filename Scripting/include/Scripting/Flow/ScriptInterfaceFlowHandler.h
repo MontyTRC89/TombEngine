@@ -8,7 +8,7 @@ enum class TITLE_TYPE
 
 class ScriptInterfaceLevel;
 
-class ScriptInterfaceFlow {
+class ScriptInterfaceFlowHandler {
 public:
 
 	std::string	IntroImagePath{};
@@ -18,7 +18,7 @@ public:
 	std::string	TitleScreenImagePath{};
 	TITLE_TYPE TitleType{ TITLE_TYPE::FLYBY };
 
-	virtual ~ScriptInterfaceFlow() = default;
+	virtual ~ScriptInterfaceFlowHandler() = default;
 	virtual void LoadFlowScript() = 0;
 	virtual int	GetNumLevels() const = 0;
 	virtual char const* GetString(const char* id) const = 0;
@@ -35,4 +35,4 @@ public:
 	virtual bool DoFlow() = 0;
 };
 
-extern ScriptInterfaceFlow* g_GameFlow;
+extern ScriptInterfaceFlowHandler* g_GameFlow;

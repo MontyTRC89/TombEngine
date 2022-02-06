@@ -8,7 +8,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
