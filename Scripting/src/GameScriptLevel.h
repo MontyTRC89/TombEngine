@@ -3,9 +3,9 @@
 #include "GameScriptSkyLayer.h"
 #include "GameScriptMirror.h"
 #include "GameScriptColor.h"
-#include "GameScriptInventoryObject.h"
 #include <GameScriptFog.h>
 #include "ScriptInterfaceLevel.h"
+#include "Flow/InventoryItem/InventoryItem.h"
 
 static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 {
@@ -39,7 +39,7 @@ struct GameScriptLevel : public ScriptInterfaceLevel
 	GameScriptMirror Mirror;
 	int LevelFarView{ 0 };
 	bool UnlimitedAir{ false };
-	std::vector<GameScriptInventoryObject> InventoryObjects;
+	std::vector<InventoryItem> InventoryObjects;
 
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
