@@ -27,7 +27,8 @@ UserDisplayString::UserDisplayString(std::string const& key, int x, int y, D3DCO
 {
 }
 
-DisplayString::DisplayString() {
+DisplayString::DisplayString()
+{
 	// We don't ever dereference this pointer; it's just
 	// a handy way to get a unique key for a hash map.
 

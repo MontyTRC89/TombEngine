@@ -11,8 +11,11 @@ Scripts that will be run on game startup.
 @pragma nostrip
 */
 
-StringsHandler::StringsHandler(sol::state* lua) : LuaHandler{ lua }
+StringsHandler::StringsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
+	sol::table table_strings{ m_lua->lua_state(), sol::create };
+	parent.set(ScriptReserved_Strings, table_strings);
+
 /***
 Show some text on-screen.
 @tparam DisplayString str the string object to draw
@@ -22,7 +25,7 @@ If not given, the string will have an "infinite" life, and will show
 until @{HideString} is called or until the level is finished.
 Default: nil (i.e. infinite)
 */
-	m_lua->set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
+	table_strings.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
 
 /***
 Hide some on-screen text.
@@ -30,7 +33,7 @@ Hide some on-screen text.
 @tparam DisplayString str the string object to hide. Must previously have been shown
 with a call to @{ShowString}, or this function will have no effect.
 */
-	m_lua->set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
+	table_strings.set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
 
 	DisplayString::Register(m_lua);
 	DisplayString::SetCallbacks(
