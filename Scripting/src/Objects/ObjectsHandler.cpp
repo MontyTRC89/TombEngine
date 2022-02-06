@@ -62,7 +62,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
-	Static::Register(m_lua);
+	Static::Register(m_lua, m_table_objects);
 	Static::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
@@ -80,7 +80,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
-	AIObject::Register(m_lua);
+	AIObject::Register(m_lua, m_table_objects);
 	AIObject::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
