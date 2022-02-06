@@ -18,7 +18,7 @@ static const std::unordered_map<std::string, DisplayStringOptions> kDisplayStrin
 
 using FlagArray = std::array<bool, static_cast<size_t>(DisplayStringOptions::NUM_OPTIONS)>;
 // Used to store data used to render the string.
-// This is separate from GameScriptDisplayString because the lifetimes
+// This is separate from DisplayString because the lifetimes
 // of the classes differ slightly.
 class UserDisplayString
 {
@@ -39,7 +39,7 @@ private:
 	bool m_isInfinite{ false };
 	bool m_isTranslated{ false };
 	friend class StringsHandler;
-	friend class GameScriptDisplayString;
+	friend class DisplayString;
 };
 
 using DisplayStringIDType = uintptr_t;
@@ -48,13 +48,13 @@ using RemoveItemCallback = std::function<bool(DisplayStringIDType)>;
 using GetItemCallback = std::function<std::optional<std::reference_wrapper<UserDisplayString>>(DisplayStringIDType)>;
 
 
-class GameScriptDisplayString
+class DisplayString
 {
 private:
 	DisplayStringIDType m_id{ 0 };
 public:
-	GameScriptDisplayString();
-	~GameScriptDisplayString();
+	DisplayString();
+	~DisplayString();
 	DisplayStringIDType GetID() const;
 	static void Register(sol::state* state);
 
@@ -71,7 +71,7 @@ public:
 	static RemoveItemCallback s_removeItemCallback;
 	static GetItemCallback s_getItemCallback;
 
-	// Creating a GameScriptDisplayString requires us to add an identifier
+	// Creating a DisplayString requires us to add an identifier
 	// to a data structure. We use callbacks so this class doesn't have
 	// to know about said data structure.
 	static void SetCallbacks(SetItemCallback cba, RemoveItemCallback cbr, GetItemCallback cbg)
