@@ -1216,7 +1216,19 @@ bool IsJumpState(LARA_STATE state)
 	return false;
 }
 
-bool IsRunJumpCountState(LARA_STATE state)
+bool IsRunJumpQueueableState(LARA_STATE state)
+{
+	if (state == LS_RUN_FORWARD ||
+		state == LS_STEP_UP ||
+		state == LS_STEP_DOWN)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool IsRunJumpCountableState(LARA_STATE state)
 {
 	if (state == LS_RUN_FORWARD ||
 		state == LS_WALK_FORWARD ||
@@ -1344,20 +1356,32 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
+	auto start1 = GAME_VECTOR(item->pos.xPos,
+							  y + testSetup.UpperFloorBound - 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end1 = GAME_VECTOR(probe.Coordinates.x,
+							y + testSetup.UpperFloorBound - 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
+	auto start2 = GAME_VECTOR(item->pos.xPos,
+							  y - coll->Setup.Height + 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end2 = GAME_VECTOR(probe.Coordinates.x,
+							probe.Coordinates.y + 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
 	// Conduct "ray" test at upper floor bound.
-	auto start = GAME_VECTOR(
-		item->pos.xPos,
-		y + testSetup.UpperFloorBound - 1,
-		item->pos.zPos,
-		item->roomNumber);
+	if (!LOS(&start1, &end1))
+		return false;
 
-	auto end = GAME_VECTOR(
-		probe.Coordinates.x,
-		probe.Coordinates.y - 1,
-		probe.Coordinates.z,
-		item->roomNumber);
-
-	if (!LOS(&start, &end))
+	// Conduct "ray" test at lowest ceiling bound.
+	if (!LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
@@ -1525,20 +1549,32 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
+	auto start1 = GAME_VECTOR(item->pos.xPos,
+							  y + testSetup.UpperFloorBound - 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end1 = GAME_VECTOR(probe.Coordinates.x,
+							y + testSetup.UpperFloorBound - 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
+	auto start2 = GAME_VECTOR(item->pos.xPos,
+							  y - LARA_HEIGHT_CRAWL + 1,
+							  item->pos.zPos,
+							  item->roomNumber);
+
+	auto end2 = GAME_VECTOR(probe.Coordinates.x,
+							probe.Coordinates.y + 1,
+							probe.Coordinates.z,
+							item->roomNumber);
+
 	// Conduct "ray" test at upper floor bound.
-	auto start = GAME_VECTOR(
-		item->pos.xPos,
-		y + testSetup.UpperFloorBound - 1,
-		item->pos.zPos,
-		item->roomNumber);
+	if (!LOS(&start1, &end1))
+		return false;
 
-	auto end = GAME_VECTOR(
-		probe.Coordinates.x,
-		probe.Coordinates.y - 1,
-		probe.Coordinates.z,
-		item->roomNumber);
-
-	if (!LOS(&start, &end))
+	// Conduct "ray" test at lowest ceiling bound.
+	if (!LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
