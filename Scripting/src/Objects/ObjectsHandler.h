@@ -5,7 +5,7 @@
 #include "Objects/Moveable/Moveable.h"
 #include "Objects/Static/GameScriptMeshInfo.h"
 #include "GameScriptSinkInfo.h"
-#include "GameScriptAIObject.h"
+#include "Objects/AIObject/AIObject.h"
 #include "GameScriptSoundSourceInfo.h"
 #include "GameScriptCameraInfo.h"
 
