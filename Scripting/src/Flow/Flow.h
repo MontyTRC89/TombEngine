@@ -1,7 +1,7 @@
 #pragma once
 #include "LanguageScript.h"
 #include "LuaHandler.h"
-#include "GameLogicScript.h"
+#include "Logic/LogicHandler.h"
 #include "GameScriptColor.h"
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
