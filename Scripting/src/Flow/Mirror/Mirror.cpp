@@ -11,9 +11,9 @@ __Not currently implemented.__
 @pragma nostrip
 */
 
-void Mirror::Register(sol::state* lua)
+void Mirror::Register(sol::table& parent)
 {
-	lua->new_usertype<Mirror>("Mirror",
+	parent.new_usertype<Mirror>("Mirror",
 		sol::constructors<Mirror(short, int, int, int, int)>(),
 		"room", &Mirror::Room,
 		"startX", &Mirror::StartX,
