@@ -4,6 +4,7 @@
 #include "ScriptAssert.h"
 #include "GameScriptPosition.h"
 #include "ScriptUtil.h"
+#include "ReservedScriptNames.h"
 /***
 AI object
 
@@ -11,11 +12,8 @@ AI object
 @pragma nostrip
 */
 
-
-constexpr auto LUA_CLASS_NAME{ "AIObject" };
-
-static auto index_error = index_error_maker(AIObject, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(AIObject, LUA_CLASS_NAME);
+static auto index_error = index_error_maker(AIObject, ScriptReserved_AIObject);
+static auto newindex_error = newindex_error_maker(AIObject, ScriptReserved_AIObject);
 
 AIObject::AIObject(AI_OBJECT & ref, bool temp) : m_aiObject{ref}, m_temporary{ temp }
 {};
@@ -29,7 +27,7 @@ AIObject::~AIObject() {
 
 void AIObject::Register(sol::table & parent)
 {
-	parent.new_usertype<AIObject>(LUA_CLASS_NAME,
+	parent.new_usertype<AIObject>(ScriptReserved_AIObject,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
