@@ -5,7 +5,6 @@
 #include "GameScriptColor.h"
 #include "GameScriptLevel.h"
 #include "GameScriptSettings.h"
-#include "GameScriptAudioTrack.h"
 #include "GameScriptAnimations.h"
 #include "ScriptInterfaceGame.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"

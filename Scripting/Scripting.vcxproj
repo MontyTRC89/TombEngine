@@ -88,6 +88,7 @@
     <ClInclude Include="src\GameScriptSettings.h" />
     <ClInclude Include="src\GameScriptSkyLayer.h" />
     <ClInclude Include="src\InventorySlots.h" />
+    <ClInclude Include="src\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
     <ClInclude Include="src\Logic\LogicHandler.h" />
     <ClInclude Include="src\LuaHandler.h" />
@@ -114,6 +115,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Flow\FlowHandler.cpp" />
+    <ClCompile Include="src\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="src\Objects\Camera\Camera.cpp" />

@@ -6,6 +6,7 @@ static constexpr char const ScriptReserved_Flow[]			= "Flow";
 static constexpr char const ScriptReserved_Logic[]			= "Logic";
 static constexpr char const ScriptReserved_Objects[]			= "Objects";
 static constexpr char const ScriptReserved_Strings[]			= "Strings";
+static constexpr char const ScriptReserved_Inventory[]			= "Inventory";
 
 // Classes
 static constexpr char const ScriptReserved_Moveable[]			= "Moveable";
@@ -41,10 +42,10 @@ static constexpr char const ScriptReserved_ShowString[]			= "ShowString";
 static constexpr char const ScriptReserved_HideString[]			= "HideString";
 static constexpr char const ScriptReserved_SetAmbientTrack[] = "SetAmbientTrack";
 static constexpr char const ScriptReserved_PlayAudioTrack[] = "PlayAudioTrack";
-static constexpr char const ScriptReserved_GiveInvItem[] = "GiveInvItem";
-static constexpr char const ScriptReserved_TakeInvItem[] = "TakeInvItem";
-static constexpr char const ScriptReserved_GetInvItemCount[] = "GetInvItemCount";
-static constexpr char const ScriptReserved_SetInvItemCount[] = "SetInvItemCount";
+static constexpr char const ScriptReserved_GiveInvItem[] = "GiveItem";
+static constexpr char const ScriptReserved_TakeInvItem[] = "TakeItem";
+static constexpr char const ScriptReserved_GetInvItemCount[] = "GetItemCount";
+static constexpr char const ScriptReserved_SetInvItemCount[] = "SetItemCount";
 static constexpr char const ScriptReserved_GetMoveableByName[] = "GetMoveableByName";
 static constexpr char const ScriptReserved_GetStaticByName[] = "GetStaticByName";
 static constexpr char const ScriptReserved_GetCameraByName[] = "GetCameraByName";
