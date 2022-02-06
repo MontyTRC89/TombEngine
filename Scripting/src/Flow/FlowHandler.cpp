@@ -101,7 +101,7 @@ Specify which translations in the strings table correspond to which languages.
 */
 	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
-	GameScriptLevel::Register(m_lua);
+	Level::Register(table_flow);
 	GameScriptSkyLayer::Register(m_lua);
 	GameScriptMirror::Register(m_lua);
 	InventoryItem::Register(table_flow);
@@ -147,9 +147,9 @@ void FlowHandler::SetAnimations(Animations const& src)
 	Anims = src;
 }
 
-void FlowHandler::AddLevel(GameScriptLevel const& level)
+void FlowHandler::AddLevel(Level const& level)
 {
-	Levels.push_back(new GameScriptLevel{ level });
+	Levels.push_back(new Level{ level });
 }
 
 void FlowHandler::SetIntroImagePath(std::string const& path)
@@ -202,7 +202,7 @@ GameScriptSettings* FlowHandler::GetSettings()
 	return &m_settings;
 }
 
-GameScriptLevel* FlowHandler::GetLevel(int id)
+Level* FlowHandler::GetLevel(int id)
 {
 	return Levels[id];
 }
@@ -231,7 +231,7 @@ bool FlowHandler::DoFlow()
 	while (true)
 	{
 		// First we need to fill some legacy variables in PCTomb5.exe
-		GameScriptLevel* level = Levels[CurrentLevel];
+		Level* level = Levels[CurrentLevel];
 
 		GAME_STATUS status;
 

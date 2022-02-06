@@ -25,7 +25,7 @@ static const std::unordered_map<std::string, LaraType> kLaraTypes
 	{"Invisible", LaraType::Invisible}
 };
 
-struct GameScriptLevel : public ScriptInterfaceLevel
+struct Level : public ScriptInterfaceLevel
 {
 	std::string AmbientTrack;
 	GameScriptSkyLayer Layer1;
@@ -49,7 +49,7 @@ struct GameScriptLevel : public ScriptInterfaceLevel
 	LaraType GetLaraType() const override;
 	void SetWeatherStrength(float val);
 	void SetLevelFarView(byte val);
-	static void Register(sol::state* state);
+	static void Register(sol::table & parent);
 	WeatherType GetWeatherType() const override;
 	short GetMirrorRoom() const override;
 };
