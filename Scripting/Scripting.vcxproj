@@ -80,7 +80,6 @@
     <ClInclude Include="src\AudioTracks.h" />
     <ClInclude Include="src\Flow\Flow.h" />
     <ClInclude Include="src\GameLogicScript.h" />
-    <ClInclude Include="src\GameScriptAIObject.h" />
     <ClInclude Include="src\GameScriptAnimations.h" />
     <ClInclude Include="src\GameScriptAudioTrack.h" />
     <ClInclude Include="src\GameScriptCameraInfo.h" />
@@ -99,6 +98,7 @@
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
     <ClInclude Include="src\LuaHandler.h" />
+    <ClInclude Include="src\Objects\AIObject\AIObject.h" />
     <ClInclude Include="src\Objects\Moveable\Moveable.h" />
     <ClInclude Include="src\Objects\ObjectIDs.h" />
     <ClInclude Include="src\Objects\ObjectsHandler.h" />
@@ -117,12 +117,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Flow\Flow.cpp" />
+    <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
     <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
     <ClCompile Include="src\Objects\Static\GameScriptMeshInfo.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameLogicScript.cpp" />
-    <ClCompile Include="src\GameScriptAIObject.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
     <ClCompile Include="src\GameScriptAudioTrack.cpp" />
     <ClCompile Include="src\GameScriptCameraInfo.cpp" />

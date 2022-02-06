@@ -80,8 +80,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
-	GameScriptAIObject::Register(m_lua);
-	GameScriptAIObject::SetNameCallbacks(
+	AIObject::Register(m_lua);
+	AIObject::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
