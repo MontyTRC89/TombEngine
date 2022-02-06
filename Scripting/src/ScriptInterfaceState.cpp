@@ -1,6 +1,6 @@
 #include "frameworkandsol.h"
 #include "ScriptInterfaceState.h"
-#include "GameLogicScript.h"
+#include "Logic/LogicHandler.h"
 #include "Flow/Flow.h"
 #include "Objects/ObjectsHandler.h"
 #include "Strings/StringsHandler.h"

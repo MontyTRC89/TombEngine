@@ -186,9 +186,6 @@
     <ClInclude Include="src\AudioTracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameLogicScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptAnimations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -285,6 +282,9 @@
     <ClInclude Include="src\Strings\DisplayString\DisplayString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Logic\LogicHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -332,9 +332,6 @@
     <ClCompile Include="src\GameScriptFreeFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameLogicScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\LuaHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -363,6 +360,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Strings\DisplayString\DisplayString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logic\LogicHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
