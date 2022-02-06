@@ -79,9 +79,9 @@
     <ClInclude Include="src\Flow\Animations\Animations.h" />
     <ClInclude Include="src\Flow\FlowHandler.h" />
     <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h" />
+    <ClInclude Include="src\Flow\Level\Level.h" />
     <ClInclude Include="src\GameScriptColor.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
-    <ClInclude Include="src\GameScriptLevel.h" />
     <ClInclude Include="src\GameScriptMirror.h" />
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
@@ -117,6 +117,7 @@
     <ClCompile Include="src\Flow\Animations\Animations.cpp" />
     <ClCompile Include="src\Flow\FlowHandler.cpp" />
     <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp" />
+    <ClCompile Include="src\Flow\Level\Level.cpp" />
     <ClCompile Include="src\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
@@ -129,7 +130,6 @@
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
-    <ClCompile Include="src\GameScriptLevel.cpp" />
     <ClCompile Include="src\GameScriptMirror.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />

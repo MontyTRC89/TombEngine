@@ -183,9 +183,6 @@
     <ClInclude Include="src\GameScriptFreeFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameScriptLevel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptMirror.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -279,6 +276,9 @@
     <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Flow\Level\Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -300,9 +300,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameScriptLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptFreeFunctions.cpp">
@@ -357,6 +354,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flow\Level\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
