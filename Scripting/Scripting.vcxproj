@@ -87,7 +87,6 @@
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
     <ClInclude Include="src\GameScriptSettings.h" />
-    <ClInclude Include="src\GameScriptSinkInfo.h" />
     <ClInclude Include="src\GameScriptSkyLayer.h" />
     <ClInclude Include="src\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="src\InventorySlots.h" />
@@ -97,8 +96,10 @@
     <ClInclude Include="src\Objects\AIObject\AIObject.h" />
     <ClInclude Include="src\Objects\Camera\Camera.h" />
     <ClInclude Include="src\Objects\Moveable\Moveable.h" />
+    <ClInclude Include="src\Objects\NamedBase.h" />
     <ClInclude Include="src\Objects\ObjectIDs.h" />
     <ClInclude Include="src\Objects\ObjectsHandler.h" />
+    <ClInclude Include="src\Objects\Sink\Sink.h" />
     <ClInclude Include="src\Objects\Static\Static.h" />
     <ClInclude Include="src\ReservedScriptNames.h" />
     <ClInclude Include="src\ScriptAssert.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="src\Objects\Camera\Camera.cpp" />
     <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
     <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
+    <ClCompile Include="src\Objects\Sink\Sink.cpp" />
     <ClCompile Include="src\Objects\Static\Static.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
@@ -131,7 +133,6 @@
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
     <ClCompile Include="src\GameScriptSettings.cpp" />
-    <ClCompile Include="src\GameScriptSinkInfo.cpp" />
     <ClCompile Include="src\GameScriptSkyLayer.cpp" />
     <ClCompile Include="src\GameScriptSoundSourceInfo.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
