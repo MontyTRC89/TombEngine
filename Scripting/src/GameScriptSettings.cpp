@@ -3,7 +3,7 @@
 
 /***
 Settings that will be run on game startup.
-@pregameclass Settings
+@tentable Settings
 @pragma nostrip
 */
 
