@@ -21,7 +21,7 @@ using std::unordered_map;
 ScriptInterfaceGame* g_GameScript;
 ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
-ScriptInterfaceFlowHandler* g_GameFlowHandler;
+ScriptInterfaceFlowHandler* g_GameFlow;
 
 FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {

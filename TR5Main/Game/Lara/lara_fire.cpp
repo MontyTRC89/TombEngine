@@ -16,7 +16,7 @@
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
