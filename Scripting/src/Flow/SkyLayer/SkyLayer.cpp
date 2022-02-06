@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptSkyLayer.h"
+#include "SkyLayer.h"
 
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
@@ -8,14 +8,14 @@ As seen in TR4's City of the Dead.
 @pragma nostrip
 */
 
-void GameScriptSkyLayer::Register(sol::state* lua)
+void SkyLayer::Register(sol::state* lua)
 {
-	lua->new_usertype<GameScriptSkyLayer>("SkyLayer",
-		sol::constructors<GameScriptSkyLayer(GameScriptColor const &, short)>(),
+	lua->new_usertype<SkyLayer>("SkyLayer",
+		sol::constructors<SkyLayer(GameScriptColor const &, short)>(),
 
 /// (@{Color}) RGB sky color
 //@mem color
-		"color", sol::property(&GameScriptSkyLayer::GetColor, &GameScriptSkyLayer::SetColor),
+		"color", sol::property(&SkyLayer::GetColor, &SkyLayer::SetColor),
 
 /*** (int) cloud speed.
 
@@ -27,7 +27,7 @@ sky to scroll so fast that it will no longer appear as a coherent stream of clou
 Less is more. City of The Dead, for example, uses a speed value of 16.
  
 @mem speed*/
-		"speed", &GameScriptSkyLayer::CloudSpeed
+		"speed", &SkyLayer::CloudSpeed
 		);
 }
 
@@ -37,20 +37,20 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 @return A SkyLayer object.
 @function SkyLayer.new
 */
-GameScriptSkyLayer::GameScriptSkyLayer(GameScriptColor const& col, short speed)
+SkyLayer::SkyLayer(GameScriptColor const& col, short speed)
 {
 	SetColor(col);
 	CloudSpeed = speed;
 	Enabled = true;
 }
 
-void GameScriptSkyLayer::SetColor(GameScriptColor const & col)
+void SkyLayer::SetColor(GameScriptColor const & col)
 {
 	R = col.GetR();
 	G = col.GetG();
 	B = col.GetB();
 }
 
-GameScriptColor GameScriptSkyLayer::GetColor() const {
+GameScriptColor SkyLayer::GetColor() const {
 	return GameScriptColor{ R, G, B };
 }

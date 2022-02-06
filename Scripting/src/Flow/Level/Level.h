@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "GameScriptSkyLayer.h"
+#include "Flow/SkyLayer/SkyLayer.h"
 #include "Flow/Mirror/Mirror.h"
 #include "GameScriptColor.h"
 #include <GameScriptFog.h>
@@ -28,8 +28,8 @@ static const std::unordered_map<std::string, LaraType> kLaraTypes
 struct Level : public ScriptInterfaceLevel
 {
 	std::string AmbientTrack;
-	GameScriptSkyLayer Layer1;
-	GameScriptSkyLayer Layer2;
+	SkyLayer Layer1;
+	SkyLayer Layer2;
 	bool ColAddHorizon{ false };
 	GameScriptFog Fog;
 	bool Storm{ false };
