@@ -17,7 +17,7 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/ScriptInterfaceFlow.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/ScriptInterfaceGame.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
