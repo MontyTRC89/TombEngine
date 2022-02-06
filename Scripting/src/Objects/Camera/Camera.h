@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptNamedBase.h"
+#include "Objects/NamedBase.h"
 #include "Specific/phd_global.h"
 
 namespace sol {
@@ -8,7 +8,7 @@ namespace sol {
 }
 class GameScriptPosition;
 
-class Camera : public GameScriptNamedBase<Camera, LEVEL_CAMERA_INFO &>
+class Camera : public NamedBase<Camera, LEVEL_CAMERA_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<LEVEL_CAMERA_INFO>;
