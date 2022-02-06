@@ -18,4 +18,3 @@ struct Mirror
 	Mirror(short room, int startX, int endX, int startZ, int endZ);
 };
 
-
