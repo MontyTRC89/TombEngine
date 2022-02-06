@@ -20,7 +20,7 @@ namespace sol {
 	class state;
 }
 
-struct GameScriptInventoryObject
+struct InventoryItem
 {
 	std::string name{};
 	InventoryObjectTypes slot{ INV_OBJECT_PISTOLS };
@@ -31,10 +31,10 @@ struct GameScriptInventoryObject
 	int meshBits{ 0 };
 	ItemOptions action{ ItemOptions::OPT_USE };
 
-	GameScriptInventoryObject() = default;
-	GameScriptInventoryObject(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
+	InventoryItem() = default;
+	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
 
-	static void Register(sol::state* lua);
+	static void Register(sol::table& lua);
 
 	void SetAction(ItemOptions a_action);
 	void SetSlot(ItemEnumPair a_slot);
