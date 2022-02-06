@@ -10,7 +10,7 @@ static constexpr char const ScriptReserved_Strings[]			= "Strings";
 // Classes
 static constexpr char const ScriptReserved_Moveable[]			= "Moveable";
 static constexpr char const ScriptReserved_Static[]			= "Static";
-static constexpr char const ScriptReserved_CameraInfo[]			= "CameraInfo";
+static constexpr char const ScriptReserved_Camera[]			= "Camera";
 static constexpr char const ScriptReserved_SinkInfo[]			= "SinkInfo";
 static constexpr char const ScriptReserved_SoundSourceInfo[]	= "SoundSourceInfo";
 static constexpr char const ScriptReserved_AIObject[]			= "AIObject";

@@ -7,7 +7,7 @@
 #include "GameScriptSinkInfo.h"
 #include "Objects/AIObject/AIObject.h"
 #include "GameScriptSoundSourceInfo.h"
-#include "GameScriptCameraInfo.h"
+#include "Camera/Camera.h"
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler
 {

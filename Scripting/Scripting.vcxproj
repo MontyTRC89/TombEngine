@@ -23,7 +23,6 @@
     <ClInclude Include="frameworkandsol.h" />
     <ClInclude Include="include\GameScriptAIObject.h" />
     <ClInclude Include="include\GameScriptAudioTrack.h" />
-    <ClInclude Include="include\GameScriptCameraInfo.h" />
     <ClInclude Include="include\GameScriptColor.h" />
     <ClInclude Include="include\GameScriptDisplayString.h" />
     <ClInclude Include="include\GameScriptInventoryObject.h" />
@@ -46,7 +45,6 @@
     <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
     <ClInclude Include="include\Scripting\GameScriptAnimations.h" />
     <ClInclude Include="include\Scripting\GameScriptAudioTrack.h" />
-    <ClInclude Include="include\Scripting\GameScriptCameraInfo.h" />
     <ClInclude Include="include\Scripting\GameScriptColor.h" />
     <ClInclude Include="include\Scripting\GameScriptDisplayString.h" />
     <ClInclude Include="include\Scripting\GameScriptFreeFunctions.h" />
@@ -81,7 +79,6 @@
     <ClInclude Include="src\Flow\Flow.h" />
     <ClInclude Include="src\GameScriptAnimations.h" />
     <ClInclude Include="src\GameScriptAudioTrack.h" />
-    <ClInclude Include="src\GameScriptCameraInfo.h" />
     <ClInclude Include="src\GameScriptColor.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptInventoryObject.h" />
@@ -99,6 +96,7 @@
     <ClInclude Include="src\Logic\LogicHandler.h" />
     <ClInclude Include="src\LuaHandler.h" />
     <ClInclude Include="src\Objects\AIObject\AIObject.h" />
+    <ClInclude Include="src\Objects\Camera\Camera.h" />
     <ClInclude Include="src\Objects\Moveable\Moveable.h" />
     <ClInclude Include="src\Objects\ObjectIDs.h" />
     <ClInclude Include="src\Objects\ObjectsHandler.h" />
@@ -119,13 +117,13 @@
     <ClCompile Include="src\Flow\Flow.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
+    <ClCompile Include="src\Objects\Camera\Camera.cpp" />
     <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
     <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
     <ClCompile Include="src\Objects\Static\Static.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
     <ClCompile Include="src\GameScriptAudioTrack.cpp" />
-    <ClCompile Include="src\GameScriptCameraInfo.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />

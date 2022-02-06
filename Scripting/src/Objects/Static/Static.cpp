@@ -26,7 +26,7 @@ Static::~Static() {
 	}
 }
 
-void Static::Register(sol::state* state, sol::table & parent)
+void Static::Register(sol::table & parent)
 {
 	parent.new_usertype<Static>(ScriptReserved_Static,
 		sol::meta_function::index, index_error,
