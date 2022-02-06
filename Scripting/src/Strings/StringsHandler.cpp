@@ -30,10 +30,10 @@ Hide some on-screen text.
 @tparam DisplayString str the string object to hide. Must previously have been shown
 with a call to @{ShowString}, or this function will have no effect.
 */
-	m_lua->set_function(ScriptReserved_HideString, [this](GameScriptDisplayString const& s) {ShowString(s, 0.0f); });
+	m_lua->set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
 
-	GameScriptDisplayString::Register(m_lua);
-	GameScriptDisplayString::SetCallbacks(
+	DisplayString::Register(m_lua);
+	DisplayString::SetCallbacks(
 		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
@@ -68,7 +68,7 @@ bool StringsHandler::SetDisplayString(DisplayStringIDType id, UserDisplayString 
 	return m_userDisplayStrings.insert_or_assign(id, ds).second;
 }
 
-void StringsHandler::ShowString(GameScriptDisplayString const & str, sol::optional<float> nSeconds)
+void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> nSeconds)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second.m_timeRemaining = nSeconds.value_or(0.0f);

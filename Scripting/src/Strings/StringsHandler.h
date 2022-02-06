@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <optional>
 #include "LuaHandler.h"
-#include "DisplayString/GameScriptDisplayString.h"
+#include "DisplayString/DisplayString.h"
 #include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
 
 using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
@@ -21,7 +21,7 @@ public:
 	std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(DisplayStringIDType id);
 	bool								ScheduleRemoveDisplayString(DisplayStringIDType id);
 
-	void								ShowString(GameScriptDisplayString const&, sol::optional<float> nSeconds);
+	void								ShowString(DisplayString const&, sol::optional<float> nSeconds);
 
 	void								Register(sol::state* state);
 };
