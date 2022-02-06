@@ -78,7 +78,6 @@
     <ClInclude Include="src\AudioTracks.h" />
     <ClInclude Include="src\Flow\FlowHandler.h" />
     <ClInclude Include="src\GameScriptAnimations.h" />
-    <ClInclude Include="src\GameScriptAudioTrack.h" />
     <ClInclude Include="src\GameScriptColor.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptInventoryObject.h" />
@@ -125,7 +124,6 @@
     <ClCompile Include="src\Objects\Static\Static.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\GameScriptAnimations.cpp" />
-    <ClCompile Include="src\GameScriptAudioTrack.cpp" />
     <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptInventoryObject.cpp" />
