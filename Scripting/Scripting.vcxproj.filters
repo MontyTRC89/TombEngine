@@ -183,9 +183,6 @@
     <ClInclude Include="src\GameScriptFreeFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameScriptMirror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GameScriptPosition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -279,6 +276,9 @@
     <ClInclude Include="src\Flow\Level\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Flow\Mirror\Mirror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -294,9 +294,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptSkyLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameScriptMirror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScriptSettings.cpp">
@@ -357,6 +354,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Flow\Level\Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flow\Mirror\Mirror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
