@@ -16,7 +16,7 @@ int lua_exception_handler(lua_State* L, sol::optional<std::exception const &> ma
 
 ScriptInterfaceGame* ScriptInterfaceState::CreateGame()
 {
-	return new GameScript(&g_solState);
+	return new LogicHandler(&g_solState, s_rootTable);
 }
 
 ScriptInterfaceFlow* ScriptInterfaceState::CreateFlow()
@@ -31,7 +31,7 @@ ScriptInterfaceObjectsHandler* ScriptInterfaceState::CreateObjectsHandler()
 
 ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
 {
-	return new StringsHandler(&g_solState);
+	return new StringsHandler(&g_solState, s_rootTable);
 }
 
 void ScriptInterfaceState::Init()

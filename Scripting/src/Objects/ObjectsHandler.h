@@ -18,7 +18,7 @@ public:
 private:
 	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
 	std::unordered_map<std::string, short>	 					m_itemsMapName{};
-
+	sol::table m_table_objects;
 
 	void AssignLara() override;
 
