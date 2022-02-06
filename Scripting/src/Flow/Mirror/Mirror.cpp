@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptMirror.h"
+#include "Mirror.h"
 
 /***
 A mirror effect.
@@ -11,19 +11,19 @@ __Not currently implemented.__
 @pragma nostrip
 */
 
-void GameScriptMirror::Register(sol::state* lua)
+void Mirror::Register(sol::state* lua)
 {
-	lua->new_usertype<GameScriptMirror>("Mirror",
-		sol::constructors<GameScriptMirror(short, int, int, int, int)>(),
-		"room", &GameScriptMirror::Room,
-		"startX", &GameScriptMirror::StartX,
-		"endX", &GameScriptMirror::EndX,
-		"startZ", &GameScriptMirror::StartZ,
-		"endZ", &GameScriptMirror::EndZ
+	lua->new_usertype<Mirror>("Mirror",
+		sol::constructors<Mirror(short, int, int, int, int)>(),
+		"room", &Mirror::Room,
+		"startX", &Mirror::StartX,
+		"endX", &Mirror::EndX,
+		"startZ", &Mirror::StartZ,
+		"endZ", &Mirror::EndZ
 		);
 }
 
-GameScriptMirror::GameScriptMirror(short room, int startX, int endX, int startZ, int endZ)
+Mirror::Mirror(short room, int startX, int endX, int startZ, int endZ)
 {
 	Room = room;
 	StartX = startX;
