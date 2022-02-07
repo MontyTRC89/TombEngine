@@ -5,19 +5,19 @@ namespace sol {
 }
 struct PHD_3DPOS;
 
-class GameScriptRotation {
+class Rotation {
 public:
 	short								x{ 0 };
 	short								y{ 0 };
 	short								z{ 0 };
 
-	GameScriptRotation() = default;
-	GameScriptRotation(int x, int y, int z);
-	GameScriptRotation(PHD_3DPOS const& pos);
+	Rotation() = default;
+	Rotation(int x, int y, int z);
+	Rotation(PHD_3DPOS const& pos);
 
 	std::string ToString() const;
 
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
 
-	static void Register(sol::state*);
+	static void Register(sol::table & parent);
 };
