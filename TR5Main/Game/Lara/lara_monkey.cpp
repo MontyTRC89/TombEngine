@@ -16,8 +16,6 @@
 #include "Specific/level.h"
 #include "Scripting/GameFlowScript.h"
 
-using namespace TEN::Floordata;
-
 // -----------------------------
 // MONKEY SWING
 // Control & Collision Functions

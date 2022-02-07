@@ -31,13 +31,34 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 		item->pos.zRot += std::min(rate, (short)(abs(maxAngle - item->pos.zRot) / 3)) * sign;
 }
 
-// TODO: Some states can't make the most of this function due to missing step up/down animations.
-// Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll, int deltaHeight)
+void EaseOutLaraHeight(ITEM_INFO* item, int height)
 {
-	if (deltaHeight == NO_HEIGHT)
+	if (height == NO_HEIGHT)
 		return;
 
+	// Translate Lara to new height.
+	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
+	constexpr int rate = 50;
+	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
+	int sign = std::copysign(1, height);
+	
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
+		item->pos.yPos += SWAMP_GRAVITY;
+	else if (abs(height) > (STEPUP_HEIGHT / 2))		// Outer range.
+		item->pos.yPos += rate * sign;
+	else if (abs(height) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
+		abs(height) >= threshold)
+	{
+		item->pos.yPos += std::max<int>(abs(height / 2.75), threshold) * sign;
+	}
+	else
+		item->pos.yPos += height;
+}
+
+// TODO: Some states can't make the most of this function due to missing step up/down animations.
+// Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
+void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+{
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		if (TestLaraStepUp(item, coll))
@@ -45,7 +66,7 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll, int deltaHeight)
 			item->targetState = LS_STEP_UP;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->pos.yPos += deltaHeight;
+				item->pos.yPos += coll->Middle.Floor;
 				return;
 			}
 		}
@@ -54,51 +75,18 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll, int deltaHeight)
 			item->targetState = LS_STEP_DOWN;
 			if (GetChange(item, &g_Level.Anims[item->animNumber]))
 			{
-				item->pos.yPos += deltaHeight;
+				item->pos.yPos += coll->Middle.Floor;
 				return;
 			}
 		}
 	}
 
-	// Height difference is below threshold for step dispatch OR step animation doesn't exist; translate Lara to new floor height.
-	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	constexpr int rate = 50;
-	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
-	int sign = std::copysign(1, deltaHeight);
-	
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && deltaHeight > 0)
-		item->pos.yPos += SWAMP_GRAVITY;
-	else if (abs(deltaHeight) > (STEPUP_HEIGHT / 2))		// Outer range.
-		item->pos.yPos += rate * sign;
-	else if (abs(deltaHeight) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
-		abs(deltaHeight) >= threshold)
-	{
-		item->pos.yPos += std::max<int>(abs(deltaHeight / 2.75), threshold) * sign;
-	}
-	else
-		item->pos.yPos += deltaHeight;
-}
-
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
-{
-	DoLaraStep(item, coll, coll->Middle.Floor);
+	EaseOutLaraHeight(item, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	constexpr int rate = 50;
-	int threshold = std::max<int>(abs(item->speed) / 3 * 2, CLICK(1.25f) / 16);
-	int sign = std::copysign(1, coll->Middle.Ceiling);
-
-	if (abs(coll->Middle.Ceiling) > (CLICK(1.25f) / 2))			// Outer range.
-		item->pos.yPos += rate * sign;
-	else if (abs(coll->Middle.Ceiling) <= (CLICK(1.25f) / 2) &&	// Inner range.
-		abs(coll->Middle.Ceiling) >= threshold)
-	{
-		item->pos.yPos += std::max<int>(abs(coll->Middle.Ceiling / 2.75), threshold) * sign;
-	}
-	else
-		item->pos.yPos += coll->Middle.Ceiling;
+	EaseOutLaraHeight(item, coll->Middle.Ceiling);
 }
 
 // TODO: Doesn't always work on bridges.
@@ -270,10 +258,10 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
-	info->gunStatus = LG_HANDS_FREE;
 	item->speed = 2;
 	item->fallspeed = 1;
 	item->airborne = true;
+	info->gunStatus = LG_HANDS_FREE;
 }
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
