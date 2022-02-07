@@ -4,5 +4,5 @@ namespace sol {
 };
 
 namespace GameScriptFreeFunctions {
-	void Register(sol::state* lua);
+	void Register(sol::state* lua, sol::table &);
 };

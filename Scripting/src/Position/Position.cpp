@@ -8,9 +8,9 @@ Represents a position in the game world.
 @pragma nostrip
 */
 
-void Position::Register(sol::state* state)
+void Position::Register(sol::table & parent)
 {
-	state->new_usertype<Position>("Position",
+	parent.new_usertype<Position>("Position",
 		sol::constructors<Position(int, int, int)>(),
 		sol::meta_function::to_string, &Position::ToString,
 
