@@ -42,21 +42,25 @@ void InitialiseLara(int restore)
 	PoisonFlag = 0;
 	Lara.poisoned = 0;
 	Lara.waterSurfaceDist = 100;
-	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present) {
+
+	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present)
+	{
 		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Pistols;
 		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Pistols;
 	}
-	else {
+	else
+	{
 		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
 		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
 	}
-	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_SHOTGUN)].Present) {
+	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_SHOTGUN)].Present)
+	{
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Shotgun;
 	}
-	else {
+	else
+	{
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	}
-
 
 	Lara.location = -1;
 	Lara.highestLocation = -1;
@@ -114,18 +118,14 @@ void LaraInitialiseMeshes()
 	/* Hardcoded code */
 
 	if (Lara.gunType == WEAPON_HK)
-	{
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::HK;
-	}
 	else if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
 		if (Lara.Weapons[WEAPON_HK].Present)
 			Lara.holsterInfo.backHolster = HOLSTER_SLOT::HK;
 	}
 	else
-	{
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
-	}
 
 	Lara.gunStatus = LG_HANDS_FREE;
 	Lara.leftArm.frameNumber = 0;
