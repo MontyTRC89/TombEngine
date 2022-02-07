@@ -104,6 +104,7 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(parent);
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
+	Position::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
