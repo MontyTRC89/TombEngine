@@ -17,7 +17,7 @@ Scripts that will be run on game startup.
 
 using namespace TEN::Effects::Lightning;
 
-namespace GameScriptFreeFunctions {
+namespace Misc {
 	static int FindRoomNumber(Position pos)
 	{
 		return 0;

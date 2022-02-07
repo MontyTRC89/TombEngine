@@ -83,12 +83,12 @@
     <ClInclude Include="src\Flow\Level\Level.h" />
     <ClInclude Include="src\Flow\Mirror\Mirror.h" />
     <ClInclude Include="src\Flow\SkyLayer\SkyLayer.h" />
-    <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
     <ClInclude Include="src\Logic\LogicHandler.h" />
     <ClInclude Include="src\LuaHandler.h" />
+    <ClInclude Include="src\Misc\Misc.h" />
     <ClInclude Include="src\Objects\AIObject\AIObject.h" />
     <ClInclude Include="src\Objects\Camera\Camera.h" />
     <ClInclude Include="src\Objects\Moveable\Moveable.h" />
@@ -123,6 +123,7 @@
     <ClCompile Include="src\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="src\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\Logic\LogicHandler.cpp" />
+    <ClCompile Include="src\Misc\Misc.cpp" />
     <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="src\Objects\Camera\Camera.cpp" />
     <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
@@ -133,7 +134,6 @@
     <ClCompile Include="src\Position\Position.cpp" />
     <ClCompile Include="src\Rotation\Rotation.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
-    <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
     <ClCompile Include="src\ScriptAssert.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />
