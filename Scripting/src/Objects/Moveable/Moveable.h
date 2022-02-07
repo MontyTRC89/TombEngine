@@ -7,7 +7,7 @@ namespace sol {
 	template <typename T> struct as_table_t;
 }
 class GameScriptPosition;
-class GameScriptRotation;
+class Rotation;
 struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
@@ -33,8 +33,8 @@ public:
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const& pos);
 
-	GameScriptRotation GetRot() const;
-	void SetRot(GameScriptRotation const& rot);
+	Rotation GetRot() const;
+	void SetRot(Rotation const& rot);
 
 	short GetCurrentAnimState() const;
 	void SetCurrentAnimState(short animState);

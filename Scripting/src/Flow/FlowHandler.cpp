@@ -103,12 +103,12 @@ Specify which translations in the strings table correspond to which languages.
 
 	Settings::Register(parent);
 	ScriptColor::Register(parent);
+	Rotation::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
 	InventoryItem::Register(table_flow);
 	Animations::Register(table_flow);
-	GameScriptRotation::Register(m_lua);
 
 	MakeReadOnlyTable(ScriptReserved_WeatherType, kWeatherTypes);
 	MakeReadOnlyTable(ScriptReserved_LaraType, kLaraTypes);
