@@ -1,23 +1,23 @@
 #include "frameworkandsol.h"
-#include "GameScriptSettings.h"
+#include "Settings.h"
 
 /***
 Settings that will be run on game startup.
-@tentable Settings
+@tenclass Settings
 @pragma nostrip
 */
 
-void GameScriptSettings::Register(sol::state* lua)
+void Settings::Register(sol::table & parent)
 {
-	lua->new_usertype<GameScriptSettings>("Settings",
-		"screenWidth", &GameScriptSettings::ScreenWidth,
-		"screenHeight", &GameScriptSettings::ScreenHeight,
-		"enableDynamicShadows", &GameScriptSettings::EnableDynamicShadows,
-		"windowed", &GameScriptSettings::Windowed,
-		"enableWaterCaustics", &GameScriptSettings::EnableWaterCaustics,
-		"drawingDistance", &GameScriptSettings::DrawingDistance,
-		"showRendererSteps", &GameScriptSettings::ShowRendererSteps,
-		"showDebugInfo", &GameScriptSettings::ShowDebugInfo,
+	parent.new_usertype<Settings>("Settings",
+		"screenWidth", &Settings::ScreenWidth,
+		"screenHeight", &Settings::ScreenHeight,
+		"enableDynamicShadows", &Settings::EnableDynamicShadows,
+		"windowed", &Settings::Windowed,
+		"enableWaterCaustics", &Settings::EnableWaterCaustics,
+		"drawingDistance", &Settings::DrawingDistance,
+		"showRendererSteps", &Settings::ShowRendererSteps,
+		"showDebugInfo", &Settings::ShowDebugInfo,
 
 /*** How should the application respond to script errors?
 Must be one of the following:
@@ -36,6 +36,6 @@ an invalid argument.
 As with `ErrorMode.WARN`, unrecoverable errors will still terminate the application.
 @mem errorMode
 */
-		"errorMode", &GameScriptSettings::ErrorMode
+		"errorMode", &Settings::ErrorMode
 		);
 }
