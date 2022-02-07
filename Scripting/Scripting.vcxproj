@@ -86,7 +86,6 @@
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
-    <ClInclude Include="src\GameScriptSettings.h" />
     <ClInclude Include="src\InventorySlots.h" />
     <ClInclude Include="src\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
@@ -105,6 +104,7 @@
     <ClInclude Include="src\ScriptAssert.h" />
     <ClInclude Include="src\ScriptInterfaceState.h" />
     <ClInclude Include="src\ScriptUtil.h" />
+    <ClInclude Include="src\Settings\Settings.h" />
     <ClInclude Include="src\Strings\DisplayString\DisplayString.h" />
     <ClInclude Include="src\Strings\StringsHandler.h" />
   </ItemGroup>
@@ -134,9 +134,9 @@
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />
-    <ClCompile Include="src\GameScriptSettings.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
     <ClCompile Include="src\ScriptAssert.cpp" />
+    <ClCompile Include="src\Settings\Settings.cpp" />
     <ClCompile Include="src\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="src\Strings\StringsHandler.cpp" />
   </ItemGroup>
