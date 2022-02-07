@@ -1392,7 +1392,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 	if (probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// No slope or death sector (if applicable).
+	// Check for slope or death sector (if applicable).
 	if (isSlopeDown || isSlopeUp || isDeath)
 		return false;
 
@@ -1591,7 +1591,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 	if (probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// No slope or death sector (if applicable).
+	// Check for slope or death sector (if applicable).
 	if (isSlopeDown || isSlopeUp || isDeath)
 		return false;
 
@@ -1707,7 +1707,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	if (probe.Position.Ceiling == NO_HEIGHT)
 		return false;
 
-	// No ceiling slope.
+	// Check for ceiling slope.
 	if (probe.Position.CeilingSlope)
 		return false;
 
@@ -1791,7 +1791,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 	
-	// Swamp depth is permissive (if applicable).
+	// Check swamp depth (if applicable).
 	if (swampTooDeep)
 		return VaultTestResult{ false };
 
@@ -2152,7 +2152,7 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTes
 	if (probeA.Position.Floor == NO_HEIGHT || probeB.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// No slope or death sector (if applicable).
+	// Check for slope or death sector (if applicable).
 	if (isSlope || isDeath)
 		return false;
 
@@ -2306,7 +2306,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 	if (probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// No swamp and not wading (if applicable).
+	// Check for swamp or wade status (if applicable).
 	if (isSwamp || isWading)
 		return false;
 
