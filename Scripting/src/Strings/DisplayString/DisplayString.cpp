@@ -71,7 +71,7 @@ If true, the str argument will be the key of a translated string specified in
 strings.lua. __Default: false__.
 @return A new DisplayString object.
 */
-std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, GameScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
+std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
@@ -157,7 +157,7 @@ std::tuple<int, int> DisplayString::GetPos() const
 	return std::make_tuple(s.m_x, s.m_y);
 }
 	
-void DisplayString::SetCol(GameScriptColor const & col)
+void DisplayString::SetCol(ScriptColor const & col)
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	s.m_color = col;
@@ -166,7 +166,7 @@ void DisplayString::SetCol(GameScriptColor const & col)
 	//s_addItemCallback(m_id, s);
 }
 
-GameScriptColor DisplayString::GetCol() 
+ScriptColor DisplayString::GetCol() 
 {
 	UserDisplayString& s = s_getItemCallback(m_id).value();
 	return s.m_color;

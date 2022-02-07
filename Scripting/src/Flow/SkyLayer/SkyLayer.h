@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 
 namespace sol {
 	class state;
@@ -15,9 +15,9 @@ struct SkyLayer
 	short CloudSpeed{ 0 };
 
 	SkyLayer() = default;
-	SkyLayer(GameScriptColor const & col, short speed);
-	void SetColor(GameScriptColor const & col);
-	GameScriptColor GetColor() const;
+	SkyLayer(ScriptColor const & col, short speed);
+	void SetColor(ScriptColor const & col);
+	ScriptColor GetColor() const;
 
 	static void Register(sol::table &);
 };
