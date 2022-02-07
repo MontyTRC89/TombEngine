@@ -18,5 +18,5 @@ public:
 
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
 
-	static void Register(sol::state*);
+	static void Register(sol::table &);
 };
