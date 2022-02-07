@@ -76,13 +76,13 @@
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
+    <ClInclude Include="src\Color\Color.h" />
     <ClInclude Include="src\Flow\Animations\Animations.h" />
     <ClInclude Include="src\Flow\FlowHandler.h" />
     <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="src\Flow\Level\Level.h" />
     <ClInclude Include="src\Flow\Mirror\Mirror.h" />
     <ClInclude Include="src\Flow\SkyLayer\SkyLayer.h" />
-    <ClInclude Include="src\GameScriptColor.h" />
     <ClInclude Include="src\GameScriptFreeFunctions.h" />
     <ClInclude Include="src\GameScriptPosition.h" />
     <ClInclude Include="src\GameScriptRotation.h" />
@@ -114,6 +114,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Color\Color.cpp" />
     <ClCompile Include="src\Flow\Animations\Animations.cpp" />
     <ClCompile Include="src\Flow\FlowHandler.cpp" />
     <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp" />
@@ -130,7 +131,6 @@
     <ClCompile Include="src\Objects\SoundSource\SoundSource.cpp" />
     <ClCompile Include="src\Objects\Static\Static.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
-    <ClCompile Include="src\GameScriptColor.cpp" />
     <ClCompile Include="src\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="src\GameScriptPosition.cpp" />
     <ClCompile Include="src\GameScriptRotation.cpp" />

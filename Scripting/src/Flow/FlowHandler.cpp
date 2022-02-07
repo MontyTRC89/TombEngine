@@ -102,12 +102,12 @@ Specify which translations in the strings table correspond to which languages.
 	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	Settings::Register(parent);
+	ScriptColor::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
 	InventoryItem::Register(table_flow);
 	Animations::Register(table_flow);
-	ScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 
 	MakeReadOnlyTable(ScriptReserved_WeatherType, kWeatherTypes);
