@@ -32,7 +32,7 @@ public:
 
 	std::string ToString() const;
 
-	static void Register(sol::state* state);
+	static void Register(sol::table & parent);
 private:
 	RGBAColor8Byte m_color;
 };

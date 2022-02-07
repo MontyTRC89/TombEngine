@@ -6,13 +6,13 @@
 An RGBA or RGB color.
 Components are specified in bytes; all values are clamped to [0, 255].
 
-@miscclass Color
+@class Color
 @pragma nostrip
 */
 
-void ScriptColor::Register(sol::state* state)
+void ScriptColor::Register(sol::table & parent)
 {
-	state->new_usertype<ScriptColor>("Color",
+	parent.new_usertype<ScriptColor>("Color",
 		sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>(),
 		sol::meta_function::to_string, &ScriptColor::ToString,
 
