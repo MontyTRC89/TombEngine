@@ -254,7 +254,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_walk_back,
 	lara_col_swim,
 	lara_col_glide,
-	lara_default_col,
+	lara_default_col,//19
 	lara_col_turn_right_fast,
 	lara_col_step_right,
 	lara_col_step_left,
@@ -921,8 +921,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		// Handle current Lara status.
 		lara_control_routines[item->activeState](item, coll);
 
-		HandleLaraMovementParameters(item, coll);
-
 		// Animate Lara.
 		AnimateLara(item);
 
@@ -935,6 +933,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			if (info->Vehicle == NO_ITEM)
 				lara_collision_routines[item->activeState](item, coll);
 		}
+
+		HandleLaraMovementParameters(item, coll);
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
 

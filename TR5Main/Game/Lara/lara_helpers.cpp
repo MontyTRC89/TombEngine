@@ -230,7 +230,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	info->turnRate = 0;
 
 	if (vaultResult.SnapToLedge)
-		SnapItemToLedge(item, coll, 0.2f);
+		SnapItemToLedge(item, coll);
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)

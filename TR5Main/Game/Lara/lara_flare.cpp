@@ -60,7 +60,7 @@ void FlareControl(short itemNum)
 
 	DoProjectileDynamics(itemNum, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->fallspeed, zVel);
 
-	short& age = flareItem->data;
+	int& age = flareItem->data;
 	age &= 0x7FFF;
 	if (age >= FLARE_AGE)
 	{
@@ -75,7 +75,7 @@ void FlareControl(short itemNum)
 
 	if (DoFlareLight((PHD_VECTOR*)&flareItem->pos, age))
 	{
-		TriggerChaffEffects(flareItem,age);
+		TriggerChaffEffects(flareItem, age);
 		/* Hardcoded code */
 
 		age |= 0x8000;
@@ -340,16 +340,16 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 		}
 
 		if (flag)
-			flareItem->speed >>= 1;
+			flareItem->speed /= 2;
 
 		if (objectNum == ID_FLARE_ITEM)
 		{
-			flareItem->data = (short)0;
-			short& age = flareItem->data;
+			flareItem->data = (int)0;
+			int& age = flareItem->data;
 			if (DoFlareLight((PHD_VECTOR*)&flareItem->pos, laraInfo->flareAge))
-				age = (laraInfo->flareAge | 0x8000);
+				age = laraInfo->flareAge | 0x8000;
 			else
-				age = (laraInfo->flareAge & 0x7FFF);
+				age = laraInfo->flareAge & 0x7FFF;
 		}
 		else
 			flareItem->itemFlags[3] = laraInfo->litTorch;
@@ -402,7 +402,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	if (age < 4)
 	{
 		falloff = 12 + ((1 - (age / 4.0f)) * 16);
-		
+
 		r = FlareMainColor.x * 255;
 		g = FlareMainColor.y * 255;
 		b = FlareMainColor.z * 255;
@@ -423,7 +423,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 
 		return (random < 0.4f);
 	}
-	else 
+	else
 	{
 		auto multiplier = GenerateFloat(0.05f, 0.8f);
 		falloff = 12 * (1.0f - ((age - (FLARE_AGE - 90)) / (FLARE_AGE - (FLARE_AGE - 90))));
