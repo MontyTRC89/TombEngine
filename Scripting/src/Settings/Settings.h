@@ -13,7 +13,7 @@ namespace sol {
 	class state;
 }
 
-struct GameScriptSettings
+struct Settings
 {
 	int ScreenWidth;
 	int ScreenHeight;
@@ -26,6 +26,6 @@ struct GameScriptSettings
 	bool ShowDebugInfo;
 	ERROR_MODE ErrorMode;
 
-	static void Register(sol::state* lua);
+	static void Register(sol::table & lua);
 };
 
