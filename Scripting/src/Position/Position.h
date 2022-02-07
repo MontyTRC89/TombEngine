@@ -5,14 +5,14 @@ namespace sol {
 }
 struct PHD_3DPOS;
 
-class GameScriptPosition {
+class Position {
 public:
 	int x;
 	int y;
 	int z;
 
-	GameScriptPosition(int x, int y, int z);
-	GameScriptPosition(PHD_3DPOS const& pos);
+	Position(int x, int y, int z);
+	Position(PHD_3DPOS const& pos);
 
 	std::string ToString() const;
 

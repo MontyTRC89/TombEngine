@@ -2,7 +2,7 @@
 #include "frameworkandsol.h"
 #include "Objects/AIObject/AIObject.h"
 #include "ScriptAssert.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -66,12 +66,12 @@ void AIObject::Register(sol::table & parent)
 		);
 }
 
-GameScriptPosition AIObject::GetPos() const
+Position AIObject::GetPos() const
 {
-	return GameScriptPosition{ m_aiObject.x, m_aiObject.y, m_aiObject.z };
+	return Position{ m_aiObject.x, m_aiObject.y, m_aiObject.z };
 }
 
-void AIObject::SetPos(GameScriptPosition const& pos)
+void AIObject::SetPos(Position const& pos)
 {
 	m_aiObject.x = pos.x;
 	m_aiObject.y = pos.y;
