@@ -1,5 +1,5 @@
 #pragma once
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 #include <functional>
 #include <array>
 
@@ -61,8 +61,8 @@ public:
 	void SetPos(int x, int y);
 	std::tuple<int, int> GetPos() const;
 
-	void SetCol(GameScriptColor const&);
-	GameScriptColor GetCol();
+	void SetCol(ScriptColor const&);
+	ScriptColor GetCol();
 
 	void SetKey(std::string const&);
 	std::string GetKey() const;
