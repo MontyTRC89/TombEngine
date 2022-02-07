@@ -3,6 +3,6 @@ namespace sol {
 	class state;
 };
 
-namespace GameScriptFreeFunctions {
+namespace Misc {
 	void Register(sol::state* lua, sol::table &);
 };
