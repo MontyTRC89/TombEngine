@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/effects/lara_fx.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -66,7 +67,7 @@ namespace TEN::Effects::Lara
 		if (lara->waterStatus == LARA_WATER_STATUS::LW_UNDERWATER || item->hitPoints <= 0)
 			return;
 
-		if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_COLD))
+		if (!TestEnvironment(ENV_FLAG_COLD, item))
 			return;
 
 		switch (item->animNumber)

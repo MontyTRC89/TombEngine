@@ -109,8 +109,7 @@ void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	info->look = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	item->activeState = LS_AUTO_JUMP;
-
+	
 	info->calcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->projectedFloorHeight - item->pos.yPos, -CLICK(7.5f)));
 }
 
