@@ -40,7 +40,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ l
 
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
 	
-	GameScriptPosition::Register(m_lua);
+	Position::Register(m_lua);
 	GameScriptFreeFunctions::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
