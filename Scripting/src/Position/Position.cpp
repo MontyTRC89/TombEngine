@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptPosition.h"
+#include "Position.h"
 #include "Specific/phd_global.h"
 
 /***
@@ -8,24 +8,24 @@ Represents a position in the game world.
 @pragma nostrip
 */
 
-void GameScriptPosition::Register(sol::state* state)
+void Position::Register(sol::state* state)
 {
-	state->new_usertype<GameScriptPosition>("Position",
-		sol::constructors<GameScriptPosition(int, int, int)>(),
-		sol::meta_function::to_string, &GameScriptPosition::ToString,
+	state->new_usertype<Position>("Position",
+		sol::constructors<Position(int, int, int)>(),
+		sol::meta_function::to_string, &Position::ToString,
 
 		/// (int) x coordinate
 		//@mem x
-		"x", &GameScriptPosition::x,
+		"x", &Position::x,
 
 		/// (int) y coordinate
 		//@mem y
 
-		"y", &GameScriptPosition::y,
+		"y", &Position::y,
 		/// (int) z coordinate
 		//@mem z
 
-		"z", &GameScriptPosition::z
+		"z", &Position::z
 		);
 }
 
@@ -36,21 +36,21 @@ void GameScriptPosition::Register(sol::state* state)
 @return A Position object.
 @function Position.new
 */
-GameScriptPosition::GameScriptPosition(int aX, int aY, int aZ)
+Position::Position(int aX, int aY, int aZ)
 {
 	x = aX;
 	y = aY;
 	z = aZ;
 }
 
-GameScriptPosition::GameScriptPosition(PHD_3DPOS const& pos)
+Position::Position(PHD_3DPOS const& pos)
 {
 	x = pos.xPos;
 	y = pos.yPos;
 	z = pos.zPos;
 }
 
-void GameScriptPosition::StoreInPHDPos(PHD_3DPOS& pos) const
+void Position::StoreInPHDPos(PHD_3DPOS& pos) const
 {
 	pos.xPos = x;
 	pos.yPos = y;
@@ -62,7 +62,7 @@ void GameScriptPosition::StoreInPHDPos(PHD_3DPOS& pos) const
 @treturn string A string showing the x, y, and z values of the position
 @function __tostring
 */
-std::string GameScriptPosition::ToString() const
+std::string Position::ToString() const
 {
 	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
 }

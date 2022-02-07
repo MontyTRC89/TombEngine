@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "Objects/Camera/Camera.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 
@@ -46,12 +46,12 @@ void Camera::Register(sol::table & parent)
 		);
 }
 
-GameScriptPosition Camera::GetPos() const
+Position Camera::GetPos() const
 {
-	return GameScriptPosition{ m_camera.x, m_camera.y, m_camera.z };
+	return Position{ m_camera.x, m_camera.y, m_camera.z };
 }
 
-void Camera::SetPos(GameScriptPosition const& pos)
+void Camera::SetPos(Position const& pos)
 {
 	m_camera.x = pos.x;
 	m_camera.y = pos.y;
