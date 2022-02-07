@@ -8,7 +8,7 @@
 #include "Specific/setup.h"
 #include "Game/control/lot.h"
 #include "GameScriptPosition.h"
-#include "GameScriptRotation.h"
+#include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
 
 /***
@@ -119,7 +119,7 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string name,
 	GameScriptPosition pos,
-	GameScriptRotation rot,
+	Rotation rot,
 	short room,
 	short currentAnimState,
 	short requiredAnimState,
@@ -338,14 +338,14 @@ void Moveable::SetPos(GameScriptPosition const& pos)
 // to a value written in via SetRot - only that the angle measures
 // will be mathematically equal
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
-GameScriptRotation Moveable::GetRot() const
+Rotation Moveable::GetRot() const
 {
-	return GameScriptRotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
+	return Rotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
 								int(TO_DEGREES(m_item->pos.yRot)) % 360,
 								int(TO_DEGREES(m_item->pos.zRot)) % 360);
 }
 
-void Moveable::SetRot(GameScriptRotation const& rot)
+void Moveable::SetRot(Rotation const& rot)
 {
 	m_item->pos.xRot = FROM_DEGREES(rot.x);
 	m_item->pos.yRot = FROM_DEGREES(rot.y);
