@@ -21,45 +21,11 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="frameworkandsol.h" />
-    <ClInclude Include="include\GameScriptAIObject.h" />
-    <ClInclude Include="include\GameScriptAudioTrack.h" />
-    <ClInclude Include="include\GameScriptColor.h" />
-    <ClInclude Include="include\GameScriptDisplayString.h" />
-    <ClInclude Include="include\GameScriptInventoryObject.h" />
-    <ClInclude Include="include\GameScriptLevel.h" />
-    <ClInclude Include="include\GameScriptMeshInfo.h" />
-    <ClInclude Include="include\GameScriptMirror.h" />
-    <ClInclude Include="include\GameScriptNamedBase.h" />
-    <ClInclude Include="include\GameScriptPosition.h" />
-    <ClInclude Include="include\GameScriptRotation.h" />
-    <ClInclude Include="include\GameScriptSettings.h" />
-    <ClInclude Include="include\GameScriptSinkInfo.h" />
-    <ClInclude Include="include\GameScriptSkyLayer.h" />
-    <ClInclude Include="include\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="include\ItemEnumPair.h" />
     <ClInclude Include="include\ReservedScriptNames.h" />
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
     <ClInclude Include="include\Scripting\Flow\ScriptInterfaceFlowHandler.h" />
-    <ClInclude Include="include\Scripting\GameFlowScript.h" />
-    <ClInclude Include="include\Scripting\GameLogicScript.h" />
-    <ClInclude Include="include\Scripting\GameScriptAIObject.h" />
-    <ClInclude Include="include\Scripting\GameScriptAnimations.h" />
-    <ClInclude Include="include\Scripting\GameScriptAudioTrack.h" />
-    <ClInclude Include="include\Scripting\GameScriptColor.h" />
-    <ClInclude Include="include\Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="include\Scripting\GameScriptFreeFunctions.h" />
-    <ClInclude Include="include\Scripting\GameScriptInventoryObject.h" />
-    <ClInclude Include="include\Scripting\GameScriptLevel.h" />
-    <ClInclude Include="include\Scripting\GameScriptMeshInfo.h" />
-    <ClInclude Include="include\Scripting\GameScriptMirror.h" />
-    <ClInclude Include="include\Scripting\GameScriptNamedBase.h" />
-    <ClInclude Include="include\Scripting\GameScriptPosition.h" />
-    <ClInclude Include="include\Scripting\GameScriptRotation.h" />
-    <ClInclude Include="include\Scripting\GameScriptSettings.h" />
-    <ClInclude Include="include\Scripting\GameScriptSinkInfo.h" />
-    <ClInclude Include="include\Scripting\GameScriptSkyLayer.h" />
-    <ClInclude Include="include\Scripting\GameScriptSoundSourceInfo.h" />
     <ClInclude Include="include\Scripting\InventorySlots.h" />
     <ClInclude Include="include\Scripting\ItemEnumPair.h" />
     <ClInclude Include="include\Scripting\LuaHandler.h" />
@@ -76,37 +42,37 @@
     <ClInclude Include="include\ScriptInterfaceLevel.h" />
     <ClInclude Include="include\ScriptUtil.h" />
     <ClInclude Include="src\AudioTracks.h" />
-    <ClInclude Include="src\Color\Color.h" />
-    <ClInclude Include="src\Flow\Animations\Animations.h" />
-    <ClInclude Include="src\Flow\FlowHandler.h" />
-    <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h" />
-    <ClInclude Include="src\Flow\Level\Level.h" />
-    <ClInclude Include="src\Flow\Mirror\Mirror.h" />
-    <ClInclude Include="src\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="src\InventorySlots.h" />
-    <ClInclude Include="src\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\ItemEnumPair.h" />
-    <ClInclude Include="src\Logic\LogicHandler.h" />
     <ClInclude Include="src\LuaHandler.h" />
-    <ClInclude Include="src\Misc\Misc.h" />
-    <ClInclude Include="src\Objects\AIObject\AIObject.h" />
-    <ClInclude Include="src\Objects\Camera\Camera.h" />
-    <ClInclude Include="src\Objects\Moveable\Moveable.h" />
-    <ClInclude Include="src\Objects\NamedBase.h" />
-    <ClInclude Include="src\Objects\ObjectIDs.h" />
-    <ClInclude Include="src\Objects\ObjectsHandler.h" />
-    <ClInclude Include="src\Objects\Sink\Sink.h" />
-    <ClInclude Include="src\Objects\SoundSource\SoundSource.h" />
-    <ClInclude Include="src\Objects\Static\Static.h" />
-    <ClInclude Include="src\Position\Position.h" />
     <ClInclude Include="src\ReservedScriptNames.h" />
-    <ClInclude Include="src\Rotation\Rotation.h" />
     <ClInclude Include="src\ScriptAssert.h" />
     <ClInclude Include="src\ScriptInterfaceState.h" />
     <ClInclude Include="src\ScriptUtil.h" />
-    <ClInclude Include="src\Settings\Settings.h" />
-    <ClInclude Include="src\Strings\DisplayString\DisplayString.h" />
-    <ClInclude Include="src\Strings\StringsHandler.h" />
+    <ClInclude Include="src\TEN\Color\Color.h" />
+    <ClInclude Include="src\TEN\Flow\Animations\Animations.h" />
+    <ClInclude Include="src\TEN\Flow\FlowHandler.h" />
+    <ClInclude Include="src\TEN\Flow\InventoryItem\InventoryItem.h" />
+    <ClInclude Include="src\TEN\Flow\Level\Level.h" />
+    <ClInclude Include="src\TEN\Flow\Mirror\Mirror.h" />
+    <ClInclude Include="src\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="src\TEN\Inventory\InventoryHandler.h" />
+    <ClInclude Include="src\TEN\Logic\LogicHandler.h" />
+    <ClInclude Include="src\TEN\Misc\Misc.h" />
+    <ClInclude Include="src\TEN\Objects\AIObject\AIObject.h" />
+    <ClInclude Include="src\TEN\Objects\Camera\Camera.h" />
+    <ClInclude Include="src\TEN\Objects\Moveable\Moveable.h" />
+    <ClInclude Include="src\TEN\Objects\NamedBase.h" />
+    <ClInclude Include="src\TEN\Objects\ObjectIDs.h" />
+    <ClInclude Include="src\TEN\Objects\ObjectsHandler.h" />
+    <ClInclude Include="src\TEN\Objects\Sink\Sink.h" />
+    <ClInclude Include="src\TEN\Objects\SoundSource\SoundSource.h" />
+    <ClInclude Include="src\TEN\Objects\Static\Static.h" />
+    <ClInclude Include="src\TEN\Position\Position.h" />
+    <ClInclude Include="src\TEN\Rotation\Rotation.h" />
+    <ClInclude Include="src\TEN\Settings\Settings.h" />
+    <ClInclude Include="src\TEN\Strings\DisplayString\DisplayString.h" />
+    <ClInclude Include="src\TEN\Strings\StringsHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -114,31 +80,31 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Color\Color.cpp" />
-    <ClCompile Include="src\Flow\Animations\Animations.cpp" />
-    <ClCompile Include="src\Flow\FlowHandler.cpp" />
-    <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp" />
-    <ClCompile Include="src\Flow\Level\Level.cpp" />
-    <ClCompile Include="src\Flow\Mirror\Mirror.cpp" />
-    <ClCompile Include="src\Flow\SkyLayer\SkyLayer.cpp" />
-    <ClCompile Include="src\Inventory\InventoryHandler.cpp" />
-    <ClCompile Include="src\Logic\LogicHandler.cpp" />
-    <ClCompile Include="src\Misc\Misc.cpp" />
-    <ClCompile Include="src\Objects\AIObject\AIObject.cpp" />
-    <ClCompile Include="src\Objects\Camera\Camera.cpp" />
-    <ClCompile Include="src\Objects\Moveable\Moveable.cpp" />
-    <ClCompile Include="src\Objects\ObjectsHandler.cpp" />
-    <ClCompile Include="src\Objects\Sink\Sink.cpp" />
-    <ClCompile Include="src\Objects\SoundSource\SoundSource.cpp" />
-    <ClCompile Include="src\Objects\Static\Static.cpp" />
-    <ClCompile Include="src\Position\Position.cpp" />
-    <ClCompile Include="src\Rotation\Rotation.cpp" />
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
     <ClCompile Include="src\ScriptAssert.cpp" />
-    <ClCompile Include="src\Settings\Settings.cpp" />
-    <ClCompile Include="src\Strings\DisplayString\DisplayString.cpp" />
-    <ClCompile Include="src\Strings\StringsHandler.cpp" />
+    <ClCompile Include="src\TEN\Color\Color.cpp" />
+    <ClCompile Include="src\TEN\Flow\Animations\Animations.cpp" />
+    <ClCompile Include="src\TEN\Flow\FlowHandler.cpp" />
+    <ClCompile Include="src\TEN\Flow\InventoryItem\InventoryItem.cpp" />
+    <ClCompile Include="src\TEN\Flow\Level\Level.cpp" />
+    <ClCompile Include="src\TEN\Flow\Mirror\Mirror.cpp" />
+    <ClCompile Include="src\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="src\TEN\Inventory\InventoryHandler.cpp" />
+    <ClCompile Include="src\TEN\Logic\LogicHandler.cpp" />
+    <ClCompile Include="src\TEN\Misc\Misc.cpp" />
+    <ClCompile Include="src\TEN\Objects\AIObject\AIObject.cpp" />
+    <ClCompile Include="src\TEN\Objects\Camera\Camera.cpp" />
+    <ClCompile Include="src\TEN\Objects\Moveable\Moveable.cpp" />
+    <ClCompile Include="src\TEN\Objects\ObjectsHandler.cpp" />
+    <ClCompile Include="src\TEN\Objects\Sink\Sink.cpp" />
+    <ClCompile Include="src\TEN\Objects\SoundSource\SoundSource.cpp" />
+    <ClCompile Include="src\TEN\Objects\Static\Static.cpp" />
+    <ClCompile Include="src\TEN\Position\Position.cpp" />
+    <ClCompile Include="src\TEN\Rotation\Rotation.cpp" />
+    <ClCompile Include="src\TEN\Settings\Settings.cpp" />
+    <ClCompile Include="src\TEN\Strings\DisplayString\DisplayString.cpp" />
+    <ClCompile Include="src\TEN\Strings\StringsHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -221,7 +187,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting;$(SolutionDir)Scripting\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting;$(SolutionDir)Scripting\src;$(SolutionDir)Scripting\src\TEN</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -243,7 +209,7 @@
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>frameworkandsol.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting;$(SolutionDir)Scripting\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common;$(SolutionDir)Common\Game;$(SolutionDir)Common\Game\pickup;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting;$(SolutionDir)Scripting\include;$(SolutionDir)Scripting\include\Scripting;$(SolutionDir)Scripting\src;$(SolutionDir)Scripting\src\TEN</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
