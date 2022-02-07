@@ -807,20 +807,23 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 	short angle1 = angle + ANGLE(15.0f);
 	short angle2 = angle - ANGLE(15.0f);
 
-	auto start = GAME_VECTOR(item->pos.xPos,
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos,
-							item->roomNumber);
+	auto start = GAME_VECTOR(
+		item->pos.xPos,
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle1),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle1),
-							item->roomNumber);
+	auto end1 = GAME_VECTOR(
+		item->pos.xPos + dist * phd_sin(angle1),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angle1),
+		item->roomNumber);
 
-	auto end2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(angle2),
-							item->pos.yPos - STEPUP_HEIGHT,
-							item->pos.zPos + dist * phd_cos(angle2),
-							item->roomNumber);
+	auto end2 = GAME_VECTOR(
+		item->pos.xPos + dist * phd_sin(angle2),
+		item->pos.yPos - STEPUP_HEIGHT,
+		item->pos.zPos + dist * phd_cos(angle2),
+		item->roomNumber);
 
 	bool result1 = LOS(&start, &end1);
 	bool result2 = LOS(&start, &end2);
@@ -830,25 +833,29 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 {
-	auto start1 = GAME_VECTOR(item->pos.xPos,
-						    item->pos.yPos - LARA_HEADROOM,
-						    item->pos.zPos,
-						    item->roomNumber);
+	auto start1 = GAME_VECTOR(
+		item->pos.xPos,
+		item->pos.yPos - LARA_HEADROOM,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto start2 = GAME_VECTOR(item->pos.xPos,
-						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
-						    item->pos.zPos,
-						    item->roomNumber);
+	auto start2 = GAME_VECTOR(
+		item->pos.xPos,
+		item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
+		item->pos.zPos,
+		item->roomNumber);
 	
-	auto end1 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
-						    item->pos.yPos - LARA_HEADROOM,
-						    item->pos.zPos + dist * phd_cos(ang),
-						    item->roomNumber);
+	auto end1 = GAME_VECTOR(
+		item->pos.xPos + dist * phd_sin(ang),
+		item->pos.yPos - LARA_HEADROOM,
+		item->pos.zPos + dist * phd_cos(ang),
+		item->roomNumber);
 
-	auto end2 = GAME_VECTOR(item->pos.xPos + dist * phd_sin(ang),
-						    item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
-						    item->pos.zPos + dist * phd_cos(ang),
-						    item->roomNumber);
+	auto end2 = GAME_VECTOR(
+		item->pos.xPos + dist * phd_sin(ang),
+		item->pos.yPos - LARA_HEIGHT + LARA_HEADROOM,
+		item->pos.zPos + dist * phd_cos(ang),
+		item->roomNumber);
 
 	auto result1 = LOS(&start1, &end1);
 	auto result2 = LOS(&start2, &end2);
@@ -1134,6 +1141,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	item->fallspeed = 0;
 	info->gunStatus = LG_HANDS_BUSY;
 	info->waterStatus = LW_ABOVE_WATER;
+	info->turnRate = 0;
 
 	return true;
 }
@@ -1356,41 +1364,47 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
-	auto start1 = GAME_VECTOR(item->pos.xPos,
-							  y + testSetup.UpperFloorBound - 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start1 = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.UpperFloorBound - 1,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end1 = GAME_VECTOR(probe.Coordinates.x,
-							y + testSetup.UpperFloorBound - 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end1 = GAME_VECTOR(
+		probe.Coordinates.x,
+		y + testSetup.UpperFloorBound - 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	auto start2 = GAME_VECTOR(item->pos.xPos,
-							  y - coll->Setup.Height + 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start2 = GAME_VECTOR(
+		item->pos.xPos,
+		y - coll->Setup.Height + 1,
+		item->pos.zPos,
+		 item->roomNumber);
 
-	auto end2 = GAME_VECTOR(probe.Coordinates.x,
-							probe.Coordinates.y + 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end2 = GAME_VECTOR(
+		probe.Coordinates.x,
+		probe.Coordinates.y + 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	// Conduct "ray" test at upper floor bound.
-	if (!LOS(&start1, &end1))
+	// Discard walls.
+	if (probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// Conduct "ray" test at lowest ceiling bound.
-	if (!LOS(&start2, &end2))
+	// No slope or death sector (if applicable).
+	if (isSlopeDown || isSlopeUp || isDeath)
+		return false;
+
+	// Conduct "ray" test at upper floor bound and lowest ceiling bound.
+	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
 	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&					// Within lower floor bound.
 		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&					// Within upper floor bound.
 		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height &&	// Space is not a clamp.
-		!isSlopeDown && !isSlopeUp && !isDeath &&									// No slope or death sector (if applicable).
-		probe.Position.Floor != NO_HEIGHT)
+		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height)	// Space is not a clamp.
 	{
 		return true;
 	}
@@ -1549,41 +1563,47 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
 	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
 
-	auto start1 = GAME_VECTOR(item->pos.xPos,
-							  y + testSetup.UpperFloorBound - 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start1 = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.UpperFloorBound - 1,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end1 = GAME_VECTOR(probe.Coordinates.x,
-							y + testSetup.UpperFloorBound - 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end1 = GAME_VECTOR(
+		probe.Coordinates.x,
+		y + testSetup.UpperFloorBound - 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	auto start2 = GAME_VECTOR(item->pos.xPos,
-							  y - LARA_HEIGHT_CRAWL + 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start2 = GAME_VECTOR(
+		item->pos.xPos,
+		y - LARA_HEIGHT_CRAWL + 1,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end2 = GAME_VECTOR(probe.Coordinates.x,
-							probe.Coordinates.y + 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end2 = GAME_VECTOR(
+		probe.Coordinates.x,
+		probe.Coordinates.y + 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	// Conduct "ray" test at upper floor bound.
-	if (!LOS(&start1, &end1))
+	// Discard walls.
+	if (probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	// Conduct "ray" test at lowest ceiling bound.
-	if (!LOS(&start2, &end2))
+	// No slope or death sector (if applicable).
+	if (isSlopeDown || isSlopeUp || isDeath)
+		return false;
+
+	// Conduct "ray" test at upper floor bound and lowest ceiling bound.
+	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
-	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&					// Within lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&					// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&						// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL &&	// Space is not a clamp.
-		!isSlopeDown && !isSlopeUp && !isDeath &&									// No slope or death sector (if applicable).
-		probe.Position.Floor != NO_HEIGHT)
+	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&				// Within lower floor bound.
+		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&				// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&					// Within lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL)	// Space is not a clamp.
 	{
 		return true;
 	}
@@ -1659,32 +1679,40 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	int dist = OFFSET_RADIUS(coll->Setup.Radius);
 	auto probe = GetCollisionResult(item, testSetup.Angle, dist);
 
-	auto start1 = GAME_VECTOR(item->pos.xPos,
-							  y + testSetup.LowerCeilingBound + 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start1 = GAME_VECTOR(
+		item->pos.xPos,
+		y + testSetup.LowerCeilingBound + 1,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end1 = GAME_VECTOR(probe.Coordinates.x,
-							probe.Coordinates.y - LARA_HEIGHT_MONKEY + testSetup.LowerCeilingBound + 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end1 = GAME_VECTOR(
+		probe.Coordinates.x,
+		probe.Coordinates.y - LARA_HEIGHT_MONKEY + testSetup.LowerCeilingBound + 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	auto start2 = GAME_VECTOR(item->pos.xPos,
-							  y + LARA_HEIGHT_MONKEY - 1,
-							  item->pos.zPos,
-							  item->roomNumber);
+	auto start2 = GAME_VECTOR(
+		item->pos.xPos,
+		y + LARA_HEIGHT_MONKEY - 1,
+		item->pos.zPos,
+		item->roomNumber);
 
-	auto end2 = GAME_VECTOR(probe.Coordinates.x,
-							probe.Coordinates.y - 1,
-							probe.Coordinates.z,
-							item->roomNumber);
+	auto end2 = GAME_VECTOR(
+		probe.Coordinates.x,
+		probe.Coordinates.y - 1,
+		probe.Coordinates.z,
+		item->roomNumber);
 
-	// Conduct "ray" test at lower ceiling bound.
-	if (!LOS(&start1, &end1))
+	// Discard walls.
+	if (probe.Position.Ceiling == NO_HEIGHT)
 		return false;
 
-	// Conduct "ray" test at lowest floor bound.
-	if (!LOS(&start2, &end2))
+	// No ceiling slope.
+	if (probe.Position.CeilingSlope)
+		return false;
+
+	// Conduct "ray" test at lower ceiling bound and highest floor bound.
+	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
 	// Assess move feasibility to location ahead.
@@ -1692,9 +1720,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Within highest floor bound.
 		(probe.Position.Ceiling - y) <= testSetup.LowerCeilingBound &&				// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= testSetup.UpperCeilingBound &&				// Within upper ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY &&	// Space is not a clamp.
-		!probe.Position.CeilingSlope &&												// No ceiling slope.
-		probe.Position.Ceiling != NO_HEIGHT)
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY)	// Space is not a clamp.
 	{
 		return true;
 	}
@@ -1764,6 +1790,10 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 	auto probeMiddle = GetCollisionResult(item);
 
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
+	
+	// Swamp depth is permissive (if applicable).
+	if (swampTooDeep)
+		return VaultTestResult{ false };
 
 	// HACK: Where the probe finds that the wall in front is formed by a ceiling or the space between the floor and ceiling is a clamp,
 	// any climable floor in a room above will be missed.
@@ -1778,14 +1808,16 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 		yOffset -= std::max<int>(CLICK(0.5f), testSetup.ClampMin);
 	}
 
+	// Discard walls.
+	if (probeFront.Position.Floor == NO_HEIGHT)
+		return VaultTestResult{ false };
+
 	// Assess vault candidate location.
 	if ((probeFront.Position.Floor - y) < testSetup.LowerCeilingBound &&						// Within lower floor bound.
 		(probeFront.Position.Floor - y) >= testSetup.UpperCeilingBound &&						// Within upper floor bound.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Within clamp min.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMax &&	// Within clamp max.
-		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive.
-		!swampTooDeep &&																		// Swamp depth is permissive.
-		probeFront.Position.Floor != NO_HEIGHT)
+		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= testSetup.GapMin)		// Gap is optically permissive.
 	{
 		return VaultTestResult{ true, probeFront.Position.Floor };
 	}
@@ -2116,6 +2148,15 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTes
 	bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;
 	bool isDeath = testSetup.CheckDeath ? probeB.Block->Flags.Death : false;
 
+	// Discard walls.
+	if (probeA.Position.Floor == NO_HEIGHT || probeB.Position.Floor == NO_HEIGHT)
+		return false;
+
+	// No slope or death sector (if applicable).
+	if (isSlope || isDeath)
+		return false;
+
+	// Assess crawl vault feasibility to location ahead.
 	if ((probeA.Position.Floor - y) <= testSetup.LowerFloorBound &&								// Within lower floor bound.
 		(probeA.Position.Floor - y) >= testSetup.UpperFloorBound &&								// Within upper floor bound.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > testSetup.ClampMin &&			// Crossing clamp limit.
@@ -2123,9 +2164,7 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTes
 		abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= testSetup.GapMin &&		// Gap is optically permissive (going up).
 		abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&		// Gap is optically permissive (going down).
 		abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.MaxProbeHeightDif &&	// Crossing/destination floor height difference suggests continuous crawl surface.
-		(probeA.Position.Ceiling - y) < -testSetup.GapMin &&									// Ceiling height is permissive.
-		!isSlope && !isDeath &&																	// No slope or death sector.
-		probeA.Position.Floor != NO_HEIGHT && probeB.Position.Floor != NO_HEIGHT)
+		(probeA.Position.Ceiling - y) < -testSetup.GapMin)										// Ceiling height is permissive.
 	{
 		return true;
 	}
@@ -2226,7 +2265,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & (IN_ACTION | IN_JUMP)))
-		return CrawlVaultTestResult{ false, (LARA_STATE)-1 };
+		return CrawlVaultTestResult{ false };
 
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
@@ -2250,7 +2289,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraCrawlDownStep(item, coll))
 		return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
 
-	return CrawlVaultTestResult{ false, (LARA_STATE)-1 };
+	return CrawlVaultTestResult{ false };
 }
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testSetup)
@@ -2260,16 +2299,23 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 	int y = item->pos.yPos;
 	auto probe = GetCollisionResult(item, testSetup.Angle, testSetup.Dist, -coll->Setup.Height);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 	bool isWading = testSetup.CheckWadeStatus ? (info->waterStatus == LW_WADE) : false;
 
+	// Discard walls.
+	if (probe.Position.Floor == NO_HEIGHT)
+		return false;
+
+	// No swamp and not wading (if applicable).
+	if (isSwamp || isWading)
+		return false;
+
+	// Assess jump feasibility toward location ahead.
 	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Dist) &&						// Avoid jumping through corners.
 		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
-				(probe.Position.Floor - y) >= CLICK(0.5f))) &&										// AND there is a drop below.
-		!isWading &&																		// Not wading in water (if applicable).
-		!TestEnvironment(ENV_FLAG_SWAMP, item) &&											// No swamp.
-		probe.Position.Floor != NO_HEIGHT)
+				(probe.Position.Floor - y) >= CLICK(0.5f))))										// AND there is a drop below.
 	{
 		return true;
 	}
