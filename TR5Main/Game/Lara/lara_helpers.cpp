@@ -5,12 +5,22 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_collide.h"
 #include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+#include "Objects/TR2/Vehicles/snowmobile.h"
+#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
+#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/upv.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -396,4 +406,60 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		info->turnRate = 0;
 	item->pos.yRot += info->turnRate;
+}
+
+void HandleLaraVehicles(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	if (info->Vehicle != NO_ITEM)
+	{
+		switch (g_Level.Items[info->Vehicle].objectNumber)
+		{
+		case ID_QUAD:
+			if (QuadBikeControl(item, coll))
+				return;
+			break;
+
+		case ID_JEEP:
+			if (JeepControl())
+				return;
+			break;
+
+		case ID_MOTORBIKE:
+			if (MotorbikeControl())
+				return;
+			break;
+
+		case ID_KAYAK:
+			if (KayakControl(item))
+				return;
+			break;
+
+		case ID_SNOWMOBILE:
+			if (SkidooControl(item, coll))
+				return;
+			break;
+
+		case ID_UPV:
+			if (SubControl(item, coll))
+				return;
+			break;
+
+		case ID_MINECART:
+			if (MineCartControl())
+				return;
+			break;
+
+		case ID_BIGGUN:
+			if (BigGunControl(item, coll))
+				return;
+			break;
+
+		// Boats are processed like normal items in loop.
+		default:
+			LaraGun(item);
+			return;
+		}
+	}
 }
