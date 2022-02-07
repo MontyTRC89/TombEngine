@@ -29,7 +29,7 @@ associated getters and setters.
 	@tparam ItemAction action is this usable, equippable, or examinable?
 	@return an InventoryObject
 */
-InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
+InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },
 	slot{ a_slot.m_pair.second },
 	yOffset{ a_yOffset },
@@ -44,7 +44,7 @@ InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, sho
 void InventoryItem::Register(sol::table & parent)
 {
 	parent.new_usertype<InventoryItem>("InventoryObject",
-		sol::constructors<InventoryItem(std::string const &, ItemEnumPair, short, float, GameScriptRotation const &, RotationFlags, int, ItemOptions), InventoryItem()>(),
+		sol::constructors<InventoryItem(std::string const &, ItemEnumPair, short, float, Rotation const &, RotationFlags, int, ItemOptions), InventoryItem()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
 */

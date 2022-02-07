@@ -1,32 +1,32 @@
 #include "frameworkandsol.h"
-#include "GameScriptRotation.h"
+#include "Rotation.h"
 #include "Specific/phd_global.h"
 
 /*** Represents a rotation.
 Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
 All values will be clamped to [-32768, 32767].
-@miscclass Rotation
+@tenclass Rotation
 @pragma nostrip
 */
 
-void GameScriptRotation::Register(sol::state* state)
+void Rotation::Register(sol::table & parent)
 {
-	state->new_usertype<GameScriptRotation>("Rotation",
-		sol::constructors<GameScriptRotation(int, int, int)>(),
-		sol::meta_function::to_string, &GameScriptRotation::ToString,
+	parent.new_usertype<Rotation>("Rotation",
+		sol::constructors<Rotation(int, int, int)>(),
+		sol::meta_function::to_string, &Rotation::ToString,
 
 /// (int) rotation about x axis
 //@mem x
-		"x", &GameScriptRotation::x,
+		"x", &Rotation::x,
 
 /// (int) rotation about x axis
 //@mem y
-		"y", &GameScriptRotation::y,
+		"y", &Rotation::y,
 
 /// (int) rotation about x axis
 //@mem z
-		"z", &GameScriptRotation::z
+		"z", &Rotation::z
 	);
 }
 
@@ -37,21 +37,21 @@ void GameScriptRotation::Register(sol::state* state)
 @return A Rotation object.
 @function Rotation.new
 */
-GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
+Rotation::Rotation(int aX, int aY, int aZ)
 {
 	x = aX;
 	y = aY;
 	z = aZ;
 }
 
-void GameScriptRotation::StoreInPHDPos(PHD_3DPOS& pos) const
+void Rotation::StoreInPHDPos(PHD_3DPOS& pos) const
 {
 	pos.xRot = x;
 	pos.yRot = y;
 	pos.zRot = z;
 }
 
-GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
+Rotation::Rotation(PHD_3DPOS const & pos)
 {
 	x = pos.xRot;
 	y = pos.yRot;
@@ -63,7 +63,7 @@ GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
 @treturn string A string showing the x, y, and z values of the rotation
 @function __tostring
 */
-std::string GameScriptRotation::ToString() const
+std::string Rotation::ToString() const
 {
 	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
 }

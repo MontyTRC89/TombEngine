@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include "Color/Color.h"
 #include "GameScriptPosition.h"
-#include "GameScriptRotation.h"
+#include "Rotation/Rotation.h"
 #include "Strings/StringsHandler.h"
 
 struct LuaFunction {
