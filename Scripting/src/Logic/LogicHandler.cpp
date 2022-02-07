@@ -24,7 +24,7 @@ using namespace TEN::Effects::Lightning;
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@tentable Logic
+@tentable Misc 
 @pragma nostrip
 */
 
@@ -39,9 +39,6 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ l
 	ResetLevelTables();
 
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
-	
-	Position::Register(m_lua);
-	GameScriptFreeFunctions::Register(m_lua);
 
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
