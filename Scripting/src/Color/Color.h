@@ -8,13 +8,13 @@ namespace sol {
 	template <typename T> struct as_table_t;
 }
 
-class GameScriptColor {
+class ScriptColor {
 public:
-	GameScriptColor(byte r, byte g, byte b);
-	GameScriptColor(byte r, byte g, byte b, byte a);
-	GameScriptColor(Vector3 const &);
-	GameScriptColor(Vector4 const &);
-	GameScriptColor(D3DCOLOR);
+	ScriptColor(byte r, byte g, byte b);
+	ScriptColor(byte r, byte g, byte b, byte a);
+	ScriptColor(Vector3 const &);
+	ScriptColor(Vector4 const &);
+	ScriptColor(D3DCOLOR);
 
 	operator Vector3() const;
 	operator Vector4() const;
