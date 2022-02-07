@@ -131,24 +131,28 @@ namespace GameScriptFreeFunctions {
 	}
 
 
-	void Register(sol::state* lua) {
+	void Register(sol::state * state, sol::table & parent) {
+		sol::table table_misc{ state->lua_state(), sol::create };
+		parent.set(ScriptReserved_Inventory, table_misc);
+
+
 		///Set and play an ambient track
 		//@function SetAmbientTrack
 		//@tparam string name of track (without file extension) to play
-		lua->set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
+		table_misc.set_function(ScriptReserved_SetAmbientTrack, &SetAmbientTrack);
 
 		/// Play an audio track
 		//@function PlayAudioTrack
 		//@tparam string name of track (without file extension) to play
 		//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
-		lua->set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
 		//@tparam Position posA first position
 		//@tparam Position posB second position
 		//@treturn int the direct distance from one position to the other
-		lua->set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
+		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 		
 		///Calculate the horizontal distance between two positions.
@@ -156,7 +160,7 @@ namespace GameScriptFreeFunctions {
 		//@tparam Position posA first position
 		//@tparam Position posB second position
 		//@treturn int the direct distance on the XZ plane from one position to the other
-		lua->set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
+		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 
 
 		///Translate a pair of percentages to screen-space pixel coordinates.
@@ -166,7 +170,7 @@ namespace GameScriptFreeFunctions {
 		//@tparam float y percent value to translate to y-coordinate
 		//@treturn int x x coordinate in pixels
 		//@treturn int y y coordinate in pixels
-		lua->set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 
 
 		///Translate a pair of coordinates to percentages of window dimensions.
@@ -176,6 +180,6 @@ namespace GameScriptFreeFunctions {
 		//@tparam int y pixel value to translate to a percentage of the window height
 		//@treturn float x coordinate as percentage
 		//@treturn float y coordinate as percentage
-		lua->set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 	}
 }
