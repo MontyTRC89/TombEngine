@@ -105,7 +105,7 @@ Specify which translations in the strings table correspond to which languages.
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
 	InventoryItem::Register(table_flow);
-	GameScriptSettings::Register(m_lua);
+	Settings::Register(m_lua);
 	Animations::Register(table_flow);
 	GameScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
@@ -137,7 +137,7 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 	m_translationsMap = std::move(src);
 }
 
-void FlowHandler::SetSettings(GameScriptSettings const & src)
+void FlowHandler::SetSettings(Settings const & src)
 {
 	m_settings = src;
 }
@@ -197,7 +197,7 @@ char const * FlowHandler::GetString(const char* id) const
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
 
-GameScriptSettings* FlowHandler::GetSettings()
+Settings* FlowHandler::GetSettings()
 {
 	return &m_settings;
 }
