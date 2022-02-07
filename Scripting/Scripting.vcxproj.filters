@@ -15,19 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\GameScriptPosition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="frameworkandsol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptRotation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ScriptUtil.h">
@@ -36,97 +27,16 @@
     <ClInclude Include="include\ScriptAssert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameScriptNamedBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptAIObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptInventoryObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ItemEnumPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameScriptAudioTrack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptSkyLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptSinkInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptMirror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptDisplayString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ReservedScriptNames.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptSoundSourceInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameScriptLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ScriptInterfaceLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ScriptInterfaceGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptAIObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptAudioTrack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptDisplayString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptInventoryObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptLevel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptMeshInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptMirror.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptNamedBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptPosition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptRotation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptSinkInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptSkyLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptSoundSourceInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\ItemEnumPair.h">
@@ -147,19 +57,7 @@
     <ClInclude Include="include\Scripting\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptAnimations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameScriptFreeFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameLogicScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scripting\LuaHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scripting\GameFlowScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\InventorySlots.h">
@@ -198,85 +96,85 @@
     <ClInclude Include="src\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Strings\StringsHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scripting\Strings\ScriptInterfaceStringsHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\ObjectIDs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\ObjectsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Scripting\Objects\ScriptInterfaceObjectsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\Moveable\Moveable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\AIObject\AIObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Static\Static.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Strings\DisplayString\DisplayString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Logic\LogicHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Camera\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\NamedBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Sink\Sink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\SoundSource\SoundSource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Flow\FlowHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scripting\Flow\ScriptInterfaceFlowHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inventory\InventoryHandler.h">
+    <ClInclude Include="src\TEN\Color\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flow\Animations\Animations.h">
+    <ClInclude Include="src\TEN\Flow\Animations\Animations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flow\InventoryItem\InventoryItem.h">
+    <ClInclude Include="src\TEN\Flow\InventoryItem\InventoryItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flow\Level\Level.h">
+    <ClInclude Include="src\TEN\Flow\Level\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flow\Mirror\Mirror.h">
+    <ClInclude Include="src\TEN\Flow\Mirror\Mirror.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flow\SkyLayer\SkyLayer.h">
+    <ClInclude Include="src\TEN\Flow\SkyLayer\SkyLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Settings\Settings.h">
+    <ClInclude Include="src\TEN\Flow\FlowHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Color\Color.h">
+    <ClInclude Include="src\TEN\Inventory\InventoryHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rotation\Rotation.h">
+    <ClInclude Include="src\TEN\Logic\LogicHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Position\Position.h">
+    <ClInclude Include="src\TEN\Misc\Misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Misc\Misc.h">
+    <ClInclude Include="src\TEN\Objects\AIObject\AIObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\Camera\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\Moveable\Moveable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\Sink\Sink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\SoundSource\SoundSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\Static\Static.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\NamedBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\ObjectIDs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Objects\ObjectsHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Position\Position.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Rotation\Rotation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Settings\Settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Strings\DisplayString\DisplayString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEN\Strings\StringsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -293,70 +191,70 @@
     <ClCompile Include="src\ScriptInterfaceState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Strings\StringsHandler.cpp">
+    <ClCompile Include="src\TEN\Color\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\ObjectsHandler.cpp">
+    <ClCompile Include="src\TEN\Flow\Animations\Animations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Moveable\Moveable.cpp">
+    <ClCompile Include="src\TEN\Flow\InventoryItem\InventoryItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\AIObject\AIObject.cpp">
+    <ClCompile Include="src\TEN\Flow\Level\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Static\Static.cpp">
+    <ClCompile Include="src\TEN\Flow\Mirror\Mirror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Strings\DisplayString\DisplayString.cpp">
+    <ClCompile Include="src\TEN\Flow\SkyLayer\SkyLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logic\LogicHandler.cpp">
+    <ClCompile Include="src\TEN\Flow\FlowHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Camera\Camera.cpp">
+    <ClCompile Include="src\TEN\Inventory\InventoryHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Sink\Sink.cpp">
+    <ClCompile Include="src\TEN\Logic\LogicHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\SoundSource\SoundSource.cpp">
+    <ClCompile Include="src\TEN\Misc\Misc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\FlowHandler.cpp">
+    <ClCompile Include="src\TEN\Objects\AIObject\AIObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inventory\InventoryHandler.cpp">
+    <ClCompile Include="src\TEN\Objects\Camera\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\Animations\Animations.cpp">
+    <ClCompile Include="src\TEN\Objects\Moveable\Moveable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\InventoryItem\InventoryItem.cpp">
+    <ClCompile Include="src\TEN\Objects\Sink\Sink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\Level\Level.cpp">
+    <ClCompile Include="src\TEN\Objects\SoundSource\SoundSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\Mirror\Mirror.cpp">
+    <ClCompile Include="src\TEN\Objects\Static\Static.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flow\SkyLayer\SkyLayer.cpp">
+    <ClCompile Include="src\TEN\Objects\ObjectsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Settings\Settings.cpp">
+    <ClCompile Include="src\TEN\Position\Position.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Color\Color.cpp">
+    <ClCompile Include="src\TEN\Rotation\Rotation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rotation\Rotation.cpp">
+    <ClCompile Include="src\TEN\Settings\Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Position\Position.cpp">
+    <ClCompile Include="src\TEN\Strings\DisplayString\DisplayString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Misc\Misc.cpp">
+    <ClCompile Include="src\TEN\Strings\StringsHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
