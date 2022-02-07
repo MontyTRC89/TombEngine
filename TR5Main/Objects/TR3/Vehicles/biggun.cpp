@@ -79,7 +79,7 @@ static bool BigGunTestMount(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		Lara.gunStatus != LG_HANDS_FREE ||
-		laraItem->airborne) // BUG: Lara can still mount when jumping up. @Sezz 2021.11.16
+		laraItem->airborne)
 	{
 		return false;
 	}
@@ -87,8 +87,9 @@ static bool BigGunTestMount(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 	int x = laraItem->pos.xPos - bGunItem->pos.xPos;
 	int y = laraItem->pos.yPos - bGunItem->pos.yPos;
 	int z = laraItem->pos.zPos - bGunItem->pos.zPos;
-	int dist = pow(x, 2) + pow(y, 2) + pow(z, 2);
-	if (dist > 30000)
+
+	int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+	if (distance > 30000)
 		return false;
 
 	short deltaAngle = abs(laraItem->pos.yRot - bGunItem->pos.yRot);

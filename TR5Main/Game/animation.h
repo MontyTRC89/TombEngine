@@ -68,6 +68,7 @@ struct BONE_MUTATOR
 	bool IsEmpty() { return (Scale == Vector3::One) && (Offset == Vector3::Zero) && (Rotation == Vector3::Zero); };
 };
 
+void AnimateLara(ITEM_INFO* item);
 void AnimateItem(ITEM_INFO* item);
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);
 void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart = 0);
@@ -81,7 +82,7 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
 BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
-void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum);
+void GetLaraJointPosition(PHD_VECTOR* pos, int laraMeshIndex);
 void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint);
 void ClampRotation(PHD_3DPOS* pos, short angle, short rot); 
 bool TestLastFrame(ITEM_INFO* item, int animNumber = -1);

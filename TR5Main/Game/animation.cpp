@@ -6,14 +6,197 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+
+#include "Objects/Generic/Object/rope.h"
+
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Entities::Generic;
 using TEN::Renderer::g_Renderer;
 
 BOUNDING_BOX InterpolatedBounds;
+
+void AnimateLara(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+
+	item->frameNumber++;
+
+	auto* anim = &g_Level.Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &g_Level.Anims[item->animNumber];
+		item->activeState = anim->activeState;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			short* cmd = &g_Level.Commands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*(cmd++))
+				{
+				case COMMAND_MOVE_ORIGIN:
+					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
+					cmd += 3;
+					break;
+
+				case COMMAND_JUMP_VELOCITY:
+					item->fallspeed = *(cmd++);
+					item->speed = *(cmd++);
+					item->airborne = true;
+					if (info->calcJumpVelocity)
+					{
+						item->fallspeed = info->calcJumpVelocity;
+						info->calcJumpVelocity = 0;
+					}
+					break;
+
+				case COMMAND_ATTACK_READY:
+					if (info->gunStatus != LG_SPECIAL)
+						info->gunStatus = LG_HANDS_FREE;
+					break;
+
+				case COMMAND_SOUND_FX:
+				case COMMAND_EFFECT:
+					cmd += 2;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+
+		anim = &g_Level.Anims[item->animNumber];
+		item->activeState = anim->activeState;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		short* cmd = &g_Level.Commands[anim->commandIndex];
+		int flags;
+		int effectID = 0;
+
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*(cmd++))
+			{
+			case COMMAND_MOVE_ORIGIN:
+				cmd += 3;
+				break;
+
+			case COMMAND_JUMP_VELOCITY:
+				cmd += 2;
+				break;
+
+			case COMMAND_SOUND_FX:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				flags = cmd[1] & 0xC000;
+				if (flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
+					(flags == (int)SOUND_PLAYCONDITION::Land && (info->waterSurfaceDist >= 0 || info->waterSurfaceDist == NO_HEIGHT)) ||
+					(flags == (int)SOUND_PLAYCONDITION::Water && info->waterSurfaceDist < 0 && info->waterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+				{
+					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+				}
+
+				cmd += 2;
+				break;
+
+			case COMMAND_EFFECT:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				effectID = cmd[1] & 0x3FFF;
+				DoFlipEffect(effectID, item);
+
+				cmd += 2;
+				break;
+
+			default:
+				break;
+
+			}
+		}
+	}
+
+	int lateral = anim->Xvelocity;
+	if (anim->Xacceleration)
+		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
+	lateral >>= 16;
+
+	if (item->airborne)
+	{
+		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		{
+			item->speed -= item->speed >> 3;
+			if (abs(item->speed) < 8)
+			{
+				item->speed = 0;
+				item->airborne = false;
+			}
+			if (item->fallspeed > 128)
+				item->fallspeed /= 2;
+			item->fallspeed -= item->fallspeed / 4;
+			if (item->fallspeed < 4)
+				item->fallspeed = 4;
+			item->pos.yPos += item->fallspeed;
+		}
+		else
+		{
+			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
+			item->speed -= velocity >> 16;
+			item->speed += (velocity + anim->acceleration) >> 16;
+			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
+			item->pos.yPos += item->fallspeed;
+		}
+	}
+	else
+	{
+		int velocity;
+
+		if (info->waterStatus == LW_WADE && TestEnvironment(ENV_FLAG_SWAMP, item))
+		{
+			velocity = (anim->velocity >> 1);
+			if (anim->acceleration)
+				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
+		}
+		else
+		{
+			velocity = anim->velocity;
+			if (anim->acceleration)
+				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		}
+
+		item->speed = velocity >> 16;
+	}
+
+	if (info->ropePtr != -1)
+		DelAlignLaraToRope(item);
+
+	if (!info->isMoving)
+		MoveItem(item, info->moveAngle, item->speed, lateral);
+
+	// Update matrices
+	g_Renderer.updateLaraAnimations(true);
+}
 
 void AnimateItem(ITEM_INFO* item)
 {
@@ -22,13 +205,12 @@ void AnimateItem(ITEM_INFO* item)
 
 	item->frameNumber++;
 
-	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	auto* anim = &g_Level.Anims[item->animNumber];
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
 		anim = &g_Level.Anims[item->animNumber];
 
 		item->activeState = anim->activeState;
-
 		if (item->requiredState == item->activeState)
 			item->requiredState = 0;
 	}
@@ -58,6 +240,7 @@ void AnimateItem(ITEM_INFO* item)
 						item->afterDeath = 1;
 					item->status = ITEM_DEACTIVATED;
 					break;
+
 				case COMMAND_SOUND_FX:
 				case COMMAND_EFFECT:
 					cmd += 2;
@@ -73,7 +256,6 @@ void AnimateItem(ITEM_INFO* item)
 		item->frameNumber = anim->jumpFrameNum;
 
 		anim = &g_Level.Anims[item->animNumber];
-
 		if (item->activeState != anim->activeState)
 		{
 			item->activeState = anim->activeState;
@@ -136,6 +318,7 @@ void AnimateItem(ITEM_INFO* item)
 					else
 						SoundEffect(cmd[1] & 0x3FFF, &item->pos, 0);
 				}
+
 				break;
 
 			case COMMAND_EFFECT:
@@ -169,6 +352,7 @@ void AnimateItem(ITEM_INFO* item)
 		int velocity = anim->velocity;
 		if (anim->acceleration)
 			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+
 		item->speed = velocity >> 16;
 
 		lateral = anim->Xvelocity;
@@ -180,7 +364,7 @@ void AnimateItem(ITEM_INFO* item)
 
 	MoveItem(item, item->pos.yRot, item->speed, lateral);
 
-	// Update matrices
+	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
 	g_Renderer.updateItemAnimations(itemNumber, true);
 }
@@ -205,17 +389,16 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
-		CHANGE_STRUCT* change = &g_Level.Changes[anim->changeIndex + i];
+		auto* change = &g_Level.Changes[anim->changeIndex + i];
 		if (change->targetState == item->targetState)
 		{
 			for (int j = 0; j < change->numberRanges; j++)
 			{
-				RANGE_STRUCT* range = &g_Level.Ranges[change->rangeIndex + j];
+				auto* range = &g_Level.Ranges[change->rangeIndex + j];
 				if (item->frameNumber >= range->startFrame && item->frameNumber <= range->endFrame)
 				{
 					item->animNumber = range->linkAnimNum;
 					item->frameNumber = range->linkFrameNum;
-
 					return true;
 				}
 			}
@@ -261,26 +444,26 @@ ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
 
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 {
-	ANIM_STRUCT *anim;
-	int frm;
-	int first, second;
-	int interp, rat;
-
-	frm = item->frameNumber;
-	anim = &g_Level.Anims[item->animNumber];
+	int frame = item->frameNumber;
+	auto* anim = &g_Level.Anims[item->animNumber];
 	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
-	rat = *rate = anim->interpolation & 0x00ff;
-	frm -= anim->frameBase; 
-	first = frm / rat;
-	interp = frm % rat;
-	framePtr[0] += first;				  // Get Frame pointers
-	framePtr[1] = framePtr[0] + 1;               // and store away
-	if (interp == 0)
-		return(0);
-	second = first * rat + rat;
-	if (second>anim->frameEnd)                       // Clamp KeyFrame to End if need be
-		*rate = anim->frameEnd - (second - rat);
-	return(interp);
+	int rate2 = *rate = anim->interpolation & 0x00ff;
+	frame -= anim->frameBase; 
+
+	int first = frame / rate2;
+	int interpolation = frame % rate2;
+	framePtr[0] += first;			// Get frame pointers...
+	framePtr[1] = framePtr[0] + 1;	// and store away.
+
+	if (interpolation == 0)
+		return 0;
+
+	// Clamp key frame to end if need be.
+	int second = first * rate2 + rate2;
+	if (second > anim->frameEnd)
+		*rate = anim->frameEnd - (second - rate2);
+
+	return interpolation;
 }
 
 int GetCurrentRelativeFrameNumber(ITEM_INFO* item)
@@ -295,7 +478,7 @@ int GetFrameNumber(ITEM_INFO* item, int frameToStart)
 
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 {
-	return g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart;
+	return (g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart);
 }
 
 int GetFrameCount(int animNumber)
@@ -346,7 +529,7 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 	if (item->animNumber != animNumber)
 		return false;
 
-	ANIM_STRUCT* anim = &g_Level.Anims[animNumber];
+	auto* anim = &g_Level.Anims[animNumber];
 	return (item->frameNumber >= anim->frameEnd);
 }
 
@@ -356,17 +539,17 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
-void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
+void GetLaraJointPosition(PHD_VECTOR* pos, int laraMeshIndex)
 {
-	if (LM_enum >= NUM_LARA_MESHES)
-		LM_enum = LM_HEAD;
+	if (laraMeshIndex >= NUM_LARA_MESHES)
+		laraMeshIndex = LM_HEAD;
 
-	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.getLaraAbsBonePosition(&p, LM_enum);
+	auto pos2 = Vector3(pos->x, pos->y, pos->z);
+	g_Renderer.getLaraAbsBonePosition(&pos2, laraMeshIndex);
 
-	pos->x = p.x;
-	pos->y = p.y;
-	pos->z = p.z;
+	pos->x = pos2.x;
+	pos->y = pos2.y;
+	pos->z = pos2.z;
 }
 
 void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
@@ -379,7 +562,5 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
 			pos->yRot -= rot;
 	}
 	else
-	{
 		pos->yRot += rot;
-	}
 }
