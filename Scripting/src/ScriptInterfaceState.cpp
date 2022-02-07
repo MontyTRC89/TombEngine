@@ -6,7 +6,7 @@
 #include "Strings/StringsHandler.h"
 #include "Inventory/InventoryHandler.h"
 #include "ReservedScriptNames.h"
-#include "GameScriptFreeFunctions.h"
+#include "Misc/Misc.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -46,6 +46,6 @@ void ScriptInterfaceState::Init()
 
 	// Misc handlers not assigned above
 	InventoryHandler::Register(&s_solState, s_rootTable);
-	GameScriptFreeFunctions::Register(&s_solState, s_rootTable);
+	Misc::Register(&s_solState, s_rootTable);
 }
 
