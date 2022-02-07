@@ -8,7 +8,7 @@ namespace sol {
 }
 
 class GameScriptPosition;
-class GameScriptColor;
+class ScriptColor;
 
 class Static : public NamedBase<Static, MESH_INFO &>
 {
@@ -29,8 +29,8 @@ public:
 	void SetName(std::string const & name);
 	int GetStaticNumber() const;
 	void SetStaticNumber(int staticNumber);
-	GameScriptColor GetColor() const;
-	void SetColor(GameScriptColor const & col);
+	ScriptColor GetColor() const;
+	void SetColor(ScriptColor const & col);
 	int GetHP() const;
 	void SetHP(int hp);
 private:

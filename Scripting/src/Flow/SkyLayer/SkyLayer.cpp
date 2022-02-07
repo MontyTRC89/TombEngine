@@ -11,7 +11,7 @@ As seen in TR4's City of the Dead.
 void SkyLayer::Register(sol::table & parent)
 {
 	parent.new_usertype<SkyLayer>("SkyLayer",
-		sol::constructors<SkyLayer(GameScriptColor const &, short)>(),
+		sol::constructors<SkyLayer(ScriptColor const &, short)>(),
 
 /// (@{Color}) RGB sky color
 //@mem color
@@ -37,20 +37,20 @@ Less is more. City of The Dead, for example, uses a speed value of 16.
 @return A SkyLayer object.
 @function SkyLayer.new
 */
-SkyLayer::SkyLayer(GameScriptColor const& col, short speed)
+SkyLayer::SkyLayer(ScriptColor const& col, short speed)
 {
 	SetColor(col);
 	CloudSpeed = speed;
 	Enabled = true;
 }
 
-void SkyLayer::SetColor(GameScriptColor const & col)
+void SkyLayer::SetColor(ScriptColor const & col)
 {
 	R = col.GetR();
 	G = col.GetG();
 	B = col.GetB();
 }
 
-GameScriptColor SkyLayer::GetColor() const {
-	return GameScriptColor{ R, G, B };
+ScriptColor SkyLayer::GetColor() const {
+	return ScriptColor{ R, G, B };
 }

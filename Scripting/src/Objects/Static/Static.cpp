@@ -3,7 +3,7 @@
 #include "ScriptAssert.h"
 #include "Static.h"
 #include "GameScriptPosition.h"
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -112,12 +112,12 @@ void Static::SetStaticNumber(int staticNumber)
 	m_mesh.staticNumber = staticNumber;
 }
 
-GameScriptColor Static::GetColor() const
+ScriptColor Static::GetColor() const
 {
-	return GameScriptColor{ m_mesh.color };
+	return ScriptColor{ m_mesh.color };
 }
 
-void Static::SetColor(GameScriptColor const & col)
+void Static::SetColor(ScriptColor const & col)
 {
 	m_mesh.color = col;
 }

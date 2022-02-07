@@ -2,7 +2,7 @@
 #include "ReservedScriptNames.h"
 #include "Sound\sound.h"
 #include "GameScriptPosition.h"
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 #include "Game\effects\lightning.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
@@ -23,7 +23,7 @@ namespace GameScriptFreeFunctions {
 		return 0;
 	}
 
-	static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+	static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 	{
 		PHD_VECTOR p1;
 		p1.x = src.x;
@@ -38,7 +38,7 @@ namespace GameScriptFreeFunctions {
 		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 	}
 
-	static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
+	static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
 		PHD_3DPOS p;
 		p.xPos = pos.x;
@@ -48,7 +48,7 @@ namespace GameScriptFreeFunctions {
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
 
-	static void AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)
+	static void AddDynamicLight(GameScriptPosition pos, ScriptColor color, int radius, int lifetime)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 	}
@@ -142,8 +142,6 @@ namespace GameScriptFreeFunctions {
 		//@tparam string name of track (without file extension) to play
 		//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
 		lua->set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
-
-		
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
