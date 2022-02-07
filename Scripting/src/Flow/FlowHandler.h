@@ -2,7 +2,7 @@
 #include "LanguageScript.h"
 #include "LuaHandler.h"
 #include "Logic/LogicHandler.h"
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 #include "Flow/Level/Level.h"
 #include "Settings/Settings.h"
 #include "Flow/Animations/Animations.h"

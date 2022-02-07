@@ -101,13 +101,13 @@ Specify which translations in the strings table correspond to which languages.
 */
 	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
+	Settings::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);
 	InventoryItem::Register(table_flow);
-	Settings::Register(m_lua);
 	Animations::Register(table_flow);
-	GameScriptColor::Register(m_lua);
+	ScriptColor::Register(m_lua);
 	GameScriptRotation::Register(m_lua);
 	GameScriptFog::Register(m_lua);
 

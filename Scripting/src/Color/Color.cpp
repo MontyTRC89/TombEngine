@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptColor.h"
+#include "Color.h"
 #include <cmath>
 
 /***
@@ -10,27 +10,27 @@ Components are specified in bytes; all values are clamped to [0, 255].
 @pragma nostrip
 */
 
-void GameScriptColor::Register(sol::state* state)
+void ScriptColor::Register(sol::state* state)
 {
-	state->new_usertype<GameScriptColor>("Color",
-		sol::constructors<GameScriptColor(byte, byte, byte), GameScriptColor(byte, byte, byte, byte)>(),
-		sol::meta_function::to_string, &GameScriptColor::ToString,
+	state->new_usertype<ScriptColor>("Color",
+		sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>(),
+		sol::meta_function::to_string, &ScriptColor::ToString,
 
 /// (int) red component
 //@mem r
-		"r", sol::property(&GameScriptColor::GetR, &GameScriptColor::SetR),
+		"r", sol::property(&ScriptColor::GetR, &ScriptColor::SetR),
 
 /// (int) green component
 //@mem g
-		"g", sol::property(&GameScriptColor::GetG, &GameScriptColor::SetG),
+		"g", sol::property(&ScriptColor::GetG, &ScriptColor::SetG),
 
 /// (int) blue component
 //@mem b
-		"b", sol::property(&GameScriptColor::GetB, &GameScriptColor::SetB),
+		"b", sol::property(&ScriptColor::GetB, &ScriptColor::SetB),
 
 /// (int) alpha component (255 is opaque, 0 is invisible)
 //@mem a
-		"a", sol::property(&GameScriptColor::GetA, &GameScriptColor::SetA)
+		"a", sol::property(&ScriptColor::GetA, &ScriptColor::SetA)
 	);
 }
 
@@ -41,7 +41,7 @@ void GameScriptColor::Register(sol::state* state)
 @return A Color object.
 @function Color.new
 */
-GameScriptColor::GameScriptColor(byte r, byte g, byte b) :
+ScriptColor::ScriptColor(byte r, byte g, byte b) :
 m_color(r, g, b)
 {
 }
@@ -54,83 +54,83 @@ m_color(r, g, b)
 @return A Color object.
 @function Color.new
 */
-GameScriptColor::GameScriptColor(byte r, byte g, byte b, byte a) : GameScriptColor(r, g, b)
+ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) : ScriptColor(r, g, b)
 {
 	SetA(a);
 }
 
-GameScriptColor::GameScriptColor(Vector3 const& col) :
+ScriptColor::ScriptColor(Vector3 const& col) :
 	m_color(col)
 {
 }
 
-GameScriptColor::GameScriptColor(Vector4 const& col) :
+ScriptColor::ScriptColor(Vector4 const& col) :
 	m_color(col)
 {
 }
 
-GameScriptColor::GameScriptColor(D3DCOLOR col) : 
+ScriptColor::ScriptColor(D3DCOLOR col) : 
 	m_color(col)
 {
 }
 
-GameScriptColor::operator Vector3() const
+ScriptColor::operator Vector3() const
 {
 	return m_color;
 }
 
-GameScriptColor::operator Vector4() const
+ScriptColor::operator Vector4() const
 {
 	return m_color;
 }
 
 // D3DCOLOR is 32 bits and is layed out as ARGB.
-GameScriptColor::operator D3DCOLOR() const
+ScriptColor::operator D3DCOLOR() const
 {	
 	return m_color;
 }
 
-GameScriptColor::operator RGBAColor8Byte() const
+ScriptColor::operator RGBAColor8Byte() const
 {
 	return m_color;
 }
 
-byte GameScriptColor::GetR() const
+byte ScriptColor::GetR() const
 {
 	return m_color.GetR();
 }
 
-void GameScriptColor::SetR(byte v)
+void ScriptColor::SetR(byte v)
 {
 	m_color.SetR(v);
 }
 
-byte GameScriptColor::GetG() const
+byte ScriptColor::GetG() const
 {
 	return m_color.GetG();
 }
 
-void GameScriptColor::SetG(byte v)
+void ScriptColor::SetG(byte v)
 {
 	m_color.SetG(v);
 }
 
-byte GameScriptColor::GetB() const
+byte ScriptColor::GetB() const
 {
 	return m_color.GetB();
 }
 
-void GameScriptColor::SetB(byte v)
+void ScriptColor::SetB(byte v)
 {
 	m_color.SetB(v);
 }
 
-byte GameScriptColor::GetA() const
+byte ScriptColor::GetA() const
 {
 	return m_color.GetA();
 }
 
-void GameScriptColor::SetA(byte v)
+void ScriptColor::SetA(byte v)
 {
 	m_color.SetA(v);
 }
@@ -140,7 +140,7 @@ void GameScriptColor::SetA(byte v)
 @treturn string A string showing the r, g, b, and a values of the color
 @function __tostring
 */
-std::string GameScriptColor::ToString() const
+std::string ScriptColor::ToString() const
 {
 	return "{" + std::to_string(GetR()) + ", " + std::to_string(GetG()) + ", " + std::to_string(GetB()) +  ", " + std::to_string(GetA()) + "}";
 }
