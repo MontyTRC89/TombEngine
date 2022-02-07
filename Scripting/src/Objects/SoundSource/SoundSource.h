@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class GameScriptPosition;
+class Position;
 
 class SoundSource : public NamedBase<SoundSource, SOUND_SOURCE_INFO &>
 {
@@ -19,8 +19,8 @@ public:
 	SoundSource(SoundSource const& other) = delete;
 
 	static void Register(sol::table &);
-	GameScriptPosition GetPos() const;
-	void SetPos(GameScriptPosition const& pos);
+	Position GetPos() const;
+	void SetPos(Position const& pos);
 
 	int GetSoundID() const;
 	void SetSoundID(int soundID);

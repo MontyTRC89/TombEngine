@@ -7,7 +7,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Game/control/lot.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
 
@@ -118,7 +118,7 @@ out of scope).
 template <bool temp> static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string name,
-	GameScriptPosition pos,
+	Position pos,
 	Rotation rot,
 	short room,
 	short currentAnimState,
@@ -324,12 +324,12 @@ void Moveable::SetName(std::string const & id)
 	s_callbackSetName(id, m_num);
 }
 
-GameScriptPosition Moveable::GetPos() const
+Position Moveable::GetPos() const
 {
-	return GameScriptPosition(	m_item->pos	);
+	return Position(	m_item->pos	);
 }
 
-void Moveable::SetPos(GameScriptPosition const& pos)
+void Moveable::SetPos(Position const& pos)
 {
 	pos.StoreInPHDPos(m_item->pos);
 }

@@ -2,7 +2,7 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "Sink.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -52,12 +52,12 @@ void Sink::Register(sol::table& parent)
 		);
 }
 
-GameScriptPosition Sink::GetPos() const
+Position Sink::GetPos() const
 {
-	return GameScriptPosition{ m_sink.x, m_sink.y, m_sink.z };
+	return Position{ m_sink.x, m_sink.y, m_sink.z };
 }
 
-void Sink::SetPos(GameScriptPosition const& pos)
+void Sink::SetPos(Position const& pos)
 {
 	m_sink.x = pos.x;
 	m_sink.y = pos.y;

@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ReservedScriptNames.h"
 #include "Sound\sound.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "Color/Color.h"
 #include "Game\effects\lightning.h"
 #include "effects\tomb4fx.h"
@@ -18,12 +18,12 @@ Scripts that will be run on game startup.
 using namespace TEN::Effects::Lightning;
 
 namespace GameScriptFreeFunctions {
-	static int FindRoomNumber(GameScriptPosition pos)
+	static int FindRoomNumber(Position pos)
 	{
 		return 0;
 	}
 
-	static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+	static void AddLightningArc(Position src, Position dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 	{
 		PHD_VECTOR p1;
 		p1.x = src.x;
@@ -38,7 +38,7 @@ namespace GameScriptFreeFunctions {
 		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 	}
 
-	static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
+	static void AddShockwave(Position pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
 		PHD_3DPOS p;
 		p.xPos = pos.x;
@@ -48,17 +48,17 @@ namespace GameScriptFreeFunctions {
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
 
-	static void AddDynamicLight(GameScriptPosition pos, ScriptColor color, int radius, int lifetime)
+	static void AddDynamicLight(Position pos, ScriptColor color, int radius, int lifetime)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 	}
 
-	static void AddBlood(GameScriptPosition pos, int num)
+	static void AddBlood(Position pos, int num)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, -1, num);
 	}
 
-	static void AddFireFlame(GameScriptPosition pos, int size)
+	static void AddFireFlame(Position pos, int size)
 	{
 		AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
 	}
@@ -74,7 +74,7 @@ namespace GameScriptFreeFunctions {
 		PlaySoundTrack(trackName, mode);
 	}
 
-	static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
+	static void PlaySoundEffect(int id, Position p, int flags)
 	{
 		PHD_3DPOS pos;
 
@@ -98,13 +98,13 @@ namespace GameScriptFreeFunctions {
 		PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
 	}
 
-	static int CalculateDistance(GameScriptPosition const& pos1, GameScriptPosition const& pos2)
+	static int CalculateDistance(Position const& pos1, Position const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 		return static_cast<int>(round(result));
 	}
 
-	static int CalculateHorizontalDistance(GameScriptPosition const& pos1, GameScriptPosition const& pos2)
+	static int CalculateHorizontalDistance(Position const& pos1, Position const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 		return static_cast<int>(round(result));

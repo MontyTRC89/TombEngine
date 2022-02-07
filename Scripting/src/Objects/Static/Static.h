@@ -7,7 +7,7 @@ namespace sol {
 	class state;
 }
 
-class GameScriptPosition;
+class Position;
 class ScriptColor;
 
 class Static : public NamedBase<Static, MESH_INFO &>
@@ -21,8 +21,8 @@ public:
 
 	static void Register(sol::table & parent);
 
-	GameScriptPosition GetPos() const;
-	void SetPos(GameScriptPosition const & pos);
+	Position GetPos() const;
+	void SetPos(Position const & pos);
 	int GetRot() const;
 	void SetRot(int yRot);
 	std::string GetName() const;

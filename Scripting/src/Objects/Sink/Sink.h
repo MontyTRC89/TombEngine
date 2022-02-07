@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class GameScriptPosition;
+class Position;
 
 class Sink : public NamedBase<Sink, SINK_INFO &>
 {
@@ -18,8 +18,8 @@ public:
 	Sink(Sink const& other) = delete;
 
 	static void Register(sol::table &);
-	GameScriptPosition GetPos() const;
-	void SetPos(GameScriptPosition const& pos);
+	Position GetPos() const;
+	void SetPos(Position const& pos);
 
 	int GetStrength() const;
 	void SetStrength(int strength);
