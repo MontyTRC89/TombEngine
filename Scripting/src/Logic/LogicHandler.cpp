@@ -13,7 +13,6 @@
 #include "Game/effects/effects.h"
 #include "Game/pickup/pickup.h"
 #include "Game/gui.h"
-#include "GameScriptFreeFunctions.h"
 #include "ReservedScriptNames.h"
 #include "Game/camera.h"
 #include "ScriptUtil.h"
