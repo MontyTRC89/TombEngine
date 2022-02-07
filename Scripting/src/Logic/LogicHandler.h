@@ -5,7 +5,7 @@
 #include "LuaHandler.h"
 #include "Specific/trmath.h"
 #include <unordered_set>
-#include "GameScriptColor.h"
+#include "Color/Color.h"
 #include "GameScriptPosition.h"
 #include "GameScriptRotation.h"
 #include "Strings/StringsHandler.h"
