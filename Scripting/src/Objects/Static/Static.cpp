@@ -2,7 +2,7 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "Static.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "Color/Color.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
@@ -59,12 +59,12 @@ void Static::Register(sol::table & parent)
 		);
 }
 
-GameScriptPosition Static::GetPos() const
+Position Static::GetPos() const
 {
-	return GameScriptPosition{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
+	return Position{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
 }
 
-void Static::SetPos(GameScriptPosition const& pos)
+void Static::SetPos(Position const& pos)
 {
 	m_mesh.pos.xPos = pos.x;
 	m_mesh.pos.yPos = pos.y;

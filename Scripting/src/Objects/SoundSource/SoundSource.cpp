@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
 #include "SoundSource.h"
-#include "GameScriptPosition.h"
+#include "Position/Position.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -49,12 +49,12 @@ void SoundSource::Register(sol::table & parent)
 	);
 }
 
-GameScriptPosition SoundSource::GetPos() const
+Position SoundSource::GetPos() const
 {
-	return GameScriptPosition{ m_soundSource.x, m_soundSource.y, m_soundSource.z };
+	return Position{ m_soundSource.x, m_soundSource.y, m_soundSource.z };
 }
 
-void SoundSource::SetPos(GameScriptPosition const& pos)
+void SoundSource::SetPos(Position const& pos)
 {
 	m_soundSource.x = pos.x;
 	m_soundSource.y = pos.y;

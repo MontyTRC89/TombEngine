@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class GameScriptPosition;
+class Position;
 
 class AIObject : public NamedBase<AIObject, AI_OBJECT&>
 {
@@ -19,8 +19,8 @@ public:
 
 	static void Register(sol::table & parent);
 
-	GameScriptPosition GetPos() const;
-	void SetPos(GameScriptPosition const& pos);
+	Position GetPos() const;
+	void SetPos(Position const& pos);
 
 	short GetRoom() const;
 	void SetRoom(short Room);
