@@ -909,7 +909,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Temp. debug stuff.
 	static bool doRoutines = true;
-
 	static bool dbT = false;
 	if (KeyMap[DIK_T] && !dbT)
 		doRoutines = !doRoutines;
@@ -924,6 +923,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 		// Animate Lara.
 		AnimateLara(item);
 
+		HandleLaraMovementParameters(item, coll);
+
 		if (info->ExtraAnim == -1)
 		{
 			// Check for collision with items.
@@ -933,8 +934,6 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			if (info->Vehicle == NO_ITEM)
 				lara_collision_routines[item->activeState](item, coll);
 		}
-
-		HandleLaraMovementParameters(item, coll);
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
 

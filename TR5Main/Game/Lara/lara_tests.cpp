@@ -93,7 +93,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 
 bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return abs((short)(coll->NearestLedgeAngle - item->pos.yRot)) <= LARA_GRAB_THRESHOLD;
+	return (abs((short)(coll->NearestLedgeAngle - item->pos.yRot)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
@@ -1765,7 +1765,9 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	// "Floor" ahead may be formed by ceiling; raise y position of probe point to find potential vault candidate location.
+	// HACK: Where the probe finds that the wall in front is formed by a ceiling or the space between the floor and ceiling is a clamp,
+	// any climable floor in a room above will be missed.
+	// Raise y position of probe point by increments of CLICK(0.5f) to find this potential vault candidate location.
 	int yOffset = testSetup.LowerCeilingBound;
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height...
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMin ||		// OR clamp is too small
@@ -2042,7 +2044,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Move ladder checks here when ladders are less prone to breaking.
 	// In this case, they fail due to a reliance on ShiftItem(). @Sezz 2021.02.05
 
-	// TODO: calcJumpVelocity not getting set?
 	// Auto jump to monkey swing.
 	vaultResult = TestLaraMonkeyAutoJump(item, coll);
 	if (vaultResult.Success &&

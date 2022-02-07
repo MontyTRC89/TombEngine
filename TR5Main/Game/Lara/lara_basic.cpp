@@ -97,7 +97,7 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	DoLaraStep(item, coll, info->projectedFloorHeight - item->pos.yPos);
+	EaseOutLaraHeight(item, info->projectedFloorHeight - item->pos.yPos);
 }
 
 // State:	LS_AUTO_JUMP (62)
