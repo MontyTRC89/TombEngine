@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "ItemEnumPair.h"
-#include "GameScriptRotation.h"
+#include "Rotation/Rotation.h"
 #include "Game/gui.h"
 
 static const std::unordered_map<std::string, RotationFlags> kRotAxes{
@@ -26,13 +26,13 @@ struct InventoryItem
 	InventoryObjectTypes slot{ INV_OBJECT_PISTOLS };
 	short yOffset{ 0 };
 	float scale{ 1.0f };
-	GameScriptRotation rot{};
+	Rotation rot{};
 	RotationFlags rotationFlags{ RotationFlags::INV_ROT_X };
 	int meshBits{ 0 };
 	ItemOptions action{ ItemOptions::OPT_USE };
 
 	InventoryItem() = default;
-	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, GameScriptRotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
+	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
 
 	static void Register(sol::table& lua);
 
