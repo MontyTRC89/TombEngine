@@ -4,6 +4,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/gui.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
@@ -388,10 +389,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             laraitem->pos.yPos = item->pos.yPos;
             laraitem->pos.zPos = item->pos.zPos;
             laraitem->pos.yRot = item->pos.yRot;
-            Lara.headYrot = 0;
-            Lara.headXrot = 0;
-            Lara.torsoYrot = 0;
-            Lara.torsoXrot = 0;
+            ResetLaraFlex(laraitem);
             Lara.hitDirection = -1;
             AnimateItem(laraitem);
             motorbike->revs = 0;

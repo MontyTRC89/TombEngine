@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/collision/floordata.h"
 #include "Specific/input.h"
 #include "Game/camera.h"
@@ -52,10 +53,8 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
 			l->pos.yRot += ANGLE(180);
-		Lara.headYrot = 0;
-		Lara.headXrot = 0;
-		Lara.torsoYrot = 0;
-		Lara.torsoXrot = 0;
+		
+		ResetLaraFlex(l);
 		Lara.gunStatus = LG_HANDS_BUSY;
 		l->airborne = false;
 		l->fallspeed = 0;
@@ -98,10 +97,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				l->activeState = LS_TRAPDOOR_FLOOR_OPEN;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				AddActiveItem(itemNumber);
 				item->status = ITEM_ACTIVE;

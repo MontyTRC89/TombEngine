@@ -4,6 +4,7 @@
 #include "Game/items.h"
 #include "Game/people.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
@@ -726,10 +727,7 @@ namespace TEN::Entities::TR4
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					l->pos.yRot = item->pos.yRot;
 					Lara.isMoving = false;
-					Lara.headXrot = 0;
-					Lara.headYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.torsoYrot = 0;
+					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					item->flags |= 0x3E00;
 					item->status = ITEM_ACTIVE;

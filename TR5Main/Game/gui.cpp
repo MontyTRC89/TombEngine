@@ -1718,11 +1718,11 @@ void GuiController::ConstructObjectList()
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.small_waterskin)
-		InsertObjectIntoList((Lara.small_waterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.smallWaterskin)
+		InsertObjectIntoList((Lara.smallWaterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.big_waterskin)
-		InsertObjectIntoList((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.bigWaterskin)
+		InsertObjectIntoList((Lara.bigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLES; i++)
 		if (Lara.Puzzles[i])
@@ -1819,11 +1819,11 @@ void GuiController::ConstructCombineObjectList()
 			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.small_waterskin)
-		InsertObjectIntoList_v2(Lara.small_waterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.smallWaterskin)
+		InsertObjectIntoList_v2(Lara.smallWaterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.big_waterskin)
-		InsertObjectIntoList_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.bigWaterskin)
+		InsertObjectIntoList_v2(Lara.bigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
@@ -3858,14 +3858,14 @@ bool GuiController::PerformWaterskinCombine(int flag)
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
 
-	small_liters = Lara.small_waterskin - 1;//how many liters in the small one?
-	big_liters = Lara.big_waterskin - 1;//how many liters in the big one?
+	small_liters = Lara.smallWaterskin - 1;//how many liters in the small one?
+	big_liters = Lara.bigWaterskin - 1;//how many liters in the big one?
 	small_capacity = 3 - small_liters;//how many more liters can we fit in the small one?
 	big_capacity = 5 - big_liters;//how many more liters can we fit in the big one?
 
 	if (flag)
 	{
-		if (Lara.big_waterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
+		if (Lara.bigWaterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
 		{
 			i = big_liters;
 
@@ -3882,17 +3882,17 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.small_waterskin = small_liters + 1;
-			Lara.big_waterskin = big_liters + 1;
+			Lara.smallWaterskin = small_liters + 1;
+			Lara.bigWaterskin = big_liters + 1;
 			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
 			return 1;
 		}
 	}
 	else 
 	{
-		if (Lara.small_waterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
+		if (Lara.smallWaterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
 		{
-			i = Lara.small_waterskin - 1;
+			i = Lara.smallWaterskin - 1;
 
 			do
 			{
@@ -3907,8 +3907,8 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.small_waterskin = small_liters + 1;
-			Lara.big_waterskin = big_liters + 1;
+			Lara.smallWaterskin = small_liters + 1;
+			Lara.bigWaterskin = big_liters + 1;
 			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
 			return 1;
 		}

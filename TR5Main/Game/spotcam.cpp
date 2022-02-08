@@ -8,6 +8,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 
 using namespace TEN::Renderer;
@@ -123,10 +124,7 @@ void InitialiseSpotCam(short Sequence)
 
 	LaraItem->meshBits = -1;
 
-	Lara.headYrot = 0;
-	Lara.headXrot = 0;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
+	ResetLaraFlex(LaraItem);
 
 	Camera.bounce = 0;
 

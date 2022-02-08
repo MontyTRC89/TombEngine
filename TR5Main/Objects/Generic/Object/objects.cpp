@@ -4,6 +4,7 @@
 #include "Game/effects/effects.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Specific/setup.h"
@@ -148,10 +149,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->animNumber = LA_TIGHTROPE_START;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 #ifdef NEW_TIGHTROPE
 				Lara.tightrope.balance = 0;
 				Lara.tightrope.canGoOff = false;
@@ -202,10 +200,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			l->fallspeed = false;
 			l->airborne = false;
 
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
+			ResetLaraFlex(item);
 
 			if (test1)
 				l->pos.yRot = item->pos.yRot;

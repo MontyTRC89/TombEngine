@@ -10,6 +10,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 
@@ -737,10 +738,7 @@ namespace TEN::Entities::TR4
 
 					if (LaraItem->activeState >= 56 && LaraItem->activeState <= 61 && !Lara.location)
 					{
-						Lara.torsoXrot = 0; 
-						Lara.torsoYrot = 0;
-						Lara.headXrot = 0;
-						Lara.headYrot = 0;
+						ResetLaraFlex(LaraItem);
 						LaraItem->targetState = 3;
 						LaraItem->activeState = 3;
 						LaraItem->animNumber = 34;

@@ -41,6 +41,18 @@ struct LaraTightropeInfo;
 struct LaraTightropeInfoBuilder;
 struct LaraTightropeInfoT;
 
+struct ExtraVelocity;
+struct ExtraVelocityBuilder;
+struct ExtraVelocityT;
+
+struct ExtraRotation;
+struct ExtraRotationBuilder;
+struct ExtraRotationT;
+
+struct LaraRope;
+struct LaraRopeBuilder;
+struct LaraRopeT;
+
 struct Lara;
 struct LaraBuilder;
 struct LaraT;
@@ -1375,6 +1387,389 @@ struct LaraTightropeInfo::Traits {
 
 flatbuffers::Offset<LaraTightropeInfo> CreateLaraTightropeInfo(flatbuffers::FlatBufferBuilder &_fbb, const LaraTightropeInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct ExtraVelocityT : public flatbuffers::NativeTable {
+  typedef ExtraVelocity TableType;
+  int32_t x = 0;
+  int32_t y = 0;
+  int32_t z = 0;
+};
+
+struct ExtraVelocity FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ExtraVelocityT NativeTableType;
+  typedef ExtraVelocityBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_X = 4,
+    VT_Y = 6,
+    VT_Z = 8
+  };
+  int32_t x() const {
+    return GetField<int32_t>(VT_X, 0);
+  }
+  int32_t y() const {
+    return GetField<int32_t>(VT_Y, 0);
+  }
+  int32_t z() const {
+    return GetField<int32_t>(VT_Z, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_X) &&
+           VerifyField<int32_t>(verifier, VT_Y) &&
+           VerifyField<int32_t>(verifier, VT_Z) &&
+           verifier.EndTable();
+  }
+  ExtraVelocityT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ExtraVelocityT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ExtraVelocity> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExtraVelocityT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ExtraVelocityBuilder {
+  typedef ExtraVelocity Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_x(int32_t x) {
+    fbb_.AddElement<int32_t>(ExtraVelocity::VT_X, x, 0);
+  }
+  void add_y(int32_t y) {
+    fbb_.AddElement<int32_t>(ExtraVelocity::VT_Y, y, 0);
+  }
+  void add_z(int32_t z) {
+    fbb_.AddElement<int32_t>(ExtraVelocity::VT_Z, z, 0);
+  }
+  explicit ExtraVelocityBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ExtraVelocity> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ExtraVelocity>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ExtraVelocity> CreateExtraVelocity(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x = 0,
+    int32_t y = 0,
+    int32_t z = 0) {
+  ExtraVelocityBuilder builder_(_fbb);
+  builder_.add_z(z);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  return builder_.Finish();
+}
+
+struct ExtraVelocity::Traits {
+  using type = ExtraVelocity;
+  static auto constexpr Create = CreateExtraVelocity;
+};
+
+flatbuffers::Offset<ExtraVelocity> CreateExtraVelocity(flatbuffers::FlatBufferBuilder &_fbb, const ExtraVelocityT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ExtraRotationT : public flatbuffers::NativeTable {
+  typedef ExtraRotation TableType;
+  int32_t x = 0;
+  int32_t y = 0;
+  int32_t z = 0;
+};
+
+struct ExtraRotation FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ExtraRotationT NativeTableType;
+  typedef ExtraRotationBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_X = 4,
+    VT_Y = 6,
+    VT_Z = 8
+  };
+  int32_t x() const {
+    return GetField<int32_t>(VT_X, 0);
+  }
+  int32_t y() const {
+    return GetField<int32_t>(VT_Y, 0);
+  }
+  int32_t z() const {
+    return GetField<int32_t>(VT_Z, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_X) &&
+           VerifyField<int32_t>(verifier, VT_Y) &&
+           VerifyField<int32_t>(verifier, VT_Z) &&
+           verifier.EndTable();
+  }
+  ExtraRotationT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ExtraRotationT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ExtraRotation> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExtraRotationT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ExtraRotationBuilder {
+  typedef ExtraRotation Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_x(int32_t x) {
+    fbb_.AddElement<int32_t>(ExtraRotation::VT_X, x, 0);
+  }
+  void add_y(int32_t y) {
+    fbb_.AddElement<int32_t>(ExtraRotation::VT_Y, y, 0);
+  }
+  void add_z(int32_t z) {
+    fbb_.AddElement<int32_t>(ExtraRotation::VT_Z, z, 0);
+  }
+  explicit ExtraRotationBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ExtraRotation> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ExtraRotation>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ExtraRotation> CreateExtraRotation(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x = 0,
+    int32_t y = 0,
+    int32_t z = 0) {
+  ExtraRotationBuilder builder_(_fbb);
+  builder_.add_z(z);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  return builder_.Finish();
+}
+
+struct ExtraRotation::Traits {
+  using type = ExtraRotation;
+  static auto constexpr Create = CreateExtraRotation;
+};
+
+flatbuffers::Offset<ExtraRotation> CreateExtraRotation(flatbuffers::FlatBufferBuilder &_fbb, const ExtraRotationT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LaraRopeT : public flatbuffers::NativeTable {
+  typedef LaraRope TableType;
+  int32_t segment = 0;
+  int32_t direction = 0;
+  int32_t arc_front = 0;
+  int32_t arc_back = 0;
+  int32_t last_x = 0;
+  int32_t max_x_forward = 0;
+  int32_t max_x_backward = 0;
+  int32_t dframe = 0;
+  int32_t frame = 0;
+  int32_t frame_rate = 0;
+  int32_t y = 0;
+  int32_t ptr = 0;
+  int32_t offset = 0;
+  int32_t down_vel = 0;
+  int32_t flag = 0;
+  int32_t count = 0;
+};
+
+struct LaraRope FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LaraRopeT NativeTableType;
+  typedef LaraRopeBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SEGMENT = 4,
+    VT_DIRECTION = 6,
+    VT_ARC_FRONT = 8,
+    VT_ARC_BACK = 10,
+    VT_LAST_X = 12,
+    VT_MAX_X_FORWARD = 14,
+    VT_MAX_X_BACKWARD = 16,
+    VT_DFRAME = 18,
+    VT_FRAME = 20,
+    VT_FRAME_RATE = 22,
+    VT_Y = 24,
+    VT_PTR = 26,
+    VT_OFFSET = 28,
+    VT_DOWN_VEL = 30,
+    VT_FLAG = 32,
+    VT_COUNT = 34
+  };
+  int32_t segment() const {
+    return GetField<int32_t>(VT_SEGMENT, 0);
+  }
+  int32_t direction() const {
+    return GetField<int32_t>(VT_DIRECTION, 0);
+  }
+  int32_t arc_front() const {
+    return GetField<int32_t>(VT_ARC_FRONT, 0);
+  }
+  int32_t arc_back() const {
+    return GetField<int32_t>(VT_ARC_BACK, 0);
+  }
+  int32_t last_x() const {
+    return GetField<int32_t>(VT_LAST_X, 0);
+  }
+  int32_t max_x_forward() const {
+    return GetField<int32_t>(VT_MAX_X_FORWARD, 0);
+  }
+  int32_t max_x_backward() const {
+    return GetField<int32_t>(VT_MAX_X_BACKWARD, 0);
+  }
+  int32_t dframe() const {
+    return GetField<int32_t>(VT_DFRAME, 0);
+  }
+  int32_t frame() const {
+    return GetField<int32_t>(VT_FRAME, 0);
+  }
+  int32_t frame_rate() const {
+    return GetField<int32_t>(VT_FRAME_RATE, 0);
+  }
+  int32_t y() const {
+    return GetField<int32_t>(VT_Y, 0);
+  }
+  int32_t ptr() const {
+    return GetField<int32_t>(VT_PTR, 0);
+  }
+  int32_t offset() const {
+    return GetField<int32_t>(VT_OFFSET, 0);
+  }
+  int32_t down_vel() const {
+    return GetField<int32_t>(VT_DOWN_VEL, 0);
+  }
+  int32_t flag() const {
+    return GetField<int32_t>(VT_FLAG, 0);
+  }
+  int32_t count() const {
+    return GetField<int32_t>(VT_COUNT, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_SEGMENT) &&
+           VerifyField<int32_t>(verifier, VT_DIRECTION) &&
+           VerifyField<int32_t>(verifier, VT_ARC_FRONT) &&
+           VerifyField<int32_t>(verifier, VT_ARC_BACK) &&
+           VerifyField<int32_t>(verifier, VT_LAST_X) &&
+           VerifyField<int32_t>(verifier, VT_MAX_X_FORWARD) &&
+           VerifyField<int32_t>(verifier, VT_MAX_X_BACKWARD) &&
+           VerifyField<int32_t>(verifier, VT_DFRAME) &&
+           VerifyField<int32_t>(verifier, VT_FRAME) &&
+           VerifyField<int32_t>(verifier, VT_FRAME_RATE) &&
+           VerifyField<int32_t>(verifier, VT_Y) &&
+           VerifyField<int32_t>(verifier, VT_PTR) &&
+           VerifyField<int32_t>(verifier, VT_OFFSET) &&
+           VerifyField<int32_t>(verifier, VT_DOWN_VEL) &&
+           VerifyField<int32_t>(verifier, VT_FLAG) &&
+           VerifyField<int32_t>(verifier, VT_COUNT) &&
+           verifier.EndTable();
+  }
+  LaraRopeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LaraRopeT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LaraRope> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraRopeT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LaraRopeBuilder {
+  typedef LaraRope Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_segment(int32_t segment) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_SEGMENT, segment, 0);
+  }
+  void add_direction(int32_t direction) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_DIRECTION, direction, 0);
+  }
+  void add_arc_front(int32_t arc_front) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_ARC_FRONT, arc_front, 0);
+  }
+  void add_arc_back(int32_t arc_back) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_ARC_BACK, arc_back, 0);
+  }
+  void add_last_x(int32_t last_x) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_LAST_X, last_x, 0);
+  }
+  void add_max_x_forward(int32_t max_x_forward) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_MAX_X_FORWARD, max_x_forward, 0);
+  }
+  void add_max_x_backward(int32_t max_x_backward) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_MAX_X_BACKWARD, max_x_backward, 0);
+  }
+  void add_dframe(int32_t dframe) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_DFRAME, dframe, 0);
+  }
+  void add_frame(int32_t frame) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_FRAME, frame, 0);
+  }
+  void add_frame_rate(int32_t frame_rate) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_FRAME_RATE, frame_rate, 0);
+  }
+  void add_y(int32_t y) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_Y, y, 0);
+  }
+  void add_ptr(int32_t ptr) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_PTR, ptr, 0);
+  }
+  void add_offset(int32_t offset) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_OFFSET, offset, 0);
+  }
+  void add_down_vel(int32_t down_vel) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_DOWN_VEL, down_vel, 0);
+  }
+  void add_flag(int32_t flag) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_FLAG, flag, 0);
+  }
+  void add_count(int32_t count) {
+    fbb_.AddElement<int32_t>(LaraRope::VT_COUNT, count, 0);
+  }
+  explicit LaraRopeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<LaraRope> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LaraRope>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LaraRope> CreateLaraRope(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t segment = 0,
+    int32_t direction = 0,
+    int32_t arc_front = 0,
+    int32_t arc_back = 0,
+    int32_t last_x = 0,
+    int32_t max_x_forward = 0,
+    int32_t max_x_backward = 0,
+    int32_t dframe = 0,
+    int32_t frame = 0,
+    int32_t frame_rate = 0,
+    int32_t y = 0,
+    int32_t ptr = 0,
+    int32_t offset = 0,
+    int32_t down_vel = 0,
+    int32_t flag = 0,
+    int32_t count = 0) {
+  LaraRopeBuilder builder_(_fbb);
+  builder_.add_count(count);
+  builder_.add_flag(flag);
+  builder_.add_down_vel(down_vel);
+  builder_.add_offset(offset);
+  builder_.add_ptr(ptr);
+  builder_.add_y(y);
+  builder_.add_frame_rate(frame_rate);
+  builder_.add_frame(frame);
+  builder_.add_dframe(dframe);
+  builder_.add_max_x_backward(max_x_backward);
+  builder_.add_max_x_forward(max_x_forward);
+  builder_.add_last_x(last_x);
+  builder_.add_arc_back(arc_back);
+  builder_.add_arc_front(arc_front);
+  builder_.add_direction(direction);
+  builder_.add_segment(segment);
+  return builder_.Finish();
+}
+
+struct LaraRope::Traits {
+  using type = LaraRope;
+  static auto constexpr Create = CreateLaraRope;
+};
+
+flatbuffers::Offset<LaraRope> CreateLaraRope(flatbuffers::FlatBufferBuilder &_fbb, const LaraRopeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraT : public flatbuffers::NativeTable {
   typedef Lara TableType;
   int32_t item_number = 0;
@@ -1389,6 +1784,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t water_status = 0;
   bool climb_status = false;
   int32_t pose_count = 0;
+  int32_t projected_floor_height = 0;
   int32_t jump_direction = 0;
   int32_t run_jump_count = 0;
   bool run_jump_queued = false;
@@ -1399,9 +1795,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t dive_count = 0;
   int32_t death_count = 0;
   int32_t current_active = 0;
-  int32_t current_x_vel = 0;
-  int32_t current_y_vel = 0;
-  int32_t current_z_vel = 0;
+  std::unique_ptr<TEN::Save::ExtraVelocityT> current_vel{};
   int32_t spasm_effect_count = 0;
   int32_t flare_age = 0;
   int32_t burn_count = 0;
@@ -1434,31 +1828,12 @@ struct LaraT : public flatbuffers::NativeTable {
   std::vector<int32_t> target_angles{};
   int32_t turn_rate = 0;
   int32_t move_angle = 0;
-  int32_t head_x_rot = 0;
-  int32_t head_y_rot = 0;
-  int32_t head_z_rot = 0;
-  int32_t torso_x_rot = 0;
-  int32_t torso_y_rot = 0;
-  int32_t torso_z_rot = 0;
+  std::unique_ptr<TEN::Save::ExtraRotationT> extra_head_rot{};
+  std::unique_ptr<TEN::Save::ExtraRotationT> extra_torso_rot{};
   std::unique_ptr<TEN::Save::LaraArmInfoT> left_arm{};
   std::unique_ptr<TEN::Save::LaraArmInfoT> right_arm{};
-  int32_t rope_segment = 0;
-  int32_t rope_direction = 0;
-  int32_t rope_arc_front = 0;
-  int32_t rope_arc_back = 0;
-  int32_t rope_last_x = 0;
-  int32_t rope_max_x_forward = 0;
-  int32_t rope_max_x_backward = 0;
-  int32_t rope_dframe = 0;
-  int32_t rope_frame = 0;
-  int32_t rope_framerate = 0;
-  int32_t rope_y = 0;
-  int32_t rope_ptr = 0;
+  std::unique_ptr<TEN::Save::LaraRopeT> rope_parameters{};
   int32_t interacted_item = 0;
-  int32_t rope_offset = 0;
-  int32_t rope_down_vel = 0;
-  int32_t rope_flag = 0;
-  int32_t rope_count = 0;
   int32_t move_count = 0;
   int32_t location = 0;
   int32_t highest_location = 0;
@@ -1510,108 +1885,88 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WATER_STATUS = 22,
     VT_CLIMB_STATUS = 24,
     VT_POSE_COUNT = 26,
-    VT_JUMP_DIRECTION = 28,
-    VT_RUN_JUMP_COUNT = 30,
-    VT_RUN_JUMP_QUEUED = 32,
-    VT_HIT_FRAME = 34,
-    VT_HIT_DIRECTION = 36,
-    VT_SPRINT_TIMER = 38,
-    VT_AIR = 40,
-    VT_DIVE_COUNT = 42,
-    VT_DEATH_COUNT = 44,
-    VT_CURRENT_ACTIVE = 46,
-    VT_CURRENT_X_VEL = 48,
-    VT_CURRENT_Y_VEL = 50,
-    VT_CURRENT_Z_VEL = 52,
-    VT_SPASM_EFFECT_COUNT = 54,
-    VT_FLARE_AGE = 56,
-    VT_BURN_COUNT = 58,
-    VT_WEAPON_ITEM = 60,
-    VT_HOLSTER_INFO = 62,
-    VT_FLARE_FRAME = 64,
-    VT_POISONED = 66,
-    VT_WET = 68,
-    VT_FLARE_CONTROL_LEFT = 70,
-    VT_LOOK = 72,
-    VT_BURN = 74,
-    VT_KEEP_LOW = 76,
-    VT_IS_LOW = 78,
-    VT_IS_MOVING = 80,
-    VT_CAN_MONKEY_SWING = 82,
-    VT_BURN_BLUE = 84,
-    VT_BURN_SMOKE = 86,
-    VT_HAS_FIRED = 88,
-    VT_BUSY = 90,
-    VT_OLD_BUSY = 92,
-    VT_UNCONTROLLABLE = 94,
-    VT_LIT_TORCH = 96,
-    VT_IS_CLIMBING = 98,
-    VT_FIRED = 100,
-    VT_WATER_SURFACE_DIST = 102,
-    VT_LAST_POSITION = 104,
-    VT_NEXT_CORNER_POSITION = 106,
-    VT_NEXT_CORNER_ROTATION = 108,
-    VT_MESH_PTRS = 110,
-    VT_TARGET_ANGLES = 112,
-    VT_TURN_RATE = 114,
-    VT_MOVE_ANGLE = 116,
-    VT_HEAD_X_ROT = 118,
-    VT_HEAD_Y_ROT = 120,
-    VT_HEAD_Z_ROT = 122,
-    VT_TORSO_X_ROT = 124,
-    VT_TORSO_Y_ROT = 126,
-    VT_TORSO_Z_ROT = 128,
-    VT_LEFT_ARM = 130,
-    VT_RIGHT_ARM = 132,
-    VT_ROPE_SEGMENT = 134,
-    VT_ROPE_DIRECTION = 136,
-    VT_ROPE_ARC_FRONT = 138,
-    VT_ROPE_ARC_BACK = 140,
-    VT_ROPE_LAST_X = 142,
-    VT_ROPE_MAX_X_FORWARD = 144,
-    VT_ROPE_MAX_X_BACKWARD = 146,
-    VT_ROPE_DFRAME = 148,
-    VT_ROPE_FRAME = 150,
-    VT_ROPE_FRAMERATE = 152,
-    VT_ROPE_Y = 154,
-    VT_ROPE_PTR = 156,
-    VT_INTERACTED_ITEM = 158,
-    VT_ROPE_OFFSET = 160,
-    VT_ROPE_DOWN_VEL = 162,
-    VT_ROPE_FLAG = 164,
-    VT_ROPE_COUNT = 166,
-    VT_MOVE_COUNT = 168,
-    VT_LOCATION = 170,
-    VT_HIGHEST_LOCATION = 172,
-    VT_LOCATION_PAD = 174,
-    VT_TIGHTROPE = 176,
-    VT_BEETLE_LIFE = 178,
-    VT_HAS_BEETLE_THINGS = 180,
-    VT_SMALL_WATERSKIN = 182,
-    VT_BIG_WATERSKIN = 184,
-    VT_VEHICLE = 186,
-    VT_EXTRA_ANIM = 188,
-    VT_MINE_L = 190,
-    VT_MINE_R = 192,
-    VT_WEAPONS = 194,
-    VT_PUZZLES = 196,
-    VT_KEYS = 198,
-    VT_PICKUPS = 200,
-    VT_EXAMINES = 202,
-    VT_PUZZLES_COMBO = 204,
-    VT_KEYS_COMBO = 206,
-    VT_PICKUPS_COMBO = 208,
-    VT_EXAMINES_COMBO = 210,
-    VT_SECRETS = 212,
-    VT_LASERSIGHT = 214,
-    VT_CROWBAR = 216,
-    VT_TORCH = 218,
-    VT_SILENCER = 220,
-    VT_BINOCULARS = 222,
-    VT_NUM_LARGE_MEDIPACKS = 224,
-    VT_NUM_SMALL_MEDIPACKS = 226,
-    VT_NUM_FLARES = 228,
-    VT_TARGET_ITEM_NUMBER = 230
+    VT_PROJECTED_FLOOR_HEIGHT = 28,
+    VT_JUMP_DIRECTION = 30,
+    VT_RUN_JUMP_COUNT = 32,
+    VT_RUN_JUMP_QUEUED = 34,
+    VT_HIT_FRAME = 36,
+    VT_HIT_DIRECTION = 38,
+    VT_SPRINT_TIMER = 40,
+    VT_AIR = 42,
+    VT_DIVE_COUNT = 44,
+    VT_DEATH_COUNT = 46,
+    VT_CURRENT_ACTIVE = 48,
+    VT_CURRENT_VEL = 50,
+    VT_SPASM_EFFECT_COUNT = 52,
+    VT_FLARE_AGE = 54,
+    VT_BURN_COUNT = 56,
+    VT_WEAPON_ITEM = 58,
+    VT_HOLSTER_INFO = 60,
+    VT_FLARE_FRAME = 62,
+    VT_POISONED = 64,
+    VT_WET = 66,
+    VT_FLARE_CONTROL_LEFT = 68,
+    VT_LOOK = 70,
+    VT_BURN = 72,
+    VT_KEEP_LOW = 74,
+    VT_IS_LOW = 76,
+    VT_IS_MOVING = 78,
+    VT_CAN_MONKEY_SWING = 80,
+    VT_BURN_BLUE = 82,
+    VT_BURN_SMOKE = 84,
+    VT_HAS_FIRED = 86,
+    VT_BUSY = 88,
+    VT_OLD_BUSY = 90,
+    VT_UNCONTROLLABLE = 92,
+    VT_LIT_TORCH = 94,
+    VT_IS_CLIMBING = 96,
+    VT_FIRED = 98,
+    VT_WATER_SURFACE_DIST = 100,
+    VT_LAST_POSITION = 102,
+    VT_NEXT_CORNER_POSITION = 104,
+    VT_NEXT_CORNER_ROTATION = 106,
+    VT_MESH_PTRS = 108,
+    VT_TARGET_ANGLES = 110,
+    VT_TURN_RATE = 112,
+    VT_MOVE_ANGLE = 114,
+    VT_EXTRA_HEAD_ROT = 116,
+    VT_EXTRA_TORSO_ROT = 118,
+    VT_LEFT_ARM = 120,
+    VT_RIGHT_ARM = 122,
+    VT_ROPE_PARAMETERS = 124,
+    VT_INTERACTED_ITEM = 126,
+    VT_MOVE_COUNT = 128,
+    VT_LOCATION = 130,
+    VT_HIGHEST_LOCATION = 132,
+    VT_LOCATION_PAD = 134,
+    VT_TIGHTROPE = 136,
+    VT_BEETLE_LIFE = 138,
+    VT_HAS_BEETLE_THINGS = 140,
+    VT_SMALL_WATERSKIN = 142,
+    VT_BIG_WATERSKIN = 144,
+    VT_VEHICLE = 146,
+    VT_EXTRA_ANIM = 148,
+    VT_MINE_L = 150,
+    VT_MINE_R = 152,
+    VT_WEAPONS = 154,
+    VT_PUZZLES = 156,
+    VT_KEYS = 158,
+    VT_PICKUPS = 160,
+    VT_EXAMINES = 162,
+    VT_PUZZLES_COMBO = 164,
+    VT_KEYS_COMBO = 166,
+    VT_PICKUPS_COMBO = 168,
+    VT_EXAMINES_COMBO = 170,
+    VT_SECRETS = 172,
+    VT_LASERSIGHT = 174,
+    VT_CROWBAR = 176,
+    VT_TORCH = 178,
+    VT_SILENCER = 180,
+    VT_BINOCULARS = 182,
+    VT_NUM_LARGE_MEDIPACKS = 184,
+    VT_NUM_SMALL_MEDIPACKS = 186,
+    VT_NUM_FLARES = 188,
+    VT_TARGET_ITEM_NUMBER = 190
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -1649,6 +2004,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t pose_count() const {
     return GetField<int32_t>(VT_POSE_COUNT, 0);
   }
+  int32_t projected_floor_height() const {
+    return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
+  }
   int32_t jump_direction() const {
     return GetField<int32_t>(VT_JUMP_DIRECTION, 0);
   }
@@ -1679,14 +2037,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t current_active() const {
     return GetField<int32_t>(VT_CURRENT_ACTIVE, 0);
   }
-  int32_t current_x_vel() const {
-    return GetField<int32_t>(VT_CURRENT_X_VEL, 0);
-  }
-  int32_t current_y_vel() const {
-    return GetField<int32_t>(VT_CURRENT_Y_VEL, 0);
-  }
-  int32_t current_z_vel() const {
-    return GetField<int32_t>(VT_CURRENT_Z_VEL, 0);
+  const TEN::Save::ExtraVelocity *current_vel() const {
+    return GetPointer<const TEN::Save::ExtraVelocity *>(VT_CURRENT_VEL);
   }
   int32_t spasm_effect_count() const {
     return GetField<int32_t>(VT_SPASM_EFFECT_COUNT, 0);
@@ -1784,23 +2136,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
   }
-  int32_t head_x_rot() const {
-    return GetField<int32_t>(VT_HEAD_X_ROT, 0);
+  const TEN::Save::ExtraRotation *extra_head_rot() const {
+    return GetPointer<const TEN::Save::ExtraRotation *>(VT_EXTRA_HEAD_ROT);
   }
-  int32_t head_y_rot() const {
-    return GetField<int32_t>(VT_HEAD_Y_ROT, 0);
-  }
-  int32_t head_z_rot() const {
-    return GetField<int32_t>(VT_HEAD_Z_ROT, 0);
-  }
-  int32_t torso_x_rot() const {
-    return GetField<int32_t>(VT_TORSO_X_ROT, 0);
-  }
-  int32_t torso_y_rot() const {
-    return GetField<int32_t>(VT_TORSO_Y_ROT, 0);
-  }
-  int32_t torso_z_rot() const {
-    return GetField<int32_t>(VT_TORSO_Z_ROT, 0);
+  const TEN::Save::ExtraRotation *extra_torso_rot() const {
+    return GetPointer<const TEN::Save::ExtraRotation *>(VT_EXTRA_TORSO_ROT);
   }
   const TEN::Save::LaraArmInfo *left_arm() const {
     return GetPointer<const TEN::Save::LaraArmInfo *>(VT_LEFT_ARM);
@@ -1808,56 +2148,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::LaraArmInfo *right_arm() const {
     return GetPointer<const TEN::Save::LaraArmInfo *>(VT_RIGHT_ARM);
   }
-  int32_t rope_segment() const {
-    return GetField<int32_t>(VT_ROPE_SEGMENT, 0);
-  }
-  int32_t rope_direction() const {
-    return GetField<int32_t>(VT_ROPE_DIRECTION, 0);
-  }
-  int32_t rope_arc_front() const {
-    return GetField<int32_t>(VT_ROPE_ARC_FRONT, 0);
-  }
-  int32_t rope_arc_back() const {
-    return GetField<int32_t>(VT_ROPE_ARC_BACK, 0);
-  }
-  int32_t rope_last_x() const {
-    return GetField<int32_t>(VT_ROPE_LAST_X, 0);
-  }
-  int32_t rope_max_x_forward() const {
-    return GetField<int32_t>(VT_ROPE_MAX_X_FORWARD, 0);
-  }
-  int32_t rope_max_x_backward() const {
-    return GetField<int32_t>(VT_ROPE_MAX_X_BACKWARD, 0);
-  }
-  int32_t rope_dframe() const {
-    return GetField<int32_t>(VT_ROPE_DFRAME, 0);
-  }
-  int32_t rope_frame() const {
-    return GetField<int32_t>(VT_ROPE_FRAME, 0);
-  }
-  int32_t rope_framerate() const {
-    return GetField<int32_t>(VT_ROPE_FRAMERATE, 0);
-  }
-  int32_t rope_y() const {
-    return GetField<int32_t>(VT_ROPE_Y, 0);
-  }
-  int32_t rope_ptr() const {
-    return GetField<int32_t>(VT_ROPE_PTR, 0);
+  const TEN::Save::LaraRope *rope_parameters() const {
+    return GetPointer<const TEN::Save::LaraRope *>(VT_ROPE_PARAMETERS);
   }
   int32_t interacted_item() const {
     return GetField<int32_t>(VT_INTERACTED_ITEM, 0);
-  }
-  int32_t rope_offset() const {
-    return GetField<int32_t>(VT_ROPE_OFFSET, 0);
-  }
-  int32_t rope_down_vel() const {
-    return GetField<int32_t>(VT_ROPE_DOWN_VEL, 0);
-  }
-  int32_t rope_flag() const {
-    return GetField<int32_t>(VT_ROPE_FLAG, 0);
-  }
-  int32_t rope_count() const {
-    return GetField<int32_t>(VT_ROPE_COUNT, 0);
   }
   int32_t move_count() const {
     return GetField<int32_t>(VT_MOVE_COUNT, 0);
@@ -1969,6 +2264,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyField<uint8_t>(verifier, VT_CLIMB_STATUS) &&
            VerifyField<int32_t>(verifier, VT_POSE_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
            VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_RUN_JUMP_COUNT) &&
            VerifyField<uint8_t>(verifier, VT_RUN_JUMP_QUEUED) &&
@@ -1979,9 +2275,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_DIVE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_DEATH_COUNT) &&
            VerifyField<int32_t>(verifier, VT_CURRENT_ACTIVE) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_X_VEL) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_Y_VEL) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_Z_VEL) &&
+           VerifyOffset(verifier, VT_CURRENT_VEL) &&
+           verifier.VerifyTable(current_vel()) &&
            VerifyField<int32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_FLARE_AGE) &&
            VerifyField<int32_t>(verifier, VT_BURN_COUNT) &&
@@ -2018,33 +2313,17 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(target_angles()) &&
            VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
-           VerifyField<int32_t>(verifier, VT_HEAD_X_ROT) &&
-           VerifyField<int32_t>(verifier, VT_HEAD_Y_ROT) &&
-           VerifyField<int32_t>(verifier, VT_HEAD_Z_ROT) &&
-           VerifyField<int32_t>(verifier, VT_TORSO_X_ROT) &&
-           VerifyField<int32_t>(verifier, VT_TORSO_Y_ROT) &&
-           VerifyField<int32_t>(verifier, VT_TORSO_Z_ROT) &&
+           VerifyOffset(verifier, VT_EXTRA_HEAD_ROT) &&
+           verifier.VerifyTable(extra_head_rot()) &&
+           VerifyOffset(verifier, VT_EXTRA_TORSO_ROT) &&
+           verifier.VerifyTable(extra_torso_rot()) &&
            VerifyOffset(verifier, VT_LEFT_ARM) &&
            verifier.VerifyTable(left_arm()) &&
            VerifyOffset(verifier, VT_RIGHT_ARM) &&
            verifier.VerifyTable(right_arm()) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_SEGMENT) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_DIRECTION) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_ARC_FRONT) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_ARC_BACK) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_LAST_X) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_MAX_X_FORWARD) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_MAX_X_BACKWARD) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_DFRAME) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_FRAME) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_FRAMERATE) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_Y) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_PTR) &&
+           VerifyOffset(verifier, VT_ROPE_PARAMETERS) &&
+           verifier.VerifyTable(rope_parameters()) &&
            VerifyField<int32_t>(verifier, VT_INTERACTED_ITEM) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_OFFSET) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_DOWN_VEL) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_FLAG) &&
-           VerifyField<int32_t>(verifier, VT_ROPE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_MOVE_COUNT) &&
            VerifyField<int32_t>(verifier, VT_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_HIGHEST_LOCATION) &&
@@ -2135,6 +2414,9 @@ struct LaraBuilder {
   void add_pose_count(int32_t pose_count) {
     fbb_.AddElement<int32_t>(Lara::VT_POSE_COUNT, pose_count, 0);
   }
+  void add_projected_floor_height(int32_t projected_floor_height) {
+    fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
+  }
   void add_jump_direction(int32_t jump_direction) {
     fbb_.AddElement<int32_t>(Lara::VT_JUMP_DIRECTION, jump_direction, 0);
   }
@@ -2165,14 +2447,8 @@ struct LaraBuilder {
   void add_current_active(int32_t current_active) {
     fbb_.AddElement<int32_t>(Lara::VT_CURRENT_ACTIVE, current_active, 0);
   }
-  void add_current_x_vel(int32_t current_x_vel) {
-    fbb_.AddElement<int32_t>(Lara::VT_CURRENT_X_VEL, current_x_vel, 0);
-  }
-  void add_current_y_vel(int32_t current_y_vel) {
-    fbb_.AddElement<int32_t>(Lara::VT_CURRENT_Y_VEL, current_y_vel, 0);
-  }
-  void add_current_z_vel(int32_t current_z_vel) {
-    fbb_.AddElement<int32_t>(Lara::VT_CURRENT_Z_VEL, current_z_vel, 0);
+  void add_current_vel(flatbuffers::Offset<TEN::Save::ExtraVelocity> current_vel) {
+    fbb_.AddOffset(Lara::VT_CURRENT_VEL, current_vel);
   }
   void add_spasm_effect_count(int32_t spasm_effect_count) {
     fbb_.AddElement<int32_t>(Lara::VT_SPASM_EFFECT_COUNT, spasm_effect_count, 0);
@@ -2270,23 +2546,11 @@ struct LaraBuilder {
   void add_move_angle(int32_t move_angle) {
     fbb_.AddElement<int32_t>(Lara::VT_MOVE_ANGLE, move_angle, 0);
   }
-  void add_head_x_rot(int32_t head_x_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_HEAD_X_ROT, head_x_rot, 0);
+  void add_extra_head_rot(flatbuffers::Offset<TEN::Save::ExtraRotation> extra_head_rot) {
+    fbb_.AddOffset(Lara::VT_EXTRA_HEAD_ROT, extra_head_rot);
   }
-  void add_head_y_rot(int32_t head_y_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_HEAD_Y_ROT, head_y_rot, 0);
-  }
-  void add_head_z_rot(int32_t head_z_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_HEAD_Z_ROT, head_z_rot, 0);
-  }
-  void add_torso_x_rot(int32_t torso_x_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_TORSO_X_ROT, torso_x_rot, 0);
-  }
-  void add_torso_y_rot(int32_t torso_y_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_TORSO_Y_ROT, torso_y_rot, 0);
-  }
-  void add_torso_z_rot(int32_t torso_z_rot) {
-    fbb_.AddElement<int32_t>(Lara::VT_TORSO_Z_ROT, torso_z_rot, 0);
+  void add_extra_torso_rot(flatbuffers::Offset<TEN::Save::ExtraRotation> extra_torso_rot) {
+    fbb_.AddOffset(Lara::VT_EXTRA_TORSO_ROT, extra_torso_rot);
   }
   void add_left_arm(flatbuffers::Offset<TEN::Save::LaraArmInfo> left_arm) {
     fbb_.AddOffset(Lara::VT_LEFT_ARM, left_arm);
@@ -2294,56 +2558,11 @@ struct LaraBuilder {
   void add_right_arm(flatbuffers::Offset<TEN::Save::LaraArmInfo> right_arm) {
     fbb_.AddOffset(Lara::VT_RIGHT_ARM, right_arm);
   }
-  void add_rope_segment(int32_t rope_segment) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_SEGMENT, rope_segment, 0);
-  }
-  void add_rope_direction(int32_t rope_direction) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_DIRECTION, rope_direction, 0);
-  }
-  void add_rope_arc_front(int32_t rope_arc_front) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_ARC_FRONT, rope_arc_front, 0);
-  }
-  void add_rope_arc_back(int32_t rope_arc_back) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_ARC_BACK, rope_arc_back, 0);
-  }
-  void add_rope_last_x(int32_t rope_last_x) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_LAST_X, rope_last_x, 0);
-  }
-  void add_rope_max_x_forward(int32_t rope_max_x_forward) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_MAX_X_FORWARD, rope_max_x_forward, 0);
-  }
-  void add_rope_max_x_backward(int32_t rope_max_x_backward) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_MAX_X_BACKWARD, rope_max_x_backward, 0);
-  }
-  void add_rope_dframe(int32_t rope_dframe) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_DFRAME, rope_dframe, 0);
-  }
-  void add_rope_frame(int32_t rope_frame) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_FRAME, rope_frame, 0);
-  }
-  void add_rope_framerate(int32_t rope_framerate) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_FRAMERATE, rope_framerate, 0);
-  }
-  void add_rope_y(int32_t rope_y) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_Y, rope_y, 0);
-  }
-  void add_rope_ptr(int32_t rope_ptr) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_PTR, rope_ptr, 0);
+  void add_rope_parameters(flatbuffers::Offset<TEN::Save::LaraRope> rope_parameters) {
+    fbb_.AddOffset(Lara::VT_ROPE_PARAMETERS, rope_parameters);
   }
   void add_interacted_item(int32_t interacted_item) {
     fbb_.AddElement<int32_t>(Lara::VT_INTERACTED_ITEM, interacted_item, 0);
-  }
-  void add_rope_offset(int32_t rope_offset) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_OFFSET, rope_offset, 0);
-  }
-  void add_rope_down_vel(int32_t rope_down_vel) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_DOWN_VEL, rope_down_vel, 0);
-  }
-  void add_rope_flag(int32_t rope_flag) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_FLAG, rope_flag, 0);
-  }
-  void add_rope_count(int32_t rope_count) {
-    fbb_.AddElement<int32_t>(Lara::VT_ROPE_COUNT, rope_count, 0);
   }
   void add_move_count(int32_t move_count) {
     fbb_.AddElement<int32_t>(Lara::VT_MOVE_COUNT, move_count, 0);
@@ -2466,6 +2685,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t water_status = 0,
     bool climb_status = false,
     int32_t pose_count = 0,
+    int32_t projected_floor_height = 0,
     int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
     bool run_jump_queued = false,
@@ -2476,9 +2696,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t dive_count = 0,
     int32_t death_count = 0,
     int32_t current_active = 0,
-    int32_t current_x_vel = 0,
-    int32_t current_y_vel = 0,
-    int32_t current_z_vel = 0,
+    flatbuffers::Offset<TEN::Save::ExtraVelocity> current_vel = 0,
     int32_t spasm_effect_count = 0,
     int32_t flare_age = 0,
     int32_t burn_count = 0,
@@ -2511,31 +2729,12 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_angles = 0,
     int32_t turn_rate = 0,
     int32_t move_angle = 0,
-    int32_t head_x_rot = 0,
-    int32_t head_y_rot = 0,
-    int32_t head_z_rot = 0,
-    int32_t torso_x_rot = 0,
-    int32_t torso_y_rot = 0,
-    int32_t torso_z_rot = 0,
+    flatbuffers::Offset<TEN::Save::ExtraRotation> extra_head_rot = 0,
+    flatbuffers::Offset<TEN::Save::ExtraRotation> extra_torso_rot = 0,
     flatbuffers::Offset<TEN::Save::LaraArmInfo> left_arm = 0,
     flatbuffers::Offset<TEN::Save::LaraArmInfo> right_arm = 0,
-    int32_t rope_segment = 0,
-    int32_t rope_direction = 0,
-    int32_t rope_arc_front = 0,
-    int32_t rope_arc_back = 0,
-    int32_t rope_last_x = 0,
-    int32_t rope_max_x_forward = 0,
-    int32_t rope_max_x_backward = 0,
-    int32_t rope_dframe = 0,
-    int32_t rope_frame = 0,
-    int32_t rope_framerate = 0,
-    int32_t rope_y = 0,
-    int32_t rope_ptr = 0,
+    flatbuffers::Offset<TEN::Save::LaraRope> rope_parameters = 0,
     int32_t interacted_item = 0,
-    int32_t rope_offset = 0,
-    int32_t rope_down_vel = 0,
-    int32_t rope_flag = 0,
-    int32_t rope_count = 0,
     int32_t move_count = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
@@ -2594,31 +2793,12 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_highest_location(highest_location);
   builder_.add_location(location);
   builder_.add_move_count(move_count);
-  builder_.add_rope_count(rope_count);
-  builder_.add_rope_flag(rope_flag);
-  builder_.add_rope_down_vel(rope_down_vel);
-  builder_.add_rope_offset(rope_offset);
   builder_.add_interacted_item(interacted_item);
-  builder_.add_rope_ptr(rope_ptr);
-  builder_.add_rope_y(rope_y);
-  builder_.add_rope_framerate(rope_framerate);
-  builder_.add_rope_frame(rope_frame);
-  builder_.add_rope_dframe(rope_dframe);
-  builder_.add_rope_max_x_backward(rope_max_x_backward);
-  builder_.add_rope_max_x_forward(rope_max_x_forward);
-  builder_.add_rope_last_x(rope_last_x);
-  builder_.add_rope_arc_back(rope_arc_back);
-  builder_.add_rope_arc_front(rope_arc_front);
-  builder_.add_rope_direction(rope_direction);
-  builder_.add_rope_segment(rope_segment);
+  builder_.add_rope_parameters(rope_parameters);
   builder_.add_right_arm(right_arm);
   builder_.add_left_arm(left_arm);
-  builder_.add_torso_z_rot(torso_z_rot);
-  builder_.add_torso_y_rot(torso_y_rot);
-  builder_.add_torso_x_rot(torso_x_rot);
-  builder_.add_head_z_rot(head_z_rot);
-  builder_.add_head_y_rot(head_y_rot);
-  builder_.add_head_x_rot(head_x_rot);
+  builder_.add_extra_torso_rot(extra_torso_rot);
+  builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_move_angle(move_angle);
   builder_.add_turn_rate(turn_rate);
   builder_.add_target_angles(target_angles);
@@ -2637,9 +2817,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_burn_count(burn_count);
   builder_.add_flare_age(flare_age);
   builder_.add_spasm_effect_count(spasm_effect_count);
-  builder_.add_current_z_vel(current_z_vel);
-  builder_.add_current_y_vel(current_y_vel);
-  builder_.add_current_x_vel(current_x_vel);
+  builder_.add_current_vel(current_vel);
   builder_.add_current_active(current_active);
   builder_.add_death_count(death_count);
   builder_.add_dive_count(dive_count);
@@ -2649,6 +2827,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_hit_frame(hit_frame);
   builder_.add_run_jump_count(run_jump_count);
   builder_.add_jump_direction(jump_direction);
+  builder_.add_projected_floor_height(projected_floor_height);
   builder_.add_pose_count(pose_count);
   builder_.add_water_status(water_status);
   builder_.add_calc_jump_velocity(calc_jump_velocity);
@@ -2705,6 +2884,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t water_status = 0,
     bool climb_status = false,
     int32_t pose_count = 0,
+    int32_t projected_floor_height = 0,
     int32_t jump_direction = 0,
     int32_t run_jump_count = 0,
     bool run_jump_queued = false,
@@ -2715,9 +2895,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t dive_count = 0,
     int32_t death_count = 0,
     int32_t current_active = 0,
-    int32_t current_x_vel = 0,
-    int32_t current_y_vel = 0,
-    int32_t current_z_vel = 0,
+    flatbuffers::Offset<TEN::Save::ExtraVelocity> current_vel = 0,
     int32_t spasm_effect_count = 0,
     int32_t flare_age = 0,
     int32_t burn_count = 0,
@@ -2750,31 +2928,12 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     const std::vector<int32_t> *target_angles = nullptr,
     int32_t turn_rate = 0,
     int32_t move_angle = 0,
-    int32_t head_x_rot = 0,
-    int32_t head_y_rot = 0,
-    int32_t head_z_rot = 0,
-    int32_t torso_x_rot = 0,
-    int32_t torso_y_rot = 0,
-    int32_t torso_z_rot = 0,
+    flatbuffers::Offset<TEN::Save::ExtraRotation> extra_head_rot = 0,
+    flatbuffers::Offset<TEN::Save::ExtraRotation> extra_torso_rot = 0,
     flatbuffers::Offset<TEN::Save::LaraArmInfo> left_arm = 0,
     flatbuffers::Offset<TEN::Save::LaraArmInfo> right_arm = 0,
-    int32_t rope_segment = 0,
-    int32_t rope_direction = 0,
-    int32_t rope_arc_front = 0,
-    int32_t rope_arc_back = 0,
-    int32_t rope_last_x = 0,
-    int32_t rope_max_x_forward = 0,
-    int32_t rope_max_x_backward = 0,
-    int32_t rope_dframe = 0,
-    int32_t rope_frame = 0,
-    int32_t rope_framerate = 0,
-    int32_t rope_y = 0,
-    int32_t rope_ptr = 0,
+    flatbuffers::Offset<TEN::Save::LaraRope> rope_parameters = 0,
     int32_t interacted_item = 0,
-    int32_t rope_offset = 0,
-    int32_t rope_down_vel = 0,
-    int32_t rope_flag = 0,
-    int32_t rope_count = 0,
     int32_t move_count = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
@@ -2833,6 +2992,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       water_status,
       climb_status,
       pose_count,
+      projected_floor_height,
       jump_direction,
       run_jump_count,
       run_jump_queued,
@@ -2843,9 +3003,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       dive_count,
       death_count,
       current_active,
-      current_x_vel,
-      current_y_vel,
-      current_z_vel,
+      current_vel,
       spasm_effect_count,
       flare_age,
       burn_count,
@@ -2878,31 +3036,12 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       target_angles__,
       turn_rate,
       move_angle,
-      head_x_rot,
-      head_y_rot,
-      head_z_rot,
-      torso_x_rot,
-      torso_y_rot,
-      torso_z_rot,
+      extra_head_rot,
+      extra_torso_rot,
       left_arm,
       right_arm,
-      rope_segment,
-      rope_direction,
-      rope_arc_front,
-      rope_arc_back,
-      rope_last_x,
-      rope_max_x_forward,
-      rope_max_x_backward,
-      rope_dframe,
-      rope_frame,
-      rope_framerate,
-      rope_y,
-      rope_ptr,
+      rope_parameters,
       interacted_item,
-      rope_offset,
-      rope_down_vel,
-      rope_flag,
-      rope_count,
       move_count,
       location,
       highest_location,
@@ -5102,6 +5241,141 @@ inline flatbuffers::Offset<LaraTightropeInfo> CreateLaraTightropeInfo(flatbuffer
       _tightrope_item);
 }
 
+inline ExtraVelocityT *ExtraVelocity::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ExtraVelocityT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ExtraVelocity::UnPackTo(ExtraVelocityT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+}
+
+inline flatbuffers::Offset<ExtraVelocity> ExtraVelocity::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExtraVelocityT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateExtraVelocity(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ExtraVelocity> CreateExtraVelocity(flatbuffers::FlatBufferBuilder &_fbb, const ExtraVelocityT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ExtraVelocityT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  return TEN::Save::CreateExtraVelocity(
+      _fbb,
+      _x,
+      _y,
+      _z);
+}
+
+inline ExtraRotationT *ExtraRotation::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ExtraRotationT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ExtraRotation::UnPackTo(ExtraRotationT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+}
+
+inline flatbuffers::Offset<ExtraRotation> ExtraRotation::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ExtraRotationT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateExtraRotation(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ExtraRotation> CreateExtraRotation(flatbuffers::FlatBufferBuilder &_fbb, const ExtraRotationT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ExtraRotationT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  return TEN::Save::CreateExtraRotation(
+      _fbb,
+      _x,
+      _y,
+      _z);
+}
+
+inline LaraRopeT *LaraRope::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<LaraRopeT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void LaraRope::UnPackTo(LaraRopeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = segment(); _o->segment = _e; }
+  { auto _e = direction(); _o->direction = _e; }
+  { auto _e = arc_front(); _o->arc_front = _e; }
+  { auto _e = arc_back(); _o->arc_back = _e; }
+  { auto _e = last_x(); _o->last_x = _e; }
+  { auto _e = max_x_forward(); _o->max_x_forward = _e; }
+  { auto _e = max_x_backward(); _o->max_x_backward = _e; }
+  { auto _e = dframe(); _o->dframe = _e; }
+  { auto _e = frame(); _o->frame = _e; }
+  { auto _e = frame_rate(); _o->frame_rate = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = ptr(); _o->ptr = _e; }
+  { auto _e = offset(); _o->offset = _e; }
+  { auto _e = down_vel(); _o->down_vel = _e; }
+  { auto _e = flag(); _o->flag = _e; }
+  { auto _e = count(); _o->count = _e; }
+}
+
+inline flatbuffers::Offset<LaraRope> LaraRope::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraRopeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLaraRope(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LaraRope> CreateLaraRope(flatbuffers::FlatBufferBuilder &_fbb, const LaraRopeT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraRopeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _segment = _o->segment;
+  auto _direction = _o->direction;
+  auto _arc_front = _o->arc_front;
+  auto _arc_back = _o->arc_back;
+  auto _last_x = _o->last_x;
+  auto _max_x_forward = _o->max_x_forward;
+  auto _max_x_backward = _o->max_x_backward;
+  auto _dframe = _o->dframe;
+  auto _frame = _o->frame;
+  auto _frame_rate = _o->frame_rate;
+  auto _y = _o->y;
+  auto _ptr = _o->ptr;
+  auto _offset = _o->offset;
+  auto _down_vel = _o->down_vel;
+  auto _flag = _o->flag;
+  auto _count = _o->count;
+  return TEN::Save::CreateLaraRope(
+      _fbb,
+      _segment,
+      _direction,
+      _arc_front,
+      _arc_back,
+      _last_x,
+      _max_x_forward,
+      _max_x_backward,
+      _dframe,
+      _frame,
+      _frame_rate,
+      _y,
+      _ptr,
+      _offset,
+      _down_vel,
+      _flag,
+      _count);
+}
+
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraT>();
   UnPackTo(_o.get(), _resolver);
@@ -5123,6 +5397,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = climb_status(); _o->climb_status = _e; }
   { auto _e = pose_count(); _o->pose_count = _e; }
+  { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
   { auto _e = jump_direction(); _o->jump_direction = _e; }
   { auto _e = run_jump_count(); _o->run_jump_count = _e; }
   { auto _e = run_jump_queued(); _o->run_jump_queued = _e; }
@@ -5133,9 +5408,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = dive_count(); _o->dive_count = _e; }
   { auto _e = death_count(); _o->death_count = _e; }
   { auto _e = current_active(); _o->current_active = _e; }
-  { auto _e = current_x_vel(); _o->current_x_vel = _e; }
-  { auto _e = current_y_vel(); _o->current_y_vel = _e; }
-  { auto _e = current_z_vel(); _o->current_z_vel = _e; }
+  { auto _e = current_vel(); if (_e) _o->current_vel = std::unique_ptr<TEN::Save::ExtraVelocityT>(_e->UnPack(_resolver)); }
   { auto _e = spasm_effect_count(); _o->spasm_effect_count = _e; }
   { auto _e = flare_age(); _o->flare_age = _e; }
   { auto _e = burn_count(); _o->burn_count = _e; }
@@ -5168,31 +5441,12 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = target_angles(); if (_e) { _o->target_angles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->target_angles[_i] = _e->Get(_i); } } }
   { auto _e = turn_rate(); _o->turn_rate = _e; }
   { auto _e = move_angle(); _o->move_angle = _e; }
-  { auto _e = head_x_rot(); _o->head_x_rot = _e; }
-  { auto _e = head_y_rot(); _o->head_y_rot = _e; }
-  { auto _e = head_z_rot(); _o->head_z_rot = _e; }
-  { auto _e = torso_x_rot(); _o->torso_x_rot = _e; }
-  { auto _e = torso_y_rot(); _o->torso_y_rot = _e; }
-  { auto _e = torso_z_rot(); _o->torso_z_rot = _e; }
+  { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::ExtraRotationT>(_e->UnPack(_resolver)); }
+  { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::ExtraRotationT>(_e->UnPack(_resolver)); }
   { auto _e = left_arm(); if (_e) _o->left_arm = std::unique_ptr<TEN::Save::LaraArmInfoT>(_e->UnPack(_resolver)); }
   { auto _e = right_arm(); if (_e) _o->right_arm = std::unique_ptr<TEN::Save::LaraArmInfoT>(_e->UnPack(_resolver)); }
-  { auto _e = rope_segment(); _o->rope_segment = _e; }
-  { auto _e = rope_direction(); _o->rope_direction = _e; }
-  { auto _e = rope_arc_front(); _o->rope_arc_front = _e; }
-  { auto _e = rope_arc_back(); _o->rope_arc_back = _e; }
-  { auto _e = rope_last_x(); _o->rope_last_x = _e; }
-  { auto _e = rope_max_x_forward(); _o->rope_max_x_forward = _e; }
-  { auto _e = rope_max_x_backward(); _o->rope_max_x_backward = _e; }
-  { auto _e = rope_dframe(); _o->rope_dframe = _e; }
-  { auto _e = rope_frame(); _o->rope_frame = _e; }
-  { auto _e = rope_framerate(); _o->rope_framerate = _e; }
-  { auto _e = rope_y(); _o->rope_y = _e; }
-  { auto _e = rope_ptr(); _o->rope_ptr = _e; }
+  { auto _e = rope_parameters(); if (_e) _o->rope_parameters = std::unique_ptr<TEN::Save::LaraRopeT>(_e->UnPack(_resolver)); }
   { auto _e = interacted_item(); _o->interacted_item = _e; }
-  { auto _e = rope_offset(); _o->rope_offset = _e; }
-  { auto _e = rope_down_vel(); _o->rope_down_vel = _e; }
-  { auto _e = rope_flag(); _o->rope_flag = _e; }
-  { auto _e = rope_count(); _o->rope_count = _e; }
   { auto _e = move_count(); _o->move_count = _e; }
   { auto _e = location(); _o->location = _e; }
   { auto _e = highest_location(); _o->highest_location = _e; }
@@ -5247,6 +5501,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _water_status = _o->water_status;
   auto _climb_status = _o->climb_status;
   auto _pose_count = _o->pose_count;
+  auto _projected_floor_height = _o->projected_floor_height;
   auto _jump_direction = _o->jump_direction;
   auto _run_jump_count = _o->run_jump_count;
   auto _run_jump_queued = _o->run_jump_queued;
@@ -5257,9 +5512,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _dive_count = _o->dive_count;
   auto _death_count = _o->death_count;
   auto _current_active = _o->current_active;
-  auto _current_x_vel = _o->current_x_vel;
-  auto _current_y_vel = _o->current_y_vel;
-  auto _current_z_vel = _o->current_z_vel;
+  auto _current_vel = _o->current_vel ? CreateExtraVelocity(_fbb, _o->current_vel.get(), _rehasher) : 0;
   auto _spasm_effect_count = _o->spasm_effect_count;
   auto _flare_age = _o->flare_age;
   auto _burn_count = _o->burn_count;
@@ -5292,31 +5545,12 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _target_angles = _fbb.CreateVector(_o->target_angles);
   auto _turn_rate = _o->turn_rate;
   auto _move_angle = _o->move_angle;
-  auto _head_x_rot = _o->head_x_rot;
-  auto _head_y_rot = _o->head_y_rot;
-  auto _head_z_rot = _o->head_z_rot;
-  auto _torso_x_rot = _o->torso_x_rot;
-  auto _torso_y_rot = _o->torso_y_rot;
-  auto _torso_z_rot = _o->torso_z_rot;
+  auto _extra_head_rot = _o->extra_head_rot ? CreateExtraRotation(_fbb, _o->extra_head_rot.get(), _rehasher) : 0;
+  auto _extra_torso_rot = _o->extra_torso_rot ? CreateExtraRotation(_fbb, _o->extra_torso_rot.get(), _rehasher) : 0;
   auto _left_arm = _o->left_arm ? CreateLaraArmInfo(_fbb, _o->left_arm.get(), _rehasher) : 0;
   auto _right_arm = _o->right_arm ? CreateLaraArmInfo(_fbb, _o->right_arm.get(), _rehasher) : 0;
-  auto _rope_segment = _o->rope_segment;
-  auto _rope_direction = _o->rope_direction;
-  auto _rope_arc_front = _o->rope_arc_front;
-  auto _rope_arc_back = _o->rope_arc_back;
-  auto _rope_last_x = _o->rope_last_x;
-  auto _rope_max_x_forward = _o->rope_max_x_forward;
-  auto _rope_max_x_backward = _o->rope_max_x_backward;
-  auto _rope_dframe = _o->rope_dframe;
-  auto _rope_frame = _o->rope_frame;
-  auto _rope_framerate = _o->rope_framerate;
-  auto _rope_y = _o->rope_y;
-  auto _rope_ptr = _o->rope_ptr;
+  auto _rope_parameters = _o->rope_parameters ? CreateLaraRope(_fbb, _o->rope_parameters.get(), _rehasher) : 0;
   auto _interacted_item = _o->interacted_item;
-  auto _rope_offset = _o->rope_offset;
-  auto _rope_down_vel = _o->rope_down_vel;
-  auto _rope_flag = _o->rope_flag;
-  auto _rope_count = _o->rope_count;
   auto _move_count = _o->move_count;
   auto _location = _o->location;
   auto _highest_location = _o->highest_location;
@@ -5363,6 +5597,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _water_status,
       _climb_status,
       _pose_count,
+      _projected_floor_height,
       _jump_direction,
       _run_jump_count,
       _run_jump_queued,
@@ -5373,9 +5608,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _dive_count,
       _death_count,
       _current_active,
-      _current_x_vel,
-      _current_y_vel,
-      _current_z_vel,
+      _current_vel,
       _spasm_effect_count,
       _flare_age,
       _burn_count,
@@ -5408,31 +5641,12 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _target_angles,
       _turn_rate,
       _move_angle,
-      _head_x_rot,
-      _head_y_rot,
-      _head_z_rot,
-      _torso_x_rot,
-      _torso_y_rot,
-      _torso_z_rot,
+      _extra_head_rot,
+      _extra_torso_rot,
       _left_arm,
       _right_arm,
-      _rope_segment,
-      _rope_direction,
-      _rope_arc_front,
-      _rope_arc_back,
-      _rope_last_x,
-      _rope_max_x_forward,
-      _rope_max_x_backward,
-      _rope_dframe,
-      _rope_frame,
-      _rope_framerate,
-      _rope_y,
-      _rope_ptr,
+      _rope_parameters,
       _interacted_item,
-      _rope_offset,
-      _rope_down_vel,
-      _rope_flag,
-      _rope_count,
       _move_count,
       _location,
       _highest_location,

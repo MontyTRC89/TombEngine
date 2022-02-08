@@ -64,7 +64,7 @@ void InitialiseLara(int restore)
 
 	Lara.location = -1;
 	Lara.highestLocation = -1;
-	Lara.ropePtr = -1;
+	Lara.ropeParameters.Ptr = -1;
 	LaraItem->hitPoints = LARA_HEALTH_MAX;
 	Lara.gunStatus = LG_HANDS_FREE;
 

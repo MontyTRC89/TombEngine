@@ -2,6 +2,7 @@
 #include "Objects/Generic/Switches/rail_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
@@ -81,10 +82,7 @@ namespace TEN::Entities::Switches
 					l->targetState = LS_LEVERSWITCH_PUSH;
 					l->activeState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
+					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
 					item->status = ITEM_ACTIVE;
@@ -109,10 +107,7 @@ namespace TEN::Entities::Switches
 					l->targetState = LS_LEVERSWITCH_PUSH;
 					l->activeState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
+					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
 					item->status = ITEM_ACTIVE;

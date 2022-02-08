@@ -5,6 +5,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -91,10 +92,7 @@ void LaraCheatyBits()
 					Lara.poisoned = 0;
 					Lara.air = 1800;
 					Lara.deathCount = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
+					ResetLaraFlex(LaraItem);
 				}
 			}
 			else if (!NoCheatCounter)
@@ -124,10 +122,10 @@ void LaraCheatGetStuff()
 		Lara.hasBeetleThings |= 1;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		Lara.small_waterskin = 1;
+		Lara.smallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		Lara.big_waterskin = 1;
+		Lara.bigWaterskin = 1;
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{

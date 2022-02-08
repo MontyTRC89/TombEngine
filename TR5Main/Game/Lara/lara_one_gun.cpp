@@ -88,8 +88,8 @@ void FireHarpoon()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.torsoXrot;
-			item->pos.yRot += Lara.torsoYrot;
+			item->pos.xRot += Lara.extraTorsoRot.x;
+			item->pos.yRot += Lara.extraTorsoRot.y;
 		}
 
 		item->pos.zRot = 0;
@@ -323,8 +323,8 @@ void FireGrenade()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.torsoXrot;
-			item->pos.yRot += Lara.torsoYrot;
+			item->pos.xRot += Lara.extraTorsoRot.x;
+			item->pos.yRot += Lara.extraTorsoRot.y;
 		}
 
 		item->speed = GRENADE_SPEED;
@@ -1483,12 +1483,11 @@ void RifleHandler(int weaponType)
 
 	if (Lara.leftArm.lock)
 	{
-		Lara.torsoXrot = Lara.leftArm.xRot;
-		Lara.torsoYrot = Lara.leftArm.yRot;
+		Lara.extraTorsoRot.x = Lara.leftArm.xRot;
+		Lara.extraTorsoRot.y = Lara.leftArm.yRot;
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
 		{
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
+			Lara.extraHeadRot = { 0, 0, 0 };
 		}
 	}
 
@@ -1590,8 +1589,8 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 			if (!Lara.leftArm.lock)
 			{
-				item->pos.xRot += Lara.torsoXrot;
-				item->pos.yRot += Lara.torsoYrot;
+				item->pos.xRot += Lara.extraTorsoRot.x;
+				item->pos.yRot += Lara.extraTorsoRot.y;
 			}
 		}
 
@@ -1690,8 +1689,8 @@ void FireRocket()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.torsoXrot;
-			item->pos.yRot += Lara.torsoYrot;
+			item->pos.xRot += Lara.extraTorsoRot.x;
+			item->pos.yRot += Lara.extraTorsoRot.y;
 		}
 
 		item->speed = 512 >> 5;
@@ -1887,8 +1886,8 @@ void FireHK(int mode)
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.torsoYrot + Lara.leftArm.yRot + LaraItem->pos.yRot;
-		angles[1] = Lara.torsoXrot + Lara.leftArm.xRot;
+		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[1] = Lara.extraTorsoRot.x + Lara.leftArm.xRot;
 	}
 
 	if (mode)
@@ -1920,8 +1919,8 @@ void FireShotgun()
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.torsoYrot + Lara.leftArm.yRot + LaraItem->pos.yRot;
-		angles[1] = Lara.torsoXrot + Lara.leftArm.xRot;
+		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[1] = Lara.extraTorsoRot.x + Lara.leftArm.xRot;
 	}
 
 	short loopAngles[2];

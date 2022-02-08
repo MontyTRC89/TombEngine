@@ -381,7 +381,7 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 
 	if (!laraInfo->currentActive)
 	{
-		int absVel = abs(laraInfo->currentXvel);
+		int absVel = abs(laraInfo->currentVel.x);
 		int shift;
 
 		if (absVel > 16)
@@ -391,12 +391,12 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		else
 			shift = 2;
 
-		laraInfo->currentXvel -= laraInfo->currentXvel >> shift;
+		laraInfo->currentVel.x -= laraInfo->currentVel.x >> shift;
 
-		if (abs(laraInfo->currentXvel) < 4)
-			laraInfo->currentXvel = 0;
+		if (abs(laraInfo->currentVel.x) < 4)
+			laraInfo->currentVel.x = 0;
 
-		absVel = abs(laraInfo->currentZvel);
+		absVel = abs(laraInfo->currentVel.z);
 		if (absVel > 16)
 			shift = 4;
 		else if (absVel > 8)
@@ -404,11 +404,11 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		else
 			shift = 2;
 
-		laraInfo->currentZvel -= laraInfo->currentZvel >> shift;
-		if (abs(laraInfo->currentZvel) < 4)
-			laraInfo->currentZvel = 0;
+		laraInfo->currentVel.z -= laraInfo->currentVel.z >> shift;
+		if (abs(laraInfo->currentVel.z) < 4)
+			laraInfo->currentVel.z = 0;
 
-		if (laraInfo->currentXvel == 0 && laraInfo->currentZvel == 0)
+		if (laraInfo->currentVel.x == 0 && laraInfo->currentVel.z == 0)
 			return;
 	}
 	else
@@ -429,12 +429,12 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 
-		laraInfo->currentXvel += (dx - laraInfo->currentXvel) / 16;
-		laraInfo->currentZvel += (dz - laraInfo->currentZvel) / 16;
+		laraInfo->currentVel.x += (dx - laraInfo->currentVel.x) / 16;
+		laraInfo->currentVel.z += (dz - laraInfo->currentVel.z) / 16;
 	}
 
-	kayakItem->pos.xPos += laraInfo->currentXvel / 256;
-	kayakItem->pos.zPos += laraInfo->currentZvel / 256;
+	kayakItem->pos.xPos += laraInfo->currentVel.x / 256;
+	kayakItem->pos.zPos += laraInfo->currentVel.z / 256;
 
 	laraInfo->currentActive = 0;
 }
@@ -751,7 +751,7 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_IDLE:
 		if (TrInput & KAYAK_IN_DISMOUNT &&
 			!laraInfo->currentActive &&
-			!laraInfo->currentXvel && !laraInfo->currentZvel)
+			!laraInfo->currentVel.x && !laraInfo->currentVel.z)
 		{
 			if (TrInput & KAYAK_IN_LEFT && KayakCanGetOut(kayakItem, -1))
 			{
@@ -797,15 +797,15 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		}
 		else if (TrInput & KAYAK_IN_HOLD_LEFT &&
 			(kayakInfo->Vel ||
-				laraInfo->currentXvel ||
-				laraInfo->currentZvel))
+				laraInfo->currentVel.x ||
+				laraInfo->currentVel.z))
 		{
 			laraItem->targetState = KAYAK_STATE_HOLD_LEFT;
 		}
 		else if (TrInput & KAYAK_IN_HOLD_RIGHT &&
 			(kayakInfo->Vel ||
-				laraInfo->currentXvel ||
-				laraInfo->currentZvel))
+				laraInfo->currentVel.x ||
+				laraInfo->currentVel.z))
 		{
 			laraItem->targetState = KAYAK_STATE_HOLD_RIGHT;
 		}
@@ -961,8 +961,8 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_HOLD_LEFT:
 		if (!(TrInput & KAYAK_IN_HOLD_LEFT) ||
 			!kayakInfo->Vel &&
-				!laraInfo->currentXvel &&
-				!laraInfo->currentZvel)
+				!laraInfo->currentVel.x &&
+				!laraInfo->currentVel.z)
 		{
 			laraItem->targetState = KAYAK_STATE_IDLE;
 		}
@@ -997,8 +997,8 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_HOLD_RIGHT:
 		if (!(TrInput & KAYAK_IN_HOLD_RIGHT) ||
 			(!kayakInfo->Vel &&
-				!laraInfo->currentXvel &&
-				!laraInfo->currentZvel))
+				!laraInfo->currentVel.x &&
+				!laraInfo->currentVel.z))
 		{
 			laraItem->targetState = KAYAK_STATE_IDLE;
 		}
@@ -1357,8 +1357,8 @@ int KayakControl(ITEM_INFO* laraItem)
 	}
 
 	if (!kayakItem->speed &&
-		!laraInfo->currentXvel &&
-		!laraInfo->currentZvel)
+		!laraInfo->currentVel.x &&
+		!laraInfo->currentVel.z)
 	{
 		if (WakeShade)
 			WakeShade--;

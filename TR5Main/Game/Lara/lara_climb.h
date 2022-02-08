@@ -38,4 +38,4 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll);
 int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll);
 int LaraTestClimb(int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift);
 int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge);
-int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll);
+bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll);

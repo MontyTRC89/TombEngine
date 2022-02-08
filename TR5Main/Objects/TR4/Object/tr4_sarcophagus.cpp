@@ -3,6 +3,7 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
@@ -42,10 +43,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->status = ITEM_ACTIVE;
 
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
 			else

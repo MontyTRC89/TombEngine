@@ -2,6 +2,7 @@
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/crowbar_switch.h"
 #include "Game/gui.h"
 #include "Sound/sound.h"
@@ -138,10 +139,7 @@ namespace TEN::Entities::Switches
 				l->targetState = LS_SWITCH_DOWN;
 				l->activeState = LS_SWITCH_DOWN;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->status = ITEM_ACTIVE;
 
