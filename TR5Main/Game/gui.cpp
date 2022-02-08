@@ -697,7 +697,8 @@ InventoryResult GuiController::TitleOptions()
 		else if (menu_to_display == Menu::SelectLevel)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
-			g_GameFlow->SelectedLevelForNewGame = selected_option;
+			// Level 0 is the title level, so increment the option by 1 to offset it.
+			g_GameFlow->SelectedLevelForNewGame = selected_option + 1;
 			menu_to_display = Menu::Title;
 			selected_option = 0;
 			ret = InventoryResult::NewGameSelectedLevel;
