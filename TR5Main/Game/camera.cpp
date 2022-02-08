@@ -148,10 +148,10 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	if (OldCam.pos.xRot != LaraItem->pos.xRot ||
 		OldCam.pos.yRot != LaraItem->pos.yRot ||
 		OldCam.pos.zRot != LaraItem->pos.zRot ||
-		OldCam.pos2.xRot != Lara.headXrot ||
-		OldCam.pos2.yRot != Lara.headYrot ||
-		OldCam.pos2.xPos != Lara.torsoXrot ||
-		OldCam.pos2.yPos != Lara.torsoYrot ||
+		OldCam.pos2.xRot != Lara.extraHeadRot.x ||
+		OldCam.pos2.yRot != Lara.extraHeadRot.y ||
+		OldCam.pos2.xPos != Lara.extraTorsoRot.x ||
+		OldCam.pos2.yPos != Lara.extraTorsoRot.y ||
 		OldCam.pos.xPos != LaraItem->pos.xPos ||
 		OldCam.pos.yPos != LaraItem->pos.yPos ||
 		OldCam.pos.zPos != LaraItem->pos.zPos ||
@@ -170,10 +170,10 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xRot = LaraItem->pos.xRot;
 		OldCam.pos.yRot = LaraItem->pos.yRot;
 		OldCam.pos.zRot = LaraItem->pos.zRot;
-		OldCam.pos2.xRot = Lara.headXrot;
-		OldCam.pos2.yRot = Lara.headYrot;
-		OldCam.pos2.xPos = Lara.torsoXrot;
-		OldCam.pos2.yPos = Lara.torsoYrot;
+		OldCam.pos2.xRot = Lara.extraHeadRot.x;
+		OldCam.pos2.yRot = Lara.extraHeadRot.y;
+		OldCam.pos2.xPos = Lara.extraTorsoRot.x;
+		OldCam.pos2.yPos = Lara.extraTorsoRot.y;
 		OldCam.pos.xPos = LaraItem->pos.xPos;
 		OldCam.pos.yPos = LaraItem->pos.yPos;
 		OldCam.pos.zPos = LaraItem->pos.zPos;
@@ -465,8 +465,8 @@ void CombatCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.targetAngle = Lara.headYrot + Lara.torsoYrot;
-		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15.0f);
+		Camera.targetAngle = Lara.extraHeadRot.y + Lara.extraTorsoRot.y;
+		Camera.targetElevation = Lara.extraHeadRot.x + Lara.extraTorsoRot.x + item->pos.xRot - ANGLE(15.0f);
 	}
 
 	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
@@ -780,34 +780,34 @@ void LookCamera(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
-	short headXrot = info->headXrot;
-	short headYrot = info->headYrot;
-	short torsoXrot = info->torsoXrot;
-	short torsoYrot = info->torsoYrot;
+	short headXRot = info->extraHeadRot.x;
+	short headYRot = info->extraHeadRot.y;
+	short torsoXRot = info->extraTorsoRot.x;
+	short torsoYRot = info->extraTorsoRot.y;
 
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
-	info->headXrot *= 2;
-	info->headYrot *= 2;
+	info->extraTorsoRot.x = 0;
+	info->extraTorsoRot.y = 0;
+	info->extraHeadRot.x *= 2;
+	info->extraHeadRot.y *= 2;
 
 	// Clamp head rotation.
-	if (info->headXrot > ANGLE(55.0f))
-		info->headXrot = ANGLE(55.0f);
-	else if (info->headXrot < -ANGLE(75.0f))
-		info->headXrot = -ANGLE(75.0f);
-	if (info->headYrot < -ANGLE(80.0f))
-		info->headYrot = -ANGLE(80.0f);
-	else if (info->headYrot > ANGLE(80.0f))
-		info->headYrot = ANGLE(80.0f);
+	if (info->extraHeadRot.x > ANGLE(55.0f))
+		info->extraHeadRot.x = ANGLE(55.0f);
+	else if (info->extraHeadRot.x < -ANGLE(75.0f))
+		info->extraHeadRot.x = -ANGLE(75.0f);
+	if (info->extraHeadRot.y < -ANGLE(80.0f))
+		info->extraHeadRot.y = -ANGLE(80.0f);
+	else if (info->extraHeadRot.y > ANGLE(80.0f))
+		info->extraHeadRot.y = ANGLE(80.0f);
 
-	if (abs(info->headXrot - OldCam.pos.xRot) >= 16)
-		OldCam.pos.xRot = (info->headXrot + OldCam.pos.xRot) / 2;
+	if (abs(info->extraHeadRot.x - OldCam.pos.xRot) >= 16)
+		OldCam.pos.xRot = (info->extraHeadRot.x + OldCam.pos.xRot) / 2;
 	else
-		OldCam.pos.xRot = info->headXrot;
-	if (abs(info->headYrot - OldCam.pos.yRot) >= 16)
-		OldCam.pos.yRot = (info->headYrot + OldCam.pos.yRot) / 2;
+		OldCam.pos.xRot = info->extraHeadRot.x;
+	if (abs(info->extraHeadRot.y - OldCam.pos.yRot) >= 16)
+		OldCam.pos.yRot = (info->extraHeadRot.y + OldCam.pos.yRot) / 2;
 	else
-		OldCam.pos.yRot = info->headYrot;
+		OldCam.pos.yRot = info->extraHeadRot.y;
 
 	PHD_VECTOR pos = { 0, STEP_SIZE / 16, STEP_SIZE / 4 };
 	GetLaraJointPosition(&pos, LM_HEAD);
@@ -896,8 +896,8 @@ void LookCamera(ITEM_INFO* item)
 	GAME_VECTOR ideal = { x, y, z };
 	ideal.roomNumber = roomNum;
 
-	if (OldCam.pos.xRot == info->headXrot &&
-		OldCam.pos.yRot == info->headYrot &&
+	if (OldCam.pos.xRot == info->extraHeadRot.x &&
+		OldCam.pos.yRot == info->extraHeadRot.y &&
 		OldCam.pos.xPos == item->pos.xPos &&
 		OldCam.pos.yPos == item->pos.yPos &&
 		OldCam.pos.zPos == item->pos.zPos &&
@@ -915,8 +915,8 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OldCam.pos.xRot = info->headXrot;
-		OldCam.pos.yRot = info->headYrot;
+		OldCam.pos.xRot = info->extraHeadRot.x;
+		OldCam.pos.yRot = info->extraHeadRot.y;
 		OldCam.pos.xPos = item->pos.xPos;
 		OldCam.pos.yPos = item->pos.yPos;
 		OldCam.pos.zPos = item->pos.zPos;
@@ -1032,7 +1032,7 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->pos.yRot + info->headYrot + info->torsoYrot;
+		Camera.actualAngle = item->pos.yRot + info->extraHeadRot.y + info->extraTorsoRot.y;
 		Camera.mikePos.x = item->pos.xPos;
 		Camera.mikePos.y = item->pos.yPos;
 		Camera.mikePos.z = item->pos.zPos;
@@ -1047,10 +1047,10 @@ void LookCamera(ITEM_INFO* item)
 
 	Camera.oldType = Camera.type;
 
-	info->headXrot = headXrot;
-	info->headYrot = headYrot;
-	info->torsoXrot = torsoXrot;
-	info->torsoYrot = torsoYrot;
+	info->extraHeadRot.x = headXRot;
+	info->extraHeadRot.y = headYRot;
+	info->extraTorsoRot.x = torsoXRot;
+	info->extraTorsoRot.y = torsoYRot;
 }
 
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
@@ -1091,10 +1091,10 @@ void BinocularCamera(ITEM_INFO* item)
 			AlterFOV(14560);
 			item->meshBits = -1;
 			info->busy = false;
-			info->headYrot = 0;
-			info->headXrot = 0;
-			info->torsoYrot = 0;
-			info->torsoXrot = 0;
+			info->extraHeadRot.y = 0;
+			info->extraHeadRot.x = 0;
+			info->extraTorsoRot.y = 0;
+			info->extraTorsoRot.x = 0;
 			Camera.type = BinocularOldCamera;
 
 			return;
@@ -1104,18 +1104,18 @@ void BinocularCamera(ITEM_INFO* item)
 	item->meshBits = 0;
 	AlterFOV(7 * (2080 - BinocularRange));
 
-	short headXrot = info->headXrot * 2;
-	short headYrot = info->headYrot;
+	short headXRot = info->extraHeadRot.x * 2;
+	short headYRot = info->extraHeadRot.y;
 
-	if (headXrot > ANGLE(75.0f))
-		headXrot = ANGLE(75.0f);
-	else if (headXrot < -ANGLE(75.0f))
-		headXrot = -ANGLE(75.0f);
+	if (headXRot > ANGLE(75.0f))
+		headXRot = ANGLE(75.0f);
+	else if (headXRot < -ANGLE(75.0f))
+		headXRot = -ANGLE(75.0f);
 
-	if (headYrot > ANGLE(80.0f))
-		headYrot = ANGLE(80.0f);
-	else if (headYrot < -ANGLE(80.0f))
-		headYrot = -ANGLE(80.0f);
+	if (headYRot > ANGLE(80.0f))
+		headYRot = ANGLE(80.0f);
+	else if (headYRot < -ANGLE(80.0f))
+		headYRot = -ANGLE(80.0f);
 
 	int x = item->pos.xPos;
 	int y = item->pos.yPos - CLICK(2);
@@ -1132,11 +1132,11 @@ void BinocularCamera(ITEM_INFO* item)
 	Camera.pos.z = z;
 	Camera.pos.roomNumber = probe.RoomNumber;
 
-	int l = (WALL_SIZE * 20 + CLICK(1)) * phd_cos(headXrot);
+	int l = (WALL_SIZE * 20 + CLICK(1)) * phd_cos(headXRot);
 
-	int tx = x + l * phd_sin(item->pos.yRot + headYrot);
-	int ty = y - (WALL_SIZE * 20 + CLICK(1)) * phd_sin(headXrot);
-	int tz = z + l * phd_cos(item->pos.yRot + headYrot);
+	int tx = x + l * phd_sin(item->pos.yRot + headYRot);
+	int ty = y - (WALL_SIZE * 20 + CLICK(1)) * phd_sin(headXRot);
+	int tz = z + l * phd_cos(item->pos.yRot + headYRot);
 
 	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
 	{
@@ -1175,7 +1175,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->pos.yRot + info->headYrot + info->torsoYrot;
+		Camera.actualAngle = item->pos.yRot + info->extraHeadRot.y + info->extraTorsoRot.y;
 		Camera.mikePos.x = item->pos.xPos;
 		Camera.mikePos.y = item->pos.yPos;
 		Camera.mikePos.z = item->pos.zPos;
@@ -1354,7 +1354,7 @@ void BinocularCamera(ITEM_INFO* item)
 			// Reimplement this mode?
 		}
 		else
-			LaraTorch(&src, &target, info->headYrot, 192);
+			LaraTorch(&src, &target, info->extraHeadRot.y, 192);
 	}
 }
 
@@ -1463,23 +1463,23 @@ void CalculateCamera()
 
 			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
 			{
-				short change = angle - Lara.headYrot;
+				short change = angle - Lara.extraHeadRot.y;
 				if (change > ANGLE(4.0f))
-					Lara.headYrot += ANGLE(4.0f);
+					Lara.extraHeadRot.y += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.headYrot -= ANGLE(4.0f);
+					Lara.extraHeadRot.y -= ANGLE(4.0f);
 				else
-					Lara.headYrot += change;
-				Lara.torsoYrot = Lara.headYrot;
+					Lara.extraHeadRot.y += change;
+				Lara.extraTorsoRot.y = Lara.extraHeadRot.y;
 
-				change = tilt - Lara.headXrot;
+				change = tilt - Lara.extraHeadRot.x;
 				if (change > ANGLE(4.0f))
-					Lara.headXrot += ANGLE(4.0f);
+					Lara.extraHeadRot.x += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.headXrot -= ANGLE(4.0f);
+					Lara.extraHeadRot.x -= ANGLE(4.0f);
 				else
-					Lara.headXrot += change;
-				Lara.torsoXrot = Lara.headXrot;
+					Lara.extraHeadRot.x += change;
+				Lara.extraTorsoRot.x = Lara.extraHeadRot.x;
 
 				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 				Camera.item->lookedAt = 1;
@@ -1628,23 +1628,23 @@ void LookLeftRight()
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (Lara.headYrot > -ANGLE(44.0f))
+		if (Lara.extraHeadRot.y > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				Lara.extraHeadRot.y += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				Lara.headYrot -= ANGLE(2.0f);
+				Lara.extraHeadRot.y -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (Lara.headYrot < ANGLE(44.0f))
+		if (Lara.extraHeadRot.y < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				Lara.extraHeadRot.y += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				Lara.headYrot += ANGLE(2.0f);
+				Lara.extraHeadRot.y += ANGLE(2.0f);
 		}
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
@@ -1652,7 +1652,7 @@ void LookLeftRight()
 		!Lara.leftArm.lock &&
 		!Lara.rightArm.lock)
 	{
-		Lara.torsoYrot = Lara.headYrot;
+		Lara.extraTorsoRot.y = Lara.extraHeadRot.y;
 	}
 }
 
@@ -1662,23 +1662,23 @@ void LookUpDown()
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (Lara.headXrot > -ANGLE(35.0f))
+		if (Lara.extraHeadRot.x > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				Lara.extraHeadRot.x += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				Lara.headXrot -= ANGLE(2.0f);
+				Lara.extraHeadRot.x -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (Lara.headXrot < ANGLE(30.0f))
+		if (Lara.extraHeadRot.x < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				Lara.extraHeadRot.x += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				Lara.headXrot += ANGLE(2.0f);
+				Lara.extraHeadRot.x += ANGLE(2.0f);
 		}
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
@@ -1686,7 +1686,7 @@ void LookUpDown()
 		!Lara.leftArm.lock &&
 		!Lara.rightArm.lock)
 	{
-		Lara.torsoXrot = Lara.headXrot;
+		Lara.extraTorsoRot.x = Lara.extraHeadRot.x;
 	}
 }
 
@@ -1696,38 +1696,38 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
 	{
-		if (abs(info->headXrot) > ANGLE(0.1f))
-			info->headXrot += info->headXrot / -8;
+		if (abs(info->extraHeadRot.x) > ANGLE(0.1f))
+			info->extraHeadRot.x += info->extraHeadRot.x / -8;
 		else
-			info->headXrot = 0;
+			info->extraHeadRot.x = 0;
 
-		if (abs(info->headYrot) > ANGLE(0.1f))
-			info->headYrot += info->headYrot / -8;
+		if (abs(info->extraHeadRot.y) > ANGLE(0.1f))
+			info->extraHeadRot.y += info->extraHeadRot.y / -8;
 		else
-			info->headYrot = 0;
+			info->extraHeadRot.y = 0;
 
-		if (abs(info->headZrot) > ANGLE(0.1f))
-			info->headZrot += info->headZrot / -8;
+		if (abs(info->extraHeadRot.z) > ANGLE(0.1f))
+			info->extraHeadRot.z += info->extraHeadRot.z / -8;
 		else
-			info->headZrot = 0;
+			info->extraHeadRot.z = 0;
 
 		if (info->gunStatus != LG_HANDS_BUSY &&
 			!info->leftArm.lock &&
 			!info->rightArm.lock &&
 			info->Vehicle == NO_ITEM)
 		{
-			info->torsoXrot = info->headXrot;
-			info->torsoYrot = info->headYrot;
-			info->torsoZrot = info->headZrot;
+			info->extraTorsoRot.x = info->extraHeadRot.x;
+			info->extraTorsoRot.y = info->extraHeadRot.y;
+			info->extraTorsoRot.z = info->extraHeadRot.z;
 		}
 		else
 		{
-			if (!info->headXrot)
-				info->torsoXrot = 0;
-			if (!info->headYrot)
-				info->torsoYrot = 0;
-			if (!info->headZrot)
-				info->torsoZrot = 0;
+			if (!info->extraHeadRot.x)
+				info->extraTorsoRot.x = 0;
+			if (!info->extraHeadRot.y)
+				info->extraTorsoRot.y = 0;
+			if (!info->extraHeadRot.z)
+				info->extraTorsoRot.z = 0;
 		}
 	}
 }

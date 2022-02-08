@@ -188,7 +188,7 @@ void AnimateLara(ITEM_INFO* item)
 		item->speed = velocity >> 16;
 	}
 
-	if (info->ropePtr != -1)
+	if (info->ropeParameters.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!info->isMoving)

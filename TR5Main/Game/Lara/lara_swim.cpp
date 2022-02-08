@@ -338,8 +338,8 @@ void LaraWaterCurrent(COLL_INFO* coll)
 		SINK_INFO* sink = &g_Level.Sinks[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->pos.xPos, LaraItem->pos.zPos);
-		Lara.currentXvel += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.currentXvel) / 16;
-		Lara.currentZvel += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.currentZvel) / 16;
+		Lara.currentVel.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.currentVel.x) / 16;
+		Lara.currentVel.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.currentVel.z) / 16;
 
 		LaraItem->pos.yPos += (sink->y - LaraItem->pos.yPos) >> 4;
 	}
@@ -347,30 +347,30 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	{
 		int shift = 0;
 
-		if (abs(Lara.currentXvel) <= 16)
-			shift = (abs(Lara.currentXvel) > 8) + 2;
+		if (abs(Lara.currentVel.x) <= 16)
+			shift = (abs(Lara.currentVel.x) > 8) + 2;
 		else
 			shift = 4;
-		Lara.currentXvel -= Lara.currentXvel >> shift;
+		Lara.currentVel.x -= Lara.currentVel.x >> shift;
 
-		if (abs(Lara.currentXvel) < 4)
-			Lara.currentXvel = 0;
+		if (abs(Lara.currentVel.x) < 4)
+			Lara.currentVel.x = 0;
 
-		if (abs(Lara.currentZvel) <= 16)
-			shift = (abs(Lara.currentZvel) > 8) + 2;
+		if (abs(Lara.currentVel.z) <= 16)
+			shift = (abs(Lara.currentVel.z) > 8) + 2;
 		else
 			shift = 4;
-		Lara.currentZvel -= Lara.currentZvel >> shift;
+		Lara.currentVel.z -= Lara.currentVel.z >> shift;
 
-		if (abs(Lara.currentZvel) < 4)
-			Lara.currentZvel = 0;
+		if (abs(Lara.currentVel.z) < 4)
+			Lara.currentVel.z = 0;
 
-		if (!Lara.currentXvel && !Lara.currentZvel)
+		if (!Lara.currentVel.x && !Lara.currentVel.z)
 			return;
 	}
 
-	LaraItem->pos.xPos += Lara.currentXvel >> 8;
-	LaraItem->pos.zPos += Lara.currentZvel >> 8;
+	LaraItem->pos.xPos += Lara.currentVel.x >> 8;
+	LaraItem->pos.zPos += Lara.currentVel.z >> 8;
 	Lara.currentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(LaraItem->pos.zPos - coll->Setup.OldPosition.z, LaraItem->pos.xPos - coll->Setup.OldPosition.x);

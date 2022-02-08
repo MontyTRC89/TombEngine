@@ -3,6 +3,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
@@ -134,10 +135,7 @@ namespace TEN::Entities::Switches
 					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
+					ResetLaraFlex(l);
 
 					AddActiveItem(itemNum);
 					item->status = ITEM_ACTIVE;

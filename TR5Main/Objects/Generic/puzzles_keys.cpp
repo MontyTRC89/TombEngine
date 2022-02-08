@@ -8,6 +8,7 @@
 #include "Game/gui.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
@@ -125,10 +126,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			Lara.isMoving = false;
-			Lara.headYrot = 0;
-			Lara.headXrot = 0;
-			Lara.torsoYrot = 0;
-			Lara.torsoXrot = 0;
+			ResetLaraFlex(l);
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->flags |= 0x20;
 			Lara.interactedItem = itemNum;
@@ -289,10 +287,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->activeState = LS_INSERT_KEY;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->flags |= 0x20;
 				item->status = ITEM_ACTIVE;

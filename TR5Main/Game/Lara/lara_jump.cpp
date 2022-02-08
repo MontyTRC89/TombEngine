@@ -250,7 +250,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	if (info->ropePtr == -1)
+	if (info->ropeParameters.Ptr == -1)
 		item->airborne = true;
 
 	info->moveAngle = item->pos.yRot;
@@ -642,7 +642,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
 		item->pos.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->speed) - item->pos.xRot) / 3);
-		info->headYrot += (ANGLE(10.0f) - item->pos.zRot) / 3;
+		info->extraHeadRot.y += (ANGLE(10.0f) - item->pos.zRot) / 3;
 	}
 	else
 		item->speed = item->speed <= 0 ? -2 : 2;

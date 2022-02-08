@@ -19,8 +19,6 @@
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_initialise.h"
 
-#include "Objects/Generic/Object/rope.h"
-
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -37,7 +35,6 @@
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Lara;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Control::Volumes;
 using std::function;
 using TEN::Renderer::g_Renderer;
@@ -788,7 +785,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
-	HandleLaraVehicles(item, coll);
+	HandleLaraVehicle(item, coll);
 
 	// Temp. debug stuff
 	//---

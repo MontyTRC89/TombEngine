@@ -12,6 +12,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/savegame.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
@@ -303,7 +304,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	LaraInfo*& laraInfo = laraItem->data;
 
-	if (laraInfo->currentXvel || laraInfo->currentZvel)
+	if (laraInfo->currentVel.x || laraInfo->currentVel.z)
 		return false;
 
 	short moveAngle = UPVItem->pos.yRot + ANGLE(180.0f);
@@ -359,7 +360,7 @@ static void DoCurrent(ITEM_INFO* item)
 	{
 		long shifter, absvel;
 
-		absvel = abs(Lara.currentXvel);
+		absvel = abs(Lara.currentVel.x);
 
 		if (absvel > 16)
 			shifter = 4;
@@ -368,12 +369,12 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.currentXvel -= Lara.currentXvel >> shifter;
+		Lara.currentVel.x -= Lara.currentVel.x >> shifter;
 
-		if (abs(Lara.currentXvel) < 4)
-			Lara.currentXvel = 0;
+		if (abs(Lara.currentVel.x) < 4)
+			Lara.currentVel.x = 0;
 
-		absvel = abs(Lara.currentZvel);
+		absvel = abs(Lara.currentVel.z);
 		if (absvel > 16)
 			shifter = 4;
 		else if (absvel > 8)
@@ -381,11 +382,11 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.currentZvel -= Lara.currentZvel >> shifter;
-		if (abs(Lara.currentZvel) < 4)
-			Lara.currentZvel = 0;
+		Lara.currentVel.z -= Lara.currentVel.z >> shifter;
+		if (abs(Lara.currentVel.z) < 4)
+			Lara.currentVel.z = 0;
 
-		if (Lara.currentXvel == 0 && Lara.currentZvel == 0)
+		if (Lara.currentVel.x == 0 && Lara.currentVel.z == 0)
 			return;
 	}
 	else
@@ -405,12 +406,12 @@ static void DoCurrent(ITEM_INFO* item)
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 
-		Lara.currentXvel += ((dx - Lara.currentXvel) / 16);
-		Lara.currentZvel += ((dz - Lara.currentZvel) / 16);
+		Lara.currentVel.x += ((dx - Lara.currentVel.x) / 16);
+		Lara.currentVel.z += ((dz - Lara.currentVel.z) / 16);
 	}
 
-	item->pos.xPos += (Lara.currentXvel / 256);
-	item->pos.zPos += (Lara.currentZvel / 256);
+	item->pos.xPos += (Lara.currentVel.x / 256);
+	item->pos.zPos += (Lara.currentVel.z / 256);
 	Lara.currentActive = 0;
 }
 
@@ -735,10 +736,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraInfo->waterStatus = LW_SURFACE;
 			laraInfo->waterSurfaceDist = -heightFromWater;
 			laraInfo->diveCount = 11;
-			laraInfo->torsoXrot = 0;
-			laraInfo->torsoYrot = 0;
-			laraInfo->headXrot = 0;
-			laraInfo->headYrot = 0;
+			ResetLaraFlex(laraItem);
 			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
 

@@ -211,6 +211,43 @@ bool SaveGame::Save(int slot)
 	holsterInfo.add_right_holster((int)Lara.holsterInfo.rightHolster);
 	auto holsterInfoOffset = holsterInfo.Finish();
 
+	Save::ExtraVelocityBuilder currentVel{ fbb };
+	currentVel.add_x(Lara.currentVel.x);
+	currentVel.add_y(Lara.currentVel.y);
+	currentVel.add_z(Lara.currentVel.z);
+	auto currentVelOffset = currentVel.Finish();
+
+	Save::ExtraRotationBuilder extraHeadRot{ fbb };
+	extraHeadRot.add_x(Lara.extraHeadRot.x);
+	extraHeadRot.add_y(Lara.extraHeadRot.y);
+	extraHeadRot.add_z(Lara.extraHeadRot.z);
+	auto extraHeadRotOffset = extraHeadRot.Finish();
+
+	Save::ExtraRotationBuilder extraTorsoRot{ fbb };
+	extraTorsoRot.add_x(Lara.extraTorsoRot.x);
+	extraTorsoRot.add_y(Lara.extraTorsoRot.y);
+	extraTorsoRot.add_z(Lara.extraTorsoRot.z);
+	auto extraTorsoRotOffset = extraTorsoRot.Finish();
+
+	Save::LaraRopeBuilder ropeParameters{ fbb };
+	ropeParameters.add_segment(Lara.ropeParameters.Segment);
+	ropeParameters.add_direction(Lara.ropeParameters.Direction);
+	ropeParameters.add_arc_front(Lara.ropeParameters.ArcFront);
+	ropeParameters.add_arc_back(Lara.ropeParameters.ArcBack);
+	ropeParameters.add_last_x(Lara.ropeParameters.LastX);
+	ropeParameters.add_max_x_forward(Lara.ropeParameters.MaxXForward);
+	ropeParameters.add_max_x_backward(Lara.ropeParameters.MaxXBackward);
+	ropeParameters.add_dframe(Lara.ropeParameters.DFrame);
+	ropeParameters.add_frame(Lara.ropeParameters.Frame);
+	ropeParameters.add_frame_rate(Lara.ropeParameters.FrameRate);
+	ropeParameters.add_y(Lara.ropeParameters.Y);
+	ropeParameters.add_ptr(Lara.ropeParameters.Ptr);
+	ropeParameters.add_offset(Lara.ropeParameters.Offset);
+	ropeParameters.add_down_vel(Lara.ropeParameters.DownVel);
+	ropeParameters.add_flag(Lara.ropeParameters.Flag);
+	ropeParameters.add_count(Lara.ropeParameters.Count);
+	auto ropeParametersOffset = ropeParameters.Finish();
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < NUM_WEAPONS; i++)
 	{
@@ -242,7 +279,7 @@ bool SaveGame::Save(int slot)
 	Save::LaraBuilder lara{ fbb };
 	lara.add_air(Lara.air);
 	lara.add_beetle_life(Lara.BeetleLife);
-	lara.add_big_waterskin(Lara.big_waterskin);
+	lara.add_big_waterskin(Lara.bigWaterskin);
 	lara.add_binoculars(Lara.Binoculars);
 	lara.add_burn(Lara.burn);
 	lara.add_burn_blue(Lara.burnBlue);
@@ -256,14 +293,14 @@ bool SaveGame::Save(int slot)
 	lara.add_next_corner_rotation(&nextCornerRot);
 	lara.add_crowbar(Lara.Crowbar);
 	lara.add_current_active(Lara.currentActive);
-	lara.add_current_x_vel(Lara.currentXvel);
-	lara.add_current_y_vel(Lara.currentYvel);
-	lara.add_current_z_vel(Lara.currentZvel);
+	lara.add_current_vel(currentVelOffset);
 	lara.add_death_count(Lara.deathCount);
 	lara.add_dive_count(Lara.diveCount);
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_examines(examinesOffset);
 	lara.add_examines_combo(examinesComboOffset);
+	lara.add_extra_head_rot(extraHeadRotOffset);
+	lara.add_extra_torso_rot(extraTorsoRotOffset);
 	lara.add_fired(Lara.fired);
 	lara.add_flare_age(Lara.flareAge);
 	lara.add_flare_control_left(Lara.flareControlLeft);
@@ -272,9 +309,6 @@ bool SaveGame::Save(int slot)
 	lara.add_gun_type(Lara.gunType);
 	lara.add_has_beetle_things(Lara.hasBeetleThings);
 	lara.add_has_fired(Lara.hasFired);
-	lara.add_head_x_rot(Lara.headXrot);
-	lara.add_head_y_rot(Lara.headYrot);
-	lara.add_head_z_rot(Lara.headZrot);
 	lara.add_highest_location(Lara.highestLocation);
 	lara.add_hit_direction(Lara.hitDirection);
 	lara.add_hit_frame(Lara.hitFrame);
@@ -311,38 +345,21 @@ bool SaveGame::Save(int slot)
 	lara.add_pose_count(Lara.poseCount);
 	lara.add_pickups(pickupsOffset);
 	lara.add_pickups_combo(pickupsComboOffset);
+	lara.add_projected_floor_height(Lara.projectedFloorHeight);
 	lara.add_request_gun_type(Lara.requestGunType);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_rope_arc_back(Lara.ropeArcBack);
-	lara.add_rope_arc_front(Lara.ropeArcFront);
-	lara.add_rope_count(Lara.ropeCount);
-	lara.add_rope_dframe(Lara.ropeDFrame);
-	lara.add_rope_direction(Lara.ropeDirection);
-	lara.add_rope_down_vel(Lara.ropeDownVel);
-	lara.add_rope_flag(Lara.ropeFlag);
-	lara.add_rope_framerate(Lara.ropeFrameRate);
-	lara.add_rope_frame(Lara.ropeFrame);
-	lara.add_rope_last_x(Lara.ropeLastX);
-	lara.add_rope_max_x_backward(Lara.ropeMaxXBackward);
-	lara.add_rope_max_x_forward(Lara.ropeMaxXForward);
-	lara.add_rope_offset(Lara.ropeOffset);
-	lara.add_rope_ptr(Lara.ropePtr);
-	lara.add_rope_segment(Lara.ropeSegment);
-	lara.add_rope_y(Lara.ropeY);
+	lara.add_rope_parameters(ropeParametersOffset);
 	lara.add_run_jump_count(Lara.runJumpCount);
 	lara.add_run_jump_queued(Lara.runJumpQueued);
 	lara.add_secrets(Lara.Secrets);
 	lara.add_silencer(Lara.Silencer);
-	lara.add_small_waterskin(Lara.small_waterskin);
+	lara.add_small_waterskin(Lara.smallWaterskin);
 	lara.add_spasm_effect_count(Lara.spasmEffectCount);
 	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
 	lara.add_tightrope(tightRopeOffset);
 	lara.add_torch(Lara.Torch);
-	lara.add_torso_x_rot(Lara.torsoXrot);
-	lara.add_torso_y_rot(Lara.torsoYrot);
-	lara.add_torso_z_rot(Lara.torsoZrot);
 	lara.add_turn_rate(Lara.turnRate);
 	lara.add_uncontrollable(Lara.uncontrollable);
 	lara.add_vehicle(Lara.Vehicle);
@@ -624,9 +641,9 @@ bool SaveGame::Save(int slot)
 	flatbuffers::Offset<Save::Pendulum> pendulumOffset;
 	flatbuffers::Offset<Save::Pendulum> alternatePendulumOffset;
 
-	if (Lara.ropePtr != -1)
+	if (Lara.ropeParameters.Ptr != -1)
 	{
-		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+		ROPE_STRUCT* rope = &Ropes[Lara.ropeParameters.Ptr];
 
 		std::vector<const Save::Vector3*> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
@@ -735,7 +752,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_sinks(sinksOffset);
 	sgb.add_flyby_cameras(flybyCamerasOffset);
 
-	if (Lara.ropePtr != -1)
+	if (Lara.ropeParameters.Ptr != -1)
 	{
 		sgb.add_rope(ropeOffset);
 		sgb.add_pendulum(pendulumOffset);
@@ -1157,7 +1174,7 @@ bool SaveGame::Load(int slot)
 
 	Lara.air = s->lara()->air();
 	Lara.BeetleLife = s->lara()->beetle_life();
-	Lara.big_waterskin = s->lara()->big_waterskin();
+	Lara.bigWaterskin = s->lara()->big_waterskin();
 	Lara.Binoculars = s->lara()->binoculars();
 	Lara.burn = s->lara()->burn();
 	Lara.burnBlue = s->lara()->burn_blue();
@@ -1167,21 +1184,20 @@ bool SaveGame::Load(int slot)
 	Lara.calcJumpVelocity = s->lara()->calc_jump_velocity();
 	Lara.canMonkeySwing = s->lara()->can_monkey_swing();
 	Lara.climbStatus = s->lara()->climb_status();
-	Lara.nextCornerPos = PHD_3DPOS(
-		s->lara()->next_corner_position()->x(),
-		s->lara()->next_corner_position()->y(),
-		s->lara()->next_corner_position()->z(),
-		s->lara()->next_corner_rotation()->x(),
-		s->lara()->next_corner_rotation()->y(),
-		s->lara()->next_corner_rotation()->z());
 	Lara.Crowbar = s->lara()->crowbar();
 	Lara.currentActive = s->lara()->current_active();
-	Lara.currentXvel = s->lara()->current_x_vel();
-	Lara.currentYvel = s->lara()->current_y_vel();
-	Lara.currentZvel = s->lara()->current_z_vel();
+	Lara.currentVel.x = s->lara()->current_vel()->x();
+	Lara.currentVel.y = s->lara()->current_vel()->y();
+	Lara.currentVel.z = s->lara()->current_vel()->z();
 	Lara.deathCount = s->lara()->death_count();
 	Lara.diveCount = s->lara()->dive_count();
 	Lara.ExtraAnim = s->lara()->extra_anim();
+	Lara.extraHeadRot.x = s->lara()->extra_head_rot()->x();
+	Lara.extraHeadRot.y = s->lara()->extra_head_rot()->y();
+	Lara.extraHeadRot.z = s->lara()->extra_head_rot()->z();
+	Lara.extraTorsoRot.x = s->lara()->extra_torso_rot()->x();
+	Lara.extraTorsoRot.y = s->lara()->extra_torso_rot()->y();
+	Lara.extraTorsoRot.z = s->lara()->extra_torso_rot()->z();
 	Lara.fired = s->lara()->fired();
 	Lara.flareAge = s->lara()->flare_age();
 	Lara.flareControlLeft = s->lara()->flare_control_left();
@@ -1190,9 +1206,6 @@ bool SaveGame::Load(int slot)
 	Lara.gunType = (LARA_WEAPON_TYPE)s->lara()->gun_type();
 	Lara.hasBeetleThings = s->lara()->has_beetle_things();
 	Lara.hasFired = s->lara()->has_fired();
-	Lara.headXrot = s->lara()->head_x_rot();
-	Lara.headYrot = s->lara()->head_y_rot();
-	Lara.headZrot = s->lara()->head_z_rot();
 	Lara.highestLocation = s->lara()->highest_location();
 	Lara.hitDirection = s->lara()->hit_direction();
 	Lara.hitFrame = s->lara()->hit_frame();
@@ -1225,12 +1238,20 @@ bool SaveGame::Load(int slot)
 	Lara.mineR = s->lara()->mine_r();
 	Lara.moveAngle = s->lara()->move_angle();
 	Lara.moveCount = s->lara()->move_count();
+	Lara.nextCornerPos = PHD_3DPOS(
+		s->lara()->next_corner_position()->x(),
+		s->lara()->next_corner_position()->y(),
+		s->lara()->next_corner_position()->z(),
+		s->lara()->next_corner_rotation()->x(),
+		s->lara()->next_corner_rotation()->y(),
+		s->lara()->next_corner_rotation()->z());
 	Lara.NumFlares = s->lara()->num_flares();
 	Lara.NumLargeMedipacks = s->lara()->num_large_medipacks();
 	Lara.NumSmallMedipacks = s->lara()->num_small_medipacks();
 	Lara.oldBusy = s->lara()->old_busy();
 	Lara.poisoned = s->lara()->poisoned();
 	Lara.poseCount = s->lara()->pose_count();
+	Lara.projectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.requestGunType = (LARA_WEAPON_TYPE)s->lara()->request_gun_type();
 	Lara.rightArm.animNumber = s->lara()->right_arm()->anim_number();
 	Lara.rightArm.flash_gun = s->lara()->right_arm()->flash_gun();
@@ -1240,36 +1261,33 @@ bool SaveGame::Load(int slot)
 	Lara.rightArm.xRot = s->lara()->right_arm()->x_rot();
 	Lara.rightArm.yRot = s->lara()->right_arm()->y_rot();
 	Lara.rightArm.zRot = s->lara()->right_arm()->z_rot();
-	Lara.ropeArcBack = s->lara()->rope_arc_back();
-	Lara.ropeArcFront = s->lara()->rope_arc_front();
-	Lara.ropeCount = s->lara()->rope_count();
-	Lara.ropeDFrame = s->lara()->rope_dframe();
-	Lara.ropeDirection = s->lara()->rope_direction();
-	Lara.ropeDownVel = s->lara()->rope_down_vel();
-	Lara.ropeFlag = s->lara()->rope_flag();
-	Lara.ropeFrame = s->lara()->rope_frame();
-	Lara.ropeFrameRate = s->lara()->rope_framerate();
-	Lara.ropeLastX = s->lara()->rope_last_x();
-	Lara.ropeMaxXBackward = s->lara()->rope_max_x_backward();
-	Lara.ropeMaxXForward = s->lara()->rope_max_x_forward();
-	Lara.ropeOffset = s->lara()->rope_offset();
-	Lara.ropePtr = s->lara()->rope_ptr();
-	Lara.ropeSegment = s->lara()->rope_segment();
-	Lara.ropeY = s->lara()->rope_y();
+	Lara.ropeParameters.Segment = s->lara()->rope_parameters()->segment();
+	Lara.ropeParameters.Direction = s->lara()->rope_parameters()->direction();
+	Lara.ropeParameters.ArcFront = s->lara()->rope_parameters()->arc_front();
+	Lara.ropeParameters.ArcBack = s->lara()->rope_parameters()->arc_back();
+	Lara.ropeParameters.LastX = s->lara()->rope_parameters()->last_x();
+	Lara.ropeParameters.MaxXForward = s->lara()->rope_parameters()->max_x_forward();
+	Lara.ropeParameters.MaxXBackward = s->lara()->rope_parameters()->max_x_backward();
+	Lara.ropeParameters.DFrame = s->lara()->rope_parameters()->dframe();
+	Lara.ropeParameters.Frame = s->lara()->rope_parameters()->frame();
+	Lara.ropeParameters.FrameRate = s->lara()->rope_parameters()->frame_rate();
+	Lara.ropeParameters.Y = s->lara()->rope_parameters()->y();
+	Lara.ropeParameters.Ptr = s->lara()->rope_parameters()->ptr();
+	Lara.ropeParameters.Offset = s->lara()->rope_parameters()->offset();
+	Lara.ropeParameters.DownVel = s->lara()->rope_parameters()->down_vel();
+	Lara.ropeParameters.Flag = s->lara()->rope_parameters()->flag();
+	Lara.ropeParameters.Count = s->lara()->rope_parameters()->count();
 	Lara.runJumpCount = s->lara()->run_jump_count();
 	Lara.runJumpQueued = s->lara()->run_jump_queued();
 	Lara.Secrets = s->lara()->secrets();
 	Lara.Silencer = s->lara()->silencer();
-	Lara.small_waterskin = s->lara()->small_waterskin();
+	Lara.smallWaterskin = s->lara()->small_waterskin();
 	Lara.spasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.sprintTimer = s->lara()->sprint_timer();
 	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
 	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
 	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
 	Lara.Torch = s->lara()->torch();
-	Lara.torsoXrot = s->lara()->torso_x_rot();
-	Lara.torsoYrot = s->lara()->torso_y_rot();
-	Lara.torsoZrot = s->lara()->torso_z_rot();
 	Lara.turnRate = s->lara()->turn_rate();
 	Lara.uncontrollable = s->lara()->uncontrollable();
 	Lara.Vehicle = s->lara()->vehicle();
@@ -1314,9 +1332,9 @@ bool SaveGame::Load(int slot)
 	}
 
 	// Rope
-	if (Lara.ropePtr >= 0)
+	if (Lara.ropeParameters.Ptr >= 0)
 	{
-		ROPE_STRUCT* rope = &Ropes[Lara.ropePtr];
+		ROPE_STRUCT* rope = &Ropes[Lara.ropeParameters.Ptr];
 		
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{

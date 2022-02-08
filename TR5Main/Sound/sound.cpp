@@ -696,14 +696,16 @@ void Sound_UpdateScene()
 	Vector3 at = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) -
 		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
 	at.Normalize();
-	auto mikePos = BASS_3DVECTOR( Camera.mikePos.x,		// Pos
+	auto mikePos = BASS_3DVECTOR(					// Pos
+		Camera.mikePos.x,
 		Camera.mikePos.y,
 		Camera.mikePos.z);
-	auto laraVel = BASS_3DVECTOR(Lara.currentXvel,		// Vel
-		Lara.currentYvel,
-		Lara.currentZvel);
-	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);			// At
-	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);		// Up
+	auto laraVel = BASS_3DVECTOR(					// Vel
+		Lara.currentVel.x,
+		Lara.currentVel.y,
+		Lara.currentVel.z);
+	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
+	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
 	BASS_Set3DPosition(&mikePos,
 					   &laraVel,
 					   &atVec,

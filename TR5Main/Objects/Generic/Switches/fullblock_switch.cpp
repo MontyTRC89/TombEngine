@@ -2,6 +2,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/setup.h"
 #include "Game/collision/collide_item.h"
@@ -63,10 +64,7 @@ namespace TEN::Entities::Switches
 				AnimateItem(item);
 
 				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
+				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
 			else

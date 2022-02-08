@@ -11,8 +11,9 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
-#include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/double_doors.h"
@@ -56,10 +57,7 @@ namespace TEN::Entities::Doors
 					item->status = ITEM_ACTIVE;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
+					ResetLaraFlex(l);
 				}
 				else
 				{

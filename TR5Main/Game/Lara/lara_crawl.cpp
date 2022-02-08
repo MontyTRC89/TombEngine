@@ -102,8 +102,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
+	info->extraTorsoRot = { 0, 0, 0 };
 	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -445,8 +444,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
+	info->extraTorsoRot = { 0, 0, 0 };
 	item->fallspeed = 0;
 	item->airborne = false;
 	coll->Setup.ForwardAngle = info->moveAngle;
@@ -545,8 +543,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
+	info->extraTorsoRot = { 0, 0, 0 };
 	item->airborne = false;
 	item->fallspeed = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;

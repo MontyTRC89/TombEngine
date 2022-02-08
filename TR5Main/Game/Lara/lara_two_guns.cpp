@@ -296,36 +296,28 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 
 	if (Lara.leftArm.lock && !Lara.rightArm.lock)
 	{
-		Lara.torsoYrot = Lara.leftArm.yRot / 2;
-		Lara.torsoXrot = Lara.leftArm.xRot / 2;
+		Lara.extraTorsoRot.y = Lara.leftArm.yRot / 2;
+		Lara.extraTorsoRot.x = Lara.leftArm.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-		{
-			Lara.headYrot = Lara.torsoYrot;
-			Lara.headXrot = Lara.torsoXrot;
-		}
+			Lara.extraHeadRot = Lara.extraTorsoRot;
 	}
 	else if (!Lara.leftArm.lock && Lara.rightArm.lock)
 	{
-		Lara.torsoYrot = Lara.rightArm.yRot / 2;
-		Lara.torsoXrot = Lara.rightArm.xRot / 2;
+		Lara.extraTorsoRot.y = Lara.rightArm.yRot / 2;
+		Lara.extraTorsoRot.x = Lara.rightArm.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-		{
-			Lara.headYrot = Lara.torsoYrot;
-			Lara.headXrot = Lara.torsoXrot;
-		}
+			Lara.extraHeadRot = Lara.extraTorsoRot;
 	}
 	else if (Lara.leftArm.lock && Lara.rightArm.lock)
 	{
-		Lara.torsoYrot = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
-		Lara.torsoXrot = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.extraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
+		Lara.extraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-		{
-			Lara.headYrot = Lara.torsoYrot;
-			Lara.headXrot = Lara.torsoXrot;
-		}
+			Lara.extraHeadRot = Lara.extraTorsoRot;
+
 	}
 
 	AnimatePistols(weaponType);
@@ -483,10 +475,10 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 	if (!(TrInput & IN_LOOK))
 	{
-		Lara.headYrot = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
-		Lara.torsoYrot = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
-		Lara.headXrot = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
-		Lara.torsoXrot = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.extraHeadRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.extraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.extraHeadRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
+		Lara.extraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
 	}
 }
 
