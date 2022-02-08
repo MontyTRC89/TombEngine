@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
 #include "Objects/TR3/Vehicles/quad_info.h"
@@ -1218,8 +1219,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 		lara->pos.yPos = quad->pos.yPos;
 		lara->pos.zPos = quad->pos.zPos;
 		lara->pos.yRot = quad->pos.yRot;
-		laraInfo->headXrot = laraInfo->headYrot = 0;
-		laraInfo->torsoXrot = laraInfo->torsoYrot = 0;
+		ResetLaraFlex(lara);
 		laraInfo->hitDirection = -1;
 
 		AnimateItem(lara);

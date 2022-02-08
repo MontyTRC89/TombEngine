@@ -879,7 +879,7 @@ enum LARA_CLOTH_TYPES
 
 enum JumpDirection
 {
-	NoDirection,
+	NoDirection, // TODO: Convert to enum class and rename this to "None".
 	Up,
 	Forward,
 	Back,
@@ -1043,7 +1043,7 @@ struct DiaryInfo
 	bool Present;
 	short numPages;
 	short currentPage;
-	DiaryPage	Pages[MaxDiaryPages];
+	DiaryPage Pages[MaxDiaryPages];
 };
 
 struct LARA_ARM
@@ -1068,15 +1068,49 @@ struct LaraTightrope
 };
 #endif
 
+struct ExtraVelocity
+{
+	int x;
+	int y;
+	int z;
+};
+
+struct ExtraRotation
+{
+	short x;
+	short y;
+	short z;
+};
+
+struct LaraRope
+{
+	byte Segment;
+	byte Direction;
+	short ArcFront;
+	short ArcBack;
+	short LastX;
+	short MaxXForward;
+	short MaxXBackward;
+	int DFrame;
+	int Frame;
+	unsigned short FrameRate;
+	unsigned short Y;
+	int Ptr;
+	int Offset;
+	int DownVel;
+	byte Flag;
+	int Count;
+};
+
 struct LaraInfo
 {
 	short itemNumber;
-	LARA_GUN_STATUS gunStatus; // LG_enum
-	LARA_WEAPON_TYPE gunType; // WEAPON_enum
-	LARA_WEAPON_TYPE requestGunType; // WEAPON_enum
-	LARA_WEAPON_TYPE lastGunType; // WEAPON_enum
+	LARA_GUN_STATUS gunStatus;
+	LARA_WEAPON_TYPE gunType;
+	LARA_WEAPON_TYPE requestGunType;
+	LARA_WEAPON_TYPE lastGunType;
 	int calcJumpVelocity;
-	LARA_WATER_STATUS waterStatus; // LW_enum
+	LARA_WATER_STATUS waterStatus;
 	bool climbStatus;
 	int poseCount;
 	int projectedFloorHeight;
@@ -1090,9 +1124,7 @@ struct LaraInfo
 	int diveCount;
 	int deathCount;
 	short currentActive;
-	int currentXvel;
-	int currentYvel;
-	int currentZvel;
+	ExtraVelocity currentVel;
 	int spasmEffectCount;
 	int flareAge;
 	int burnCount;
@@ -1126,33 +1158,14 @@ struct LaraInfo
 	short targetAngles[2];
 	short turnRate;
 	short moveAngle;
-	short headYrot;
-	short headXrot;
-	short headZrot;
-	short torsoYrot;
-	short torsoXrot;
-	short torsoZrot;
+	ExtraRotation extraHeadRot;
+	ExtraRotation extraTorsoRot;
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
 	CREATURE_INFO* creature;
-	byte ropeSegment;
-	byte ropeDirection;
-	short ropeArcFront;
-	short ropeArcBack;
-	short ropeLastX;
-	short ropeMaxXForward;
-	short ropeMaxXBackward;
-	int ropeDFrame;
-	int ropeFrame;
-	unsigned short ropeFrameRate;
-	unsigned short ropeY;
-	int ropePtr;
+	LaraRope ropeParameters;
 	short interactedItem;
-	int ropeOffset;
-	int ropeDownVel;
-	byte ropeFlag;
 	byte moveCount;
-	int ropeCount;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
@@ -1165,9 +1178,9 @@ struct LaraInfo
 #endif
 	/// =================================== NEW:
 	byte BeetleLife;
-	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
-	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
+	short hasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte smallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
+	byte bigWaterskin;		// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
 	short Vehicle;
 	short ExtraAnim;
 	bool mineL;

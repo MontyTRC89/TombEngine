@@ -120,13 +120,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
-	info->torsoZrot += std::min(abs(rate), abs(maxAngle - info->torsoZrot) / 6) * sign;
+	info->extraTorsoRot.z += std::min(abs(rate), abs(maxAngle - info->extraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->activeState != LS_CRAWL_BACK)
 	{
-		info->headZrot = info->torsoZrot / 2;
-		info->headYrot = info->headZrot;
+		info->extraHeadRot.z = info->extraTorsoRot.z / 2;
+		info->extraHeadRot.y = info->extraHeadRot.z;
 	}
 }
 
@@ -311,36 +311,36 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 	LaraInfo*& info = item->data;
 
 	// Reset head.
-	if (abs(info->headXrot) > ANGLE(0.1f))
-		info->headXrot += info->headXrot / -rate;
+	if (abs(info->extraHeadRot.x) > ANGLE(0.1f))
+		info->extraHeadRot.x += info->extraHeadRot.x / -rate;
 	else
-		info->headXrot = 0;
+		info->extraHeadRot.x = 0;
 
-	if (abs(info->headYrot) > ANGLE(0.1f))
-		info->headYrot += info->headYrot / -rate;
+	if (abs(info->extraHeadRot.y) > ANGLE(0.1f))
+		info->extraHeadRot.y += info->extraHeadRot.y / -rate;
 	else
-		info->headYrot = 0;
+		info->extraHeadRot.y = 0;
 
-	if (abs(info->headZrot) > ANGLE(0.1f))
-		info->headZrot += info->headZrot / -rate;
+	if (abs(info->extraHeadRot.z) > ANGLE(0.1f))
+		info->extraHeadRot.z += info->extraHeadRot.z / -rate;
 	else
-		info->headZrot = 0;
+		info->extraHeadRot.z = 0;
 
 	// Reset torso.
-	if (abs(info->torsoXrot) > ANGLE(0.1f))
-		info->torsoXrot += info->torsoXrot / -rate;
+	if (abs(info->extraTorsoRot.x) > ANGLE(0.1f))
+		info->extraTorsoRot.x += info->extraTorsoRot.x / -rate;
 	else
-		info->torsoXrot = 0;
+		info->extraTorsoRot.x = 0;
 
-	if (abs(info->torsoYrot) > ANGLE(0.1f))
-		info->torsoYrot += info->torsoYrot / -rate;
+	if (abs(info->extraTorsoRot.y) > ANGLE(0.1f))
+		info->extraTorsoRot.y += info->extraTorsoRot.y / -rate;
 	else
-		info->torsoYrot = 0;
+		info->extraTorsoRot.y = 0;
 
-	if (abs(info->torsoZrot) > ANGLE(0.1f))
-		info->torsoZrot += info->torsoZrot / -rate;
+	if (abs(info->extraTorsoRot.z) > ANGLE(0.1f))
+		info->extraTorsoRot.z += info->extraTorsoRot.z / -rate;
 	else
-		info->torsoZrot = 0;
+		info->extraTorsoRot.z = 0;
 }
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
@@ -408,7 +408,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	item->pos.yRot += info->turnRate;
 }
 
-void HandleLaraVehicles(ITEM_INFO* item, COLL_INFO* coll)
+void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 

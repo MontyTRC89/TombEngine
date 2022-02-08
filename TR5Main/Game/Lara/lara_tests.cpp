@@ -184,9 +184,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->speed = 0;
 	item->fallspeed = 0;
 	info->gunStatus = LG_HANDS_BUSY;
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
-	info->torsoZrot = 0;
+	info->extraTorsoRot.x = 0;
+	info->extraTorsoRot.y = 0;
+	info->extraTorsoRot.z = 0;
 
 	return true;
 }

@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/gui.h"
 #include "Game/effects/effects.h"
 #include "Game/collision/collide_item.h"
@@ -1547,8 +1548,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			LaraItem->pos.zPos = item->pos.zPos;
 			LaraItem->pos.yRot = item->pos.yRot;
 
-			Lara.headXrot = Lara.headYrot = 0;
-			Lara.torsoXrot = Lara.torsoYrot = 0;
+			ResetLaraFlex(LaraItem);
 			Lara.hitDirection = -1;
 
 			AnimateItem(l);

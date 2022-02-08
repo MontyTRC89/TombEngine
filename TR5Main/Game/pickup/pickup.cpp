@@ -1079,9 +1079,9 @@ int UseSpecialItem(ITEM_INFO* item)
 			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->pos.yPos > Lara.waterSurfaceDist))
 			{
 				if (use < ID_WATERSKIN1_3)
-					Lara.small_waterskin = 4;
+					Lara.smallWaterskin = 4;
 				else
-					Lara.big_waterskin = 6;
+					Lara.bigWaterskin = 6;
 
 				flag = 1;
 			}
@@ -1089,13 +1089,13 @@ int UseSpecialItem(ITEM_INFO* item)
 			{
 				if (use <= ID_WATERSKIN1_3)
 				{
-					item->itemFlags[3] = Lara.small_waterskin - 1;
-					Lara.small_waterskin = 1;
+					item->itemFlags[3] = Lara.smallWaterskin - 1;
+					Lara.smallWaterskin = 1;
 				}
 				else
 				{
-					item->itemFlags[3] = Lara.big_waterskin - 1;
-					Lara.big_waterskin = 1;
+					item->itemFlags[3] = Lara.bigWaterskin - 1;
+					Lara.bigWaterskin = 1;
 				}
 
 				flag = 2;

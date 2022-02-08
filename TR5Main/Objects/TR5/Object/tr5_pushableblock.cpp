@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
@@ -440,10 +441,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 		item->status = ITEM_ACTIVE;
 		AddActiveItem(itemNum);
-		Lara.headYrot = 0;
-		Lara.headXrot = 0;
-		Lara.torsoYrot = 0;
-		Lara.torsoXrot = 0;
+		ResetLaraFlex(l);
 		
 		pushable->moveX = item->pos.xPos;
 		pushable->moveZ = item->pos.zPos;

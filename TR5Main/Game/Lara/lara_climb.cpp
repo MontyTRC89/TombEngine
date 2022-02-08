@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
@@ -961,7 +962,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 	return -2;
 }
 
-int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short roomNumber = item->roomNumber;
 
@@ -969,13 +970,9 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->fallspeed = 0;
 
 	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
-		return 0;
+		return false;
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-
-	Lara.headYrot = 0;
-	Lara.headXrot = 0;
+	ResetLaraFlex(item);
 
 	SetAnimation(item, LA_FALL_START);
 
@@ -985,5 +982,5 @@ int LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 
 	Lara.gunStatus = LG_HANDS_FREE;
 
-	return 1;
+	return true;
 }

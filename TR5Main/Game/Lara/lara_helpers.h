@@ -32,4 +32,4 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
 
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);
-void HandleLaraVehicles(ITEM_INFO* item, COLL_INFO* coll);
+void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll);
