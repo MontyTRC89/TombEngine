@@ -14,16 +14,16 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (item->status == ITEM_INVISIBLE)
+		if (item->Status == ITEM_INVISIBLE)
 			return;
 
-		if (item->itemFlags[3])
+		if (item->ItemFlags[3])
 		{
 			if (TestBoundsCollide(item, l, coll->Setup.Radius))
 			{
-				int oldX = LaraItem->pos.xPos;
-				int oldY = LaraItem->pos.yPos;
-				int oldZ = LaraItem->pos.zPos;
+				int oldX = LaraItem->Position.xPos;
+				int oldY = LaraItem->Position.yPos;
+				int oldZ = LaraItem->Position.zPos;
 
 				int dx = 0;
 				int dy = 0;
@@ -31,27 +31,27 @@ namespace TEN::Entities::TR4
 
 				if (ItemPushItem(item, l, coll, 1, 1))
 				{
-					LaraItem->hitPoints -= item->itemFlags[3];
+					LaraItem->HitPoints -= item->ItemFlags[3];
 
-					dx = oldX - LaraItem->pos.xPos;
-					dy = oldY - LaraItem->pos.yPos;
-					dz = oldZ - LaraItem->pos.zPos;
+					dx = oldX - LaraItem->Position.xPos;
+					dy = oldY - LaraItem->Position.yPos;
+					dz = oldZ - LaraItem->Position.zPos;
 
 					if ((dx || dy || dz) && TriggerActive(item))
 					{
-						DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
-							l->pos.yPos - (GetRandomControl() & 0x1FF) - 256,
-							(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
-							(GetRandomControl() & 3) + (item->itemFlags[3] / 32) + 2,
+						DoBloodSplat((GetRandomControl() & 0x3F) + l->Position.xPos - 32,
+							l->Position.yPos - (GetRandomControl() & 0x1FF) - 256,
+							(GetRandomControl() & 0x3F) + l->Position.zPos - 32,
+							(GetRandomControl() & 3) + (item->ItemFlags[3] / 32) + 2,
 							2 * GetRandomControl(),
-							l->roomNumber);
+							l->RoomNumber);
 					}
 
 					if (!coll->Setup.EnableObjectPush)
 					{
-						LaraItem->pos.xPos += dx;
-						LaraItem->pos.yPos += dy;
-						LaraItem->pos.zPos += dz;
+						LaraItem->Position.xPos += dx;
+						LaraItem->Position.yPos += dy;
+						LaraItem->Position.zPos += dz;
 					}
 				}
 			}

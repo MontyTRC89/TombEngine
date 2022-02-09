@@ -17,9 +17,9 @@ void InitialiseYeti(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
-	item->animNumber = Objects[item->objectNumber].animIndex + 19;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->activeState = g_Level.Anims[item->animNumber].activeState;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->ActiveState = g_Level.Anims[item->AnimNumber].ActiveState;
 }
 
 void YetiControl(short itemNum)
@@ -28,20 +28,20 @@ void YetiControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* yeti = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* yeti = (CREATURE_INFO*)item->Data;
 	AI_INFO info;
 	short angle = 0, torso = 0, head = 0, tilt = 0;
 	bool lara_alive;
 
-	lara_alive = (LaraItem->hitPoints > 0);
+	lara_alive = (LaraItem->HitPoints > 0);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 8)
+		if (item->ActiveState != 8)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 31;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 8;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 31;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 8;
 		}
 	}
 	else
@@ -53,7 +53,7 @@ void YetiControl(short itemNum)
 
 		angle = CreatureTurn(item, yeti->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 2:
 			if (info.ahead)
@@ -64,45 +64,45 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
-			else if (item->requiredState)
+			else if (item->RequiredState)
 			{
-				item->targetState = item->requiredState;
+				item->TargetState = item->RequiredState;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
-					item->targetState = 7;
+					item->TargetState = 7;
 				else if (GetRandomControl() < 0x200)
-					item->targetState = 9;
+					item->TargetState = 9;
 				else if (GetRandomControl() < 0x300)
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2) && GetRandomControl() < 0x4000)
 			{
-				item->targetState = 4;
+				item->TargetState = 4;
 			}
 			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
 			{
-				item->targetState = 5;
+				item->TargetState = 5;
 			}
 			else if (yeti->mood == STALK_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			break;
 		case 7:
 			if (info.ahead)
 				head = info.angle;
 
-			if (yeti->mood == ESCAPE_MOOD || item->hitStatus)
+			if (yeti->mood == ESCAPE_MOOD || item->HitStatus)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
@@ -110,51 +110,51 @@ void YetiControl(short itemNum)
 				{
 					if (GetRandomControl() < 0x100)
 					{
-						item->targetState = 2;
+						item->TargetState = 2;
 					}
 					else if (GetRandomControl() < 0x200)
 					{
-						item->targetState = 9;
+						item->TargetState = 9;
 					}
 					else if (GetRandomControl() < 0x300)
 					{
-						item->targetState = 2;
-						item->requiredState = 3;
+						item->TargetState = 2;
+						item->RequiredState = 3;
 					}
 				}
 			}
 			else if (GetRandomControl() < 0x200)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 		case 9:
 			if (info.ahead)
 				head = info.angle;
 
-			if (yeti->mood == ESCAPE_MOOD || item->hitStatus)
+			if (yeti->mood == ESCAPE_MOOD || item->HitStatus)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
 				{
-					item->targetState = 7;
+					item->TargetState = 7;
 				}
 				else if (GetRandomControl() < 0x200)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 				else if (GetRandomControl() < 0x300)
 				{
-					item->targetState = 2;
-					item->requiredState = 3;
+					item->TargetState = 2;
+					item->RequiredState = 3;
 				}
 			}
 			else if (GetRandomControl() < 0x200)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 		case 3:
@@ -165,31 +165,31 @@ void YetiControl(short itemNum)
 
 			if (yeti->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100 || !lara_alive)
 				{
-					item->targetState = 2;
-					item->requiredState = 7;
+					item->TargetState = 2;
+					item->RequiredState = 7;
 				}
 				else if (GetRandomControl() < 0x200)
 				{
-					item->targetState = 2;
-					item->requiredState = 9;
+					item->TargetState = 2;
+					item->RequiredState = 9;
 				}
 				else if (GetRandomControl() < 0x300)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 			}
 			else if (yeti->mood == ATTACK_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(STEP_SIZE))
-					item->targetState = 2;
+					item->TargetState = 2;
 				else if (info.distance < SQUARE(WALL_SIZE * 2))
-					item->targetState = 1;
+					item->TargetState = 1;
 			}
 			break;
 		case 1:
@@ -206,30 +206,30 @@ void YetiControl(short itemNum)
 			}
 			else if (yeti->mood == BORED_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->targetState = 6;
+				item->TargetState = 6;
 			}
 			else if (yeti->mood == STALK_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 		case 4:
 			if (info.ahead)
 				torso = info.angle;
 
-			if (!yeti->flags && (item->touchBits & 0x1400))
+			if (!yeti->flags && (item->TouchBits & 0x1400))
 			{
 				CreatureEffect(item, &yetiBiteR, DoBloodSplat);
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 100;
+				LaraItem->HitStatus = true;
 
 				yeti->flags = 1;
 			}
@@ -239,15 +239,15 @@ void YetiControl(short itemNum)
 				torso = info.angle;
 			yeti->maximumTurn = ANGLE(4);
 
-			if (!yeti->flags && (item->touchBits & (0x0700 | 0x1400)))
+			if (!yeti->flags && (item->TouchBits & (0x0700 | 0x1400)))
 			{
-				if (item->touchBits & 0x0700)
+				if (item->TouchBits & 0x0700)
 					CreatureEffect(item, &yetiBiteL, DoBloodSplat);
-				if (item->touchBits & 0x1400)
+				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &yetiBiteR, DoBloodSplat);
 
-				LaraItem->hitPoints -= 150;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 150;
+				LaraItem->HitStatus = true;
 
 				yeti->flags = 1;
 			}
@@ -256,15 +256,15 @@ void YetiControl(short itemNum)
 			if (info.ahead)
 				torso = info.angle;
 
-			if (!yeti->flags && (item->touchBits & (0x0700 | 0x1400)))
+			if (!yeti->flags && (item->TouchBits & (0x0700 | 0x1400)))
 			{
-				if (item->touchBits & 0x0700)
+				if (item->TouchBits & 0x0700)
 					CreatureEffect(item, &yetiBiteL, DoBloodSplat);
-				if (item->touchBits & 0x1400)
+				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &yetiBiteR, DoBloodSplat);
 
-				LaraItem->hitPoints -= 200;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 200;
+				LaraItem->HitStatus = true;
 
 				yeti->flags = 1;
 			}
@@ -289,29 +289,29 @@ void YetiControl(short itemNum)
 	CreatureJoint(item, 0, torso);
 	CreatureJoint(item, 1, head);
 
-	if (item->activeState < 10)
+	if (item->ActiveState < 10)
 	{
 		switch (CreatureVault(itemNum, angle, 2, 300))
 		{
 		case 2:
-			item->animNumber = Objects[item->objectNumber].animIndex + 34;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 10;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 34;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 10;
 			break;
 		case 3:
-			item->animNumber = Objects[item->objectNumber].animIndex + 33;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 11;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 33;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 11;
 			break;
 		case 4:
-			item->animNumber = Objects[item->objectNumber].animIndex + 32;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 12;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 12;
 			break;
 		case -4:
-			item->animNumber = Objects[item->objectNumber].animIndex + 35;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 13;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 13;
 			break;
 		}
 	}

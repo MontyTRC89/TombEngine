@@ -20,12 +20,12 @@ void InitialiseGladiator(short itemNum)
 
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = 1;
-    item->activeState = 1;
-    if (item->triggerFlags == 1)
-        item->swapMeshFlags = -1;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = 1;
+    item->ActiveState = 1;
+    if (item->TriggerFlags == 1)
+        item->SwapMeshFlags = -1;
 }
 
 void ControlGladiator(short itemNumber)
@@ -45,21 +45,21 @@ void ControlGladiator(short itemNumber)
 		int i;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			item->hitPoints = 0;
-			if (item->activeState != 6)
+			item->HitPoints = 0;
+			if (item->ActiveState != 6)
 			{
-				item->animNumber = Objects[ID_GLADIATOR].animIndex + 16;
-				item->activeState = 6;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[ID_GLADIATOR].animIndex + 16;
+				item->ActiveState = 6;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 		else
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 			{
 				GetAITarget(creature);
 			}
@@ -84,10 +84,10 @@ void ControlGladiator(short itemNumber)
 			}
 			else
 			{
-				int dx = LaraItem->pos.xPos - item->pos.xPos;
-				int dz = LaraItem->pos.zPos - item->pos.zPos;
+				int dx = LaraItem->Position.xPos - item->Position.xPos;
+				int dz = LaraItem->Position.zPos - item->Position.zPos;
 			
-				rot = phd_atan(dz, dx) - item->pos.yRot;
+				rot = phd_atan(dz, dx) - item->Position.yRot;
 				if (rot <= -ANGLE(90) || rot >= ANGLE(90))
 					unknown = false;
 
@@ -106,14 +106,14 @@ void ControlGladiator(short itemNumber)
 				joint1 = info.xAngle;
 			}
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case 1:
 				creature->flags = 0;
 				joint2 = rot;
 				creature->maximumTurn = (-(creature->mood != 0)) & 0x16C;
 				
-				if (item->aiBits & GUARD 
+				if (item->AIBits & GUARD 
 					|| !(GetRandomControl() & 0x1F) 
 					&& (info.distance > SQUARE(1024)
 						|| creature->mood != ATTACK_MOOD))
@@ -122,9 +122,9 @@ void ControlGladiator(short itemNumber)
 					break;
 				}
 
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 				else
 				{
@@ -132,26 +132,26 @@ void ControlGladiator(short itemNumber)
 					{
 						if (Lara.target != item
 							&& info.ahead
-							&& !item->hitStatus)
+							&& !item->HitStatus)
 						{
-							item->targetState = 1;
+							item->TargetState = 1;
 							break;
 						}
 					}
 					else
 					{
 						if (!creature->mood 
-							|| item->aiBits & FOLLOW 
+							|| item->AIBits & FOLLOW 
 							&& (creature->reachedGoal 
 								|| distance > SQUARE(2048)))
 						{
-							if (item->requiredState)
+							if (item->RequiredState)
 							{
-								item->targetState = item->requiredState;
+								item->TargetState = item->RequiredState;
 							}
 							else if (!(GetRandomControl() & 0x3F))
 							{
-								item->targetState = 2;
+								item->TargetState = 2;
 							}
 							break;
 						}
@@ -162,22 +162,22 @@ void ControlGladiator(short itemNumber)
 							&& GetRandomControl() & 1
 							&& (Lara.gunType == WEAPON_SHOTGUN 
 								|| !(GetRandomControl() & 0xF))
-							&& item->meshBits == -1)
+							&& item->MeshBits == -1)
 						{
-							item->targetState = 4;
+							item->TargetState = 4;
 							break;
 						}
 						
 						if (info.bite && info.distance < SQUARE(819))
 						{
 							if (GetRandomControl() & 1)
-								item->targetState = 8;
+								item->TargetState = 8;
 							else
-								item->targetState = 9;
+								item->TargetState = 9;
 							break;
 						}
 					}
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 				break;
 
@@ -186,35 +186,35 @@ void ControlGladiator(short itemNumber)
 				joint2 = rot;
 				creature->maximumTurn = creature->mood != BORED_MOOD ? ANGLE(7) : ANGLE(2);
 
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 					joint2 = 0;
 				}
 				else if (creature->mood == ESCAPE_MOOD)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 				else if (creature->mood)
 				{
 					if (info.distance < SQUARE(1024))
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 						break;
 					}
 
 					if (info.bite && info.distance < SQUARE(2048))
 					{
-						item->targetState = 11;
+						item->TargetState = 11;
 					}
 					else if (!info.ahead || info.distance > SQUARE(1536))
 					{
-						item->targetState = 3;
+						item->TargetState = 3;
 					}
 				}
 				else if (!(GetRandomControl() & 0x3F))
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 					break;
 				}
 				
@@ -227,10 +227,10 @@ void ControlGladiator(short itemNumber)
 				creature->maximumTurn = ANGLE(11);
 				tilt = angle / 2;
 
-				if (item->aiBits & GUARD)
+				if (item->AIBits & GUARD)
 				{
 					creature->maximumTurn = 0;
-					item->targetState = 1;
+					item->TargetState = 1;
 					break;
 				}
 
@@ -238,55 +238,55 @@ void ControlGladiator(short itemNumber)
 				{
 					if (Lara.target != item && info.ahead)
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 						break;
 					}
 					break;
 				}
 
-				if (item->aiBits & FOLLOW 
+				if (item->AIBits & FOLLOW 
 					&& (creature->reachedGoal 
 						|| distance > SQUARE(2048)))
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 					break;
 				}
 
 				if (!creature->mood)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 					break;
 				}
 
 				if (info.distance < SQUARE(1536))
 				{
 					if (info.bite)
-						item->targetState = 10;
+						item->TargetState = 10;
 					else
-						item->targetState = 2;
+						item->TargetState = 2;
 				}
 				break;
 
 			case 4:
-				if (item->hitStatus)
+				if (item->HitStatus)
 				{
 					if (!unknown)
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 						break;
 					}
 				}
 				else if (Lara.target != item 
 					|| !(GetRandomControl() & 0x7F))
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 					break;
 				}
 				break;
 
 			case 5:
 				if (Lara.target != item)
-					item->targetState = 1;
+					item->TargetState = 1;
 				break;
 
 			case 8:
@@ -297,18 +297,18 @@ void ControlGladiator(short itemNumber)
 				if (abs(info.angle) >= ANGLE(7))
 				{
 					if (info.angle >= 0)
-						item->pos.yRot += ANGLE(7);
+						item->Position.yRot += ANGLE(7);
 					else
-						item->pos.yRot -= ANGLE(7);
+						item->Position.yRot -= ANGLE(7);
 				}
 				else
 				{
-					item->pos.yRot += info.angle;
+					item->Position.yRot += info.angle;
 				}
 
-				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 10)
+				if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 10)
 				{
-					r = &g_Level.Rooms[item->roomNumber];
+					r = &g_Level.Rooms[item->RoomNumber];
 					pos.x = 0;
 					pos.y = 0;
 					pos.z = 0;
@@ -327,11 +327,11 @@ void ControlGladiator(short itemNumber)
 								{
 									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 									{
-										ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
+										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
 										mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
-										TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
+										TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 									}
 								}
 							}
@@ -340,12 +340,12 @@ void ControlGladiator(short itemNumber)
 
 					if (!creature->flags)
 					{
-						if (item->touchBits & 0x6000)
+						if (item->TouchBits & 0x6000)
 						{
-							LaraItem->hitPoints -= 120;
-							LaraItem->hitStatus = true;
-							CreatureEffect2(item, &GladiatorBite, 10, item->pos.yRot, DoBloodSplat);
-							SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
+							LaraItem->HitPoints -= 120;
+							LaraItem->HitStatus = true;
+							CreatureEffect2(item, &GladiatorBite, 10, item->Position.yRot, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 							creature->flags = 1;
 						}
 					}

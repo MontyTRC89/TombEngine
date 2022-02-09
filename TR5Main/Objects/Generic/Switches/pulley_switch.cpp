@@ -29,13 +29,13 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->itemFlags[3] = item->triggerFlags;
-		item->triggerFlags = abs(item->triggerFlags);
+		item->ItemFlags[3] = item->TriggerFlags;
+		item->TriggerFlags = abs(item->TriggerFlags);
 
-		if (item->status == ITEM_INVISIBLE)
+		if (item->Status == ITEM_INVISIBLE)
 		{
-			item->itemFlags[1] = 1;
-			item->status = ITEM_NOT_ACTIVE;
+			item->ItemFlags[1] = 1;
+			item->Status = ITEM_NOT_ACTIVE;
 		}
 	}
 
@@ -45,35 +45,35 @@ namespace TEN::Entities::Switches
 
 		if ((TrInput & IN_ACTION)
 			&& Lara.gunStatus == LG_HANDS_FREE
-			&& l->activeState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
+			&& l->ActiveState == LS_IDLE
+			&& l->AnimNumber == LA_STAND_IDLE
 			&& l->Airborne == false
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			short oldYrot = item->pos.yRot;
-			item->pos.yRot = l->pos.yRot;
+			short oldYrot = item->Position.yRot;
+			item->Position.yRot = l->Position.yRot;
 			if (TestLaraPosition(&PulleyBounds, item, l))
 			{
-				if (item->itemFlags[1])
+				if (item->ItemFlags[1])
 				{
-					if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
+					if (OldPickupPos.x != l->Position.xPos || OldPickupPos.y != l->Position.yPos || OldPickupPos.z != l->Position.zPos)
 					{
-						OldPickupPos.x = l->pos.xPos;
-						OldPickupPos.y = l->pos.yPos;
-						OldPickupPos.z = l->pos.zPos;
+						OldPickupPos.x = l->Position.xPos;
+						OldPickupPos.y = l->Position.yPos;
+						OldPickupPos.z = l->Position.zPos;
 						SayNo();
 					}
 				}
 				else if (MoveLaraPosition(&PulleyPos, item, l))
 				{
-					l->animNumber = LA_PULLEY_GRAB;
-					l->activeState = LS_PULLEY;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+					l->AnimNumber = LA_PULLEY_GRAB;
+					l->ActiveState = LS_PULLEY;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 
 					AddActiveItem(itemNum);
 
-					item->pos.yRot = oldYrot;
-					item->status = ITEM_ACTIVE;
+					item->Position.yRot = oldYrot;
+					item->Status = ITEM_ACTIVE;
 
 					Lara.isMoving = false;
 					ResetLaraFlex(l);
@@ -84,7 +84,7 @@ namespace TEN::Entities::Switches
 				{
 					Lara.interactedItem = itemNum;
 				}
-				item->pos.yRot = oldYrot;
+				item->Position.yRot = oldYrot;
 			}
 			else
 			{
@@ -93,10 +93,10 @@ namespace TEN::Entities::Switches
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
-				item->pos.yRot = oldYrot;
+				item->Position.yRot = oldYrot;
 			}
 		}
-		else if (l->activeState != LS_PULLEY)
+		else if (l->ActiveState != LS_PULLEY)
 		{
 			ObjectCollision(itemNum, l, coll);
 		}

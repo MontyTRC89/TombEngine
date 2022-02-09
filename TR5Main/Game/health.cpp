@@ -52,20 +52,20 @@ void DrawHealthBar(float value)
 
 void UpdateHealthBar(ITEM_INFO* item, int flash)
 {
-	auto hitPoints = item->hitPoints;
+	auto HitPoints = item->HitPoints;
 
-	if (hitPoints < 0)
-		hitPoints = 0;
-	else if (hitPoints > LARA_HEALTH_MAX)
-		hitPoints = LARA_HEALTH_MAX;
+	if (HitPoints < 0)
+		HitPoints = 0;
+	else if (HitPoints > LARA_HEALTH_MAX)
+		HitPoints = LARA_HEALTH_MAX;
 
 	// OPT: smoothly transition health bar display.
 	if (EnableSmoothHealthBar)
 	{
-		if (OldHitPoints != hitPoints)
+		if (OldHitPoints != HitPoints)
 		{
-			MutateAmount += OldHitPoints - hitPoints;
-			OldHitPoints = hitPoints;
+			MutateAmount += OldHitPoints - HitPoints;
+			OldHitPoints = HitPoints;
 			HealthBarTimer = 40;
 		}
 
@@ -80,17 +80,17 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 		if (MutateAmount > -0.5f && MutateAmount < 0.5f)
 		{
 			MutateAmount = 0;
-			HealthBar = hitPoints;
+			HealthBar = HitPoints;
 		}
 	}
 
 	// OG: discretely transition health bar display.
 	else
 	{
-		if (OldHitPoints != hitPoints)
+		if (OldHitPoints != HitPoints)
 		{
-			OldHitPoints = hitPoints;
-			HealthBar = hitPoints;
+			OldHitPoints = HitPoints;
+			HealthBar = HitPoints;
 			HealthBarTimer = 40;
 		}
 	}
@@ -139,11 +139,11 @@ void DrawAirBar(float value)
 
 void UpdateAirBar(ITEM_INFO* item, int flash)
 {
-	if (Lara.air == LARA_AIR_MAX || item->hitPoints <= 0)
+	if (Lara.air == LARA_AIR_MAX || item->HitPoints <= 0)
 		return;
 
 	if (Lara.Vehicle == NO_ITEM ||
-		g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV)
+		g_Level.Items[Lara.Vehicle].ObjectNumber != ID_UPV)
 	{
 		if (Lara.waterStatus != LW_UNDERWATER &&
 			Lara.waterStatus != LW_SURFACE &&

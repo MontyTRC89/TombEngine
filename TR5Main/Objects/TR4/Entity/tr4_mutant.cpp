@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 
     static bool ShootFrame(ITEM_INFO* item)
     {
-		int frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
+		int frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
         if (frameNumber == 45
             //||  frameNumber == 50
             //||  frameNumber == 55
@@ -127,7 +127,7 @@ namespace TEN::Entities::TR4
     {
         if (creature->enemy == nullptr)
         {
-            headAngle = item->pos.yRot;
+            headAngle = item->Position.yRot;
             return;
         }
         ITEM_INFO* enemy = creature->enemy;
@@ -137,9 +137,9 @@ namespace TEN::Entities::TR4
         pos.y = 0;
         pos.z = 0;
         GetJointAbsPosition(item, &pos, joint);
-        x = enemy->pos.xPos - pos.x;
-        z = enemy->pos.zPos - pos.z;
-        headAngle = (short)(phd_atan(z, x) - item->pos.yRot) / 2;
+        x = enemy->Position.xPos - pos.x;
+        z = enemy->Position.zPos - pos.z;
+        headAngle = (short)(phd_atan(z, x) - item->Position.yRot) / 2;
     }
 
     static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
@@ -177,40 +177,40 @@ namespace TEN::Entities::TR4
 
     static void MoveItemFront(ITEM_INFO* item, int distance)
     {
-        short degree = short(TO_DEGREES(item->pos.yRot));
+        short degree = short(TO_DEGREES(item->Position.yRot));
         switch (degree)
         {
         case C_NORTH:
-            item->pos.zPos += distance;
+            item->Position.zPos += distance;
             break;
         case C_EAST:
-            item->pos.xPos += distance;
+            item->Position.xPos += distance;
             break;
         case C_SOUTH:
-            item->pos.zPos -= distance;
+            item->Position.zPos -= distance;
             break;
         case C_WEST:
-            item->pos.xPos -= distance;
+            item->Position.xPos -= distance;
             break;
         }
     }
 
     static void MoveItemBack(ITEM_INFO* item, int distance)
     {
-        short degree = short(TO_DEGREES(item->pos.yRot));
+        short degree = short(TO_DEGREES(item->Position.yRot));
         switch (degree)
         {
         case C_NORTH:
-            item->pos.zPos -= distance;
+            item->Position.zPos -= distance;
             break;
         case C_EAST:
-            item->pos.xPos -= distance;
+            item->Position.xPos -= distance;
             break;
         case C_SOUTH:
-            item->pos.zPos += distance;
+            item->Position.zPos += distance;
             break;
         case C_WEST:
-            item->pos.xPos += distance;
+            item->Position.xPos += distance;
             break;
         }
     }
@@ -218,9 +218,9 @@ namespace TEN::Entities::TR4
     static void MutantAIFix(ITEM_INFO* item, AI_INFO* info)
     {
         MoveItemFront(item, SECTOR(2));
-        item->pos.yPos -= CLICK(3);
+        item->Position.yPos -= CLICK(3);
         CreatureAIInfo(item, info);
-        item->pos.yPos += CLICK(3);
+        item->Position.yPos += CLICK(3);
         MoveItemBack(item, SECTOR(2));
     }
 
@@ -230,10 +230,10 @@ namespace TEN::Entities::TR4
         InitialiseCreature(itemNumber);
 
         item = &g_Level.Items[itemNumber];
-        item->animNumber = Objects[item->objectNumber].animIndex + MUTANT_ANIM_APPEAR;
-        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->activeState = STATE_MUTANT_APPEAR;
-        item->targetState = STATE_MUTANT_APPEAR;
+        item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
+        item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+        item->ActiveState = STATE_MUTANT_APPEAR;
+        item->TargetState = STATE_MUTANT_APPEAR;
     }
 
     void CrocgodControl(short itemNumber)
@@ -254,7 +254,7 @@ namespace TEN::Entities::TR4
         angle = 0;
         headY = 0;
 
-        if (item->aiBits & ALL_AIOBJ)
+        if (item->AIBits & ALL_AIOBJ)
             GetAITarget(mutant);
         else if (mutant->hurtByLara)
             mutant->enemy = LaraItem;
@@ -268,46 +268,46 @@ namespace TEN::Entities::TR4
         mutant->maximumTurn = 0;
         angle = CreatureTurn(item, 0);
 
-        switch (item->activeState)
+        switch (item->ActiveState)
         {
         case STATE_MUTANT_IDLE:
             if (info.ahead)
             {
                 int random = GetRandomControl() & 31;
                 if ((random > 0 && random < 10) && info.distance <= MUTANT_SHOOT_RANGE)
-                    item->targetState = STATE_MUTANT_SHOOT;
+                    item->TargetState = STATE_MUTANT_SHOOT;
                 else if ((random > 10 && random < 20) && info.distance <= MUTANT_LOCUST1_RANGE)
-                    item->targetState = STATE_MUTANT_LOCUST1;
+                    item->TargetState = STATE_MUTANT_LOCUST1;
                 else if ((random > 20 && random < 30) && info.distance <= MUTANT_LOCUST2_RANGE)
-                    item->targetState = STATE_MUTANT_LOCUST2;
+                    item->TargetState = STATE_MUTANT_LOCUST2;
             }
             break;
 
         case STATE_MUTANT_SHOOT:
-            frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
+            frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
             if (frameNumber >= 94 && frameNumber <= 96)
             {
                 PHD_3DPOS src;
                 GetTargetPosition(item, &src);
                 if (frameNumber == 94)
                 {
-                    ShootFireball(&src, MissileRotationType::M_FRONT, item->roomNumber, 0);
+                    ShootFireball(&src, MissileRotationType::M_FRONT, item->RoomNumber, 0);
                 }
                 else if (frameNumber == 95)
                 {
-                    ShootFireball(&src, MissileRotationType::M_LEFT, item->roomNumber, 1);
+                    ShootFireball(&src, MissileRotationType::M_LEFT, item->RoomNumber, 1);
                     //ShootFireball(&src, MissileRotationType::M_LEFT, item->roomNumber, 1);
                 }
                 else if (frameNumber == 96)
                 {
-                    ShootFireball(&src, MissileRotationType::M_RIGHT, item->roomNumber, 1);
+                    ShootFireball(&src, MissileRotationType::M_RIGHT, item->RoomNumber, 1);
                     //ShootFireball(&src, MissileRotationType::M_RIGHT, item->roomNumber, 1);
                 }
             }
             break;
 
         case STATE_MUTANT_LOCUST1:
-            frameNumber = (item->frameNumber - g_Level.Anims[item->animNumber].frameBase);
+            frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
             if (frameNumber >= 60 && frameNumber <= 120)
                 TEN::Entities::TR4::SpawnLocust(item);
             break;
@@ -317,12 +317,12 @@ namespace TEN::Entities::TR4
             {
                 PHD_3DPOS src;
                 GetTargetPosition(item, &src);
-                ShootFireball(&src, MissileRotationType::M_FRONT, item->roomNumber, 1);
+                ShootFireball(&src, MissileRotationType::M_FRONT, item->RoomNumber, 1);
             }
             break;
         }
 
-        if (item->activeState != STATE_MUTANT_LOCUST1)
+        if (item->ActiveState != STATE_MUTANT_LOCUST1)
             mutant_joint = OBJECT_BONES(headY, info.xAngle, true);
         else
             mutant_joint = OBJECT_BONES(0);

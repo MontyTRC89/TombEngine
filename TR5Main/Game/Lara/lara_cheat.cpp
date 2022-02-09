@@ -18,11 +18,11 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_FORWARD)
 	{
-		item->pos.xRot -= ANGLE(3);
+		item->Position.xRot -= ANGLE(3);
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->pos.xRot += ANGLE(3);
+		item->Position.xRot += ANGLE(3);
 	}
 
 	if (TrInput & IN_LEFT)
@@ -42,7 +42,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		TriggerDynamicLight(item->pos.xPos, item->pos.yPos, item->pos.zPos, 31, 255, 255, 255);
+		TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos, 31, 255, 255, 255);
 	}
 
 	if (TrInput & IN_OPTION)
@@ -79,16 +79,16 @@ void LaraCheatyBits()
 
 				DelsGiveLaraItemsCheat();
 
-				LaraItem->pos.yPos -= 128;
+				LaraItem->Position.yPos -= 128;
 
 				if (Lara.waterStatus != LW_FLYCHEAT)
 				{
 					Lara.waterStatus = LW_FLYCHEAT;
 					SetAnimation(LaraItem, LA_DOZY);
 					LaraItem->Airborne = false;
-					LaraItem->pos.xRot = ANGLE(30);
+					LaraItem->Position.xRot = ANGLE(30);
 					LaraItem->VerticalVelocity = 30;
-					LaraItem->hitPoints = 1000;
+					LaraItem->HitPoints = 1000;
 					Lara.poisoned = 0;
 					Lara.air = 1800;
 					Lara.deathCount = 0;

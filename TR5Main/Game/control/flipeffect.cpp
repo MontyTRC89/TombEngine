@@ -85,7 +85,7 @@ void FlashOrange(ITEM_INFO* item)
 
 void MeshSwapToPour(ITEM_INFO* item)
 {
-	Lara.meshPtrs[LM_LHAND] = Objects[item->itemFlags[2]].meshIndex + LM_LHAND;
+	Lara.meshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ITEM_INFO* item)
@@ -120,12 +120,12 @@ void ResetHair(ITEM_INFO* item)
 
 void InvisibilityOff(ITEM_INFO* item)
 {
-	item->status = ITEM_ACTIVE;
+	item->Status = ITEM_ACTIVE;
 }
 
 void InvisibilityOn(ITEM_INFO* item)
 {
-	item->status = ITEM_INVISIBLE;
+	item->Status = ITEM_INVISIBLE;
 }
 
 void SetFog(ITEM_INFO* item)
@@ -187,19 +187,19 @@ void KillActiveBaddies(ITEM_INFO* item)
 		{
 			targetItem = &g_Level.Items[itemNum];
 
-			if (Objects[targetItem->objectNumber].intelligent)
+			if (Objects[targetItem->ObjectNumber].intelligent)
 			{
-				targetItem->status = ITEM_INVISIBLE;
+				targetItem->Status = ITEM_INVISIBLE;
 
 				if (*(int*)&item != 0xABCDEF)
 				{
 					RemoveActiveItem(itemNum);
 					DisableBaddieAI(itemNum);
-					targetItem->flags |= IFLAG_INVISIBLE;
+					targetItem->Flags |= IFLAG_INVISIBLE;
 				}
 			}
 
-			itemNum = targetItem->nextActive;
+			itemNum = targetItem->NextActive;
 		} while (itemNum != NO_ITEM);
 	}
 
@@ -263,8 +263,8 @@ void RubbleFX(ITEM_INFO* item)
 		ITEM_INFO* eq = &g_Level.Items[itemList[0]];
 
 		AddActiveItem(itemList[0]);
-		eq->status = ITEM_ACTIVE;
-		eq->flags |= IFLAG_ACTIVATION_MASK;
+		eq->Status = ITEM_ACTIVE;
+		eq->Flags |= IFLAG_ACTIVATION_MASK;
 	}
 	else
 	{
@@ -282,9 +282,9 @@ void PlaySoundEffect(ITEM_INFO* item)
 
 void FloorShake(ITEM_INFO* item)
 {
-	int x = abs(item->pos.xPos - Camera.pos.x);
-	int y = abs(item->pos.yPos - Camera.pos.y);
-	int z = abs(item->pos.zPos - Camera.pos.z);
+	int x = abs(item->Position.xPos - Camera.pos.x);
+	int y = abs(item->Position.yPos - Camera.pos.y);
+	int z = abs(item->Position.zPos - Camera.pos.z);
 
 	if (x < SECTOR(16) && y < SECTOR(16) && z < SECTOR(16))
 	{
@@ -294,8 +294,8 @@ void FloorShake(ITEM_INFO* item)
 
 void Turn180(ITEM_INFO* item)
 {
-	item->pos.yRot -= ANGLE(180);
-	item->pos.xRot = -item->pos.xRot;
+	item->Position.yRot -= ANGLE(180);
+	item->Position.xRot = -item->Position.xRot;
 }
 
 void FinishLevel(ITEM_INFO* item)

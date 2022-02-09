@@ -38,16 +38,16 @@ void InitialiseHitman(short itemNum)
 
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex + 4;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = STATE_HITMAN_STOP;
-    item->activeState = STATE_HITMAN_STOP;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = STATE_HITMAN_STOP;
+    item->ActiveState = STATE_HITMAN_STOP;
 }
 
 static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -86,72 +86,72 @@ void HitmanControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 		short angle = 0;
 		short joint2 = 0;
 		short joint1 = 0;
 		short joint0 = 0;
 
-		int x = item->pos.xPos;
-		int z = item->pos.zPos;
+		int x = item->Position.xPos;
+		int z = item->Position.zPos;
 
-		int dx = 808 * phd_sin(item->pos.yRot);
-		int dz = 808 * phd_cos(item->pos.yRot);
-
-		x += dx;
-		z += dz;
-
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-		int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
+		int dx = 808 * phd_sin(item->Position.yRot);
+		int dz = 808 * phd_cos(item->Position.yRot);
 
 		x += dx;
 		z += dz;
 
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-		int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
+		short roomNumber = item->RoomNumber;
+		FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+		int height1 = GetFloorHeight(floor, x, item->Position.yPos, z);
 
 		x += dx;
 		z += dz;
 
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-		int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
+		roomNumber = item->RoomNumber;
+		floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+		int height2 = GetFloorHeight(floor, x, item->Position.yPos, z);
+
+		x += dx;
+		z += dz;
+
+		roomNumber = item->RoomNumber;
+		floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+		int height3 = GetFloorHeight(floor, x, item->Position.yPos, z);
 
 		bool canJump1block;
-		if (item->boxNumber == LaraItem->boxNumber
-			|| item->pos.yPos >= height1 - 384
-			|| item->pos.yPos >= height2 + 256
-			|| item->pos.yPos <= height2 - 256)
+		if (item->BoxNumber == LaraItem->BoxNumber
+			|| item->Position.yPos >= height1 - 384
+			|| item->Position.yPos >= height2 + 256
+			|| item->Position.yPos <= height2 - 256)
 			canJump1block = false;
 		else
 			canJump1block = true;
 
 		bool canJump2blocks;
-		if (item->boxNumber == LaraItem->boxNumber
-			|| item->pos.yPos >= height1 - 384
-			|| item->pos.yPos >= height2 - 384
-			|| item->pos.yPos >= height3 + 256
-			|| item->pos.yPos <= height3 - 256)
+		if (item->BoxNumber == LaraItem->BoxNumber
+			|| item->Position.yPos >= height1 - 384
+			|| item->Position.yPos >= height2 - 384
+			|| item->Position.yPos >= height3 + 256
+			|| item->Position.yPos <= height3 - 256)
 			canJump2blocks = false;
 		else
 			canJump2blocks = true;
 
-		if (item->firedWeapon)
+		if (item->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 			pos.x = HitmanGun.x;
 			pos.y = HitmanGun.y;
 			pos.z = HitmanGun.z;
 			GetJointAbsPosition(item, &pos, HitmanGun.meshNum);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
-			item->firedWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
+			item->FiredWeapon--;
 		}
 
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->enemy = LaraItem;
@@ -159,22 +159,22 @@ void HitmanControl(short itemNumber)
 		AI_INFO info, laraInfo;
 		CreatureAIInfo(item, &info);
 
-		if (item->hitStatus)
+		if (item->HitStatus)
 		{
 			if (!(GetRandomControl() & 7))
 			{
-				if (item->itemFlags[0] < 11)
+				if (item->ItemFlags[0] < 11)
 				{
-					item->swapMeshFlags |= 1 << HitmanJoints[item->itemFlags[0]];
-					item->itemFlags[0]++;
+					item->SwapMeshFlags |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->ItemFlags[0]++;
 				}
 			}
 		}
 
 		byte random = (byte)GetRandomControl();
-		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 			random &= 31;
-		if (random < item->itemFlags[0])
+		if (random < item->ItemFlags[0])
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;
@@ -186,7 +186,7 @@ void HitmanControl(short itemNumber)
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
-			SoundEffect(SFX_TR5_HITMAN_ELEC_SHORT, &item->pos, 0);
+			SoundEffect(SFX_TR5_HITMAN_ELEC_SHORT, &item->Position, 0);
 
 			if (random == 5 || random == 7 || random == 10)
 			{
@@ -202,12 +202,12 @@ void HitmanControl(short itemNumber)
 					break;
 				case 7:
 					GetJointAbsPosition(item, &pos2, 6);
-					if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER && item->hitPoints > 0)
+					if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER && item->HitPoints > 0)
 					{
-						item->activeState = STATE_HITMAN_DEATH;
-						item->animNumber = obj->animIndex + 69;
-						item->hitPoints = 0;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->ActiveState = STATE_HITMAN_DEATH;
+						item->AnimNumber = obj->animIndex + 69;
+						item->HitPoints = 0;
+						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						DropBaddyPickups(item);
 					}
 					break;
@@ -220,7 +220,7 @@ void HitmanControl(short itemNumber)
 			}
 		}
 
-		if (item->hitPoints > 0)
+		if (item->HitPoints > 0)
 		{
 			if (creature->enemy == LaraItem)
 			{
@@ -229,26 +229,26 @@ void HitmanControl(short itemNumber)
 			}
 			else
 			{
-				int dx = LaraItem->pos.xPos - item->pos.xPos;
-				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
+				int dx = LaraItem->Position.xPos - item->Position.xPos;
+				int dz = LaraItem->Position.zPos - item->Position.zPos;
+				laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
 			GetCreatureMood(item, &info, creature->enemy != LaraItem);
 
-			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_NO_LENSFLARE) // Gassed room?
+			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_NO_LENSFLARE) // Gassed room?
 			{
 				if (!(GlobalCounter & 7))
-					item->hitPoints--;
+					item->HitPoints--;
 
 				creature->mood = ESCAPE_MOOD;
 
-				if (item->hitPoints <= 0)
+				if (item->HitPoints <= 0)
 				{
-					item->activeState = STATE_HITMAN_GASSED;
-					item->animNumber = obj->animIndex + 68;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->ActiveState = STATE_HITMAN_GASSED;
+					item->AnimNumber = obj->animIndex + 68;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				}
 			}
 
@@ -258,10 +258,10 @@ void HitmanControl(short itemNumber)
 			
 			if (laraInfo.distance < SQUARE(2048) 
 				&& LaraItem->Velocity> 20
-				|| item->hitStatus
+				|| item->HitStatus
 				|| TargetVisible(item, &laraInfo))
 			{
-				if (!(item->aiBits & FOLLOW))
+				if (!(item->AIBits & FOLLOW))
 				{
 					creature->enemy = LaraItem;
 					AlertAllGuards(itemNumber);
@@ -272,7 +272,7 @@ void HitmanControl(short itemNumber)
 			int height;
 			short roomNumber;
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case STATE_HITMAN_STOP:
 				creature->LOT.isJumping = false;
@@ -280,28 +280,28 @@ void HitmanControl(short itemNumber)
 				creature->flags = 0;
 				creature->maximumTurn = 0;
 
-				if (info.ahead && item->aiBits != GUARD)
+				if (info.ahead && item->AIBits != GUARD)
 				{
 					joint0 = info.angle / 2;
 					joint1 = info.xAngle;
 				}
 				
-				if (item->requiredState)
+				if (item->RequiredState)
 				{
-					item->targetState = item->requiredState;
+					item->TargetState = item->RequiredState;
 				}
 				else
 				{
-					if (item->aiBits & GUARD)
+					if (item->AIBits & GUARD)
 					{
 						joint2 = AIGuard(creature);
 						
-						if (item->aiBits & PATROL1)
+						if (item->AIBits & PATROL1)
 						{
-							item->triggerFlags--;
-							if (item->triggerFlags < 1)
+							item->TriggerFlags--;
+							if (item->TriggerFlags < 1)
 							{
-								item->aiBits |= PATROL1;
+								item->AIBits |= PATROL1;
 							}
 						}
 					}
@@ -309,53 +309,53 @@ void HitmanControl(short itemNumber)
 					{
 						if (info.distance < SQUARE(4096) || info.zoneNumber != info.enemyZone)
 						{
-							item->targetState = STATE_HITMAN_AIM;
+							item->TargetState = STATE_HITMAN_AIM;
 						}
-						else if (item->aiBits != MODIFY)
+						else if (item->AIBits != MODIFY)
 						{
-							item->targetState = STATE_HITMAN_WALK;
+							item->TargetState = STATE_HITMAN_WALK;
 						}
 					}
 					else
 					{
-						if (item->aiBits & PATROL1)
+						if (item->AIBits & PATROL1)
 						{
-							item->targetState = STATE_HITMAN_WALK;
+							item->TargetState = STATE_HITMAN_WALK;
 						}
 						else
 						{
 							if (canJump1block || canJump2blocks)
 							{
 								creature->maximumTurn = 0;
-								item->animNumber = obj->animIndex + 22;
-								item->activeState = STATE_HITMAN_JUMP;
-								item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+								item->AnimNumber = obj->animIndex + 22;
+								item->ActiveState = STATE_HITMAN_JUMP;
+								item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 								if (canJump2blocks)
-									item->targetState = STATE_HITMAN_JUMP_2BLOCKS;
+									item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
 								creature->LOT.isJumping = true;
 							}
 							else if (!creature->monkeyAhead)
 							{
 								if (creature->mood)
 								{
-									if (info.distance < SQUARE(3072) || item->aiBits & FOLLOW)
-										item->targetState = STATE_HITMAN_WALK;
+									if (info.distance < SQUARE(3072) || item->AIBits & FOLLOW)
+										item->TargetState = STATE_HITMAN_WALK;
 									else
-										item->targetState = STATE_HITMAN_RUN;
+										item->TargetState = STATE_HITMAN_RUN;
 								}
 								else
 								{
-									item->targetState = STATE_HITMAN_STOP;
+									item->TargetState = STATE_HITMAN_STOP;
 								}
 							}
 							else
 							{
-								floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-								height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-								if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-									item->targetState = STATE_HITMAN_START_END_MONKEY;
+								floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+								height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+								if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - 1536)
+									item->TargetState = STATE_HITMAN_START_END_MONKEY;
 								else
-									item->targetState = STATE_HITMAN_WALK;
+									item->TargetState = STATE_HITMAN_WALK;
 							}
 						}
 					}
@@ -369,19 +369,19 @@ void HitmanControl(short itemNumber)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
-					item->targetState = STATE_HITMAN_STOP;
-					item->requiredState = STATE_HITMAN_AIM;
+					item->TargetState = STATE_HITMAN_STOP;
+					item->RequiredState = STATE_HITMAN_AIM;
 				}
 				else
 				{
 					if (canJump1block || canJump2blocks)
 					{
 						creature->maximumTurn = 0;
-						item->animNumber = obj->animIndex + 22;
-						item->activeState = STATE_HITMAN_JUMP;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->AnimNumber = obj->animIndex + 22;
+						item->ActiveState = STATE_HITMAN_JUMP;
+						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						if (canJump2blocks)
-							item->targetState = STATE_HITMAN_JUMP_2BLOCKS;
+							item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
 						creature->LOT.isJumping = true;
 					}
 					else if (!creature->monkeyAhead)
@@ -390,18 +390,18 @@ void HitmanControl(short itemNumber)
 						{
 							if (info.distance > SQUARE(3072))
 							{
-								if (!item->aiBits)
-									item->targetState = STATE_HITMAN_RUN;
+								if (!item->AIBits)
+									item->TargetState = STATE_HITMAN_RUN;
 							}
 						}
 						else
 						{
-							item->targetState = STATE_HITMAN_STOP;
+							item->TargetState = STATE_HITMAN_STOP;
 						}
 					}
 					else
 					{
-						item->targetState = STATE_HITMAN_STOP;
+						item->TargetState = STATE_HITMAN_STOP;
 					}
 				}
 				break;
@@ -414,44 +414,44 @@ void HitmanControl(short itemNumber)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
-					item->targetState = STATE_HITMAN_STOP;
-					item->requiredState = STATE_HITMAN_AIM;
+					item->TargetState = STATE_HITMAN_STOP;
+					item->RequiredState = STATE_HITMAN_AIM;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
 					creature->maximumTurn = 0;
-					item->animNumber = obj->animIndex + 22;
-					item->activeState = STATE_HITMAN_JUMP;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->AnimNumber = obj->animIndex + 22;
+					item->ActiveState = STATE_HITMAN_JUMP;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					if (canJump2blocks)
-						item->targetState = STATE_HITMAN_JUMP_2BLOCKS;
+						item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
 					creature->LOT.isJumping = true;
 				}
 				else
 				{
 					if (creature->monkeyAhead)
 					{
-						item->targetState = STATE_HITMAN_STOP;
+						item->TargetState = STATE_HITMAN_STOP;
 					}
 					else if (info.distance < SQUARE(3072))
-						item->targetState = STATE_HITMAN_WALK;
+						item->TargetState = STATE_HITMAN_WALK;
 				}
 				break;
 
 			case STATE_HITMAN_START_END_MONKEY:
 				creature->maximumTurn = 0;
 				
-				if (item->boxNumber == creature->LOT.targetBox 
+				if (item->BoxNumber == creature->LOT.targetBox 
 					|| !creature->monkeyAhead)
 				{
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-						item->targetState = STATE_HITMAN_STOP;
+					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+					height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+					if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - 1536)
+						item->TargetState = STATE_HITMAN_STOP;
 				}
 				else
 				{
-					item->targetState = STATE_HITMAN_MONKEY;
+					item->TargetState = STATE_HITMAN_MONKEY;
 				}
 				break;
 
@@ -460,13 +460,13 @@ void HitmanControl(short itemNumber)
 				creature->LOT.isJumping = true;
 				creature->maximumTurn = ANGLE(5);
 				
-				if (item->boxNumber == creature->LOT.targetBox
+				if (item->BoxNumber == creature->LOT.targetBox
 					|| !creature->monkeyAhead)
 				{
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
-						item->targetState = STATE_HITMAN_START_END_MONKEY;
+					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+					height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+					if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - 1536)
+						item->TargetState = STATE_HITMAN_START_END_MONKEY;
 				}
 				break;
 
@@ -482,21 +482,21 @@ void HitmanControl(short itemNumber)
 				if (abs(info.angle) >= ANGLE(2))
 				{
 					if (info.angle >= 0)
-						item->pos.yRot += ANGLE(2);
+						item->Position.yRot += ANGLE(2);
 					else
-						item->pos.yRot -= ANGLE(2);
+						item->Position.yRot -= ANGLE(2);
 				}
 				else
 				{
-					item->pos.yRot += info.angle;
+					item->Position.yRot += info.angle;
 				}
 
 				if (Targetable(item, &info) 
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
-					item->targetState = STATE_HITMAN_FIRE;
+					item->TargetState = STATE_HITMAN_FIRE;
 				else
-					item->targetState = STATE_HITMAN_STOP;
+					item->TargetState = STATE_HITMAN_STOP;
 				break;
 
 			case STATE_HITMAN_FIRE:
@@ -511,20 +511,20 @@ void HitmanControl(short itemNumber)
 				if (abs(info.angle) >= ANGLE(2))
 				{
 					if (info.angle >= 0)
-						item->pos.yRot += ANGLE(2);
+						item->Position.yRot += ANGLE(2);
 					else
-						item->pos.yRot -= ANGLE(2);
+						item->Position.yRot -= ANGLE(2);
 				}
 				else
 				{
-					item->pos.yRot += info.angle;
+					item->Position.yRot += info.angle;
 				}
 
-				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 6
-					&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 16
-					&& ((byte)item->frameNumber - (byte)g_Level.Anims[item->animNumber].frameBase) & 1)
+				if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 6
+					&& item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 16
+					&& ((byte)item->FrameNumber - (byte)g_Level.Anims[item->AnimNumber].frameBase) & 1)
 				{
-					item->firedWeapon = 1;
+					item->FiredWeapon = 1;
 					ShotLara(item, &info, &HitmanGun, joint0, 12);
 				}
 				break;
@@ -534,7 +534,7 @@ void HitmanControl(short itemNumber)
 
 			}
 		}
-		else if (item->activeState == 43 && !Lara.burn)
+		else if (item->ActiveState == 43 && !Lara.burn)
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;			
@@ -542,7 +542,7 @@ void HitmanControl(short itemNumber)
 			pos.z = 0;
 			GetLaraJointPosition(&pos, LM_LFOOT);
 			
-			short roomNumberLeft = LaraItem->roomNumber;
+			short roomNumberLeft = LaraItem->RoomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
 			
 			pos.x = 0;
@@ -550,13 +550,13 @@ void HitmanControl(short itemNumber)
 			pos.z = 0; 
 			GetLaraJointPosition(&pos, LM_RFOOT);
 
-			short roomNumberRight = LaraItem->roomNumber;
+			short roomNumberRight = LaraItem->RoomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
 
 			ROOM_INFO* roomRight = &g_Level.Rooms[roomNumberRight];
 			ROOM_INFO* roomLeft = &g_Level.Rooms[roomNumberLeft];
 
-			short flipNumber = g_Level.Rooms[item->roomNumber].flipNumber;
+			short flipNumber = g_Level.Rooms[item->RoomNumber].flipNumber;
 
 			if ((roomRight->flags | roomLeft->flags) & ENV_FLAG_WATER)
 			{
@@ -565,7 +565,7 @@ void HitmanControl(short itemNumber)
 					LaraBurn(LaraItem);
 					Lara.burnCount = 48;
 					Lara.burnBlue = 1;
-					LaraItem->hitPoints = 0;
+					LaraItem->HitPoints = 0;
 				}
 			}
 		}
@@ -579,29 +579,29 @@ void HitmanControl(short itemNumber)
 			if (creature->enemy)
 			{
 				TestTriggers(
-					creature->enemy->pos.xPos,
-					creature->enemy->pos.yPos,
-					creature->enemy->pos.zPos, roomNumber, true);
+					creature->enemy->Position.xPos,
+					creature->enemy->Position.yPos,
+					creature->enemy->Position.zPos, roomNumber, true);
 				
-				item->requiredState = STATE_HITMAN_WALK;
+				item->RequiredState = STATE_HITMAN_WALK;
 
-				if (creature->enemy->flags & 2)
-					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
+				if (creature->enemy->Flags & 2)
+					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
 
-				if (creature->enemy->flags & 8)
+				if (creature->enemy->Flags & 8)
 				{
-					item->requiredState = STATE_HITMAN_STOP;
-					item->triggerFlags = 300;
-					item->aiBits = GUARD | PATROL1;
+					item->RequiredState = STATE_HITMAN_STOP;
+					item->TriggerFlags = 300;
+					item->AIBits = GUARD | PATROL1;
 				}
 				
-				item->itemFlags[3]++;
+				item->ItemFlags[3]++;
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
 			}
 		}
 		
-		if (item->activeState >= 15 || item->activeState == 5)
+		if (item->ActiveState >= 15 || item->ActiveState == 5)
 		{
 			CreatureAnimation(itemNumber, angle, 0);
 		}
@@ -611,44 +611,44 @@ void HitmanControl(short itemNumber)
 			{
 			case 0:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 35;
-				item->activeState = 25;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 35;
+				item->ActiveState = 25;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 1:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 41;
-				item->activeState = 24;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 41;
+				item->ActiveState = 24;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 2:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 42;
-				item->activeState = 23;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 42;
+				item->ActiveState = 23;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 6:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 29;
-				item->activeState = 19;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 29;
+				item->ActiveState = 19;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 7:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 28;
-				item->activeState = 18;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 28;
+				item->ActiveState = 18;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 8:
 				creature->maximumTurn = 0;
-				item->animNumber = obj->animIndex + 27;
-				item->activeState = 17;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 27;
+				item->ActiveState = 17;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			default:

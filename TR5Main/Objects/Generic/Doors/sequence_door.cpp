@@ -26,16 +26,16 @@ namespace TEN::Entities::Doors
 	void SequenceDoorControl(short itemNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		DOOR_DATA* door = (DOOR_DATA*)item->data;
+		DOOR_DATA* door = (DOOR_DATA*)item->Data;
 
 		if (CurrentSequence == 3)
 		{
-			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == item->triggerFlags)
+			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == item->TriggerFlags)
 			{
-				if (item->activeState == 1)
-					item->targetState = 1;
+				if (item->ActiveState == 1)
+					item->TargetState = 1;
 				else
-					item->targetState = 0;
+					item->TargetState = 0;
 
 				TestTriggers(item, true);
 			}
@@ -43,9 +43,9 @@ namespace TEN::Entities::Doors
 			CurrentSequence = 4;
 		}
 
-		if (item->activeState == item->targetState)
+		if (item->ActiveState == item->TargetState)
 		{
-			if (item->activeState == 1)
+			if (item->ActiveState == 1)
 			{
 				if (!door->opened)
 				{
@@ -54,7 +54,7 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&door->d1flip, door);
 					OpenThatDoor(&door->d2flip, door);
 					door->opened = true;
-					item->flags |= 0x3E;
+					item->Flags |= 0x3E;
 				}
 			}
 			else
@@ -66,7 +66,7 @@ namespace TEN::Entities::Doors
 					ShutThatDoor(&door->d1flip, door);
 					ShutThatDoor(&door->d2flip, door);
 					door->opened = false;
-					item->flags &= 0xC1;
+					item->Flags &= 0xC1;
 				}
 			}
 		}

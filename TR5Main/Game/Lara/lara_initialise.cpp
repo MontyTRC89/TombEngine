@@ -15,10 +15,10 @@ void InitialiseLara(int restore)
 
 	short itemNumber = Lara.itemNumber;
 
-	LaraItem->data = &Lara;
-	LaraItem->collidable = false;
-	LaraItem->location.roomNumber = LaraItem->roomNumber;
-	LaraItem->location.yNumber = LaraItem->pos.yPos;
+	LaraItem->Data = &Lara;
+	LaraItem->Collidable = false;
+	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
+	LaraItem->Location.yNumber = LaraItem->Position.yPos;
 
 	if (restore)
 	{
@@ -65,7 +65,7 @@ void InitialiseLara(int restore)
 	Lara.location = -1;
 	Lara.highestLocation = -1;
 	Lara.ropeParameters.Ptr = -1;
-	LaraItem->hitPoints = LARA_HEALTH_MAX;
+	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.gunStatus = LG_HANDS_FREE;
 
 	LARA_WEAPON_TYPE gun = WEAPON_NONE;

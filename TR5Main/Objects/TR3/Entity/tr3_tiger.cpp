@@ -18,18 +18,18 @@ void TigerControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 9)
+		if (item->ActiveState != 9)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 11;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 9;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 9;
 		}
 	}
 	else
@@ -49,7 +49,7 @@ void TigerControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			creature->maximumTurn = 0;
@@ -58,42 +58,42 @@ void TigerControl(short itemNum)
 			if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else if (creature->mood == BORED_MOOD)
 			{
 				short random = GetRandomControl();
 				if (random < 0x60)
-					item->targetState = 5;
+					item->TargetState = 5;
 				else if (random < 0x460);
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (info.bite && info.distance < SQUARE(340))
-				item->targetState = 6;
+				item->TargetState = 6;
 			else if (info.bite && info.distance < SQUARE(1024))
 			{
 				creature->maximumTurn = ANGLE(3);
-				item->targetState = 8;
+				item->TargetState = 8;
 			}
-			else if (item->requiredState)
-				item->targetState = item->requiredState;
+			else if (item->RequiredState)
+				item->TargetState = item->RequiredState;
 			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
-				item->targetState = 5;
+				item->TargetState = 5;
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 2:
 			creature->maximumTurn = ANGLE(3);
 
 			if (creature->mood == ESCAPE_MOOD || creature->mood == ATTACK_MOOD)
-				item->targetState = 3;
+				item->TargetState = 3;
 			else if (GetRandomControl() < 0x60)
 			{
-				item->targetState = 1;
-				item->requiredState = 5;
+				item->TargetState = 1;
+				item->RequiredState = 5;
 			}
 			break;
 
@@ -101,23 +101,23 @@ void TigerControl(short itemNum)
 			creature->maximumTurn = ANGLE(6);
 
 			if (creature->mood == BORED_MOOD)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (creature->flags && info.ahead)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (info.bite && info.distance < SQUARE(1536))
 			{
 				if (LaraItem->Velocity == 0)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 7;
+					item->TargetState = 7;
 			}
 			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
 			{
-				item->requiredState = 5;
-				item->targetState = 1;
+				item->RequiredState = 5;
+				item->TargetState = 1;
 			}
 			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead)
-				item->targetState = 1;
+				item->TargetState = 1;
 
 			creature->flags = 0;
 			break;
@@ -125,10 +125,10 @@ void TigerControl(short itemNum)
 		case 6:
 		case 7:
 		case 8:
-			if (!creature->flags && (item->touchBits & 0x7FDC000))
+			if (!creature->flags && (item->TouchBits & 0x7FDC000))
 			{
-				LaraItem->hitStatus = true;
-				LaraItem->hitPoints -= 90;
+				LaraItem->HitStatus = true;
+				LaraItem->HitPoints -= 90;
 				CreatureEffect(item, &tigerBite, DoBloodSplat);
 				creature->flags = 1;
 			}

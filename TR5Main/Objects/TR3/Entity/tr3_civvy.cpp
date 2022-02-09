@@ -45,9 +45,9 @@ void InitialiseCivvy(short item_number)
 
 	item = &g_Level.Items[item_number];
 	InitialiseCreature(item_number);
-	item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_STOP_ANIM;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->activeState = item->targetState = CIVVY_STOP;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_STOP_ANIM;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->ActiveState = item->TargetState = CIVVY_STOP;
 }
 
 void CivvyControl(short item_number)
@@ -62,28 +62,28 @@ void CivvyControl(short item_number)
 	AI_INFO info, lara_info;
 
 	item = &g_Level.Items[item_number];
-	civvy = (CREATURE_INFO*)item->data;
+	civvy = (CREATURE_INFO*)item->Data;
 	torso_y = torso_x = head = angle = tilt = 0;
 
-	if (item->boxNumber != NO_BOX && (g_Level.Boxes[item->boxNumber].flags & BLOCKED))
+	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 	{
-		DoLotsOfBlood(item->pos.xPos, item->pos.yPos - (GetRandomControl() & 255) - 32, item->pos.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->roomNumber, 3);
-		item->hitPoints -= 20;
+		DoLotsOfBlood(item->Position.xPos, item->Position.yPos - (GetRandomControl() & 255) - 32, item->Position.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
+		item->HitPoints -= 20;
 	}
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != CIVVY_DEATH)
+		if (item->ActiveState != CIVVY_DEATH)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_DIE_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = CIVVY_DEATH;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_DIE_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = CIVVY_DEATH;
 			civvy->LOT.step = STEP_SIZE;
 		}
 	}
 	else
 	{
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(civvy);
 		else
 			civvy->enemy = LaraItem;
@@ -97,9 +97,9 @@ void CivvyControl(short item_number)
 		}
 		else
 		{
-			lara_dz = LaraItem->pos.zPos - item->pos.zPos;
-			lara_dx = LaraItem->pos.xPos - item->pos.xPos;
-			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->pos.yRot;
+			lara_dz = LaraItem->Position.zPos - item->Position.zPos;
+			lara_dx = LaraItem->Position.xPos - item->Position.xPos;
+			lara_info.angle = phd_atan(lara_dz, lara_dx) - item->Position.yRot;
 			lara_info.distance = lara_dz * lara_dz + lara_dx * lara_dx;
 		}
 
@@ -116,20 +116,20 @@ void CivvyControl(short item_number)
 		real_enemy = civvy->enemy;
 		civvy->enemy = LaraItem;
 
-		if ((lara_info.distance < CIVVY_AWARE_DISTANCE || item->hitStatus || TargetVisible(item, &lara_info)) && !(item->aiBits & FOLLOW))
+		if ((lara_info.distance < CIVVY_AWARE_DISTANCE || item->HitStatus || TargetVisible(item, &lara_info)) && !(item->AIBits & FOLLOW))
 		{
 			if (!civvy->alerted)
-				SoundEffect(300, &item->pos, 0);
+				SoundEffect(300, &item->Position, 0);
 			AlertAllGuards(item_number);
 		}
 		civvy->enemy = real_enemy;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case CIVVY_WAIT:
-			if (civvy->alerted || item->targetState == CIVVY_RUN)
+			if (civvy->alerted || item->TargetState == CIVVY_RUN)
 			{
-				item->targetState = CIVVY_STOP;
+				item->TargetState = CIVVY_STOP;
 				break;
 			}
 
@@ -138,46 +138,46 @@ void CivvyControl(short item_number)
 			civvy->maximumTurn = 0;
 			head = lara_info.angle;
 
-			if (item->aiBits & GUARD)
+			if (item->AIBits & GUARD)
 			{
 				head = AIGuard(civvy);
 				if (!(GetRandomControl() & 0xFF))
 				{
-					if (item->activeState == CIVVY_STOP)
-						item->targetState = CIVVY_WAIT;
+					if (item->ActiveState == CIVVY_STOP)
+						item->TargetState = CIVVY_WAIT;
 					else
-						item->targetState = CIVVY_STOP;
+						item->TargetState = CIVVY_STOP;
 				}
 				break;
 			}
 
-			else if (item->aiBits & PATROL1)
-				item->targetState = CIVVY_WALK;
+			else if (item->AIBits & PATROL1)
+				item->TargetState = CIVVY_WALK;
 
 			else if (civvy->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
-					item->targetState = CIVVY_STOP;
+					item->TargetState = CIVVY_STOP;
 				else
-					item->targetState = CIVVY_RUN;
+					item->TargetState = CIVVY_RUN;
 			}
-			else if (civvy->mood == BORED_MOOD || ((item->aiBits & FOLLOW) && (civvy->reachedGoal || lara_info.distance > SQUARE(WALL_SIZE * 2))))
+			else if (civvy->mood == BORED_MOOD || ((item->AIBits & FOLLOW) && (civvy->reachedGoal || lara_info.distance > SQUARE(WALL_SIZE * 2))))
 			{
-				if (item->requiredState)
-					item->targetState = item->requiredState;
+				if (item->RequiredState)
+					item->TargetState = item->RequiredState;
 				else if (info.ahead)
-					item->targetState = CIVVY_STOP;
+					item->TargetState = CIVVY_STOP;
 				else
-					item->targetState = CIVVY_RUN;
+					item->TargetState = CIVVY_RUN;
 			}
 			else if (info.bite && info.distance < CIVVY_ATTACK0_RANGE)
-				item->targetState = CIVVY_AIM0;
+				item->TargetState = CIVVY_AIM0;
 			else if (info.bite && info.distance < CIVVY_ATTACK1_RANGE)
-				item->targetState = CIVVY_AIM1;
+				item->TargetState = CIVVY_AIM1;
 			else if (info.bite && info.distance < CIVVY_WALK_RANGE)
-				item->targetState = CIVVY_WALK;
+				item->TargetState = CIVVY_WALK;
 			else
-				item->targetState = CIVVY_RUN;
+				item->TargetState = CIVVY_RUN;
 			break;
 
 		case CIVVY_WALK:
@@ -185,27 +185,27 @@ void CivvyControl(short item_number)
 
 			civvy->maximumTurn = CIVVY_WALK_TURN;
 
-			if (item->aiBits & PATROL1)
+			if (item->AIBits & PATROL1)
 			{
-				item->targetState = CIVVY_WALK;
+				item->TargetState = CIVVY_WALK;
 				head = 0;
 			}
 			else if (civvy->mood == ESCAPE_MOOD)
-				item->targetState = CIVVY_RUN;
+				item->TargetState = CIVVY_RUN;
 			else if (civvy->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < CIVVY_WAIT_CHANCE)
 				{
-					item->requiredState = CIVVY_WAIT;
-					item->targetState = CIVVY_STOP;
+					item->RequiredState = CIVVY_WAIT;
+					item->TargetState = CIVVY_STOP;
 				}
 			}
 			else if (info.bite && info.distance < CIVVY_ATTACK0_RANGE)
-				item->targetState = CIVVY_STOP;
+				item->TargetState = CIVVY_STOP;
 			else if (info.bite && info.distance < CIVVY_ATTACK2_RANGE)
-				item->targetState = CIVVY_AIM2;
+				item->TargetState = CIVVY_AIM2;
 			else
-				item->targetState = CIVVY_RUN;
+				item->TargetState = CIVVY_RUN;
 			break;
 
 		case CIVVY_RUN:
@@ -215,20 +215,20 @@ void CivvyControl(short item_number)
 			civvy->maximumTurn = CIVVY_RUN_TURN;
 			tilt = angle / 2;
 
-			if (item->aiBits & GUARD)
-				item->targetState = CIVVY_WAIT;
+			if (item->AIBits & GUARD)
+				item->TargetState = CIVVY_WAIT;
 			else if (civvy->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
-					item->targetState = CIVVY_STOP;
+					item->TargetState = CIVVY_STOP;
 				break;
 			}
-			else if ((item->aiBits & FOLLOW) && (civvy->reachedGoal || lara_info.distance > SQUARE(WALL_SIZE * 2)))
-				item->targetState = CIVVY_STOP;
+			else if ((item->AIBits & FOLLOW) && (civvy->reachedGoal || lara_info.distance > SQUARE(WALL_SIZE * 2)))
+				item->TargetState = CIVVY_STOP;
 			else if (civvy->mood == BORED_MOOD)
-				item->targetState = CIVVY_WALK;
+				item->TargetState = CIVVY_WALK;
 			else if (info.ahead && info.distance < CIVVY_WALK_RANGE)
-				item->targetState = CIVVY_WALK;
+				item->TargetState = CIVVY_WALK;
 			break;
 
 		case CIVVY_AIM0:
@@ -241,9 +241,9 @@ void CivvyControl(short item_number)
 
 			civvy->flags = 0;
 			if (info.bite && info.distance < CIVVY_ATTACK0_RANGE)
-				item->targetState = CIVVY_PUNCH0;
+				item->TargetState = CIVVY_PUNCH0;
 			else
-				item->targetState = CIVVY_STOP;
+				item->TargetState = CIVVY_STOP;
 			break;
 
 		case CIVVY_AIM1:
@@ -256,9 +256,9 @@ void CivvyControl(short item_number)
 
 			civvy->flags = 0;
 			if (info.ahead && info.distance < CIVVY_ATTACK1_RANGE)
-				item->targetState = CIVVY_PUNCH1;
+				item->TargetState = CIVVY_PUNCH1;
 			else
-				item->targetState = CIVVY_STOP;
+				item->TargetState = CIVVY_STOP;
 			break;
 
 		case CIVVY_AIM2:
@@ -271,9 +271,9 @@ void CivvyControl(short item_number)
 			civvy->flags = 0;
 
 			if (info.bite && info.distance < CIVVY_ATTACK2_RANGE)
-				item->targetState = CIVVY_PUNCH2;
+				item->TargetState = CIVVY_PUNCH2;
 			else
-				item->targetState = CIVVY_WALK;
+				item->TargetState = CIVVY_WALK;
 			break;
 
 		case CIVVY_PUNCH0:
@@ -284,12 +284,12 @@ void CivvyControl(short item_number)
 			}
 			civvy->maximumTurn = CIVVY_WALK_TURN;
 
-			if (!civvy->flags && (item->touchBits & CIVVY_TOUCH))
+			if (!civvy->flags && (item->TouchBits & CIVVY_TOUCH))
 			{
-				LaraItem->hitPoints -= CIVVY_HIT_DAMAGE;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &civvy_hit, DoBloodSplat);
-				SoundEffect(70, &item->pos, 0);
+				SoundEffect(70, &item->Position, 0);
 
 				civvy->flags = 1;
 			}
@@ -303,18 +303,18 @@ void CivvyControl(short item_number)
 			}
 			civvy->maximumTurn = CIVVY_WALK_TURN;
 
-			if (!civvy->flags && (item->touchBits & CIVVY_TOUCH))
+			if (!civvy->flags && (item->TouchBits & CIVVY_TOUCH))
 			{
-				LaraItem->hitPoints -= CIVVY_HIT_DAMAGE;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &civvy_hit, DoBloodSplat);
-				SoundEffect(70, &item->pos, 0);
+				SoundEffect(70, &item->Position, 0);
 
 				civvy->flags = 1;
 			}
 
 			if (info.ahead && info.distance > CIVVY_ATTACK1_RANGE&& info.distance < CIVVY_ATTACK2_RANGE)
-				item->targetState = CIVVY_PUNCH2;
+				item->TargetState = CIVVY_PUNCH2;
 			break;
 
 		case CIVVY_PUNCH2:
@@ -325,12 +325,12 @@ void CivvyControl(short item_number)
 			}
 			civvy->maximumTurn = CIVVY_WALK_TURN;
 
-			if (civvy->flags != 2 && (item->touchBits & CIVVY_TOUCH))
+			if (civvy->flags != 2 && (item->TouchBits & CIVVY_TOUCH))
 			{
-				LaraItem->hitPoints -= CIVVY_SWIPE_DAMAGE;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= CIVVY_SWIPE_DAMAGE;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &civvy_hit, DoBloodSplat);
-				SoundEffect(70, &item->pos, 0);
+				SoundEffect(70, &item->Position, 0);
 
 				civvy->flags = 2;
 			}
@@ -343,35 +343,35 @@ void CivvyControl(short item_number)
 	CreatureJoint(item, 1, torso_x);
 	CreatureJoint(item, 2, head);
 
-	if (item->activeState < CIVVY_DEATH)
+	if (item->ActiveState < CIVVY_DEATH)
 	{
 		switch (CreatureVault(item_number, angle, 2, CIVVY_VAULT_SHIFT))
 		{
 		case 2:
 			civvy->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB1_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = CIVVY_CLIMB1;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB1_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = CIVVY_CLIMB1;
 			break;
 
 		case 3:
 			civvy->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB2_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = CIVVY_CLIMB2;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB2_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = CIVVY_CLIMB2;
 			break;
 
 		case 4:
 			civvy->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_CLIMB3_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = CIVVY_CLIMB3;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB3_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = CIVVY_CLIMB3;
 			break;
 		case -4:
 			civvy->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + CIVVY_FALL3_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = CIVVY_FALL3;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_FALL3_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = CIVVY_FALL3;
 			break;
 		}
 	}

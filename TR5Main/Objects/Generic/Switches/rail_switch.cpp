@@ -41,25 +41,25 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((!(TrInput & IN_ACTION)
-			|| l->activeState != LS_IDLE
-			|| l->animNumber != LA_STAND_IDLE
+			|| l->ActiveState != LS_IDLE
+			|| l->AnimNumber != LA_STAND_IDLE
 			|| Lara.gunStatus)
 			&& (!Lara.isMoving
 				|| Lara.interactedItem != itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
 		}
-		else if (item->activeState)
+		else if (item->ActiveState)
 		{
-			if (item->activeState == SWITCH_ON)
+			if (item->ActiveState == SWITCH_ON)
 			{
-				l->pos.yRot ^= (short)ANGLE(180);
+				l->Position.yRot ^= (short)ANGLE(180);
 
 				if (TestLaraPosition(&RailSwitchBounds2, item, l))
 				{
 					if (MoveLaraPosition(&RailSwitchPos2, item, l))
 					{
-						item->targetState = SWITCH_OFF;
+						item->TargetState = SWITCH_OFF;
 						flag = 1;
 					}
 					else
@@ -73,19 +73,19 @@ namespace TEN::Entities::Switches
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 
-				l->pos.yRot ^= (short)ANGLE(180);
+				l->Position.yRot ^= (short)ANGLE(180);
 
 				if (flag)
 				{
-					l->animNumber = LA_LEVER_PUSH;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->targetState = LS_LEVERSWITCH_PUSH;
-					l->activeState = LS_LEVERSWITCH_PUSH;
+					l->AnimNumber = LA_LEVER_PUSH;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+					l->TargetState = LS_LEVERSWITCH_PUSH;
+					l->ActiveState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
-					item->status = ITEM_ACTIVE;
+					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNum);
 					AnimateItem(item);
 
@@ -101,16 +101,16 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&RailSwitchPos, item, l))
 				{
-					item->targetState = SWITCH_ON;
-					l->animNumber = LA_LEVER_PUSH;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->targetState = LS_LEVERSWITCH_PUSH;
-					l->activeState = LS_LEVERSWITCH_PUSH;
+					item->TargetState = SWITCH_ON;
+					l->AnimNumber = LA_LEVER_PUSH;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+					l->TargetState = LS_LEVERSWITCH_PUSH;
+					l->ActiveState = LS_LEVERSWITCH_PUSH;
 					Lara.isMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
-					item->status = ITEM_ACTIVE;
+					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNum);
 					AnimateItem(item);
 				}

@@ -18,18 +18,18 @@ void RatControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short head = 0;
 	short angle = 0;
 	short random = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 6)
+		if (item->ActiveState != 6)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 9;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 6;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 6;
 		}
 	}
 	else
@@ -45,31 +45,31 @@ void RatControl(short itemNum)
 
 		angle = CreatureTurn(item, ANGLE(6));
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 4:
 			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
-					item->requiredState = 3;
+					item->RequiredState = 3;
 				else if (random > 0xA00)
-					item->requiredState = 1;
+					item->RequiredState = 1;
 			}
 			else if (info.distance < SQUARE(340))
-				item->requiredState = 5;
+				item->RequiredState = 5;
 			else
-				item->requiredState = 1;
+				item->RequiredState = 1;
 
-			if (item->requiredState)
-				item->targetState = 2;
+			if (item->RequiredState)
+				item->TargetState = 2;
 			break;
 
 		case 2:
 			creature->maximumTurn = 0;
 
-			if (item->requiredState)
-				item->targetState = item->requiredState;
+			if (item->RequiredState)
+				item->TargetState = item->RequiredState;
 			break;
 
 		case 1:
@@ -80,29 +80,29 @@ void RatControl(short itemNum)
 				random = (short)GetRandomControl();
 				if (random < 0x500)
 				{
-					item->requiredState = 3;
-					item->targetState = 2;
+					item->RequiredState = 3;
+					item->TargetState = 2;
 				}
 				else if (random < 0xA00)
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(340))
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 5:
-			if (!item->requiredState && (item->touchBits & 0x7F))
+			if (!item->RequiredState && (item->TouchBits & 0x7F))
 			{
 				CreatureEffect(item, &ratBite, DoBloodSplat);
-				LaraItem->hitPoints -= 20;
-				LaraItem->hitStatus = true;
-				item->requiredState = 2;
+				LaraItem->HitPoints -= 20;
+				LaraItem->HitStatus = true;
+				item->RequiredState = 2;
 			}
 			break;
 
 		case 3:
 			if (GetRandomControl() < 0x500)
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 		}
 	}

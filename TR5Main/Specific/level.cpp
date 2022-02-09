@@ -114,24 +114,24 @@ void LoadItems()
 		{
 			ITEM_INFO* item = &g_Level.Items[i];
 			
-			item->objectNumber = from_underlying(ReadInt16());
-			item->roomNumber = ReadInt16();
-			item->pos.xPos = ReadInt32();
-			item->pos.yPos = ReadInt32();
-			item->pos.zPos = ReadInt32();
-			item->pos.yRot = ReadInt16();
-			item->shade = ReadInt16();
-			item->triggerFlags = ReadInt16();
-			item->flags = ReadInt16();
+			item->ObjectNumber = from_underlying(ReadInt16());
+			item->RoomNumber = ReadInt16();
+			item->Position.xPos = ReadInt32();
+			item->Position.yPos = ReadInt32();
+			item->Position.zPos = ReadInt32();
+			item->Position.yRot = ReadInt16();
+			item->Shade = ReadInt16();
+			item->TriggerFlags = ReadInt16();
+			item->Flags = ReadInt16();
 
 			byte numBytes = ReadInt8();
 			char buffer[255];
 			ReadBytes(buffer, numBytes);
-			item->luaName = std::string(buffer, buffer + numBytes);
+			item->LuaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddName(item->luaName, i);
+			g_GameScript->AddName(item->LuaName, i);
 
-			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
+			memcpy(&item->StartPosition, &item->Position, sizeof(PHD_3DPOS));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -236,7 +236,7 @@ void LoadObjects()
 
 		anim->framePtr = ReadInt32();
 		anim->interpolation = ReadInt32();
-		anim->activeState = ReadInt32();
+		anim->ActiveState = ReadInt32();
 		anim->velocity = ReadInt32();
 		anim->acceleration = ReadInt32();
 		anim->Xvelocity = ReadInt32();
@@ -731,7 +731,7 @@ void ReadRooms()
 			float a = ReadFloat();
 			mesh.staticNumber = ReadUInt16();
 			mesh.color = Vector4(rgb.x, rgb.y, rgb.z, a);
-			mesh.hitPoints = ReadInt16();
+			mesh.HitPoints = ReadInt16();
 
 			byte numBytes = ReadInt8();
 			char buffer[255];
@@ -1251,25 +1251,25 @@ void LoadSprites()
 void GetCarriedItems()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
-		g_Level.Items[i].carriedItem = NO_ITEM;
+		g_Level.Items[i].CarriedItem = NO_ITEM;
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
 		auto item = &g_Level.Items[i];
-		if (Objects[item->objectNumber].intelligent || item->objectNumber >= ID_SEARCH_OBJECT1 && item->objectNumber <= ID_SEARCH_OBJECT3)
+		if (Objects[item->ObjectNumber].intelligent || item->ObjectNumber >= ID_SEARCH_OBJECT1 && item->ObjectNumber <= ID_SEARCH_OBJECT3)
 		{
-			for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+			for (short linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 			{
 				auto item2 = &g_Level.Items[linknum];
-				if (abs(item2->pos.xPos - item->pos.xPos) < 512
-					&& abs(item2->pos.zPos - item->pos.zPos) < 512
-					&& abs(item2->pos.yPos - item->pos.yPos) < 256
-					&& Objects[item2->objectNumber].isPickup)
+				if (abs(item2->Position.xPos - item->Position.xPos) < 512
+					&& abs(item2->Position.zPos - item->Position.zPos) < 512
+					&& abs(item2->Position.yPos - item->Position.yPos) < 256
+					&& Objects[item2->ObjectNumber].isPickup)
 				{
-					item2->carriedItem = item->carriedItem;
-					item->carriedItem = linknum;
+					item2->CarriedItem = item->CarriedItem;
+					item->CarriedItem = linknum;
 					RemoveDrawnItem(linknum);
-					item2->roomNumber = NO_ROOM;
+					item2->RoomNumber = NO_ROOM;
 				}
 			}
 		}
@@ -1281,25 +1281,25 @@ void GetAIPickups()
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
 		auto item = &g_Level.Items[i];
-		if (Objects[item->objectNumber].intelligent)
+		if (Objects[item->ObjectNumber].intelligent)
 		{
-			item->aiBits = 0;
+			item->AIBits = 0;
 			for (int num = 0; num < g_Level.AIObjects.size(); ++num)
 			{
 				auto object = &g_Level.AIObjects[num];
-				if (abs(object->x - item->pos.xPos) < 512
-					&& abs(object->z - item->pos.zPos) < 512
-					&& object->roomNumber == item->roomNumber
+				if (abs(object->x - item->Position.xPos) < 512
+					&& abs(object->z - item->Position.zPos) < 512
+					&& object->roomNumber == item->RoomNumber
 					&& object->objectNumber < ID_AI_PATROL2)
 				{
-					item->aiBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
-					item->itemFlags[3] = object->triggerFlags;
+					item->AIBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
+					item->ItemFlags[3] = object->triggerFlags;
 					if (object->objectNumber != ID_AI_GUARD)
 						object->roomNumber = NO_ROOM;
 				}
 			}
 
-			item->TOSSPAD |= item->aiBits << 8 | (char) item->itemFlags[3];
+			item->Tosspad |= item->AIBits << 8 | (char) item->ItemFlags[3];
 		}
 	}
 }

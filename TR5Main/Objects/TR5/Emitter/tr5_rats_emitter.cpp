@@ -46,26 +46,26 @@ void LittleRatsControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->triggerFlags)
+	if (item->TriggerFlags)
 	{
-		if (!item->itemFlags[2] || !(GetRandomControl() & 0xF))
+		if (!item->ItemFlags[2] || !(GetRandomControl() & 0xF))
 		{
-			item->triggerFlags--;
+			item->TriggerFlags--;
 
-			if (item->itemFlags[2] && GetRandomControl() & 1)
-				item->itemFlags[2]--;
+			if (item->ItemFlags[2] && GetRandomControl() & 1)
+				item->ItemFlags[2]--;
 
 			short ratNum = GetNextRat();
 			if (ratNum != -1)
 			{
 				RAT_STRUCT* rat = &Rats[ratNum];
 
-				rat->pos.xPos = item->pos.xPos;
-				rat->pos.yPos = item->pos.yPos;
-				rat->pos.zPos = item->pos.zPos;
-				rat->roomNumber = item->roomNumber;
+				rat->pos.xPos = item->Position.xPos;
+				rat->pos.yPos = item->Position.yPos;
+				rat->pos.zPos = item->Position.zPos;
+				rat->roomNumber = item->RoomNumber;
 
-				if (item->itemFlags[0])
+				if (item->ItemFlags[0])
 				{
 					rat->pos.yRot = 2 * GetRandomControl();
 					rat->fallspeed = -16 - (GetRandomControl() & 31);
@@ -73,7 +73,7 @@ void LittleRatsControl(short itemNumber)
 				else
 				{
 					rat->fallspeed = 0;
-					rat->pos.yRot = item->pos.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+					rat->pos.yRot = item->Position.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
 				}
 
 				rat->pos.xRot = 0;
@@ -100,13 +100,13 @@ void InitialiseLittleRats(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	char flags = item->triggerFlags / 1000;
+	char flags = item->TriggerFlags / 1000;
 
-	item->pos.xRot = ANGLE(45);
-	item->itemFlags[1] = flags & 2;
-	item->itemFlags[2] = flags & 4;
-	item->itemFlags[0] = flags & 1;
-	item->triggerFlags = item->triggerFlags % 1000;
+	item->Position.xRot = ANGLE(45);
+	item->ItemFlags[1] = flags & 2;
+	item->ItemFlags[2] = flags & 4;
+	item->ItemFlags[0] = flags & 1;
+	item->TriggerFlags = item->TriggerFlags % 1000;
 
 	if (flags & 1)
 	{
@@ -114,22 +114,22 @@ void InitialiseLittleRats(short itemNumber)
 		return;
 	}
 
-	if (item->pos.yRot > -28672 && item->pos.yRot < -4096)
+	if (item->Position.yRot > -28672 && item->Position.yRot < -4096)
 	{
-		item->pos.xPos += 512;
+		item->Position.xPos += 512;
 	}
-	else if (item->pos.yRot > 4096 && item->pos.yRot < 28672)
+	else if (item->Position.yRot > 4096 && item->Position.yRot < 28672)
 	{
-		item->pos.xPos -= 512;
+		item->Position.xPos -= 512;
 	}
 
-	if (item->pos.yRot > -8192 && item->pos.yRot < 8192)
+	if (item->Position.yRot > -8192 && item->Position.yRot < 8192)
 	{
-		item->pos.zPos -= 512;
+		item->Position.zPos -= 512;
 	}
-	else if (item->pos.yRot < -20480 || item->pos.yRot > 20480)
+	else if (item->Position.yRot < -20480 || item->Position.yRot > 20480)
 	{
-		item->pos.zPos += 512;
+		item->Position.zPos += 512;
 	}
 
 	ClearRats();
@@ -155,9 +155,9 @@ void UpdateRats()
 
 				rat->fallspeed += GRAVITY;
 
-				int dx = LaraItem->pos.xPos - rat->pos.xPos;
-				int dy = LaraItem->pos.yPos - rat->pos.yPos;
-				int dz = LaraItem->pos.zPos - rat->pos.zPos;
+				int dx = LaraItem->Position.xPos - rat->pos.xPos;
+				int dy = LaraItem->Position.yPos - rat->pos.yPos;
+				int dz = LaraItem->Position.zPos - rat->pos.zPos;
 
 				short angle;
 				if (rat->flags >= 170)
@@ -167,8 +167,8 @@ void UpdateRats()
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
-					LaraItem->hitPoints--;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints--;
+					LaraItem->HitStatus = true;
 				}
 
 				// if life is even

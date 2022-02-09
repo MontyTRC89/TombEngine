@@ -28,12 +28,12 @@ static void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
 
-	pos.x = (GetRandomControl() * 256 / 32768) + item->pos.xPos - 128;
-	pos.y = (GetRandomControl() * 256 / 32768) + item->pos.yPos - 256;
-	pos.z = (GetRandomControl() * 256 / 32768) + item->pos.zPos - 128;
+	pos.x = (GetRandomControl() * 256 / 32768) + item->Position.xPos - 128;
+	pos.y = (GetRandomControl() * 256 / 32768) + item->Position.yPos - 256;
+	pos.z = (GetRandomControl() * 256 / 32768) + item->Position.zPos - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, WEAPON_GRENADE_LAUNCHER, 32);
-	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->pos, 0);
+	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Position, 0);
 }
 
 void SwordGuardianControl(short itemNum)
@@ -48,17 +48,17 @@ void SwordGuardianControl(short itemNum)
 	bool lara_alive;
 
 	item = &g_Level.Items[itemNum];
-	sword = (CREATURE_INFO*)item->data;
+	sword = (CREATURE_INFO*)item->Data;
 	angle = head = torso = 0;
-	lara_alive = (LaraItem->hitPoints > 0);
+	lara_alive = (LaraItem->HitPoints > 0);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 12)
+		if (item->ActiveState != 12)
 		{
 			//item->meshBits >>= 1;
-			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 0);
+			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Position, 0);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
 			ExplodingDeath(itemNum, -1, 256);
@@ -67,7 +67,7 @@ void SwordGuardianControl(short itemNum)
 			KillItem(itemNum);
 			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;
-			item->activeState = 12;
+			item->ActiveState = 12;
 		}
 		return;
 	}
@@ -79,7 +79,7 @@ void SwordGuardianControl(short itemNum)
 		sword->LOT.zone = ZONE_BASIC;
 		CreatureAIInfo(item, &info);
 
-		if (item->activeState == 8)
+		if (item->ActiveState == 8)
 		{
 			if (info.zoneNumber != info.enemyZone)
 			{
@@ -96,17 +96,17 @@ void SwordGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, sword->maximumTurn);
 
-		if (item->activeState != 9)
-			item->meshBits = 0xFFFFFFFF;
+		if (item->ActiveState != 9)
+			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 9:
 			sword->maximumTurn = 0;
 
 			if (!sword->flags)
 			{
-				item->meshBits = (item->meshBits << 1) + 1;
+				item->MeshBits = (item->MeshBits << 1) + 1;
 				sword->flags = 3;
 			}
 			else
@@ -126,21 +126,21 @@ void SwordGuardianControl(short itemNum)
 				if (info.bite && info.distance < 0x100000)
 				{
 					if (GetRandomControl() >= 0x4000)
-						item->targetState = 5;
+						item->TargetState = 5;
 					else
-						item->targetState = 3;
+						item->TargetState = 3;
 				}
 				else
 				{
 					if (info.zoneNumber == info.enemyZone)
-						item->targetState = 2;
+						item->TargetState = 2;
 					else
-						item->targetState = 8;
+						item->TargetState = 8;
 				}
 			}
 			else
 			{
-				item->targetState = 7;
+				item->TargetState = 7;
 			}
 			break;
 
@@ -153,13 +153,13 @@ void SwordGuardianControl(short itemNum)
 			if (lara_alive)
 			{
 				if (info.bite && info.distance < 0x400000)
-					item->targetState = 10;
+					item->TargetState = 10;
 				else if (info.zoneNumber != info.enemyZone)
-					item->targetState = 1;
+					item->TargetState = 1;
 			}
 			else
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			break;
 
@@ -170,9 +170,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x100000)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else
-				item->targetState = 4;
+				item->TargetState = 4;
 			break;
 
 		case 5:
@@ -182,9 +182,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x100000)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else
-				item->targetState = 6;
+				item->TargetState = 6;
 			break;
 
 		case 10:
@@ -194,9 +194,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x400000)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else
-				item->targetState = 11;
+				item->TargetState = 11;
 			break;
 
 		case 8:
@@ -208,7 +208,7 @@ void SwordGuardianControl(short itemNum)
 			SwordGuardianFly(item);
 
 			if (!sword->LOT.fly)
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 
 		case 4:
@@ -217,10 +217,10 @@ void SwordGuardianControl(short itemNum)
 			if (info.ahead)
 				torso = info.angle;
 
-			if (!sword->flags && (item->touchBits & 0xC000))
+			if (!sword->flags && (item->TouchBits & 0xC000))
 			{
-				LaraItem->hitPoints -= 300;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 300;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &swordBite, DoBloodSplat);
 				sword->flags = 1;
 			}
@@ -228,7 +228,7 @@ void SwordGuardianControl(short itemNum)
 		}
 	}
 
-	if (item->hitPoints > 0)
+	if (item->HitPoints > 0)
 	{
 		CreatureJoint(item, 0, torso);
 		CreatureJoint(item, 1, head);

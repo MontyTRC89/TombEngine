@@ -18,14 +18,14 @@ void InitialiseTr5Dog(short itemNum)
     ITEM_INFO* item;
 
     item = &g_Level.Items[itemNum];
-    item->activeState = 1;
-    item->animNumber = Objects[item->objectNumber].animIndex + 8;
-    if (!item->triggerFlags)
+    item->ActiveState = 1;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+    if (!item->TriggerFlags)
     {
-        item->animNumber = Objects[item->objectNumber].animIndex + 1;
+        item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
         // TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
     }
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 void Tr5DogControl(short itemNumber)
@@ -39,25 +39,25 @@ void Tr5DogControl(short itemNumber)
 	short joint0 = 0;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->animNumber == obj->animIndex + 1)
+		if (item->AnimNumber == obj->animIndex + 1)
 		{
-			item->hitPoints = obj->hitPoints;
+			item->HitPoints = obj->HitPoints;
 		}
-		else if (item->activeState != 11)
+		else if (item->ActiveState != 11)
 		{
-			item->animNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
-			item->activeState = 11;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
+			item->ActiveState = 11;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 	}
 	else
 	{
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->enemy = LaraItem;
@@ -72,8 +72,8 @@ void Tr5DogControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->pos.xPos - item->pos.xPos;
-			int dz = LaraItem->pos.zPos - item->pos.zPos;
+			int dx = LaraItem->Position.xPos - item->Position.xPos;
+			int dz = LaraItem->Position.zPos - item->Position.zPos;
 			phd_atan(dz, dx);
 			distance = SQUARE(dx) + SQUARE(dz);
 		}
@@ -94,90 +94,90 @@ void Tr5DogControl(short itemNumber)
 		joint0 = 4 * angle;
 
 
-		if (creature->hurtByLara || distance < SQUARE(3072) && !(item->aiBits & MODIFY))
+		if (creature->hurtByLara || distance < SQUARE(3072) && !(item->AIBits & MODIFY))
 		{
 			AlertAllGuards(itemNumber);
-			item->aiBits &= ~MODIFY;
+			item->AIBits &= ~MODIFY;
 		}
 
 		short random = GetRandomControl();
-		int frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+		int frame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 0:
 		case 8:
 			joint1 = 0;
 			joint2 = 0;
-			if (creature->mood && (item->aiBits) != MODIFY)
+			if (creature->mood && (item->AIBits) != MODIFY)
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			else
 			{
 				creature->flags++;
 				creature->maximumTurn = 0;
 				if (creature->flags > 300 && random < 128)
-					item->targetState = 1;
+					item->TargetState = 1;
 			}
 			break;
 
 		case 1:
 		case 9:
-			if (item->activeState == 9 && item->requiredState)
+			if (item->ActiveState == 9 && item->RequiredState)
 			{
-				item->targetState = item->requiredState;
+				item->TargetState = item->RequiredState;
 				break;
 			}
 
 			creature->maximumTurn = 0;
-			if (item->aiBits & GUARD)
+			if (item->AIBits & GUARD)
 			{
 				joint1 = AIGuard(creature);
 				if (GetRandomControl())
 					break;
-				if (item->activeState == 1)
+				if (item->ActiveState == 1)
 				{
-					item->targetState = 9;
+					item->TargetState = 9;
 					break;
 				}
 			}
 			else
 			{
-				if (item->activeState == 9 && random < 128)
+				if (item->ActiveState == 9 && random < 128)
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 					break;
 				}
 
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					if (item->activeState == 1)
-						item->targetState = 2;
+					if (item->ActiveState == 1)
+						item->TargetState = 2;
 					else
-						item->targetState = 1;
+						item->TargetState = 1;
 					break;
 				}
 
 				if (creature->mood == ESCAPE_MOOD)
 				{
-					if (Lara.target == item || !info.ahead || item->hitStatus)
+					if (Lara.target == item || !info.ahead || item->HitStatus)
 					{
-						item->requiredState = 3;
-						item->targetState = 9;
+						item->RequiredState = 3;
+						item->TargetState = 9;
 					}
 					else
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 					}
 					break;
 				}
 
 				if (creature->mood)
 				{
-					item->requiredState = 3;
-					if (item->activeState == 1)
-						item->targetState = 9;
+					item->RequiredState = 3;
+					if (item->ActiveState == 1)
+						item->TargetState = 9;
 					break;
 				}
 
@@ -186,11 +186,11 @@ void Tr5DogControl(short itemNumber)
 
 				if (random < 256)
 				{
-					if (item->aiBits & MODIFY)
+					if (item->AIBits & MODIFY)
 					{
-						if (item->activeState == 1)
+						if (item->ActiveState == 1)
 						{
-							item->targetState = 8;
+							item->TargetState = 8;
 							creature->flags = 0;
 							break;
 						}
@@ -200,33 +200,33 @@ void Tr5DogControl(short itemNumber)
 				if (random >= 4096)
 				{
 					if (!(random & 0x1F))
-						item->targetState = 7;
+						item->TargetState = 7;
 					break;
 				}
 
-				if (item->activeState == 1)
+				if (item->ActiveState == 1)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 					break;
 				}
 			}
-			item->targetState = 1;
+			item->TargetState = 1;
 			break;
 
 		case 2:
 			creature->maximumTurn = ANGLE(3);
-			if (item->aiBits & PATROL1)
+			if (item->AIBits & PATROL1)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 				break;
 			}
 
 			if (!creature->mood && random < 256)
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 				break;
 			}
-			item->targetState = 5;
+			item->TargetState = 5;
 			break;
 
 		case 3:
@@ -234,23 +234,23 @@ void Tr5DogControl(short itemNumber)
 			if (creature->mood == ESCAPE_MOOD)
 			{
 				if (Lara.target != item && info.ahead)
-					item->targetState = 9;
+					item->TargetState = 9;
 			}
 			else if (creature->mood)
 			{
 				if (info.bite && info.distance < SQUARE(1024))
 				{
-					item->targetState = 6;
+					item->TargetState = 6;
 				}
 				else if (info.distance < SQUARE(1536))
 				{
-					item->requiredState = 5;
-					item->targetState = 9;
+					item->RequiredState = 5;
+					item->TargetState = 9;
 				}
 			}
 			else
 			{
-				item->targetState = 9;
+				item->TargetState = 9;
 			}
 			break;
 
@@ -260,34 +260,34 @@ void Tr5DogControl(short itemNumber)
 			{
 				if (creature->mood == ESCAPE_MOOD)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 				else if (info.bite && info.distance < SQUARE(341))
 				{
-					item->targetState = 12;
-					item->requiredState = 5;
+					item->TargetState = 12;
+					item->RequiredState = 5;
 				}
-				else if (info.distance > SQUARE(1536) || item->hitStatus)
+				else if (info.distance > SQUARE(1536) || item->HitStatus)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 			}
 			else
 			{
-				item->targetState = 9;
+				item->TargetState = 9;
 			}
 			break;
 		case 6:
 			if (info.bite
-				&& item->touchBits & 0x6648
+				&& item->TouchBits & 0x6648
 				&& frame >= 4
 				&& frame <= 14)
 			{
 				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 20;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 20;
+				LaraItem->HitStatus = true;
 			}
-			item->targetState = 3;
+			item->TargetState = 3;
 			break;
 
 		case 7:
@@ -297,15 +297,15 @@ void Tr5DogControl(short itemNumber)
 
 		case 12:
 			if (info.bite
-				&& item->touchBits & 0x48
+				&& item->TouchBits & 0x48
 				&& (frame >= 9
 					&& frame <= 12
 					|| frame >= 22
 					&& frame <= 25))
 			{
 				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 10;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 10;
+				LaraItem->HitStatus = true;
 			}
 			break;
 		default:

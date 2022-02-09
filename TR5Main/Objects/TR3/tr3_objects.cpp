@@ -43,7 +43,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = TonyControl;
 		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 100;
+		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -63,7 +63,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = TigerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 24;
+		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 340;
@@ -82,7 +82,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = CobraControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 8;
+		obj->HitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -102,7 +102,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = RaptorControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 100;
+		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->pivotLength = 600;
@@ -124,7 +124,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = TribemanAxeControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 28;
+		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -144,7 +144,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = TribemanDartsControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->hitPoints = 28;
+		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -163,7 +163,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->control = TyrannosaurControl;
 		obj->collision = CreatureCollision;
-		obj->hitPoints = 800;
+		obj->HitPoints = 800;
 		obj->hitEffect = HIT_BLOOD;
 		obj->shadowSize = 64;
 		obj->pivotLength = 1800;
@@ -184,7 +184,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = ScubaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 20;
+		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -214,7 +214,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 36;
+		obj->HitPoints = 36;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -236,7 +236,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 8;
+		obj->HitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -257,7 +257,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = MPGunControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 28;
+		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -280,7 +280,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = MPStickControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 28;
+		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -304,7 +304,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = ShivaControl;
 		//obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 100;
+		obj->HitPoints = 100;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 256;
@@ -326,7 +326,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->drawRoutine = S_DrawLondonBoss;
 		obj->shadowSize = 0;
 		obj->pivotLength = 50;
-		obj->hitPoints = 300;
+		obj->HitPoints = 300;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -346,7 +346,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = CivvyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 15;
+		obj->HitPoints = 15;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;

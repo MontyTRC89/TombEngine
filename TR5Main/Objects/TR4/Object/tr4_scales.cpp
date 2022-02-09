@@ -22,19 +22,19 @@ void ScalesControl(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
+	if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameEnd)
 	{
 		AnimateItem(item);
 		return;
 	}
 
-	if (item->activeState == 1 || item->itemFlags[1])
+	if (item->ActiveState == 1 || item->ItemFlags[1])
 	{
-		if (Objects[item->objectNumber].animIndex)
+		if (Objects[item->ObjectNumber].animIndex)
 		{
 			RemoveActiveItem(itemNum);
-			item->status = ITEM_NOT_ACTIVE;
-			item->itemFlags[1] = 0;
+			item->Status = ITEM_NOT_ACTIVE;
+			item->ItemFlags[1] = 0;
 
 			AnimateItem(item);
 			return;
@@ -47,15 +47,15 @@ void ScalesControl(short itemNum)
 
 			if (sw > 0)
 			{
-				while (g_Level.Items[itemNos[sw]].objectNumber == ID_FLAME_EMITTER2)
+				while (g_Level.Items[itemNos[sw]].ObjectNumber == ID_FLAME_EMITTER2)
 				{
 					if (--sw <= 0)
 						break;
 				}
-				g_Level.Items[itemNos[sw]].flags = 1024;
+				g_Level.Items[itemNos[sw]].Flags = 1024;
 			}
 
-			item->targetState = 1;
+			item->TargetState = 1;
 		}
 
 		AnimateItem(item);
@@ -63,16 +63,16 @@ void ScalesControl(short itemNum)
 
 	int flags = 0;
 
-	if (item->activeState == 2)
+	if (item->ActiveState == 2)
 	{
 		flags = -512;
 		RemoveActiveItem(itemNum);
-		item->status = ITEM_NOT_ACTIVE;
+		item->Status = ITEM_NOT_ACTIVE;
 	}
 	else
 	{
 		flags = -1024;
-		item->itemFlags[1] = 1;
+		item->ItemFlags[1] = 1;
 	}
 
 	TestTriggers(item, true, flags);
@@ -85,7 +85,7 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (TestBoundsCollide(item, l, LARA_RAD))
 	{
-		if (l->animNumber != LA_WATERSKIN_POUR_LOW && l->animNumber != LA_WATERSKIN_POUR_HIGH || item->activeState != 1)
+		if (l->AnimNumber != LA_WATERSKIN_POUR_LOW && l->AnimNumber != LA_WATERSKIN_POUR_HIGH || item->ActiveState != 1)
 		{
 			GlobalCollisionBounds.X1 = 640;
 			GlobalCollisionBounds.X2 = 1280;
@@ -108,8 +108,8 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			short rotY = item->pos.yRot;
-			item->pos.yRot = (short)(l->pos.yRot + ANGLE(45)) & 0xC000;
+			short rotY = item->Position.yRot;
+			item->Position.yRot = (short)(l->Position.yRot + ANGLE(45)) & 0xC000;
 
 			ScalesBounds.boundingBox.X1 = -1408;
 			ScalesBounds.boundingBox.X2 = -640;
@@ -118,46 +118,46 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 			if (TestLaraPosition(&ScalesBounds, item, l))
 			{
-				l->animNumber = LA_WATERSKIN_POUR_HIGH;
-				l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->pos.yRot = rotY;
+				l->AnimNumber = LA_WATERSKIN_POUR_HIGH;
+				l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Position.yRot = rotY;
 			}
-			else if (l->frameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
+			else if (l->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
-				SoundEffect(SFX_TR4_POUR, &l->pos, 0);
-				item->pos.yRot = rotY;
+				SoundEffect(SFX_TR4_POUR, &l->Position, 0);
+				item->Position.yRot = rotY;
 			}
-			else if (l->frameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+			else if (l->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 			{
 				AddActiveItem(itemNum);
-				item->status = ITEM_ACTIVE;
+				item->Status = ITEM_ACTIVE;
 
-				if (l->itemFlags[3] < item->triggerFlags)
+				if (l->ItemFlags[3] < item->TriggerFlags)
 				{
-					item->targetState = 4;
-					item->pos.yRot = rotY;
+					item->TargetState = 4;
+					item->Position.yRot = rotY;
 				}
-				else if (l->itemFlags[3] == item->triggerFlags)
+				else if (l->ItemFlags[3] == item->TriggerFlags)
 				{
-					item->targetState = 2;
-					item->pos.yRot = rotY;
+					item->TargetState = 2;
+					item->Position.yRot = rotY;
 				}
 				else
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 			}
 			else
 			{
-				item->pos.yRot = rotY;
+				item->Position.yRot = rotY;
 			}
 		}
 	}
 	
-	if (l->frameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
-		l->frameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
-		l->frameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
-		l->frameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+	if (l->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
+		l->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
+		l->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
+		l->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
 		PHD_VECTOR pos;
 		pos.x = 0;
@@ -177,6 +177,6 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		drip->yVel = (GetRandomControl() & 0x1F) + 32;
 		drip->gravity = (GetRandomControl() & 0x1F) + 32;
 		drip->life = (GetRandomControl() & 0x1F) + 16;
-		drip->roomNumber = l->roomNumber;
+		drip->roomNumber = l->RoomNumber;
 	}
 }

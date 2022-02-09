@@ -14,9 +14,9 @@ void InitialiseSpinningBlade(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->animNumber = Objects[item->objectNumber].animIndex + 3;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->activeState = 1;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->ActiveState = 1;
 }
 
 void SpinningBladeControl(short itemNumber)
@@ -24,48 +24,48 @@ void SpinningBladeControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	bool spinning = false;
 
-	if (item->activeState == 2)
+	if (item->ActiveState == 2)
 	{
-		if (item->targetState != 1)
+		if (item->TargetState != 1)
 		{
-			int x = item->pos.xPos + WALL_SIZE * 3 * phd_sin(item->pos.yRot) / 2;
-			int z = item->pos.zPos + WALL_SIZE * 3 * phd_cos(item->pos.yRot) / 2;
+			int x = item->Position.xPos + WALL_SIZE * 3 * phd_sin(item->Position.yRot) / 2;
+			int z = item->Position.zPos + WALL_SIZE * 3 * phd_cos(item->Position.yRot) / 2;
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-			int height = GetFloorHeight(floor, x, item->pos.yPos, z);
+			short roomNumber = item->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+			int height = GetFloorHeight(floor, x, item->Position.yPos, z);
 
 			if (height == NO_HEIGHT)
-				item->targetState = 1;
+				item->TargetState = 1;
 		}
 
 		spinning = true;
 
-		if (item->touchBits)
+		if (item->TouchBits)
 		{
-			LaraItem->hitStatus = true;
-			LaraItem->hitPoints -= 100;
+			LaraItem->HitStatus = true;
+			LaraItem->HitPoints -= 100;
 
-			DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE * 2, LaraItem->pos.zPos, (short)(item->Velocity * 2), LaraItem->pos.yRot, LaraItem->roomNumber, 2);
+			DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - STEP_SIZE * 2, LaraItem->Position.zPos, (short)(item->Velocity * 2), LaraItem->Position.yRot, LaraItem->RoomNumber, 2);
 		}
 
-		SoundEffect(231, &item->pos, 0);
+		SoundEffect(231, &item->Position, 0);
 	}
 	else
 	{
 		if (TriggerActive(item))
-			item->targetState = 2;
+			item->TargetState = 2;
 		spinning = false;
 	}
 
 	AnimateItem(item);
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	item->floor = item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	if (roomNumber != item->roomNumber)
+	short roomNumber = item->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	item->Floor = item->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	if (roomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if (spinning && item->activeState == 1)
-		item->pos.yRot += -ANGLE(180);
+	if (spinning && item->ActiveState == 1)
+		item->Position.yRot += -ANGLE(180);
 }

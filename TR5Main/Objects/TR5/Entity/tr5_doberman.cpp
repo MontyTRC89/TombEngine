@@ -16,18 +16,18 @@ void InitialiseDoberman(short itemNum)
     ITEM_INFO* item;
 
     item = &g_Level.Items[itemNum];
-    if (item->triggerFlags)
+    if (item->TriggerFlags)
     {
-        item->activeState = 5;
-        item->animNumber = Objects[item->objectNumber].animIndex + 6;
+        item->ActiveState = 5;
+        item->AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
     }
     else
     {
-        item->activeState = 6;
-        item->animNumber = Objects[item->objectNumber].animIndex + 10;
+        item->ActiveState = 6;
+        item->AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
     }
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 void DobermanControl(short itemNumber)
@@ -39,9 +39,9 @@ void DobermanControl(short itemNumber)
 		short joint = 0;
 		
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 		
-		if (item->hitPoints > 0)
+		if (item->HitPoints > 0)
 		{
 			AI_INFO info;
 			CreatureAIInfo(item, &info);
@@ -56,32 +56,32 @@ void DobermanControl(short itemNumber)
 		
 			int random;
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case 1:
 				creature->maximumTurn = ANGLE(3);
 				if (creature->mood)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 				else
 				{
 					random = GetRandomControl();
 					if (random < 768)
 					{
-						item->requiredState = 4;
-						item->targetState = 3;
+						item->RequiredState = 4;
+						item->TargetState = 3;
 						break;
 					}
 					if (random < 1536)
 					{
-						item->requiredState = 5;
-						item->targetState = 3;
+						item->RequiredState = 5;
+						item->TargetState = 3;
 						break;
 					}
 					if (random < 2816)
 					{
-						item->targetState = 3;
+						item->TargetState = 3;
 						break;
 					}
 				}
@@ -92,11 +92,11 @@ void DobermanControl(short itemNumber)
 				creature->maximumTurn = ANGLE(6);
 				if (!creature->mood)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 					break;
 				}
 				if (info.distance < SQUARE(768))
-					item->targetState = 8;
+					item->TargetState = 8;
 				break;
 
 			case 3:
@@ -107,15 +107,15 @@ void DobermanControl(short itemNumber)
 					if (creature->mood != ESCAPE_MOOD 
 						&& info.distance < SQUARE(341)
 						&& info.ahead)
-						item->targetState = 7;
+						item->TargetState = 7;
 					else
-						item->targetState = 2;
+						item->TargetState = 2;
 				}
 				else
 				{
-					if (item->requiredState)
+					if (item->RequiredState)
 					{
-						item->targetState = item->requiredState;
+						item->TargetState = item->RequiredState;
 					}
 					else
 					{
@@ -125,16 +125,16 @@ void DobermanControl(short itemNumber)
 							if (random >= 1536)
 							{
 								if (random < 9728)
-									item->targetState = 1;
+									item->TargetState = 1;
 							}
 							else
 							{
-								item->targetState = 5;
+								item->TargetState = 5;
 							}
 						}
 						else
 						{
-							item->targetState = 4;
+							item->TargetState = 4;
 						}
 					}
 				}
@@ -143,21 +143,21 @@ void DobermanControl(short itemNumber)
 			case 4:
 				if (creature->mood || GetRandomControl() < 1280)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 				break;
 
 			case 5:
 				if (creature->mood || GetRandomControl() < 256)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 				break;
 
 			case 6:
 				if (creature->mood || GetRandomControl() < 512)
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 				break;
 
@@ -165,59 +165,59 @@ void DobermanControl(short itemNumber)
 				creature->maximumTurn = ANGLE(1) / 2;
 				if (creature->flags != 1 
 					&& info.ahead 
-					&& item->touchBits & 0x122000)
+					&& item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					LaraItem->hitPoints -= 30;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 30;
+					LaraItem->HitStatus = true;
 					creature->flags = 1;
 				}
 
 				if (info.distance <= SQUARE(341) || info.distance >= SQUARE(682))
-					item->targetState = 3;
+					item->TargetState = 3;
 				else
-					item->targetState = 9;
+					item->TargetState = 9;
 				break;
 
 			case 8:
-				if (creature->flags != 2 && item->touchBits & 0x122000)
+				if (creature->flags != 2 && item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					LaraItem->hitPoints -= 80;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 80;
+					LaraItem->HitStatus = true;
 					creature->flags = 2;
 				}
 				if (info.distance >= SQUARE(341))
 				{
 					if (info.distance < SQUARE(682))
-						item->targetState = 9;
+						item->TargetState = 9;
 				}
 				else
 				{
-					item->targetState = 7;
+					item->TargetState = 7;
 				}
 				break;
 			case 9:
 				creature->maximumTurn = ANGLE(6);
-				if (creature->flags != 3 && item->touchBits & 0x122000)
+				if (creature->flags != 3 && item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					LaraItem->hitPoints -= 50;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 50;
+					LaraItem->HitStatus = true;
 					creature->flags = 3;
 				}
 				if (info.distance < SQUARE(341))
-					item->targetState = 7;
+					item->TargetState = 7;
 				break;
 			default:
 				break;
 			}
 		}
-		else if (item->activeState != 10)
+		else if (item->ActiveState != 10)
 		{
-			item->animNumber = Objects[ID_DOG].animIndex + 13;
-			item->activeState = 10;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[ID_DOG].animIndex + 13;
+			item->ActiveState = 10;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 
 		CreatureTilt(item, tilt);

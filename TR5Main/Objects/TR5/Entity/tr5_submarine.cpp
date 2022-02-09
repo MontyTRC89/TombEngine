@@ -118,10 +118,10 @@ static void SubmarineAttack(ITEM_INFO* item)
 	{
 		ITEM_INFO* torpedoItem = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->pos, 2);
+		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Position, 2);
 
-		torpedoItem->objectNumber = ID_TORPEDO;
-		torpedoItem->shade = -15856;
+		torpedoItem->ObjectNumber = ID_TORPEDO;
+		torpedoItem->Shade = -15856;
 
 		PHD_VECTOR pos1;
 		PHD_VECTOR pos2;
@@ -141,21 +141,21 @@ static void SubmarineAttack(ITEM_INFO* item)
 			TriggerTorpedoSparks2(&pos1, &pos2, 0);
 		}
 
-		torpedoItem->roomNumber = item->roomNumber;
-		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->roomNumber);
+		torpedoItem->RoomNumber = item->RoomNumber;
+		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
 
-		torpedoItem->pos.xPos = pos1.x;
-		torpedoItem->pos.yPos = pos1.y;
-		torpedoItem->pos.zPos = pos1.z;
+		torpedoItem->Position.xPos = pos1.x;
+		torpedoItem->Position.yPos = pos1.y;
+		torpedoItem->Position.zPos = pos1.z;
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->pos.xRot = 0;
-		torpedoItem->pos.yRot = item->pos.yRot;
-		torpedoItem->pos.zRot = 0;
+		torpedoItem->Position.xRot = 0;
+		torpedoItem->Position.yRot = item->Position.yRot;
+		torpedoItem->Position.zRot = 0;
 		torpedoItem->Velocity = 0;
 		torpedoItem->VerticalVelocity = 0;
-		torpedoItem->itemFlags[0] = -1;
+		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
 	}
@@ -167,12 +167,12 @@ void InitialiseSubmarine(short itemNum)
 
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = 0;
-    item->activeState = 0;
-    if (!item->triggerFlags)
-        item->triggerFlags = 120;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = 0;
+    item->ActiveState = 0;
+    if (!item->TriggerFlags)
+        item->TriggerFlags = 120;
 }
 
 void SubmarineControl(short itemNumber)
@@ -181,9 +181,9 @@ void SubmarineControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-	if (item->aiBits)
+	if (item->AIBits)
 		GetAITarget(creature);
 	else
 		creature->enemy = LaraItem;
@@ -203,15 +203,15 @@ void SubmarineControl(short itemNumber)
 	}
 	else
 	{
-		int dx = LaraItem->pos.xPos - item->pos.xPos;
-		int dz = LaraItem->pos.zPos - item->pos.zPos;
+		int dx = LaraItem->Position.xPos - item->Position.xPos;
+		int dz = LaraItem->Position.zPos - item->Position.zPos;
 
-		laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
+		laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 		laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		laraInfo.ahead = true;
 	}
 
-	int tilt = item->itemFlags[0] + (angle / 2);
+	int tilt = item->ItemFlags[0] + (angle / 2);
 	
 	if (tilt > 2048)
 	{
@@ -222,25 +222,25 @@ void SubmarineControl(short itemNumber)
 		tilt = -2048;
 	}
 
-	item->itemFlags[0] = tilt;
+	item->ItemFlags[0] = tilt;
 
 	if (abs(tilt) >= 64)
 	{
 		if (tilt > 0)
-			item->itemFlags[0] -= 64;
+			item->ItemFlags[0] -= 64;
 		else
-			item->itemFlags[0] += 64;
+			item->ItemFlags[0] += 64;
 	}
 	else
 	{
-		item->itemFlags[0] = 0;
+		item->ItemFlags[0] = 0;
 	}
 
 	creature->maximumTurn = ANGLE(2);
 
 	short joint = info.xAngle - ANGLE(45);
 
-	if (creature->flags < item->triggerFlags)
+	if (creature->flags < item->TriggerFlags)
 		creature->flags++;
 
 	ITEM_INFO* enemy = creature->enemy;
@@ -248,7 +248,7 @@ void SubmarineControl(short itemNumber)
 
 	if (Targetable(item, &laraInfo))
 	{
-		if (creature->flags >= item->triggerFlags 
+		if (creature->flags >= item->TriggerFlags 
 			&& laraInfo.angle > -ANGLE(90) 
 			&& laraInfo.angle < ANGLE(90))
 		{
@@ -258,12 +258,12 @@ void SubmarineControl(short itemNumber)
 
 		if (laraInfo.distance >= SQUARE(3072))
 		{
-			item->targetState = 1;
-			SoundEffect(SFX_TR5_MINI_SUB_LOOP, &item->pos, 2);
+			item->TargetState = 1;
+			SoundEffect(SFX_TR5_MINI_SUB_LOOP, &item->Position, 2);
 		}
 		else
 		{
-			item->targetState = 0;
+			item->TargetState = 0;
 		}
 
 		if (info.distance < SQUARE(1024))
@@ -272,19 +272,19 @@ void SubmarineControl(short itemNumber)
 			if (abs(laraInfo.angle) >= ANGLE(2))
 			{
 				if (laraInfo.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += laraInfo.angle;
+				item->Position.yRot += laraInfo.angle;
 			}
 		}
 	}
 	else
 	{
-		item->targetState = 1;
+		item->TargetState = 1;
 	}
 
 	creature->enemy = enemy;
@@ -356,7 +356,7 @@ void SubmarineControl(short itemNumber)
 	pos1.x = 0;
 	pos1.y = -600;
 	pos1.z = -40;
-	pos1.roomNumber = item->roomNumber;
+	pos1.roomNumber = item->RoomNumber;
 	GetJointAbsPosition(item, (PHD_VECTOR*)&pos1, 0);
 
 	GAME_VECTOR pos2;
@@ -381,8 +381,8 @@ void SubmarineControl(short itemNumber)
 		if (creature->enemy)
 		{
 			if (creature->flags & 2)
-				item->itemFlags[3] = LOBYTE(item->TOSSPAD) - 1;
-			item->itemFlags[3]++;
+				item->ItemFlags[3] = LOBYTE(item->Tosspad) - 1;
+			item->ItemFlags[3]++;
 			creature->reachedGoal = false;
 			creature->enemy = NULL;
 		}
@@ -398,17 +398,17 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->VerticalVelocity)
 	{
-		item->pos.xRot += ANGLE(3);
-		item->pos.zRot += ANGLE(5);
+		item->Position.xRot += ANGLE(3);
+		item->Position.zRot += ANGLE(5);
 	}
 
-	int dx = item->Velocity * phd_sin(item->pos.yRot);
-	int dz = item->Velocity * phd_cos(item->pos.yRot);
+	int dx = item->Velocity * phd_sin(item->Position.yRot);
+	int dz = item->Velocity * phd_cos(item->Position.yRot);
 
-	item->pos.xPos += dx;
-	item->pos.zPos += dz;
+	item->Position.xPos += dx;
+	item->Position.zPos += dz;
 	
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 	{
 		item->VerticalVelocity += (5 - item->VerticalVelocity) / 2;
 		item->Velocity += (5 - item->Velocity) / 2;
@@ -418,9 +418,9 @@ void ChaffFlareControl(short itemNumber)
 		item->VerticalVelocity += GRAVITY;
 	}
 
-	item->pos.yPos += item->VerticalVelocity;
+	item->Position.yPos += item->VerticalVelocity;
 
-	DoProjectileDynamics(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->VerticalVelocity, dz);
+	DoProjectileDynamics(itemNumber, item->Position.xPos, item->Position.yPos, item->Position.zPos, dx, item->VerticalVelocity, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;
@@ -436,13 +436,13 @@ void ChaffFlareControl(short itemNumber)
 
 	TriggerTorpedoBubbles(&pos1, &pos2, 1);
 
-	if (item->itemFlags[0] >= 300)
+	if (item->ItemFlags[0] >= 300)
 	{
 		if (!item->VerticalVelocity && !item->Velocity)
 		{
-			if (item->itemFlags[1] <= 90)
+			if (item->ItemFlags[1] <= 90)
 			{
-				item->itemFlags[1]++;
+				item->ItemFlags[1]++;
 			}
 			else
 			{
@@ -452,7 +452,7 @@ void ChaffFlareControl(short itemNumber)
 	}
 	else
 	{
-		item->itemFlags[0]++;
+		item->ItemFlags[0]++;
 	}
 }
 
@@ -460,23 +460,23 @@ void TorpedoControl(short itemNumber)
 {
 	ITEM_INFO*  item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &item->pos, 2);
+	SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &item->Position, 2);
 
 	PHD_VECTOR pos;
 
-	if (item->itemFlags[0] == NO_ITEM)
+	if (item->ItemFlags[0] == NO_ITEM)
 	{
 		bool found = false;
 		for (int i = g_Level.NumItems; i < 256; i++)
 		{
 			ITEM_INFO* searchItem = &g_Level.Items[i];
 
-			if (searchItem->objectNumber == ID_CHAFF && searchItem->active)
+			if (searchItem->ObjectNumber == ID_CHAFF && searchItem->Active)
 			{
-				item->itemFlags[0] = i;
-				pos.x = searchItem->pos.xPos;
-				pos.y = searchItem->pos.yPos;
-				pos.z = searchItem->pos.zPos;
+				item->ItemFlags[0] = i;
+				pos.x = searchItem->Position.xPos;
+				pos.y = searchItem->Position.yPos;
+				pos.z = searchItem->Position.zPos;
 				found = true;
 				break;
 			}
@@ -484,34 +484,34 @@ void TorpedoControl(short itemNumber)
 
 		if (!found)
 		{
-			pos.x = LaraItem->pos.xPos;
-			pos.y = LaraItem->pos.yPos;
-			pos.z = LaraItem->pos.zPos;
+			pos.x = LaraItem->Position.xPos;
+			pos.y = LaraItem->Position.yPos;
+			pos.z = LaraItem->Position.zPos;
 		}
 	}
 	else
 	{
-		ITEM_INFO* chaffItem = &g_Level.Items[item->itemFlags[0]];
+		ITEM_INFO* chaffItem = &g_Level.Items[item->ItemFlags[0]];
 
-		if (chaffItem->active && chaffItem->objectNumber == ID_CHAFF)
+		if (chaffItem->Active && chaffItem->ObjectNumber == ID_CHAFF)
 		{
-			pos.x = chaffItem->pos.xPos;
-			pos.y = chaffItem->pos.yPos;
-			pos.z = chaffItem->pos.zPos;
-			item->activeState = pos.x / 4;
-			item->targetState = pos.y / 4;
-			item->requiredState = pos.z / 4;
+			pos.x = chaffItem->Position.xPos;
+			pos.y = chaffItem->Position.yPos;
+			pos.z = chaffItem->Position.zPos;
+			item->ActiveState = pos.x / 4;
+			item->TargetState = pos.y / 4;
+			item->RequiredState = pos.z / 4;
 		}
 		else
 		{
-			pos.x = 4 * item->activeState;
-			pos.y = 4 * item->targetState;
-			pos.z = 4 * item->requiredState;
+			pos.x = 4 * item->ActiveState;
+			pos.y = 4 * item->TargetState;
+			pos.z = 4 * item->RequiredState;
 		}
 	}
 
 	short angles[2];
-	phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
+	phd_GetVectorAngles(pos.x - item->Position.xPos, pos.y - item->Position.yPos, pos.z - item->Position.zPos, angles);
 
 	if (item->Velocity >= 48)
 	{
@@ -523,15 +523,15 @@ void TorpedoControl(short itemNumber)
 		item->Velocity += 4;
 	}
 
-	item->itemFlags[1]++;
+	item->ItemFlags[1]++;
 
-	if (item->itemFlags[1] - 1 < 60)
+	if (item->ItemFlags[1] - 1 < 60)
 	{
-		short dry = angles[0] - item->pos.yRot;
+		short dry = angles[0] - item->Position.yRot;
 		if (abs(dry) > 0x8000)
 			dry = -dry;
 
-		short drx = angles[1] - item->pos.xRot;
+		short drx = angles[1] - item->Position.xRot;
 		if (abs(drx) > 0x8000)
 			drx = -drx;
 
@@ -558,37 +558,37 @@ void TorpedoControl(short itemNumber)
 			dry = 512;
 		}
 
-		item->pos.yRot += dry;
-		item->pos.xRot += drx;
+		item->Position.yRot += dry;
+		item->Position.xRot += drx;
 	}
 
-	int x = item->pos.xPos;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos;
+	int x = item->Position.xPos;
+	int y = item->Position.yPos;
+	int z = item->Position.zPos;
 
-	item->pos.zRot += 16 * item->Velocity;
+	item->Position.zRot += 16 * item->Velocity;
 
-	int c = item->Velocity * phd_cos(item->pos.xRot);
+	int c = item->Velocity * phd_cos(item->Position.xRot);
 
-	item->pos.xPos += c * phd_sin(item->pos.yRot);
-	item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
-	item->pos.zPos += c * phd_cos(item->pos.yRot);
+	item->Position.xPos += c * phd_sin(item->Position.yRot);
+	item->Position.yPos += item->Velocity * phd_sin(-item->Position.xRot);
+	item->Position.zPos += c * phd_cos(item->Position.yRot);
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	int floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	int ceilingHeight = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	short roomNumber = item->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	int floorHeight = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	int ceilingHeight = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
-	if (item->pos.yPos < floorHeight && item->pos.yPos > ceilingHeight && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
+	if (item->Position.yPos < floorHeight && item->Position.yPos > ceilingHeight && g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
-		if (ItemNearLara(&item->pos, 200))
+		if (ItemNearLara(&item->Position, 200))
 		{
-			LaraItem->hitStatus = true;
+			LaraItem->HitStatus = true;
 			KillItem(itemNumber);
 			TriggerUnderwaterExplosion(item, 1);
-			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->pos, 2);
-			SoundEffect(SFX_TR5_LARA_UNDERWATER_HIT, &LaraItem->pos, 2);
-			LaraItem->hitPoints -= 200;
+			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Position, 2);
+			SoundEffect(SFX_TR5_LARA_UNDERWATER_HIT, &LaraItem->Position, 2);
+			LaraItem->HitPoints -= 200;
 		//	if (Lara.anxiety >= 0x7F)
 		//		Lara.anxiety--;
 		//	else
@@ -599,7 +599,7 @@ void TorpedoControl(short itemNumber)
 		//	if (ItemNearLara(&item->pos, 400) && Lara.anxiety < 0xE0)
 		//		Lara.anxiety += 32;
 
-			if (roomNumber!= item->roomNumber)
+			if (roomNumber!= item->RoomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
 
 			PHD_VECTOR pos1;
@@ -619,11 +619,11 @@ void TorpedoControl(short itemNumber)
 	}
 	else
 	{
-		item->pos.xPos = x;
-		item->pos.yPos = y;
-		item->pos.zPos = z;
+		item->Position.xPos = x;
+		item->Position.yPos = y;
+		item->Position.zPos = z;
 		TriggerUnderwaterExplosion(item, 1);
-		SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->pos, 2);
+		SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Position, 2);
 		KillItem(itemNumber);
 	}
 }

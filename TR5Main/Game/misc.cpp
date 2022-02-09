@@ -12,7 +12,7 @@ using std::vector;
 
 CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
 {
-    return (CREATURE_INFO*)item->data;
+    return (CREATURE_INFO*)item->Data;
 }
 
 void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
@@ -26,12 +26,12 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 			continue;
 
 		if (target != item &&
-			target->hitPoints > 0 &&
-			target->status != ITEM_INVISIBLE)
+			target->HitPoints > 0 &&
+			target->Status != ITEM_INVISIBLE)
 		{
-			int x = target->pos.xPos - item->pos.xPos;
-			int y = target->pos.yPos - item->pos.yPos;
-			int z = target->pos.zPos - item->pos.zPos;
+			int x = target->Position.xPos - item->Position.xPos;
+			int y = target->Position.yPos - item->Position.yPos;
+			int z = target->Position.zPos - item->Position.zPos;
 
 			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 			if (distance < bestDistance)

@@ -129,32 +129,32 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 					}
-					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
-					TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 				}
 				else
 				{
 					item = &g_Level.Items[itemNumber];
-					if (item->objectNumber < ID_SHOOT_SWITCH1 || item->objectNumber > ID_SHOOT_SWITCH4)
+					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
-						if ((Objects[item->objectNumber].explodableMeshbits & ShatterItem.bit)
+						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit)
 							&& LaserSight)
 						{
 							//if (!Objects[item->objectNumber].intelligent)
 							//{
-							item->meshBits &= ~ShatterItem.bit;
+							item->MeshBits &= ~ShatterItem.bit;
 							ShatterImpactData.impactDirection = direction;
 							ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 							ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-							TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+							TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 							/*}
 							else
 							{
 								if (item->objectNumber != ID_GUARD_LASER)
 								{
-									item->hitPoints -= 30;
-									if (item->hitPoints < 0)
-										item->hitPoints = 0;
+									item->HitPoints -= 30;
+									if (item->HitPoints < 0)
+										item->HitPoints = 0;
 									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
@@ -162,7 +162,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									angle = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
-										item->hitPoints = 0;
+										item->HitPoints = 0;
 										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 									}
 								}
@@ -172,41 +172,41 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						{
 							if (DrawTarget && (Lara.gunType == WEAPON_REVOLVER || Lara.gunType == WEAPON_HK))
 							{
-								if (Objects[item->objectNumber].intelligent)
+								if (Objects[item->ObjectNumber].intelligent)
 								{
 									HitTarget(LaraItem, item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
 								{
 									// TR5
-									if (Objects[item->objectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
+										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 								}
 							}
 							else
 							{
-								if (item->objectNumber >= ID_SMASH_OBJECT1 && item->objectNumber <= ID_SMASH_OBJECT8)
+								if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
 								{
 									SmashObject(itemNumber);
 								}
 								else
 								{
-									if (Objects[item->objectNumber].hitEffect == HIT_BLOOD)
+									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
 									{
-										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->pos.yRot, item->roomNumber);
+										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Position.yRot, item->RoomNumber);
 									}
-									else if (Objects[item->objectNumber].hitEffect == HIT_SMOKE)
+									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
 									{
-										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, -5);
+										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, -5);
 									}
-									else if (Objects[item->objectNumber].hitEffect == HIT_RICOCHET)
+									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
 									{
-										TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 									}
-									item->hitStatus = true;
-									if (!Objects[item->objectNumber].undead)
+									item->HitStatus = true;
+									if (!Objects[item->ObjectNumber].undead)
 									{
-										item->hitPoints -= Weapons[Lara.gunType].damage;
+										item->HitPoints -= Weapons[Lara.gunType].damage;
 									}
 								}
 							}
@@ -214,13 +214,13 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 					}
 					else
 					{
-						if (ShatterItem.bit == 1 << Objects[item->objectNumber].nmeshes - 1)
+						if (ShatterItem.bit == 1 << Objects[item->ObjectNumber].nmeshes - 1)
 						{
-							if (!(item->flags & 0x40))
+							if (!(item->Flags & 0x40))
 							{
-								if (item->objectNumber == ID_SHOOT_SWITCH1)
-									ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
-								if (item->triggerFlags == 444 && item->objectNumber == ID_SHOOT_SWITCH2)
+								if (item->ObjectNumber == ID_SHOOT_SWITCH1)
+									ExplodeItemNode(item, Objects[item->ObjectNumber].nmeshes - 1, 0, 64);
+								if (item->TriggerFlags == 444 && item->ObjectNumber == ID_SHOOT_SWITCH2)
 								{
 									// TR5 ID_SWITCH_TYPE_8/ID_SHOOT_SWITCH2
 									ProcessExplodingSwitchType8(item);
@@ -233,29 +233,29 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 										ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
 									}*/
 
-									if (item->flags & IFLAG_ACTIVATION_MASK && (item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+									if (item->Flags & IFLAG_ACTIVATION_MASK && (item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										TestTriggers(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, item->roomNumber, true, item->flags & IFLAG_ACTIVATION_MASK);
+										TestTriggers(item->Position.xPos, item->Position.yPos - 256, item->Position.zPos, item->RoomNumber, true, item->Flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
 										for (count = GetSwitchTrigger(item, triggerItems, 1); count > 0; --count)
 										{
 											AddActiveItem(triggerItems[count - 1]);
-											g_Level.Items[triggerItems[count - 1]].status = ITEM_ACTIVE;
-											g_Level.Items[triggerItems[count - 1]].flags |= IFLAG_ACTIVATION_MASK;
+											g_Level.Items[triggerItems[count - 1]].Status = ITEM_ACTIVE;
+											g_Level.Items[triggerItems[count - 1]].Flags |= IFLAG_ACTIVATION_MASK;
 										}
 									}
 								}
 							}
-							if (item->status != ITEM_DEACTIVATED)
+							if (item->Status != ITEM_DEACTIVATED)
 							{
 								AddActiveItem(itemNumber);
-								item->status = ITEM_ACTIVE;
-								item->flags |= IFLAG_ACTIVATION_MASK | 0x40;
+								item->Status = ITEM_ACTIVE;
+								item->Flags |= IFLAG_ACTIVATION_MASK | 0x40;
 							}
 						}
-						TriggerRicochetSpark(&target, LaraItem->pos.yRot, 3, 0);
+						TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 					}
 				}
 			}
@@ -283,7 +283,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 			target.y -= target.y - src->y >> 5;
 			target.z -= target.z - src->z >> 5;
 			if (firing && !result)
-				TriggerRicochetSpark(&target, LaraItem->pos.yRot, 8, 0);
+				TriggerRicochetSpark(&target, LaraItem->Position.yRot, 8, 0);
 		}
 	}
 
@@ -328,28 +328,28 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 			}
 		}
 
-		for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+		for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 		{
 			auto item = &g_Level.Items[linknum];
 
-			if ((item->status == ITEM_DEACTIVATED) || (item->status == ITEM_INVISIBLE))
+			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
 				continue;
 
-			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->objectNumber != priorityObject))
+			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->ObjectNumber != priorityObject))
 				continue;
 
-			if ((item->objectNumber != ID_LARA) && (Objects[item->objectNumber].collision == NULL))
+			if ((item->ObjectNumber != ID_LARA) && (Objects[item->ObjectNumber].collision == NULL))
 				continue;
 
-			if ((item->objectNumber == ID_LARA) && (priorityObject != ID_LARA))
+			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
 				continue;
 
 			auto box = GetBoundsAccurate(item);
 
-			pos.xPos = item->pos.xPos;
-			pos.yPos = item->pos.yPos;
-			pos.zPos = item->pos.zPos;
-			pos.yRot = item->pos.yRot;
+			pos.xPos = item->Position.xPos;
+			pos.yPos = item->Position.yPos;
+			pos.zPos = item->Position.zPos;
+			pos.yRot = item->Position.yRot;
 
 			if (DoRayBox(start, end, box, &pos, vec, linknum))
 			{
@@ -408,7 +408,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 	{
 		// For items instead we need to test spheres
 		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 		// Get the ransformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -422,7 +422,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
 			// If mesh is visibile...
-			if (item->meshBits & (1 << i))
+			if (item->MeshBits & (1 << i))
 			{
 				SPHERE* sphere = &CreatureSpheres[i];
 
@@ -533,7 +533,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
-		ShatterItem.yRot = item->pos.yRot;
+		ShatterItem.yRot = item->Position.yRot;
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;

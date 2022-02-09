@@ -93,7 +93,7 @@ static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 
 void BaboonDieEffect(ITEM_INFO* item)
 {
-    PHD_3DPOS pos = PHD_3DPOS(item->pos.xPos, item->pos.yPos - 128, item->pos.zPos);
+    PHD_3DPOS pos = PHD_3DPOS(item->Position.xPos, item->Position.yPos - 128, item->Position.zPos);
 
     // trigger shockwave effect
     TriggerBaboonShockwave(pos, ANGLE(0.0f));
@@ -109,13 +109,13 @@ static void KillRespawnedBaboon(short itemNumber, bool remove = false)
 {
     ITEM_INFO* item;
     item = &g_Level.Items[itemNumber];
-    item->hitPoints = 0;
+    item->HitPoints = 0;
     RemoveActiveItem(itemNumber); // remove it from the active item list
-    item->flags = IFLAG_CLEAR_BODY;
-    item->afterDeath = 128; // instant disappear !
-    item->status = ITEM_DEACTIVATED; // wont triggered again...
+    item->Flags = IFLAG_CLEAR_BODY;
+    item->AfterDeath = 128; // instant disappear !
+    item->Status = ITEM_DEACTIVATED; // wont triggered again...
     if (remove)
-        item->itemFlags[0] = NO_BABOON;
+        item->ItemFlags[0] = NO_BABOON;
     DisableBaddieAI(itemNumber); // desactivate this AI or you will get crash later...
 }
 
@@ -125,13 +125,13 @@ static bool CheckRespawnedBaboon(short itemNumber)
     BaboonRespawnStruct* baboon;
 
     item = &g_Level.Items[itemNumber];
-    if (item->itemFlags[0] == NO_BABOON) // NORMAL/INV for now
+    if (item->ItemFlags[0] == NO_BABOON) // NORMAL/INV for now
     {
         KillRespawnedBaboon(itemNumber);
         return false;
     }
 
-    baboon = BaboonRespawn.GetBaboonRespawn(item->itemFlags[0]);
+    baboon = BaboonRespawn.GetBaboonRespawn(item->ItemFlags[0]);
     if (baboon == nullptr)
         return false;
 
@@ -150,42 +150,42 @@ static void UpdateRespawnedBaboon(short itemNumber)
     BaboonRespawnStruct* baboon;
 
     item = &g_Level.Items[itemNumber];
-    obj = &Objects[item->objectNumber];
-    baboon = BaboonRespawn.GetBaboonRespawn(item->itemFlags[0]);
+    obj = &Objects[item->ObjectNumber];
+    baboon = BaboonRespawn.GetBaboonRespawn(item->ItemFlags[0]);
     if (baboon == nullptr)
         return;
 
-    item->pos = baboon->pos;
+    item->Position = baboon->pos;
 
-    auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-    if (item->roomNumber != outsideRoom && outsideRoom != NO_ROOM)
+    auto outsideRoom = IsRoomOutside(item->Position.xPos, item->Position.yPos, item->Position.zPos);
+    if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
         ItemNewRoom(itemNumber, outsideRoom);
     
 	if (baboon->count < baboon->max_count)
         baboon->count++;
 
-    item->animNumber = obj->animIndex + BABOON_SIT_IDLE_ANIM;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->activeState = BABOON_SIT_IDLE;
-    item->targetState = BABOON_SIT_IDLE;
-    item->hitPoints = obj->hitPoints;
+    item->AnimNumber = obj->animIndex + BABOON_SIT_IDLE_ANIM;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->ActiveState = BABOON_SIT_IDLE;
+    item->TargetState = BABOON_SIT_IDLE;
+    item->HitPoints = obj->HitPoints;
 
     RemoveActiveItem(itemNumber);
-    item->flags = NULL;
-    item->afterDeath = 0;
-    item->status = ITEM_INVISIBLE;
+    item->Flags = NULL;
+    item->AfterDeath = 0;
+    item->Status = ITEM_INVISIBLE;
 
     DisableBaddieAI(itemNumber);
-    if (item->objectNumber == ID_BABOON_NORMAL)
+    if (item->ObjectNumber == ID_BABOON_NORMAL)
     {
-        if (item->triggerFlags == 1)
+        if (item->TriggerFlags == 1)
             return;
         else
-            item->collidable = true;
+            item->Collidable = true;
     }
-    else if (item->triggerFlags == 0)
+    else if (item->TriggerFlags == 0)
     {
-        item->collidable = true;
+        item->Collidable = true;
     }
 }
 
@@ -206,15 +206,15 @@ void InitialiseBaboon(short itemNumber)
     InitialiseCreature(itemNumber);
 
     item = &g_Level.Items[itemNumber];
-    item->animNumber = Objects[item->objectNumber].animIndex + BABOON_SIT_IDLE_ANIM;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = BABOON_SIT_IDLE;
-    item->activeState = BABOON_SIT_IDLE;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SIT_IDLE_ANIM;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = BABOON_SIT_IDLE;
+    item->ActiveState = BABOON_SIT_IDLE;
 
-    if (item->objectNumber == ID_BABOON_SILENT && item->triggerFlags != 0)
-        BaboonRespawn.Add(item, item->triggerFlags);
+    if (item->ObjectNumber == ID_BABOON_SILENT && item->TriggerFlags != 0)
+        BaboonRespawn.Add(item, item->TriggerFlags);
     else
-        item->itemFlags[0] = NO_BABOON;
+        item->ItemFlags[0] = NO_BABOON;
 }
 
 void BaboonControl(short itemNumber)
@@ -234,19 +234,19 @@ void BaboonControl(short itemNumber)
     tilt = 0;
     angle = 0;
 
-    if (item->hitPoints <= 0 && item->hitPoints != NOT_TARGETABLE)
+    if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
     {
-        if (item->activeState == BABOON_DEATH)
+        if (item->ActiveState == BABOON_DEATH)
         {
-            if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+            if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
                 BaboonRespawnFunction(itemNumber);
         }
-        else if (item->activeState != BABOON_ACTIVATE_SWITCH)
+        else if (item->ActiveState != BABOON_ACTIVATE_SWITCH)
         {
-            item->animNumber = Objects[item->objectNumber].animIndex + BABOON_DEATH_ANIM;
-            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-            item->activeState = BABOON_DEATH;
-            item->targetState = BABOON_DEATH;
+            item->AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_DEATH_ANIM;
+            item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+            item->ActiveState = BABOON_DEATH;
+            item->TargetState = BABOON_DEATH;
         }
     }
     else
@@ -254,12 +254,12 @@ void BaboonControl(short itemNumber)
         GetAITarget(baboon);
         CreatureAIInfo(item, &info);
 
-        if (!item->hitStatus && item->objectNumber == ID_BABOON_NORMAL)
+        if (!item->HitStatus && item->ObjectNumber == ID_BABOON_NORMAL)
         {
             int dx, dz;
-            dx = LaraItem->pos.xPos - item->pos.xPos;
-            dz = LaraItem->pos.zPos - item->pos.zPos;
-            Lara_info.angle = phd_atan(dx, dz) - item->pos.yRot;
+            dx = LaraItem->Position.xPos - item->Position.xPos;
+            dz = LaraItem->Position.zPos - item->Position.zPos;
+            Lara_info.angle = phd_atan(dx, dz) - item->Position.yRot;
             Lara_info.distance = SQUARE(dx) + SQUARE(dz);
             if (baboon->enemy == nullptr || baboon->enemy == LaraItem)
                 baboon->enemy = nullptr;
@@ -275,22 +275,22 @@ void BaboonControl(short itemNumber)
         CreatureMood(item, &info, TRUE);
         angle = CreatureTurn(item, baboon->maximumTurn);
 
-        if (baboon->enemy != nullptr && baboon->enemy != LaraItem && baboon->enemy->objectNumber == ID_AI_FOLLOW)
+        if (baboon->enemy != nullptr && baboon->enemy != LaraItem && baboon->enemy->ObjectNumber == ID_AI_FOLLOW)
         {
             if (baboon->reachedGoal
-            && (abs(item->pos.xPos - baboon->enemy->pos.xPos) < CLICK(1)
-            &&  abs(item->pos.yPos - baboon->enemy->pos.yPos) < CLICK(1)
-            &&  abs(item->pos.zPos - baboon->enemy->pos.zPos) < CLICK(1)))
+            && (abs(item->Position.xPos - baboon->enemy->Position.xPos) < CLICK(1)
+            &&  abs(item->Position.yPos - baboon->enemy->Position.yPos) < CLICK(1)
+            &&  abs(item->Position.zPos - baboon->enemy->Position.zPos) < CLICK(1)))
             {
-                item->pos.xPos = baboon->enemy->pos.xPos;
-                item->pos.yPos = baboon->enemy->pos.yPos;
-                item->pos.zPos = baboon->enemy->pos.zPos;
-                item->pos.yRot = baboon->enemy->pos.yRot;
-                item->animNumber = Objects[item->objectNumber].animIndex + BABOON_SWITCH_ANIM;
-                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                item->targetState = BABOON_ACTIVATE_SWITCH;
-                item->activeState = BABOON_ACTIVATE_SWITCH;
-                item->aiBits &= ~(FOLLOW);
+                item->Position.xPos = baboon->enemy->Position.xPos;
+                item->Position.yPos = baboon->enemy->Position.yPos;
+                item->Position.zPos = baboon->enemy->Position.zPos;
+                item->Position.yRot = baboon->enemy->Position.yRot;
+                item->AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
+                item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+                item->TargetState = BABOON_ACTIVATE_SWITCH;
+                item->ActiveState = BABOON_ACTIVATE_SWITCH;
+                item->AIBits &= ~(FOLLOW);
 
 				TestTriggers(item, true);
 
@@ -298,199 +298,199 @@ void BaboonControl(short itemNumber)
             }
         }
 
-        switch (item->activeState)
+        switch (item->ActiveState)
         {
         case BABOON_IDLE:
             baboon->maximumTurn = 0;
             baboon->flags = 0;
 
-            if (item->aiBits & GUARD)
+            if (item->AIBits & GUARD)
             {
                 AIGuard(baboon);
                 if (!(GetRandomControl() & 0xF))
                 {
                     if (GetRandomControl() & 1)
-                        item->targetState = BABOON_HITGROUND;
+                        item->TargetState = BABOON_HITGROUND;
                     else
-                        item->targetState = BABOON_SIT_IDLE;
+                        item->TargetState = BABOON_SIT_IDLE;
                 }
             }
-            else if (item->aiBits & PATROL1)
+            else if (item->AIBits & PATROL1)
             {
-                item->targetState = BABOON_WALK;
+                item->TargetState = BABOON_WALK;
             }
             else if (baboon->mood == ESCAPE_MOOD)
             {
                 if (info.ahead && Lara.target != item)
-                    item->targetState = BABOON_IDLE;
+                    item->TargetState = BABOON_IDLE;
                 else
-                    item->targetState = BABOON_RUN;
+                    item->TargetState = BABOON_RUN;
             }
             else if (baboon->mood == ATTACK_MOOD)
             {
-                if (!(item->aiBits & FOLLOW) || (!item->Airborne && info.distance <= BABOON_RUNROLL_RANGE))
+                if (!(item->AIBits & FOLLOW) || (!item->Airborne && info.distance <= BABOON_RUNROLL_RANGE))
                 {
                     if (info.bite && info.distance < BABOON_ATK_NORMALRANGE)
                     {
-                        if (LaraItem->pos.yPos >= item->pos.yPos)
-                            item->targetState = BABOON_ATK1;
+                        if (LaraItem->Position.yPos >= item->Position.yPos)
+                            item->TargetState = BABOON_ATK1;
                         else
-                            item->targetState = BABOON_JUMPATK;
+                            item->TargetState = BABOON_JUMPATK;
                     }
                     else if (info.bite && info.distance < BABOON_JUMP_RANGE)
                     {
-                        item->targetState = BABOON_SUPERJUMPATK;
+                        item->TargetState = BABOON_SUPERJUMPATK;
                     }
                     else if (info.bite && info.distance < BABOON_RUNROLL_RANGE)
                     {
-                        item->targetState = BABOON_RUN_ROLL;
+                        item->TargetState = BABOON_RUN_ROLL;
                     }
                     else
                     {
-                        item->targetState = BABOON_RUN;
+                        item->TargetState = BABOON_RUN;
                     }
                 }
-                else if (item->requiredState)
+                else if (item->RequiredState)
                 {
-                    item->targetState = item->requiredState;
+                    item->TargetState = item->RequiredState;
                 }
                 else if (GetRandomControl() & 1)
                 {
-                    item->targetState = BABOON_SIT_IDLE;
+                    item->TargetState = BABOON_SIT_IDLE;
                 }
             }
-            else if (item->requiredState)
+            else if (item->RequiredState)
             {
-                item->targetState = item->requiredState;
+                item->TargetState = item->RequiredState;
             }
             else if (!(GetRandomControl() & 3))
             {
-                item->targetState = BABOON_WALK;
+                item->TargetState = BABOON_WALK;
             }
             else if (!(GetRandomControl() & 1))
             {
-                item->targetState = BABOON_RUN_ROLL;
+                item->TargetState = BABOON_RUN_ROLL;
             }
             else if (GetRandomControl() & 4)
             {
-                item->targetState = BABOON_HITGROUND;
+                item->TargetState = BABOON_HITGROUND;
             }
             break;
         case BABOON_SIT_IDLE:
             baboon->maximumTurn = 0;
             baboon->flags = 0;
 
-            if (item->aiBits & GUARD)
+            if (item->AIBits & GUARD)
             {
                 AIGuard(baboon);
                 if (GetRandomControl() & 0xF)
-                    item->targetState = BABOON_SIT_EAT;
+                    item->TargetState = BABOON_SIT_EAT;
                 else if (GetRandomControl() & 0xA)
-                    item->targetState = BABOON_SIT_SCRATCH;
+                    item->TargetState = BABOON_SIT_SCRATCH;
             }
-            else if (item->aiBits & PATROL1)
+            else if (item->AIBits & PATROL1)
             {
-                item->targetState = BABOON_WALK;
+                item->TargetState = BABOON_WALK;
             }
             else if (baboon->mood != ESCAPE_MOOD)
             {
                 if (baboon->mood == BORED_MOOD)
                 {
-                    if (item->requiredState)
+                    if (item->RequiredState)
                     {
-                        item->targetState = item->requiredState;
+                        item->TargetState = item->RequiredState;
                     }
                     // NOTE: it's not the original code, but it's too wreid 
                     // that the baboon repeat the same move so i included the sit_idle with more random number
                     // (the eat not exist in the bored mood, i added it !)
                     else if (GetRandomControl() & 0x10)
                     {
-                        item->targetState = BABOON_SIT_IDLE;
+                        item->TargetState = BABOON_SIT_IDLE;
                     }
                     else if (GetRandomControl() & 0x500)
                     {
                         if (GetRandomControl() & 0x200)
-                            item->targetState = BABOON_SIT_SCRATCH;
+                            item->TargetState = BABOON_SIT_SCRATCH;
                         else if (GetRandomControl() & 0x250)
-                            item->targetState = BABOON_SIT_EAT;
+                            item->TargetState = BABOON_SIT_EAT;
                     }
-                    else if (GetRandomControl() & 0x1000 || item->aiBits & FOLLOW)
+                    else if (GetRandomControl() & 0x1000 || item->AIBits & FOLLOW)
                     {
-                        item->targetState = BABOON_WALK;
+                        item->TargetState = BABOON_WALK;
                     }
                 }
-                else if ((item->aiBits & FOLLOW) && info.distance > BABOON_IDLE_DISTANCE)
+                else if ((item->AIBits & FOLLOW) && info.distance > BABOON_IDLE_DISTANCE)
                 {
-                    if (item->requiredState)
-                        item->targetState = item->requiredState;
+                    if (item->RequiredState)
+                        item->TargetState = item->RequiredState;
                     else
-                        item->targetState = BABOON_WALK;
+                        item->TargetState = BABOON_WALK;
                 }
                 else
                 {
-                    item->targetState = BABOON_WALK;
+                    item->TargetState = BABOON_WALK;
                 }
             }
             else
             {
-                item->targetState = BABOON_IDLE;
+                item->TargetState = BABOON_IDLE;
             }
             break;
         case BABOON_WALK:
             baboon->maximumTurn = BABOON_WALK_ANGLE;
 
-            if (item->aiBits & PATROL1)
+            if (item->AIBits & PATROL1)
             {
-                item->targetState = BABOON_WALK;
+                item->TargetState = BABOON_WALK;
             }
             else if (baboon->mood == BORED_MOOD)
             {
-                if (item->aiBits & FOLLOW)
-                    item->targetState = BABOON_WALK;
+                if (item->AIBits & FOLLOW)
+                    item->TargetState = BABOON_WALK;
                 else if (GetRandomControl() < 256)
-                    item->targetState = BABOON_SIT_IDLE;
+                    item->TargetState = BABOON_SIT_IDLE;
             }
             else if (baboon->mood == ESCAPE_MOOD)
             {
-                item->targetState = BABOON_RUN;
+                item->TargetState = BABOON_RUN;
             }
             else if (baboon->mood == ATTACK_MOOD)
             {
                 if (info.bite && info.distance < BABOON_ATK_RANGE)
-                    item->targetState = BABOON_IDLE;
+                    item->TargetState = BABOON_IDLE;
             }
             else if (GetRandomControl() < 256)
             {
-                item->targetState = BABOON_SIT_IDLE;
+                item->TargetState = BABOON_SIT_IDLE;
             }
             break;
         case BABOON_RUN:
             baboon->maximumTurn = BABOON_RUN_ANGLE;
             tilt = angle / 2;
 
-            if (item->aiBits & GUARD)
+            if (item->AIBits & GUARD)
             {
-                item->targetState = BABOON_IDLE;
+                item->TargetState = BABOON_IDLE;
             }
             else if (baboon->mood == ESCAPE_MOOD)
             {
                 if (info.ahead && Lara.target != item)
-                    item->targetState = BABOON_IDLE;
+                    item->TargetState = BABOON_IDLE;
             }
-            else if (item->aiBits & FOLLOW && (item->Airborne || info.distance > BABOON_FOLLOW_RANGE))
+            else if (item->AIBits & FOLLOW && (item->Airborne || info.distance > BABOON_FOLLOW_RANGE))
             {
-                item->targetState = BABOON_IDLE;
+                item->TargetState = BABOON_IDLE;
             }
             else if (baboon->mood == ATTACK_MOOD)
             {
                 if (info.distance < BABOON_ATK_RANGE)
-                    item->targetState = BABOON_IDLE;
+                    item->TargetState = BABOON_IDLE;
                 else if (info.bite && info.distance < BABOON_RUNROLL_RANGE)
-                    item->targetState = BABOON_RUN_ROLL;
+                    item->TargetState = BABOON_RUN_ROLL;
             }
             else
             {
-                item->targetState = BABOON_RUN_ROLL;
+                item->TargetState = BABOON_RUN_ROLL;
             }
             break;
         case BABOON_PICKUP:
@@ -499,9 +499,9 @@ void BaboonControl(short itemNumber)
             break;
         case BABOON_ACTIVATE_SWITCH:
             baboon->maximumTurn = 0;
-            item->hitPoints = NOT_TARGETABLE;
+            item->HitPoints = NOT_TARGETABLE;
 
-            if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 212)
+            if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 212)
             {
                 GAME_VECTOR pos;
                 pos.x = 0;
@@ -510,33 +510,33 @@ void BaboonControl(short itemNumber)
                 pos.boxNumber = 0;
                 pos.roomNumber = NO_ROOM;
 
-                switch (item->pos.yRot)
+                switch (item->Position.yRot)
                 {
                 case -0x4000: // WEST (OK)
-                    pos.x = item->pos.xPos - SECTOR(1);
-                    pos.z = item->pos.zPos;
+                    pos.x = item->Position.xPos - SECTOR(1);
+                    pos.z = item->Position.zPos;
                     break;
                 case 0x4000: // EAST (OK)
-                    pos.x = item->pos.xPos + SECTOR(1);
-                    pos.z = item->pos.zPos;
+                    pos.x = item->Position.xPos + SECTOR(1);
+                    pos.z = item->Position.zPos;
                     break;
                 case 0:      // NORTH (NOP) maybe okay now with TombEngine
-                    pos.x = item->pos.xPos;
-                    pos.z = item->pos.zPos + SECTOR(1);
+                    pos.x = item->Position.xPos;
+                    pos.z = item->Position.zPos + SECTOR(1);
                     break;
                 case -0x8000: // SOUTH (OK)
-                    pos.x = item->pos.xPos;
-                    pos.z = item->pos.zPos - SECTOR(1);
+                    pos.x = item->Position.xPos;
+                    pos.z = item->Position.zPos - SECTOR(1);
                     break;
                 }
 
-                pos.y = item->pos.yPos;
-                pos.roomNumber = item->roomNumber;
+                pos.y = item->Position.yPos;
+                pos.roomNumber = item->RoomNumber;
                 floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
                 int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-                item->floor = height;
+                item->Floor = height;
                 TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE);
-                item->triggerFlags = 1;
+                item->TriggerFlags = 1;
             }
             break;
         case BABOON_ATK1:
@@ -549,22 +549,22 @@ void BaboonControl(short itemNumber)
             if (abs(info.angle) >= BABOON_ATTACK_ANGLE)
             {
                 if (info.angle >= 0)
-                    item->pos.yRot += BABOON_ATTACK_ANGLE;
+                    item->Position.yRot += BABOON_ATTACK_ANGLE;
                 else
-                    item->pos.yRot -= BABOON_ATTACK_ANGLE;
+                    item->Position.yRot -= BABOON_ATTACK_ANGLE;
             }
             else
             {
-                item->pos.yRot += info.angle;
+                item->Position.yRot += info.angle;
             }
 
             if ( baboon->flags == 0
-            && ((item->touchBits & BABOON_TOUCHBITS)
-            ||  (item->touchBits & BABOON_RIGHT_TOUCHBITS)
-            ||  (item->touchBits & BABOON_JUMP_TOUCHBITS)))
+            && ((item->TouchBits & BABOON_TOUCHBITS)
+            ||  (item->TouchBits & BABOON_RIGHT_TOUCHBITS)
+            ||  (item->TouchBits & BABOON_JUMP_TOUCHBITS)))
             {
-                LaraItem->hitPoints -= BABOON_DAMAGE;
-                LaraItem->hitStatus = true;
+                LaraItem->HitPoints -= BABOON_DAMAGE;
+                LaraItem->HitStatus = true;
                 CreatureEffect2(item, &baboonBite, 10, -1, DoBloodSplat);
                 baboon->flags = 1;
             }
@@ -586,10 +586,10 @@ void BaboonRespawnClass::Add(ITEM_INFO* item, int max_count)
 {
     BaboonRespawnStruct toAdd;
     toAdd.id = GetBaboonFreePlace();
-    toAdd.pos = item->pos;
+    toAdd.pos = item->Position;
     toAdd.count = 0;
     toAdd.max_count = max_count;
-    item->itemFlags[0] = toAdd.id; // conserve the id of baboon respawn position on the array...
+    item->ItemFlags[0] = toAdd.id; // conserve the id of baboon respawn position on the array...
     baboonRespawnArray.push_back(toAdd);
 }
 

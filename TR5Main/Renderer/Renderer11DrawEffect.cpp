@@ -75,9 +75,9 @@ namespace TEN::Renderer
 
 				for (int j = 0; j < 6; j++)
 				{
-					LightningPos[j].x -= LaraItem->pos.xPos;
-					LightningPos[j].y -= LaraItem->pos.yPos;
-					LightningPos[j].z -= LaraItem->pos.zPos;
+					LightningPos[j].x -= LaraItem->Position.xPos;
+					LightningPos[j].y -= LaraItem->Position.yPos;
+					LightningPos[j].z -= LaraItem->Position.zPos;
 				}
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
@@ -88,15 +88,15 @@ namespace TEN::Renderer
 
 					for (int s = 0; s < 3 * arc->segments - 1; s++)
 					{
-						int ix = LaraItem->pos.xPos + interpolatedPos[0];
-						int iy = LaraItem->pos.yPos + interpolatedPos[1];
-						int iz = LaraItem->pos.zPos + interpolatedPos[2];
+						int ix = LaraItem->Position.xPos + interpolatedPos[0];
+						int iy = LaraItem->Position.yPos + interpolatedPos[1];
+						int iz = LaraItem->Position.zPos + interpolatedPos[2];
 
 						interpolatedPos += 4;
 
-						int ix2 = LaraItem->pos.xPos + interpolatedPos[0];
-						int iy2 = LaraItem->pos.yPos + interpolatedPos[1];
-						int iz2 = LaraItem->pos.zPos + interpolatedPos[2];
+						int ix2 = LaraItem->Position.xPos + interpolatedPos[0];
+						int iy2 = LaraItem->Position.yPos + interpolatedPos[1];
+						int iz2 = LaraItem->Position.zPos + interpolatedPos[2];
 
 						byte r, g, b;
 
@@ -252,9 +252,9 @@ namespace TEN::Renderer
 						} 
 						else 
 						{
-							pos.x += item->pos.xPos;
-							pos.y += item->pos.yPos;
-							pos.z += item->pos.zPos;
+							pos.x += item->Position.xPos;
+							pos.y += item->Position.yPos;
+							pos.z += item->Position.zPos;
 						}
 					}
 
@@ -532,7 +532,7 @@ namespace TEN::Renderer
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 		OBJECT_INFO* obj = &Objects[0];
-		RendererRoom const & room = m_rooms[LaraItem->roomNumber];
+		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.itemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
@@ -640,11 +640,11 @@ namespace TEN::Renderer
 			{
 				// Does the item need gunflash?
 				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-				OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
-				if (obj->biteOffset == -1 || !nativeItem->firedWeapon)
+				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
+				if (obj->biteOffset == -1 || !nativeItem->FiredWeapon)
 					continue;
 
-				RendererRoom const& room = m_rooms[nativeItem->roomNumber];
+				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 				m_stItem.AmbientLight = room.AmbientLight;
@@ -742,9 +742,9 @@ namespace TEN::Renderer
 			RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
 
 			if (dust->Reset) {
-				dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->X = LaraItem->Position.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Y = LaraItem->Position.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Z = LaraItem->Position.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
 
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;

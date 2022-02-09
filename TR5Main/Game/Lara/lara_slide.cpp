@@ -21,13 +21,13 @@
 // Collision:	lara_col_slide_forward()
 void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	Camera.targetElevation = -ANGLE(45.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH; // TODO
+		item->TargetState = LS_DEATH; // TODO
 		return;
 	}
 
@@ -56,19 +56,19 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP)
 		{
-			item->targetState = LS_JUMP_FORWARD;
+			item->TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->targetState = LS_SLIDE_FORWARD;
+		item->TargetState = LS_SLIDE_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD)
-		item->targetState = LS_RUN_FORWARD;
+		item->TargetState = LS_RUN_FORWARD;
 	else
-		item->targetState = LS_IDLE;
+		item->TargetState = LS_IDLE;
 
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
@@ -78,9 +78,9 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_forward()
 void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->pos.yRot;
+	info->moveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -117,14 +117,14 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_slide_back()
 void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH; // TODO
+		item->TargetState = LS_DEATH; // TODO
 		return;
 	}
 
@@ -153,16 +153,16 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP)
 		{
-			item->targetState = LS_JUMP_BACK;
+			item->TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->targetState = LS_SLIDE_BACK;
+		item->TargetState = LS_SLIDE_BACK;
 		return;
 	}
 
-	item->targetState = LS_IDLE;
+	item->TargetState = LS_IDLE;
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
 }
@@ -171,9 +171,9 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_back()
 void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	info->moveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;

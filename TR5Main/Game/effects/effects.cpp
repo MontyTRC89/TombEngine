@@ -106,9 +106,9 @@ void DetatchSpark(int num, SpriteEnumFlag type)
 					else
 					{
 						item = &g_Level.Items[num];
-						sptr->x += item->pos.xPos;
-						sptr->y += item->pos.yPos;
-						sptr->z += item->pos.zPos;
+						sptr->x += item->Position.xPos;
+						sptr->y += item->Position.yPos;
+						sptr->z += item->Position.zPos;
 						sptr->flags &= ~SP_ITEM;
 					}
 					break;
@@ -172,12 +172,12 @@ void UpdateSparks()
 {
 	BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
 
-	DeadlyBounds[0] = LaraItem->pos.xPos + bounds->X1;
-	DeadlyBounds[1] = LaraItem->pos.xPos + bounds->X2;
-	DeadlyBounds[2] = LaraItem->pos.yPos + bounds->Y1;
-	DeadlyBounds[3] = LaraItem->pos.yPos + bounds->Y2;
-	DeadlyBounds[4] = LaraItem->pos.zPos + bounds->Z1;
-	DeadlyBounds[5] = LaraItem->pos.zPos + bounds->Z2;
+	DeadlyBounds[0] = LaraItem->Position.xPos + bounds->X1;
+	DeadlyBounds[1] = LaraItem->Position.xPos + bounds->X2;
+	DeadlyBounds[2] = LaraItem->Position.yPos + bounds->Y1;
+	DeadlyBounds[3] = LaraItem->Position.yPos + bounds->Y2;
+	DeadlyBounds[4] = LaraItem->Position.zPos + bounds->Z1;
+	DeadlyBounds[5] = LaraItem->Position.zPos + bounds->Z2;
 
 	for (int i = 0; i < MAX_SPARKS; i++)
 	{
@@ -307,7 +307,7 @@ void UpdateSparks()
 							if (spark->flags & SP_FIRE)
 								LaraBurn(LaraItem);
 							else
-								LaraItem->hitPoints -= 2;
+								LaraItem->HitPoints -= 2;
 						}
 					}
 				}
@@ -398,8 +398,8 @@ void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk)
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -441,8 +441,8 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -ANGLE(90) && dx <= ANGLE(90) && dz >= -ANGLE(90) && dz <= ANGLE(90))
 	{
@@ -557,8 +557,8 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 
 void TriggerExplosionSmoke(int x, int y, int z, int uw)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 	
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -790,8 +790,8 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 
 void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 {
-	long dx = LaraItem->pos.xPos - item->pos.xPos;
-	long dz = LaraItem->pos.zPos - item->pos.zPos;
+	long dx = LaraItem->Position.xPos - item->Position.xPos;
+	long dz = LaraItem->Position.zPos - item->Position.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -811,9 +811,9 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->fadeToBlack = 8;
 		sptr->transType = TransTypeEnum::COLADD;
 		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
-		sptr->x = (GetRandomControl() & 0x1F) + item->pos.xPos - 16;
-		sptr->y = (GetRandomControl() & 0x1F) + item->pos.yPos - 16;
-		sptr->z = (GetRandomControl() & 0x1F) + item->pos.zPos - 16;
+		sptr->x = (GetRandomControl() & 0x1F) + item->Position.xPos - 16;
+		sptr->y = (GetRandomControl() & 0x1F) + item->Position.yPos - 16;
+		sptr->z = (GetRandomControl() & 0x1F) + item->Position.zPos - 16;
 		sptr->friction = 51;
 		sptr->maxYvel = 0;
 		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
@@ -823,7 +823,7 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
 		sptr->sSize = sptr->size = sptr->dSize / 2;
 
-		if ((-(item->triggerFlags & 0xFF) & 7) == 1)
+		if ((-(item->TriggerFlags & 0xFF) & 7) == 1)
 		{
 			sptr->gravity = -16 - (GetRandomControl() & 0x1F);
 			sptr->xVel = (GetRandomControl() & 0xFF) - 128;
@@ -839,15 +839,15 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->pos.yRot == 0)
+		if (item->Position.yRot == 0)
 		{
 			sptr->zVel = -(size - (size >> 2));
 		}
-		else if (item->pos.yRot == ANGLE(90))
+		else if (item->Position.yRot == ANGLE(90))
 		{
 			sptr->xVel = -(size - (size >> 2));
 		}
-		else if (item->pos.yRot == ANGLE(-180))
+		else if (item->Position.yRot == ANGLE(-180))
 		{
 			sptr->zVel = size - (size >> 2);
 		}
@@ -1089,7 +1089,7 @@ void TriggerLaraBlood()
 
 	for (i = 0; i < LARA_MESHES::LM_HEAD; i++)
 	{
-		if (node & LaraItem->touchBits)
+		if (node & LaraItem->TouchBits)
 		{
 			PHD_VECTOR vec;
 			vec.x = (GetRandomControl() & 31) - 16;
@@ -1097,7 +1097,7 @@ void TriggerLaraBlood()
 			vec.z = (GetRandomControl() & 31) - 16;
 
 			GetLaraJointPosition(&vec, (LARA_MESHES)i);
-			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->roomNumber);
+			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
 		}
 
 		node <<= 1;
@@ -1111,7 +1111,7 @@ void TriggerUnderwaterBlood(int x, int y, int z, int sizeme)
 
 void Richochet(PHD_3DPOS* pos)
 {
-	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->pos.zPos, LaraItem->pos.xPos);
+	short angle = mGetAngle(pos->zPos, pos->xPos, LaraItem->Position.zPos, LaraItem->Position.xPos);
 	GAME_VECTOR target;
 	target.x = pos->xPos;
 	target.y = pos->yPos;
@@ -1125,11 +1125,11 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	int x, z;
 
-	x = item->pos.xPos - phd_sin(item->pos.yRot + ANGLE(180)) * 512 + phd_sin(item->pos.yRot - ANGLE(90)) * 256;
-	z = item->pos.zPos - phd_cos(item->pos.yRot + ANGLE(180)) * 512 + phd_cos(item->pos.yRot - ANGLE(90)) * 256;
+	x = item->Position.xPos - phd_sin(item->Position.yRot + ANGLE(180)) * 512 + phd_sin(item->Position.yRot - ANGLE(90)) * 256;
+	z = item->Position.zPos - phd_cos(item->Position.yRot + ANGLE(180)) * 512 + phd_cos(item->Position.yRot - ANGLE(90)) * 256;
 
-	TriggerWaterfallMist(x, item->pos.yPos, z, item->pos.yRot + ANGLE(180));
-	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
+	TriggerWaterfallMist(x, item->Position.yPos, z, item->Position.yRot + ANGLE(180));
+	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Position, 0);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1218,15 +1218,15 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 
 void WadeSplash(ITEM_INFO* item, int wh, int wd)
 {
-	short roomNumber = item->roomNumber;
-	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	short roomNumber = item->RoomNumber;
+	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 	if (!TestEnvironment(ENV_FLAG_WATER, room))
 		return;
 
-	short roomNumber2 = item->roomNumber;
-	GetFloor(item->pos.xPos, room->y - 128, item->pos.zPos, &roomNumber2);
+	short roomNumber2 = item->RoomNumber;
+	GetFloor(item->Position.xPos, room->y - 128, item->Position.zPos, &roomNumber2);
 
 	ROOM_INFO* room2 = &g_Level.Rooms[roomNumber2];
 
@@ -1234,30 +1234,30 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 		return;
 
 	ANIM_FRAME* frame = GetBestFrame(item);
-	if (item->pos.yPos + frame->boundingBox.Y1 > wh)
+	if (item->Position.yPos + frame->boundingBox.Y1 > wh)
 		return;
 
-	if (item->pos.yPos + frame->boundingBox.Y2 < wh)
+	if (item->Position.yPos + frame->boundingBox.Y2 < wh)
 		return;
 
 	if (item->VerticalVelocity <= 0 || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
-			if (!(GetRandomControl() & 0xF) || item->activeState != LS_IDLE)
+			if (!(GetRandomControl() & 0xF) || item->ActiveState != LS_IDLE)
 			{
-				if (item->activeState == LS_IDLE)
-					SetupRipple(item->pos.xPos, wh - 1, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				if (item->ActiveState == LS_IDLE)
+					SetupRipple(item->Position.xPos, wh - 1, item->Position.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				else
-					SetupRipple(item->pos.xPos, wh - 1, item->pos.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+					SetupRipple(item->Position.xPos, wh - 1, item->Position.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 			}
 		}
 	}
 	else
 	{
 		SplashSetup.y = wh - 1;
-		SplashSetup.x = item->pos.xPos;
-		SplashSetup.z = item->pos.zPos;
+		SplashSetup.x = item->Position.xPos;
+		SplashSetup.z = item->Position.zPos;
 		SplashSetup.innerRadius = 16;
 		SplashSetup.splashPower = item->Velocity;
 		SetupSplash(&SplashSetup, roomNumber);
@@ -1267,16 +1267,16 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 
 void Splash(ITEM_INFO* item)
 {
-	short roomNumber = item->roomNumber;
-	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	short roomNumber = item->RoomNumber;
+	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
-		int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, roomNumber);
+		int waterHeight = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
 		SplashSetup.y = waterHeight - 1;
-		SplashSetup.x = item->pos.xPos;
-		SplashSetup.z = item->pos.zPos;
+		SplashSetup.x = item->Position.xPos;
+		SplashSetup.z = item->Position.zPos;
 		SplashSetup.splashPower = item->VerticalVelocity;
 		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup, roomNumber);
@@ -1503,8 +1503,8 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1716,8 +1716,8 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{

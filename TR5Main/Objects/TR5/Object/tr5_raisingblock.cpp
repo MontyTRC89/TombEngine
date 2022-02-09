@@ -18,20 +18,20 @@ void InitialiseRaisingBlock(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	short roomNumber = item->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 	if(floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 	// Set mutators to 0 by default
-	for (int i = 0; i < item->mutator.size(); i++)
-		item->mutator[i].Scale.y = 0;
+	for (int i = 0; i < item->Mutator.size(); i++)
+		item->Mutator[i].Scale.y = 0;
 
-	if (item->triggerFlags < 0)
+	if (item->TriggerFlags < 0)
 	{
-		item->aiBits |= ALL_AIOBJ;
+		item->AIBits |= ALL_AIOBJ;
 		AddActiveItem(itemNumber);
-		item->status = ITEM_ACTIVE;
+		item->Status = ITEM_ACTIVE;
 	}
 
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
@@ -43,15 +43,15 @@ void ControlRaisingBlock(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (!item->itemFlags[2])
+		if (!item->ItemFlags[2])
 		{
-			if (item->objectNumber == ID_RAISING_BLOCK1)
+			if (item->ObjectNumber == ID_RAISING_BLOCK1)
 			{
-				if (item->triggerFlags == -1)
+				if (item->TriggerFlags == -1)
 				{
 					//AlterFloorHeight(item, -255);
 				}
-				else if (item->triggerFlags == -3)
+				else if (item->TriggerFlags == -3)
 				{
 					//AlterFloorHeight(item, -1023);
 				}
@@ -65,26 +65,26 @@ void ControlRaisingBlock(short itemNumber)
 				//AlterFloorHeight(item, -item->itemFlags[7]);
 			}
 
-			item->itemFlags[2] = 1;
+			item->ItemFlags[2] = 1;
 		}
 
-		if (item->triggerFlags < 0)
+		if (item->TriggerFlags < 0)
 		{
-			item->itemFlags[1] = 1;
+			item->ItemFlags[1] = 1;
 		}
-		else if (item->itemFlags[1] < 4096)
+		else if (item->ItemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, 0);
+			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
 
-			item->itemFlags[1] += 64;
+			item->ItemFlags[1] += 64;
 
-			if (item->triggerFlags > 0)
+			if (item->TriggerFlags > 0)
 			{
-				if (abs(item->pos.xPos - Camera.pos.x) < 10240 &&
-					abs(item->pos.xPos - Camera.pos.x) < 10240 &&
-					abs(item->pos.xPos - Camera.pos.x) < 10240)
+				if (abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+					abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+					abs(item->Position.xPos - Camera.pos.x) < 10240)
 				{
-					if (item->itemFlags[1] == 64 || item->itemFlags[1] == 4096)
+					if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
 						Camera.bounce = -32;
 					else
 						Camera.bounce = -16;
@@ -92,23 +92,23 @@ void ControlRaisingBlock(short itemNumber)
 			}
 		}
 	}
-	else if (item->itemFlags[1] <= 0 || item->triggerFlags < 0)
+	else if (item->ItemFlags[1] <= 0 || item->TriggerFlags < 0)
 	{
-		if (item->itemFlags[2])
+		if (item->ItemFlags[2])
 		{
-			item->itemFlags[1] = 0;
+			item->ItemFlags[1] = 0;
 
-			if (item->objectNumber == ID_RAISING_BLOCK1)
+			if (item->ObjectNumber == ID_RAISING_BLOCK1)
 			{
-				if (item->triggerFlags == -1)
+				if (item->TriggerFlags == -1)
 				{
 					//AlterFloorHeight(item, 255);
-					item->itemFlags[2] = 0;
+					item->ItemFlags[2] = 0;
 				}
-				else if (item->triggerFlags == -3)
+				else if (item->TriggerFlags == -3)
 				{
 					//AlterFloorHeight(item, 1023);
-					item->itemFlags[2] = 0;
+					item->ItemFlags[2] = 0;
 				}
 				else
 				{
@@ -120,34 +120,34 @@ void ControlRaisingBlock(short itemNumber)
 				//AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
-			item->itemFlags[2] = 0;
+			item->ItemFlags[2] = 0;
 		}
 	}
 	else
 	{
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, 0);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
 
-		if (item->triggerFlags >= 0)
+		if (item->TriggerFlags >= 0)
 		{
-			if (abs(item->pos.xPos - Camera.pos.x) < 10240 &&
-				abs(item->pos.xPos - Camera.pos.x) < 10240 &&
-				abs(item->pos.xPos - Camera.pos.x) < 10240)
+			if (abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+				abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+				abs(item->Position.xPos - Camera.pos.x) < 10240)
 			{
-				if (item->itemFlags[1] == 64 || item->itemFlags[1] == 4096)
+				if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
 					Camera.bounce = -32;
 				else
 					Camera.bounce = -16;
 			}
 		}
 
-		item->itemFlags[1] -= 64;
+		item->ItemFlags[1] -= 64;
 	}
 
 	// Update bone mutators
-	if (item->triggerFlags > -1)
+	if (item->TriggerFlags > -1)
 	{
-		for (int i = 0; i < item->mutator.size(); i++)
-			item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
+		for (int i = 0; i < item->Mutator.size(); i++)
+			item->Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 
@@ -162,7 +162,7 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 		auto bounds = GetBoundsAccurate(item);
 		auto height = abs(bounds->Y2 - bounds->Y1);
 
-		auto currentHeight = item->pos.yPos - height * item->itemFlags[1] / 4096;
+		auto currentHeight = item->Position.yPos - height * item->ItemFlags[1] / 4096;
 		return std::optional{ currentHeight };
 	}
 

@@ -27,13 +27,13 @@ void InitialiseWorkerShotgun(short itemNum)
 	ANIM_STRUCT* anim;
 	ITEM_INFO* item;
 	item = &g_Level.Items[itemNum];
-	item->animNumber = Objects[item->objectNumber].animIndex + 5;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
 
 	ClearItem(itemNum);
 
-	anim = &g_Level.Anims[item->animNumber];
-	item->frameNumber = anim->frameBase;
-	item->activeState = anim->activeState;
+	anim = &g_Level.Anims[item->AnimNumber];
+	item->FrameNumber = anim->frameBase;
+	item->ActiveState = anim->ActiveState;
 }
 
 void WorkerShotgunControl(short itemNum)
@@ -47,16 +47,16 @@ void WorkerShotgunControl(short itemNum)
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
 	item = &g_Level.Items[itemNum];
-	shotgun = (CREATURE_INFO*)item->data;
+	shotgun = (CREATURE_INFO*)item->Data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 7)
+		if (item->ActiveState != 7)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 18;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 7;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 18;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 7;
 		}
 	}
 	else
@@ -68,7 +68,7 @@ void WorkerShotgunControl(short itemNum)
 
 		angle = CreatureTurn(item, shotgun->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 2:
 			shotgun->flags = 0;
@@ -82,26 +82,26 @@ void WorkerShotgunControl(short itemNum)
 
 			if (shotgun->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 5;
+				item->TargetState = 5;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance <= 0x900000 || info.zoneNumber != info.enemyZone)
 				{
-					item->targetState = (GetRandomControl() >= 0x4000) ? 9 : 8;
+					item->TargetState = (GetRandomControl() >= 0x4000) ? 9 : 8;
 				}
 				else
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
-				item->targetState = (info.distance <= 0x400000) ? 1 : 5;
+				item->TargetState = (info.distance <= 0x400000) ? 1 : 5;
 			}
 			else
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -114,11 +114,11 @@ void WorkerShotgunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->targetState = 4;
+				item->TargetState = 4;
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 
@@ -133,23 +133,23 @@ void WorkerShotgunControl(short itemNum)
 
 			if (shotgun->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 5;
+				item->TargetState = 5;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
-					item->targetState = 2;
+					item->TargetState = 2;
 				else
-					item->targetState = 6;
+					item->TargetState = 6;
 			}
 			else if (shotgun->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance > 0x400000)
-					item->targetState = 5;
+					item->TargetState = 5;
 			}
 			else
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 
@@ -167,11 +167,11 @@ void WorkerShotgunControl(short itemNum)
 			{
 				if (Targetable(item, &info))
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 				else if (shotgun->mood == BORED_MOOD || shotgun->mood == STALK_MOOD)
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 			}
 			break;
@@ -188,7 +188,7 @@ void WorkerShotgunControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->targetState = (item->activeState == 8) ? 4 : 10;
+				item->TargetState = (item->ActiveState == 8) ? 4 : 10;
 			}
 			break;
 
@@ -203,13 +203,13 @@ void WorkerShotgunControl(short itemNum)
 			if (!shotgun->flags)
 			{
 				ShotLara_WithShotgun(item, &info, &workerShotgun, torso_y, 25);
-				item->firedWeapon = 2;
+				item->FiredWeapon = 2;
 				shotgun->flags = 1;
 			}
 
-			if (item->activeState == 4 && item->targetState != 2 && (shotgun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->ActiveState == 4 && item->TargetState != 2 && (shotgun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 
@@ -223,7 +223,7 @@ void WorkerShotgunControl(short itemNum)
 			if (!shotgun->flags)
 			{
 				ShotLara_WithShotgun(item, &info, &workerShotgun, torso_y, 25);
-				item->firedWeapon = 2;
+				item->FiredWeapon = 2;
 				shotgun->flags = 1;
 			}
 			break;

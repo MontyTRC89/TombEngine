@@ -9,66 +9,66 @@ void InitialiseSmokeEmitter(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->triggerFlags == 111)
+	if (item->TriggerFlags == 111)
 	{
-		if (item->pos.yRot > 0)
+		if (item->Position.yRot > 0)
 		{
-			if (item->pos.yRot == ANGLE(90.0f))
-				item->pos.xPos += 512;
+			if (item->Position.yRot == ANGLE(90.0f))
+				item->Position.xPos += 512;
 		}
-		else if (item->pos.yRot)
+		else if (item->Position.yRot)
 		{
-			if (item->pos.yRot == -ANGLE(180.0f))
+			if (item->Position.yRot == -ANGLE(180.0f))
 			{
-				item->pos.zPos -= 512;
+				item->Position.zPos -= 512;
 			}
-			else if (item->pos.yRot == -ANGLE(90.0f))
+			else if (item->Position.yRot == -ANGLE(90.0f))
 			{
-				item->pos.xPos -= 512;
+				item->Position.xPos -= 512;
 			}
 		}
 		else
 		{
-			item->pos.zPos += 512;
+			item->Position.zPos += 512;
 		}
 	}
-	else if (item->objectNumber != ID_SMOKE_EMITTER)
+	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
 	{
 		return;
 	}
-	else if (item->triggerFlags & 8)
+	else if (item->TriggerFlags & 8)
 	{
-		item->itemFlags[0] = item->triggerFlags / 16;
+		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->pos.yRot > 0)
+		if (item->Position.yRot > 0)
 		{
-			if (item->pos.yRot == ANGLE(90.0f))
-				item->pos.xPos += 256;
+			if (item->Position.yRot == ANGLE(90.0f))
+				item->Position.xPos += 256;
 		}
 		else
 		{
-			if (item->pos.yRot == 0)
+			if (item->Position.yRot == 0)
 			{
-				item->pos.zPos += 256;
+				item->Position.zPos += 256;
 			}
-			else if (item->pos.yRot == -ANGLE(180.0f))
+			else if (item->Position.yRot == -ANGLE(180.0f))
 			{
-				item->pos.zPos -= 256;
+				item->Position.zPos -= 256;
 			}
-			else if (item->pos.yRot == -ANGLE(90.0f))
-				item->pos.xPos -= 256;
+			else if (item->Position.yRot == -ANGLE(90.0f))
+				item->Position.xPos -= 256;
 		}
 
-		if ((signed short)(item->triggerFlags / 16) <= 0)
+		if ((signed short)(item->TriggerFlags / 16) <= 0)
 		{
-			item->itemFlags[2] = 4096;
-			item->triggerFlags |= 4;
+			item->ItemFlags[2] = 4096;
+			item->TriggerFlags |= 4;
 		}
 	}
-	else if (g_Level.Rooms[item->roomNumber].flags & 1 && item->triggerFlags == 1)
+	else if (g_Level.Rooms[item->RoomNumber].flags & 1 && item->TriggerFlags == 1)
 	{
-		item->itemFlags[0] = 20;
-		item->itemFlags[1] = 1;
+		item->ItemFlags[0] = 20;
+		item->ItemFlags[1] = 1;
 	}
 }
 

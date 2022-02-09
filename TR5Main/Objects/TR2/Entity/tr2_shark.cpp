@@ -18,17 +18,17 @@ void SharkControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short angle = 0;
 	short head = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 5)
+		if (item->ActiveState != 5)
 		{
-			item->animNumber = Objects[ID_SHARK].animIndex + 4;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 5;
+			item->AnimNumber = Objects[ID_SHARK].animIndex + 4;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 5;
 		}
 		CreatureFloat(itemNum);
 		return;
@@ -43,16 +43,16 @@ void SharkControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 0:
 			creature->flags = 0;
 			creature->maximumTurn = 0;
 
 			if (info.ahead && info.distance < SQUARE(768) && info.zoneNumber == info.enemyZone)
-				item->targetState = 3;
+				item->TargetState = 3;
 			else
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 
 		case 1:
@@ -60,9 +60,9 @@ void SharkControl(short itemNum)
 			if (creature->mood == BORED_MOOD)
 				break;
 			else if (info.ahead && info.distance < SQUARE(768))
-				item->targetState = 0;
+				item->TargetState = 0;
 			else if (creature->mood == ESCAPE_MOOD || info.distance > SQUARE(3072) || !info.ahead)
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 2:
@@ -70,15 +70,15 @@ void SharkControl(short itemNum)
 			creature->maximumTurn = ANGLE(2);
 
 			if (creature->mood == BORED_MOOD)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (creature->mood == ESCAPE_MOOD)
 				break;
 			else if (info.ahead && info.distance < SQUARE(1365) && info.zoneNumber == info.enemyZone)
 			{
 				if (GetRandomControl() < 0x800)
-					item->targetState = 0;
+					item->TargetState = 0;
 				else if (info.distance < SQUARE(768))
-					item->targetState = 4;
+					item->TargetState = 4;
 			}
 			break;
 
@@ -87,10 +87,10 @@ void SharkControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			if (!creature->flags && (item->touchBits & 0x3400))
+			if (!creature->flags && (item->TouchBits & 0x3400))
 			{
-				LaraItem->hitPoints -= 400;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 400;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &sharkBite, DoBloodSplat);
 
 				creature->flags = 1;
@@ -99,7 +99,7 @@ void SharkControl(short itemNum)
 		}
 	}
 
-	if (item->activeState != 6)
+	if (item->ActiveState != 6)
 	{
 		CreatureJoint(item, 0, head);
 		CreatureAnimation(itemNum, angle, 0);

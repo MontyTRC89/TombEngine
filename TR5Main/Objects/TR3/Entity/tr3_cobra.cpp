@@ -15,10 +15,10 @@ void InitialiseCobra(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
-	item->animNumber = Objects[item->objectNumber].animIndex + 2;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 45;
-	item->activeState = item->targetState = 3;
-	item->itemFlags[2] = item->hitStatus;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase + 45;
+	item->ActiveState = item->TargetState = 3;
+	item->ItemFlags[2] = item->HitStatus;
 }
 
 void CobraControl(short itemNum)
@@ -27,18 +27,18 @@ void CobraControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 4)
+		if (item->ActiveState != 4)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 4;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 4;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 4;
 		}
 	}
 	else
@@ -51,50 +51,50 @@ void CobraControl(short itemNum)
 		GetCreatureMood(item, &info, 1);
 		CreatureMood(item, &info, 1);
 
-		creature->target.x = LaraItem->pos.xPos;
-		creature->target.z = LaraItem->pos.zPos;
+		creature->target.x = LaraItem->Position.xPos;
+		creature->target.z = LaraItem->Position.zPos;
 		angle = CreatureTurn(item, creature->maximumTurn);
 
 		if (info.ahead)
 			head = info.angle;
 
 		if (abs(info.angle) < ANGLE(10))
-			item->pos.yRot += info.angle;
+			item->Position.yRot += info.angle;
 		else if (info.angle < 0)
-			item->pos.yRot -= ANGLE(10);
+			item->Position.yRot -= ANGLE(10);
 		else
-			item->pos.yRot += ANGLE(10);
+			item->Position.yRot += ANGLE(10);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			creature->flags = 0;
 			if (info.distance > SQUARE(2560))
-				item->targetState = 3;
-			else if ((LaraItem->hitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->hitStatus || (LaraItem->Velocity > 15)))
-				item->targetState = 2;
+				item->TargetState = 3;
+			else if ((LaraItem->HitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->HitStatus || (LaraItem->Velocity > 15)))
+				item->TargetState = 2;
 			break;
 
 		case 3:
 			creature->flags = 0;
-			if (item->hitPoints != -16384)
+			if (item->HitPoints != -16384)
 			{
-				item->itemFlags[2] = item->hitPoints;
-				item->hitPoints = -16384;
+				item->ItemFlags[2] = item->HitPoints;
+				item->HitPoints = -16384;
 			}
-			if (info.distance < SQUARE(1536) && LaraItem->hitPoints > 0)
+			if (info.distance < SQUARE(1536) && LaraItem->HitPoints > 0)
 			{
-				item->targetState = 0;
-				item->hitPoints = item->itemFlags[2];
+				item->TargetState = 0;
+				item->HitPoints = item->ItemFlags[2];
 			}
 			break;
 
 		case 2:
-			if (creature->flags != 1 && (item->touchBits & 0x2000))
+			if (creature->flags != 1 && (item->TouchBits & 0x2000))
 			{
 				creature->flags = 1;
-				LaraItem->hitPoints -= 80;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 80;
+				LaraItem->HitStatus = true;
 				Lara.poisoned = 0x100;
 
 				CreatureEffect(item, &cobraBite, DoBloodSplat);
@@ -102,7 +102,7 @@ void CobraControl(short itemNum)
 			break;
 
 		case 0:
-			item->hitPoints = item->itemFlags[2];
+			item->HitPoints = item->ItemFlags[2];
 			break;
 
 		}

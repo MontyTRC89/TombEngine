@@ -49,7 +49,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 
 	if (!(GetRandomControl() & 0x1F))
 	{
-		short fxNumber = CreateNewEffect(item->roomNumber);
+		short fxNumber = CreateNewEffect(item->RoomNumber);
 		if (fxNumber != -1)
 		{
 			FX_INFO* fx = &EffectList[fxNumber];
@@ -57,7 +57,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 			fx->pos.xPos = pos->x;
 			fx->pos.yPos = pos->y;
 			fx->pos.zPos = pos->z;
-			fx->roomNumber = item->roomNumber;
+			fx->roomNumber = item->RoomNumber;
 			fx->pos.zRot = 0;
 			fx->pos.xRot = 0;
 			fx->pos.yRot = 2 * GetRandomControl();
@@ -270,13 +270,13 @@ void InitialiseRomanStatue(short itemNum)
     
 	ClearItem(itemNum);
     
-    item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
-    item->targetState = 13;
-    item->activeState = 13;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->status = ITEM_NOT_ACTIVE;
-	item->pos.xPos += 486 * phd_sin(item->pos.yRot + ANGLE(90.0f));
-    item->pos.zPos += 486 * phd_cos(item->pos.yRot + ANGLE(90.0f));
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_ROMAN_STATUE_START_JUMP_DOWN;
+    item->TargetState = 13;
+    item->ActiveState = 13;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Status = ITEM_NOT_ACTIVE;
+	item->Position.xPos += 486 * phd_sin(item->Position.yRot + ANGLE(90.0f));
+    item->Position.zPos += 486 * phd_cos(item->Position.yRot + ANGLE(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(ROMAN_STATUE_STRUCT));
 }
@@ -292,47 +292,47 @@ void RomanStatueControl(short itemNumber)
 	short joint0 = 0;
 	
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	
-	int oldSwapMeshFlags = item->swapMeshFlags;
+	int oldSwapMeshFlags = item->SwapMeshFlags;
 
 	// At some HP values, roman statues loses a piece
-	if (item->hitPoints < 1 && !(item->swapMeshFlags & 0x10000))
+	if (item->HitPoints < 1 && !(item->SwapMeshFlags & 0x10000))
 	{
 		ExplodeItemNode(item, 16, 0, 8);
-		item->meshBits |= 0x10000;
-		item->swapMeshFlags |= 0x10000;
+		item->MeshBits |= 0x10000;
+		item->SwapMeshFlags |= 0x10000;
 	}
-	else if (item->hitPoints < 75 && !(item->swapMeshFlags & 0x100))
+	else if (item->HitPoints < 75 && !(item->SwapMeshFlags & 0x100))
 	{
 		ExplodeItemNode(item, 8, 0, 8);
-		item->meshBits |= 0x100;
-		item->swapMeshFlags |= 0x100;
+		item->MeshBits |= 0x100;
+		item->SwapMeshFlags |= 0x100;
 	}
-	else if (item->hitPoints < 150 && !(item->swapMeshFlags & 0x400))
+	else if (item->HitPoints < 150 && !(item->SwapMeshFlags & 0x400))
 	{
 		ExplodeItemNode(item, 10, 0, 32);
 		ExplodeItemNode(item, 11, 0, 32);
-		item->meshBits |= 0x400u;
-		item->swapMeshFlags |= 0x400;
+		item->MeshBits |= 0x400u;
+		item->SwapMeshFlags |= 0x400;
 	}
-	else if (item->hitPoints < 225 && !(item->swapMeshFlags & 0x10))
+	else if (item->HitPoints < 225 && !(item->SwapMeshFlags & 0x10))
 	{
 		ExplodeItemNode(item, 4, 0, 8);
-		item->meshBits |= 0x10;
-		item->swapMeshFlags |= 0x10;
+		item->MeshBits |= 0x10;
+		item->SwapMeshFlags |= 0x10;
 	}
 
 	// Play hit animation
-	if (oldSwapMeshFlags != item->swapMeshFlags)
+	if (oldSwapMeshFlags != item->SwapMeshFlags)
 	{
-		item->targetState = STATE_ROMAN_STATUE_HIT;
-		item->activeState = STATE_ROMAN_STATUE_HIT;
-		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_HIT;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->TargetState = STATE_ROMAN_STATUE_HIT;
+		item->ActiveState = STATE_ROMAN_STATUE_HIT;
+		item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_ROMAN_STATUE_HIT;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 	}
 
-	if (item->hitPoints > 0)
+	if (item->HitPoints > 0)
 	{
 		creature->enemy = LaraItem;
 
@@ -369,7 +369,7 @@ void RomanStatueControl(short itemNumber)
 		LIGHTNING_INFO* arc;
 		short random;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_ROMAN_STATUE_STOP:    
 			creature->flags = 0;
@@ -381,12 +381,12 @@ void RomanStatueControl(short itemNumber)
 			else
 			{
 				creature->maximumTurn = 0;
-				item->targetState = STATE_ROMAN_STATUE_WALK;
+				item->TargetState = STATE_ROMAN_STATUE_WALK;
 			}
 			
 			joint2 = info.angle;
 			
-			if (item->aiBits
+			if (item->AIBits
 				|| !(GetRandomControl() & 0x1F)
 				&& (info.distance > SQUARE(1024)
 					|| creature->mood != ATTACK_MOOD))
@@ -395,45 +395,45 @@ void RomanStatueControl(short itemNumber)
 			}
 			else if (info.angle > 20480 || info.angle < -20480)
 			{
-				item->targetState = STATE_ROMAN_STATUE_TURN_180;
+				item->TargetState = STATE_ROMAN_STATUE_TURN_180;
 			}
 			else if (info.ahead && info.distance < SQUARE(1024))
 			{
 				if (info.bite & ((GetRandomControl() & 3) == 0))
 				{
-					item->targetState = STATE_ROMAN_STATUE_ATTACK1;
+					item->TargetState = STATE_ROMAN_STATUE_ATTACK1;
 				}
 				else if (GetRandomControl() & 1)
 				{
-					item->targetState = STATE_ROMAN_STATUE_ATTACK2;
+					item->TargetState = STATE_ROMAN_STATUE_ATTACK2;
 				}
 				else
 				{
-					item->targetState = STATE_ROMAN_STATUE_ATTACK3;
+					item->TargetState = STATE_ROMAN_STATUE_ATTACK3;
 				}
 			}
 			else
 			{
-				if (!item->itemFlags[0])
+				if (!item->ItemFlags[0])
 				{
-					item->targetState = STATE_ROMAN_STATUE_SCREAMING;
-					item->itemFlags[0] = 5;
+					item->TargetState = STATE_ROMAN_STATUE_SCREAMING;
+					item->ItemFlags[0] = 5;
 					break;
 				}
-				if (item->triggerFlags == 1)
+				if (item->TriggerFlags == 1)
 				{
 					if (Targetable(item, &info) && GetRandomControl() & 1)
 					{
-						item->targetState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
+						item->TargetState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
 						break;
 					}
 				}
-				if (item->triggerFlags || info.distance >= SQUARE(2560) || !info.bite)
+				if (item->TriggerFlags || info.distance >= SQUARE(2560) || !info.bite)
 				{
-					item->targetState = STATE_ROMAN_STATUE_WALK;
+					item->TargetState = STATE_ROMAN_STATUE_WALK;
 					break;
 				}
-				item->targetState = STATE_ROMAN_STATUE_ATTACK1;
+				item->TargetState = STATE_ROMAN_STATUE_ATTACK1;
 			}
 			
 			break;
@@ -455,7 +455,7 @@ void RomanStatueControl(short itemNumber)
 			pos.y = (pos1.y + pos2.y) / 2;
 			pos.z = (pos1.z + pos2.z) / 2;
 
-			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			deltaFrame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
 			if (deltaFrame > 68 && deltaFrame < 130)
 			{
@@ -472,7 +472,7 @@ void RomanStatueControl(short itemNumber)
 				
 				color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 				
-				if (item->triggerFlags)
+				if (item->TriggerFlags)
 					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color, color / 2);
 				else
 					TriggerDynamicLight(pos.x, pos.y, pos.z, 16, 0, color / 2, color);
@@ -492,14 +492,14 @@ void RomanStatueControl(short itemNumber)
 						8 * (pos.x - x),
 						8 * (pos.y - y),
 						8 * (1024 - (random & 0x7FF)),
-						item->triggerFlags);
+						item->TriggerFlags);
 				}
 			}
 
 			if (deltaFrame <= 90 || deltaFrame >= 130)
 				break;
 
-			if (item->triggerFlags)
+			if (item->TriggerFlags)
 			{
 				pos.x = -48;
 				pos.y = 48;
@@ -516,9 +516,9 @@ void RomanStatueControl(short itemNumber)
 
 			color = (GetRandomControl() & 0x3F) + 128;
 			
-			pos1.x = (GetRandomControl() & 0xFFF) + item->pos.xPos - 2048;
-			pos1.y = item->pos.yPos - (GetRandomControl() & 0x3FF) - 4096;
-			pos1.z = (GetRandomControl() & 0xFFF) + item->pos.zPos - 2048;
+			pos1.x = (GetRandomControl() & 0xFFF) + item->Position.xPos - 2048;
+			pos1.y = item->Position.yPos - (GetRandomControl() & 0x3FF) - 4096;
+			pos1.z = (GetRandomControl() & 0xFFF) + item->Position.zPos - 2048;
 			
 			for (i = 0; i < 8; i++)
 			{
@@ -530,7 +530,7 @@ void RomanStatueControl(short itemNumber)
 					arc->pos4.y = pos2.y;
 					arc->pos4.z = pos2.z;
 
-					if (item->triggerFlags)
+					if (item->TriggerFlags)
 						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color, color / 2);
 					else
 						TriggerLightningGlow(pos1.x, pos1.y, pos1.z, 16, 0, color / 2, color);
@@ -544,7 +544,7 @@ void RomanStatueControl(short itemNumber)
 					continue;
 				}
 
-				if (item->triggerFlags)
+				if (item->TriggerFlags)
 				{
 					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
 						(PHD_VECTOR*)& dest.xRot,
@@ -584,16 +584,16 @@ void RomanStatueControl(short itemNumber)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 
-			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 10)
+			if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 10)
 			{
 				pos.x = 0;
 				pos.y = 0;
@@ -601,7 +601,7 @@ void RomanStatueControl(short itemNumber)
 				
 				GetJointAbsPosition(item, &pos, 16);
 
-				room = &g_Level.Rooms[item->roomNumber];
+				room = &g_Level.Rooms[item->RoomNumber];
 				floor = GetSector(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
@@ -615,13 +615,13 @@ void RomanStatueControl(short itemNumber)
 						{
 							if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 							{
-								ShatterObject(0, mesh, -64, LaraItem->roomNumber, 0);
+								ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 
 								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
 
-								TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
+								TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 							}
 						}
 					}
@@ -629,17 +629,17 @@ void RomanStatueControl(short itemNumber)
 
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0xC000)
+					if (item->TouchBits & 0xC000)
 					{
-						LaraItem->hitPoints -= 200;
-						LaraItem->hitStatus = true;
-						CreatureEffect2(item, &RomanStatueBite, 20, item->pos.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
+						LaraItem->HitPoints -= 200;
+						LaraItem->HitStatus = true;
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Position.yRot, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 						creature->flags = 1;
 					}
 				}
 
-				if (!item->triggerFlags)
+				if (!item->TriggerFlags)
 				{
 					pos1.x = -40;
 					pos1.y = 64;
@@ -647,12 +647,12 @@ void RomanStatueControl(short itemNumber)
 					
 					GetJointAbsPosition(item, &pos1, 14);
 
-					pos1.y = item->pos.yPos - 64;
+					pos1.y = item->Position.yPos - 64;
 					
-					if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 34 && item->activeState == 3)
+					if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 34 && item->ActiveState == 3)
 					{
-						if (item->itemFlags[0])
-							item->itemFlags[0]--;
+						if (item->ItemFlags[0])
+							item->ItemFlags[0]--;
 						
 						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
@@ -660,8 +660,8 @@ void RomanStatueControl(short itemNumber)
 						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 					}
 
-					deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-					deltaFrame2 = g_Level.Anims[item->animNumber].frameEnd - item->frameNumber;
+					deltaFrame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+					deltaFrame2 = g_Level.Anims[item->AnimNumber].frameEnd - item->FrameNumber;
 					
 					if (deltaFrame2 >= 16)
 					{
@@ -692,41 +692,41 @@ void RomanStatueControl(short itemNumber)
 				if (abs(info.angle) >= ANGLE(2))
 				{
 					if (info.angle > 0)
-						item->pos.yRot += ANGLE(2);
+						item->Position.yRot += ANGLE(2);
 					else
-						item->pos.yRot -= ANGLE(2);
+						item->Position.yRot -= ANGLE(2);
 				}
 				else
 				{
-					item->pos.yRot += info.angle;
+					item->Position.yRot += info.angle;
 				}
 			}
 
 			if (info.distance < SQUARE(1024))
 			{
-				item->targetState = STATE_ROMAN_STATUE_STOP;
+				item->TargetState = STATE_ROMAN_STATUE_STOP;
 				break;
 			}
 
 			if (info.bite && info.distance < SQUARE(1792))
 			{
-				item->targetState = 9;
+				item->TargetState = 9;
 				break;
 			}
 
-			if (item->triggerFlags == 1)
+			if (item->TriggerFlags == 1)
 			{
 				if (Targetable(item, &info) && !(GetRandomControl() & 3))
 				{
-					item->targetState = STATE_ROMAN_STATUE_STOP;
+					item->TargetState = STATE_ROMAN_STATUE_STOP;
 					break;
 				}
 			}
 
-			if (item->triggerFlags || info.distance >= SQUARE(2560))
-				item->targetState = STATE_ROMAN_STATUE_WALK;
+			if (item->TriggerFlags || info.distance >= SQUARE(2560))
+				item->TargetState = STATE_ROMAN_STATUE_WALK;
 			else
-				item->targetState = STATE_ROMAN_STATUE_STOP;
+				item->TargetState = STATE_ROMAN_STATUE_STOP;
 
 			break;
 
@@ -735,12 +735,12 @@ void RomanStatueControl(short itemNumber)
 			creature->maximumTurn = 0;
 
 			if (info.angle > 0)
-				item->pos.yRot -= ANGLE(2);
+				item->Position.yRot -= ANGLE(2);
 			else
-				item->pos.yRot += ANGLE(2);
+				item->Position.yRot += ANGLE(2);
 
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-				item->pos.yRot += -ANGLE(180);
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+				item->Position.yRot += -ANGLE(180);
 		
 			break;
 
@@ -755,7 +755,7 @@ void RomanStatueControl(short itemNumber)
 				TriggerDynamicLight(RomanStatueData.pos.x, RomanStatueData.pos.y, RomanStatueData.pos.z, 16, 0, color, color / 2);
 			}
 			
-			deltaFrame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			deltaFrame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
 			if (deltaFrame == 34)
 			{
@@ -778,7 +778,7 @@ void RomanStatueControl(short itemNumber)
 				attackPos.yRot = angles[0];
 				attackPos.zRot = 0;
 
-				roomNumber = item->roomNumber;
+				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
 				RomanStatueAttack(&attackPos, roomNumber, 1);
@@ -797,8 +797,8 @@ void RomanStatueControl(short itemNumber)
 				RomanStatueData.pos.y = attackPos.yPos;
 				RomanStatueData.pos.z = attackPos.zPos;
 				
-				if (item->itemFlags[0])
-					item->itemFlags[0]--;
+				if (item->ItemFlags[0])
+					item->ItemFlags[0]--;
 			}
 			else if (deltaFrame < 10 || deltaFrame > 49)
 			{
@@ -890,36 +890,36 @@ void RomanStatueControl(short itemNumber)
 	}
 	else
 	{
-		item->hitPoints = 0;
+		item->HitPoints = 0;
 
-		if (item->activeState == STATE_ROMAN_STATUE_DEATH)
+		if (item->ActiveState == STATE_ROMAN_STATUE_DEATH)
 		{
-			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 54
-				&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 74
-				&& item->touchBits)
+			if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 54
+				&& item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 74
+				&& item->TouchBits)
 			{
-				LaraItem->hitPoints -= 40;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 40;
+				LaraItem->HitStatus = true;
 			}
-			else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
 				// Activate trigger on death
-				short roomNumber = item->itemFlags[2] & 0xFF;
-				short floorHeight = item->itemFlags[2] & 0xFF00;
+				short roomNumber = item->ItemFlags[2] & 0xFF;
+				short floorHeight = item->ItemFlags[2] & 0xFF00;
 				ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
-				int x = r->x + (item->TOSSPAD / 256 & 0xFF) * SECTOR(1) + 512;
+				int x = r->x + (item->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
 				int y = r->minfloor + floorHeight;
-				int z = r->z + (item->TOSSPAD & 0xFF) * SECTOR(1) + 512;
+				int z = r->z + (item->Tosspad & 0xFF) * SECTOR(1) + 512;
 
 				TestTriggers(x, y, z, roomNumber, true);
 			}
 		}
 		else
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
-			item->activeState = STATE_ROMAN_STATUE_DEATH;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_ROMAN_STATUE_DEATH;
+			item->ActiveState = STATE_ROMAN_STATUE_DEATH;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 	}
 
@@ -928,7 +928,7 @@ void RomanStatueControl(short itemNumber)
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 
-	if (item->swapMeshFlags & 0x400)
+	if (item->SwapMeshFlags & 0x400)
 	{
 		PHD_VECTOR pos;
 		pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -937,7 +937,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 10);
 	}
 
-	if (item->swapMeshFlags & 0x10)
+	if (item->SwapMeshFlags & 0x10)
 	{
 		PHD_VECTOR pos;
 		pos.x = -40;
@@ -946,7 +946,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 4);
 	}
 
-	if (item->swapMeshFlags & 0x100)
+	if (item->SwapMeshFlags & 0x100)
 	{
 		PHD_VECTOR pos;
 		pos.x = (GetRandomControl() & 0x3F) + 54;

@@ -127,10 +127,10 @@ void GameScriptMeshInfo::SetColor(GameScriptColor const & col)
 
 int GameScriptMeshInfo::GetHP() const
 {
-	return m_mesh.hitPoints;
+	return m_mesh.HitPoints;
 }
 
 void GameScriptMeshInfo::SetHP(int hp)
 {
-	m_mesh.hitPoints = hp;
+	m_mesh.HitPoints = hp;
 }

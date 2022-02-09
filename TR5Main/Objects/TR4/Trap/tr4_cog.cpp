@@ -18,22 +18,22 @@ namespace TEN::Entities::TR4
 
         if (TriggerActive(item))
         {
-            item->status = ITEM_ACTIVE;
+            item->Status = ITEM_ACTIVE;
             AnimateItem(item);
 
-            if (item->triggerFlags == 666)
+            if (item->TriggerFlags == 666)
             {
                 PHD_VECTOR pos;
                 GetJointAbsPosition(item, &pos, 0);
                 SoundEffect(65, (PHD_3DPOS*)&pos, 0);
 
-                if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-                    item->flags &= 0xC1;
+                if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+                    item->Flags &= 0xC1;
             }
         }
-        else if (item->triggerFlags == 2)
+        else if (item->TriggerFlags == 2)
         {
-            item->status |= ITEM_INVISIBLE;
+            item->Status |= ITEM_INVISIBLE;
         }
     }
 
@@ -41,20 +41,20 @@ namespace TEN::Entities::TR4
     {
         ITEM_INFO* item = &g_Level.Items[itemNumber];
         
-        if (item->status != ITEM_INVISIBLE)
+        if (item->Status != ITEM_INVISIBLE)
         {
             if (TestBoundsCollide(item, l, coll->Setup.Radius))
             {
                 if (TriggerActive(item))
                 {
                     DoBloodSplat(
-                        (GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
-                        (GetRandomControl() & 0x1F) + item->pos.yPos - 16, 
-                        (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
+                        (GetRandomControl() & 0x3F) + l->Position.xPos - 32, 
+                        (GetRandomControl() & 0x1F) + item->Position.yPos - 16, 
+                        (GetRandomControl() & 0x3F) + l->Position.zPos - 32, 
                         (GetRandomControl() & 3) + 2, 
                         2 * GetRandomControl(),
-                        l->roomNumber);
-                    LaraItem->hitPoints -= 10;
+                        l->RoomNumber);
+                    LaraItem->HitPoints -= 10;
                 }
                 else if (coll->Setup.EnableObjectPush)
                 {

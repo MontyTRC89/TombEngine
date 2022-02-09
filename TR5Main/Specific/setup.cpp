@@ -276,7 +276,7 @@ void TrapObjects()
 	{
 		obj->control = KillAllCurrentItems;
 		obj->drawRoutine = nullptr;
-		obj->hitPoints = 0;
+		obj->HitPoints = 0;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -409,7 +409,7 @@ void InitialiseObjects()
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = NO_SHADOW;
-		obj->hitPoints = -16384;
+		obj->HitPoints = -16384;
 		obj->hitEffect = HIT_NONE;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;

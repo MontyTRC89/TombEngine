@@ -13,11 +13,11 @@ using namespace TEN::Floordata;
 void ClearItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->collidable = true;
-	item->data = nullptr;
-	item->startPos = item->pos;
+	item->Collidable = true;
+	item->Data = nullptr;
+	item->StartPosition = item->Position;
 }
 
 void KillItem(short itemNum)
@@ -33,39 +33,39 @@ void KillItem(short itemNum)
 
 		DetatchSpark(itemNum, SP_ITEM);
 
-		item->active = false;
+		item->Active = false;
 
 		if (NextItemActive == itemNum)
 		{
-			NextItemActive = item->nextActive;
+			NextItemActive = item->NextActive;
 		}
 		else
 		{
 			short linknum;
-			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
+			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextActive)
 			{
-				if (g_Level.Items[linknum].nextActive == itemNum)
+				if (g_Level.Items[linknum].NextActive == itemNum)
 				{
-					g_Level.Items[linknum].nextActive = item->nextActive;
+					g_Level.Items[linknum].NextActive = item->NextActive;
 					break;
 				}
 			}
 		}
 
-		if (item->roomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_ROOM)
 		{
-			if (g_Level.Rooms[item->roomNumber].itemNumber == itemNum)
+			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNum)
 			{
-				g_Level.Rooms[item->roomNumber].itemNumber = item->nextItem;
+				g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 			}
 			else
 			{
 				short linknum;
-				for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+				for (linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 				{
-					if (g_Level.Items[linknum].nextItem == itemNum)
+					if (g_Level.Items[linknum].NextItem == itemNum)
 					{
-						g_Level.Items[linknum].nextItem = item->nextItem;
+						g_Level.Items[linknum].NextItem = item->NextItem;
 						break;
 					}
 				}
@@ -75,17 +75,17 @@ void KillItem(short itemNum)
 		if (item == Lara.target)
 			Lara.target = NULL;
 
-		if (Objects[item->objectNumber].floor != nullptr)
+		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNum, true);
 
 		if (itemNum >= g_Level.NumItems)
 		{
-			item->nextItem = NextItemFree;
+			item->NextItem = NextItemFree;
 			NextItemFree = itemNum;
 		}
 		else
 		{
-			item->flags |= IFLAG_KILLED;
+			item->Flags |= IFLAG_KILLED;
 		}
 	}
 }
@@ -99,14 +99,14 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[currentItemNum];
 
-		if (item->objectNumber == objectNumber)
+		if (item->ObjectNumber == objectNumber)
 		{
 			RemoveActiveItem(currentItemNum);
-			item->status = ITEM_NOT_ACTIVE;
-			item->flags &= 0xC1;
+			item->Status = ITEM_NOT_ACTIVE;
+			item->Flags &= 0xC1;
 		}
 
-		currentItemNum = item->nextItem;
+		currentItemNum = item->NextItem;
 	}
 }
 
@@ -114,18 +114,18 @@ void AddActiveItem(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->flags |= 0x20;
+	item->Flags |= 0x20;
 
-	if (Objects[item->objectNumber].control == NULL)
+	if (Objects[item->ObjectNumber].control == NULL)
 	{
-		item->status = ITEM_NOT_ACTIVE;
+		item->Status = ITEM_NOT_ACTIVE;
 		return;
 	}
 
-	if (!item->active)
+	if (!item->Active)
 	{
-		item->active = true;
-		item->nextActive = NextItemActive;
+		item->Active = true;
+		item->NextActive = NextItemActive;
 		NextItemActive = itemNumber;
 	}
 }
@@ -142,29 +142,29 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->roomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_ROOM)
 		{
-			ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
+			ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
 
 			if (r->itemNumber == itemNumber)
 			{
-				r->itemNumber = item->nextItem;
+				r->itemNumber = item->NextItem;
 			}
 			else
 			{
-				for (short linknum = r->itemNumber; linknum != -1; linknum = g_Level.Items[linknum].nextItem)
+				for (short linknum = r->itemNumber; linknum != -1; linknum = g_Level.Items[linknum].NextItem)
 				{
-					if (g_Level.Items[linknum].nextItem == itemNumber)
+					if (g_Level.Items[linknum].NextItem == itemNumber)
 					{
-						g_Level.Items[linknum].nextItem = item->nextItem;
+						g_Level.Items[linknum].NextItem = item->NextItem;
 						break;
 					}
 				}
 			}
 		}
 
-		item->roomNumber = roomNumber;
-		item->nextItem = g_Level.Rooms[roomNumber].itemNumber;
+		item->RoomNumber = roomNumber;
+		item->NextItem = g_Level.Rooms[roomNumber].itemNumber;
 		g_Level.Rooms[roomNumber].itemNumber = itemNumber;
 	}
 }
@@ -293,17 +293,17 @@ void RemoveDrawnItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (g_Level.Rooms[item->roomNumber].itemNumber == itemNum)
+	if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNum)
 	{
-		g_Level.Rooms[item->roomNumber].itemNumber = item->nextItem;
+		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 	}
 	else
 	{
-		for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+		for (short linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 		{
-			if (g_Level.Items[linknum].nextItem == itemNum)
+			if (g_Level.Items[linknum].NextItem == itemNum)
 			{
-				g_Level.Items[linknum].nextItem = item->nextItem;
+				g_Level.Items[linknum].NextItem = item->NextItem;
 				break;
 			}
 		}
@@ -312,21 +312,21 @@ void RemoveDrawnItem(short itemNum)
 
 void RemoveActiveItem(short itemNum) 
 {
-	if (g_Level.Items[itemNum].active)
+	if (g_Level.Items[itemNum].Active)
 	{
-		g_Level.Items[itemNum].active = false;
+		g_Level.Items[itemNum].Active = false;
 
 		if (NextItemActive == itemNum)
 		{
-			NextItemActive = g_Level.Items[itemNum].nextActive;
+			NextItemActive = g_Level.Items[itemNum].NextActive;
 		}
 		else
 		{
-			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
+			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextActive)
 			{
-				if (g_Level.Items[linknum].nextActive == itemNum)
+				if (g_Level.Items[linknum].NextActive == itemNum)
 				{
-					g_Level.Items[linknum].nextActive = g_Level.Items[itemNum].nextActive;
+					g_Level.Items[linknum].NextActive = g_Level.Items[itemNum].NextActive;
 					break;
 				}
 			}
@@ -338,92 +338,92 @@ void InitialiseItem(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
-	item->requiredState = 0;
-	item->targetState = g_Level.Anims[item->animNumber].activeState;
-	item->activeState = g_Level.Anims[item->animNumber].activeState;
+	item->RequiredState = 0;
+	item->TargetState = g_Level.Anims[item->AnimNumber].ActiveState;
+	item->ActiveState = g_Level.Anims[item->AnimNumber].ActiveState;
 
-	item->pos.zRot = 0;
-	item->pos.xRot = 0;
+	item->Position.zRot = 0;
+	item->Position.xRot = 0;
 
 	item->VerticalVelocity = 0;
 	item->Velocity = 0;
 
-	item->itemFlags[3] = 0;
-	item->itemFlags[2] = 0;
-	item->itemFlags[1] = 0;
-	item->itemFlags[0] = 0;
+	item->ItemFlags[3] = 0;
+	item->ItemFlags[2] = 0;
+	item->ItemFlags[1] = 0;
+	item->ItemFlags[0] = 0;
 
-	item->active = false;
-	item->status = ITEM_NOT_ACTIVE;
+	item->Active = false;
+	item->Status = ITEM_NOT_ACTIVE;
 	item->Airborne = false;
-	item->hitStatus = false;
-	item->collidable = true;
-	item->lookedAt = false;
-	item->poisoned = false;
-	item->aiBits = 0;
+	item->HitStatus = false;
+	item->Collidable = true;
+	item->LookedAt = false;
+	item->Poisoned = false;
+	item->AIBits = 0;
 
-	item->timer = 0;
+	item->Timer = 0;
 
-	item->hitPoints = Objects[item->objectNumber].hitPoints;
+	item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
-	if (item->objectNumber == ID_HK_ITEM ||
-		item->objectNumber == ID_HK_AMMO_ITEM ||
-		item->objectNumber == ID_CROSSBOW_ITEM ||
-		item->objectNumber == ID_REVOLVER_ITEM)
+	if (item->ObjectNumber == ID_HK_ITEM ||
+		item->ObjectNumber == ID_HK_AMMO_ITEM ||
+		item->ObjectNumber == ID_CROSSBOW_ITEM ||
+		item->ObjectNumber == ID_REVOLVER_ITEM)
 	{
-		item->meshBits = 1;
+		item->MeshBits = 1;
 	}
 	else
 	{
-		item->meshBits = -1;
+		item->MeshBits = -1;
 	}
 
-	item->touchBits = 0;
-	item->afterDeath = 0;
-	item->firedWeapon = 0;
-	item->swapMeshFlags = 0;
+	item->TouchBits = 0;
+	item->AfterDeath = 0;
+	item->FiredWeapon = 0;
+	item->SwapMeshFlags = 0;
 
-	if (item->flags & IFLAG_INVISIBLE)
+	if (item->Flags & IFLAG_INVISIBLE)
 	{
-		item->flags &= ~IFLAG_INVISIBLE;
-		item->status = ITEM_INVISIBLE;
+		item->Flags &= ~IFLAG_INVISIBLE;
+		item->Status = ITEM_INVISIBLE;
 	}
-	else if (Objects[item->objectNumber].intelligent)
+	else if (Objects[item->ObjectNumber].intelligent)
 	{
-		item->status = ITEM_INVISIBLE;
+		item->Status = ITEM_INVISIBLE;
 	}
 
-	if ((item->flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
+	if ((item->Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
 	{
-		item->flags &= ~IFLAG_ACTIVATION_MASK;
-		item->flags |= IFLAG_REVERSE;
+		item->Flags &= ~IFLAG_ACTIVATION_MASK;
+		item->Flags |= IFLAG_REVERSE;
 		AddActiveItem(itemNum);
-		item->status = ITEM_ACTIVE;
+		item->Status = ITEM_ACTIVE;
 	}
 
-	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
+	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
 
-	item->nextItem = r->itemNumber;
+	item->NextItem = r->itemNumber;
 	r->itemNumber = itemNum;
 
-	FLOOR_INFO* floor = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
-	item->floor = floor->FloorHeight(item->pos.xPos, item->pos.zPos);
-	item->boxNumber = floor->Box;
+	FLOOR_INFO* floor = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z);
+	item->Floor = floor->FloorHeight(item->Position.xPos, item->Position.zPos);
+	item->BoxNumber = floor->Box;
 
-	if (Objects[item->objectNumber].nmeshes > 0)
+	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->mutator.resize(Objects[item->objectNumber].nmeshes);
-		for (int i = 0; i < item->mutator.size(); i++)
-			item->mutator[i] = {};
+		item->Mutator.resize(Objects[item->ObjectNumber].nmeshes);
+		for (int i = 0; i < item->Mutator.size(); i++)
+			item->Mutator[i] = {};
 	}
 	else
-		item->mutator.clear();
+		item->Mutator.clear();
 
-	if (Objects[item->objectNumber].initialise != NULL)
-		Objects[item->objectNumber].initialise(itemNum);
+	if (Objects[item->ObjectNumber].initialise != NULL)
+		Objects[item->ObjectNumber].initialise(itemNum);
 }
 
 short CreateItem()
@@ -433,9 +433,9 @@ short CreateItem()
 	if (NextItemFree == -1) return NO_ITEM;
 
 	itemNum = NextItemFree;
-	g_Level.Items[NextItemFree].flags = 0;
-	g_Level.Items[NextItemFree].luaName = "";
-	NextItemFree = g_Level.Items[NextItemFree].nextItem;
+	g_Level.Items[NextItemFree].Flags = 0;
+	g_Level.Items[NextItemFree].LuaName = "";
+	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
 	return itemNum;
 }
@@ -451,12 +451,12 @@ void InitialiseItemArray(int numitems)
 	{
 		for (int i = g_Level.NumItems + 1; i < numitems; i++, item++)
 		{
-			item->nextItem = i;
-			item->active = false;
+			item->NextItem = i;
+			item->Active = false;
 		}
 	}
 
-	item->nextItem = NO_ITEM;
+	item->NextItem = NO_ITEM;
 }
 
 short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
@@ -466,14 +466,14 @@ short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
 	{
 		ITEM_INFO* spawn = &g_Level.Items[itemNumber];
 
-		spawn->objectNumber = objectNumber;
-		spawn->roomNumber = item->roomNumber;
-		memcpy(&spawn->pos, &item->pos, sizeof(PHD_3DPOS));
+		spawn->ObjectNumber = objectNumber;
+		spawn->RoomNumber = item->RoomNumber;
+		memcpy(&spawn->Position, &item->Position, sizeof(PHD_3DPOS));
 
 		InitialiseItem(itemNumber);
 
-		spawn->status = ITEM_NOT_ACTIVE;
-		spawn->shade = 0x4210;
+		spawn->Status = ITEM_NOT_ACTIVE;
+		spawn->Shade = 0x4210;
 	}
 
 	return itemNumber;
@@ -485,11 +485,11 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[i];
-		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
+		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
-			if (g_Level.Items[itemNumber].objectNumber == search)
+			if (g_Level.Items[itemNumber].ObjectNumber == search)
 			{
-				g_Level.Items[itemNumber].objectNumber = replace;
+				g_Level.Items[itemNumber].ObjectNumber = replace;
 				changed++;
 			}
 		}
@@ -502,17 +502,17 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // TODO: There is one edge case offsets don't fix. @Sezz 2022.02.02
 void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
 {
-	float c = phd_cos(item->pos.yRot);
-	float s = phd_sin(item->pos.yRot);
+	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Position.yRot);
 
-	int x = item->pos.xPos + roundf(c * xOffset + s * zOffset);
-	int y = height + item->pos.yPos;
-	int z = item->pos.zPos + roundf(-s * xOffset + c * zOffset);
-	item->location = GetRoom(item->location, x, y, z);
-	item->floor = GetFloorHeight(item->location, x, z).value_or(NO_HEIGHT);
+	int x = item->Position.xPos + roundf(c * xOffset + s * zOffset);
+	int y = height + item->Position.yPos;
+	int z = item->Position.zPos + roundf(-s * xOffset + c * zOffset);
+	item->Location = GetRoom(item->Location, x, y, z);
+	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
 
-	if (item->roomNumber != item->location.roomNumber)
-		ItemNewRoom(FindItem(item), item->location.roomNumber);
+	if (item->RoomNumber != item->Location.roomNumber)
+		ItemNewRoom(FindItem(item), item->Location.roomNumber);
 }
 
 std::vector<int> FindAllItems(short objectNumber)
@@ -521,7 +521,7 @@ std::vector<int> FindAllItems(short objectNumber)
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		if (g_Level.Items[i].objectNumber == objectNumber)
+		if (g_Level.Items[i].ObjectNumber == objectNumber)
 			itemList.push_back(i);
 	}
 
@@ -536,7 +536,7 @@ ITEM_INFO* FindItem(int object_number)
 	{
 		item = &g_Level.Items[i];
 
-		if (item->objectNumber == object_number)
+		if (item->ObjectNumber == object_number)
 			return item;
 	}
 

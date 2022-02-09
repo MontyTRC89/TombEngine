@@ -56,10 +56,10 @@ void KnifeControl(short fxNum)
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
-		LaraItem->hitPoints -= 50;
-		LaraItem->hitStatus = true;
+		LaraItem->HitPoints -= 50;
+		LaraItem->HitStatus = true;
 
-		fx->pos.yRot = LaraItem->pos.yRot;
+		fx->pos.yRot = LaraItem->Position.yRot;
 		fx->speed = LaraItem->Velocity;
 		fx->frameNumber = fx->counter = 0;
 
@@ -84,16 +84,16 @@ void KnifethrowerControl(short itemNum)
 	short angle, torso, head, tilt;
 
 	item = &g_Level.Items[itemNum];
-	knife = (CREATURE_INFO*)item->data;
+	knife = (CREATURE_INFO*)item->Data;
 	angle = torso = head = tilt = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 10)
+		if (item->ActiveState != 10)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 23;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 10;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 10;
 		}
 	}
 	else
@@ -103,7 +103,7 @@ void KnifethrowerControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, knife->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			knife->maximumTurn = 0;
@@ -113,24 +113,24 @@ void KnifethrowerControl(short itemNum)
 
 			if (knife->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->targetState = 8;
+				item->TargetState = 8;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (!info.ahead || info.distance > SQUARE(WALL_SIZE*6))
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE*4))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -142,25 +142,25 @@ void KnifethrowerControl(short itemNum)
 
 			if (knife->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE((WALL_SIZE*5)/2) || info.zoneNumber != info.enemyZone)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else if (GetRandomControl() < 0x4000)
-					item->targetState = 4;
+					item->TargetState = 4;
 				else
-					item->targetState = 6;
+					item->TargetState = 6;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(WALL_SIZE*6))
-					item->targetState = 1;
+					item->TargetState = 1;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE*4))
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -173,18 +173,18 @@ void KnifethrowerControl(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (knife->mood == BORED_MOOD)
 			{
 				if (info.ahead && info.distance < SQUARE(WALL_SIZE*6))
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE*4))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 
@@ -195,9 +195,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->targetState = 5;
+				item->TargetState = 5;
 			else
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 6:
@@ -207,9 +207,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->targetState = 7;
+				item->TargetState = 7;
 			else
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 8:
@@ -219,9 +219,9 @@ void KnifethrowerControl(short itemNum)
 				torso = info.angle;
 
 			if (Targetable(item, &info))
-				item->targetState = 9;
+				item->TargetState = 9;
 			else
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 
 		case 5:

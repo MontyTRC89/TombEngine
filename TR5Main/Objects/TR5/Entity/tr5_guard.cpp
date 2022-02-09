@@ -79,78 +79,78 @@ void InitialiseGuard(short itemNum)
     anim = Objects[ID_SWAT].animIndex;
     if (!Objects[ID_SWAT].loaded)
         anim = Objects[ID_GUARD1].animIndex;
-    switch (item->triggerFlags)
+    switch (item->TriggerFlags)
     {
         case 0:
         case 10:
-            item->animNumber = anim;
-            item->targetState = STATE_GUARD_STOP;
+            item->AnimNumber = anim;
+            item->TargetState = STATE_GUARD_STOP;
             break;
         case 1:
-            item->targetState = STATE_GUARD_RECOIL;
-            item->animNumber = anim + 23;
+            item->TargetState = STATE_GUARD_RECOIL;
+            item->AnimNumber = anim + 23;
             break;
         case 2:
-            item->targetState = STATE_GUARD_CROUCH;
-            item->animNumber = anim + 25;
+            item->TargetState = STATE_GUARD_CROUCH;
+            item->AnimNumber = anim + 25;
             // TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
             break;
         case 3:
-            item->targetState = STATE_GUARD_SITTING;
-            item->animNumber = anim + 28;
-            item->swapMeshFlags = 9216;
-            roomItemNumber = g_Level.Rooms[item->roomNumber].itemNumber;
+            item->TargetState = STATE_GUARD_SITTING;
+            item->AnimNumber = anim + 28;
+            item->SwapMeshFlags = 9216;
+            roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
             if (roomItemNumber != NO_ITEM)
             {
                 while (true)
                 {
                     item2 = &g_Level.Items[roomItemNumber];
-                    if (item2->objectNumber >= ID_ANIMATING1 && item2->objectNumber <= ID_ANIMATING15 && item2->roomNumber == item->roomNumber && item2->triggerFlags == 3)
+                    if (item2->ObjectNumber >= ID_ANIMATING1 && item2->ObjectNumber <= ID_ANIMATING15 && item2->RoomNumber == item->RoomNumber && item2->TriggerFlags == 3)
                         break;
-                    roomItemNumber = item2->nextItem;
+                    roomItemNumber = item2->NextItem;
                     if (roomItemNumber == NO_ITEM)
                     {
-                        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                        item->activeState = item->targetState;
+                        item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+                        item->ActiveState = item->TargetState;
                         break;
                     }
                 }
-                item2->meshBits = -5;
+                item2->MeshBits = -5;
             }
             break;
         case 4:
-            item->targetState = 17;
-			item->swapMeshFlags = 8192;
-            item->animNumber = anim + 30;
+            item->TargetState = 17;
+			item->SwapMeshFlags = 8192;
+            item->AnimNumber = anim + 30;
             break;
         case 5:
             FLOOR_INFO *floor;
             short roomNumber;
-            item->animNumber = anim + 26;
-            item->targetState = STATE_GUARD_ROPE_DOWN;
-            roomNumber = item->roomNumber;
-            floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-            GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-            item->pos.yPos = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) - SECTOR(2);
+            item->AnimNumber = anim + 26;
+            item->TargetState = STATE_GUARD_ROPE_DOWN;
+            roomNumber = item->RoomNumber;
+            floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+            GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+            item->Position.yPos = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) - SECTOR(2);
             break;
         case 6:
-            item->targetState = STATE_GUARD_WAITING_ON_WALL;
-            item->animNumber = anim + 32;
+            item->TargetState = STATE_GUARD_WAITING_ON_WALL;
+            item->AnimNumber = anim + 32;
             break;
         case 7:
         case 9:
-            item->targetState = STATE_GUARD_USE_COMPUTER;
-            item->animNumber = anim + 59;
-            item->pos.xPos -= 512 * phd_sin(item->pos.yRot);
-            item->pos.zPos -= 512 * phd_cos(item->pos.yRot);
+            item->TargetState = STATE_GUARD_USE_COMPUTER;
+            item->AnimNumber = anim + 59;
+            item->Position.xPos -= 512 * phd_sin(item->Position.yRot);
+            item->Position.zPos -= 512 * phd_cos(item->Position.yRot);
             break;
         case 8:
-            item->targetState = STATE_GUARD_HUNTING_IDLE;
-            item->animNumber = anim + 46;
+            item->TargetState = STATE_GUARD_HUNTING_IDLE;
+            item->AnimNumber = anim + 46;
             break;
         case 11:
-            item->targetState = STATE_GUARD_RUN;
-            item->animNumber = anim + 12;
+            item->TargetState = STATE_GUARD_RUN;
+            item->AnimNumber = anim + 12;
             break;
         default:
             break;
@@ -162,13 +162,13 @@ void InitialiseSniper(short itemNum)
     ITEM_INFO* item;
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = STATE_SNIPER_STOP;
-    item->activeState = STATE_SNIPER_STOP;
-	item->pos.yPos += STEP_SIZE * 2;
-    item->pos.xPos += 1024 * phd_sin(item->pos.yRot + ANGLE(90));
-    item->pos.zPos += 1024 * phd_cos(item->pos.yRot + ANGLE(90));
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = STATE_SNIPER_STOP;
+    item->ActiveState = STATE_SNIPER_STOP;
+	item->Position.yPos += STEP_SIZE * 2;
+    item->Position.xPos += 1024 * phd_sin(item->Position.yRot + ANGLE(90));
+    item->Position.zPos += 1024 * phd_cos(item->Position.yRot + ANGLE(90));
 }
 
 void InitialiseGuardLaser(short itemNum)
@@ -176,10 +176,10 @@ void InitialiseGuardLaser(short itemNum)
     ITEM_INFO* item;
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex + 6;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = STATE_GUARD_STOP;
-    item->activeState = STATE_GUARD_STOP;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = STATE_GUARD_STOP;
+    item->ActiveState = STATE_GUARD_STOP;
 }
 
 void ControlGuardLaser(short itemNumber)
@@ -199,58 +199,58 @@ void GuardControl(short itemNum)
 		animIndex = Objects[ID_GUARD1].animIndex;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short angle = 0;
 	short joint2 = 0;
 	short joint1 = 0;
 	short joint0 = 0;
-	int x = item->pos.xPos;
-	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot);
-	int dz = 870 * phd_cos(item->pos.yRot);
+	int x = item->Position.xPos;
+	int z = item->Position.zPos;
+	int dx = 870 * phd_sin(item->Position.yRot);
+	int dz = 870 * phd_cos(item->Position.yRot);
 	x += dx;
 	z += dz;
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	short roomNumber = item->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height1 = GetFloorHeight(floor, x, item->Position.yPos, z);
 	x += dx;
 	z += dz;
-	roomNumber = item->roomNumber;
-	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	roomNumber = item->RoomNumber;
+	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height2 = GetFloorHeight(floor, x, item->Position.yPos, z);
 	x += dx;
 	z += dz;
-	roomNumber = item->roomNumber;
-	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
+	roomNumber = item->RoomNumber;
+	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height3 = GetFloorHeight(floor, x, item->Position.yPos, z);
 	bool canJump1block;
-	if (item->boxNumber == LaraItem->boxNumber
-		|| item->pos.yPos >= height1 - 384
-		|| item->pos.yPos >= height2 + 256
-		|| item->pos.yPos <= height2 - 256)
+	if (item->BoxNumber == LaraItem->BoxNumber
+		|| item->Position.yPos >= height1 - 384
+		|| item->Position.yPos >= height2 + 256
+		|| item->Position.yPos <= height2 - 256)
 		canJump1block = false;
 	else
 		canJump1block = true;
 	bool canJump2blocks;
-	if (item->boxNumber == LaraItem->boxNumber 
-		|| item->pos.yPos >= height1 - 384 
-		|| item->pos.yPos >= height2 - 384
-		|| item->pos.yPos >= height3 + 256 
-		|| item->pos.yPos <= height3 - 256)
+	if (item->BoxNumber == LaraItem->BoxNumber 
+		|| item->Position.yPos >= height1 - 384 
+		|| item->Position.yPos >= height2 - 384
+		|| item->Position.yPos >= height3 + 256 
+		|| item->Position.yPos <= height3 - 256)
 		canJump2blocks = false;
 	else
 		canJump2blocks = true;
-	if (item->firedWeapon)
+	if (item->FiredWeapon)
 	{
 		PHD_VECTOR pos;
 		pos.x = SwatGun.x;
 		pos.y = SwatGun.y;
 		pos.z = SwatGun.z;
 		GetJointAbsPosition(item, &pos, SwatGun.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
-		item->firedWeapon--;
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
+		item->FiredWeapon--;
 	}
-	if (item->aiBits)
+	if (item->AIBits)
 		GetAITarget(creature);
 	else
 		creature->enemy = LaraItem;
@@ -264,37 +264,37 @@ void GuardControl(short itemNum)
 	}
 	else
 	{
-		int dx = LaraItem->pos.xPos - item->pos.xPos;
-		int dz = LaraItem->pos.zPos - item->pos.zPos;
-		laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
+		int dx = LaraItem->Position.xPos - item->Position.xPos;
+		int dz = LaraItem->Position.zPos - item->Position.zPos;
+		laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 		laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 	}
 	
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != STATE_GUARD_DEATH1 && item->activeState != STATE_GUARD_DEATH2)
+		if (item->ActiveState != STATE_GUARD_DEATH1 && item->ActiveState != STATE_GUARD_DEATH2)
 		{
 			if (laraInfo.angle >= 12288 || laraInfo.angle <= -12288)
 			{
-				item->activeState = STATE_GUARD_DEATH2;
-				item->animNumber = animIndex + ANIMATION_GUARD_DEATH2;
-				item->pos.yRot += laraInfo.angle + -ANGLE(180);
+				item->ActiveState = STATE_GUARD_DEATH2;
+				item->AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
+				item->Position.yRot += laraInfo.angle + -ANGLE(180);
 			}
 			else
 			{
-				item->activeState = STATE_GUARD_DEATH1;
-				item->animNumber = animIndex + ANIMATION_GUARD_DEATH1;
-				item->pos.yRot += laraInfo.angle;
+				item->ActiveState = STATE_GUARD_DEATH1;
+				item->AnimNumber = animIndex + ANIMATION_GUARD_DEATH1;
+				item->Position.yRot += laraInfo.angle;
 			}
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 	}
 	else
 	{
 		GetCreatureMood(item, &info, creature->enemy != LaraItem);
-		if (item->objectNumber == ID_SCIENTIST)
+		if (item->ObjectNumber == ID_SCIENTIST)
 		{
-			if (item->hitPoints >= Objects[ID_SCIENTIST].hitPoints)
+			if (item->HitPoints >= Objects[ID_SCIENTIST].HitPoints)
 			{
 				if (creature->enemy == LaraItem)
 					creature->mood = BORED_MOOD;
@@ -304,27 +304,27 @@ void GuardControl(short itemNum)
 				creature->mood = ESCAPE_MOOD;
 			}
 		}
-		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_NO_LENSFLARE) // CHECK
+		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_NO_LENSFLARE) // CHECK
 		{
-			if (item->objectNumber == ID_SWAT_PLUS)
+			if (item->ObjectNumber == ID_SWAT_PLUS)
 			{
-				item->itemFlags[0]++;
-				if (item->itemFlags[0] > 60 && !(GetRandomControl() & 0xF))
+				item->ItemFlags[0]++;
+				if (item->ItemFlags[0] > 60 && !(GetRandomControl() & 0xF))
 				{
-					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->pos, 0);
-					item->itemFlags[0] = 0;
+					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Position, 0);
+					item->ItemFlags[0] = 0;
 				}
 			}
 			else
 			{
 				if (!(GlobalCounter & 7))
-					item->hitPoints--;
+					item->HitPoints--;
 				creature->mood = ESCAPE_MOOD;
-				if (item->hitPoints <= 0)
+				if (item->HitPoints <= 0)
 				{
-					item->activeState = STATE_GUARD_DEATH2;
-					item->animNumber = animIndex + ANIMATION_GUARD_DEATH2;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->ActiveState = STATE_GUARD_DEATH2;
+					item->AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				}
 			}
 		}
@@ -333,10 +333,10 @@ void GuardControl(short itemNum)
 		angle = CreatureTurn(item, creature->maximumTurn);
 		creature->enemy = LaraItem;
 		if (laraInfo.distance < 0x400000 && LaraItem->Velocity > 20
-			|| item->hitStatus
+			|| item->HitStatus
 			|| TargetVisible(item, &laraInfo))
 		{
-			if (!(item->aiBits & FOLLOW) && item->objectNumber != ID_SCIENTIST && abs(item->pos.yPos - LaraItem->pos.yPos) < 1280)
+			if (!(item->AIBits & FOLLOW) && item->ObjectNumber != ID_SCIENTIST && abs(item->Position.yPos - LaraItem->Position.yPos) < 1280)
 			{
 				creature->enemy = LaraItem;
 				AlertAllGuards(itemNum);
@@ -344,22 +344,22 @@ void GuardControl(short itemNum)
 		}
 		creature->enemy = enemy;
 		GAME_VECTOR src;
-		src.x = item->pos.xPos;
-		src.y = item->pos.yPos - 384;
-		src.z = item->pos.zPos;
-		src.roomNumber = item->roomNumber;
+		src.x = item->Position.xPos;
+		src.y = item->Position.yPos - 384;
+		src.z = item->Position.zPos;
+		src.roomNumber = item->RoomNumber;
 		ANIM_FRAME* frame = GetBestFrame(LaraItem);
 		GAME_VECTOR dest;
-		dest.x = LaraItem->pos.xPos;
-		dest.y = LaraItem->pos.yPos + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
-		dest.z = LaraItem->pos.zPos;
-		bool los = !LOS(&src, &dest) && item->triggerFlags != 10;
+		dest.x = LaraItem->Position.xPos;
+		dest.y = LaraItem->Position.yPos + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
+		dest.z = LaraItem->Position.zPos;
+		bool los = !LOS(&src, &dest) && item->TriggerFlags != 10;
 		creature->maximumTurn = 0;
 		ITEM_INFO* currentItem;
 		short currentItemNumber;
 		PHD_VECTOR pos1, pos2;
 		PHD_VECTOR pos;
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_GUARD_STOP:
 			creature->LOT.isJumping = false;
@@ -367,95 +367,95 @@ void GuardControl(short itemNum)
 			creature->flags = 0;
 			if (info.ahead)
 			{
-				if (!(item->aiBits & FOLLOW))
+				if (!(item->AIBits & FOLLOW))
 				{
 					joint0 = info.angle / 2;
 					joint1 = info.xAngle;
 				}
 			}
-			if (item->objectNumber == ID_SCIENTIST && item == Lara.target)
+			if (item->ObjectNumber == ID_SCIENTIST && item == Lara.target)
 			{
-				item->targetState = STATE_GUARD_SURREND;
+				item->TargetState = STATE_GUARD_SURREND;
 			}
-			else if (item->requiredState)
+			else if (item->RequiredState)
 			{
-				item->targetState = item->requiredState;
+				item->TargetState = item->RequiredState;
 			}
-			else if (item->aiBits & GUARD)
+			else if (item->AIBits & GUARD)
 			{
-				if (item->aiBits & MODIFY)
+				if (item->AIBits & MODIFY)
 					joint2 = 0;
 				else
 					joint2 = AIGuard(creature);
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					item->triggerFlags--;
-					if (item->triggerFlags < 1)
-						item->aiBits &= ~GUARD;
+					item->TriggerFlags--;
+					if (item->TriggerFlags < 1)
+						item->AIBits &= ~GUARD;
 				}
 			}
-			else if (creature->enemy == LaraItem && (laraInfo.angle > 20480 || laraInfo.angle < -20480) && item->objectNumber != ID_SCIENTIST)
+			else if (creature->enemy == LaraItem && (laraInfo.angle > 20480 || laraInfo.angle < -20480) && item->ObjectNumber != ID_SCIENTIST)
 			{
-				item->targetState = STATE_GUARD_TURN180;
+				item->TargetState = STATE_GUARD_TURN180;
 			}
-			else if (item->aiBits & PATROL1)
+			else if (item->AIBits & PATROL1)
 			{
-				item->targetState = STATE_GUARD_WALK;
+				item->TargetState = STATE_GUARD_WALK;
 			}
-			else if (item->aiBits & AMBUSH)
+			else if (item->AIBits & AMBUSH)
 			{
-				item->targetState = STATE_GUARD_RUN;
+				item->TargetState = STATE_GUARD_RUN;
 			}
-			else if (Targetable(item, &info) && item->objectNumber != ID_SCIENTIST)
+			else if (Targetable(item, &info) && item->ObjectNumber != ID_SCIENTIST)
 			{
 				if (info.distance >= 0x1000000 && info.zoneNumber == info.enemyZone)
 				{
-					if (!(item->aiBits & MODIFY))
-						item->targetState = STATE_GUARD_WALK;
+					if (!(item->AIBits & MODIFY))
+						item->TargetState = STATE_GUARD_WALK;
 				}
 				else
-					item->targetState = STATE_GUARD_AIM;
+					item->TargetState = STATE_GUARD_AIM;
 			}
 			else if (canJump1block || canJump2blocks)
 			{
 				creature->maximumTurn = 0;
-				item->animNumber = animIndex + 41;
-				item->activeState = STATE_GUARD_STOP_START_JUMP;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = animIndex + 41;
+				item->ActiveState = STATE_GUARD_STOP_START_JUMP;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				if (canJump1block)
-					item->targetState = STATE_GUARD_JUMPING_1BLOCK;
+					item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 				else
-					item->targetState = STATE_GUARD_JUMPING_2BLOCKS;
+					item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
 				creature->LOT.isJumping = true;
 			}
 			else if (los)
 			{
-				item->targetState = STATE_GUARD_HUNTING_IDLE;
+				item->TargetState = STATE_GUARD_HUNTING_IDLE;
 			}
 			else if (creature->mood)
 			{
-				if (info.distance < 0x900000 || item->aiBits & FOLLOW)
+				if (info.distance < 0x900000 || item->AIBits & FOLLOW)
 				{
-					item->targetState = STATE_GUARD_WALK;
+					item->TargetState = STATE_GUARD_WALK;
 				}
 				else
-					item->targetState = STATE_GUARD_RUN;
+					item->TargetState = STATE_GUARD_RUN;
 			}
 			else
 			{
-				item->targetState = STATE_GUARD_STOP;
+				item->TargetState = STATE_GUARD_STOP;
 			}
-			if (item->triggerFlags == 11)
-				item->triggerFlags = 0;
+			if (item->TriggerFlags == 11)
+				item->TriggerFlags = 0;
 			break;
 		case STATE_GUARD_TURN180:
 			creature->flags = 0;
 			if (info.angle >= 0)
-				item->pos.yRot -= ANGLE(2);
+				item->Position.yRot -= ANGLE(2);
 			else
-				item->pos.yRot += ANGLE(2);
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-				item->pos.yRot += -ANGLE(180);
+				item->Position.yRot += ANGLE(2);
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+				item->Position.yRot += -ANGLE(180);
 			break;
 		case STATE_GUARD_FIRE_SINGLE:
 		case STATE_GUARD_FIRE_FAST:
@@ -466,28 +466,28 @@ void GuardControl(short itemNum)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
-			if (item->activeState == STATE_GUARD_FIRE_FAST)
+			if (item->ActiveState == STATE_GUARD_FIRE_FAST)
 			{
 				if (creature->flags)
 				{
-					if (item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 10
-						&& (item->frameNumber - g_Level.Anims[item->animNumber].frameBase) & 1)
+					if (item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 10
+						&& (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) & 1)
 						creature->flags = 0;
 				}
 			}
 			if (!creature->flags)
 			{
 				creature->flags = 1;
-				item->firedWeapon = 2;
-				if (item->activeState == STATE_GUARD_FIRE_SINGLE)
+				item->FiredWeapon = 2;
+				if (item->ActiveState == STATE_GUARD_FIRE_SINGLE)
 					ShotLara(item, &info, &SwatGun, joint0, 30);
 				else
 					ShotLara(item, &info, &SwatGun, joint0, 10);
@@ -510,94 +510,94 @@ void GuardControl(short itemNum)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 			if (!Targetable(item, &info))
-				item->targetState = STATE_GUARD_STOP;
-			else if (item->objectNumber == ID_GUARD1 || item->objectNumber == ID_GUARD2)
-				item->targetState = STATE_GUARD_FIRE_SINGLE;
+				item->TargetState = STATE_GUARD_STOP;
+			else if (item->ObjectNumber == ID_GUARD1 || item->ObjectNumber == ID_GUARD2)
+				item->TargetState = STATE_GUARD_FIRE_SINGLE;
 			else
-				item->targetState = STATE_GUARD_FIRE_FAST;
+				item->TargetState = STATE_GUARD_FIRE_FAST;
 			break;
 		case STATE_GUARD_WALK:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(5);
 			if (!Targetable(item, &info)
 				|| info.distance >= 0x1000000 && info.zoneNumber == info.enemyZone
-				|| item->objectNumber == ID_SCIENTIST
-				|| item->aiBits & AMBUSH || item->aiBits & PATROL1) // CHECK
+				|| item->ObjectNumber == ID_SCIENTIST
+				|| item->AIBits & AMBUSH || item->AIBits & PATROL1) // CHECK
 			{
 				if (canJump1block || canJump2blocks)
 				{
 					creature->maximumTurn = 0;
-					item->animNumber = animIndex + 41;
-					item->activeState = STATE_GUARD_STOP_START_JUMP;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->AnimNumber = animIndex + 41;
+					item->ActiveState = STATE_GUARD_STOP_START_JUMP;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					if (canJump1block)
-						item->targetState = STATE_GUARD_JUMPING_1BLOCK;
+						item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 					else
-						item->targetState = STATE_GUARD_JUMPING_2BLOCKS;
+						item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
 					creature->LOT.isJumping = true;
 				}
 				else if (info.distance >= 0x100000)
 				{
-					if (!los || item->aiBits)
+					if (!los || item->AIBits)
 					{
 						if (info.distance > 0x900000)
 						{
-							if (!(item->inDrawRoom))
-								item->targetState = STATE_GUARD_RUN;
+							if (!(item->InDrawRoom))
+								item->TargetState = STATE_GUARD_RUN;
 						}
 					}
 					else
 					{
-						item->targetState = STATE_GUARD_STOP;
+						item->TargetState = STATE_GUARD_STOP;
 					}
 				}
 				else
 				{
-					item->targetState = STATE_GUARD_STOP;
+					item->TargetState = STATE_GUARD_STOP;
 				}
 			}
 			else
 			{
-				item->targetState = STATE_GUARD_AIM;
+				item->TargetState = STATE_GUARD_AIM;
 			}
 			break;
 		case STATE_GUARD_RUN:
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(10);
-			if (Targetable(item, &info) && (info.distance < 0x1000000 || info.enemyZone == info.zoneNumber) && item->objectNumber != ID_SCIENTIST)
+			if (Targetable(item, &info) && (info.distance < 0x1000000 || info.enemyZone == info.zoneNumber) && item->ObjectNumber != ID_SCIENTIST)
 			{
-				item->targetState = STATE_GUARD_AIM;
+				item->TargetState = STATE_GUARD_AIM;
 			}
 			else if (canJump1block || canJump2blocks)
 			{
 				creature->maximumTurn = 0;
-				item->animNumber = animIndex + 50;
-				item->activeState = STATE_GUARD_STOP_START_JUMP;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = animIndex + 50;
+				item->ActiveState = STATE_GUARD_STOP_START_JUMP;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				if (canJump1block)
-					item->targetState = STATE_GUARD_JUMPING_1BLOCK;
+					item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 				else
-					item->targetState = STATE_GUARD_JUMPING_2BLOCKS;
+					item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
 				creature->LOT.isJumping = true;
 			}
 			else if (los)
 			{
-				item->targetState = STATE_GUARD_STOP;
+				item->TargetState = STATE_GUARD_STOP;
 			}
 			else if (info.distance < 0x900000)
 			{
-				item->targetState = STATE_GUARD_WALK;
+				item->TargetState = STATE_GUARD_WALK;
 			}
-			if (item->triggerFlags == 11)
+			if (item->TriggerFlags == 11)
 			{
 				creature->LOT.isJumping = true;
 				creature->maximumTurn = 0;
@@ -605,180 +605,180 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_ROPE_DOWN:
 			joint2 = laraInfo.angle;
-			if (item->pos.yPos <= item->floor - 2048 || item->triggerFlags != 5)
+			if (item->Position.yPos <= item->Floor - 2048 || item->TriggerFlags != 5)
 			{
-				if (item->pos.yPos >= item->floor - 512)
-					item->targetState = STATE_GUARD_AIM;
+				if (item->Position.yPos >= item->Floor - 512)
+					item->TargetState = STATE_GUARD_AIM;
 			}
 			else
 			{
-				item->triggerFlags = 0;
+				item->TriggerFlags = 0;
 				TestTriggers(item, true);
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->pos, 0);
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Position, 0);
 			}
 			if (abs(info.angle) >= 364)
 			{
 				if ((info.angle & 0x8000) == 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 			break;
 		case STATE_GUARD_SITTING:
 			joint2 = AIGuard(creature);
 			if (creature->alerted)
-				item->targetState = STATE_GUARD_STAND_UP;
+				item->TargetState = STATE_GUARD_STAND_UP;
 			break;
 		case STATE_GUARD_STAND_UP:
 		case 18:
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 			{
 				TestTriggers(item, true);
 				break;
 			}
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 44)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 44)
 			{
-				item->swapMeshFlags = 0;
-				short currentItemNumber = g_Level.Rooms[item->roomNumber].itemNumber;
+				item->SwapMeshFlags = 0;
+				short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (currentItemNumber == NO_ITEM)
 					break;
 				ITEM_INFO * currentItem;
 				while (true)
 				{
 					currentItem = &g_Level.Items[currentItemNumber];
-					if (currentItem->objectNumber >= ID_ANIMATING1
-						&& currentItem->objectNumber <= ID_ANIMATING15
-						&& currentItem->roomNumber == item->roomNumber)
+					if (currentItem->ObjectNumber >= ID_ANIMATING1
+						&& currentItem->ObjectNumber <= ID_ANIMATING15
+						&& currentItem->RoomNumber == item->RoomNumber)
 					{
-						if (currentItem->triggerFlags > 2 && currentItem->triggerFlags < 5)
+						if (currentItem->TriggerFlags > 2 && currentItem->TriggerFlags < 5)
 							break;
 					}
-					currentItemNumber = currentItem->nextItem;
+					currentItemNumber = currentItem->NextItem;
 					if (currentItemNumber == -1)
 						break;
 				}
 				if (currentItemNumber == NO_ITEM)
 					break;
-				currentItem->meshBits = -3;
+				currentItem->MeshBits = -3;
 			}
-			else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
-				item->pos.yRot -= ANGLE(90);
+				item->Position.yRot -= ANGLE(90);
 			}
 			break;
 		case 17:
 			joint2 = 0;
-			if (!item->hitStatus && LaraItem->Velocity < 40 && !Lara.hasFired)
+			if (!item->HitStatus && LaraItem->Velocity < 40 && !Lara.hasFired)
 				creature->alerted = false;
 			if (creature->alerted)
-				item->targetState = 18;
+				item->TargetState = 18;
 			break;
 		case STATE_GUARD_WAITING_ON_WALL:
 			joint2 = AIGuard(creature);
 			if (creature->alerted)
-				item->targetState = STATE_GUARD_STOP;
+				item->TargetState = STATE_GUARD_STOP;
 			break;
 		case STATE_GUARD_HUNTING:
 		case STATE_GUARD_HUNTING_IDLE:
-			if (item->activeState == STATE_GUARD_HUNTING_IDLE)
+			if (item->ActiveState == STATE_GUARD_HUNTING_IDLE)
 			{
-				if (item->triggerFlags != 8 || !los || item->hitStatus)
-					item->targetState = STATE_GUARD_HUNTING;
+				if (item->TriggerFlags != 8 || !los || item->HitStatus)
+					item->TargetState = STATE_GUARD_HUNTING;
 			}
 			creature->LOT.isJumping = false;
 			creature->maximumTurn = ANGLE(5);
-			if (canJump1block || canJump2blocks || info.distance < 0x100000 || !los || item->hitStatus)
-				item->targetState = STATE_GUARD_STOP;
+			if (canJump1block || canJump2blocks || info.distance < 0x100000 || !los || item->HitStatus)
+				item->TargetState = STATE_GUARD_STOP;
 			break;
 		case STATE_GUARD_INSERT_CODE:
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 39)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 39)
 			{
 				TestTriggers(item, true);
 			}
 			break;
 		case STATE_GUARD_START_USE_COMPUTER:
 			currentItem = NULL;
-			for (currentItemNumber = g_Level.Rooms[item->roomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->nextItem)
+			for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
 			{
 				currentItem = &g_Level.Items[currentItemNumber];
-				if (item->objectNumber == ID_PUZZLE_HOLE8)
+				if (item->ObjectNumber == ID_PUZZLE_HOLE8)
 					break;
 			}
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 			{
-				currentItem->meshBits = 0x1FFF;
-				item->pos.xPos = currentItem->pos.xPos - 256;
-				item->pos.yRot = currentItem->pos.yRot;
-				item->pos.zPos = currentItem->pos.zPos + 128;
-				item->swapMeshFlags = 1024;
+				currentItem->MeshBits = 0x1FFF;
+				item->Position.xPos = currentItem->Position.xPos - 256;
+				item->Position.yRot = currentItem->Position.yRot;
+				item->Position.zPos = currentItem->Position.zPos + 128;
+				item->SwapMeshFlags = 1024;
 			}
 			else
 			{
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 32)
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 32)
 				{
-					currentItem->meshBits = 16381;
+					currentItem->MeshBits = 16381;
 				}
-				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 74)
+				else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 74)
 				{
-					currentItem->meshBits = 278461;
+					currentItem->MeshBits = 278461;
 				}
-				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 120)
+				else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 120)
 				{
-					currentItem->meshBits = 802621;
+					currentItem->MeshBits = 802621;
 				}
-				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 157)
+				else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 157)
 				{
-					currentItem->meshBits = 819001;
+					currentItem->MeshBits = 819001;
 				}
-				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 190)
+				else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 190)
 				{
-					currentItem->meshBits = 17592121;
+					currentItem->MeshBits = 17592121;
 				}
-				else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + g_Level.Anims[item->animNumber].frameEnd)
+				else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + g_Level.Anims[item->AnimNumber].frameEnd)
 				{
-					currentItem->meshBits = 0x1FFF;
+					currentItem->MeshBits = 0x1FFF;
 					TestTriggers(item, true);
-					item->requiredState = STATE_GUARD_WALK;
-					item->swapMeshFlags = 0;
+					item->RequiredState = STATE_GUARD_WALK;
+					item->SwapMeshFlags = 0;
 				}
 			}
 			break;
 		case STATE_GUARD_USE_COMPUTER:
-			if ((item->objectNumber != ID_SCIENTIST || item != Lara.target)
-				&& (GetRandomControl() & 0x7F || item->triggerFlags >= 10 || item->triggerFlags == 9))
+			if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.target)
+				&& (GetRandomControl() & 0x7F || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
 			{
-				if (item->aiBits & GUARD)
+				if (item->AIBits & GUARD)
 				{
 					joint2 = AIGuard(creature);
-					if (item->aiBits & PATROL1)
+					if (item->AIBits & PATROL1)
 					{
-						item->triggerFlags--;
-						if (item->triggerFlags < 1)
+						item->TriggerFlags--;
+						if (item->TriggerFlags < 1)
 						{
-							item->aiBits = PATROL1 | MODIFY;
+							item->AIBits = PATROL1 | MODIFY;
 						}
 					}
 				}
 			}
 			else
 			{
-				item->targetState = STATE_GUARD_STOP;
+				item->TargetState = STATE_GUARD_STOP;
 			}
 			break;
 		case STATE_GUARD_SURREND:
 			if (item != Lara.target && !(GetRandomControl() & 0x3F))
 			{
-				if (item->triggerFlags == 7 || item->triggerFlags == 9)
-					item->requiredState = STATE_GUARD_USE_COMPUTER;
-				item->targetState = STATE_GUARD_STOP;
+				if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
+					item->RequiredState = STATE_GUARD_USE_COMPUTER;
+				item->TargetState = STATE_GUARD_STOP;
 			}
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 39)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 39)
 			{
-				TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, enemy->roomNumber, true);
+				TestTriggers(item->Position.xPos, item->Position.yPos, item->Position.zPos, enemy->RoomNumber, true);
 			}
 			break;
 		default:
@@ -792,49 +792,49 @@ void GuardControl(short itemNum)
 	{
 		ITEM_INFO* enemy = creature->enemy;
 		
-		if (enemy->flags != 4)
+		if (enemy->Flags != 4)
 		{
-			if (enemy->flags & 0x10)
+			if (enemy->Flags & 0x10)
 			{
-				item->targetState = STATE_GUARD_STOP;
-				item->requiredState = STATE_GUARD_USE_COMPUTER;
-				item->triggerFlags = 300;
-				item->aiBits = GUARD | PATROL1;
+				item->TargetState = STATE_GUARD_STOP;
+				item->RequiredState = STATE_GUARD_USE_COMPUTER;
+				item->TriggerFlags = 300;
+				item->AIBits = GUARD | PATROL1;
 			}
 			else
 			{
-				if (enemy->flags & 0x20)
+				if (enemy->Flags & 0x20)
 				{
-					item->targetState = STATE_GUARD_STOP;
-					item->requiredState = 36;
-					item->aiBits = PATROL1 | MODIFY;
+					item->TargetState = STATE_GUARD_STOP;
+					item->RequiredState = 36;
+					item->AIBits = PATROL1 | MODIFY;
 				}
 				else
 				{
-					TestTriggers(creature->enemy->pos.xPos, creature->enemy->pos.yPos, creature->enemy->pos.zPos, enemy->roomNumber, true);
+					TestTriggers(creature->enemy->Position.xPos, creature->enemy->Position.yPos, creature->enemy->Position.zPos, enemy->RoomNumber, true);
 
-					item->requiredState = STATE_GUARD_WALK;
-					if (creature->enemy->flags & 2)
-						item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
-					if (creature->enemy->flags & 8)
+					item->RequiredState = STATE_GUARD_WALK;
+					if (creature->enemy->Flags & 2)
+						item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+					if (creature->enemy->Flags & 8)
 					{
-						item->requiredState = STATE_GUARD_STOP;
-						item->triggerFlags = 300;
-						item->aiBits |= GUARD | PATROL1;
+						item->RequiredState = STATE_GUARD_STOP;
+						item->TriggerFlags = 300;
+						item->AIBits |= GUARD | PATROL1;
 					}
 				}
 			}
 		}
 		else
 		{
-			item->targetState = STATE_GUARD_STOP;
-			item->requiredState = 37;
+			item->TargetState = STATE_GUARD_STOP;
+			item->RequiredState = 37;
 		}
 	}
-	if ((item->activeState >= 20 
-		|| item->activeState == 6 
-		|| item->activeState == 8) 
-		&& item->activeState != 30)
+	if ((item->ActiveState >= 20 
+		|| item->ActiveState == 6 
+		|| item->ActiveState == 8) 
+		&& item->ActiveState != 30)
 	{
 		CreatureAnimation(itemNum, angle, 0);
 	}
@@ -844,39 +844,39 @@ void GuardControl(short itemNum)
 		{
 		case 0:
 			creature->maximumTurn = 0;
-			item->animNumber = animIndex + 38;
-			item->activeState = 23;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 38;
+			item->ActiveState = 23;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 1:
 			creature->maximumTurn = 0;
-			item->animNumber = animIndex + 39;
-			item->activeState = 24;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 39;
+			item->ActiveState = 24;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 2:
 			creature->maximumTurn = 0;
-			item->animNumber = animIndex + 40;
-			item->activeState = 25;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 40;
+			item->ActiveState = 25;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 6:
 			creature->maximumTurn = 0;
-			item->animNumber = animIndex + 35;
-			item->activeState = 20;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 35;
+			item->ActiveState = 20;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 7:
 			creature->maximumTurn = 0; 
-			item->animNumber = animIndex + 36;
-			item->activeState = 21;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 36;
+			item->ActiveState = 21;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 8:
 			creature->maximumTurn = 0;
-			item->animNumber = animIndex + 37;
-			item->activeState = 22;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = animIndex + 37;
+			item->ActiveState = 22;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		}
 	}
@@ -891,20 +891,20 @@ void SniperControl(short itemNumber)
 		short joint2 = 0;
 		short joint1 = 0;
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		if (item->firedWeapon)
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		if (item->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 			pos.x = SniperGun.x;
 			pos.y = SniperGun.y;
 			pos.z = SniperGun.z;
 			GetJointAbsPosition(item, &pos, SniperGun.meshNum);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
-			item->firedWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
+			item->FiredWeapon--;
 		}
-		if (item->hitPoints > 0)
+		if (item->HitPoints > 0)
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 			{
 				GetAITarget(creature);
 			}
@@ -924,27 +924,27 @@ void SniperControl(short itemNumber)
 				joint1 = info.xAngle;
 			}
 			creature->maximumTurn = 0;
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case STATE_SNIPER_STOP:
-				item->meshBits = 0;
+				item->MeshBits = 0;
 				if (TargetVisible(item, &info))
-					item->targetState = STATE_SNIPER_UNHIDE;
+					item->TargetState = STATE_SNIPER_UNHIDE;
 				break;
 			case STATE_SNIPER_UNHIDE:
-				item->meshBits = -1;
+				item->MeshBits = -1;
 				break;
 			case 3:
 				creature->flags = 0;
 				if (!TargetVisible(item, &info)
-					|| item->hitStatus
+					|| item->HitStatus
 					&& GetRandomControl() & 1)
 				{
-					item->targetState = STATE_SNIPER_HIDE;
+					item->TargetState = STATE_SNIPER_HIDE;
 				}
 				else if (!(GetRandomControl() & 0x1F))
 				{
-					item->targetState = STATE_SNIPER_FIRE;
+					item->TargetState = STATE_SNIPER_FIRE;
 				}
 				break;
 			case STATE_SNIPER_FIRE:
@@ -952,7 +952,7 @@ void SniperControl(short itemNumber)
 				{
 					ShotLara(item, &info, &SniperGun, joint0, 100);
 					creature->flags = 1;
-					item->firedWeapon = 2;
+					item->FiredWeapon = 2;
 				}
 				break;
 			default:
@@ -961,12 +961,12 @@ void SniperControl(short itemNumber)
 		}
 		else
 		{
-			item->hitPoints = 0;
-			if (item->activeState != STATE_SNIPER_DEATH)
+			item->HitPoints = 0;
+			if (item->ActiveState != STATE_SNIPER_DEATH)
 			{
-				item->animNumber = Objects[ID_SNIPER].animIndex + 5;
-				item->activeState = STATE_SNIPER_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[ID_SNIPER].animIndex + 5;
+				item->ActiveState = STATE_SNIPER_DEATH;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 		CreatureTilt(item, 0);
@@ -981,11 +981,11 @@ void InitialiseMafia2(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	ClearItem(itemNum);
-	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->targetState = STATE_GUARD_STOP;
-	item->activeState = STATE_GUARD_STOP;
-	item->swapMeshFlags = 9216;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->TargetState = STATE_GUARD_STOP;
+	item->ActiveState = STATE_GUARD_STOP;
+	item->SwapMeshFlags = 9216;
 }
 
 void Mafia2Control(short itemNum)
@@ -993,35 +993,35 @@ void Mafia2Control(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short angle = 0;
 	short joint2 = 0;
 	short joint1 = 0;
 	short joint0 = 0;
 	// Can baddy jump? Check for a distance of 1 and 2 sectors
-	int x = item->pos.xPos;
-	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-	int dx = 870 * phd_sin(item->pos.yRot);
-	int dz = 870 * phd_cos(item->pos.yRot);
+	int x = item->Position.xPos;
+	int y = item->Position.yPos;
+	int z = item->Position.zPos;
+	int dx = 870 * phd_sin(item->Position.yRot);
+	int dz = 870 * phd_cos(item->Position.yRot);
 	x += dx;
 	z += dz;
-	short roomNumber = item->roomNumber;
+	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, y, z);
 	x += dx;
 	z += dz;
-	roomNumber = item->roomNumber;
+	roomNumber = item->RoomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
 	int height2 = GetFloorHeight(floor, x, y, z);
 	x += dx;
 	z += dz;
-	roomNumber = item->roomNumber;
+	roomNumber = item->RoomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
 	int height3 = GetFloorHeight(floor, x, y, z);
 	int height = 0;
 	bool canJump1sector = true;
-	if (item->boxNumber == LaraItem->boxNumber
+	if (item->BoxNumber == LaraItem->BoxNumber
 		|| y >= height1 - 384
 		|| y >= height2 + 256
 		|| y <= height2 - 256)
@@ -1030,7 +1030,7 @@ void Mafia2Control(short itemNum)
 		canJump1sector = false;
 	}
 	bool canJump2sectors = true;
-	if (item->boxNumber == LaraItem->boxNumber
+	if (item->BoxNumber == LaraItem->BoxNumber
 		|| y >= height1 - 384
 		|| y >= height - 384
 		|| y >= height3 + 256
@@ -1038,22 +1038,22 @@ void Mafia2Control(short itemNum)
 	{
 		canJump2sectors = false;
 	}
-	if (item->firedWeapon)
+	if (item->FiredWeapon)
 	{
 		PHD_VECTOR pos;
 		pos.x = ArmedBaddy2Gun.x;
 		pos.y = ArmedBaddy2Gun.y;
 		pos.z = ArmedBaddy2Gun.z;
 		GetJointAbsPosition(item, &pos, ArmedBaddy2Gun.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->firedWeapon + 8, 24, 16, 4);
-		item->firedWeapon--;
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->FiredWeapon + 8, 24, 16, 4);
+		item->FiredWeapon--;
 	}
 	AI_INFO info;
 	AI_INFO laraInfo;
 	ZeroMemory(&info, sizeof(AI_INFO));
-	if (item->hitPoints > 0)
+	if (item->HitPoints > 0)
 	{
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->enemy = LaraItem;
@@ -1065,93 +1065,93 @@ void Mafia2Control(short itemNum)
 		}
 		else
 		{
-			dx = LaraItem->pos.xPos - item->pos.xPos;
-			dz = LaraItem->pos.zPos - item->pos.zPos;
-			laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
+			dx = LaraItem->Position.xPos - item->Position.xPos;
+			dz = LaraItem->Position.zPos - item->Position.zPos;
+			laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 		GetCreatureMood(item, &info, creature->enemy != LaraItem);
 		CreatureMood(item, &info, creature->enemy != LaraItem);
 		angle = CreatureTurn(item, creature->maximumTurn);
 		creature->enemy = LaraItem;
-		if (laraInfo.distance < SQUARE(2048) && LaraItem->Velocity > 20 || item->hitStatus || TargetVisible(item, &laraInfo))
+		if (laraInfo.distance < SQUARE(2048) && LaraItem->Velocity > 20 || item->HitStatus || TargetVisible(item, &laraInfo))
 		{
-			if (!(item->aiBits & FOLLOW))
+			if (!(item->AIBits & FOLLOW))
 			{
 				creature->enemy = LaraItem;
 				AlertAllGuards(itemNum);
 			}
 		}
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_MAFIA2_STOP:
 			creature->LOT.isJumping = false;
 			joint2 = laraInfo.angle;
 			creature->flags = 0;
 			creature->maximumTurn = 0;
-			if (info.ahead && !(item->aiBits & GUARD))
+			if (info.ahead && !(item->AIBits & GUARD))
 			{
 				joint0 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
-			if (item->aiBits & GUARD)
+			if (item->AIBits & GUARD)
 			{
 				joint2 = AIGuard(creature);
 				break;
 			}
 			if (laraInfo.angle <= 20480 && laraInfo.angle >= -20480)
 			{
-				if (item->swapMeshFlags == 9216)
+				if (item->SwapMeshFlags == 9216)
 				{
-					item->targetState = STATE_MAFIA2_UNDRAW_GUNS;
+					item->TargetState = STATE_MAFIA2_UNDRAW_GUNS;
 					break;
 				}
 			}
-			else if (item->swapMeshFlags == 9216)
+			else if (item->SwapMeshFlags == 9216)
 			{
-				item->targetState = STATE_MAFIA2_TURN180;
+				item->TargetState = STATE_MAFIA2_TURN180;
 				break;
 			}
 			if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone)
 				{
-					item->targetState = STATE_MAFIA2_AIM;
+					item->TargetState = STATE_MAFIA2_AIM;
 				}
-				else if (!(item->aiBits & MODIFY))
+				else if (!(item->AIBits & MODIFY))
 				{
-					item->targetState = STATE_MAFIA2_WALK;
+					item->TargetState = STATE_MAFIA2_WALK;
 				}
 			}
 			else
 			{
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					item->targetState = STATE_MAFIA2_WALK;
+					item->TargetState = STATE_MAFIA2_WALK;
 				}
 				else
 				{
 					if (canJump1sector || canJump2sectors)
 					{
 						creature->maximumTurn = 0;
-						item->animNumber = Objects[item->objectNumber].animIndex + 41;
-						item->activeState = STATE_MAFIA2_STOP_START_JUMP;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
+						item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
+						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						if (canJump2sectors)
-							item->targetState = STATE_MAFIA2_JUMPING_2BLOCKS;
+							item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 						else
-							item->targetState = STATE_MAFIA2_JUMPING_1BLOCK;
+							item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
 						creature->LOT.isJumping = true;
 						break;
 					}
 					if (creature->mood)
 					{
 						if (info.distance >= SQUARE(3072))
-							item->targetState = STATE_MAFIA2_WALK;
+							item->TargetState = STATE_MAFIA2_WALK;
 					}
 					else
 					{
-						item->targetState = STATE_MAFIA2_STOP;
+						item->TargetState = STATE_MAFIA2_STOP;
 					}
 				}
 			}
@@ -1160,18 +1160,18 @@ void Mafia2Control(short itemNum)
 		case STATE_MAFIA2_TURN180:
 			creature->maximumTurn = 0;
 			if (info.angle >= 0)
-				item->pos.yRot -= ANGLE(2);
+				item->Position.yRot -= ANGLE(2);
 			else
-				item->pos.yRot += ANGLE(2);
-			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase + 16 
-				|| item->swapMeshFlags != 9216)
+				item->Position.yRot += ANGLE(2);
+			if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameBase + 16 
+				|| item->SwapMeshFlags != 9216)
 			{
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-					item->pos.yRot += -ANGLE(180);
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+					item->Position.yRot += -ANGLE(180);
 			}
 			else
 			{
-				item->swapMeshFlags = 128;
+				item->SwapMeshFlags = 128;
 			}
 			break;
 		case STATE_MAFIA2_FIRE:
@@ -1183,19 +1183,19 @@ void Mafia2Control(short itemNum)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 			if (!creature->flags)
 			{
 				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle / 2, 35);
 				creature->flags = 1;
-				item->firedWeapon = 2;
+				item->FiredWeapon = 2;
 			}
 			break;
 		case STATE_MAFIA2_AIM:
@@ -1208,25 +1208,25 @@ void Mafia2Control(short itemNum)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 			if (Targetable(item, &info))
 			{
-				item->targetState = STATE_MAFIA2_FIRE;
+				item->TargetState = STATE_MAFIA2_FIRE;
 			}
 			else if (laraInfo.angle > 20480 || laraInfo.angle < -20480)
 			{
-				item->targetState = 32;
+				item->TargetState = 32;
 			}
 			else
 			{
-				item->targetState = STATE_MAFIA2_STOP;
+				item->TargetState = STATE_MAFIA2_STOP;
 			}
 			break;
 		case STATE_MAFIA2_WALK:
@@ -1234,7 +1234,7 @@ void Mafia2Control(short itemNum)
 			creature->maximumTurn = ANGLE(5);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
-				item->targetState = STATE_MAFIA2_AIM;
+				item->TargetState = STATE_MAFIA2_AIM;
 			}
 			else
 			{
@@ -1242,24 +1242,24 @@ void Mafia2Control(short itemNum)
 				{
 					creature->maximumTurn = 0;
 					creature->maximumTurn = 0;
-					item->animNumber = Objects[item->objectNumber].animIndex + 41;
-					item->activeState = STATE_MAFIA2_STOP_START_JUMP;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
+					item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					if (canJump2sectors)
-						item->targetState = STATE_MAFIA2_JUMPING_2BLOCKS;
+						item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 					else
-						item->targetState = STATE_MAFIA2_JUMPING_1BLOCK;
+						item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
 					creature->LOT.isJumping = true;
 					break;
 				}
 				if (info.distance >= SQUARE(1024))
 				{
 					if (info.distance > SQUARE(3072))
-						item->targetState = STATE_MAFIA2_RUN;
+						item->TargetState = STATE_MAFIA2_RUN;
 				}
 				else
 				{
-					item->targetState = STATE_MAFIA2_STOP;
+					item->TargetState = STATE_MAFIA2_STOP;
 				}
 			}
 			break;
@@ -1268,34 +1268,34 @@ void Mafia2Control(short itemNum)
 			creature->maximumTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
-				item->targetState = STATE_MAFIA2_AIM;
+				item->TargetState = STATE_MAFIA2_AIM;
 			}
 			else if (canJump1sector || canJump2sectors)
 			{
 				creature->maximumTurn = 0;
-				item->animNumber = Objects[item->objectNumber].animIndex + 50;
-				item->activeState = STATE_MAFIA2_STOP_START_JUMP;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 50;
+				item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				if (canJump2sectors)
-					item->targetState = STATE_MAFIA2_JUMPING_2BLOCKS;
+					item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 				else
-					item->targetState = STATE_MAFIA2_JUMPING_1BLOCK;
+					item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
 				creature->LOT.isJumping = true;
 			}
 			else if (info.distance < SQUARE(3072))
 			{
-				item->targetState = STATE_MAFIA2_WALK;
+				item->TargetState = STATE_MAFIA2_WALK;
 			}
 			break;
 		case STATE_MAFIA2_UNDRAW_GUNS:
 			creature->maximumTurn = 0;
 			if (info.angle >= 0)
-				item->pos.yRot += ANGLE(2);
+				item->Position.yRot += ANGLE(2);
 			else
-				item->pos.yRot -= ANGLE(2);
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 16 
-				&& item->swapMeshFlags == 9216)
-				item->swapMeshFlags = 128;
+				item->Position.yRot -= ANGLE(2);
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 16 
+				&& item->SwapMeshFlags == 9216)
+				item->SwapMeshFlags = 128;
 			break;
 		default:
 			break;
@@ -1303,27 +1303,27 @@ void Mafia2Control(short itemNum)
 	}
 	else
 	{
-		if (item->activeState != STATE_MAFIA2_DEATH2 && item->activeState != STATE_MAFIA2_DEATH1)
+		if (item->ActiveState != STATE_MAFIA2_DEATH2 && item->ActiveState != STATE_MAFIA2_DEATH1)
 		{
 			if (info.angle >= 12288 || info.angle <= -12288)
 			{
-				item->activeState = STATE_MAFIA2_DEATH2;
-				item->animNumber = Objects[item->objectNumber].animIndex + 16;
-				item->pos.yRot += info.angle - ANGLE(180);
+				item->ActiveState = STATE_MAFIA2_DEATH2;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
+				item->Position.yRot += info.angle - ANGLE(180);
 			}
 			else
 			{
-				item->activeState = STATE_MAFIA2_DEATH1;
-				item->animNumber = Objects[item->objectNumber].animIndex + 11;
-				item->pos.yRot += info.angle;
+				item->ActiveState = STATE_MAFIA2_DEATH1;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
+				item->Position.yRot += info.angle;
 			}
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 	}
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-	if (item->activeState >= 20 || item->activeState == 6 || item->activeState == 8)
+	if (item->ActiveState >= 20 || item->ActiveState == 6 || item->ActiveState == 8)
 	{
 		CreatureAnimation(itemNum, angle, 0);
 	}
@@ -1333,39 +1333,39 @@ void Mafia2Control(short itemNum)
 		{
 		case 0:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 38;
-			item->activeState = 23;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 38;
+			item->ActiveState = 23;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 1:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 39;
-			item->activeState = 24;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 39;
+			item->ActiveState = 24;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 2:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 40;
-			item->activeState = 25;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 40;
+			item->ActiveState = 25;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 6:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 35;
-			item->activeState = 20;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
+			item->ActiveState = 20;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 7:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 36;
-			item->activeState = 21;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
+			item->ActiveState = 21;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 8:
 			creature->maximumTurn = 0;
-			item->animNumber = Objects[item->objectNumber].animIndex + 37;
-			item->activeState = 22;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
+			item->ActiveState = 22;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		default:
 			return;

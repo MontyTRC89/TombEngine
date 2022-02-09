@@ -15,21 +15,21 @@ namespace TEN::Entities::TR4
         ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		// Set bone mutators to 0 by default
-		for (int i = 0; i < item->mutator.size(); i++)
-			item->mutator[i].Scale.y = 0.0f;
+		for (int i = 0; i < item->Mutator.size(); i++)
+			item->Mutator[i].Scale.y = 0.0f;
 
-        item->pos.yRot = GetRandomControl() * 1024;
-        item->itemFlags[2] = GetRandomControl() & 1;
+        item->Position.yRot = GetRandomControl() * 1024;
+        item->ItemFlags[2] = GetRandomControl() & 1;
 
-        short roomNumber = item->roomNumber;
-        FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-        int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+        short roomNumber = item->RoomNumber;
+        FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+        int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
         // TODO: check this optimized division
         //v6 = 1321528399i64 * ((height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) << 12);
         //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
 
-        item->itemFlags[3] = (short)((height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) * 1024 * 12 / 13);
+        item->ItemFlags[3] = (short)((height - GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos)) * 1024 * 12 / 13);
     }
 
     void JobySpikesControl(short itemNumber)
@@ -42,49 +42,49 @@ namespace TEN::Entities::TR4
         ANIM_FRAME* framePtr[2];
         int rate;
 
-        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
+        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
         GetFrame(LaraItem, framePtr, &rate);
 
-        int dy = LaraItem->pos.yPos + framePtr[0]->boundingBox.Y1;
-        int dl = 3328 * item->itemFlags[1] / 4096;
+        int dy = LaraItem->Position.yPos + framePtr[0]->boundingBox.Y1;
+        int dl = 3328 * item->ItemFlags[1] / 4096;
 
-        if (LaraItem->hitPoints > 0)
+        if (LaraItem->HitPoints > 0)
         {
-            if (item->pos.yPos + dl > dy)
+            if (item->Position.yPos + dl > dy)
             {
-                if (abs(item->pos.xPos - LaraItem->pos.xPos) < 512)
+                if (abs(item->Position.xPos - LaraItem->Position.xPos) < 512)
                 {
-                    if (abs(item->pos.zPos - LaraItem->pos.zPos) < 512)
+                    if (abs(item->Position.zPos - LaraItem->Position.zPos) < 512)
                     {
-                        int x = (GetRandomControl() & 0x7F) + LaraItem->pos.xPos - 64;
-                        int y = dy + GetRandomControl() % (item->pos.yPos - dy + dl);
-                        int z = (GetRandomControl() & 0x7F) + LaraItem->pos.zPos - 64;
+                        int x = (GetRandomControl() & 0x7F) + LaraItem->Position.xPos - 64;
+                        int y = dy + GetRandomControl() % (item->Position.yPos - dy + dl);
+                        int z = (GetRandomControl() & 0x7F) + LaraItem->Position.zPos - 64;
 
-                        DoBloodSplat(x, y, z, (GetRandomControl() & 3) + 2, 2 * GetRandomControl(), item->roomNumber);
-                        LaraItem->hitPoints -= 8;
+                        DoBloodSplat(x, y, z, (GetRandomControl() & 3) + 2, 2 * GetRandomControl(), item->RoomNumber);
+                        LaraItem->HitPoints -= 8;
                     }
                 }
             }
         }
 
-        if (item->itemFlags[2])
+        if (item->ItemFlags[2])
         {
-            if (item->itemFlags[0] > -4096)
-                item->itemFlags[0] = item->itemFlags[1] + (item->itemFlags[1] / 64) - 2;
+            if (item->ItemFlags[0] > -4096)
+                item->ItemFlags[0] = item->ItemFlags[1] + (item->ItemFlags[1] / 64) - 2;
         }
-        else if (item->itemFlags[0] < 4096)
-            item->itemFlags[0] = (item->itemFlags[1] / 64) + item->itemFlags[1] + 2;
+        else if (item->ItemFlags[0] < 4096)
+            item->ItemFlags[0] = (item->ItemFlags[1] / 64) + item->ItemFlags[1] + 2;
 
-        if (item->itemFlags[1] < item->itemFlags[3])
-            item->itemFlags[1] += 3;
+        if (item->ItemFlags[1] < item->ItemFlags[3])
+            item->ItemFlags[1] += 3;
 
-        item->pos.yRot += item->itemFlags[0];
+        item->Position.yRot += item->ItemFlags[0];
 
 		// Update bone mutators
-		if (item->itemFlags[1])
+		if (item->ItemFlags[1])
 		{
-			for (int i = 0; i < item->mutator.size(); i++)
-				item->mutator[i].Scale = Vector3(1.0f, item->itemFlags[1] / 4096.0f, 1.0f);
+			for (int i = 0; i < item->Mutator.size(); i++)
+				item->Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 		}
     }
 }

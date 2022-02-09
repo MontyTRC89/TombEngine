@@ -44,15 +44,15 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((((TrInput & IN_ACTION) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-			&& l->activeState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
+			&& l->ActiveState == LS_IDLE
+			&& l->AnimNumber == LA_STAND_IDLE
 			&& Lara.gunStatus == LG_HANDS_FREE
-			&& item->itemFlags[0] == 0)
+			&& item->ItemFlags[0] == 0)
 			|| (Lara.isMoving && Lara.interactedItem == itemNum))
 		{
-			if (item->activeState == SWITCH_ON)
+			if (item->ActiveState == SWITCH_ON)
 			{
-				l->pos.yRot ^= (short)ANGLE(180);
+				l->Position.yRot ^= (short)ANGLE(180);
 
 				if (TestLaraPosition(&CrowbarBounds2, item, l))
 				{
@@ -61,9 +61,9 @@ namespace TEN::Entities::Switches
 						if (MoveLaraPosition(&CrowbarPos2, item, l))
 						{
 							doSwitch = 1;
-							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
-							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-							item->targetState = SWITCH_OFF;
+							l->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+							item->TargetState = SWITCH_OFF;
 						}
 						else
 						{
@@ -82,7 +82,7 @@ namespace TEN::Entities::Switches
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
-				l->pos.yRot ^= (short)ANGLE(180);
+				l->Position.yRot ^= (short)ANGLE(180);
 			}
 			else
 			{
@@ -93,9 +93,9 @@ namespace TEN::Entities::Switches
 						if (MoveLaraPosition(&CrowbarPos, item, l))
 						{
 							doSwitch = 1;
-							l->animNumber = LA_CROWBAR_USE_ON_FLOOR;
-							l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-							item->targetState = SWITCH_ON;
+							l->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+							item->TargetState = SWITCH_ON;
 						}
 						else
 						{
@@ -125,23 +125,23 @@ namespace TEN::Entities::Switches
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{
-					if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
+					if (OldPickupPos.x != l->Position.xPos || OldPickupPos.y != l->Position.yPos || OldPickupPos.z != l->Position.zPos)
 					{
-						OldPickupPos.x = l->pos.xPos;
-						OldPickupPos.y = l->pos.yPos;
-						OldPickupPos.z = l->pos.zPos;
+						OldPickupPos.x = l->Position.xPos;
+						OldPickupPos.y = l->Position.yPos;
+						OldPickupPos.z = l->Position.zPos;
 						SayNo();
 					}
 				}
 			}
 			else
 			{
-				l->targetState = LS_SWITCH_DOWN;
-				l->activeState = LS_SWITCH_DOWN;
+				l->TargetState = LS_SWITCH_DOWN;
+				l->ActiveState = LS_SWITCH_DOWN;
 				Lara.isMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
-				item->status = ITEM_ACTIVE;
+				item->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNum);
 				AnimateItem(item);
