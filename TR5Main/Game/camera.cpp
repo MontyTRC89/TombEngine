@@ -1210,7 +1210,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange < 128)
 			BinocularRange = 128;
 		else 
-			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
+			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 	else if (InputBusy & IN_DUCK)
 	{
@@ -1218,7 +1218,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange > 1536)
 			BinocularRange = 1536;
 		else
-			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
+			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 
 	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
