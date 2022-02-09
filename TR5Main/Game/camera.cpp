@@ -1268,11 +1268,11 @@ void BinocularCamera(ITEM_INFO* item)
 					firing = 1;
 
 					if (info->Weapons[WEAPON_HK].HasSilencer)
-						SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
+						SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-						SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
+						SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 					}
 				}
 				else if (info->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
@@ -1289,11 +1289,11 @@ void BinocularCamera(ITEM_INFO* item)
 						firing = 1;
 
 						if (info->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 						}
 					}
 					else
@@ -1301,11 +1301,11 @@ void BinocularCamera(ITEM_INFO* item)
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
 						if (info->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 						}
 					}
 				}
@@ -1314,11 +1314,11 @@ void BinocularCamera(ITEM_INFO* item)
 					if (LSHKTimer)
 					{
 						if (info->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
+							SoundEffect(SSFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 						}
 					}
 					else
@@ -1331,7 +1331,7 @@ void BinocularCamera(ITEM_INFO* item)
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 						}
 					}
 
