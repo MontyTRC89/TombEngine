@@ -120,8 +120,8 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->fallspeed = 0;
-	item->airborne = false;
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);

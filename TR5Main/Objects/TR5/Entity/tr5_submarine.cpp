@@ -153,8 +153,8 @@ static void SubmarineAttack(ITEM_INFO* item)
 		torpedoItem->pos.xRot = 0;
 		torpedoItem->pos.yRot = item->pos.yRot;
 		torpedoItem->pos.zRot = 0;
-		torpedoItem->speed = 0;
-		torpedoItem->fallspeed = 0;
+		torpedoItem->Velocity = 0;
+		torpedoItem->VerticalVelocity = 0;
 		torpedoItem->itemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
@@ -396,31 +396,31 @@ void ChaffFlareControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
-	if (item->fallspeed)
+	if (item->VerticalVelocity)
 	{
 		item->pos.xRot += ANGLE(3);
 		item->pos.zRot += ANGLE(5);
 	}
 
-	int dx = item->speed * phd_sin(item->pos.yRot);
-	int dz = item->speed * phd_cos(item->pos.yRot);
+	int dx = item->Velocity * phd_sin(item->pos.yRot);
+	int dz = item->Velocity * phd_cos(item->pos.yRot);
 
 	item->pos.xPos += dx;
 	item->pos.zPos += dz;
 	
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		item->fallspeed += (5 - item->fallspeed) / 2;
-		item->speed += (5 - item->speed) / 2;
+		item->VerticalVelocity += (5 - item->VerticalVelocity) / 2;
+		item->Velocity += (5 - item->Velocity) / 2;
 	}
 	else
 	{
-		item->fallspeed += GRAVITY;
+		item->VerticalVelocity += GRAVITY;
 	}
 
-	item->pos.yPos += item->fallspeed;
+	item->pos.yPos += item->VerticalVelocity;
 
-	DoProjectileDynamics(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->fallspeed, dz);
+	DoProjectileDynamics(itemNumber, item->pos.xPos, item->pos.yPos, item->pos.zPos, dx, item->VerticalVelocity, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;
@@ -438,7 +438,7 @@ void ChaffFlareControl(short itemNumber)
 
 	if (item->itemFlags[0] >= 300)
 	{
-		if (!item->fallspeed && !item->speed)
+		if (!item->VerticalVelocity && !item->Velocity)
 		{
 			if (item->itemFlags[1] <= 90)
 			{
@@ -513,14 +513,14 @@ void TorpedoControl(short itemNumber)
 	short angles[2];
 	phd_GetVectorAngles(pos.x - item->pos.xPos, pos.y - item->pos.yPos, pos.z - item->pos.zPos, angles);
 
-	if (item->speed >= 48)
+	if (item->Velocity >= 48)
 	{
-		if (item->speed < 192)
-			item->speed++;
+		if (item->Velocity < 192)
+			item->Velocity++;
 	}
 	else
 	{
-		item->speed += 4;
+		item->Velocity += 4;
 	}
 
 	item->itemFlags[1]++;
@@ -566,12 +566,12 @@ void TorpedoControl(short itemNumber)
 	int y = item->pos.yPos;
 	int z = item->pos.zPos;
 
-	item->pos.zRot += 16 * item->speed;
+	item->pos.zRot += 16 * item->Velocity;
 
-	int c = item->speed * phd_cos(item->pos.xRot);
+	int c = item->Velocity * phd_cos(item->pos.xRot);
 
 	item->pos.xPos += c * phd_sin(item->pos.yRot);
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
+	item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
 	item->pos.zPos += c * phd_cos(item->pos.yRot);
 
 	short roomNumber = item->roomNumber;

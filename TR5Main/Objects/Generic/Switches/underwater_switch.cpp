@@ -80,7 +80,7 @@ namespace TEN::Entities::Switches
 					{
 						if (MoveLaraPosition(&UnderwaterSwitchPos, item, l))
 						{
-							l->fallspeed = 0;
+							l->VerticalVelocity = 0;
 							l->targetState = LS_SWITCH_DOWN;
 
 							do
@@ -141,7 +141,7 @@ namespace TEN::Entities::Switches
 				l->activeState = LS_SWITCH_DOWN;
 				l->animNumber = LA_UNDERWATER_CEILING_SWITCH_PULL;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->fallspeed = 0;
+				l->VerticalVelocity = 0;
 				Lara.isMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->targetState = SWITCH_ON;

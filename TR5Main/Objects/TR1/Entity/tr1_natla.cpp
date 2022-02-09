@@ -79,12 +79,12 @@ void NatlaControl(short itemNum)
 		case NATLA_FALL:
 			if (item->pos.yPos < item->floor)
 			{
-				item->airborne = true;
-				item->speed = 0;
+				item->Airborne = true;
+				item->Velocity = 0;
 			}
 			else
 			{
-				item->airborne = 0;
+				item->Airborne = 0;
 				item->targetState = NATLA_SEMIDEATH;
 				item->pos.yPos = item->floor;
 				timer = 0;

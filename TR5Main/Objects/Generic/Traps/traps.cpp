@@ -47,7 +47,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		y = l->pos.yPos;
 		z = l->pos.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
-		damage = item->fallspeed > 0 ? 96 : 0;
+		damage = item->VerticalVelocity > 0 ? 96 : 0;
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
@@ -224,28 +224,28 @@ void WreckingBallControl(short itemNumber)
 		{
 			SoundEffect(SFX_TR5_J_GRAB_DROP, &item->pos, 0);
 			++item->itemFlags[1];
-			item->fallspeed = 6;
-			item->pos.yPos += item->fallspeed;
+			item->VerticalVelocity = 6;
+			item->pos.yPos += item->VerticalVelocity;
 		}
 	}
 	else if (item->itemFlags[1] == 2)
 	{
-		item->fallspeed += 24;
-		item->pos.yPos += item->fallspeed;
+		item->VerticalVelocity += 24;
+		item->pos.yPos += item->VerticalVelocity;
 		room = item->roomNumber;
 		height = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (height < item->pos.yPos)
 		{
 			item->pos.yPos = height;
-			if (item->fallspeed > 48)
+			if (item->VerticalVelocity > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->fallspeed = -item->fallspeed >> 3;
+				item->VerticalVelocity = -item->VerticalVelocity >> 3;
 			}
 			else
 			{
 				++item->itemFlags[1];
-				item->fallspeed = 0;
+				item->VerticalVelocity = 0;
 			}
 		}
 		else if (height - item->pos.yPos < 1536 && item->activeState)
@@ -255,23 +255,23 @@ void WreckingBallControl(short itemNumber)
 	}
 	else if (item->itemFlags[1] == 3)
 	{
-		item->fallspeed -= 3;
-		item->pos.yPos += item->fallspeed;
+		item->VerticalVelocity -= 3;
+		item->pos.yPos += item->VerticalVelocity;
 		if (item->pos.yPos < item2->pos.yPos + 1644)
 		{
 			StopSoundEffect(SFX_TR5_J_GRAB_WINCH_UP_LP);
 			item->itemFlags[0] = 1;
 			item->pos.yPos = item2->pos.yPos + 1644;
-			if (item->fallspeed < -32)
+			if (item->VerticalVelocity < -32)
 			{
 				SoundEffect(SFX_TR5_J_GRAB_IMPACT, &item->pos, 4104);
-				item->fallspeed = -item->fallspeed >> 3;
+				item->VerticalVelocity = -item->VerticalVelocity >> 3;
 				BounceCamera(item, 16, 8192);
 			}
 			else
 			{
 				item->itemFlags[1] = -1;
-				item->fallspeed = 0;
+				item->VerticalVelocity = 0;
 				item->itemFlags[0] = 0;
 			}
 		}

@@ -348,8 +348,8 @@ void InitialiseItem(short itemNum)
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
 
-	item->fallspeed = 0;
-	item->speed = 0;
+	item->VerticalVelocity = 0;
+	item->Velocity = 0;
 
 	item->itemFlags[3] = 0;
 	item->itemFlags[2] = 0;
@@ -358,7 +358,7 @@ void InitialiseItem(short itemNum)
 
 	item->active = false;
 	item->status = ITEM_NOT_ACTIVE;
-	item->airborne = false;
+	item->Airborne = false;
 	item->hitStatus = false;
 	item->collidable = true;
 	item->lookedAt = false;

@@ -70,13 +70,13 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	if (coll->Setup.EnableObjectPush)
 	{
-		if (item->speed > 0)
+		if (item->Velocity > 0)
 			ItemPushItem(item, laraitem, coll, coll->Setup.EnableSpasm, 0);
 		else
 			ItemPushItem(item, laraitem, coll, 0, 0);
 	}
 
-	if (Lara.Vehicle == NO_ITEM && item->speed > 0)
+	if (Lara.Vehicle == NO_ITEM && item->Velocity > 0)
 	{
 		laraitem->hitStatus = true;
 		laraitem->hitPoints -= 100;
@@ -209,7 +209,7 @@ void SkidManControl(short riderNum)
 	{
 		skidman->jointRotation[0] = (skidman->jointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(155, &item->pos, 4 + ((0x10000 - (100 - item->speed) * 100) << 8));
+		SoundEffect(155, &item->pos, 4 + ((0x10000 - (100 - item->Velocity) * 100) << 8));
 	}
 
 	CreatureAnimation(item_number, angle, 0);
@@ -226,7 +226,7 @@ void SkidManControl(short riderNum)
 		rider->animNumber = item->animNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
 		rider->frameNumber = item->frameNumber + (g_Level.Anims[rider->animNumber].frameBase - g_Level.Anims[item->animNumber].frameBase);
 	}
-	else if (rider->status == ITEM_DEACTIVATED && item->speed == 0 && item->fallspeed == 0)
+	else if (rider->status == ITEM_DEACTIVATED && item->Velocity == 0 && item->VerticalVelocity == 0)
 	{
 		RemoveActiveItem(riderNum);
 		rider->collidable = false;

@@ -442,28 +442,28 @@ namespace TEN::Entities::TR4
 			switch (item->activeState)
 			{
 			case STATE_BADDY_DEATH:
-				item->airborne = true;
+				item->Airborne = true;
 				currentCreature->LOT.isMonkeying = false;
 				if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
-					item->fallspeed = 0;
-					item->airborne = false;
+					item->VerticalVelocity = 0;
+					item->Airborne = false;
 				}
 				break;
 
 			case STATE_BADDY_MONKEY_TO_FREEFALL:
 				item->targetState = STATE_BADDY_FREEFALL;
-				item->airborne = false;
+				item->Airborne = false;
 				break;
 
 			case STATE_BADDY_FREEFALL:
-				item->airborne = true;
+				item->Airborne = true;
 				if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
-					item->fallspeed = 0;
-					item->airborne = false;
+					item->VerticalVelocity = 0;
+					item->Airborne = false;
 					item->targetState = STATE_BADDY_FREEFALL_LAND_DEATH;
 				}
 				break;
@@ -478,7 +478,7 @@ namespace TEN::Entities::TR4
 				item->animNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_MONKEY_TO_FREEFALL;
 				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				item->activeState = STATE_BADDY_MONKEY_TO_FREEFALL;
-				item->speed = 0;
+				item->Velocity = 0;
 				break;
 
 			default:
@@ -1045,9 +1045,9 @@ namespace TEN::Entities::TR4
 						LaraItem->targetState = LS_JUMP_UP;
 						LaraItem->animNumber = LA_JUMP_UP;
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->frameNumber].frameBase + 9;
-						LaraItem->airborne = true;
-						LaraItem->speed = 2;
-						LaraItem->fallspeed = 1;
+						LaraItem->Airborne = true;
+						LaraItem->VerticalVelocity = 2;
+						LaraItem->VerticalVelocity = 1;
 						LaraItem->pos.yPos += (STEP_SIZE * 0.75f);
 						Lara.gunStatus = LG_HANDS_FREE;
 						currentCreature->flags = 1;

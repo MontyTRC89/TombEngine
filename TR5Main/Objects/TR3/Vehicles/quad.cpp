@@ -271,8 +271,8 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 			lara->pos.xPos = pos.x;
 			lara->pos.yPos = pos.y;
 			lara->pos.zPos = pos.z;
-			lara->fallspeed = quad->fallspeed;
-			lara->airborne = true;
+			lara->VerticalVelocity = quad->VerticalVelocity;
+			lara->Airborne = true;
 			lara->pos.xRot = 0;
 			lara->pos.zRot = 0;
 			lara->hitPoints = 0;
@@ -285,8 +285,8 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		{
 			quadInfo->flags |= QUAD_FLAG_DEAD;
 			lara->targetState = LS_DEATH;
-			lara->fallspeed = DAMAGE_START + DAMAGE_LENGTH;
-			lara->speed = 0;
+			lara->VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
+			lara->VerticalVelocity = 0;
 
 			return false;
 		}
@@ -302,7 +302,7 @@ static int GetOnQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, COLL_INFO* coll)
 	LaraInfo*& laraInfo = lara->data;
 
 	if (!(TrInput & IN_ACTION) ||
-		lara->airborne ||
+		lara->Airborne ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
 		quad->flags & ONESHOT ||
 		abs(quad->pos.yPos - lara->pos.yPos) > STEP_SIZE)
@@ -375,7 +375,7 @@ static void QuadBaddieCollision(ITEM_INFO* lara, ITEM_INFO* quad)
 					{
 						if (TestBoundsCollide(item, quad, QUAD_RADIUS))
 						{
-							DoLotsOfBlood(item->pos.xPos, quad->pos.yPos - STEP_SIZE, item->pos.zPos, quad->speed, quad->pos.yRot, item->roomNumber, 3);
+							DoLotsOfBlood(item->pos.xPos, quad->pos.yPos - STEP_SIZE, item->pos.zPos, quad->VerticalVelocity, quad->pos.yRot, item->roomNumber, 3);
 							item->hitPoints = 0;
 						}
 					}
@@ -671,9 +671,9 @@ static int QuadDynamics(ITEM_INFO* lara, ITEM_INFO* quad)
 	probe = GetCollisionResult(quad);
 	int speed = 0;
 	if (quad->pos.yPos >= probe.Position.Floor)
-		speed = quad->speed * phd_cos(quad->pos.xRot);
+		speed = quad->VerticalVelocity * phd_cos(quad->pos.xRot);
 	else
-		speed = quad->speed;
+		speed = quad->VerticalVelocity;
 
 	quad->pos.zPos += speed * phd_cos(quadInfo->momentumAngle);
 	quad->pos.xPos += speed * phd_sin(quadInfo->momentumAngle);
@@ -946,7 +946,7 @@ static void AnimateQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, int collide, int d
 		case QUAD_STATE_FALL:
 			if (quad->pos.yPos == quad->floor)
 				lara->targetState = QUAD_STATE_LAND;
-			else if (quad->fallspeed > TERMINAL_FALLSPEED)
+			else if (quad->VerticalVelocity > TERMINAL_FALLSPEED)
 				quadInfo->flags |= QUAD_FLAG_IS_FALLING;
 
 			break;
@@ -1146,7 +1146,7 @@ static int QuadUserControl(ITEM_INFO* quad, int height, int* pitch)
 				quadInfo->revs = 0;
 		}
 
-		quad->speed = quadInfo->velocity / 256;
+		quad->VerticalVelocity = quadInfo->velocity / 256;
 
 		if (quadInfo->engineRevs > 0x7000)
 			quadInfo->engineRevs = -0x2000;
@@ -1373,7 +1373,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 
 	quadInfo->leftFallspeed = DoQuadDynamics(floorHeightLeft, quadInfo->leftFallspeed, (int*)&frontLeft.y);
 	quadInfo->rightFallspeed = DoQuadDynamics(floorHeightRight, quadInfo->rightFallspeed, (int*)&frontRight.y);
-	quad->fallspeed = DoQuadDynamics(probe.Position.Floor, quad->fallspeed, (int*)&quad->pos.yPos);
+	quad->VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quad->VerticalVelocity, (int*)&quad->pos.yPos);
 
 	probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
 	xRot = phd_atan(QUAD_FRONT, quad->pos.yPos - probe.Position.Floor);
@@ -1430,11 +1430,11 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 			pos.z = quadEffectsPositions[i].z;
 			GetJointAbsPosition(quad, &pos, quadEffectsPositions[i].meshNum);
 			angle = quad->pos.yRot + ((i == 0) ? 0x9000 : 0x7000);
-			if (quad->speed > 32)
+			if (quad->VerticalVelocity > 32)
 			{
-				if (quad->speed < 64)
+				if (quad->VerticalVelocity < 64)
 				{
-					speed = 64 - quad->speed;
+					speed = 64 - quad->VerticalVelocity;
 					TriggerQuadExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 1);
 				}
 			}

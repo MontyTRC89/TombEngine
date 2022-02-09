@@ -18,10 +18,10 @@ void SpringBoardControl(short itemNumber)
 			return;
 
 		if (LaraItem->activeState == LS_WALK_BACK || LaraItem->activeState == LS_RUN_BACK)
-			LaraItem->speed = -LaraItem->speed;
+			LaraItem->Velocity = -LaraItem->Velocity;
 
-		LaraItem->fallspeed = -240;
-		LaraItem->airborne = true;
+		LaraItem->VerticalVelocity = -240;
+		LaraItem->Airborne = true;
 		LaraItem->animNumber = LA_FALL_START;
 		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 		LaraItem->activeState = LS_JUMP_FORWARD;

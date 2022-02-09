@@ -94,8 +94,8 @@ void FireHarpoon()
 
 		item->pos.zRot = 0;
 
-		item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
-		item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
+		item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+		item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot);
 		item->hitPoints = HARPOON_TIME;
 
 		AddActiveItem(itemNumber);
@@ -127,8 +127,8 @@ void HarpoonBoltControl(short itemNumber)
 			item->pos.xRot -= ANGLE(1);
 			if (item->pos.xRot < -ANGLE(90))
 				item->pos.xRot = -ANGLE(90);
-			item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot);
-			item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot);
+			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot);
+			item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot);
 			aboveWater = true;
 		}
 		else
@@ -137,15 +137,15 @@ void HarpoonBoltControl(short itemNumber)
 			if ((Wibble & 15) == 0)
 				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 			TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
-			item->fallspeed = -HARPOON_SPEED * phd_sin(item->pos.xRot) / 2;
-			item->speed = HARPOON_SPEED * phd_cos(item->pos.xRot) / 2;
+			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot) / 2;
+			item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot) / 2;
 			aboveWater = false;
 		}
 
 		// Update bolt's position
-		item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
-		item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
-		item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+		item->pos.xPos += item->Velocity * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+		item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
+		item->pos.zPos += item->Velocity * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
 	}
 	else
 	{
@@ -327,8 +327,8 @@ void FireGrenade()
 			item->pos.yRot += Lara.extraTorsoRot.y;
 		}
 
-		item->speed = GRENADE_SPEED;
-		item->fallspeed = -512 * phd_sin(item->pos.xRot);
+		item->Velocity = GRENADE_SPEED;
+		item->VerticalVelocity = -512 * phd_sin(item->pos.xRot);
 		item->activeState = item->pos.xRot;
 		item->targetState = item->pos.yRot;
 		item->requiredState = 0;
@@ -398,8 +398,8 @@ void GrenadeControl(short itemNumber)
 					newGrenade->pos.xRot = (GetRandomControl() & 0x3FFF) + ANGLE(45);
 					newGrenade->pos.yRot = GetRandomControl() * 2;
 					newGrenade->pos.zRot = 0;
-					newGrenade->speed = 64;
-					newGrenade->fallspeed = -64 * phd_sin(newGrenade->pos.xRot);
+					newGrenade->Velocity = 64;
+					newGrenade->VerticalVelocity = -64 * phd_sin(newGrenade->pos.xRot);
 					newGrenade->activeState = newGrenade->pos.xRot;
 					newGrenade->targetState = newGrenade->pos.yRot;
 					newGrenade->requiredState = 0;
@@ -441,35 +441,35 @@ void GrenadeControl(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->fallspeed += (5 - item->fallspeed) >> 1;
-		item->speed -= item->speed >> 2;
-		if (item->speed)
+		item->VerticalVelocity += (5 - item->VerticalVelocity) >> 1;
+		item->Velocity -= item->Velocity >> 2;
+		if (item->Velocity)
 		{
-			item->pos.zRot += (((item->speed >> 4) + 3) * ANGLE(1));
+			item->pos.zRot += (((item->Velocity >> 4) + 3) * ANGLE(1));
 			if (item->requiredState)
-				item->pos.yRot += (((item->speed >> 2) + 3) * ANGLE(1));
+				item->pos.yRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 2) + 3) * ANGLE(1));
+				item->pos.xRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
 		}
 	}
 	else
 	{
 		aboveWater = true;
 		someFlag = true;
-		item->fallspeed += 3;
-		if (item->speed)
+		item->VerticalVelocity += 3;
+		if (item->Velocity)
 		{
-			item->pos.zRot += (((item->speed >> 2) + 7) * ANGLE(1));
+			item->pos.zRot += (((item->Velocity >> 2) + 7) * ANGLE(1));
 			if (item->requiredState)
-				item->pos.yRot += (((item->speed >> 1) + 7) * ANGLE(1));
+				item->pos.yRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed >> 1) + 7) * ANGLE(1));
+				item->pos.xRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
 
 		}
 	}
 
 	// Trigger fire and smoke sparks in the direction of motion
-	if (item->speed && aboveWater)
+	if (item->Velocity && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(item->pos.yRot - ANGLE(180)),
@@ -486,9 +486,9 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Update grenade position
-	xv = item->speed * phd_sin(item->targetState);
-	yv = item->fallspeed;
-	zv = item->speed * phd_cos(item->targetState);
+	xv = item->Velocity * phd_sin(item->targetState);
+	yv = item->VerticalVelocity;
+	zv = item->Velocity * phd_cos(item->targetState);
 
 	item->pos.xPos += xv;
 	item->pos.yPos += yv;
@@ -758,23 +758,23 @@ void RocketControl(short itemNumber)
 	bool abovewater = false;
 	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 	{
-		if (item->speed > ROCKET_SPEED / 4)
-			item->speed -= (item->speed / 4);
+		if (item->Velocity > ROCKET_SPEED / 4)
+			item->Velocity -= (item->Velocity / 4);
 		else
 		{
-			item->speed += (item->speed / 4) + 4;
-			if (item->speed > ROCKET_SPEED / 4)
-				item->speed = ROCKET_SPEED / 4;
+			item->Velocity += (item->Velocity / 4) + 4;
+			if (item->Velocity > ROCKET_SPEED / 4)
+				item->Velocity = ROCKET_SPEED / 4;
 		}
 
-		item->pos.zRot += (((item->speed / 8) + 3) * ANGLE(1));
+		item->pos.zRot += (((item->Velocity / 8) + 3) * ANGLE(1));
 		abovewater = false;
 	}
 	else
 	{
-		if (item->speed < ROCKET_SPEED)
-			item->speed += (item->speed / 4) + 4;
-		item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
+		if (item->Velocity < ROCKET_SPEED)
+			item->Velocity += (item->Velocity / 4) + 4;
+		item->pos.zRot += (((item->Velocity / 4) + 7) * ANGLE(1));
 		abovewater = true;
 	}
 
@@ -807,9 +807,9 @@ void RocketControl(short itemNumber)
 	}
 
 	// Update rocket's position
-	short speed = item->speed * phd_cos(item->pos.xRot);
+	short speed = item->Velocity * phd_cos(item->pos.xRot);
 	item->pos.xPos += speed * phd_sin(item->pos.yRot);
-	item->pos.yPos += -item->speed * phd_sin(item->pos.xRot);
+	item->pos.yPos += -item->Velocity * phd_sin(item->pos.xRot);
 	item->pos.zPos += speed * phd_cos(item->pos.yRot);
 
 	bool explode = false;
@@ -1049,7 +1049,7 @@ void AnimateShotgun(int weaponType)
 	}
 
 	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
-	bool running = (weaponType == WEAPON_HK && LaraItem->speed != 0);
+	bool running = (weaponType == WEAPON_HK && LaraItem->Velocity != 0);
 	bool harpoonFired = false;
 
 	switch (item->activeState)
@@ -1269,8 +1269,8 @@ void CrossbowBoltControl(short itemNumber)
 	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
 		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		if (item->speed > 64)
-			item->speed -= (item->speed >> 4);
+		if (item->Velocity > 64)
+			item->Velocity -= (item->Velocity >> 4);
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, roomNumber, 4, 7, 0, 0, 0, 0);
 		aboveWater = false;
@@ -1281,9 +1281,9 @@ void CrossbowBoltControl(short itemNumber)
 	}
 
 	// Update bolt's position
-	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
-	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+	item->pos.xPos += item->Velocity * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
+	item->pos.zPos += item->Velocity * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -1594,7 +1594,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 			}
 		}
 
-		item->speed = 512;
+		item->Velocity = 512;
 
 		AddActiveItem(itemNumber);
 
@@ -1693,7 +1693,7 @@ void FireRocket()
 			item->pos.yRot += Lara.extraTorsoRot.y;
 		}
 
-		item->speed = 512 >> 5;
+		item->Velocity = 512 >> 5;
 		item->itemFlags[0] = 0;
 
 		AddActiveItem(itemNumber);

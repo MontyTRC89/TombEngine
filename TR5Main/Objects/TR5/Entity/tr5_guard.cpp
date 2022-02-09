@@ -332,7 +332,7 @@ void GuardControl(short itemNum)
 		ITEM_INFO * enemy = creature->enemy;
 		angle = CreatureTurn(item, creature->maximumTurn);
 		creature->enemy = LaraItem;
-		if (laraInfo.distance < 0x400000 && LaraItem->speed > 20
+		if (laraInfo.distance < 0x400000 && LaraItem->Velocity > 20
 			|| item->hitStatus
 			|| TargetVisible(item, &laraInfo))
 		{
@@ -672,7 +672,7 @@ void GuardControl(short itemNum)
 			break;
 		case 17:
 			joint2 = 0;
-			if (!item->hitStatus && LaraItem->speed < 40 && !Lara.hasFired)
+			if (!item->hitStatus && LaraItem->Velocity < 40 && !Lara.hasFired)
 				creature->alerted = false;
 			if (creature->alerted)
 				item->targetState = 18;
@@ -1074,7 +1074,7 @@ void Mafia2Control(short itemNum)
 		CreatureMood(item, &info, creature->enemy != LaraItem);
 		angle = CreatureTurn(item, creature->maximumTurn);
 		creature->enemy = LaraItem;
-		if (laraInfo.distance < SQUARE(2048) && LaraItem->speed > 20 || item->hitStatus || TargetVisible(item, &laraInfo))
+		if (laraInfo.distance < SQUARE(2048) && LaraItem->Velocity > 20 || item->hitStatus || TargetVisible(item, &laraInfo))
 		{
 			if (!(item->aiBits & FOLLOW))
 			{

@@ -76,8 +76,8 @@ namespace TEN::Entities::Generic
 			}
 
 			if (TrInput & IN_DRAW
-				&& !(LaraItem->airborne)
-				&& !LaraItem->fallspeed
+				&& !(LaraItem->Airborne)
+				&& !LaraItem->VerticalVelocity
 				&& LaraItem->activeState != LS_JUMP_PREPARE
 				&& LaraItem->activeState != LS_JUMP_UP
 				&& LaraItem->activeState != LS_JUMP_FORWARD
@@ -96,7 +96,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case 1:
-			if (Lara.leftArm.frameNumber < 12 && LaraItem->airborne)
+			if (Lara.leftArm.frameNumber < 12 && LaraItem->Airborne)
 			{
 				Lara.leftArm.lock = false;
 				Lara.leftArm.frameNumber = 0;
@@ -203,35 +203,35 @@ namespace TEN::Entities::Generic
 		int oldY = item->pos.yPos;
 		int oldZ = item->pos.zPos;
 
-		if (item->fallspeed)
+		if (item->VerticalVelocity)
 			item->pos.zRot += ANGLE(5);
-		else if (!item->speed)
+		else if (!item->Velocity)
 		{
 			item->pos.xRot = 0;
 			item->pos.zRot = 0;
 		}
 
-		int xv = item->speed * phd_sin(item->pos.yRot);
-		int zv = item->speed * phd_cos(item->pos.yRot);
+		int xv = item->Velocity * phd_sin(item->pos.yRot);
+		int zv = item->Velocity * phd_cos(item->pos.yRot);
 
 		item->pos.xPos += xv;
 		item->pos.zPos += zv;
 
 		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
 		{
-			item->fallspeed += (5 - item->fallspeed) / 2;
-			item->speed += (5 - item->speed) / 2;
+			item->VerticalVelocity += (5 - item->VerticalVelocity) / 2;
+			item->Velocity += (5 - item->Velocity) / 2;
 			if (item->itemFlags[3] != 0)
 				item->itemFlags[3] = 0;
 		}
 		else
 		{
-			item->fallspeed += 6;
+			item->VerticalVelocity += 6;
 		}
 
-		item->pos.yPos += item->fallspeed;
+		item->pos.yPos += item->VerticalVelocity;
 
-		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->fallspeed, zv);
+		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->VerticalVelocity, zv);
 
 		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, 0))
 		{
@@ -246,7 +246,7 @@ namespace TEN::Entities::Generic
 			{
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
 			}
-			item->speed >>= 1;
+			item->Velocity >>= 1;
 		}
 		if (item->itemFlags[3])
 		{
@@ -296,7 +296,7 @@ namespace TEN::Entities::Generic
 			|| !(TrInput & IN_ACTION)
 			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
-			|| l->airborne)
+			|| l->Airborne)
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, l, coll);

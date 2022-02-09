@@ -118,7 +118,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->airborne)
+	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->Airborne)
 		return 0;
 
 	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
@@ -249,7 +249,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (cart->Speed < 0xf000)
 		{
 			cart->Flags |= CF_STOPPED | CF_CONTROL;
-			cart->Speed = v->speed = 0;
+			cart->Speed = v->Velocity = 0;
 			return;
 		}
 		else
@@ -323,9 +323,9 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 	cart->Speed += (-cart->Gradient * 4);
 
-	if ((v->speed = cart->Speed / 256) < CART_MIN_VEL)
+	if ((v->Velocity = cart->Speed / 256) < CART_MIN_VEL)
 	{
-		v->speed = CART_MIN_VEL;
+		v->Velocity = CART_MIN_VEL;
 
 		StopSoundEffect(209);
 
@@ -341,7 +341,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (cart->YVel)
 			StopSoundEffect(209);
 		else
-			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
+			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->Velocity * 32768));
 	}
 
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
@@ -349,7 +349,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		float x, z;
 		unsigned short quad, deg;
 
-		if ((cart->TurnLen += (v->speed * 3)) > ANGLE(90))
+		if ((cart->TurnLen += (v->Velocity * 3)) > ANGLE(90))
 		{
 			if (cart->Flags & CF_TURNINGL)
 				v->pos.yRot = cart->TurnRot - 16384;
@@ -403,8 +403,8 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	}
 	else
 	{
-		v->pos.xPos += v->speed * phd_sin(v->pos.yRot);
-		v->pos.zPos += v->speed * phd_cos(v->pos.yRot);
+		v->pos.xPos += v->Velocity * phd_sin(v->pos.yRot);
+		v->pos.zPos += v->Velocity * phd_cos(v->pos.yRot);
 	}
 
 	cart->MidPos = TestMinecartHeight(v, 0, 0);
@@ -442,9 +442,9 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
 	{
 		if (cart->Flags & CF_TURNINGR)
-			v->pos.zRot = -(val * v->speed) / 512;
+			v->pos.zRot = -(val * v->Velocity) / 512;
 		else
-			v->pos.zRot = ((0x4000 - val) * v->speed) / 512;
+			v->pos.zRot = ((0x4000 - val) * v->Velocity) / 512;
 	}
 	else
 	{
@@ -688,7 +688,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		{
 			l->frameNumber = GetFrameNumber(v, 34) + 28;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | (CF_NOANIM);
-			cart->Speed = v->speed = 0;
+			cart->Speed = v->Velocity = 0;
 		}
 		break;
 	}
@@ -708,7 +708,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->activeState = l->targetState = CART_TURNDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | CF_STOPPED | CF_DEAD;
-			cart->Speed = v->speed = 0;
+			cart->Speed = v->Velocity = 0;
 			return;
 		}
 
@@ -719,7 +719,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 			l->activeState = l->targetState = CART_WALLDEATH;
 			cart->Flags = (cart->Flags & ~CF_CONTROL) | (CF_STOPPED | CF_DEAD);
-			cart->Speed = v->speed = 0;
+			cart->Speed = v->Velocity = 0;
 			l->hitPoints = -1;
 			return;
 		}
@@ -738,7 +738,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 				l->animNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 				l->activeState = l->targetState = CART_HIT;
-				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->speed, v->pos.yRot, l->roomNumber, 3);
+				DoLotsOfBlood(l->pos.xPos, l->pos.yPos - 768, l->pos.zPos, v->Velocity, v->pos.yRot, l->roomNumber, 3);
 
 				hits = (CART_NHITS * short((cart->Speed) / 2048));
 				if (hits < 20)

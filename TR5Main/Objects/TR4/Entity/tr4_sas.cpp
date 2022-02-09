@@ -487,7 +487,7 @@ namespace TEN::Entities::TR4
 
 				if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
 				{
-					if (!creature->enemy->speed)
+					if (!creature->enemy->Velocity)
 					{
 						angle2 += (GetRandomControl() & 0x1FF) - 256;
 						joint1 = angle2;
@@ -631,9 +631,9 @@ namespace TEN::Entities::TR4
 			}
 
 			grenadeItem->itemFlags[2] = 1;
-			grenadeItem->speed = 128;
+			grenadeItem->Velocity = 128;
 			grenadeItem->activeState = grenadeItem->pos.xRot;
-			grenadeItem->fallspeed = -128 * phd_sin(grenadeItem->pos.xRot);
+			grenadeItem->VerticalVelocity = -128 * phd_sin(grenadeItem->pos.xRot);
 			grenadeItem->targetState = grenadeItem->pos.yRot;
 			grenadeItem->requiredState = 0;
 			grenadeItem->hitPoints = 120;
@@ -695,7 +695,7 @@ namespace TEN::Entities::TR4
 			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
 			|| Lara.gunStatus
-			|| l->airborne
+			|| l->Airborne
 			|| item->flags & 0x3E00)
 			&& (!(Lara.isMoving) || Lara.interactedItem != itemNumber))
 		{

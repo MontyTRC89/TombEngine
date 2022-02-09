@@ -111,7 +111,7 @@ namespace TEN::Entities::TR4
 					l->animNumber = LA_MINE_DEATH;
 					l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					l->activeState = LS_DEATH;
-					l->speed = 0;
+					l->Velocity = 0;
 
 					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &item->pos, 0);
 				}

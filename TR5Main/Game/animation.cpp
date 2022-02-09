@@ -48,12 +48,12 @@ void AnimateLara(ITEM_INFO* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->fallspeed = *(cmd++);
-					item->speed = *(cmd++);
-					item->airborne = true;
+					item->VerticalVelocity = *(cmd++);
+					item->Velocity = *(cmd++);
+					item->Airborne = true;
 					if (info->calcJumpVelocity)
 					{
-						item->fallspeed = info->calcJumpVelocity;
+						item->VerticalVelocity = info->calcJumpVelocity;
 						info->calcJumpVelocity = 0;
 					}
 					break;
@@ -142,30 +142,30 @@ void AnimateLara(ITEM_INFO* item)
 		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
 	lateral >>= 16;
 
-	if (item->airborne)
+	if (item->Airborne)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->speed -= item->speed >> 3;
-			if (abs(item->speed) < 8)
+			item->Velocity -= item->Velocity >> 3;
+			if (abs(item->Velocity) < 8)
 			{
-				item->speed = 0;
-				item->airborne = false;
+				item->Velocity = 0;
+				item->Airborne = false;
 			}
-			if (item->fallspeed > 128)
-				item->fallspeed /= 2;
-			item->fallspeed -= item->fallspeed / 4;
-			if (item->fallspeed < 4)
-				item->fallspeed = 4;
-			item->pos.yPos += item->fallspeed;
+			if (item->VerticalVelocity > 128)
+				item->VerticalVelocity /= 2;
+			item->VerticalVelocity -= item->VerticalVelocity / 4;
+			if (item->VerticalVelocity < 4)
+				item->VerticalVelocity = 4;
+			item->pos.yPos += item->VerticalVelocity;
 		}
 		else
 		{
 			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
-			item->speed -= velocity >> 16;
-			item->speed += (velocity + anim->acceleration) >> 16;
-			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
-			item->pos.yPos += item->fallspeed;
+			item->Velocity -= velocity >> 16;
+			item->Velocity += (velocity + anim->acceleration) >> 16;
+			item->VerticalVelocity += (item->VerticalVelocity >= 128 ? 1 : GRAVITY);
+			item->pos.yPos += item->VerticalVelocity;
 		}
 	}
 	else
@@ -185,14 +185,14 @@ void AnimateLara(ITEM_INFO* item)
 				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
 		}
 
-		item->speed = velocity >> 16;
+		item->Velocity = velocity >> 16;
 	}
 
 	if (info->ropeParameters.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!info->isMoving)
-		MoveItem(item, info->moveAngle, item->speed, lateral);
+		MoveItem(item, info->moveAngle, item->Velocity, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);
@@ -230,9 +230,9 @@ void AnimateItem(ITEM_INFO* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->fallspeed = *(cmd++);
-					item->speed = *(cmd++);
-					item->airborne = true;
+					item->VerticalVelocity = *(cmd++);
+					item->Velocity = *(cmd++);
+					item->Airborne = true;
 					break;
 
 				case COMMAND_DEACTIVATE:
@@ -342,10 +342,10 @@ void AnimateItem(ITEM_INFO* item)
 
 	int lateral = 0;
 
-	if (item->airborne)
+	if (item->Airborne)
 	{
-		item->fallspeed += (item->fallspeed >= 128 ? 1 : 6);
-		item->pos.yPos += item->fallspeed;
+		item->VerticalVelocity += (item->VerticalVelocity >= 128 ? 1 : 6);
+		item->pos.yPos += item->VerticalVelocity;
 	}
 	else
 	{
@@ -353,7 +353,7 @@ void AnimateItem(ITEM_INFO* item)
 		if (anim->acceleration)
 			velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
 
-		item->speed = velocity >> 16;
+		item->Velocity = velocity >> 16;
 
 		lateral = anim->Xvelocity;
 		if (anim->Xacceleration)
@@ -362,7 +362,7 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	MoveItem(item, item->pos.yRot, item->speed, lateral);
+	MoveItem(item, item->pos.yRot, item->Velocity, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();

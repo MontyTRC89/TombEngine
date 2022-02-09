@@ -140,7 +140,7 @@ void InitialiseLaraAnims(ITEM_INFO* item)
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		Lara.waterStatus = LW_UNDERWATER;
-		item->fallspeed = 0;
+		item->VerticalVelocity = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else

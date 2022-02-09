@@ -242,9 +242,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	LaraItem->pos.yRot = item->pos.yRot;
 	LaraItem->pos.xRot = item->pos.xRot;
 	LaraItem->pos.zRot = item->pos.zRot;
-	LaraItem->fallspeed = 0;
-	LaraItem->airborne = false;
-	LaraItem->speed = 0;
+	LaraItem->VerticalVelocity = 0;
+	LaraItem->Airborne = false;
+	LaraItem->VerticalVelocity = 0;
 
 	if (item->roomNumber != LaraItem->roomNumber)
 		ItemNewRoom(Lara.itemNumber, item->roomNumber);
@@ -290,7 +290,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	pos.y = bite->y;
 	pos.z = bite->z;
 	GetJointAbsPosition(item, &pos, bite->meshNum);
-	return func(pos.x, pos.y, pos.z, item->speed, item->pos.yRot, item->roomNumber);
+	return func(pos.x, pos.y, pos.z, item->VerticalVelocity, item->pos.yRot, item->roomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
@@ -430,7 +430,7 @@ short CreatureTurn(ITEM_INFO* item, short maximumTurn)
 	x = creature->target.x - item->pos.xPos;
 	z = creature->target.z - item->pos.zPos;
 	angle = phd_atan(z, x) - item->pos.yRot;
-	range = item->speed * 16384 / maximumTurn;
+	range = item->VerticalVelocity * 16384 / maximumTurn;
 	distance = SQUARE(x) + SQUARE(z);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < SQUARE(range))
@@ -656,7 +656,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			CreatureTilt(item, (tilt * 2));
 	}
 
-	if (item->objectNumber != ID_TYRANNOSAUR && item->speed && item->hitPoints > 0)
+	if (item->objectNumber != ID_TYRANNOSAUR && item->VerticalVelocity && item->hitPoints > 0)
 		biffAngle = CreatureCreature(itemNumber);
 	else
 		biffAngle = 0;
@@ -730,7 +730,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
 		item->floor = GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos);
  
-		angle = (item->speed) ? phd_atan(item->speed, -dy) : 0;
+		angle = (item->VerticalVelocity) ? phd_atan(item->VerticalVelocity, -dy) : 0;
 		if (angle < -ANGLE(20))
 			angle = -ANGLE(20);
 		else if (angle > ANGLE(20))
@@ -1534,13 +1534,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.moveAngle) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
-		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.moveAngle) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
+		x = enemy->pos.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.moveAngle) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.moveAngle) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 	else
 	{
-		x = enemy->pos.xPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
-		z = enemy->pos.zPos + enemy->speed * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
+		x = enemy->pos.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->pos.yRot) - item->pos.xPos - obj->pivotLength * phd_sin(item->pos.yRot);
+		z = enemy->pos.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->pos.yRot) - item->pos.zPos - obj->pivotLength * phd_cos(item->pos.yRot);
 	}
 
 	y = item->pos.yPos - enemy->pos.yPos;

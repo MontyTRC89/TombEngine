@@ -54,9 +54,9 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 			grenadeItem->itemFlags[0] = 2;
 		}
 
-		grenadeItem->speed = 32;
+		grenadeItem->Velocity = 32;
 		grenadeItem->activeState = grenadeItem->pos.xRot;
-		grenadeItem->fallspeed = -32 * phd_sin(grenadeItem->pos.xRot);
+		grenadeItem->VerticalVelocity = -32 * phd_sin(grenadeItem->pos.xRot);
 		grenadeItem->targetState = grenadeItem->pos.yRot;
 		grenadeItem->requiredState = 0;
 		grenadeItem->hitPoints = 120;
@@ -385,12 +385,12 @@ void EnemyJeepControl(short itemNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (item->pos.yPos < item->floor)
-			item->airborne = true;
+			item->Airborne = true;
 		else
 		{
-			item->fallspeed = 0;
+			item->VerticalVelocity = 0;
 			item->pos.yPos = item->floor;
-			item->airborne = false;
+			item->Airborne = false;
 		}
 
 		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] * 1024) + 16777220);

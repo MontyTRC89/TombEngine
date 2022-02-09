@@ -102,7 +102,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -117,7 +117,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->moveAngle = (item->speed > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
+	info->moveAngle = (item->Velocity > 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -134,16 +134,16 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	info->moveAngle = (item->speed < 0) ? item->pos.yRot : info->moveAngle;
+	info->moveAngle = (item->Velocity < 0) ? item->pos.yRot : info->moveAngle;
 }
 
 // State:		LS_FREEFALL (9)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->speed = item->speed * 0.95f;
+	item->Velocity = item->Velocity * 0.95f;
 
-	if (item->fallspeed == LARA_FREEFALL_SCREAM_SPEED &&
+	if (item->VerticalVelocity == LARA_FREEFALL_SCREAM_SPEED &&
 		item->hitPoints > 0)
 	{
 		SoundEffect(SFX_TR4_LARA_FALL, &item->pos, 0);
@@ -233,7 +233,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -251,7 +251,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	if (info->ropeParameters.Ptr == -1)
-		item->airborne = true;
+		item->Airborne = true;
 
 	info->moveAngle = item->pos.yRot;
 
@@ -259,7 +259,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
 	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
 
-	coll->Setup.Height = item->fallspeed > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
+	coll->Setup.Height = item->VerticalVelocity > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -387,7 +387,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 
-	item->fallspeed = 0; // TODO: Check this.
+	item->VerticalVelocity = 0; // TODO: Check this.
 	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -476,7 +476,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -531,7 +531,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}*/
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -586,7 +586,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}*/
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -630,24 +630,24 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->speed += 2;
-		if (item->speed > 5)
-			item->speed = 5;
+		item->Velocity += 2;
+		if (item->Velocity > 5)
+			item->Velocity = 5;
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->speed -= 2;
-		if (item->speed < -5)
-			item->speed = -5;
+		item->Velocity -= 2;
+		if (item->Velocity < -5)
+			item->Velocity = -5;
 
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->pos.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->speed) - item->pos.xRot) / 3);
+		item->pos.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Velocity) - item->pos.xRot) / 3);
 		info->extraHeadRot.y += (ANGLE(10.0f) - item->pos.zRot) / 3;
 	}
 	else
-		item->speed = item->speed <= 0 ? -2 : 2;
+		item->Velocity = item->Velocity <= 0 ? -2 : 2;
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -667,7 +667,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->speed >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
+	coll->Setup.ForwardAngle = (item->Velocity >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 	GetCollisionInfo(coll, item);
 
@@ -686,7 +686,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		coll->CollisionType == CT_TOP_FRONT ||
 		coll->CollisionType == CT_CLAMP)
 	{
-		item->fallspeed = 1;
+		item->VerticalVelocity = 1;
 	}
 
 	ShiftItem(item, coll);
@@ -742,7 +742,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 		return;
@@ -786,7 +786,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
-	if (item->fallspeed >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL_DIVE;
 		return;
@@ -815,7 +815,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 		info->gunStatus = LG_HANDS_FREE;
 
-	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	{
 		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 
@@ -844,7 +844,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_freefall_dive()
 void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->speed = item->speed * 0.95f;
+	item->Velocity = item->Velocity * 0.95f;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
@@ -852,7 +852,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		DoLaraFallDamage(item);	// Should never occur before fall speed reaches death speed, but here for extendability.
 
-		if (item->hitPoints <= 0 || item->fallspeed >= LARA_FREEFALL_DIVE_DEATH_SPEED)
+		if (item->hitPoints <= 0 || item->VerticalVelocity >= LARA_FREEFALL_DIVE_DEATH_SPEED)
 			item->targetState = LS_DEATH;
 		else
 			item->targetState = LS_IDLE;

@@ -71,8 +71,8 @@ namespace TEN::Entities::Generic
 		else if (isLara && 
 				 TrInput & IN_ACTION &&
 			     !Lara.gunStatus && 
-				 l->airborne && 
-				 l->fallspeed > Lara.gunStatus && 
+				 l->Airborne && 
+				 l->VerticalVelocity > Lara.gunStatus && 
 				 l->activeState == LS_REACH || l->activeState == LS_JUMP_UP)
 		{
 			if (TestBoundsCollide(item, l, 100) &&
@@ -97,8 +97,8 @@ namespace TEN::Entities::Generic
 						l->animNumber = LA_JUMP_UP_TO_POLE;
 						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 					}
-					l->airborne = false;
-					l->fallspeed = false;
+					l->Airborne = false;
+					l->VerticalVelocity = false;
 					l->activeState = LS_POLE_IDLE;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					item->pos.yRot = rot;

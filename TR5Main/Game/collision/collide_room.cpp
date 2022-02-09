@@ -313,13 +313,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		tfLocation = GetRoom(item->location, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
+		tcLocation = GetRoom(item->location, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -349,13 +349,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -420,13 +420,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		lrfLocation = GetRoom(item->location, x, y, z);
 		height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
+		lrcLocation = GetRoom(item->location, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -473,13 +473,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -531,13 +531,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		lrfLocation = GetRoom(item->location, x, y, z);
 		height = GetFloorHeight(lrfLocation, x, z).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->location, x, y - item->fallspeed, z);
+		lrcLocation = GetRoom(item->location, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(lrcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -584,13 +584,13 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		tfLocation = GetRoom(tfLocation, x, y, z);
 		height = GetFloorHeight(tfLocation, x, z).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, x, y - item->fallspeed, z);
+		tcLocation = GetRoom(tcLocation, x, y - item->VerticalVelocity, z);
 		ceiling = GetCeilingHeight(tcLocation, x, z).value_or(NO_HEIGHT);
 	}
 	else
 	{
 		height = collResult.Position.Floor;
-		ceiling = GetCeiling(collResult.Block, x, y - item->fallspeed, z);
+		ceiling = GetCeiling(collResult.Block, x, y - item->VerticalVelocity, z);
 	}
 	if (height  != NO_HEIGHT) height -= (playerCollision ? yPos : y);
 	if (ceiling != NO_HEIGHT) ceiling -= y;
@@ -711,7 +711,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->speed);
+			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -763,7 +763,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->speed);
+			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;

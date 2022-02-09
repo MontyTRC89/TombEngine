@@ -430,28 +430,28 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_after_death(itemToSerialize.afterDeath);
 		serializedItem.add_box_number(itemToSerialize.boxNumber);
 		serializedItem.add_carried_item(itemToSerialize.carriedItem);
-		serializedItem.add_current_anim_state(itemToSerialize.activeState);
-		serializedItem.add_fall_speed(itemToSerialize.fallspeed);
+		serializedItem.add_active_state(itemToSerialize.activeState);
+		serializedItem.add_vertical_velocity(itemToSerialize.VerticalVelocity);
 		serializedItem.add_fired_weapon(itemToSerialize.firedWeapon);
 		serializedItem.add_flags(itemToSerialize.flags);
 		serializedItem.add_floor(itemToSerialize.floor);
 		serializedItem.add_frame_number(itemToSerialize.frameNumber);
-		serializedItem.add_goal_anim_state(itemToSerialize.targetState);
+		serializedItem.add_target_state(itemToSerialize.targetState);
 		serializedItem.add_hit_points(itemToSerialize.hitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
 		serializedItem.add_mesh_bits(itemToSerialize.meshBits);
 		serializedItem.add_object_id(itemToSerialize.objectNumber);
 		serializedItem.add_position(&position);
-		serializedItem.add_required_anim_state(itemToSerialize.requiredState);
+		serializedItem.add_required_state(itemToSerialize.requiredState);
 		serializedItem.add_room_number(itemToSerialize.roomNumber);
-		serializedItem.add_speed(itemToSerialize.speed);
+		serializedItem.add_velocity(itemToSerialize.Velocity);
 		serializedItem.add_timer(itemToSerialize.timer);
 		serializedItem.add_touch_bits(itemToSerialize.touchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.triggerFlags);
 		serializedItem.add_triggered((itemToSerialize.flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.active);
 		serializedItem.add_status(itemToSerialize.status);
-		serializedItem.add_airborne(itemToSerialize.airborne);
+		serializedItem.add_airborne(itemToSerialize.Airborne);
 		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
 		serializedItem.add_poisoned(itemToSerialize.poisoned);
 		serializedItem.add_ai_bits(itemToSerialize.aiBits);
@@ -926,8 +926,8 @@ bool SaveGame::Load(int slot)
 			item->pos.zRot = savedItem->position()->z_rot();
 		}
 
-		item->speed = savedItem->speed();
-		item->fallspeed = savedItem->fall_speed();
+		item->Velocity = savedItem->velocity();
+		item->VerticalVelocity = savedItem->vertical_velocity();
 
 		// Do the correct way for assigning new room number
 		if (item->objectNumber == ID_LARA)
@@ -952,9 +952,9 @@ bool SaveGame::Load(int slot)
 		}
 
 		// Animations
-		item->activeState = savedItem->current_anim_state();
-		item->requiredState = savedItem->required_anim_state();
-		item->targetState = savedItem->goal_anim_state();
+		item->activeState = savedItem->active_state();
+		item->requiredState = savedItem->required_state();
+		item->targetState = savedItem->target_state();
 		item->animNumber = obj->animIndex + savedItem->anim_number();
 		item->frameNumber = savedItem->frame_number();
 
@@ -979,7 +979,7 @@ bool SaveGame::Load(int slot)
 		item->hitStatus = savedItem->hit_stauts();
 		item->status = savedItem->status();
 		item->aiBits = savedItem->ai_bits();
-		item->airborne = savedItem->airborne();
+		item->Airborne = savedItem->airborne();
 		item->collidable = savedItem->collidable();
 		item->lookedAt = savedItem->looked_at();
 		item->poisoned = savedItem->poisoned();

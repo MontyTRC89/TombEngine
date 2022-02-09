@@ -520,7 +520,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	item->targetState = LS_LADDER_IDLE;
 	item->activeState = LS_LADDER_IDLE;
 
-	if (coll->Setup.OldAnimState != LS_LADDER_IDLE)
+	if (coll->Setup.OldState != LS_LADDER_IDLE)
 	{	
 		SetAnimation(item, LA_LADDER_IDLE);
 		return;
@@ -966,8 +966,8 @@ bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short roomNumber = item->roomNumber;
 
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 
 	if (TrInput & IN_ACTION && item->hitPoints > 0 || item->animNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
 		return false;
@@ -976,9 +976,9 @@ bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 
 	SetAnimation(item, LA_FALL_START);
 
-	item->speed = 2;
-	item->airborne = true;
-	item->fallspeed = 1;
+	item->Velocity = 2;
+	item->Airborne = true;
+	item->VerticalVelocity = 1;
 
 	Lara.gunStatus = LG_HANDS_FREE;
 

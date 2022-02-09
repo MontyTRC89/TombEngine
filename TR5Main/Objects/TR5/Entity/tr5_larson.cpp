@@ -104,14 +104,14 @@ void LarsonControl(short itemNumber)
 		if (CurrentLevel == 2)
 		{
 			item->itemFlags[3] = 1;
-			item->airborne = false;
+			item->Airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_DEACTIVATED;
 		}
 		else
 		{
-			item->airborne = false;
+			item->Airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_ACTIVE;
@@ -136,7 +136,7 @@ void LarsonControl(short itemNumber)
 		/*if (creature->flags)
 		{
 			item->hitPoints = 60;
-			item->airborne = false;
+			item->Airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_DESACTIVATED;
@@ -147,7 +147,7 @@ void LarsonControl(short itemNumber)
 		CreatureMood(item, &info, VIOLENT);
 
 		if (info.distance < SQUARE(2048) 
-			&& LaraItem->speed > 20
+			&& LaraItem->Velocity > 20
 			|| item->hitStatus
 			|| TargetVisible(item, &info) != 0)
 		{
@@ -404,7 +404,7 @@ void LarsonControl(short itemNumber)
 			item->targetState = STATE_TR5_LARSON_STOP;
 			item->requiredState = STATE_TR5_LARSON_STOP;
 			creature->reachedGoal = false;
-			item->airborne = false;
+			item->Airborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_NOT_ACTIVE;

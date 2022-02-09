@@ -303,7 +303,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 							getThisItemPlease = itemNum;
 							l->animNumber = LA_UNDERWATER_PICKUP_FLARE;
 							l->activeState = LS_PICKUP_FLARE;
-							l->fallspeed = 0;
+							l->VerticalVelocity = 0;
 						}
 						else
 						{
@@ -718,8 +718,8 @@ void PickupControl(short itemNum)
 	switch (triggerFlags)
 	{
 	case 5:
-		item->fallspeed += 6;
-		item->pos.yPos += item->fallspeed;
+		item->VerticalVelocity += 6;
+		item->pos.yPos += item->VerticalVelocity;
 		
 		roomNumber = item->roomNumber;
 		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -727,10 +727,10 @@ void PickupControl(short itemNum)
 		if (item->pos.yPos > item->itemFlags[0])
 		{
 			item->pos.yPos = item->itemFlags[0];
-			if (item->fallspeed <= 64)
+			if (item->VerticalVelocity <= 64)
 				item->triggerFlags &= 0xC0;
 			else
-				item->fallspeed = -item->fallspeed >> 2;
+				item->VerticalVelocity = -item->VerticalVelocity >> 2;
 		}
 
 		if (item->roomNumber != roomNumber)

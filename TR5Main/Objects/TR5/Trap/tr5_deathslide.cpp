@@ -26,7 +26,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->airborne || Lara.gunStatus != LG_HANDS_FREE || l->activeState != LS_IDLE)
+	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.gunStatus != LG_HANDS_FREE || l->activeState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -86,15 +86,15 @@ void ControlDeathSlide(short itemNumber)
 
 		AnimateItem(item);
 
-		if (item->fallspeed < 100)
-			item->fallspeed += 5;
+		if (item->VerticalVelocity < 100)
+			item->VerticalVelocity += 5;
 
 		float c = phd_cos(item->pos.yRot);
 		float s = phd_sin(item->pos.yRot);
 
-		item->pos.zPos += item->fallspeed * c;
-		item->pos.xPos += item->fallspeed * s;
-		item->pos.yPos += item->fallspeed / 4;
+		item->pos.zPos += item->VerticalVelocity * c;
+		item->pos.xPos += item->VerticalVelocity * s;
+		item->pos.yPos += item->VerticalVelocity / 4;
 
 		short roomNumber = item->roomNumber;
 		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -120,9 +120,9 @@ void ControlDeathSlide(short itemNumber)
 			{
 				LaraItem->targetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
-				LaraItem->airborne = true;
-				LaraItem->speed = item->fallspeed;
-				LaraItem->fallspeed = item->fallspeed / 4;
+				LaraItem->Airborne = true;
+				LaraItem->Velocity = item->VerticalVelocity;
+				LaraItem->VerticalVelocity = item->VerticalVelocity / 4;
 			}
 
 			// Stop

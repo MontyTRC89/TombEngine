@@ -52,17 +52,17 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->fallspeed += 16;
+		item->VerticalVelocity += 16;
 
-		if (item->fallspeed > 400)
-			item->fallspeed = 400;
+		if (item->VerticalVelocity > 400)
+			item->VerticalVelocity = 400;
 	}
 	else
 	{
-		if (item->fallspeed >= 8)
-			item->fallspeed -= item->fallspeed >> 3;
+		if (item->VerticalVelocity >= 8)
+			item->VerticalVelocity -= item->VerticalVelocity >> 3;
 		else
-			item->fallspeed = 0;
+			item->VerticalVelocity = 0;
 	}
 }
 
@@ -85,9 +85,9 @@ void LaraCheatyBits()
 				{
 					Lara.waterStatus = LW_FLYCHEAT;
 					SetAnimation(LaraItem, LA_DOZY);
-					LaraItem->airborne = false;
+					LaraItem->Airborne = false;
 					LaraItem->pos.xRot = ANGLE(30);
-					LaraItem->fallspeed = 30;
+					LaraItem->VerticalVelocity = 30;
 					LaraItem->hitPoints = 1000;
 					Lara.poisoned = 0;
 					Lara.air = 1800;

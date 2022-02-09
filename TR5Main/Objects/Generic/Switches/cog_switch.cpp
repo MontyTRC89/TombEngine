@@ -68,7 +68,7 @@ namespace TEN::Entities::Switches
 			if (!(item->flags & ONESHOT)
 				&& (TrInput & IN_ACTION
 					&& !Lara.gunStatus
-					&& !item->airborne
+					&& !item->Airborne
 					&& l->activeState == LS_IDLE
 					&& l->animNumber == LA_STAND_IDLE
 					|| Lara.isMoving
