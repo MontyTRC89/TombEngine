@@ -129,17 +129,17 @@ namespace TEN::Entities::TR4
 
 				int bloodCount = 0;
 
-				if ((item->itemFlags[0] > 1024 || LaraItem->airborne) 
+				if ((item->itemFlags[0] > 1024 || LaraItem->Airborne) 
 					&& (item->triggerFlags & 7) > 2 
 					&& (item->triggerFlags & 7) < 6)
 				{
-					if (LaraItem->fallspeed > 6 || item->itemFlags[0] > 1024)
+					if (LaraItem->VerticalVelocity > 6 || item->itemFlags[0] > 1024)
 					{
 						LaraItem->hitPoints = -1;
 						bloodCount = 20;
 					}
 				}
-				else if (LaraItem->speed >= 30)
+				else if (LaraItem->Velocity >= 30)
 				{
 					LaraItem->hitPoints -= 8;
 					bloodCount = (GetRandomControl() & 3) + 2;
@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 						LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 						LaraItem->activeState = LS_DEATH;
 						LaraItem->targetState = LS_DEATH;
-						LaraItem->airborne = false;
+						LaraItem->Airborne = false;
 					}
 				}
 			}

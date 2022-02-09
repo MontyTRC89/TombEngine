@@ -103,8 +103,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->pos.yRot;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -176,8 +176,8 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
-	item->airborne = 0;
-	item->fallspeed = 0;
+	item->Airborne = 0;
+	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
@@ -187,7 +187,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
-	// she becomes airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
+	// she becomes Airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
 		item->pos.xPos = coll->Setup.OldPosition.x;
@@ -199,7 +199,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		SetLaraFallState(item);
 		info->gunStatus = LG_HANDS_FREE;
-		item->speed /= 3;				// Truncate speed to prevent flying off.
+		item->Velocity /= 3;				// Truncate speed to prevent flying off.
 		return;
 	}
 
@@ -445,8 +445,8 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
-	item->fallspeed = 0;
-	item->airborne = false;
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	coll->Setup.ForwardAngle = info->moveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -544,8 +544,8 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
@@ -641,8 +641,8 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
@@ -824,8 +824,8 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		GetCollisionInfo(coll, item);
 		info->gunStatus = LG_HANDS_BUSY;
 		item->pos.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
-		item->airborne = true;
-		item->speed = 2;
-		item->fallspeed = 1;
+		item->Airborne = true;
+		item->Velocity = 2;
+		item->VerticalVelocity = 1;
 	}
 }

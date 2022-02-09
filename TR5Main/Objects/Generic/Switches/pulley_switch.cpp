@@ -47,7 +47,7 @@ namespace TEN::Entities::Switches
 			&& Lara.gunStatus == LG_HANDS_FREE
 			&& l->activeState == LS_IDLE
 			&& l->animNumber == LA_STAND_IDLE
-			&& l->airborne == false
+			&& l->Airborne == false
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			short oldYrot = item->pos.yRot;

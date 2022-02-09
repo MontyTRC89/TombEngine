@@ -143,28 +143,28 @@ void PushableBlockControl(short itemNumber)
 	}
 
 	// control block falling
-	if (item->airborne)
+	if (item->Airborne)
 	{
 		auto floorHeight = GetCollisionResult(item->pos.xPos, item->pos.yPos + 10, item->pos.zPos, item->roomNumber).Position.Floor;
 
-		if (item->pos.yPos < floorHeight - item->fallspeed)
+		if (item->pos.yPos < floorHeight - item->VerticalVelocity)
 		{
-			if (item->fallspeed + pushable->gravity < 128)
-				item->fallspeed += pushable->gravity;
+			if (item->VerticalVelocity + pushable->gravity < 128)
+				item->VerticalVelocity += pushable->gravity;
 			else
-				item->fallspeed++;
-			item->pos.yPos += item->fallspeed;
+				item->VerticalVelocity++;
+			item->pos.yPos += item->VerticalVelocity;
 
-			MoveStackY(itemNumber, item->fallspeed);
+			MoveStackY(itemNumber, item->VerticalVelocity);
 		}
 		else
 		{
-			item->airborne = false;
+			item->Airborne = false;
 			int relY = floorHeight - item->pos.yPos;
 			item->pos.yPos = floorHeight;
-			if (item->fallspeed >= 96)
+			if (item->VerticalVelocity >= 96)
 				FloorShake(item);
-			item->fallspeed = 0;
+			item->VerticalVelocity = 0;
 			SoundEffect(pushable->fallSound, &item->pos, 2);
 
 			MoveStackY(itemNumber, relY);
@@ -247,7 +247,7 @@ void PushableBlockControl(short itemNumber)
 					DoPushPull = 0;
 					LaraItem->targetState = LS_IDLE;
 
-					item->airborne = true; // do fall
+					item->Airborne = true; // do fall
 					return;
 				}
 			}
@@ -379,7 +379,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	if ((!(TrInput & IN_ACTION)
 		|| l->activeState != LS_IDLE
 		|| l->animNumber != LA_STAND_IDLE
-		|| l->airborne
+		|| l->Airborne
 		|| Lara.gunStatus
 		|| item->status == ITEM_INVISIBLE
 		|| item->triggerFlags < 0)

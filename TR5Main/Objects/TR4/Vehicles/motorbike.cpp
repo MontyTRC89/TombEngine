@@ -299,7 +299,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     short room_number;
 
     item = &g_Level.Items[itemNumber];
-    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->airborne)
+    if (item->flags & ONESHOT || Lara.gunStatus != LG_HANDS_FREE || LaraItem->Airborne)
         return false;
 
     if ((abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE || !(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
@@ -485,7 +485,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
         pos.z = -500;
         GetJointAbsPosition(item, &pos, 0);
 
-        speed = item->speed;
+        speed = item->VerticalVelocity;
         if (speed > 32 && speed < 64)
         {
             TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - ANGLE(180), 64 - speed, TRUE);
@@ -805,9 +805,9 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room_number);
     height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
     if (item->pos.yPos >= height)
-        speed = item->speed * phd_cos(item->pos.xRot);
+        speed = item->VerticalVelocity * phd_cos(item->pos.xRot);
     else
-        speed = item->speed;
+        speed = item->VerticalVelocity;
 
     item->pos.zPos += speed * phd_cos(motorbike->momentumAngle);
     item->pos.xPos += speed * phd_sin(motorbike->momentumAngle);
@@ -1096,7 +1096,7 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
                 {
                     LaraItem->targetState = BIKE_LANDING;
 
-                    int fallspeed_damage = item->fallspeed - 140;
+                    int fallspeed_damage = item->VerticalVelocity - 140;
                     if (fallspeed_damage > 0)
                     {
                         if (fallspeed_damage <= 100)
@@ -1105,7 +1105,7 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
                             LaraItem->hitPoints = 0;
                     }
                 }
-                else if (item->fallspeed > 220)
+                else if (item->VerticalVelocity > 220)
                     motorbike->flags |= FL_FALLING;
                 break;
 
@@ -1333,7 +1333,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             }
         }
 
-        item->speed = motorbike->velocity / 256;
+        item->VerticalVelocity = motorbike->velocity / 256;
 
         if (motorbike->engineRevs > MOTORBIKE_ACCEL_MAX)
             motorbike->engineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
@@ -1365,7 +1365,7 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even
     lara->targetState = BIKE_IDLE;
     lara->animNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_IDLE;
     lara->frameNumber = g_Level.Anims[lara->animNumber].frameBase;
-    lara->airborne = false;
+    lara->Airborne = false;
     item->animNumber = lara->animNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
     item->frameNumber = lara->frameNumber + (g_Level.Anims[ID_MOTORBIKE].frameBase - g_Level.Anims[ID_MOTORBIKE_LARA_ANIMS].frameBase);
     item->hitPoints = 1;
@@ -1450,7 +1450,7 @@ int MotorbikeControl(void)
     motorbike->wheelLeft = rotation;
     motorbike->wheelRight = rotation;
     int newy = item->pos.yPos;
-    item->fallspeed = DoMotorBikeDynamics(height, item->fallspeed, &item->pos.yPos, 0);
+    item->VerticalVelocity = DoMotorBikeDynamics(height, item->VerticalVelocity, &item->pos.yPos, 0);
 
     short xrot = 0, zrot = 0;
     int r1, r2;

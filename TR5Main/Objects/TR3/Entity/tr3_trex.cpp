@@ -23,7 +23,7 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	LaraItem->pos.yRot = item->pos.yRot;
 	LaraItem->pos.xRot = 0;
 	LaraItem->pos.zRot = 0;
-	LaraItem->airborne = false;
+	LaraItem->Airborne = false;
 
 	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
 	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;

@@ -67,16 +67,16 @@ void lara_col_swim(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->fallspeed = 0;
+	item->VerticalVelocity = 0;
 }
 
 void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
 	Lara.look = 0;
 
-	item->fallspeed -= 8;
-	if (item->fallspeed <= 0)
-		item->fallspeed = 0;
+	item->VerticalVelocity -= 8;
+	if (item->VerticalVelocity <= 0)
+		item->VerticalVelocity = 0;
 
 	if (item->pos.xRot < -ANGLE(2.0f) ||
 		item->pos.xRot > ANGLE(2.0f))
@@ -124,10 +124,10 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 		item->targetState = LS_UNDERWATER_FORWARD;
 
-	item->fallspeed -= 6;
+	item->VerticalVelocity -= 6;
 
-	if (item->fallspeed < 0)
-		item->fallspeed = 0;
+	if (item->VerticalVelocity < 0)
+		item->VerticalVelocity = 0;
 
 	if (Lara.gunStatus == LG_HANDS_BUSY)
 		Lara.gunStatus = LG_HANDS_FREE;
@@ -158,11 +158,11 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 		item->targetState = LS_UNDERWATER_FORWARD;
 
-	item->fallspeed -= 6;
-	if (item->fallspeed < 0)
-		item->fallspeed = 0;
+	item->VerticalVelocity -= 6;
+	if (item->VerticalVelocity < 0)
+		item->VerticalVelocity = 0;
 
-	if (item->fallspeed <= 133)
+	if (item->VerticalVelocity <= 133)
 		item->targetState = LS_UNDERWATER_STOP;
 }
 
@@ -188,10 +188,10 @@ void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SwimTurnSubsuit(item);
 
-	item->fallspeed += 8;
+	item->VerticalVelocity += 8;
 
-	if (item->fallspeed > 200)
-		item->fallspeed = 200;
+	if (item->VerticalVelocity > 200)
+		item->VerticalVelocity = 200;
 
 	if (!(TrInput & IN_JUMP))
 		item->targetState = LS_UNDERWATER_INERTIA;
@@ -205,7 +205,7 @@ void UpdateSubsuitAngles()
 		Subsuit.YVel = ceil(0.9375 * Subsuit.YVel - 1); // YVel * (15/16)
 	}
 
-	Subsuit.Vel[0] = Subsuit.Vel[1] = -4 * LaraItem->fallspeed;
+	Subsuit.Vel[0] = Subsuit.Vel[1] = -4 * LaraItem->VerticalVelocity;
 
 	if (Subsuit.XRot >= Subsuit.dXRot)
 	{
@@ -327,7 +327,7 @@ void SwimDive(ITEM_INFO* item)
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->targetState = LS_UNDERWATER_FORWARD;
 	item->pos.xRot = ANGLE(-45.0f);
-	item->fallspeed = 80;
+	item->VerticalVelocity = 80;
 	Lara.waterStatus = LW_UNDERWATER;
 }
 
@@ -385,12 +385,12 @@ void LaraWaterCurrent(COLL_INFO* coll)
 		else if (LaraItem->pos.xRot < -ANGLE(35.0f))
 			LaraItem->pos.xRot -= ANGLE(1.0f);
 		else
-			LaraItem->fallspeed = 0;
+			LaraItem->VerticalVelocity = 0;
 	}
 	else if (coll->CollisionType == CT_TOP)
 		LaraItem->pos.xRot -= ANGLE(1.0f);
 	else if (coll->CollisionType == CT_TOP_FRONT)
-		LaraItem->fallspeed = 0;
+		LaraItem->VerticalVelocity = 0;
 	else if (coll->CollisionType == CT_LEFT)
 		LaraItem->pos.yRot += ANGLE(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)

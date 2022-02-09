@@ -143,14 +143,14 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t touch_bits = 0;
   int32_t mesh_bits = 0;
   int32_t object_id = 0;
-  int32_t current_anim_state = 0;
-  int32_t goal_anim_state = 0;
-  int32_t required_anim_state = 0;
+  int32_t active_state = 0;
+  int32_t target_state = 0;
+  int32_t required_state = 0;
   int32_t anim_number = 0;
   int32_t frame_number = 0;
   int32_t room_number = 0;
-  int32_t speed = 0;
-  int32_t fall_speed = 0;
+  int32_t velocity = 0;
+  int32_t vertical_velocity = 0;
   int32_t hit_points = 0;
   int32_t box_number = 0;
   int32_t timer = 0;
@@ -183,14 +183,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TOUCH_BITS = 6,
     VT_MESH_BITS = 8,
     VT_OBJECT_ID = 10,
-    VT_CURRENT_ANIM_STATE = 12,
-    VT_GOAL_ANIM_STATE = 14,
-    VT_REQUIRED_ANIM_STATE = 16,
+    VT_ACTIVE_STATE = 12,
+    VT_TARGET_STATE = 14,
+    VT_REQUIRED_STATE = 16,
     VT_ANIM_NUMBER = 18,
     VT_FRAME_NUMBER = 20,
     VT_ROOM_NUMBER = 22,
-    VT_SPEED = 24,
-    VT_FALL_SPEED = 26,
+    VT_VELOCITY = 24,
+    VT_VERTICAL_VELOCITY = 26,
     VT_HIT_POINTS = 28,
     VT_BOX_NUMBER = 30,
     VT_TIMER = 32,
@@ -226,14 +226,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t object_id() const {
     return GetField<int32_t>(VT_OBJECT_ID, 0);
   }
-  int32_t current_anim_state() const {
-    return GetField<int32_t>(VT_CURRENT_ANIM_STATE, 0);
+  int32_t active_state() const {
+    return GetField<int32_t>(VT_ACTIVE_STATE, 0);
   }
-  int32_t goal_anim_state() const {
-    return GetField<int32_t>(VT_GOAL_ANIM_STATE, 0);
+  int32_t target_state() const {
+    return GetField<int32_t>(VT_TARGET_STATE, 0);
   }
-  int32_t required_anim_state() const {
-    return GetField<int32_t>(VT_REQUIRED_ANIM_STATE, 0);
+  int32_t required_state() const {
+    return GetField<int32_t>(VT_REQUIRED_STATE, 0);
   }
   int32_t anim_number() const {
     return GetField<int32_t>(VT_ANIM_NUMBER, 0);
@@ -244,11 +244,11 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t room_number() const {
     return GetField<int32_t>(VT_ROOM_NUMBER, 0);
   }
-  int32_t speed() const {
-    return GetField<int32_t>(VT_SPEED, 0);
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
   }
-  int32_t fall_speed() const {
-    return GetField<int32_t>(VT_FALL_SPEED, 0);
+  int32_t vertical_velocity() const {
+    return GetField<int32_t>(VT_VERTICAL_VELOCITY, 0);
   }
   int32_t hit_points() const {
     return GetField<int32_t>(VT_HIT_POINTS, 0);
@@ -389,14 +389,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_TOUCH_BITS) &&
            VerifyField<int32_t>(verifier, VT_MESH_BITS) &&
            VerifyField<int32_t>(verifier, VT_OBJECT_ID) &&
-           VerifyField<int32_t>(verifier, VT_CURRENT_ANIM_STATE) &&
-           VerifyField<int32_t>(verifier, VT_GOAL_ANIM_STATE) &&
-           VerifyField<int32_t>(verifier, VT_REQUIRED_ANIM_STATE) &&
+           VerifyField<int32_t>(verifier, VT_ACTIVE_STATE) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_STATE) &&
+           VerifyField<int32_t>(verifier, VT_REQUIRED_STATE) &&
            VerifyField<int32_t>(verifier, VT_ANIM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_TIMER) &&
@@ -532,14 +532,14 @@ struct ItemBuilder {
   void add_object_id(int32_t object_id) {
     fbb_.AddElement<int32_t>(Item::VT_OBJECT_ID, object_id, 0);
   }
-  void add_current_anim_state(int32_t current_anim_state) {
-    fbb_.AddElement<int32_t>(Item::VT_CURRENT_ANIM_STATE, current_anim_state, 0);
+  void add_active_state(int32_t active_state) {
+    fbb_.AddElement<int32_t>(Item::VT_ACTIVE_STATE, active_state, 0);
   }
-  void add_goal_anim_state(int32_t goal_anim_state) {
-    fbb_.AddElement<int32_t>(Item::VT_GOAL_ANIM_STATE, goal_anim_state, 0);
+  void add_target_state(int32_t target_state) {
+    fbb_.AddElement<int32_t>(Item::VT_TARGET_STATE, target_state, 0);
   }
-  void add_required_anim_state(int32_t required_anim_state) {
-    fbb_.AddElement<int32_t>(Item::VT_REQUIRED_ANIM_STATE, required_anim_state, 0);
+  void add_required_state(int32_t required_state) {
+    fbb_.AddElement<int32_t>(Item::VT_REQUIRED_STATE, required_state, 0);
   }
   void add_anim_number(int32_t anim_number) {
     fbb_.AddElement<int32_t>(Item::VT_ANIM_NUMBER, anim_number, 0);
@@ -550,11 +550,11 @@ struct ItemBuilder {
   void add_room_number(int32_t room_number) {
     fbb_.AddElement<int32_t>(Item::VT_ROOM_NUMBER, room_number, 0);
   }
-  void add_speed(int32_t speed) {
-    fbb_.AddElement<int32_t>(Item::VT_SPEED, speed, 0);
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(Item::VT_VELOCITY, velocity, 0);
   }
-  void add_fall_speed(int32_t fall_speed) {
-    fbb_.AddElement<int32_t>(Item::VT_FALL_SPEED, fall_speed, 0);
+  void add_vertical_velocity(int32_t vertical_velocity) {
+    fbb_.AddElement<int32_t>(Item::VT_VERTICAL_VELOCITY, vertical_velocity, 0);
   }
   void add_hit_points(int32_t hit_points) {
     fbb_.AddElement<int32_t>(Item::VT_HIT_POINTS, hit_points, 0);
@@ -639,14 +639,14 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t touch_bits = 0,
     int32_t mesh_bits = 0,
     int32_t object_id = 0,
-    int32_t current_anim_state = 0,
-    int32_t goal_anim_state = 0,
-    int32_t required_anim_state = 0,
+    int32_t active_state = 0,
+    int32_t target_state = 0,
+    int32_t required_state = 0,
     int32_t anim_number = 0,
     int32_t frame_number = 0,
     int32_t room_number = 0,
-    int32_t speed = 0,
-    int32_t fall_speed = 0,
+    int32_t velocity = 0,
+    int32_t vertical_velocity = 0,
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
@@ -684,14 +684,14 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_timer(timer);
   builder_.add_box_number(box_number);
   builder_.add_hit_points(hit_points);
-  builder_.add_fall_speed(fall_speed);
-  builder_.add_speed(speed);
+  builder_.add_vertical_velocity(vertical_velocity);
+  builder_.add_velocity(velocity);
   builder_.add_room_number(room_number);
   builder_.add_frame_number(frame_number);
   builder_.add_anim_number(anim_number);
-  builder_.add_required_anim_state(required_anim_state);
-  builder_.add_goal_anim_state(goal_anim_state);
-  builder_.add_current_anim_state(current_anim_state);
+  builder_.add_required_state(required_state);
+  builder_.add_target_state(target_state);
+  builder_.add_active_state(active_state);
   builder_.add_object_id(object_id);
   builder_.add_mesh_bits(mesh_bits);
   builder_.add_touch_bits(touch_bits);
@@ -718,14 +718,14 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t touch_bits = 0,
     int32_t mesh_bits = 0,
     int32_t object_id = 0,
-    int32_t current_anim_state = 0,
-    int32_t goal_anim_state = 0,
-    int32_t required_anim_state = 0,
+    int32_t active_state = 0,
+    int32_t target_state = 0,
+    int32_t required_state = 0,
     int32_t anim_number = 0,
     int32_t frame_number = 0,
     int32_t room_number = 0,
-    int32_t speed = 0,
-    int32_t fall_speed = 0,
+    int32_t velocity = 0,
+    int32_t vertical_velocity = 0,
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
@@ -755,14 +755,14 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       touch_bits,
       mesh_bits,
       object_id,
-      current_anim_state,
-      goal_anim_state,
-      required_anim_state,
+      active_state,
+      target_state,
+      required_state,
       anim_number,
       frame_number,
       room_number,
-      speed,
-      fall_speed,
+      velocity,
+      vertical_velocity,
       hit_points,
       box_number,
       timer,
@@ -4910,14 +4910,14 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = touch_bits(); _o->touch_bits = _e; }
   { auto _e = mesh_bits(); _o->mesh_bits = _e; }
   { auto _e = object_id(); _o->object_id = _e; }
-  { auto _e = current_anim_state(); _o->current_anim_state = _e; }
-  { auto _e = goal_anim_state(); _o->goal_anim_state = _e; }
-  { auto _e = required_anim_state(); _o->required_anim_state = _e; }
+  { auto _e = active_state(); _o->active_state = _e; }
+  { auto _e = target_state(); _o->target_state = _e; }
+  { auto _e = required_state(); _o->required_state = _e; }
   { auto _e = anim_number(); _o->anim_number = _e; }
   { auto _e = frame_number(); _o->frame_number = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
-  { auto _e = speed(); _o->speed = _e; }
-  { auto _e = fall_speed(); _o->fall_speed = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
   { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = timer(); _o->timer = _e; }
@@ -4954,14 +4954,14 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _touch_bits = _o->touch_bits;
   auto _mesh_bits = _o->mesh_bits;
   auto _object_id = _o->object_id;
-  auto _current_anim_state = _o->current_anim_state;
-  auto _goal_anim_state = _o->goal_anim_state;
-  auto _required_anim_state = _o->required_anim_state;
+  auto _active_state = _o->active_state;
+  auto _target_state = _o->target_state;
+  auto _required_state = _o->required_state;
   auto _anim_number = _o->anim_number;
   auto _frame_number = _o->frame_number;
   auto _room_number = _o->room_number;
-  auto _speed = _o->speed;
-  auto _fall_speed = _o->fall_speed;
+  auto _velocity = _o->velocity;
+  auto _vertical_velocity = _o->vertical_velocity;
   auto _hit_points = _o->hit_points;
   auto _box_number = _o->box_number;
   auto _timer = _o->timer;
@@ -4990,14 +4990,14 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _touch_bits,
       _mesh_bits,
       _object_id,
-      _current_anim_state,
-      _goal_anim_state,
-      _required_anim_state,
+      _active_state,
+      _target_state,
+      _required_state,
       _anim_number,
       _frame_number,
       _room_number,
-      _speed,
-      _fall_speed,
+      _velocity,
+      _vertical_velocity,
       _hit_points,
       _box_number,
       _timer,

@@ -19,10 +19,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 	{
 		SetAnimation(item, LA_FALL_START);
 
-		item->airborne = true;
-		item->speed = 2;
+		item->Airborne = true;
+		item->Velocity = 2;
 		item->pos.yPos += STEP_SIZE;
-		item->fallspeed = 1;
+		item->VerticalVelocity = 1;
 
 		Lara.gunStatus = LG_HANDS_FREE;
 
@@ -78,8 +78,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 10*/
 	/*state code: lara_as_hang*/
-	item->fallspeed = 0;
-	item->airborne = false;
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 
 	if (item->animNumber == LA_REACH_TO_HANG)
 	{

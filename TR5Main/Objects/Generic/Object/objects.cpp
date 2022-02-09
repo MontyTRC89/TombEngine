@@ -197,8 +197,8 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			l->activeState = LS_MISC_CONTROL;
 			l->animNumber = LA_SWINGBAR_GRAB;
 			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-			l->fallspeed = false;
-			l->airborne = false;
+			l->VerticalVelocity = false;
+			l->Airborne = false;
 
 			ResetLaraFlex(item);
 

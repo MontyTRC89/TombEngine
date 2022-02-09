@@ -51,17 +51,17 @@ namespace TEN::Entities::TR4
 					{
 						item->animNumber = Objects[item->objectNumber].animIndex + 5;
 						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->airborne = true;
+						item->Airborne = true;
 						item->activeState = 6;
-						item->speed = 0;
+						item->Velocity = 0;
 						item->pos.xRot = 0;
 					}
 				}
 				else if (item->pos.yPos >= item->floor)
 				{
 					item->pos.yPos = item->floor;
-					item->airborne = false;
-					item->fallspeed = 0;
+					item->Airborne = false;
+					item->VerticalVelocity = 0;
 					item->targetState = 8;
 				}
 			}

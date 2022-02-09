@@ -438,7 +438,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		item->activeState == LS_IDLE &&
 		item->targetState == LS_IDLE &&
 		item->animNumber == LA_STAND_IDLE &&
-		!item->airborne)
+		!item->Airborne)
 	{
 		info->gunStatus = LG_HANDS_FREE;
 	}
@@ -482,7 +482,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					info->air = LARA_AIR_MAX;
 					info->waterStatus = LW_UNDERWATER;
-					item->airborne = false;
+					item->Airborne = false;
 					item->pos.yPos += 100;
 
 					UpdateItemRoom(item, 0);
@@ -494,7 +494,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->pos.xRot = -ANGLE(45.0f);
 						item->targetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
-						item->fallspeed *= 2;
+						item->VerticalVelocity *= 2;
 					}
 					else if (item->activeState == LS_FREEFALL_DIVE)
 					{
@@ -502,13 +502,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->pos.xRot = -ANGLE(85.0f);
 						item->targetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
-						item->fallspeed *= 2;
+						item->VerticalVelocity *= 2;
 					}
 					else
 					{
 						item->pos.xRot = -ANGLE(45.0f);
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->fallspeed = 3 * item->fallspeed / 2;
+						item->VerticalVelocity = 3 * item->VerticalVelocity / 2;
 					}
 
 					ResetLaraFlex(item);
@@ -520,16 +520,16 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				info->waterStatus = LW_WADE;
 
-				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while Airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
 					!isSwamp &&
-					item->airborne)
+					item->Airborne)
 				{
 					Splash(item);
 					item->targetState = LS_IDLE;
 				}
 				// Lara is grounded; don't splash again.
-				else if (!item->airborne)
+				else if (!item->Airborne)
 					item->targetState = LS_IDLE;
 				else if (isSwamp)
 				{
@@ -557,9 +557,9 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1))
 					{
 						SetAnimation(item, LA_FALL_START);
-						item->speed = item->fallspeed / 4;
-						item->airborne = true;
-						item->fallspeed = 0;
+						item->Velocity = item->VerticalVelocity / 4;
+						item->Airborne = true;
+						item->VerticalVelocity = 0;
 						item->pos.zRot = 0;
 						item->pos.xRot = 0;
 						info->waterStatus = LW_ABOVE_WATER;
@@ -569,7 +569,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					{
 						SetAnimation(item, LA_UNDERWATER_RESURFACE);
 						item->pos.yPos = waterHeight;
-						item->fallspeed = 0;
+						item->VerticalVelocity = 0;
 						item->pos.zRot = 0;
 						item->pos.xRot = 0;
 						info->waterStatus = LW_SURFACE;
@@ -585,7 +585,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
 				item->pos.yPos = waterHeight + 1;
-				item->fallspeed = 0;
+				item->VerticalVelocity = 0;
 				item->pos.zRot = 0;
 				item->pos.xRot = 0;
 				info->waterStatus = LW_SURFACE;
@@ -603,8 +603,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				if (heightFromWater <= WADE_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
-					item->speed = item->fallspeed / 4;
-					item->airborne = true;
+					item->Velocity = item->VerticalVelocity / 4;
+					item->Airborne = true;
 					info->waterStatus = LW_ABOVE_WATER;
 				}
 				else
@@ -616,7 +616,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					AnimateItem(item);
 				}
 
-				item->fallspeed = 0;
+				item->VerticalVelocity = 0;
 				item->pos.zRot = 0;
 				item->pos.xRot = 0;
 				ResetLaraFlex(item);
@@ -635,8 +635,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 					info->waterStatus = LW_SURFACE;
 					item->pos.yPos += 1 - heightFromWater;
-					item->airborne = false;
-					item->fallspeed = 0;
+					item->Airborne = false;
+					item->VerticalVelocity = 0;
 					item->pos.zRot = 0;
 					item->pos.xRot = 0;
 					info->diveCount = 0;
@@ -756,7 +756,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.OldPosition.x = item->pos.xPos;
 	coll->Setup.OldPosition.y = item->pos.yPos;
 	coll->Setup.OldPosition.z = item->pos.zPos;
-	coll->Setup.OldAnimState = item->activeState;
+	coll->Setup.OldState = item->activeState;
 	coll->Setup.OldAnimNumber = item->animNumber;
 	coll->Setup.OldFrameNumber = item->frameNumber;
 
@@ -981,9 +981,9 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	AnimateLara(item);
 
-	item->pos.xPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_sin(item->pos.yRot) / 4;
-	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) / 4;
-	item->pos.zPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_cos(item->pos.yRot) / 4;
+	item->pos.xPos += phd_cos(item->pos.xRot) * item->VerticalVelocity * phd_sin(item->pos.yRot) / 4;
+	item->pos.yPos -= item->VerticalVelocity * phd_sin(item->pos.xRot) / 4;
+	item->pos.zPos += phd_cos(item->pos.xRot) * item->VerticalVelocity * phd_cos(item->pos.yRot) / 4;
 
 	DoObjectCollision(item, coll);
 
@@ -1047,8 +1047,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	AnimateLara(item);
 
-	item->pos.xPos += item->fallspeed * phd_sin(info->moveAngle) / 4;
-	item->pos.zPos += item->fallspeed * phd_cos(info->moveAngle) / 4;
+	item->pos.xPos += item->VerticalVelocity * phd_sin(info->moveAngle) / 4;
+	item->pos.zPos += item->VerticalVelocity * phd_cos(info->moveAngle) / 4;
 
 	DoObjectCollision(item, coll);
 

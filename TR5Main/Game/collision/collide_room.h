@@ -86,7 +86,7 @@ struct COLL_SETUP
 	int   UpperCeilingBound;	// Borderline ceiling step-down height
 
 	PHD_VECTOR OldPosition;		// Preserve old parameters to restore later
-	int OldAnimState;
+	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
 };

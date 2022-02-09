@@ -744,8 +744,8 @@ namespace TEN::Entities::TR4
 						LaraItem->animNumber = 34;
 						LaraItem->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 						LaraItem->hitStatus = true;
-						LaraItem->speed = 2;
-						LaraItem->fallspeed = 1;
+						LaraItem->Velocity = 2;
+						LaraItem->VerticalVelocity = 1;
 						Lara.gunStatus = LG_HANDS_FREE;
 					}
 				}

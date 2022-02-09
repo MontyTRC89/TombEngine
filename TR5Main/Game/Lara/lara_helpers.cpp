@@ -30,7 +30,7 @@
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
 void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
-	if (!item->speed)
+	if (!item->Velocity)
 		return;
 
 	int sign = copysign(1, maxAngle);
@@ -49,7 +49,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	constexpr int rate = 50;
-	int threshold = std::max(abs(item->speed) / 3 * 2, STEP_SIZE / 16);
+	int threshold = std::max(abs(item->Velocity) / 3 * 2, STEP_SIZE / 16);
 	int sign = std::copysign(1, height);
 	
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
@@ -114,7 +114,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 {
 	LaraInfo*& info = item->data;
 
-	if (!item->speed)
+	if (!item->Velocity)
 		return;
 
 	int sign = copysign(1, maxAngle);
@@ -133,7 +133,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 void DoLaraFallDamage(ITEM_INFO* item)
 {
 	// TODO: Demagic more of these numbers.
-	int landSpeed = item->fallspeed - 140;
+	int landSpeed = item->VerticalVelocity - 140;
 
 	if (landSpeed > 0)
 	{
@@ -233,9 +233,9 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->speed = 0;
-	item->fallspeed = 0;
-	item->airborne = false;
+	item->Velocity = 0;
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 
 	LaraSnapToHeight(item, coll);
 }
@@ -243,15 +243,15 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 void SetLaraFallState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->fallspeed = 0;
-	item->airborne = true;
+	item->VerticalVelocity = 0;
+	item->Airborne = true;
 }
 
 void SetLaraFallBackState(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->fallspeed = 0;
-	item->airborne = true;
+	item->VerticalVelocity = 0;
+	item->Airborne = true;
 }
 
 void SetLaraMonkeyFallState(ITEM_INFO* item)
@@ -268,9 +268,9 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->data;
 
-	item->speed = 2;
-	item->fallspeed = 1;
-	item->airborne = true;
+	item->Velocity = 2;
+	item->VerticalVelocity = 1;
+	item->Airborne = true;
 	info->gunStatus = LG_HANDS_FREE;
 }
 
@@ -392,7 +392,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) &&
 		coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&
-		(!item->speed || (item->speed && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+		(!item->Velocity || (item->Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
 		ResetLaraFlex(item, 12);
 	}

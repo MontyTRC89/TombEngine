@@ -328,7 +328,7 @@ void BaboonControl(short itemNumber)
             }
             else if (baboon->mood == ATTACK_MOOD)
             {
-                if (!(item->aiBits & FOLLOW) || (!item->airborne && info.distance <= BABOON_RUNROLL_RANGE))
+                if (!(item->aiBits & FOLLOW) || (!item->Airborne && info.distance <= BABOON_RUNROLL_RANGE))
                 {
                     if (info.bite && info.distance < BABOON_ATK_NORMALRANGE)
                     {
@@ -477,7 +477,7 @@ void BaboonControl(short itemNumber)
                 if (info.ahead && Lara.target != item)
                     item->targetState = BABOON_IDLE;
             }
-            else if (item->aiBits & FOLLOW && (item->airborne || info.distance > BABOON_FOLLOW_RANGE))
+            else if (item->aiBits & FOLLOW && (item->Airborne || info.distance > BABOON_FOLLOW_RANGE))
             {
                 item->targetState = BABOON_IDLE;
             }

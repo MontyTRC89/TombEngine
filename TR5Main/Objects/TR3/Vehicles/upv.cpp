@@ -157,8 +157,8 @@ static void FireSubHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		harpoonItem->pos.yRot = UPVItem->pos.yRot;
 		harpoonItem->pos.zRot = 0;
 
-		harpoonItem->fallspeed = -HARPOON_SPEED * phd_sin(harpoonItem->pos.xRot);
-		harpoonItem->speed = HARPOON_SPEED * phd_cos(harpoonItem->pos.xRot);
+		harpoonItem->VerticalVelocity = -HARPOON_SPEED * phd_sin(harpoonItem->pos.xRot);
+		harpoonItem->VerticalVelocity = HARPOON_SPEED * phd_cos(harpoonItem->pos.xRot);
 		harpoonItem->hitPoints = HARPOON_TIME;
 		harpoonItem->itemFlags[0] = 1;
 
@@ -332,7 +332,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->gunStatus != LG_HANDS_FREE ||
-		laraItem->airborne)
+		laraItem->Airborne)
 	{
 		return false;
 	}
@@ -689,8 +689,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->pos.zPos = LPos.z;
 
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
-			laraItem->fallspeed = 0;
-			laraItem->airborne = false;
+			laraItem->VerticalVelocity = 0;
+			laraItem->Airborne = false;
 			laraItem->pos.xRot = laraItem->pos.zRot = 0;
 
 			UpdateItemRoom(laraItem, 0);
@@ -727,8 +727,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->pos.zPos = vec.z;
 
 			SetAnimation(laraItem, LA_ONWATER_IDLE);
-			laraItem->fallspeed = 0;
-			laraItem->airborne = false;
+			laraItem->VerticalVelocity = 0;
+			laraItem->Airborne = false;
 			laraItem->pos.xRot = laraItem->pos.zRot = 0;
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
@@ -765,13 +765,13 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->pos.zRot = 0;
 
 			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
-			laraItem->fallspeed = 0;
-			laraItem->airborne = 0;
+			laraItem->VerticalVelocity = 0;
+			laraItem->Airborne = 0;
 			
 			UPVInfo->Flags |= UPV_DEAD;
 		}
 
-		UPVItem->speed = 0;
+		UPVItem->VerticalVelocity = 0;
 		break;
 	}
 
@@ -917,7 +917,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		UserInput(laraItem, UPVItem);
 
-		UPVItem->speed = UPVInfo->Vel / 65536;
+		UPVItem->VerticalVelocity = UPVInfo->Vel / 65536;
 
 		UPVItem->pos.xRot += UPVInfo->RotX / 65536;
 		UPVItem->pos.yRot += UPVInfo->Rot / 65536;
@@ -928,9 +928,9 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		else if (UPVItem->pos.xRot < -UPDOWN_LIMIT)
 			UPVItem->pos.xRot = -UPDOWN_LIMIT;
 
-		UPVItem->pos.xPos += phd_sin(UPVItem->pos.yRot) * UPVItem->speed * phd_cos(UPVItem->pos.xRot);
-		UPVItem->pos.yPos -= phd_sin(UPVItem->pos.xRot) * UPVItem->speed;
-		UPVItem->pos.zPos += phd_cos(UPVItem->pos.yRot) * UPVItem->speed * phd_cos(UPVItem->pos.xRot);
+		UPVItem->pos.xPos += phd_sin(UPVItem->pos.yRot) * UPVItem->VerticalVelocity * phd_cos(UPVItem->pos.xRot);
+		UPVItem->pos.yPos -= phd_sin(UPVItem->pos.xRot) * UPVItem->VerticalVelocity;
+		UPVItem->pos.zPos += phd_cos(UPVItem->pos.yRot) * UPVItem->VerticalVelocity * phd_cos(UPVItem->pos.xRot);
 	}
 
 	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
@@ -941,7 +941,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVItem->pos.xPos = oldPos.xPos;
 		UPVItem->pos.yPos = oldPos.yPos;
 		UPVItem->pos.zPos = oldPos.zPos;
-		UPVItem->speed = 0;
+		UPVItem->VerticalVelocity = 0;
 	}
 
 	UPVItem->floor = probe.Position.Floor;
@@ -1042,7 +1042,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPVInfo->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2 | 4 | 0x1000000 | (UPVItem->speed * 65536));
+			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * 65536));
 
 		UPVItem->animNumber = Objects[ID_UPV].animIndex + (laraItem->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->frameNumber = g_Level.Anims[UPVItem->animNumber].frameBase + (laraItem->frameNumber - g_Level.Anims[laraItem->animNumber].frameBase);
@@ -1066,9 +1066,9 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVInfo->RotX = 0;
 
 		SetAnimation(UPVItem, UPV_ANIM_IDLE);
-		UPVItem->fallspeed = 0;
-		UPVItem->speed = 0;
-		UPVItem->airborne = true;
+		UPVItem->VerticalVelocity = 0;
+		UPVItem->VerticalVelocity = 0;
+		UPVItem->Airborne = true;
 		AnimateItem(UPVItem);
 
 		return true;

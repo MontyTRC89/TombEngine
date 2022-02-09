@@ -235,8 +235,8 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			item->pos.yPos = item->itemFlags[1] - (192 - item->speed) * phd_sin(item->itemFlags[2]);
-			item->itemFlags[2] += ONE_DEGREE * item->speed;
+			item->pos.yPos = item->itemFlags[1] - (192 - item->Velocity) * phd_sin(item->itemFlags[2]);
+			item->itemFlags[2] += ONE_DEGREE * item->Velocity;
 
 			if (!(GlobalCounter & 7))
 			{
@@ -248,8 +248,8 @@ void LaserHeadControl(short itemNumber)
 			InterpolateAngle(item->triggerFlags, &item->pos.xRot, 0, 2);
 
 			// Final death
-			item->speed++;
-			if (item->speed > 136)
+			item->Velocity++;
+			if (item->Velocity > 136)
 			{
 				ExplodeItemNode(&g_Level.Items[creature->baseItem], 0, 0, 128);
 				KillItem(creature->baseItem);
@@ -398,7 +398,7 @@ void LaserHeadControl(short itemNumber)
 					if (!(GetRandomControl() & 0x1F)
 						&& abs(LaserHeadData.xRot) < 1024
 						&& abs(LaserHeadData.yRot) < 1024
-						&& !LaraItem->fallspeed
+						&& !LaraItem->VerticalVelocity
 						|| !(GetRandomControl() & 0x1FF))
 					{
 						item->itemFlags[0]++;
@@ -626,10 +626,10 @@ void LaserHeadControl(short itemNumber)
 			}
 			else
 			{
-				item->fallspeed += 3;
-				if (item->fallspeed > 32)
-					item->fallspeed = 32;
-				item->pos.yPos -= item->fallspeed;
+				item->VerticalVelocity += 3;
+				if (item->VerticalVelocity > 32)
+					item->VerticalVelocity = 32;
+				item->pos.yPos -= item->VerticalVelocity;
 			}
 		}
 		else if (!(GlobalCounter & 7))
@@ -671,7 +671,7 @@ void LaserHeadControl(short itemNumber)
 
 			item->itemFlags[0] = 3;
 			item->itemFlags[3] = item->pos.yRot + (GetRandomControl() & 0x1000) - 2048;
-			item->speed = 3;
+			item->Velocity = 3;
 			item->triggerFlags = item->pos.xRot + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}

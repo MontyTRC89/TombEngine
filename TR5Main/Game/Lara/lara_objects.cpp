@@ -280,7 +280,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	ITEM_INFO* barItem = &g_Level.Items[Lara.interactedItem];
 
-	item->airborne = true;
+	item->Airborne = true;
 
 	if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 	{
@@ -291,8 +291,8 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			dist = barItem->triggerFlags % 100 - 2;
 
-		item->fallspeed = -(20 * dist + 64);
-		item->speed = 20 * dist + 58;
+		item->VerticalVelocity = -(20 * dist + 64);
+		item->Velocity = 20 * dist + 58;
 	}
 
 	if (TestLastFrame(item))
@@ -459,7 +459,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 		item->animNumber = LA_FREEFALL;
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
-		item->fallspeed = 81;
+		item->VerticalVelocity = 81;
 		Camera.targetspeed = 16;
 	}
 }
@@ -558,7 +558,7 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 			item->animNumber = LA_FREEFALL;
 			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 
-			item->fallspeed = 81;
+			item->VerticalVelocity = 81;
 			Camera.targetspeed = 16;
 		}
 	}
@@ -1152,9 +1152,9 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 
 		AnimateLara(item);
 
-		item->airborne = true;
-		item->speed = 100;
-		item->fallspeed = 40;
+		item->Airborne = true;
+		item->Velocity = 100;
+		item->VerticalVelocity = 40;
 		info->moveAngle = item->pos.yRot;
 	}
 }

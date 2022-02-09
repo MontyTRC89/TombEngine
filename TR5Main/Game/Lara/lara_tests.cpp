@@ -144,9 +144,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
-		item->airborne = false;
-		item->speed = 0;
-		item->fallspeed = 0;
+		item->Airborne = false;
+		item->Velocity = 0;
+		item->VerticalVelocity = 0;
 		item->pos.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		info->gunStatus = LG_HANDS_BUSY;
 		return true;
@@ -180,9 +180,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll);
 
-	item->airborne = false;
-	item->speed = 0;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->Velocity = 0;
+	item->VerticalVelocity = 0;
 	info->gunStatus = LG_HANDS_BUSY;
 	info->extraTorsoRot.x = 0;
 	info->extraTorsoRot.y = 0;
@@ -202,9 +202,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEY);
 		ResetLaraFlex(item);
-		item->airborne = false;
-		item->speed = 0;
-		item->fallspeed = 0;
+		item->Airborne = false;
+		item->Velocity = 0;
+		item->VerticalVelocity = 0;
 		item->pos.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		info->gunStatus = LG_HANDS_BUSY;
 		return true;
@@ -251,9 +251,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll, 0.2f);
 
-	item->airborne = true;
-	item->speed = 2;
-	item->fallspeed = 1;
+	item->Airborne = true;
+	item->Velocity = 2;
+	item->VerticalVelocity = 1;
 	info->gunStatus = LG_HANDS_BUSY;
 
 	return true;
@@ -339,9 +339,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->pos.yPos += 256;
-			item->airborne = true;
-			item->speed = 2;
-			item->fallspeed = 1;
+			item->Airborne = true;
+			item->Velocity = 2;
+			item->VerticalVelocity = 1;
 			info->gunStatus = LG_HANDS_FREE;
 		}
 	}
@@ -386,7 +386,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic && 
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
-				if (item->speed != 0)
+				if (item->Velocity != 0)
 					SnapItemToLedge(item, coll);
 
 				item->pos.yPos += verticalShift;
@@ -412,9 +412,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->pos.xPos += coll->Shift.x;
 			item->pos.yPos += GetBoundsAccurate(item)->Y2 * 1.8f;
 			item->pos.zPos += coll->Shift.z;
-			item->airborne = true;
-			item->speed = 2;
-			item->fallspeed = 1;
+			item->Airborne = true;
+			item->Velocity = 2;
+			item->VerticalVelocity = 1;
 			info->gunStatus = LG_HANDS_FREE;
 		}
 	}
@@ -683,7 +683,7 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	if (!info->climbStatus)
 		return false;
 
-	if (item->fallspeed < 0)
+	if (item->VerticalVelocity < 0)
 		return false;
 	   
 	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
@@ -741,14 +741,14 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	int hdif = coll->Front.Floor - bounds->Y1;
 
-	if (hdif < 0 == hdif + item->fallspeed < 0)
+	if (hdif < 0 == hdif + item->VerticalVelocity < 0)
 	{
 		hdif = item->pos.yPos + bounds->Y1;
 
-		if ((hdif + item->fallspeed & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
+		if ((hdif + item->VerticalVelocity & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
 		{
-			if (item->fallspeed > 0)
-				*edge = (hdif + item->fallspeed) & 0xFFFFFF00;
+			if (item->VerticalVelocity > 0)
+				*edge = (hdif + item->VerticalVelocity) & 0xFFFFFF00;
 			else
 				*edge = hdif & 0xFFFFFF00;
 
@@ -952,8 +952,8 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int heightFromFloor = GetCollisionResult(item).Position.Floor - item->pos.yPos;
 	
-	if (item->airborne && item->fallspeed >= 0 &&
-		(heightFromFloor <= std::min<int>(item->fallspeed, STEPUP_HEIGHT) ||
+	if (item->Airborne && item->VerticalVelocity >= 0 &&
+		(heightFromFloor <= std::min<int>(item->VerticalVelocity, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
@@ -986,9 +986,9 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
-	item->airborne = false;
-	item->speed = 0;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->Velocity = 0;
+	item->VerticalVelocity = 0;
 	info->waterStatus = LW_WADE;
 
 	return true;
@@ -1066,9 +1066,9 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->pos.yPos += frontFloor - 5;
 	item->activeState = LS_ONWATER_EXIT;
-	item->airborne = false;
-	item->speed = 0;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->Velocity = 0;
+	item->VerticalVelocity = 0;
 	info->gunStatus = LG_HANDS_BUSY;
 	info->waterStatus = LW_ABOVE_WATER;
 
@@ -1136,9 +1136,9 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	item->pos.yPos -= 10;//otherwise she falls back into the water
 	item->pos.zRot = 0;
 	item->pos.xRot = 0;
-	item->airborne = false;
-	item->speed = 0;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->Velocity = 0;
+	item->VerticalVelocity = 0;
 	info->gunStatus = LG_HANDS_BUSY;
 	info->waterStatus = LW_ABOVE_WATER;
 	info->turnRate = 0;
@@ -1156,7 +1156,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (waterDepth == NO_HEIGHT)
 	{
-		item->fallspeed = 0;
+		item->VerticalVelocity = 0;
 		item->pos.xPos = coll->Setup.OldPosition.x;
 		item->pos.yPos = coll->Setup.OldPosition.y;
 		item->pos.zPos = coll->Setup.OldPosition.z;
@@ -1169,9 +1169,9 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->targetState = LS_IDLE;
 		item->pos.zRot = 0;
 		item->pos.xRot = 0;
-		item->speed = 0;
-		item->fallspeed = 0;
-		item->airborne = false;
+		item->Velocity = 0;
+		item->VerticalVelocity = 0;
+		item->Airborne = false;
 		item->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		info->waterStatus = LW_WADE;
 	}

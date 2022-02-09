@@ -166,7 +166,7 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (item->triggerFlags == 2
-			&& item->status == ITEM_NOT_ACTIVE && !item->airborne // CHECK
+			&& item->status == ITEM_NOT_ACTIVE && !item->Airborne // CHECK
 			&& ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 				&& l->activeState == LS_IDLE
 				&& l->animNumber == LA_STAND_IDLE

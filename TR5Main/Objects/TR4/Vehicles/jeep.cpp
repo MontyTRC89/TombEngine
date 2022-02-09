@@ -436,7 +436,7 @@ static int GetOnJeep(int itemNumber)
 	if (LaraItem->animNumber != LA_STAND_IDLE)
 		return 0;
 
-	if (LaraItem->airborne)
+	if (LaraItem->Airborne)
 		return 0;
 
 	if (abs(item->pos.yPos - LaraItem->pos.yPos) >= STEP_SIZE)
@@ -699,7 +699,7 @@ int JeepDynamics(ITEM_INFO* item)
 				if (rot > 13650)
 				{
 					item->pos.yPos -= 41;
-					item->fallspeed = -6 - (GetRandomControl() & 3);
+					item->VerticalVelocity = -6 - (GetRandomControl() & 3);
 					jeep->jeepTurn = 0;
 					jeep->velocity -= (jeep->velocity / 8);
 				}
@@ -715,7 +715,7 @@ int JeepDynamics(ITEM_INFO* item)
 			if (rot < -13650)
 			{
 				item->pos.yPos -= 41;
-				item->fallspeed = -6 - (GetRandomControl() & 3);
+				item->VerticalVelocity = -6 - (GetRandomControl() & 3);
 				jeep->jeepTurn = 0;
 				jeep->velocity -= (jeep->velocity / 8);
 			}
@@ -733,9 +733,9 @@ int JeepDynamics(ITEM_INFO* item)
 
 	short speed;
 	if (item->pos.yPos < height)
-		speed = item->speed;
+		speed = item->Velocity;
 	else
-		speed = item->speed * phd_cos(item->pos.xRot);
+		speed = item->Velocity * phd_cos(item->pos.xRot);
 
 	item->pos.xPos += speed * phd_sin(jeep->momentumAngle);
 	item->pos.zPos += speed * phd_cos(jeep->momentumAngle);
@@ -995,7 +995,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 		else
 			jeep->velocity = 0;
 
-		item->speed = jeep->velocity / 256;
+		item->Velocity = jeep->velocity / 256;
 		if (jeep->engineRevs > 0xC000)
 			jeep->engineRevs = (GetRandomControl() & 0x1FF) + 48896;
 
@@ -1317,7 +1317,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 		case JS_JUMP:
 			if (item->pos.yPos == item->floor)
 				LaraItem->targetState = JS_LAND;
-			else if (item->fallspeed > 300)
+			else if (item->VerticalVelocity > 300)
 				jeep->flags |= JF_FALLING;
 			break;
 
@@ -1644,7 +1644,7 @@ int JeepControl(void)
 	jeep->rot4 -= rotAdd;
 
 	int oldY = item->pos.yPos;
-	item->fallspeed = DoJeepDynamics(height, item->fallspeed, &item->pos.yPos, 0);
+	item->VerticalVelocity = DoJeepDynamics(height, item->VerticalVelocity, &item->pos.yPos, 0);
 
 	height = (fl.y + fr.y) / 2;
 	short xRot;
@@ -1743,7 +1743,7 @@ int JeepControl(void)
 
 		GetJointAbsPosition(item, &pos, 11);
 
-		if (item->speed <= 32)
+		if (item->Velocity <= 32)
 		{
 			if (JeepSmokeStart >= 16)
 			{
@@ -1759,8 +1759,8 @@ int JeepControl(void)
 			}
 			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot + -32768, speed, 0);
 		}
-		else if (item->speed < 64)
-			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - 32768, 64 - item->speed, 1);
+		else if (item->Velocity < 64)
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->pos.yRot - 32768, 64 - item->Velocity, 1);
 	}
 
 	return JeepCheckGetOff();

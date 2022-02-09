@@ -106,7 +106,7 @@ void TigerControl(short itemNum)
 				item->targetState = 1;
 			else if (info.bite && info.distance < SQUARE(1536))
 			{
-				if (LaraItem->speed == 0)
+				if (LaraItem->Velocity == 0)
 					item->targetState = 1;
 				else
 					item->targetState = 7;

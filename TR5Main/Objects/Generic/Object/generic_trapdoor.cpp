@@ -48,7 +48,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->pos.yRot += ANGLE(180);
 
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->activeState == LS_JUMP_UP && l->airborne && Lara.gunStatus == LG_HANDS_FREE && itemIsAbove && (result || result2))
+	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->activeState == LS_JUMP_UP && l->Airborne && Lara.gunStatus == LG_HANDS_FREE && itemIsAbove && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
@@ -56,8 +56,8 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		
 		ResetLaraFlex(l);
 		Lara.gunStatus = LG_HANDS_BUSY;
-		l->airborne = false;
-		l->fallspeed = 0;
+		l->Airborne = false;
+		l->VerticalVelocity = 0;
 		l->animNumber = LA_TRAPDOOR_CEILING_OPEN;
 		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 		l->activeState = LS_FREEFALL_BIS;
