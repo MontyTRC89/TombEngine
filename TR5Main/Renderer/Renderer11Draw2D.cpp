@@ -13,12 +13,14 @@ TEN::Renderer::RendererHUDBar* g_AirBar;
 TEN::Renderer::RendererHUDBar* g_DashBar;
 TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
 TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
+TEN::Renderer::RendererHUDBar* g_LoadingBar;
 
-namespace TEN::Renderer {
-
+namespace TEN::Renderer
+{
 	void Renderer11::InitialiseBars()
 	{
-		std::array<Vector4, 5> healthColors = {
+		std::array<Vector4, 5> healthColors = 
+		{
 			//top
 			Vector4(82 / 255.0f,0,0,1),
 			Vector4(0,82 / 255.0f,0,1),
@@ -29,7 +31,8 @@ namespace TEN::Renderer {
 			Vector4(0,82 / 255.0f,0,1),
 		};
 
-		std::array<Vector4, 5> airColors = {
+		std::array<Vector4, 5> airColors = 
+		{
 			//top
 			Vector4(0 ,0,90 / 255.0f,1),
 			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
@@ -40,7 +43,20 @@ namespace TEN::Renderer {
 			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
 		};
 
-		std::array<Vector4, 5> dashColors = {
+		std::array<Vector4, 5> loadingColors = 
+		{
+			//top
+			Vector4(0 ,0,90 / 255.0f,1),
+			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
+			//center
+			Vector4(0,39 / 255,155 / 255.0f,1),
+			//bottom
+			Vector4(0 ,0,90 / 255.0f,1),
+			Vector4(0 ,47 / 255.0f,96 / 255.0f,1),
+		};
+
+		std::array<Vector4, 5> dashColors =
+		{
 			//top
 			Vector4(78 / 255.0f,4 / 255.0f,0,1),
 			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
@@ -50,7 +66,8 @@ namespace TEN::Renderer {
 			Vector4(78 / 255.0f,4 / 255.0f,0,1),
 			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 		};
-		std::array<Vector4, 5> soundSettingColors = {
+		std::array<Vector4, 5> soundSettingColors = 
+		{
 			//top
 			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
@@ -60,13 +77,17 @@ namespace TEN::Renderer {
 			Vector4(0.18f,0.3f,0.72f,1),
 			Vector4(0.18f,0.3f,0.72f,1),
 		};
+
 		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
 		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, airColors);
 		g_DashBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
 		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 194, 150, 8, 1, soundSettingColors);
 		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
+		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 400, 150, 8, 1, airColors);
 	}
-	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison) {
+
+	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison)
+	{
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
@@ -106,6 +127,49 @@ namespace TEN::Renderer {
 		m_context->RSSetState(m_states->CullNone());
 		m_context->DrawIndexed(12, 0, 0);
 	}
+
+	void Renderer11::DrawLoadingBar(float percentage)
+	{
+		UINT strides = sizeof(RendererVertex);
+		UINT offset = 0;
+		float color[] = { 0,0,0,1.0f };
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetVertexBuffers(0, 1, g_LoadingBar->VertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetIndexBuffer(g_LoadingBar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShaderResources(0, 1,  loadingBarBorder.ShaderResourceView.GetAddressOf());
+		ID3D11SamplerState* sampler = m_states->LinearClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
+		m_context->RSSetState(m_states->CullNone());
+		m_context->DrawIndexed(56, 0, 0);
+		m_context->PSSetShaderResources(0, 1, loadingBarInner.ShaderResourceView.GetAddressOf());
+
+
+		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+		m_context->IASetVertexBuffers(0, 1, g_LoadingBar->InnerVertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetIndexBuffer(g_LoadingBar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		m_stHUDBar.Percent = percentage / 100.0f;
+		m_stHUDBar.Poisoned = false;
+		m_stHUDBar.Frame = 0;
+		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
+		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
+		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
+		m_context->RSSetState(m_states->CullNone());
+		m_context->DrawIndexed(12, 0, 0);
+	}
+
 
 	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
 		RendererLine2D line;
