@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 			&& item->Status == ITEM_NOT_ACTIVE
 			&& !(item->Flags & 0x100)
 			&& item->TriggerFlags >= 0
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
@@ -133,7 +133,7 @@ namespace TEN::Entities::Switches
 					}
 
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					ResetLaraFlex(l);
 
@@ -146,9 +146,9 @@ namespace TEN::Entities::Switches
 					Lara.interactedItem = itemNum;
 				}
 			}
-			else if (Lara.isMoving && Lara.interactedItem == itemNum)
+			else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 

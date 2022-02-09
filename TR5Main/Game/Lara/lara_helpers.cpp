@@ -120,13 +120,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
-	info->ExtraTorsoRot.z += std::min(abs(rate), abs(maxAngle - info->ExtraTorsoRot.z) / 6) * sign;
+	info->Control.ExtraTorsoRot.zRot += std::min(abs(rate), abs(maxAngle - info->Control.ExtraTorsoRot.zRot) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->ActiveState != LS_CRAWL_BACK)
 	{
-		info->ExtraHeadRot.z = info->ExtraTorsoRot.z / 2;
-		info->ExtraHeadRot.y = info->ExtraHeadRot.z;
+		info->Control.ExtraHeadRot.zRot = info->Control.ExtraTorsoRot.zRot / 2;
+		info->Control.ExtraHeadRot.yRot = info->Control.ExtraHeadRot.zRot;
 	}
 }
 
@@ -175,31 +175,31 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
 	{
-		info->jumpDirection = JumpDirection::Forward;
+		info->Control.JumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
 		TestLaraJumpBack(item, coll))
 	{
-		info->jumpDirection = JumpDirection::Back;
+		info->Control.JumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
 		TestLaraJumpLeft(item, coll))
 	{
-		info->jumpDirection = JumpDirection::Left;
+		info->Control.JumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
 		TestLaraJumpRight(item, coll))
 	{
-		info->jumpDirection = JumpDirection::Right;
+		info->Control.JumpDirection = JumpDirection::Right;
 	}
 	else if (TestLaraJumpUp(item, coll)) [[likely]]
-		info->jumpDirection = JumpDirection::Up;
+		info->Control.JumpDirection = JumpDirection::Up;
 	else
-		info->jumpDirection = JumpDirection::NoDirection;
+		info->Control.JumpDirection = JumpDirection::NoDirection;
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// runJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
+// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
@@ -213,19 +213,19 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		info->runJumpQueued = IsRunJumpQueueableState((LARA_STATE)item->TargetState);
+		info->Control.RunJumpQueued = IsRunJumpQueueableState((LARA_STATE)item->TargetState);
 	}
 	else
-		info->runJumpQueued = false;
+		info->Control.RunJumpQueued = false;
 }
 
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
 	LaraInfo*& info = item->Data;
 
-	info->projectedFloorHeight = vaultResult.Height;
+	info->Control.ProjectedFloorHeight = vaultResult.Height;
 	info->gunStatus = vaultResult.SetBusyHands ? LG_HANDS_BUSY : info->gunStatus;
-	info->turnRate = 0;
+	info->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
 		SnapItemToLedge(item, coll);
@@ -302,7 +302,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	LaraSnapToHeight(item, coll);
-	info->moveAngle = direction;
+	info->Control.MoveAngle = direction;
 	oldAngle = direction;
 }
 
@@ -311,36 +311,36 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 	LaraInfo*& info = item->Data;
 
 	// Reset head.
-	if (abs(info->ExtraHeadRot.x) > ANGLE(0.1f))
-		info->ExtraHeadRot.x += info->ExtraHeadRot.x / -rate;
+	if (abs(info->Control.ExtraHeadRot.xRot) > ANGLE(0.1f))
+		info->Control.ExtraHeadRot.xRot += info->Control.ExtraHeadRot.xRot / -rate;
 	else
-		info->ExtraHeadRot.x = 0;
+		info->Control.ExtraHeadRot.xRot = 0;
 
-	if (abs(info->ExtraHeadRot.y) > ANGLE(0.1f))
-		info->ExtraHeadRot.y += info->ExtraHeadRot.y / -rate;
+	if (abs(info->Control.ExtraHeadRot.yRot) > ANGLE(0.1f))
+		info->Control.ExtraHeadRot.yRot += info->Control.ExtraHeadRot.yRot / -rate;
 	else
-		info->ExtraHeadRot.y = 0;
+		info->Control.ExtraHeadRot.yRot = 0;
 
-	if (abs(info->ExtraHeadRot.z) > ANGLE(0.1f))
-		info->ExtraHeadRot.z += info->ExtraHeadRot.z / -rate;
+	if (abs(info->Control.ExtraHeadRot.zRot) > ANGLE(0.1f))
+		info->Control.ExtraHeadRot.zRot += info->Control.ExtraHeadRot.zRot / -rate;
 	else
-		info->ExtraHeadRot.z = 0;
+		info->Control.ExtraHeadRot.zRot = 0;
 
 	// Reset torso.
-	if (abs(info->ExtraTorsoRot.x) > ANGLE(0.1f))
-		info->ExtraTorsoRot.x += info->ExtraTorsoRot.x / -rate;
+	if (abs(info->Control.ExtraTorsoRot.zRot) > ANGLE(0.1f))
+		info->Control.ExtraTorsoRot.zRot += info->Control.ExtraTorsoRot.zRot / -rate;
 	else
-		info->ExtraTorsoRot.x = 0;
+		info->Control.ExtraTorsoRot.zRot = 0;
 
-	if (abs(info->ExtraTorsoRot.y) > ANGLE(0.1f))
-		info->ExtraTorsoRot.y += info->ExtraTorsoRot.y / -rate;
+	if (abs(info->Control.ExtraTorsoRot.yRot) > ANGLE(0.1f))
+		info->Control.ExtraTorsoRot.yRot += info->Control.ExtraTorsoRot.yRot / -rate;
 	else
-		info->ExtraTorsoRot.y = 0;
+		info->Control.ExtraTorsoRot.yRot = 0;
 
-	if (abs(info->ExtraTorsoRot.z) > ANGLE(0.1f))
-		info->ExtraTorsoRot.z += info->ExtraTorsoRot.z / -rate;
+	if (abs(info->Control.ExtraTorsoRot.zRot) > ANGLE(0.1f))
+		info->Control.ExtraTorsoRot.zRot += info->Control.ExtraTorsoRot.zRot / -rate;
 	else
-		info->ExtraTorsoRot.z = 0;
+		info->Control.ExtraTorsoRot.zRot = 0;
 }
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
@@ -349,33 +349,33 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LARA_STATE)item->ActiveState))
-		info->runJumpCount = 0;
+		info->Control.RunJumpCount = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LARA_STATE)item->ActiveState))
-		info->runJumpQueued = false;
+		info->Control.RunJumpQueued = false;
 
 	// Reset projected height value used by step function.
 	//if (!IsVaultState((LARA_STATE)item->ActiveState))
-	//	info->projectedFloorHeight = NO_HEIGHT;
+	//	info->Control.ProjectedFloorHeight = NO_HEIGHT;
 
 	// Reset calculated auto jump velocity.
 	//if (item->ActiveState != LS_AUTO_JUMP)
-	//	info->calcJumpVelocity = 0;
+	//	info->Control.CalculatedJumpVelocity = 0;
 
 	// Increment/reset AFK pose timer.
-	if (info->poseCount < LARA_POSE_TIME &&
+	if (info->Control.PoseCount < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->Animations.Pose)
 	{
-		info->poseCount++;
+		info->Control.PoseCount++;
 	}
 	else
-		info->poseCount = 0;
+		info->Control.PoseCount = 0;
 
 	// Reset lean.
-	if (!info->isMoving || (info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if (!info->Control.IsMoving || (info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
 		if (abs(item->Position.zRot) > ANGLE(0.1f))
 			item->Position.zRot += item->Position.zRot / -6;
@@ -398,14 +398,14 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Reset turn rate.
-	int sign = copysign(1, info->turnRate);
-	if (abs(info->turnRate) > ANGLE(2.0f))
-		info->turnRate -= ANGLE(2.0f) * sign;
-	else if (abs(info->turnRate) > ANGLE(0.5f))
-		info->turnRate -= ANGLE(0.5f) * sign;
+	int sign = copysign(1, info->Control.TurnRate);
+	if (abs(info->Control.TurnRate) > ANGLE(2.0f))
+		info->Control.TurnRate -= ANGLE(2.0f) * sign;
+	else if (abs(info->Control.TurnRate) > ANGLE(0.5f))
+		info->Control.TurnRate -= ANGLE(0.5f) * sign;
 	else
-		info->turnRate = 0;
-	item->Position.yRot += info->turnRate;
+		info->Control.TurnRate = 0;
+	item->Position.yRot += info->Control.TurnRate;
 }
 
 void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)

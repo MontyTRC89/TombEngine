@@ -72,7 +72,7 @@ void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.look = 0;
+	Lara.Control.CanLook = false;
 
 	item->VerticalVelocity -= 8;
 	if (item->VerticalVelocity <= 0)
@@ -245,13 +245,13 @@ void UpdateSubsuitAngles()
 	Subsuit.Vel[0] += abs(Subsuit.XRot >> 3);
 	Subsuit.Vel[1] += abs(Subsuit.XRot >> 3);
 
-	if (Lara.turnRate > 0)
+	if (Lara.Control.TurnRate > 0)
 	{
-		Subsuit.Vel[0] += 2 * abs(Lara.turnRate);
+		Subsuit.Vel[0] += 2 * abs(Lara.Control.TurnRate);
 	}
-	else if (Lara.turnRate < 0)
+	else if (Lara.Control.TurnRate < 0)
 	{
-		Subsuit.Vel[1] += 2 * abs(Lara.turnRate);
+		Subsuit.Vel[1] += 2 * abs(Lara.Control.TurnRate);
 	}
 
 	if (Subsuit.Vel[0] > 1536)
@@ -280,17 +280,17 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_SUBSUIT_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN_MAX)
-			Lara.turnRate = -LARA_MED_TURN_MAX;
+		Lara.Control.TurnRate -= LARA_SUBSUIT_TURN_RATE;
+		if (Lara.Control.TurnRate < -LARA_MED_TURN_MAX)
+			Lara.Control.TurnRate = -LARA_MED_TURN_MAX;
 
 		item->Position.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_SUBSUIT_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN_MAX)
-			Lara.turnRate = LARA_MED_TURN_MAX;
+		Lara.Control.TurnRate += LARA_SUBSUIT_TURN_RATE;
+		if (Lara.Control.TurnRate > LARA_MED_TURN_MAX)
+			Lara.Control.TurnRate = LARA_MED_TURN_MAX;
 
 		item->Position.zRot += LARA_LEAN_RATE;
 	}
@@ -305,17 +305,17 @@ void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-		if (Lara.turnRate < -LARA_MED_TURN_MAX)
-			Lara.turnRate = -LARA_MED_TURN_MAX;
+		Lara.Control.TurnRate -= LARA_TURN_RATE;
+		if (Lara.Control.TurnRate < -LARA_MED_TURN_MAX)
+			Lara.Control.TurnRate = -LARA_MED_TURN_MAX;
 
 		item->Position.zRot -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
-		if (Lara.turnRate > LARA_MED_TURN_MAX)
-			Lara.turnRate = LARA_MED_TURN_MAX;
+		Lara.Control.TurnRate += LARA_TURN_RATE;
+		if (Lara.Control.TurnRate > LARA_MED_TURN_MAX)
+			Lara.Control.TurnRate = LARA_MED_TURN_MAX;
 
 		item->Position.zRot += LARA_LEAN_RATE;
 	}
@@ -338,8 +338,8 @@ void LaraWaterCurrent(COLL_INFO* coll)
 		SINK_INFO* sink = &g_Level.Sinks[Lara.currentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->Position.xPos, LaraItem->Position.zPos);
-		Lara.currentVel.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.currentVel.x) / 16;
-		Lara.currentVel.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.currentVel.z) / 16;
+		Lara.Control.ExtraVelocity.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.Control.ExtraVelocity.x) / 16;
+		Lara.Control.ExtraVelocity.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - Lara.Control.ExtraVelocity.z) / 16;
 
 		LaraItem->Position.yPos += (sink->y - LaraItem->Position.yPos) >> 4;
 	}
@@ -347,30 +347,30 @@ void LaraWaterCurrent(COLL_INFO* coll)
 	{
 		int shift = 0;
 
-		if (abs(Lara.currentVel.x) <= 16)
-			shift = (abs(Lara.currentVel.x) > 8) + 2;
+		if (abs(Lara.Control.ExtraVelocity.x) <= 16)
+			shift = (abs(Lara.Control.ExtraVelocity.x) > 8) + 2;
 		else
 			shift = 4;
-		Lara.currentVel.x -= Lara.currentVel.x >> shift;
+		Lara.Control.ExtraVelocity.x -= Lara.Control.ExtraVelocity.x >> shift;
 
-		if (abs(Lara.currentVel.x) < 4)
-			Lara.currentVel.x = 0;
+		if (abs(Lara.Control.ExtraVelocity.x) < 4)
+			Lara.Control.ExtraVelocity.x = 0;
 
-		if (abs(Lara.currentVel.z) <= 16)
-			shift = (abs(Lara.currentVel.z) > 8) + 2;
+		if (abs(Lara.Control.ExtraVelocity.z) <= 16)
+			shift = (abs(Lara.Control.ExtraVelocity.z) > 8) + 2;
 		else
 			shift = 4;
-		Lara.currentVel.z -= Lara.currentVel.z >> shift;
+		Lara.Control.ExtraVelocity.z -= Lara.Control.ExtraVelocity.z >> shift;
 
-		if (abs(Lara.currentVel.z) < 4)
-			Lara.currentVel.z = 0;
+		if (abs(Lara.Control.ExtraVelocity.z) < 4)
+			Lara.Control.ExtraVelocity.z = 0;
 
-		if (!Lara.currentVel.x && !Lara.currentVel.z)
+		if (!Lara.Control.ExtraVelocity.x && !Lara.Control.ExtraVelocity.z)
 			return;
 	}
 
-	LaraItem->Position.xPos += Lara.currentVel.x >> 8;
-	LaraItem->Position.zPos += Lara.currentVel.z >> 8;
+	LaraItem->Position.xPos += Lara.Control.ExtraVelocity.x >> 8;
+	LaraItem->Position.zPos += Lara.Control.ExtraVelocity.z >> 8;
 	Lara.currentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(LaraItem->Position.zPos - coll->Setup.OldPosition.z, LaraItem->Position.xPos - coll->Setup.OldPosition.x);

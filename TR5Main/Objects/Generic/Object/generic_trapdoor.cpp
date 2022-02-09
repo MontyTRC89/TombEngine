@@ -87,7 +87,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 	item = &g_Level.Items[itemNumber];
 	if (TrInput & IN_ACTION && item->Status != ITEM_ACTIVE && l->ActiveState == LS_IDLE && l->AnimNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE
-		|| Lara.isMoving && Lara.interactedItem == itemNumber)
+		|| Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
 		{
@@ -96,7 +96,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->ActiveState = LS_TRAPDOOR_FLOOR_OPEN;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				AddActiveItem(itemNumber);

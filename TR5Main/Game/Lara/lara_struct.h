@@ -1068,25 +1068,11 @@ struct LaraTightrope
 };
 #endif
 
-struct ExtraVelocity
-{
-	int x;
-	int y;
-	int z;
-};
-
-struct ExtraRotation
-{
-	short x;
-	short y;
-	short z;
-};
-
 struct FlareData
 {
-	int FlareAge;
-	int FlareFrame;
-	bool FlareControlLeft;
+	int Life;
+	int Frame;
+	bool ControlLeft;
 };
 
 struct RopeControlData
@@ -1109,6 +1095,43 @@ struct RopeControlData
 	int Count;
 };
 
+struct LaraControlData
+{
+	short MoveAngle;
+	short TurnRate;
+	int ProjectedFloorHeight;
+	int CalculatedJumpVelocity;
+	JumpDirection JumpDirection;
+
+	PHD_3DPOS ExtraHeadRot;
+	PHD_3DPOS ExtraTorsoRot;
+	PHD_VECTOR ExtraVelocity;
+
+	bool IsMoving;
+	bool RunJumpQueued;
+	bool CanLook;
+	bool KeepLow;
+	bool IsLow;
+	bool CanClimbLadder;
+	bool IsClimbingLadder;
+	bool CanMonkeySwing;
+
+	int RunJumpCount;
+	int PoseCount;
+	int DiveCount;
+	int DeathCount;
+
+	RopeControlData RopeControl;
+
+	// Inventory stuff??
+	bool IsBusy;
+	bool OldBusy;
+
+	// ??
+	bool Uncontrollable;
+	byte MoveCount; // Convert to int?
+};
+
 struct LaraInfo
 {
 	short itemNumber;
@@ -1116,44 +1139,26 @@ struct LaraInfo
 	LARA_WEAPON_TYPE gunType;
 	LARA_WEAPON_TYPE requestGunType;
 	LARA_WEAPON_TYPE lastGunType;
-	int calcJumpVelocity;
 	LARA_WATER_STATUS waterStatus;
-	bool climbStatus;
-	int poseCount;
-	int projectedFloorHeight;
-	JumpDirection jumpDirection;
-	int runJumpCount;
-	bool runJumpQueued;
+	LaraControlData Control;
 	int hitFrame;
 	int hitDirection;
 	int sprintTimer;
 	int air;
-	int diveCount;
-	int deathCount;
 	short currentActive;
-	ExtraVelocity currentVel;
 	FX_INFO* SpasmEffect;
-	int spasmEffectCount;
+	int SpasmEffectCount;
 	FlareData Flare;
 	int burnCount;
 	short weaponItem;
 	HolsterInfo holsterInfo;
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-	bool look;
 	bool burn;
-	bool keepLow;
-	bool isLow;
-	bool isMoving;
-	bool canMonkeySwing;
 	byte burnBlue;
 	bool burnSmoke;
 	bool hasFired;
-	bool busy;
-	bool oldBusy;
-	bool uncontrollable;
 	bool litTorch;
-	bool isClimbing;
 	bool fired;
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
@@ -1161,16 +1166,10 @@ struct LaraInfo
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
-	short turnRate;
-	short moveAngle;
-	ExtraRotation ExtraHeadRot;
-	ExtraRotation ExtraTorsoRot;
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
 	CREATURE_INFO* creature;
-	RopeControlData RopeControlData;
 	short interactedItem;
-	byte moveCount;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;

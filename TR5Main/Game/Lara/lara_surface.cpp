@@ -14,32 +14,32 @@
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	Lara.moveAngle = item->Position.yRot;
+	Lara.Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->Position.yRot + ANGLE(90);
+	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->Position.yRot - ANGLE(90);
+	Lara.Control.MoveAngle = item->Position.yRot - ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.moveAngle = item->Position.yRot + ANGLE(180);
+	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	Lara.moveAngle = item->Position.yRot;
+	Lara.Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
@@ -99,13 +99,13 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_JUMP)
 	{
-		Lara.diveCount++;
-		if (Lara.diveCount == 10)
+		Lara.Control.DiveCount++;
+		if (Lara.Control.DiveCount == 10)
 			SwimDive(item);
 		return;
 	}
 
-	Lara.diveCount = 0;
+	Lara.Control.DiveCount = 0;
 	item->TargetState = LS_ONWATER_STOP;
 }
 
@@ -117,7 +117,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.diveCount = 0;
+	Lara.Control.DiveCount = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -146,7 +146,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.diveCount = 0;
+	Lara.Control.DiveCount = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -175,7 +175,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.diveCount = 0;
+	Lara.Control.DiveCount = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -204,7 +204,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.diveCount = 0;
+	Lara.Control.DiveCount = 0;
 
 	if (TrInput & IN_LEFT)
 	{

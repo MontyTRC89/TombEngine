@@ -40,7 +40,7 @@ namespace TEN::Entities::Switches
 			|| Lara.gunStatus
 			|| l->ActiveState != LS_IDLE
 			|| l->AnimNumber != LA_STAND_IDLE)
-			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
+			&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
 			return;
@@ -63,7 +63,7 @@ namespace TEN::Entities::Switches
 				AddActiveItem(itemNum);
 				AnimateItem(item);
 
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
@@ -72,9 +72,9 @@ namespace TEN::Entities::Switches
 				Lara.interactedItem = itemNum;
 			}
 		}
-		else if (Lara.isMoving && Lara.interactedItem == itemNum)
+		else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
-			Lara.isMoving = false;
+			Lara.Control.IsMoving = false;
 			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}

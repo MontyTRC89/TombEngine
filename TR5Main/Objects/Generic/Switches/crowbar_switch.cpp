@@ -48,7 +48,7 @@ namespace TEN::Entities::Switches
 			&& l->AnimNumber == LA_STAND_IDLE
 			&& Lara.gunStatus == LG_HANDS_FREE
 			&& item->ItemFlags[0] == 0)
-			|| (Lara.isMoving && Lara.interactedItem == itemNum))
+			|| (Lara.Control.IsMoving && Lara.interactedItem == itemNum))
 		{
 			if (item->ActiveState == SWITCH_ON)
 			{
@@ -56,7 +56,7 @@ namespace TEN::Entities::Switches
 
 				if (TestLaraPosition(&CrowbarBounds2, item, l))
 				{
-					if (Lara.isMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
+					if (Lara.Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
 						if (MoveLaraPosition(&CrowbarPos2, item, l))
 						{
@@ -77,9 +77,9 @@ namespace TEN::Entities::Switches
 						doSwitch = -1;
 					}
 				}
-				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				l->Position.yRot ^= (short)ANGLE(180);
@@ -88,7 +88,7 @@ namespace TEN::Entities::Switches
 			{
 				if (TestLaraPosition(&CrowbarBounds, item, l))
 				{
-					if (Lara.isMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
+					if (Lara.Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
 						if (MoveLaraPosition(&CrowbarPos, item, l))
 						{
@@ -109,9 +109,9 @@ namespace TEN::Entities::Switches
 						doSwitch = -1;
 					}
 				}
-				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
@@ -138,7 +138,7 @@ namespace TEN::Entities::Switches
 			{
 				l->TargetState = LS_SWITCH_DOWN;
 				l->ActiveState = LS_SWITCH_DOWN;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->Status = ITEM_ACTIVE;

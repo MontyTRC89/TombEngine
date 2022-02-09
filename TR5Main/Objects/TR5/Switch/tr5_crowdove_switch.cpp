@@ -43,7 +43,7 @@ namespace TEN::Entities::TR5
 				|| l->ActiveState != LS_IDLE
 				|| l->AnimNumber != LA_STAND_IDLE
 				|| l->Airborne)
-			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
+			&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
 		{
 			if (l->ActiveState != LS_DOVESWITCH)
 				ObjectCollision(itemNum, l, coll);
@@ -68,7 +68,7 @@ namespace TEN::Entities::TR5
 
 					item->Status = ITEM_ACTIVE;
 					item->Position.yRot = oldYrot;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.interactedItem = itemNum;
@@ -81,9 +81,9 @@ namespace TEN::Entities::TR5
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->Position.yRot = oldYrot;

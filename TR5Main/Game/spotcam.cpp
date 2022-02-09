@@ -128,7 +128,7 @@ void InitialiseSpotCam(short Sequence)
 
 	Camera.bounce = 0;
 
-	Lara.busy = 0;
+	Lara.Control.IsBusy = 0;
 
 	CameraFade = -1;
 	LastSpotCamSequence = Sequence;
@@ -136,7 +136,7 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
-	Lara.uncontrollable = false;
+	Lara.Control.Uncontrollable = false;
 
 	LastFOV = CurrentFOV;
 	LaraAir = Lara.air;
@@ -176,7 +176,7 @@ void InitialiseSpotCam(short Sequence)
 
 	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		Lara.uncontrollable = true;
+		Lara.Control.Uncontrollable = true;
 		SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
@@ -390,7 +390,7 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO Backup;
 
-	if (Lara.uncontrollable)
+	if (Lara.Control.Uncontrollable)
 	{
 		LaraItem->HitPoints = LaraHealth;
 		Lara.air = LaraAir;
@@ -657,14 +657,14 @@ void CalculateSpotCameras()
 				{
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS))
 					{
-						Lara.uncontrollable = false;
+						Lara.Control.Uncontrollable = false;
 					}
 
 					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
 					{						
 						if (CurrentLevel)
 							SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
-						Lara.uncontrollable = true;
+						Lara.Control.Uncontrollable = true;
 					}
 
 					int sp2 = 0;
@@ -769,7 +769,7 @@ void CalculateSpotCameras()
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
 					UseSpotCam = 0;
-					Lara.uncontrollable = false;
+					Lara.Control.Uncontrollable = false;
 					CheckTrigger = 0;
 					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
 					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
@@ -884,7 +884,7 @@ void CalculateSpotCameras()
 	{
 		SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 		UseSpotCam = false;
-		Lara.uncontrollable = false;
+		Lara.Control.Uncontrollable = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera();

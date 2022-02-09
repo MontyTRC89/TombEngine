@@ -36,9 +36,9 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
-	info->runJumpCount++;
-	if (info->runJumpCount > LARA_RUN_JUMP_TIME / 2)
-		info->runJumpCount = LARA_RUN_JUMP_TIME / 2;
+	info->Control.RunJumpCount++;
+	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME / 2)
+		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{
@@ -53,15 +53,15 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN_MAX)
-			info->turnRate = -LARA_JUMP_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_JUMP_TURN_MAX)
+			info->Control.TurnRate = -LARA_JUMP_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN_MAX)
-			info->turnRate = LARA_JUMP_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_JUMP_TURN_MAX)
+			info->Control.TurnRate = LARA_JUMP_TURN_MAX;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -117,11 +117,11 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = (item->Velocity > 0) ? item->Position.yRot : item->Position.yRot + ANGLE(180.0f);
+	info->Control.MoveAngle = (item->Velocity > 0) ? item->Position.yRot : item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
@@ -134,7 +134,7 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	info->moveAngle = (item->Velocity < 0) ? item->Position.yRot : info->moveAngle;
+	info->Control.MoveAngle = (item->Velocity < 0) ? item->Position.yRot : info->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
@@ -175,7 +175,7 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
@@ -209,15 +209,15 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -250,10 +250,10 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	if (info->RopeControlData.Ptr == -1)
+	if (info->Control.RopeControl.Ptr == -1)
 		item->Airborne = true;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 
 	// HACK: height is altered according to fallspeed to fix "issues" with physically impossible
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
@@ -263,7 +263,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 	GetCollisionInfo(coll, item);
@@ -300,53 +300,53 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN_MAX)
-				info->turnRate = -LARA_SLOW_TURN_MAX;
+			info->Control.TurnRate -= LARA_TURN_RATE;
+			if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN_MAX)
-				info->turnRate = LARA_SLOW_TURN_MAX;
+			info->Control.TurnRate += LARA_TURN_RATE;
+			if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 		}
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
-		info->jumpDirection = JumpDirection::NoDirection;
+		info->Control.JumpDirection = JumpDirection::NoDirection;
 
 	if ((TrInput & IN_FORWARD ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Forward) &&
+		!(TrInput & IN_DIRECTION) && info->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		item->TargetState = LS_JUMP_FORWARD;
-		info->jumpDirection = JumpDirection::Forward;
+		info->Control.JumpDirection = JumpDirection::Forward;
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Back) &&
+		!(TrInput & IN_DIRECTION) && info->Control.JumpDirection == JumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		item->TargetState = LS_JUMP_BACK;
-		info->jumpDirection = JumpDirection::Back;
+		info->Control.JumpDirection = JumpDirection::Back;
 		return;
 	}
 
 	if ((TrInput & IN_LEFT ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Left) &&
+		!(TrInput & IN_DIRECTION) && info->Control.JumpDirection == JumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		item->TargetState = LS_JUMP_LEFT;
-		info->jumpDirection = JumpDirection::Left;
+		info->Control.JumpDirection = JumpDirection::Left;
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-		!(TrInput & IN_DIRECTION) && info->jumpDirection == JumpDirection::Right) &&
+		!(TrInput & IN_DIRECTION) && info->Control.JumpDirection == JumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		item->TargetState = LS_JUMP_RIGHT;
-		info->jumpDirection = JumpDirection::Right;
+		info->Control.JumpDirection = JumpDirection::Right;
 		return;
 	}
 
@@ -354,12 +354,12 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraJumpUp(item, coll))
 	{
 		item->TargetState = LS_JUMP_UP;
-		info->jumpDirection = JumpDirection::Up;
+		info->Control.JumpDirection = JumpDirection::Up;
 		return;
 	}
 
 	item->TargetState = LS_IDLE;
-	info->jumpDirection = JumpDirection::NoDirection;
+	info->Control.JumpDirection = JumpDirection::NoDirection;
 }
 
 // State:		LS_JUMP_PREPARE (15)
@@ -368,19 +368,19 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
-	switch (info->jumpDirection)
+	info->Control.MoveAngle = item->Position.yRot;
+	switch (info->Control.JumpDirection)
 	{
 	case JumpDirection::Back:
-		info->moveAngle += ANGLE(180.0f);
+		info->Control.MoveAngle += ANGLE(180.0f);
 		break;
 
 	case JumpDirection::Left:
-		info->moveAngle -= ANGLE(90.0f);
+		info->Control.MoveAngle -= ANGLE(90.0f);
 		break;
 
 	case JumpDirection::Right:
-		info->moveAngle += ANGLE(90.0f);
+		info->Control.MoveAngle += ANGLE(90.0f);
 		break;
 
 	default:
@@ -393,7 +393,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;		// Security.
 	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;	// Security.
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -430,7 +430,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 	Camera.targetAngle = ANGLE(135.0f);
 
 	if (item->HitPoints <= 0)
@@ -446,15 +446,15 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -498,7 +498,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -553,7 +553,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -608,7 +608,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -642,7 +642,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
 		item->Position.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Velocity) - item->Position.xRot) / 3);
-		info->ExtraHeadRot.y += (ANGLE(10.0f) - item->Position.zRot) / 3;
+		info->Control.ExtraHeadRot.yRot += (ANGLE(10.0f) - item->Position.zRot) / 3;
 	}
 	else
 		item->Velocity = item->Velocity <= 0 ? -2 : 2;
@@ -662,12 +662,12 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Velocity >= 0) ? info->moveAngle : info->moveAngle + ANGLE(180.0f);
+	coll->Setup.ForwardAngle = (item->Velocity >= 0) ? info->Control.MoveAngle : info->Control.MoveAngle + ANGLE(180.0f);
 	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
 	GetCollisionInfo(coll, item);
 
@@ -711,15 +711,15 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = -LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN_MAX / 2)
-			info->turnRate = LARA_JUMP_TURN_MAX / 2;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
+			info->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -765,23 +765,23 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	info->gunStatus = LG_HANDS_BUSY;
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_JUMP_TURN_MAX)
-			info->turnRate = -LARA_JUMP_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_JUMP_TURN_MAX)
+			info->Control.TurnRate = -LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_JUMP_TURN_MAX)
-			info->turnRate = LARA_JUMP_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_JUMP_TURN_MAX)
+			info->Control.TurnRate = LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
@@ -803,13 +803,13 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	auto bounds = GetBoundsAccurate(item);
 	int realHeight = bounds->Y2 - bounds->Y1;
 
-	info->moveAngle = item->Position.yRot;
-	info->keepLow = TestLaraKeepLow(item, coll);
+	info->Control.MoveAngle = item->Position.yRot;
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	coll->Setup.Height = std::max<int>(LARA_HEIGHT_CRAWL, realHeight * 0.7f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeJump(item, coll))
@@ -821,13 +821,13 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
-		else if (info->keepLow ||
+		else if (info->Control.KeepLow ||
 			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
-			if (!info->keepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
+			if (!info->Control.KeepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
 				MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
 		}
 		else [[likely]]

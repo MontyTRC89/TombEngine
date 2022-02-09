@@ -330,7 +330,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->Position.zRot = 0;
 			lara->Airborne = true;
 			laraInfo->gunStatus = LG_HANDS_FREE;
-			laraInfo->moveAngle = skidoo->Position.yRot;
+			laraInfo->Control.MoveAngle = skidoo->Position.yRot;
 			skidoo->Flags |= ONESHOT;
 			skidoo->Collidable = false;
 
@@ -668,7 +668,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 	{
 		CreateFlare(lara, ID_FLARE_ITEM, false);
 		UndrawFlareMeshes(lara);
-		laraInfo->Flare.FlareControlLeft = 0;
+		laraInfo->Flare.ControlLeft = 0;
 		laraInfo->requestGunType = WEAPON_NONE;
 		laraInfo->gunStatus = LG_HANDS_FREE;
 	}

@@ -304,7 +304,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	LaraInfo*& laraInfo = laraItem->Data;
 
-	if (laraInfo->currentVel.x || laraInfo->currentVel.z)
+	if (laraInfo->Control.ExtraVelocity.x || laraInfo->Control.ExtraVelocity.z)
 		return false;
 
 	short moveAngle = UPVItem->Position.yRot + ANGLE(180.0f);
@@ -360,7 +360,7 @@ static void DoCurrent(ITEM_INFO* item)
 	{
 		long shifter, absvel;
 
-		absvel = abs(Lara.currentVel.x);
+		absvel = abs(Lara.Control.ExtraVelocity.x);
 
 		if (absvel > 16)
 			shifter = 4;
@@ -369,12 +369,12 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.currentVel.x -= Lara.currentVel.x >> shifter;
+		Lara.Control.ExtraVelocity.x -= Lara.Control.ExtraVelocity.x >> shifter;
 
-		if (abs(Lara.currentVel.x) < 4)
-			Lara.currentVel.x = 0;
+		if (abs(Lara.Control.ExtraVelocity.x) < 4)
+			Lara.Control.ExtraVelocity.x = 0;
 
-		absvel = abs(Lara.currentVel.z);
+		absvel = abs(Lara.Control.ExtraVelocity.z);
 		if (absvel > 16)
 			shifter = 4;
 		else if (absvel > 8)
@@ -382,11 +382,11 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.currentVel.z -= Lara.currentVel.z >> shifter;
-		if (abs(Lara.currentVel.z) < 4)
-			Lara.currentVel.z = 0;
+		Lara.Control.ExtraVelocity.z -= Lara.Control.ExtraVelocity.z >> shifter;
+		if (abs(Lara.Control.ExtraVelocity.z) < 4)
+			Lara.Control.ExtraVelocity.z = 0;
 
-		if (Lara.currentVel.x == 0 && Lara.currentVel.z == 0)
+		if (Lara.Control.ExtraVelocity.x == 0 && Lara.Control.ExtraVelocity.z == 0)
 			return;
 	}
 	else
@@ -406,12 +406,12 @@ static void DoCurrent(ITEM_INFO* item)
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 
-		Lara.currentVel.x += ((dx - Lara.currentVel.x) / 16);
-		Lara.currentVel.z += ((dz - Lara.currentVel.z) / 16);
+		Lara.Control.ExtraVelocity.x += ((dx - Lara.Control.ExtraVelocity.x) / 16);
+		Lara.Control.ExtraVelocity.z += ((dz - Lara.Control.ExtraVelocity.z) / 16);
 	}
 
-	item->Position.xPos += (Lara.currentVel.x / 256);
-	item->Position.zPos += (Lara.currentVel.z / 256);
+	item->Position.xPos += (Lara.Control.ExtraVelocity.x / 256);
+	item->Position.zPos += (Lara.Control.ExtraVelocity.z / 256);
 	Lara.currentActive = 0;
 }
 
@@ -436,9 +436,9 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
 	if ((UPVItem->Position.xRot >= -16384) && (UPVItem->Position.xRot <= 16384))
-		coll->Setup.ForwardAngle = laraInfo->moveAngle = UPVItem->Position.yRot;
+		coll->Setup.ForwardAngle = laraInfo->Control.MoveAngle = UPVItem->Position.yRot;
 	else
-		coll->Setup.ForwardAngle = laraInfo->moveAngle = UPVItem->Position.yRot - ANGLE(180.0f);
+		coll->Setup.ForwardAngle = laraInfo->Control.MoveAngle = UPVItem->Position.yRot - ANGLE(180.0f);
 
 	int height = phd_sin(UPVItem->Position.xRot) * SUB_LENGTH;
 	if (height < 0)
@@ -735,7 +735,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			laraInfo->waterStatus = LW_SURFACE;
 			laraInfo->waterSurfaceDist = -heightFromWater;
-			laraInfo->diveCount = 11;
+			laraInfo->Control.DiveCount = 11;
 			ResetLaraFlex(laraItem);
 			laraInfo->gunStatus = LG_HANDS_FREE;
 			laraInfo->Vehicle = NO_ITEM;
@@ -869,7 +869,7 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
-			laraInfo->Flare.FlareControlLeft = false;
+			laraInfo->Flare.ControlLeft = false;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}
 

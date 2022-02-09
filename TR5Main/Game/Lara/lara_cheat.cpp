@@ -27,17 +27,17 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= 613;
+		Lara.Control.TurnRate -= 613;
 
-		if (Lara.turnRate < -ANGLE(6))
-			Lara.turnRate = -ANGLE(6);
+		if (Lara.Control.TurnRate < -ANGLE(6))
+			Lara.Control.TurnRate = -ANGLE(6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += 613;
+		Lara.Control.TurnRate += 613;
 
-		if (Lara.turnRate > ANGLE(6))
-			Lara.turnRate = ANGLE(6);
+		if (Lara.Control.TurnRate > ANGLE(6))
+			Lara.Control.TurnRate = ANGLE(6);
 	}
 
 	if (TrInput & IN_ACTION)
@@ -47,7 +47,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_OPTION)
 	{
-		Lara.turnRate = -ANGLE(12);
+		Lara.Control.TurnRate = -ANGLE(12);
 	}
 
 	if (TrInput & IN_JUMP)
@@ -91,7 +91,7 @@ void LaraCheatyBits()
 					LaraItem->HitPoints = 1000;
 					Lara.poisoned = 0;
 					Lara.air = 1800;
-					Lara.deathCount = 0;
+					Lara.Control.DeathCount = 0;
 					ResetLaraFlex(LaraItem);
 				}
 			}

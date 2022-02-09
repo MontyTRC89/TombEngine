@@ -27,9 +27,9 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -53,18 +53,18 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX / 2)
-			info->turnRate = -LARA_SLOW_TURN_MAX / 2;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX / 2)
+			info->Control.TurnRate = -LARA_SLOW_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX / 2)
-			info->turnRate = LARA_SLOW_TURN_MAX / 2;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX / 2)
+			info->Control.TurnRate = LARA_SLOW_TURN_MAX / 2;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_ROLL)
 		{
@@ -119,7 +119,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -128,7 +128,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -157,9 +157,9 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -173,18 +173,18 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		// TODO
 		/*if (TrInput & IN_ROLL | IN_BACK)
@@ -213,14 +213,14 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -247,9 +247,9 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -263,18 +263,18 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -296,14 +296,14 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot + ANGLE(180.0f);
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -330,9 +330,9 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -346,18 +346,18 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_LSTEP)
 		{
@@ -379,14 +379,14 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot - ANGLE(90.0f);
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -413,9 +413,9 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -429,18 +429,18 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_SLOW_TURN_MAX)
-			info->turnRate = -LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_SLOW_TURN_MAX)
-			info->turnRate = LARA_SLOW_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_RSTEP)
 		{
@@ -462,14 +462,14 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot + ANGLE(90.0f);
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.CeilingSlopeIsWall = true;
 	coll->Setup.NoMonkeyFlagIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -514,9 +514,9 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -528,7 +528,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
@@ -556,9 +556,9 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->TargetState = LS_MONKEY_TURN_LEFT;
 
-			info->turnRate -= LARA_TURN_RATE;
-			if (info->turnRate < -LARA_SLOW_TURN_MAX)
-				info->turnRate = -LARA_SLOW_TURN_MAX;
+			info->Control.TurnRate -= LARA_TURN_RATE;
+			if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 
 			return;
 		}
@@ -584,9 +584,9 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraTorsoRot.z = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraTorsoRot.zRot = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -598,7 +598,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION && info->canMonkeySwing)
+	if (TrInput & IN_ACTION && info->Control.CanMonkeySwing)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
@@ -626,9 +626,9 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->TargetState = LS_MONKEY_TURN_RIGHT;
 
-			info->turnRate += LARA_TURN_RATE;
-			if (info->turnRate > LARA_SLOW_TURN_MAX)
-				info->turnRate = LARA_SLOW_TURN_MAX;
+			info->Control.TurnRate += LARA_TURN_RATE;
+			if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 
 			return;
 		}

@@ -148,10 +148,10 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	if (OldCam.pos.xRot != LaraItem->Position.xRot ||
 		OldCam.pos.yRot != LaraItem->Position.yRot ||
 		OldCam.pos.zRot != LaraItem->Position.zRot ||
-		OldCam.pos2.xRot != Lara.ExtraHeadRot.x ||
-		OldCam.pos2.yRot != Lara.ExtraHeadRot.y ||
-		OldCam.pos2.xPos != Lara.ExtraTorsoRot.x ||
-		OldCam.pos2.yPos != Lara.ExtraTorsoRot.y ||
+		OldCam.pos2.xRot != Lara.Control.ExtraHeadRot.xRot ||
+		OldCam.pos2.yRot != Lara.Control.ExtraHeadRot.yRot ||
+		OldCam.pos2.xPos != Lara.Control.ExtraTorsoRot.zRot ||
+		OldCam.pos2.yPos != Lara.Control.ExtraTorsoRot.yRot ||
 		OldCam.pos.xPos != LaraItem->Position.xPos ||
 		OldCam.pos.yPos != LaraItem->Position.yPos ||
 		OldCam.pos.zPos != LaraItem->Position.zPos ||
@@ -170,10 +170,10 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xRot = LaraItem->Position.xRot;
 		OldCam.pos.yRot = LaraItem->Position.yRot;
 		OldCam.pos.zRot = LaraItem->Position.zRot;
-		OldCam.pos2.xRot = Lara.ExtraHeadRot.x;
-		OldCam.pos2.yRot = Lara.ExtraHeadRot.y;
-		OldCam.pos2.xPos = Lara.ExtraTorsoRot.x;
-		OldCam.pos2.yPos = Lara.ExtraTorsoRot.y;
+		OldCam.pos2.xRot = Lara.Control.ExtraHeadRot.xRot;
+		OldCam.pos2.yRot = Lara.Control.ExtraHeadRot.yRot;
+		OldCam.pos2.xPos = Lara.Control.ExtraTorsoRot.zRot;
+		OldCam.pos2.yPos = Lara.Control.ExtraTorsoRot.yRot;
 		OldCam.pos.xPos = LaraItem->Position.xPos;
 		OldCam.pos.yPos = LaraItem->Position.yPos;
 		OldCam.pos.zPos = LaraItem->Position.zPos;
@@ -465,8 +465,8 @@ void CombatCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.targetAngle = Lara.ExtraHeadRot.y + Lara.ExtraTorsoRot.y;
-		Camera.targetElevation = Lara.ExtraHeadRot.x + Lara.ExtraTorsoRot.x + item->Position.xRot - ANGLE(15.0f);
+		Camera.targetAngle = Lara.Control.ExtraHeadRot.yRot + Lara.Control.ExtraTorsoRot.yRot;
+		Camera.targetElevation = Lara.Control.ExtraHeadRot.xRot + Lara.Control.ExtraTorsoRot.zRot + item->Position.xRot - ANGLE(15.0f);
 	}
 
 	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
@@ -780,34 +780,34 @@ void LookCamera(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->Data;
 
-	short headXRot = info->ExtraHeadRot.x;
-	short headYRot = info->ExtraHeadRot.y;
-	short torsoXRot = info->ExtraTorsoRot.x;
-	short torsoYRot = info->ExtraTorsoRot.y;
+	short headXRot = info->Control.ExtraHeadRot.xRot;
+	short headYRot = info->Control.ExtraHeadRot.yRot;
+	short torsoXRot = info->Control.ExtraTorsoRot.zRot;
+	short torsoYRot = info->Control.ExtraTorsoRot.yRot;
 
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
-	info->ExtraHeadRot.x *= 2;
-	info->ExtraHeadRot.y *= 2;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
+	info->Control.ExtraHeadRot.xRot *= 2;
+	info->Control.ExtraHeadRot.yRot *= 2;
 
 	// Clamp head rotation.
-	if (info->ExtraHeadRot.x > ANGLE(55.0f))
-		info->ExtraHeadRot.x = ANGLE(55.0f);
-	else if (info->ExtraHeadRot.x < -ANGLE(75.0f))
-		info->ExtraHeadRot.x = -ANGLE(75.0f);
-	if (info->ExtraHeadRot.y < -ANGLE(80.0f))
-		info->ExtraHeadRot.y = -ANGLE(80.0f);
-	else if (info->ExtraHeadRot.y > ANGLE(80.0f))
-		info->ExtraHeadRot.y = ANGLE(80.0f);
+	if (info->Control.ExtraHeadRot.xRot > ANGLE(55.0f))
+		info->Control.ExtraHeadRot.xRot = ANGLE(55.0f);
+	else if (info->Control.ExtraHeadRot.xRot < -ANGLE(75.0f))
+		info->Control.ExtraHeadRot.xRot = -ANGLE(75.0f);
+	if (info->Control.ExtraHeadRot.yRot < -ANGLE(80.0f))
+		info->Control.ExtraHeadRot.yRot = -ANGLE(80.0f);
+	else if (info->Control.ExtraHeadRot.yRot > ANGLE(80.0f))
+		info->Control.ExtraHeadRot.yRot = ANGLE(80.0f);
 
-	if (abs(info->ExtraHeadRot.x - OldCam.pos.xRot) >= 16)
-		OldCam.pos.xRot = (info->ExtraHeadRot.x + OldCam.pos.xRot) / 2;
+	if (abs(info->Control.ExtraHeadRot.xRot - OldCam.pos.xRot) >= 16)
+		OldCam.pos.xRot = (info->Control.ExtraHeadRot.xRot + OldCam.pos.xRot) / 2;
 	else
-		OldCam.pos.xRot = info->ExtraHeadRot.x;
-	if (abs(info->ExtraHeadRot.y - OldCam.pos.yRot) >= 16)
-		OldCam.pos.yRot = (info->ExtraHeadRot.y + OldCam.pos.yRot) / 2;
+		OldCam.pos.xRot = info->Control.ExtraHeadRot.xRot;
+	if (abs(info->Control.ExtraHeadRot.yRot - OldCam.pos.yRot) >= 16)
+		OldCam.pos.yRot = (info->Control.ExtraHeadRot.yRot + OldCam.pos.yRot) / 2;
 	else
-		OldCam.pos.yRot = info->ExtraHeadRot.y;
+		OldCam.pos.yRot = info->Control.ExtraHeadRot.yRot;
 
 	PHD_VECTOR pos = { 0, STEP_SIZE / 16, STEP_SIZE / 4 };
 	GetLaraJointPosition(&pos, LM_HEAD);
@@ -896,8 +896,8 @@ void LookCamera(ITEM_INFO* item)
 	GAME_VECTOR ideal = { x, y, z };
 	ideal.roomNumber = roomNum;
 
-	if (OldCam.pos.xRot == info->ExtraHeadRot.x &&
-		OldCam.pos.yRot == info->ExtraHeadRot.y &&
+	if (OldCam.pos.xRot == info->Control.ExtraHeadRot.xRot &&
+		OldCam.pos.yRot == info->Control.ExtraHeadRot.yRot &&
 		OldCam.pos.xPos == item->Position.xPos &&
 		OldCam.pos.yPos == item->Position.yPos &&
 		OldCam.pos.zPos == item->Position.zPos &&
@@ -915,8 +915,8 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OldCam.pos.xRot = info->ExtraHeadRot.x;
-		OldCam.pos.yRot = info->ExtraHeadRot.y;
+		OldCam.pos.xRot = info->Control.ExtraHeadRot.xRot;
+		OldCam.pos.yRot = info->Control.ExtraHeadRot.yRot;
 		OldCam.pos.xPos = item->Position.xPos;
 		OldCam.pos.yPos = item->Position.yPos;
 		OldCam.pos.zPos = item->Position.zPos;
@@ -1032,7 +1032,7 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Position.yRot + info->ExtraHeadRot.y + info->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Position.yRot + info->Control.ExtraHeadRot.yRot + info->Control.ExtraTorsoRot.yRot;
 		Camera.mikePos.x = item->Position.xPos;
 		Camera.mikePos.y = item->Position.yPos;
 		Camera.mikePos.z = item->Position.zPos;
@@ -1047,10 +1047,10 @@ void LookCamera(ITEM_INFO* item)
 
 	Camera.oldType = Camera.type;
 
-	info->ExtraHeadRot.x = headXRot;
-	info->ExtraHeadRot.y = headYRot;
-	info->ExtraTorsoRot.x = torsoXRot;
-	info->ExtraTorsoRot.y = torsoYRot;
+	info->Control.ExtraHeadRot.xRot = headXRot;
+	info->Control.ExtraHeadRot.yRot = headYRot;
+	info->Control.ExtraTorsoRot.zRot = torsoXRot;
+	info->Control.ExtraTorsoRot.yRot = torsoYRot;
 }
 
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
@@ -1090,11 +1090,11 @@ void BinocularCamera(ITEM_INFO* item)
 			BinocularRange = 0;
 			AlterFOV(14560);
 			item->MeshBits = -1;
-			info->busy = false;
-			info->ExtraHeadRot.y = 0;
-			info->ExtraHeadRot.x = 0;
-			info->ExtraTorsoRot.y = 0;
-			info->ExtraTorsoRot.x = 0;
+			info->Control.IsBusy = false;
+			info->Control.ExtraHeadRot.yRot = 0;
+			info->Control.ExtraHeadRot.xRot = 0;
+			info->Control.ExtraTorsoRot.yRot = 0;
+			info->Control.ExtraTorsoRot.zRot = 0;
 			Camera.type = BinocularOldCamera;
 
 			return;
@@ -1104,8 +1104,8 @@ void BinocularCamera(ITEM_INFO* item)
 	item->MeshBits = 0;
 	AlterFOV(7 * (2080 - BinocularRange));
 
-	short headXRot = info->ExtraHeadRot.x * 2;
-	short headYRot = info->ExtraHeadRot.y;
+	short headXRot = info->Control.ExtraHeadRot.xRot * 2;
+	short headYRot = info->Control.ExtraHeadRot.yRot;
 
 	if (headXRot > ANGLE(75.0f))
 		headXRot = ANGLE(75.0f);
@@ -1175,7 +1175,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Position.yRot + info->ExtraHeadRot.y + info->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Position.yRot + info->Control.ExtraHeadRot.yRot + info->Control.ExtraTorsoRot.yRot;
 		Camera.mikePos.x = item->Position.xPos;
 		Camera.mikePos.y = item->Position.yPos;
 		Camera.mikePos.z = item->Position.zPos;
@@ -1354,7 +1354,7 @@ void BinocularCamera(ITEM_INFO* item)
 			// Reimplement this mode?
 		}
 		else
-			LaraTorch(&src, &target, info->ExtraHeadRot.y, 192);
+			LaraTorch(&src, &target, info->Control.ExtraHeadRot.yRot, 192);
 	}
 }
 
@@ -1463,23 +1463,23 @@ void CalculateCamera()
 
 			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
 			{
-				short change = angle - Lara.ExtraHeadRot.y;
+				short change = angle - Lara.Control.ExtraHeadRot.yRot;
 				if (change > ANGLE(4.0f))
-					Lara.ExtraHeadRot.y += ANGLE(4.0f);
+					Lara.Control.ExtraHeadRot.yRot += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.ExtraHeadRot.y -= ANGLE(4.0f);
+					Lara.Control.ExtraHeadRot.yRot -= ANGLE(4.0f);
 				else
-					Lara.ExtraHeadRot.y += change;
-				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
+					Lara.Control.ExtraHeadRot.yRot += change;
+				Lara.Control.ExtraTorsoRot.yRot = Lara.Control.ExtraHeadRot.yRot;
 
-				change = tilt - Lara.ExtraHeadRot.x;
+				change = tilt - Lara.Control.ExtraHeadRot.xRot;
 				if (change > ANGLE(4.0f))
-					Lara.ExtraHeadRot.x += ANGLE(4.0f);
+					Lara.Control.ExtraHeadRot.xRot += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.ExtraHeadRot.x -= ANGLE(4.0f);
+					Lara.Control.ExtraHeadRot.xRot -= ANGLE(4.0f);
 				else
-					Lara.ExtraHeadRot.x += change;
-				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
+					Lara.Control.ExtraHeadRot.xRot += change;
+				Lara.Control.ExtraTorsoRot.zRot = Lara.Control.ExtraHeadRot.xRot;
 
 				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 				Camera.item->LookedAt = 1;
@@ -1628,23 +1628,23 @@ void LookLeftRight()
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (Lara.ExtraHeadRot.y > -ANGLE(44.0f))
+		if (Lara.Control.ExtraHeadRot.yRot > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				Lara.Control.ExtraHeadRot.yRot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				Lara.ExtraHeadRot.y -= ANGLE(2.0f);
+				Lara.Control.ExtraHeadRot.yRot -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (Lara.ExtraHeadRot.y < ANGLE(44.0f))
+		if (Lara.Control.ExtraHeadRot.yRot < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.y += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				Lara.Control.ExtraHeadRot.yRot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				Lara.ExtraHeadRot.y += ANGLE(2.0f);
+				Lara.Control.ExtraHeadRot.yRot += ANGLE(2.0f);
 		}
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
@@ -1652,7 +1652,7 @@ void LookLeftRight()
 		!Lara.leftArm.lock &&
 		!Lara.rightArm.lock)
 	{
-		Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
+		Lara.Control.ExtraTorsoRot.yRot = Lara.Control.ExtraHeadRot.yRot;
 	}
 }
 
@@ -1662,23 +1662,23 @@ void LookUpDown()
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (Lara.ExtraHeadRot.x > -ANGLE(35.0f))
+		if (Lara.Control.ExtraHeadRot.xRot > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				Lara.Control.ExtraHeadRot.xRot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				Lara.ExtraHeadRot.x -= ANGLE(2.0f);
+				Lara.Control.ExtraHeadRot.xRot -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (Lara.ExtraHeadRot.x < ANGLE(30.0f))
+		if (Lara.Control.ExtraHeadRot.xRot < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.x += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				Lara.Control.ExtraHeadRot.xRot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				Lara.ExtraHeadRot.x += ANGLE(2.0f);
+				Lara.Control.ExtraHeadRot.xRot += ANGLE(2.0f);
 		}
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
@@ -1686,7 +1686,7 @@ void LookUpDown()
 		!Lara.leftArm.lock &&
 		!Lara.rightArm.lock)
 	{
-		Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
+		Lara.Control.ExtraTorsoRot.zRot = Lara.Control.ExtraHeadRot.xRot;
 	}
 }
 
@@ -1696,38 +1696,38 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
 	{
-		if (abs(info->ExtraHeadRot.x) > ANGLE(0.1f))
-			info->ExtraHeadRot.x += info->ExtraHeadRot.x / -8;
+		if (abs(info->Control.ExtraHeadRot.xRot) > ANGLE(0.1f))
+			info->Control.ExtraHeadRot.xRot += info->Control.ExtraHeadRot.xRot / -8;
 		else
-			info->ExtraHeadRot.x = 0;
+			info->Control.ExtraHeadRot.xRot = 0;
 
-		if (abs(info->ExtraHeadRot.y) > ANGLE(0.1f))
-			info->ExtraHeadRot.y += info->ExtraHeadRot.y / -8;
+		if (abs(info->Control.ExtraHeadRot.yRot) > ANGLE(0.1f))
+			info->Control.ExtraHeadRot.yRot += info->Control.ExtraHeadRot.yRot / -8;
 		else
-			info->ExtraHeadRot.y = 0;
+			info->Control.ExtraHeadRot.yRot = 0;
 
-		if (abs(info->ExtraHeadRot.z) > ANGLE(0.1f))
-			info->ExtraHeadRot.z += info->ExtraHeadRot.z / -8;
+		if (abs(info->Control.ExtraHeadRot.zRot) > ANGLE(0.1f))
+			info->Control.ExtraHeadRot.zRot += info->Control.ExtraHeadRot.zRot / -8;
 		else
-			info->ExtraHeadRot.z = 0;
+			info->Control.ExtraHeadRot.zRot = 0;
 
 		if (info->gunStatus != LG_HANDS_BUSY &&
 			!info->leftArm.lock &&
 			!info->rightArm.lock &&
 			info->Vehicle == NO_ITEM)
 		{
-			info->ExtraTorsoRot.x = info->ExtraHeadRot.x;
-			info->ExtraTorsoRot.y = info->ExtraHeadRot.y;
-			info->ExtraTorsoRot.z = info->ExtraHeadRot.z;
+			info->Control.ExtraTorsoRot.zRot = info->Control.ExtraHeadRot.xRot;
+			info->Control.ExtraTorsoRot.yRot = info->Control.ExtraHeadRot.yRot;
+			info->Control.ExtraTorsoRot.zRot = info->Control.ExtraHeadRot.zRot;
 		}
 		else
 		{
-			if (!info->ExtraHeadRot.x)
-				info->ExtraTorsoRot.x = 0;
-			if (!info->ExtraHeadRot.y)
-				info->ExtraTorsoRot.y = 0;
-			if (!info->ExtraHeadRot.z)
-				info->ExtraTorsoRot.z = 0;
+			if (!info->Control.ExtraHeadRot.xRot)
+				info->Control.ExtraTorsoRot.zRot = 0;
+			if (!info->Control.ExtraHeadRot.yRot)
+				info->Control.ExtraTorsoRot.yRot = 0;
+			if (!info->Control.ExtraHeadRot.zRot)
+				info->Control.ExtraTorsoRot.zRot = 0;
 		}
 	}
 }

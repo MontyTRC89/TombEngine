@@ -33,7 +33,7 @@ void InitialiseLara(int restore)
 		Lara.Vehicle = NO_ITEM;
 	}
 
-	Lara.look = true;
+	Lara.Control.CanLook = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
 	Lara.sprintTimer = LARA_SPRINT_MAX;
@@ -64,7 +64,7 @@ void InitialiseLara(int restore)
 
 	Lara.location = -1;
 	Lara.highestLocation = -1;
-	Lara.RopeControlData.Ptr = -1;
+	Lara.Control.RopeControl.Ptr = -1;
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.gunStatus = LG_HANDS_FREE;
 
