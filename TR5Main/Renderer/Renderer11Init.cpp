@@ -274,6 +274,9 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
 
+	loadingBarBorder = Texture2D(m_device.Get(), L"Textures/LoadingBarBorder.png");
+	loadingBarInner = Texture2D(m_device.Get(), L"Textures/LoadingBarInner.png");
+
 	// Initialise buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);

@@ -33,6 +33,7 @@ using namespace TEN::Entities::Generic;
 extern TEN::Renderer::RendererHUDBar* g_DashBar;
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
+extern TEN::Renderer::RendererHUDBar* g_LoadingBar;
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
@@ -1927,27 +1928,23 @@ namespace TEN::Renderer
 #endif _DEBUG
 	}
 
-	void Renderer11::RenderLoadingScreen(std::wstring& fileName)
+	void Renderer11::SetLoadingScreen(std::wstring& fileName)
 	{
-		return;
-		/*
+		if (loadingScreenTexture!=nullptr)
+		{
+			delete loadingScreenTexture;
+		}
 
-		Texture2D texture = Texture2D(m_device, fileName);
+		loadingScreenTexture = new Texture2D(m_device.Get(), fileName);
+	}
 
-		m_fadeStatus = RENDERER_FADE_STATUS::FADE_IN;
-		m_fadeFactor = 0.0f;
-
-		while (true) {
-		    if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor < 1.0f)
-		        m_fadeFactor += FADE_FACTOR;
-
-		    if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor > 0.0f)
-		        m_fadeFactor -= FADE_FACTOR;
-
-		    // Set basic render states
-		    m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+	void Renderer11::RenderLoadingScreen(float percentage)
+	{
+		do
+		{
+			// Set basic render states
+			SetBlendMode(BLENDMODE_OPAQUE);
 		    m_context->RSSetState(m_states->CullCounterClockwise());
-		    m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
 
 		    // Clear screen
 		    m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
@@ -1958,26 +1955,21 @@ namespace TEN::Renderer
 		    m_context->RSSetViewports(1, &m_viewport);
 
 		    // Draw the full screen background
-		    DrawFullScreenQuad(texture.ShaderResourceView.GetAddressOf(), Vector3(m_fadeFactor, m_fadeFactor, m_fadeFactor), false);
+			DrawFullScreenQuad(
+				loadingScreenTexture->ShaderResourceView.Get(),
+				Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent),
+				false);
 		    m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			DrawLoadingBar(percentage);
 
 		    m_swapChain->Present(0, 0);
 		    m_context->ClearState();
-		    if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_IN && m_fadeFactor >= 1.0f) {
-		        m_fadeStatus = RENDERER_FADE_STATUS::NO_FADE;
-		        m_fadeFactor = 1.0f;
-		    }
 
-		    if (m_fadeStatus == RENDERER_FADE_STATUS::NO_FADE && m_progress == 100) {
-		        m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
-		        m_fadeFactor = 1.0f;
-		    }
+			SyncRenderer();
+			UpdateFadeScreenAndCinematicBars();
 
-		    if (m_fadeStatus == RENDERER_FADE_STATUS::FADE_OUT && m_fadeFactor <= 0.0f) {
-		        break;
-		    }
-		}
-		*/
+		} while (ScreenFading || !ScreenFadedOut);
 	}
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -2598,8 +2590,8 @@ namespace TEN::Renderer
 		vertices[3].UV.y = 1.0f;
 		vertices[3].Color = Vector4::One;
 
-		m_context->VSSetShader(m_vsFinalPass.Get(), NULL, 0);
-		m_context->PSSetShader(m_psFinalPass.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsFinalPass.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFinalPass.Get(), nullptr, 0);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());

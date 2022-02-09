@@ -332,6 +332,9 @@ namespace TEN::Renderer
 		Texture2D m_LasersightTexture;
 		Texture2D m_whiteTexture;
 		RenderTargetCubeArray m_shadowMaps;
+		Texture2D loadingBarBorder;
+		Texture2D loadingBarInner;
+		Texture2D* loadingScreenTexture = nullptr;
 
 		// Level data
 		Texture2D m_titleScreen;
@@ -541,6 +544,7 @@ namespace TEN::Renderer
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 		void DrawFootprints(RenderView& view);
+		void DrawLoadingBar(float percent);
 
 		template <typename C>
 		ConstantBuffer<C> CreateConstantBuffer()
@@ -593,7 +597,7 @@ namespace TEN::Renderer
 		void ClearDynamicLights();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void FreeRendererData();
-		void RenderLoadingScreen(std::wstring& fileName);
+		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
 		void ToggleFullScreen();
@@ -620,6 +624,7 @@ namespace TEN::Renderer
 		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);
+		void SetLoadingScreen(std::wstring& fileName);
 	};
 
 	extern Renderer11 g_Renderer;
