@@ -86,10 +86,10 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_STAND;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = STATE_SAS_STOP;
-		item->activeState = STATE_SAS_STOP;
+		item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_STAND;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = STATE_SAS_STOP;
+		item->ActiveState = STATE_SAS_STOP;
 	}
 
 	void SasControl(short itemNumber)
@@ -98,7 +98,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 		ITEM_INFO* enemyItem = creature->enemy;
 
 		short tilt = 0;
@@ -108,7 +108,7 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 
 		// Handle SAS firing
-		if (item->firedWeapon)
+		if (item->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 
@@ -118,12 +118,12 @@ namespace TEN::Entities::TR4
 
 			GetJointAbsPosition(item, &pos, sasGun.meshNum);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
-			item->firedWeapon--;
+			item->FiredWeapon--;
 		}
 
-		if (item->hitPoints > 0)
+		if (item->HitPoints > 0)
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 				GetAITarget(creature);
 			else
 				creature->enemy = LaraItem;
@@ -144,9 +144,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = LaraItem->pos.xPos - item->pos.xPos;
-				dz = LaraItem->pos.zPos - item->pos.zPos;
-				ang = phd_atan(dz, dx) - item->pos.yRot;
+				dx = LaraItem->Position.xPos - item->Position.xPos;
+				dz = LaraItem->Position.zPos - item->Position.zPos;
+				ang = phd_atan(dz, dx) - item->Position.yRot;
 				distance = dx * dx + dz * dz;
 			}
 
@@ -159,62 +159,62 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &info, creature->enemy != LaraItem);
 			angle = CreatureTurn(item, creature->maximumTurn);
 
-			if (item->hitStatus)
+			if (item->HitStatus)
 				AlertAllGuards(itemNumber);
 
 			int angle1 = 0;
 			int angle2 = 0;
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case STATE_SAS_STOP:
 				creature->flags = 0;
 				creature->maximumTurn = 0;
 				joint2 = ang;
-				if (item->animNumber == Objects[item->objectNumber].animIndex + ANIMATION_SAS_WALK_TO_STAND)
+				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_WALK_TO_STAND)
 				{
 					if (abs(info.angle) >= ANGLE(10))
 					{
 						if (info.angle >= 0)
-							item->pos.yRot += ANGLE(10);
+							item->Position.yRot += ANGLE(10);
 						else
-							item->pos.yRot -= ANGLE(10);
+							item->Position.yRot -= ANGLE(10);
 					}
 					else
 					{
-						item->pos.yRot += info.angle;
+						item->Position.yRot += info.angle;
 					}
 				}
-				else if (item->aiBits & MODIFY || Lara.Vehicle != NO_ITEM)
+				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(info.angle) >= ANGLE(2))
 					{
 						if (info.angle >= 0)
-							item->pos.yRot += ANGLE(2);
+							item->Position.yRot += ANGLE(2);
 						else
-							item->pos.yRot -= ANGLE(2);
+							item->Position.yRot -= ANGLE(2);
 					}
 					else
 					{
-						item->pos.yRot += info.angle;
+						item->Position.yRot += info.angle;
 					}
 				}
 
-				if (item->aiBits & GUARD)
+				if (item->AIBits & GUARD)
 				{
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 					{
-						if (item->activeState == STATE_SAS_STOP)
+						if (item->ActiveState == STATE_SAS_STOP)
 						{
-							item->targetState = STATE_SAS_WAIT;
+							item->TargetState = STATE_SAS_WAIT;
 							break;
 						}
-						item->targetState = STATE_SAS_STOP;
+						item->TargetState = STATE_SAS_STOP;
 					}
 				}
-				else if (!(item->aiBits & PATROL1)
-					|| item->aiBits & MODIFY
+				else if (!(item->AIBits & PATROL1)
+					|| item->AIBits & MODIFY
 					|| Lara.Vehicle != NO_ITEM)
 				{
 					if (Targetable(item, &info))
@@ -224,53 +224,53 @@ namespace TEN::Entities::TR4
 						{
 							if (GetRandomControl() & 1)
 							{
-								item->targetState = STATE_SAS_SIGHT_AIM;
+								item->TargetState = STATE_SAS_SIGHT_AIM;
 							}
 							else if (GetRandomControl() & 1)
 							{
-								item->targetState = STATE_SAS_HOLD_AIM;
+								item->TargetState = STATE_SAS_HOLD_AIM;
 							}
 							else
 							{
-								item->targetState = STATE_SAS_KNEEL_AIM;
+								item->TargetState = STATE_SAS_KNEEL_AIM;
 							}
 						}
-						else if (!(item->aiBits & MODIFY))
+						else if (!(item->AIBits & MODIFY))
 						{
-							item->targetState = STATE_SAS_WALK;
+							item->TargetState = STATE_SAS_WALK;
 						}
 					}
 					else
 					{
-						if (item->aiBits & MODIFY)
+						if (item->AIBits & MODIFY)
 						{
-							item->targetState = STATE_SAS_STOP;
+							item->TargetState = STATE_SAS_STOP;
 						}
 						else
 						{
 							if (creature->mood == ESCAPE_MOOD)
 							{
-								item->targetState = STATE_SAS_RUN;
+								item->TargetState = STATE_SAS_RUN;
 							}
 							else
 							{
 								if ((creature->alerted
 									|| creature->mood != BORED_MOOD)
-									&& (!(item->aiBits & FOLLOW)
+									&& (!(item->AIBits & FOLLOW)
 										|| !creature->reachedGoal
 										&& distance <= SQUARE(2048)))
 								{
 									if (creature->mood == BORED_MOOD
 										|| info.distance <= SQUARE(2048))
 									{
-										item->targetState = STATE_SAS_WALK;
+										item->TargetState = STATE_SAS_WALK;
 										break;
 									}
-									item->targetState = STATE_SAS_RUN;
+									item->TargetState = STATE_SAS_RUN;
 								}
 								else
 								{
-									item->targetState = STATE_SAS_STOP;
+									item->TargetState = STATE_SAS_STOP;
 								}
 							}
 						}
@@ -278,7 +278,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					item->targetState = STATE_SAS_WALK;
+					item->TargetState = STATE_SAS_WALK;
 					joint2 = 0;
 				}
 				break;
@@ -288,21 +288,21 @@ namespace TEN::Entities::TR4
 				creature->flags = 0;
 				creature->maximumTurn = 0;
 
-				if (item->aiBits & GUARD)
+				if (item->AIBits & GUARD)
 				{
 					joint2 = AIGuard(creature);
 					if (!GetRandomControl())
 					{
-						item->targetState = STATE_SAS_STOP;
+						item->TargetState = STATE_SAS_STOP;
 					}
 				}
 				else if (Targetable(item, &info)
 					|| creature->mood != BORED_MOOD
 					|| !info.ahead
-					|| item->aiBits & MODIFY
+					|| item->AIBits & MODIFY
 					|| Lara.Vehicle != NO_ITEM)
 				{
-					item->targetState = STATE_SAS_STOP;
+					item->TargetState = STATE_SAS_STOP;
 				}
 				break;
 
@@ -311,26 +311,26 @@ namespace TEN::Entities::TR4
 				creature->maximumTurn = ANGLE(5);
 				joint2 = ang;
 
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					item->targetState = STATE_SAS_WALK;
+					item->TargetState = STATE_SAS_WALK;
 				}
 				else if (Lara.Vehicle == NO_ITEM
-					|| !(item->aiBits & MODIFY)
-					&& item->aiBits)
+					|| !(item->AIBits & MODIFY)
+					&& item->AIBits)
 				{
 					if (creature->mood == ESCAPE_MOOD)
 					{
-						item->targetState = STATE_SAS_RUN;
+						item->TargetState = STATE_SAS_RUN;
 					}
 					else
 					{
-						if (item->aiBits & GUARD
-							|| item->aiBits & FOLLOW
+						if (item->AIBits & GUARD
+							|| item->AIBits & FOLLOW
 							&& (creature->reachedGoal
 								|| distance > SQUARE(2048)))
 						{
-							item->targetState = STATE_SAS_STOP;
+							item->TargetState = STATE_SAS_STOP;
 							break;
 						}
 						if (Targetable(item, &info))
@@ -338,28 +338,28 @@ namespace TEN::Entities::TR4
 							if (info.distance < SQUARE(3072)
 								|| info.enemyZone != info.zoneNumber)
 							{
-								item->targetState = STATE_SAS_STOP;
+								item->TargetState = STATE_SAS_STOP;
 								break;
 							}
-							item->targetState = STATE_SAS_WALK_AIM;
+							item->TargetState = STATE_SAS_WALK_AIM;
 						}
 						else if (creature->mood)
 						{
 							if (info.distance > SQUARE(2048))
 							{
-								item->targetState = STATE_SAS_RUN;
+								item->TargetState = STATE_SAS_RUN;
 							}
 						}
 						else if (info.ahead)
 						{
-							item->targetState = STATE_SAS_STOP;
+							item->TargetState = STATE_SAS_STOP;
 							break;
 						}
 					}
 				}
 				else
 				{
-					item->targetState = STATE_SAS_STOP;
+					item->TargetState = STATE_SAS_STOP;
 				}
 				break;
 
@@ -371,19 +371,19 @@ namespace TEN::Entities::TR4
 
 				if (Lara.Vehicle != NO_ITEM)
 				{
-					if (item->aiBits & MODIFY || !item->aiBits)
+					if (item->AIBits & MODIFY || !item->AIBits)
 					{
-						item->targetState = STATE_SAS_WAIT;
+						item->TargetState = STATE_SAS_WAIT;
 						break;
 					}
 				}
 
-				if (item->aiBits & GUARD
-					|| item->aiBits & FOLLOW
+				if (item->AIBits & GUARD
+					|| item->AIBits & FOLLOW
 					&& (creature->reachedGoal
 						|| distance > SQUARE(2048)))
 				{
-					item->targetState = STATE_SAS_WALK;
+					item->TargetState = STATE_SAS_WALK;
 					break;
 				}
 
@@ -391,16 +391,16 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &info))
 					{
-						item->targetState = STATE_SAS_WALK;
+						item->TargetState = STATE_SAS_WALK;
 					}
 					else
 					{
 						if (creature->mood != BORED_MOOD
 							|| creature->mood == STALK_MOOD
-							&& item->aiBits & FOLLOW
+							&& item->AIBits & FOLLOW
 							&& info.distance < SQUARE(2048))
 						{
-							item->targetState = STATE_SAS_WALK;
+							item->TargetState = STATE_SAS_WALK;
 						}
 					}
 				}
@@ -416,26 +416,26 @@ namespace TEN::Entities::TR4
 					joint0 = info.angle;
 					if (Targetable(item, &info))
 					{
-						if (item->activeState == STATE_SAS_SIGHT_AIM)
+						if (item->ActiveState == STATE_SAS_SIGHT_AIM)
 						{
-							item->targetState = STATE_SAS_SIGHT_SHOOT;
+							item->TargetState = STATE_SAS_SIGHT_SHOOT;
 						}
-						else if (item->activeState == STATE_SAS_KNEEL_AIM)
+						else if (item->ActiveState == STATE_SAS_KNEEL_AIM)
 						{
-							item->targetState = STATE_SAS_KNEEL_SHOOT;
+							item->TargetState = STATE_SAS_KNEEL_SHOOT;
 						}
 						else if (GetRandomControl() & 1)
 						{
-							item->targetState = STATE_SAS_HOLD_SHOOT;
+							item->TargetState = STATE_SAS_HOLD_SHOOT;
 						}
 						else
 						{
-							item->targetState = STATE_SAS_HOLD_PREPARE_GRENADE;
+							item->TargetState = STATE_SAS_HOLD_PREPARE_GRENADE;
 						}
 					}
 					else
 					{
-						item->targetState = STATE_SAS_STOP;
+						item->TargetState = STATE_SAS_STOP;
 					}
 				}
 				break;
@@ -448,11 +448,11 @@ namespace TEN::Entities::TR4
 					joint0 = info.angle;
 					if (Targetable(item, &info))
 					{
-						item->targetState = STATE_SAS_WALK_SHOOT;
+						item->TargetState = STATE_SAS_WALK_SHOOT;
 					}
 					else
 					{
-						item->targetState = STATE_SAS_WALK;
+						item->TargetState = STATE_SAS_WALK;
 					}
 				}
 				break;
@@ -485,7 +485,7 @@ namespace TEN::Entities::TR4
 					angle2 = 0;
 				}
 
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 20)
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 20)
 				{
 					if (!creature->enemy->Velocity)
 					{
@@ -498,7 +498,7 @@ namespace TEN::Entities::TR4
 					SasFireGrenade(item, angle2, angle1);
 
 					if (Targetable(item, &info))
-						item->targetState = STATE_SAS_HOLD_PREPARE_GRENADE;
+						item->TargetState = STATE_SAS_HOLD_PREPARE_GRENADE;
 				}
 				break;
 
@@ -506,18 +506,18 @@ namespace TEN::Entities::TR4
 			case STATE_SAS_KNEEL_SHOOT:
 			case STATE_SAS_SIGHT_SHOOT:
 			case STATE_SAS_WALK_SHOOT:
-				if (item->activeState == STATE_SAS_HOLD_SHOOT
-					|| item->activeState == STATE_SAS_KNEEL_SHOOT)
+				if (item->ActiveState == STATE_SAS_HOLD_SHOOT
+					|| item->ActiveState == STATE_SAS_KNEEL_SHOOT)
 				{
-					if (item->targetState != STATE_SAS_STOP
-						&& item->targetState != STATE_SAS_KNEEL_STOP
+					if (item->TargetState != STATE_SAS_STOP
+						&& item->TargetState != STATE_SAS_KNEEL_STOP
 						&& (creature->mood == ESCAPE_MOOD
 							|| !Targetable(item, &info)))
 					{
-						if (item->activeState == STATE_SAS_HOLD_SHOOT)
-							item->targetState = STATE_SAS_STOP;
+						if (item->ActiveState == STATE_SAS_HOLD_SHOOT)
+							item->TargetState = STATE_SAS_STOP;
 						else
-							item->targetState = STATE_SAS_KNEEL_STOP;
+							item->TargetState = STATE_SAS_KNEEL_STOP;
 					}
 				}
 
@@ -533,13 +533,13 @@ namespace TEN::Entities::TR4
 				{
 					ShotLara(item, &info, &sasGun, joint0, 15);
 					creature->flags = 5;
-					item->firedWeapon = 3;
+					item->FiredWeapon = 3;
 				}
 				break;
 
 			case STATE_SAS_BLIND:
 				if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
-					item->targetState = STATE_SAS_WAIT;
+					item->TargetState = STATE_SAS_WAIT;
 				break;
 
 			default:
@@ -547,22 +547,22 @@ namespace TEN::Entities::TR4
 			}
 
 			if (WeaponEnemyTimer > 100
-				&& item->activeState != STATE_SAS_BLIND)
+				&& item->ActiveState != STATE_SAS_BLIND)
 			{
 				creature->maximumTurn = 0;
-				item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_BLIND;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase + (GetRandomControl() & 7);
-				item->activeState = STATE_SAS_BLIND;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_BLIND;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase + (GetRandomControl() & 7);
+				item->ActiveState = STATE_SAS_BLIND;
 			}
 
 		}
 		else
 		{
-			if (item->activeState != STATE_SAS_DEATH)
+			if (item->ActiveState != STATE_SAS_DEATH)
 			{
-				item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_SAS_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->activeState = STATE_SAS_DEATH;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_DEATH;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->ActiveState = STATE_SAS_DEATH;
 			}
 		}
 
@@ -581,9 +581,9 @@ namespace TEN::Entities::TR4
 		{
 			ITEM_INFO* grenadeItem = &g_Level.Items[itemNumber];
 
-			grenadeItem->shade = -15856;
-			grenadeItem->objectNumber = ID_GRENADE;
-			grenadeItem->roomNumber = item->roomNumber;
+			grenadeItem->Shade = -15856;
+			grenadeItem->ObjectNumber = ID_GRENADE;
+			grenadeItem->RoomNumber = item->RoomNumber;
 
 			PHD_VECTOR pos;
 			pos.x = sasGun.x;
@@ -592,19 +592,19 @@ namespace TEN::Entities::TR4
 
 			GetJointAbsPosition(item, &pos, sasGun.meshNum);
 
-			grenadeItem->pos.xPos = pos.x;
-			grenadeItem->pos.yPos = pos.y;
-			grenadeItem->pos.zPos = pos.z;
+			grenadeItem->Position.xPos = pos.x;
+			grenadeItem->Position.yPos = pos.y;
+			grenadeItem->Position.zPos = pos.z;
 
-			FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &grenadeItem->roomNumber);
+			FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &grenadeItem->RoomNumber);
 			int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 
-			if (height < grenadeItem->pos.yPos)
+			if (height < grenadeItem->Position.yPos)
 			{
-				grenadeItem->pos.xPos = item->pos.xPos;
-				grenadeItem->pos.yPos = height;
-				grenadeItem->pos.zPos = item->pos.zPos;
-				grenadeItem->roomNumber = item->roomNumber;
+				grenadeItem->Position.xPos = item->Position.xPos;
+				grenadeItem->Position.yPos = height;
+				grenadeItem->Position.zPos = item->Position.zPos;
+				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
 			SmokeCountL = 32;
@@ -617,26 +617,26 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->pos.xRot = angle1 + item->pos.xRot;
-			grenadeItem->pos.yRot = angle2 + item->pos.yRot;
-			grenadeItem->pos.zRot = 0;
+			grenadeItem->Position.xRot = angle1 + item->Position.xRot;
+			grenadeItem->Position.yRot = angle2 + item->Position.yRot;
+			grenadeItem->Position.zRot = 0;
 
 			if (GetRandomControl() & 3)
 			{
-				grenadeItem->itemFlags[0] = GRENADE_NORMAL;
+				grenadeItem->ItemFlags[0] = GRENADE_NORMAL;
 			}
 			else
 			{
-				grenadeItem->itemFlags[0] = GRENADE_SUPER;
+				grenadeItem->ItemFlags[0] = GRENADE_SUPER;
 			}
 
-			grenadeItem->itemFlags[2] = 1;
+			grenadeItem->ItemFlags[2] = 1;
 			grenadeItem->Velocity = 128;
-			grenadeItem->activeState = grenadeItem->pos.xRot;
-			grenadeItem->VerticalVelocity = -128 * phd_sin(grenadeItem->pos.xRot);
-			grenadeItem->targetState = grenadeItem->pos.yRot;
-			grenadeItem->requiredState = 0;
-			grenadeItem->hitPoints = 120;
+			grenadeItem->ActiveState = grenadeItem->Position.xRot;
+			grenadeItem->VerticalVelocity = -128 * phd_sin(grenadeItem->Position.xRot);
+			grenadeItem->TargetState = grenadeItem->Position.yRot;
+			grenadeItem->RequiredState = 0;
+			grenadeItem->HitPoints = 120;
 
 			AddActiveItem(itemNumber);
 		}
@@ -646,39 +646,39 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex;
-			item->targetState = item->activeState = 1;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+			item->TargetState = item->ActiveState = 1;
 		}
 		else
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 3;
-			item->targetState = item->activeState = 4;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+			item->TargetState = item->ActiveState = 4;
 		}
 
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 	}
 
 	void InjuredSasControl(short itemNumber)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->activeState == 1)
+		if (item->ActiveState == 1)
 		{
 			if (!(GetRandomControl() & 0x7F))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 				AnimateItem(item);
 			}
 			else if (!(byte)GetRandomControl())
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 		}
-		else if (item->activeState == 4 && !(GetRandomControl() & 0x7F))
+		else if (item->ActiveState == 4 && !(GetRandomControl() & 0x7F))
 		{
-			item->targetState = 5;
+			item->TargetState = 5;
 			AnimateItem(item);
 		}
 		else
@@ -692,25 +692,25 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION)
-			|| l->activeState != LS_IDLE
-			|| l->animNumber != LA_STAND_IDLE
+			|| l->ActiveState != LS_IDLE
+			|| l->AnimNumber != LA_STAND_IDLE
 			|| Lara.gunStatus
 			|| l->Airborne
-			|| item->flags & 0x3E00)
+			|| item->Flags & 0x3E00)
 			&& (!(Lara.isMoving) || Lara.interactedItem != itemNumber))
 		{
-			if (item->status == ITEM_ACTIVE)
+			if (item->Status == ITEM_ACTIVE)
 			{
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 				{
-					int x = l->pos.xPos - 512 * phd_sin(l->pos.yRot);
-					int y = l->pos.yPos;
-					int z = l->pos.zPos - 512 * phd_cos(l->pos.yRot);
+					int x = l->Position.xPos - 512 * phd_sin(l->Position.yRot);
+					int y = l->Position.yPos;
+					int z = l->Position.zPos - 512 * phd_cos(l->Position.yRot);
 
-					TestTriggers(x, y, z, l->roomNumber, true);
+					TestTriggers(x, y, z, l->RoomNumber, true);
 
 					RemoveActiveItem(itemNumber);
-					item->status = ITEM_NOT_ACTIVE;
+					item->Status = ITEM_NOT_ACTIVE;
 				}
 			}
 
@@ -722,15 +722,15 @@ namespace TEN::Entities::TR4
 			{
 				if (MoveLaraPosition(&SasDragBlokePosition, item, l))
 				{
-					l->animNumber = LA_DRAG_BODY;
-					l->activeState = LS_MISC_CONTROL;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					l->pos.yRot = item->pos.yRot;
+					l->AnimNumber = LA_DRAG_BODY;
+					l->ActiveState = LS_MISC_CONTROL;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+					l->Position.yRot = item->Position.yRot;
 					Lara.isMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
-					item->flags |= 0x3E00;
-					item->status = ITEM_ACTIVE;
+					item->Flags |= 0x3E00;
+					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNumber);
 				}
 				else

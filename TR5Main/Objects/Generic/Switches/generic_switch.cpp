@@ -27,20 +27,20 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->flags |= 0x3E00;
+		item->Flags |= 0x3E00;
 
-		if (!TriggerActive(item) && !(item->flags & ONESHOT))
+		if (!TriggerActive(item) && !(item->Flags & ONESHOT))
 		{
-			if (item->objectNumber == ID_JUMP_SWITCH)
+			if (item->ObjectNumber == ID_JUMP_SWITCH)
 			{
-				item->targetState = SWITCH_OFF;
-				item->timer = 0;
+				item->TargetState = SWITCH_OFF;
+				item->Timer = 0;
 				AnimateItem(item);
 			}
 			else
 			{
-				item->targetState = SWITCH_ON;
-				item->timer = 0;
+				item->TargetState = SWITCH_ON;
+				item->Timer = 0;
 			}
 		}
 
@@ -51,30 +51,30 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 		if (TrInput & IN_ACTION
-			&& l->activeState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
+			&& l->ActiveState == LS_IDLE
+			&& l->AnimNumber == LA_STAND_IDLE
 			&& !Lara.gunStatus
-			&& item->status == ITEM_NOT_ACTIVE
-			&& !(item->flags & 0x100)
-			&& item->triggerFlags >= 0
+			&& item->Status == ITEM_NOT_ACTIVE
+			&& !(item->Flags & 0x100)
+			&& item->TriggerFlags >= 0
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
 			BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-			if (item->triggerFlags == 3 && item->activeState == SWITCH_ON
-				|| item->triggerFlags >= 5 && item->triggerFlags <= 7 
-					&& item->activeState == SWITCH_OFF)
+			if (item->TriggerFlags == 3 && item->ActiveState == SWITCH_ON
+				|| item->TriggerFlags >= 5 && item->TriggerFlags <= 7 
+					&& item->ActiveState == SWITCH_OFF)
 				return;
 
 			SwitchBounds.boundingBox.X1 = bounds->X1 - 256;
 			SwitchBounds.boundingBox.X2 = bounds->X2 + 256;
 
-			if (item->triggerFlags)
+			if (item->TriggerFlags)
 			{
 				SwitchBounds.boundingBox.Z1 = bounds->Z1 - 512;
 				SwitchBounds.boundingBox.Z2 = bounds->Z2 + 512;
 
-				if (item->triggerFlags == 3)
+				if (item->TriggerFlags == 3)
 				{
 					SwitchPos.z = bounds->Z1 - 256;
 				}
@@ -94,51 +94,51 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&SwitchPos, item, l))
 				{
-					if (item->activeState == SWITCH_ON) /* Switch down */
+					if (item->ActiveState == SWITCH_ON) /* Switch down */
 					{
-						if (item->triggerFlags)
+						if (item->TriggerFlags)
 						{
-							l->animNumber = LA_HOLESWITCH_ACTIVATE;
-							l->activeState = LS_HOLE;
+							l->AnimNumber = LA_HOLESWITCH_ACTIVATE;
+							l->ActiveState = LS_HOLE;
 						}
 						else
 						{
-							l->activeState = LS_SWITCH_UP;
-							l->animNumber = LA_WALLSWITCH_DOWN;
+							l->ActiveState = LS_SWITCH_UP;
+							l->AnimNumber = LA_WALLSWITCH_DOWN;
 						}
 						
-						item->targetState = SWITCH_OFF;
+						item->TargetState = SWITCH_OFF;
 					}
 					else /* Switch up */
 					{
-						if (item->triggerFlags)
+						if (item->TriggerFlags)
 						{
-							if (item->triggerFlags == 3)
+							if (item->TriggerFlags == 3)
 							{
-								l->animNumber = LA_BUTTON_LARGE_PUSH;
+								l->AnimNumber = LA_BUTTON_LARGE_PUSH;
 							}
 							else
 							{
-								l->animNumber = LA_HOLESWITCH_ACTIVATE;
-								l->activeState = LS_HOLE;
+								l->AnimNumber = LA_HOLESWITCH_ACTIVATE;
+								l->ActiveState = LS_HOLE;
 							}
 						}
 						else
 						{
-							l->activeState = LS_SWITCH_DOWN;
-							l->animNumber = LA_WALLSWITCH_UP;
+							l->ActiveState = LS_SWITCH_DOWN;
+							l->AnimNumber = LA_WALLSWITCH_UP;
 						}
 
-						item->targetState = SWITCH_ON;
+						item->TargetState = SWITCH_ON;
 					}
 
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					ResetLaraFlex(l);
 
 					AddActiveItem(itemNum);
-					item->status = ITEM_ACTIVE;
+					item->Status = ITEM_ACTIVE;
 					AnimateItem(item);
 				}
 				else
@@ -155,7 +155,7 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (l->activeState != LS_SWITCH_DOWN && l->activeState != LS_SWITCH_UP)
+		if (l->ActiveState != LS_SWITCH_DOWN && l->ActiveState != LS_SWITCH_UP)
 			ObjectCollision(itemNum, l, coll);
 	}
 }

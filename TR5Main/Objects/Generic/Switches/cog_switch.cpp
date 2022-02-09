@@ -48,8 +48,8 @@ namespace TEN::Entities::Switches
 			if (targetItemNum < g_Level.Items.size())
 			{
 				target = &g_Level.Items[targetItemNum];
-				if (target->data.is<DOOR_DATA>())
-					door = (DOOR_DATA*)target->data;
+				if (target->Data.is<DOOR_DATA>())
+					door = (DOOR_DATA*)target->Data;
 			}
 		}
 
@@ -63,14 +63,14 @@ namespace TEN::Entities::Switches
 
 		// Door is found, attach to it.
 
-		if (item->status == ITEM_NOT_ACTIVE)
+		if (item->Status == ITEM_NOT_ACTIVE)
 		{
-			if (!(item->flags & ONESHOT)
+			if (!(item->Flags & ONESHOT)
 				&& (TrInput & IN_ACTION
 					&& !Lara.gunStatus
 					&& !item->Airborne
-					&& l->activeState == LS_IDLE
-					&& l->animNumber == LA_STAND_IDLE
+					&& l->ActiveState == LS_IDLE
+					&& l->AnimNumber == LA_STAND_IDLE
 					|| Lara.isMoving
 					&& Lara.interactedItem == itemNum))
 			{
@@ -82,21 +82,21 @@ namespace TEN::Entities::Switches
 						ResetLaraFlex(l);
 						Lara.gunStatus = LG_HANDS_BUSY;
 						Lara.interactedItem = targetItemNum;
-						l->animNumber = LA_COGWHEEL_GRAB;
-						l->targetState = LS_COGWHEEL;
-						l->activeState = LS_COGWHEEL;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						l->AnimNumber = LA_COGWHEEL_GRAB;
+						l->TargetState = LS_COGWHEEL;
+						l->ActiveState = LS_COGWHEEL;
+						l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 
 						AddActiveItem(itemNum);
-						item->targetState = SWITCH_ON;
-						item->status = ITEM_ACTIVE;
+						item->TargetState = SWITCH_ON;
+						item->Status = ITEM_ACTIVE;
 
 						if (door != NULL)
 						{
 							if (!door->opened)
 							{
 								AddActiveItem((target - g_Level.Items.data()));
-								target->status = ITEM_ACTIVE;
+								target->Status = ITEM_ACTIVE;
 							}
 						}
 					}
@@ -123,36 +123,36 @@ namespace TEN::Entities::Switches
 
 		AnimateItem(item);
 
-		if (item->activeState == SWITCH_ON)
+		if (item->ActiveState == SWITCH_ON)
 		{
-			if (item->targetState == SWITCH_ON && !(TrInput & IN_ACTION))
+			if (item->TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->targetState = LS_IDLE;
-				item->targetState = SWITCH_OFF;
+				LaraItem->TargetState = LS_IDLE;
+				item->TargetState = SWITCH_OFF;
 			}
 
-			if (LaraItem->animNumber == LA_COGWHEEL_PULL)
+			if (LaraItem->AnimNumber == LA_COGWHEEL_PULL)
 			{
-				if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase + 10)
+				if (LaraItem->FrameNumber == g_Level.Anims[LaraItem->AnimNumber].frameBase + 10)
 				{
 					ITEM_INFO* doorItem = &g_Level.Items[Lara.interactedItem];
-					doorItem->itemFlags[0] = COG_DOOR_TURN;
+					doorItem->ItemFlags[0] = COG_DOOR_TURN;
 				}
 			}
 		}
 		else
 		{
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
-				item->activeState = SWITCH_OFF;
-				item->status = ITEM_NOT_ACTIVE;
+				item->ActiveState = SWITCH_OFF;
+				item->Status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
 
-				LaraItem->animNumber = LA_STAND_SOLID;
-				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->targetState = LS_IDLE;
-				LaraItem->activeState = LS_IDLE;
+				LaraItem->AnimNumber = LA_STAND_SOLID;
+				LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
+				LaraItem->TargetState = LS_IDLE;
+				LaraItem->ActiveState = LS_IDLE;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}

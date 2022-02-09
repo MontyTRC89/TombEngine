@@ -19,7 +19,7 @@ void InitialiseLOTarray(int itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	CREATURE_INFO* creature = item->data;
+	CREATURE_INFO* creature = item->Data;
 	if(!creature->LOT.initialised) {
 		creature->LOT.node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
 		creature->LOT.initialised = true;
@@ -31,7 +31,7 @@ int EnableBaddieAI(short itemNum, int always)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (item->data.is<CREATURE_INFO>())
+	if (item->Data.is<CREATURE_INFO>())
 		return true;
 	   	
 	/*
@@ -91,7 +91,7 @@ int EnableBaddieAI(short itemNum, int always)
 		}
 		*/
 		InitialiseSlot(itemNum, 0);
-		ActiveCreatures.push_back(item->data);
+		ActiveCreatures.push_back(item->Data);
 	}
 
 	return true;
@@ -100,7 +100,7 @@ int EnableBaddieAI(short itemNum, int always)
 void DisableBaddieAI(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	
 	
 	if (creature)
@@ -108,7 +108,7 @@ void DisableBaddieAI(short itemNumber)
 		creature->itemNum = NO_ITEM;
 		KillItem(creature->aiTargetNum);
 		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
-		item->data = nullptr;
+		item->Data = nullptr;
 
 	}
 }
@@ -116,10 +116,10 @@ void DisableBaddieAI(short itemNumber)
 void InitialiseSlot(short itemNum, short slot)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-	item->data = CREATURE_INFO();
-	CREATURE_INFO* creature = item->data;
+	item->Data = CREATURE_INFO();
+	CREATURE_INFO* creature = item->Data;
 	InitialiseLOTarray(itemNum);
 	creature->itemNum = itemNum;
 	creature->mood = BORED_MOOD;
@@ -162,7 +162,7 @@ void InitialiseSlot(short itemNum, short slot)
 		{
 			if (obj->undead)
 				obj->hitEffect = HIT_SMOKE;
-			else if (!obj->undead && obj->hitPoints)
+			else if (!obj->undead && obj->HitPoints)
 				obj->hitEffect = HIT_BLOOD;
 		}
 		
@@ -206,13 +206,13 @@ void InitialiseSlot(short itemNum, short slot)
 			creature->LOT.drop = -SECTOR(20);
 			creature->LOT.zone = ZONE_WATER;
 
-			if (item->objectNumber == ID_CROCODILE)
+			if (item->ObjectNumber == ID_CROCODILE)
 			{
 				creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED / 2; // is more slow than the other underwater entity
 				creature->LOT.isAmphibious = true; // crocodile can walk and swim.
 				creature->LOT.zone = ZONE_FLYER;
 			}
-			else if (item->objectNumber == ID_BIG_RAT)
+			else if (item->ObjectNumber == ID_BIG_RAT)
 			{
 				creature->LOT.fly = NO_FLYING; // dont want the bigrat to be able to go in water (just the surface !)
 				creature->LOT.isAmphibious = true; // bigrat can walk and swim.
@@ -301,10 +301,10 @@ void ClearLOT(LOT_INFO* LOT)
 
 void CreateZone(ITEM_INFO* item)
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
 
-	item->boxNumber = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z)->Box;
+	item->BoxNumber = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z)->Box;
 
 	if (creature->LOT.fly)
 	{
@@ -323,8 +323,8 @@ void CreateZone(ITEM_INFO* item)
 		int* zone = g_Level.Zones[creature->LOT.zone][0].data();
 		int* flippedZone = g_Level.Zones[creature->LOT.zone][1].data();
 
-		int zoneNumber = zone[item->boxNumber];
-		int flippedZoneNumber = flippedZone[item->boxNumber];
+		int zoneNumber = zone[item->BoxNumber];
+		int flippedZoneNumber = flippedZone[item->BoxNumber];
 
 		BOX_NODE* node = creature->LOT.node.data();
 		creature->LOT.zoneCount = 0;

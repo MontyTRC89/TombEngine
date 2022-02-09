@@ -12,39 +12,39 @@ namespace TEN::Entities::Traps
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->touchBits)
+		if (item->TouchBits)
 		{
-			LaraItem->hitPoints -= 25;
-			LaraItem->hitStatus = true;
+			LaraItem->HitPoints -= 25;
+			LaraItem->HitStatus = true;
 			Lara.poisoned += 160;
-			DoBloodSplat(item->pos.xPos, item->pos.yPos, item->pos.zPos, (GetRandomControl() & 3) + 4, LaraItem->pos.yRot, LaraItem->roomNumber);
+			DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else
 		{
-			int oldX = item->pos.xPos;
-			int oldZ = item->pos.zPos-1000;
+			int oldX = item->Position.xPos;
+			int oldZ = item->Position.zPos-1000;
 
-			int speed = item->Velocity * phd_cos(item->pos.xRot);
+			int speed = item->Velocity * phd_cos(item->Position.xRot);
 
-			item->pos.xPos += speed * phd_sin(item->pos.yRot);
-			item->pos.yPos -= item->Velocity * phd_sin(item->pos.xRot);
-			item->pos.zPos += speed * phd_cos(item->pos.yRot);
+			item->Position.xPos += speed * phd_sin(item->Position.yRot);
+			item->Position.yPos -= item->Velocity * phd_sin(item->Position.xRot);
+			item->Position.zPos += speed * phd_cos(item->Position.yRot);
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			short roomNumber = item->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
-			if (item->roomNumber != roomNumber)
+			if (item->RoomNumber != roomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
 
-			int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			item->floor = height;
+			int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			item->Floor = height;
 
-			if (item->pos.yPos >= height)
+			if (item->Position.yPos >= height)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					TriggerDartSmoke(oldX, item->pos.yPos, oldZ, 0, 0, true);
+					TriggerDartSmoke(oldX, item->Position.yPos, oldZ, 0, 0, true);
 				}
 
 				KillItem(itemNumber);
@@ -56,16 +56,16 @@ namespace TEN::Entities::Traps
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->active)
+		if (item->Active)
 		{
-			if (item->timer > 0)
+			if (item->Timer > 0)
 			{
-				item->timer--;
+				item->Timer--;
 				return;
 			}
 			else
 			{
-				item->timer = 24;
+				item->Timer = 24;
 			}
 		}
 
@@ -75,13 +75,13 @@ namespace TEN::Entities::Traps
 		{
 			ITEM_INFO* dartItem = &g_Level.Items[dartItemNumber];
 
-			dartItem->objectNumber = ID_DARTS;
-			dartItem->roomNumber = item->roomNumber;
+			dartItem->ObjectNumber = ID_DARTS;
+			dartItem->RoomNumber = item->RoomNumber;
 
 			int x = 0;
 			int z = 0;
 
-			switch (item->pos.yRot)
+			switch (item->Position.yRot)
 			{
 			case 0:
 				z = WALL_SIZE / 2;
@@ -100,14 +100,14 @@ namespace TEN::Entities::Traps
 				break;
 			}
 
-			dartItem->pos.xPos = x + item->pos.xPos;
-			dartItem->pos.yPos = item->pos.yPos - WALL_SIZE / 2;
-			dartItem->pos.zPos = z + item->pos.zPos;
+			dartItem->Position.xPos = x + item->Position.xPos;
+			dartItem->Position.yPos = item->Position.yPos - WALL_SIZE / 2;
+			dartItem->Position.zPos = z + item->Position.zPos;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->pos.xRot = 0;
-			dartItem->pos.yRot = item->pos.yRot + -ANGLE(180);
+			dartItem->Position.xRot = 0;
+			dartItem->Position.yRot = item->Position.yRot + -ANGLE(180);
 			dartItem->Velocity = 256;
 
 			int xf = 0;
@@ -135,20 +135,20 @@ namespace TEN::Entities::Traps
 				else
 					xv = -(xf & random);
 
-				TriggerDartSmoke(dartItem->pos.xPos, dartItem->pos.yPos, dartItem->pos.zPos, xv, zv, false);
+				TriggerDartSmoke(dartItem->Position.xPos, dartItem->Position.yPos, dartItem->Position.zPos, xv, zv, false);
 			}
 
 			AddActiveItem(dartItemNumber);
-			dartItem->status = ITEM_ACTIVE;
+			dartItem->Status = ITEM_ACTIVE;
 
-			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->pos, 0);
+			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Position, 0);
 		}
 	}
 
 	void TriggerDartSmoke(int x, int y, int z, int xv, int zv, bool hit)
 	{
-		int dx = LaraItem->pos.xPos - x;
-		int dz = LaraItem->pos.zPos - z;
+		int dx = LaraItem->Position.xPos - x;
+		int dz = LaraItem->Position.zPos - z;
 
 		if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 			return;

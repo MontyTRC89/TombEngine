@@ -45,7 +45,7 @@ struct MESH_INFO
 	short staticNumber;
 	short flags;
 	Vector4 color;
-	short hitPoints;
+	short HitPoints;
 	std::string luaName;
 };
 

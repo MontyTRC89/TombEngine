@@ -38,31 +38,31 @@ void TriggerChaffEffects(int flareAge)
 	vel.y = vect.y - pos.y;
 	vel.z = vect.z - pos.z;
 
-	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Velocity, (bool)(g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WATER),flareAge);
+	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER),flareAge);
 }
 
 void TriggerChaffEffects(ITEM_INFO* Item,int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->pos.yRot), TO_RAD(Item->pos.xRot), TO_RAD(Item->pos.zRot));
+		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Position.yRot), TO_RAD(Item->Position.xRot), TO_RAD(Item->Position.zRot));
 
 	PHD_VECTOR pos;
-	pos.x = Item->pos.xPos + world.Translation().x;
-	pos.y = Item->pos.yPos + world.Translation().y;
-	pos.z = Item->pos.zPos + world.Translation().z;
+	pos.x = Item->Position.xPos + world.Translation().x;
+	pos.y = Item->Position.yPos + world.Translation().y;
+	pos.z = Item->Position.zPos + world.Translation().z;
 
 	world
 		= Matrix::CreateTranslation(-6, 6, 32)
 		* Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->pos.yRot), TO_RAD(Item->pos.xRot), TO_RAD(Item->pos.zRot));
+		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Position.yRot), TO_RAD(Item->Position.xRot), TO_RAD(Item->Position.zRot));
 
 	PHD_VECTOR vel;
 	vel.x = world.Translation().x;
 	vel.y = world.Translation().y;
 	vel.z = world.Translation().z;
 
-	TriggerChaffEffects(Item, &pos, &vel, Item->Velocity, (bool)(g_Level.Rooms[Item->roomNumber].flags & ENV_FLAG_WATER),age);
+	TriggerChaffEffects(Item, &pos, &vel, Item->Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER),age);
 }
 
 void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int speed, bool isUnderwater,int age)
@@ -72,8 +72,8 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 	{
 		long	dx, dz;
 
-		dx = item->pos.xPos - pos->x;
-		dz = item->pos.zPos - pos->z;
+		dx = item->Position.xPos - pos->x;
+		dz = item->Position.zPos - pos->z;
 
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
@@ -86,14 +86,14 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 		TriggerChaffSparkles(pos, vel, &color,age,item);
 		if (isUnderwater)
 		{
-			TriggerChaffBubbles(pos, item->roomNumber);
+			TriggerChaffBubbles(pos, item->RoomNumber);
 		}
 		else
 		{
 			Vector3 position = Vector3(pos->x,pos->y,pos->z);
 			Vector3 direction = Vector3(vel->x, vel->y, vel->z);
 			direction.Normalize();
-			TEN::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->roomNumber);
+			TEN::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->RoomNumber);
 		}
 	}
 }
@@ -135,7 +135,7 @@ void TriggerChaffSparkles (PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int 
 	sparkle->gravity = sparkle->maxYvel = 0;
 	sparkle->flags = SP_SCALE;
 	*/
-	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->roomNumber);
+	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->RoomNumber);
 }
 
 

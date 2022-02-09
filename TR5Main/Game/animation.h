@@ -16,7 +16,7 @@ struct ANIM_FRAME
 
 struct CHANGE_STRUCT
 {
-	int targetState;
+	int TargetState;
 	int numberRanges;
 	int rangeIndex;
 };
@@ -33,7 +33,7 @@ struct ANIM_STRUCT
 {
 	int framePtr;
 	int interpolation;
-	int activeState;
+	int ActiveState;
 	int velocity;
 	int acceleration;
 	int Xvelocity;

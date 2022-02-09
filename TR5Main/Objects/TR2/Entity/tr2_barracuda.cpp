@@ -17,17 +17,17 @@ void BarracudaControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short angle = 0;
 	short head = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 6)
+		if (item->ActiveState != 6)
 		{
-			item->animNumber = Objects[ID_BARRACUDA].animIndex + 6;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 6;
+			item->AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 6;
 		}
 
 		CreatureFloat(itemNum);
@@ -43,19 +43,19 @@ void BarracudaControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			creature->flags = 0;
 
 			if (creature->mood == BORED_MOOD)
-				item->targetState = 2;
+				item->TargetState = 2;
 			else if (info.ahead && info.distance < 680)
-				item->targetState = 4;
+				item->TargetState = 4;
 			else if (creature->mood == STALK_MOOD)
-				item->targetState = 2;
+				item->TargetState = 2;
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 2:
@@ -63,10 +63,10 @@ void BarracudaControl(short itemNum)
 
 			if (creature->mood == BORED_MOOD)
 				break;
-			else if (info.ahead && (item->touchBits & 0xE0))
-				item->targetState = 1;
+			else if (info.ahead && (item->TouchBits & 0xE0))
+				item->TargetState = 1;
 			else if (creature->mood != STALK_MOOD)
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 3:
@@ -74,13 +74,13 @@ void BarracudaControl(short itemNum)
 			creature->flags = 0;
 
 			if (creature->mood == BORED_MOOD)
-				item->targetState = 2;
+				item->TargetState = 2;
 			else if (info.ahead && info.distance < 340)
-				item->targetState = 5;
+				item->TargetState = 5;
 			else if (info.ahead && info.distance < 680)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (creature->mood == STALK_MOOD)
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 4:
@@ -88,10 +88,10 @@ void BarracudaControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			if (!creature->flags && (item->touchBits & 0xE0))
+			if (!creature->flags && (item->TouchBits & 0xE0))
 			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 100;
+				LaraItem->HitStatus = true;
 				CreatureEffect(item, &barracudaBite, DoBloodSplat);
 
 				creature->flags = 1;

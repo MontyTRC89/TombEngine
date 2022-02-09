@@ -25,15 +25,15 @@ namespace TEN::Entities::Doors
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->meshBits = 1;
-		item->pos.yPos -= 1024;
+		item->MeshBits = 1;
+		item->Position.yPos -= 1024;
 	}
 
 	void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->itemFlags[0] != 3)
+		if (item->ItemFlags[0] != 3)
 		{
 			if (TestBoundsCollide(item, l, coll->Setup.Radius))
 			{

@@ -16,13 +16,13 @@ void LaraDoubleControl(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
 
 	if (CreatureActive(itemNum))
 	{
-		if (item->hitStatus)
+		if (item->HitStatus)
 		{
-			LaraItem->hitPoints = item->hitPoints;
+			LaraItem->HitPoints = item->HitPoints;
 		}
 
 		AnimateItem(item);

@@ -25,7 +25,7 @@ ITEM_INFO* findReference(ITEM_INFO* item, short objectNum)
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		ITEM_INFO* itemz = &g_Level.Items[i];
-		if (itemz->objectNumber == objectNum && itemz->roomNumber == item->roomNumber)
+		if (itemz->ObjectNumber == objectNum && itemz->RoomNumber == item->RoomNumber)
 		{
 			itemNum = i;
 			found = true;
@@ -55,49 +55,49 @@ void DoppelgangerControl(short itemNum)
 	item = &g_Level.Items[itemNum];
 
 
-	if (item->hitPoints < 1000)                   			// If Evil Lara being Injured
+	if (item->HitPoints < 1000)                   			// If Evil Lara being Injured
 	{                                                       // then take the hits off Lara instead...
-		LaraItem->hitPoints -= GetWeaponDamage(Lara.gunType);
-		item->hitPoints = 1000;
+		LaraItem->HitPoints -= GetWeaponDamage(Lara.gunType);
+		item->HitPoints = 1000;
 	}
 
 	ref = findReference(item, ID_BACON_REFERENCE); // find reference point
 
-	if (item->data == NULL)
+	if (item->Data == NULL)
 	{
 		if (ref == nullptr) // if no reference found, she doesn't move
 		{
-			x = item->pos.xPos;
-			y = LaraItem->pos.yPos;
-			z = item->pos.zPos;
+			x = item->Position.xPos;
+			y = LaraItem->Position.yPos;
+			z = item->Position.zPos;
 		}
 		else
 		{
-			x = 2 * ref->pos.xPos - LaraItem->pos.xPos;
-			y = LaraItem->pos.yPos;
-			z = 2 * ref->pos.zPos - LaraItem->pos.zPos;
+			x = 2 * ref->Position.xPos - LaraItem->Position.xPos;
+			y = LaraItem->Position.yPos;
+			z = 2 * ref->Position.zPos - LaraItem->Position.zPos;
 		}
 		// get bacon height
-		room_num = item->roomNumber;
+		room_num = item->RoomNumber;
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
-		item->floor = h;
+		item->Floor = h;
 		// get lara height
-		room_num = LaraItem->roomNumber;
-		floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &room_num);
-		lh = GetFloorHeight(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		room_num = LaraItem->RoomNumber;
+		floor = GetFloor(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, &room_num);
+		lh = GetFloorHeight(floor, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
 		// animate bacon
-		item->frameNumber = LaraItem->frameNumber;
-		item->animNumber = LaraItem->animNumber;
+		item->FrameNumber = LaraItem->FrameNumber;
+		item->AnimNumber = LaraItem->AnimNumber;
 		// move bacon
-		item->pos.xPos = x;
-		item->pos.yPos = y;
-		item->pos.zPos = z;
-		item->pos.xRot = LaraItem->pos.xRot;
-		item->pos.yRot = LaraItem->pos.yRot - ANGLE(180); // make sure she's facing Lara
-		item->pos.zRot = LaraItem->pos.zRot;
+		item->Position.xPos = x;
+		item->Position.yPos = y;
+		item->Position.zPos = z;
+		item->Position.xRot = LaraItem->Position.xRot;
+		item->Position.yRot = LaraItem->Position.yRot - ANGLE(180); // make sure she's facing Lara
+		item->Position.zRot = LaraItem->Position.zRot;
 
-		ItemNewRoom(itemNum, LaraItem->roomNumber);				// Follow Laras Room
+		ItemNewRoom(itemNum, LaraItem->RoomNumber);				// Follow Laras Room
 
 		if (h >= lh + WALL_SIZE + 1 && !LaraItem->Airborne) // added +1 to avoid bacon dying when exiting water rooms
 		{
@@ -105,31 +105,31 @@ void DoppelgangerControl(short itemNum)
 			item->Airborne = true;
 			item->VerticalVelocity = 0;
 			item->Velocity = 0;
-			item->data = -1;
-			item->pos.yPos += 50;
+			item->Data = -1;
+			item->Position.yPos += 50;
 		}
 	}
 	
-	if (item->data)
+	if (item->Data)
 	{
 		AnimateItem(item);
-		room_num = item->roomNumber;
-		x = item->pos.xPos;
-		y = item->pos.yPos;
-		z = item->pos.zPos;
+		room_num = item->RoomNumber;
+		x = item->Position.xPos;
+		y = item->Position.yPos;
+		z = item->Position.zPos;
 		floor = GetFloor(x, y, z, &room_num);
 		h = GetFloorHeight(floor, x, y, z);
-		item->floor = h;
-		TestTriggers(x, y, z, item->roomNumber, true);
-		if (item->pos.yPos >= h)
+		item->Floor = h;
+		TestTriggers(x, y, z, item->RoomNumber, true);
+		if (item->Position.yPos >= h)
 		{
-			item->floor = item->pos.yPos = h;
-			TestTriggers(x, h, z, item->roomNumber, true);
+			item->Floor = item->Position.yPos = h;
+			TestTriggers(x, h, z, item->RoomNumber, true);
 
 			item->Airborne = false;
 			item->VerticalVelocity = 0;
-			item->targetState = LS_DEATH;
-			item->requiredState = LS_DEATH;
+			item->TargetState = LS_DEATH;
+			item->RequiredState = LS_DEATH;
 		}
 	}
 }

@@ -17,34 +17,34 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->itemFlags[0] = (item->triggerFlags / 1000) & 1;
-		item->itemFlags[1] = (item->triggerFlags / 1000) & 2;
-		item->itemFlags[2] = (item->triggerFlags / 1000) & 4;
+		item->ItemFlags[0] = (item->TriggerFlags / 1000) & 1;
+		item->ItemFlags[1] = (item->TriggerFlags / 1000) & 2;
+		item->ItemFlags[2] = (item->TriggerFlags / 1000) & 4;
 
-		item->triggerFlags = item->triggerFlags % 1000;
+		item->TriggerFlags = item->TriggerFlags % 1000;
 
-		if (!item->itemFlags[1])
+		if (!item->ItemFlags[1])
 		{
-			if (item->pos.yRot <= 4096 || item->pos.yRot >= 28672)
+			if (item->Position.yRot <= 4096 || item->Position.yRot >= 28672)
 			{
-				if (!(item->pos.yRot >= -4096 || item->pos.yRot <= -28672))
-					item->pos.xPos += 512;
+				if (!(item->Position.yRot >= -4096 || item->Position.yRot <= -28672))
+					item->Position.xPos += 512;
 			}
 			else
 			{
-				item->pos.xPos -= 512;
+				item->Position.xPos -= 512;
 			}
 
-			if (item->pos.yRot <= -8192 || item->pos.yRot >= 0x2000)
+			if (item->Position.yRot <= -8192 || item->Position.yRot >= 0x2000)
 			{
-				if (item->pos.yRot < -20480 || item->pos.yRot > 20480)
+				if (item->Position.yRot < -20480 || item->Position.yRot > 20480)
 				{
-					item->pos.zPos += 512;
+					item->Position.zPos += 512;
 				}
 			}
 			else
 			{
-				item->pos.zPos -= 512;
+				item->Position.zPos -= 512;
 			}
 		}
 	}
@@ -53,16 +53,16 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			if (!item->itemFlags[2] || !(GetRandomControl() & 0xF))
+			if (!item->ItemFlags[2] || !(GetRandomControl() & 0xF))
 			{
-				item->triggerFlags--;
-				if (item->itemFlags[2])
+				item->TriggerFlags--;
+				if (item->ItemFlags[2])
 				{
 					if (GetRandomControl() & 1)
 					{
-						item->itemFlags[2]--;
+						item->ItemFlags[2]--;
 					}
 				}
 
@@ -70,18 +70,18 @@ namespace TEN::Entities::TR4
 				if (beetleNum != NO_ITEM)
 				{
 					SCARAB_STRUCT* beetle = &Scarabs[beetleNum];
-					beetle->pos.xPos = item->pos.xPos;
-					beetle->pos.yPos = item->pos.yPos;
-					beetle->pos.zPos = item->pos.zPos;
-					beetle->roomNumber = item->roomNumber;
-					if (item->itemFlags[0])
+					beetle->pos.xPos = item->Position.xPos;
+					beetle->pos.yPos = item->Position.yPos;
+					beetle->pos.zPos = item->Position.zPos;
+					beetle->roomNumber = item->RoomNumber;
+					if (item->ItemFlags[0])
 					{
 						beetle->pos.yRot = 2 * GetRandomControl();
 						beetle->fallspeed= -16 - (GetRandomControl() & 0x1F);
 					}
 					else
 					{
-						beetle->pos.yRot = item->pos.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+						beetle->pos.yRot = item->Position.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
 						beetle->fallspeed = 0;
 					}
 					beetle->pos.xRot = 0;
@@ -151,16 +151,16 @@ namespace TEN::Entities::TR4
 
 				beetle->fallspeed += GRAVITY;
 
-				int dx = LaraItem->pos.xPos - beetle->pos.xPos;
-				int dy = LaraItem->pos.yPos - beetle->pos.yPos;
-				int dz = LaraItem->pos.zPos - beetle->pos.zPos;
+				int dx = LaraItem->Position.xPos - beetle->pos.xPos;
+				int dy = LaraItem->Position.yPos - beetle->pos.yPos;
+				int dz = LaraItem->Position.zPos - beetle->pos.zPos;
 
 				short angle = phd_atan(dz, dx) - beetle->pos.yRot;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
-					LaraItem->hitPoints--;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints--;
+					LaraItem->HitStatus = true;
 				}
 
 				if (beetle->flags)

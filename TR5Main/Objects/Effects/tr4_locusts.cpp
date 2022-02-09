@@ -42,12 +42,12 @@ namespace TEN::Entities::TR4
         {
             locust = &Locusts[locustNumber];
             // emitter
-            if (item->objectNumber == ID_LOCUSTS_EMITTER)
+            if (item->ObjectNumber == ID_LOCUSTS_EMITTER)
             {
-                end.x = item->pos.xPos;
-                end.y = item->pos.yPos;
-                end.z = item->pos.zPos;
-                angles[0] = item->pos.yRot - ANGLE(180.0f);
+                end.x = item->Position.xPos;
+                end.y = item->Position.yPos;
+                end.z = item->Position.zPos;
+                angles[0] = item->Position.yRot - ANGLE(180.0f);
                 angles[1] = 0;
             }
             // mutant
@@ -74,7 +74,7 @@ namespace TEN::Entities::TR4
             locust->pos.zPos = end.z;
             locust->pos.yRot = (GetRandomControl() & 0x7FF) + angles[0] - 0x400;
             locust->pos.xRot = (GetRandomControl() & 0x3FF) + angles[1] - 0x200;
-            locust->roomNumber = item->roomNumber;
+            locust->roomNumber = item->RoomNumber;
             locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
             locust->escapeYrot = (GetRandomControl() & 0x1FF);
             locust->escapeXrot = ((GetRandomControl() & 0x7) + 0xF) * 20;
@@ -86,21 +86,21 @@ namespace TEN::Entities::TR4
     {
         ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-        if (item->pos.yRot > 0)
+        if (item->Position.yRot > 0)
         {
-            if (item->pos.yRot == ANGLE(90))
-                item->pos.xPos += CLICK(2);
+            if (item->Position.yRot == ANGLE(90))
+                item->Position.xPos += CLICK(2);
         }
-        else if (item->pos.yRot < 0)
+        else if (item->Position.yRot < 0)
         {
-            if (item->pos.yRot == -ANGLE(180))
-                item->pos.zPos -= CLICK(2);
-            else if (item->pos.yRot == -ANGLE(90))
-                item->pos.xPos -= CLICK(2);
+            if (item->Position.yRot == -ANGLE(180))
+                item->Position.zPos -= CLICK(2);
+            else if (item->Position.yRot == -ANGLE(90))
+                item->Position.xPos -= CLICK(2);
         }
         else
         {
-            item->pos.zPos += CLICK(2);
+            item->Position.zPos += CLICK(2);
         }
     }
 
@@ -110,10 +110,10 @@ namespace TEN::Entities::TR4
 
         if (TriggerActive(item))
         {
-            if (item->triggerFlags)
+            if (item->TriggerFlags)
             {
                 SpawnLocust(item);
-                item->triggerFlags--;
+                item->TriggerFlags--;
             }
             else
             {
@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
                 //if (LaraItem == nullptr)
                 //    LaraItem = LaraItem;
 
-                if ((Lara.keepLow || LaraItem->hitPoints <= 0)
+                if ((Lara.keepLow || LaraItem->HitPoints <= 0)
                     && locust->counter >= 90
                     && !(GetRandomControl() & 7))
                     locust->counter = 90;
@@ -160,12 +160,12 @@ namespace TEN::Entities::TR4
                 }
 
                 phd_GetVectorAngles(
-                    LaraItem->pos.xPos + 8 * locust->escapeXrot - locust->pos.xPos,
-                    LaraItem->pos.yPos - locust->escapeYrot - locust->pos.yPos,
-                    LaraItem->pos.zPos + 8 * locust->escapeZrot - locust->pos.zPos,
+                    LaraItem->Position.xPos + 8 * locust->escapeXrot - locust->pos.xPos,
+                    LaraItem->Position.yPos - locust->escapeYrot - locust->pos.yPos,
+                    LaraItem->Position.zPos + 8 * locust->escapeZrot - locust->pos.zPos,
                     angles);
 
-                distance = SQUARE(LaraItem->pos.zPos - locust->pos.zPos) + SQUARE(LaraItem->pos.xPos - locust->pos.xPos);
+                distance = SQUARE(LaraItem->Position.zPos - locust->pos.zPos) + SQUARE(LaraItem->Position.xPos - locust->pos.xPos);
                 square = int(sqrt(distance)) / 8;
                 if (square <= 128)
                 {
@@ -209,11 +209,11 @@ namespace TEN::Entities::TR4
                 if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
                 {
                     TriggerBlood(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 2 * GetRandomControl(), 2);
-                    if (LaraItem->hitPoints > 0)
-                        LaraItem->hitPoints -= LOCUST_LARA_DAMAGE;
+                    if (LaraItem->HitPoints > 0)
+                        LaraItem->HitPoints -= LOCUST_LARA_DAMAGE;
                     // NOTE: not present in original TR4 code
                     //else
-                    //    LaraItem->hitPoints -= LOCUST_ENTITY_DAMAGE;
+                    //    LaraItem->HitPoints -= LOCUST_ENTITY_DAMAGE;
                 }
 
                 if (locust->counter > 0)

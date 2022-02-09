@@ -24,10 +24,10 @@ void InitialiseHammerhead(short itemNumber)
 
     ClearItem(itemNumber);
 
-    item->animNumber = Objects[item->objectNumber].animIndex + 8;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = STATE_HAMMERHEAD_STOP;
-    item->activeState = STATE_HAMMERHEAD_STOP;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = STATE_HAMMERHEAD_STOP;
+    item->ActiveState = STATE_HAMMERHEAD_STOP;
 }
 
 void HammerheadControl(short itemNumber)
@@ -35,11 +35,11 @@ void HammerheadControl(short itemNumber)
     if (CreatureActive(itemNumber))
     {
         ITEM_INFO* item = &g_Level.Items[itemNumber];
-        CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+        CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-        if (item->hitPoints > 0)
+        if (item->HitPoints > 0)
         {
-            if (item->aiBits)
+            if (item->AIBits)
                 GetAITarget(creature);
             else if (creature->hurtByLara)
                 creature->enemy = LaraItem;
@@ -49,7 +49,7 @@ void HammerheadControl(short itemNumber)
 
             if (creature->enemy != LaraItem)
             {
-                phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
+                phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
             }
 
             GetCreatureMood(item, &info, VIOLENT);
@@ -57,10 +57,10 @@ void HammerheadControl(short itemNumber)
 
             short angle = CreatureTurn(item, creature->maximumTurn);
 
-            switch (item->activeState)
+            switch (item->ActiveState)
             {
             case STATE_HAMMERHEAD_STOP:
-                item->targetState = STATE_HAMMERHEAD_SWIM_SLOW;
+                item->TargetState = STATE_HAMMERHEAD_SWIM_SLOW;
                 creature->flags = 0;
                 break;
 
@@ -70,29 +70,29 @@ void HammerheadControl(short itemNumber)
                 {
                     if (info.distance < SQUARE(682))
                     {
-                        item->targetState = STATE_HAMMERHEAD_ATTACK;
+                        item->TargetState = STATE_HAMMERHEAD_ATTACK;
                     }
                 }
                 else
                 {
-                    item->targetState = STATE_HAMMERHEAD_SWIM_FAST;
+                    item->TargetState = STATE_HAMMERHEAD_SWIM_FAST;
                 }
                 break;
 
             case STATE_HAMMERHEAD_SWIM_FAST:
                 if (info.distance < SQUARE(1024))
                 {
-                    item->targetState = STATE_HAMMERHEAD_SWIM_SLOW;
+                    item->TargetState = STATE_HAMMERHEAD_SWIM_SLOW;
                 }
                 break;
 
             case STATE_HAMMERHEAD_ATTACK:
                 if (!creature->flags)
                 {
-                    if (item->touchBits & 0x3400)
+                    if (item->TouchBits & 0x3400)
                     {
-                        LaraItem->hitPoints -= 120;
-                        LaraItem->hitStatus = true;
+                        LaraItem->HitPoints -= 120;
+                        LaraItem->HitStatus = true;
                         CreatureEffect(item, &HammerheadAttack, DoBloodSplat);
                         creature->flags = 1;
                     }
@@ -112,7 +112,7 @@ void HammerheadControl(short itemNumber)
 
             // NOTE: in TR2 shark there was a call to CreatureKill with special kill anim
             // Hammerhead seems to not have it in original code but this check is still there as a leftover
-            if (item->activeState == STATE_HAMMERHEAD_KILL)
+            if (item->ActiveState == STATE_HAMMERHEAD_KILL)
             {
                 AnimateItem(item);
             }
@@ -124,12 +124,12 @@ void HammerheadControl(short itemNumber)
         }
         else
         {
-            item->hitPoints = 0;
-            if (item->activeState != STATE_HAMMERHEAD_DEATH)
+            item->HitPoints = 0;
+            if (item->ActiveState != STATE_HAMMERHEAD_DEATH)
             {
-                item->animNumber = Objects[item->objectNumber].animIndex + 4;
-                item->activeState = STATE_HAMMERHEAD_DEATH;
-                item->frameNumber = g_Level.Anims[item->frameNumber].frameBase;
+                item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+                item->ActiveState = STATE_HAMMERHEAD_DEATH;
+                item->FrameNumber = g_Level.Anims[item->FrameNumber].frameBase;
             }
 
             CreatureFloat(itemNumber);

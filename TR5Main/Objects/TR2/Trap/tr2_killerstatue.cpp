@@ -13,9 +13,9 @@ void InitialiseKillerStatue(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->animNumber = Objects[item->objectNumber].animIndex + 3;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->activeState = 1;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->ActiveState = 1;
 }
 
 void KillerStatueControl(short itemNumber)
@@ -26,21 +26,21 @@ void KillerStatueControl(short itemNumber)
 
 	item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->activeState == 1)
-		item->targetState = 2;
+	if (TriggerActive(item) && item->ActiveState == 1)
+		item->TargetState = 2;
 	else
-		item->targetState = 1;
+		item->TargetState = 1;
 
-	if ((item->touchBits & 0x80) && item->activeState == 2)
+	if ((item->TouchBits & 0x80) && item->ActiveState == 2)
 	{
-		LaraItem->hitStatus = 1;
-		LaraItem->hitPoints -= 20;
+		LaraItem->HitStatus = 1;
+		LaraItem->HitPoints -= 20;
 
-		int x = LaraItem->pos.xPos + (GetRandomControl() - 16384) / 256;
-		int z = LaraItem->pos.zPos + (GetRandomControl() - 16384) / 256;
-		int y = LaraItem->pos.yPos - GetRandomControl() / 44;
-		int d = (GetRandomControl() - 16384) / 8 + LaraItem->pos.yRot;
-		DoBloodSplat(x, y, z, LaraItem->Velocity, d, LaraItem->roomNumber);
+		int x = LaraItem->Position.xPos + (GetRandomControl() - 16384) / 256;
+		int z = LaraItem->Position.zPos + (GetRandomControl() - 16384) / 256;
+		int y = LaraItem->Position.yPos - GetRandomControl() / 44;
+		int d = (GetRandomControl() - 16384) / 8 + LaraItem->Position.yRot;
+		DoBloodSplat(x, y, z, LaraItem->Velocity, d, LaraItem->RoomNumber);
 	}
 
 	AnimateItem(item);

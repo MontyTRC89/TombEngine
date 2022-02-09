@@ -20,10 +20,10 @@ void InitialiseLion(short itemNum)
 
 	ClearItem(itemNum);
 
-	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->targetState = 1;
-	item->activeState = 1;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->TargetState = 1;
+	item->ActiveState = 1;
 }
 
 void LionControl(short itemNum)
@@ -37,16 +37,16 @@ void LionControl(short itemNum)
 
 	if (CreatureActive(itemNum))
 	{
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			item->hitPoints = 0;
-			if (item->activeState != 5)
+			item->HitPoints = 0;
+			if (item->ActiveState != 5)
 			{
-				item->animNumber = Objects[item->objectNumber].animIndex + (GetRandomControl() & 1) + 7;
-				item->activeState = 5;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
+				item->ActiveState = 5;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 		else
@@ -63,35 +63,35 @@ void LionControl(short itemNum)
 			angle = CreatureTurn(item, creature->maximumTurn);
 			joint0 = -16 * angle;
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case 1:
 				creature->maximumTurn = 0;
-				if (item->requiredState)
+				if (item->RequiredState)
 				{
-					item->targetState = item->requiredState;
+					item->TargetState = item->RequiredState;
 					break;
 				}
 				if (!creature->mood)
 				{
 					if (!(GetRandomControl() & 0x3F))
-						item->targetState = 2;
+						item->TargetState = 2;
 					break;
 				}
 				if (info.ahead)
 				{
-					if (item->touchBits & 0x200048)
+					if (item->TouchBits & 0x200048)
 					{
-						item->targetState = 7;
+						item->TargetState = 7;
 						break;
 					}
 					if (info.distance < SQUARE(1024))
 					{
-						item->targetState = 4;
+						item->TargetState = 4;
 						break;
 					}
 				}
-				item->targetState = 3;
+				item->TargetState = 3;
 				break;
 
 			case 2:
@@ -100,12 +100,12 @@ void LionControl(short itemNum)
 				{
 					if (GetRandomControl() < 128)
 					{
-						item->requiredState = 6;
-						item->targetState = 1;
+						item->RequiredState = 6;
+						item->TargetState = 1;
 					}
 				}
 				else
-					item->targetState = 1;
+					item->TargetState = 1;
 				break;
 
 			case 3:
@@ -115,44 +115,44 @@ void LionControl(short itemNum)
 				{
 					if (info.ahead && info.distance < SQUARE(1024))
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 					}
-					else if (item->touchBits & 0x200048 && info.ahead)
+					else if (item->TouchBits & 0x200048 && info.ahead)
 					{
-						item->targetState = 1;
+						item->TargetState = 1;
 					}
 					else if (creature->mood != ESCAPE_MOOD)
 					{
 						if (GetRandomControl() < 128)
 						{
-							item->requiredState = 6;
-							item->targetState = 1;
+							item->RequiredState = 6;
+							item->TargetState = 1;
 						}
 					}
 				}
 				else
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 				break;
 
 			case 4:
-				if (!item->requiredState && item->touchBits & 0x200048)
+				if (!item->RequiredState && item->TouchBits & 0x200048)
 				{
-					LaraItem->hitPoints -= 200;
-					LaraItem->hitStatus = true;
-					CreatureEffect2(item, &LionBite1, 10, item->pos.yRot, DoBloodSplat);
-					item->requiredState = 1;
+					LaraItem->HitPoints -= 200;
+					LaraItem->HitStatus = true;
+					CreatureEffect2(item, &LionBite1, 10, item->Position.yRot, DoBloodSplat);
+					item->RequiredState = 1;
 				}
 				break;
 			case 7:
 				creature->maximumTurn = ANGLE(1);
-				if (!item->requiredState && item->touchBits & 0x200048)
+				if (!item->RequiredState && item->TouchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite2, 10, item->pos.yRot, DoBloodSplat);
-					LaraItem->hitPoints -= 60;
-					LaraItem->hitStatus = true;
-					item->requiredState = 1;
+					CreatureEffect2(item, &LionBite2, 10, item->Position.yRot, DoBloodSplat);
+					LaraItem->HitPoints -= 60;
+					LaraItem->HitStatus = true;
+					item->RequiredState = 1;
 				}
 				break;
 			}

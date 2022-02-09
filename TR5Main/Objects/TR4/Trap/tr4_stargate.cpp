@@ -28,17 +28,17 @@ namespace TEN::Entities::TR4
 	void StargateControl(short itemNum)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
-		item->itemFlags[3] = 50;
+		item->ItemFlags[3] = 50;
 
 		if (TriggerActive(item))
 		{
-			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->pos, 0);
-			item->itemFlags[0] = 0x36DB600;
+			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Position, 0);
+			item->ItemFlags[0] = 0x36DB600;
 			AnimateItem(item);
 		}
 		else
 		{
-			item->itemFlags[0] = 0;
+			item->ItemFlags[0] = 0;
 		}
 	}
 
@@ -46,7 +46,7 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (item->status == ITEM_INVISIBLE)
+		if (item->Status == ITEM_INVISIBLE)
 			return;
 
 		if (TestBoundsCollide(item, l, c->Setup.Radius))
@@ -64,8 +64,8 @@ namespace TEN::Entities::TR4
 			int result = TestCollision(item, l);
 			if (result)
 			{
-				result &= item->itemFlags[0];
-				int flags = item->itemFlags[0];
+				result &= item->ItemFlags[0];
+				int flags = item->ItemFlags[0];
 
 				if (result)
 				{
@@ -74,32 +74,32 @@ namespace TEN::Entities::TR4
 					{
 						if (result & 1)
 						{
-							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->pos.xPos;
-							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->pos.yPos;
-							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->pos.zPos;
-							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->pos.xPos;
-							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->pos.yPos;
-							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->pos.zPos;
+							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->Position.xPos;
+							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->Position.yPos;
+							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->Position.zPos;
+							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->Position.xPos;
+							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->Position.yPos;
+							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->Position.zPos;
 
-							int oldX = LaraItem->pos.xPos;
-							int oldY = LaraItem->pos.yPos;
-							int oldZ = LaraItem->pos.zPos;
+							int oldX = LaraItem->Position.xPos;
+							int oldY = LaraItem->Position.yPos;
+							int oldZ = LaraItem->Position.zPos;
 
 							if (ItemPushItem(item, l, c, flags & 1, 2))
 							{
 								if ((flags & 1) &&
-									(oldX != LaraItem->pos.xPos 
-									|| oldY != LaraItem->pos.yPos 
-									|| oldZ != LaraItem->pos.zPos) &&
+									(oldX != LaraItem->Position.xPos 
+									|| oldY != LaraItem->Position.yPos 
+									|| oldZ != LaraItem->Position.zPos) &&
 									TriggerActive(item))
 								{
-									DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
+									DoBloodSplat((GetRandomControl() & 0x3F) + l->Position.xPos - 32,
 										(GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16,
-										(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
+										(GetRandomControl() & 0x3F) + l->Position.zPos - 32,
 										(GetRandomControl() & 3) + 2,
 										2 * GetRandomControl(),
-										l->roomNumber);
-									LaraItem->hitPoints -= 100;
+										l->RoomNumber);
+									LaraItem->HitPoints -= 100;
 								}
 							}
 						}

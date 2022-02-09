@@ -36,24 +36,24 @@ void InitialiseImp(short itemNum)
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
 
-    if (item->triggerFlags == 2 || item->triggerFlags == 12)
+    if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
     {
         stateid = STATE_IMP_START_ROLL;
-        item->animNumber = Objects[ID_IMP].animIndex + 8;
+        item->AnimNumber = Objects[ID_IMP].animIndex + 8;
     }
-    else if (item->triggerFlags == 1 || item->triggerFlags == 11)
+    else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
     {
         stateid = STATE_IMP_START_CLIMB;
-        item->animNumber = Objects[ID_IMP].animIndex + 7;
+        item->AnimNumber = Objects[ID_IMP].animIndex + 7;
     }
     else
     {
         stateid = 1;
-        item->animNumber = Objects[ID_IMP].animIndex + 1;
+        item->AnimNumber = Objects[ID_IMP].animIndex + 1;
     }
-    item->targetState = stateid;
-    item->activeState = stateid;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+    item->TargetState = stateid;
+    item->ActiveState = stateid;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 static void ImpThrowStones(ITEM_INFO* item)
@@ -84,14 +84,14 @@ static void ImpThrowStones(ITEM_INFO* item)
 	angles[0] += GetRandomControl() % (distance / 4) - (distance / 8);
 	angles[1] += GetRandomControl() % (distance / 2) - (distance / 4);
 	
-	short fxNum = CreateNewEffect(item->roomNumber);
+	short fxNum = CreateNewEffect(item->RoomNumber);
 	if (fxNum != NO_ITEM)
 	{
 		FX_INFO* fx = &EffectList[fxNum];
 		fx->pos.xPos = pos1.x;
 		fx->pos.yPos = pos1.y;
 		fx->pos.zPos = pos1.z;
-		fx->roomNumber = item->roomNumber;
+		fx->roomNumber = item->RoomNumber;
 		fx->pos.xRot = (angles[1] + distance) / 2;
 		fx->pos.yRot = angles[0];
 		fx->pos.zRot = 0;
@@ -121,11 +121,11 @@ void ImpControl(short itemNumber)
 		short angle2 = 0;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-		if (item->hitPoints > 0)
+		if (item->HitPoints > 0)
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 			{
 				GetAITarget(creature);
 			}
@@ -143,19 +143,19 @@ void ImpControl(short itemNumber)
 			}
 			else
 			{
-				angle2 = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+				angle2 = phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos) - item->Position.yRot;
 			}
 
-			int d1 = item->pos.yPos - LaraItem->pos.yPos + 384;
+			int d1 = item->Position.yPos - LaraItem->Position.yPos + 384;
 
-			if (LaraItem->activeState == LS_CROUCH_IDLE
-				|| LaraItem->activeState == LS_CROUCH_ROLL
-				|| LaraItem->activeState > LS_MONKEY_TURN_180
-				&& LaraItem->activeState < LS_HANG_TO_CRAWL
-				|| LaraItem->activeState == LS_CROUCH_TURN_LEFT
-				|| LaraItem->activeState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->ActiveState == LS_CROUCH_IDLE
+				|| LaraItem->ActiveState == LS_CROUCH_ROLL
+				|| LaraItem->ActiveState > LS_MONKEY_TURN_180
+				&& LaraItem->ActiveState < LS_HANG_TO_CRAWL
+				|| LaraItem->ActiveState == LS_CROUCH_TURN_LEFT
+				|| LaraItem->ActiveState == LS_CROUCH_TURN_RIGHT)
 			{
-				d1 = item->pos.yPos - LaraItem->pos.yPos;
+				d1 = item->Position.yPos - LaraItem->Position.yPos;
 			}
 
 			int d2 = sqrt(info.distance);
@@ -163,7 +163,7 @@ void ImpControl(short itemNumber)
 			info.xAngle = phd_atan(d2, d1);
 
 			GetCreatureMood(item, &info, VIOLENT);
-			if (item->activeState == STATE_IMP_SCARED)
+			if (item->ActiveState == STATE_IMP_SCARED)
 				creature->mood = ESCAPE_MOOD;
 
 			CreatureMood(item, &info, VIOLENT);
@@ -175,53 +175,53 @@ void ImpControl(short itemNumber)
 			joint2 = info.xAngle / 2;
 
 			if (Wibble & 0x10)
-				item->swapMeshFlags = 1024;
+				item->SwapMeshFlags = 1024;
 			else
-				item->swapMeshFlags = 0;
+				item->SwapMeshFlags = 0;
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case STATE_IMP_WALK:
 				creature->maximumTurn = ANGLE(7);
 				if (info.distance <= SQUARE(2048))
 				{
 					if (info.distance < SQUARE(2048))
-						item->targetState = STATE_IMP_STOP;
+						item->TargetState = STATE_IMP_STOP;
 				}
 				else
 				{
-					item->targetState = STATE_IMP_RUN;
+					item->TargetState = STATE_IMP_RUN;
 				}
 				break;
 
 			case STATE_IMP_STOP:
 				creature->maximumTurn = -1;
 				creature->flags = 0;
-				if (info.bite && info.distance < SQUARE(170) && item->triggerFlags < 10)
+				if (info.bite && info.distance < SQUARE(170) && item->TriggerFlags < 10)
 				{
 					if (GetRandomControl() & 1)
-						item->targetState = STATE_IMP_ATTACK1;
+						item->TargetState = STATE_IMP_ATTACK1;
 					else
-						item->targetState = STATE_IMP_ATTACK2;
+						item->TargetState = STATE_IMP_ATTACK2;
 				}
-				else if (item->aiBits & FOLLOW)
+				else if (item->AIBits & FOLLOW)
 				{
-					item->targetState = STATE_IMP_WALK;
+					item->TargetState = STATE_IMP_WALK;
 				}
 				else
 				{
-					if (item->triggerFlags == 3)
+					if (item->TriggerFlags == 3)
 					{
-						item->targetState = STATE_IMP_THROW_STONES;
+						item->TargetState = STATE_IMP_THROW_STONES;
 					}
 					else if (info.distance <= SQUARE(2048))
 					{
-						if (info.distance > SQUARE(512) || item->triggerFlags < 10)
-							item->targetState = STATE_IMP_WALK;
+						if (info.distance > SQUARE(512) || item->TriggerFlags < 10)
+							item->TargetState = STATE_IMP_WALK;
 					}
 					else
 					{
-						item->targetState = STATE_IMP_RUN;
+						item->TargetState = STATE_IMP_RUN;
 					}
 				}
 				break;
@@ -231,11 +231,11 @@ void ImpControl(short itemNumber)
 				if (info.distance >= SQUARE(512))
 				{
 					if (info.distance < SQUARE(2048))
-						item->targetState = STATE_IMP_WALK;
+						item->TargetState = STATE_IMP_WALK;
 				}
 				else
 				{
-					item->targetState = STATE_IMP_STOP;
+					item->TargetState = STATE_IMP_STOP;
 				}
 				break;
 
@@ -243,11 +243,11 @@ void ImpControl(short itemNumber)
 			case STATE_IMP_ATTACK2:
 				creature->maximumTurn = -1;
 				if (creature->flags == 0 
-					&& item->touchBits & 0x280)
+					&& item->TouchBits & 0x280)
 				{
-					LaraItem->hitPoints -= 3;
-					LaraItem->hitStatus = true;
-					CreatureEffect2(item, &ImpBite, 10, item->pos.yRot, DoBloodSplat);
+					LaraItem->HitPoints -= 3;
+					LaraItem->HitStatus = true;
+					CreatureEffect2(item, &ImpBite, 10, item->Position.yRot, DoBloodSplat);
 				}
 				break;
 
@@ -262,7 +262,7 @@ void ImpControl(short itemNumber)
 
 			case STATE_IMP_THROW_STONES:
 				creature->maximumTurn = -1;
-				if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 40)
+				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 40)
 					ImpThrowStones(item);
 				break;
 
@@ -273,12 +273,12 @@ void ImpControl(short itemNumber)
 		}
 		else
 		{
-			item->hitPoints = 0;
-			if (item->activeState != STATE_IMP_DEATH)
+			item->HitPoints = 0;
+			if (item->ActiveState != STATE_IMP_DEATH)
 			{
-				item->animNumber = Objects[ID_IMP].animIndex + ANIMATION_IMP_DEATH;
-				item->activeState = STATE_IMP_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[ID_IMP].animIndex + ANIMATION_IMP_DEATH;
+				item->ActiveState = STATE_IMP_DEATH;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 
@@ -288,13 +288,13 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= ANGLE(2))
 			{
 				if (angle2 >= 0)
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				else
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 			}
 			else
 			{
-				item->pos.yRot += angle2;
+				item->Position.yRot += angle2;
 			}
 		}
 

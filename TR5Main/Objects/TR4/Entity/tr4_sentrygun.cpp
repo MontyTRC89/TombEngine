@@ -79,9 +79,9 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNum);
 
-		item->itemFlags[0] = 0;
-		item->itemFlags[1] = 768;
-		item->itemFlags[2] = 0;
+		item->ItemFlags[0] = 0;
+		item->ItemFlags[1] = 768;
+		item->ItemFlags[2] = 0;
 	}
 
 	void SentryGunControl(short itemNum)
@@ -91,7 +91,7 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNum))
 			return;
 
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 		AI_INFO info = {};
 		int c = 0;
@@ -100,9 +100,9 @@ namespace TEN::Entities::TR4
 			return;
 
 		// Flags set by the ID_MINE object?
-		if (item->meshBits & 0x40)
+		if (item->MeshBits & 0x40)
 		{
-			if (item->itemFlags[0])
+			if (item->ItemFlags[0])
 			{
 				PHD_VECTOR pos;
 
@@ -112,21 +112,21 @@ namespace TEN::Entities::TR4
 
 				GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
 
-				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
 
-				item->itemFlags[0]--;
+				item->ItemFlags[0]--;
 			}
 
-			if (item->itemFlags[0] & 1)
-				item->meshBits |= 0x100;
+			if (item->ItemFlags[0] & 1)
+				item->MeshBits |= 0x100;
 			else
-				item->meshBits &= ~0x100;
+				item->MeshBits &= ~0x100;
 
-			if (item->triggerFlags == 0)
+			if (item->TriggerFlags == 0)
 			{
-				item->pos.yPos -= 512;
+				item->Position.yPos -= 512;
 				CreatureAIInfo(item, &info);
-				item->pos.yPos += 512;
+				item->Position.yPos += 512;
 
 				int deltaAngle = info.angle - creature->jointRotation[0];
 
@@ -138,7 +138,7 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(SECTOR(9)))
 					{
-						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->ItemFlags[0])
 						{
 							if (info.distance <= SQUARE(SECTOR(2)))
 							{
@@ -150,15 +150,15 @@ namespace TEN::Entities::TR4
 							{
 								// Shot to Lara with bullets
 								c = 0;
-								item->itemFlags[0] = 2;
+								item->ItemFlags[0] = 2;
 
 								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
-								SoundEffect(SFX_TR4_AUTOGUNS, &item->pos, 0);
+								SoundEffect(SFX_TR4_AUTOGUNS, &item->Position, 0);
 
-								item->itemFlags[2] += 256;
-								if (item->itemFlags[2] > 6144)
+								item->ItemFlags[2] += 256;
+								if (item->ItemFlags[2] > 6144)
 								{
-									item->itemFlags[2] = 6144;
+									item->ItemFlags[2] = 6144;
 								}
 							}
 						}
@@ -182,20 +182,20 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				item->itemFlags[2] -= 32;
+				item->ItemFlags[2] -= 32;
 
-				if (item->itemFlags[2] < 0)
+				if (item->ItemFlags[2] < 0)
 				{
-					item->itemFlags[2] = 0;
+					item->ItemFlags[2] = 0;
 				}
 
-				creature->jointRotation[3] += item->itemFlags[2];
-				creature->jointRotation[2] += item->itemFlags[1];
+				creature->jointRotation[3] += item->ItemFlags[2];
+				creature->jointRotation[2] += item->ItemFlags[1];
 
 				if (creature->jointRotation[2] > ANGLE(90) ||
 					creature->jointRotation[2] < -ANGLE(90))
 				{
-					item->itemFlags[1] = -item->itemFlags[1];
+					item->ItemFlags[1] = -item->ItemFlags[1];
 				}
 			}
 			else
@@ -212,17 +212,17 @@ namespace TEN::Entities::TR4
 			DisableBaddieAI(itemNum);
 			KillItem(itemNum);
 
-			item->flags |= 1u;
-			item->status = ITEM_DEACTIVATED;
+			item->Flags |= 1u;
+			item->Status = ITEM_DEACTIVATED;
 
-			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
+			RemoveAllItemsInRoom(item->RoomNumber, ID_SMOKE_EMITTER_BLACK);
 
-			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
+			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 3, -2, 0, item->RoomNumber);
 			for (int i = 0; i < 2; i++)
-				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
+				TriggerExplosionSparks(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 3, -1, 0, item->RoomNumber);
 
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
 		}
 	}
 }

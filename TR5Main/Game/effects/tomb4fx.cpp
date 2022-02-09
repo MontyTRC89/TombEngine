@@ -604,7 +604,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 		else
 			spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
 	}
-	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
+	else if (g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WIND)
 	{
 		spark->flags = SP_WIND;
 	}
@@ -854,7 +854,7 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 	gshell->pos.xRot = 0;
 	gshell->pos.yRot = 0;
 	gshell->pos.zRot = GetRandomControl();
-	gshell->roomNumber = LaraItem->roomNumber;
+	gshell->roomNumber = LaraItem->RoomNumber;
 	gshell->speed = (GetRandomControl() & 0x1F) + 16;
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
 	gshell->objectNumber = objNum;
@@ -865,19 +865,19 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 		{
 			gshell->dirXrot = Lara.leftArm.yRot
 				+ Lara.extraTorsoRot.y
-				+ LaraItem->pos.yRot
+				+ LaraItem->Position.yRot
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
 			gshell->pos.yRot += Lara.leftArm.yRot 
 				+ Lara.extraTorsoRot.y 
-				+ LaraItem->pos.yRot;
+				+ LaraItem->Position.yRot;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
 			gshell->dirXrot = Lara.leftArm.yRot 
-				+ LaraItem->pos.yRot 
+				+ LaraItem->Position.yRot 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
@@ -885,12 +885,12 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 	else
 	{
 		gshell->dirXrot = Lara.leftArm.yRot 
-			+ LaraItem->pos.yRot 
+			+ LaraItem->Position.yRot 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
 
-	if (LaraItem->meshBits)
+	if (LaraItem->MeshBits)
 	{
 		if (weaponType == WEAPON_SHOTGUN)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, WEAPON_SHOTGUN, 24);
@@ -1039,7 +1039,7 @@ void LaraBubbles(ITEM_INFO* item)
 	PHD_VECTOR pos;
 	int num, i;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->pos, 1);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Position, 1);
 
 	pos.x = 0;
 
@@ -1064,7 +1064,7 @@ void LaraBubbles(ITEM_INFO* item)
 
 	for (i = 0; i < num; i++)
 	{
-		CreateBubble(&pos, item->roomNumber, 8, 7, 0, 0, 0, 0);
+		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
 	}
 }
 
@@ -1164,7 +1164,7 @@ void TriggerLaraDrips(ITEM_INFO* item)
 			auto pos = PHD_VECTOR();
 
 			GetLaraJointPosition(&pos, (LARA_MESHES)i);
-			auto room = GetRoom(item->location, pos.x, pos.y, pos.z).roomNumber;
+			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
 				Lara.wet[i] = UCHAR_MAX;
@@ -1190,7 +1190,7 @@ void TriggerLaraDrips(ITEM_INFO* item)
 				dptr->yVel = (GetRandomControl() & 0x1F) + 32;
 				dptr->gravity = (GetRandomControl() & 0x1F) + 32;
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
-				dptr->roomNumber = LaraItem->roomNumber;
+				dptr->roomNumber = LaraItem->RoomNumber;
 
 				if (Lara.wet[i] >= 4)
 					Lara.wet[i] -= 4;
@@ -1205,23 +1205,23 @@ void TriggerLaraDrips(ITEM_INFO* item)
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->pos.yRot),
-		TO_RAD(item->pos.xRot),
-		TO_RAD(item->pos.zRot)
+		TO_RAD(item->Position.yRot),
+		TO_RAD(item->Position.xRot),
+		TO_RAD(item->Position.zRot)
 	);
 
 	int bit = 1;
 
-	if ((bit & meshBits) && (bit & item->meshBits))
+	if ((bit & meshBits) && (bit & item->MeshBits))
 	{
 		if ((GetRandomControl() & 3) == 0)
 		{
-			short fxNumber = CreateNewEffect(item->roomNumber);
+			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &EffectList[fxNumber];
@@ -1230,11 +1230,11 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
-				fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
-				fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
-				fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
+				fx->pos.xPos = boneMatrix.Translation().x + item->Position.xPos;
+				fx->pos.yPos = boneMatrix.Translation().y + item->Position.yPos;
+				fx->pos.zPos = boneMatrix.Translation().z + item->Position.zPos;
 
-				fx->roomNumber = item->roomNumber;
+				fx->roomNumber = item->RoomNumber;
 				fx->pos.xRot = 0;
 				fx->pos.yRot = GetRandomControl() * 2;
 
@@ -1261,7 +1261,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				fx->flag2 = flags;
 			}
 
-			item->meshBits -= bit;
+			item->MeshBits -= bit;
 		}
 	}
 
@@ -1272,20 +1272,20 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		boneMatrix = world * boneMatrix;
 
 		bit <<= 1;
-		if ((bit & meshBits) && (bit & item->meshBits))
+		if ((bit & meshBits) && (bit & item->MeshBits))
 		{
 			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
 			{
-				short fxNumber = CreateNewEffect(item->roomNumber);
+				short fxNumber = CreateNewEffect(item->RoomNumber);
 				if (fxNumber != NO_ITEM)
 				{
 					FX_INFO* fx = &EffectList[fxNumber];
 
-					fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
-					fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
-					fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
+					fx->pos.xPos = boneMatrix.Translation().x + item->Position.xPos;
+					fx->pos.yPos = boneMatrix.Translation().y + item->Position.yPos;
+					fx->pos.zPos = boneMatrix.Translation().z + item->Position.zPos;
 
-					fx->roomNumber = item->roomNumber;
+					fx->roomNumber = item->RoomNumber;
 					fx->pos.xRot = 0;
 					fx->pos.yRot = GetRandomControl() * 2;
 
@@ -1313,12 +1313,12 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 					fx->frameNumber = obj->meshIndex + i;
 				}
 
-				item->meshBits -= bit;
+				item->MeshBits -= bit;
 			}
 		}
 	}
 
-	return item->meshBits == 0;
+	return item->MeshBits == 0;
 }
 
 int GetFreeShockwave()
@@ -1360,8 +1360,8 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1429,18 +1429,18 @@ void UpdateShockwaves()
 				sw->outerRad += sw->speed;
 				sw->speed -= (sw->speed >> 4);
 
-				if (LaraItem->hitPoints > 0)
+				if (LaraItem->HitPoints > 0)
 				{
 					if (sw->flags & 3)
 					{
 						ANIM_FRAME* frame = GetBestFrame(LaraItem);
 
-						int dx = LaraItem->pos.xPos - sw->x;
-						int dz = LaraItem->pos.zPos - sw->z;
+						int dx = LaraItem->Position.xPos - sw->x;
+						int dz = LaraItem->Position.zPos - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
-						if (sw->y <= LaraItem->pos.yPos + frame->boundingBox.Y1
-							|| sw->y >= LaraItem->pos.yPos + frame->boundingBox.Y2 + 256
+						if (sw->y <= LaraItem->Position.yPos + frame->boundingBox.Y1
+							|| sw->y >= LaraItem->Position.yPos + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
 							|| distance >= sw->outerRad)
 						{
@@ -1449,13 +1449,13 @@ void UpdateShockwaves()
 						else
 						{
 							short angle = phd_atan(dz, dx);
-							TriggerShockwaveHitEffect(LaraItem->pos.xPos,
+							TriggerShockwaveHitEffect(LaraItem->Position.xPos,
 								sw->y,
-								LaraItem->pos.zPos,
+								LaraItem->Position.zPos,
 								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
-							LaraItem->hitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
+							LaraItem->HitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
 						}
 					}
 				}
@@ -1466,8 +1466,8 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 {
-	int dx = LaraItem->pos.xPos - x;
-	int dz = LaraItem->pos.zPos - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{

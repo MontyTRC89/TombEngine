@@ -34,12 +34,12 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((!(TrInput & IN_ACTION)
-			|| item->status
-			|| item->flags & 0x100
+			|| item->Status
+			|| item->Flags & 0x100
 			|| CurrentSequence >= 3
 			|| Lara.gunStatus
-			|| l->activeState != LS_IDLE
-			|| l->animNumber != LA_STAND_IDLE)
+			|| l->ActiveState != LS_IDLE
+			|| l->AnimNumber != LA_STAND_IDLE)
 			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
@@ -50,15 +50,15 @@ namespace TEN::Entities::Switches
 		{
 			if (MoveLaraPosition(&FullBlockSwitchPos, item, l))
 			{
-				if (item->activeState == 1)
+				if (item->ActiveState == 1)
 				{
-					l->activeState = LS_SWITCH_DOWN;
-					l->animNumber = LA_BUTTON_GIANT_PUSH;
-					item->targetState = 0;
+					l->ActiveState = LS_SWITCH_DOWN;
+					l->AnimNumber = LA_BUTTON_GIANT_PUSH;
+					item->TargetState = 0;
 				}
-				l->targetState = LS_IDLE;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				item->status = ITEM_ACTIVE;
+				l->TargetState = LS_IDLE;
+				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+				item->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNum);
 				AnimateItem(item);
@@ -83,23 +83,23 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->animNumber != Objects[item->objectNumber].animIndex + 2
+		if (item->AnimNumber != Objects[item->ObjectNumber].animIndex + 2
 			|| CurrentSequence >= 3
-			|| item->itemFlags[0])
+			|| item->ItemFlags[0])
 		{
 			if (CurrentSequence >= 4)
 			{
-				item->itemFlags[0] = 0;
-				item->targetState = SWITCH_ON;
-				item->status = ITEM_NOT_ACTIVE;
+				item->ItemFlags[0] = 0;
+				item->TargetState = SWITCH_ON;
+				item->Status = ITEM_NOT_ACTIVE;
 				if (++CurrentSequence >= 7)
 					CurrentSequence = 0;
 			}
 		}
 		else
 		{
-			item->itemFlags[0] = 1;
-			Sequences[CurrentSequence++] = item->triggerFlags;
+			item->ItemFlags[0] = 1;
+			Sequences[CurrentSequence++] = item->TriggerFlags;
 		}
 
 		AnimateItem(item);

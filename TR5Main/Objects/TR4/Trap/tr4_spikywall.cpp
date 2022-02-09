@@ -12,37 +12,37 @@ void ControlSpikyWall(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	/* Move wall */
-	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
+	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int x = item->pos.xPos + phd_sin(item->pos.yRot);
-		int z = item->pos.zPos + phd_cos(item->pos.yRot);
+		int x = item->Position.xPos + phd_sin(item->Position.yRot);
+		int z = item->Position.zPos + phd_cos(item->Position.yRot);
 
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+		short roomNumber = item->RoomNumber;
+		FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
 
-		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
+		if (GetFloorHeight(floor, x, item->Position.yPos, z) != item->Position.yPos)
 		{
-			item->status = ITEM_DEACTIVATED;
+			item->Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 		}
 		else
 		{
-			item->pos.xPos = x;
-			item->pos.zPos = z;
-			if (roomNumber != item->roomNumber)
+			item->Position.xPos = x;
+			item->Position.zPos = z;
+			if (roomNumber != item->RoomNumber)
 				ItemNewRoom(itemNum, roomNumber);
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->pos, 0);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Position, 0);
 		}
 	}
 
-	if (item->touchBits)
+	if (item->TouchBits)
 	{
-		LaraItem->hitPoints -= 15;
-		LaraItem->hitStatus = true;
+		LaraItem->HitPoints -= 15;
+		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - 512, LaraItem->pos.zPos, 4, item->pos.yRot, LaraItem->roomNumber, 3);
-		item->touchBits = 0;
+		DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - 512, LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
+		item->TouchBits = 0;
 
-		SoundEffect(56, &item->pos, 0);
+		SoundEffect(56, &item->Position, 0);
 	}
 }

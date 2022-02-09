@@ -86,8 +86,8 @@ enum SpeedBoatAnim
 void InitialiseSpeedBoat(short itemNum)
 {
 	ITEM_INFO* sBoatItem = &g_Level.Items[itemNum];
-	sBoatItem->data = BOAT_INFO();
-	BOAT_INFO* sBoatInfo = sBoatItem->data;
+	sBoatItem->Data = BOAT_INFO();
+	BOAT_INFO* sBoatInfo = sBoatItem->Data;
 
 	sBoatInfo->boatTurn = 0;
 	sBoatInfo->leftFallspeed = 0;
@@ -100,7 +100,7 @@ void InitialiseSpeedBoat(short itemNum)
 
 void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
 {
-	SetupRipple(sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(sBoatItem->pos.yRot));
+	SetupRipple(sBoatItem->Position.xPos, sBoatItem->Position.yPos, sBoatItem->Position.zPos, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(sBoatItem->Position.yRot));
 	TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
 
 	// OLD WAKE EFFECT
@@ -177,7 +177,7 @@ void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
 
 BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, COLL_INFO* coll)
 {
-	LaraInfo*& laraInfo = laraItem->data;
+	LaraInfo*& laraInfo = laraItem->Data;
 
 	BoatMountType mountType = BoatMountType::None;
 
@@ -190,11 +190,11 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	if (!TestCollision(sBoatItem, laraItem))
 		return mountType;
 
-	int dist = (laraItem->pos.zPos - sBoatItem->pos.zPos) * phd_cos(-sBoatItem->pos.yRot) - (laraItem->pos.xPos - sBoatItem->pos.xPos) * phd_sin(-sBoatItem->pos.yRot);
+	int dist = (laraItem->Position.zPos - sBoatItem->Position.zPos) * phd_cos(-sBoatItem->Position.yRot) - (laraItem->Position.xPos - sBoatItem->Position.xPos) * phd_sin(-sBoatItem->Position.yRot);
 	if (dist > 200)
 		return mountType;
 
-	short rot = sBoatItem->pos.yRot - laraItem->pos.yRot;
+	short rot = sBoatItem->Position.yRot - laraItem->Position.yRot;
 	if (laraInfo->waterStatus == LW_SURFACE || laraInfo->waterStatus == LW_WADE)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Airborne || sBoatItem->Velocity)
@@ -210,7 +210,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		if (laraItem->VerticalVelocity > 0)
 		{
 			if (rot > -ANGLE(135.0f) && rot < ANGLE(135.0f) &&
-				laraItem->pos.yPos > sBoatItem->pos.yPos)
+				laraItem->Position.yPos > sBoatItem->Position.yPos)
 			{
 				mountType = BoatMountType::Jump;
 			}
@@ -219,9 +219,9 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		{
 			if (rot > -ANGLE(135.0f) && rot < ANGLE(135.0f))
 			{
-				if (laraItem->pos.xPos == sBoatItem->pos.xPos &&
-					laraItem->pos.yPos == sBoatItem->pos.yPos &&
-					laraItem->pos.zPos == sBoatItem->pos.zPos)
+				if (laraItem->Position.xPos == sBoatItem->Position.xPos &&
+					laraItem->Position.yPos == sBoatItem->Position.yPos &&
+					laraItem->Position.zPos == sBoatItem->Position.zPos)
 				{
 					mountType = BoatMountType::StartPosition;
 				}
@@ -238,16 +238,16 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 {
 	short angle;
 	if (direction < 0)
-		angle = sBoatItem->pos.yRot - ANGLE(90.0f);
+		angle = sBoatItem->Position.yRot - ANGLE(90.0f);
 	else
-		angle = sBoatItem->pos.yRot + ANGLE(90.0f);
+		angle = sBoatItem->Position.yRot + ANGLE(90.0f);
 
-	int x = sBoatItem->pos.xPos + DISMOUNT_DIST * phd_sin(angle);
-	int y = sBoatItem->pos.yPos;
-	int z = sBoatItem->pos.zPos + DISMOUNT_DIST * phd_cos(angle);
-	auto probe = GetCollisionResult(x, y, z, sBoatItem->roomNumber);
+	int x = sBoatItem->Position.xPos + DISMOUNT_DIST * phd_sin(angle);
+	int y = sBoatItem->Position.yPos;
+	int z = sBoatItem->Position.zPos + DISMOUNT_DIST * phd_cos(angle);
+	auto probe = GetCollisionResult(x, y, z, sBoatItem->RoomNumber);
 
-	if ((probe.Position.Floor - sBoatItem->pos.yPos) < -CLICK(2))
+	if ((probe.Position.Floor - sBoatItem->Position.yPos) < -CLICK(2))
 		return false;
 
 	if (probe.Position.FloorSlope ||
@@ -257,7 +257,7 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 	}
 
 	if ((probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT ||
-		(probe.Position.Ceiling - sBoatItem->pos.yPos) > -LARA_HEIGHT)
+		(probe.Position.Ceiling - sBoatItem->Position.yPos) > -LARA_HEIGHT)
 	{
 		return false;
 	}
@@ -267,55 +267,55 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 
 void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 {
-	LaraInfo*& laraInfo = laraItem->data;
+	LaraInfo*& laraInfo = laraItem->Data;
 
-	if ((laraItem->activeState == SBOAT_STATE_DISMOUNT_LEFT ||
-		laraItem->activeState == SBOAT_STATE_DISMOUNT_RIGHT) &&
-		TestLastFrame(laraItem, laraItem->animNumber))
+	if ((laraItem->ActiveState == SBOAT_STATE_DISMOUNT_LEFT ||
+		laraItem->ActiveState == SBOAT_STATE_DISMOUNT_RIGHT) &&
+		TestLastFrame(laraItem, laraItem->AnimNumber))
 	{
-		if (laraItem->activeState == SBOAT_STATE_DISMOUNT_LEFT)
-			laraItem->pos.yRot -= ANGLE(90.0f);
-		else if(laraItem->activeState == SBOAT_STATE_DISMOUNT_RIGHT)
-			laraItem->pos.yRot += ANGLE(90.0f);
+		if (laraItem->ActiveState == SBOAT_STATE_DISMOUNT_LEFT)
+			laraItem->Position.yRot -= ANGLE(90.0f);
+		else if(laraItem->ActiveState == SBOAT_STATE_DISMOUNT_RIGHT)
+			laraItem->Position.yRot += ANGLE(90.0f);
 
 		SetAnimation(laraItem, LA_JUMP_FORWARD);
 		laraItem->Airborne = true;
 		laraItem->VerticalVelocity = -50;
 		laraItem->Velocity = 40;
-		laraItem->pos.xRot = 0;
-		laraItem->pos.zRot = 0;
+		laraItem->Position.xRot = 0;
+		laraItem->Position.zRot = 0;
 		laraInfo->Vehicle = NO_ITEM;
 
-		int x = laraItem->pos.xPos + 360 * phd_sin(laraItem->pos.yRot);
-		int y = laraItem->pos.yPos - 90;
-		int z = laraItem->pos.zPos + 360 * phd_cos(laraItem->pos.yRot);
-		auto probe = GetCollisionResult(x, y, z, laraItem->roomNumber);
+		int x = laraItem->Position.xPos + 360 * phd_sin(laraItem->Position.yRot);
+		int y = laraItem->Position.yPos - 90;
+		int z = laraItem->Position.zPos + 360 * phd_cos(laraItem->Position.yRot);
+		auto probe = GetCollisionResult(x, y, z, laraItem->RoomNumber);
 
 		if (probe.Position.Floor >= y - STEP_SIZE)
 		{
-			laraItem->pos.xPos = x;
-			laraItem->pos.zPos = z;
+			laraItem->Position.xPos = x;
+			laraItem->Position.zPos = z;
 
-			if (probe.RoomNumber != laraItem->roomNumber)
+			if (probe.RoomNumber != laraItem->RoomNumber)
 				ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
 		}
-		laraItem->pos.yPos = y;
+		laraItem->Position.yPos = y;
 
-		sBoatItem->animNumber = Objects[ID_SPEEDBOAT].animIndex;
-		sBoatItem->frameNumber = g_Level.Anims[sBoatItem->animNumber].frameBase;
+		sBoatItem->AnimNumber = Objects[ID_SPEEDBOAT].animIndex;
+		sBoatItem->FrameNumber = g_Level.Anims[sBoatItem->AnimNumber].frameBase;
 	}
 }
 
 int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOff, int xOff, PHD_VECTOR* pos)
 {
-	float s = phd_sin(sBoatItem->pos.yRot);
-	float c = phd_cos(sBoatItem->pos.yRot);
+	float s = phd_sin(sBoatItem->Position.yRot);
+	float c = phd_cos(sBoatItem->Position.yRot);
 
-	pos->x = sBoatItem->pos.xPos + zOff * s + xOff * c;
-	pos->y = sBoatItem->pos.yPos - zOff * phd_sin(sBoatItem->pos.xRot) + xOff * phd_sin(sBoatItem->pos.zRot);
-	pos->z = sBoatItem->pos.zPos + zOff * c - xOff * s;
+	pos->x = sBoatItem->Position.xPos + zOff * s + xOff * c;
+	pos->y = sBoatItem->Position.yPos - zOff * phd_sin(sBoatItem->Position.xRot) + xOff * phd_sin(sBoatItem->Position.zRot);
+	pos->z = sBoatItem->Position.zPos + zOff * c - xOff * s;
 
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, sBoatItem->roomNumber);
+	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, sBoatItem->RoomNumber);
 	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
@@ -333,22 +333,22 @@ void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNum)
 	ITEM_INFO* item;
 	int x, z, distance, radius;
 
-	auto item_number = g_Level.Rooms[sBoatItem->roomNumber].itemNumber;
+	auto item_number = g_Level.Rooms[sBoatItem->RoomNumber].itemNumber;
 	while (item_number != NO_ITEM)
 	{
 		item = &g_Level.Items[item_number];
 
-		if (item->objectNumber == ID_SPEEDBOAT && item_number != itemNum && Lara.Vehicle != item_number)
+		if (item->ObjectNumber == ID_SPEEDBOAT && item_number != itemNum && Lara.Vehicle != item_number)
 		{
-			x = item->pos.xPos - sBoatItem->pos.xPos;
-			z = item->pos.zPos - sBoatItem->pos.zPos;
+			x = item->Position.xPos - sBoatItem->Position.xPos;
+			z = item->Position.zPos - sBoatItem->Position.zPos;
 			distance = SQUARE(x) + SQUARE(z);
 			radius = SQUARE(BOAT_RADIUS * 2);
 
 			if (distance < radius)
 			{
-				sBoatItem->pos.xPos = item->pos.xPos - x * radius / distance;
-				sBoatItem->pos.zPos = item->pos.zPos - z * radius / distance;
+				sBoatItem->Position.xPos = item->Position.xPos - x * radius / distance;
+				sBoatItem->Position.zPos = item->Position.zPos - z * radius / distance;
 			}
 
 			return;
@@ -356,7 +356,7 @@ void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNum)
 
 		// TODO: mine and gondola
 
-		item_number = item->nextItem;
+		item_number = item->NextItem;
 	}
 }
 
@@ -375,31 +375,31 @@ short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (z == zOld)
 		{
-			skidoo->pos.zPos += (old->z - pos->z);
-			skidoo->pos.xPos += (old->x - pos->x);
+			skidoo->Position.zPos += (old->z - pos->z);
+			skidoo->Position.xPos += (old->x - pos->x);
 		}
 		else if (z > zOld)
 		{
-			skidoo->pos.zPos -= shiftZ + 1;
-			return (pos->x - skidoo->pos.xPos);
+			skidoo->Position.zPos -= shiftZ + 1;
+			return (pos->x - skidoo->Position.xPos);
 		}
 		else
 		{
-			skidoo->pos.zPos += WALL_SIZE - shiftZ;
-			return (skidoo->pos.xPos - pos->x);
+			skidoo->Position.zPos += WALL_SIZE - shiftZ;
+			return (skidoo->Position.xPos - pos->x);
 		}
 	}
 	else if (z == zOld)
 	{
 		if (x > xOld)
 		{
-			skidoo->pos.xPos -= shiftX + 1;
-			return (skidoo->pos.zPos - pos->z);
+			skidoo->Position.xPos -= shiftX + 1;
+			return (skidoo->Position.zPos - pos->z);
 		}
 		else
 		{ 
-			skidoo->pos.xPos += WALL_SIZE - shiftX;
-			return (pos->z - skidoo->pos.zPos);
+			skidoo->Position.xPos += WALL_SIZE - shiftX;
+			return (pos->z - skidoo->Position.zPos);
 		}
 	}
 	else
@@ -407,7 +407,7 @@ short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		short roomNumber = skidoo->roomNumber;
+		short roomNumber = skidoo->RoomNumber;
 		FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
@@ -418,7 +418,7 @@ short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = WALL_SIZE - shiftZ;
 		}
 
-		roomNumber = skidoo->roomNumber;
+		roomNumber = skidoo->RoomNumber;
 		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
 		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
 		if (height < old->y - STEP_SIZE)
@@ -431,29 +431,29 @@ short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		if (x && z)
 		{
-			skidoo->pos.zPos += z;
-			skidoo->pos.xPos += x;
+			skidoo->Position.zPos += z;
+			skidoo->Position.xPos += x;
 		}
 		else if (z)
 		{
-			skidoo->pos.zPos += z;
+			skidoo->Position.zPos += z;
 			if (z > 0)
-				return (skidoo->pos.xPos - pos->x);
+				return (skidoo->Position.xPos - pos->x);
 			else
-				return (pos->x - skidoo->pos.xPos);
+				return (pos->x - skidoo->Position.xPos);
 		}
 		else if (x)
 		{
-			skidoo->pos.xPos += x;
+			skidoo->Position.xPos += x;
 			if (x > 0)
-				return (pos->z - skidoo->pos.zPos);
+				return (pos->z - skidoo->Position.zPos);
 			else
-				return (skidoo->pos.zPos - pos->z);
+				return (skidoo->Position.zPos - pos->z);
 		}
 		else
 		{
-			skidoo->pos.zPos += (old->z - pos->z);
-			skidoo->pos.xPos += (old->x - pos->x);
+			skidoo->Position.zPos += (old->z - pos->z);
+			skidoo->Position.xPos += (old->x - pos->x);
 		}
 	}
 
@@ -462,13 +462,13 @@ short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, PHD_VECTOR* moved)
 {
-	moved->x = sBoatItem->pos.xPos - moved->x;
-	moved->z = sBoatItem->pos.zPos - moved->z;
+	moved->x = sBoatItem->Position.xPos - moved->x;
+	moved->z = sBoatItem->Position.zPos - moved->z;
 
 	if (moved->x || moved->z)
 	{
-		float s = phd_sin(sBoatItem->pos.yRot);
-		float c = phd_cos(sBoatItem->pos.yRot);
+		float s = phd_sin(sBoatItem->Position.yRot);
+		float c = phd_cos(sBoatItem->Position.yRot);
 		
 		int front = moved->z * c + moved->x * s;
 		int side = -moved->z * s + moved->x * c;
@@ -520,11 +520,11 @@ int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y)
 
 int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 {
-	LaraInfo*& laraInfo = laraItem->data;
+	LaraInfo*& laraInfo = laraItem->Data;
 	auto sBoatItem = &g_Level.Items[itemNum];
-	BOAT_INFO* sBoatInfo = sBoatItem->data;
+	BOAT_INFO* sBoatInfo = sBoatItem->Data;
 
-	sBoatItem->pos.zRot -= sBoatInfo->tiltAngle;
+	sBoatItem->Position.zRot -= sBoatInfo->tiltAngle;
 
 	PHD_VECTOR old, fl_old, fr_old, bl_old, br_old, f_old;
 	auto hfl_old = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, -BOAT_SIDE, &fl_old);
@@ -533,9 +533,9 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 	auto hbr_old = SpeedBoatTestWaterHeight(sBoatItem, -BOAT_FRONT, BOAT_SIDE, &br_old);
 	auto hf_old  = SpeedBoatTestWaterHeight(sBoatItem, BOAT_TIP, 0, &f_old);
 
-	old.x = sBoatItem->pos.xPos;
-	old.y = sBoatItem->pos.yPos;
-	old.z = sBoatItem->pos.zPos;
+	old.x = sBoatItem->Position.xPos;
+	old.y = sBoatItem->Position.yPos;
+	old.z = sBoatItem->Position.zPos;
 
 	if (bl_old.y > hbl_old)
 		bl_old.y = hbl_old;
@@ -548,25 +548,25 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 	if (f_old.y > hf_old)
 		f_old.y = hf_old;
 
-	sBoatItem->pos.yRot += sBoatInfo->boatTurn + sBoatInfo->extraRotation;
+	sBoatItem->Position.yRot += sBoatInfo->boatTurn + sBoatInfo->extraRotation;
 	sBoatInfo->tiltAngle = sBoatInfo->boatTurn * 6;
 
-	sBoatItem->pos.xPos += sBoatItem->Velocity * phd_sin(sBoatItem->pos.yRot);
-	sBoatItem->pos.zPos += sBoatItem->Velocity * phd_cos(sBoatItem->pos.yRot);
+	sBoatItem->Position.xPos += sBoatItem->Velocity * phd_sin(sBoatItem->Position.yRot);
+	sBoatItem->Position.zPos += sBoatItem->Velocity * phd_cos(sBoatItem->Position.yRot);
 	
-	int slip = BOAT_SIDE_SLIP * phd_sin(sBoatItem->pos.zRot);
-	if (!slip && sBoatItem->pos.zRot)
-		slip = (sBoatItem->pos.zRot > 0) ? 1 : -1;
-	sBoatItem->pos.xPos += slip * phd_sin(sBoatItem->pos.yRot);
-	sBoatItem->pos.zPos -= slip * phd_cos(sBoatItem->pos.yRot);
+	int slip = BOAT_SIDE_SLIP * phd_sin(sBoatItem->Position.zRot);
+	if (!slip && sBoatItem->Position.zRot)
+		slip = (sBoatItem->Position.zRot > 0) ? 1 : -1;
+	sBoatItem->Position.xPos += slip * phd_sin(sBoatItem->Position.yRot);
+	sBoatItem->Position.zPos -= slip * phd_cos(sBoatItem->Position.yRot);
 	
-	slip = BOAT_SLIP * phd_sin(sBoatItem->pos.xRot);
-	if (!slip && sBoatItem->pos.xRot)
-		slip = (sBoatItem->pos.xRot > 0) ? 1 : -1;
-	sBoatItem->pos.xPos -= slip * phd_sin(sBoatItem->pos.yRot);
-	sBoatItem->pos.zPos -= slip * phd_cos(sBoatItem->pos.yRot);
+	slip = BOAT_SLIP * phd_sin(sBoatItem->Position.xRot);
+	if (!slip && sBoatItem->Position.xRot)
+		slip = (sBoatItem->Position.xRot > 0) ? 1 : -1;
+	sBoatItem->Position.xPos -= slip * phd_sin(sBoatItem->Position.yRot);
+	sBoatItem->Position.zPos -= slip * phd_cos(sBoatItem->Position.yRot);
 	
-	auto moved = PHD_VECTOR(sBoatItem->pos.xPos, 0, sBoatItem->pos.zPos);
+	auto moved = PHD_VECTOR(sBoatItem->Position.xPos, 0, sBoatItem->Position.zPos);
 
 	SpeedBoatDoBoatShift(sBoatItem, itemNum);
 
@@ -597,13 +597,13 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 	}
 
 	auto probe = GetCollisionResult(sBoatItem);
-	auto height = GetWaterHeight(sBoatItem->pos.xPos, sBoatItem->pos.yPos - 5, sBoatItem->pos.zPos, probe.RoomNumber);
+	auto height = GetWaterHeight(sBoatItem->Position.xPos, sBoatItem->Position.yPos - 5, sBoatItem->Position.zPos, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
-		height = GetFloorHeight(probe.Block, sBoatItem->pos.xPos, sBoatItem->pos.yPos - 5, sBoatItem->pos.zPos);
+		height = GetFloorHeight(probe.Block, sBoatItem->Position.xPos, sBoatItem->Position.yPos - 5, sBoatItem->Position.zPos);
 
-	if (height < sBoatItem->pos.yPos - CLICK(0.5f))
-		SpeedBoatDoShift(sBoatItem, (PHD_VECTOR*)&sBoatItem->pos, &old);
+	if (height < sBoatItem->Position.yPos - CLICK(0.5f))
+		SpeedBoatDoShift(sBoatItem, (PHD_VECTOR*)&sBoatItem->Position, &old);
 
 	sBoatInfo->extraRotation = rot;
 
@@ -612,13 +612,13 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 	int newspeed = 0;
 	if (slip || collide)
 	{
-		newspeed = (sBoatItem->pos.zPos - old.z) * phd_cos(sBoatItem->pos.yRot) + (sBoatItem->pos.xPos - old.x) * phd_sin(sBoatItem->pos.yRot);
+		newspeed = (sBoatItem->Position.zPos - old.z) * phd_cos(sBoatItem->Position.yRot) + (sBoatItem->Position.xPos - old.x) * phd_sin(sBoatItem->Position.yRot);
 
 		if (laraInfo->Vehicle == itemNum && sBoatItem->Velocity > BOAT_MAX_SPEED + BOAT_ACCELERATION && newspeed < sBoatItem->Velocity - 10)
 		{
-			laraItem->hitPoints -= sBoatItem->Velocity;
-			laraItem->hitStatus = 1;
-			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->pos, 0);
+			laraItem->HitPoints -= sBoatItem->Velocity;
+			laraItem->HitStatus = 1;
+			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Position, 0);
 			newspeed /= 2;
 			sBoatItem->Velocity /= 2;
 		}
@@ -645,12 +645,12 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 
 bool SpeedBoatUserControl(ITEM_INFO* sBoatItem)
 {
-	BOAT_INFO* sBoatInfo = (BOAT_INFO*)sBoatItem->data;
+	BOAT_INFO* sBoatInfo = (BOAT_INFO*)sBoatItem->Data;
 
 	bool noTurn = true;
 	int maxSpeed;
 	
-	if (sBoatItem->pos.yPos >= sBoatInfo->water - STEP_SIZE / 2 && sBoatInfo->water != NO_HEIGHT)
+	if (sBoatItem->Position.yPos >= sBoatInfo->water - STEP_SIZE / 2 && sBoatInfo->water != NO_HEIGHT)
 	{
 		if (!(TrInput & SBOAT_IN_DISMOUNT) && !(TrInput & IN_LOOK) ||
 			sBoatItem->Velocity)
@@ -737,53 +737,53 @@ bool SpeedBoatUserControl(ITEM_INFO* sBoatItem)
 
 void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 {
-	BOAT_INFO* sBoatInfo = sBoatItem->data;
+	BOAT_INFO* sBoatInfo = sBoatItem->Data;
 
-	if (laraItem->hitPoints <= 0)
+	if (laraItem->HitPoints <= 0)
 	{
-		if (laraItem->activeState != SBOAT_STATE_DEATH)
+		if (laraItem->ActiveState != SBOAT_STATE_DEATH)
 		{
-			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_DEATH;
-			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->activeState = laraItem->targetState = SBOAT_STATE_DEATH;
+			laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_DEATH;
+			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+			laraItem->ActiveState = laraItem->TargetState = SBOAT_STATE_DEATH;
 		}
 	}
-	else if (sBoatItem->pos.yPos < sBoatInfo->water - CLICK(0.5f) && sBoatItem->VerticalVelocity > 0)
+	else if (sBoatItem->Position.yPos < sBoatInfo->water - CLICK(0.5f) && sBoatItem->VerticalVelocity > 0)
 	{
-		if (laraItem->activeState != SBOAT_STATE_FALL)
+		if (laraItem->ActiveState != SBOAT_STATE_FALL)
 		{
-			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_LEAP_START;
-			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->activeState = laraItem->targetState = SBOAT_STATE_FALL;
+			laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_LEAP_START;
+			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+			laraItem->ActiveState = laraItem->TargetState = SBOAT_STATE_FALL;
 		}
 	}
 	else if (collide)
 	{
-		if (laraItem->activeState != SBOAT_STATE_HIT)
+		if (laraItem->ActiveState != SBOAT_STATE_HIT)
 		{
-			laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
-			laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-			laraItem->activeState = laraItem->targetState = SBOAT_STATE_HIT;
+			laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
+			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+			laraItem->ActiveState = laraItem->TargetState = SBOAT_STATE_HIT;
 		}
 	}
 	else
 	{
-		switch (laraItem->activeState)
+		switch (laraItem->ActiveState)
 		{
 		case SBOAT_STATE_IDLE:
 			if (TrInput & SBOAT_IN_DISMOUNT)
 			{
 				if (sBoatItem->Velocity == 0)
 				{
-					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->pos.yRot + ANGLE(90.0f)))
-						laraItem->targetState = SBOAT_STATE_DISMOUNT_RIGHT;
-					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->pos.yRot - ANGLE(90.0f)))
-						laraItem->targetState = SBOAT_STATE_DISMOUNT_LEFT;
+					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Position.yRot + ANGLE(90.0f)))
+						laraItem->TargetState = SBOAT_STATE_DISMOUNT_RIGHT;
+					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Position.yRot - ANGLE(90.0f)))
+						laraItem->TargetState = SBOAT_STATE_DISMOUNT_LEFT;
 				}
 			}
 
 			if (sBoatItem->Velocity > 0)
-				laraItem->targetState = SBOAT_STATE_MOVING;
+				laraItem->TargetState = SBOAT_STATE_MOVING;
 
 			break;
 
@@ -791,32 +791,32 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 			if (TrInput & SBOAT_IN_DISMOUNT)
 			{
 				if (TrInput & SBOAT_IN_RIGHT)
-					laraItem->targetState = SBOAT_STATE_DISMOUNT_RIGHT;
+					laraItem->TargetState = SBOAT_STATE_DISMOUNT_RIGHT;
 				else if (TrInput & SBOAT_IN_RIGHT)
-					laraItem->targetState = SBOAT_STATE_DISMOUNT_LEFT;
+					laraItem->TargetState = SBOAT_STATE_DISMOUNT_LEFT;
 			}
 			else if (sBoatItem->Velocity <= 0)
-				laraItem->targetState = SBOAT_STATE_IDLE;
+				laraItem->TargetState = SBOAT_STATE_IDLE;
 
 			break;
 
 		case SBOAT_STATE_FALL:
-			laraItem->targetState = SBOAT_STATE_MOVING;
+			laraItem->TargetState = SBOAT_STATE_MOVING;
 			break;
 
 		//case BOAT_TURNR:
 			if (sBoatItem->Velocity <= 0)
-				laraItem->targetState = SBOAT_STATE_IDLE;
+				laraItem->TargetState = SBOAT_STATE_IDLE;
 			else if (!(TrInput & SBOAT_IN_RIGHT))
-				laraItem->targetState = SBOAT_STATE_MOVING;
+				laraItem->TargetState = SBOAT_STATE_MOVING;
 
 			break;
 
 		case SBOAT_STATE_TURN_LEFT:
 			if (sBoatItem->Velocity <= 0)
-				laraItem->targetState = SBOAT_STATE_IDLE;
+				laraItem->TargetState = SBOAT_STATE_IDLE;
 			else if (!(TrInput & SBOAT_IN_LEFT))
-				laraItem->targetState = SBOAT_STATE_MOVING;
+				laraItem->TargetState = SBOAT_STATE_MOVING;
 
 			break;
 		}
@@ -855,9 +855,9 @@ void SpeedBoatSplash(ITEM_INFO* item, long fallspeed, long water)
 
 void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	LaraInfo*& laraInfo = laraItem->data;
+	LaraInfo*& laraInfo = laraItem->Data;
 
-	if (laraItem->hitPoints < 0 || laraInfo->Vehicle != NO_ITEM)
+	if (laraItem->HitPoints < 0 || laraInfo->Vehicle != NO_ITEM)
 		return;
 
 	auto sBoatItem = &g_Level.Items[itemNum];
@@ -870,45 +870,45 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		return;
 
 	case BoatMountType::WaterLeft:
-		laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_LEFT;
+		laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_LEFT;
 		break;
 
 	case BoatMountType::WaterRight:
-		laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_RIGHT;
+		laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_RIGHT;
 		break;
 
 	case BoatMountType::Jump:
-		laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_JUMP;
+		laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_MOUNT_JUMP;
 		break;
 
 	case BoatMountType::StartPosition:
-		laraItem->animNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_IDLE;
+		laraItem->AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_IDLE;
 		break;
 	}
 
 	laraInfo->waterStatus = LW_ABOVE_WATER;
-	laraItem->pos.xPos = sBoatItem->pos.xPos;
-	laraItem->pos.yPos = sBoatItem->pos.yPos - 5;
-	laraItem->pos.zPos = sBoatItem->pos.zPos;
-	laraItem->pos.yRot = sBoatItem->pos.yRot;
-	laraItem->pos.xRot = 0;
-	laraItem->pos.zRot = 0;
+	laraItem->Position.xPos = sBoatItem->Position.xPos;
+	laraItem->Position.yPos = sBoatItem->Position.yPos - 5;
+	laraItem->Position.zPos = sBoatItem->Position.zPos;
+	laraItem->Position.yRot = sBoatItem->Position.yRot;
+	laraItem->Position.xRot = 0;
+	laraItem->Position.zRot = 0;
 	laraItem->Airborne = false;
 	laraItem->Velocity = 0;
 	laraItem->VerticalVelocity = 0;
-	laraItem->frameNumber = g_Level.Anims[laraItem->animNumber].frameBase;
-	laraItem->activeState = SBOAT_STATE_MOUNT;
-	laraItem->targetState = SBOAT_STATE_MOUNT;
+	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+	laraItem->ActiveState = SBOAT_STATE_MOUNT;
+	laraItem->TargetState = SBOAT_STATE_MOUNT;
 
-	if (laraItem->roomNumber != sBoatItem->roomNumber)
-		ItemNewRoom(laraInfo->itemNumber, sBoatItem->roomNumber);
+	if (laraItem->RoomNumber != sBoatItem->RoomNumber)
+		ItemNewRoom(laraInfo->itemNumber, sBoatItem->RoomNumber);
 
 	AnimateItem(laraItem);
 
-	if (g_Level.Items[itemNum].status != ITEM_ACTIVE)
+	if (g_Level.Items[itemNum].Status != ITEM_ACTIVE)
 	{
 		AddActiveItem(itemNum);
-		g_Level.Items[itemNum].status = ITEM_ACTIVE;
+		g_Level.Items[itemNum].Status = ITEM_ACTIVE;
 	}
  
 	laraInfo->Vehicle = itemNum;
@@ -917,9 +917,9 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 void SpeedBoatControl(short itemNum)
 {
 	auto* laraItem = LaraItem;
-	LaraInfo*& laraInfo = laraItem->data;
+	LaraInfo*& laraInfo = laraItem->Data;
 	auto sBoatItem = &g_Level.Items[itemNum];
-	BOAT_INFO* sBoatInfo = sBoatItem->data;
+	BOAT_INFO* sBoatInfo = sBoatItem->Data;
 
 	PHD_VECTOR frontLeft, frontRight;
 	bool noTurn = true;
@@ -938,12 +938,12 @@ void SpeedBoatControl(short itemNum)
 		TestTriggers(sBoatItem, false);
 	}
 
-	auto water = GetWaterHeight(sBoatItem->pos.xPos, sBoatItem->pos.yPos, sBoatItem->pos.zPos, probe.RoomNumber);
+	auto water = GetWaterHeight(sBoatItem->Position.xPos, sBoatItem->Position.yPos, sBoatItem->Position.zPos, probe.RoomNumber);
 	sBoatInfo->water = water;
 
-	if (laraInfo->Vehicle == itemNum && laraItem->hitPoints > 0)
+	if (laraInfo->Vehicle == itemNum && laraItem->HitPoints > 0)
 	{
-		switch (laraItem->activeState)
+		switch (laraItem->ActiveState)
 		{
 		case SBOAT_STATE_MOUNT:
 		case SBOAT_STATE_DISMOUNT_RIGHT:
@@ -974,7 +974,7 @@ void SpeedBoatControl(short itemNum)
 			sBoatInfo->boatTurn = 0;
 	}
 
-	sBoatItem->floor = probe.Position.Floor - 5;
+	sBoatItem->Floor = probe.Position.Floor - 5;
 	if (sBoatInfo->water == NO_HEIGHT)
 		sBoatInfo->water = probe.Position.Floor;
 	else
@@ -983,7 +983,7 @@ void SpeedBoatControl(short itemNum)
 	sBoatInfo->leftFallspeed = SpeedBoatDoBoatDynamics(heightFrontLeft, sBoatInfo->leftFallspeed, (int*)&frontLeft.y);
 	sBoatInfo->rightFallspeed = SpeedBoatDoBoatDynamics(heightFrontRight, sBoatInfo->rightFallspeed, (int*)&frontRight.y);
 	auto ofs = sBoatItem->VerticalVelocity;
-	sBoatItem->VerticalVelocity = SpeedBoatDoBoatDynamics(sBoatInfo->water, sBoatItem->VerticalVelocity, (int*)&sBoatItem->pos.yPos);
+	sBoatItem->VerticalVelocity = SpeedBoatDoBoatDynamics(sBoatInfo->water, sBoatItem->VerticalVelocity, (int*)&sBoatItem->Position.yPos);
 	if (ofs - sBoatItem->VerticalVelocity > 32 && sBoatItem->VerticalVelocity == 0 && water != NO_HEIGHT)
 		SpeedBoatSplash(sBoatItem, ofs - sBoatItem->VerticalVelocity, water);
 
@@ -993,41 +993,41 @@ void SpeedBoatControl(short itemNum)
 	else
 		probe.Position.Floor /= 2;
 
-	short xRot = phd_atan(BOAT_FRONT, sBoatItem->pos.yPos - probe.Position.Floor);
+	short xRot = phd_atan(BOAT_FRONT, sBoatItem->Position.yPos - probe.Position.Floor);
 	short zRot = phd_atan(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
 
-	sBoatItem->pos.xRot += ((xRot - sBoatItem->pos.xRot) / 2);
-	sBoatItem->pos.zRot += ((zRot - sBoatItem->pos.zRot) / 2);
+	sBoatItem->Position.xRot += ((xRot - sBoatItem->Position.xRot) / 2);
+	sBoatItem->Position.zRot += ((zRot - sBoatItem->Position.zRot) / 2);
  
-	if (!xRot && abs(sBoatItem->pos.xRot) < 4)
-		sBoatItem->pos.xRot = 0;
-	if (!zRot && abs(sBoatItem->pos.zRot) < 4)
-		sBoatItem->pos.zRot = 0;
+	if (!xRot && abs(sBoatItem->Position.xRot) < 4)
+		sBoatItem->Position.xRot = 0;
+	if (!zRot && abs(sBoatItem->Position.zRot) < 4)
+		sBoatItem->Position.zRot = 0;
 
 	if (laraInfo->Vehicle == itemNum)
 	{
 		SpeedBoatAnimation(laraItem, sBoatItem, collide);
 
-		if (probe.RoomNumber != sBoatItem->roomNumber)
+		if (probe.RoomNumber != sBoatItem->RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
 			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
 		}
 
-		sBoatItem->pos.zRot += sBoatInfo->tiltAngle;
-		laraItem->pos.xPos = sBoatItem->pos.xPos;
-		laraItem->pos.yPos = sBoatItem->pos.yPos;
-		laraItem->pos.zPos = sBoatItem->pos.zPos;
-		laraItem->pos.xRot = sBoatItem->pos.xRot;
-		laraItem->pos.yRot = sBoatItem->pos.yRot;
-		laraItem->pos.zRot = sBoatItem->pos.zRot;
+		sBoatItem->Position.zRot += sBoatInfo->tiltAngle;
+		laraItem->Position.xPos = sBoatItem->Position.xPos;
+		laraItem->Position.yPos = sBoatItem->Position.yPos;
+		laraItem->Position.zPos = sBoatItem->Position.zPos;
+		laraItem->Position.xRot = sBoatItem->Position.xRot;
+		laraItem->Position.yRot = sBoatItem->Position.yRot;
+		laraItem->Position.zRot = sBoatItem->Position.zRot;
 
 		AnimateItem(laraItem);
 
-		if (laraItem->hitPoints > 0)
+		if (laraItem->HitPoints > 0)
 		{
-			sBoatItem->animNumber = Objects[ID_SPEEDBOAT].animIndex + (laraItem->animNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
-			sBoatItem->frameNumber = g_Level.Anims[sBoatItem->animNumber].frameBase + (laraItem->frameNumber - g_Level.Anims[laraItem->animNumber].frameBase);
+			sBoatItem->AnimNumber = Objects[ID_SPEEDBOAT].animIndex + (laraItem->AnimNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
+			sBoatItem->FrameNumber = g_Level.Anims[sBoatItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
 		}
 
 		Camera.targetElevation = -ANGLE(20.0f);
@@ -1035,19 +1035,19 @@ void SpeedBoatControl(short itemNum)
 	}
 	else
 	{
-		if (probe.RoomNumber != sBoatItem->roomNumber)
+		if (probe.RoomNumber != sBoatItem->RoomNumber)
 			ItemNewRoom(itemNum, probe.RoomNumber);
 
-		sBoatItem->pos.zRot += sBoatInfo->tiltAngle;
+		sBoatItem->Position.zRot += sBoatInfo->tiltAngle;
 	}
 
 	auto pitch = sBoatItem->Velocity;
 	sBoatInfo->pitch += ((pitch - sBoatInfo->pitch) / 4);
 
 	int fx = (sBoatItem->Velocity > 8) ? SFX_TR2_BOAT_MOVING : (drive ? SFX_TR2_BOAT_IDLE : SFX_TR2_BOAT_ACCELERATE);
-	SoundEffect(fx, &sBoatItem->pos, 0, sBoatInfo->pitch / (float)BOAT_MAX_SPEED);
+	SoundEffect(fx, &sBoatItem->Position, 0, sBoatInfo->pitch / (float)BOAT_MAX_SPEED);
 
-	if (sBoatItem->Velocity && water - 5 == sBoatItem->pos.yPos)
+	if (sBoatItem->Velocity && water - 5 == sBoatItem->Position.yPos)
 		DoBoatWakeEffect(sBoatItem);
 
 	if (laraInfo->Vehicle != itemNum)

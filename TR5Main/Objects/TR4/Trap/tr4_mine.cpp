@@ -17,8 +17,8 @@ namespace TEN::Entities::TR4
 	void InitialiseMine(short itemNum)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
-		if (item->triggerFlags)
-			item->meshBits = 0;
+		if (item->TriggerFlags)
+			item->MeshBits = 0;
 	}
 
 	void MineControl(short itemNum)
@@ -26,11 +26,11 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-		if (item->itemFlags[0] >= 150)
+		if (item->ItemFlags[0] >= 150)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0, 0.7f, 0.5f);
 
 			if (num > 0)
 			{
@@ -40,8 +40,8 @@ namespace TEN::Entities::TR4
 					{
 						SPHERE* sphere = &CreatureSpheres[i];
 
-						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->roomNumber);
-						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->roomNumber);
+						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->RoomNumber);
+						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->RoomNumber);
 						TriggerShockwave((PHD_3DPOS*)sphere, 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, 2048, 0);
 					}
 				}
@@ -52,26 +52,26 @@ namespace TEN::Entities::TR4
 
 			Weather.Flash(255, 192, 64, 0.03f);
 
-			short currentItemNumber = g_Level.Rooms[item->roomNumber].itemNumber;
+			short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 
 			// Make the sentry gun explode?
 			while (currentItemNumber != NO_ITEM)
 			{
 				ITEM_INFO* currentItem = &g_Level.Items[currentItemNumber];
 
-				if (currentItem->objectNumber == ID_SENTRY_GUN)
-					currentItem->meshBits &= ~0x40;
+				if (currentItem->ObjectNumber == ID_SENTRY_GUN)
+					currentItem->MeshBits &= ~0x40;
 
-				currentItemNumber = currentItem->nextItem;
+				currentItemNumber = currentItem->NextItem;
 			}
 
 			KillItem(itemNum);
 		}
 		else
 		{
-			item->itemFlags[0]++;
+			item->ItemFlags[0]++;
 
-			int fireOn = 4 * item->itemFlags[0];
+			int fireOn = 4 * item->ItemFlags[0];
 			if (fireOn > 255)
 				fireOn = 0;
 
@@ -80,11 +80,11 @@ namespace TEN::Entities::TR4
 				if (i == 0 || i > 5)
 				{
 					SPHERE* sphere = &CreatureSpheres[i];
-					AddFire(sphere->x, sphere->y, sphere->z, 2, item->roomNumber, fireOn);
+					AddFire(sphere->x, sphere->y, sphere->z, 2, item->RoomNumber, fireOn);
 				}
 			}
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 		}
 	}
 
@@ -92,28 +92,28 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (item->triggerFlags && !item->itemFlags[3])
+		if (item->TriggerFlags && !item->ItemFlags[3])
 		{
-			if (l->animNumber != LA_DETONATOR_USE
-				|| l->frameNumber < g_Level.Anims[l->animNumber].frameBase + 57)
+			if (l->AnimNumber != LA_DETONATOR_USE
+				|| l->FrameNumber < g_Level.Anims[l->AnimNumber].frameBase + 57)
 			{
 				if (TestBoundsCollide(item, l, 512))
 				{
-					TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, 0, item->roomNumber);
+					TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -2, 0, item->RoomNumber);
 					for (int i = 0; i < 2; i++)
-						TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -1, 0, item->roomNumber);
+						TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -1, 0, item->RoomNumber);
 
-					item->meshBits = 1;
+					item->MeshBits = 1;
 
 					ExplodeItemNode(item, 0, 0, 128);
 					KillItem(itemNum);
 
-					l->animNumber = LA_MINE_DEATH;
-					l->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					l->activeState = LS_DEATH;
+					l->AnimNumber = LA_MINE_DEATH;
+					l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+					l->ActiveState = LS_DEATH;
 					l->Velocity = 0;
 
-					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &item->pos, 0);
+					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &item->Position, 0);
 				}
 			}
 			else
@@ -123,38 +123,38 @@ namespace TEN::Entities::TR4
 					ITEM_INFO* currentItem = &g_Level.Items[i];
 
 					// Explode other mines
-					if (currentItem->objectNumber == ID_MINE
-						&& currentItem->status != ITEM_INVISIBLE
-						&& currentItem->triggerFlags == 0)
+					if (currentItem->ObjectNumber == ID_MINE
+						&& currentItem->Status != ITEM_INVISIBLE
+						&& currentItem->TriggerFlags == 0)
 					{
 						TriggerExplosionSparks(
-							currentItem->pos.xPos,
-							currentItem->pos.yPos,
-							currentItem->pos.zPos,
+							currentItem->Position.xPos,
+							currentItem->Position.yPos,
+							currentItem->Position.zPos,
 							3,
 							-2,
 							0,
-							currentItem->roomNumber);
+							currentItem->RoomNumber);
 
 						for (int j = 0; j < 2; j++)
 							TriggerExplosionSparks(
-								currentItem->pos.xPos,
-								currentItem->pos.yPos,
-								currentItem->pos.zPos,
+								currentItem->Position.xPos,
+								currentItem->Position.yPos,
+								currentItem->Position.zPos,
 								3,
 								-1,
 								0,
-								currentItem->roomNumber);
+								currentItem->RoomNumber);
 
-						currentItem->meshBits = 1;
+						currentItem->MeshBits = 1;
 
 						ExplodeItemNode(currentItem, 0, 0, -32);
 						KillItem(i);
 
 						if (!(GetRandomControl() & 3))
-							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->pos, 0);
+							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->Position, 0);
 
-						currentItem->status = ITEM_INVISIBLE;
+						currentItem->Status = ITEM_INVISIBLE;
 					}
 				}
 			}

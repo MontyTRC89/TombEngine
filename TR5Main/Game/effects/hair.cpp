@@ -56,7 +56,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
 
-	LaraInfo*& lara = item->data;
+	LaraInfo*& lara = item->Data;
 
 	if (framePtr == NULL)
 	{
@@ -206,10 +206,10 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 		Hairs[ponytail][0].pos.yPos = pos.y;
 		Hairs[ponytail][0].pos.zPos = pos.z;
 
-		short roomNumber = item->roomNumber;
-		int x = item->pos.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-		int y = item->pos.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
-		int z = item->pos.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
+		short roomNumber = item->RoomNumber;
+		int x = item->Position.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int y = item->Position.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+		int z = item->Position.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 		int wh = GetWaterHeight(x, y, z, roomNumber);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
@@ -227,7 +227,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 
 			// TR3 UPV uses a hack which forces Lara water status to dry. 
 			// Therefore, we can't directly use water status value to determine hair mode.
-			bool dryMode = (lara->waterStatus == LW_ABOVE_WATER) && (lara->Vehicle == -1 || g_Level.Items[lara->Vehicle].objectNumber != ID_UPV);
+			bool dryMode = (lara->waterStatus == LW_ABOVE_WATER) && (lara->Vehicle == -1 || g_Level.Items[lara->Vehicle].ObjectNumber != ID_UPV);
 
 			if (dryMode)
 			{

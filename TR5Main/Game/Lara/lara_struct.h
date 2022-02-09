@@ -1082,7 +1082,7 @@ struct ExtraRotation
 	short z;
 };
 
-struct LaraRope
+struct RopeControlData
 {
 	byte Segment;
 	byte Direction;
@@ -1163,7 +1163,7 @@ struct LaraInfo
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
 	CREATURE_INFO* creature;
-	LaraRope ropeParameters;
+	RopeControlData ropeParameters;
 	short interactedItem;
 	byte moveCount;
 	signed char location;

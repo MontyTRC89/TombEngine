@@ -84,20 +84,20 @@ void ControlFish(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	int leader = item->hitPoints;
+	int leader = item->HitPoints;
 	if (!LeaderInfo[leader].on)
 		SetupFish(leader, item);
 
-	if (item->triggerFlags & OCB_FISH_LETAL)  
+	if (item->TriggerFlags & OCB_FISH_LETAL)  
 	{
-		if ((item->triggerFlags == OCB_FISH_EAT_CARCASS) == 0)
-			pirahnaAttack = (LaraItem->roomNumber == item->roomNumber);
+		if ((item->TriggerFlags == OCB_FISH_EAT_CARCASS) == 0)
+			pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
 		else
 		{
 			if (CarcassItem != -1)
 				pirahnaAttack = 2;
 			else
-				pirahnaAttack = (LaraItem->roomNumber == item->roomNumber);
+				pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
 		}
 	}
 	else
@@ -115,7 +115,7 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->pos.xPos, fish->z + item->pos.zPos, enemy->pos.xPos, enemy->pos.zPos) + 0x4000)) / 16) & 4095;
+		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Position.xPos, fish->z + item->Position.zPos, enemy->Position.xPos, enemy->Position.zPos) + 0x4000)) / 16) & 4095;
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 	}
 
@@ -270,21 +270,21 @@ void ControlFish(short itemNumber)
 
 	for (int i = 0; i < 24; i++)
 	{
-		if (item->flags & OCB_FISH_LETAL)
+		if (item->Flags & OCB_FISH_LETAL)
 		{
 			PHD_3DPOS pos;
-			pos.xPos = item->pos.xPos + fish->x;
-			pos.yPos = item->pos.yPos + fish->y;
-			pos.zPos = item->pos.zPos + fish->z;
+			pos.xPos = item->Position.xPos + fish->x;
+			pos.yPos = item->Position.yPos + fish->y;
+			pos.zPos = item->Position.zPos + fish->z;
 			if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
 			{
 				if (PirahnaHitWait == 0)
 				{
-					DoBloodSplat(item->pos.xPos + fish->x, item->pos.yPos + fish->y, item->pos.zPos + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->roomNumber : enemy->roomNumber);
+					DoBloodSplat(item->Position.xPos + fish->x, item->Position.yPos + fish->y, item->Position.zPos + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
 					PirahnaHitWait = 8;
 				}
 				if (pirahnaAttack != 2)
-					LaraItem->hitPoints -= PIRAHNA_DAMAGE;
+					LaraItem->HitPoints -= PIRAHNA_DAMAGE;
 			}
 		}
 
@@ -375,7 +375,7 @@ void ControlFish(short itemNumber)
 		}
 		else
 		{
-			int y = enemy->pos.yPos - item->pos.yPos;
+			int y = enemy->Position.yPos - item->Position.yPos;
 			if (abs(fish->y - fish->destY) < 16)
 				fish->destY = y + (GetRandomControl() & 255); 
 		}
@@ -387,9 +387,9 @@ void ControlFish(short itemNumber)
 
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 {
-	int x = pos->xPos - item->pos.xPos;
-	int y = abs(pos->yPos - item->pos.yPos);
-	int z = pos->zPos - item->pos.zPos;
+	int x = pos->xPos - item->Position.xPos;
+	int y = abs(pos->yPos - item->Position.yPos);
+	int z = pos->zPos - item->Position.zPos;
 
 	if (x < -distance || x > distance || z < -distance || z > distance || y < -WALL_SIZE * 3 || y > WALL_SIZE * 3)
 		return false;

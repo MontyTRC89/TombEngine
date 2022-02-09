@@ -36,7 +36,7 @@ namespace TEN::Entities::TR4
 
     static bool isBatCollideTarget(ITEM_INFO* item)
     {
-        return item->touchBits >= 0;
+        return item->TouchBits >= 0;
     }
 
     void InitialiseBat(short itemNumber)
@@ -45,10 +45,10 @@ namespace TEN::Entities::TR4
 
         InitialiseCreature(itemNumber);
 
-        item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_IDLE;
-        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-        item->targetState = STATE_BAT_IDLE;
-        item->activeState = STATE_BAT_IDLE;
+        item->AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
+        item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+        item->TargetState = STATE_BAT_IDLE;
+        item->ActiveState = STATE_BAT_IDLE;
     }
 
     void BatControl(short itemNumber)
@@ -66,9 +66,9 @@ namespace TEN::Entities::TR4
         bat = GetCreatureInfo(item);
         angle = 0;
 
-        if (item->hitPoints > 0)
+        if (item->HitPoints > 0)
         {
-            if (item->aiBits)
+            if (item->AIBits)
             {
                 GetAITarget(bat);
             }
@@ -120,13 +120,13 @@ namespace TEN::Entities::TR4
 
             angle = CreatureTurn(item, BAT_ANGLE);
 
-            switch (item->activeState)
+            switch (item->ActiveState)
             {
             case STATE_BAT_IDLE:
                 if (info.distance < BAT_TARGETING_RANGE
-                    || item->hitStatus
+                    || item->HitStatus
                     || bat->hurtByLara)
-                    item->targetState = STATE_BAT_START;
+                    item->TargetState = STATE_BAT_START;
                 break;
 
             case STATE_BAT_FLY:
@@ -135,63 +135,63 @@ namespace TEN::Entities::TR4
 
                 if (!bat->flags)
                 {
-                    if (item->touchBits
+                    if (item->TouchBits
                         || bat->enemy != LaraItem
                         && info.distance < BAT_ATTACK_RANGE
                         && info.ahead
-                        && abs(item->pos.yPos - bat->enemy->pos.yPos) < BAT_TARGET_YPOS)
+                        && abs(item->Position.yPos - bat->enemy->Position.yPos) < BAT_TARGET_YPOS)
                     {
-                        item->targetState = STATE_BAT_ATK;
+                        item->TargetState = STATE_BAT_ATK;
                     }
                 }
                 break;
 
             case STATE_BAT_ATK:
                 if (!bat->flags
-                    && (item->touchBits
+                    && (item->TouchBits
                         || bat->enemy != LaraItem)
                     && info.distance < BAT_ATTACK_RANGE
                     && info.ahead &&
-                    abs(item->pos.yPos - bat->enemy->pos.yPos) < BAT_TARGET_YPOS)
+                    abs(item->Position.yPos - bat->enemy->Position.yPos) < BAT_TARGET_YPOS)
                 {
                     CreatureEffect(item, &batBite, DoBloodSplat);
                     if (bat->enemy == LaraItem)
                     {
-                        LaraItem->hitPoints -= BAT_DAMAGE;
-                        LaraItem->hitStatus = true;
+                        LaraItem->HitPoints -= BAT_DAMAGE;
+                        LaraItem->HitStatus = true;
                     }
                     bat->flags = 1;
                 }
                 else
                 {
-                    item->targetState = STATE_BAT_FLY;
+                    item->TargetState = STATE_BAT_FLY;
                     bat->mood = BORED_MOOD;
                 }
                 break;
             }
         }
-        else if (item->activeState == STATE_BAT_ATK)
+        else if (item->ActiveState == STATE_BAT_ATK)
         {
-            item->animNumber = Objects[item->objectNumber].animIndex + 1;
-            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-            item->targetState = STATE_BAT_FLY;
-            item->activeState = STATE_BAT_FLY;
+            item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+            item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+            item->TargetState = STATE_BAT_FLY;
+            item->ActiveState = STATE_BAT_FLY;
         }
         else
         {
-            if (item->pos.yPos >= item->floor)
+            if (item->Position.yPos >= item->Floor)
             {
-                item->targetState = STATE_BAT_DEATH;
-                item->pos.yPos = item->floor;
+                item->TargetState = STATE_BAT_DEATH;
+                item->Position.yPos = item->Floor;
                 item->Airborne = false;
             }
             else
             {
                 item->Airborne = true;
-                item->animNumber = Objects[item->objectNumber].animIndex + BAT_ANIM_FALLING;
-                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-                item->targetState = STATE_BAT_FALLING;
-                item->activeState = STATE_BAT_FALLING;
+                item->AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALLING;
+                item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+                item->TargetState = STATE_BAT_FALLING;
+                item->ActiveState = STATE_BAT_FALLING;
                 item->Velocity = 0;
             }
         }

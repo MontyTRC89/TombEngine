@@ -15,10 +15,10 @@ void InitialiseReaper(short itemNum)
     ClearItem(itemNum);
 
     item = &g_Level.Items[itemNum];
-    item->animNumber = Objects[item->objectNumber].animIndex + 1;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = 2;
-    item->activeState = 2;
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = 2;
+    item->ActiveState = 2;
 }
 
 void ReaperControl(short itemNumber)
@@ -26,9 +26,9 @@ void ReaperControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
 			creature->enemy = LaraItem;
@@ -40,25 +40,25 @@ void ReaperControl(short itemNumber)
 
 		short angle = CreatureTurn(item, ANGLE(2));
 
-		if (item->activeState == 2 
+		if (item->ActiveState == 2 
 			&& !(GetRandomControl() & 0x3F))
-			item->targetState = 1;
+			item->TargetState = 1;
 
 		if (creature->reachedGoal)
 		{
 			if (creature->enemy)
 			{
-				if (creature->enemy->flags & 2)
-					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
+				if (creature->enemy->Flags & 2)
+					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
 
-				item->itemFlags[3]++;
+				item->ItemFlags[3]++;
 
 				creature->reachedGoal = false;
 				creature->enemy = NULL;
 			}
 		}
 
-		item->pos.xRot = -12288;
+		item->Position.xRot = -12288;
 		CreatureAnimation(itemNumber, angle, 0);
 		CreatureUnderwater(item, 1024);
 	}

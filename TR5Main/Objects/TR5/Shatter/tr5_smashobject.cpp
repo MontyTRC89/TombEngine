@@ -9,11 +9,11 @@
 void InitialiseSmashObject(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->flags = 0;
-	item->meshBits = 1;
+	item->Flags = 0;
+	item->MeshBits = 1;
 
-	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-	FLOOR_INFO* floor = GetSector(r, item->pos.xPos - r->x, item->pos.zPos - r->z);
+	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
+	FLOOR_INFO* floor = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z);
 	BOX_INFO* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
@@ -22,25 +22,25 @@ void InitialiseSmashObject(short itemNumber)
 void SmashObject(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	ROOM_INFO* r = &g_Level.Rooms[item->roomNumber];
-	int sector = ((item->pos.zPos - r->z) / 1024) + r->zSize * ((item->pos.xPos - r->x) / 1024);
+	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
+	int sector = ((item->Position.zPos - r->z) / 1024) + r->zSize * ((item->Position.xPos - r->x) / 1024);
 
 	BOX_INFO* box = &g_Level.Boxes[r->floor[sector].Box];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 
-	SoundEffect(SFX_TR5_SMASH_GLASS, &item->pos, 0);
+	SoundEffect(SFX_TR5_SMASH_GLASS, &item->Position, 0);
 
-	item->collidable = 0;
-	item->meshBits = 0xFFFE;
+	item->Collidable = 0;
+	item->MeshBits = 0xFFFE;
 
 	ExplodingDeath(itemNumber, -1, 257);
 
-	item->flags |= IFLAG_INVISIBLE;
+	item->Flags |= IFLAG_INVISIBLE;
 
-	if (item->status == ITEM_ACTIVE)
+	if (item->Status == ITEM_ACTIVE)
 		RemoveActiveItem(itemNumber);
-	item->status = ITEM_DEACTIVATED;
+	item->Status = ITEM_DEACTIVATED;
 }
 
 void SmashObjectControl(short itemNumber)

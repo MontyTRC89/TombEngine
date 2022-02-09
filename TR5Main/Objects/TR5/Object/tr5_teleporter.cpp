@@ -175,45 +175,45 @@ void ControlTeleporter(short itemNumber)
 
 	Lara.uncontrollable = false;
 
-	if (item->triggerFlags == 666)
+	if (item->TriggerFlags == 666)
 	{
-		if (item->itemFlags[0] == 70)
+		if (item->ItemFlags[0] == 70)
 		{
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
 			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);
 		}
 
-		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->targetState = LS_MISC_CONTROL;
-		LaraItem->activeState = LS_MISC_CONTROL;
+		LaraItem->AnimNumber = LA_ELEVATOR_RECOVER;
+		LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
+		LaraItem->TargetState = LS_MISC_CONTROL;
+		LaraItem->ActiveState = LS_MISC_CONTROL;
 
-		item->itemFlags[0]++;
-		if (item->itemFlags[0] >= 150)
+		item->ItemFlags[0]++;
+		if (item->ItemFlags[0] >= 150)
 			KillItem(itemNumber);
 	}
 	else
 	{
 		Camera.fixedCamera = true;
-		LaraItem->pos.xPos = item->pos.xPos;
-		LaraItem->pos.zPos = item->pos.zPos;
-		LaraItem->pos.yRot = item->pos.yRot - ANGLE(180.0f);
+		LaraItem->Position.xPos = item->Position.xPos;
+		LaraItem->Position.zPos = item->Position.zPos;
+		LaraItem->Position.yRot = item->Position.yRot - ANGLE(180.0f);
 
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		LaraItem->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		short roomNumber = item->RoomNumber;
+		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+		LaraItem->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
-		if (LaraItem->roomNumber != roomNumber)
+		if (LaraItem->RoomNumber != roomNumber)
 			ItemNewRoom(Lara.itemNumber, roomNumber);
 
-		if (item->flags & ONESHOT)
+		if (item->Flags & ONESHOT)
 		{
 			KillItem(itemNumber);
 		}
-		else if (item->triggerFlags != 512)
+		else if (item->TriggerFlags != 512)
 		{
 			RemoveActiveItem(itemNumber);
-			item->flags &= 0xC1FFu;
+			item->Flags &= 0xC1FFu;
 		}
 	}
 }

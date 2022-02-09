@@ -42,60 +42,60 @@ enum ItemFlags
 
 struct ITEM_INFO
 {
-	std::string luaName;
-	GAME_OBJECT_ID objectNumber;
-	int boxNumber;
+	std::string LuaName;
+	GAME_OBJECT_ID ObjectNumber;
+	int BoxNumber;
 
-	PHD_3DPOS startPos;
-	PHD_3DPOS pos;
-	ROOM_VECTOR location;
-	short roomNumber;
-	int floor;
-	std::vector<BONE_MUTATOR> mutator;
+	PHD_3DPOS StartPosition;
+	PHD_3DPOS Position;
+	ROOM_VECTOR Location;
+	short RoomNumber;
+	int Floor;
+	std::vector<BONE_MUTATOR> Mutator;
 
-	int animNumber;
-	int frameNumber;
-	int activeState;
-	int targetState;
-	int requiredState; // TODO: Phase out this weird feature.
+	int AnimNumber;
+	int FrameNumber;
+	int ActiveState;
+	int TargetState;
+	int RequiredState; // TODO: Phase out this weird feature.
 
-	ITEM_DATA data;
+	ITEM_DATA Data;
 
-	uint32_t touchBits;
-	uint32_t meshBits;
+	uint32_t TouchBits;
+	uint32_t MeshBits;
 
-	short nextItem;
-	short nextActive;
+	short NextItem;
+	short NextActive;
 
 	short Velocity;
 	short VerticalVelocity;
 	bool Airborne;
 
-	short hitPoints;
-	short timer;
-	short shade;
-	short carriedItem;
-	short afterDeath;
-	short firedWeapon;
+	short HitPoints;
+	short Timer;
+	short Shade;
+	short CarriedItem;
+	short AfterDeath;
+	short FiredWeapon;
 
-	short itemFlags[8];
-	short triggerFlags;
-	uint16_t flags; // ItemFlags enum
-	uint8_t aiBits; // AIObjectType enum
-	uint32_t swapMeshFlags;
+	short ItemFlags[8];
+	short TriggerFlags;
+	uint16_t Flags; // ItemFlags enum
+	uint8_t AIBits; // AIObjectType enum
+	uint32_t SwapMeshFlags;
 
-	bool active;
-	short status; // ItemStatus enum
-	bool hitStatus;
-	bool collidable;
-	bool lookedAt;
-	bool poisoned;
-	bool inDrawRoom;
-	bool friendly;
+	bool Active;
+	short Status; // ItemStatus enum
+	bool HitStatus;
+	bool Collidable;
+	bool LookedAt;
+	bool Poisoned;
+	bool InDrawRoom;
+	bool Friendly;
 
-	short drawRoom;
-	short TOSSPAD;
-	short locationAI;
+	short DrawRoom;
+	short Tosspad;
+	short LocationAI;
 };
 
 // used by fx->shade !

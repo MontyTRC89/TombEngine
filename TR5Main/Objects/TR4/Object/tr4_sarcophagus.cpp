@@ -24,9 +24,9 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TrInput & IN_ACTION &&
-		item->status != ITEM_ACTIVE &&
-		l->activeState == LS_IDLE &&
-		l->animNumber == LA_STAND_IDLE &&
+		item->Status != ITEM_ACTIVE &&
+		l->ActiveState == LS_IDLE &&
+		l->AnimNumber == LA_STAND_IDLE &&
 		Lara.gunStatus == LG_HANDS_FREE ||
 		Lara.isMoving && Lara.interactedItem == itemNum)
 	{
@@ -34,13 +34,13 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{
-				l->animNumber = LA_PICKUP_SARCOPHAGUS;
-				l->activeState = LS_MISC_CONTROL;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				item->flags |= IFLAG_ACTIVATION_MASK;
+				l->AnimNumber = LA_PICKUP_SARCOPHAGUS;
+				l->ActiveState = LS_MISC_CONTROL;
+				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+				item->Flags |= IFLAG_ACTIVATION_MASK;
 
 				AddActiveItem(itemNum);
-				item->status = ITEM_ACTIVE;
+				item->Status = ITEM_ACTIVE;
 
 				Lara.isMoving = false;
 				ResetLaraFlex(l);
@@ -60,25 +60,25 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 	}
-	else if (l->animNumber != LA_PICKUP_SARCOPHAGUS || l->frameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+	else if (l->AnimNumber != LA_PICKUP_SARCOPHAGUS || l->FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNum, l, coll);
 	}
 	else
 	{
 		short linknum;
-		for (linknum = g_Level.Items[g_Level.Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+		for (linknum = g_Level.Items[g_Level.Rooms[item->RoomNumber].itemNumber].NextItem; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 		{
 			ITEM_INFO* currentItem = &g_Level.Items[linknum];
 
-			if (linknum != itemNum && currentItem->pos.xPos == item->pos.xPos && currentItem->pos.zPos == item->pos.zPos)
+			if (linknum != itemNum && currentItem->Position.xPos == item->Position.xPos && currentItem->Position.zPos == item->Position.zPos)
 			{
-				if (Objects[currentItem->objectNumber].isPickup)
+				if (Objects[currentItem->ObjectNumber].isPickup)
 				{
-					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->objectNumber), 0);
-					currentItem->status = ITEM_ACTIVE;
-					currentItem->itemFlags[3] = 1;
-					AddDisplayPickup(currentItem->objectNumber);
+					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->ObjectNumber), 0);
+					currentItem->Status = ITEM_ACTIVE;
+					currentItem->ItemFlags[3] = 1;
+					AddDisplayPickup(currentItem->ObjectNumber);
 				}
 			}
 		}

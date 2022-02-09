@@ -1999,7 +1999,7 @@ void GuiController::UseCurrentItem()
 	OldBinocular = BinocularRange;
 	Lara.oldBusy = false;
 	BinocularRange = 0;
-	LaraItem->meshBits = -1;
+	LaraItem->MeshBits = -1;
 	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	gmeobject = inventry_objects_list[invobject].object_number;
 
@@ -2039,12 +2039,12 @@ void GuiController::UseCurrentItem()
 		{
 			if (Lara.gunStatus == LG_HANDS_FREE)
 			{
-				if (LaraItem->activeState != LS_CRAWL_IDLE &&
-					LaraItem->activeState != LS_CRAWL_FORWARD &&
-					LaraItem->activeState != LS_CRAWL_TURN_LEFT &&
-					LaraItem->activeState != LS_CRAWL_TURN_RIGHT &&
-					LaraItem->activeState != LS_CRAWL_BACK &&
-					LaraItem->activeState != LS_CRAWL_TO_HANG)
+				if (LaraItem->ActiveState != LS_CRAWL_IDLE &&
+					LaraItem->ActiveState != LS_CRAWL_FORWARD &&
+					LaraItem->ActiveState != LS_CRAWL_TURN_LEFT &&
+					LaraItem->ActiveState != LS_CRAWL_TURN_RIGHT &&
+					LaraItem->ActiveState != LS_CRAWL_BACK &&
+					LaraItem->ActiveState != LS_CRAWL_TO_HANG)
 				{
 					if (Lara.gunType != WEAPON_FLARE)
 					{
@@ -2065,7 +2065,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->activeState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
+			if (((LaraItem->ActiveState == LS_IDLE && LaraItem->AnimNumber == LA_STAND_IDLE)
 				|| (Lara.isLow && !(TrInput & IN_CROUCH)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
@@ -2086,7 +2086,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.poisoned)
 			{
 				SayNo();
 				return;
@@ -2098,10 +2098,10 @@ void GuiController::UseCurrentItem()
 					Lara.NumSmallMedipacks--;
 
 				Lara.poisoned = 0;
-				LaraItem->hitPoints += 500;
+				LaraItem->HitPoints += 500;
 
-				if (LaraItem->hitPoints > 1000)
-					LaraItem->hitPoints = 1000;
+				if (LaraItem->HitPoints > 1000)
+					LaraItem->HitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2113,7 +2113,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.poisoned)
 			{
 				SayNo();
 				return;
@@ -2125,7 +2125,7 @@ void GuiController::UseCurrentItem()
 					Lara.NumLargeMedipacks--;
 
 				Lara.poisoned = 0;
-				LaraItem->hitPoints = 1000;
+				LaraItem->HitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2149,15 +2149,15 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (LaraItem->activeState == LS_CRAWL_IDLE ||
-		LaraItem->activeState == LS_CRAWL_FORWARD ||
-		LaraItem->activeState == LS_CRAWL_TURN_LEFT ||
-		LaraItem->activeState == LS_CRAWL_TURN_RIGHT ||
-		LaraItem->activeState == LS_CRAWL_BACK ||
-		LaraItem->activeState == LS_CRAWL_TO_HANG ||
-		LaraItem->activeState == LS_CROUCH_IDLE ||
-		LaraItem->activeState == LS_CROUCH_TURN_LEFT ||
-		LaraItem->activeState == LS_CROUCH_TURN_RIGHT)
+	if (LaraItem->ActiveState == LS_CRAWL_IDLE ||
+		LaraItem->ActiveState == LS_CRAWL_FORWARD ||
+		LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
+		LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||
+		LaraItem->ActiveState == LS_CRAWL_BACK ||
+		LaraItem->ActiveState == LS_CRAWL_TO_HANG ||
+		LaraItem->ActiveState == LS_CROUCH_IDLE ||
+		LaraItem->ActiveState == LS_CROUCH_TURN_LEFT ||
+		LaraItem->ActiveState == LS_CROUCH_TURN_RIGHT)
 	{
 		SayNo();
 		return;
@@ -3279,8 +3279,8 @@ void GuiController::DrawCompass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
-	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
-	short compass_angle = (LaraItem->pos.yRot + compass_speed) - ANGLE(180);
+	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->Position.yRot);
+	short compass_angle = (LaraItem->Position.yRot + compass_speed) - ANGLE(180);
 	Matrix::CreateRotationY(compass_angle);
 }
 

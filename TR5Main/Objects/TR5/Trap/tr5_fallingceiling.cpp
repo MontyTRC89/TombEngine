@@ -10,42 +10,42 @@ void FallingCeilingControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->activeState)
+	if (item->ActiveState)
 	{
-		if (item->activeState == 1 && item->touchBits)
+		if (item->ActiveState == 1 && item->TouchBits)
 		{
-			LaraItem->hitPoints -= 300;
-			LaraItem->hitStatus = true;
+			LaraItem->HitPoints -= 300;
+			LaraItem->HitStatus = true;
 		}
 	}
 	else
 	{
-		item->targetState = 1;
+		item->TargetState = 1;
 		item->Airborne = true;;
 	}
 
 	AnimateItem(item);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->Status == ITEM_DEACTIVATED)
 	{
 		RemoveActiveItem(itemNumber);
 	}
 	else
 	{
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		short roomNumber = item->RoomNumber;
+		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+		item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
-		if (roomNumber != item->roomNumber)
+		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (item->activeState == 1)
+		if (item->ActiveState == 1)
 		{
-			if (item->pos.yPos >= item->floor)
+			if (item->Position.yPos >= item->Floor)
 			{
-				item->pos.yPos = item->floor;
+				item->Position.yPos = item->Floor;
 				item->Airborne = false;
-				item->targetState = 2;
+				item->TargetState = 2;
 				item->VerticalVelocity = 0;
 			}
 		}
