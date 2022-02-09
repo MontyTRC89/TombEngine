@@ -163,7 +163,7 @@ static void FireSubHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		AddActiveItem(itemNum);
 
-		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
+		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &LaraItem->pos, 2);
 
 		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
 			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
