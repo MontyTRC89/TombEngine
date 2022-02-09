@@ -381,7 +381,7 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 
 	if (!laraInfo->currentActive)
 	{
-		int absVel = abs(laraInfo->currentVel.x);
+		int absVel = abs(laraInfo->Control.ExtraVelocity.x);
 		int shift;
 
 		if (absVel > 16)
@@ -391,12 +391,12 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		else
 			shift = 2;
 
-		laraInfo->currentVel.x -= laraInfo->currentVel.x >> shift;
+		laraInfo->Control.ExtraVelocity.x -= laraInfo->Control.ExtraVelocity.x >> shift;
 
-		if (abs(laraInfo->currentVel.x) < 4)
-			laraInfo->currentVel.x = 0;
+		if (abs(laraInfo->Control.ExtraVelocity.x) < 4)
+			laraInfo->Control.ExtraVelocity.x = 0;
 
-		absVel = abs(laraInfo->currentVel.z);
+		absVel = abs(laraInfo->Control.ExtraVelocity.z);
 		if (absVel > 16)
 			shift = 4;
 		else if (absVel > 8)
@@ -404,11 +404,11 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		else
 			shift = 2;
 
-		laraInfo->currentVel.z -= laraInfo->currentVel.z >> shift;
-		if (abs(laraInfo->currentVel.z) < 4)
-			laraInfo->currentVel.z = 0;
+		laraInfo->Control.ExtraVelocity.z -= laraInfo->Control.ExtraVelocity.z >> shift;
+		if (abs(laraInfo->Control.ExtraVelocity.z) < 4)
+			laraInfo->Control.ExtraVelocity.z = 0;
 
-		if (laraInfo->currentVel.x == 0 && laraInfo->currentVel.z == 0)
+		if (laraInfo->Control.ExtraVelocity.x == 0 && laraInfo->Control.ExtraVelocity.z == 0)
 			return;
 	}
 	else
@@ -429,12 +429,12 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 
-		laraInfo->currentVel.x += (dx - laraInfo->currentVel.x) / 16;
-		laraInfo->currentVel.z += (dz - laraInfo->currentVel.z) / 16;
+		laraInfo->Control.ExtraVelocity.x += (dx - laraInfo->Control.ExtraVelocity.x) / 16;
+		laraInfo->Control.ExtraVelocity.z += (dz - laraInfo->Control.ExtraVelocity.z) / 16;
 	}
 
-	kayakItem->Position.xPos += laraInfo->currentVel.x / 256;
-	kayakItem->Position.zPos += laraInfo->currentVel.z / 256;
+	kayakItem->Position.xPos += laraInfo->Control.ExtraVelocity.x / 256;
+	kayakItem->Position.zPos += laraInfo->Control.ExtraVelocity.z / 256;
 
 	laraInfo->currentActive = 0;
 }
@@ -751,7 +751,7 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_IDLE:
 		if (TrInput & KAYAK_IN_DISMOUNT &&
 			!laraInfo->currentActive &&
-			!laraInfo->currentVel.x && !laraInfo->currentVel.z)
+			!laraInfo->Control.ExtraVelocity.x && !laraInfo->Control.ExtraVelocity.z)
 		{
 			if (TrInput & KAYAK_IN_LEFT && KayakCanGetOut(kayakItem, -1))
 			{
@@ -797,15 +797,15 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 		}
 		else if (TrInput & KAYAK_IN_HOLD_LEFT &&
 			(kayakInfo->Vel ||
-				laraInfo->currentVel.x ||
-				laraInfo->currentVel.z))
+				laraInfo->Control.ExtraVelocity.x ||
+				laraInfo->Control.ExtraVelocity.z))
 		{
 			laraItem->TargetState = KAYAK_STATE_HOLD_LEFT;
 		}
 		else if (TrInput & KAYAK_IN_HOLD_RIGHT &&
 			(kayakInfo->Vel ||
-				laraInfo->currentVel.x ||
-				laraInfo->currentVel.z))
+				laraInfo->Control.ExtraVelocity.x ||
+				laraInfo->Control.ExtraVelocity.z))
 		{
 			laraItem->TargetState = KAYAK_STATE_HOLD_RIGHT;
 		}
@@ -961,8 +961,8 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_HOLD_LEFT:
 		if (!(TrInput & KAYAK_IN_HOLD_LEFT) ||
 			!kayakInfo->Vel &&
-				!laraInfo->currentVel.x &&
-				!laraInfo->currentVel.z)
+				!laraInfo->Control.ExtraVelocity.x &&
+				!laraInfo->Control.ExtraVelocity.z)
 		{
 			laraItem->TargetState = KAYAK_STATE_IDLE;
 		}
@@ -997,8 +997,8 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	case KAYAK_STATE_HOLD_RIGHT:
 		if (!(TrInput & KAYAK_IN_HOLD_RIGHT) ||
 			(!kayakInfo->Vel &&
-				!laraInfo->currentVel.x &&
-				!laraInfo->currentVel.z))
+				!laraInfo->Control.ExtraVelocity.x &&
+				!laraInfo->Control.ExtraVelocity.z))
 		{
 			laraItem->TargetState = KAYAK_STATE_IDLE;
 		}
@@ -1225,7 +1225,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
-			laraInfo->Flare.FlareControlLeft = 0;
+			laraInfo->Flare.ControlLeft = 0;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}
 
@@ -1357,8 +1357,8 @@ int KayakControl(ITEM_INFO* laraItem)
 	}
 
 	if (!kayakItem->Velocity &&
-		!laraInfo->currentVel.x &&
-		!laraInfo->currentVel.z)
+		!laraInfo->Control.ExtraVelocity.x &&
+		!laraInfo->Control.ExtraVelocity.z)
 	{
 		if (WakeShade)
 			WakeShade--;

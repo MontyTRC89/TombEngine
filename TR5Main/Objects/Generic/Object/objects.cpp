@@ -111,7 +111,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->AnimNumber != LA_STAND_IDLE
 		|| l->Status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
-		&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
+		&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
 	{
 #ifdef NEW_TIGHTROPE
 		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
@@ -148,7 +148,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->ActiveState = LS_TIGHTROPE_ENTER;
 				l->AnimNumber = LA_TIGHTROPE_START;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 #ifdef NEW_TIGHTROPE
 				Lara.tightrope.balance = 0;
@@ -171,8 +171,8 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.interactedItem == itemNum)
-				Lara.isMoving = false;
+			if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				Lara.Control.IsMoving = false;
 			item->Position.yRot += -ANGLE(180);
 		}
 	}

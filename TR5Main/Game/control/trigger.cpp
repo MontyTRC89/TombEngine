@@ -725,7 +725,7 @@ void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 void ProcessSectorFlags(FLOOR_INFO* floor)
 {
 	// Monkeyswing
-	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
+	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;
 
 	// Burn Lara
 	if (floor->Flags.Death && (LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LARA_STATE)LaraItem->ActiveState) || Lara.waterStatus))
@@ -733,7 +733,7 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 
 	// Set climb status
 	if ((1 << (GetQuadrant(LaraItem->Position.yRot) + 8)) & GetClimbFlags(floor))
-		Lara.climbStatus = true;
+		Lara.Control.CanClimbLadder = true;
 	else
-		Lara.climbStatus = false;
+		Lara.Control.CanClimbLadder = false;
 }

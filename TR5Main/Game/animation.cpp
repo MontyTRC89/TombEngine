@@ -51,10 +51,10 @@ void AnimateLara(ITEM_INFO* item)
 					item->VerticalVelocity = *(cmd++);
 					item->Velocity = *(cmd++);
 					item->Airborne = true;
-					if (info->calcJumpVelocity)
+					if (info->Control.CalculatedJumpVelocity)
 					{
-						item->VerticalVelocity = info->calcJumpVelocity;
-						info->calcJumpVelocity = 0;
+						item->VerticalVelocity = info->Control.CalculatedJumpVelocity;
+						info->Control.CalculatedJumpVelocity = 0;
 					}
 					break;
 
@@ -188,11 +188,11 @@ void AnimateLara(ITEM_INFO* item)
 		item->Velocity = velocity >> 16;
 	}
 
-	if (info->RopeControlData.Ptr != -1)
+	if (info->Control.RopeControl.Ptr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!info->isMoving)
-		MoveItem(item, info->moveAngle, item->Velocity, lateral);
+	if (!info->Control.IsMoving)
+		MoveItem(item, info->Control.MoveAngle, item->Velocity, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

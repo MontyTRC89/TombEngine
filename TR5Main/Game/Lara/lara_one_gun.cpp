@@ -88,8 +88,8 @@ void FireHarpoon()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->Position.xRot += Lara.ExtraTorsoRot.x;
-			item->Position.yRot += Lara.ExtraTorsoRot.y;
+			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
+			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
 		}
 
 		item->Position.zRot = 0;
@@ -323,8 +323,8 @@ void FireGrenade()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->Position.xRot += Lara.ExtraTorsoRot.x;
-			item->Position.yRot += Lara.ExtraTorsoRot.y;
+			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
+			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = GRENADE_SPEED;
@@ -1483,11 +1483,11 @@ void RifleHandler(int weaponType)
 
 	if (Lara.leftArm.lock)
 	{
-		Lara.ExtraTorsoRot.x = Lara.leftArm.xRot;
-		Lara.ExtraTorsoRot.y = Lara.leftArm.yRot;
+		Lara.Control.ExtraTorsoRot.zRot = Lara.leftArm.xRot;
+		Lara.Control.ExtraTorsoRot.yRot = Lara.leftArm.yRot;
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
 		{
-			Lara.ExtraHeadRot = { 0, 0, 0 };
+			Lara.Control.ExtraHeadRot = { 0, 0, 0 };
 		}
 	}
 
@@ -1589,8 +1589,8 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 			if (!Lara.leftArm.lock)
 			{
-				item->Position.xRot += Lara.ExtraTorsoRot.x;
-				item->Position.yRot += Lara.ExtraTorsoRot.y;
+				item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
+				item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
 			}
 		}
 
@@ -1689,8 +1689,8 @@ void FireRocket()
 
 		if (!Lara.leftArm.lock)
 		{
-			item->Position.xRot += Lara.ExtraTorsoRot.x;
-			item->Position.yRot += Lara.ExtraTorsoRot.y;
+			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
+			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = 512 >> 5;
@@ -1886,8 +1886,8 @@ void FireHK(int mode)
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.ExtraTorsoRot.y + Lara.leftArm.yRot + LaraItem->Position.yRot;
-		angles[1] = Lara.ExtraTorsoRot.x + Lara.leftArm.xRot;
+		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.leftArm.yRot + LaraItem->Position.yRot;
+		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.leftArm.xRot;
 	}
 
 	if (mode)
@@ -1919,8 +1919,8 @@ void FireShotgun()
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.ExtraTorsoRot.y + Lara.leftArm.yRot + LaraItem->Position.yRot;
-		angles[1] = Lara.ExtraTorsoRot.x + Lara.leftArm.xRot;
+		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.leftArm.yRot + LaraItem->Position.yRot;
+		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.leftArm.xRot;
 	}
 
 	short loopAngles[2];

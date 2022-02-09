@@ -5,7 +5,7 @@ struct COLL_INFO;
 struct PHD_VECTOR;
 enum GAME_OBJECT_ID : short;
 
-constexpr auto FLARE_AGE = 60 * 30;		// 60 * 30 frames = 60 seconds.
+constexpr auto FLARE_LIFE_MAX = 60 * 30;	// 60 * 30 frames = 60 seconds.
 
 void FlareControl(short itemNum);
 void ReadyFlare(ITEM_INFO* laraItem);

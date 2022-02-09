@@ -30,7 +30,7 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 39, 98*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
@@ -47,7 +47,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 67*/
 	/*collison: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
@@ -68,7 +68,7 @@ void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*states 40, 126*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
@@ -83,7 +83,7 @@ void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 41*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
@@ -126,7 +126,7 @@ void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 42*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
@@ -140,7 +140,7 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 43*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
@@ -168,7 +168,7 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 36*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
@@ -183,7 +183,7 @@ void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 37*/
 	/*collision: lara_default_col*/
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
@@ -215,7 +215,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 	ITEM_INFO* pulley = &g_Level.Items[info->interactedItem];
 
-	info->look = false;
+	info->Control.CanLook = false;
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -315,7 +315,7 @@ void lara_trbalance_mesh(ITEM_INFO* item)
 	LaraInfo*& info = item->Data;
 
 	item->Position.zRot = info->tightrope.balance / 4;
-	info->ExtraTorsoRot.z = -info->tightrope.balance;
+	info->Control.ExtraTorsoRot.zRot = -info->tightrope.balance;
 }
 
 void lara_trbalance_regen(ITEM_INFO* item)
@@ -405,7 +405,7 @@ void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->AnimNumber == LA_TIGHTROPE_END &&
 		TestLastFrame(item))
 	{
-		info->ExtraTorsoRot.z = 0;
+		info->Control.ExtraTorsoRot.zRot = 0;
 		item->Position.zRot = 0;
 	}
 }
@@ -619,7 +619,7 @@ void lara_as_ropel(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_LEFT)
-			Lara.RopeControlData.Y += ANGLE(1.4f);
+			Lara.Control.RopeControl.Y += ANGLE(1.4f);
 		else
 			item->TargetState = LS_ROPE_IDLE;
 	}
@@ -632,7 +632,7 @@ void lara_as_roper(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_RIGHT)
-			Lara.RopeControlData.Y -= ANGLE(1.4f);
+			Lara.Control.RopeControl.Y -= ANGLE(1.4f);
 		else
 			item->TargetState = LS_ROPE_IDLE;
 	}
@@ -661,19 +661,19 @@ void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_SPRINT)
 		{
-			Lara.RopeControlData.DFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
-			Lara.RopeControlData.Frame = Lara.RopeControlData.DFrame;
+			Lara.Control.RopeControl.DFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
+			Lara.Control.RopeControl.Frame = Lara.Control.RopeControl.DFrame;
 
 			item->TargetState = LS_ROPE_SWING;
 		}
-		else if (TrInput & IN_FORWARD && Lara.RopeControlData.Segment > 4)
+		else if (TrInput & IN_FORWARD && Lara.Control.RopeControl.Segment > 4)
 			item->TargetState = LS_ROPE_UP;
-		else if (TrInput & IN_BACK && Lara.RopeControlData.Segment < 21)
+		else if (TrInput & IN_BACK && Lara.Control.RopeControl.Segment < 21)
 		{
 			item->TargetState = LS_ROPE_DOWN;
 
-			Lara.RopeControlData.Flag = 0;
-			Lara.RopeControlData.Count = 0;
+			Lara.Control.RopeControl.Flag = 0;
+			Lara.Control.RopeControl.Count = 0;
 		}
 		else if (TrInput & IN_LEFT)
 			item->TargetState = LS_ROPE_TURN_CLOCKWISE;
@@ -698,35 +698,35 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			int vel;
 
-			if (abs(Lara.RopeControlData.LastX) < 9000)
-				vel = 192 * (9000 - abs(Lara.RopeControlData.LastX)) / 9000;
+			if (abs(Lara.Control.RopeControl.LastX) < 9000)
+				vel = 192 * (9000 - abs(Lara.Control.RopeControl.LastX)) / 9000;
 			else
 				vel = 0;
 
-			ApplyVelocityToRope(Lara.RopeControlData.Segment - 2,
-				item->Position.yRot + (Lara.RopeControlData.Direction ? ANGLE(0.0f) : ANGLE(180.0f)),
+			ApplyVelocityToRope(Lara.Control.RopeControl.Segment - 2,
+				item->Position.yRot + (Lara.Control.RopeControl.Direction ? ANGLE(0.0f) : ANGLE(180.0f)),
 				vel >> 5);
 		}
 
-		if (Lara.RopeControlData.Frame > Lara.RopeControlData.DFrame)
+		if (Lara.Control.RopeControl.Frame > Lara.Control.RopeControl.DFrame)
 		{
-			Lara.RopeControlData.Frame -= (unsigned short)Lara.RopeControlData.FrameRate;
-			if (Lara.RopeControlData.Frame < Lara.RopeControlData.DFrame)
-				Lara.RopeControlData.Frame = Lara.RopeControlData.DFrame;
+			Lara.Control.RopeControl.Frame -= (unsigned short)Lara.Control.RopeControl.FrameRate;
+			if (Lara.Control.RopeControl.Frame < Lara.Control.RopeControl.DFrame)
+				Lara.Control.RopeControl.Frame = Lara.Control.RopeControl.DFrame;
 		}
-		else if (Lara.RopeControlData.Frame < Lara.RopeControlData.DFrame)
+		else if (Lara.Control.RopeControl.Frame < Lara.Control.RopeControl.DFrame)
 		{
-			Lara.RopeControlData.Frame += (unsigned short)Lara.RopeControlData.FrameRate;
-			if (Lara.RopeControlData.Frame > Lara.RopeControlData.DFrame)
-				Lara.RopeControlData.Frame = Lara.RopeControlData.DFrame;
+			Lara.Control.RopeControl.Frame += (unsigned short)Lara.Control.RopeControl.FrameRate;
+			if (Lara.Control.RopeControl.Frame > Lara.Control.RopeControl.DFrame)
+				Lara.Control.RopeControl.Frame = Lara.Control.RopeControl.DFrame;
 		}
 
-		item->FrameNumber = Lara.RopeControlData.Frame >> 8;
+		item->FrameNumber = Lara.Control.RopeControl.Frame >> 8;
 
 		if (!(TrInput & IN_SPRINT) &&
 			item->FrameNumber == g_Level.Anims[LA_ROPE_SWING].frameBase + 32 &&
-			Lara.RopeControlData.MaxXBackward < 6750 &&
-			Lara.RopeControlData.MaxXForward < 6750)
+			Lara.Control.RopeControl.MaxXBackward < 6750 &&
+			Lara.Control.RopeControl.MaxXForward < 6750)
 		{
 			item->AnimNumber = LA_JUMP_UP_TO_ROPE_END;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -739,7 +739,7 @@ void lara_col_ropefwd(ITEM_INFO* item, COLL_INFO* coll)
 			JumpOffRope(item);
 	}
 	else if (item->FrameNumber == g_Level.Anims[LA_ROPE_IDLE_TO_SWING].frameBase + 15)
-		ApplyVelocityToRope(Lara.RopeControlData.Segment, item->Position.yRot, 128);
+		ApplyVelocityToRope(Lara.Control.RopeControl.Segment, item->Position.yRot, 128);
 }
 
 void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll)
@@ -755,10 +755,10 @@ void lara_as_climbrope(ITEM_INFO* item, COLL_INFO* coll)
 		if (g_Level.Anims[item->AnimNumber].frameEnd == item->FrameNumber)
 		{
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			Lara.RopeControlData.Segment -= 2;
+			Lara.Control.RopeControl.Segment -= 2;
 		}
 
-		if (!(TrInput & IN_FORWARD) || Lara.RopeControlData.Segment <= 4)
+		if (!(TrInput & IN_FORWARD) || Lara.Control.RopeControl.Segment <= 4)
 			item->TargetState = LS_ROPE_IDLE;
 	}
 }
@@ -798,15 +798,15 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				info->turnRate += LARA_POLE_TURN_RATE;
-				if (info->turnRate > LARA_POLE_TURN_MAX)
-					info->turnRate = LARA_POLE_TURN_MAX;
+				info->Control.TurnRate += LARA_POLE_TURN_RATE;
+				if (info->Control.TurnRate > LARA_POLE_TURN_MAX)
+					info->Control.TurnRate = LARA_POLE_TURN_MAX;
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				info->turnRate -= LARA_POLE_TURN_RATE;
-				if (info->turnRate < -LARA_POLE_TURN_MAX)
-					info->turnRate = -LARA_POLE_TURN_MAX;
+				info->Control.TurnRate -= LARA_POLE_TURN_RATE;
+				if (info->Control.TurnRate < -LARA_POLE_TURN_MAX)
+					info->Control.TurnRate = -LARA_POLE_TURN_MAX;
 			}
 		}
 
@@ -867,11 +867,11 @@ void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.FloorSlopeIsWall = true;
 	GetCollisionInfo(coll, item);
@@ -900,15 +900,15 @@ void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_POLE_TURN_RATE;
-			if (info->turnRate > LARA_POLE_TURN_MAX)
-				info->turnRate = LARA_POLE_TURN_MAX;
+			info->Control.TurnRate += LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate > LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_POLE_TURN_RATE;
-			if (info->turnRate < -LARA_POLE_TURN_MAX)
-				info->turnRate = -LARA_POLE_TURN_MAX;
+			info->Control.TurnRate -= LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate < -LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -959,15 +959,15 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_POLE_TURN_RATE;
-			if (info->turnRate > LARA_POLE_TURN_MAX)
-				info->turnRate = LARA_POLE_TURN_MAX;
+			info->Control.TurnRate += LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate > LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_POLE_TURN_RATE;
-			if (info->turnRate < -LARA_POLE_TURN_MAX)
-				info->turnRate = -LARA_POLE_TURN_MAX;
+			info->Control.TurnRate -= LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate < -LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -996,12 +996,12 @@ void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	GetCollisionInfo(coll, item);
 
@@ -1057,9 +1057,9 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			info->turnRate += LARA_POLE_TURN_RATE;
-			if (info->turnRate > LARA_POLE_TURN_MAX)
-				info->turnRate = LARA_POLE_TURN_MAX;
+			info->Control.TurnRate += LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate > LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = LARA_POLE_TURN_MAX;
 
 			item->TargetState = LS_POLE_TURN_CLOCKWISE;
 			return;
@@ -1112,9 +1112,9 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			info->turnRate -= LARA_POLE_TURN_RATE;
-			if (info->turnRate < -LARA_POLE_TURN_MAX)
-				info->turnRate = -LARA_POLE_TURN_MAX;
+			info->Control.TurnRate -= LARA_POLE_TURN_RATE;
+			if (info->Control.TurnRate < -LARA_POLE_TURN_MAX)
+				info->Control.TurnRate = -LARA_POLE_TURN_MAX;
 
 			item->TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 			return;
@@ -1155,6 +1155,6 @@ void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 		item->Airborne = true;
 		item->Velocity = 100;
 		item->VerticalVelocity = 40;
-		info->moveAngle = item->Position.yRot;
+		info->Control.MoveAngle = item->Position.yRot;
 	}
 }

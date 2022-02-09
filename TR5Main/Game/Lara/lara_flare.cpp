@@ -62,7 +62,7 @@ void FlareControl(short itemNum)
 
 	int& age = flareItem->Data;
 	age &= 0x7FFF;
-	if (age >= FLARE_AGE)
+	if (age >= FLARE_LIFE_MAX)
 	{
 		if (!flareItem->VerticalVelocity && !flareItem->Velocity)
 		{
@@ -115,10 +115,10 @@ void DrawFlareMeshes(ITEM_INFO* laraItem)
 void UndrawFlare(ITEM_INFO* laraItem)
 {
 	LaraInfo*& laraInfo = laraItem->Data;
-	int FlareFrame = laraInfo->Flare.FlareFrame;
+	int flareFrame = laraInfo->Flare.Frame;
 	int armFrame = laraInfo->leftArm.frameNumber;
 
-	laraInfo->Flare.FlareControlLeft = true;
+	laraInfo->Flare.ControlLeft = true;
 
 	if (laraItem->TargetState == LS_IDLE &&
 		laraInfo->Vehicle == NO_ITEM)
@@ -126,16 +126,16 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		if (laraItem->AnimNumber == LA_STAND_IDLE)
 		{
 			laraItem->AnimNumber = LA_DISCARD_FLARE;
-			FlareFrame = armFrame + g_Level.Anims[laraItem->AnimNumber].frameBase;
-			laraInfo->Flare.FlareFrame = FlareFrame;
-			laraItem->FrameNumber = FlareFrame;
+			flareFrame = armFrame + g_Level.Anims[laraItem->AnimNumber].frameBase;
+			laraInfo->Flare.Frame = flareFrame;
+			laraItem->FrameNumber = flareFrame;
 		}
 
 		if (laraItem->AnimNumber == LA_DISCARD_FLARE)
 		{
-			laraInfo->Flare.FlareControlLeft = false;
+			laraInfo->Flare.ControlLeft = false;
 
-			if (FlareFrame >= g_Level.Anims[laraItem->AnimNumber].frameBase + 31) // Last frame.
+			if (flareFrame >= g_Level.Anims[laraItem->AnimNumber].frameBase + 31) // Last frame.
 			{
 				laraInfo->requestGunType = laraInfo->lastGunType;
 				laraInfo->gunType = laraInfo->lastGunType;
@@ -147,11 +147,11 @@ void UndrawFlare(ITEM_INFO* laraItem)
 				laraInfo->rightArm.lock = false;
 				laraInfo->leftArm.lock = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				laraInfo->Flare.FlareFrame = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraInfo->Flare.Frame = g_Level.Anims[laraItem->AnimNumber].frameBase;
 				return;
 			}
 
-			laraInfo->Flare.FlareFrame++;
+			laraInfo->Flare.Frame++;
 		}
 	}
 	else if (laraItem->AnimNumber == LA_DISCARD_FLARE)
@@ -160,12 +160,12 @@ void UndrawFlare(ITEM_INFO* laraItem)
 	if (armFrame >= 33 && armFrame < 72)
 	{
 		armFrame = 2;
-		DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+		DoFlareInHand(laraItem, laraInfo->Flare.Life);
 	}
 	else if (!armFrame)
 	{
 		armFrame = 1;
-		DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+		DoFlareInHand(laraItem, laraInfo->Flare.Life);
 	}
 	else if (armFrame >= 72 && armFrame < 95)
 	{
@@ -174,7 +174,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		if (armFrame == 94)
 		{
 			armFrame = 1;
-			DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+			DoFlareInHand(laraItem, laraInfo->Flare.Life);
 		}
 	}
 	else if (armFrame >= 1 && armFrame < 33)
@@ -185,7 +185,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, true);
 			UndrawFlareMeshes(laraItem);
-			laraInfo->Flare.FlareAge = 0;
+			laraInfo->Flare.Life = 0;
 		}
 		else if (armFrame == 33)
 		{
@@ -196,14 +196,14 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			InitialiseNewWeapon(laraItem);
 
-			laraInfo->Flare.FlareControlLeft = false;
+			laraInfo->Flare.ControlLeft = false;
 			laraInfo->target = NULL;
 			laraInfo->rightArm.lock = false;
 			laraInfo->leftArm.lock = false;
-			laraInfo->Flare.FlareFrame = 0;
+			laraInfo->Flare.Frame = 0;
 		}
 		else if (armFrame < 21)
-			DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+			DoFlareInHand(laraItem, laraInfo->Flare.Life);
 	}
 	else if (armFrame >= 95 && armFrame < 110)
 	{
@@ -212,7 +212,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		if (armFrame == 110)
 		{
 			armFrame = 1;
-			DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+			DoFlareInHand(laraItem, laraInfo->Flare.Life);
 		}
 	}
 
@@ -227,15 +227,15 @@ void DrawFlare(ITEM_INFO* laraItem)
 	if (laraItem->ActiveState == LS_PICKUP_FLARE ||
 		laraItem->ActiveState == LS_PICKUP)
 	{
-		DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
-		laraInfo->Flare.FlareControlLeft = false;
+		DoFlareInHand(laraItem, laraInfo->Flare.Life);
+		laraInfo->Flare.ControlLeft = false;
 		laraInfo->leftArm.frameNumber = 93;
 		SetFlareArm(laraItem, 93);
 	}
 	else
 	{
 		int armFrame = laraInfo->leftArm.frameNumber + 1;
-		laraInfo->Flare.FlareControlLeft = true;
+		laraInfo->Flare.ControlLeft = true;
 
 		if (armFrame < 33 || armFrame > 94)
 			armFrame = 33;
@@ -246,10 +246,10 @@ void DrawFlare(ITEM_INFO* laraItem)
 			if (armFrame == 72)
 			{
 				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Position, TestEnvironment(ENV_FLAG_WATER, laraItem));
-				laraInfo->Flare.FlareAge = 1;
+				laraInfo->Flare.Life = 1;
 			}
 
-			DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+			DoFlareInHand(laraItem, laraInfo->Flare.Life);
 		}
 		else
 		{
@@ -257,7 +257,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 			{
 				ReadyFlare(laraItem);
 				armFrame = 0;
-				DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
+				DoFlareInHand(laraItem, laraInfo->Flare.Life);
 			}
 		}
 
@@ -346,10 +346,10 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 		{
 			flareItem->Data = (int)0;
 			int& age = flareItem->Data;
-			if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, laraInfo->Flare.FlareAge))
-				age = laraInfo->Flare.FlareAge | 0x8000;
+			if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, laraInfo->Flare.Life))
+				age = laraInfo->Flare.Life | 0x8000;
 			else
-				age = laraInfo->Flare.FlareAge & 0x7FFF;
+				age = laraInfo->Flare.Life & 0x7FFF;
 		}
 		else
 			flareItem->ItemFlags[3] = laraInfo->litTorch;
@@ -376,13 +376,13 @@ void DoFlareInHand(ITEM_INFO* laraItem, int flareAge)
 
 	/* Hardcoded code */
 
-	if (ItemInfo->Flare.FlareAge >= FLARE_AGE)
+	if (ItemInfo->Flare.Life >= FLARE_LIFE_MAX)
 	{
 		if (ItemInfo->gunStatus == LG_HANDS_FREE)
 			ItemInfo->gunStatus = LG_UNDRAW_GUNS;
 	}
-	else if (ItemInfo->Flare.FlareAge != 0)
-		ItemInfo->Flare.FlareAge++;
+	else if (ItemInfo->Flare.Life != 0)
+		ItemInfo->Flare.Life++;
 }
 
 int DoFlareLight(PHD_VECTOR* pos, int age)
@@ -390,7 +390,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	int r, g, b;
 	int falloff;
 
-	if (age >= FLARE_AGE || age == 0)
+	if (age >= FLARE_LIFE_MAX || age == 0)
 		return 0;
 
 	auto random = GenerateFloat();
@@ -411,7 +411,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 
 		return (random < 0.9f);
 	}
-	else if (age < (FLARE_AGE - 90))
+	else if (age < (FLARE_LIFE_MAX - 90))
 	{
 		auto multiplier = GenerateFloat(0.75f, 1.0f);
 		falloff = 12 * multiplier;
@@ -426,7 +426,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	else
 	{
 		auto multiplier = GenerateFloat(0.05f, 0.8f);
-		falloff = 12 * (1.0f - ((age - (FLARE_AGE - 90)) / (FLARE_AGE - (FLARE_AGE - 90))));
+		falloff = 12 * (1.0f - ((age - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
 
 		r = FlareMainColor.x * 255 * multiplier;
 		g = FlareMainColor.y * 255 * multiplier;

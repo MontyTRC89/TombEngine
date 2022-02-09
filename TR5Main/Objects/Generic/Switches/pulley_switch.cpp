@@ -48,7 +48,7 @@ namespace TEN::Entities::Switches
 			&& l->ActiveState == LS_IDLE
 			&& l->AnimNumber == LA_STAND_IDLE
 			&& l->Airborne == false
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			short oldYrot = item->Position.yRot;
 			item->Position.yRot = l->Position.yRot;
@@ -75,7 +75,7 @@ namespace TEN::Entities::Switches
 					item->Position.yRot = oldYrot;
 					item->Status = ITEM_ACTIVE;
 
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.interactedItem = itemNum;
@@ -88,9 +88,9 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->Position.yRot = oldYrot;

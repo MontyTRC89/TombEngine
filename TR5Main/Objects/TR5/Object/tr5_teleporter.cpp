@@ -173,7 +173,7 @@ void ControlTeleporter(short itemNumber)
 		}
 	}*/
 
-	Lara.uncontrollable = false;
+	Lara.Control.Uncontrollable = false;
 
 	if (item->TriggerFlags == 666)
 	{

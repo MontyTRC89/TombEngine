@@ -65,28 +65,28 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 			switch (lara->hitDirection)
 			{
 			case NORTH:
-				if (lara->isLow)
+				if (lara->Control.IsLow)
 					spaz = 294;
 				else
 					spaz = 125;
 				break;
 
 			case SOUTH:
-				if (lara->isLow)
+				if (lara->Control.IsLow)
 					spaz = 293;
 				else
 					spaz = 126;
 				break;
 
 			case EAST:
-				if (lara->isLow)
+				if (lara->Control.IsLow)
 					spaz = 295;
 				else
 					spaz = 127;
 				break;
 
 			default:
-				if (lara->isLow)
+				if (lara->Control.IsLow)
 					spaz = 296;
 				else
 					spaz = 128;

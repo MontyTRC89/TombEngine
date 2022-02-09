@@ -54,11 +54,11 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		info->turnRate = -LARA_CRAWL_TURN_MAX;
+		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->turnRate = LARA_CRAWL_TURN_MAX;
+		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -99,11 +99,11 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->keepLow = TestLaraKeepLow(item, coll);
-	info->isLow = true;
-	info->moveAngle = item->Position.yRot;
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
+	info->Control.IsLow = true;
+	info->Control.MoveAngle = item->Position.yRot;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -143,24 +143,24 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_TURN_RATE;
-		if (info->turnRate < -LARA_CROUCH_ROLL_TURN_MAX)
-			info->turnRate = -LARA_CROUCH_ROLL_TURN_MAX;
+		info->Control.TurnRate -= LARA_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_CROUCH_ROLL_TURN_MAX)
+			info->Control.TurnRate = -LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_TURN_RATE;
-		if (info->turnRate > LARA_CROUCH_ROLL_TURN_MAX)
-			info->turnRate = LARA_CROUCH_ROLL_TURN_MAX;
+		info->Control.TurnRate += LARA_TURN_RATE;
+		if (info->Control.TurnRate > LARA_CROUCH_ROLL_TURN_MAX)
+			info->Control.TurnRate = LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -174,9 +174,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->keepLow = TestLaraKeepLow(item, coll);
-	info->isLow = true;
-	info->moveAngle = item->Position.yRot;
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
+	info->Control.IsLow = true;
+	info->Control.MoveAngle = item->Position.yRot;
 	item->Airborne = 0;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -243,9 +243,9 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	info->turnRate = -LARA_CRAWL_TURN_MAX;
+	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -299,9 +299,9 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown();
 
-	info->turnRate = LARA_CRAWL_TURN_MAX;
+	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -366,11 +366,11 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		info->turnRate = -LARA_CRAWL_TURN_MAX;
+		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->turnRate = LARA_CRAWL_TURN_MAX;
+		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		// TODO: Flare not working.
@@ -442,14 +442,14 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->keepLow = TestLaraKeepLow(item, coll);
-	info->isLow = true;
-	info->moveAngle = item->Position.yRot;
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
+	info->Control.IsLow = true;
+	info->Control.MoveAngle = item->Position.yRot;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -499,22 +499,22 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		info->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		info->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -542,11 +542,11 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->keepLow = TestLaraKeepLow(item, coll);
-	info->isLow = true;
-	info->moveAngle = item->Position.yRot;
-	info->ExtraTorsoRot.x = 0;
-	info->ExtraTorsoRot.y = 0;
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
+	info->Control.IsLow = true;
+	info->Control.MoveAngle = item->Position.yRot;
+	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.yRot = 0;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -557,7 +557,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -590,7 +590,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->look = false;
+	info->Control.CanLook = false;
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -604,22 +604,22 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		info->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		info->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
@@ -641,9 +641,9 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->keepLow = TestLaraKeepLow(item, coll);
-	info->isLow = true;
-	info->moveAngle = item->Position.yRot + ANGLE(180.0f);
+	info->Control.KeepLow = TestLaraKeepLow(item, coll);
+	info->Control.IsLow = true;
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -654,7 +654,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -698,9 +698,9 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->turnRate = -LARA_CRAWL_TURN_MAX;
+	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -758,9 +758,9 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->turnRate = LARA_CRAWL_TURN_MAX;
+	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->keepLow) &&
+	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
 		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -812,12 +812,12 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
-		info->moveAngle = item->Position.yRot;
+		info->Control.MoveAngle = item->Position.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = info->moveAngle;
+		coll->Setup.ForwardAngle = info->Control.MoveAngle;
 
 		MoveItem(item, item->Position.yRot, -CLICK(1));
 		GetCollisionInfo(coll, item);

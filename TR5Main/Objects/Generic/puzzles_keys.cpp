@@ -59,7 +59,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& l->ActiveState == LS_IDLE
 		&& l->AnimNumber == LA_STAND_IDLE
 		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
-		|| (Lara.isMoving
+		|| (Lara.Control.IsMoving
 			&& Lara.interactedItem == itemNum))
 	{
 		short oldYrot = item->Position.yRot;
@@ -77,7 +77,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			pos.y = 0;
 			pos.z = 0;
 
-			if (!Lara.isMoving)
+			if (!Lara.Control.IsMoving)
 			{
 				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 				{
@@ -125,7 +125,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 
 			l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-			Lara.isMoving = false;
+			Lara.Control.IsMoving = false;
 			ResetLaraFlex(l);
 			Lara.gunStatus = LG_HANDS_BUSY;
 			item->Flags |= 0x20;
@@ -135,11 +135,11 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		if (Lara.isMoving)
+		if (Lara.Control.IsMoving)
 		{
 			if (Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
@@ -148,7 +148,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		if (!Lara.isMoving && Lara.interactedItem == itemNum || Lara.interactedItem != itemNum)
+		if (!Lara.Control.IsMoving && Lara.interactedItem == itemNum || Lara.interactedItem != itemNum)
 		{
 			if (Lara.interactedItem == itemNum)
 			{
@@ -249,7 +249,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& !Lara.gunStatus
 		&& l->ActiveState == LS_IDLE
 		&& l->AnimNumber == LA_STAND_IDLE)
-		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
+		&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
 	{
 		if (item->ObjectNumber < ID_KEY_HOLE6)
 			ObjectCollision(itemNum, l, coll);
@@ -258,7 +258,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (TestLaraPosition(&KeyHoleBounds, item, l))
 		{
-			if (!Lara.isMoving)//TROYE INVENTORY FIX ME
+			if (!Lara.Control.IsMoving)//TROYE INVENTORY FIX ME
 			{
 				if (item->Status != ITEM_NOT_ACTIVE)
 					return;
@@ -286,7 +286,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				l->ActiveState = LS_INSERT_KEY;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->Flags |= 0x20;
@@ -308,9 +308,9 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 
-		if (Lara.isMoving && Lara.interactedItem == itemNum)
+		if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
-			Lara.isMoving = false;
+			Lara.Control.IsMoving = false;
 			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}

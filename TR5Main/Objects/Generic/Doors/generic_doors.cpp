@@ -172,12 +172,12 @@ namespace TEN::Entities::Doors
 				&& l->AnimNumber == LA_STAND_IDLE
 				&& !l->HitStatus
 				&& Lara.gunStatus == LG_HANDS_FREE
-				|| Lara.isMoving && Lara.interactedItem == itemNum))
+				|| Lara.Control.IsMoving && Lara.interactedItem == itemNum))
 		{
 			item->Position.yRot ^= ANGLE(180);
 			if (TestLaraPosition(&CrowbarDoorBounds, item, l))
 			{
-				if (!Lara.isMoving)
+				if (!Lara.Control.IsMoving)
 				{
 					if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 					{
@@ -219,7 +219,7 @@ namespace TEN::Entities::Doors
 					item->Flags |= IFLAG_ACTIVATION_MASK;
 					item->Status = ITEM_ACTIVE;
 					item->TargetState = LS_RUN_FORWARD;
-					Lara.isMoving = 0;
+					Lara.Control.IsMoving = 0;
 					Lara.gunStatus = LG_HANDS_BUSY;
 
 					return;
@@ -227,9 +227,9 @@ namespace TEN::Entities::Doors
 
 				Lara.interactedItem = itemNum;
 			}
-			else if (Lara.isMoving && Lara.interactedItem == itemNum)
+			else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = 0;
+				Lara.Control.IsMoving = 0;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 

@@ -71,14 +71,14 @@ namespace TEN::Entities::Switches
 					&& !item->Airborne
 					&& l->ActiveState == LS_IDLE
 					&& l->AnimNumber == LA_STAND_IDLE
-					|| Lara.isMoving
+					|| Lara.Control.IsMoving
 					&& Lara.interactedItem == itemNum))
 			{
 				if (TestLaraPosition(&CogSwitchBounds, item, l))
 				{
 					if (MoveLaraPosition(&CogSwitchPos, item, l))
 					{
-						Lara.isMoving = false;
+						Lara.Control.IsMoving = false;
 						ResetLaraFlex(l);
 						Lara.gunStatus = LG_HANDS_BUSY;
 						Lara.interactedItem = targetItemNum;
@@ -106,9 +106,9 @@ namespace TEN::Entities::Switches
 					}
 					return;
 				}
-				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
