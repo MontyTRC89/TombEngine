@@ -71,7 +71,7 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateProgress(float value)
 	{
-		m_progress = value;
+		RenderLoadingScreen(value);
 	}
 
 	void Renderer11::RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumer)
