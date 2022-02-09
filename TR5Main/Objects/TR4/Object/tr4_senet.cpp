@@ -433,7 +433,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 				laraitem->FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
 				laraitem->ActiveState = LS_MISC_CONTROL;
 				Lara.isMoving = false;
-				Lara.extraTorsoRot = { 0, 0, 0 };
+				Lara.ExtraTorsoRot = { 0, 0, 0 };
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(item_num);

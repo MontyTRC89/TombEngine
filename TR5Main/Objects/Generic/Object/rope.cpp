@@ -209,8 +209,8 @@ namespace TEN::Entities::Generic
 				{
 					l->AnimNumber = LA_REACH_TO_ROPE_SWING;
 					l->ActiveState = LS_ROPE_SWING;
-					Lara.ropeParameters.Frame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
-					Lara.ropeParameters.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
+					Lara.RopeControlData.Frame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
+					Lara.RopeControlData.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
 				}
 				else
 				{
@@ -223,9 +223,9 @@ namespace TEN::Entities::Generic
 				l->VerticalVelocity = 0;
 
 				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.ropeParameters.Ptr = item->TriggerFlags;
-				Lara.ropeParameters.Segment = segment;
-				Lara.ropeParameters.Y = l->Position.yRot;
+				Lara.RopeControlData.Ptr = item->TriggerFlags;
+				Lara.RopeControlData.Segment = segment;
+				Lara.RopeControlData.Y = l->Position.yRot;
 
 				DelAlignLaraToRope(l);
 
@@ -254,19 +254,19 @@ namespace TEN::Entities::Generic
 					rope->velocity[i].y = 0;
 			}
 		}
-		if (Lara.ropeParameters.Ptr != -1 && rope == &Ropes[Lara.ropeParameters.Ptr])
+		if (Lara.RopeControlData.Ptr != -1 && rope == &Ropes[Lara.RopeControlData.Ptr])
 		{
 			pendulumPointer = &CurrentPendulum;
-			if (CurrentPendulum.node != Lara.ropeParameters.Segment + 1)
+			if (CurrentPendulum.node != Lara.RopeControlData.Segment + 1)
 			{
-				SetPendulumPoint(rope, Lara.ropeParameters.Segment + 1);
+				SetPendulumPoint(rope, Lara.RopeControlData.Segment + 1);
 				flag = 1;
 			}
 		}
 		else
 		{
 			pendulumPointer = &AlternatePendulum;
-			if (Lara.ropeParameters.Ptr == -1 && CurrentPendulum.rope)
+			if (Lara.RopeControlData.Ptr == -1 && CurrentPendulum.rope)
 			{
 				for (i = 0; i < CurrentPendulum.node; i++)
 				{
@@ -286,7 +286,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.rope = NULL;
 			}
 		}
-		if (Lara.ropeParameters.Ptr != -1)
+		if (Lara.RopeControlData.Ptr != -1)
 		{
 			vec.x = pendulumPointer->position.x - rope->segment[0].x;
 			vec.y = pendulumPointer->position.y - rope->segment[0].y;
@@ -387,7 +387,7 @@ namespace TEN::Entities::Generic
 			NormaliseRopeVector(&rope->normalisedSegment[i]);
 		}
 
-		if (Lara.ropeParameters.Ptr != -1 && rope != &Ropes[Lara.ropeParameters.Ptr])
+		if (Lara.RopeControlData.Ptr != -1 && rope != &Ropes[Lara.RopeControlData.Ptr])
 		{
 			rope->meshSegment[0].x = rope->segment[0].x;
 			rope->meshSegment[0].y = rope->segment[0].y;
@@ -534,27 +534,27 @@ namespace TEN::Entities::Generic
 
 	void UpdateRopeSwing(ITEM_INFO* item)
 	{
-		if (Lara.ropeParameters.MaxXForward > 9000)
+		if (Lara.RopeControlData.MaxXForward > 9000)
 		{
-			Lara.ropeParameters.MaxXForward = 9000;
+			Lara.RopeControlData.MaxXForward = 9000;
 		}
 
-		if (Lara.ropeParameters.MaxXBackward > 9000)
+		if (Lara.RopeControlData.MaxXBackward > 9000)
 		{
-			Lara.ropeParameters.MaxXBackward = 9000;
+			Lara.RopeControlData.MaxXBackward = 9000;
 		}
 
-		if (Lara.ropeParameters.Direction)
+		if (Lara.RopeControlData.Direction)
 		{
-			if (item->Position.xRot > 0 && item->Position.xRot - Lara.ropeParameters.LastX < -100)
+			if (item->Position.xRot > 0 && item->Position.xRot - Lara.RopeControlData.LastX < -100)
 			{
-				Lara.ropeParameters.ArcFront = Lara.ropeParameters.LastX;
-				Lara.ropeParameters.Direction = 0;
-				Lara.ropeParameters.MaxXBackward = 0;
-				int frame = 15 * Lara.ropeParameters.MaxXForward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
-				if (frame > Lara.ropeParameters.DFrame)
+				Lara.RopeControlData.ArcFront = Lara.RopeControlData.LastX;
+				Lara.RopeControlData.Direction = 0;
+				Lara.RopeControlData.MaxXBackward = 0;
+				int frame = 15 * Lara.RopeControlData.MaxXForward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				if (frame > Lara.RopeControlData.DFrame)
 				{
-					Lara.ropeParameters.DFrame = frame;
+					Lara.RopeControlData.DFrame = frame;
 					RopeSwing = 1;
 				}
 				else
@@ -564,30 +564,30 @@ namespace TEN::Entities::Generic
 
 				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
 			}
-			else if (Lara.ropeParameters.LastX < 0 && Lara.ropeParameters.Frame == Lara.ropeParameters.DFrame)
+			else if (Lara.RopeControlData.LastX < 0 && Lara.RopeControlData.Frame == Lara.RopeControlData.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.ropeParameters.DFrame = 15 * Lara.ropeParameters.MaxXBackward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
-				Lara.ropeParameters.FrameRate = 15 * Lara.ropeParameters.MaxXBackward / 9000 + 1;
+				Lara.RopeControlData.DFrame = 15 * Lara.RopeControlData.MaxXBackward / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				Lara.RopeControlData.FrameRate = 15 * Lara.RopeControlData.MaxXBackward / 9000 + 1;
 			}
-			else if (Lara.ropeParameters.FrameRate < 512)
+			else if (Lara.RopeControlData.FrameRate < 512)
 			{
 				int num = RopeSwing ? 31 : 7;
 
-				Lara.ropeParameters.FrameRate += num * Lara.ropeParameters.MaxXBackward / 9000 + 1;
+				Lara.RopeControlData.FrameRate += num * Lara.RopeControlData.MaxXBackward / 9000 + 1;
 			}
 		}
 		else
 		{
-			if (item->Position.xRot < 0 && item->Position.xRot - Lara.ropeParameters.LastX > 100)
+			if (item->Position.xRot < 0 && item->Position.xRot - Lara.RopeControlData.LastX > 100)
 			{
-				Lara.ropeParameters.ArcBack = Lara.ropeParameters.LastX;
-				Lara.ropeParameters.Direction = 1;
-				Lara.ropeParameters.MaxXForward = 0;
-				int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.ropeParameters.MaxXBackward / 18000 + 17 << 8;
-				if (frame < Lara.ropeParameters.DFrame)
+				Lara.RopeControlData.ArcBack = Lara.RopeControlData.LastX;
+				Lara.RopeControlData.Direction = 1;
+				Lara.RopeControlData.MaxXForward = 0;
+				int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.RopeControlData.MaxXBackward / 18000 + 17 << 8;
+				if (frame < Lara.RopeControlData.DFrame)
 				{
-					Lara.ropeParameters.DFrame = frame;
+					Lara.RopeControlData.DFrame = frame;
 					RopeSwing = 1;
 				}
 				else
@@ -597,37 +597,37 @@ namespace TEN::Entities::Generic
 
 				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
 			}
-			else if (Lara.ropeParameters.LastX > 0 && Lara.ropeParameters.Frame == Lara.ropeParameters.DFrame)
+			else if (Lara.RopeControlData.LastX > 0 && Lara.RopeControlData.Frame == Lara.RopeControlData.DFrame)
 			{
 				RopeSwing = 0;
 
-				Lara.ropeParameters.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.ropeParameters.MaxXForward / 18000 + 17 << 8;
-				Lara.ropeParameters.FrameRate = 15 * Lara.ropeParameters.MaxXForward / 9000 + 1;
+				Lara.RopeControlData.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Lara.RopeControlData.MaxXForward / 18000 + 17 << 8;
+				Lara.RopeControlData.FrameRate = 15 * Lara.RopeControlData.MaxXForward / 9000 + 1;
 			}
-			else if (Lara.ropeParameters.FrameRate < 512)
+			else if (Lara.RopeControlData.FrameRate < 512)
 			{
 				int num = RopeSwing ? 31 : 7;
 
-				Lara.ropeParameters.FrameRate += num * Lara.ropeParameters.MaxXForward / 9000 + 1;
+				Lara.RopeControlData.FrameRate += num * Lara.RopeControlData.MaxXForward / 9000 + 1;
 			}
 		}
 
-		Lara.ropeParameters.LastX = item->Position.xRot;
-		if (Lara.ropeParameters.Direction)
+		Lara.RopeControlData.LastX = item->Position.xRot;
+		if (Lara.RopeControlData.Direction)
 		{
-			if (item->Position.xRot > Lara.ropeParameters.MaxXForward)
-				Lara.ropeParameters.MaxXForward = item->Position.xRot;
+			if (item->Position.xRot > Lara.RopeControlData.MaxXForward)
+				Lara.RopeControlData.MaxXForward = item->Position.xRot;
 		}
 		else
 		{
-			if (item->Position.xRot < -Lara.ropeParameters.MaxXBackward)
-				Lara.ropeParameters.MaxXBackward = abs(item->Position.xRot);
+			if (item->Position.xRot < -Lara.RopeControlData.MaxXBackward)
+				Lara.RopeControlData.MaxXBackward = abs(item->Position.xRot);
 		}
 	}
 
 	void JumpOffRope(ITEM_INFO* item)
 	{
-		if (Lara.ropeParameters.Ptr != -1)
+		if (Lara.RopeControlData.Ptr != -1)
 		{
 			if (item->Position.xRot >= 0)
 			{
@@ -662,7 +662,7 @@ namespace TEN::Entities::Generic
 			item->ActiveState = LS_REACH;
 			item->TargetState = LS_REACH;
 
-			Lara.ropeParameters.Ptr = -1;
+			Lara.RopeControlData.Ptr = -1;
 		}
 	}
 
@@ -681,7 +681,7 @@ namespace TEN::Entities::Generic
 		item->Airborne = true;
 
 		Lara.gunStatus = LG_HANDS_FREE;
-		Lara.ropeParameters.Ptr = -1;
+		Lara.RopeControlData.Ptr = -1;
 	}
 
 	void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
@@ -693,27 +693,27 @@ namespace TEN::Entities::Generic
 		else
 		{
 			Camera.targetAngle = ANGLE(30.0f);
-			if (Lara.ropeParameters.Count)
+			if (Lara.RopeControlData.Count)
 			{
-				if (!Lara.ropeParameters.Flag)
+				if (!Lara.RopeControlData.Flag)
 				{
-					--Lara.ropeParameters.Count;
-					Lara.ropeParameters.Offset += Lara.ropeParameters.DownVel;
-					if (!Lara.ropeParameters.Count)
-						Lara.ropeParameters.Flag = 1;
+					--Lara.RopeControlData.Count;
+					Lara.RopeControlData.Offset += Lara.RopeControlData.DownVel;
+					if (!Lara.RopeControlData.Count)
+						Lara.RopeControlData.Flag = 1;
 					return;
 				}
 			}
 			else
 			{
-				if (!Lara.ropeParameters.Flag)
+				if (!Lara.RopeControlData.Flag)
 				{
-					ROPE_STRUCT* rope = &Ropes[Lara.ropeParameters.Ptr];
-					Lara.ropeParameters.Offset = 0;
-					Lara.ropeParameters.DownVel = (unsigned int)(rope->meshSegment[Lara.ropeParameters.Segment + 1].y - rope->meshSegment[Lara.ropeParameters.Segment].y) >> 17;
-					Lara.ropeParameters.Count = 0;
-					Lara.ropeParameters.Offset += Lara.ropeParameters.DownVel;
-					Lara.ropeParameters.Flag = 1;
+					ROPE_STRUCT* rope = &Ropes[Lara.RopeControlData.Ptr];
+					Lara.RopeControlData.Offset = 0;
+					Lara.RopeControlData.DownVel = (unsigned int)(rope->meshSegment[Lara.RopeControlData.Segment + 1].y - rope->meshSegment[Lara.RopeControlData.Segment].y) >> 17;
+					Lara.RopeControlData.Count = 0;
+					Lara.RopeControlData.Offset += Lara.RopeControlData.DownVel;
+					Lara.RopeControlData.Flag = 1;
 					return;
 				}
 			}
@@ -722,12 +722,12 @@ namespace TEN::Entities::Generic
 			{
 				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Position, 0);
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				Lara.ropeParameters.Flag = 0;
-				++Lara.ropeParameters.Segment;
-				Lara.ropeParameters.Offset = 0;
+				Lara.RopeControlData.Flag = 0;
+				++Lara.RopeControlData.Segment;
+				Lara.RopeControlData.Offset = 0;
 			}
 
-			if (!(TrInput & IN_BACK) || Lara.ropeParameters.Segment >= 21)
+			if (!(TrInput & IN_BACK) || Lara.RopeControlData.Segment >= 21)
 				item->TargetState = LS_ROPE_IDLE;
 		}
 	}
@@ -746,11 +746,11 @@ namespace TEN::Entities::Generic
 		vec.z = 0;
 
 		frame = (ANIM_FRAME*)GetBestFrame(item);
-		ropeY = Lara.ropeParameters.Y - ANGLE(90);
-		rope = &Ropes[Lara.ropeParameters.Ptr];
+		ropeY = Lara.RopeControlData.Y - ANGLE(90);
+		rope = &Ropes[Lara.RopeControlData.Ptr];
 
-		GetRopePos(rope, (Lara.ropeParameters.Segment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
-		GetRopePos(rope, (Lara.ropeParameters.Segment - 1 << 7) + frame->offsetY - 192, &pos2.x, &pos2.y, &pos2.z);
+		GetRopePos(rope, (Lara.RopeControlData.Segment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
+		GetRopePos(rope, (Lara.RopeControlData.Segment - 1 << 7) + frame->offsetY - 192, &pos2.x, &pos2.y, &pos2.z);
 
 		diff.x = pos.x - pos2.x << 16;
 		diff.y = pos.y - pos2.y << 16;
@@ -815,9 +815,9 @@ namespace TEN::Entities::Generic
 
 		phd_GetMatrixAngles(matrix, angle);
 
-		item->Position.xPos = rope->position.x + (rope->meshSegment[Lara.ropeParameters.Segment].x >> FP_SHIFT);
-		item->Position.yPos = rope->position.y + (rope->meshSegment[Lara.ropeParameters.Segment].y >> FP_SHIFT) + Lara.ropeParameters.Offset;
-		item->Position.zPos = rope->position.z + (rope->meshSegment[Lara.ropeParameters.Segment].z >> FP_SHIFT);
+		item->Position.xPos = rope->position.x + (rope->meshSegment[Lara.RopeControlData.Segment].x >> FP_SHIFT);
+		item->Position.yPos = rope->position.y + (rope->meshSegment[Lara.RopeControlData.Segment].y >> FP_SHIFT) + Lara.RopeControlData.Offset;
+		item->Position.zPos = rope->position.z + (rope->meshSegment[Lara.RopeControlData.Segment].z >> FP_SHIFT);
 
 		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(angle[1]),

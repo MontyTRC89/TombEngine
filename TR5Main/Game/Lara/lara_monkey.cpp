@@ -27,9 +27,9 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -157,9 +157,9 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -247,9 +247,9 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -330,9 +330,9 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -413,9 +413,9 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -514,9 +514,9 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -584,9 +584,9 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);

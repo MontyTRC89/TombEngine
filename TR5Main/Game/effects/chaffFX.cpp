@@ -38,7 +38,7 @@ void TriggerChaffEffects(int flareAge)
 	vel.y = vect.y - pos.y;
 	vel.z = vect.z - pos.z;
 
-	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER),flareAge);
+	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }
 
 void TriggerChaffEffects(ITEM_INFO* Item,int age)
