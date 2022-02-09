@@ -1082,6 +1082,13 @@ struct ExtraRotation
 	short z;
 };
 
+struct FlareData
+{
+	int FlareAge;
+	int FlareFrame;
+	bool FlareControlLeft;
+};
+
 struct RopeControlData
 {
 	byte Segment;
@@ -1125,15 +1132,14 @@ struct LaraInfo
 	int deathCount;
 	short currentActive;
 	ExtraVelocity currentVel;
+	FX_INFO* SpasmEffect;
 	int spasmEffectCount;
-	int flareAge;
+	FlareData Flare;
 	int burnCount;
 	short weaponItem;
 	HolsterInfo holsterInfo;
-	int flareFrame;
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-	bool flareControlLeft;
 	bool look;
 	bool burn;
 	bool keepLow;
@@ -1152,18 +1158,17 @@ struct LaraInfo
 	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	PHD_3DPOS nextCornerPos;
-	FX_INFO* spazEffect;
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
 	short turnRate;
 	short moveAngle;
-	ExtraRotation extraHeadRot;
-	ExtraRotation extraTorsoRot;
+	ExtraRotation ExtraHeadRot;
+	ExtraRotation ExtraTorsoRot;
 	LARA_ARM leftArm;
 	LARA_ARM rightArm;
 	CREATURE_INFO* creature;
-	RopeControlData ropeParameters;
+	RopeControlData RopeControlData;
 	short interactedItem;
 	byte moveCount;
 	signed char location;

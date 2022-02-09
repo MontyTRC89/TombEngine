@@ -359,10 +359,10 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             {
                 CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
                 UndrawFlareMeshes(laraitem);
-                Lara.flareControlLeft = false;
+                Lara.Flare.FlareControlLeft = false;
                 Lara.gunType = WEAPON_NONE;
                 Lara.requestGunType = WEAPON_NONE;
-                Lara.flareAge = 0;
+                Lara.Flare.FlareAge = 0;
             }
 
             Lara.gunStatus = LG_HANDS_FREE;

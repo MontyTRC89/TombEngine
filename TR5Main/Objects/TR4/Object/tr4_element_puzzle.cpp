@@ -282,7 +282,7 @@ namespace TEN::Entities::TR4
                     l->AnimNumber = (abs(item->Position.yPos - l->Position.yPos) >> 8) + LA_TORCH_LIGHT_3;
                     l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
                     l->ActiveState = LS_MISC_CONTROL;
-                    Lara.flareControlLeft = false;
+                    Lara.Flare.FlareControlLeft = false;
                     Lara.leftArm.lock = true;
                     item->ItemFlags[0] = 2;
                 }

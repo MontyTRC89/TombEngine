@@ -98,7 +98,13 @@ table ExtraRotation {
 	z: int32;
 }
 
-table LaraRope {
+table FlareData {
+	flare_age: int32;
+	flare_frame: int32;
+	flare_control_left: bool;
+}
+
+table RopeControlData {
 	segment: int32;
 	direction: int32;
 	arc_front: int32;
@@ -143,14 +149,12 @@ table Lara {
 	current_active: int32;
 	current_vel: ExtraVelocity;
 	spasm_effect_count: int32;
-	flare_age: int32;
+	flare: FlareData;
 	burn_count: int32;
 	weapon_item: int32;
 	holster_info: HolsterInfo;
-	flare_frame: int32;
 	poisoned: int32;
 	wet: [bool];
-	flare_control_left: int32;
 	look: bool;
 	burn: bool;
 	keep_low: bool;
@@ -178,7 +182,7 @@ table Lara {
 	extra_torso_rot: ExtraRotation;
 	left_arm: LaraArmInfo;
 	right_arm: LaraArmInfo;
-	rope_parameters: LaraRope;
+	rope_control_data: RopeControlData;
 	interacted_item: int32;
 	move_count: int32;
 	location: int32;

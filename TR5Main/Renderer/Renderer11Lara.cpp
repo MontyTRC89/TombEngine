@@ -73,8 +73,8 @@ void Renderer11::updateLaraAnimations(bool force)
 	item->World = m_LaraWorldMatrix;
 
 	// Update first Lara's animations
-	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.extraTorsoRot.x), TO_RAD(Lara.extraTorsoRot.y), TO_RAD(Lara.extraTorsoRot.z));
-	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.extraHeadRot.x), TO_RAD(Lara.extraHeadRot.y), TO_RAD(Lara.extraHeadRot.z));
+	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraTorsoRot.x), TO_RAD(Lara.ExtraTorsoRot.y), TO_RAD(Lara.ExtraTorsoRot.z));
+	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraHeadRot.x), TO_RAD(Lara.ExtraHeadRot.y), TO_RAD(Lara.ExtraHeadRot.z));
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
@@ -85,7 +85,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_HANDS_FREE || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.flareControlLeft)
+	if (Lara.gunType != WEAPON_FLARE && (Lara.gunStatus == LG_HANDS_FREE || Lara.gunStatus == LG_HANDS_BUSY) || Lara.gunType == WEAPON_FLARE && !Lara.Flare.FlareControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);

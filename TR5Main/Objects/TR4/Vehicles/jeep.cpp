@@ -1501,7 +1501,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 				UndrawFlareMeshes(l);
-				Lara.flareControlLeft = 0;
+				Lara.Flare.FlareControlLeft = 0;
 				Lara.requestGunType = WEAPON_NONE;
 				Lara.gunType = WEAPON_NONE;
 			}

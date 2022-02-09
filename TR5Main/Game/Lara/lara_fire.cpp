@@ -409,8 +409,8 @@ void LaraGun(ITEM_INFO* laraItem)
 				{
 					CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 					UndrawFlareMeshes(laraItem);
-					laraInfo->flareControlLeft = false;
-					laraInfo->flareAge = 0;
+					laraInfo->Flare.FlareControlLeft = false;
+					laraInfo->Flare.FlareAge = 0;
 				}
 
 				laraInfo->gunType = laraInfo->requestGunType;
@@ -590,7 +590,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			if (laraInfo->Vehicle != NO_ITEM ||
 				CheckForHoldingState(laraItem->ActiveState))
 			{
-				if (laraInfo->flareControlLeft)
+				if (laraInfo->Flare.FlareControlLeft)
 				{
 					if (laraInfo->leftArm.frameNumber)
 					{
@@ -601,13 +601,13 @@ void LaraGun(ITEM_INFO* laraItem)
 				else
 				{
 					laraInfo->leftArm.frameNumber = 95;
-					laraInfo->flareControlLeft = true;
+					laraInfo->Flare.FlareControlLeft = true;
 				}
 			}
 			else
-				laraInfo->flareControlLeft = false;
+				laraInfo->Flare.FlareControlLeft = false;
 
-			DoFlareInHand(laraItem, laraInfo->flareAge);
+			DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
 			SetFlareArm(laraItem, laraInfo->leftArm.frameNumber);
 		}
 
@@ -618,8 +618,8 @@ void LaraGun(ITEM_INFO* laraItem)
 		{
 			if (laraInfo->meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				laraInfo->flareControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->ActiveState));
-				DoFlareInHand(laraItem, laraInfo->flareAge);
+				laraInfo->Flare.FlareControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->ActiveState));
+				DoFlareInHand(laraItem, laraInfo->Flare.FlareAge);
 				SetFlareArm(laraItem, laraInfo->leftArm.frameNumber);
 			}
 		}
@@ -1076,8 +1076,8 @@ void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weaponInfo)
 						if (LOS(&src, &target))
 						{
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= lara->Position.yRot + laraInfo->extraTorsoRot.y;
-							angle[1] -= lara->Position.xRot + laraInfo->extraTorsoRot.x;
+							angle[0] -= lara->Position.yRot + laraInfo->ExtraTorsoRot.y;
+							angle[1] -= lara->Position.xRot + laraInfo->ExtraTorsoRot.x;
 							if (angle[0] >= weaponInfo->lockAngles[0] && angle[0] <= weaponInfo->lockAngles[1] && angle[1] >= weaponInfo->lockAngles[2] && angle[1] <= weaponInfo->lockAngles[3])
 							{
 								TargetList[targets] = item;

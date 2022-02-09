@@ -179,7 +179,7 @@ void DoPickup(ITEM_INFO* character)
 			lara->gunType = WEAPON_FLARE;
 			InitialiseNewWeapon(character);
 			lara->gunStatus = LG_SPECIAL;
-			lara->flareAge = (int)(item->Data) & 0x7FFF;
+			lara->Flare.FlareAge = (int)(item->Data) & 0x7FFF;
 			DrawFlareMeshes(character);
 			KillItem(pickupitem);
 
@@ -195,7 +195,7 @@ void DoPickup(ITEM_INFO* character)
 			lara->gunType = WEAPON_FLARE;
 			InitialiseNewWeapon(character);
 			lara->gunStatus = LG_SPECIAL;
-			lara->flareAge = (short)(item->Data) & 0x7FFF;
+			lara->Flare.FlareAge = (short)(item->Data) & 0x7FFF;
 			KillItem(pickupitem);
 			getThisItemPlease = NO_ITEM;
 			return;

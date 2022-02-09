@@ -1192,7 +1192,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 		{
 			CreateFlare(lara, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(lara);
-			laraInfo->flareControlLeft = 0;
+			laraInfo->Flare.FlareControlLeft = 0;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}
 
