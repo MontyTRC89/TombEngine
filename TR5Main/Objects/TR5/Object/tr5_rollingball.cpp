@@ -22,13 +22,13 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (TestCollision(item, l))
 		{
-			if (TriggerActive(item) && (item->itemFlags[0] || item->fallspeed))
+			if (TriggerActive(item) && (item->itemFlags[0] || item->VerticalVelocity))
 			{
 				LaraItem->animNumber = LA_BOULDER_DEATH;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->targetState = LS_DEATH;
 				LaraItem->activeState = LS_DEATH;
-				LaraItem->airborne = false;
+				LaraItem->Airborne = false;
 			}
 			else
 			{
@@ -45,16 +45,16 @@ void RollingBallControl(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	item->fallspeed += GRAVITY;
+	item->VerticalVelocity += GRAVITY;
 	item->pos.xPos += item->itemFlags[0] / 32;
-	item->pos.yPos += item->fallspeed;
+	item->pos.yPos += item->VerticalVelocity;
 	item->pos.zPos += item->itemFlags[1] / 32;
 
 	int dh = GetCollisionResult(item).Position.Floor - CLICK(2);
 
 	if (item->pos.yPos > dh)
 	{
-		if (abs(item->fallspeed) > 16)
+		if (abs(item->VerticalVelocity) > 16)
 		{
 			int distance = sqrt(
 				SQUARE(Camera.pos.x - item->pos.xPos) +
@@ -62,22 +62,22 @@ void RollingBallControl(short itemNumber)
 				SQUARE(Camera.pos.z - item->pos.zPos));
 
 			if (distance < 16384)
-				Camera.bounce = -(((16384 - distance) * abs(item->fallspeed)) / 16384);
+				Camera.bounce = -(((16384 - distance) * abs(item->VerticalVelocity)) / 16384);
 		}
 
 		if (item->pos.yPos - dh < 512)
 			item->pos.yPos = dh;
 
-		if (item->fallspeed <= 64)
+		if (item->VerticalVelocity <= 64)
 		{
-			if (abs(item->speed) <= 512 || (GetRandomControl() & 0x1F))
-				item->fallspeed = 0;
+			if (abs(item->Velocity) <= 512 || (GetRandomControl() & 0x1F))
+				item->VerticalVelocity = 0;
 			else
-				item->fallspeed = -(short)(GetRandomControl() % (item->speed / 8));
+				item->VerticalVelocity = -(short)(GetRandomControl() % (item->Velocity / 8));
 		}
 		else
 		{
-			item->fallspeed = -(short)(item->fallspeed / 4);
+			item->VerticalVelocity = -(short)(item->VerticalVelocity / 4);
 		}
 	}
 
@@ -320,7 +320,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 			return;
 		if (!TestCollision(item, lara))
 			return;
-		if (lara->airborne)
+		if (lara->Airborne)
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
@@ -334,7 +334,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 			x = item->pos.xPos + ((x * 512) / d);
 			y = item->pos.yPos - 512 + ((y * 512) / d);
 			z = item->pos.zPos + ((z * 512) / d);
-			DoBloodSplat(x, y, z, item->speed, item->pos.yRot, item->roomNumber);
+			DoBloodSplat(x, y, z, item->Velocity, item->pos.yRot, item->roomNumber);
 		}
 		else
 		{
@@ -360,7 +360,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 					y = lara->pos.yPos - (GetRandomControl() / 64);
 					z = lara->pos.zPos + (GetRandomControl() - ANGLE(180) / 256);
 					d = ((GetRandomControl() - ANGLE(180) / 8) + item->pos.yRot);
-					DoBloodSplat(x, y, z, (short)(item->speed * 2), d, item->roomNumber);
+					DoBloodSplat(x, y, z, (short)(item->Velocity * 2), d, item->roomNumber);
 				}
 			}
 		}
@@ -390,10 +390,10 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->pos.yPos < item->floor)
 		{
-			if (!item->airborne)
+			if (!item->Airborne)
 			{
-				item->airborne = 1;
-				item->fallspeed = -10;
+				item->Airborne = 1;
+				item->VerticalVelocity = -10;
 			}
 		}
 		else if (item->activeState == 0)
@@ -413,8 +413,8 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->pos.yPos >= (int)floor - 256)
 		{
-			item->airborne = false;
-			item->fallspeed = 0;
+			item->Airborne = false;
+			item->VerticalVelocity = 0;
 			item->pos.yPos = item->floor;
 			SoundEffect(SFX_TR3_ROLLING_BALL, &item->pos, 0);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->pos.xPos)) + (SQUARE(Camera.mikePos.z - item->pos.zPos)));
@@ -456,8 +456,8 @@ void ClassicRollingBallControl(short itemNum)
 			item->pos.yPos = item->floor;
 			item->pos.xPos = oldx;
 			item->pos.zPos = oldz;
-			item->speed = 0;
-			item->fallspeed = 0;
+			item->Velocity = 0;
+			item->VerticalVelocity = 0;
 			item->touchBits = 0;
 		}
 	}

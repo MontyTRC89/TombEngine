@@ -190,8 +190,8 @@ namespace TEN::Entities::Generic
 			&& Lara.gunStatus == LG_HANDS_FREE 
 			&& (l->activeState == LS_REACH
 				|| l->activeState == LS_JUMP_UP) 
-			&& l->airborne 
-			&& l->fallspeed > 0
+			&& l->Airborne 
+			&& l->VerticalVelocity > 0
 			&& rope->active)
 		{
 			frame = GetBoundsAccurate(l);
@@ -219,8 +219,8 @@ namespace TEN::Entities::Generic
 				}
 
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->airborne = false;
-				l->fallspeed = 0;
+				l->Airborne = false;
+				l->VerticalVelocity = 0;
 
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.ropeParameters.Ptr = item->triggerFlags;
@@ -233,7 +233,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, l->pos.yRot, 16 * LaraItem->speed);
+				ApplyVelocityToRope(segment, l->pos.yRot, 16 * LaraItem->Velocity);
 			}
 		}
 	}
@@ -631,17 +631,17 @@ namespace TEN::Entities::Generic
 		{
 			if (item->pos.xRot >= 0)
 			{
-				item->fallspeed = -112;
-				item->speed = item->pos.xRot / 128;
+				item->VerticalVelocity = -112;
+				item->Velocity = item->pos.xRot / 128;
 			}
 			else
 			{
-				item->speed = 0;
-				item->fallspeed = -20;
+				item->Velocity = 0;
+				item->VerticalVelocity = -20;
 			}
 
 			item->pos.xRot = 0;
-			item->airborne = true;
+			item->Airborne = true;
 
 			Lara.gunStatus = LG_HANDS_FREE;
 
@@ -668,7 +668,7 @@ namespace TEN::Entities::Generic
 
 	void FallFromRope(ITEM_INFO* item)
 	{
-		item->speed = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
+		item->Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->pos.xRot = 0;
 		item->pos.yPos += 320;
 
@@ -677,8 +677,8 @@ namespace TEN::Entities::Generic
 		item->activeState = LS_JUMP_FORWARD;
 		item->targetState = LS_JUMP_FORWARD;
 
-		item->fallspeed = 0;
-		item->airborne = true;
+		item->VerticalVelocity = 0;
+		item->Airborne = true;
 
 		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.ropeParameters.Ptr = -1;

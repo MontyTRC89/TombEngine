@@ -296,8 +296,8 @@ void HarpyControl(short itemNumber)
 					item->animNumber = obj->animIndex + 5;
 					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 					item->activeState = 9;
-					item->speed = 0;
-					item->airborne = true;
+					item->Velocity = 0;
+					item->Airborne = true;
 					item->pos.xRot = 0;
 				}
 
@@ -320,9 +320,9 @@ void HarpyControl(short itemNumber)
 		if (item->pos.yPos >= item->floor)
 		{
 			item->pos.yPos = item->floor;
-			item->fallspeed = 0;
+			item->VerticalVelocity = 0;
 			item->targetState = STATE_HARPY_DEATH;
-			item->airborne = false;
+			item->Airborne = false;
 		}
 
 		item->pos.xRot = 0;

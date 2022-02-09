@@ -1240,7 +1240,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	if (item->pos.yPos + frame->boundingBox.Y2 < wh)
 		return;
 
-	if (item->fallspeed <= 0 || wd >= 474 || SplashCount != 0)
+	if (item->VerticalVelocity <= 0 || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
@@ -1259,7 +1259,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
 		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item->speed;
+		SplashSetup.splashPower = item->Velocity;
 		SetupSplash(&SplashSetup, roomNumber);
 		SplashCount = 16;
 	}
@@ -1277,7 +1277,7 @@ void Splash(ITEM_INFO* item)
 		SplashSetup.y = waterHeight - 1;
 		SplashSetup.x = item->pos.xPos;
 		SplashSetup.z = item->pos.zPos;
-		SplashSetup.splashPower = item->fallspeed;
+		SplashSetup.splashPower = item->VerticalVelocity;
 		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup, roomNumber);
 	}

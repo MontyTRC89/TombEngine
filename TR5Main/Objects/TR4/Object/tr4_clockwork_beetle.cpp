@@ -60,8 +60,8 @@ void ClockworkBeetleControl(short item_number)
 
 	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->pos, 0);
 
-	beetle->fallspeed += 12;
-	beetle->pos.yPos += beetle->fallspeed;
+	beetle->VerticalVelocity += 12;
+	beetle->pos.yPos += beetle->VerticalVelocity;
 
 	short roomNum = beetle->roomNumber;
 	FLOOR_INFO* floor = GetFloor(beetle->pos.xPos, beetle->pos.yPos - 20, beetle->pos.zPos, &roomNum);
@@ -71,10 +71,10 @@ void ClockworkBeetleControl(short item_number)
 	{
 		beetle->pos.yPos = height;
 
-		if (beetle->fallspeed <= 32)
-			beetle->fallspeed = 0;
+		if (beetle->VerticalVelocity <= 32)
+			beetle->VerticalVelocity = 0;
 		else
-			beetle->fallspeed = -beetle->fallspeed >> 1;
+			beetle->VerticalVelocity = -beetle->VerticalVelocity >> 1;
 
 		flag = 1;
 	}
@@ -144,22 +144,22 @@ void ClockworkBeetleControl(short item_number)
 
 				if (SQUARE(x) + SQUARE(z) >= 0x19000)
 				{
-					if (beetle->speed < 32)
-						beetle->speed++;
+					if (beetle->Velocity < 32)
+						beetle->Velocity++;
 				}
 				else
 				{
-					if (beetle->speed <= 4)
+					if (beetle->Velocity <= 4)
 					{
-						if (beetle->speed < 4)
-							beetle->speed++;
+						if (beetle->Velocity < 4)
+							beetle->Velocity++;
 					}
 					else
-						beetle->speed = beetle->speed - (beetle->itemFlags[2] == 4) - 1;
+						beetle->Velocity = beetle->Velocity - (beetle->itemFlags[2] == 4) - 1;
 				}
 
-				beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
-				beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
+				beetle->pos.xPos += beetle->Velocity * phd_sin(beetle->pos.yRot);
+				beetle->pos.zPos += beetle->Velocity * phd_cos(beetle->pos.yRot);
 			}
 			else
 			{
@@ -233,11 +233,11 @@ void ClockworkBeetleControl(short item_number)
 
 		case 3:
 		{
-			if (beetle->speed < 32)
-				beetle->speed++;
+			if (beetle->Velocity < 32)
+				beetle->Velocity++;
 
-			beetle->pos.xPos += beetle->speed * phd_sin(beetle->pos.yRot);
-			beetle->pos.zPos += beetle->speed * phd_cos(beetle->pos.yRot);
+			beetle->pos.xPos += beetle->Velocity * phd_sin(beetle->pos.yRot);
+			beetle->pos.zPos += beetle->Velocity * phd_cos(beetle->pos.yRot);
 
 			if (!floor->Flags.MarkBeetle)
 				beetle->itemFlags[3] = 1;
@@ -275,7 +275,7 @@ void ClockworkBeetleControl(short item_number)
 
 			if (flag && beetle->itemFlags[3] > 30 && val)
 			{
-				beetle->fallspeed = -((val >> 1) + GetRandomControl() % val);
+				beetle->VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 		}
@@ -287,7 +287,7 @@ void ClockworkBeetleControl(short item_number)
 
 			if (flag && val)
 			{
-				beetle->fallspeed = -((val >> 1) + GetRandomControl() % val);
+				beetle->VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 
@@ -334,7 +334,7 @@ void UseClockworkBeetle(short flag)
 			else
 				item->itemFlags[0] = 0;
 
-			item->speed = 0;
+			item->Velocity = 0;
 			AddActiveItem(itemNum);
 
 			if (item->itemFlags[0])

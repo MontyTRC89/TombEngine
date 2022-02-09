@@ -25,10 +25,10 @@ namespace TEN::Entities::Traps
 			int oldX = item->pos.xPos;
 			int oldZ = item->pos.zPos-1000;
 
-			int speed = item->speed * phd_cos(item->pos.xRot);
+			int speed = item->Velocity * phd_cos(item->pos.xRot);
 
 			item->pos.xPos += speed * phd_sin(item->pos.yRot);
-			item->pos.yPos -= item->speed * phd_sin(item->pos.xRot);
+			item->pos.yPos -= item->Velocity * phd_sin(item->pos.xRot);
 			item->pos.zPos += speed * phd_cos(item->pos.yRot);
 
 			short roomNumber = item->roomNumber;
@@ -108,7 +108,7 @@ namespace TEN::Entities::Traps
 
 			dartItem->pos.xRot = 0;
 			dartItem->pos.yRot = item->pos.yRot + -ANGLE(180);
-			dartItem->speed = 256;
+			dartItem->Velocity = 256;
 
 			int xf = 0;
 			int zf = 0;

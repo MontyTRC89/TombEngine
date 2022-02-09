@@ -78,7 +78,7 @@ void AbortionControl(short itemNum)
 		{
 		case ABORT_SET:
 			item->targetState = ABORT_FALL;
-			item->airborne = true;
+			item->Airborne = true;
 			break;
 
 		case ABORT_STOP:
@@ -174,7 +174,7 @@ void AbortionControl(short itemNum)
 				LaraItem->pos.zPos = item->pos.zPos;
 				LaraItem->pos.yRot = item->pos.yRot;
 				LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-				LaraItem->airborne = false;
+				LaraItem->Airborne = false;
 				LaraItem->hitPoints = -1;
 				Lara.air = -1;
 				Lara.gunStatus = LG_HANDS_BUSY;
@@ -201,7 +201,7 @@ void AbortionControl(short itemNum)
 		if (item->pos.yPos > item->floor)
 		{
 			item->targetState = ABORT_STOP;
-			item->airborne = false;
+			item->Airborne = false;
 			item->pos.yPos = item->floor;
 			Camera.bounce = 500;
 		}

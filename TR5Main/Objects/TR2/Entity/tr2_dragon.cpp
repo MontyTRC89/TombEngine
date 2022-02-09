@@ -102,8 +102,8 @@ static void createExplosion(ITEM_INFO* item)
 		itemExplo->pos.yRot = 0;
 		itemExplo->pos.xRot = 0;
 		itemExplo->pos.zRot = 0;
-		itemExplo->speed = 0;
-		itemExplo->fallspeed = 0;
+		itemExplo->Velocity = 0;
+		itemExplo->VerticalVelocity = 0;
 
 		InitialiseItem(ExplIndex);
 		AddActiveItem(ExplIndex);
@@ -183,7 +183,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			anim = item->animNumber - Objects[ID_DRAGON_BACK].animIndex;
 			frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 			if ((anim == DRAGON_DEAD_ANIM || (anim == DRAGON_DEAD_ANIM + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
-				(TrInput & IN_ACTION) && item->objectNumber == ID_DRAGON_BACK && !laraitem->airborne &&
+				(TrInput & IN_ACTION) && item->objectNumber == ID_DRAGON_BACK && !laraitem->Airborne &&
 				shift <= DRAGON_MID && shift > DRAGON_CLOSE - 350 && side_shift > -350 && side_shift < 350 &&
 				angle > 0x4000 - ANGLE(30) && angle < 0x4000 + ANGLE(30))
 			{
@@ -198,9 +198,9 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				laraitem->pos.yRot = item->pos.yRot;
 				laraitem->pos.xRot = item->pos.xRot;
 				laraitem->pos.zRot = item->pos.zRot;
-				laraitem->fallspeed = 0;
-				laraitem->airborne = false;
-				laraitem->speed = 0;
+				laraitem->VerticalVelocity = 0;
+				laraitem->Airborne = false;
+				laraitem->Velocity = 0;
 
 				if (item->roomNumber != laraitem->roomNumber)
 					ItemNewRoom(Lara.itemNumber, item->roomNumber);

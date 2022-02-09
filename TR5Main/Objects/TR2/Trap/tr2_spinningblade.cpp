@@ -46,7 +46,7 @@ void SpinningBladeControl(short itemNumber)
 			LaraItem->hitStatus = true;
 			LaraItem->hitPoints -= 100;
 
-			DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE * 2, LaraItem->pos.zPos, (short)(item->speed * 2), LaraItem->pos.yRot, LaraItem->roomNumber, 2);
+			DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - STEP_SIZE * 2, LaraItem->pos.zPos, (short)(item->Velocity * 2), LaraItem->pos.yRot, LaraItem->roomNumber, 2);
 		}
 
 		SoundEffect(231, &item->pos, 0);

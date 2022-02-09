@@ -648,7 +648,7 @@ namespace TEN::Entities::Effects
 			|| !(TrInput & IN_ACTION)
 			|| l->activeState != LS_IDLE
 			|| l->animNumber != LA_STAND_IDLE
-			|| l->airborne)
+			|| l->Airborne)
 		{
 			if (item->objectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, l, coll);

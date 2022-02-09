@@ -38,7 +38,7 @@ namespace TEN::Entities::Doors
 
 		if (TrInput & IN_ACTION
 			&& l->activeState == LS_UNDERWATER_STOP
-			&& !(item->status && item->airborne)
+			&& !(item->status && item->Airborne)
 			&& Lara.waterStatus == LW_UNDERWATER
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
@@ -50,7 +50,7 @@ namespace TEN::Entities::Doors
 				if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
 				{
 					SetAnimation(l, LA_UNDERWATER_DOOR_OPEN);
-					l->fallspeed = 0;
+					l->VerticalVelocity = 0;
 					item->status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNum);

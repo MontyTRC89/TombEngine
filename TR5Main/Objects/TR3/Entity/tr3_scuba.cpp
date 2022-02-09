@@ -31,7 +31,7 @@ static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, s
 
 		harpoon->pos.xRot = 0;
 		harpoon->pos.yRot = yRot;
-		harpoon->speed = 150;
+		harpoon->VerticalVelocity = 150;
 
 		AddActiveItem(harpoonItemNum);
 		harpoon->status = ITEM_ACTIVE;
@@ -54,10 +54,10 @@ void ScubaHarpoonControl(short itemNum)
 		int ox = item->pos.xPos;
 		int oz = item->pos.zPos;
 
-		short speed = item->speed * phd_cos(item->pos.xRot);
+		short speed = item->VerticalVelocity * phd_cos(item->pos.xRot);
 		item->pos.zPos += speed * phd_cos(item->pos.yRot);
 		item->pos.xPos += speed * phd_sin(item->pos.yRot);
-		item->pos.yPos += -item->speed * phd_sin(item->pos.xRot);
+		item->pos.yPos += -item->VerticalVelocity * phd_sin(item->pos.xRot);
 
 		short roomNumber = item->roomNumber;
 		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -179,7 +179,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->flags)
 			{
-				ShootHarpoon(item, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->speed, item->pos.yRot, item->roomNumber);
+				ShootHarpoon(item, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->VerticalVelocity, item->pos.yRot, item->roomNumber);
 				creature->flags = 1;
 			}
 			break;
@@ -217,7 +217,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->flags)
 			{
-				ShootHarpoon(item, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->speed, item->pos.yRot, item->roomNumber);
+				ShootHarpoon(item, item->pos.xPos, item->pos.yPos, item->pos.zPos, item->VerticalVelocity, item->pos.yRot, item->roomNumber);
 				creature->flags = 1;
 			}
 			break;

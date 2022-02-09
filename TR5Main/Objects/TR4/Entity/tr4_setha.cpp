@@ -364,7 +364,7 @@ void SethaControl(short itemNumber)
 			if (item->animNumber != Objects[item->animNumber].animIndex + 26)
 			{
 				creature->LOT.fly = 16;
-				item->airborne = false;
+				item->Airborne = false;
 				creature->maximumTurn = 0;
 				creature->target.y = LaraItem->pos.yPos;
 
@@ -396,7 +396,7 @@ void SethaControl(short itemNumber)
 			else
 			{
 				creature->LOT.fly = 0;
-				item->airborne = true;
+				item->Airborne = true;
 				if (item->pos.yPos - item->floor > 0)
 				{
 					item->targetState = 1;

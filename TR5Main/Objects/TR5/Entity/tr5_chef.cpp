@@ -111,7 +111,7 @@ void ControlChef(short itemNumber)
 			if (abs(LaraItem->pos.yPos - item->pos.yPos) < 1024
 				&& info.distance < SQUARE(1536)
 				&& (item->touchBits
-					|| LaraItem->speed > 15
+					|| LaraItem->Velocity> 15
 					|| item->hitStatus
 					|| TargetVisible(item, &laraInfo)))
 			{

@@ -47,9 +47,9 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->fallspeed -= 4;
-	if (item->fallspeed < 0)
-		item->fallspeed = 0;
+	item->VerticalVelocity -= 4;
+	if (item->VerticalVelocity < 0)
+		item->VerticalVelocity = 0;
 
 	if (item->hitPoints <= 0)
 	{
@@ -133,9 +133,9 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		item->targetState = LS_ONWATER_STOP;
 	}
 
-	item->fallspeed += 8;
-	if (item->fallspeed > 60)
-		item->fallspeed = 60;
+	item->VerticalVelocity += 8;
+	if (item->VerticalVelocity > 60)
+		item->VerticalVelocity = 60;
 }
 
 void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
@@ -162,9 +162,9 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		item->targetState = LS_ONWATER_STOP;
 	}
 
-	item->fallspeed += 8;
-	if (item->fallspeed > 60)
-		item->fallspeed = 60;
+	item->VerticalVelocity += 8;
+	if (item->VerticalVelocity > 60)
+		item->VerticalVelocity = 60;
 }
 
 void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
@@ -191,9 +191,9 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		item->targetState = LS_ONWATER_STOP;
 	}
 
-	item->fallspeed += 8;
-	if (item->fallspeed > 60)
-		item->fallspeed = 60;
+	item->VerticalVelocity += 8;
+	if (item->VerticalVelocity > 60)
+		item->VerticalVelocity = 60;
 }
 
 void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
@@ -220,9 +220,9 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 		item->targetState = LS_ONWATER_STOP;
 
-	item->fallspeed += 8;
-	if (item->fallspeed > 60)
-		item->fallspeed = 60;
+	item->VerticalVelocity += 8;
+	if (item->VerticalVelocity > 60)
+		item->VerticalVelocity = 60;
 }
 
 void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)

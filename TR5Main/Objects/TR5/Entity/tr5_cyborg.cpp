@@ -257,7 +257,7 @@ void HitmanControl(short itemNumber)
 			angle = CreatureTurn(item, creature->maximumTurn);
 			
 			if (laraInfo.distance < SQUARE(2048) 
-				&& LaraItem->speed > 20
+				&& LaraItem->Velocity> 20
 				|| item->hitStatus
 				|| TargetVisible(item, &laraInfo))
 			{

@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 
 		item->itemFlags[0] = 0;
 		item->itemFlags[6] = 0;
-		item->speed = WraithSpeed;
+		item->VerticalVelocity = WraithSpeed;
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
@@ -98,7 +98,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->pos.xRot;
 
-		int speed = 8 * WraithSpeed / item->speed;
+		int speed = 8 * WraithSpeed / item->VerticalVelocity;
 
 		if (abs(angleH) >= item->itemFlags[2] || angleH > 0 != item->itemFlags[2] > 0)
 		{
@@ -170,9 +170,9 @@ namespace TEN::Entities::TR4
 		oldY = item->pos.yPos;
 		oldZ = item->pos.zPos;
 
-		item->pos.xPos += item->speed * phd_sin(item->pos.yRot);
-		item->pos.yPos += item->speed * phd_sin(item->pos.xRot);
-		item->pos.zPos += item->speed * phd_cos(item->pos.yRot);
+		item->pos.xPos += item->VerticalVelocity * phd_sin(item->pos.yRot);
+		item->pos.yPos += item->VerticalVelocity * phd_sin(item->pos.xRot);
+		item->pos.zPos += item->VerticalVelocity * phd_cos(item->pos.yRot);
 
 		auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
 		if (item->roomNumber != outsideRoom && outsideRoom != NO_ROOM)
@@ -247,9 +247,9 @@ namespace TEN::Entities::TR4
 		{
 			if (Wibble & 16)
 			{
-				if (item->speed < WraithSpeed)
+				if (item->VerticalVelocity < WraithSpeed)
 				{
-					item->speed++;
+					item->VerticalVelocity++;
 				}
 				if (item->itemFlags[6])
 				{
@@ -262,9 +262,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (item->speed > 32)
+			if (item->VerticalVelocity > 32)
 			{
-				item->speed -= 12;
+				item->VerticalVelocity -= 12;
 			}
 			if (target == LaraItem)
 			{

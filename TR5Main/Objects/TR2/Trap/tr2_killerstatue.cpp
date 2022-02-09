@@ -40,7 +40,7 @@ void KillerStatueControl(short itemNumber)
 		int z = LaraItem->pos.zPos + (GetRandomControl() - 16384) / 256;
 		int y = LaraItem->pos.yPos - GetRandomControl() / 44;
 		int d = (GetRandomControl() - 16384) / 8 + LaraItem->pos.yRot;
-		DoBloodSplat(x, y, z, LaraItem->speed, d, LaraItem->roomNumber);
+		DoBloodSplat(x, y, z, LaraItem->Velocity, d, LaraItem->roomNumber);
 	}
 
 	AnimateItem(item);

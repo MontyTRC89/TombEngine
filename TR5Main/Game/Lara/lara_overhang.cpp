@@ -447,7 +447,7 @@ void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 
 void lara_as_slopefall(ITEM_INFO* lara, COLL_INFO* coll)
 {
-	lara->airborne = true;
+	lara->Airborne = true;
 
 	if (GlobalCounter % 2)
 		lara->pos.xRot--;

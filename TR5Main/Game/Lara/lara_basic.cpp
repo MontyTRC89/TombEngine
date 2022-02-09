@@ -177,8 +177,8 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -661,9 +661,9 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	item->airborne = false;
-	item->fallspeed = 0;
-	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
+	info->moveAngle = (item->Velocity >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -775,8 +775,8 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->fallspeed = 0;
-	item->airborne = false;
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -1408,8 +1408,8 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1726,8 +1726,8 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(90.0f);
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
@@ -1811,8 +1811,8 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot - ANGLE(90.0f);
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
@@ -1874,8 +1874,8 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1943,8 +1943,8 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->data;
 
 	info->moveAngle = item->pos.yRot;
-	item->airborne = false;
-	item->fallspeed = 0;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -2264,7 +2264,7 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->targetState != LS_DEATH &&
 		item->targetState != LS_IDLE &&
 		item->targetState != LS_RUN_FORWARD &&
-		item->fallspeed >= LARA_FREEFALL_SPEED)
+		item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->targetState = LS_FREEFALL;
 	}
@@ -2276,7 +2276,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
 
-	info->moveAngle = (item->speed >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
+	info->moveAngle = (item->Velocity >= 0) ? item->pos.yRot : item->pos.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -2292,10 +2292,10 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->speed < 0)
+	if (item->Velocity < 0)
 		info->moveAngle = item->pos.yRot; // ???
 
-	if (coll->Middle.Floor <= 0 && item->fallspeed > 0)
+	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	{
 		DoLaraFallDamage(item);
 
@@ -2306,10 +2306,10 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			item->targetState = LS_RUN_FORWARD;
 
-		item->airborne = false;
-		item->fallspeed = 0;
+		item->Airborne = false;
+		item->VerticalVelocity = 0;
 		item->pos.yPos += coll->Middle.Floor;
-		item->speed = 0;
+		item->Velocity = 0;
 
 		AnimateLara(item);
 	}

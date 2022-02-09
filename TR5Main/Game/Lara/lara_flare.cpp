@@ -28,7 +28,7 @@ void FlareControl(short itemNum)
 		return;
 	}
 
-	if (flareItem->fallspeed)
+	if (flareItem->VerticalVelocity)
 	{
 		flareItem->pos.xRot += ANGLE(3.0f);
 		flareItem->pos.zRot += ANGLE(5.0f);
@@ -41,8 +41,8 @@ void FlareControl(short itemNum)
 
 	PHD_VECTOR oldPos = { flareItem->pos.xPos , flareItem->pos.yPos , flareItem->pos.zPos };
 
-	int xVel = flareItem->speed * phd_sin(flareItem->pos.yRot);
-	int zVel = flareItem->speed * phd_cos(flareItem->pos.yRot);
+	int xVel = flareItem->Velocity * phd_sin(flareItem->pos.yRot);
+	int zVel = flareItem->Velocity * phd_cos(flareItem->pos.yRot);
 
 	flareItem->pos.xPos += xVel;
 	flareItem->pos.zPos += zVel;
@@ -50,21 +50,21 @@ void FlareControl(short itemNum)
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
 	{
-		flareItem->fallspeed += (5 - flareItem->fallspeed) / 2;
-		flareItem->speed += (5 - flareItem->speed) / 2;
+		flareItem->VerticalVelocity += (5 - flareItem->VerticalVelocity) / 2;
+		flareItem->Velocity += (5 - flareItem->Velocity) / 2;
 	}
 	else
-		flareItem->fallspeed += 6;
+		flareItem->VerticalVelocity += 6;
 
-	flareItem->pos.yPos += flareItem->fallspeed;
+	flareItem->pos.yPos += flareItem->VerticalVelocity;
 
-	DoProjectileDynamics(itemNum, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->fallspeed, zVel);
+	DoProjectileDynamics(itemNum, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->VerticalVelocity, zVel);
 
 	int& age = flareItem->data;
 	age &= 0x7FFF;
 	if (age >= FLARE_AGE)
 	{
-		if (!flareItem->fallspeed && !flareItem->speed)
+		if (!flareItem->VerticalVelocity && !flareItem->Velocity)
 		{
 			KillItem(itemNum);
 			return;
@@ -330,17 +330,17 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 
 		if (thrown)
 		{
-			flareItem->speed = laraItem->speed + 50;
-			flareItem->fallspeed = laraItem->fallspeed - 50;
+			flareItem->Velocity = laraItem->Velocity + 50;
+			flareItem->VerticalVelocity = laraItem->VerticalVelocity - 50;
 		}
 		else
 		{
-			flareItem->speed = laraItem->speed + 10;
-			flareItem->fallspeed = laraItem->fallspeed + 50;
+			flareItem->Velocity = laraItem->Velocity + 10;
+			flareItem->VerticalVelocity = laraItem->VerticalVelocity + 50;
 		}
 
 		if (flag)
-			flareItem->speed /= 2;
+			flareItem->Velocity /= 2;
 
 		if (objectNum == ID_FLARE_ITEM)
 		{

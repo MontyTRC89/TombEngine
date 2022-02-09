@@ -302,7 +302,7 @@ static void TribesmanShotDart(ITEM_INFO* item)
 
 		dartItem->pos.xRot = angles[1];
 		dartItem->pos.yRot = angles[0];
-		dartItem->speed = 256;
+		dartItem->Velocity = 256;
 
 		AddActiveItem(dartItemNumber);
 

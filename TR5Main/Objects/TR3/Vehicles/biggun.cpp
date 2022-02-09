@@ -79,7 +79,7 @@ static bool BigGunTestMount(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		Lara.gunStatus != LG_HANDS_FREE ||
-		laraItem->airborne)
+		laraItem->Airborne)
 	{
 		return false;
 	}
@@ -123,7 +123,7 @@ void BigGunFire(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 		projectileItem->pos.xRot = -((bGunInfo->xRot - 32) * ANGLE(1.0f));
 		projectileItem->pos.yRot = bGunItem->pos.yRot;
 		projectileItem->pos.zRot = 0;
-		projectileItem->speed = 16;
+		projectileItem->Velocity = 16;
 		projectileItem->itemFlags[0] = 1;
 
 		AddActiveItem(itemNum);
@@ -166,7 +166,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->targetState = BGUN_STATE_MOUNT;
 		laraItem->activeState = BGUN_STATE_MOUNT;
 		laraItem->pos = bGunItem->pos;
-		laraItem->airborne = false;
+		laraItem->Airborne = false;
 		laraInfo->gunStatus = LG_HANDS_BUSY;
 		bGunItem->hitPoints = 1;
 		bGunInfo->flags = 0;

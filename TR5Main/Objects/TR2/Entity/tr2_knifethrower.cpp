@@ -60,7 +60,7 @@ void KnifeControl(short fxNum)
 		LaraItem->hitStatus = true;
 
 		fx->pos.yRot = LaraItem->pos.yRot;
-		fx->speed = LaraItem->speed;
+		fx->speed = LaraItem->Velocity;
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);

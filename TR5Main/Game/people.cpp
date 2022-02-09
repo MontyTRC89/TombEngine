@@ -21,7 +21,7 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 
 	if (info->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->speed * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->Velocity * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
 		distance = info->distance + SQUARE(distance);
 		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
 		{

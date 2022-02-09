@@ -77,7 +77,7 @@ namespace TEN::Entities::TR4
 					if (item->itemFlags[0])
 					{
 						beetle->pos.yRot = 2 * GetRandomControl();
-						beetle->fallspeed = -16 - (GetRandomControl() & 0x1F);
+						beetle->fallspeed= -16 - (GetRandomControl() & 0x1F);
 					}
 					else
 					{

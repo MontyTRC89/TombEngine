@@ -3,7 +3,7 @@
 struct MoveTestSetup
 {
 	short Angle;
-	int LowerFloorBound;
+	int	LowerFloorBound;
 	int UpperFloorBound;
 	bool CheckSlopeDown = true;
 	bool CheckSlopeUp = true;

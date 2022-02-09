@@ -59,28 +59,28 @@ void ControlCentaurBomb(short itemNumber)
 		item->pos.xRot -= ANGLE(1);
 		if (item->pos.xRot < -16384)
 			item->pos.xRot = -16384;
-		item->fallspeed = -BOMB_SPEED * phd_sin(item->pos.xRot);
-		item->speed = BOMB_SPEED * phd_cos(item->pos.xRot);
+		item->VerticalVelocity = -BOMB_SPEED * phd_sin(item->pos.xRot);
+		item->Velocity = BOMB_SPEED * phd_cos(item->pos.xRot);
 		aboveWater = true;
 	}
 	else
 	{
 		aboveWater = true;
-		item->fallspeed += 3;
-		if (item->speed)
+		item->VerticalVelocity += 3;
+		if (item->Velocity)
 		{
-			item->pos.zRot += (((item->speed / 4) + 7) * ANGLE(1));
+			item->pos.zRot += (((item->Velocity / 4) + 7) * ANGLE(1));
 			if (item->requiredState)
-				item->pos.yRot += (((item->speed / 2) + 7) * ANGLE(1));
+				item->pos.yRot += (((item->Velocity / 2) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->speed / 2) + 7) * ANGLE(1));
+				item->pos.xRot += (((item->Velocity / 2) + 7) * ANGLE(1));
 
 		}
 	}
 
-	item->pos.xPos += item->speed * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
-	item->pos.yPos += item->speed * phd_sin(-item->pos.xRot);
-	item->pos.zPos += item->speed * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+	item->pos.xPos += item->Velocity * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
+	item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
+	item->pos.zPos += item->Velocity * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
 
 	roomNumber = item->roomNumber;
 	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
@@ -175,8 +175,8 @@ static void RocketGun(ITEM_INFO* v)
 		item->pos.yRot = v->pos.yRot;
 		item->pos.zRot = 0;
 
-		item->fallspeed = -BOMB_SPEED * phd_cos(item->pos.xRot);
-		item->speed = BOMB_SPEED *phd_cos(item->pos.xRot);
+		item->VerticalVelocity = -BOMB_SPEED * phd_cos(item->pos.xRot);
+		item->Velocity = BOMB_SPEED *phd_cos(item->pos.xRot);
 		item->itemFlags[0] = 1;
 
 		AddActiveItem(itemNum);

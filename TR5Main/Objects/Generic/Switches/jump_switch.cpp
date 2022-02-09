@@ -29,8 +29,8 @@ namespace TEN::Entities::Switches
 		if ((TrInput & IN_ACTION)
 			&& !Lara.gunStatus
 			&& (l->activeState == LS_REACH || l->activeState == LS_JUMP_UP)
-			&& (l->status || l->airborne)
-			&& l->fallspeed > 0
+			&& (l->status || l->Airborne)
+			&& l->VerticalVelocity > 0
 			&& !item->activeState)
 		{
 			if (TestLaraPosition(&JumpSwitchBounds, item, l))
@@ -39,9 +39,9 @@ namespace TEN::Entities::Switches
 
 				l->activeState = LS_SWITCH_DOWN;
 				l->animNumber = LA_JUMPSWITCH_PULL;
-				l->fallspeed = 0;
+				l->VerticalVelocity = 0;
 				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->airborne = false;
+				l->Airborne = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 
 				item->targetState = SWITCH_ON;

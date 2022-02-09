@@ -71,7 +71,7 @@ void CobraControl(short itemNum)
 			creature->flags = 0;
 			if (info.distance > SQUARE(2560))
 				item->targetState = 3;
-			else if ((LaraItem->hitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->hitStatus || (LaraItem->speed > 15)))
+			else if ((LaraItem->hitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->hitStatus || (LaraItem->Velocity > 15)))
 				item->targetState = 2;
 			break;
 
