@@ -186,7 +186,7 @@ namespace TEN::Renderer
 		//DrawLara(false, true);
 
 		Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-		Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		Vector3 itemPos = Vector3(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
 		if (lightPos == itemPos)
 			return;
 
@@ -228,10 +228,10 @@ namespace TEN::Renderer
 
 		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-		RendererRoom& room = m_rooms[LaraItem->roomNumber];
+		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 
 		m_stItem.World = m_LaraWorldMatrix;
-		m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+		m_stItem.Position = Vector4(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -360,7 +360,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
-		RendererRoom& room = m_rooms[LaraItem->roomNumber];
+		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.itemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
@@ -2071,7 +2071,7 @@ namespace TEN::Renderer
 		{
 			m_currentY = 60;
 
-			ROOM_INFO* r = &g_Level.Rooms[LaraItem->roomNumber];
+			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
 
 			switch (m_numDebugPage)
 			{
@@ -2093,12 +2093,12 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
-				PrintDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
+				PrintDebugMessage("Lara.location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Lara.roomNumber: %d", LaraItem->RoomNumber);
 				PrintDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-				                  LaraItem->boxNumber);
-				PrintDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-				PrintDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
+				                  LaraItem->BoxNumber);
+				PrintDebugMessage("Lara.pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+				PrintDebugMessage("Lara.rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE,
 				                  r->z + r->zSize * WALL_SIZE);
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
@@ -2107,11 +2107,11 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
-				PrintDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
-				PrintDebugMessage("Lara.activeState: %d", LaraItem->activeState);
-				PrintDebugMessage("Lara.requiredState: %d", LaraItem->requiredState);
-				PrintDebugMessage("Lara.targetState: %d", LaraItem->targetState);
+				PrintDebugMessage("Lara.animNumber: %d", LaraItem->AnimNumber);
+				PrintDebugMessage("Lara.frameNumber: %d", LaraItem->FrameNumber);
+				PrintDebugMessage("Lara.ActiveState: %d", LaraItem->ActiveState);
+				PrintDebugMessage("Lara.RequiredState: %d", LaraItem->RequiredState);
+				PrintDebugMessage("Lara.TargetState: %d", LaraItem->TargetState);
 				PrintDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
 				PrintDebugMessage("Lara.gunType: %d", Lara.gunType);
 				PrintDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
@@ -2121,7 +2121,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
+				PrintDebugMessage("target HitPoints: %d", Lara.target ? Lara.target->HitPoints : NULL);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
@@ -2654,7 +2654,7 @@ namespace TEN::Renderer
 
 		// Setup Lara item
 		m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
-		CollectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
+		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.itemNumber], view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -2820,13 +2820,13 @@ namespace TEN::Renderer
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
 				ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
-				RendererRoom& room = m_rooms[nativeItem->roomNumber];
-				RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
+				RendererRoom& room = m_rooms[nativeItem->RoomNumber];
+				RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 
 				if (moveableObj.DoNotDraw)
 					continue;
 
-				short objectNumber = nativeItem->objectNumber;
+				short objectNumber = nativeItem->ObjectNumber;
 
 				if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 				{
@@ -2855,15 +2855,15 @@ namespace TEN::Renderer
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		RendererRoom* room = &m_rooms[nativeItem->roomNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+		RendererRoom* room = &m_rooms[nativeItem->RoomNumber];
+		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
-		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos, 1.0f);
+		m_stItem.Position = Vector4(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -2878,12 +2878,12 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
-			if (!(nativeItem->meshBits & (1 << k)))
+			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
 			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
-			if (obj->meshSwapSlot != -1 && ((nativeItem->swapMeshFlags >> k) & 1))
+			if (obj->meshSwapSlot != -1 && ((nativeItem->SwapMeshFlags >> k) & 1))
 			{
 				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
 				if (swapMeshObj.ObjectMeshes.size() > k)
@@ -2907,9 +2907,9 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		ITEM_INFO* nativeItem = &g_Level.Items[info->item->ItemNumber];
-		RendererRoom& room = m_rooms[nativeItem->roomNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+		RendererRoom& room = m_rooms[nativeItem->RoomNumber];
+		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
 		// Set shaders
 		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
@@ -2968,16 +2968,16 @@ namespace TEN::Renderer
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		Vector3 start = Vector3(
-			nativeItem->pos.xPos,
-			nativeItem->pos.yPos,
-			nativeItem->pos.zPos);
+			nativeItem->Position.xPos,
+			nativeItem->Position.yPos,
+			nativeItem->Position.zPos);
 
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->pos.xRot)));
+		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Position.xRot)));
 
 		Vector3 end = Vector3(
-			nativeItem->pos.xPos + speed * phd_sin(TO_RAD(nativeItem->pos.yRot)),
-			nativeItem->pos.yPos + 96 * phd_sin(TO_RAD(nativeItem->pos.xRot)),
-			nativeItem->pos.zPos + speed * phd_cos(TO_RAD(nativeItem->pos.yRot)));
+			nativeItem->Position.xPos + speed * phd_sin(TO_RAD(nativeItem->Position.yRot)),
+			nativeItem->Position.yPos + 96 * phd_sin(TO_RAD(nativeItem->Position.xRot)),
+			nativeItem->Position.zPos + speed * phd_cos(TO_RAD(nativeItem->Position.yRot)));
 
 		addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
@@ -2985,7 +2985,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
+		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->Data;
 
 		for (int j = 0; j <= 4; j++)
 		{

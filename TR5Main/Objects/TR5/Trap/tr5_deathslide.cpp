@@ -16,21 +16,21 @@ PHD_VECTOR DeathSlidePosition(0, 0, 371);
 void InitialiseDeathSlide(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->data = GAME_VECTOR();
-	GAME_VECTOR* pos = item->data;
-	pos->x = item->pos.xPos;
-	pos->y = item->pos.yPos;
-	pos->z = item->pos.zPos;
-	pos->roomNumber = item->roomNumber;
+	item->Data = GAME_VECTOR();
+	GAME_VECTOR* pos = item->Data;
+	pos->x = item->Position.xPos;
+	pos->y = item->Position.yPos;
+	pos->z = item->Position.zPos;
+	pos->roomNumber = item->RoomNumber;
 }
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.gunStatus != LG_HANDS_FREE || l->activeState != LS_IDLE)
+	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.gunStatus != LG_HANDS_FREE || l->ActiveState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (item->status != ITEM_NOT_ACTIVE)
+	if (item->Status != ITEM_NOT_ACTIVE)
 		return;
 
 	if (TestLaraPosition(&DeathSlideBounds, item, LaraItem))
@@ -38,16 +38,16 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
 		Lara.gunStatus = LG_HANDS_BUSY;
 
-		l->targetState = LS_ZIPLINE_RIDE;
+		l->TargetState = LS_ZIPLINE_RIDE;
 		do
 			AnimateItem(l);
-		while (l->activeState != LS_GRABBING);
+		while (l->ActiveState != LS_GRABBING);
 
-		if (!item->active)
+		if (!item->Active)
 			AddActiveItem(itemNumber);
 
-		item->status = ITEM_ACTIVE;
-		item->flags |= ONESHOT;
+		item->Status = ITEM_ACTIVE;
+		item->Flags |= ONESHOT;
 	}
 }
 
@@ -55,30 +55,30 @@ void ControlDeathSlide(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->status == ITEM_ACTIVE)
+	if (item->Status == ITEM_ACTIVE)
 	{
-		if (!(item->flags & ONESHOT))
+		if (!(item->Flags & ONESHOT))
 		{
-			GAME_VECTOR* old = (GAME_VECTOR*)item->data;
+			GAME_VECTOR* old = (GAME_VECTOR*)item->Data;
 
-			item->pos.xPos = old->x;
-			item->pos.yPos = old->y;
-			item->pos.zPos = old->z;
+			item->Position.xPos = old->x;
+			item->Position.yPos = old->y;
+			item->Position.zPos = old->z;
 
-			if (old->roomNumber != item->roomNumber)
+			if (old->roomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, old->roomNumber);
 
-			item->status = ITEM_NOT_ACTIVE;
-			item->activeState = item->targetState = 1;
-			item->animNumber = Objects[item->objectNumber].animIndex;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Status = ITEM_NOT_ACTIVE;
+			item->ActiveState = item->TargetState = 1;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
 			RemoveActiveItem(itemNumber);
 
 			return;
 		}
 
-		if (item->activeState == 1)
+		if (item->ActiveState == 1)
 		{
 			AnimateItem(item);
 			return;
@@ -89,36 +89,36 @@ void ControlDeathSlide(short itemNumber)
 		if (item->VerticalVelocity < 100)
 			item->VerticalVelocity += 5;
 
-		float c = phd_cos(item->pos.yRot);
-		float s = phd_sin(item->pos.yRot);
+		float c = phd_cos(item->Position.yRot);
+		float s = phd_sin(item->Position.yRot);
 
-		item->pos.zPos += item->VerticalVelocity * c;
-		item->pos.xPos += item->VerticalVelocity * s;
-		item->pos.yPos += item->VerticalVelocity / 4;
+		item->Position.zPos += item->VerticalVelocity * c;
+		item->Position.xPos += item->VerticalVelocity * s;
+		item->Position.yPos += item->VerticalVelocity / 4;
 
-		short roomNumber = item->roomNumber;
-		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		if (roomNumber != item->roomNumber)
+		short roomNumber = item->RoomNumber;
+		GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (LaraItem->activeState == LS_ZIPLINE_RIDE)
+		if (LaraItem->ActiveState == LS_ZIPLINE_RIDE)
 		{
-			LaraItem->pos.xPos = item->pos.xPos;
-			LaraItem->pos.yPos = item->pos.yPos;
-			LaraItem->pos.zPos = item->pos.zPos;
+			LaraItem->Position.xPos = item->Position.xPos;
+			LaraItem->Position.yPos = item->Position.yPos;
+			LaraItem->Position.zPos = item->Position.zPos;
 		}
 
-		int x = item->pos.xPos + 1024 * s;
-		int y = item->pos.yPos + 64;
-		int z = item->pos.zPos + 1024 * c;
+		int x = item->Position.xPos + 1024 * s;
+		int y = item->Position.yPos + 64;
+		int z = item->Position.zPos + 1024 * c;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
-			if (LaraItem->activeState == LS_ZIPLINE_RIDE)
+			if (LaraItem->ActiveState == LS_ZIPLINE_RIDE)
 			{
-				LaraItem->targetState = LS_JUMP_FORWARD;
+				LaraItem->TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
 				LaraItem->Airborne = true;
 				LaraItem->Velocity = item->VerticalVelocity;
@@ -126,15 +126,15 @@ void ControlDeathSlide(short itemNumber)
 			}
 
 			// Stop
-			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &item->pos, 0);
+			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &item->Position, 0);
 			RemoveActiveItem(itemNumber);
-			item->status = ITEM_NOT_ACTIVE;
-			item->flags -= ONESHOT;
+			item->Status = ITEM_NOT_ACTIVE;
+			item->Flags -= ONESHOT;
 		}
 		else
 		{
 			// Whizz
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &item->pos, 0);
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &item->Position, 0);
 		}
 	}
 }

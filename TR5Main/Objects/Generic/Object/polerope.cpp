@@ -30,25 +30,25 @@ namespace TEN::Entities::Generic
 	void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		auto item = &g_Level.Items[itemNumber];
-		auto isLara = (!item->data.is<LaraInfo*>());
+		auto isLara = (!item->Data.is<LaraInfo*>());
 
 		if (isLara &&
 			TrInput & IN_ACTION && 
 			!Lara.gunStatus && 
-			l->activeState == LS_IDLE && 
-			l->animNumber == LA_STAND_IDLE || Lara.isMoving &&
+			l->ActiveState == LS_IDLE && 
+			l->AnimNumber == LA_STAND_IDLE || Lara.isMoving &&
 			Lara.interactedItem == itemNumber)
 		{
-			short rot = item->pos.yRot;
-			item->pos.yRot = l->pos.yRot;
+			short rot = item->Position.yRot;
+			item->Position.yRot = l->Position.yRot;
 
 			if (TestLaraPosition(&PoleBounds, item, l))
 			{
 				if (MoveLaraPosition(&PolePos, item, l))
 				{
-					l->animNumber = LA_STAND_TO_POLE;
-					l->activeState = LS_POLE_IDLE;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+					l->AnimNumber = LA_STAND_TO_POLE;
+					l->ActiveState = LS_POLE_IDLE;
+					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 				}
@@ -56,7 +56,7 @@ namespace TEN::Entities::Generic
 				{
 					Lara.interactedItem = itemNumber;
 				}
-				item->pos.yRot = rot;
+				item->Position.yRot = rot;
 			}
 			else
 			{
@@ -65,7 +65,7 @@ namespace TEN::Entities::Generic
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
-				item->pos.yRot = rot;
+				item->Position.yRot = rot;
 			}
 		}
 		else if (isLara && 
@@ -73,7 +73,7 @@ namespace TEN::Entities::Generic
 			     !Lara.gunStatus && 
 				 l->Airborne && 
 				 l->VerticalVelocity > Lara.gunStatus && 
-				 l->activeState == LS_REACH || l->activeState == LS_JUMP_UP)
+				 l->ActiveState == LS_REACH || l->ActiveState == LS_JUMP_UP)
 		{
 			if (TestBoundsCollide(item, l, 100) &&
 				TestLaraPoleCollision(l, coll, true, -STEP_SIZE) &&
@@ -81,34 +81,34 @@ namespace TEN::Entities::Generic
 			{
 				if (TestCollision(item, l))
 				{
-					short rot = item->pos.yRot;
-					item->pos.yRot = l->pos.yRot;
-					if (l->activeState == LS_REACH)
+					short rot = item->Position.yRot;
+					item->Position.yRot = l->Position.yRot;
+					if (l->ActiveState == LS_REACH)
 					{
-						PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
+						PolePosR.y = l->Position.yPos - item->Position.yPos + 10;
 						AlignLaraPosition(&PolePosR, item, l);
-						l->animNumber = LA_REACH_TO_POLE;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						l->AnimNumber = LA_REACH_TO_POLE;
+						l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					}
 					else
 					{
-						PolePosR.y = l->pos.yPos - item->pos.yPos + 66;
+						PolePosR.y = l->Position.yPos - item->Position.yPos + 66;
 						AlignLaraPosition(&PolePosR, item, l);
-						l->animNumber = LA_JUMP_UP_TO_POLE;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						l->AnimNumber = LA_JUMP_UP_TO_POLE;
+						l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					}
 					l->Airborne = false;
 					l->VerticalVelocity = false;
-					l->activeState = LS_POLE_IDLE;
+					l->ActiveState = LS_POLE_IDLE;
 					Lara.gunStatus = LG_HANDS_BUSY;
-					item->pos.yRot = rot;
+					item->Position.yRot = rot;
 				}
 			}
 		}
 		else
 		{
 			if (!isLara || 
-				((l->activeState < LS_POLE_IDLE || l->activeState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->activeState != LS_JUMP_BACK))
+				((l->ActiveState < LS_POLE_IDLE || l->ActiveState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->ActiveState != LS_JUMP_BACK))
 				ObjectCollision(itemNumber, l, coll);
 		}
 	}

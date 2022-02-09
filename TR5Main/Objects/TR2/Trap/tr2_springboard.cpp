@@ -10,24 +10,24 @@ void SpringBoardControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->activeState == 0 && LaraItem->pos.yPos == item->pos.yPos &&
-		LaraItem->pos.xPos / SECTOR(1) == item->pos.xPos / SECTOR(1) &&
-		LaraItem->pos.zPos / SECTOR(1) == item->pos.zPos / SECTOR(1))
+	if (item->ActiveState == 0 && LaraItem->Position.yPos == item->Position.yPos &&
+		LaraItem->Position.xPos / SECTOR(1) == item->Position.xPos / SECTOR(1) &&
+		LaraItem->Position.zPos / SECTOR(1) == item->Position.zPos / SECTOR(1))
 	{
-		if (LaraItem->hitPoints <= 0)
+		if (LaraItem->HitPoints <= 0)
 			return;
 
-		if (LaraItem->activeState == LS_WALK_BACK || LaraItem->activeState == LS_RUN_BACK)
+		if (LaraItem->ActiveState == LS_WALK_BACK || LaraItem->ActiveState == LS_RUN_BACK)
 			LaraItem->Velocity = -LaraItem->Velocity;
 
 		LaraItem->VerticalVelocity = -240;
 		LaraItem->Airborne = true;
-		LaraItem->animNumber = LA_FALL_START;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->activeState = LS_JUMP_FORWARD;
-		LaraItem->targetState = LS_JUMP_FORWARD;
+		LaraItem->AnimNumber = LA_FALL_START;
+		LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
+		LaraItem->ActiveState = LS_JUMP_FORWARD;
+		LaraItem->TargetState = LS_JUMP_FORWARD;
 
-		item->targetState = 1;
+		item->TargetState = 1;
 	}
 
 	AnimateItem(item);

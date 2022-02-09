@@ -12,9 +12,9 @@ void GenSlot1Control(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && !item->triggerFlags)
+	if (TriggerActive(item) && !item->TriggerFlags)
 	{
-		int df = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+		int df = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
 		if (df == 10 || df == 11)
 		{
@@ -61,10 +61,10 @@ void GenSlot1Control(short itemNumber)
 					int y = pos.y + (GetRandomControl() & 0xFF) - 128;
 					int z = pos.z + (GetRandomControl() & 0xFF) - 128;
 
-					DoBloodSplat(x, y, z, 1, -1, LaraItem->roomNumber);
+					DoBloodSplat(x, y, z, 1, -1, LaraItem->RoomNumber);
 				}
 
-				LaraItem->hitPoints = 0;
+				LaraItem->HitPoints = 0;
 			}
 		}
 
@@ -76,7 +76,7 @@ void InitialiseGenSlot3(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (CurrentLevel != 7)
-		item->meshBits = item->triggerFlags;
+		item->MeshBits = item->TriggerFlags;
 }
 
 void InitialiseGenSlot4(short itemNumber)

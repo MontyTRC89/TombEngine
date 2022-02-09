@@ -37,13 +37,13 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->activeState == LS_UNDERWATER_STOP
-			&& !(item->status && item->Airborne)
+			&& l->ActiveState == LS_UNDERWATER_STOP
+			&& !(item->Status && item->Airborne)
 			&& Lara.waterStatus == LW_UNDERWATER
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			l->pos.yRot ^= ANGLE(180.0f);
+			l->Position.yRot ^= ANGLE(180.0f);
 
 			if (TestLaraPosition(&UnderwaterDoorBounds, item, l))
 			{
@@ -51,11 +51,11 @@ namespace TEN::Entities::Doors
 				{
 					SetAnimation(l, LA_UNDERWATER_DOOR_OPEN);
 					l->VerticalVelocity = 0;
-					item->status = ITEM_ACTIVE;
+					item->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNum);
 
-					item->targetState = LS_RUN_FORWARD;
+					item->TargetState = LS_RUN_FORWARD;
 
 					AnimateItem(item);
 
@@ -66,7 +66,7 @@ namespace TEN::Entities::Doors
 				{
 					Lara.interactedItem = itemNum;
 				}
-				l->pos.yRot ^= ANGLE(180);
+				l->Position.yRot ^= ANGLE(180);
 			}
 			else
 			{
@@ -75,10 +75,10 @@ namespace TEN::Entities::Doors
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
-				l->pos.yRot ^= ANGLE(180);
+				l->Position.yRot ^= ANGLE(180);
 			}
 		}
-		else if (item->status == ITEM_ACTIVE)
+		else if (item->Status == ITEM_ACTIVE)
 		{
 			ObjectCollision(itemNum, l, coll);
 		}

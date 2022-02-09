@@ -59,13 +59,13 @@ void InitialiseSpiders(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	short flags = item->triggerFlags / -24;
+	short flags = item->TriggerFlags / -24;
 
-	item->pos.xRot = ANGLE(45);
-	item->itemFlags[1] = flags & 2;
-	item->itemFlags[2] = flags & 4;
-	item->itemFlags[0] = flags & 1;
-	item->triggerFlags = flags % 1000;
+	item->Position.xRot = ANGLE(45);
+	item->ItemFlags[1] = flags & 2;
+	item->ItemFlags[2] = flags & 4;
+	item->ItemFlags[0] = flags & 1;
+	item->TriggerFlags = flags % 1000;
 
 	if (flags & 1)
 	{
@@ -73,22 +73,22 @@ void InitialiseSpiders(short itemNumber)
 		return;
 	}
 
-	if (item->pos.yRot > -28672 && item->pos.yRot < -4096)
+	if (item->Position.yRot > -28672 && item->Position.yRot < -4096)
 	{
-		item->pos.xPos += 512;
+		item->Position.xPos += 512;
 	}
-	else if (item->pos.yRot > 4096 && item->pos.yRot < 28672)
+	else if (item->Position.yRot > 4096 && item->Position.yRot < 28672)
 	{
-		item->pos.xPos -= 512;
+		item->Position.xPos -= 512;
 	}
 
-	if (item->pos.yRot > -8192 && item->pos.yRot < 8192)
+	if (item->Position.yRot > -8192 && item->Position.yRot < 8192)
 	{
-		item->pos.zPos -= 512;
+		item->Position.zPos -= 512;
 	}
-	else if (item->pos.yRot < -20480 || item->pos.yRot > 20480)
+	else if (item->Position.yRot < -20480 || item->Position.yRot > 20480)
 	{
-		item->pos.zPos += 512;
+		item->Position.zPos += 512;
 	}
 
 	ClearSpiders();
@@ -98,26 +98,26 @@ void SpidersEmitterControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->triggerFlags)
+	if (item->TriggerFlags)
 	{
-		if (!item->itemFlags[2] || !(GetRandomControl() & 0xF))
+		if (!item->ItemFlags[2] || !(GetRandomControl() & 0xF))
 		{
-			item->triggerFlags--;
+			item->TriggerFlags--;
 
-			if (item->itemFlags[2] && GetRandomControl() & 1)
-				item->itemFlags[2]--;
+			if (item->ItemFlags[2] && GetRandomControl() & 1)
+				item->ItemFlags[2]--;
 
 			short spiderNum = GetNextSpider();
 			if (spiderNum != NO_ITEM)
 			{
 				SPIDER_STRUCT* spider = &Spiders[spiderNum];
 
-				spider->pos.xPos = item->pos.xPos;
-				spider->pos.yPos = item->pos.yPos;
-				spider->pos.zPos = item->pos.zPos;
-				spider->roomNumber = item->roomNumber;
+				spider->pos.xPos = item->Position.xPos;
+				spider->pos.yPos = item->Position.yPos;
+				spider->pos.zPos = item->Position.zPos;
+				spider->roomNumber = item->RoomNumber;
 
-				if (item->itemFlags[0])
+				if (item->ItemFlags[0])
 				{
 					spider->pos.yRot = 2 * GetRandomControl();
 					spider->fallspeed = -16 - (GetRandomControl() & 0x1F);
@@ -125,7 +125,7 @@ void SpidersEmitterControl(short itemNumber)
 				else
 				{
 					spider->fallspeed = 0;
-					spider->pos.yRot = item->pos.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+					spider->pos.yRot = item->Position.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
 				}
 
 				spider->pos.xRot = 0;
@@ -156,16 +156,16 @@ void UpdateSpiders()
 				spider->pos.zPos += spider->speed * phd_cos(spider->pos.yRot);
 				spider->fallspeed += GRAVITY;
 
-				int dx = LaraItem->pos.xPos - spider->pos.xPos;
-				int dy = LaraItem->pos.yPos - spider->pos.yPos;
-				int dz = LaraItem->pos.zPos - spider->pos.zPos;
+				int dx = LaraItem->Position.xPos - spider->pos.xPos;
+				int dy = LaraItem->Position.yPos - spider->pos.yPos;
+				int dz = LaraItem->Position.zPos - spider->pos.zPos;
 
 				short angle = phd_atan(dz, dx) - spider->pos.yRot;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
-					LaraItem->hitPoints -= 3;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 3;
+					LaraItem->HitStatus = true;
 					TriggerBlood(spider->pos.xPos, spider->pos.yPos, spider->pos.zPos, spider->pos.yRot, 1);
 				}
 

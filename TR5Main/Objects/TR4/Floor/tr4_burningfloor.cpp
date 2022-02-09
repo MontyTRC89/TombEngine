@@ -5,7 +5,7 @@
 
 void InitialiseBurningFloor(short itemNum)
 {
-	g_Level.Items[itemNum].requiredState = 127;
+	g_Level.Items[itemNum].RequiredState = 127;
 }
 
 void BurningFloorControl(short itemNum)

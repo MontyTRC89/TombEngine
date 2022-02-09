@@ -23,9 +23,9 @@ void ShootAtLara(FX_INFO *fx)
 	int x, y, z, distance;
 	BOUNDING_BOX* bounds;
 
-	x = LaraItem->pos.xPos - fx->pos.xPos;
-	y = LaraItem->pos.yPos - fx->pos.yPos;
-	z = LaraItem->pos.zPos - fx->pos.zPos;
+	x = LaraItem->Position.xPos - fx->pos.xPos;
+	y = LaraItem->Position.yPos - fx->pos.yPos;
+	z = LaraItem->Position.zPos - fx->pos.zPos;
 
 	bounds = GetBoundsAccurate(LaraItem);
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 3 / 4;
@@ -88,7 +88,7 @@ void ControlMissile(short fxNumber)
 	{
 		if (ItemNearLara(&fx->pos, 350))
 		{
-			LaraItem->hitPoints -= 3;
+			LaraItem->HitPoints -= 3;
 			LaraItem->hitStatus = 1;
 			LaraBurn(LaraItem);
 			return;
@@ -98,19 +98,19 @@ void ControlMissile(short fxNumber)
 	{
 		/*if (fx->objectNumber == KNIFE)
 		{
-			LaraItem->hitPoints -= KNIFE_DAMAGE;
+			LaraItem->HitPoints -= KNIFE_DAMAGE;
 			SoundEffect(317, &fx->pos, 0);
 			KillEffect(fx_number);
 		}
 		else*/ if (fx->objectNumber == ID_SCUBA_HARPOON)
 		{
-			LaraItem->hitPoints -= DIVER_HARPOON_DAMAGE;
+			LaraItem->HitPoints -= DIVER_HARPOON_DAMAGE;
 			SoundEffect(317, &fx->pos, 0);
 			KillEffect(fxNumber);
 		}
-	LaraItem->hitStatus = 1;
+	LaraItem->HitStatus = 1;
 
-		fx->pos.yRot = LaraItem->pos.yRot;
+		fx->pos.yRot = LaraItem->Position.yRot;
 		fx->speed = LaraItem->Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}

@@ -12,25 +12,25 @@
 
 void LaraTyrannosaurDeath(ITEM_INFO* item)
 {
-	item->targetState = 8;
+	item->TargetState = 8;
 
-	if (LaraItem->roomNumber != item->roomNumber)
-		ItemNewRoom(Lara.itemNumber, item->roomNumber);
+	if (LaraItem->RoomNumber != item->RoomNumber)
+		ItemNewRoom(Lara.itemNumber, item->RoomNumber);
 
-	LaraItem->pos.xPos = item->pos.xPos;
-	LaraItem->pos.yPos = item->pos.yPos;
-	LaraItem->pos.zPos = item->pos.zPos;
-	LaraItem->pos.yRot = item->pos.yRot;
-	LaraItem->pos.xRot = 0;
-	LaraItem->pos.zRot = 0;
+	LaraItem->Position.xPos = item->Position.xPos;
+	LaraItem->Position.yPos = item->Position.yPos;
+	LaraItem->Position.zPos = item->Position.zPos;
+	LaraItem->Position.yRot = item->Position.yRot;
+	LaraItem->Position.xRot = 0;
+	LaraItem->Position.zRot = 0;
 	LaraItem->Airborne = false;
 
-	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
-	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-	LaraItem->activeState = LS_DEATH;
-	LaraItem->targetState = LS_DEATH;
+	LaraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
+	LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
+	LaraItem->ActiveState = LS_DEATH;
+	LaraItem->TargetState = LS_DEATH;
 
-	LaraItem->hitPoints = -16384;
+	LaraItem->HitPoints = -16384;
 	Lara.air = -1;
 	Lara.gunStatus = LG_HANDS_BUSY;
 	Lara.gunType = WEAPON_NONE;
@@ -46,17 +46,17 @@ void TyrannosaurControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 	short head = 0;
 	short angle = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState == 1)
-			item->targetState = 5;
+		if (item->ActiveState == 1)
+			item->TargetState = 5;
 		else
-			item->targetState = 1;
+			item->TargetState = 1;
 	}
 	else
 	{
@@ -71,8 +71,8 @@ void TyrannosaurControl(short itemNum)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		if (item->touchBits)
-			LaraItem->hitPoints -= (item->activeState == 3) ? 10 : 1;
+		if (item->TouchBits)
+			LaraItem->HitPoints -= (item->ActiveState == 3) ? 10 : 1;
 
 		creature->flags = (creature->mood != ESCAPE_MOOD && !info.ahead &&
 			info.enemyFacing > -FRONT_ARC && info.enemyFacing < FRONT_ARC);
@@ -80,28 +80,28 @@ void TyrannosaurControl(short itemNum)
 		if (!creature->flags && info.distance > SQUARE(1500) && info.distance < SQUARE(4096) && info.bite)
 			creature->flags = 1;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
-			if (item->requiredState)
-				item->targetState = item->requiredState;
+			if (item->RequiredState)
+				item->TargetState = item->RequiredState;
 			else if (info.distance < SQUARE(1500) && info.bite)
-				item->targetState = 7;
+				item->TargetState = 7;
 			else if (creature->mood == BORED_MOOD || creature->flags)
-				item->targetState = 2;
+				item->TargetState = 2;
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 2:
 			creature->maximumTurn = ANGLE(2);
 
 			if (creature->mood != BORED_MOOD || !creature->flags)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (info.ahead && GetRandomControl() < 0x200)
 			{
-				item->requiredState = 6;
-				item->targetState = 1;
+				item->RequiredState = 6;
+				item->TargetState = 1;
 			}
 			break;
 
@@ -109,29 +109,29 @@ void TyrannosaurControl(short itemNum)
 			creature->maximumTurn = ANGLE(4);
 
 			if (info.distance < SQUARE(5120) && info.bite)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (creature->flags)
-				item->targetState = 1;
+				item->TargetState = 1;
 			else if (creature->mood != ESCAPE_MOOD && info.ahead && GetRandomControl() < 0x200)
 			{
-				item->requiredState = 6;
-				item->targetState = 1;
+				item->RequiredState = 6;
+				item->TargetState = 1;
 			}
 			else if (creature->mood == BORED_MOOD)
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 
 		case 7:
-			if (item->touchBits & 0x3000)
+			if (item->TouchBits & 0x3000)
 			{
-				LaraItem->hitPoints -= 1500;
-				LaraItem->hitStatus = true;
-				item->targetState = 8;
+				LaraItem->HitPoints -= 1500;
+				LaraItem->HitStatus = true;
+				item->TargetState = 8;
 				if (LaraItem == LaraItem)
 					LaraTyrannosaurDeath(item);
 			}
 
-			item->requiredState = 2;
+			item->RequiredState = 2;
 			break;
 		}
 	}
@@ -141,5 +141,5 @@ void TyrannosaurControl(short itemNum)
 
 	CreatureAnimation(itemNum, angle, 0);
 
-	item->collidable = true;
+	item->Collidable = true;
 }

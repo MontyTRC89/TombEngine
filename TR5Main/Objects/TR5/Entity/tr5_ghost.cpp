@@ -17,11 +17,11 @@ void InitialiseInvisibleGhost(short itemNum)
 
     item = &g_Level.Items[itemNum];
     ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->targetState = 1;
-    item->activeState = 1;
-    item->pos.yPos += CLICK(2);
+    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->TargetState = 1;
+    item->ActiveState = 1;
+    item->Position.yPos += CLICK(2);
 }
 
 void InvisibleGhostControl(short itemNumber)
@@ -34,9 +34,9 @@ void InvisibleGhostControl(short itemNumber)
 		short angle = 0;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 		
-		if (item->aiBits)
+		if (item->AIBits)
 		{
 			GetAITarget(creature);
 		}
@@ -52,13 +52,13 @@ void InvisibleGhostControl(short itemNumber)
 		if (abs(info.angle) >= ANGLE(3))
 		{
 			if (info.angle > 0)
-				item->pos.yRot += ANGLE(3);
+				item->Position.yRot += ANGLE(3);
 			else
-				item->pos.yRot -= ANGLE(3);
+				item->Position.yRot -= ANGLE(3);
 		}
 		else
 		{
-			item->pos.yRot += info.angle;
+			item->Position.yRot += info.angle;
 		}
 
 		if (info.ahead)
@@ -70,26 +70,26 @@ void InvisibleGhostControl(short itemNumber)
 
 		creature->maximumTurn = 0;
 		
-		if (item->activeState == 1)
+		if (item->ActiveState == 1)
 		{
 			creature->flags = 0;
 			if (info.distance < SQUARE(614))
 			{
 				if (GetRandomControl() & 1)
-					item->targetState = 2;
+					item->TargetState = 2;
 				else
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 		}
-		else if (item->activeState > 1
-			&& item->activeState <= 3
+		else if (item->ActiveState > 1
+			&& item->ActiveState <= 3
 			&& !creature->flags
-			&& item->touchBits & 0x9470
-			&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 18)
+			&& item->TouchBits & 0x9470
+			&& item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 18)
 		{
-			LaraItem->hitPoints -= 400;
-			LaraItem->hitStatus = true;
-			CreatureEffect2(item, &InvisibleGhostBite, 10, item->pos.yRot, DoBloodSplat);
+			LaraItem->HitPoints -= 400;
+			LaraItem->HitStatus = true;
+			CreatureEffect2(item, &InvisibleGhostBite, 10, item->Position.yRot, DoBloodSplat);
 			creature->flags = 1;
 		}
 
@@ -99,16 +99,16 @@ void InvisibleGhostControl(short itemNumber)
 
 		if (info.distance >= SQUARE(1536))
 		{
-			item->afterDeath = 125;
-			item->itemFlags[0] = 0;
+			item->AfterDeath = 125;
+			item->ItemFlags[0] = 0;
 		}
 		else
 		{
-			item->afterDeath = sqrt(info.distance) / 16;
-			if (item->itemFlags[0] == 0)
+			item->AfterDeath = sqrt(info.distance) / 16;
+			if (item->ItemFlags[0] == 0)
 			{
-				item->itemFlags[0] = 1;
-				SoundEffect(SFX_TR5_SKELETON_APPEAR, &item->pos, 0);
+				item->ItemFlags[0] = 1;
+				SoundEffect(SFX_TR5_SKELETON_APPEAR, &item->Position, 0);
 			}
 		}
 

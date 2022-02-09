@@ -13,7 +13,7 @@ namespace TEN::Entities::TR4
 {
     void InitialiseMapper(short itemNumber)
     {
-        g_Level.Items[itemNumber].meshBits = -3;
+        g_Level.Items[itemNumber].MeshBits = -3;
     }
 
     void MapperControl(short itemNumber)
@@ -23,11 +23,11 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase >= 200)
+        if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase >= 200)
         {
-            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->pos, 0);
+            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Position, 0);
 
-            item->meshBits |= 2;
+            item->MeshBits |= 2;
 
             PHD_VECTOR pos;
             pos.x = 0;
@@ -38,9 +38,9 @@ namespace TEN::Entities::TR4
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            short roomNumber = item->roomNumber;
-            FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-            int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+            short roomNumber = item->RoomNumber;
+            FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+            int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
             for (int i = 0; i < 2; i++)
             {

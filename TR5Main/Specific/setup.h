@@ -47,7 +47,7 @@ struct OBJECT_INFO
 	std::function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
 	ZoneType zoneType;
 	int animIndex; 
-	short hitPoints; 
+	short HitPoints; 
 	short pivotLength; 
 	short radius; 
 	short shadowSize; 

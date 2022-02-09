@@ -86,13 +86,13 @@ static void LondonBossDie(short item_number)
 {
 	ITEM_INFO* item;
 	item = &g_Level.Items[item_number];
-	item->collidable = false;
-	item->hitPoints = -16384;
+	item->Collidable = false;
+	item->HitPoints = -16384;
 
 	KillItem(item_number);
 	DisableBaddieAI(item_number);
 
-	item->flags |= ONESHOT;
+	item->Flags |= ONESHOT;
 }
 
 void ControlLaserBolts(short item_number)
@@ -128,7 +128,7 @@ void S_DrawLondonBoss(ITEM_INFO* item)
 		/*code*/
 	}
 
-	if (item->hitPoints <= 0 && BossData.ExplodeCount == 0)
+	if (item->HitPoints <= 0 && BossData.ExplodeCount == 0)
 	{
 		/*code*/
 	}

@@ -42,11 +42,11 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
-	l->touchBits = 0;
+	l->TouchBits = 0;
 
 	if (creatureSphereCount <= 0)
 	{
-		item->touchBits = 0;
+		item->TouchBits = 0;
 		return 0;
 	}
 	else
@@ -55,9 +55,9 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 		{
 			SPHERE* ptr1 = &CreatureSpheres[i];
 			
-			int x1 = item->pos.xPos + ptr1->x;
-			int y1 = item->pos.yPos + ptr1->y;
-			int z1 = item->pos.zPos + ptr1->z;
+			int x1 = item->Position.xPos + ptr1->x;
+			int y1 = item->Position.yPos + ptr1->y;
+			int z1 = item->Position.zPos + ptr1->z;
 			int r1 = ptr1->r;
 
 			if (r1 > 0)
@@ -66,9 +66,9 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 				{
 					SPHERE* ptr2 = &LaraSpheres[j];
 
-					int x2 = item->pos.xPos + ptr2->x;
-					int y2 = item->pos.yPos + ptr2->y;
-					int z2 = item->pos.zPos + ptr2->z;
+					int x2 = item->Position.xPos + ptr2->x;
+					int y2 = item->Position.yPos + ptr2->y;
+					int z2 = item->Position.zPos + ptr2->z;
 					int r2 = ptr2->r;
 
 					if (r2 > 0)
@@ -80,7 +80,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 
 						if (SQUARE(dx) + SQUARE(dy) + SQUARE(dz) < SQUARE(r))
 						{
-							l->touchBits |= (1 << j);
+							l->TouchBits |= (1 << j);
 							flags |= (1 << i);
 							break;
 						}
@@ -89,7 +89,7 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 			}
 		}
 
-		item->touchBits = flags;
+		item->TouchBits = flags;
 		return flags;
 	}
 }

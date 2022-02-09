@@ -13,16 +13,16 @@ namespace TEN::Entities::TR4
 
 		if (!TriggerActive(item))
 		{
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 		else
 		{
-			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-				item->itemFlags[3] = 0;
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+				item->ItemFlags[3] = 0;
 			else
-				item->itemFlags[3] = 200;
+				item->ItemFlags[3] = 200;
 
 			AnimateItem(item);
 		}

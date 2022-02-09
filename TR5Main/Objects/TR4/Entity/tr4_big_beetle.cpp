@@ -20,10 +20,10 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->animNumber = Objects[item->objectNumber].animIndex + 3;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = 1;
-		item->activeState = 1;
+		item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = 1;
+		item->ActiveState = 1;
 	}
 
 	void BigBeetleControl(short itemNumber)
@@ -32,40 +32,40 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 		short angle = 0;
 
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			if (item->activeState != 6)
+			if (item->ActiveState != 6)
 			{
-				if (item->activeState != 7)
+				if (item->ActiveState != 7)
 				{
-					if (item->activeState == 8)
+					if (item->ActiveState == 8)
 					{
-						item->pos.xRot = 0;
-						item->pos.yPos = item->floor;
+						item->Position.xRot = 0;
+						item->Position.yPos = item->Floor;
 					}
 					else
 					{
-						item->animNumber = Objects[item->objectNumber].animIndex + 5;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
+						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						item->Airborne = true;
-						item->activeState = 6;
+						item->ActiveState = 6;
 						item->Velocity = 0;
-						item->pos.xRot = 0;
+						item->Position.xRot = 0;
 					}
 				}
-				else if (item->pos.yPos >= item->floor)
+				else if (item->Position.yPos >= item->Floor)
 				{
-					item->pos.yPos = item->floor;
+					item->Position.yPos = item->Floor;
 					item->Airborne = false;
 					item->VerticalVelocity = 0;
-					item->targetState = 8;
+					item->TargetState = 8;
 				}
 			}
-			item->pos.xRot = 0;
+			item->Position.xRot = 0;
 		}
 		else
 		{
@@ -81,23 +81,23 @@ namespace TEN::Entities::TR4
 
 			if (info.distance > SQUARE(3072)
 				|| !(GetRandomControl() & 0x7F)
-				|| item->hitStatus)
+				|| item->HitStatus)
 			{
 				creature->flags = 0;
 			}
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case 1:
-				item->pos.yPos = item->floor;
+				item->Position.yPos = item->Floor;
 				creature->maximumTurn = ANGLE(1);
 
-				if (item->hitStatus
+				if (item->HitStatus
 					|| info.distance < SQUARE(3072)
 					|| creature->hurtByLara
-					|| item->aiBits == MODIFY)
+					|| item->AIBits == MODIFY)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 
 				break;
@@ -105,15 +105,15 @@ namespace TEN::Entities::TR4
 			case 3:
 				creature->maximumTurn = ANGLE(7);
 
-				if (item->requiredState)
+				if (item->RequiredState)
 				{
-					item->targetState = item->requiredState;
+					item->TargetState = item->RequiredState;
 				}
 				else if (info.ahead)
 				{
 					if (info.distance < SQUARE(256))
 					{
-						item->targetState = 9;
+						item->TargetState = 9;
 					}
 				}
 
@@ -126,25 +126,25 @@ namespace TEN::Entities::TR4
 				{
 					if (info.distance < SQUARE(256))
 					{
-						item->targetState = 4;
+						item->TargetState = 4;
 					}
 				}
 				else if (info.distance < SQUARE(256))
 				{
-					item->targetState = 9;
+					item->TargetState = 9;
 				}
 				else
 				{
-					item->requiredState = 3;
-					item->targetState = 9;
+					item->RequiredState = 3;
+					item->TargetState = 9;
 				}
 
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0x60)
+					if (item->TouchBits & 0x60)
 					{
-						LaraItem->hitPoints -= 50;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 50;
+						LaraItem->HitStatus = true;
 						CreatureEffect2(
 							item,
 							&BitBeetleBite,
@@ -160,37 +160,37 @@ namespace TEN::Entities::TR4
 			case 5:
 				creature->flags = 0;
 
-				item->pos.yPos += 51;
-				if (item->pos.yPos > item->floor)
-					item->pos.yPos = item->floor;
+				item->Position.yPos += 51;
+				if (item->Position.yPos > item->Floor)
+					item->Position.yPos = item->Floor;
 
 				break;
 
 			case 9u:
 				creature->maximumTurn = ANGLE(7);
 
-				if (item->requiredState)
+				if (item->RequiredState)
 				{
-					item->targetState = item->requiredState;
+					item->TargetState = item->RequiredState;
 				}
-				else if (!item->hitStatus
+				else if (!item->HitStatus
 					&& GetRandomControl() >= 384
-					&& item->aiBits != MODIFY
+					&& item->AIBits != MODIFY
 					&& (creature->mood && GetRandomControl() >= 128
 						|| creature->hurtByLara
-						|| item->aiBits == MODIFY))
+						|| item->AIBits == MODIFY))
 				{
 					if (info.ahead)
 					{
 						if (info.distance < SQUARE(256) && !creature->flags)
 						{
-							item->targetState = 4;
+							item->TargetState = 4;
 						}
 					}
 				}
 				else
 				{
-					item->targetState = 3;
+					item->TargetState = 3;
 				}
 
 				break;

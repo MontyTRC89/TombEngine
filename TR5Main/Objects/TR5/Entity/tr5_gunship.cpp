@@ -20,7 +20,7 @@ void ControlGunShip(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->pos, 0);
+		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Position, 0);
 
 		GAME_VECTOR pos;
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
@@ -30,32 +30,32 @@ void ControlGunShip(short itemNumber)
 
 		GAME_VECTOR end = pos;
 
-		if (!item->itemFlags[0] && !item->itemFlags[1] && !item->itemFlags[2])
+		if (!item->ItemFlags[0] && !item->ItemFlags[1] && !item->ItemFlags[2])
 		{
-			item->itemFlags[0] = pos.x / 16;
-			item->itemFlags[1] = pos.y / 16;
-			item->itemFlags[2] = pos.z / 16;
+			item->ItemFlags[0] = pos.x / 16;
+			item->ItemFlags[1] = pos.y / 16;
+			item->ItemFlags[2] = pos.z / 16;
 		}
 
-		pos.x = (pos.x + 80 * item->itemFlags[0]) / 6;
-		pos.y = (pos.y + 80 * item->itemFlags[1]) / 6;
-		pos.z = (pos.z + 80 * item->itemFlags[2]) / 6;
+		pos.x = (pos.x + 80 * item->ItemFlags[0]) / 6;
+		pos.y = (pos.y + 80 * item->ItemFlags[1]) / 6;
+		pos.z = (pos.z + 80 * item->ItemFlags[2]) / 6;
 
-		item->itemFlags[0] = pos.x / 16;
-		item->itemFlags[1] = pos.y / 16;
-		item->itemFlags[2] = pos.z / 16;
+		item->ItemFlags[0] = pos.x / 16;
+		item->ItemFlags[1] = pos.y / 16;
+		item->ItemFlags[2] = pos.z / 16;
 
-		if (item->triggerFlags == 1)
-			item->pos.zPos += (pos.z - item->pos.zPos) / 32;
+		if (item->TriggerFlags == 1)
+			item->Position.zPos += (pos.z - item->Position.zPos) / 32;
 		else
-			item->pos.xPos += (pos.x - item->pos.xPos) / 32;
-		item->pos.yPos += (pos.y - item->pos.yPos - 256) / 32;
+			item->Position.xPos += (pos.x - item->Position.xPos) / 32;
+		item->Position.yPos += (pos.y - item->Position.yPos - 256) / 32;
 
 		GAME_VECTOR start;
-		start.x = GetRandomControl() + item->pos.xPos - 128;
-		start.y = GetRandomControl() + item->pos.yPos - 128;
-		start.z = GetRandomControl() + item->pos.zPos - 128;
-		start.roomNumber = item->roomNumber;
+		start.x = GetRandomControl() + item->Position.xPos - 128;
+		start.y = GetRandomControl() + item->Position.yPos - 128;
+		start.z = GetRandomControl() + item->Position.zPos - 128;
+		start.roomNumber = item->RoomNumber;
 		int los = LOS(&start, &end);
 
 		end.x = 3 * pos.x - 2 * start.x;
@@ -69,12 +69,12 @@ void ControlGunShip(short itemNumber)
 			GunShipCounter++;
 
 		if (GunShipCounter <= 15)
-			item->meshBits |= 0x100;
+			item->MeshBits |= 0x100;
 		else
-			item->meshBits &= 0xFEFF;
+			item->MeshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_TR5_HK_FIRE, &item->pos, 0xC00004);
+			SoundEffect(SFX_TR5_HK_FIRE, &item->Position, 0xC00004);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);
@@ -118,10 +118,10 @@ void ControlGunShip(short itemNumber)
 		{
 			ITEM_INFO* hitItem = &g_Level.Items[objOnLos];
 
-			if (hitItem->objectNumber != ID_LARA)
+			if (hitItem->ObjectNumber != ID_LARA)
 			{
-				if (hitItem->objectNumber >= ID_SMASH_OBJECT1
-					&& hitItem->objectNumber <= ID_SMASH_OBJECT8)
+				if (hitItem->ObjectNumber >= ID_SMASH_OBJECT1
+					&& hitItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
 					ExplodeItemNode(hitItem, 0, 0, 128);
 					SmashObject(objOnLos);
@@ -141,9 +141,9 @@ void ControlGunShip(short itemNumber)
 					start.x, start.y, start.z,
 					(GetRandomControl() & 1) + 2,
 					2 * GetRandomControl(),
-					LaraItem->roomNumber);
+					LaraItem->RoomNumber);
 
-				LaraItem->hitPoints -= 20;
+				LaraItem->HitPoints -= 20;
 			}
 		}
 

@@ -43,13 +43,13 @@ void InitialiseWorkerFlamethrower(short itemNum)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNum];
-	item->animNumber = Objects[item->objectNumber].animIndex + 12;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
 
 	ClearItem(itemNum);
 
-	anim = &g_Level.Anims[item->animNumber];
-	item->frameNumber = anim->frameBase;
-	item->activeState = anim->activeState;
+	anim = &g_Level.Anims[item->AnimNumber];
+	item->FrameNumber = anim->frameBase;
+	item->ActiveState = anim->ActiveState;
 }
 
 void WorkerFlamethrower(short itemNum)
@@ -64,7 +64,7 @@ void WorkerFlamethrower(short itemNum)
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
 	item = &g_Level.Items[itemNum];
-	flame = (CREATURE_INFO*)item->data;
+	flame = (CREATURE_INFO*)item->Data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
 	pos.x = workerFlameThrower.x;
@@ -72,21 +72,21 @@ void WorkerFlamethrower(short itemNum)
 	pos.z = workerFlameThrower.z;
 	GetJointAbsPosition(item, &pos, workerFlameThrower.meshNum);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 7)
+		if (item->ActiveState != 7)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 19;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 7;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 7;
 		}
 	}
 	else
 	{
-		if (item->activeState != 5 && item->activeState != 6)
+		if (item->ActiveState != 5 && item->ActiveState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
+			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
 		}
 		else
 		{
@@ -98,7 +98,7 @@ void WorkerFlamethrower(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, flame->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			flame->flags = 0;
@@ -112,25 +112,25 @@ void WorkerFlamethrower(short itemNum)
 
 			if (flame->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
-					item->targetState = 8;
+					item->TargetState = 8;
 				else
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (flame->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance <= SQUARE(WALL_SIZE * 2))
-					item->targetState = 2;
+					item->TargetState = 2;
 				else
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else
 			{
-				item->targetState = 4;
+				item->TargetState = 4;
 			}
 			break;
 
@@ -145,23 +145,23 @@ void WorkerFlamethrower(short itemNum)
 
 			if (flame->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (Targetable(item, &info))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 6;
+					item->TargetState = 6;
 			}
 			else if (flame->mood == ATTACK_MOOD || !info.ahead)
 			{
 				if (info.distance > SQUARE(WALL_SIZE * 2))
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else
 			{
-				item->targetState = 4;
+				item->TargetState = 4;
 			}
 			break;
 
@@ -178,11 +178,11 @@ void WorkerFlamethrower(short itemNum)
 			{
 				if (Targetable(item, &info))
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 				else if (flame->mood == BORED_MOOD || flame->mood == STALK_MOOD)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 				}
 			}
 			break;
@@ -196,17 +196,17 @@ void WorkerFlamethrower(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->targetState = 5;
+				item->TargetState = 5;
 			}
 			else
 			{
 				if (flame->mood == ATTACK_MOOD)
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 				else if (!info.ahead)
 				{
-					item->targetState = 1;
+					item->TargetState = 1;
 				}
 			}
 			break;
@@ -219,9 +219,9 @@ void WorkerFlamethrower(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (item->targetState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
+			if (item->TargetState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			break;
 
@@ -237,11 +237,11 @@ void WorkerFlamethrower(short itemNum)
 
 			if (Targetable(item, &info))
 			{
-				item->targetState = (item->activeState == 8) ? 5 : 11;
+				item->TargetState = (item->ActiveState == 8) ? 5 : 11;
 			}
 			else
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			break;
 		}

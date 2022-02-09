@@ -51,9 +51,9 @@ void FireHarpoon()
 		GAME_VECTOR pos;
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->shade = 0x4210 | 0x8000;
-		item->objectNumber = ID_HARPOON;
-		item->roomNumber = LaraItem->roomNumber;
+		item->Shade = 0x4210 | 0x8000;
+		item->ObjectNumber = ID_HARPOON;
+		item->RoomNumber = LaraItem->RoomNumber;
 
 		PHD_VECTOR jointPos;
 		
@@ -63,40 +63,40 @@ void FireHarpoon()
 
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
 		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
 
 		if (height >= jointPos.y)
 		{
-			item->pos.xPos = jointPos.x;
-			item->pos.yPos = jointPos.y;
-			item->pos.zPos = jointPos.z;
+			item->Position.xPos = jointPos.x;
+			item->Position.yPos = jointPos.y;
+			item->Position.zPos = jointPos.z;
 		}
 		else
 		{
-			item->pos.xPos = LaraItem->pos.xPos;
-			item->pos.yPos = jointPos.y;
-			item->pos.zPos = LaraItem->pos.zPos;
-			item->roomNumber = LaraItem->roomNumber;
+			item->Position.xPos = LaraItem->Position.xPos;
+			item->Position.yPos = jointPos.y;
+			item->Position.zPos = LaraItem->Position.zPos;
+			item->RoomNumber = LaraItem->RoomNumber;
 		}
 
 		InitialiseItem(itemNumber);
 
-		item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
-		item->pos.zRot = 0;
-		item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
+		item->Position.xRot = Lara.leftArm.xRot + LaraItem->Position.xRot;
+		item->Position.zRot = 0;
+		item->Position.yRot = Lara.leftArm.yRot + LaraItem->Position.yRot;
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.extraTorsoRot.x;
-			item->pos.yRot += Lara.extraTorsoRot.y;
+			item->Position.xRot += Lara.extraTorsoRot.x;
+			item->Position.yRot += Lara.extraTorsoRot.y;
 		}
 
-		item->pos.zRot = 0;
+		item->Position.zRot = 0;
 
-		item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot);
-		item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot);
-		item->hitPoints = HARPOON_TIME;
+		item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot);
+		item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot);
+		item->HitPoints = HARPOON_TIME;
 
 		AddActiveItem(itemNumber);
 
@@ -110,72 +110,72 @@ void HarpoonBoltControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
-	short roomNumber = item->roomNumber;
+	int oldX = item->Position.xPos;
+	int oldY = item->Position.yPos;
+	int oldZ = item->Position.zPos;
+	short roomNumber = item->RoomNumber;
 
 	bool aboveWater = false;
 
 	// Update speed and check if above water
 
-	if (item->hitPoints == HARPOON_TIME)
+	if (item->HitPoints == HARPOON_TIME)
 	{
-		item->pos.zRot += ANGLE(35);
-		if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER))
+		item->Position.zRot += ANGLE(35);
+		if (!(g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER))
 		{
-			item->pos.xRot -= ANGLE(1);
-			if (item->pos.xRot < -ANGLE(90))
-				item->pos.xRot = -ANGLE(90);
-			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot);
-			item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot);
+			item->Position.xRot -= ANGLE(1);
+			if (item->Position.xRot < -ANGLE(90))
+				item->Position.xRot = -ANGLE(90);
+			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot);
+			item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot);
 			aboveWater = true;
 		}
 		else
 		{
 			// Create bubbles
 			if ((Wibble & 15) == 0)
-				CreateBubble((PHD_VECTOR*)&item->pos, item->roomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
-			TriggerRocketSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 64);
-			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->pos.xRot) / 2;
-			item->Velocity = HARPOON_SPEED * phd_cos(item->pos.xRot) / 2;
+				CreateBubble((PHD_VECTOR*)&item->Position, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
+			TriggerRocketSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 64);
+			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot) / 2;
+			item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot) / 2;
 			aboveWater = false;
 		}
 
 		// Update bolt's position
-		item->pos.xPos += item->Velocity * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
-		item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
-		item->pos.zPos += item->Velocity * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+		item->Position.xPos += item->Velocity * phd_cos(item->Position.xRot) * phd_sin(item->Position.yRot);
+		item->Position.yPos += item->Velocity * phd_sin(-item->Position.xRot);
+		item->Position.zPos += item->Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 	}
 	else
 	{
-		if (item->hitPoints > 0)
-			item->hitPoints--;
+		if (item->HitPoints > 0)
+			item->HitPoints--;
 		else
 			KillItem(itemNumber);
 		return;
 	}
 
-	roomNumber = item->roomNumber;
-	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	roomNumber = item->RoomNumber;
+	FLOOR_INFO * floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 	// Check if bolt has hit a solid wall
-	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
-		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
+	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
+		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
 	{
 		// I have hit a solid wall, this is the end for the bolt
-		item->hitPoints--;
+		item->HitPoints--;
 		return;
 	}
 
 	// Has harpoon changed room?
-	if (item->roomNumber != roomNumber)
+	if (item->RoomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	// If now in water and before in land, add a ripple
-	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
+	if ((g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER) && aboveWater)
 	{
-		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 	}
 
 	int n = 0;
@@ -196,15 +196,15 @@ void HarpoonBoltControl(short itemNumber)
 		int k = 0;
 		do
 		{
-			OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+			OBJECT_INFO* currentObj = &Objects[currentItem->ObjectNumber];
 
-			if (!currentObj->isPickup && currentObj->collision && currentItem->collidable)
+			if (!currentObj->isPickup && currentObj->collision && currentItem->Collidable)
 				foundCollidedObjects = true;
 
-			if (currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
+			if (currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead)
 			{
 				explodeItem = false;
-				HitTarget(LaraItem, currentItem, (GAME_VECTOR*)&item->pos, Weapons[WEAPON_HARPOON_GUN].damage, 0);
+				HitTarget(LaraItem, currentItem, (GAME_VECTOR*)&item->Position, Weapons[WEAPON_HARPOON_GUN].damage, 0);
 			}
 
 			// All other items (like puzzles) can't be hit
@@ -224,14 +224,14 @@ void HarpoonBoltControl(short itemNumber)
 			STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
 			if (s->shatterType != SHT_NONE)
 			{
-				currentMesh->hitPoints -= Weapons[WEAPON_CROSSBOW].damage;
-				if (currentMesh->hitPoints <= 0)
+				currentMesh->HitPoints -= Weapons[WEAPON_CROSSBOW].damage;
+				if (currentMesh->HitPoints <= 0)
 				{
-					TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+					TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->RoomNumber);
 					auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-					ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
-					SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+					ShatterObject(NULL, currentMesh, -128, item->RoomNumber, 0);
+					SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
 					SmashedMesh[SmashedMeshCount] = currentMesh;
 					SmashedMeshCount++;
 					currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -274,9 +274,9 @@ void FireGrenade()
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		
-		item->shade = 0xC210;
-		item->objectNumber = ID_GRENADE;
-		item->roomNumber = LaraItem->roomNumber;
+		item->Shade = 0xC210;
+		item->ObjectNumber = ID_GRENADE;
+		item->RoomNumber = LaraItem->RoomNumber;
 
 		PHD_VECTOR jointPos;
 		jointPos.x = 0;
@@ -285,18 +285,18 @@ void FireGrenade()
 
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		item->pos.xPos = x = jointPos.x;
-		item->pos.yPos = y = jointPos.y;
-		item->pos.zPos = z = jointPos.z;
+		item->Position.xPos = x = jointPos.x;
+		item->Position.yPos = y = jointPos.y;
+		item->Position.zPos = z = jointPos.z;
 
-		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
 		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
 		if (height < jointPos.y)
 		{
-			item->pos.xPos = LaraItem->pos.xPos;
-			item->pos.yPos = jointPos.y;
-			item->pos.zPos = LaraItem->pos.zPos;
-			item->roomNumber = LaraItem->roomNumber;
+			item->Position.xPos = LaraItem->Position.xPos;
+			item->Position.yPos = jointPos.y;
+			item->Position.zPos = LaraItem->Position.zPos;
+			item->RoomNumber = LaraItem->RoomNumber;
 		}
 
 		jointPos.x = 0;
@@ -308,7 +308,7 @@ void FireGrenade()
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_GRENADE_LAUNCHER;
 
-		if (LaraItem->meshBits)
+		if (LaraItem->MeshBits)
 		{
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, WEAPON_GRENADE_LAUNCHER, 32);
@@ -317,30 +317,30 @@ void FireGrenade()
 
 		InitialiseItem(itemNumber);
 
-		item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-		item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-		item->pos.zRot = 0;
+		item->Position.xRot = LaraItem->Position.xRot + Lara.leftArm.xRot;
+		item->Position.yRot = LaraItem->Position.yRot + Lara.leftArm.yRot;
+		item->Position.zRot = 0;
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.extraTorsoRot.x;
-			item->pos.yRot += Lara.extraTorsoRot.y;
+			item->Position.xRot += Lara.extraTorsoRot.x;
+			item->Position.yRot += Lara.extraTorsoRot.y;
 		}
 
 		item->Velocity = GRENADE_SPEED;
-		item->VerticalVelocity = -512 * phd_sin(item->pos.xRot);
-		item->activeState = item->pos.xRot;
-		item->targetState = item->pos.yRot;
-		item->requiredState = 0;
-		item->hitPoints = 120;	
-		item->itemFlags[0] = WEAPON_AMMO2;
+		item->VerticalVelocity = -512 * phd_sin(item->Position.xRot);
+		item->ActiveState = item->Position.xRot;
+		item->TargetState = item->Position.yRot;
+		item->RequiredState = 0;
+		item->HitPoints = 120;	
+		item->ItemFlags[0] = WEAPON_AMMO2;
 
 		AddActiveItem(itemNumber);
 
 		if (!ammo.hasInfinite())
 			(ammo)--;
 
-		item->itemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+		item->ItemFlags[0] = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -351,17 +351,17 @@ void GrenadeControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->itemFlags[1])
+	if (item->ItemFlags[1])
 	{
-		item->itemFlags[1]--;
+		item->ItemFlags[1]--;
 
-		if (item->itemFlags[1])
+		if (item->ItemFlags[1])
 		{
-			if (item->itemFlags[0] == GRENADE_FLASH)
+			if (item->ItemFlags[0] == GRENADE_FLASH)
 			{
 				// Flash grenades
 				int R, G, B;
-				if (item->itemFlags[1] == 1)
+				if (item->ItemFlags[1] == 1)
 				{
 					WeaponEnemyTimer = 120;
 					R = 255;
@@ -375,8 +375,8 @@ void GrenadeControl(short itemNumber)
 				}
 				Weather.Flash(R, G, B, 0.03f);
 
-				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-				TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+				TriggerFlashSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+				TriggerFlashSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 			}
 			else
 			{
@@ -386,33 +386,33 @@ void GrenadeControl(short itemNumber)
 				{
 					ITEM_INFO* newGrenade = &g_Level.Items[newGrenadeItemNumber];
 
-					newGrenade->shade = 0xC210;
-					newGrenade->objectNumber = ID_GRENADE;
-					newGrenade->roomNumber = item->roomNumber;
-					newGrenade->pos.xPos = (GetRandomControl() & 0x1FF) + item->pos.xPos - 256;
-					newGrenade->pos.yPos = item->pos.yPos - 256;
-					newGrenade->pos.zPos = (GetRandomControl() & 0x1FF) + item->pos.zPos - 256;
+					newGrenade->Shade = 0xC210;
+					newGrenade->ObjectNumber = ID_GRENADE;
+					newGrenade->RoomNumber = item->RoomNumber;
+					newGrenade->Position.xPos = (GetRandomControl() & 0x1FF) + item->Position.xPos - 256;
+					newGrenade->Position.yPos = item->Position.yPos - 256;
+					newGrenade->Position.zPos = (GetRandomControl() & 0x1FF) + item->Position.zPos - 256;
 					
 					InitialiseItem(newGrenadeItemNumber);
 					
-					newGrenade->pos.xRot = (GetRandomControl() & 0x3FFF) + ANGLE(45);
-					newGrenade->pos.yRot = GetRandomControl() * 2;
-					newGrenade->pos.zRot = 0;
+					newGrenade->Position.xRot = (GetRandomControl() & 0x3FFF) + ANGLE(45);
+					newGrenade->Position.yRot = GetRandomControl() * 2;
+					newGrenade->Position.zRot = 0;
 					newGrenade->Velocity = 64;
-					newGrenade->VerticalVelocity = -64 * phd_sin(newGrenade->pos.xRot);
-					newGrenade->activeState = newGrenade->pos.xRot;
-					newGrenade->targetState = newGrenade->pos.yRot;
-					newGrenade->requiredState = 0;
+					newGrenade->VerticalVelocity = -64 * phd_sin(newGrenade->Position.xRot);
+					newGrenade->ActiveState = newGrenade->Position.xRot;
+					newGrenade->TargetState = newGrenade->Position.yRot;
+					newGrenade->RequiredState = 0;
 					
 					AddActiveItem(newGrenadeItemNumber);
 					
-					newGrenade->status = ITEM_INVISIBLE;
-					newGrenade->itemFlags[2] = item->itemFlags[2];
-					newGrenade->hitPoints = 3000; // 60; // 3000;
-					newGrenade->itemFlags[0] = GRENADE_ULTRA;
+					newGrenade->Status = ITEM_INVISIBLE;
+					newGrenade->ItemFlags[2] = item->ItemFlags[2];
+					newGrenade->HitPoints = 3000; // 60; // 3000;
+					newGrenade->ItemFlags[0] = GRENADE_ULTRA;
 
-					if (g_Level.Rooms[newGrenade->roomNumber].flags & ENV_FLAG_WATER)
-						newGrenade->hitPoints = 1;
+					if (g_Level.Rooms[newGrenade->RoomNumber].flags & ENV_FLAG_WATER)
+						newGrenade->HitPoints = 1;
 				}
 			}
 
@@ -424,20 +424,20 @@ void GrenadeControl(short itemNumber)
 	}
 	   
 	// Store old position for later
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
+	int oldX = item->Position.xPos;
+	int oldY = item->Position.yPos;
+	int oldZ = item->Position.zPos;
 
 	int xv;
 	int yv;
 	int zv;
 
-	item->shade = 0xC210;
+	item->Shade = 0xC210;
 
 	// Check if above water and update speed and fallspeed
 	bool aboveWater = false;
 	bool someFlag = false;
-	if (g_Level.Rooms[item->roomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
+	if (g_Level.Rooms[item->RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 	{
 		aboveWater = false;
 		someFlag = false;
@@ -445,11 +445,11 @@ void GrenadeControl(short itemNumber)
 		item->Velocity -= item->Velocity >> 2;
 		if (item->Velocity)
 		{
-			item->pos.zRot += (((item->Velocity >> 4) + 3) * ANGLE(1));
-			if (item->requiredState)
-				item->pos.yRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
+			item->Position.zRot += (((item->Velocity >> 4) + 3) * ANGLE(1));
+			if (item->RequiredState)
+				item->Position.yRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
+				item->Position.xRot += (((item->Velocity >> 2) + 3) * ANGLE(1));
 		}
 	}
 	else
@@ -459,11 +459,11 @@ void GrenadeControl(short itemNumber)
 		item->VerticalVelocity += 3;
 		if (item->Velocity)
 		{
-			item->pos.zRot += (((item->Velocity >> 2) + 7) * ANGLE(1));
-			if (item->requiredState)
-				item->pos.yRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
+			item->Position.zRot += (((item->Velocity >> 2) + 7) * ANGLE(1));
+			if (item->RequiredState)
+				item->Position.yRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
 			else
-				item->pos.xRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
+				item->Position.xRot += (((item->Velocity >> 1) + 7) * ANGLE(1));
 
 		}
 	}
@@ -472,27 +472,27 @@ void GrenadeControl(short itemNumber)
 	if (item->Velocity && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
-			TO_RAD(item->pos.yRot - ANGLE(180)),
-			TO_RAD(item->pos.xRot),
-			TO_RAD(item->pos.zRot)
+			TO_RAD(item->Position.yRot - ANGLE(180)),
+			TO_RAD(item->Position.xRot),
+			TO_RAD(item->Position.zRot)
 		) * Matrix::CreateTranslation(0, 0, -64);
 
 		int wx = world.Translation().x;
 		int wy = world.Translation().y;
 		int wz = world.Translation().z;
 
-		TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
-		TriggerRocketFire(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos);
+		TriggerRocketSmoke(wx + item->Position.xPos, wy + item->Position.yPos, wz + item->Position.zPos, -1);
+		TriggerRocketFire(wx + item->Position.xPos, wy + item->Position.yPos, wz + item->Position.zPos);
 	}
 
 	// Update grenade position
-	xv = item->Velocity * phd_sin(item->targetState);
+	xv = item->Velocity * phd_sin(item->TargetState);
 	yv = item->VerticalVelocity;
-	zv = item->Velocity * phd_cos(item->targetState);
+	zv = item->Velocity * phd_cos(item->TargetState);
 
-	item->pos.xPos += xv;
-	item->pos.yPos += yv;
-	item->pos.zPos += zv;
+	item->Position.xPos += xv;
+	item->Position.yPos += yv;
+	item->Position.zPos += zv;
 
 	FLOOR_INFO* floor;
 	int height;
@@ -500,31 +500,31 @@ void GrenadeControl(short itemNumber)
 	short roomNumber;
 
 	// Grenades that originate from first grenade when special ammo is selected
-	if (item->itemFlags[0] == GRENADE_ULTRA)
+	if (item->ItemFlags[0] == GRENADE_ULTRA)
 	{
-		roomNumber = item->roomNumber;
+		roomNumber = item->RoomNumber;
 		
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-		height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-		ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+		height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		ceiling = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
-		if (height < item->pos.yPos || ceiling > item->pos.yPos)
-			item->hitPoints = 1;
+		if (height < item->Position.yPos || ceiling > item->Position.yPos)
+			item->HitPoints = 1;
 	}
 	else
 	{
 		// Do grenade's physics
-		short sYrot = item->pos.yRot;
-		item->pos.yRot = item->targetState;
+		short sYrot = item->Position.yRot;
+		item->Position.yRot = item->TargetState;
 
 		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
 
-		item->targetState = item->pos.yRot;
-		item->pos.yRot = sYrot;
+		item->TargetState = item->Position.yRot;
+		item->Position.yRot = sYrot;
 	}
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	roomNumber = item->RoomNumber;
+	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 	// TODO: splash effect
 	/*
@@ -550,23 +550,23 @@ void GrenadeControl(short itemNumber)
     {
       goto LABEL_35;
     }
-    item->hitPoints = 1;
+    item->HitPoints = 1;
   }*/
 
-	if (item->itemFlags[0] == GRENADE_ULTRA)
-		TriggerFireFlame(item->pos.xPos, item->pos.yPos, item->pos.zPos, -1, 1);
+	if (item->ItemFlags[0] == GRENADE_ULTRA)
+		TriggerFireFlame(item->Position.xPos, item->Position.yPos, item->Position.zPos, -1, 1);
 
 	// Check if it's time to explode
 	int radius = 0;
 	bool explode = false; 
 
-	if (item->hitPoints)
+	if (item->HitPoints)
 	{
-		item->hitPoints--;
+		item->HitPoints--;
 
-		if (item->hitPoints)
+		if (item->HitPoints)
 		{
-			if (item->hitPoints > 118)
+			if (item->HitPoints > 118)
 			{
 				return;
 			}
@@ -579,7 +579,7 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// If is not a flash grenade then try to destroy surrounding objects
-	if (!(item->itemFlags[0] == GRENADE_FLASH && explode))
+	if (!(item->ItemFlags[0] == GRENADE_FLASH && explode))
 	{
 		//int radius = (explode ? GRENADE_EXPLODE_RADIUS : GRENADE_HIT_RADIUS);
 		bool foundCollidedObjects = false;
@@ -601,21 +601,21 @@ void GrenadeControl(short itemNumber)
 
 					ITEM_INFO* currentItem = CollidedItems[i];
 
-					if (currentItem->objectNumber < ID_SMASH_OBJECT1 || currentItem->objectNumber > ID_SMASH_OBJECT16)
+					if (currentItem->ObjectNumber < ID_SMASH_OBJECT1 || currentItem->ObjectNumber > ID_SMASH_OBJECT16)
 					{
-						if (currentItem->objectNumber < ID_SHOOT_SWITCH1 || currentItem->objectNumber > ID_SHOOT_SWITCH4 || (currentItem->flags & 0x40))
+						if (currentItem->ObjectNumber < ID_SHOOT_SWITCH1 || currentItem->ObjectNumber > ID_SHOOT_SWITCH4 || (currentItem->Flags & 0x40))
 						{
-							if (Objects[currentItem->objectNumber].intelligent || currentItem->objectNumber == ID_LARA)
+							if (Objects[currentItem->ObjectNumber].intelligent || currentItem->ObjectNumber == ID_LARA)
 							{
 								DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_GRENADE_LAUNCHER);
 							}
 						}
 						else
 						{
-							if ((currentItem->flags & IFLAG_ACTIVATION_MASK) &&
-								(currentItem->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+							if ((currentItem->Flags & IFLAG_ACTIVATION_MASK) &&
+								(currentItem->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 							{
-								TestTriggers(currentItem->pos.xPos, currentItem->pos.yPos - 256, currentItem->pos.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
+								TestTriggers(currentItem->Position.xPos, currentItem->Position.yPos - 256, currentItem->Position.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
 							}
 							else
 							{
@@ -626,28 +626,28 @@ void GrenadeControl(short itemNumber)
 									for (int j = 0; j < numSwitchItems; j++)
 									{
 										AddActiveItem(itemNos[j]);
-										g_Level.Items[itemNos[j]].status = ITEM_ACTIVE;
-										g_Level.Items[itemNos[j]].flags |= 0x3E00;
+										g_Level.Items[itemNos[j]].Status = ITEM_ACTIVE;
+										g_Level.Items[itemNos[j]].Flags |= 0x3E00;
 									}
 								}
 							}
 
-							if (currentItem->objectNumber == ID_SHOOT_SWITCH1)
+							if (currentItem->ObjectNumber == ID_SHOOT_SWITCH1)
 							{
-								ExplodeItemNode(currentItem, Objects[currentItem->objectNumber].nmeshes - 1, 0, 64);
+								ExplodeItemNode(currentItem, Objects[currentItem->ObjectNumber].nmeshes - 1, 0, 64);
 							}
 
 							AddActiveItem(currentItem - g_Level.Items.data());
 
-							currentItem->status = ITEM_ACTIVE;
-							currentItem->flags |= 0x3E40;
+							currentItem->Status = ITEM_ACTIVE;
+							currentItem->Flags |= 0x3E40;
 						}
 					}
 					else
 					{
 						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
-						TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-						auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
+						TriggerExplosionSparks(currentItem->Position.xPos, currentItem->Position.yPos, currentItem->Position.zPos, 3, -2, 0, currentItem->RoomNumber);
+						auto pos = PHD_3DPOS(currentItem->Position.xPos, currentItem->Position.yPos - 128, currentItem->Position.zPos);
 						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 						ExplodeItemNode(currentItem, 0, 0, 128);
 						short currentItemNumber = (currentItem - CollidedItems[0]);
@@ -666,14 +666,14 @@ void GrenadeControl(short itemNumber)
 						STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
 						if (s->shatterType != SHT_NONE)
 						{
-							currentMesh->hitPoints -= Weapons[WEAPON_GRENADE_LAUNCHER].damage;
-							if (currentMesh->hitPoints <= 0)
+							currentMesh->HitPoints -= Weapons[WEAPON_GRENADE_LAUNCHER].damage;
+							if (currentMesh->HitPoints <= 0)
 							{
-								TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+								TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->RoomNumber);
 								auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-								ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
-								SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+								ShatterObject(NULL, currentMesh, -128, item->RoomNumber, 0);
+								SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
 								SmashedMesh[SmashedMeshCount] = currentMesh;
 								SmashedMeshCount++;
 								currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -693,7 +693,7 @@ void GrenadeControl(short itemNumber)
 					return;
 
 				explode = true;
-				if (item->itemFlags[0] == GRENADE_FLASH)
+				if (item->ItemFlags[0] == GRENADE_FLASH)
 				{
 					break;
 				}
@@ -704,38 +704,38 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Handle explosion effects
-	if (explode || (item->itemFlags[0] == GRENADE_FLASH && explode))
+	if (explode || (item->ItemFlags[0] == GRENADE_FLASH && explode))
 	{
-		if (item->itemFlags[0] == GRENADE_FLASH)
+		if (item->ItemFlags[0] == GRENADE_FLASH)
 		{
 			Weather.Flash(255, 255, 255, 0.03f);
-			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-			TriggerFlashSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+			TriggerFlashSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+			TriggerFlashSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 		}
-		else if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		else if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 		{
 			TriggerUnderwaterExplosion(item, 0);
 		}
 		else
 		{
-			item->pos.yPos -= 128;
-			TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+			item->Position.yPos -= 128;
+			TriggerShockwave(&item->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
+			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
 			for (int x = 0; x < 2; x++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
 
 		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
-		if (item->itemFlags[0] != GRENADE_NORMAL && item->itemFlags[0] != GRENADE_ULTRA)
+		if (item->ItemFlags[0] != GRENADE_NORMAL && item->ItemFlags[0] != GRENADE_ULTRA)
 		{
-			item->meshBits = 0;
-			item->itemFlags[1] = (item->itemFlags[0] != GRENADE_SUPER ? 16 : 4);
+			item->MeshBits = 0;
+			item->ItemFlags[1] = (item->ItemFlags[0] != GRENADE_SUPER ? 16 : 4);
 			return;
 		}
 
@@ -749,14 +749,14 @@ void RocketControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	// Save old position for later
-	short oldroom = item->roomNumber;
-	int oldx = item->pos.xPos;
-	int oldy = item->pos.yPos;
-	int oldz = item->pos.zPos;
+	short oldroom = item->RoomNumber;
+	int oldx = item->Position.xPos;
+	int oldy = item->Position.yPos;
+	int oldz = item->Position.zPos;
 
 	// Update speed and rotation and check if above water or underwater
 	bool abovewater = false;
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 	{
 		if (item->Velocity > ROCKET_SPEED / 4)
 			item->Velocity -= (item->Velocity / 4);
@@ -767,24 +767,24 @@ void RocketControl(short itemNumber)
 				item->Velocity = ROCKET_SPEED / 4;
 		}
 
-		item->pos.zRot += (((item->Velocity / 8) + 3) * ANGLE(1));
+		item->Position.zRot += (((item->Velocity / 8) + 3) * ANGLE(1));
 		abovewater = false;
 	}
 	else
 	{
 		if (item->Velocity < ROCKET_SPEED)
 			item->Velocity += (item->Velocity / 4) + 4;
-		item->pos.zRot += (((item->Velocity / 4) + 7) * ANGLE(1));
+		item->Position.zRot += (((item->Velocity / 4) + 7) * ANGLE(1));
 		abovewater = true;
 	}
 
-	item->shade = 0x4210 | 0x8000;
+	item->Shade = 0x4210 | 0x8000;
 
 	// Calculate offset in rocket direction for fire and smoke sparks
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->pos.yRot - ANGLE(180)),
-		TO_RAD(item->pos.xRot),
-		TO_RAD(item->pos.zRot)
+		TO_RAD(item->Position.yRot - ANGLE(180)),
+		TO_RAD(item->Position.xRot),
+		TO_RAD(item->Position.zRot)
 	) * Matrix::CreateTranslation(0, 0, -64);
 
 	int wx = world.Translation().x;
@@ -792,47 +792,47 @@ void RocketControl(short itemNumber)
 	int wz = world.Translation().z;
 
 	// Trigger fire, smoke and lighting
-	TriggerRocketSmoke(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos, -1);
-	TriggerRocketFire(wx + item->pos.xPos, wy + item->pos.yPos, wz + item->pos.zPos);
-	TriggerDynamicLight(wx + item->pos.xPos + (GetRandomControl() & 15) - 8, wy + item->pos.yPos + (GetRandomControl() & 15) - 8, wz + item->pos.zPos + (GetRandomControl() & 15) - 8, 14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
+	TriggerRocketSmoke(wx + item->Position.xPos, wy + item->Position.yPos, wz + item->Position.zPos, -1);
+	TriggerRocketFire(wx + item->Position.xPos, wy + item->Position.yPos, wz + item->Position.zPos);
+	TriggerDynamicLight(wx + item->Position.xPos + (GetRandomControl() & 15) - 8, wy + item->Position.yPos + (GetRandomControl() & 15) - 8, wz + item->Position.zPos + (GetRandomControl() & 15) - 8, 14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
 
 	// If underwater generate bubbles
-	if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 	{
 		PHD_VECTOR pos;
-		pos.x = wx + item->pos.xPos;
-		pos.y = wy + item->pos.yPos;
-		pos.z = wz + item->pos.zPos;
-		CreateBubble(&pos, item->roomNumber, 4, 8, 0, 0, 0, 0);
+		pos.x = wx + item->Position.xPos;
+		pos.y = wy + item->Position.yPos;
+		pos.z = wz + item->Position.zPos;
+		CreateBubble(&pos, item->RoomNumber, 4, 8, 0, 0, 0, 0);
 	}
 
 	// Update rocket's position
-	short speed = item->Velocity * phd_cos(item->pos.xRot);
-	item->pos.xPos += speed * phd_sin(item->pos.yRot);
-	item->pos.yPos += -item->Velocity * phd_sin(item->pos.xRot);
-	item->pos.zPos += speed * phd_cos(item->pos.yRot);
+	short speed = item->Velocity * phd_cos(item->Position.xRot);
+	item->Position.xPos += speed * phd_sin(item->Position.yRot);
+	item->Position.yPos += -item->Velocity * phd_sin(item->Position.xRot);
+	item->Position.zPos += speed * phd_cos(item->Position.yRot);
 
 	bool explode = false;
 	
 	// Check if solid wall and then decide if explode or not
-	short roomNumber = item->roomNumber;
-	FLOOR_INFO * floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
-		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
+	short roomNumber = item->RoomNumber;
+	FLOOR_INFO * floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
+		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
 	{
-		item->pos.xPos = oldx;
-		item->pos.yPos = oldy;
-		item->pos.zPos = oldz;
+		item->Position.xPos = oldx;
+		item->Position.yPos = oldy;
+		item->Position.zPos = oldz;
 		explode = true;
 	}
 
 	// Has bolt changed room?
-	if (item->roomNumber != roomNumber)
+	if (item->RoomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	// If now in water and before in land, add a ripple
-	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && abovewater)
-		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+	if ((g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER) && abovewater)
+		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 
 	int radius = (explode ? ROCKET_EXPLODE_RADIUS : ROCKET_HIT_RADIUS);
 	bool foundCollidedObjects = false;
@@ -856,12 +856,12 @@ void RocketControl(short itemNumber)
 			int k = 0;
 			do
 			{
-				OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+				OBJECT_INFO* currentObj = &Objects[currentItem->ObjectNumber];
 
-				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE)
-					|| currentItem->objectNumber == ID_LARA
-					|| (currentItem->flags & 0x40 &&
-					(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
+				if ((currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE)
+					|| currentItem->ObjectNumber == ID_LARA
+					|| (currentItem->Flags & 0x40 &&
+					(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
 					// All active intelligent creatures explode, if their HP is <= 0
 					// Explosion is handled by CreatureDie()
@@ -869,11 +869,11 @@ void RocketControl(short itemNumber)
 					// HitTarget() is called inside this
 					DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_ROCKET_LAUNCHER);
 				}
-				else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
+				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
 					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
-					TriggerExplosionSparks(currentItem->pos.xPos, currentItem->pos.yPos, currentItem->pos.zPos, 3, -2, 0, currentItem->roomNumber);
-					auto pos = PHD_3DPOS(currentItem->pos.xPos, currentItem->pos.yPos - 128, currentItem->pos.zPos);
+					TriggerExplosionSparks(currentItem->Position.xPos, currentItem->Position.yPos, currentItem->Position.zPos, 3, -2, 0, currentItem->RoomNumber);
+					auto pos = PHD_3DPOS(currentItem->Position.xPos, currentItem->Position.yPos - 128, currentItem->Position.zPos);
 					TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 					ExplodeItemNode(currentItem, 0, 0, 128);
 					short currentItemNumber = (currentItem - CollidedItems[0]);
@@ -905,14 +905,14 @@ void RocketControl(short itemNumber)
 				STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
 				if (s->shatterType != SHT_NONE)
 				{
-					currentMesh->hitPoints -= Weapons[WEAPON_ROCKET_LAUNCHER].damage;
-					if (currentMesh->hitPoints <= 0)
+					currentMesh->HitPoints -= Weapons[WEAPON_ROCKET_LAUNCHER].damage;
+					if (currentMesh->HitPoints <= 0)
 					{
-						TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->roomNumber);
+						TriggerExplosionSparks(currentMesh->pos.xPos, currentMesh->pos.yPos, currentMesh->pos.zPos, 3, -2, 0, item->RoomNumber);
 						auto pos = PHD_3DPOS(currentMesh->pos.xPos, currentMesh->pos.yPos - 128, currentMesh->pos.zPos, 0, currentMesh->pos.yRot, 0);
 						TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-						ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+						ShatterObject(NULL, currentMesh, -128, item->RoomNumber, 0);
+						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
 						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -932,21 +932,21 @@ void RocketControl(short itemNumber)
 	// Do explosion if needed
 	if (explode)
 	{
-		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 			TriggerUnderwaterExplosion(item, 0);
 		else
 		{
-			TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-			item->pos.yPos += 128;
-			TriggerExplosionSparks(oldx, oldy, oldz, 3, -2, 0, item->roomNumber);
+			TriggerShockwave(&item->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+			item->Position.yPos += 128;
+			TriggerExplosionSparks(oldx, oldy, oldz, 3, -2, 0, item->RoomNumber);
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldx, oldy, oldz, 3, -1, 0, item->roomNumber);
+				TriggerExplosionSparks(oldx, oldy, oldz, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
@@ -963,22 +963,22 @@ void draw_shotgun(int weaponType)
 		
 		item = &g_Level.Items[Lara.weaponItem];
 
-		item->objectNumber = WeaponObject(weaponType);
+		item->ObjectNumber = WeaponObject(weaponType);
 
 		if (weaponType == WEAPON_ROCKET_LAUNCHER)
-			item->animNumber = Objects[item->objectNumber].animIndex + 1;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 		else if (weaponType == WEAPON_GRENADE_LAUNCHER)
-			item->animNumber = Objects[item->objectNumber].animIndex + 0;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 0;
 		else
-			item->animNumber = Objects[item->objectNumber].animIndex + 1;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 		
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = WSTATE_DRAW;
-		item->activeState = WSTATE_DRAW;
-		item->status = ITEM_ACTIVE;
-		item->roomNumber = NO_ROOM;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = WSTATE_DRAW;
+		item->ActiveState = WSTATE_DRAW;
+		item->Status = ITEM_ACTIVE;
+		item->RoomNumber = NO_ROOM;
 		
-		Lara.rightArm.frameBase = Objects[item->objectNumber].frameBase;
+		Lara.rightArm.frameBase = Objects[item->ObjectNumber].frameBase;
 		Lara.leftArm.frameBase = Lara.rightArm.frameBase;
 	}
 	else
@@ -988,21 +988,21 @@ void draw_shotgun(int weaponType)
 
 	AnimateItem(item);
 
-	if (item->activeState != 0 && item->activeState != 6)
+	if (item->ActiveState != 0 && item->ActiveState != 6)
 	{
-		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == Weapons[weaponType].drawFrame)
+		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == Weapons[weaponType].drawFrame)
 			draw_shotgun_meshes(weaponType);
 		else if (Lara.waterStatus == LW_UNDERWATER)
-			item->targetState = 6;
+			item->TargetState = 6;
 	}
 	else
 	{
 		ready_shotgun(weaponType);
 	}
 
-	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
+	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->AnimNumber;
 }
 
 void AnimateShotgun(int weaponType)
@@ -1044,7 +1044,7 @@ void AnimateShotgun(int weaponType)
 
 		GetLaraJointPosition(&pos, LM_RHAND);
 
-		if (LaraItem->meshBits)
+		if (LaraItem->MeshBits)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
@@ -1052,7 +1052,7 @@ void AnimateShotgun(int weaponType)
 	bool running = (weaponType == WEAPON_HK && LaraItem->Velocity != 0);
 	bool harpoonFired = false;
 
-	switch (item->activeState)
+	switch (item->ActiveState)
 	{
 	case WSTATE_AIM:
 //		HKFlag = 0;
@@ -1060,11 +1060,11 @@ void AnimateShotgun(int weaponType)
 //		HKFlag2 = 0;
 
 		if (Lara.waterStatus == LW_UNDERWATER || running)
-			item->targetState = WSTATE_UW_AIM;
+			item->TargetState = WSTATE_UW_AIM;
 		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == false)
-			item->targetState = WSTATE_UNAIM;
+			item->TargetState = WSTATE_UNAIM;
 		else
-			item->targetState = WSTATE_RECOIL;
+			item->TargetState = WSTATE_RECOIL;
 
 		break;
 
@@ -1076,19 +1076,19 @@ void AnimateShotgun(int weaponType)
 		if (Lara.waterStatus == LW_UNDERWATER || running)
 		{
 			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.leftArm.lock == false)
-				item->targetState = WSTATE_UW_UNAIM;
+				item->TargetState = WSTATE_UW_UNAIM;
 			else
-				item->targetState = WSTATE_UW_RECOIL;
+				item->TargetState = WSTATE_UW_RECOIL;
 		}
 		else
-			item->targetState = WSTATE_AIM;
+			item->TargetState = WSTATE_AIM;
 		
 		break;
 
 	case WSTATE_RECOIL:
-		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+		if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 		{
-			item->targetState = WSTATE_UNAIM;
+			item->TargetState = WSTATE_UNAIM;
 			
 			if (Lara.waterStatus != LW_UNDERWATER && !running && !harpoonFired)
 			{
@@ -1123,25 +1123,25 @@ void AnimateShotgun(int weaponType)
 						}
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, &LaraItem->pos, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, &LaraItem->Position, 0);
 						}
 					}
 					else
 						FireShotgun();
 
-					item->targetState = WSTATE_RECOIL;
+					item->TargetState = WSTATE_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
-					item->targetState = 0; 
+					item->TargetState = 0; 
 			}
 
-			if (item->targetState != WSTATE_RECOIL 
+			if (item->TargetState != WSTATE_RECOIL 
 //				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_TR5_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->pos, 0);
+				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->Position, 0);
 //				HKFlag = 0;
 			}
 		}
@@ -1159,18 +1159,18 @@ void AnimateShotgun(int weaponType)
 		}*/
 		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.leftArm.lock)
 		{
-			item->targetState = WSTATE_UNAIM;
+			item->TargetState = WSTATE_UNAIM;
 		}
 
-		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 12 
+		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 12 
 			&& weaponType == WEAPON_SHOTGUN)
 			TriggerGunShell(1, ID_SHOTGUNSHELL, WEAPON_SHOTGUN);
 		break;
 
 	case WSTATE_UW_RECOIL:
-		if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 0)
+		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 0)
 		{
-			item->targetState = WSTATE_UW_UNAIM;
+			item->TargetState = WSTATE_UW_UNAIM;
 
 			if ((Lara.waterStatus == LW_UNDERWATER || running)
 				&& !harpoonFired)
@@ -1189,33 +1189,33 @@ void AnimateShotgun(int weaponType)
 					{
 						FireHK(1);
 //						HKFlag = 1;
-						item->targetState = 8;
+						item->TargetState = 8;
 						if (Lara.Weapons[WEAPON_HK].HasSilencer)
 						{
 							SoundEffect(14, 0, 0);
 						}
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, &LaraItem->pos, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 83888140);
+							SoundEffect(SFX_TR5_HK_FIRE, &LaraItem->Position, 0);
 						}
 					}
 					else
 					{
-						item->targetState = WSTATE_UW_AIM;
+						item->TargetState = WSTATE_UW_AIM;
 					}
 
-					item->targetState = WSTATE_UW_RECOIL;
+					item->TargetState = WSTATE_UW_RECOIL;
 				}
 				else if (Lara.leftArm.lock)
-					item->targetState = WSTATE_UW_AIM;
+					item->TargetState = WSTATE_UW_AIM;
 			}
-			else if (item->targetState != WSTATE_UW_RECOIL 
+			else if (item->TargetState != WSTATE_UW_RECOIL 
 //				&& HKFlag 
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_TR5_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->pos, 0);
+				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->Position, 0);
 //				HKFlag = 0;
 			}
 /*			else if (HKFlag)
@@ -1240,9 +1240,9 @@ void AnimateShotgun(int weaponType)
 
 	AnimateItem(item);
 
-	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->animNumber;
+	Lara.leftArm.frameBase = Lara.rightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.leftArm.frameNumber = Lara.rightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.leftArm.animNumber = Lara.rightArm.animNumber = item->AnimNumber;
 }
 
 enum CROSSBOW_TYPE
@@ -1257,10 +1257,10 @@ void CrossbowBoltControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->pos.xPos;
-	int oldY = item->pos.yPos;
-	int oldZ = item->pos.zPos;
-	short roomNumber = item->roomNumber;
+	int oldX = item->Position.xPos;
+	int oldY = item->Position.yPos;
+	int oldZ = item->Position.zPos;
+	short roomNumber = item->RoomNumber;
 
 	bool aboveWater = false;
 	bool explode = false;
@@ -1268,7 +1268,7 @@ void CrossbowBoltControl(short itemNumber)
 	// Update speed and check if above water
 	if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 	{
-		PHD_VECTOR bubblePos(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		PHD_VECTOR bubblePos(item->Position.xPos, item->Position.yPos, item->Position.zPos);
 		if (item->Velocity > 64)
 			item->Velocity -= (item->Velocity >> 4);
 		if (GlobalCounter & 1)
@@ -1281,24 +1281,24 @@ void CrossbowBoltControl(short itemNumber)
 	}
 
 	// Update bolt's position
-	item->pos.xPos += item->Velocity * phd_cos(item->pos.xRot) * phd_sin(item->pos.yRot);
-	item->pos.yPos += item->Velocity * phd_sin(-item->pos.xRot);
-	item->pos.zPos += item->Velocity * phd_cos(item->pos.xRot) * phd_cos(item->pos.yRot);
+	item->Position.xPos += item->Velocity * phd_cos(item->Position.xRot) * phd_sin(item->Position.yRot);
+	item->Position.yPos += item->Velocity * phd_sin(-item->Position.xRot);
+	item->Position.zPos += item->Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 
-	roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	roomNumber = item->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 	
 	// Check if bolt has hit a solid wall
-	if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) < item->pos.yPos ||
-		GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos)
+	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
+		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
 	{
 		// I have hit a solid wall, this is the end for the bolt
-		item->pos.xPos = oldX;
-		item->pos.yPos = oldY;
-		item->pos.zPos = oldZ;
+		item->Position.xPos = oldX;
+		item->Position.yPos = oldY;
+		item->Position.zPos = oldZ;
 
 		// If ammos are normal, then just shatter the bolt and quit
-		if (item->itemFlags[0] != CROSSBOW_EXPLODE)
+		if (item->ItemFlags[0] != CROSSBOW_EXPLODE)
 		{
 			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 			KillItem(itemNumber);
@@ -1312,13 +1312,13 @@ void CrossbowBoltControl(short itemNumber)
 	}
 
 	// Has bolt changed room?
-	if (item->roomNumber != roomNumber)
+	if (item->RoomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	// If now in water and before in land, add a ripple
-	if ((g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER) && aboveWater)
+	if ((g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER) && aboveWater)
 	{
-		SetupRipple(item->pos.xPos, g_Level.Rooms[item->roomNumber].minfloor, item->pos.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 	}
 
 	int radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
@@ -1339,7 +1339,7 @@ void CrossbowBoltControl(short itemNumber)
 		foundCollidedObjects = true;
 
 		// If explosive ammos selected and item hit, then blast everything
-		if (item->itemFlags[0] == CROSSBOW_EXPLODE)
+		if (item->ItemFlags[0] == CROSSBOW_EXPLODE)
 			explode = true;
 
 		if (CollidedItems[0])
@@ -1349,12 +1349,12 @@ void CrossbowBoltControl(short itemNumber)
 			int k = 0;
 			do
 			{
-				OBJECT_INFO* currentObj = &Objects[currentItem->objectNumber];
+				OBJECT_INFO* currentObj = &Objects[currentItem->ObjectNumber];
 
-				if ((currentObj->intelligent && currentObj->collision && currentItem->status == ITEM_ACTIVE && !currentObj->undead)
-					|| (currentItem->objectNumber == ID_LARA && explode)
-					|| (currentItem->flags & 0x40 &&
-					(Objects[currentItem->objectNumber].explodableMeshbits || currentItem == LaraItem)))
+				if ((currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead)
+					|| (currentItem->ObjectNumber == ID_LARA && explode)
+					|| (currentItem->Flags & 0x40 &&
+					(Objects[currentItem->ObjectNumber].explodableMeshbits || currentItem == LaraItem)))
 				{
 					if (explode)
 					{
@@ -1364,17 +1364,17 @@ void CrossbowBoltControl(short itemNumber)
 						// HitTarget() is called inside this
 						DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
 					}
-					else if (currentItem->objectNumber != ID_LARA)
+					else if (currentItem->ObjectNumber != ID_LARA)
 					{
 						// Normal hit
-						HitTarget(LaraItem, currentItem, (GAME_VECTOR*)& item->pos, Weapons[WEAPON_CROSSBOW].damage << item->itemFlags[0], 0);
+						HitTarget(LaraItem, currentItem, (GAME_VECTOR*)& item->Position, Weapons[WEAPON_CROSSBOW].damage << item->ItemFlags[0], 0);
 
 						// Poisoned ammos
-						if (item->itemFlags[0] == CROSSBOW_POISON)
-							currentItem->poisoned = true;
+						if (item->ItemFlags[0] == CROSSBOW_POISON)
+							currentItem->Poisoned = true;
 					}
 				}
-				else if (currentItem->objectNumber >= ID_SMASH_OBJECT1 && currentItem->objectNumber <= ID_SMASH_OBJECT8)
+				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
 					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 
@@ -1411,11 +1411,11 @@ void CrossbowBoltControl(short itemNumber)
 				STATIC_INFO* s = &StaticObjects[currentMesh->staticNumber];
 				if (s->shatterType != SHT_NONE)
 				{
-					currentMesh->hitPoints -= Weapons[WEAPON_CROSSBOW].damage;
-					if (currentMesh->hitPoints <= 0)
+					currentMesh->HitPoints -= Weapons[WEAPON_CROSSBOW].damage;
+					if (currentMesh->HitPoints <= 0)
 					{
-						ShatterObject(NULL, currentMesh, -128, item->roomNumber, 0);
-						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
+						ShatterObject(NULL, currentMesh, -128, item->RoomNumber, 0);
+						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
 						SmashedMeshCount++;
 						currentMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -1446,23 +1446,23 @@ void CrossbowBoltControl(short itemNumber)
 	else
 	{
 		// Explode
-		if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 		{
 			TriggerUnderwaterExplosion(item, 0);
 		}
 		else
 		{
-			TriggerShockwave(&item->pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-			item->pos.yPos += 128;
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->roomNumber);
+			TriggerShockwave(&item->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+			item->Position.yPos += 128;
+			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->roomNumber);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
@@ -1535,22 +1535,22 @@ void FireCrossbow(PHD_3DPOS* pos)
 	if (itemNumber != NO_ITEM)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		item->objectNumber = ID_CROSSBOW_BOLT;
-		item->shade = 0xC210;
+		item->ObjectNumber = ID_CROSSBOW_BOLT;
+		item->Shade = 0xC210;
 		if (!ammos.hasInfinite())
 			(ammos)--;
 		if (pos)
 		{
-			item->roomNumber = LaraItem->roomNumber;
-			item->pos.xPos = pos->xPos;
-			item->pos.yPos = pos->yPos;
-			item->pos.zPos = pos->zPos;
+			item->RoomNumber = LaraItem->RoomNumber;
+			item->Position.xPos = pos->xPos;
+			item->Position.yPos = pos->yPos;
+			item->Position.zPos = pos->zPos;
 
 			InitialiseItem(itemNumber);
 
-			item->pos.xRot = pos->xRot;
-			item->pos.yRot = pos->yRot;
-			item->pos.zRot = pos->zRot;
+			item->Position.xRot = pos->xRot;
+			item->Position.yRot = pos->yRot;
+			item->Position.zRot = pos->zRot;
 		}
 		else
 		{
@@ -1562,35 +1562,35 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 			GetLaraJointPosition(&jointPos, LM_RHAND);
 
-			item->roomNumber = LaraItem->roomNumber;
+			item->RoomNumber = LaraItem->RoomNumber;
 
-			FLOOR_INFO * floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->roomNumber);
+			FLOOR_INFO * floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
 			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
 
 			if (height >= jointPos.y)
 			{
-				item->pos.xPos = jointPos.x;
-				item->pos.yPos = jointPos.y;
-				item->pos.zPos = jointPos.z;
+				item->Position.xPos = jointPos.x;
+				item->Position.yPos = jointPos.y;
+				item->Position.zPos = jointPos.z;
 			}
 			else
 			{
-				item->pos.xPos = LaraItem->pos.xPos;
-				item->pos.yPos = jointPos.y;
-				item->pos.zPos = LaraItem->pos.zPos;
-				item->roomNumber = LaraItem->roomNumber;
+				item->Position.xPos = LaraItem->Position.xPos;
+				item->Position.yPos = jointPos.y;
+				item->Position.zPos = LaraItem->Position.zPos;
+				item->RoomNumber = LaraItem->RoomNumber;
 			}
 
 			InitialiseItem(itemNumber);
 
-			item->pos.xRot = Lara.leftArm.xRot + LaraItem->pos.xRot;
-			item->pos.zRot = 0;
-			item->pos.yRot = Lara.leftArm.yRot + LaraItem->pos.yRot;
+			item->Position.xRot = Lara.leftArm.xRot + LaraItem->Position.xRot;
+			item->Position.zRot = 0;
+			item->Position.yRot = Lara.leftArm.yRot + LaraItem->Position.yRot;
 
 			if (!Lara.leftArm.lock)
 			{
-				item->pos.xRot += Lara.extraTorsoRot.x;
-				item->pos.yRot += Lara.extraTorsoRot.y;
+				item->Position.xRot += Lara.extraTorsoRot.x;
+				item->Position.yRot += Lara.extraTorsoRot.y;
 			}
 		}
 
@@ -1598,7 +1598,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 		AddActiveItem(itemNumber);
 
-		item->itemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+		item->ItemFlags[0] = Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 
 		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
 
@@ -1642,8 +1642,8 @@ void FireRocket()
 	if (itemNumber != NO_ITEM)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		item->objectNumber = ID_ROCKET;
-		item->roomNumber = LaraItem->roomNumber;
+		item->ObjectNumber = ID_ROCKET;
+		item->RoomNumber = LaraItem->RoomNumber;
 
 		if (!ammos.hasInfinite())
 			(ammos)--;
@@ -1656,9 +1656,9 @@ void FireRocket()
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		int x, y, z;
-		item->pos.xPos = x = jointPos.x;
-		item->pos.yPos = y = jointPos.y;
-		item->pos.zPos = z = jointPos.z;
+		item->Position.xPos = x = jointPos.x;
+		item->Position.yPos = y = jointPos.y;
+		item->Position.zPos = z = jointPos.z;
 
 		jointPos.x = 0;
 		jointPos.y = 180 + 1024;
@@ -1683,18 +1683,18 @@ void FireRocket()
 
 		InitialiseItem(itemNumber);
 
-		item->pos.xRot = LaraItem->pos.xRot + Lara.leftArm.xRot;
-		item->pos.yRot = LaraItem->pos.yRot + Lara.leftArm.yRot;
-		item->pos.zRot = 0;
+		item->Position.xRot = LaraItem->Position.xRot + Lara.leftArm.xRot;
+		item->Position.yRot = LaraItem->Position.yRot + Lara.leftArm.yRot;
+		item->Position.zRot = 0;
 
 		if (!Lara.leftArm.lock)
 		{
-			item->pos.xRot += Lara.extraTorsoRot.x;
-			item->pos.yRot += Lara.extraTorsoRot.y;
+			item->Position.xRot += Lara.extraTorsoRot.x;
+			item->Position.yRot += Lara.extraTorsoRot.y;
 		}
 
 		item->Velocity = 512 >> 5;
-		item->itemFlags[0] = 0;
+		item->ItemFlags[0] = 0;
 
 		AddActiveItem(itemNumber);
 
@@ -1707,15 +1707,15 @@ void FireRocket()
 
 void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 {
-	if (!(dest->flags & 0x8000))
+	if (!(dest->Flags & 0x8000))
 	{
-		if (dest != LaraItem || LaraItem->hitPoints <= 0)
+		if (dest != LaraItem || LaraItem->HitPoints <= 0)
 		{
-			if (!src->itemFlags[2])
+			if (!src->ItemFlags[2])
 			{
-				dest->hitStatus = true;
+				dest->HitStatus = true;
 
-				OBJECT_INFO* obj = &Objects[dest->objectNumber];
+				OBJECT_INFO* obj = &Objects[dest->ObjectNumber];
 				// TODO: in TR4 condition was objectNumber != (ID_MUMMY, ID_SKELETON, ID_SETHA)
 				if (!obj->undead)
 				{
@@ -1723,7 +1723,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 					if (dest != LaraItem)
 					{
 						Statistics.Game.AmmoHits++;
-						if (dest->hitPoints <= 0)
+						if (dest->HitPoints <= 0)
 						{
 							Statistics.Level.Kills++;
 							CreatureDie((dest - g_Level.Items.data()), 1);
@@ -1734,8 +1734,8 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* dest, ITEM_INFO* src, int weapon)
 		}
 		else
 		{
-			LaraItem->hitPoints -= (Weapons[weapon].damage * 5);
-			if (!(g_Level.Rooms[dest->roomNumber].flags & ENV_FLAG_WATER) && LaraItem->hitPoints <= Weapons[weapon].damage)
+			LaraItem->HitPoints -= (Weapons[weapon].damage * 5);
+			if (!(g_Level.Rooms[dest->RoomNumber].flags & ENV_FLAG_WATER) && LaraItem->HitPoints <= Weapons[weapon].damage)
 				LaraBurn(LaraItem);
 		}
 	}
@@ -1776,40 +1776,40 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
 {
 	if (flag)
 	{
-		int x = (GetRandomControl() & 0x1FF) + item->pos.xPos - 256;
-		int y = item->pos.yPos;
-		int z = (GetRandomControl() & 0x1FF) + item->pos.zPos - 256;
+		int x = (GetRandomControl() & 0x1FF) + item->Position.xPos - 256;
+		int y = item->Position.yPos;
+		int z = (GetRandomControl() & 0x1FF) + item->Position.zPos - 256;
 		
-		TriggerExplosionBubbles(x, y, z, item->roomNumber);
-		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->roomNumber);
+		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
+		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
 		
-		int wh = GetWaterHeight(x, y, z, item->roomNumber);
+		int wh = GetWaterHeight(x, y, z, item->RoomNumber);
 		if (wh != NO_HEIGHT)
 			SomeSparkEffect(x, wh, z, 8);
 	}
 	else
 	{
-		TriggerExplosionBubble(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
-		TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -2, 1, item->roomNumber);
+		TriggerExplosionBubble(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+		TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 2, -2, 1, item->RoomNumber);
 
 		for (int i = 0; i < 3; i++)
 		{
-			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 2, -1, 1, item->roomNumber);
+			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 2, -1, 1, item->RoomNumber);
 		}
 
-		int wh = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+		int wh = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 		if (wh != NO_HEIGHT)
 		{
-			int dy = item->pos.yPos - wh;
+			int dy = item->Position.yPos - wh;
 			if (dy < 2048)
 			{
 				SplashSetup.y = wh;
-				SplashSetup.x = item->pos.xPos;
-				SplashSetup.z = item->pos.zPos;
+				SplashSetup.x = item->Position.xPos;
+				SplashSetup.z = item->Position.zPos;
 				SplashSetup.innerRadius = 160;
 				SplashSetup.splashPower = 2048 - dy;
 
-				SetupSplash(&SplashSetup, item->roomNumber);
+				SetupSplash(&SplashSetup, item->RoomNumber);
 			}
 		}
 	}
@@ -1818,11 +1818,11 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
 void undraw_shotgun(int weapon)
 {
 	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
-	item->targetState = 3;
+	item->TargetState = 3;
 	
 	AnimateItem(item);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->Status == ITEM_DEACTIVATED)
 	{
 		Lara.gunStatus = LG_HANDS_FREE;
 		Lara.target = nullptr;
@@ -1833,16 +1833,16 @@ void undraw_shotgun(int weapon)
 		Lara.rightArm.frameNumber = 0;
 		Lara.leftArm.frameNumber = 0;
 	}
-	else if (item->activeState == 3 && item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 21)
+	else if (item->ActiveState == 3 && item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 21)
 	{
 		undraw_shotgun_meshes(weapon);
 	}
 	
-	Lara.rightArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
-	Lara.leftArm.frameBase = g_Level.Anims[item->animNumber].framePtr;
-	Lara.rightArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-	Lara.leftArm.frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-	Lara.rightArm.animNumber = item->animNumber;
+	Lara.rightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.leftArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.rightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.leftArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.rightArm.animNumber = item->AnimNumber;
 	Lara.leftArm.animNumber = Lara.rightArm.animNumber;
 }
 
@@ -1882,11 +1882,11 @@ void FireHK(int mode)
 	short angles[2];
 
 	angles[1] = Lara.leftArm.xRot;
-	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
+	angles[0] = Lara.leftArm.yRot + LaraItem->Position.yRot;
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->Position.yRot;
 		angles[1] = Lara.extraTorsoRot.x + Lara.leftArm.xRot;
 	}
 
@@ -1915,11 +1915,11 @@ void FireShotgun()
 	short angles[2];
 	
 	angles[1] = Lara.leftArm.xRot;
-	angles[0] = Lara.leftArm.yRot + LaraItem->pos.yRot;
+	angles[0] = Lara.leftArm.yRot + LaraItem->Position.yRot;
 
 	if (!Lara.leftArm.lock)
 	{
-		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->pos.yRot;
+		angles[0] = Lara.extraTorsoRot.y + Lara.leftArm.yRot + LaraItem->Position.yRot;
 		angles[1] = Lara.extraTorsoRot.x + Lara.leftArm.xRot;
 	}
 
@@ -1961,7 +1961,7 @@ void FireShotgun()
 		SmokeCountL = 32;
 		SmokeWeapon = WEAPON_SHOTGUN;
 
-		if (LaraItem->meshBits != 0)
+		if (LaraItem->MeshBits != 0)
 		{
 			for (int i = 0; i < 7; i++)
 				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, SmokeCountL);
@@ -1969,8 +1969,8 @@ void FireShotgun()
 
 		Lara.rightArm.flash_gun = Weapons[WEAPON_SHOTGUN].flashTime;
 		
-		SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->pos, 20971524);
-		SoundEffect(Weapons[WEAPON_SHOTGUN].sampleNum, &LaraItem->pos, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 20971524);
+		SoundEffect(Weapons[WEAPON_SHOTGUN].sampleNum, &LaraItem->Position, 0);
 		
 		Statistics.Game.AmmoUsed++;
 	}

@@ -108,7 +108,7 @@ namespace TEN {
 				dir.Normalize();
 				s.velocity = dir;
 				s.gravity = -.1f;
-				s.affectedByWind = g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND;
+				s.affectedByWind = g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WIND;
 				s.sourceColor = Vector4(.4, .4, .4, 1);
 				s.destinationColor = Vector4(0, 0, 0, 0);
 
@@ -168,7 +168,7 @@ namespace TEN {
 				s.angularVelocity = GenerateFloat(-PI / 4, PI / 4);
 
 				s.angularDrag = 0.95f;
-				s.room = LaraItem->roomNumber;
+				s.room = LaraItem->RoomNumber;
 				
 			}
 

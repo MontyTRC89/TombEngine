@@ -25,11 +25,11 @@ void InitialiseLagoonWitch(short itemNumber)
 	
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[item->objectNumber].animIndex + 1;
-	item->targetState = STATE_LAGOON_WITCH_STOP;
-	item->activeState = STATE_LAGOON_WITCH_STOP;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->pos.yPos += 512;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->TargetState = STATE_LAGOON_WITCH_STOP;
+	item->ActiveState = STATE_LAGOON_WITCH_STOP;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Position.yPos += 512;
 }
 
 void LagoonWitchControl(short itemNumber)
@@ -43,28 +43,28 @@ void LagoonWitchControl(short itemNumber)
 	short angle = 0;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != STATE_LAGOON_WITCH_DEATH)
+		if (item->ActiveState != STATE_LAGOON_WITCH_DEATH)
 		{
-			item->hitPoints = 0;
-			item->activeState = STATE_LAGOON_WITCH_DEATH;
-			item->animNumber = obj->animIndex + ANIMATION_LAGOON_WITCH_DEATH;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->HitPoints = 0;
+			item->ActiveState = STATE_LAGOON_WITCH_DEATH;
+			item->AnimNumber = obj->animIndex + ANIMATION_LAGOON_WITCH_DEATH;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 	}
 	else
 	{
 		if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM2))
 		{
-			item->aiBits = 0;
+			item->AIBits = 0;
 			creature->enemy = LaraItem;
 		}
 
-		if (item->aiBits)
+		if (item->AIBits)
 		{
 			GetAITarget(creature);
 		}
@@ -93,34 +93,34 @@ void LagoonWitchControl(short itemNumber)
 
 		creature->maximumTurn = 0;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_LAGOON_WITCH_SWIM:
 			creature->maximumTurn = 728;
 			if (info.distance < SQUARE(1024))
-				item->targetState = STATE_LAGOON_WITCH_STOP;
+				item->TargetState = STATE_LAGOON_WITCH_STOP;
 			break;
 
 		case STATE_LAGOON_WITCH_STOP:
 			creature->flags = 0;
 			creature->maximumTurn = ANGLE(2);
 			if (info.distance < SQUARE(768))
-				item->targetState = STATE_LAGOON_WITCH_ATTACK;
+				item->TargetState = STATE_LAGOON_WITCH_ATTACK;
 			else if (info.distance > SQUARE(1024))
-				item->targetState = STATE_LAGOON_WITCH_SWIM;
+				item->TargetState = STATE_LAGOON_WITCH_SWIM;
 			else
-				item->targetState = STATE_LAGOON_WITCH_STOP;
+				item->TargetState = STATE_LAGOON_WITCH_STOP;
 			break;
 
 		case STATE_LAGOON_WITCH_ATTACK:
 			creature->maximumTurn = ANGLE(2);
 			if (!creature->flags
-				&& item->touchBits & 0x3C3C0
-				&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 29)
+				&& item->TouchBits & 0x3C3C0
+				&& item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 29)
 			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
-				CreatureEffect2(item, &LagoonWitchBite, 10, item->pos.yRot, DoBloodSplat);
+				LaraItem->HitPoints -= 100;
+				LaraItem->HitStatus = true;
+				CreatureEffect2(item, &LagoonWitchBite, 10, item->Position.yRot, DoBloodSplat);
 				creature->flags = STATE_LAGOON_WITCH_SWIM;
 			}
 			break;
@@ -132,9 +132,9 @@ void LagoonWitchControl(short itemNumber)
 			ITEM_INFO* enemy = creature->enemy;
 			if (enemy)
 			{
-				if (enemy->flags & 2)
-					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
-				item->itemFlags[3]++;
+				if (enemy->Flags & 2)
+					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+				item->ItemFlags[3]++;
 				creature->reachedGoal = false;
 				creature->enemy = 0;
 			}

@@ -129,9 +129,9 @@ void InitialiseVentilator(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->itemFlags[0] = item->triggerFlags * SECTOR(1);
-	if (item->itemFlags[0] < 2048)
-		item->itemFlags[0] = 3072;
+	item->ItemFlags[0] = item->TriggerFlags * SECTOR(1);
+	if (item->ItemFlags[0] < 2048)
+		item->ItemFlags[0] = 3072;
 }
 
 void VentilatorControl(short itemNumber)
@@ -151,22 +151,22 @@ void VentilatorControl(short itemNumber)
 	{
 		xChange = 1;
 		TestTriggers(item, true);
-		if (item->activeState == 1)
+		if (item->ActiveState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 				return;
 		}
 		else
 		{
-			item->targetState = 1;
+			item->TargetState = 1;
 		}
 	}
 
 	int speed = 0;
-	if (item->activeState == 1)
+	if (item->ActiveState == 1)
 	{
-		speed = g_Level.Anims[item->animNumber].frameEnd - item->frameNumber;
+		speed = g_Level.Anims[item->AnimNumber].frameEnd - item->FrameNumber;
 	}
 	else
 	{
@@ -176,38 +176,38 @@ void VentilatorControl(short itemNumber)
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	BOUNDING_BOX effectBounds;
 
-	effectBounds.Y1 = item->pos.yPos + bounds->Y1;
-	effectBounds.Y2 = item->pos.yPos + bounds->Y2;
+	effectBounds.Y1 = item->Position.yPos + bounds->Y1;
+	effectBounds.Y2 = item->Position.yPos + bounds->Y2;
 
-	if (item->objectNumber != ID_PROPELLER_V) // TODO: check this ID
+	if (item->ObjectNumber != ID_PROPELLER_V) // TODO: check this ID
 	{
-		if (item->pos.yRot != -ANGLE(180.0f))
+		if (item->Position.yRot != -ANGLE(180.0f))
 		{
-			if (item->pos.yRot == -ANGLE(90.0f))
+			if (item->Position.yRot == -ANGLE(90.0f))
 			{
-				effectBounds.X1 = item->pos.xPos - bounds->Z2;
-				effectBounds.X2 = item->pos.xPos - bounds->Z1;
-				effectBounds.Z1 = item->pos.zPos + bounds->X1;
-				effectBounds.Z2 = item->pos.zPos + bounds->X2;
+				effectBounds.X1 = item->Position.xPos - bounds->Z2;
+				effectBounds.X2 = item->Position.xPos - bounds->Z1;
+				effectBounds.Z1 = item->Position.zPos + bounds->X1;
+				effectBounds.Z2 = item->Position.zPos + bounds->X2;
 				xChange = 0;
 				zChange = 1;
 			}
 			else
 			{
-				if (item->pos.yRot != ANGLE(90.0f))
+				if (item->Position.yRot != ANGLE(90.0f))
 				{
-					effectBounds.X1 = item->pos.xPos + bounds->X1;
-					effectBounds.X2 = item->pos.xPos + bounds->X2;
-					effectBounds.Z1 = item->pos.zPos + bounds->Z1;
-					effectBounds.Z2 = item->pos.zPos + bounds->Z2;
+					effectBounds.X1 = item->Position.xPos + bounds->X1;
+					effectBounds.X2 = item->Position.xPos + bounds->X2;
+					effectBounds.Z1 = item->Position.zPos + bounds->Z1;
+					effectBounds.Z2 = item->Position.zPos + bounds->Z2;
 					zChange = 0;
 				}
 				else
 				{
-					effectBounds.X1 = item->pos.xPos + bounds->Z1;
-					effectBounds.X2 = item->pos.xPos + bounds->Z2;
-					effectBounds.Z1 = item->pos.zPos - bounds->X2;
-					effectBounds.Z2 = item->pos.zPos - bounds->X1;
+					effectBounds.X1 = item->Position.xPos + bounds->Z1;
+					effectBounds.X2 = item->Position.xPos + bounds->Z2;
+					effectBounds.Z1 = item->Position.zPos - bounds->X2;
+					effectBounds.Z2 = item->Position.zPos - bounds->X1;
 					xChange = 0;
 					zChange = 1;
 				}
@@ -215,57 +215,57 @@ void VentilatorControl(short itemNumber)
 		}
 		else
 		{
-			effectBounds.X1 = item->pos.xPos - bounds->X2;
-			effectBounds.X2 = item->pos.xPos - bounds->X1;
-			effectBounds.Z1 = item->pos.zPos - bounds->Z2;
-			effectBounds.Z2 = item->pos.zPos - bounds->Z1;
+			effectBounds.X1 = item->Position.xPos - bounds->X2;
+			effectBounds.X2 = item->Position.xPos - bounds->X1;
+			effectBounds.Z1 = item->Position.zPos - bounds->Z2;
+			effectBounds.Z2 = item->Position.zPos - bounds->Z1;
 			zChange = 0;
 		}
 
-		VentilatorEffect(&effectBounds, 2, item->pos.yRot, speed);
-		VentilatorEffect(&effectBounds, -2, item->pos.yRot, speed);
+		VentilatorEffect(&effectBounds, 2, item->Position.yRot, speed);
+		VentilatorEffect(&effectBounds, -2, item->Position.yRot, speed);
 
-		if (LaraItem->pos.yPos >= effectBounds.Y1 && LaraItem->pos.yPos <= effectBounds.Y2)
+		if (LaraItem->Position.yPos >= effectBounds.Y1 && LaraItem->Position.yPos <= effectBounds.Y2)
 		{
 			if (zChange)
 			{
-				if (LaraItem->pos.xPos >= effectBounds.X1 && LaraItem->pos.xPos <= effectBounds.X2)
+				if (LaraItem->Position.xPos >= effectBounds.X1 && LaraItem->Position.xPos <= effectBounds.X2)
 				{
-					int z1 = abs(LaraItem->pos.zPos - effectBounds.Z1);
-					int z2 = abs(LaraItem->pos.zPos - effectBounds.Z2);
+					int z1 = abs(LaraItem->Position.zPos - effectBounds.Z1);
+					int z2 = abs(LaraItem->Position.zPos - effectBounds.Z2);
 
 					if (z2 >= z1)
 						zChange = -zChange;
 					else
 						z1 = z2;
 
-					if (z1 < item->itemFlags[0])
+					if (z1 < item->ItemFlags[0])
 					{
-						int dz = 96 * zChange * (item->itemFlags[0] - z1) / item->itemFlags[0];
-						if (item->activeState == 1)
+						int dz = 96 * zChange * (item->ItemFlags[0] - z1) / item->ItemFlags[0];
+						if (item->ActiveState == 1)
 							dz = speed * dz / 120;
-						LaraItem->pos.zPos += dz;
+						LaraItem->Position.zPos += dz;
 					}
 				}
 			}
 			else
 			{
-				if (LaraItem->pos.zPos >= effectBounds.Z1 && LaraItem->pos.zPos <= effectBounds.Z2)
+				if (LaraItem->Position.zPos >= effectBounds.Z1 && LaraItem->Position.zPos <= effectBounds.Z2)
 				{
-					int x1 = abs(LaraItem->pos.xPos - effectBounds.X1);
-					int x2 = abs(LaraItem->pos.xPos - effectBounds.X2);
+					int x1 = abs(LaraItem->Position.xPos - effectBounds.X1);
+					int x2 = abs(LaraItem->Position.xPos - effectBounds.X2);
 
 					if (x2 >= x1)
 						xChange = -xChange;
 					else
 						x1 = x2;
 
-					if (x1 < item->itemFlags[0])
+					if (x1 < item->ItemFlags[0])
 					{
-						int dx = 96 * xChange * (item->itemFlags[0] - x1) / item->itemFlags[0];
-						if (item->activeState == 1)
+						int dx = 96 * xChange * (item->ItemFlags[0] - x1) / item->ItemFlags[0];
+						if (item->ActiveState == 1)
 							dx = speed * dx / 120;
-						LaraItem->pos.xPos += dx;
+						LaraItem->Position.xPos += dx;
 					}
 				}
 			}
@@ -274,37 +274,37 @@ void VentilatorControl(short itemNumber)
 	else
 	{
 		BOUNDING_BOX tbounds;
-		phd_RotBoundingBoxNoPersp(&item->pos, bounds, &tbounds);
+		phd_RotBoundingBoxNoPersp(&item->Position, bounds, &tbounds);
 
-		effectBounds.X1 = item->pos.xPos + tbounds.X1;
-		effectBounds.X2 = item->pos.xPos + tbounds.X2;
-		effectBounds.Z1 = item->pos.zPos + tbounds.Z1;
-		effectBounds.Z2 = item->pos.zPos + tbounds.Z2;
+		effectBounds.X1 = item->Position.xPos + tbounds.X1;
+		effectBounds.X2 = item->Position.xPos + tbounds.X2;
+		effectBounds.Z1 = item->Position.zPos + tbounds.Z1;
+		effectBounds.Z2 = item->Position.zPos + tbounds.Z2;
 
 		VentilatorEffect(&effectBounds, 1, 0, speed);
 		VentilatorEffect(&effectBounds, -1, 0, speed);
 
-		if (LaraItem->pos.xPos >= effectBounds.X1 && LaraItem->pos.xPos <= effectBounds.X2)
+		if (LaraItem->Position.xPos >= effectBounds.X1 && LaraItem->Position.xPos <= effectBounds.X2)
 		{
-			if (LaraItem->pos.zPos >= effectBounds.Z1 && LaraItem->pos.zPos <= effectBounds.Z2)
+			if (LaraItem->Position.zPos >= effectBounds.Z1 && LaraItem->Position.zPos <= effectBounds.Z2)
 			{
 				int y = effectBounds.Y2;
 
-				if (LaraItem->pos.yPos <= effectBounds.Y2)
+				if (LaraItem->Position.yPos <= effectBounds.Y2)
 				{
-					if (effectBounds.Y1 - LaraItem->pos.yPos >= item->itemFlags[0])
+					if (effectBounds.Y1 - LaraItem->Position.yPos >= item->ItemFlags[0])
 						return;
-					y = 96 * (effectBounds.Y2 - item->itemFlags[0]) / item->itemFlags[0];
+					y = 96 * (effectBounds.Y2 - item->ItemFlags[0]) / item->ItemFlags[0];
 				}
 				else
 				{
-					if (LaraItem->pos.yPos - effectBounds.Y2 >= item->itemFlags[0])
+					if (LaraItem->Position.yPos - effectBounds.Y2 >= item->ItemFlags[0])
 						return;
-					y = 96 * (item->itemFlags[0] - (LaraItem->pos.yPos - effectBounds.Y2)) / item->itemFlags[0];
+					y = 96 * (item->ItemFlags[0] - (LaraItem->Position.yPos - effectBounds.Y2)) / item->ItemFlags[0];
 				}
-				if (item->activeState == 1)
+				if (item->ActiveState == 1)
 					y = speed * y / 120;
-				LaraItem->pos.yPos += y;
+				LaraItem->Position.yPos += y;
 			}
 		}
 	}

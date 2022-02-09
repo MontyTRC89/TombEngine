@@ -110,10 +110,10 @@ namespace TEN::Entities::TR4
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 		OBJECT_INFO* obj = &Objects[ID_HORSE];
 
-		item->animNumber = obj->animIndex + 2;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = STATE_HORSEMAN_HORSE_RUN;
-		item->activeState = STATE_HORSEMAN_HORSE_RUN;
+		item->AnimNumber = obj->animIndex + 2;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = STATE_HORSEMAN_HORSE_RUN;
+		item->ActiveState = STATE_HORSEMAN_HORSE_RUN;
 	}
 
 	void InitialiseHorseman(short itemNumber)
@@ -123,11 +123,11 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->animNumber = obj->animIndex + 8;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = 9;
-		item->activeState = 9;
-		item->itemFlags[0] = NO_ITEM; // No horse yet
+		item->AnimNumber = obj->animIndex + 8;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = 9;
+		item->ActiveState = 9;
+		item->ItemFlags[0] = NO_ITEM; // No horse yet
 	}
 
 	void HorsemanControl(short itemNumber)
@@ -136,30 +136,30 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 		// Try to find the horse
-		if (item->itemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_ITEM)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
 				ITEM_INFO* currentItem = &g_Level.Items[i];
-				if (currentItem->objectNumber == ID_HORSE && item->triggerFlags == currentItem->triggerFlags)
+				if (currentItem->ObjectNumber == ID_HORSE && item->TriggerFlags == currentItem->TriggerFlags)
 				{
-					item->itemFlags[0] = i;
-					currentItem->flags |= 0x20;
+					item->ItemFlags[0] = i;
+					currentItem->Flags |= 0x20;
 				}
 			}
 		}
 
 		// If no horse was found, then set it to 0 so it won't be searched anymore in the future
-		if (item->itemFlags[0] == NO_ITEM)
-			item->itemFlags[0] = 0;
+		if (item->ItemFlags[0] == NO_ITEM)
+			item->ItemFlags[0] = 0;
 
 		// The horse
 		ITEM_INFO* horseItem = NULL;
-		if (item->itemFlags[0] != 0)
-			horseItem = &g_Level.Items[item->itemFlags[0]];
+		if (item->ItemFlags[0] != 0)
+			horseItem = &g_Level.Items[item->ItemFlags[0]];
 
 		int x = 0;
 		int y = 0;
@@ -176,18 +176,18 @@ namespace TEN::Entities::TR4
 
 		if (horseItem != NULL)
 		{
-			roomNumber = item->roomNumber;
+			roomNumber = item->RoomNumber;
 
-			x = horseItem->pos.xPos + 341 * phd_sin(horseItem->pos.yRot);
-			y = horseItem->pos.yPos;
-			z = horseItem->pos.zPos + 341 * phd_cos(horseItem->pos.yRot);
+			x = horseItem->Position.xPos + 341 * phd_sin(horseItem->Position.yRot);
+			y = horseItem->Position.yPos;
+			z = horseItem->Position.zPos + 341 * phd_cos(horseItem->Position.yRot);
 
 			floor = GetFloor(x, y, z, &roomNumber);
 			height1 = GetFloorHeight(floor, x, y, z);
 
-			x = horseItem->pos.xPos - 341 * phd_sin(horseItem->pos.yRot);
-			y = horseItem->pos.yPos;
-			z = horseItem->pos.zPos - 341 * phd_cos(horseItem->pos.yRot);
+			x = horseItem->Position.xPos - 341 * phd_sin(horseItem->Position.yRot);
+			y = horseItem->Position.yPos;
+			z = horseItem->Position.zPos - 341 * phd_cos(horseItem->Position.yRot);
 
 			floor = GetFloor(x, y, z, &roomNumber);
 			height2 = GetFloorHeight(floor, x, y, z);
@@ -195,41 +195,41 @@ namespace TEN::Entities::TR4
 			xRot = phd_atan(682, height2 - height1);
 		}
 
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			item->hitPoints = 0;
-			if (item->itemFlags[1] == 0)
+			item->HitPoints = 0;
+			if (item->ItemFlags[1] == 0)
 			{
-				if (item->activeState != 16)
+				if (item->ActiveState != 16)
 				{
-					item->animNumber = Objects[ID_HORSEMAN].animIndex + 21;
-					item->activeState = 16;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->AnimNumber = Objects[ID_HORSEMAN].animIndex + 21;
+					item->ActiveState = 16;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
-					if (item->itemFlags[0])
+					if (item->ItemFlags[0])
 					{
-						horseItem->afterDeath = 1;
-						item->itemFlags[0] = 0;
+						horseItem->AfterDeath = 1;
+						item->ItemFlags[0] = 0;
 					}
 				}
 			}
 			else
 			{
-				item->hitPoints = 100;
-				item->aiBits = 0;
-				item->itemFlags[1] = 0;
-				item->animNumber = Objects[ID_HORSEMAN].animIndex + 3;
-				item->activeState = 8;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->HitPoints = 100;
+				item->AIBits = 0;
+				item->ItemFlags[1] = 0;
+				item->AnimNumber = Objects[ID_HORSEMAN].animIndex + 3;
+				item->ActiveState = 8;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
 				creature->enemy = NULL;
 
-				horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
+				horseItem->TargetState = STATE_HORSEMAN_HORSE_RUN;
 			}
 		}
 		else
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 			{
 				GetAITarget(creature);
 			}
@@ -250,55 +250,55 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				deltaX = LaraItem->pos.zPos - item->pos.zPos;
-				deltaZ = LaraItem->pos.zPos - item->pos.zPos;
+				deltaX = LaraItem->Position.zPos - item->Position.zPos;
+				deltaZ = LaraItem->Position.zPos - item->Position.zPos;
 
-				laraInfo.angle = phd_atan(deltaZ, deltaX) - item->pos.yRot;
+				laraInfo.angle = phd_atan(deltaZ, deltaX) - item->Position.yRot;
 				laraInfo.distance = SQUARE(deltaX) + SQUARE(deltaZ);
 			}
 
 			short tilt = 0;
 
-			if (item->hitStatus
+			if (item->HitStatus
 				&& laraInfo.angle < 12288
 				&& laraInfo.angle > -12288
 				&& laraInfo.distance < SQUARE(2048))
 			{
-				if (item->activeState != 15)
+				if (item->ActiveState != 15)
 				{
 					if (laraInfo.angle <= 0)
 					{
-						if (item->itemFlags[1])
+						if (item->ItemFlags[1])
 						{
-							if (!item->itemFlags[1])
+							if (!item->ItemFlags[1])
 							{
-								if (item->meshBits & 0x400)
+								if (item->MeshBits & 0x400)
 								{
-									item->requiredState = 15;  
+									item->RequiredState = 15;  
 								}
 							}
 						}
 						else
 						{
-							if (laraInfo.angle > 0 || !(item->meshBits & 0x400))
+							if (laraInfo.angle > 0 || !(item->MeshBits & 0x400))
 							{
 								if (Lara.gunType == WEAPON_SHOTGUN)
 								{
-									item->hitPoints -= 10;
-									item->hitStatus = true;
+									item->HitPoints -= 10;
+									item->HitStatus = true;
 								}
 								else if (Lara.gunType == WEAPON_REVOLVER)
 								{
-									item->hitPoints -= 20;
-									item->hitStatus = true;
+									item->HitPoints -= 20;
+									item->HitStatus = true;
 								}
 								else
 								{
-									item->hitPoints--;
+									item->HitPoints--;
 								}
 
-								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->pos, 0);
-								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->pos, 0);
+								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Position, 0);
+								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Position, 0);
 
 								PHD_VECTOR pos;
 								pos.x = 0;
@@ -306,13 +306,13 @@ namespace TEN::Entities::TR4
 								pos.z = 80;
 
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
-								HorsemanSparks(&pos, item->pos.yRot, 7);
+								HorsemanSparks(&pos, item->Position.yRot, 7);
 							}
 							else if (!(GetRandomControl() & 7))
 							{
-								if (item->activeState == 15)
+								if (item->ActiveState == 15)
 								{
-									item->targetState = 9;
+									item->TargetState = 9;
 								}
 								ExplodeItemNode(item, 10, 1, -24);
 							}
@@ -328,19 +328,19 @@ namespace TEN::Entities::TR4
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 
-			switch (item->activeState)
+			switch (item->ActiveState)
 			{
 			case STATE_HORSEMAN_HORSE_RUN:
 				creature->maximumTurn = ANGLE(3);
-				horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
-				if (item->requiredState)
+				horseItem->TargetState = STATE_HORSEMAN_HORSE_WALK;
+				if (item->RequiredState)
 				{
-					item->targetState = 17;
-					horseItem->targetState = STATE_HORSEMAN_GET_ON_HORSE;
+					item->TargetState = 17;
+					horseItem->TargetState = STATE_HORSEMAN_GET_ON_HORSE;
 				}
 				else if (creature->flags
 					|| creature->reachedGoal
-					|| item->hitStatus
+					|| item->HitStatus
 					&& !GetRandomControl())
 				{
 					if (laraInfo.distance > SQUARE(4096)
@@ -350,14 +350,14 @@ namespace TEN::Entities::TR4
 						creature->enemy = LaraItem;
 						if (laraInfo.angle > -8192 && laraInfo.angle < 0x2000)
 						{
-							item->targetState = STATE_HORSEMAN_HORSE_STOP;
-							horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
+							item->TargetState = STATE_HORSEMAN_HORSE_STOP;
+							horseItem->TargetState = STATE_HORSEMAN_HORSE_RUN;
 						}
 					}
 					else
 					{
-						item->aiBits = FOLLOW;
-						item->itemFlags[3] = (-(item->itemFlags[3] != 1)) + 2;
+						item->AIBits = FOLLOW;
+						item->ItemFlags[3] = (-(item->ItemFlags[3] != 1)) + 2;
 					}
 				}
 
@@ -376,13 +376,13 @@ namespace TEN::Entities::TR4
 									info.angle < ANGLE(20)))
 							{
 								creature->maximumTurn = 0;
-								item->targetState = 6;
+								item->TargetState = 6;
 							}
 						}
 						else
 						{
 							creature->maximumTurn = 0;
-							item->targetState = 7;
+							item->TargetState = 7;
 						}
 					}
 				}
@@ -404,13 +404,13 @@ namespace TEN::Entities::TR4
 										info.angle < ANGLE(20)))
 								{
 									creature->maximumTurn = 0;
-									item->targetState = 6;
+									item->TargetState = 6;
 								}
 							}
 							else
 							{
 								creature->maximumTurn = 0;
-								item->targetState = 7;
+								item->TargetState = 7;
 							}
 						}
 					}
@@ -425,8 +425,8 @@ namespace TEN::Entities::TR4
 				{
 					creature->reachedGoal = false;
 					creature->flags = 0;
-					item->targetState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
+					item->TargetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->TargetState = STATE_HORSEMAN_HORSE_WALK;
 					creature->enemy = LaraItem;
 				}
 
@@ -434,43 +434,43 @@ namespace TEN::Entities::TR4
 
 			case 3:
 				creature->maximumTurn = 0;
-				horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
+				horseItem->TargetState = STATE_HORSEMAN_HORSE_RUN;
 
 				if (creature->flags)
 				{
-					item->aiBits = FOLLOW;
-					item->itemFlags[3] = -(item->itemFlags[3] != 1) + 2;
+					item->AIBits = FOLLOW;
+					item->ItemFlags[3] = -(item->ItemFlags[3] != 1) + 2;
 				}
 				else
 				{
 					creature->flags = 0;
 				}
 
-				if (item->requiredState)
+				if (item->RequiredState)
 				{
-					item->targetState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
-					horseItem->flags = 0;
+					item->TargetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->TargetState = STATE_HORSEMAN_HORSE_WALK;
+					horseItem->Flags = 0;
 				}
 				else if (creature->reachedGoal
-					|| !horseItem->flags
+					|| !horseItem->Flags
 					&& info.distance < SQUARE(1024)
 					&& info.bite
 					&& info.angle < ANGLE(10)
 					&& info.angle > -ANGLE(10))
 				{
-					item->targetState = STATE_HORSEMAN_HORSE_REARING;
+					item->TargetState = STATE_HORSEMAN_HORSE_REARING;
 					if (creature->reachedGoal)
 					{
-						item->requiredState = 17;
+						item->RequiredState = 17;
 					}
-					horseItem->flags = 0;
+					horseItem->Flags = 0;
 				}
 				else
 				{
-					item->targetState = STATE_HORSEMAN_HORSE_RUN;
-					horseItem->targetState = STATE_HORSEMAN_HORSE_WALK;
-					horseItem->flags = 0;
+					item->TargetState = STATE_HORSEMAN_HORSE_RUN;
+					horseItem->TargetState = STATE_HORSEMAN_HORSE_WALK;
+					horseItem->Flags = 0;
 				}
 
 				break;
@@ -478,21 +478,21 @@ namespace TEN::Entities::TR4
 			case 4:
 				creature->maximumTurn = 0;
 
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				{
-					horseItem->animNumber = Objects[ID_HORSE].animIndex + 1;
-					horseItem->activeState = STATE_HORSEMAN_HORSE_REARING;
-					horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
+					horseItem->AnimNumber = Objects[ID_HORSE].animIndex + 1;
+					horseItem->ActiveState = STATE_HORSEMAN_HORSE_REARING;
+					horseItem->FrameNumber = g_Level.Anims[horseItem->AnimNumber].frameBase;
 				}
 
-				if (!horseItem->flags)
+				if (!horseItem->Flags)
 				{
-					if (horseItem->touchBits & 0x22000)
+					if (horseItem->TouchBits & 0x22000)
 					{
-						LaraItem->hitPoints -= 150;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 150;
+						LaraItem->HitStatus = true;
 
-						if (horseItem->touchBits & 0x2000)
+						if (horseItem->TouchBits & 0x2000)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -511,7 +511,7 @@ namespace TEN::Entities::TR4
 								DoBloodSplat);
 						}
 
-						horseItem->flags = 1;
+						horseItem->Flags = 1;
 					}
 				}
 
@@ -520,24 +520,24 @@ namespace TEN::Entities::TR4
 			case 6:
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0x60)
+					if (item->TouchBits & 0x60)
 					{
-						LaraItem->hitPoints -= 250;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 250;
+						LaraItem->HitStatus = true;
 
 						CreatureEffect2(
 							item,
 							&horsemanBite1,
 							10,
-							item->pos.yRot,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->flags = 1;
 					}
 				}
-				if (item->hitStatus)
+				if (item->HitStatus)
 				{
-					item->targetState = 9;
+					item->TargetState = 9;
 				}
 
 				break;
@@ -545,16 +545,16 @@ namespace TEN::Entities::TR4
 			case 7:
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0x4000)
+					if (item->TouchBits & 0x4000)
 					{
-						LaraItem->hitPoints -= 100;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 100;
+						LaraItem->HitStatus = true;
 
 						CreatureEffect2(
 							item,
 							&horsemanBite2,
 							3,
-							item->pos.yRot,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->flags = 1;
@@ -567,24 +567,24 @@ namespace TEN::Entities::TR4
 				creature->maximumTurn = 0;
 				creature->flags = 0;
 
-				if (!item->aiBits || item->itemFlags[3])
+				if (!item->AIBits || item->ItemFlags[3])
 				{
-					if (item->requiredState)
+					if (item->RequiredState)
 					{
-						item->targetState = item->requiredState;
+						item->TargetState = item->RequiredState;
 					}
 					else if (info.bite && info.distance < SQUARE(682))
 					{
-						item->targetState = 14;
+						item->TargetState = 14;
 					}
 					else if (info.distance < SQUARE(6144) && info.distance > SQUARE(682))
 					{
-						item->targetState = 10;
+						item->TargetState = 10;
 					}
 				}
 				else
 				{
-					item->targetState = 10;
+					item->TargetState = 10;
 				}
 
 				break;
@@ -595,50 +595,50 @@ namespace TEN::Entities::TR4
 
 				if (creature->reachedGoal)
 				{
-					item->aiBits = 0;
-					item->itemFlags[1] = 1;
+					item->AIBits = 0;
+					item->ItemFlags[1] = 1;
 
-					item->pos.xPos = horseItem->pos.xPos;
-					item->pos.yPos = horseItem->pos.yPos;
-					item->pos.zPos = horseItem->pos.zPos;
-					item->pos.xRot = horseItem->pos.xRot;
-					item->pos.yRot = horseItem->pos.yRot;
-					item->pos.zRot = horseItem->pos.zRot;
+					item->Position.xPos = horseItem->Position.xPos;
+					item->Position.yPos = horseItem->Position.yPos;
+					item->Position.zPos = horseItem->Position.zPos;
+					item->Position.xRot = horseItem->Position.xRot;
+					item->Position.yRot = horseItem->Position.yRot;
+					item->Position.zRot = horseItem->Position.zRot;
 
 					creature->reachedGoal = false;
 					creature->enemy = NULL;
 
-					item->animNumber = Objects[ID_HORSEMAN].animIndex + 14;
-					item->activeState = STATE_HORSEMAN_GET_ON_HORSE;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+					item->AnimNumber = Objects[ID_HORSEMAN].animIndex + 14;
+					item->ActiveState = STATE_HORSEMAN_GET_ON_HORSE;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
 					creature->maximumTurn = 0;
 
 					break;
 				}
 
-				if (item->hitStatus)
+				if (item->HitStatus)
 				{
-					item->targetState = 9;
+					item->TargetState = 9;
 				}
 				else if (info.bite && info.distance < SQUARE(682))
 				{
 					if (GetRandomControl() & 1)
 					{
-						item->targetState = 12;
+						item->TargetState = 12;
 					}
 					else if (GetRandomControl() & 1)
 					{
-						item->targetState = 13;
+						item->TargetState = 13;
 					}
 					else
 					{
-						item->targetState = 9;
+						item->TargetState = 9;
 					}
 				}
 				else if (info.distance < SQUARE(5120) && info.distance > SQUARE(1365))
 				{
-					item->targetState = 11;
+					item->TargetState = 11;
 				}
 
 				break;
@@ -646,7 +646,7 @@ namespace TEN::Entities::TR4
 			case 11:
 				if (info.distance < SQUARE(1365))
 				{
-					item->targetState = 10;
+					item->TargetState = 10;
 				}
 
 				break;
@@ -659,30 +659,30 @@ namespace TEN::Entities::TR4
 				{
 					if (info.angle >= 0)
 					{
-						item->pos.yRot += ANGLE(3);
+						item->Position.yRot += ANGLE(3);
 					}
 					else
 					{
-						item->pos.yRot -= ANGLE(3);
+						item->Position.yRot -= ANGLE(3);
 					}
 				}
 				else
 				{
-					item->pos.yRot += info.angle;
+					item->Position.yRot += info.angle;
 				}
 
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0x4000)
+					if (item->TouchBits & 0x4000)
 					{
-						LaraItem->hitPoints -= 100;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 100;
+						LaraItem->HitStatus = true;
 
 						CreatureEffect2(
 							item,
 							&horsemanBite2,
 							3,
-							item->pos.yRot,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->flags = 1;
@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 			case 15:
 				if (Lara.target != item || info.bite && info.distance < SQUARE(682))
 				{
-					item->targetState = 9;
+					item->TargetState = 9;
 				}
 
 				break;
@@ -703,14 +703,14 @@ namespace TEN::Entities::TR4
 				creature->reachedGoal = false;
 				creature->maximumTurn = 546;
 
-				if (!horseItem->flags)
+				if (!horseItem->Flags)
 				{
-					if (horseItem->touchBits & 0xA2000)
+					if (horseItem->TouchBits & 0xA2000)
 					{
-						LaraItem->hitPoints -= 150;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 150;
+						LaraItem->HitStatus = true;
 
-						if (horseItem->touchBits & 0x2000)
+						if (horseItem->TouchBits & 0x2000)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -720,7 +720,7 @@ namespace TEN::Entities::TR4
 								DoBloodSplat);
 						}
 
-						if (horseItem->touchBits & 0x20000)
+						if (horseItem->TouchBits & 0x20000)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -730,7 +730,7 @@ namespace TEN::Entities::TR4
 								DoBloodSplat);
 						}
 
-						if (horseItem->touchBits & 0x80000)
+						if (horseItem->TouchBits & 0x80000)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -740,17 +740,17 @@ namespace TEN::Entities::TR4
 								DoBloodSplat);
 						}
 
-						horseItem->flags = 1;
+						horseItem->Flags = 1;
 					}
 				}
 
 				if (!creature->flags)
 				{
-					if (item->touchBits & 0x460)
+					if (item->TouchBits & 0x460)
 					{
-						LaraItem->hitStatus = true;
+						LaraItem->HitStatus = true;
 
-						if (item->touchBits & 0x60)
+						if (item->TouchBits & 0x60)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -758,9 +758,9 @@ namespace TEN::Entities::TR4
 								20,
 								-1,
 								DoBloodSplat);
-							LaraItem->hitPoints -= 250;
+							LaraItem->HitPoints -= 250;
 						}
-						else if (item->touchBits & 0x400)
+						else if (item->TouchBits & 0x400)
 						{
 							CreatureEffect2(
 								horseItem,
@@ -768,18 +768,18 @@ namespace TEN::Entities::TR4
 								10,
 								-1,
 								DoBloodSplat);
-							LaraItem->hitPoints -= 150;
+							LaraItem->HitPoints -= 150;
 						}
 
 						creature->flags = 1;
 					}
 				}
 
-				if (item->animNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
-					item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+				if (item->AnimNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
+					item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				{
-					horseItem->animNumber = Objects[ID_HORSE].animIndex + 10;
-					horseItem->frameNumber = g_Level.Anims[horseItem->animNumber].frameBase;
+					horseItem->AnimNumber = Objects[ID_HORSE].animIndex + 10;
+					horseItem->FrameNumber = g_Level.Anims[horseItem->AnimNumber].frameBase;
 				}
 
 				if (laraInfo.distance > SQUARE(4096) || creature->reachedGoal)
@@ -790,8 +790,8 @@ namespace TEN::Entities::TR4
 				}
 				else if (!info.ahead)
 				{
-					item->targetState = STATE_HORSEMAN_HORSE_STOP;
-					horseItem->targetState = STATE_HORSEMAN_HORSE_RUN;
+					item->TargetState = STATE_HORSEMAN_HORSE_STOP;
+					horseItem->TargetState = STATE_HORSEMAN_HORSE_RUN;
 				}
 				break;
 
@@ -799,40 +799,40 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			if (horseItem && item->itemFlags[1])
+			if (horseItem && item->ItemFlags[1])
 			{
-				if (abs(xRot - item->pos.xRot) < 256)
+				if (abs(xRot - item->Position.xRot) < 256)
 				{
-					item->pos.xRot = xRot;
+					item->Position.xRot = xRot;
 				}
-				else if (xRot <= item->pos.xRot)
+				else if (xRot <= item->Position.xRot)
 				{
-					if (xRot < item->pos.xRot)
+					if (xRot < item->Position.xRot)
 					{
-						item->pos.xRot -= 256;
+						item->Position.xRot -= 256;
 					}
 				}
 				else
 				{
-					item->pos.xRot += 256;
+					item->Position.xRot += 256;
 				}
 
-				horseItem->pos.xPos = item->pos.xPos;
-				horseItem->pos.yPos = item->pos.yPos;
-				horseItem->pos.zPos = item->pos.zPos;
-				horseItem->pos.xRot = item->pos.xRot;
-				horseItem->pos.yRot = item->pos.yRot;
-				horseItem->pos.zRot = item->pos.zRot;
+				horseItem->Position.xPos = item->Position.xPos;
+				horseItem->Position.yPos = item->Position.yPos;
+				horseItem->Position.zPos = item->Position.zPos;
+				horseItem->Position.xRot = item->Position.xRot;
+				horseItem->Position.yRot = item->Position.yRot;
+				horseItem->Position.zRot = item->Position.zRot;
 
-				if (horseItem->roomNumber != item->roomNumber)
+				if (horseItem->RoomNumber != item->RoomNumber)
 				{
-					ItemNewRoom(item->itemFlags[0], item->roomNumber);
+					ItemNewRoom(item->ItemFlags[0], item->RoomNumber);
 				}
 				AnimateItem(horseItem);
 			}
 		}
 
-		Objects[ID_HORSEMAN].radius = item->itemFlags[1] != 0 ? 409 : 170;
+		Objects[ID_HORSEMAN].radius = item->ItemFlags[1] != 0 ? 409 : 170;
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 }

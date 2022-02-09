@@ -32,20 +32,20 @@ void InitialiseScorpion(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	if (item->triggerFlags == 1)
+	if (item->TriggerFlags == 1)
 	{
-		item->targetState = STATE_SCORPION_TROOPS_ATTACK;
-		item->activeState = STATE_SCORPION_TROOPS_ATTACK;
-		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
+		item->TargetState = STATE_SCORPION_TROOPS_ATTACK;
+		item->ActiveState = STATE_SCORPION_TROOPS_ATTACK;
+		item->AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
 	}
 	else
 	{
-		item->targetState = STATE_SCORPION_STOP;
-		item->activeState = STATE_SCORPION_STOP;
-		item->animNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
+		item->TargetState = STATE_SCORPION_STOP;
+		item->ActiveState = STATE_SCORPION_STOP;
+		item->AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 void ScorpionControl(short itemNumber)
@@ -54,7 +54,7 @@ void ScorpionControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	short angle = 0;
 	short head = 0;
 	short neck = 0;
@@ -63,104 +63,104 @@ void ScorpionControl(short itemNumber)
 	short joint1 = 0;
 	short joint2 = 0;
 	short joint3 = 0;
-	short roomNumber = item->roomNumber;
+	short roomNumber = item->RoomNumber;
 
-	int x = item->pos.xPos + 682 * phd_sin(item->pos.yRot);
-	int z = item->pos.zPos + 682 * phd_cos(item->pos.yRot);
+	int x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
+	int z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
-	if (abs(item->pos.yPos - height1) > 512)
-		height1 = item->pos.yPos;
+	FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height1 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	if (abs(item->Position.yPos - height1) > 512)
+		height1 = item->Position.yPos;
 
-	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot);
-	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot);
+	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
+	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
-	if (abs(item->pos.yPos - height2) > 512)
-		height2 = item->pos.yPos;
+	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height2 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	if (abs(item->Position.yPos - height2) > 512)
+		height2 = item->Position.yPos;
 
 	short angle1 = phd_atan(1344, height2 - height1);
 
-	x = item->pos.xPos - 682 * phd_sin(item->pos.yRot);
-	z = item->pos.zPos + 682 * phd_cos(item->pos.yRot);
+	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
+	z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
-	if (abs(item->pos.yPos - height3) > 512)
-		height3 = item->pos.yPos;
+	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height3 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	if (abs(item->Position.yPos - height3) > 512)
+		height3 = item->Position.yPos;
 
-	x = item->pos.xPos + 682 * phd_sin(item->pos.yRot);
-	z = item->pos.zPos - 682 * phd_cos(item->pos.yRot);
+	x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
+	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
-	int height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
-	if (abs(item->pos.yPos - height4) > 512)
-		height4 = item->pos.yPos;
+	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
+	int height4 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	if (abs(item->Position.yPos - height4) > 512)
+		height4 = item->Position.yPos;
 
 	short angle2 = phd_atan(1344, height4 - height3);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->hitPoints = 0;
-		if (item->activeState != STATE_SCORPION_DEATH)
+		item->HitPoints = 0;
+		if (item->ActiveState != STATE_SCORPION_DEATH)
 		{
-			if (item->triggerFlags > 0 && item->triggerFlags < 7)
+			if (item->TriggerFlags > 0 && item->TriggerFlags < 7)
 			{
 				CutSeqNum = 4;
 
-				item->animNumber = Objects[item->animNumber].animIndex + 5;
-				item->activeState = STATE_SCORPION_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-				item->status = ITEM_INVISIBLE;
+				item->AnimNumber = Objects[item->AnimNumber].animIndex + 5;
+				item->ActiveState = STATE_SCORPION_DEATH;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Status = ITEM_INVISIBLE;
 				creature->maximumTurn = 0;
 				
-				short linkNum = g_Level.Rooms[item->roomNumber].itemNumber;
+				short linkNum = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (linkNum != NO_ITEM)
 				{
-					for (linkNum = g_Level.Rooms[item->roomNumber].itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].nextItem)
+					for (linkNum = g_Level.Rooms[item->RoomNumber].itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].NextItem)
 					{
 						ITEM_INFO* currentItem = &g_Level.Items[linkNum];
 						
-						if (currentItem->objectNumber == ID_TROOPS && currentItem->triggerFlags == 1)
+						if (currentItem->ObjectNumber == ID_TROOPS && currentItem->TriggerFlags == 1)
 						{
 							DisableBaddieAI(linkNum);
 							KillItem(linkNum);
-							currentItem->flags |= IFLAG_KILLED;
+							currentItem->Flags |= IFLAG_KILLED;
 							break;
 						}
 					}
 				}
 			}
-			else if (item->activeState != STATE_SCORPION_DEATH && item->activeState != STATE_SCORPION_SPECIAL_DEATH)
+			else if (item->ActiveState != STATE_SCORPION_DEATH && item->ActiveState != STATE_SCORPION_SPECIAL_DEATH)
 			{
-				item->animNumber = Objects[item->objectNumber].animIndex + 5;
-				item->activeState = STATE_SCORPION_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
+				item->ActiveState = STATE_SCORPION_DEATH;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 		else if (CutSeqNum == 4)
 		{
-			item->frameNumber = g_Level.Anims[item->animNumber].frameEnd - 1;
-			item->status = ITEM_INVISIBLE;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameEnd - 1;
+			item->Status = ITEM_INVISIBLE;
 		}
-		else if (item->activeState == STATE_SCORPION_DEATH)
+		else if (item->ActiveState == STATE_SCORPION_DEATH)
 		{
-			if (item->status == ITEM_INVISIBLE)
+			if (item->Status == ITEM_INVISIBLE)
 			{
-				item->status = ITEM_ACTIVE;
+				item->Status = ITEM_ACTIVE;
 			}
 		}
 	}
 	else
 	{
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
 		{
 			if (creature->hurtByLara 
-				&& item->activeState != STATE_SCORPION_TROOPS_ATTACK)
+				&& item->ActiveState != STATE_SCORPION_TROOPS_ATTACK)
 			{
 				creature->enemy = LaraItem;
 			}
@@ -177,14 +177,14 @@ void ScorpionControl(short itemNumber)
 					{
 						ITEM_INFO* currentItem = &g_Level.Items[baddy->itemNum];
 
-						if (currentItem->objectNumber != ID_LARA)
+						if (currentItem->ObjectNumber != ID_LARA)
 						{
-							if (currentItem->objectNumber != ID_BIG_SCORPION &&
+							if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
 								(currentItem != LaraItem || creature->hurtByLara))
 							{
-								int dx = currentItem->pos.xPos - item->pos.xPos;
-								int dy = currentItem->pos.yPos - item->pos.yPos;
-								int dz = currentItem->pos.zPos - item->pos.zPos;
+								int dx = currentItem->Position.xPos - item->Position.xPos;
+								int dy = currentItem->Position.yPos - item->Position.yPos;
+								int dz = currentItem->Position.zPos - item->Position.zPos;
 
 								int distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
 
@@ -209,7 +209,7 @@ void ScorpionControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_SCORPION_STOP:
 			creature->maximumTurn = 0;
@@ -217,7 +217,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance > SQUARE(1365))
 			{
-				item->targetState = STATE_SCORPION_WALK;
+				item->TargetState = STATE_SCORPION_WALK;
 				break;
 			}
 
@@ -226,19 +226,19 @@ void ScorpionControl(short itemNumber)
 				creature->maximumTurn = ANGLE(2);
 
 				if (GetRandomControl() & 1 
-					&& creature->enemy->hitPoints <= 15
-					&& creature->enemy->objectNumber == ID_TROOPS)
+					&& creature->enemy->HitPoints <= 15
+					&& creature->enemy->ObjectNumber == ID_TROOPS)
 				{
-					item->targetState = STATE_SCORPION_ATTACK1;
+					item->TargetState = STATE_SCORPION_ATTACK1;
 				}
 				else
 				{
-					item->targetState = STATE_SCORPION_ATTACK2;
+					item->TargetState = STATE_SCORPION_ATTACK2;
 				}
 			}
 			else if (!info.ahead)
 			{
-				item->targetState = STATE_SCORPION_WALK;
+				item->TargetState = STATE_SCORPION_WALK;
 			}
 
 			break;
@@ -248,11 +248,11 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance < SQUARE(1365))
 			{
-				item->targetState = STATE_SCORPION_STOP;
+				item->TargetState = STATE_SCORPION_STOP;
 			}
 			else if (info.distance > SQUARE(853))
 			{
-				item->targetState = STATE_SCORPION_RUN;
+				item->TargetState = STATE_SCORPION_RUN;
 			}
 
 			break;
@@ -262,7 +262,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance < SQUARE(1365))
 			{
-				item->targetState = STATE_SCORPION_STOP;
+				item->TargetState = STATE_SCORPION_STOP;
 			}
 
 			break;
@@ -275,16 +275,16 @@ void ScorpionControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->pos.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2);
 				}
 				else
 				{
-					item->pos.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2);
 				}
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 
 			if (creature->flags)
@@ -296,29 +296,29 @@ void ScorpionControl(short itemNumber)
 				&& creature->enemy != LaraItem 
 				&& info.distance < SQUARE(1365))
 			{
-				creature->enemy->hitPoints -= 15;
-				if (creature->enemy->hitPoints <= 0)
+				creature->enemy->HitPoints -= 15;
+				if (creature->enemy->HitPoints <= 0)
 				{
-					item->targetState = STATE_SCORPION_SPECIAL_DEATH;
+					item->TargetState = STATE_SCORPION_SPECIAL_DEATH;
 					creature->maximumTurn = 0;
 				}
 
-				creature->enemy->hitStatus = true;
+				creature->enemy->HitStatus = true;
 				creature->flags = 1;
 
 				CreatureEffect2(
 					item,
 					&scorpionBite1,
 					10,
-					item->pos.yRot - ANGLE(180),
+					item->Position.yRot - ANGLE(180),
 					DoBloodSplat);
 			}
-			else if (item->touchBits & 0x1B00100)
+			else if (item->TouchBits & 0x1B00100)
 			{
-				LaraItem->hitPoints -= 120;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 120;
+				LaraItem->HitStatus = true;
 
-				if (item->activeState == 5)
+				if (item->ActiveState == 5)
 				{
 					Lara.poisoned += 2048;
 
@@ -326,7 +326,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&scorpionBite1,
 						10,
-						item->pos.yRot - ANGLE(180),
+						item->Position.yRot - ANGLE(180),
 						DoBloodSplat);
 				}
 				else
@@ -335,12 +335,12 @@ void ScorpionControl(short itemNumber)
 						item,
 						&scorpionBite2,
 						10,
-						item->pos.yRot - ANGLE(180),
+						item->Position.yRot - ANGLE(180),
 						DoBloodSplat);
 				}
 
 				creature->flags = 1;
-				if (LaraItem->hitPoints <= 0)
+				if (LaraItem->HitPoints <= 0)
 				{
 					CreatureKill(item, 6, 7, 442);
 					creature->maximumTurn = 0;
@@ -352,16 +352,16 @@ void ScorpionControl(short itemNumber)
 
 		case STATE_SCORPION_TROOPS_ATTACK:
 			creature->maximumTurn = 0;
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
-				item->triggerFlags++;
+				item->TriggerFlags++;
 			}
 			if (creature->enemy 
-				&& creature->enemy->hitPoints <= 0 
-				|| item->triggerFlags > 6)
+				&& creature->enemy->HitPoints <= 0 
+				|| item->TriggerFlags > 6)
 			{
-				item->targetState = STATE_SCORPION_SPECIAL_DEATH;
-				creature->enemy->hitPoints = 0;
+				item->TargetState = STATE_SCORPION_SPECIAL_DEATH;
+				creature->enemy->HitPoints = 0;
 			}
 
 			break;
@@ -371,24 +371,24 @@ void ScorpionControl(short itemNumber)
 		}
 	}
 
-	if ((angle1 - item->pos.xRot) < 256)
-		item->pos.xRot = 256;
+	if ((angle1 - item->Position.xRot) < 256)
+		item->Position.xRot = 256;
 	else
 	{
-		if (angle1 <= item->pos.xRot)
-			item->pos.xRot -= 256;
+		if (angle1 <= item->Position.xRot)
+			item->Position.xRot -= 256;
 		else
-			item->pos.xRot += 256;
+			item->Position.xRot += 256;
 	}
 
-	if ((angle2 - item->pos.zRot) < 256)
-		item->pos.zRot = 256;
+	if ((angle2 - item->Position.zRot) < 256)
+		item->Position.zRot = 256;
 	else
 	{
-		if (angle2 <= item->pos.zRot)
-			item->pos.zRot -= 256;
+		if (angle2 <= item->Position.zRot)
+			item->Position.zRot -= 256;
 		else
-			item->pos.zRot += 256;
+			item->Position.zRot += 256;
 	}
 
 	if (!CutSeqNum)

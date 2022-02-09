@@ -14,17 +14,17 @@ void ClockworkBeetleControl(short item_number)
 
 	flag = 0;
 
-	if (LaraItem->animNumber == LA_MECHANICAL_BEETLE_USE)
+	if (LaraItem->AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
 		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].frameBase;
 
-		if (LaraItem->frameNumber < fb + 14)
+		if (LaraItem->FrameNumber < fb + 14)
 		{
-			beetle->status = ITEM_INVISIBLE;
+			beetle->Status = ITEM_INVISIBLE;
 			return;
 		}
 
-		if (LaraItem->frameNumber < fb + 104)
+		if (LaraItem->FrameNumber < fb + 104)
 		{
 			PHD_VECTOR pos;
 			pos.x = 0;
@@ -32,44 +32,44 @@ void ClockworkBeetleControl(short item_number)
 			pos.z = -32;
 			GetLaraJointPosition(&pos, LM_RHAND);
 
-			beetle->pos.xPos = pos.x;
-			beetle->pos.yPos = pos.y;
-			beetle->pos.zPos = pos.z;
-			beetle->status = ITEM_ACTIVE;
-			beetle->pos.yRot = LaraItem->pos.yRot;
-			beetle->pos.zRot = -0x31C4;
+			beetle->Position.xPos = pos.x;
+			beetle->Position.yPos = pos.y;
+			beetle->Position.zPos = pos.z;
+			beetle->Status = ITEM_ACTIVE;
+			beetle->Position.yRot = LaraItem->Position.yRot;
+			beetle->Position.zRot = -0x31C4;
 			return;
 		}
 
-		if (LaraItem->frameNumber == fb + 104)
+		if (LaraItem->FrameNumber == fb + 104)
 		{
-			short roomNum = beetle->roomNumber;
-			FLOOR_INFO* floor = GetFloor(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, &roomNum);
-			int height = GetFloorHeight(floor, beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
+			short roomNum = beetle->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, &roomNum);
+			int height = GetFloorHeight(floor, beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
 
-			if (abs(LaraItem->pos.yPos - height) > 64)
+			if (abs(LaraItem->Position.yPos - height) > 64)
 			{
-				beetle->pos.xPos = LaraItem->pos.xPos;
-				beetle->pos.yPos = LaraItem->pos.yPos;
-				beetle->pos.zPos = LaraItem->pos.zPos;
+				beetle->Position.xPos = LaraItem->Position.xPos;
+				beetle->Position.yPos = LaraItem->Position.yPos;
+				beetle->Position.zPos = LaraItem->Position.zPos;
 			}
 
 			return;
 		}
 	}
 
-	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->pos, 0);
+	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Position, 0);
 
 	beetle->VerticalVelocity += 12;
-	beetle->pos.yPos += beetle->VerticalVelocity;
+	beetle->Position.yPos += beetle->VerticalVelocity;
 
-	short roomNum = beetle->roomNumber;
-	FLOOR_INFO* floor = GetFloor(beetle->pos.xPos, beetle->pos.yPos - 20, beetle->pos.zPos, &roomNum);
-	int height = GetFloorHeight(floor, beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
+	short roomNum = beetle->RoomNumber;
+	FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos - 20, beetle->Position.zPos, &roomNum);
+	int height = GetFloorHeight(floor, beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
 
-	if (beetle->pos.yPos > height)
+	if (beetle->Position.yPos > height)
 	{
-		beetle->pos.yPos = height;
+		beetle->Position.yPos = height;
 
 		if (beetle->VerticalVelocity <= 32)
 			beetle->VerticalVelocity = 0;
@@ -81,47 +81,47 @@ void ClockworkBeetleControl(short item_number)
 
 	TestTriggers(beetle, false);
 
-	if (roomNum != beetle->roomNumber)
+	if (roomNum != beetle->RoomNumber)
 		ItemNewRoom(item_number, roomNum);
 
-	if (beetle->itemFlags[0])
+	if (beetle->ItemFlags[0])
 	{
-		beetle->pos.zRot = 4096 * phd_sin(4096 * (GlobalCounter & 0xF));
+		beetle->Position.zRot = 4096 * phd_sin(4096 * (GlobalCounter & 0xF));
 
-		switch (beetle->itemFlags[2])
+		switch (beetle->ItemFlags[2])
 		{
 		case 0:
 		{
 			int x, z;
 
-			x = (beetle->pos.xPos & -512) | 0x200;
-			z = (beetle->pos.zPos & -512) | 0x200;
-			x -= beetle->pos.xPos;
-			z -= beetle->pos.zPos;
+			x = (beetle->Position.xPos & -512) | 0x200;
+			z = (beetle->Position.zPos & -512) | 0x200;
+			x -= beetle->Position.xPos;
+			z -= beetle->Position.zPos;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
 				int atan = phd_atan(z, x);
-				short rot = atan - beetle->pos.yRot;
+				short rot = atan - beetle->Position.yRot;
 
 				if (abs(rot) > 0x8000)
-					rot = beetle->pos.yRot - atan;
+					rot = beetle->Position.yRot - atan;
 
 				if (abs(rot) < 256)
 				{
-					beetle->pos.yRot = atan;
-					beetle->itemFlags[2] = 1;
+					beetle->Position.yRot = atan;
+					beetle->ItemFlags[2] = 1;
 				}
 				else if (rot < 0)
-					beetle->pos.yRot -= 256;
+					beetle->Position.yRot -= 256;
 				else
-					beetle->pos.yRot += 256;
+					beetle->Position.yRot += 256;
 			}
 			else
 			{
-				beetle->pos.zPos &= -512;
-				beetle->pos.zPos &= -512;
-				beetle->itemFlags[2] = 2;
+				beetle->Position.zPos &= -512;
+				beetle->Position.zPos &= -512;
+				beetle->ItemFlags[2] = 2;
 			}
 
 			break;
@@ -132,15 +132,15 @@ void ClockworkBeetleControl(short item_number)
 		{
 			int x, z;
 
-			x = (beetle->pos.xPos & -512) | 0x200;
-			z = (beetle->pos.zPos & -512) | 0x200;
-			x -= beetle->pos.xPos;
-			z -= beetle->pos.zPos;
+			x = (beetle->Position.xPos & -512) | 0x200;
+			z = (beetle->Position.zPos & -512) | 0x200;
+			x -= beetle->Position.xPos;
+			z -= beetle->Position.zPos;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
 				int atan = phd_atan(z, x);
-				beetle->pos.yRot = atan;
+				beetle->Position.yRot = atan;
 
 				if (SQUARE(x) + SQUARE(z) >= 0x19000)
 				{
@@ -155,24 +155,24 @@ void ClockworkBeetleControl(short item_number)
 							beetle->Velocity++;
 					}
 					else
-						beetle->Velocity = beetle->Velocity - (beetle->itemFlags[2] == 4) - 1;
+						beetle->Velocity = beetle->Velocity - (beetle->ItemFlags[2] == 4) - 1;
 				}
 
-				beetle->pos.xPos += beetle->Velocity * phd_sin(beetle->pos.yRot);
-				beetle->pos.zPos += beetle->Velocity * phd_cos(beetle->pos.yRot);
+				beetle->Position.xPos += beetle->Velocity * phd_sin(beetle->Position.yRot);
+				beetle->Position.zPos += beetle->Velocity * phd_cos(beetle->Position.yRot);
 			}
 			else
 			{
-				beetle->pos.xPos = (beetle->pos.xPos & -512) | 0x200;
-				beetle->pos.zPos = (beetle->pos.zPos & -512) | 0x200;
+				beetle->Position.xPos = (beetle->Position.xPos & -512) | 0x200;
+				beetle->Position.zPos = (beetle->Position.zPos & -512) | 0x200;
 
-				if (beetle->itemFlags[2] == 1)
-					beetle->itemFlags[2] = 2;
+				if (beetle->ItemFlags[2] == 1)
+					beetle->ItemFlags[2] = 2;
 				else
 				{
 					Lara.BeetleLife--;
-					beetle->itemFlags[2] = 5;
-					short room_item = g_Level.Rooms[beetle->roomNumber].itemNumber;
+					beetle->ItemFlags[2] = 5;
+					short room_item = g_Level.Rooms[beetle->RoomNumber].itemNumber;
 
 					if (room_item != NO_ITEM)
 					{
@@ -183,13 +183,13 @@ void ClockworkBeetleControl(short item_number)
 						while (1)
 						{
 							item = &g_Level.Items[room_item];
-							nex = item->nextItem;
+							nex = item->NextItem;
 
-							if (item->objectNumber == ID_MAPPER)
+							if (item->ObjectNumber == ID_MAPPER)
 							{
-								dx = beetle->pos.xPos - item->pos.xPos;
-								dy = beetle->pos.yPos - item->pos.yPos;
-								dz = beetle->pos.zPos - item->pos.zPos;
+								dx = beetle->Position.xPos - item->Position.xPos;
+								dy = beetle->Position.yPos - item->Position.yPos;
+								dz = beetle->Position.zPos - item->Position.zPos;
 								if (dx > -1024 && dx < 1024 && dz > -1024 && dz < 1024 && dy > -1024 && dy < 1024)
 									break;
 							}
@@ -200,7 +200,7 @@ void ClockworkBeetleControl(short item_number)
 								return;
 						}
 
-						item->itemFlags[0] = 1;
+						item->ItemFlags[0] = 1;
 					}
 				}
 			}
@@ -210,22 +210,22 @@ void ClockworkBeetleControl(short item_number)
 
 		case 2:
 		{
-			int rot = beetle->itemFlags[1] - beetle->pos.yRot;
+			int rot = beetle->ItemFlags[1] - beetle->Position.yRot;
 
 			if (abs(rot) > 0x8000)
-				rot = beetle->pos.yRot - beetle->itemFlags[1];
+				rot = beetle->Position.yRot - beetle->ItemFlags[1];
 
 			if (abs(rot) < 256)
 			{
-				beetle->itemFlags[2] = 3;
-				beetle->pos.yRot = beetle->itemFlags[1];
+				beetle->ItemFlags[2] = 3;
+				beetle->Position.yRot = beetle->ItemFlags[1];
 			}
 			else
 			{
 				if (rot < 0)
-					beetle->pos.yRot -= 256;
+					beetle->Position.yRot -= 256;
 				else
-					beetle->pos.yRot += 256;
+					beetle->Position.yRot += 256;
 			}
 
 			break;
@@ -236,15 +236,15 @@ void ClockworkBeetleControl(short item_number)
 			if (beetle->Velocity < 32)
 				beetle->Velocity++;
 
-			beetle->pos.xPos += beetle->Velocity * phd_sin(beetle->pos.yRot);
-			beetle->pos.zPos += beetle->Velocity * phd_cos(beetle->pos.yRot);
+			beetle->Position.xPos += beetle->Velocity * phd_sin(beetle->Position.yRot);
+			beetle->Position.zPos += beetle->Velocity * phd_cos(beetle->Position.yRot);
 
 			if (!floor->Flags.MarkBeetle)
-				beetle->itemFlags[3] = 1;
+				beetle->ItemFlags[3] = 1;
 			else
 			{
-				if (beetle->itemFlags[3])
-					beetle->itemFlags[2] = 4;
+				if (beetle->ItemFlags[3])
+					beetle->ItemFlags[2] = 4;
 			}
 
 			break;
@@ -256,24 +256,24 @@ void ClockworkBeetleControl(short item_number)
 	}
 	else
 	{
-		beetle->pos.zRot = 8192 * phd_sin(8192 * (GlobalCounter & 0x7));
+		beetle->Position.zRot = 8192 * phd_sin(8192 * (GlobalCounter & 0x7));
 
-		if (beetle->itemFlags[3])
-			beetle->itemFlags[3]--;
+		if (beetle->ItemFlags[3])
+			beetle->ItemFlags[3]--;
 
 		if (Lara.BeetleLife)
 		{
 			int val;
 
-			if (beetle->itemFlags[3] <= 75)
-				val = beetle->itemFlags[3];
+			if (beetle->ItemFlags[3] <= 75)
+				val = beetle->ItemFlags[3];
 			else
-				val = 150 - beetle->itemFlags[3];
+				val = 150 - beetle->ItemFlags[3];
 
-			beetle->pos.yRot += 32 * val;
+			beetle->Position.yRot += 32 * val;
 			val >>= 1;
 
-			if (flag && beetle->itemFlags[3] > 30 && val)
+			if (flag && beetle->ItemFlags[3] > 30 && val)
 			{
 				beetle->VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
 				return;
@@ -281,9 +281,9 @@ void ClockworkBeetleControl(short item_number)
 		}
 		else
 		{
-			beetle->pos.zRot *= 2;
-			int val = (150 - beetle->itemFlags[3]) >> 1;
-			beetle->pos.yRot += val << 7;
+			beetle->Position.zRot *= 2;
+			int val = (150 - beetle->ItemFlags[3]) >> 1;
+			beetle->Position.yRot += val << 7;
 
 			if (flag && val)
 			{
@@ -291,9 +291,9 @@ void ClockworkBeetleControl(short item_number)
 				return;
 			}
 
-			if (beetle->itemFlags[3] < 30)
+			if (beetle->ItemFlags[3] < 30)
 			{
-				SoundEffect(102, &beetle->pos, 0);
+				SoundEffect(102, &beetle->Position, 0);
 				ExplodeItemNode(beetle, 0, 0, 128);
 				KillItem(item_number);
 			}
@@ -307,9 +307,9 @@ void UseClockworkBeetle(short flag)
 	short itemNum;
 
 	if (flag
-		|| LaraItem->activeState == LS_IDLE
-		&& LaraItem->animNumber == LA_STAND_IDLE
-		&& !LaraItem->hitStatus
+		|| LaraItem->ActiveState == LS_IDLE
+		&& LaraItem->AnimNumber == LA_STAND_IDLE
+		&& !LaraItem->HitStatus
 		&& Lara.gunStatus == LG_HANDS_FREE)
 	{
 		itemNum = CreateItem();
@@ -318,45 +318,45 @@ void UseClockworkBeetle(short flag)
 		{
 			item = &g_Level.Items[itemNum];
 			Lara.hasBeetleThings &= 0xFE;
-			item->shade = -15856;
-			item->objectNumber = ID_CLOCKWORK_BEETLE;
-			item->roomNumber = LaraItem->roomNumber;
-			item->pos.xPos = LaraItem->pos.xPos;
-			item->pos.yPos = LaraItem->pos.yPos;
-			item->pos.zPos = LaraItem->pos.zPos;
+			item->Shade = -15856;
+			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
+			item->RoomNumber = LaraItem->RoomNumber;
+			item->Position.xPos = LaraItem->Position.xPos;
+			item->Position.yPos = LaraItem->Position.yPos;
+			item->Position.zPos = LaraItem->Position.zPos;
 			InitialiseItem(itemNum);
-			item->pos.zRot = 0;
-			item->pos.xRot = 0;
-			item->pos.yRot = LaraItem->pos.yRot;
+			item->Position.zRot = 0;
+			item->Position.xRot = 0;
+			item->Position.yRot = LaraItem->Position.yRot;
 
 			if (Lara.BeetleLife)
-				item->itemFlags[0] = GetCollisionResult(item).Block->Flags.MarkBeetle;
+				item->ItemFlags[0] = GetCollisionResult(item).Block->Flags.MarkBeetle;
 			else
-				item->itemFlags[0] = 0;
+				item->ItemFlags[0] = 0;
 
 			item->Velocity = 0;
 			AddActiveItem(itemNum);
 
-			if (item->itemFlags[0])
+			if (item->ItemFlags[0])
 			{
 				ITEM_INFO* item2;
 				short roomItem, nex;
 				int dx, dy, dz;
 
-				roomItem = g_Level.Rooms[item->roomNumber].itemNumber;
+				roomItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
 				if (roomItem != NO_ITEM)
 				{
 					while (1)
 					{
 						item2 = &g_Level.Items[roomItem];
-						nex = item2->nextItem;
+						nex = item2->NextItem;
 
-						if (item2->objectNumber == ID_MAPPER)
+						if (item2->ObjectNumber == ID_MAPPER)
 						{
-							dx = item->pos.xPos - item2->pos.xPos;
-							dy = item->pos.yPos - item2->pos.yPos;
-							dz = item->pos.zPos - item2->pos.zPos;
+							dx = item->Position.xPos - item2->Position.xPos;
+							dy = item->Position.yPos - item2->Position.yPos;
+							dz = item->Position.zPos - item2->Position.zPos;
 							if (dx > -1024 && dx < 1024 && dz > -1024 && dz < 1024 && dy > -1024 && dy < 1024)
 								break;
 						}
@@ -364,24 +364,24 @@ void UseClockworkBeetle(short flag)
 
 						if (roomItem == NO_ITEM)
 						{
-							if (!item->itemFlags[0])
-								item->itemFlags[3] = 150;
+							if (!item->ItemFlags[0])
+								item->ItemFlags[3] = 150;
 
 							return;
 						}
 					}
 
-					item->itemFlags[1] = item2->pos.yRot + 0x8000;
+					item->ItemFlags[1] = item2->Position.yRot + 0x8000;
 
-					if (item2->itemFlags[0])
-						item->itemFlags[0] = 0;
+					if (item2->ItemFlags[0])
+						item->ItemFlags[0] = 0;
 					else
-						item2->itemFlags[0] = 1;
+						item2->ItemFlags[0] = 1;
 				}
 			}
 
-			if (!item->itemFlags[0])
-				item->itemFlags[3] = 150;
+			if (!item->ItemFlags[0])
+				item->ItemFlags[3] = 150;
 		}
 	}
 }

@@ -16,8 +16,8 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->itemFlags[0] = item->pos.yPos;
-	item->itemFlags[1] = 1;
+	item->ItemFlags[0] = item->Position.yPos;
+	item->ItemFlags[1] = 1;
 	UpdateBridgeItem(itemNumber);
 }
 
@@ -27,18 +27,18 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			if (item->pos.yPos > (item->itemFlags[0] - 16 * (int) (item->triggerFlags & 0xFFFFFFF0)))
+			if (item->Position.yPos > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
 			{
-				item->pos.yPos -= item->triggerFlags & 0xF;
+				item->Position.yPos -= item->TriggerFlags & 0xF;
 			}
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			short roomNumber = item->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+			item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
-			if (roomNumber != item->roomNumber)
+			if (roomNumber != item->RoomNumber)
 			{
 				UpdateBridgeItem(itemNumber, true);
 				ItemNewRoom(itemNumber, roomNumber);
@@ -49,45 +49,45 @@ void TwoBlocksPlatformControl(short itemNumber)
 		{
 			bool onObject = false;
 
-			int height = LaraItem->pos.yPos + 1;
-			if (GetBridgeItemIntersect(itemNumber, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, false).has_value())
+			int height = LaraItem->Position.yPos + 1;
+			if (GetBridgeItemIntersect(itemNumber, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, false).has_value())
 			{
-				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
+				if (LaraItem->Position.yPos <= item->Position.yPos + 32)
 				{
-					if (item->pos.yPos < height)
+					if (item->Position.yPos < height)
 					{
 						onObject = true;
 					}
 				}
 			}
 
-			if (onObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
-				item->itemFlags[1] = 1;
+			if (onObject && LaraItem->AnimNumber != LA_HOP_BACK_CONTINUE)
+				item->ItemFlags[1] = 1;
 			else
-				item->itemFlags[1] = -1;
+				item->ItemFlags[1] = -1;
 
-			if (item->itemFlags[1] < 0)
+			if (item->ItemFlags[1] < 0)
 			{
-				if (item->pos.yPos <= item->itemFlags[0])
+				if (item->Position.yPos <= item->ItemFlags[0])
 				{
-					item->itemFlags[1] = 1;
+					item->ItemFlags[1] = 1;
 				}
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-					item->pos.yPos -= 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
+					item->Position.yPos -= 4;
 				}
 			}
-			else if (item->itemFlags[1] > 0)
+			else if (item->ItemFlags[1] > 0)
 			{
-				if (item->pos.yPos >= item->itemFlags[0] + 128)
+				if (item->Position.yPos >= item->ItemFlags[0] + 128)
 				{
-					item->itemFlags[1] = -1;
+					item->ItemFlags[1] = -1;
 				}
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-					item->pos.yPos += 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
+					item->Position.yPos += 4;
 				}
 			}
 		}
@@ -98,7 +98,7 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!item->meshBits)
+	if (!item->MeshBits)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -108,7 +108,7 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (!item->meshBits)
+	if (!item->MeshBits)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

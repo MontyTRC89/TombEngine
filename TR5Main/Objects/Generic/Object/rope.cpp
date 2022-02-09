@@ -26,11 +26,11 @@ namespace TEN::Entities::Generic
 		PHD_VECTOR itemPos;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		short roomNumber = item->roomNumber;
+		short roomNumber = item->RoomNumber;
 
-		itemPos.x = item->pos.xPos;
-		itemPos.y = item->pos.yPos;
-		itemPos.z = item->pos.zPos;
+		itemPos.x = item->Position.xPos;
+		itemPos.y = item->Position.yPos;
+		itemPos.z = item->Position.zPos;
 
 		FLOOR_INFO* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
 		itemPos.y = GetCeiling(floor, itemPos.x, itemPos.y, itemPos.z);
@@ -43,7 +43,7 @@ namespace TEN::Entities::Generic
 		ROPE_STRUCT rope;
 		PrepareRope(&rope, &itemPos, &pos, 128, item);
 
-		item->triggerFlags = Ropes.size();
+		item->TriggerFlags = Ropes.size();
 
 		Ropes.push_back(rope);
 	}
@@ -59,7 +59,7 @@ namespace TEN::Entities::Generic
 
 		NormaliseRopeVector(pos2);
 
-		if (item->triggerFlags == -1)
+		if (item->TriggerFlags == -1)
 			rope->coiled = 30;
 		else
 			rope->coiled = 0;
@@ -78,7 +78,7 @@ namespace TEN::Entities::Generic
 			rope->velocity[i].y = 0;
 			rope->velocity[i].z = 0;
 
-			if (item->triggerFlags == -1)
+			if (item->TriggerFlags == -1)
 			{
 				rope->segment[i].x = l;
 				rope->segment[i].y >>= 4;
@@ -164,7 +164,7 @@ namespace TEN::Entities::Generic
 		ROPE_STRUCT* rope;
 
 		item = &g_Level.Items[itemNumber];
-		rope = &Ropes[item->triggerFlags];
+		rope = &Ropes[item->TriggerFlags];
 		if (TriggerActive(item))
 		{
 			rope->active = 1;
@@ -184,12 +184,12 @@ namespace TEN::Entities::Generic
 		int segment;
 
 		item = &g_Level.Items[itemNumber];
-		rope = &Ropes[item->triggerFlags];
+		rope = &Ropes[item->TriggerFlags];
 		
 		if (TrInput & IN_ACTION 
 			&& Lara.gunStatus == LG_HANDS_FREE 
-			&& (l->activeState == LS_REACH
-				|| l->activeState == LS_JUMP_UP) 
+			&& (l->ActiveState == LS_REACH
+				|| l->ActiveState == LS_JUMP_UP) 
 			&& l->Airborne 
 			&& l->VerticalVelocity > 0
 			&& rope->active)
@@ -198,34 +198,34 @@ namespace TEN::Entities::Generic
 
 			segment = RopeNodeCollision(
 				rope,
-				l->pos.xPos,
-				l->pos.yPos + frame->Y1 + 512,
-				l->pos.zPos + frame->Z2 * phd_cos(l->pos.yRot),
-				l->activeState == LS_REACH ? 128 : 320);
+				l->Position.xPos,
+				l->Position.yPos + frame->Y1 + 512,
+				l->Position.zPos + frame->Z2 * phd_cos(l->Position.yRot),
+				l->ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
 			{
-				if (l->activeState == LS_REACH)
+				if (l->ActiveState == LS_REACH)
 				{
-					l->animNumber = LA_REACH_TO_ROPE_SWING;
-					l->activeState = LS_ROPE_SWING;
+					l->AnimNumber = LA_REACH_TO_ROPE_SWING;
+					l->ActiveState = LS_ROPE_SWING;
 					Lara.ropeParameters.Frame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
 					Lara.ropeParameters.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
 				}
 				else
 				{
-					l->animNumber = LA_JUMP_UP_TO_ROPE_START;
-					l->activeState = LS_ROPE_IDLE;
+					l->AnimNumber = LA_JUMP_UP_TO_ROPE_START;
+					l->ActiveState = LS_ROPE_IDLE;
 				}
 
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->Airborne = false;
 				l->VerticalVelocity = 0;
 
 				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.ropeParameters.Ptr = item->triggerFlags;
+				Lara.ropeParameters.Ptr = item->TriggerFlags;
 				Lara.ropeParameters.Segment = segment;
-				Lara.ropeParameters.Y = l->pos.yRot;
+				Lara.ropeParameters.Y = l->Position.yRot;
 
 				DelAlignLaraToRope(l);
 
@@ -233,7 +233,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, l->pos.yRot, 16 * LaraItem->Velocity);
+				ApplyVelocityToRope(segment, l->Position.yRot, 16 * LaraItem->Velocity);
 			}
 		}
 	}
@@ -546,7 +546,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.ropeParameters.Direction)
 		{
-			if (item->pos.xRot > 0 && item->pos.xRot - Lara.ropeParameters.LastX < -100)
+			if (item->Position.xRot > 0 && item->Position.xRot - Lara.ropeParameters.LastX < -100)
 			{
 				Lara.ropeParameters.ArcFront = Lara.ropeParameters.LastX;
 				Lara.ropeParameters.Direction = 0;
@@ -562,7 +562,7 @@ namespace TEN::Entities::Generic
 					RopeSwing = 0;
 				}
 
-				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->pos, 0);
+				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
 			}
 			else if (Lara.ropeParameters.LastX < 0 && Lara.ropeParameters.Frame == Lara.ropeParameters.DFrame)
 			{
@@ -579,7 +579,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->pos.xRot < 0 && item->pos.xRot - Lara.ropeParameters.LastX > 100)
+			if (item->Position.xRot < 0 && item->Position.xRot - Lara.ropeParameters.LastX > 100)
 			{
 				Lara.ropeParameters.ArcBack = Lara.ropeParameters.LastX;
 				Lara.ropeParameters.Direction = 1;
@@ -595,7 +595,7 @@ namespace TEN::Entities::Generic
 					RopeSwing = 0;
 				}
 
-				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->pos, 0);
+				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
 			}
 			else if (Lara.ropeParameters.LastX > 0 && Lara.ropeParameters.Frame == Lara.ropeParameters.DFrame)
 			{
@@ -612,16 +612,16 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		Lara.ropeParameters.LastX = item->pos.xRot;
+		Lara.ropeParameters.LastX = item->Position.xRot;
 		if (Lara.ropeParameters.Direction)
 		{
-			if (item->pos.xRot > Lara.ropeParameters.MaxXForward)
-				Lara.ropeParameters.MaxXForward = item->pos.xRot;
+			if (item->Position.xRot > Lara.ropeParameters.MaxXForward)
+				Lara.ropeParameters.MaxXForward = item->Position.xRot;
 		}
 		else
 		{
-			if (item->pos.xRot < -Lara.ropeParameters.MaxXBackward)
-				Lara.ropeParameters.MaxXBackward = abs(item->pos.xRot);
+			if (item->Position.xRot < -Lara.ropeParameters.MaxXBackward)
+				Lara.ropeParameters.MaxXBackward = abs(item->Position.xRot);
 		}
 	}
 
@@ -629,10 +629,10 @@ namespace TEN::Entities::Generic
 	{
 		if (Lara.ropeParameters.Ptr != -1)
 		{
-			if (item->pos.xRot >= 0)
+			if (item->Position.xRot >= 0)
 			{
 				item->VerticalVelocity = -112;
-				item->Velocity = item->pos.xRot / 128;
+				item->Velocity = item->Position.xRot / 128;
 			}
 			else
 			{
@@ -640,27 +640,27 @@ namespace TEN::Entities::Generic
 				item->VerticalVelocity = -20;
 			}
 
-			item->pos.xRot = 0;
+			item->Position.xRot = 0;
 			item->Airborne = true;
 
 			Lara.gunStatus = LG_HANDS_FREE;
 
-			if (item->frameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
+			if (item->FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
 			{
-				item->animNumber = LA_ROPE_SWING_TO_REACH_1;
+				item->AnimNumber = LA_ROPE_SWING_TO_REACH_1;
 			}
-			else if (item->frameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
+			else if (item->FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
 			{
-				item->animNumber = LA_ROPE_SWING_TO_REACH_2;
+				item->AnimNumber = LA_ROPE_SWING_TO_REACH_2;
 			}
 			else
 			{
-				item->animNumber = LA_ROPE_SWING_TO_REACH_3;
+				item->AnimNumber = LA_ROPE_SWING_TO_REACH_3;
 			}
 
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = LS_REACH;
-			item->targetState = LS_REACH;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = LS_REACH;
+			item->TargetState = LS_REACH;
 
 			Lara.ropeParameters.Ptr = -1;
 		}
@@ -669,13 +669,13 @@ namespace TEN::Entities::Generic
 	void FallFromRope(ITEM_INFO* item)
 	{
 		item->Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
-		item->pos.xRot = 0;
-		item->pos.yPos += 320;
+		item->Position.xRot = 0;
+		item->Position.yPos += 320;
 
-		item->animNumber = LA_FALL_START;
-		item->frameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-		item->activeState = LS_JUMP_FORWARD;
-		item->targetState = LS_JUMP_FORWARD;
+		item->AnimNumber = LA_FALL_START;
+		item->FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
+		item->ActiveState = LS_JUMP_FORWARD;
+		item->TargetState = LS_JUMP_FORWARD;
 
 		item->VerticalVelocity = 0;
 		item->Airborne = true;
@@ -718,17 +718,17 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			if (item->animNumber == LA_ROPE_DOWN && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			if (item->AnimNumber == LA_ROPE_DOWN && item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->pos, 0);
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Position, 0);
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				Lara.ropeParameters.Flag = 0;
 				++Lara.ropeParameters.Segment;
 				Lara.ropeParameters.Offset = 0;
 			}
 
 			if (!(TrInput & IN_BACK) || Lara.ropeParameters.Segment >= 21)
-				item->targetState = LS_ROPE_IDLE;
+				item->TargetState = LS_ROPE_IDLE;
 		}
 	}
 
@@ -815,9 +815,9 @@ namespace TEN::Entities::Generic
 
 		phd_GetMatrixAngles(matrix, angle);
 
-		item->pos.xPos = rope->position.x + (rope->meshSegment[Lara.ropeParameters.Segment].x >> FP_SHIFT);
-		item->pos.yPos = rope->position.y + (rope->meshSegment[Lara.ropeParameters.Segment].y >> FP_SHIFT) + Lara.ropeParameters.Offset;
-		item->pos.zPos = rope->position.z + (rope->meshSegment[Lara.ropeParameters.Segment].z >> FP_SHIFT);
+		item->Position.xPos = rope->position.x + (rope->meshSegment[Lara.ropeParameters.Segment].x >> FP_SHIFT);
+		item->Position.yPos = rope->position.y + (rope->meshSegment[Lara.ropeParameters.Segment].y >> FP_SHIFT) + Lara.ropeParameters.Offset;
+		item->Position.zPos = rope->position.z + (rope->meshSegment[Lara.ropeParameters.Segment].z >> FP_SHIFT);
 
 		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(angle[1]),
@@ -827,12 +827,12 @@ namespace TEN::Entities::Generic
 
 		rotMatrix = rotMatrix.Transpose();
 
-		item->pos.xPos += -112 * rotMatrix.m[0][2];
-		item->pos.yPos += -112 * rotMatrix.m[1][2];
-		item->pos.zPos += -112 * rotMatrix.m[2][2];
+		item->Position.xPos += -112 * rotMatrix.m[0][2];
+		item->Position.yPos += -112 * rotMatrix.m[1][2];
+		item->Position.zPos += -112 * rotMatrix.m[2][2];
 
-		item->pos.xRot = angle[0];
-		item->pos.yRot = angle[1];
-		item->pos.zRot = angle[2];
+		item->Position.xRot = angle[0];
+		item->Position.yRot = angle[1];
+		item->Position.zRot = angle[2];
 	}
 }

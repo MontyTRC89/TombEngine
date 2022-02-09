@@ -222,12 +222,12 @@ int S_UpdateInput()
 	{
 		if (!flare_no)
 		{
-			if (LaraItem->activeState == LS_CRAWL_IDLE ||
-				LaraItem->activeState == LS_CRAWL_FORWARD ||
-				LaraItem->activeState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->activeState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->activeState == LS_CRAWL_BACK ||
-				LaraItem->activeState == LS_CRAWL_TO_HANG)
+			if (LaraItem->ActiveState == LS_CRAWL_IDLE ||
+				LaraItem->ActiveState == LS_CRAWL_FORWARD ||
+				LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->ActiveState == LS_CRAWL_BACK ||
+				LaraItem->ActiveState == LS_CRAWL_TO_HANG)
 			{
 				SoundEffect(SFX_TR4_LARA_NO, nullptr, 2);
 				flare_no = true;
@@ -342,7 +342,7 @@ int S_UpdateInput()
 	{
 		if (medipack_timeout == 0)
 		{
-			if (LaraItem->hitPoints > 0 && LaraItem->hitPoints < 1000 || Lara.poisoned)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.poisoned)
 			{
 				if (Lara.NumSmallMedipacks != 0)
 				{
@@ -350,12 +350,12 @@ int S_UpdateInput()
 						Lara.NumSmallMedipacks--;
 
 					Lara.poisoned = 0;
-					LaraItem->hitPoints += 500;
+					LaraItem->HitPoints += 500;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);//Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
 
-					if (LaraItem->hitPoints > 1000)
+					if (LaraItem->HitPoints > 1000)
 					{
-						LaraItem->hitPoints = 1000;
+						LaraItem->HitPoints = 1000;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Statistics.Game.HealthUsed++;
 					}
@@ -369,7 +369,7 @@ int S_UpdateInput()
 	{
 		if (medipack_timeout == 0)
 		{
-			if (LaraItem->hitPoints > 0 && LaraItem->hitPoints < 1000 || Lara.poisoned)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.poisoned)
 			{
 				if (Lara.NumLargeMedipacks != 0)
 				{
@@ -377,11 +377,11 @@ int S_UpdateInput()
 						Lara.NumLargeMedipacks--;
 
 					Lara.poisoned = 0;
-					LaraItem->hitPoints += 1000;
+					LaraItem->HitPoints += 1000;
 
-					if (LaraItem->hitPoints > 1000)
+					if (LaraItem->HitPoints > 1000)
 					{
-						LaraItem->hitPoints = 1000;
+						LaraItem->HitPoints = 1000;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Statistics.Game.HealthUsed++;
 					}

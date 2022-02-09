@@ -38,14 +38,14 @@ namespace TEN::Entities::Doors
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (TrInput & IN_ACTION
-			&& l->activeState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
-			&& !(item->status && item->Airborne)
-			&& !(l->hitStatus)
+			&& l->ActiveState == LS_IDLE
+			&& l->AnimNumber == LA_STAND_IDLE
+			&& !(item->Status && item->Airborne)
+			&& !(l->HitStatus)
 			&& !Lara.gunStatus
 			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			item->pos.yRot ^= ANGLE(180);
+			item->Position.yRot ^= ANGLE(180);
 			if (TestLaraPosition(&DoubleDoorBounds, item, l))
 			{
 				if (MoveLaraPosition(&DoubleDoorPos, item, l))
@@ -54,7 +54,7 @@ namespace TEN::Entities::Doors
 
 					AddActiveItem(itemNum);
 
-					item->status = ITEM_ACTIVE;
+					item->Status = ITEM_ACTIVE;
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					ResetLaraFlex(l);
@@ -63,7 +63,7 @@ namespace TEN::Entities::Doors
 				{
 					Lara.interactedItem = itemNum;
 				}
-				item->pos.yRot ^= ANGLE(180);
+				item->Position.yRot ^= ANGLE(180);
 			}
 			else
 			{
@@ -72,7 +72,7 @@ namespace TEN::Entities::Doors
 					Lara.isMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
-				item->pos.yRot ^= ANGLE(180);
+				item->Position.yRot ^= ANGLE(180);
 			}
 		}
 	}

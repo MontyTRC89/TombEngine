@@ -40,23 +40,23 @@ namespace TEN::Renderer
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].NextItem)
 		{
 			ITEM_INFO* item = &g_Level.Items[itemNum];
 
-			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
+			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
 				break;
 
-			if (item->objectNumber == ID_LARA)
+			if (item->ObjectNumber == ID_LARA)
 				continue;
 
-			if (item->status == ITEM_INVISIBLE)
+			if (item->Status == ITEM_INVISIBLE)
 				continue;
 
-			if (!m_moveableObjects[item->objectNumber].has_value())
+			if (!m_moveableObjects[item->ObjectNumber].has_value())
 				continue;
 
-			auto bounds = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
+			auto bounds = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
 			Vector3 min = bounds.Center - bounds.Extents;
 			Vector3 max = bounds.Center + bounds.Extents;
 
@@ -66,14 +66,14 @@ namespace TEN::Renderer
 			auto newItem = &m_items[itemNum];
 
 			newItem->ItemNumber = itemNum;
-			newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot),
-															   TO_RAD(item->pos.xRot),
-															   TO_RAD(item->pos.zRot));
+			newItem->Translation = Matrix::CreateTranslation(item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Position.yRot),
+															   TO_RAD(item->Position.xRot),
+															   TO_RAD(item->Position.zRot));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			CollectLightsForItem(item->roomNumber, newItem, renderView);
+			CollectLightsForItem(item->RoomNumber, newItem, renderView);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -235,14 +235,14 @@ namespace TEN::Renderer
 		// Interpolate ambient light between rooms
 		if (item->PreviousRoomNumber == NO_ITEM)
 		{
-			item->PreviousRoomNumber = nativeItem->roomNumber;
-			item->CurrentRoomNumber = nativeItem->roomNumber;
+			item->PreviousRoomNumber = nativeItem->RoomNumber;
+			item->CurrentRoomNumber = nativeItem->RoomNumber;
 			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
 		}
-		else if (nativeItem->roomNumber != item->CurrentRoomNumber)
+		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
 		{
 			item->PreviousRoomNumber = item->CurrentRoomNumber;
-			item->CurrentRoomNumber = nativeItem->roomNumber;
+			item->CurrentRoomNumber = nativeItem->RoomNumber;
 			item->AmbientLightSteps = 0;
 		}
 		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
@@ -252,7 +252,7 @@ namespace TEN::Renderer
 
 		if (item->PreviousRoomNumber == NO_ITEM)
 		{
-			item->AmbientLight = m_rooms[nativeItem->roomNumber].AmbientLight;
+			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
 		}
 		else
 		{
@@ -265,9 +265,9 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 
-		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos);
 
-		if (nativeItem->objectNumber == ID_LARA)
+		if (nativeItem->ObjectNumber == ID_LARA)
 		{
 			shadowLight = nullptr;
 		}
@@ -339,7 +339,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+					if (nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -370,7 +370,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->objectNumber == ID_LARA)
+					if (nativeItem->ObjectNumber == ID_LARA)
 					{
 						if (intensity >= brightest)
 						{
@@ -391,7 +391,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nativeItem->objectNumber == ID_LARA)
+		if (nativeItem->ObjectNumber == ID_LARA)
 		{
 			shadowLight = brightestLight;
 		}

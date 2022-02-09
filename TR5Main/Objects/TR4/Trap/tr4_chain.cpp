@@ -11,30 +11,30 @@ namespace TEN::Entities::TR4
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			item->itemFlags[2] = 1;
-			item->itemFlags[3] = 75;
+			item->ItemFlags[2] = 1;
+			item->ItemFlags[3] = 75;
 
 			if (TriggerActive(item))
 			{
-				*((int*)&item->itemFlags[0]) = 0x787E;
+				*((int*)&item->ItemFlags[0]) = 0x787E;
 				AnimateItem(item);
 				return;
 			}
 		}
 		else
 		{
-			item->itemFlags[3] = 25;
+			item->ItemFlags[3] = 25;
 
 			if (TriggerActive(item))
 			{
-				*((int*)&item->itemFlags[0]) = 0x780;
+				*((int*)&item->ItemFlags[0]) = 0x780;
 				AnimateItem(item);
 				return;
 			}
 		}
 
-		*((int*)&item->itemFlags[0]) = 0;
+		*((int*)&item->ItemFlags[0]) = 0;
 	}
 }

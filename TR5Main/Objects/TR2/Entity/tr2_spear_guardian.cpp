@@ -16,22 +16,22 @@ BITE_INFO spearRightBite = { 0, 0, 920, 18 };
 
 static void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
 {
-	if (!(xian->flags & 1) && (item->touchBits & 0x40000))
+	if (!(xian->flags & 1) && (item->TouchBits & 0x40000))
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
 		CreatureEffect(item, &spearRightBite, DoBloodSplat);
 		xian->flags |= 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
 	}
 
-	if (!(xian->flags & 2) && (item->touchBits & 0x800))
+	if (!(xian->flags & 2) && (item->TouchBits & 0x800))
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
 		CreatureEffect(item, &spearLeftBite, DoBloodSplat);
 		xian->flags |= 2;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
 	}
 }
 
@@ -43,12 +43,12 @@ void InitialiseSpearGuardian(short itemNum)
 	ClearItem(itemNum);
 
 	item = &g_Level.Items[itemNum];
-	item->animNumber = Objects[item->objectNumber].animIndex + 48;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
 
-	anim = &g_Level.Anims[item->animNumber];
+	anim = &g_Level.Anims[item->AnimNumber];
 
-	item->frameNumber = anim->frameBase;
-	item->activeState = anim->activeState;
+	item->FrameNumber = anim->frameBase;
+	item->ActiveState = anim->ActiveState;
 }
 
 void SpearGuardianControl(short itemNum)
@@ -63,16 +63,16 @@ void SpearGuardianControl(short itemNum)
 	AI_INFO info;
 
 	item = &g_Level.Items[itemNum];
-	xian = (CREATURE_INFO*)item->data;
+	xian = (CREATURE_INFO*)item->Data;
 	head = neck = angle = tilt = 0;
-	lara_alive = (LaraItem->hitPoints > 0);
+	lara_alive = (LaraItem->HitPoints > 0);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->activeState = 17;
-		item->meshBits /= 2;
+		item->ActiveState = 17;
+		item->MeshBits /= 2;
 
-		if (!item->meshBits)
+		if (!item->MeshBits)
 		{
 			SoundEffect(105, NULL, 0);
 			// TODO: exploding death
@@ -88,15 +88,15 @@ void SpearGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, xian->maximumTurn);
 
-		if (item->activeState != 18)
-			item->meshBits = 0xFFFFFFFF;
+		if (item->ActiveState != 18)
+			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 18:
 			if (!xian->flags)
 			{
-				item->meshBits = (item->meshBits << 1) + 1;
+				item->MeshBits = (item->MeshBits << 1) + 1;
 				xian->flags = 3;
 			}
 			else
@@ -113,14 +113,14 @@ void SpearGuardianControl(short itemNum)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->targetState = 2;
+					item->TargetState = 2;
 				else if (random < 0x400)
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->targetState = 5;
+				item->TargetState = 5;
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 2:
@@ -130,19 +130,19 @@ void SpearGuardianControl(short itemNum)
 			xian->maximumTurn = 0;
 
 			if (xian->mood == ESCAPE_MOOD)
-				item->targetState = 3;
+				item->TargetState = 3;
 			else if (xian->mood == BORED_MOOD)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else if (random < 0x400)
-					item->targetState = 3;
+					item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->targetState = 13;
+				item->TargetState = 13;
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 3:
@@ -152,26 +152,26 @@ void SpearGuardianControl(short itemNum)
 			xian->maximumTurn = ANGLE(3);
 
 			if (xian->mood == ESCAPE_MOOD)
-				item->targetState = 4;
+				item->TargetState = 4;
 			else if (xian->mood == BORED_MOOD)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else if (random < 0x400)
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 3 / 2))
-					item->targetState = 7;
+					item->TargetState = 7;
 				else if (GetRandomControl() < 0x4000)
-					item->targetState = 9;
+					item->TargetState = 9;
 				else
-					item->targetState = 11;
+					item->TargetState = 11;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3))
-				item->targetState = 4;
+				item->TargetState = 4;
 			break;
 
 		case 4:
@@ -185,12 +185,12 @@ void SpearGuardianControl(short itemNum)
 			else if (xian->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->targetState = 15;
+				item->TargetState = 15;
 			break;
 
 		case 5:
@@ -199,9 +199,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->targetState = 1;
+				item->TargetState = 1;
 			else
-				item->targetState = 6;
+				item->TargetState = 6;
 			break;
 
 		case 7:
@@ -210,9 +210,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3 / 2))
-				item->targetState = 3;
+				item->TargetState = 3;
 			else
-				item->targetState = 8;
+				item->TargetState = 8;
 			break;
 
 		case 9:
@@ -221,9 +221,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->targetState = 3;
+				item->TargetState = 3;
 			else
-				item->targetState = 8;
+				item->TargetState = 8;
 			break;
 
 		case 11:
@@ -232,9 +232,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->targetState = 3;
+				item->TargetState = 3;
 			else
-				item->targetState = 8;
+				item->TargetState = 8;
 			break;
 
 		case 13:
@@ -243,9 +243,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->targetState = 2;
+				item->TargetState = 2;
 			else
-				item->targetState = 14;
+				item->TargetState = 14;
 			break;
 
 		case 15:
@@ -254,9 +254,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->targetState = 4;
+				item->TargetState = 4;
 			else
-				item->targetState = 16;
+				item->TargetState = 16;
 			break;
 
 		case 6:
@@ -274,12 +274,12 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else
-				item->targetState = 3;
+				item->TargetState = 3;
 			break;
 
 		case 14:
@@ -289,9 +289,9 @@ void SpearGuardianControl(short itemNum)
 			XianDamage(item, xian, 75);
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->targetState = 1;
+				item->TargetState = 1;
 			else
-				item->targetState = 2;
+				item->TargetState = 2;
 			break;
 
 		case 16:
@@ -303,19 +303,19 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 2;
+					item->TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->targetState = 3;
+				item->TargetState = 3;
 			else
-				item->targetState = 4;
+				item->TargetState = 4;
 			break;
 		}
 	}
 
-	if (lara_alive && LaraItem->hitPoints <= 0)
+	if (lara_alive && LaraItem->HitPoints <= 0)
 	{
 		CreatureKill(item, 49, 19, 2);
 		return;

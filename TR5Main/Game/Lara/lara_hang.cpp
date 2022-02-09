@@ -15,18 +15,18 @@
 
 void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 {
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
 
 		item->Airborne = true;
 		item->Velocity = 2;
-		item->pos.yPos += STEP_SIZE;
+		item->Position.yPos += STEP_SIZE;
 		item->VerticalVelocity = 1;
 
 		Lara.gunStatus = LG_HANDS_FREE;
 
-		item->pos.yRot += Lara.nextCornerPos.yRot / 2;
+		item->Position.yRot += Lara.nextCornerPos.yRot / 2;
 		return;
 	}
 
@@ -41,10 +41,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
-		coll->Setup.OldPosition.x = item->pos.xPos = Lara.nextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->pos.yPos = Lara.nextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->pos.zPos = Lara.nextCornerPos.zPos;
-		item->pos.yRot = Lara.nextCornerPos.yRot;
+		coll->Setup.OldPosition.x = item->Position.xPos = Lara.nextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->Position.yPos = Lara.nextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->Position.zPos = Lara.nextCornerPos.zPos;
+		item->Position.yRot = Lara.nextCornerPos.yRot;
 	}
 }
 
@@ -55,9 +55,9 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hang*/
 	Lara.isClimbing = false;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_IDLE;
+		item->TargetState = LS_IDLE;
 		return;
 	}
 
@@ -81,24 +81,24 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 
-	if (item->animNumber == LA_REACH_TO_HANG)
+	if (item->AnimNumber == LA_REACH_TO_HANG)
 	{
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
 			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
 			{
-				item->targetState = LS_SHIMMY_LEFT;
+				item->TargetState = LS_SHIMMY_LEFT;
 				return;
 			}
 
 			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->targetState = LS_SHIMMY_INNER_LEFT;
+				item->TargetState = LS_SHIMMY_INNER_LEFT;
 				return;
 			
 			case CORNER_RESULT::OUTER:
-				item->targetState = LS_SHIMMY_OUTER_LEFT;
+				item->TargetState = LS_SHIMMY_OUTER_LEFT;
 				return;
 			
 			default:
@@ -108,11 +108,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, -45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->targetState = LS_SHIMMY_45_INNER_LEFT;
+				item->TargetState = LS_SHIMMY_45_INNER_LEFT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->targetState = LS_SHIMMY_45_OUTER_LEFT;
+				item->TargetState = LS_SHIMMY_45_OUTER_LEFT;
 				return;
 
 			default:
@@ -124,18 +124,18 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
 			{
-				item->targetState = LS_SHIMMY_RIGHT;
+				item->TargetState = LS_SHIMMY_RIGHT;
 				return;
 			}
 
 			switch (TestLaraHangCorner(item, coll, 90.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->targetState = LS_SHIMMY_INNER_RIGHT;
+				item->TargetState = LS_SHIMMY_INNER_RIGHT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->targetState = LS_SHIMMY_OUTER_RIGHT;
+				item->TargetState = LS_SHIMMY_OUTER_RIGHT;
 				return;
 
 			default:
@@ -145,11 +145,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			switch (TestLaraHangCorner(item, coll, 45.0f))
 			{
 			case CORNER_RESULT::INNER:
-				item->targetState = LS_SHIMMY_45_INNER_RIGHT;
+				item->TargetState = LS_SHIMMY_45_INNER_RIGHT;
 				return;
 
 			case CORNER_RESULT::OUTER:
-				item->targetState = LS_SHIMMY_45_OUTER_RIGHT;
+				item->TargetState = LS_SHIMMY_45_OUTER_RIGHT;
 				return;
 
 			default:
@@ -158,11 +158,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	Lara.moveAngle = item->pos.yRot;
+	Lara.moveAngle = item->Position.yRot;
 
 	TestLaraHang(item, coll);
 
-	if (item->animNumber == LA_REACH_TO_HANG)
+	if (item->AnimNumber == LA_REACH_TO_HANG)
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -177,16 +177,16 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					if (TrInput & IN_WALK)
 					{
-						item->targetState = LS_HANDSTAND;
+						item->TargetState = LS_HANDSTAND;
 					}
 					else if (TrInput & IN_CROUCH)
 					{
-						item->targetState = LS_HANG_TO_CRAWL;
-						item->requiredState = LS_CROUCH_IDLE;
+						item->TargetState = LS_HANG_TO_CRAWL;
+						item->RequiredState = LS_CROUCH_IDLE;
 					}
 					else
 					{
-						item->targetState = LS_GRABBING;
+						item->TargetState = LS_GRABBING;
 					}
 
 					return;
@@ -197,8 +197,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -256 &&
 					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -256)
 				{
-					item->targetState = LS_HANG_TO_CRAWL;
-					item->requiredState = LS_CROUCH_IDLE;
+					item->TargetState = LS_HANG_TO_CRAWL;
+					item->RequiredState = LS_CROUCH_IDLE;
 
 					return;
 			}
@@ -210,7 +210,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (TestLaraClimbStance(item, coll))
 				{
-					item->targetState = LS_LADDER_IDLE;
+					item->TargetState = LS_LADDER_IDLE;
 				}
 				else if (TestLastFrame(item))
 				{
@@ -224,11 +224,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_BACK &&
 			Lara.climbStatus &&
 			coll->Middle.Floor > 344 &&
-			item->animNumber == LA_REACH_TO_HANG)
+			item->AnimNumber == LA_REACH_TO_HANG)
 		{
 			if (TestLaraClimbStance(item, coll))
 			{
-				item->targetState = LS_LADDER_IDLE;
+				item->TargetState = LS_LADDER_IDLE;
 			}
 			else if (TestLastFrame(item))
 			{
@@ -248,17 +248,17 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
-		item->targetState = LS_HANG;
+		item->TargetState = LS_HANG;
 }
 
 void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	Lara.moveAngle = item->Position.yRot - ANGLE(90);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
+	Lara.moveAngle = item->Position.yRot - ANGLE(90);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
@@ -271,17 +271,17 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
-		item->targetState = LS_HANG;
+		item->TargetState = LS_HANG;
 }
 
 void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*state code: lara_as_hangright*/
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	Lara.moveAngle = item->Position.yRot + ANGLE(90);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
+	Lara.moveAngle = item->Position.yRot + ANGLE(90);
 }
 
 void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)

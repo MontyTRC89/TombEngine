@@ -26,7 +26,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_CROSSBOW:
 		case WEAPON_SHOTGUN:
-			return (LaraItem->activeState == LS_IDLE || LaraItem->activeState == LS_TURN_LEFT_FAST || LaraItem->activeState == LS_TURN_RIGHT_FAST || LaraItem->activeState == LS_TURN_LEFT_SLOW || LaraItem->activeState == LS_TURN_RIGHT_SLOW);
+			return (LaraItem->ActiveState == LS_IDLE || LaraItem->ActiveState == LS_TURN_LEFT_FAST || LaraItem->ActiveState == LS_TURN_RIGHT_FAST || LaraItem->ActiveState == LS_TURN_LEFT_SLOW || LaraItem->ActiveState == LS_TURN_RIGHT_SLOW);
 			break;
 		case WEAPON_HK:
 		{
@@ -35,7 +35,7 @@ bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
 			if(laraInfo.rightArm.animNumber - baseAnim == 0 || laraInfo.rightArm.animNumber - baseAnim == 2 || laraInfo.rightArm.animNumber - baseAnim == 4){
 				return true;
 			} else
-				return (LaraItem->activeState == LS_IDLE || LaraItem->activeState == LS_TURN_LEFT_FAST || LaraItem->activeState == LS_TURN_RIGHT_FAST || LaraItem->activeState == LS_TURN_LEFT_SLOW || LaraItem->activeState == LS_TURN_RIGHT_SLOW);
+				return (LaraItem->ActiveState == LS_IDLE || LaraItem->ActiveState == LS_TURN_LEFT_FAST || LaraItem->ActiveState == LS_TURN_RIGHT_FAST || LaraItem->ActiveState == LS_TURN_LEFT_SLOW || LaraItem->ActiveState == LS_TURN_RIGHT_SLOW);
 		}
 			break;
 		default:
@@ -66,8 +66,8 @@ void Renderer11::updateLaraAnimations(bool force)
 		laraObj.LinearizedBones[i]->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 
 	// Lara world matrix
-	translation = Matrix::CreateTranslation(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->pos.yRot), TO_RAD(LaraItem->pos.xRot), TO_RAD(LaraItem->pos.zRot));
+	translation = Matrix::CreateTranslation(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+	rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(LaraItem->Position.yRot), TO_RAD(LaraItem->Position.xRot), TO_RAD(LaraItem->Position.zRot));
 
 	m_LaraWorldMatrix = rotation * translation;
 	item->World = m_LaraWorldMatrix;
@@ -181,8 +181,8 @@ void Renderer11::updateLaraAnimations(bool force)
 		case WEAPON_FLARE:
 		case WEAPON_TORCH:
 			// Left arm
-			LaraItem->animNumber = Lara.leftArm.animNumber;
-			LaraItem->frameNumber = Lara.leftArm.frameNumber;
+			LaraItem->AnimNumber = Lara.leftArm.animNumber;
+			LaraItem->FrameNumber = Lara.leftArm.frameNumber;
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = GetFrame(LaraItem, framePtr, &rate);
@@ -241,10 +241,10 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-	RendererRoom* room = &m_rooms[LaraItem->roomNumber];
+	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
 	m_stItem.World = m_LaraWorldMatrix;
-	m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+	m_stItem.Position = Vector4(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, 1.0f);
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 	m_cbItem.updateData(m_stItem, m_context.Get());
@@ -310,7 +310,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 void Renderer11::DrawLaraHolsters()
 {
 	RendererItem* item = &m_items[Lara.itemNumber];
-	RendererRoom* room = &m_rooms[LaraItem->roomNumber];
+	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
 	HOLSTER_SLOT leftHolsterID = Lara.holsterInfo.leftHolster;
 	HOLSTER_SLOT rightHolsterID = Lara.holsterInfo.rightHolster;

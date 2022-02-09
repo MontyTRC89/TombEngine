@@ -373,17 +373,17 @@ bool SaveGame::Save(int slot)
 
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		OBJECT_INFO* obj = &Objects[itemToSerialize.objectNumber];
+		OBJECT_INFO* obj = &Objects[itemToSerialize.ObjectNumber];
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
-			itemFlags.push_back(itemToSerialize.itemFlags[i]);
+			itemFlags.push_back(itemToSerialize.ItemFlags[i]);
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 
-		if (Objects[itemToSerialize.objectNumber].intelligent 
-			&& itemToSerialize.data.is<CREATURE_INFO>())
+		if (Objects[itemToSerialize.ObjectNumber].intelligent 
+			&& itemToSerialize.Data.is<CREATURE_INFO>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
@@ -417,63 +417,63 @@ bool SaveGame::Save(int slot)
 		} 
 
 		Save::Position position = Save::Position(
-			(int32_t)itemToSerialize.pos.xPos,
-			(int32_t)itemToSerialize.pos.yPos,
-			(int32_t)itemToSerialize.pos.zPos,
-			(int32_t)itemToSerialize.pos.xRot,
-			(int32_t)itemToSerialize.pos.yRot,
-			(int32_t)itemToSerialize.pos.zRot);
+			(int32_t)itemToSerialize.Position.xPos,
+			(int32_t)itemToSerialize.Position.yPos,
+			(int32_t)itemToSerialize.Position.zPos,
+			(int32_t)itemToSerialize.Position.xRot,
+			(int32_t)itemToSerialize.Position.yRot,
+			(int32_t)itemToSerialize.Position.zRot);
 
 		Save::ItemBuilder serializedItem{ fbb };
 
-		serializedItem.add_anim_number(itemToSerialize.animNumber - obj->animIndex);
-		serializedItem.add_after_death(itemToSerialize.afterDeath);
-		serializedItem.add_box_number(itemToSerialize.boxNumber);
-		serializedItem.add_carried_item(itemToSerialize.carriedItem);
-		serializedItem.add_active_state(itemToSerialize.activeState);
+		serializedItem.add_anim_number(itemToSerialize.AnimNumber - obj->animIndex);
+		serializedItem.add_after_death(itemToSerialize.AfterDeath);
+		serializedItem.add_box_number(itemToSerialize.BoxNumber);
+		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
+		serializedItem.add_active_state(itemToSerialize.ActiveState);
 		serializedItem.add_vertical_velocity(itemToSerialize.VerticalVelocity);
-		serializedItem.add_fired_weapon(itemToSerialize.firedWeapon);
-		serializedItem.add_flags(itemToSerialize.flags);
-		serializedItem.add_floor(itemToSerialize.floor);
-		serializedItem.add_frame_number(itemToSerialize.frameNumber);
-		serializedItem.add_target_state(itemToSerialize.targetState);
-		serializedItem.add_hit_points(itemToSerialize.hitPoints);
+		serializedItem.add_fired_weapon(itemToSerialize.FiredWeapon);
+		serializedItem.add_flags(itemToSerialize.Flags);
+		serializedItem.add_floor(itemToSerialize.Floor);
+		serializedItem.add_frame_number(itemToSerialize.FrameNumber);
+		serializedItem.add_target_state(itemToSerialize.TargetState);
+		serializedItem.add_hit_points(itemToSerialize.HitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
-		serializedItem.add_mesh_bits(itemToSerialize.meshBits);
-		serializedItem.add_object_id(itemToSerialize.objectNumber);
+		serializedItem.add_mesh_bits(itemToSerialize.MeshBits);
+		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
 		serializedItem.add_position(&position);
-		serializedItem.add_required_state(itemToSerialize.requiredState);
-		serializedItem.add_room_number(itemToSerialize.roomNumber);
+		serializedItem.add_required_state(itemToSerialize.RequiredState);
+		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(itemToSerialize.Velocity);
-		serializedItem.add_timer(itemToSerialize.timer);
-		serializedItem.add_touch_bits(itemToSerialize.touchBits);
-		serializedItem.add_trigger_flags(itemToSerialize.triggerFlags);
-		serializedItem.add_triggered((itemToSerialize.flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
-		serializedItem.add_active(itemToSerialize.active);
-		serializedItem.add_status(itemToSerialize.status);
+		serializedItem.add_timer(itemToSerialize.Timer);
+		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
+		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
+		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
+		serializedItem.add_active(itemToSerialize.Active);
+		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_airborne(itemToSerialize.Airborne);
-		serializedItem.add_hit_stauts(itemToSerialize.hitStatus);
-		serializedItem.add_poisoned(itemToSerialize.poisoned);
-		serializedItem.add_ai_bits(itemToSerialize.aiBits);
-		serializedItem.add_collidable(itemToSerialize.collidable);
-		serializedItem.add_looked_at(itemToSerialize.lookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.swapMeshFlags);
+		serializedItem.add_hit_stauts(itemToSerialize.HitStatus);
+		serializedItem.add_poisoned(itemToSerialize.Poisoned);
+		serializedItem.add_ai_bits(itemToSerialize.AIBits);
+		serializedItem.add_collidable(itemToSerialize.Collidable);
+		serializedItem.add_looked_at(itemToSerialize.LookedAt);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshFlags);
 
-		if (Objects[itemToSerialize.objectNumber].intelligent 
-			&& itemToSerialize.data.is<CREATURE_INFO>())
+		if (Objects[itemToSerialize.ObjectNumber].intelligent 
+			&& itemToSerialize.Data.is<CREATURE_INFO>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
 		}
-		else if (itemToSerialize.data.is<short>())
+		else if (itemToSerialize.Data.is<short>())
 		{
-			short& data = itemToSerialize.data;
+			short& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Short);
 			serializedItem.add_data(data);
 		}
-		else if (itemToSerialize.data.is<int>())
+		else if (itemToSerialize.Data.is<int>())
 		{
-			int& data = itemToSerialize.data;
+			int& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Int);
 			serializedItem.add_data(data);
 		}
@@ -881,7 +881,7 @@ bool SaveGame::Load(int slot)
 		}
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 		if (!dynamicItem)
 		{
@@ -892,100 +892,100 @@ bool SaveGame::Load(int slot)
 					UpdateBridgeItem(itemNumber, true);
 
 				KillItem(i);
-				item->status = ITEM_DEACTIVATED;
-				item->flags |= ONESHOT;
+				item->Status = ITEM_DEACTIVATED;
+				item->Flags |= ONESHOT;
 				continue;
 			}
 
 			// If not triggered, don't load remaining data
-			if (item->objectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+			if (item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 				continue;
 		}
 
-		item->pos.xPos = savedItem->position()->x_pos();
-		item->pos.yPos = savedItem->position()->y_pos();
-		item->pos.zPos = savedItem->position()->z_pos();
-		item->pos.xRot = savedItem->position()->x_rot();
-		item->pos.yRot = savedItem->position()->y_rot();
-		item->pos.zRot = savedItem->position()->z_rot();
+		item->Position.xPos = savedItem->position()->x_pos();
+		item->Position.yPos = savedItem->position()->y_pos();
+		item->Position.zPos = savedItem->position()->z_pos();
+		item->Position.xRot = savedItem->position()->x_rot();
+		item->Position.yRot = savedItem->position()->y_rot();
+		item->Position.zRot = savedItem->position()->z_rot();
 
 		short roomNumber = savedItem->room_number();
 
 		if (dynamicItem)
 		{
-			item->roomNumber = roomNumber;
+			item->RoomNumber = roomNumber;
 
 			InitialiseItem(itemNumber);
 			
 			// InitialiseItem could overwrite position so restore it
-			item->pos.xPos = savedItem->position()->x_pos();
-			item->pos.yPos = savedItem->position()->y_pos();
-			item->pos.zPos = savedItem->position()->z_pos();
-			item->pos.xRot = savedItem->position()->x_rot();
-			item->pos.yRot = savedItem->position()->y_rot();
-			item->pos.zRot = savedItem->position()->z_rot();
+			item->Position.xPos = savedItem->position()->x_pos();
+			item->Position.yPos = savedItem->position()->y_pos();
+			item->Position.zPos = savedItem->position()->z_pos();
+			item->Position.xRot = savedItem->position()->x_rot();
+			item->Position.yRot = savedItem->position()->y_rot();
+			item->Position.zRot = savedItem->position()->z_rot();
 		}
 
 		item->Velocity = savedItem->velocity();
 		item->VerticalVelocity = savedItem->vertical_velocity();
 
 		// Do the correct way for assigning new room number
-		if (item->objectNumber == ID_LARA)
+		if (item->ObjectNumber == ID_LARA)
 		{
-			LaraItem->location.roomNumber = roomNumber;
-			LaraItem->location.yNumber = item->pos.yPos;
-			item->roomNumber = roomNumber;
+			LaraItem->Location.roomNumber = roomNumber;
+			LaraItem->Location.yNumber = item->Position.yPos;
+			item->RoomNumber = roomNumber;
 			Lara.itemNumber = i;
 			LaraItem = item;
 			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
 		else
 		{
-			if (item->roomNumber != roomNumber)
+			if (item->RoomNumber != roomNumber)
 				ItemNewRoom(i, roomNumber);
 
 			if (obj->shadowSize)
 			{
-				FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+				FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+				item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 			}
 		}
 
 		// Animations
-		item->activeState = savedItem->active_state();
-		item->requiredState = savedItem->required_state();
-		item->targetState = savedItem->target_state();
-		item->animNumber = obj->animIndex + savedItem->anim_number();
-		item->frameNumber = savedItem->frame_number();
+		item->ActiveState = savedItem->active_state();
+		item->RequiredState = savedItem->required_state();
+		item->TargetState = savedItem->target_state();
+		item->AnimNumber = obj->animIndex + savedItem->anim_number();
+		item->FrameNumber = savedItem->frame_number();
 
 		// Hit points
-		item->hitPoints = savedItem->hit_points();
+		item->HitPoints = savedItem->hit_points();
 
 		// Flags and timers
 		for (int j = 0; j < 7; j++)
-			item->itemFlags[j] = savedItem->item_flags()->Get(j);
-		item->timer = savedItem->timer();
-		item->triggerFlags = savedItem->trigger_flags();
-		item->flags = savedItem->flags();
+			item->ItemFlags[j] = savedItem->item_flags()->Get(j);
+		item->Timer = savedItem->timer();
+		item->TriggerFlags = savedItem->trigger_flags();
+		item->Flags = savedItem->flags();
 
 		// Carried item
-		item->carriedItem = savedItem->carried_item();
+		item->CarriedItem = savedItem->carried_item();
 
 		// Activate item if needed
-		if (savedItem->active() && !item->active)
+		if (savedItem->active() && !item->Active)
 			AddActiveItem(i);
 
-		item->active = savedItem->active();
-		item->hitStatus = savedItem->hit_stauts();
-		item->status = savedItem->status();
-		item->aiBits = savedItem->ai_bits();
+		item->Active = savedItem->active();
+		item->HitStatus = savedItem->hit_stauts();
+		item->Status = savedItem->status();
+		item->AIBits = savedItem->ai_bits();
 		item->Airborne = savedItem->airborne();
-		item->collidable = savedItem->collidable();
-		item->lookedAt = savedItem->looked_at();
-		item->poisoned = savedItem->poisoned();
+		item->Collidable = savedItem->collidable();
+		item->LookedAt = savedItem->looked_at();
+		item->Poisoned = savedItem->poisoned();
 
 		// Creature data for intelligent items
-		if (item->objectNumber != ID_LARA && obj->intelligent)
+		if (item->ObjectNumber != ID_LARA && obj->intelligent)
 		{
 			EnableBaddieAI(i, true);
 
@@ -1021,27 +1021,27 @@ bool SaveGame::Load(int slot)
 		{
 			auto data = savedItem->data();
 			auto savedData = (Save::Short*)data;
-			item->data = savedData->scalar();
+			item->Data = savedData->scalar();
 		}
 
 		// Mesh stuff
-		item->meshBits = savedItem->mesh_bits();
-		item->swapMeshFlags = savedItem->swap_mesh_flags();
+		item->MeshBits = savedItem->mesh_bits();
+		item->SwapMeshFlags = savedItem->swap_mesh_flags();
 
 		// Now some post-load specific hacks for objects
-		if (item->objectNumber >= ID_PUZZLE_HOLE1 
-			&& item->objectNumber <= ID_PUZZLE_HOLE16 
-			&& (item->status == ITEM_ACTIVE
-				|| item->status == ITEM_DEACTIVATED))
+		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 
+			&& item->ObjectNumber <= ID_PUZZLE_HOLE16 
+			&& (item->Status == ITEM_ACTIVE
+				|| item->Status == ITEM_DEACTIVATED))
 		{
-			item->objectNumber = (GAME_OBJECT_ID)((int)item->objectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
-			item->animNumber = Objects[item->objectNumber].animIndex + savedItem->anim_number();
+			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
-		if ((item->objectNumber >= ID_SMASH_OBJECT1)
-			&& (item->objectNumber <= ID_SMASH_OBJECT8)
-			&& (item->flags & ONESHOT))
-			item->meshBits = 0x00100;
+		if ((item->ObjectNumber >= ID_SMASH_OBJECT1)
+			&& (item->ObjectNumber <= ID_SMASH_OBJECT8)
+			&& (item->Flags & ONESHOT))
+			item->MeshBits = 0x00100;
 
 		if (obj->floor != nullptr)
 			UpdateBridgeItem(itemNumber);

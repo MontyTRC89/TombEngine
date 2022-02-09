@@ -122,7 +122,7 @@ void InitialiseSpotCam(short Sequence)
 
 	AlterFOV(16380);
 
-	LaraItem->meshBits = -1;
+	LaraItem->MeshBits = -1;
 
 	ResetLaraFlex(LaraItem);
 
@@ -149,12 +149,12 @@ void InitialiseSpotCam(short Sequence)
 	InitialCameraTarget.y = Camera.target.y;
 	InitialCameraTarget.z = Camera.target.z;
 
-	LaraHealth = LaraItem->hitPoints;
+	LaraHealth = LaraItem->HitPoints;
 	InitialCameraRoom = Camera.pos.roomNumber;
 
-	LaraFixedPosition.x = LaraItem->pos.xPos;
-	LaraFixedPosition.y = LaraItem->pos.yPos;
-	LaraFixedPosition.z = LaraItem->pos.zPos;
+	LaraFixedPosition.x = LaraItem->Position.xPos;
+	LaraFixedPosition.y = LaraItem->Position.yPos;
+	LaraFixedPosition.z = LaraItem->Position.zPos;
 
 	CurrentSpotcamSequence = Sequence;
 	CurrentSplineCamera = 0;
@@ -392,7 +392,7 @@ void CalculateSpotCameras()
 
 	if (Lara.uncontrollable)
 	{
-		LaraItem->hitPoints = LaraHealth;
+		LaraItem->HitPoints = LaraHealth;
 		Lara.air = LaraAir;
 	}
 
@@ -435,9 +435,9 @@ void CalculateSpotCameras()
 
 	if ((s->flags & SCF_TRACKING_CAM))
 	{
-		lx = LaraItem->pos.xPos;
-		ly = LaraItem->pos.yPos;
-		lz = LaraItem->pos.zPos;
+		lx = LaraItem->Position.xPos;
+		ly = LaraItem->Position.yPos;
+		lz = LaraItem->Position.zPos;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -506,9 +506,9 @@ void CalculateSpotCameras()
 
 		if ((s->flags & SCF_FOCUS_LARA_HEAD) || (s->flags & SCF_TRACKING_CAM))
 		{
-			Camera.target.x = LaraItem->pos.xPos;
-			Camera.target.y = LaraItem->pos.yPos;
-			Camera.target.z = LaraItem->pos.zPos;
+			Camera.target.x = LaraItem->Position.xPos;
+			Camera.target.y = LaraItem->Position.yPos;
+			Camera.target.z = LaraItem->Position.zPos;
 		}
 		else
 		{

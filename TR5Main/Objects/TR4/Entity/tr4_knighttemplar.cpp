@@ -19,11 +19,11 @@ void InitialiseKnightTemplar(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
-	item->targetState = 1;
-	item->activeState = 1;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->meshBits &= 0xF7FF;
+	item->AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
+	item->TargetState = 1;
+	item->ActiveState = 1;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->MeshBits &= 0xF7FF;
 }
 
 void KnightTemplarControl(short itemNumber)
@@ -32,12 +32,12 @@ void KnightTemplarControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-	if (item->animNumber == obj->animIndex ||
-		item->animNumber - obj->animIndex == 1 ||
-		item->animNumber - obj->animIndex == 11 ||
-		item->animNumber - obj->animIndex == 12)
+	if (item->AnimNumber == obj->animIndex ||
+		item->AnimNumber - obj->animIndex == 1 ||
+		item->AnimNumber - obj->animIndex == 11 ||
+		item->AnimNumber - obj->animIndex == 12)
 	{
 		if (GetRandomControl() & 1)
 		{
@@ -52,7 +52,7 @@ void KnightTemplarControl(short itemNumber)
 		}
 	}
 
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 	short tilt = 0;
 	short angle = 0;
@@ -61,10 +61,10 @@ void KnightTemplarControl(short itemNumber)
 	short joint2 = 0;
 
 	// Knight is immortal
-	if (item->hitPoints < obj->hitPoints)
-		item->hitPoints = obj->hitPoints;
+	if (item->HitPoints < obj->HitPoints)
+		item->HitPoints = obj->HitPoints;
 
-	if (item->aiBits)
+	if (item->AIBits)
 		GetAITarget(creature);
 	else if (creature->hurtByLara)
 		creature->enemy = LaraItem;
@@ -76,7 +76,7 @@ void KnightTemplarControl(short itemNumber)
 
 	int a = 0;
 	if (creature->enemy != LaraItem)
-		a = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
+		a = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);
@@ -93,30 +93,30 @@ void KnightTemplarControl(short itemNumber)
 	int frameBase = 0;
 	int frameNumber = 0;
 
-	switch (item->activeState)
+	switch (item->ActiveState)
 	{
 	case 1:
 		creature->flags = 0;
 		creature->maximumTurn = ANGLE(2);
 
-		item->targetState = 2;
+		item->TargetState = 2;
 
 		if (info.distance > SQUARE(682))
 		{
 			if (Lara.target == item)
-				item->targetState = 6;
+				item->TargetState = 6;
 		}
 		else if (GetRandomControl() & 1)
 		{
-			item->targetState = 4;
+			item->TargetState = 4;
 		}
 		else if (GetRandomControl() & 1)
 		{
-			item->targetState = 3;
+			item->TargetState = 3;
 		}
 		else
 		{
-			item->targetState = 5;
+			item->TargetState = 5;
 		}
 
 		break;
@@ -126,7 +126,7 @@ void KnightTemplarControl(short itemNumber)
 
 		if (Lara.target == item || info.distance <= SQUARE(682))
 		{
-			item->targetState = 1;
+			item->TargetState = 1;
 		}
 
 		break;
@@ -140,20 +140,20 @@ void KnightTemplarControl(short itemNumber)
 		{
 			if (info.angle >= 0)
 			{
-				item->pos.yRot += ANGLE(1);
+				item->Position.yRot += ANGLE(1);
 			}
 			else
 			{
-				item->pos.yRot -= ANGLE(1);
+				item->Position.yRot -= ANGLE(1);
 			}
 		}
 		else
 		{
-			item->pos.yRot += info.angle;
+			item->Position.yRot += info.angle;
 		}
 
-		frameNumber = item->frameNumber;
-		frameBase = g_Level.Anims[item->animNumber].frameBase;
+		frameNumber = item->FrameNumber;
+		frameBase = g_Level.Anims[item->AnimNumber].frameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
@@ -164,7 +164,7 @@ void KnightTemplarControl(short itemNumber)
 
 			GetJointAbsPosition(item, &pos, 11);
 
-			ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+			ROOM_INFO* room = &g_Level.Rooms[item->RoomNumber];
 
 			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
 
@@ -178,13 +178,13 @@ void KnightTemplarControl(short itemNumber)
 						floor(pos.z) == floor(mesh->pos.zPos) &&
 						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
-						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
+						ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
+						SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;
 
-						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
+						TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 					}
 
 					mesh++;
@@ -193,10 +193,10 @@ void KnightTemplarControl(short itemNumber)
 
 			if (!creature->flags)
 			{
-				if (item->touchBits & 0xC00)
+				if (item->TouchBits & 0xC00)
 				{
-					LaraItem->hitPoints -= 120;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 120;
+					LaraItem->HitStatus = true;
 
 					CreatureEffect2(
 						item,
@@ -217,36 +217,36 @@ void KnightTemplarControl(short itemNumber)
 		{
 			if (info.angle >= 0)
 			{
-				item->pos.yRot += ANGLE(1);
+				item->Position.yRot += ANGLE(1);
 			}
 			else
 			{
-				item->pos.yRot -= ANGLE(1);
+				item->Position.yRot -= ANGLE(1);
 			}
 		}
 		else
 		{
-			item->pos.yRot += info.angle;
+			item->Position.yRot += info.angle;
 		}
 
-		if (item->hitStatus)
+		if (item->HitStatus)
 		{
 			if (GetRandomControl() & 1)
 			{
-				item->targetState = 7;
+				item->TargetState = 7;
 			}
 			else
 			{
-				item->targetState = 8;
+				item->TargetState = 8;
 			}
 		}
 		else if (info.distance <= SQUARE(682) || Lara.target != item)
 		{
-			item->targetState = 1;
+			item->TargetState = 1;
 		}
 		else
 		{
-			item->targetState = 6;
+			item->TargetState = 6;
 		}
 		break;
 

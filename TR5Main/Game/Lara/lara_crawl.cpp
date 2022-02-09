@@ -34,19 +34,19 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
 
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->targetState == LS_PICKUP)
+	if (item->TargetState == LS_PICKUP)
 		return;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -65,48 +65,48 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 			info->gunStatus == LG_HANDS_FREE &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->targetState = LS_CROUCH_ROLL;
+			item->TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->targetState = LS_CROUCH_TURN_LEFT;
+			item->TargetState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->targetState = LS_CROUCH_TURN_RIGHT;
+			item->TargetState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->targetState = LS_CROUCH_IDLE;
+		item->TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->targetState = LS_IDLE;
+	item->TargetState = LS_IDLE;
 }
 
 // State:		LS_CROUCH_IDLE (71)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
-	info->moveAngle = item->pos.yRot;
+	info->moveAngle = item->Position.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.ForwardAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.LowerCeilingBound = 0;
@@ -140,7 +140,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->look = false;
 	coll->Setup.EnableObjectPush = true;
@@ -164,24 +164,24 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	item->targetState = LS_CROUCH_IDLE;
+	item->TargetState = LS_CROUCH_IDLE;
 }
 
 // State:		LS_CROUCH_ROLL (72)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
-	info->moveAngle = item->pos.yRot;
+	info->moveAngle = item->Position.yRot;
 	item->Airborne = 0;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
-	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.ForwardAngle = item->Position.yRot;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
 	GetCollisionInfo(coll, item);
@@ -190,9 +190,9 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	// she becomes Airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
-		item->pos.xPos = coll->Setup.OldPosition.x;
-		item->pos.yPos = coll->Setup.OldPosition.y;
-		item->pos.zPos = coll->Setup.OldPosition.z;
+		item->Position.xPos = coll->Setup.OldPosition.x;
+		item->Position.yPos = coll->Setup.OldPosition.y;
+		item->Position.zPos = coll->Setup.OldPosition.z;
 	}
 
 	if (TestLaraFall(item, coll))
@@ -228,14 +228,14 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -250,27 +250,27 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->targetState = LS_CROUCH_ROLL;
+			item->TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->targetState = LS_CROUCH_TURN_LEFT;
+			item->TargetState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 
-		item->targetState = LS_CROUCH_IDLE;
+		item->TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->targetState = LS_IDLE;
+	item->TargetState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (105)
@@ -284,14 +284,14 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -306,27 +306,27 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->targetState = LS_CROUCH_ROLL;
+			item->TargetState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->targetState = LS_CROUCH_TURN_RIGHT;
+			item->TargetState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->targetState = LS_CROUCH_IDLE;
+		item->TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->targetState = LS_IDLE;
+	item->TargetState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
@@ -344,7 +344,7 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableObjectPush = true;
@@ -352,12 +352,12 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->targetState == LS_PICKUP)
+	if (item->TargetState == LS_PICKUP)
 		return;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -376,9 +376,9 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(info->gunType) &&
-			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
+			item->AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
-			item->targetState = LS_CROUCH_IDLE;
+			item->TargetState = LS_CROUCH_IDLE;
 			info->gunStatus = LG_HANDS_FREE;
 			return;
 		}
@@ -391,13 +391,13 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 				crawlVaultResult.Success &&
 				g_GameFlow->Animations.CrawlExtended)
 			{
-				item->targetState = crawlVaultResult.TargetState;
+				item->TargetState = crawlVaultResult.TargetState;
 				ResetLaraFlex(item);
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
-				item->targetState = LS_CRAWL_FORWARD;
+				item->TargetState = LS_CRAWL_FORWARD;
 				return;
 			}
 		}
@@ -405,33 +405,33 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{
-				item->targetState = LS_CRAWL_TO_HANG;
+				item->TargetState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
 			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
-				item->targetState = LS_CRAWL_BACK;
+				item->TargetState = LS_CRAWL_BACK;
 				return;
 			}
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->targetState = LS_CRAWL_TURN_LEFT;
+			item->TargetState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->targetState = LS_CRAWL_TURN_RIGHT;
+			item->TargetState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->targetState = LS_CRAWL_IDLE;
+		item->TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->targetState = LS_CROUCH_IDLE;
+	item->TargetState = LS_CROUCH_IDLE;
 	info->gunStatus = LG_HANDS_FREE;
 }
 
@@ -439,11 +439,11 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
-	info->moveAngle = item->pos.yRot;
+	info->moveAngle = item->Position.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
@@ -482,16 +482,16 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -517,32 +517,32 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->targetState = LS_CRAWL_FORWARD;
+			item->TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
-		item->targetState = LS_CRAWL_IDLE;
+		item->TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->targetState = LS_CRAWL_IDLE;
+	item->TargetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_FORWARD (81)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
-	info->moveAngle = item->pos.yRot;
+	info->moveAngle = item->Position.yRot;
 	info->extraTorsoRot = { 0, 0, 0 };
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
@@ -585,7 +585,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->look = false;
 	info->gunStatus = LG_HANDS_BUSY;
@@ -593,9 +593,9 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -621,26 +621,26 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			item->targetState = LS_CRAWL_BACK;
+			item->TargetState = LS_CRAWL_BACK;
 			return;
 		}
 
-		item->targetState = LS_CRAWL_IDLE;
+		item->TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->targetState = LS_CRAWL_IDLE;
+	item->TargetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_BACK (86)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->keepLow = TestLaraKeepLow(item, coll);
 	info->isLow = true;
-	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	info->moveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -682,16 +682,16 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -702,33 +702,33 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->targetState = LS_CRAWL_FORWARD;
+			item->TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->targetState = LS_CRAWL_BACK;
+			item->TargetState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->targetState = LS_CRAWL_TURN_LEFT;
+			item->TargetState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 
-		item->targetState = LS_CRAWL_IDLE;
+		item->TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->targetState = LS_CRAWL_IDLE;
+	item->TargetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
@@ -742,16 +742,16 @@ void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->gunStatus = LG_HANDS_BUSY;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		item->targetState = LS_DEATH;
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
@@ -762,33 +762,33 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->targetState = LS_CRAWL_IDLE;
+			item->TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->targetState = LS_CRAWL_FORWARD;
+			item->TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->targetState = LS_CRAWL_BACK;
+			item->TargetState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->targetState = LS_CRAWL_TURN_RIGHT;
+			item->TargetState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->targetState = LS_CRAWL_IDLE;
+		item->TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->targetState = LS_CRAWL_IDLE;
+	item->TargetState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
@@ -800,30 +800,30 @@ void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
-	if (item->animNumber == LA_CRAWL_TO_HANG_END)
+	if (item->AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
-		info->moveAngle = item->pos.yRot;
+		info->moveAngle = item->Position.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = info->moveAngle;
 
-		MoveItem(item, item->pos.yRot, -CLICK(1));
+		MoveItem(item, item->Position.yRot, -CLICK(1));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
 		info->gunStatus = LG_HANDS_BUSY;
-		item->pos.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
+		item->Position.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
 		item->Airborne = true;
 		item->Velocity = 2;
 		item->VerticalVelocity = 1;

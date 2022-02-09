@@ -36,9 +36,9 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 	int sign = copysign(1, maxAngle);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->pos.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->pos.zRot) / 3)) * sign;
+		item->Position.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->Position.zRot) / 3)) * sign;
 	else
-		item->pos.zRot += std::min(rate, (short)(abs(maxAngle - item->pos.zRot) / 3)) * sign;
+		item->Position.zRot += std::min(rate, (short)(abs(maxAngle - item->Position.zRot) / 3)) * sign;
 }
 
 void EaseOutLaraHeight(ITEM_INFO* item, int height)
@@ -53,16 +53,16 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 	int sign = std::copysign(1, height);
 	
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
-		item->pos.yPos += SWAMP_GRAVITY;
+		item->Position.yPos += SWAMP_GRAVITY;
 	else if (abs(height) > (STEPUP_HEIGHT / 2))		// Outer range.
-		item->pos.yPos += rate * sign;
+		item->Position.yPos += rate * sign;
 	else if (abs(height) <= (STEPUP_HEIGHT / 2) &&	// Inner range.
 		abs(height) >= threshold)
 	{
-		item->pos.yPos += std::max<int>(abs(height / 2.75), threshold) * sign;
+		item->Position.yPos += std::max<int>(abs(height / 2.75), threshold) * sign;
 	}
 	else
-		item->pos.yPos += height;
+		item->Position.yPos += height;
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
@@ -73,19 +73,19 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestLaraStepUp(item, coll))
 		{
-			item->targetState = LS_STEP_UP;
-			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			item->TargetState = LS_STEP_UP;
+			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 			{
-				item->pos.yPos += coll->Middle.Floor;
+				item->Position.yPos += coll->Middle.Floor;
 				return;
 			}
 		}
 		else if (TestLaraStepDown(item, coll))
 		{
-			item->targetState = LS_STEP_DOWN;
-			if (GetChange(item, &g_Level.Anims[item->animNumber]))
+			item->TargetState = LS_STEP_DOWN;
+			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 			{
-				item->pos.yPos += coll->Middle.Floor;
+				item->Position.yPos += coll->Middle.Floor;
 				return;
 			}
 		}
@@ -102,17 +102,17 @@ void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Doesn't always work on bridges.
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.ForwardAngle = item->pos.yRot + ANGLE(180.0f);
+	coll->Setup.ForwardAngle = item->Position.yRot + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
 	SnapItemToLedge(item, coll);
-	MoveItem(item, item->pos.yRot, -LARA_RAD_CRAWL);
-	item->pos.yRot += ANGLE(180.0f);
+	MoveItem(item, item->Position.yRot, -LARA_RAD_CRAWL);
+	item->Position.yRot += ANGLE(180.0f);
 	LaraResetGravityStatus(item, coll);
 }
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	if (!item->Velocity)
 		return;
@@ -123,7 +123,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	info->extraTorsoRot.z += std::min(abs(rate), abs(maxAngle - info->extraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
-		item->activeState != LS_CRAWL_BACK)
+		item->ActiveState != LS_CRAWL_BACK)
 	{
 		info->extraHeadRot.z = info->extraTorsoRot.z / 2;
 		info->extraHeadRot.y = info->extraHeadRot.z;
@@ -138,15 +138,15 @@ void DoLaraFallDamage(ITEM_INFO* item)
 	if (landSpeed > 0)
 	{
 		if (landSpeed <= 14)
-			item->hitPoints -= LARA_HEALTH_MAX * pow(landSpeed, 2) / 196;
+			item->HitPoints -= LARA_HEALTH_MAX * pow(landSpeed, 2) / 196;
 		else
-			item->hitPoints = 0;
+			item->HitPoints = 0;
 	}
 }
 
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	short direction = item->pos.yRot;
+	short direction = item->Position.yRot;
 
 	//if (g_GameFlow->Animations.SlideExtended)
 	//{
@@ -170,7 +170,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
@@ -202,18 +202,18 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 // runJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
-	int y = item->pos.yPos;
+	int y = item->Position.yPos;
 	int dist = WALL_SIZE;
-	auto probe = GetCollisionResult(item, item->pos.yRot, dist, -coll->Setup.Height);
+	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		info->runJumpQueued = IsRunJumpQueueableState((LARA_STATE)item->targetState);
+		info->runJumpQueued = IsRunJumpQueueableState((LARA_STATE)item->TargetState);
 	}
 	else
 		info->runJumpQueued = false;
@@ -221,7 +221,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	info->projectedFloorHeight = vaultResult.Height;
 	info->gunStatus = vaultResult.SetBusyHands ? LG_HANDS_BUSY : info->gunStatus;
@@ -257,7 +257,7 @@ void SetLaraFallBackState(ITEM_INFO* item)
 void SetLaraMonkeyFallState(ITEM_INFO* item)
 {
 	// Hack.
-	if (item->activeState == LS_MONKEY_TURN_180)
+	if (item->ActiveState == LS_MONKEY_TURN_180)
 		return;
 
 	SetAnimation(item, LA_MONKEY_TO_FREEFALL);
@@ -266,7 +266,7 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 
 void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
@@ -276,29 +276,29 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	short direction = GetLaraSlideDirection(item, coll);
-	short delta = direction - item->pos.yRot;
+	short delta = direction - item->Position.yRot;
 	static short oldAngle = 1;
 
 	ShiftItem(item, coll);
 
 	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
 	{
-		if (item->activeState == LS_SLIDE_BACK && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_BACK && oldAngle == direction)
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
-		item->pos.yRot = direction + ANGLE(180.0f);
+		item->Position.yRot = direction + ANGLE(180.0f);
 	}
 	else
 	{
-		if (item->activeState == LS_SLIDE_FORWARD && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_FORWARD && oldAngle == direction)
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
-		item->pos.yRot = direction;
+		item->Position.yRot = direction;
 	}
 
 	LaraSnapToHeight(item, coll);
@@ -308,7 +308,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	// Reset head.
 	if (abs(info->extraHeadRot.x) > ANGLE(0.1f))
@@ -345,22 +345,22 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LARA_STATE)item->activeState))
+	if (!IsRunJumpCountableState((LARA_STATE)item->ActiveState))
 		info->runJumpCount = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LARA_STATE)item->activeState))
+	if (!IsRunJumpQueueableState((LARA_STATE)item->ActiveState))
 		info->runJumpQueued = false;
 
 	// Reset projected height value used by step function.
-	//if (!IsVaultState((LARA_STATE)item->activeState))
+	//if (!IsVaultState((LARA_STATE)item->ActiveState))
 	//	info->projectedFloorHeight = NO_HEIGHT;
 
 	// Reset calculated auto jump velocity.
-	//if (item->activeState != LS_AUTO_JUMP)
+	//if (item->ActiveState != LS_AUTO_JUMP)
 	//	info->calcJumpVelocity = 0;
 
 	// Increment/reset AFK pose timer.
@@ -377,17 +377,17 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	// Reset lean.
 	if (!info->isMoving || (info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 	{
-		if (abs(item->pos.zRot) > ANGLE(0.1f))
-			item->pos.zRot += item->pos.zRot / -6;
+		if (abs(item->Position.zRot) > ANGLE(0.1f))
+			item->Position.zRot += item->Position.zRot / -6;
 		else
-			item->pos.zRot = 0;
+			item->Position.zRot = 0;
 	}
 
 	// Temp.
-	if (abs(item->pos.xRot) > ANGLE(0.1f))
-		item->pos.xRot += item->pos.xRot / -6;
+	if (abs(item->Position.xRot) > ANGLE(0.1f))
+		item->Position.xRot += item->Position.xRot / -6;
 	else
-		item->pos.xRot = 0;
+		item->Position.xRot = 0;
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) &&
@@ -405,16 +405,16 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 		info->turnRate -= ANGLE(0.5f) * sign;
 	else
 		info->turnRate = 0;
-	item->pos.yRot += info->turnRate;
+	item->Position.yRot += info->turnRate;
 }
 
 void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->data;
+	LaraInfo*& info = item->Data;
 
 	if (info->Vehicle != NO_ITEM)
 	{
-		switch (g_Level.Items[info->Vehicle].objectNumber)
+		switch (g_Level.Items[info->Vehicle].ObjectNumber)
 		{
 		case ID_QUAD:
 			if (QuadBikeControl(item, coll))

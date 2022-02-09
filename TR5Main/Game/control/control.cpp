@@ -143,7 +143,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0 && !g_Renderer.isFading())
 		{
-			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
+			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
 
@@ -161,7 +161,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				if (g_Gui.CallInventory(false))
 					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
 			}
-			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->hitPoints > 0)
+			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
 				StopAllSounds();
 				g_Renderer.DumpGameScene();
@@ -169,7 +169,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) && LaraItem->hitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) && LaraItem->HitPoints > 0)
 			{
 				// Stop all sounds
 				StopAllSounds();
@@ -213,7 +213,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->activeState != LS_IDLE || LaraItem->animNumber != LA_STAND_IDLE) && (!Lara.isLow || TrInput & IN_CROUCH || LaraItem->animNumber != LA_CROUCH_IDLE || LaraItem->targetState != LS_CROUCH_IDLE)))
+				((LaraItem->ActiveState != LS_IDLE || LaraItem->AnimNumber != LA_STAND_IDLE) && (!Lara.isLow || TrInput & IN_CROUCH || LaraItem->AnimNumber != LA_CROUCH_IDLE || LaraItem->TargetState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -231,7 +231,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						BinocularRange = 0;
 						LaserSight = false;
 						AlterFOV(ANGLE(80));
-						LaraItem->meshBits = 0xFFFFFFFF;
+						LaraItem->MeshBits = 0xFFFFFFFF;
 						Lara.busy = false;
 						Camera.type = BinocularOldCamera;
 
@@ -271,16 +271,16 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		while (itemNum != NO_ITEM)
 		{
 			ITEM_INFO *item = &g_Level.Items[itemNum];
-			short nextItem = item->nextActive;
+			short nextItem = item->NextActive;
 
-			if (item->afterDeath <= 128)
+			if (item->AfterDeath <= 128)
 			{
-				if (Objects[item->objectNumber].control)
-					Objects[item->objectNumber].control(itemNum);
+				if (Objects[item->ObjectNumber].control)
+					Objects[item->ObjectNumber].control(itemNum);
 
-				if (item->afterDeath > 0 && item->afterDeath < 128 && !(Wibble & 3))
-					item->afterDeath++;
-				if (item->afterDeath == 128)
+				if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
+					item->AfterDeath++;
+				if (item->AfterDeath == 128)
 					KillItem(itemNum);
 			}
 			else
@@ -604,13 +604,13 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		Camera.pos.x = LaraItem->pos.xPos + 256;
-		Camera.pos.y = LaraItem->pos.yPos + 256;
-		Camera.pos.z = LaraItem->pos.zPos + 256;
+		Camera.pos.x = LaraItem->Position.xPos + 256;
+		Camera.pos.y = LaraItem->Position.yPos + 256;
+		Camera.pos.z = LaraItem->Position.zPos + 256;
 
-		Camera.target.x = LaraItem->pos.xPos;
-		Camera.target.y = LaraItem->pos.yPos;
-		Camera.target.z = LaraItem->pos.zPos;
+		Camera.target.x = LaraItem->Position.xPos;
+		Camera.target.y = LaraItem->Position.yPos;
+		Camera.target.z = LaraItem->Position.zPos;
 
 		int x = Lara.weaponItem;
 
@@ -755,9 +755,9 @@ void AlterFloorHeight(ITEM_INFO *item, int height)
 			height--;
 	}
 
-	roomNumber = item->roomNumber;
-	floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-	ceiling = GetFloor(item->pos.xPos, height + item->pos.yPos - WALL_SIZE, item->pos.zPos, &roomNumber);
+	roomNumber = item->RoomNumber;
+	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	ceiling = GetFloor(item->Position.xPos, height + item->Position.yPos - WALL_SIZE, item->Position.zPos, &roomNumber);
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
@@ -801,26 +801,26 @@ int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
 
 bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 {
-	if (1 << node & item->meshBits)
+	if (1 << node & item->MeshBits)
 	{
 		int num = bits;
-		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
-			SoundEffect(SFX_TR5_SMASH_METAL, &item->pos, 0);
+		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
+			SoundEffect(SFX_TR5_SMASH_METAL, &item->Position, 0);
 		else if (num == 256)
 			num = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
-		ShatterItem.yRot = item->pos.yRot;
+		ShatterItem.yRot = item->Position.yRot;
 		ShatterItem.bit = 1 << node;
-		ShatterItem.meshIndex = Objects[item->objectNumber].meshIndex + node;
+		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
 		ShatterItem.sphere.x = CreatureSpheres[node].x;
 		ShatterItem.sphere.y = CreatureSpheres[node].y;
 		ShatterItem.sphere.z = CreatureSpheres[node].z;
-		ShatterItem.flags = item->objectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
+		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, num, item->roomNumber, noXZVel);
-		item->meshBits &= ~ShatterItem.bit;
+		ShatterObject(&ShatterItem, NULL, num, item->RoomNumber, noXZVel);
+		item->MeshBits &= ~ShatterItem.bit;
 
 		return true;
 	}
@@ -863,7 +863,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 int GetWaterSurface(ITEM_INFO* item)
 {
-	return GetWaterSurface(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	return GetWaterSurface(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 }
 
 int GetWaterDepth(int x, int y, int z, short roomNumber)
@@ -949,7 +949,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 
 int GetWaterDepth(ITEM_INFO* item)
 {
-	return GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	return GetWaterDepth(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 }
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)
@@ -1044,7 +1044,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 int GetWaterHeight(ITEM_INFO* item)
 {
-	return GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	return GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 }
 
 int GetDistanceToFloor(int itemNumber, bool precise)
@@ -1054,13 +1054,13 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 
 	// HACK: Remove item from bridge objects temporarily.
 	probe.Block->RemoveItem(itemNumber);
-	auto height = GetFloorHeight(probe.Block, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	auto height = GetFloorHeight(probe.Block, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 	probe.Block->AddItem(itemNumber);
 
 	auto bounds = GetBoundsAccurate(item);
 	int minHeight = precise ? bounds->Y2 : 0;
 
-	return (minHeight + item->pos.yPos - height);
+	return (minHeight + item->Position.yPos - height);
 }
 
 void CleanUp()

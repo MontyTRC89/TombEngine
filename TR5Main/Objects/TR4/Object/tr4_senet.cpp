@@ -26,7 +26,7 @@ void InitialiseGameStix(short itemNumber)
 	ITEM_INFO* item;
 	
 	item = &g_Level.Items[itemNumber];
-	item->itemFlags[7] = -1;
+	item->ItemFlags[7] = -1;
 	//not needed
 	//item->data = &item->itemFlags;
 	ActivePiece = -1;
@@ -40,38 +40,38 @@ void GameStixControl(short itemNumber)
 	short piece, probedRoomNumber;
 
 	auto* item = &g_Level.Items[itemNumber];
-	if (item->itemFlags[7] > -1)
+	if (item->ItemFlags[7] > -1)
 	{
-		if (item->hitPoints == 100)
-			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->pos, 0);
+		if (item->HitPoints == 100)
+			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Position, 0);
 		for (int i = 0; i < 4; ++i)
 		{
-			if (item->hitPoints < 100 - 2 * i)
+			if (item->HitPoints < 100 - 2 * i)
 			{
-				item->itemFlags[i] -= 128 * item->hitPoints;
+				item->ItemFlags[i] -= 128 * item->HitPoints;
 
-				if (item->hitPoints < (40 - 2 * i))
+				if (item->HitPoints < (40 - 2 * i))
 				{
-					if (abs(item->itemFlags[i]) < 4096 && item->itemFlags[7] & 1 << i)
-						item->itemFlags[i] = 0;
-					else if ((item->itemFlags[i] > 28672 || item->itemFlags[i] < -28672) && !(item->itemFlags[7] & 1 << i))
-						item->itemFlags[i] = -32768;
+					if (abs(item->ItemFlags[i]) < 4096 && item->ItemFlags[7] & 1 << i)
+						item->ItemFlags[i] = 0;
+					else if ((item->ItemFlags[i] > 28672 || item->ItemFlags[i] < -28672) && !(item->ItemFlags[7] & 1 << i))
+						item->ItemFlags[i] = -32768;
 				}
 			}
 		}
 
-		--item->hitPoints;
-		if (!item->hitPoints)
+		--item->HitPoints;
+		if (!item->HitPoints)
 		{
 			for (int i = 0; i < 3; ++i)
-				g_Level.Items[SenetPiecesNumber[i]].triggerFlags = 0;
+				g_Level.Items[SenetPiecesNumber[i]].TriggerFlags = 0;
 			
-			item->itemFlags[7] = -1;
+			item->ItemFlags[7] = -1;
 
 			if (ActivePiece == -1 && !SenetDisplacement)
 			{
 				RemoveActiveItem(itemNumber);
-				item->status = ITEM_NOT_ACTIVE;
+				item->Status = ITEM_NOT_ACTIVE;
 			}
 		}
 	}
@@ -79,8 +79,8 @@ void GameStixControl(short itemNumber)
 	{
 		number = ActivePiece >= 3 ? 2 : 1;
 		auto* item2 = &g_Level.Items[SenetPiecesNumber[ActivePiece]];
-		item2->flags |= 32;
-		item2->afterDeath = 48;
+		item2->Flags |= 32;
+		item2->AfterDeath = 48;
 
 		piece = ActiveSenetPieces[ActivePiece];
 		if (piece == -1 || piece >= 5)
@@ -97,27 +97,27 @@ void GameStixControl(short itemNumber)
 			z = SenetTargetZ + SECTOR(4 - piece);
 		}
 
-		if (abs(x - item2->pos.xPos) < 128)
-			item2->pos.xPos = x;
-		else if (x > item2->pos.xPos)
-			item2->pos.xPos += 128;
+		if (abs(x - item2->Position.xPos) < 128)
+			item2->Position.xPos = x;
+		else if (x > item2->Position.xPos)
+			item2->Position.xPos += 128;
 		else
-			item2->pos.xPos -= 128;
-		if (abs(z - item2->pos.zPos) < 128)
-			item2->pos.zPos = z;
-		else if (z > item2->pos.zPos)
-			item2->pos.zPos += 128;
+			item2->Position.xPos -= 128;
+		if (abs(z - item2->Position.zPos) < 128)
+			item2->Position.zPos = z;
+		else if (z > item2->Position.zPos)
+			item2->Position.zPos += 128;
 		else
-			item2->pos.zPos -= 128;
+			item2->Position.zPos -= 128;
 
-		probedRoomNumber = GetCollisionResult(item2->pos.xPos, item2->pos.yPos - 32, item2->pos.zPos, item2->roomNumber).RoomNumber;
-		if (item2->roomNumber != probedRoomNumber)
+		probedRoomNumber = GetCollisionResult(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+		if (item2->RoomNumber != probedRoomNumber)
 			ItemNewRoom(SenetPiecesNumber[ActivePiece], probedRoomNumber);
 		
-		if (x == item2->pos.xPos &&
-			z == item2->pos.zPos)
+		if (x == item2->Position.xPos &&
+			z == item2->Position.zPos)
 		{
-			item2->afterDeath = 0;
+			item2->AfterDeath = 0;
 
 			if (piece == 16)
 			{
@@ -139,14 +139,14 @@ void GameStixControl(short itemNumber)
 					for (int i = 0; i < g_Level.NumItems; ++i)
 					{
 						auto* item3 = &g_Level.Items[i];
-						if (item3->objectNumber >= ID_GAME_PIECE1 && item3->objectNumber <= ID_GAME_PIECE3 ||
-							item3->objectNumber == ID_ENEMY_PIECE ||
-							item3->objectNumber == ID_WHEEL_OF_FORTUNE)
+						if (item3->ObjectNumber >= ID_GAME_PIECE1 && item3->ObjectNumber <= ID_GAME_PIECE3 ||
+							item3->ObjectNumber == ID_ENEMY_PIECE ||
+							item3->ObjectNumber == ID_WHEEL_OF_FORTUNE)
 						{
-							item3->flags |= IFLAG_INVISIBLE | IFLAG_ACTIVATION_MASK;
+							item3->Flags |= IFLAG_INVISIBLE | IFLAG_ACTIVATION_MASK;
 							RemoveActiveItem(i);
-							item3->status = ITEM_NOT_ACTIVE;
-							item3->afterDeath = 1;
+							item3->Status = ITEM_NOT_ACTIVE;
+							item3->AfterDeath = 1;
 						}
 					}
 				}
@@ -159,15 +159,15 @@ void GameStixControl(short itemNumber)
 					{
 						item2 = &g_Level.Items[SenetPiecesNumber[i]];
 
-						if (x == item2->pos.xPos &&
-							z == item2->pos.zPos)
+						if (x == item2->Position.xPos &&
+							z == item2->Position.zPos)
 						{
 							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
-							item2->pos.xPos = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
-							item2->pos.zPos = SenetTargetZ + SECTOR(i % 3);
+							item2->Position.xPos = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
+							item2->Position.zPos = SenetTargetZ + SECTOR(i % 3);
 							
-							probedRoomNumber = GetCollisionResult(item2->pos.xPos, item2->pos.yPos - 32, item2->pos.zPos, item2->roomNumber).RoomNumber;
-							if (item2->roomNumber != probedRoomNumber)
+							probedRoomNumber = GetCollisionResult(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+							if (item2->RoomNumber != probedRoomNumber)
 								ItemNewRoom(SenetPiecesNumber[i], probedRoomNumber);
 							
 							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
@@ -179,7 +179,7 @@ void GameStixControl(short itemNumber)
 			if (!SenetDisplacement)
 			{
 				RemoveActiveItem(itemNumber);
-				item2->status = ITEM_NOT_ACTIVE;
+				item2->Status = ITEM_NOT_ACTIVE;
 			}
 
 			ActivePiece = -1;
@@ -190,7 +190,7 @@ void GameStixControl(short itemNumber)
 		_0x0040FAE0(item);
 		flag = false;
 
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
 			for (int i = 3; i < 6; ++i)
 			{
@@ -281,7 +281,7 @@ void GameStixControl(short itemNumber)
 void _0x0040FAE0(ITEM_INFO* item)
 {
 	SenetDisplacement = 0;
-	item->itemFlags[7] = 0;
+	item->ItemFlags[7] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -289,28 +289,28 @@ void _0x0040FAE0(ITEM_INFO* item)
 		SenetDisplacement += rnd;
 
 		if (rnd)
-			item->itemFlags[7] |= (1 << i);
+			item->ItemFlags[7] |= (1 << i);
 	}
 
 	if (!SenetDisplacement)
 		SenetDisplacement = 6;
 
-	item->hitPoints = 120;
+	item->HitPoints = 120;
 
 	for (int i = 0; i < 3; i++)
-		g_Level.Items[SenetPiecesNumber[i]].triggerFlags = 1;
+		g_Level.Items[SenetPiecesNumber[i]].TriggerFlags = 1;
 }
 
 void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
 {
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
-	item->pos.yPos -= STEPUP_HEIGHT;
-	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
-	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
-	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
-	TriggerShockwave(&item->pos, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
-	item->pos.yPos += STEPUP_HEIGHT;
+	item->Position.yPos -= STEPUP_HEIGHT;
+	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
+	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
+	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
+	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
+	item->Position.yPos += STEPUP_HEIGHT;
 }
 
 void trigger_item_in_room(short room_number, int object)//originally this is in deltapak
@@ -319,13 +319,13 @@ void trigger_item_in_room(short room_number, int object)//originally this is in 
 	while (num != NO_ITEM)
 	{
 		auto* item = &g_Level.Items[num];
-		short nex = item->nextItem;
+		short nex = item->NextItem;
 
-		if (item->objectNumber == object)
+		if (item->ObjectNumber == object)
 		{
 			AddActiveItem(num);
-			item->status = ITEM_ACTIVE;
-			item->flags |= IFLAG_ACTIVATION_MASK;
+			item->Status = ITEM_ACTIVE;
+			item->Flags |= IFLAG_ACTIVATION_MASK;
 		}
 
 		num = nex;
@@ -418,33 +418,33 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[item_num];
 
 	if (TrInput & IN_ACTION &&
-		laraitem->activeState == LS_IDLE &&
-		laraitem->animNumber == LA_STAND_IDLE &&
+		laraitem->ActiveState == LS_IDLE &&
+		laraitem->AnimNumber == LA_STAND_IDLE &&
 		Lara.gunStatus == LG_HANDS_FREE &&
-		!item->active || Lara.isMoving && Lara.interactedItem == item_num)
+		!item->Active || Lara.isMoving && Lara.interactedItem == item_num)
 	{
-		laraitem->pos.yRot ^= 0x8000;
+		laraitem->Position.yRot ^= 0x8000;
 
 		if (TestLaraPosition(&GameStixBounds, item, laraitem))
 		{
 			if (MoveLaraPosition(&GameStixPosition, item, laraitem))
 			{
-				laraitem->animNumber = LA_SENET_ROLL;
-				laraitem->frameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
-				laraitem->activeState = LS_MISC_CONTROL;
+				laraitem->AnimNumber = LA_SENET_ROLL;
+				laraitem->FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
+				laraitem->ActiveState = LS_MISC_CONTROL;
 				Lara.isMoving = false;
 				Lara.extraTorsoRot = { 0, 0, 0 };
 				Lara.gunStatus = LG_HANDS_BUSY;
-				item->status = ITEM_ACTIVE;
+				item->Status = ITEM_ACTIVE;
 				AddActiveItem(item_num);
-				laraitem->pos.yRot ^= 0x8000;
+				laraitem->Position.yRot ^= 0x8000;
 				return;
 			}
 
 			Lara.interactedItem = item_num;
 		}
 
-		laraitem->pos.yRot ^= 0x8000;
+		laraitem->Position.yRot ^= 0x8000;
 	}
 	else
 		ObjectCollision(item_num, laraitem, coll);
@@ -456,37 +456,37 @@ void ControlGodHead(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->pos.yRot == 0)
-			item->pos.zPos &= ~1023;
-		else if (item->pos.yRot == 0x4000)
-			item->pos.xPos &= ~1023;
-		else if (item->pos.yRot == -0x4000)
-			item->pos.xPos |= 1023;
-		else if (item->pos.yRot == -0x8000)
-			item->pos.zPos |= 1023;
+		if (item->Position.yRot == 0)
+			item->Position.zPos &= ~1023;
+		else if (item->Position.yRot == 0x4000)
+			item->Position.xPos &= ~1023;
+		else if (item->Position.yRot == -0x4000)
+			item->Position.xPos |= 1023;
+		else if (item->Position.yRot == -0x8000)
+			item->Position.zPos |= 1023;
 
-		if (item->itemFlags[0])
+		if (item->ItemFlags[0])
 		{
-			if (item->itemFlags[2])
-				item->itemFlags[2]--;
+			if (item->ItemFlags[2])
+				item->ItemFlags[2]--;
 			else
 			{
-				if (item->itemFlags[1] < 128)
+				if (item->ItemFlags[1] < 128)
 					KillItem(itemNumber);
 				else
-					item->itemFlags[1] -= 128;
+					item->ItemFlags[1] -= 128;
 			}
 		}
 		else
 		{
-			if (item->itemFlags[1] > 0x1000)
+			if (item->ItemFlags[1] > 0x1000)
 			{
-				item->itemFlags[0] = 1;
-				item->itemFlags[1] = 4096;
-				item->itemFlags[2] = 210;
+				item->ItemFlags[0] = 1;
+				item->ItemFlags[1] = 4096;
+				item->ItemFlags[2] = 210;
 			}
 			else
-				item->itemFlags[1] += 128;
+				item->ItemFlags[1] += 128;
 		}
 	}
 }
@@ -504,18 +504,18 @@ void InitialiseGamePiece(short itemNumber)
 		for (i = 0; i < g_Level.NumItems; ++i)
 		{
 			auto* item = &g_Level.Items[i];
-			if (item->objectNumber == ID_GAME_PIECE1)
+			if (item->ObjectNumber == ID_GAME_PIECE1)
 			{
 				SenetPiecesNumber[0] = i;
-				SenetTargetX = item->pos.xPos + 1024;
-				SenetTargetZ = item->pos.zPos;
+				SenetTargetX = item->Position.xPos + 1024;
+				SenetTargetZ = item->Position.zPos;
 			}
-			else if (item->objectNumber == ID_GAME_PIECE2)
+			else if (item->ObjectNumber == ID_GAME_PIECE2)
 				SenetPiecesNumber[1] = i;
-			else if (item->objectNumber == ID_GAME_PIECE3)
+			else if (item->ObjectNumber == ID_GAME_PIECE3)
 				SenetPiecesNumber[2] = i;
-			else if (item->objectNumber == ID_ENEMY_PIECE)
-				SenetPiecesNumber[3 + item->triggerFlags] = i;
+			else if (item->ObjectNumber == ID_ENEMY_PIECE)
+				SenetPiecesNumber[3 + item->TriggerFlags] = i;
 		}
 	}
 }
@@ -524,8 +524,8 @@ void SenetControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (SenetDisplacement > 0 && item->triggerFlags != 1)
-		MakeMove(item->objectNumber - ID_GAME_PIECE1, SenetDisplacement);
+	if (SenetDisplacement > 0 && item->TriggerFlags != 1)
+		MakeMove(item->ObjectNumber - ID_GAME_PIECE1, SenetDisplacement);
 
 	RemoveActiveItem(itemNumber);
 }

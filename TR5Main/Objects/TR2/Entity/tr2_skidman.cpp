@@ -36,19 +36,19 @@ void InitialiseSkidman(short itemNum)
 	{
 		item = &g_Level.Items[itemNum];
 		skidoo = &g_Level.Items[skidoo_item];
-		skidoo->objectNumber = ID_SNOWMOBILE_GUN;
-		skidoo->pos.xPos = item->pos.xPos;
-		skidoo->pos.yPos = item->pos.yPos;
-		skidoo->pos.zPos = item->pos.zPos;
-		skidoo->pos.yRot = item->pos.yRot;
-		skidoo->roomNumber = item->roomNumber;
-		skidoo->flags = ITEM_INVISIBLE;
-		skidoo->shade = -1;
+		skidoo->ObjectNumber = ID_SNOWMOBILE_GUN;
+		skidoo->Position.xPos = item->Position.xPos;
+		skidoo->Position.yPos = item->Position.yPos;
+		skidoo->Position.zPos = item->Position.zPos;
+		skidoo->Position.yRot = item->Position.yRot;
+		skidoo->RoomNumber = item->RoomNumber;
+		skidoo->Flags = ITEM_INVISIBLE;
+		skidoo->Shade = -1;
 
 		InitialiseItem(skidoo_item);
 
 		// The skidman remembers his skidoo
-		item->data = skidoo_item;
+		item->Data = skidoo_item;
 
 		g_Level.NumItems++;
 	}
@@ -78,8 +78,8 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 	if (Lara.Vehicle == NO_ITEM && item->Velocity > 0)
 	{
-		laraitem->hitStatus = true;
-		laraitem->hitPoints -= 100;
+		laraitem->HitStatus = true;
+		laraitem->HitPoints -= 100;
 	}
 }
 
@@ -92,37 +92,37 @@ void SkidManControl(short riderNum)
 	int damage;
 
 	rider = &g_Level.Items[riderNum];
-	if (rider->data == NULL)
+	if (rider->Data == NULL)
 	{
 		TENLog("Rider data does not contain the skidoo itemNumber!", LogLevel::Error);
 		return;
 	}
 
-	item_number = (short)rider->data;
+	item_number = (short)rider->Data;
 	item = &g_Level.Items[item_number];
 
-	if (!item->data)
+	if (!item->Data)
 	{
 		EnableBaddieAI(item_number, TRUE);
-		item->status = ITEM_ACTIVE;
+		item->Status = ITEM_ACTIVE;
 	}
 
-	skidman = (CREATURE_INFO*)item->data;
+	skidman = (CREATURE_INFO*)item->Data;
 	angle = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (rider->activeState != SMAN_DEATH)
+		if (rider->ActiveState != SMAN_DEATH)
 		{
-			rider->pos.xPos = item->pos.xPos;
-			rider->pos.yPos = item->pos.yPos;
-			rider->pos.zPos = item->pos.zPos;
-			rider->pos.yRot = item->pos.yRot;
-			rider->roomNumber = item->roomNumber;
+			rider->Position.xPos = item->Position.xPos;
+			rider->Position.yPos = item->Position.yPos;
+			rider->Position.zPos = item->Position.zPos;
+			rider->Position.yRot = item->Position.yRot;
+			rider->RoomNumber = item->RoomNumber;
 
-			rider->animNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_DEATH_ANIM;
-			rider->frameNumber = g_Level.Anims[rider->animNumber].frameBase;
-			rider->activeState = SMAN_DEATH;
+			rider->AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_DEATH_ANIM;
+			rider->FrameNumber = g_Level.Anims[rider->AnimNumber].frameBase;
+			rider->ActiveState = SMAN_DEATH;
 
 			if (Lara.target == item)
 				Lara.target = NULL;
@@ -130,10 +130,10 @@ void SkidManControl(short riderNum)
 		else
 			AnimateItem(rider);
 
-		if (item->activeState == SMAN_MOVING || item->activeState == SMAN_WAIT)
-			item->targetState = SMAN_WAIT;
+		if (item->ActiveState == SMAN_MOVING || item->ActiveState == SMAN_WAIT)
+			item->TargetState = SMAN_WAIT;
 		else
-			item->targetState = SMAN_MOVING;
+			item->TargetState = SMAN_MOVING;
 	}
 	else
 	{
@@ -144,48 +144,48 @@ void SkidManControl(short riderNum)
 
 		angle = CreatureTurn(item, ANGLE(6)/2);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case SMAN_WAIT:
 			if (skidman->mood == BORED_MOOD)
 				break;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				break;
-			item->targetState = SMAN_MOVING;
+			item->TargetState = SMAN_MOVING;
 			break;
 
 		case SMAN_MOVING:
 			if (skidman->mood == BORED_MOOD)
-				item->targetState = SMAN_WAIT;
+				item->TargetState = SMAN_WAIT;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
-				item->targetState = SMAN_WAIT;
+				item->TargetState = SMAN_WAIT;
 			else if (angle < -SMAN_MIN_TURN)
-				item->targetState = SMAN_STARTLEFT;
+				item->TargetState = SMAN_STARTLEFT;
 			else if (angle > SMAN_MIN_TURN)
-				item->targetState = SMAN_STARTRIGHT;
+				item->TargetState = SMAN_STARTRIGHT;
 			break;
 
 		case SMAN_STARTLEFT:
 		case SMAN_LEFT:
 			if (angle < -SMAN_MIN_TURN)
-				item->targetState = SMAN_LEFT;
+				item->TargetState = SMAN_LEFT;
 			else
-				item->targetState = SMAN_MOVING;
+				item->TargetState = SMAN_MOVING;
 			break;
 
 		case SMAN_STARTRIGHT:
 		case SMAN_RIGHT:
 			if (angle < -SMAN_MIN_TURN)
-				item->targetState = SMAN_LEFT;
+				item->TargetState = SMAN_LEFT;
 			else
-				item->targetState = SMAN_MOVING;
+				item->TargetState = SMAN_MOVING;
 			break;
 		}
 	}
 
-	if (rider->activeState != SMAN_DEATH)
+	if (rider->ActiveState != SMAN_DEATH)
 	{
-		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->hitPoints > 0)
+		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->HitPoints > 0)
 		{
 			damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
 
@@ -195,49 +195,49 @@ void SkidManControl(short riderNum)
 
 		if (skidman->flags)
 		{
-			SoundEffect(43, &item->pos, 0);
+			SoundEffect(43, &item->Position, 0);
 			skidman->flags--;
 		}
 	}
 
-	if (item->activeState == SMAN_WAIT)
+	if (item->ActiveState == SMAN_WAIT)
 	{
-		SoundEffect(153, &item->pos, 0);
+		SoundEffect(153, &item->Position, 0);
 		skidman->jointRotation[0] = 0;
 	}
 	else
 	{
 		skidman->jointRotation[0] = (skidman->jointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(155, &item->pos, 4 + ((0x10000 - (100 - item->Velocity) * 100) << 8));
+		SoundEffect(155, &item->Position, 4 + ((0x10000 - (100 - item->Velocity) * 100) << 8));
 	}
 
 	CreatureAnimation(item_number, angle, 0);
 
-	if (rider->activeState != SMAN_DEATH)
+	if (rider->ActiveState != SMAN_DEATH)
 	{
-		rider->pos.xPos = item->pos.xPos;
-		rider->pos.yPos = item->pos.yPos;
-		rider->pos.zPos = item->pos.zPos;
-		rider->pos.yRot = item->pos.yRot;
-		if (item->roomNumber != rider->roomNumber)
-			ItemNewRoom(riderNum, item->roomNumber);
+		rider->Position.xPos = item->Position.xPos;
+		rider->Position.yPos = item->Position.yPos;
+		rider->Position.zPos = item->Position.zPos;
+		rider->Position.yRot = item->Position.yRot;
+		if (item->RoomNumber != rider->RoomNumber)
+			ItemNewRoom(riderNum, item->RoomNumber);
 
-		rider->animNumber = item->animNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-		rider->frameNumber = item->frameNumber + (g_Level.Anims[rider->animNumber].frameBase - g_Level.Anims[item->animNumber].frameBase);
+		rider->AnimNumber = item->AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
+		rider->FrameNumber = item->FrameNumber + (g_Level.Anims[rider->AnimNumber].frameBase - g_Level.Anims[item->AnimNumber].frameBase);
 	}
-	else if (rider->status == ITEM_DEACTIVATED && item->Velocity == 0 && item->VerticalVelocity == 0)
+	else if (rider->Status == ITEM_DEACTIVATED && item->Velocity == 0 && item->VerticalVelocity == 0)
 	{
 		RemoveActiveItem(riderNum);
-		rider->collidable = false;
-		rider->hitPoints = -16384;
-		rider->flags |= ONESHOT;
+		rider->Collidable = false;
+		rider->HitPoints = -16384;
+		rider->Flags |= ONESHOT;
 
 		DisableBaddieAI(item_number);
-		item->objectNumber = ID_SNOWMOBILE;
-		item->status = ITEM_DEACTIVATED;
+		item->ObjectNumber = ID_SNOWMOBILE;
+		item->Status = ITEM_DEACTIVATED;
 		InitialiseSkidoo(item_number);
 
-		((SKIDOO_INFO*)item->data)->armed = true;
+		((SKIDOO_INFO*)item->Data)->armed = true;
 	}
 }

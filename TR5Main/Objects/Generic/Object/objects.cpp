@@ -36,7 +36,7 @@ void ControlAnimatingSlots(short itemNumber)
 void ControlTriggerTriggerer(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &item->RoomNumber);
 
 	if (floor->Flags.MarkTriggerer)
 	{
@@ -83,22 +83,22 @@ void ControlWaterfall(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	int dx = item->pos.xPos - LaraItem->pos.xPos;
-	int dy = item->pos.yPos - LaraItem->pos.yPos;
-	int dz = item->pos.zPos - LaraItem->pos.zPos;
+	int dx = item->Position.xPos - LaraItem->Position.xPos;
+	int dy = item->Position.yPos - LaraItem->Position.yPos;
+	int dz = item->Position.zPos - LaraItem->Position.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dy >= -16384 && dy <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		if (!(Wibble & 0xC))
 		{
 			TriggerWaterfallMist(
-				item->pos.xPos + 68 * phd_sin(item->pos.yRot),
-				item->pos.yPos,
-				item->pos.zPos + 68 * phd_cos(item->pos.yRot),
-				item->pos.yRot >> 4);
+				item->Position.xPos + 68 * phd_sin(item->Position.yRot),
+				item->Position.yPos,
+				item->Position.zPos + 68 * phd_cos(item->Position.yRot),
+				item->Position.yRot >> 4);
 		}
 
-		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->pos, 0);
+		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Position, 0);
 	}
 }
 
@@ -107,31 +107,31 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
 	if (((TrInput & IN_ACTION) == 0
-		|| l->activeState != LS_IDLE
-		|| l->animNumber != LA_STAND_IDLE
-		|| l->status == ITEM_INVISIBLE
+		|| l->ActiveState != LS_IDLE
+		|| l->AnimNumber != LA_STAND_IDLE
+		|| l->Status == ITEM_INVISIBLE
 		|| Lara.gunStatus)
 		&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
 	{
 #ifdef NEW_TIGHTROPE
-		if(l->activeState == LS_TIGHTROPE_FORWARD &&
-		   l->targetState != LS_TIGHTROPE_EXIT &&
+		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
+		   l->TargetState != LS_TIGHTROPE_EXIT &&
 		   !Lara.tightrope.canGoOff)
 		{
-			if(item->pos.yRot == l->pos.yRot)
+			if(item->Position.yRot == l->Position.yRot)
 			{
-				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
 					Lara.tightrope.canGoOff = true;
 			}
 		}
 #else // NEW_TIGHTROPE
-		if(l->activeState == LS_TIGHTROPE_FORWARD &&
-		   l->targetState != LS_TIGHTROPE_EXIT &&
+		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
+		   l->TargetState != LS_TIGHTROPE_EXIT &&
 		   !Lara.tightRopeOff)
 		{
-			if(item->pos.yRot == l->pos.yRot)
+			if(item->Position.yRot == l->Position.yRot)
 			{
-				if(abs(item->pos.xPos - l->pos.xPos) + abs(item->pos.zPos - l->pos.zPos) < 640)
+				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
 					Lara.tightRopeOff = 1;
 			}
 		}
@@ -140,14 +140,14 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 	else
 	{
-		item->pos.yRot += -ANGLE(180);
+		item->Position.yRot += -ANGLE(180);
 		if (TestLaraPosition(&TightRopeBounds, item, l))
 		{
 			if (MoveLaraPosition(&TightRopePos, item, l))
 			{
-				l->activeState = LS_TIGHTROPE_ENTER;
-				l->animNumber = LA_TIGHTROPE_START;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				l->ActiveState = LS_TIGHTROPE_ENTER;
+				l->AnimNumber = LA_TIGHTROPE_START;
+				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				Lara.isMoving = false;
 				ResetLaraFlex(l);
 #ifdef NEW_TIGHTROPE
@@ -167,13 +167,13 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				Lara.interactedItem = itemNum;
 			}
-			item->pos.yRot += -ANGLE(180);
+			item->Position.yRot += -ANGLE(180);
 		}
 		else
 		{
 			if (Lara.isMoving && Lara.interactedItem == itemNum)
 				Lara.isMoving = false;
-			item->pos.yRot += -ANGLE(180);
+			item->Position.yRot += -ANGLE(180);
 		}
 	}
 }
@@ -181,31 +181,31 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && l->activeState == LS_REACH && l->animNumber == LA_REACH)
+	if (TrInput & IN_ACTION && l->ActiveState == LS_REACH && l->AnimNumber == LA_REACH)
 	{
 		int test1 = TestLaraPosition(&ParallelBarsBounds, item, l);
 		int test2 = 0;
 		if (!test1)
 		{
-			item->pos.yRot += -ANGLE(180);
+			item->Position.yRot += -ANGLE(180);
 			test2 = TestLaraPosition(&ParallelBarsBounds, item, l);
-			item->pos.yRot += -ANGLE(180);
+			item->Position.yRot += -ANGLE(180);
 		}
 
 		if (test1 || test2)
 		{
-			l->activeState = LS_MISC_CONTROL;
-			l->animNumber = LA_SWINGBAR_GRAB;
-			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+			l->ActiveState = LS_MISC_CONTROL;
+			l->AnimNumber = LA_SWINGBAR_GRAB;
+			l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 			l->VerticalVelocity = false;
 			l->Airborne = false;
 
 			ResetLaraFlex(item);
 
 			if (test1)
-				l->pos.yRot = item->pos.yRot;
+				l->Position.yRot = item->Position.yRot;
 			else
-				l->pos.yRot = item->pos.yRot + -ANGLE(180);
+				l->Position.yRot = item->Position.yRot + -ANGLE(180);
 
 			PHD_VECTOR pos1;
 			pos1.x = 0;
@@ -220,11 +220,11 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			GetLaraJointPosition(&pos1, LM_LHAND);
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
-			if (l->pos.yRot & 0x4000)
-				l->pos.xPos += item->pos.xPos - ((pos1.x + pos2.x) >> 1);
+			if (l->Position.yRot & 0x4000)
+				l->Position.xPos += item->Position.xPos - ((pos1.x + pos2.x) >> 1);
 			else
-				l->pos.zPos += item->pos.zPos - ((pos1.z + pos2.z) / 2);
-			l->pos.yPos += item->pos.yPos - ((pos1.y + pos2.y) / 2);
+				l->Position.zPos += item->Position.zPos - ((pos1.z + pos2.z) / 2);
+			l->Position.yPos += item->Position.yPos - ((pos1.y + pos2.y) / 2);
 
 			Lara.interactedItem = itemNumber;
 		}
@@ -233,7 +233,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			ObjectCollision(itemNumber, l, coll);
 		}
 	}
-	else if (l->activeState != LS_BARS_SWING)
+	else if (l->ActiveState != LS_BARS_SWING)
 	{
 		ObjectCollision(itemNumber, l, coll);
 	}
@@ -253,23 +253,23 @@ void CutsceneRopeControl(short itemNumber)
 	pos1.x = -128;
 	pos1.y = -72;
 	pos1.z = -16;
-	GetJointAbsPosition(&g_Level.Items[item->itemFlags[2]], &pos1, 0);
+	GetJointAbsPosition(&g_Level.Items[item->ItemFlags[2]], &pos1, 0);
 
 	pos2.x = 830;
 	pos2.z = -12;
 	pos2.y = 0;
-	GetJointAbsPosition(&g_Level.Items[item->itemFlags[3]], &pos2, 0);
+	GetJointAbsPosition(&g_Level.Items[item->ItemFlags[3]], &pos2, 0);
 
-	item->pos.xPos = pos2.x;
-	item->pos.yPos = pos2.y;
-	item->pos.zPos = pos2.z;
+	item->Position.xPos = pos2.x;
+	item->Position.yPos = pos2.y;
+	item->Position.zPos = pos2.z;
 
 	dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
 	dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
 	dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
-	item->itemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	item->pos.xRot = -4869;
+	item->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
+	item->Position.xRot = -4869;
 }
 
 void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll) 
@@ -291,32 +291,32 @@ void InitialiseTightRope(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->pos.yRot > 0)
+	if (item->Position.yRot > 0)
 	{
-		if (item->pos.yRot == ANGLE(90))
-			item->pos.xPos -= 256;
+		if (item->Position.yRot == ANGLE(90))
+			item->Position.xPos -= 256;
 	}
-	else if (item->pos.yRot)
+	else if (item->Position.yRot)
 	{
-		if (item->pos.yRot == -ANGLE(180))
+		if (item->Position.yRot == -ANGLE(180))
 		{
-			item->pos.zPos += 256;
+			item->Position.zPos += 256;
 		}
-		else if (item->pos.yRot == -ANGLE(90))
+		else if (item->Position.yRot == -ANGLE(90))
 		{
-			item->pos.xPos += 256;
+			item->Position.xPos += 256;
 		}
 	}
 	else
 	{
-		item->pos.zPos -= 256;
+		item->Position.zPos -= 256;
 	}
 }
 
 void InitialiseAnimating(short itemNumber)
 {
 	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->activeState = 0;
+	item->ActiveState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
 }
@@ -328,7 +328,7 @@ void AnimatingControl(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	item->status = ITEM_ACTIVE;
+	item->Status = ITEM_ACTIVE;
 	AnimateItem(item);
 
 	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
@@ -349,16 +349,16 @@ void HighObject2Control(short itemNumber)
 		return;
 
 
-	if (!item->itemFlags[2])
+	if (!item->ItemFlags[2])
 	{
-		int div = item->triggerFlags % 10 << 10;
-		int mod = item->triggerFlags / 10 << 10;
-		item->itemFlags[0] = GetRandomControl() % div;
-		item->itemFlags[1] = GetRandomControl() % mod;
-		item->itemFlags[2] = (GetRandomControl() & 0xF) + 15;
+		int div = item->TriggerFlags % 10 << 10;
+		int mod = item->TriggerFlags / 10 << 10;
+		item->ItemFlags[0] = GetRandomControl() % div;
+		item->ItemFlags[1] = GetRandomControl() % mod;
+		item->ItemFlags[2] = (GetRandomControl() & 0xF) + 15;
 	}
 
-	if (--item->itemFlags[2] < 15)
+	if (--item->ItemFlags[2] < 15)
 	{
 		SPARKS* spark = &Sparks[GetFreeSpark()];
 		spark->on = 1;
@@ -372,9 +372,9 @@ void HighObject2Control(short itemNumber)
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
-		spark->x = item->itemFlags[1] + (GetRandomControl() & 0x3F) + item->pos.xPos - 544;
-		spark->y = item->pos.yPos;
-		spark->z = item->itemFlags[0] + (GetRandomControl() & 0x3F) + item->pos.zPos - 544;
+		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Position.xPos - 544;
+		spark->y = item->Position.yPos;
+		spark->z = item->ItemFlags[0] + (GetRandomControl() & 0x3F) + item->Position.zPos - 544;
 		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
 		spark->friction = 6;
 		spark->zVel = (GetRandomControl() & 0x1FF) - 256;

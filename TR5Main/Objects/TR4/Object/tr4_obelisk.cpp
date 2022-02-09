@@ -19,22 +19,22 @@ void InitialiseObelisk(short itemNumber)
 	ITEM_INFO* item2;
 
 	item = &g_Level.Items[itemNumber];
-	item->animNumber = Objects[item->objectNumber].animIndex + 3;;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 	AddActiveItem(itemNumber);
-	item->status = ITEM_ACTIVE;
+	item->Status = ITEM_ACTIVE;
 
-	if (item->triggerFlags == 2)
+	if (item->TriggerFlags == 2)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			item2 = &g_Level.Items[i];
 
-			if (item2->objectNumber == ID_OBELISK)
-				item->itemFlags[0]++;
+			if (item2->ObjectNumber == ID_OBELISK)
+				item->ItemFlags[0]++;
 
-			if (item2->objectNumber == ID_ANIMATING3)
-				item->itemFlags[2] = i;
+			if (item2->ObjectNumber == ID_ANIMATING3)
+				item->ItemFlags[2] = i;
 		}
 	}
 
@@ -49,10 +49,10 @@ void ObeliskControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->itemFlags[3] > 346)
+		if (item->ItemFlags[3] > 346)
 			return;
 
-		item->itemFlags[3]++;
+		item->ItemFlags[3]++;
 
 		byte r = (GetRandomControl() & 0x1F) + 224;
 		byte g = r - (GetRandomControl() & 0x1F) - 32;
@@ -63,28 +63,28 @@ void ObeliskControl(short itemNumber)
 			someNumber = 8192;
 			if (GetRandomControl() & 1)
 			{
-				if (item->itemFlags[3] < 256 
+				if (item->ItemFlags[3] < 256 
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->pos, 0);
+					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Position, 0);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
-				pos.xPos = item->pos.xPos + (3456 * phd_sin(item->pos.yRot + ANGLE(90)));
-				pos.yPos = item->pos.yPos - 256;
-				pos.zPos = item->pos.zPos + (3456 * phd_cos(item->pos.yRot + ANGLE(90)));
+				pos.xPos = item->Position.xPos + (3456 * phd_sin(item->Position.yRot + ANGLE(90)));
+				pos.yPos = item->Position.yPos - 256;
+				pos.zPos = item->Position.zPos + (3456 * phd_cos(item->Position.yRot + ANGLE(90)));
 
-				pos2.xPos = item->pos.xPos + (someNumber * phd_sin(item->pos.yRot + ANGLE(90)));
-				pos2.yPos = item->pos.yPos;
-				pos2.xPos = item->pos.zPos + (someNumber * phd_cos(item->pos.zRot + ANGLE(90)));
+				pos2.xPos = item->Position.xPos + (someNumber * phd_sin(item->Position.yRot + ANGLE(90)));
+				pos2.yPos = item->Position.yPos;
+				pos2.xPos = item->Position.zPos + (someNumber * phd_cos(item->Position.zRot + ANGLE(90)));
 
-				if (abs(pos.xPos - LaraItem->pos.xPos) < SECTOR(20)
-					&& abs(pos.yPos - LaraItem->pos.yPos) < SECTOR(20)
-					&& abs(pos.zPos - LaraItem->pos.zPos) < SECTOR(20)
-					&& abs(pos2.xPos - LaraItem->pos.xPos) < SECTOR(20)
-					&& abs(pos2.yPos - LaraItem->pos.yPos) < SECTOR(20)
-					&& abs(pos2.zPos - LaraItem->pos.zPos) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20)
+					&& abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20)
+					&& abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20)
+					&& abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20)
+					&& abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20)
+					&& abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
 				{
 					if (!(GlobalCounter & 3))
 					{
@@ -106,11 +106,11 @@ void ObeliskControl(short itemNumber)
 			}
 		}
 
-		if (item->itemFlags[3] >= 256 && item->triggerFlags == 2)
+		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
 		{
-			pos.xPos = item->pos.xPos + 8192 * phd_sin(item->pos.yRot);
-			pos.yPos = item->pos.yPos;
-			pos.zPos = item->pos.zPos + 8192 * phd_cos(item->pos.yRot + ANGLE(90));
+			pos.xPos = item->Position.xPos + 8192 * phd_sin(item->Position.yRot);
+			pos.yPos = item->Position.yPos;
+			pos.zPos = item->Position.zPos + 8192 * phd_cos(item->Position.yRot + ANGLE(90));
 
 			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
 
@@ -120,28 +120,28 @@ void ObeliskControl(short itemNumber)
 				pos2.yPos = (GetRandomControl() & 0x3FF) + pos.yPos - 512;
 				pos2.zPos = (GetRandomControl() & 0x3FF) + pos.zPos - 512;
 
-				if (abs(pos.xPos - LaraItem->pos.xPos) < SECTOR(20)
-					&& abs(pos.yPos - LaraItem->pos.yPos) < SECTOR(20)
-					&& abs(pos.zPos - LaraItem->pos.zPos) < SECTOR(20)
-					&& abs(pos2.xPos - LaraItem->pos.xPos) < SECTOR(20)
-					&& abs(pos2.yPos - LaraItem->pos.yPos) < SECTOR(20)
-					&& abs(pos2.zPos - LaraItem->pos.zPos) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20)
+					&& abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20)
+					&& abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20)
+					&& abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20)
+					&& abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20)
+					&& abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
 				{
-					if (item->itemFlags[2] != NO_ITEM)
+					if (item->ItemFlags[2] != NO_ITEM)
 					{
-						ITEM_INFO* item2 = &g_Level.Items[item->itemFlags[2]];
+						ITEM_INFO* item2 = &g_Level.Items[item->ItemFlags[2]];
 						ExplodeItemNode(item2, 0, 0, 128);
-						KillItem(item->itemFlags[2]);
+						KillItem(item->ItemFlags[2]);
 
-						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -2, 0, item2->roomNumber);
-						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -1, 0, item2->roomNumber);
+						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -2, 0, item2->RoomNumber);
+						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -1, 0, item2->RoomNumber);
 
-						item->itemFlags[2] = NO_ITEM;
+						item->ItemFlags[2] = NO_ITEM;
 						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
-						item2->status = ITEM_NOT_ACTIVE;
+						item2->Status = ITEM_NOT_ACTIVE;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &item2->pos, 0);
-						SoundEffect(SFX_TR4_EXPLOSION2, &item2->pos, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Position, 0);
+						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Position, 0);
 					}
 
 					TriggerLightning(
@@ -163,16 +163,16 @@ void ObeliskControl(short itemNumber)
 	{	
 		AnimateItem(item);
 
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 		bool flag = false;
 
-		if (item->animNumber == obj->animIndex + 2)
+		if (item->AnimNumber == obj->animIndex + 2)
 		{
-			item->pos.yRot -= ANGLE(90);
+			item->Position.yRot -= ANGLE(90);
 			if (TrInput & IN_ACTION)
 			{
-				item->animNumber = obj->animIndex + 1;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 1;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 			else
 			{
@@ -180,40 +180,40 @@ void ObeliskControl(short itemNumber)
 			}
 		}
 
-		if (item->animNumber == obj->animIndex + 6)
+		if (item->AnimNumber == obj->animIndex + 6)
 		{
-			item->pos.yRot += ANGLE(90);
+			item->Position.yRot += ANGLE(90);
 			if (!(TrInput & IN_ACTION))
 			{
-				item->animNumber = obj->animIndex + 3;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 3;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				flag = false;
 			}
 			else
 			{
-				item->animNumber = obj->animIndex + 5;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->AnimNumber = obj->animIndex + 5;
+				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 		}
 
 		if (flag)
 		{
-			item->animNumber = obj->animIndex + 3;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->AnimNumber = obj->animIndex + 3;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 
-		if (item->triggerFlags == 2)
+		if (item->TriggerFlags == 2)
 		{
 			for (int i = 0; i < g_Level.Items.size(); i++)
 			{
 				ITEM_INFO* currentItem = &g_Level.Items[i];
 
-				if (currentItem->objectNumber == ID_PULLEY)
+				if (currentItem->ObjectNumber == ID_PULLEY)
 				{
-					currentItem->itemFlags[1] =
-						(item->pos.yRot != -ANGLE(90)
-							|| g_Level.Items[item->itemFlags[0]].pos.yRot != ANGLE(90)
-							|| g_Level.Items[item->itemFlags[1]].pos.yRot != 0 ? 0 : 1) ^ 1;
+					currentItem->ItemFlags[1] =
+						(item->Position.yRot != -ANGLE(90)
+							|| g_Level.Items[item->ItemFlags[0]].Position.yRot != ANGLE(90)
+							|| g_Level.Items[item->ItemFlags[1]].Position.yRot != 0 ? 0 : 1) ^ 1;
 					break;
 				}
 			}

@@ -23,16 +23,16 @@ void BirdMonsterControl(short itemNum)
 	short angle, head;
 
 	item = &g_Level.Items[itemNum];
-	monster = (CREATURE_INFO*)item->data;
+	monster = (CREATURE_INFO*)item->Data;
 	angle = head = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 9)
+		if (item->ActiveState != 9)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 20;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 9;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 9;
 		}
 	}
 	else
@@ -46,7 +46,7 @@ void BirdMonsterControl(short itemNum)
 		CreatureMood(item, &info, VIOLENT);
 		angle = CreatureTurn(item, monster->maximumTurn);
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			monster->maximumTurn = 0;
@@ -54,80 +54,80 @@ void BirdMonsterControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 3;
+					item->TargetState = 3;
 				else
-					item->targetState = 10;
+					item->TargetState = 10;
 			}
 			else if (info.ahead && (monster->mood == BORED_MOOD || monster->mood == STALK_MOOD))
 			{
 				if (info.zoneNumber != info.enemyZone)
 				{
-					item->targetState = 2;
+					item->TargetState = 2;
 					monster->mood = ESCAPE_MOOD;
 				}
 				else
-					item->targetState = 8;
+					item->TargetState = 8;
 			}
 			else
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			break;
 		case 8:
 			monster->maximumTurn = 0;
 
 			if (monster->mood != BORED_MOOD || !info.ahead)
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 		case 2:
 			monster->maximumTurn = ANGLE(4);
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->targetState = 5;
+				item->TargetState = 5;
 			else if ((monster->mood == BORED_MOOD || monster->mood == STALK_MOOD) && info.ahead)
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 		case 3:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->targetState = 4;
+				item->TargetState = 4;
 			else
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 		case 5:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->targetState = 6;
+				item->TargetState = 6;
 			else
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 		case 10:
 			monster->flags = 0;
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->targetState = 11;
+				item->TargetState = 11;
 			else
-				item->targetState = 1;
+				item->TargetState = 1;
 			break;
 		case 4:
 		case 6:
 		case 11:
 		case 7:
-			if (!(monster->flags & 1) && (item->touchBits & 0x600000))
+			if (!(monster->flags & 1) && (item->TouchBits & 0x600000))
 			{
 				CreatureEffect(item, &birdyBiteR, DoBloodSplat);
-				LaraItem->hitPoints -= 200;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 200;
+				LaraItem->HitStatus = true;
 				monster->flags |= 1;
 			}
 
-			if (!(monster->flags & 2) && (item->touchBits & 0x0C0000))
+			if (!(monster->flags & 2) && (item->TouchBits & 0x0C0000))
 			{
 				CreatureEffect(item, &birdyBiteL, DoBloodSplat);
-				LaraItem->hitPoints -= 200;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= 200;
+				LaraItem->HitStatus = true;
 				monster->flags |= 2;
 			}
 			break;

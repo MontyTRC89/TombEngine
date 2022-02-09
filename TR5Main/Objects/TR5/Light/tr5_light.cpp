@@ -14,21 +14,21 @@ void PulseLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->itemFlags[0] -= 1024;
+		item->ItemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->itemFlags[0] + 4 * (item->pos.yPos & 0x3FFF));
+		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Position.yPos & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
 
 		TriggerDynamicLight(
-			item->pos.xPos,
-			item->pos.yPos,
-			item->pos.zPos,
+			item->Position.xPos,
+			item->Position.yPos,
+			item->Position.zPos,
 			24,
-			(pulse * 8 * (item->triggerFlags & 0x1F)) / 512,
-			(pulse * ((item->triggerFlags / 4) & 0xF8)) / 512,
-			(pulse * ((item->triggerFlags / 128) & 0xF8)) / 512);
+			(pulse * 8 * (item->TriggerFlags & 0x1F)) / 512,
+			(pulse * ((item->TriggerFlags / 4) & 0xF8)) / 512,
+			(pulse * ((item->TriggerFlags / 128) & 0xF8)) / 512);
 	}
 }
 
@@ -54,25 +54,25 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->pos.yRot += ANGLE(16.0f);
+		item->Position.yRot += ANGLE(16.0f);
 
-		byte r = 8 * (item->triggerFlags & 0x1F);
-		byte g = (item->triggerFlags / 4) & 0xF8;
-		byte b = (item->triggerFlags / 128) & 0xF8;
+		byte r = 8 * (item->TriggerFlags & 0x1F);
+		byte g = (item->TriggerFlags / 4) & 0xF8;
+		byte b = (item->TriggerFlags / 128) & 0xF8;
 
 		TriggerAlertLight(
-			item->pos.xPos,
-			item->pos.yPos - 512,
-			item->pos.zPos,
+			item->Position.xPos,
+			item->Position.yPos - 512,
+			item->Position.zPos,
 			r, g, b,
-			((item->pos.yRot + 22528) / 16) & 0xFFF,
-			item->roomNumber,
+			((item->Position.yRot + 22528) / 16) & 0xFFF,
+			item->RoomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->pos.xPos + 256 * phd_sin(item->pos.yRot + 22528),
-			item->pos.yPos - 768,
-			item->pos.zPos + 256 * phd_cos(item->pos.yRot + 22528),
+			item->Position.xPos + 256 * phd_sin(item->Position.yRot + 22528),
+			item->Position.yPos - 768,
+			item->Position.zPos + 256 * phd_cos(item->Position.yRot + 22528),
 			8,
 			r, g, b);
 	}
@@ -85,13 +85,13 @@ void ColorLightControl(short itemNumber)
 	if (TriggerActive(item))
 	{
 		TriggerDynamicLight(
-			item->pos.xPos,
-			item->pos.yPos,
-			item->pos.zPos,
+			item->Position.xPos,
+			item->Position.yPos,
+			item->Position.zPos,
 			24,
-			8 * (item->triggerFlags & 0x1F),
-			(item->triggerFlags / 4) & 0xF8,
-			(item->triggerFlags / 128) & 0xF8);
+			8 * (item->TriggerFlags & 0x1F),
+			(item->TriggerFlags / 4) & 0xF8,
+			(item->TriggerFlags / 128) & 0xF8);
 	}
 }
 
@@ -101,35 +101,35 @@ void ElectricalLightControl(short itemNumber)
 
 	if (!TriggerActive(item))
 	{
-		item->itemFlags[0] = 0;
+		item->ItemFlags[0] = 0;
 		return;
 	}
 
 	int intensity = 0;
 
-	if (item->triggerFlags > 0)
+	if (item->TriggerFlags > 0)
 	{
-		if (item->itemFlags[0] < 16)
+		if (item->ItemFlags[0] < 16)
 		{
 			intensity = 4 * (GetRandomControl() & 0x3F);
-			item->itemFlags[0]++;
+			item->ItemFlags[0]++;
 		}
-		else if (item->itemFlags[0] >= 96)
+		else if (item->ItemFlags[0] >= 96)
 		{
-			if (item->itemFlags[0] >= 160)
+			if (item->ItemFlags[0] >= 160)
 			{
 				intensity = 255 - (GetRandomControl() & 0x1F);
 			}
 			else
 			{
 				intensity = 96 - (GetRandomControl() & 0x1F);
-				if (!(GetRandomControl() & 0x1F) && item->itemFlags[0] > 128)
+				if (!(GetRandomControl() & 0x1F) && item->ItemFlags[0] > 128)
 				{
-					item->itemFlags[0] = 160;
+					item->ItemFlags[0] = 160;
 				}
 				else
 				{
-					item->itemFlags[0]++;
+					item->ItemFlags[0]++;
 				}
 			}
 		}
@@ -138,33 +138,33 @@ void ElectricalLightControl(short itemNumber)
 			if (Wibble & 0x3F && GetRandomControl() & 7)
 			{
 				intensity = GetRandomControl() & 0x3F;
-				item->itemFlags[0]++;
+				item->ItemFlags[0]++;
 			}
 			else
 			{
 				intensity = 192 - (GetRandomControl() & 0x3F);
-				item->itemFlags[0]++;
+				item->ItemFlags[0]++;
 			}
 		}
 	}
 	else
 	{
-		if (item->itemFlags[0] <= 0)
+		if (item->ItemFlags[0] <= 0)
 		{
-			item->itemFlags[0] = (GetRandomControl() & 3) + 4;
-			item->itemFlags[1] = (GetRandomControl() & 0x7F) + 128;
-			item->itemFlags[2] = GetRandomControl() & 1;
+			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
+			item->ItemFlags[1] = (GetRandomControl() & 0x7F) + 128;
+			item->ItemFlags[2] = GetRandomControl() & 1;
 		}
 
-		item->itemFlags[0]--;
+		item->ItemFlags[0]--;
 
-		if (!item->itemFlags[2])
+		if (!item->ItemFlags[2])
 		{
-			item->itemFlags[0]--;
+			item->ItemFlags[0]--;
 
-			intensity = item->itemFlags[1] - (GetRandomControl() & 0x7F);
+			intensity = item->ItemFlags[1] - (GetRandomControl() & 0x7F);
 			if (intensity > 64)
-				SoundEffect(SFX_TR5_ELEC_LIGHT_CRACKLES, &item->pos, 32 * (intensity & 0xFFFFFFF8) | 8);
+				SoundEffect(SFX_TR5_ELEC_LIGHT_CRACKLES, &item->Position, 32 * (intensity & 0xFFFFFFF8) | 8);
 		}
 		else
 		{
@@ -173,13 +173,13 @@ void ElectricalLightControl(short itemNumber)
 	}
 
 	TriggerDynamicLight(
-		item->pos.xPos,
-		item->pos.yPos,
-		item->pos.zPos,
+		item->Position.xPos,
+		item->Position.yPos,
+		item->Position.zPos,
 		24,
-		(intensity * 8 * (item->triggerFlags & 0x1F)) / 256,
-		(intensity * ((item->triggerFlags / 4) & 0xF8)) / 256,
-		(intensity * ((item->triggerFlags / 128) & 0xF8)) / 256);
+		(intensity * 8 * (item->TriggerFlags & 0x1F)) / 256,
+		(intensity * ((item->TriggerFlags / 4) & 0xF8)) / 256,
+		(intensity * ((item->TriggerFlags / 128) & 0xF8)) / 256);
 }
 
 void BlinkingLightControl(short itemNumber)
@@ -188,11 +188,11 @@ void BlinkingLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->itemFlags[0]--;
+		item->ItemFlags[0]--;
 
-		if (item->itemFlags[0] >= 3)
+		if (item->ItemFlags[0] >= 3)
 		{
-			item->meshBits = 1;
+			item->MeshBits = 1;
 		}
 		else
 		{
@@ -207,14 +207,14 @@ void BlinkingLightControl(short itemNumber)
 				pos.y,
 				pos.z,
 				16,
-				8 * (item->triggerFlags & 0x1F),
-				(item->triggerFlags / 4) & 0xF8,
-				(item->triggerFlags / 128) & 0xF8);
+				8 * (item->TriggerFlags & 0x1F),
+				(item->TriggerFlags / 4) & 0xF8,
+				(item->TriggerFlags / 128) & 0xF8);
 
-			item->meshBits = 2;
+			item->MeshBits = 2;
 
-			if (item->itemFlags[0] < 0)
-				item->itemFlags[0] = 30;
+			if (item->ItemFlags[0] < 0)
+				item->ItemFlags[0] = 30;
 		}
 	}
 }

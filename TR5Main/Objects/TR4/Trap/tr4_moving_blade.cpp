@@ -17,12 +17,12 @@ namespace TEN::Entities::TR4
 
         if (TriggerActive(item))
         {
-            item->itemFlags[3] = 50;
+            item->ItemFlags[3] = 50;
             AnimateItem(item);
         }
         else
         {
-            item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+            item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
         }
     }
 }

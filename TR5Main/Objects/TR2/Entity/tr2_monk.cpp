@@ -26,16 +26,16 @@ void MonkControl(short itemNum)
 	int random;
 
 	item = &g_Level.Items[itemNum];
-	monk = (CREATURE_INFO*)item->data;
+	monk = (CREATURE_INFO*)item->Data;
 	torso = angle = tilt = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != 9)
+		if (item->ActiveState != 9)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = 9;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = 9;
 		}
 	}
 	else
@@ -55,7 +55,7 @@ void MonkControl(short itemNum)
 		if (info.ahead)
 			torso = info.angle;
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case 1:
 			monk->flags &= 0x0FFF;
@@ -66,30 +66,30 @@ void MonkControl(short itemNum)
 			}
 			else if (monk->mood == BORED_MOOD)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x7000)
-					item->targetState = 4;
+					item->TargetState = 4;
 				else
-					item->targetState = 11;
+					item->TargetState = 11;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
-				item->targetState = 7;
+				item->TargetState = 7;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -102,29 +102,29 @@ void MonkControl(short itemNum)
 			}
 			else if (monk->mood == BORED_MOOD)
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				random = GetRandomControl();
 				if (random < 0x3000)
-					item->targetState = 5;
+					item->TargetState = 5;
 				else if (random < 0x6000)
-					item->targetState = 8;
+					item->TargetState = 8;
 				else
-					item->targetState = 1;
+					item->TargetState = 1;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
-				item->targetState = 2;
+				item->TargetState = 2;
 			}
 			else
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -136,25 +136,25 @@ void MonkControl(short itemNum)
 				if (!MonksAttackLara && info.ahead && Lara.target == item)
 				{
 					if (GetRandomControl() < 0x4000)
-						item->targetState = 1;
+						item->TargetState = 1;
 					else
-						item->targetState = 11;
+						item->TargetState = 11;
 				}
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 11;
+					item->TargetState = 11;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
 			{
-				item->targetState = 3;
+				item->TargetState = 3;
 			}
 			break;
 
@@ -169,7 +169,7 @@ void MonkControl(short itemNum)
 
 			if (monk->mood == BORED_MOOD)
 			{
-				item->targetState = 1;
+				item->TargetState = 1;
 			}
 			else if (monk->mood == ESCAPE_MOOD)
 			{
@@ -178,28 +178,28 @@ void MonkControl(short itemNum)
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 11;
+					item->TargetState = 11;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 3))
 			{
-				item->targetState = 10;
+				item->TargetState = 10;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->targetState = 1;
+					item->TargetState = 1;
 				else
-					item->targetState = 11;
+					item->TargetState = 11;
 			}
 			break;
 
 		case 8:
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE / 2))
-				item->targetState = 11;
+				item->TargetState = 11;
 			else
-				item->targetState = 6;
+				item->TargetState = 6;
 			break;
 
 		case 4:
@@ -210,13 +210,13 @@ void MonkControl(short itemNum)
 			enemy = monk->enemy;
 			if (enemy == LaraItem)
 			{
-				if (!(monk->flags & 0xF000) && (item->touchBits & 0x4000))
+				if (!(monk->flags & 0xF000) && (item->TouchBits & 0x4000))
 				{
-					LaraItem->hitPoints -= 150;
-					LaraItem->hitStatus = true;
+					LaraItem->HitPoints -= 150;
+					LaraItem->HitStatus = true;
 
 					monk->flags |= 0x1000;
-					SoundEffect(SFX_TR2_CRUNCH1, &item->pos, 0);
+					SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
 					CreatureEffect(item, &monkBite, DoBloodSplat);
 				}
 			}
@@ -224,15 +224,15 @@ void MonkControl(short itemNum)
 			{
 				if (!(monk->flags & 0xf000) && enemy)
 				{
-					if (abs(enemy->pos.xPos - item->pos.xPos) < (STEP_SIZE * 2) &&
-						abs(enemy->pos.yPos - item->pos.yPos) < (STEP_SIZE * 2) &&
-						abs(enemy->pos.zPos - item->pos.zPos) < (STEP_SIZE * 2))
+					if (abs(enemy->Position.xPos - item->Position.xPos) < (STEP_SIZE * 2) &&
+						abs(enemy->Position.yPos - item->Position.yPos) < (STEP_SIZE * 2) &&
+						abs(enemy->Position.zPos - item->Position.zPos) < (STEP_SIZE * 2))
 					{
-						enemy->hitPoints -= 5;
-						enemy->hitStatus = true;
+						enemy->HitPoints -= 5;
+						enemy->HitStatus = true;
 
 						monk->flags |= 0x1000;
-						SoundEffect(SFX_TR2_CRUNCH1, &item->pos, 0);
+						SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
 					}
 				}
 			}

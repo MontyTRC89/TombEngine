@@ -22,8 +22,8 @@ namespace TEN::Entities::Effects
 	{
 		FX_INFO* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->pos.xPos - fx->pos.xPos;
-		int dz = LaraItem->pos.zPos - fx->pos.zPos;
+		int dx = LaraItem->Position.xPos - fx->pos.xPos;
+		int dz = LaraItem->Position.zPos - fx->pos.zPos;
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
@@ -77,8 +77,8 @@ namespace TEN::Entities::Effects
 	{
 		FX_INFO* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->pos.xPos - fx->pos.xPos;
-		int dz = LaraItem->pos.zPos - fx->pos.zPos;
+		int dx = LaraItem->Position.xPos - fx->pos.xPos;
+		int dz = LaraItem->Position.zPos - fx->pos.zPos;
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
@@ -138,9 +138,9 @@ namespace TEN::Entities::Effects
 
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->pos.xPos - fx->pos.xPos,
-			LaraItem->pos.yPos - fx->pos.yPos - STEP_SIZE,
-			LaraItem->pos.zPos - fx->pos.zPos,
+			LaraItem->Position.xPos - fx->pos.xPos,
+			LaraItem->Position.yPos - fx->pos.yPos - STEP_SIZE,
+			LaraItem->Position.zPos - fx->pos.zPos,
 			angles);
 
 		int maxRotation = 0;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Effects
 
 		if (ItemNearLara(&fx->pos, 200))
 		{
-			LaraItem->hitStatus = true;
+			LaraItem->HitStatus = true;
 			if (fx->flag1 != 6)
 			{
 				BubblesShatterFunction(fx, 0, -32);

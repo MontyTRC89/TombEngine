@@ -56,20 +56,20 @@ void InitialiseMummy(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	if (item->triggerFlags == 2)
+	if (item->TriggerFlags == 2)
 	{
-		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_LYING_DOWN;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = STATE_MUMMY_LYING_DOWN;
-		item->activeState = STATE_MUMMY_LYING_DOWN;
-		item->status = ITEM_INVISIBLE;
+		item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_LYING_DOWN;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = STATE_MUMMY_LYING_DOWN;
+		item->ActiveState = STATE_MUMMY_LYING_DOWN;
+		item->Status = ITEM_INVISIBLE;
 	}
 	else
 	{
-		item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_ARMS_CROSSED;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->targetState = STATE_MUMMY_ARMS_CROSSED;
-		item->activeState = STATE_MUMMY_ARMS_CROSSED;
+		item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_ARMS_CROSSED;
+		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->TargetState = STATE_MUMMY_ARMS_CROSSED;
+		item->ActiveState = STATE_MUMMY_ARMS_CROSSED;
 	}
 }
 
@@ -79,7 +79,7 @@ void MummyControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 
 	short tilt = 0;
 	short angle = 0;
@@ -87,7 +87,7 @@ void MummyControl(short itemNumber)
 	short joint1 = 0;
 	short joint2 = 0;
 
-	if (item->aiBits)
+	if (item->AIBits)
 		GetAITarget(creature);
 	else if (creature->hurtByLara)
 		creature->enemy = LaraItem;
@@ -95,13 +95,13 @@ void MummyControl(short itemNumber)
 	AI_INFO info;
 	CreatureAIInfo(item, &info);
 
-	if (item->hitStatus)
+	if (item->HitStatus)
 	{
 		if (info.distance < SQUARE(3072))
 		{
-			if (item->activeState != ANIMATION_MUMMY_STAND_TO_WALK_ARMS_UP 
-				&& item->activeState != ANIMATION_MUMMY_WALK_ARMS_UP_TO_WALK_LEFT
-				&& item->activeState != ANIMATION_MUMMY_STAND_TO_WALK)
+			if (item->ActiveState != ANIMATION_MUMMY_STAND_TO_WALK_ARMS_UP 
+				&& item->ActiveState != ANIMATION_MUMMY_WALK_ARMS_UP_TO_WALK_LEFT
+				&& item->ActiveState != ANIMATION_MUMMY_STAND_TO_WALK)
 			{
 				if (GetRandomControl() & 3 
 					|| Lara.gunType != WEAPON_SHOTGUN 
@@ -113,27 +113,27 @@ void MummyControl(short itemNumber)
 						|| Lara.gunType == WEAPON_HK
 						|| Lara.gunType == WEAPON_REVOLVER)
 					{
-						if (item->activeState == STATE_MUMMY_WALK_ARMS_UP
-							|| item->activeState == STATE_MUMMY_WALK_HIT)
+						if (item->ActiveState == STATE_MUMMY_WALK_ARMS_UP
+							|| item->ActiveState == STATE_MUMMY_WALK_HIT)
 						{
-							item->activeState = STATE_MUMMY_ARMS_UP_PUSHED_BACK;
-							item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_ARMS_UP_PUSHED_BACK;
+							item->ActiveState = STATE_MUMMY_ARMS_UP_PUSHED_BACK;
+							item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_ARMS_UP_PUSHED_BACK;
 						}
 						else
 						{
-							item->activeState = STATE_MUMMY_PUSHED_BACK;
-							item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_PUSHED_BACK;
+							item->ActiveState = STATE_MUMMY_PUSHED_BACK;
+							item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_PUSHED_BACK;
 						}
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->pos.yRot += info.angle;
+						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+						item->Position.yRot += info.angle;
 					}
 				}
 				else
 				{
-					item->animNumber = Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_COLLAPSE_START;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->activeState = STATE_MUMMY_COLLAPSE;
-					item->pos.yRot += info.angle;
+					item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_COLLAPSE_START;
+					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+					item->ActiveState = STATE_MUMMY_COLLAPSE;
+					item->Position.yRot += info.angle;
 					creature->maximumTurn = 0;
 				}
 			}
@@ -153,7 +153,7 @@ void MummyControl(short itemNumber)
 			joint2 = info.xAngle;
 		}
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case STATE_MUMMY_STOP:
 			creature->flags = 0;
@@ -163,27 +163,27 @@ void MummyControl(short itemNumber)
 				|| info.distance >= SQUARE(7168))
 			{
 				if (info.distance - SQUARE(512) <= 0)
-					item->targetState = STATE_MUMMY_HIT;
+					item->TargetState = STATE_MUMMY_HIT;
 				else
 				{
-					item->targetState = STATE_MUMMY_STOP;
+					item->TargetState = STATE_MUMMY_STOP;
 					joint0 = 0;
 					joint1 = 0;
 					joint2 = 0;
-					if (item->triggerFlags > -100 && item->triggerFlags & 0x8000 < 0)
-						item->triggerFlags++;
+					if (item->TriggerFlags > -100 && item->TriggerFlags & 0x8000 < 0)
+						item->TriggerFlags++;
 				}
 			}
 			else
-				item->targetState = STATE_MUMMY_WALK;
+				item->TargetState = STATE_MUMMY_WALK;
 			break;
 
 		case STATE_MUMMY_WALK:
-			if (item->triggerFlags == 1)
+			if (item->TriggerFlags == 1)
 			{
 				creature->maximumTurn = 0;
-				if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-					item->triggerFlags = 0;
+				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+					item->TriggerFlags = 0;
 			}
 			else
 			{
@@ -192,12 +192,12 @@ void MummyControl(short itemNumber)
 				{
 					if (info.distance > SQUARE(7168))
 					{
-						item->targetState = STATE_MUMMY_STOP;
+						item->TargetState = STATE_MUMMY_STOP;
 					}
 				}
 				else
 				{
-					item->targetState = STATE_MUMMY_WALK_ARMS_UP;
+					item->TargetState = STATE_MUMMY_WALK_ARMS_UP;
 				}
 			}
 			break;
@@ -207,24 +207,24 @@ void MummyControl(short itemNumber)
 			creature->maximumTurn = ANGLE(7);
 			if (info.distance < SQUARE(512))
 			{
-				item->targetState = STATE_MUMMY_STOP;
+				item->TargetState = STATE_MUMMY_STOP;
 				break;
 			}
 			if (info.distance > SQUARE(3072) && info.distance < SQUARE(7168))
 			{
-				item->targetState = STATE_MUMMY_WALK;
+				item->TargetState = STATE_MUMMY_WALK;
 				break;
 			}
 			if (info.distance <= SQUARE(682))
-				item->targetState = STATE_MUMMY_WALK_HIT;
+				item->TargetState = STATE_MUMMY_WALK_HIT;
 			else if (info.distance > SQUARE(7168))
-				item->targetState = STATE_MUMMY_STOP;
+				item->TargetState = STATE_MUMMY_STOP;
 			break;
 
 		case STATE_MUMMY_ARMS_CROSSED:
 			creature->maximumTurn = 0;
-			if (info.distance < SQUARE(1024) || item->triggerFlags > -1)
-				item->targetState = STATE_MUMMY_WALK;
+			if (info.distance < SQUARE(1024) || item->TriggerFlags > -1)
+				item->TargetState = STATE_MUMMY_WALK;
 			break;
 
 		case STATE_MUMMY_LYING_DOWN:
@@ -232,11 +232,11 @@ void MummyControl(short itemNumber)
 			joint1 = 0;
 			joint2 = 0;
 			creature->maximumTurn = 0;
-			item->hitPoints = 0;
+			item->HitPoints = 0;
 			if (info.distance < SQUARE(1024) || !(GetRandomControl() & 0x7F))
 			{
-				item->targetState = STATE_MUMMY_GET_UP;
-				item->hitPoints = Objects[item->objectNumber].hitPoints;
+				item->TargetState = STATE_MUMMY_GET_UP;
+				item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 			}
 			break;
 
@@ -247,28 +247,28 @@ void MummyControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->pos.yRot += ANGLE(7);
+					item->Position.yRot += ANGLE(7);
 				}
 				else
 				{
-					item->pos.yRot -= ANGLE(7);
+					item->Position.yRot -= ANGLE(7);
 				}
 			}
 			else
 			{
-				item->pos.yRot += info.angle;
+				item->Position.yRot += info.angle;
 			}
 			if (!creature->flags)
 			{
 
-				if (item->touchBits & 0x4800)
+				if (item->TouchBits & 0x4800)
 				{
-					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase && item->frameNumber < g_Level.Anims[item->animNumber].frameEnd)
+					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase && item->FrameNumber < g_Level.Anims[item->AnimNumber].frameEnd)
 					{
-						LaraItem->hitPoints -= 100;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 100;
+						LaraItem->HitStatus = true;
 
-						if (item->animNumber == Objects[item->objectNumber].animIndex + ANIMATION_MUMMY_HIT_LEFT)
+						if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + ANIMATION_MUMMY_HIT_LEFT)
 						{
 							CreatureEffect2(
 								item,

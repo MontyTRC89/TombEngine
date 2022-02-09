@@ -44,16 +44,16 @@ void AbortionControl(short itemNum)
 	short head, angle;
 
 	item = &g_Level.Items[itemNum];
-	abort = (CREATURE_INFO*)item->data;
+	abort = (CREATURE_INFO*)item->Data;
 	head = angle = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->activeState != ABORT_DEATH)
+		if (item->ActiveState != ABORT_DEATH)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + ABORT_DIE_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->activeState = ABORT_DEATH;
+			item->AnimNumber = Objects[item->ObjectNumber].animIndex + ABORT_DIE_ANIM;
+			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->ActiveState = ABORT_DEATH;
 		}
 	}
 	else
@@ -66,116 +66,116 @@ void AbortionControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = (short)phd_atan(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
+		angle = (short)phd_atan(abort->target.z - item->Position.zPos, abort->target.x - item->Position.xPos) - item->Position.yRot;
 
-		if (item->touchBits)
+		if (item->TouchBits)
 		{
-			LaraItem->hitPoints -= ABORT_TOUCH_DAMAGE;
-			LaraItem->hitStatus = true;
+			LaraItem->HitPoints -= ABORT_TOUCH_DAMAGE;
+			LaraItem->HitStatus = true;
 		}
 
-		switch (item->activeState)
+		switch (item->ActiveState)
 		{
 		case ABORT_SET:
-			item->targetState = ABORT_FALL;
+			item->TargetState = ABORT_FALL;
 			item->Airborne = true;
 			break;
 
 		case ABORT_STOP:
-			if (LaraItem->hitPoints <= 0)
+			if (LaraItem->HitPoints <= 0)
 				break;
 
 			abort->flags = 0;
 			if (angle > ABORT_NEED_TURN)
-				item->targetState = ABORT_TURNR;
+				item->TargetState = ABORT_TURNR;
 			else if (angle < -ABORT_NEED_TURN)
-				item->targetState = ABORT_TURNL;
+				item->TargetState = ABORT_TURNL;
 			else if (info.distance < ABORT_ATTACK_RANGE)
 			{
-				if (LaraItem->hitPoints <= ABORT_ATTACK_DAMAGE)
+				if (LaraItem->HitPoints <= ABORT_ATTACK_DAMAGE)
 				{
 					if (info.distance < ABORT_CLOSE_RANGE)
-						item->targetState = ABORT_ATTACK3;
+						item->TargetState = ABORT_ATTACK3;
 					else
-						item->targetState = ABORT_FORWARD;
+						item->TargetState = ABORT_FORWARD;
 				}
 				else if (GetRandomControl() < 0x4000)
-					item->targetState = ABORT_ATTACK1;
+					item->TargetState = ABORT_ATTACK1;
 				else
-					item->targetState = ABORT_ATTACK2;
+					item->TargetState = ABORT_ATTACK2;
 			}
 			else
-				item->targetState = ABORT_FORWARD;
+				item->TargetState = ABORT_FORWARD;
 			break;
 
 		case ABORT_FORWARD:
 			if (angle < -ABORT_TURN)
-				item->targetState -= ABORT_TURN;
+				item->TargetState -= ABORT_TURN;
 			else if (angle > ABORT_TURN)
-				item->targetState += ABORT_TURN;
+				item->TargetState += ABORT_TURN;
 			else
-				item->targetState += angle;
+				item->TargetState += angle;
 
 			if (angle > ABORT_NEED_TURN || angle < -ABORT_NEED_TURN)
-				item->targetState = ABORT_STOP;
+				item->TargetState = ABORT_STOP;
 			else if (info.distance < ABORT_ATTACK_RANGE)
-				item->targetState = ABORT_STOP;
+				item->TargetState = ABORT_STOP;
 			break;
 
 		case ABORT_TURNR:
 			if (!abort->flags)
-				abort->flags = item->frameNumber;
-			else if (item->frameNumber - abort->flags > 16 && item->frameNumber - abort->flags < 23)
-				item->pos.yRot += ANGLE(14);
+				abort->flags = item->FrameNumber;
+			else if (item->FrameNumber - abort->flags > 16 && item->FrameNumber - abort->flags < 23)
+				item->Position.yRot += ANGLE(14);
 
 			if (angle < ABORT_NEED_TURN)
-				item->targetState = ABORT_STOP;
+				item->TargetState = ABORT_STOP;
 			break;
 
 		case ABORT_TURNL:
 			if (!abort->flags)
-				abort->flags = item->frameNumber;
-			else if (item->frameNumber - abort->flags > 13 && item->frameNumber - abort->flags < 23)
-				item->pos.yRot -= ANGLE(9);
+				abort->flags = item->FrameNumber;
+			else if (item->FrameNumber - abort->flags > 13 && item->FrameNumber - abort->flags < 23)
+				item->Position.yRot -= ANGLE(9);
 
 			if (angle > -ABORT_NEED_TURN)
-				item->targetState = ABORT_STOP;
+				item->TargetState = ABORT_STOP;
 			break;
 
 		case ABORT_ATTACK1:
-			if (!abort->flags && (item->touchBits & ABORT_TRIGHT))
+			if (!abort->flags && (item->TouchBits & ABORT_TRIGHT))
 			{
-				LaraItem->hitPoints -= ABORT_ATTACK_DAMAGE;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= ABORT_ATTACK_DAMAGE;
+				LaraItem->HitStatus = true;
 				abort->flags = 1;
 			}
 			break;
 
 		case ABORT_ATTACK2:
-			if (!abort->flags && (item->touchBits & ABORT_TOUCH))
+			if (!abort->flags && (item->TouchBits & ABORT_TOUCH))
 			{
-				LaraItem->hitPoints -= ABORT_ATTACK_DAMAGE;
-				LaraItem->hitStatus = true;
+				LaraItem->HitPoints -= ABORT_ATTACK_DAMAGE;
+				LaraItem->HitStatus = true;
 				abort->flags = 1;
 			}
 			break;
 
 		case ABORT_ATTACK3:
-			if (item->touchBits & ABORT_TRIGHT || LaraItem->hitPoints <= 0)
+			if (item->TouchBits & ABORT_TRIGHT || LaraItem->HitPoints <= 0)
 			{
-				item->targetState = ABORT_KILL;
+				item->TargetState = ABORT_KILL;
 
-				LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->activeState = LaraItem->targetState = 46;
-				LaraItem->roomNumber = item->roomNumber;
-				LaraItem->pos.xPos = item->pos.xPos;
-				LaraItem->pos.yPos = item->pos.yPos;
-				LaraItem->pos.zPos = item->pos.zPos;
-				LaraItem->pos.yRot = item->pos.yRot;
-				LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
+				LaraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
+				LaraItem->ActiveState = LaraItem->TargetState = 46;
+				LaraItem->RoomNumber = item->RoomNumber;
+				LaraItem->Position.xPos = item->Position.xPos;
+				LaraItem->Position.yPos = item->Position.yPos;
+				LaraItem->Position.zPos = item->Position.zPos;
+				LaraItem->Position.yRot = item->Position.yRot;
+				LaraItem->Position.xRot = LaraItem->Position.zRot = 0;
 				LaraItem->Airborne = false;
-				LaraItem->hitPoints = -1;
+				LaraItem->HitPoints = -1;
 				Lara.air = -1;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.gunType = WEAPON_NONE;
@@ -194,29 +194,29 @@ void AbortionControl(short itemNum)
 
 	CreatureJoint(item, 0, head);
 
-	if (item->activeState == ABORT_FALL)
+	if (item->ActiveState == ABORT_FALL)
 	{
 		AnimateItem(item);
 
-		if (item->pos.yPos > item->floor)
+		if (item->Position.yPos > item->Floor)
 		{
-			item->targetState = ABORT_STOP;
+			item->TargetState = ABORT_STOP;
 			item->Airborne = false;
-			item->pos.yPos = item->floor;
+			item->Position.yPos = item->Floor;
 			Camera.bounce = 500;
 		}
 	}
 	else
 		CreatureAnimation(itemNum, 0, 0);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->Status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(171, &item->pos, NULL);
+		SoundEffect(171, &item->Position, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
 
 		TestTriggers(item, true);
 
 		KillItem(itemNum);
-		item->status = ITEM_DEACTIVATED;
+		item->Status = ITEM_DEACTIVATED;
 	}
 }

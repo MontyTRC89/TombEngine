@@ -16,14 +16,14 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ITEM_INFO* item)
 	{
-		if (!item->data.is<LaraInfo*>())
+		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->data;
+		auto lara = (LaraInfo*&)item->Data;
 
 		if (!lara->burn && !lara->burnSmoke)
 		{
-			short fxNum = CreateNewEffect(item->roomNumber);
+			short fxNum = CreateNewEffect(item->RoomNumber);
 			if (fxNum != NO_ITEM)
 			{
 				EffectList[fxNum].objectNumber = ID_FLAME;
@@ -34,23 +34,23 @@ namespace TEN::Effects::Lara
 
 	void LavaBurn(ITEM_INFO* item)
 	{
-		if (!item->data.is<LaraInfo*>())
+		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->data;
+		auto lara = (LaraInfo*&)item->Data;
 
-		if (item->hitPoints >= 0 && lara->waterStatus != LW_FLYCHEAT)
+		if (item->HitPoints >= 0 && lara->waterStatus != LW_FLYCHEAT)
 		{
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, 32000, item->pos.zPos, &roomNumber);
-			if (item->floor == GetFloorHeight(floor, item->pos.xPos, 32000, item->pos.zPos))
+			short roomNumber = item->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(item->Position.xPos, 32000, item->Position.zPos, &roomNumber);
+			if (item->Floor == GetFloorHeight(floor, item->Position.xPos, 32000, item->Position.zPos))
 			{
 				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
 				//				KayakLaraRapidsDrown();
 				//			else
 				//			{
-				item->hitPoints = -1;
-				item->hitStatus = true;
+				item->HitPoints = -1;
+				item->HitStatus = true;
 				LaraBurn(item);
 				//			}
 			}
@@ -59,31 +59,31 @@ namespace TEN::Effects::Lara
 
 	void LaraBreath(ITEM_INFO* item)
 	{
-		if (!item->data.is<LaraInfo*>())
+		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->data;
+		auto lara = (LaraInfo*&)item->Data;
 
-		if (lara->waterStatus == LARA_WATER_STATUS::LW_UNDERWATER || item->hitPoints <= 0)
+		if (lara->waterStatus == LARA_WATER_STATUS::LW_UNDERWATER || item->HitPoints <= 0)
 			return;
 
 		if (!TestEnvironment(ENV_FLAG_COLD, item))
 			return;
 
-		switch (item->animNumber)
+		switch (item->AnimNumber)
 		{
 		case LA_STAND_IDLE:
-			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
+			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
 		case LA_CROUCH_IDLE:
-			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
+			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
 		case LA_CRAWL_IDLE:
-			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
+			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
 
@@ -92,8 +92,8 @@ namespace TEN::Effects::Lara
 				return;
 		}
 
-		float z = std::sin(TO_RAD(item->pos.yRot)) * -64.0f;
-		float x = std::cos(TO_RAD(item->pos.yRot)) * -64.0f;
+		float z = std::sin(TO_RAD(item->Position.yRot)) * -64.0f;
+		float x = std::cos(TO_RAD(item->Position.yRot)) * -64.0f;
 		auto offset = PHD_VECTOR(0, -4, 64);
 
 		GetLaraJointPosition(&offset, LM_HEAD);
@@ -103,6 +103,6 @@ namespace TEN::Effects::Lara
 			(GetRandomControl() & 7) - 4);
 
 		GetLaraJointPosition(&seed, LM_HEAD);
-		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->pos.yRot);
+		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Position.yRot);
 	}
 }
