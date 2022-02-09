@@ -619,12 +619,12 @@ void lara_as_slopeshimmy(ITEM_INFO* lara, COLL_INFO* coll)
 
 	if (lara->AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
-		info->moveAngle = lara->Position.yRot - 16384;
+		info->Control.MoveAngle = lara->Position.yRot - 16384;
 		Camera.targetAngle = -4096;
 	}
 	else
 	{
-		info->moveAngle = lara->Position.yRot + 16384;
+		info->Control.MoveAngle = lara->Position.yRot + 16384;
 		Camera.targetAngle = 4096;
 	}
 }
@@ -1150,7 +1150,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 			}
 		}
 
-		if (Lara.canMonkeySwing)
+		if (Lara.Control.CanMonkeySwing)
 		{
 			// Additional overhang ladder tests
 

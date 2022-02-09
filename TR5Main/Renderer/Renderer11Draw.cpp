@@ -2116,7 +2116,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara.gunType: %d", Lara.gunType);
 				PrintDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
 				PrintDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
-				PrintDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
+				PrintDebugMessage("Lara.Control.CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
 				break;
 

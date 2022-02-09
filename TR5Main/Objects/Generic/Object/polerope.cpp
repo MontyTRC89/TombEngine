@@ -36,7 +36,7 @@ namespace TEN::Entities::Generic
 			TrInput & IN_ACTION && 
 			!Lara.gunStatus && 
 			l->ActiveState == LS_IDLE && 
-			l->AnimNumber == LA_STAND_IDLE || Lara.isMoving &&
+			l->AnimNumber == LA_STAND_IDLE || Lara.Control.IsMoving &&
 			Lara.interactedItem == itemNumber)
 		{
 			short rot = item->Position.yRot;
@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 					l->AnimNumber = LA_STAND_TO_POLE;
 					l->ActiveState = LS_POLE_IDLE;
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 				}
 				else
@@ -60,9 +60,9 @@ namespace TEN::Entities::Generic
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNumber)
+				if (Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->Position.yRot = rot;

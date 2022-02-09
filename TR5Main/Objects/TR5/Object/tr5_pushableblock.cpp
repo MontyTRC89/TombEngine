@@ -383,7 +383,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| Lara.gunStatus
 		|| item->Status == ITEM_INVISIBLE
 		|| item->TriggerFlags < 0)
-		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
+		&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
 	{
 		if ((l->ActiveState != LS_PUSHABLE_GRAB
 			|| (l->FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
@@ -484,7 +484,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->ActiveState = LS_PUSHABLE_GRAB;
 				l->TargetState = LS_PUSHABLE_GRAB;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				Lara.nextCornerPos.xPos = itemNum;
 				item->Position.yRot = rot;
@@ -497,7 +497,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					l->ActiveState = LS_PUSHABLE_GRAB;
 					l->TargetState = LS_PUSHABLE_GRAB;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					Lara.nextCornerPos.xPos = itemNum;
 					item->Position.yRot = rot;
@@ -511,9 +511,9 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 		else
 		{
-			if (Lara.isMoving && Lara.interactedItem == itemNum)
+			if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 			item->Position.yRot = rot;

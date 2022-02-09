@@ -1534,8 +1534,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->Position.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.moveAngle) - item->Position.xPos - obj->pivotLength * phd_sin(item->Position.yRot);
-		z = enemy->Position.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.moveAngle) - item->Position.zPos - obj->pivotLength * phd_cos(item->Position.yRot);
+		x = enemy->Position.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Position.xPos - obj->pivotLength * phd_sin(item->Position.yRot);
+		z = enemy->Position.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Position.zPos - obj->pivotLength * phd_cos(item->Position.yRot);
 	}
 	else
 	{
@@ -1565,7 +1565,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 	z = abs(z);
 
 	// Makes Lara smaller
-	if (enemy == LaraItem && ((LaraInfo*)enemy)->isLow)
+	if (enemy == LaraItem && ((LaraInfo*)enemy)->Control.IsLow)
 		y -= STEPUP_HEIGHT;
 
 	if (x > z)

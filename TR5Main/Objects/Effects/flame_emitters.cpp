@@ -704,7 +704,7 @@ namespace TEN::Entities::Effects
 
 				l->ActiveState = LS_MISC_CONTROL;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				Lara.Flare.FlareControlLeft = false;
+				Lara.Flare.ControlLeft = false;
 				Lara.leftArm.lock = true;
 				Lara.interactedItem = itemNumber;
 			}

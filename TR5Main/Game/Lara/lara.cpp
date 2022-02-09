@@ -415,18 +415,18 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			item->HitPoints -= info->poisoned >> 8;
 	}
 
-	if (info->isMoving)
+	if (info->Control.IsMoving)
 	{
-		if (info->moveCount > 90)
+		if (info->Control.MoveCount > 90)
 		{
-			info->isMoving = false;
+			info->Control.IsMoving = false;
 			info->gunStatus = LG_HANDS_FREE;
 		}
 
-		++info->moveCount;
+		++info->Control.MoveCount;
 	}
 
-	if (!info->uncontrollable)
+	if (!info->Control.Uncontrollable)
 		info->locationPad = 128;
 
 	int oldX = item->Position.xPos;
@@ -446,7 +446,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->ActiveState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
 		info->sprintTimer++;
 
-	info->isLow = false;
+	info->Control.IsLow = false;
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
@@ -573,7 +573,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->Position.zRot = 0;
 						item->Position.xRot = 0;
 						info->waterStatus = LW_SURFACE;
-						info->diveCount = 11;
+						info->Control.DiveCount = 11;
 						ResetLaraFlex(item);
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
@@ -589,7 +589,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->Position.zRot = 0;
 				item->Position.xRot = 0;
 				info->waterStatus = LW_SURFACE;
-				info->diveCount = 11;
+				info->Control.DiveCount = 11;
 				ResetLaraFlex(item);
 
 				UpdateItemRoom(item, 0);
@@ -639,7 +639,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->VerticalVelocity = 0;
 					item->Position.zRot = 0;
 					item->Position.xRot = 0;
-					info->diveCount = 0;
+					info->Control.DiveCount = 0;
 					ResetLaraFlex(item);
 
 					UpdateItemRoom(item, 0);
@@ -661,13 +661,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->HitPoints = -1;
 
-		if (info->deathCount == 0)
+		if (info->Control.DeathCount == 0)
 			StopSoundTracks();
 
-		info->deathCount++;
+		info->Control.DeathCount++;
 		if ((item->Flags & 0x100))
 		{
-			info->deathCount++;
+			info->Control.DeathCount++;
 
 			return;
 		}
@@ -769,7 +769,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	if (TrInput & IN_LOOK && info->look &&
+	if (TrInput & IN_LOOK && info->Control.CanLook &&
 		info->ExtraAnim == NO_ITEM)
 	{
 		LookLeftRight();
@@ -780,7 +780,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Move radius and height default resets above look checks when
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
-	info->look = true;
+	info->Control.CanLook = true;
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
@@ -917,13 +917,13 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
 
-	if (TrInput & IN_LOOK && info->look)
+	if (TrInput & IN_LOOK && info->Control.CanLook)
 		LookLeftRight();
 	else
 		ResetLook(item);
 
-	info->look = true;
-	info->poseCount = 0;
+	info->Control.CanLook = true;
+	info->Control.PoseCount = 0;
 
 	lara_control_routines[item->ActiveState](item, coll);
 
@@ -931,26 +931,26 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (level->LaraType == LaraType::Divesuit)
 	{
-		if (info->turnRate < -ANGLE(0.5f))
-			info->turnRate += ANGLE(0.5f);
-		else if (info->turnRate > ANGLE(0.5f))
-			info->turnRate -= ANGLE(0.5f);
+		if (info->Control.TurnRate < -ANGLE(0.5f))
+			info->Control.TurnRate += ANGLE(0.5f);
+		else if (info->Control.TurnRate > ANGLE(0.5f))
+			info->Control.TurnRate -= ANGLE(0.5f);
 		else
-			info->turnRate = 0;
+			info->Control.TurnRate = 0;
 	}
-	else if (info->turnRate < -ANGLE(2.0f))
-		info->turnRate += ANGLE(2.0f);
-	else if (info->turnRate > ANGLE(2.0f))
-		info->turnRate -= ANGLE(2.0f);
+	else if (info->Control.TurnRate < -ANGLE(2.0f))
+		info->Control.TurnRate += ANGLE(2.0f);
+	else if (info->Control.TurnRate > ANGLE(2.0f))
+		info->Control.TurnRate -= ANGLE(2.0f);
 	else
-		info->turnRate = 0;
+		info->Control.TurnRate = 0;
 
-	item->Position.yRot += info->turnRate;
+	item->Position.yRot += info->Control.TurnRate;
 
 	if (level->LaraType == LaraType::Divesuit)
 		UpdateSubsuitAngles();
 
-	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
 		if (abs(item->Position.zRot) > 0)
 			item->Position.zRot += item->Position.zRot / -8;
@@ -1026,17 +1026,17 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
-	if (TrInput & IN_LOOK && info->look)
+	if (TrInput & IN_LOOK && info->Control.CanLook)
 		LookLeftRight();
 	else
 		ResetLook(item);
 
-	info->look = true;
-	info->poseCount = 0;
+	info->Control.CanLook = true;
+	info->Control.PoseCount = 0;
 
 	lara_control_routines[item->ActiveState](item, coll);
 
-	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 	{
 		if (abs(item->Position.zRot) > 0)
 			item->Position.zRot += item->Position.zRot / -8;
@@ -1047,8 +1047,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	AnimateLara(item);
 
-	item->Position.xPos += item->VerticalVelocity * phd_sin(info->moveAngle) / 4;
-	item->Position.zPos += item->VerticalVelocity * phd_cos(info->moveAngle) / 4;
+	item->Position.xPos += item->VerticalVelocity * phd_sin(info->Control.MoveAngle) / 4;
+	item->Position.zPos += item->VerticalVelocity * phd_cos(info->Control.MoveAngle) / 4;
 
 	DoObjectCollision(item, coll);
 

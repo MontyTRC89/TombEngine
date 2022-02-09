@@ -790,7 +790,7 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
 			UndrawFlareMeshes(l);
-			Lara.Flare.FlareControlLeft = false;
+			Lara.Flare.ControlLeft = false;
 			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
 		}
 

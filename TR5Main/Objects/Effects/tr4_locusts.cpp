@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
                 //if (LaraItem == nullptr)
                 //    LaraItem = LaraItem;
 
-                if ((Lara.keepLow || LaraItem->HitPoints <= 0)
+                if ((Lara.Control.KeepLow || LaraItem->HitPoints <= 0)
                     && locust->counter >= 90
                     && !(GetRandomControl() & 7))
                     locust->counter = 90;

@@ -131,7 +131,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Has Lara control been disabled?
-		if (Lara.uncontrollable || CurrentLevel == 0)
+		if (Lara.Control.Uncontrollable || CurrentLevel == 0)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
@@ -195,7 +195,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		int oldInput = TrInput;
 
 		// Is Lara dead?
-		if (CurrentLevel != 0 && (Lara.deathCount > 300 || Lara.deathCount > 60 && TrInput))
+		if (CurrentLevel != 0 && (Lara.Control.DeathCount > 300 || Lara.Control.DeathCount > 60 && TrInput))
 		{
 			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
 		}
@@ -213,7 +213,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->ActiveState != LS_IDLE || LaraItem->AnimNumber != LA_STAND_IDLE) && (!Lara.isLow || TrInput & IN_CROUCH || LaraItem->AnimNumber != LA_CROUCH_IDLE || LaraItem->TargetState != LS_CROUCH_IDLE)))
+				((LaraItem->ActiveState != LS_IDLE || LaraItem->AnimNumber != LA_STAND_IDLE) && (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->AnimNumber != LA_CROUCH_IDLE || LaraItem->TargetState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -232,7 +232,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						LaserSight = false;
 						AlterFOV(ANGLE(80));
 						LaraItem->MeshBits = 0xFFFFFFFF;
-						Lara.busy = false;
+						Lara.Control.IsBusy = false;
 						Camera.type = BinocularOldCamera;
 
 						ResetLaraFlex(LaraItem);
@@ -258,7 +258,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
 
-					Lara.busy = true;
+					Lara.Control.IsBusy = true;
 					LaserSight = true;
 				}
 			}
@@ -1070,7 +1070,7 @@ void CleanUp()
 
 	// Needs to be cleared or otherwise controls will lockup if user will exit to title
 	// while playing flyby with locked controls
-	Lara.uncontrollable = false;
+	Lara.Control.Uncontrollable = false;
 
 	// Weather.Clear resets lightning and wind parameters so user won't see prev weather in new level
 	Weather.Clear();

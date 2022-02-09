@@ -44,7 +44,7 @@ namespace TEN::Entities::Switches
 			|| l->ActiveState != LS_IDLE
 			|| l->AnimNumber != LA_STAND_IDLE
 			|| Lara.gunStatus)
-			&& (!Lara.isMoving
+			&& (!Lara.Control.IsMoving
 				|| Lara.interactedItem != itemNum))
 		{
 			ObjectCollision(itemNum, l, coll);
@@ -67,9 +67,9 @@ namespace TEN::Entities::Switches
 						Lara.interactedItem = itemNum;
 					}
 				}
-				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 
@@ -81,7 +81,7 @@ namespace TEN::Entities::Switches
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					l->TargetState = LS_LEVERSWITCH_PUSH;
 					l->ActiveState = LS_LEVERSWITCH_PUSH;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -106,7 +106,7 @@ namespace TEN::Entities::Switches
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					l->TargetState = LS_LEVERSWITCH_PUSH;
 					l->ActiveState = LS_LEVERSWITCH_PUSH;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
 					Lara.gunStatus = LG_HANDS_BUSY;
 
@@ -119,11 +119,11 @@ namespace TEN::Entities::Switches
 					Lara.interactedItem = itemNum;
 				}
 			}
-			else if (Lara.isMoving)
+			else if (Lara.Control.IsMoving)
 			{
 				if (Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}

@@ -52,7 +52,7 @@ namespace TEN::Entities::Doors
 			&& item->Status != ITEM_ACTIVE
 			&& !(l->HitStatus)
 			&& !Lara.gunStatus
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			bool pull = false;
 
@@ -116,13 +116,13 @@ namespace TEN::Entities::Doors
 					item->Status = ITEM_ACTIVE;
 					l->ActiveState = LS_MISC_CONTROL;
 					l->TargetState = LS_IDLE;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 				}
 			}
-			else if (Lara.isMoving && Lara.interactedItem == itemNum)
+			else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 

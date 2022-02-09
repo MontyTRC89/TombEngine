@@ -112,7 +112,7 @@ namespace TEN::Entities::Switches
 			&& l->AnimNumber == LA_UNDERWATER_IDLE
 			&& !Lara.gunStatus
 			&& (item->ActiveState == SWITCH_OFF)
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, item, l))
 			{
@@ -142,7 +142,7 @@ namespace TEN::Entities::Switches
 				l->AnimNumber = LA_UNDERWATER_CEILING_SWITCH_PULL;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->VerticalVelocity = 0;
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_BUSY;
 				item->TargetState = SWITCH_ON;
 				item->Status = ITEM_ACTIVE;

@@ -28,7 +28,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		l->ActiveState == LS_IDLE &&
 		l->AnimNumber == LA_STAND_IDLE &&
 		Lara.gunStatus == LG_HANDS_FREE ||
-		Lara.isMoving && Lara.interactedItem == itemNum)
+		Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 	{
 		if (TestLaraPosition(&SarcophagusBounds, item, l))
 		{
@@ -42,7 +42,7 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				AddActiveItem(itemNum);
 				item->Status = ITEM_ACTIVE;
 
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 				Lara.gunStatus = LG_HANDS_BUSY;
 			}
@@ -51,11 +51,11 @@ void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.interactedItem = itemNum;
 			}
 		}
-		else if (Lara.isMoving)
+		else if (Lara.Control.IsMoving)
 		{
 			if (Lara.interactedItem == itemNum)
 			{
-				Lara.isMoving = false;
+				Lara.Control.IsMoving = false;
 				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}

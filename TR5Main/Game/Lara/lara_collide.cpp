@@ -56,7 +56,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-		if (!Lara.climbStatus || item->Velocity != 2)
+		if (!Lara.Control.CanClimbLadder || item->Velocity != 2)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
@@ -67,7 +67,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, COLL_INFO* coll)
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 
 			item->Velocity /= 4;
-			Lara.moveAngle += ANGLE(180.0f);
+			Lara.Control.MoveAngle += ANGLE(180.0f);
 
 			if (item->VerticalVelocity <= 0)
 				item->VerticalVelocity = 1;
@@ -415,11 +415,11 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 {
 	LaraInfo*& info = item->Data;
 
-	info->moveAngle = moveAngle;
+	info->Control.MoveAngle = moveAngle;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
@@ -434,7 +434,7 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 
 void LaraSurfaceCollision(ITEM_INFO* item, COLL_INFO* coll)
 {
-	coll->Setup.ForwardAngle = Lara.moveAngle;
+	coll->Setup.ForwardAngle = Lara.Control.MoveAngle;
 
 	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_SURFSWIM, 0));
 	ShiftItem(item, coll);
@@ -476,12 +476,12 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->Position.xRot < -ANGLE(90.0f) ||
 		item->Position.xRot > ANGLE(90.0f))
 	{
-		Lara.moveAngle = item->Position.yRot + ANGLE(180.0f);
+		Lara.Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 		coll->Setup.ForwardAngle = item->Position.yRot - ANGLE(180.0f);
 	}
 	else
 	{
-		Lara.moveAngle = item->Position.yRot;
+		Lara.Control.MoveAngle = item->Position.yRot;
 		coll->Setup.ForwardAngle = item->Position.yRot;
 	}
 

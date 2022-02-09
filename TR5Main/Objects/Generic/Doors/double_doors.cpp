@@ -43,7 +43,7 @@ namespace TEN::Entities::Doors
 			&& !(item->Status && item->Airborne)
 			&& !(l->HitStatus)
 			&& !Lara.gunStatus
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			item->Position.yRot ^= ANGLE(180);
 			if (TestLaraPosition(&DoubleDoorBounds, item, l))
@@ -55,7 +55,7 @@ namespace TEN::Entities::Doors
 					AddActiveItem(itemNum);
 
 					item->Status = ITEM_ACTIVE;
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_BUSY;
 					ResetLaraFlex(l);
 				}
@@ -67,9 +67,9 @@ namespace TEN::Entities::Doors
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
-					Lara.isMoving = false;
+					Lara.Control.IsMoving = false;
 					Lara.gunStatus = LG_HANDS_FREE;
 				}
 				item->Position.yRot ^= ANGLE(180);
