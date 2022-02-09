@@ -296,27 +296,27 @@ void PistolHandler(LARA_WEAPON_TYPE weaponType)
 
 	if (Lara.leftArm.lock && !Lara.rightArm.lock)
 	{
-		Lara.extraTorsoRot.y = Lara.leftArm.yRot / 2;
-		Lara.extraTorsoRot.x = Lara.leftArm.xRot / 2;
+		Lara.ExtraTorsoRot.y = Lara.leftArm.yRot / 2;
+		Lara.ExtraTorsoRot.x = Lara.leftArm.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			Lara.extraHeadRot = Lara.extraTorsoRot;
+			Lara.ExtraHeadRot = Lara.ExtraTorsoRot;
 	}
 	else if (!Lara.leftArm.lock && Lara.rightArm.lock)
 	{
-		Lara.extraTorsoRot.y = Lara.rightArm.yRot / 2;
-		Lara.extraTorsoRot.x = Lara.rightArm.xRot / 2;
+		Lara.ExtraTorsoRot.y = Lara.rightArm.yRot / 2;
+		Lara.ExtraTorsoRot.x = Lara.rightArm.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			Lara.extraHeadRot = Lara.extraTorsoRot;
+			Lara.ExtraHeadRot = Lara.ExtraTorsoRot;
 	}
 	else if (Lara.leftArm.lock && Lara.rightArm.lock)
 	{
-		Lara.extraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
-		Lara.extraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.ExtraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
+		Lara.ExtraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			Lara.extraHeadRot = Lara.extraTorsoRot;
+			Lara.ExtraHeadRot = Lara.ExtraTorsoRot;
 
 	}
 
@@ -475,10 +475,10 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 	if (!(TrInput & IN_LOOK))
 	{
-		Lara.extraHeadRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
-		Lara.extraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
-		Lara.extraHeadRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
-		Lara.extraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
+		Lara.ExtraHeadRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.ExtraTorsoRot.x = (Lara.leftArm.xRot + Lara.rightArm.xRot) / 4;
+		Lara.ExtraHeadRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
+		Lara.ExtraTorsoRot.y = (Lara.leftArm.yRot + Lara.rightArm.yRot) / 4;
 	}
 }
 

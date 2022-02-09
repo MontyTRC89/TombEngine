@@ -120,13 +120,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
-	info->extraTorsoRot.z += std::min(abs(rate), abs(maxAngle - info->extraTorsoRot.z) / 6) * sign;
+	info->ExtraTorsoRot.z += std::min(abs(rate), abs(maxAngle - info->ExtraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->ActiveState != LS_CRAWL_BACK)
 	{
-		info->extraHeadRot.z = info->extraTorsoRot.z / 2;
-		info->extraHeadRot.y = info->extraHeadRot.z;
+		info->ExtraHeadRot.z = info->ExtraTorsoRot.z / 2;
+		info->ExtraHeadRot.y = info->ExtraHeadRot.z;
 	}
 }
 
@@ -311,36 +311,36 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 	LaraInfo*& info = item->Data;
 
 	// Reset head.
-	if (abs(info->extraHeadRot.x) > ANGLE(0.1f))
-		info->extraHeadRot.x += info->extraHeadRot.x / -rate;
+	if (abs(info->ExtraHeadRot.x) > ANGLE(0.1f))
+		info->ExtraHeadRot.x += info->ExtraHeadRot.x / -rate;
 	else
-		info->extraHeadRot.x = 0;
+		info->ExtraHeadRot.x = 0;
 
-	if (abs(info->extraHeadRot.y) > ANGLE(0.1f))
-		info->extraHeadRot.y += info->extraHeadRot.y / -rate;
+	if (abs(info->ExtraHeadRot.y) > ANGLE(0.1f))
+		info->ExtraHeadRot.y += info->ExtraHeadRot.y / -rate;
 	else
-		info->extraHeadRot.y = 0;
+		info->ExtraHeadRot.y = 0;
 
-	if (abs(info->extraHeadRot.z) > ANGLE(0.1f))
-		info->extraHeadRot.z += info->extraHeadRot.z / -rate;
+	if (abs(info->ExtraHeadRot.z) > ANGLE(0.1f))
+		info->ExtraHeadRot.z += info->ExtraHeadRot.z / -rate;
 	else
-		info->extraHeadRot.z = 0;
+		info->ExtraHeadRot.z = 0;
 
 	// Reset torso.
-	if (abs(info->extraTorsoRot.x) > ANGLE(0.1f))
-		info->extraTorsoRot.x += info->extraTorsoRot.x / -rate;
+	if (abs(info->ExtraTorsoRot.x) > ANGLE(0.1f))
+		info->ExtraTorsoRot.x += info->ExtraTorsoRot.x / -rate;
 	else
-		info->extraTorsoRot.x = 0;
+		info->ExtraTorsoRot.x = 0;
 
-	if (abs(info->extraTorsoRot.y) > ANGLE(0.1f))
-		info->extraTorsoRot.y += info->extraTorsoRot.y / -rate;
+	if (abs(info->ExtraTorsoRot.y) > ANGLE(0.1f))
+		info->ExtraTorsoRot.y += info->ExtraTorsoRot.y / -rate;
 	else
-		info->extraTorsoRot.y = 0;
+		info->ExtraTorsoRot.y = 0;
 
-	if (abs(info->extraTorsoRot.z) > ANGLE(0.1f))
-		info->extraTorsoRot.z += info->extraTorsoRot.z / -rate;
+	if (abs(info->ExtraTorsoRot.z) > ANGLE(0.1f))
+		info->ExtraTorsoRot.z += info->ExtraTorsoRot.z / -rate;
 	else
-		info->extraTorsoRot.z = 0;
+		info->ExtraTorsoRot.z = 0;
 }
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)

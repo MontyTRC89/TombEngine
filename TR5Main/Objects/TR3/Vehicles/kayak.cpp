@@ -1225,7 +1225,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
-			laraInfo->flareControlLeft = 0;
+			laraInfo->Flare.FlareControlLeft = 0;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}
 

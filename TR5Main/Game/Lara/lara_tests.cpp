@@ -184,9 +184,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
 	info->gunStatus = LG_HANDS_BUSY;
-	info->extraTorsoRot.x = 0;
-	info->extraTorsoRot.y = 0;
-	info->extraTorsoRot.z = 0;
+	info->ExtraTorsoRot.x = 0;
+	info->ExtraTorsoRot.y = 0;
+	info->ExtraTorsoRot.z = 0;
 
 	return true;
 }
@@ -1290,7 +1290,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&
 		info->gunStatus == LG_HANDS_FREE &&							// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->flareAge > 0) &&	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+		(info->gunType != WEAPON_FLARE || info->Flare.FlareAge > 0) &&	// Flare is not being handled. TODO: Will she pose with weapons drawn?
 		info->Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
@@ -1643,7 +1643,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 	if (info->gunStatus == LG_HANDS_FREE &&						// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->flareAge > 0))	// Not handling flare.
+		(info->gunType != WEAPON_FLARE || info->Flare.FlareAge > 0))	// Not handling flare.
 	{
 		return true;
 	}
@@ -1665,7 +1665,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 		!probe.Position.FloorSlope &&							// Not a slope.
 		info->waterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->flareAge > 0))	// Not handling flare.
+		(info->gunType != WEAPON_FLARE || info->Flare.FlareAge > 0))	// Not handling flare.
 	{
 		return true;
 	}
@@ -2218,7 +2218,7 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1.2f),
 		CLICK(1.5f),
 		-MAX_HEIGHT,
-		false
+		false, false
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
@@ -2236,7 +2236,7 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, COLL_INFO* coll)
 		CLICK(1.2f),
 		CLICK(1.5f),
 		NO_LOWER_BOUND,
-		false
+		false, false
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);

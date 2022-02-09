@@ -217,36 +217,42 @@ bool SaveGame::Save(int slot)
 	currentVel.add_z(Lara.currentVel.z);
 	auto currentVelOffset = currentVel.Finish();
 
-	Save::ExtraRotationBuilder extraHeadRot{ fbb };
-	extraHeadRot.add_x(Lara.extraHeadRot.x);
-	extraHeadRot.add_y(Lara.extraHeadRot.y);
-	extraHeadRot.add_z(Lara.extraHeadRot.z);
-	auto extraHeadRotOffset = extraHeadRot.Finish();
+	Save::ExtraRotationBuilder ExtraHeadRot{ fbb };
+	ExtraHeadRot.add_x(Lara.ExtraHeadRot.x);
+	ExtraHeadRot.add_y(Lara.ExtraHeadRot.y);
+	ExtraHeadRot.add_z(Lara.ExtraHeadRot.z);
+	auto ExtraHeadRotOffset = ExtraHeadRot.Finish();
 
-	Save::ExtraRotationBuilder extraTorsoRot{ fbb };
-	extraTorsoRot.add_x(Lara.extraTorsoRot.x);
-	extraTorsoRot.add_y(Lara.extraTorsoRot.y);
-	extraTorsoRot.add_z(Lara.extraTorsoRot.z);
-	auto extraTorsoRotOffset = extraTorsoRot.Finish();
+	Save::ExtraRotationBuilder ExtraTorsoRot{ fbb };
+	ExtraTorsoRot.add_x(Lara.ExtraTorsoRot.x);
+	ExtraTorsoRot.add_y(Lara.ExtraTorsoRot.y);
+	ExtraTorsoRot.add_z(Lara.ExtraTorsoRot.z);
+	auto ExtraTorsoRotOffset = ExtraTorsoRot.Finish();
 
-	Save::LaraRopeBuilder ropeParameters{ fbb };
-	ropeParameters.add_segment(Lara.ropeParameters.Segment);
-	ropeParameters.add_direction(Lara.ropeParameters.Direction);
-	ropeParameters.add_arc_front(Lara.ropeParameters.ArcFront);
-	ropeParameters.add_arc_back(Lara.ropeParameters.ArcBack);
-	ropeParameters.add_last_x(Lara.ropeParameters.LastX);
-	ropeParameters.add_max_x_forward(Lara.ropeParameters.MaxXForward);
-	ropeParameters.add_max_x_backward(Lara.ropeParameters.MaxXBackward);
-	ropeParameters.add_dframe(Lara.ropeParameters.DFrame);
-	ropeParameters.add_frame(Lara.ropeParameters.Frame);
-	ropeParameters.add_frame_rate(Lara.ropeParameters.FrameRate);
-	ropeParameters.add_y(Lara.ropeParameters.Y);
-	ropeParameters.add_ptr(Lara.ropeParameters.Ptr);
-	ropeParameters.add_offset(Lara.ropeParameters.Offset);
-	ropeParameters.add_down_vel(Lara.ropeParameters.DownVel);
-	ropeParameters.add_flag(Lara.ropeParameters.Flag);
-	ropeParameters.add_count(Lara.ropeParameters.Count);
-	auto ropeParametersOffset = ropeParameters.Finish();
+	Save::FlareDataBuilder Flare{ fbb };
+	Flare.add_flare_age(Lara.Flare.FlareAge);
+	Flare.add_flare_frame(Lara.Flare.FlareFrame);
+	Flare.add_flare_control_left(Lara.Flare.FlareControlLeft);
+	auto FlareOffset = Flare.Finish();
+
+	Save::RopeControlDataBuilder RopeControlData{ fbb };
+	RopeControlData.add_segment(Lara.RopeControlData.Segment);
+	RopeControlData.add_direction(Lara.RopeControlData.Direction);
+	RopeControlData.add_arc_front(Lara.RopeControlData.ArcFront);
+	RopeControlData.add_arc_back(Lara.RopeControlData.ArcBack);
+	RopeControlData.add_last_x(Lara.RopeControlData.LastX);
+	RopeControlData.add_max_x_forward(Lara.RopeControlData.MaxXForward);
+	RopeControlData.add_max_x_backward(Lara.RopeControlData.MaxXBackward);
+	RopeControlData.add_dframe(Lara.RopeControlData.DFrame);
+	RopeControlData.add_frame(Lara.RopeControlData.Frame);
+	RopeControlData.add_frame_rate(Lara.RopeControlData.FrameRate);
+	RopeControlData.add_y(Lara.RopeControlData.Y);
+	RopeControlData.add_ptr(Lara.RopeControlData.Ptr);
+	RopeControlData.add_offset(Lara.RopeControlData.Offset);
+	RopeControlData.add_down_vel(Lara.RopeControlData.DownVel);
+	RopeControlData.add_flag(Lara.RopeControlData.Flag);
+	RopeControlData.add_count(Lara.RopeControlData.Count);
+	auto RopeControlDataOffset = RopeControlData.Finish();
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < NUM_WEAPONS; i++)
@@ -299,12 +305,10 @@ bool SaveGame::Save(int slot)
 	lara.add_extra_anim(Lara.ExtraAnim);
 	lara.add_examines(examinesOffset);
 	lara.add_examines_combo(examinesComboOffset);
-	lara.add_extra_head_rot(extraHeadRotOffset);
-	lara.add_extra_torso_rot(extraTorsoRotOffset);
+	lara.add_extra_head_rot(ExtraHeadRotOffset);
+	lara.add_extra_torso_rot(ExtraTorsoRotOffset);
 	lara.add_fired(Lara.fired);
-	lara.add_flare_age(Lara.flareAge);
-	lara.add_flare_control_left(Lara.flareControlLeft);
-	lara.add_flare_frame(Lara.flareFrame);
+	lara.add_flare(FlareOffset);
 	lara.add_gun_status(Lara.gunStatus);
 	lara.add_gun_type(Lara.gunType);
 	lara.add_has_beetle_things(Lara.hasBeetleThings);
@@ -348,7 +352,7 @@ bool SaveGame::Save(int slot)
 	lara.add_projected_floor_height(Lara.projectedFloorHeight);
 	lara.add_request_gun_type(Lara.requestGunType);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_rope_parameters(ropeParametersOffset);
+	lara.add_rope_control_data(RopeControlDataOffset);
 	lara.add_run_jump_count(Lara.runJumpCount);
 	lara.add_run_jump_queued(Lara.runJumpQueued);
 	lara.add_secrets(Lara.Secrets);
@@ -641,9 +645,9 @@ bool SaveGame::Save(int slot)
 	flatbuffers::Offset<Save::Pendulum> pendulumOffset;
 	flatbuffers::Offset<Save::Pendulum> alternatePendulumOffset;
 
-	if (Lara.ropeParameters.Ptr != -1)
+	if (Lara.RopeControlData.Ptr != -1)
 	{
-		ROPE_STRUCT* rope = &Ropes[Lara.ropeParameters.Ptr];
+		ROPE_STRUCT* rope = &Ropes[Lara.RopeControlData.Ptr];
 
 		std::vector<const Save::Vector3*> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
@@ -752,7 +756,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_sinks(sinksOffset);
 	sgb.add_flyby_cameras(flybyCamerasOffset);
 
-	if (Lara.ropeParameters.Ptr != -1)
+	if (Lara.RopeControlData.Ptr != -1)
 	{
 		sgb.add_rope(ropeOffset);
 		sgb.add_pendulum(pendulumOffset);
@@ -1192,16 +1196,16 @@ bool SaveGame::Load(int slot)
 	Lara.deathCount = s->lara()->death_count();
 	Lara.diveCount = s->lara()->dive_count();
 	Lara.ExtraAnim = s->lara()->extra_anim();
-	Lara.extraHeadRot.x = s->lara()->extra_head_rot()->x();
-	Lara.extraHeadRot.y = s->lara()->extra_head_rot()->y();
-	Lara.extraHeadRot.z = s->lara()->extra_head_rot()->z();
-	Lara.extraTorsoRot.x = s->lara()->extra_torso_rot()->x();
-	Lara.extraTorsoRot.y = s->lara()->extra_torso_rot()->y();
-	Lara.extraTorsoRot.z = s->lara()->extra_torso_rot()->z();
+	Lara.ExtraHeadRot.x = s->lara()->extra_head_rot()->x();
+	Lara.ExtraHeadRot.y = s->lara()->extra_head_rot()->y();
+	Lara.ExtraHeadRot.z = s->lara()->extra_head_rot()->z();
+	Lara.ExtraTorsoRot.x = s->lara()->extra_torso_rot()->x();
+	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
+	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
 	Lara.fired = s->lara()->fired();
-	Lara.flareAge = s->lara()->flare_age();
-	Lara.flareControlLeft = s->lara()->flare_control_left();
-	Lara.flareFrame = s->lara()->flare_frame();
+	Lara.Flare.FlareAge = s->lara()->flare()->flare_age();
+	Lara.Flare.FlareControlLeft = s->lara()->flare()->flare_control_left();
+	Lara.Flare.FlareFrame = s->lara()->flare()->flare_frame();
 	Lara.gunStatus = (LARA_GUN_STATUS)s->lara()->gun_status();
 	Lara.gunType = (LARA_WEAPON_TYPE)s->lara()->gun_type();
 	Lara.hasBeetleThings = s->lara()->has_beetle_things();
@@ -1261,22 +1265,22 @@ bool SaveGame::Load(int slot)
 	Lara.rightArm.xRot = s->lara()->right_arm()->x_rot();
 	Lara.rightArm.yRot = s->lara()->right_arm()->y_rot();
 	Lara.rightArm.zRot = s->lara()->right_arm()->z_rot();
-	Lara.ropeParameters.Segment = s->lara()->rope_parameters()->segment();
-	Lara.ropeParameters.Direction = s->lara()->rope_parameters()->direction();
-	Lara.ropeParameters.ArcFront = s->lara()->rope_parameters()->arc_front();
-	Lara.ropeParameters.ArcBack = s->lara()->rope_parameters()->arc_back();
-	Lara.ropeParameters.LastX = s->lara()->rope_parameters()->last_x();
-	Lara.ropeParameters.MaxXForward = s->lara()->rope_parameters()->max_x_forward();
-	Lara.ropeParameters.MaxXBackward = s->lara()->rope_parameters()->max_x_backward();
-	Lara.ropeParameters.DFrame = s->lara()->rope_parameters()->dframe();
-	Lara.ropeParameters.Frame = s->lara()->rope_parameters()->frame();
-	Lara.ropeParameters.FrameRate = s->lara()->rope_parameters()->frame_rate();
-	Lara.ropeParameters.Y = s->lara()->rope_parameters()->y();
-	Lara.ropeParameters.Ptr = s->lara()->rope_parameters()->ptr();
-	Lara.ropeParameters.Offset = s->lara()->rope_parameters()->offset();
-	Lara.ropeParameters.DownVel = s->lara()->rope_parameters()->down_vel();
-	Lara.ropeParameters.Flag = s->lara()->rope_parameters()->flag();
-	Lara.ropeParameters.Count = s->lara()->rope_parameters()->count();
+	Lara.RopeControlData.Segment = s->lara()->rope_control_data()->segment();
+	Lara.RopeControlData.Direction = s->lara()->rope_control_data()->direction();
+	Lara.RopeControlData.ArcFront = s->lara()->rope_control_data()->arc_front();
+	Lara.RopeControlData.ArcBack = s->lara()->rope_control_data()->arc_back();
+	Lara.RopeControlData.LastX = s->lara()->rope_control_data()->last_x();
+	Lara.RopeControlData.MaxXForward = s->lara()->rope_control_data()->max_x_forward();
+	Lara.RopeControlData.MaxXBackward = s->lara()->rope_control_data()->max_x_backward();
+	Lara.RopeControlData.DFrame = s->lara()->rope_control_data()->dframe();
+	Lara.RopeControlData.Frame = s->lara()->rope_control_data()->frame();
+	Lara.RopeControlData.FrameRate = s->lara()->rope_control_data()->frame_rate();
+	Lara.RopeControlData.Y = s->lara()->rope_control_data()->y();
+	Lara.RopeControlData.Ptr = s->lara()->rope_control_data()->ptr();
+	Lara.RopeControlData.Offset = s->lara()->rope_control_data()->offset();
+	Lara.RopeControlData.DownVel = s->lara()->rope_control_data()->down_vel();
+	Lara.RopeControlData.Flag = s->lara()->rope_control_data()->flag();
+	Lara.RopeControlData.Count = s->lara()->rope_control_data()->count();
 	Lara.runJumpCount = s->lara()->run_jump_count();
 	Lara.runJumpQueued = s->lara()->run_jump_queued();
 	Lara.Secrets = s->lara()->secrets();
@@ -1332,9 +1336,9 @@ bool SaveGame::Load(int slot)
 	}
 
 	// Rope
-	if (Lara.ropeParameters.Ptr >= 0)
+	if (Lara.RopeControlData.Ptr >= 0)
 	{
-		ROPE_STRUCT* rope = &Ropes[Lara.ropeParameters.Ptr];
+		ROPE_STRUCT* rope = &Ropes[Lara.RopeControlData.Ptr];
 		
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{

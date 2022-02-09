@@ -869,7 +869,7 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
-			laraInfo->flareControlLeft = false;
+			laraInfo->Flare.FlareControlLeft = false;
 			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
 		}
 
