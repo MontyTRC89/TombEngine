@@ -675,7 +675,6 @@
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
-    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="frameworkandsol.h" />
   </ItemGroup>
