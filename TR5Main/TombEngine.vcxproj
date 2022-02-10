@@ -200,7 +200,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
-    <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -575,14 +574,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
-    <ClCompile Include="Scripting\GameScriptAnimations.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">frameworkandsol.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
