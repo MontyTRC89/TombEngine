@@ -160,7 +160,7 @@ void ControlGladiator(short itemNumber)
 							&& unknown
 							&& distance < SQUARE(1536)
 							&& GetRandomControl() & 1
-							&& (Lara.gunType == WEAPON_SHOTGUN 
+							&& (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN 
 								|| !(GetRandomControl() & 0xF))
 							&& item->MeshBits == -1)
 						{

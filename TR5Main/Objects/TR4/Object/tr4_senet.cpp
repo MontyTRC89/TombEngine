@@ -420,7 +420,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 	if (TrInput & IN_ACTION &&
 		laraitem->ActiveState == LS_IDLE &&
 		laraitem->AnimNumber == LA_STAND_IDLE &&
-		Lara.gunStatus == LG_HANDS_FREE &&
+		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.interactedItem == item_num)
 	{
 		laraitem->Position.yRot ^= 0x8000;
@@ -434,7 +434,7 @@ void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
 				laraitem->ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.Control.ExtraTorsoRot = { 0, 0, 0 };
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(item_num);
 				laraitem->Position.yRot ^= 0x8000;

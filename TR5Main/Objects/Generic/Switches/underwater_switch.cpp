@@ -69,8 +69,8 @@ namespace TEN::Entities::Switches
 		if (TrInput & IN_ACTION)
 		{
 			if (item->Status == ITEM_NOT_ACTIVE
-				&& Lara.waterStatus == LW_UNDERWATER
-				&& !Lara.gunStatus
+				&& Lara.Control.WaterStatus == WaterStatus::Underwater
+				&& Lara.Control.HandStatus == HandStatus::Free
 				&& l->ActiveState == LS_UNDERWATER_STOP)
 			{
 				if (TestLaraPosition(&UnderwaterSwitchBounds, item, l))
@@ -89,7 +89,7 @@ namespace TEN::Entities::Switches
 							} while (l->TargetState != LS_SWITCH_DOWN);
 
 							l->TargetState = LS_UNDERWATER_STOP;
-							Lara.gunStatus = LG_HANDS_BUSY;
+							Lara.Control.HandStatus = HandStatus::Busy;
 							item->TargetState = item->ActiveState != SWITCH_ON;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(itemNum);
@@ -107,10 +107,10 @@ namespace TEN::Entities::Switches
 		int flag = 0;
 
 		if (TrInput & IN_ACTION
-			&& Lara.waterStatus == LW_UNDERWATER
+			&& Lara.Control.WaterStatus == WaterStatus::Underwater
 			&& l->ActiveState == LS_UNDERWATER_STOP
 			&& l->AnimNumber == LA_UNDERWATER_IDLE
-			&& !Lara.gunStatus
+			&& Lara.Control.HandStatus == HandStatus::Free
 			&& (item->ActiveState == SWITCH_OFF)
 			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
@@ -143,7 +143,7 @@ namespace TEN::Entities::Switches
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->VerticalVelocity = 0;
 				Lara.Control.IsMoving = false;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				item->TargetState = SWITCH_ON;
 				item->Status = ITEM_ACTIVE;
 

@@ -162,7 +162,7 @@ int KeyTrigger(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	int oldkey;
 
-	if ((item->Status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
+	if ((item->Status != ITEM_ACTIVE || Lara.Control.HandStatus == HandStatus::Busy) && (!KeyTriggerActive || Lara.Control.HandStatus != HandStatus::Busy))
 		return -1;
 
 	oldkey = KeyTriggerActive;
@@ -396,7 +396,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			break;
 
 		case TRIGGER_TYPES::COMBAT:
-			if (Lara.gunStatus == LG_READY)
+			if (Lara.Control.HandStatus == HandStatus::WeaponReady)
 				break;
 			return;
 
@@ -728,8 +728,12 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;
 
 	// Burn Lara
-	if (floor->Flags.Death && (LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LARA_STATE)LaraItem->ActiveState) || Lara.waterStatus))
+	if (floor->Flags.Death &&
+		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LARA_STATE)LaraItem->ActiveState) ||
+			Lara.Control.WaterStatus != WaterStatus::Dry))
+	{
 		LavaBurn(LaraItem);
+	}
 
 	// Set climb status
 	if ((1 << (GetQuadrant(LaraItem->Position.yRot) + 8)) & GetClimbFlags(floor))

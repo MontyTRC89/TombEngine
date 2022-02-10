@@ -86,7 +86,7 @@ void ReadyFlare(ITEM_INFO* laraItem)
 {
 	LaraInfo*& laraInfo = laraItem->Data;
 
-	laraInfo->gunStatus = LG_HANDS_FREE;
+	laraInfo->Control.HandStatus = HandStatus::Free;
 	laraInfo->LeftArm.xRot = 0;
 	laraInfo->LeftArm.yRot = 0;
 	laraInfo->LeftArm.zRot = 0;
@@ -137,9 +137,9 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			if (flareFrame >= g_Level.Anims[laraItem->AnimNumber].frameBase + 31) // Last frame.
 			{
-				laraInfo->requestGunType = laraInfo->lastGunType;
-				laraInfo->gunType = laraInfo->lastGunType;
-				laraInfo->gunStatus = LG_HANDS_FREE;
+				laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.LastGunType;
+				laraInfo->Control.WeaponControl.GunType = laraInfo->Control.WeaponControl.LastGunType;
+				laraInfo->Control.HandStatus = HandStatus::Free;
 
 				InitialiseNewWeapon(laraItem);
 
@@ -190,9 +190,9 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		else if (armFrame == 33)
 		{
 			armFrame = 0;
-			laraInfo->requestGunType = laraInfo->lastGunType;
-			laraInfo->gunType = laraInfo->lastGunType;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.LastGunType;
+			laraInfo->Control.WeaponControl.GunType = laraInfo->Control.WeaponControl.LastGunType;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 
 			InitialiseNewWeapon(laraItem);
 
@@ -378,8 +378,8 @@ void DoFlareInHand(ITEM_INFO* laraItem, int flareAge)
 
 	if (ItemInfo->Flare.Life >= FLARE_LIFE_MAX)
 	{
-		if (ItemInfo->gunStatus == LG_HANDS_FREE)
-			ItemInfo->gunStatus = LG_UNDRAW_GUNS;
+		if (ItemInfo->Control.HandStatus == HandStatus::Free)
+			ItemInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 	}
 	else if (ItemInfo->Flare.Life != 0)
 		ItemInfo->Flare.Life++;

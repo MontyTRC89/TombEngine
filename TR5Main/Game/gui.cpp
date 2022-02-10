@@ -2003,30 +2003,30 @@ void GuiController::UseCurrentItem()
 	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	gmeobject = inventry_objects_list[invobject].object_number;
 
-	if (Lara.waterStatus == LW_ABOVE_WATER || Lara.waterStatus == LW_WADE)
+	if (Lara.Control.WaterStatus == WaterStatus::Dry || Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (gmeobject == ID_PISTOLS_ITEM)
 		{
-			Lara.requestGunType = WEAPON_PISTOLS;
+			Lara.Control.WeaponControl.RequestGunType = WEAPON_PISTOLS;
 
-			if (Lara.gunStatus != LG_HANDS_FREE)
+			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.gunType == WEAPON_PISTOLS)
-				Lara.gunStatus = LG_DRAW_GUNS;
+			if (Lara.Control.WeaponControl.GunType == WEAPON_PISTOLS)
+				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
 		}
 
 		if (gmeobject == ID_UZI_ITEM)
 		{
-			Lara.requestGunType = WEAPON_UZI;
+			Lara.Control.WeaponControl.RequestGunType = WEAPON_UZI;
 
-			if (Lara.gunStatus != LG_HANDS_FREE)
+			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.gunType == WEAPON_UZI)
-				Lara.gunStatus = LG_DRAW_GUNS;
+			if (Lara.Control.WeaponControl.GunType == WEAPON_UZI)
+				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
 		}
@@ -2037,7 +2037,7 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_FLARE_INV_ITEM)
 		{
-			if (Lara.gunStatus == LG_HANDS_FREE)
+			if (Lara.Control.HandStatus == HandStatus::Free)
 			{
 				if (LaraItem->ActiveState != LS_CRAWL_IDLE &&
 					LaraItem->ActiveState != LS_CRAWL_FORWARD &&
@@ -2046,7 +2046,7 @@ void GuiController::UseCurrentItem()
 					LaraItem->ActiveState != LS_CRAWL_BACK &&
 					LaraItem->ActiveState != LS_CRAWL_TO_HANG)
 				{
-					if (Lara.gunType != WEAPON_FLARE)
+					if (Lara.Control.WeaponControl.GunType != WEAPON_FLARE)
 					{
 						TrInput = IN_FLARE;
 						LaraGun(LaraItem);
@@ -2073,8 +2073,8 @@ void GuiController::UseCurrentItem()
 				Lara.Control.OldBusy = true;
 				BinocularRange = 128;
 
-				if (Lara.gunStatus != LG_HANDS_FREE)
-					Lara.gunStatus = LG_UNDRAW_GUNS;
+				if (Lara.Control.HandStatus != HandStatus::Free)
+					Lara.Control.HandStatus = HandStatus::UndrawWeapon;
 			}
 
 			if (OldBinocular)
@@ -2143,7 +2143,7 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (Lara.gunStatus == LG_HANDS_BUSY)
+	if (Lara.Control.HandStatus == HandStatus::Busy)
 	{
 		SayNo();
 		return;
@@ -2165,86 +2165,86 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_SHOTGUN_ITEM)
 	{
-		Lara.requestGunType = WEAPON_SHOTGUN;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_SHOTGUN;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_SHOTGUN)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 
 	if (gmeobject == ID_REVOLVER_ITEM)
 	{
-		Lara.requestGunType = WEAPON_REVOLVER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_REVOLVER;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_REVOLVER)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HK_ITEM)
 	{
-		Lara.requestGunType = WEAPON_HK;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_HK;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_HK)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_HK)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_CROSSBOW_ITEM)
 	{
-		Lara.requestGunType = WEAPON_CROSSBOW;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_CROSSBOW;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_CROSSBOW)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_GRENADE_GUN_ITEM)
 	{
-		Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_GRENADE_LAUNCHER;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_GRENADE_LAUNCHER)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_GRENADE_LAUNCHER)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HARPOON_ITEM)
 	{
-		Lara.requestGunType = WEAPON_HARPOON_GUN;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_HARPOON_GUN;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_HARPOON_GUN)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_HARPOON_GUN)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_ROCKET_LAUNCHER_ITEM)
 	{
-		Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_ROCKET_LAUNCHER;
 
-		if (Lara.gunStatus != LG_HANDS_FREE)
+		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.gunType == WEAPON_ROCKET_LAUNCHER)
-			Lara.gunStatus = LG_DRAW_GUNS;
+		if (Lara.Control.WeaponControl.GunType == WEAPON_ROCKET_LAUNCHER)
+			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
@@ -3412,7 +3412,7 @@ void combine_revolver_lasersight(int flag)
 		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 1;
 	}
 
-	if (Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 	{
 		undraw_pistol_mesh_right(WEAPON_REVOLVER);
 		draw_pistol_meshes(WEAPON_REVOLVER);
@@ -3432,7 +3432,7 @@ void combine_crossbow_lasersight(int flag)
 		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 1;
 	}
 
-	if (Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
 	{
 		undraw_shotgun_meshes(WEAPON_CROSSBOW);
 		draw_shotgun_meshes(WEAPON_CROSSBOW);

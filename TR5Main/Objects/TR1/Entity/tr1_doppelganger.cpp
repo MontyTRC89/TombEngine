@@ -57,7 +57,7 @@ void DoppelgangerControl(short itemNum)
 
 	if (item->HitPoints < 1000)                   			// If Evil Lara being Injured
 	{                                                       // then take the hits off Lara instead...
-		LaraItem->HitPoints -= GetWeaponDamage(Lara.gunType);
+		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.WeaponControl.GunType);
 		item->HitPoints = 1000;
 	}
 

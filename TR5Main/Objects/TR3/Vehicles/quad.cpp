@@ -259,7 +259,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 		lara->Position.xRot = 0;
 		lara->Position.zRot = 0;
 		laraInfo->Vehicle = NO_ITEM;
-		laraInfo->gunStatus = LG_HANDS_FREE;
+		laraInfo->Control.HandStatus = HandStatus::Free;
 
 		if (lara->ActiveState == QUAD_STATE_FALL_OFF)
 		{
@@ -276,7 +276,7 @@ static bool QuadCheckGetOff(ITEM_INFO* lara, ITEM_INFO* quad)
 			lara->Position.xRot = 0;
 			lara->Position.zRot = 0;
 			lara->HitPoints = 0;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			quad->Flags |= ONESHOT;
 
 			return false;
@@ -303,7 +303,7 @@ static int GetOnQuadBike(ITEM_INFO* lara, ITEM_INFO* quad, COLL_INFO* coll)
 
 	if (!(TrInput & IN_ACTION) ||
 		lara->Airborne ||
-		laraInfo->gunStatus != LG_HANDS_FREE ||
+		laraInfo->Control.HandStatus != HandStatus::Free ||
 		quad->Flags & ONESHOT ||
 		abs(quad->Position.yPos - lara->Position.yPos) > STEP_SIZE)
 	{
@@ -1188,15 +1188,15 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* lara, COLL_INFO* coll)
 
 		laraInfo->Vehicle = itemNumber;
 
-		if (laraInfo->gunType == WEAPON_FLARE)
+		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(lara, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(lara);
 			laraInfo->Flare.ControlLeft = 0;
-			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
+			laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
-		laraInfo->gunStatus = LG_HANDS_BUSY;
+		laraInfo->Control.HandStatus = HandStatus::Busy;
 
 		ang = phd_atan(quad->Position.zPos - lara->Position.zPos, quad->Position.xPos - lara->Position.xPos);
 		ang -= quad->Position.yRot;

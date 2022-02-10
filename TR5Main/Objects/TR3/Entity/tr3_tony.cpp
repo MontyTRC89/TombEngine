@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/lot.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -329,7 +330,7 @@ void ControlTonyFireBall(short fxNumber)
 	long rnd, j;
 	unsigned char radtab[7] = { 16,0,14,9,7,7,7 };
 	TonyFlameType type;
-	short room_number;
+	short roomNumber;
 
 	fx = &EffectList[fxNumber];
 	old_x = fx->pos.xPos;
@@ -369,8 +370,8 @@ void ControlTonyFireBall(short fxNumber)
 			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((old_x - fx->pos.xPos) * 8), (short)((old_y - fx->pos.yPos) * 8), (short)((old_z - fx->pos.zPos) * 4));
 	}
 
-	room_number = fx->roomNumber;
-	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &room_number);
+	roomNumber = fx->roomNumber;
+	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
 		fx->pos.yPos < GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
 	{
@@ -403,20 +404,21 @@ void ControlTonyFireBall(short fxNumber)
 
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
-				room_number = LaraItem->RoomNumber;
-				floor = GetFloor(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, &room_number);
+				roomNumber = LaraItem->RoomNumber;
+				floor = GetFloor(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, &roomNumber);
 				pos.y = GetCeiling(floor, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos) + 256;
 				pos.x = LaraItem->Position.xPos + (GetRandomControl() & 1023) - 512;
 				pos.z = LaraItem->Position.zPos + (GetRandomControl() & 1023) - 512;
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, room_number);
-				TriggerFireBall(NULL, T_DROPPER, &pos, room_number, 0, 0);
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, roomNumber);
+				TriggerFireBall(NULL, T_DROPPER, &pos, roomNumber, 0, 0);
 			}
 		}
 		KillEffect(fxNumber);
 		return;
 	}
 
-	if (g_Level.Rooms[room_number].flags & LW_UNDERWATER)
+	
+	if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 	{
 		KillEffect(fxNumber);
 		return;
@@ -434,7 +436,7 @@ void ControlTonyFireBall(short fxNumber)
 		}
 	}
 
-	if (room_number != fx->roomNumber)
+	if (roomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
 	if (radtab[fx->flag1])

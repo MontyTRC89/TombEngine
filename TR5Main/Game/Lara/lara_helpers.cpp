@@ -224,7 +224,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	LaraInfo*& info = item->Data;
 
 	info->Control.ProjectedFloorHeight = vaultResult.Height;
-	info->gunStatus = vaultResult.SetBusyHands ? LG_HANDS_BUSY : info->gunStatus;
+	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
 	info->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
@@ -271,7 +271,7 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
 	item->Airborne = true;
-	info->gunStatus = LG_HANDS_FREE;
+	info->Control.HandStatus = HandStatus::Free;
 }
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)

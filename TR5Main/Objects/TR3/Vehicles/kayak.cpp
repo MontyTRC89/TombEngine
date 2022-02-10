@@ -278,7 +278,7 @@ KayakMountType KayakGetMountType(short itemNum, ITEM_INFO* laraItem, COLL_INFO* 
 	LaraInfo*& laraInfo = laraItem->Data;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_HANDS_FREE ||
+		laraInfo->Control.HandStatus != HandStatus::Free ||
 		laraItem->Airborne)
 	{
 		return KayakMountType::None;
@@ -1073,7 +1073,7 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 			laraItem->VerticalVelocity = -50;
 			laraItem->Velocity = 40;
 			laraItem->Airborne = true;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Vehicle = NO_ITEM;
 		}
 
@@ -1097,7 +1097,7 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 			laraItem->VerticalVelocity = -50;
 			laraItem->Velocity = 40;
 			laraItem->Airborne = true;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Vehicle = NO_ITEM;
 		}
 	}
@@ -1202,8 +1202,8 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 	AnimateItem(laraItem);
 
 	laraInfo->ExtraAnim = 1;
-	laraInfo->gunStatus = LG_HANDS_BUSY;
-	laraInfo->gunType = WEAPON_NONE;
+	laraInfo->Control.HandStatus = HandStatus::Busy;
+	laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
 	laraInfo->hitDirection = -1;
 }
 
@@ -1221,12 +1221,12 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 		laraInfo->Vehicle = itemNumber;
 
-		if (laraInfo->gunType == WEAPON_FLARE)
+		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 			laraInfo->Flare.ControlLeft = 0;
-			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
+			laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
 		if (mountType == KayakMountType::Right)
@@ -1237,7 +1237,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 		laraItem->ActiveState = laraItem->TargetState = KAYAK_STATE_MOUNT_LEFT;
 
-		laraInfo->waterStatus = LW_ABOVE_WATER;
+		laraInfo->Control.WaterStatus = WaterStatus::Dry;
 		laraItem->Position.xPos = kayakItem->Position.xPos;
 		laraItem->Position.yPos = kayakItem->Position.yPos;
 		laraItem->Position.zPos = kayakItem->Position.zPos;

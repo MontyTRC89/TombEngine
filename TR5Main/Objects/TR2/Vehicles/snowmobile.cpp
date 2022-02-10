@@ -303,7 +303,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->Position.xRot = 0;
 			lara->Position.zRot = 0;
 			laraInfo->Vehicle = NO_ITEM;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 		}
 		else if (lara->ActiveState == SKIDOO_STATE_JUMP_OFF &&
 			(skidoo->Position.yPos == skidoo->Floor || TestLastFrame(lara)))
@@ -329,7 +329,7 @@ bool SkidooCheckGetOff(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			lara->Position.xRot = 0;
 			lara->Position.zRot = 0;
 			lara->Airborne = true;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Control.MoveAngle = skidoo->Position.yRot;
 			skidoo->Flags |= ONESHOT;
 			skidoo->Collidable = false;
@@ -620,7 +620,7 @@ int SkidooCheckGetOn(ITEM_INFO* lara, ITEM_INFO* skidoo, COLL_INFO* coll)
 	int mountType = 0;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_HANDS_FREE ||
+		laraInfo->Control.HandStatus != HandStatus::Free ||
 		lara->Airborne)
 	{
 		return mountType = 0;
@@ -664,13 +664,13 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 
 	laraInfo->Vehicle = itemNum;
 
-	if (laraInfo->gunType == WEAPON_FLARE)
+	if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 	{
 		CreateFlare(lara, ID_FLARE_ITEM, false);
 		UndrawFlareMeshes(lara);
 		laraInfo->Flare.ControlLeft = 0;
-		laraInfo->requestGunType = WEAPON_NONE;
-		laraInfo->gunStatus = LG_HANDS_FREE;
+		laraInfo->Control.WeaponControl.RequestGunType = WEAPON_NONE;
+		laraInfo->Control.HandStatus = HandStatus::Free;
 	}
 
 	if (mountType == 1)
@@ -684,7 +684,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 	lara->Position.xPos = skidoo->Position.xPos;
 	lara->Position.yPos = skidoo->Position.yPos;
 	lara->Position.zPos = skidoo->Position.zPos;
-	laraInfo->gunStatus = LG_HANDS_BUSY;
+	laraInfo->Control.HandStatus = HandStatus::Busy;
 	skidoo->Collidable = true;
 }
 

@@ -55,7 +55,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetDistance = WALL_SIZE;
 
 	if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 }
 
 // ------
@@ -258,7 +258,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->AnimNumber == LA_PULLEY_RELEASE &&
 		item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
 	{
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 	}
 }
 

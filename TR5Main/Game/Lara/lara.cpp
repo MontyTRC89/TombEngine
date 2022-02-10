@@ -400,10 +400,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	if (info->hasFired)
+	if (info->Control.WeaponControl.HasFired)
 	{
 		AlertNearbyGuards(item);
-		info->hasFired = false;
+		info->Control.WeaponControl.HasFired = false;
 	}
 
 	if (info->poisoned)
@@ -420,7 +420,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		if (info->Control.PositionAdjustCount > 90)
 		{
 			info->Control.IsMoving = false;
-			info->gunStatus = LG_HANDS_FREE;
+			info->Control.HandStatus = HandStatus::Free;
 		}
 
 		++info->Control.PositionAdjustCount;
@@ -434,13 +434,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	int oldZ = item->Position.zPos;
 
 	// Set hands free failsafe.
-	if (info->gunStatus == LG_HANDS_BUSY &&
+	if (info->Control.HandStatus == HandStatus::Busy &&
 		item->ActiveState == LS_IDLE &&
 		item->TargetState == LS_IDLE &&
 		item->AnimNumber == LA_STAND_IDLE &&
 		!item->Airborne)
 	{
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 	}
 
 	if (item->ActiveState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
@@ -466,9 +466,9 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Vehicle == NO_ITEM && info->ExtraAnim == -1)
 	{
-		switch (info->waterStatus)
+		switch (info->Control.WaterStatus)
 		{
-		case LW_ABOVE_WATER:
+		case WaterStatus::Dry:
 			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_DEPTH)
 				break;
 
@@ -481,7 +481,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				if (isWater)
 				{
 					info->air = LARA_AIR_MAX;
-					info->waterStatus = LW_UNDERWATER;
+					info->Control.WaterStatus = WaterStatus::Underwater;
 					item->Airborne = false;
 					item->Position.yPos += 100;
 
@@ -490,7 +490,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 					if (item->ActiveState == LS_SWAN_DIVE)
 					{
-						info->gunStatus = LG_HANDS_FREE;
+						info->Control.HandStatus = HandStatus::Free;
 						item->Position.xRot = -ANGLE(45.0f);
 						item->TargetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
@@ -498,7 +498,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					}
 					else if (item->ActiveState == LS_FREEFALL_DIVE)
 					{
-						info->gunStatus = LG_HANDS_FREE;
+						info->Control.HandStatus = HandStatus::Free;
 						item->Position.xRot = -ANGLE(85.0f);
 						item->TargetState = LS_FREEFALL_DIVE;
 						AnimateLara(item);
@@ -518,7 +518,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			// Water is at wade depth; update water status and do special handling.
 			else if (heightFromWater >= WADE_DEPTH)
 			{
-				info->waterStatus = LW_WADE;
+				info->Control.WaterStatus = WaterStatus::Wade;
 
 				// Make splash ONLY within this particular threshold before swim depth while Airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
@@ -545,7 +545,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			break;
 
-		case LW_UNDERWATER:
+		case WaterStatus::Underwater:
 			if (isWater ||
 				waterDepth == DEEP_WATER ||
 				abs(heightFromWater) >= CLICK(1) ||
@@ -562,7 +562,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->VerticalVelocity = 0;
 						item->Position.zRot = 0;
 						item->Position.xRot = 0;
-						info->waterStatus = LW_ABOVE_WATER;
+						info->Control.WaterStatus = WaterStatus::Dry;
 						ResetLaraFlex(item);
 					}
 					else
@@ -572,7 +572,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->VerticalVelocity = 0;
 						item->Position.zRot = 0;
 						item->Position.xRot = 0;
-						info->waterStatus = LW_SURFACE;
+						info->Control.WaterStatus = WaterStatus::WaterSurface;
 						info->Control.DiveCount = 11;
 						ResetLaraFlex(item);
 
@@ -588,7 +588,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->VerticalVelocity = 0;
 				item->Position.zRot = 0;
 				item->Position.xRot = 0;
-				info->waterStatus = LW_SURFACE;
+				info->Control.WaterStatus = WaterStatus::WaterSurface;
 				info->Control.DiveCount = 11;
 				ResetLaraFlex(item);
 
@@ -597,7 +597,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			break;
 
-		case LW_SURFACE:
+		case WaterStatus::WaterSurface:
 			if (!isWater)
 			{
 				if (heightFromWater <= WADE_DEPTH)
@@ -605,13 +605,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					SetAnimation(item, LA_FALL_START);
 					item->Velocity = item->VerticalVelocity / 4;
 					item->Airborne = true;
-					info->waterStatus = LW_ABOVE_WATER;
+					info->Control.WaterStatus = WaterStatus::Dry;
 				}
 				else
 				{
 					SetAnimation(item, LA_STAND_IDLE);
 					item->TargetState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
-					info->waterStatus = LW_WADE;
+					info->Control.WaterStatus = WaterStatus::Wade;
 
 					AnimateItem(item);
 				}
@@ -624,7 +624,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 			break;
 
-		case LW_WADE:
+		case WaterStatus::Wade:
 			Camera.targetElevation = -ANGLE(22.0f);
 
 			if (heightFromWater >= WADE_DEPTH)
@@ -633,7 +633,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
 
-					info->waterStatus = LW_SURFACE;
+					info->Control.WaterStatus = WaterStatus::WaterSurface;
 					item->Position.yPos += 1 - heightFromWater;
 					item->Airborne = false;
 					item->VerticalVelocity = 0;
@@ -647,7 +647,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				info->waterStatus = LW_ABOVE_WATER;
+				info->Control.WaterStatus = WaterStatus::Dry;
 
 				if (item->ActiveState == LS_WADE_FORWARD)
 					item->TargetState = LS_RUN_FORWARD;
@@ -673,10 +673,10 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	switch (info->waterStatus)
+	switch (info->Control.WaterStatus)
 	{
-	case LW_ABOVE_WATER:
-	case LW_WADE:
+	case WaterStatus::Dry:
+	case WaterStatus::Wade:
 		if (isSwamp	&& info->waterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
 			if (item->HitPoints >= 0)
@@ -703,7 +703,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 		break;
 
-	case LW_UNDERWATER:
+	case WaterStatus::Underwater:
 		if (item->HitPoints >= 0)
 		{
 			auto level = g_GameFlow->GetLevel(CurrentLevel);
@@ -723,7 +723,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 		break;
 
-	case LW_SURFACE:
+	case WaterStatus::WaterSurface:
 		if (item->HitPoints >= 0)
 		{
 			info->air += 10;
@@ -735,7 +735,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 		break;
 
-	case LW_FLYCHEAT:
+	case WaterStatus::FlyCheat:
 		LaraCheat(item, coll);
 
 		break;
@@ -976,7 +976,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot = -ANGLE(22.0f);
 	}
 
-	if (info->currentActive && info->waterStatus != LW_FLYCHEAT)
+	if (info->currentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
@@ -1042,7 +1042,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot += item->Position.zRot / -8;
 	}
 
-	if (info->currentActive && info->waterStatus != LW_FLYCHEAT)
+	if (info->currentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
@@ -1075,20 +1075,20 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
 		{
-			info->waterStatus = LW_UNDERWATER;
+			info->Control.WaterStatus = WaterStatus::Underwater;
 			SetAnimation(item, LA_UNDERWATER_IDLE);
 			ResetLaraFlex(item);
 		}
 		else
 		{
-			info->waterStatus = LW_ABOVE_WATER;
+			info->Control.WaterStatus = WaterStatus::Dry;
 			SetAnimation(item, LA_STAND_SOLID);
 			item->Position.zRot = 0;
 			item->Position.xRot = 0;
 			ResetLaraFlex(item);
 		}
 
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 		LaraInitialiseMeshes();
 		item->HitPoints = LARA_HEALTH_MAX;
 	}

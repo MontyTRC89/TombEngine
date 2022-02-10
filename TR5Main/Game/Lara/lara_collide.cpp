@@ -608,7 +608,7 @@ void LaraSwimCollision(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 	}
 
-	if (Lara.waterStatus != LW_FLYCHEAT && Lara.ExtraAnim == NO_ITEM)
+	if (Lara.Control.WaterStatus != WaterStatus::FlyCheat && Lara.ExtraAnim == NO_ITEM)
 		TestLaraWaterDepth(item, coll);
 }
 

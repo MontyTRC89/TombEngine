@@ -282,12 +282,12 @@ namespace TEN::Entities::TR4
 						{
 							if (laraInfo.angle > 0 || !(item->MeshBits & 0x400))
 							{
-								if (Lara.gunType == WEAPON_SHOTGUN)
+								if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
 								{
 									item->HitPoints -= 10;
 									item->HitStatus = true;
 								}
-								else if (Lara.gunType == WEAPON_REVOLVER)
+								else if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 								{
 									item->HitPoints -= 20;
 									item->HitStatus = true;
