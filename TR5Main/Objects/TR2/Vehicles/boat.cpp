@@ -181,7 +181,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 
 	BoatMountType mountType = BoatMountType::None;
 
-	if (laraInfo->gunStatus != LG_HANDS_FREE)
+	if (laraInfo->Control.HandStatus != HandStatus::Free)
 		return mountType;
 
 	if (!TestBoundsCollide(sBoatItem, laraItem, coll->Setup.Radius))
@@ -195,7 +195,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		return mountType;
 
 	short rot = sBoatItem->Position.yRot - laraItem->Position.yRot;
-	if (laraInfo->waterStatus == LW_SURFACE || laraInfo->waterStatus == LW_WADE)
+	if (laraInfo->Control.WaterStatus == WaterStatus::WaterSurface || laraInfo->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Airborne || sBoatItem->Velocity)
 			return mountType;
@@ -205,7 +205,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		else if (rot > -ANGLE(135.0f) && rot < -ANGLE(45.0f))
 			mountType = BoatMountType::WaterLeft;
 	}
-	else if (laraInfo->waterStatus == LW_ABOVE_WATER)
+	else if (laraInfo->Control.WaterStatus == WaterStatus::Dry)
 	{
 		if (laraItem->VerticalVelocity > 0)
 		{
@@ -886,7 +886,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		break;
 	}
 
-	laraInfo->waterStatus = LW_ABOVE_WATER;
+	laraInfo->Control.WaterStatus = WaterStatus::Dry;
 	laraItem->Position.xPos = sBoatItem->Position.xPos;
 	laraItem->Position.yPos = sBoatItem->Position.yPos - 5;
 	laraItem->Position.zPos = sBoatItem->Position.zPos;

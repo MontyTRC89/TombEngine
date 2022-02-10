@@ -198,7 +198,7 @@ namespace TEN::Entities::TR4
 		CreatureAIInfo(item, &info);
 
 		if (item->HitStatus
-			&& Lara.gunType == WEAPON_SHOTGUN
+			&& Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN
 			&& info.distance < SQUARE(3584)
 			&& item->ActiveState != 7
 			&& item->ActiveState != 17
@@ -421,7 +421,7 @@ namespace TEN::Entities::TR4
 							&& laraInfo.angle
 							&& laraInfo.distance < SQUARE(2048)
 							&& GetRandomControl() & 1
-							&& (Lara.gunType == WEAPON_SHOTGUN || !(GetRandomControl() & 0xF))
+							&& (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN || !(GetRandomControl() & 0xF))
 							&& item->MeshBits == -1)
 						{
 							item->TargetState = STATE_SKELETON_USE_SHIELD;
@@ -675,7 +675,7 @@ namespace TEN::Entities::TR4
 			case STATE_SKELETON_USE_SHIELD:
 				if (item->HitStatus)
 				{
-					if (item->MeshBits == -1 && laraInfo.angle && Lara.gunType == WEAPON_SHOTGUN)
+					if (item->MeshBits == -1 && laraInfo.angle && Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
 					{
 						if (GetRandomControl() & 3)
 						{
@@ -691,7 +691,7 @@ namespace TEN::Entities::TR4
 						item->TargetState = 2;
 					}
 				}
-				else if (Lara.target != item || item->MeshBits != -1 || Lara.gunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
+				else if (Lara.target != item || item->MeshBits != -1 || Lara.Control.WeaponControl.GunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
 				{
 					item->TargetState = 2;
 				}

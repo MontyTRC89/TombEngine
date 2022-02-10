@@ -289,7 +289,7 @@ int S_UpdateInput()
 
 	static int look_timeout = 0;
 
-	if (Lara.gunStatus == LG_READY)
+	if (Lara.Control.HandStatus == HandStatus::WeaponReady)
 	{
 		// TODO: AutoTarget Not Saved
 		//Savegame.AutoTarget = 1;
@@ -321,21 +321,21 @@ int S_UpdateInput()
 
 	/***************************WEAPON HOTKEYS***************************/
 	if (KeyMap[DIK_1] && Lara.Weapons[WEAPON_PISTOLS].Present == true)
-		Lara.requestGunType = WEAPON_PISTOLS;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_PISTOLS;
 	if (KeyMap[DIK_2] && Lara.Weapons[WEAPON_SHOTGUN].Present == true)
-		Lara.requestGunType = WEAPON_SHOTGUN;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_SHOTGUN;
 	if (KeyMap[DIK_3] && Lara.Weapons[WEAPON_REVOLVER].Present == true)
-		Lara.requestGunType = WEAPON_REVOLVER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_REVOLVER;
 	if (KeyMap[DIK_4] && Lara.Weapons[WEAPON_UZI].Present == true)
-		Lara.requestGunType = WEAPON_UZI;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_UZI;
 	if (KeyMap[DIK_5] && Lara.Weapons[WEAPON_HARPOON_GUN].Present == true)
-		Lara.requestGunType = WEAPON_HARPOON_GUN;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_HARPOON_GUN;
 	if (KeyMap[DIK_6] && Lara.Weapons[WEAPON_HK].Present == true)
-		Lara.requestGunType = WEAPON_HK;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_HK;
 	if (KeyMap[DIK_7] && Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present == true)
-		Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_ROCKET_LAUNCHER;
 	if (KeyMap[DIK_8] && Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present == true)
-		Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
+		Lara.Control.WeaponControl.RequestGunType = WEAPON_GRENADE_LAUNCHER;
 		/*------------------------------------------------------------------*/
 
 	if (KeyMap[DIK_0])

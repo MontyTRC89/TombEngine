@@ -138,7 +138,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
+	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
 	if (TestLaraMonkeyGrab(item, coll))
@@ -148,7 +148,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 		item->Velocity = 0;
 		item->VerticalVelocity = 0;
 		item->Position.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
-		info->gunStatus = LG_HANDS_BUSY;
+		info->Control.HandStatus = HandStatus::Busy;
 		return true;
 	}
 
@@ -183,7 +183,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = false;
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	info->Control.ExtraTorsoRot.zRot = 0;
 	info->Control.ExtraTorsoRot.yRot = 0;
 	info->Control.ExtraTorsoRot.zRot = 0;
@@ -195,7 +195,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE || coll->HitStatic)
+	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
 	if (TestLaraMonkeyGrab(item, coll))
@@ -206,7 +206,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		item->Velocity = 0;
 		item->VerticalVelocity = 0;
 		item->Position.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
-		info->gunStatus = LG_HANDS_BUSY;
+		info->Control.HandStatus = HandStatus::Busy;
 		return true;
 	}
 
@@ -254,7 +254,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = true;
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 
 	return true;
 }
@@ -342,7 +342,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->Airborne = true;
 			item->Velocity = 2;
 			item->VerticalVelocity = 1;
-			info->gunStatus = LG_HANDS_FREE;
+			info->Control.HandStatus = HandStatus::Free;
 		}
 	}
 	else // Normal case
@@ -415,7 +415,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->Airborne = true;
 			item->Velocity = 2;
 			item->VerticalVelocity = 1;
-			info->gunStatus = LG_HANDS_FREE;
+			info->Control.HandStatus = HandStatus::Free;
 		}
 	}
 
@@ -909,7 +909,7 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
-		info->waterStatus == LW_WADE)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
+		info->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
 	}
@@ -991,7 +991,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = false;
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	info->waterStatus = LW_WADE;
+	info->Control.WaterStatus = WaterStatus::Wade;
 
 	return true;
 }
@@ -1003,8 +1003,8 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
 
-	if (info->gunStatus &&
-		(info->gunStatus != LG_READY || info->gunType != WEAPON_FLARE))
+	if (Lara.Control.HandStatus != HandStatus::Free &&
+		(info->Control.HandStatus != HandStatus::WeaponReady || info->Control.WeaponControl.GunType != WEAPON_FLARE))
 	{
 		return false;
 	}
@@ -1071,8 +1071,8 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = false;
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	info->gunStatus = LG_HANDS_BUSY;
-	info->waterStatus = LW_ABOVE_WATER;
+	info->Control.HandStatus = HandStatus::Busy;
+	info->Control.WaterStatus = WaterStatus::Dry;
 
 	return true;
 }
@@ -1088,8 +1088,8 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 		return false;
 	}
 
-	if (info->gunStatus &&
-		(info->gunStatus != LG_READY || info->gunType != WEAPON_FLARE))
+	if (Lara.Control.HandStatus != HandStatus::Free &&
+		(info->Control.HandStatus != HandStatus::WeaponReady || info->Control.WeaponControl.GunType != WEAPON_FLARE))
 	{
 		return false;
 	}
@@ -1141,8 +1141,8 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	item->Airborne = false;
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	info->gunStatus = LG_HANDS_BUSY;
-	info->waterStatus = LW_ABOVE_WATER;
+	info->Control.HandStatus = HandStatus::Busy;
+	info->Control.WaterStatus = WaterStatus::Dry;
 	info->Control.TurnRate = 0;
 
 	return true;
@@ -1175,7 +1175,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 		item->VerticalVelocity = 0;
 		item->Airborne = false;
 		item->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-		info->waterStatus = LW_WADE;
+		info->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
 
@@ -1290,9 +1290,9 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&
-		info->gunStatus == LG_HANDS_FREE &&							// Hands are free.
+		info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->Flare.Life > 0) &&	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0) &&	// Flare is not being handled. TODO: Will she pose with weapons drawn?
 		info->Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
@@ -1307,7 +1307,7 @@ bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (abs(coll->Middle.Floor) > 0 &&
 		(coll->Middle.Floor <= STEPUP_HEIGHT ||	// Within lower floor bound...
-			info->waterStatus == LW_WADE) &&		// OR Lara is wading.
+			info->Control.WaterStatus == WaterStatus::Wade) &&		// OR Lara is wading.
 		coll->Middle.Floor >= -STEPUP_HEIGHT &&	// Within upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT)
 	{
@@ -1643,9 +1643,9 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->Data;
 
-	if (info->gunStatus == LG_HANDS_FREE &&							// Hands are free.
+	if (info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
 	{
 		return true;
 	}
@@ -1667,7 +1667,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 		!probe.Position.FloorSlope &&								// Not a slope.
 		info->waterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->gunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
 	{
 		return true;
 	}
@@ -2013,7 +2013,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	// This check is redundant, but provides for a slight optimisation.
-	if (!(TrInput & IN_ACTION) || info->gunStatus != LG_HANDS_FREE)
+	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free)
 		return VaultTestResult{ false };
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
@@ -2095,7 +2095,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || info->gunStatus != LG_HANDS_FREE)
+	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || info->Control.HandStatus != HandStatus::Free)
 		return false;
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
@@ -2110,7 +2110,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 		item->FrameNumber = GetFrameNumber(item, 0);
 		item->TargetState = LS_JUMP_UP;
 		item->ActiveState = LS_IDLE;
-		info->gunStatus = LG_HANDS_BUSY;
+		info->Control.HandStatus = HandStatus::Busy;
 		info->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);
@@ -2129,7 +2129,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 		item->FrameNumber = GetFrameNumber(item, 0);
 		item->TargetState = LS_LADDER_IDLE;
 		item->ActiveState = LS_IDLE;
-		info->gunStatus = LG_HANDS_BUSY;
+		info->Control.HandStatus = HandStatus::Busy;
 		info->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);
@@ -2304,7 +2304,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 	auto probe = GetCollisionResult(item, testSetup.Angle, testSetup.Dist, -coll->Setup.Height);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	bool isWading = testSetup.CheckWadeStatus ? (info->waterStatus == LW_WADE) : false;
+	bool isWading = testSetup.CheckWadeStatus ? (info->Control.WaterStatus == WaterStatus::Wade) : false;
 
 	// Discard walls.
 	if (probe.Position.Floor == NO_HEIGHT)

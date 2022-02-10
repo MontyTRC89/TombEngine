@@ -39,7 +39,7 @@ namespace TEN::Effects::Lara
 
 		auto lara = (LaraInfo*&)item->Data;
 
-		if (item->HitPoints >= 0 && lara->waterStatus != LW_FLYCHEAT)
+		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
 			short roomNumber = item->RoomNumber;
 			FLOOR_INFO* floor = GetFloor(item->Position.xPos, 32000, item->Position.zPos, &roomNumber);
@@ -64,7 +64,7 @@ namespace TEN::Effects::Lara
 
 		auto lara = (LaraInfo*&)item->Data;
 
-		if (lara->waterStatus == LARA_WATER_STATUS::LW_UNDERWATER || item->HitPoints <= 0)
+		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
 			return;
 
 		if (!TestEnvironment(ENV_FLAG_COLD, item))

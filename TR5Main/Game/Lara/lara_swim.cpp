@@ -33,7 +33,7 @@ void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->HitPoints = -1;
 	Lara.air = -1;
-	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.Control.HandStatus = HandStatus::Busy;
 
 	auto waterHeight = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 	if (waterHeight < (item->Position.yPos - (STEP_SIZE / 5 * 2) - 2) &&
@@ -129,8 +129,8 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->VerticalVelocity < 0)
 		item->VerticalVelocity = 0;
 
-	if (Lara.gunStatus == LG_HANDS_BUSY)
-		Lara.gunStatus = LG_HANDS_FREE;
+	if (Lara.Control.HandStatus == HandStatus::Busy)
+		Lara.Control.HandStatus = HandStatus::Free;
 }
 
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
@@ -328,7 +328,7 @@ void SwimDive(ITEM_INFO* item)
 	item->TargetState = LS_UNDERWATER_FORWARD;
 	item->Position.xRot = ANGLE(-45.0f);
 	item->VerticalVelocity = 80;
-	Lara.waterStatus = LW_UNDERWATER;
+	Lara.Control.WaterStatus = WaterStatus::Underwater;
 }
 
 void LaraWaterCurrent(COLL_INFO* coll)

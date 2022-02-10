@@ -105,7 +105,7 @@ void ScubaControl(short itemNumber)
 		GAME_VECTOR target;
 		bool shoot = false;
 
-		if (Lara.waterStatus == false)
+		if (Lara.Control.WaterStatus == WaterStatus::Dry)
 		{
 			start.x = item->Position.xPos;
 			start.y = item->Position.yPos - STEP_SIZE;

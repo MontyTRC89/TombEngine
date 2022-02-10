@@ -1227,7 +1227,7 @@ void BinocularCamera(ITEM_INFO* item)
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(item, info->gunType);
+		Ammo& ammo = GetAmmo(item, info->Control.WeaponControl.GunType);
 
 		if (!(InputBusy & IN_ACTION) ||
 			WeaponDelay ||
@@ -1235,7 +1235,7 @@ void BinocularCamera(ITEM_INFO* item)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (info->gunType != WEAPON_CROSSBOW)
+				if (info->Control.WeaponControl.GunType != WEAPON_CROSSBOW)
 					WeaponDelay = 0;
 
 				LSHKShotsFired = 0;
@@ -1244,7 +1244,7 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 		else
 		{
-			if (info->gunType == WEAPON_REVOLVER)
+			if (info->Control.WeaponControl.GunType == WEAPON_REVOLVER)
 			{
 				firing = 1;
 				WeaponDelay = 16;
@@ -1255,7 +1255,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
-			else if (info->gunType == WEAPON_CROSSBOW)
+			else if (info->Control.WeaponControl.GunType == WEAPON_CROSSBOW)
 			{
 				firing = 1;
 				WeaponDelay = 32;
@@ -1647,7 +1647,7 @@ void LookLeftRight()
 				Lara.Control.ExtraHeadRot.yRot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY &&
+	if (Lara.Control.HandStatus != HandStatus::Busy &&
 		Lara.Vehicle == NO_ITEM &&
 		!Lara.LeftArm.lock &&
 		!Lara.RightArm.lock)
@@ -1681,7 +1681,7 @@ void LookUpDown()
 				Lara.Control.ExtraHeadRot.xRot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY &&
+	if (Lara.Control.HandStatus != HandStatus::Busy &&
 		Lara.Vehicle == NO_ITEM &&
 		!Lara.LeftArm.lock &&
 		!Lara.RightArm.lock)
@@ -1711,7 +1711,7 @@ void ResetLook(ITEM_INFO* item)
 		else
 			info->Control.ExtraHeadRot.zRot = 0;
 
-		if (info->gunStatus != LG_HANDS_BUSY &&
+		if (info->Control.HandStatus != HandStatus::Busy &&
 			!info->LeftArm.lock &&
 			!info->RightArm.lock &&
 			info->Vehicle == NO_ITEM)

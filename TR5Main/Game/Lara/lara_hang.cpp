@@ -24,7 +24,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		item->Position.yPos += STEP_SIZE;
 		item->VerticalVelocity = 1;
 
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 
 		item->Position.yRot += Lara.nextCornerPos.yRot / 2;
 		return;

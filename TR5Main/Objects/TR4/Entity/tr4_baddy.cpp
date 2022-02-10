@@ -1049,7 +1049,7 @@ namespace TEN::Entities::TR4
 						LaraItem->VerticalVelocity = 2;
 						LaraItem->VerticalVelocity = 1;
 						LaraItem->Position.yPos += (STEP_SIZE * 0.75f);
-						Lara.gunStatus = LG_HANDS_FREE;
+						Lara.Control.HandStatus = HandStatus::Free;
 						currentCreature->flags = 1;
 					}
 				}

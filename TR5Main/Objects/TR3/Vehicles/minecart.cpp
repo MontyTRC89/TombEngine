@@ -118,7 +118,7 @@ static bool GetInMineCart(ITEM_INFO* v, ITEM_INFO* l, COLL_INFO* coll)
 	FLOOR_INFO* floor;
 	short roomNumber;
 
-	if (!(TrInput & IN_ACTION) || Lara.gunStatus != LG_HANDS_FREE || l->Airborne)
+	if (!(TrInput & IN_ACTION) || Lara.Control.HandStatus != HandStatus::Free || l->Airborne)
 		return 0;
 
 	if (!TestBoundsCollide(v, l, coll->Setup.Radius))
@@ -619,7 +619,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 		}
 		break;
 
@@ -638,7 +638,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 
 			SetAnimation(l, LA_STAND_SOLID);
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 		}
 		break;
 
@@ -786,15 +786,15 @@ void MineCartCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		Lara.Vehicle = itemNum;
 
-		if (Lara.gunType == WEAPON_FLARE)
+		if (Lara.Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
 			UndrawFlareMeshes(l);
 			Lara.Flare.ControlLeft = false;
-			Lara.requestGunType = Lara.gunType = WEAPON_NONE;
+			Lara.Control.WeaponControl.RequestGunType = Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
-		Lara.gunStatus = LG_HANDS_BUSY;
+		Lara.Control.HandStatus = HandStatus::Busy;
 
 		ang = short(mGetAngle(v->Position.xPos, v->Position.zPos, l->Position.xPos, l->Position.zPos) - v->Position.yRot);
 

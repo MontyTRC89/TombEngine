@@ -153,7 +153,7 @@ namespace TEN::Entities::Effects
 					&& ItemNearLara(&item->Position, 600)
 					&& (SQUARE(LaraItem->Position.xPos - item->Position.xPos) +
 						SQUARE(LaraItem->Position.zPos - item->Position.zPos) < SQUARE(512))
-					&& Lara.waterStatus != LW_FLYCHEAT)
+					&& Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 				{
 					LaraBurn(LaraItem);
 				}
@@ -346,7 +346,7 @@ namespace TEN::Entities::Effects
 			Lara.burn = false;
 		}
 
-		if (Lara.waterStatus == LW_FLYCHEAT)
+		if (Lara.Control.WaterStatus == WaterStatus::FlyCheat)
 		{
 			KillEffect(fxNumber);
 			Lara.burn = false;
@@ -620,7 +620,7 @@ namespace TEN::Entities::Effects
 
 				if (ItemNearLara(&pos, 600))
 				{
-					if ((!Lara.burn) && Lara.waterStatus != LW_FLYCHEAT)
+					if ((!Lara.burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
 						LaraItem->HitPoints -= 5;
 						LaraItem->HitStatus = true;
@@ -640,8 +640,8 @@ namespace TEN::Entities::Effects
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (Lara.gunType != WEAPON_TORCH
-			|| Lara.gunStatus != LG_READY
+		if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
+			|| Lara.Control.HandStatus != HandStatus::WeaponReady
 			|| Lara.LeftArm.lock
 			|| Lara.litTorch == (item->Status & 1)
 			|| item->Timer == -1

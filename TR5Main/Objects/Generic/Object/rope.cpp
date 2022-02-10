@@ -187,7 +187,7 @@ namespace TEN::Entities::Generic
 		rope = &Ropes[item->TriggerFlags];
 		
 		if (TrInput & IN_ACTION 
-			&& Lara.gunStatus == LG_HANDS_FREE 
+			&& Lara.Control.HandStatus == HandStatus::Free 
 			&& (l->ActiveState == LS_REACH
 				|| l->ActiveState == LS_JUMP_UP) 
 			&& l->Airborne 
@@ -222,7 +222,7 @@ namespace TEN::Entities::Generic
 				l->Airborne = false;
 				l->VerticalVelocity = 0;
 
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				Lara.Control.RopeControl.Ptr = item->TriggerFlags;
 				Lara.Control.RopeControl.Segment = segment;
 				Lara.Control.RopeControl.Y = l->Position.yRot;
@@ -643,7 +643,7 @@ namespace TEN::Entities::Generic
 			item->Position.xRot = 0;
 			item->Airborne = true;
 
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 
 			if (item->FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
 			{
@@ -680,7 +680,7 @@ namespace TEN::Entities::Generic
 		item->VerticalVelocity = 0;
 		item->Airborne = true;
 
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 		Lara.Control.RopeControl.Ptr = -1;
 	}
 

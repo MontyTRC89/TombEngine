@@ -88,10 +88,10 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 
 	if (firing && LaserSight)
 	{
-		Lara.hasFired = true;
-		Lara.fired = true;
+		Lara.Control.WeaponControl.HasFired = true;
+		Lara.Control.WeaponControl.Fired = true;
 
-		if (Lara.gunType == WEAPON_REVOLVER)
+		if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 		{
 			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
 		}
@@ -114,7 +114,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 
 		if (firing)
 		{
-			if (Lara.gunType != WEAPON_CROSSBOW)
+			if (Lara.Control.WeaponControl.GunType != WEAPON_CROSSBOW)
 			{
 				if (itemNumber < 0)
 				{
@@ -170,11 +170,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						}
 						else
 						{
-							if (DrawTarget && (Lara.gunType == WEAPON_REVOLVER || Lara.gunType == WEAPON_HK))
+							if (DrawTarget && (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER || Lara.Control.WeaponControl.GunType == WEAPON_HK))
 							{
 								if (Objects[item->ObjectNumber].intelligent)
 								{
-									HitTarget(LaraItem, item, &target, Weapons[Lara.gunType].damage, 0);
+									HitTarget(LaraItem, item, &target, Weapons[Lara.Control.WeaponControl.GunType].damage, 0);
 								}
 								else
 								{
@@ -206,7 +206,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
 									{
-										item->HitPoints -= Weapons[Lara.gunType].damage;
+										item->HitPoints -= Weapons[Lara.Control.WeaponControl.GunType].damage;
 									}
 								}
 							}
@@ -272,7 +272,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 	}
 	else
 	{
-		if (Lara.gunType == WEAPON_CROSSBOW)
+		if (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
 		{
 			if (firing && LaserSight)
 				FireCrossBowFromLaserSight(src, &target);

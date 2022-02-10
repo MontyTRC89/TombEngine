@@ -252,8 +252,8 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	AnimateItem(LaraItem);
 
 	Lara.ExtraAnim = 1;
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.gunType = WEAPON_NONE;
+	Lara.Control.HandStatus = HandStatus::Busy;
+	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 	Lara.hitDirection = -1;
 	Lara.air = -1;
 
@@ -1615,7 +1615,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* info, int violent)
 			LOT->target.z = enemy->Position.zPos;
 			LOT->requiredBox = enemy->BoxNumber;
 
-			if (LOT->fly != NO_FLYING && Lara.waterStatus == LW_ABOVE_WATER)
+			if (LOT->fly != NO_FLYING && Lara.Control.WaterStatus == WaterStatus::Dry)
 			{
 				auto bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 				LOT->target.y += bounds->Y1;

@@ -85,11 +85,14 @@ table FlareData {
 	control_left: bool;
 }
 
-table TightropeControlData {
-	balance: float;
-	time_on_tightrope: uint32;
-	can_dismount: bool;
-	tightrope_item: int32;
+table WeaponControlData {
+	weapon_item: int32;
+	has_fired: bool;
+	fired: bool;
+	gun_type: int32;
+	request_gun_type: int32;
+	last_gun_type: int32;
+	holster_info: HolsterInfo;
 }
 
 table RopeControlData {
@@ -111,15 +114,21 @@ table RopeControlData {
 	count: int32;
 }
 
+table TightropeControlData {
+	balance: float;
+	time_on_tightrope: uint32;
+	can_dismount: bool;
+	tightrope_item: int32;
+}
+
 table LaraControlData {
 	move_angle: int32;
 	turn_rate: int32;
 	projected_floor_height: int32;
 	calculated_jump_velocity: int32;
 	jump_direction: int32;
-	extra_head_rot: Vector3;
-	extra_torso_rot: Vector3;
-	extra_velocity: Vector3;
+	hand_status: int32;
+	water_status: int32;
 	can_look: bool;
 	is_moving: bool;
 	run_jump_queued: bool;
@@ -134,6 +143,10 @@ table LaraControlData {
 	pose_count: uint32;
 	dive_count: uint32;
 	death_count: uint32;
+	extra_head_rot: Vector3;
+	extra_torso_rot: Vector3;
+	extra_velocity: Vector3;
+	weapon_control: WeaponControlData;
 	rope_control: RopeControlData;
 	tightrope_control: TightropeControlData;
 	is_busy: bool;
@@ -142,10 +155,6 @@ table LaraControlData {
 
 table Lara {
 	item_number: int32;
-	gun_status: int32;
-	gun_type: int32;
-	request_gun_type: int32;
-	last_gun_type: int32;
 	hit_points: int32;
 	velocity: int32;
 	vertical_velocity: int32;
@@ -163,13 +172,9 @@ table Lara {
 	burn_blue: int32;
 	burn_smoke: bool;
 	burn_count: int32;
-	weapon_item: int32;
-	holster_info: HolsterInfo;
 	poisoned: int32;
 	wet: [bool];
-	has_fired: bool;
 	lit_torch: bool;
-	fired: bool;
 	water_surface_dist: int32;
 	last_position: Vector3;
 	next_corner_position: Vector3;

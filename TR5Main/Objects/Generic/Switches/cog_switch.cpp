@@ -67,7 +67,7 @@ namespace TEN::Entities::Switches
 		{
 			if (!(item->Flags & ONESHOT)
 				&& (TrInput & IN_ACTION
-					&& !Lara.gunStatus
+					&& Lara.Control.HandStatus == HandStatus::Free
 					&& !item->Airborne
 					&& l->ActiveState == LS_IDLE
 					&& l->AnimNumber == LA_STAND_IDLE
@@ -80,7 +80,7 @@ namespace TEN::Entities::Switches
 					{
 						Lara.Control.IsMoving = false;
 						ResetLaraFlex(l);
-						Lara.gunStatus = LG_HANDS_BUSY;
+						Lara.Control.HandStatus = HandStatus::Busy;
 						Lara.interactedItem = targetItemNum;
 						l->AnimNumber = LA_COGWHEEL_GRAB;
 						l->TargetState = LS_COGWHEEL;
@@ -109,7 +109,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 			}
 
@@ -153,7 +153,7 @@ namespace TEN::Entities::Switches
 				LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
 				LaraItem->TargetState = LS_IDLE;
 				LaraItem->ActiveState = LS_IDLE;
-				Lara.gunStatus = LG_HANDS_FREE;
+				Lara.Control.HandStatus = HandStatus::Free;
 			}
 		}
 	}

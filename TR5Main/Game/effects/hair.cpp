@@ -227,7 +227,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 
 			// TR3 UPV uses a hack which forces Lara water status to dry. 
 			// Therefore, we can't directly use water status value to determine hair mode.
-			bool dryMode = (lara->waterStatus == LW_ABOVE_WATER) && (lara->Vehicle == -1 || g_Level.Items[lara->Vehicle].ObjectNumber != ID_UPV);
+			bool dryMode = (lara->Control.WaterStatus == WaterStatus::Dry) && (lara->Vehicle == -1 || g_Level.Items[lara->Vehicle].ObjectNumber != ID_UPV);
 
 			if (dryMode)
 			{

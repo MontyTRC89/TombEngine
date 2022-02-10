@@ -55,7 +55,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
-		&& !Lara.gunStatus
+		&& Lara.Control.HandStatus == HandStatus::Free
 		&& l->ActiveState == LS_IDLE
 		&& l->AnimNumber == LA_STAND_IDLE
 		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
@@ -127,7 +127,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 			Lara.Control.IsMoving = false;
 			ResetLaraFlex(l);
-			Lara.gunStatus = LG_HANDS_BUSY;
+			Lara.Control.HandStatus = HandStatus::Busy;
 			item->Flags |= 0x20;
 			Lara.interactedItem = itemNum;
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
@@ -140,7 +140,7 @@ void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.interactedItem == itemNum)
 			{
 				Lara.Control.IsMoving = false;
-				Lara.gunStatus = LG_HANDS_FREE;
+				Lara.Control.HandStatus = HandStatus::Free;
 			}
 		}
 
@@ -246,7 +246,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
 		&& !BinocularRange
-		&& !Lara.gunStatus
+		&& Lara.Control.HandStatus == HandStatus::Free
 		&& l->ActiveState == LS_IDLE
 		&& l->AnimNumber == LA_STAND_IDLE)
 		&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
@@ -288,7 +288,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Flags |= 0x20;
 				item->Status = ITEM_ACTIVE;
 
@@ -311,7 +311,7 @@ void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.Control.IsMoving = false;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 		}
 	}
 

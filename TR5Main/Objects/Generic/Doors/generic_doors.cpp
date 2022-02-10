@@ -171,7 +171,7 @@ namespace TEN::Entities::Doors
 				&& l->ActiveState == LS_IDLE
 				&& l->AnimNumber == LA_STAND_IDLE
 				&& !l->HitStatus
-				&& Lara.gunStatus == LG_HANDS_FREE
+				&& Lara.Control.HandStatus == HandStatus::Free
 				|| Lara.Control.IsMoving && Lara.interactedItem == itemNum))
 		{
 			item->Position.yRot ^= ANGLE(180);
@@ -220,7 +220,7 @@ namespace TEN::Entities::Doors
 					item->Status = ITEM_ACTIVE;
 					item->TargetState = LS_RUN_FORWARD;
 					Lara.Control.IsMoving = 0;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 
 					return;
 				}
@@ -230,7 +230,7 @@ namespace TEN::Entities::Doors
 			else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.Control.IsMoving = 0;
-				Lara.gunStatus = LG_HANDS_FREE;
+				Lara.Control.HandStatus = HandStatus::Free;
 			}
 
 			item->Position.yRot ^= ANGLE(180);

@@ -746,7 +746,7 @@ namespace TEN::Entities::TR4
 						LaraItem->HitStatus = true;
 						LaraItem->Velocity = 2;
 						LaraItem->VerticalVelocity = 1;
-						Lara.gunStatus = LG_HANDS_FREE;
+						Lara.Control.HandStatus = HandStatus::Free;
 					}
 				}
 

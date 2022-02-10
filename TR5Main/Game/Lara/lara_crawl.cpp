@@ -59,10 +59,10 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			info->gunStatus == LG_HANDS_FREE &&
+			info->Control.HandStatus == HandStatus::Free &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->TargetState = LS_CROUCH_ROLL;
@@ -118,7 +118,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
@@ -199,7 +199,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 		item->Velocity /= 3;				// Truncate speed to prevent flying off.
 		return;
 	}
@@ -246,7 +246,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
@@ -302,7 +302,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
@@ -347,7 +347,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -371,16 +371,16 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(info->gunType) &&
+			!IsStandingWeapon(info->Control.WeaponControl.GunType) &&
 			item->AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
 			item->TargetState = LS_CROUCH_IDLE;
-			info->gunStatus = LG_HANDS_FREE;
+			info->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
@@ -433,7 +433,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->TargetState = LS_CROUCH_IDLE;
-	info->gunStatus = LG_HANDS_FREE;
+	info->Control.HandStatus = HandStatus::Free;
 }
 
 // State:		LS_CRAWL_IDLE (80)
@@ -486,7 +486,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -515,7 +515,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -591,7 +591,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	info->Control.CanLook = false;
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -620,7 +620,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -687,7 +687,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -701,7 +701,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -747,7 +747,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -761,7 +761,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -825,7 +825,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
-		info->gunStatus = LG_HANDS_BUSY;
+		info->Control.HandStatus = HandStatus::Busy;
 		item->Position.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
 		item->Airborne = true;
 		item->Velocity = 2;

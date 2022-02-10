@@ -413,7 +413,7 @@ void SethaControl(short itemNumber)
 
 	if (item->HitStatus)
 	{
-		if ((Lara.gunType == WEAPON_SHOTGUN || Lara.gunType == WEAPON_REVOLVER)
+		if ((Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN || Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 			&& info.distance < SQUARE(2048)
 			&& !(creature->LOT.isJumping))
 		{

@@ -126,7 +126,7 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 	RubberBoatMountType getOn = RBOAT_MOUNT_NONE;
 
 	if (!(TrInput & IN_ACTION) ||
-		Lara.gunStatus != LG_HANDS_FREE ||
+		Lara.Control.HandStatus != HandStatus::Free ||
 		lara->Airborne ||
 		rBoat->Velocity)
 	{
@@ -141,14 +141,14 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 		return RBOAT_MOUNT_NONE;
 
 	short rot = rBoat->Position.yRot - lara->Position.yRot;
-	if (Lara.waterStatus == LW_SURFACE || Lara.waterStatus == LW_WADE)
+	if (Lara.Control.WaterStatus == WaterStatus::WaterSurface || Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (rot > ANGLE(45.0f) && rot < ANGLE(135.0f))
 			getOn = RBOAT_MOUNT_LEFT;
 		if (rot < -ANGLE(135.0f) && rot > -ANGLE(45.0f))
 			getOn = RBOAT_MOUNT_RIGHT;
 	}
-	else if (Lara.waterStatus == LW_ABOVE_WATER)
+	else if (Lara.Control.WaterStatus == WaterStatus::Dry)
 	{
 		if (lara->VerticalVelocity > 0)
 		{
@@ -656,7 +656,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 	else
 		lara->AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE;
 
-	Lara.waterStatus = LW_ABOVE_WATER;
+	Lara.Control.WaterStatus = WaterStatus::Dry;
 	lara->Position.xPos = item->Position.xPos;
 	lara->Position.yPos = item->Position.yPos - 5;
 	lara->Position.zPos = item->Position.zPos;

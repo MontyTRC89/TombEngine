@@ -177,8 +177,8 @@ void AbortionControl(short itemNum)
 				LaraItem->Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.air = -1;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.gunType = WEAPON_NONE;
+				Lara.Control.HandStatus = HandStatus::Busy;
+				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 
 				Camera.targetDistance = SECTOR(2);
 				Camera.flags = CF_FOLLOW_CENTER;
