@@ -7,7 +7,7 @@ New custom animations which Lara can perform.
 @pragma nostrip
 */
 
-void Animations::Register(sol::table & parent)
+void Animations::Register(sol::table& parent)
 {
 	parent.new_usertype<Animations>("Animations",
 		"crawlExtended", &Animations::CrawlExtended,
@@ -18,3 +18,4 @@ void Animations::Register(sol::table & parent)
 		"oscillateHang", &Animations::OscillateHang,
 		"pose", &Animations::Pose
 		);
+}

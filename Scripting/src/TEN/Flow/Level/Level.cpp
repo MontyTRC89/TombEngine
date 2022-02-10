@@ -238,3 +238,23 @@ short Level::GetMirrorRoom() const
 	return Mirror.Room;
 }
 
+bool Level::GetFogEnabled() const
+{
+	return Fog.Enabled;
+}
+
+
+RGBAColor8Byte Level::GetFogColor() const
+{
+	return Fog.GetColor();
+}
+
+short Level::GetFogMinDistance() const
+{
+	return Fog.MinDistance;
+}
+
+short Level::GetFogMaxDistance() const
+{
+	return Fog.MaxDistance;
+}

@@ -177,6 +177,9 @@
     <ClInclude Include="src\TEN\Strings\StringsHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Scripting\GameScriptFog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -255,6 +258,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TEN\Strings\StringsHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameScriptFog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
