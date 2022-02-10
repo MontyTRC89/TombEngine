@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameScriptColor.h"
+class RGBAColor8Byte;
 
 namespace sol {
 	class state;
@@ -16,8 +16,9 @@ struct GameScriptFog
 	short MaxDistance{ 0 };
 
 	GameScriptFog() = default;
-	GameScriptFog(GameScriptColor const& col, short minDistance, short maxDistance);
-	void SetColor(GameScriptColor const& col);
+	GameScriptFog(RGBAColor8Byte const& col, short minDistance, short maxDistance);
+	void SetColor(RGBAColor8Byte const& col);
+	RGBAColor8Byte GetColor() const;
 
 	static void Register(sol::state*);
 };

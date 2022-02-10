@@ -26,6 +26,7 @@
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
     <ClInclude Include="include\Scripting\Flow\ScriptInterfaceFlowHandler.h" />
+    <ClInclude Include="include\Scripting\GameScriptFog.h" />
     <ClInclude Include="include\Scripting\InventorySlots.h" />
     <ClInclude Include="include\Scripting\ItemEnumPair.h" />
     <ClInclude Include="include\Scripting\LuaHandler.h" />
@@ -90,6 +91,7 @@
     <ClCompile Include="src\TEN\Flow\Level\Level.cpp" />
     <ClCompile Include="src\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="src\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="src\GameScriptFog.cpp" />
     <ClCompile Include="src\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\TEN\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\TEN\Misc\Misc.cpp" />

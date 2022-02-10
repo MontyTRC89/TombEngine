@@ -46,7 +46,7 @@ public:
 	void SetFrameNumber(int frameNumber);
 
 	int GetRequiredAnimState() const;
-	void SetRequiredAnimState(short animState);
+	void SetRequiredAnimState(int animState);
 
 	int GetGoalAnimState() const;
 	void SetGoalAnimState(int animState);
