@@ -42,7 +42,7 @@ namespace TEN::Entities::Doors
 			&& l->AnimNumber == LA_STAND_IDLE
 			&& !(item->Status && item->Airborne)
 			&& !(l->HitStatus)
-			&& !Lara.gunStatus
+			&& Lara.Control.HandStatus == HandStatus::Free
 			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			item->Position.yRot ^= ANGLE(180);
@@ -56,7 +56,7 @@ namespace TEN::Entities::Doors
 
 					item->Status = ITEM_ACTIVE;
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 					ResetLaraFlex(l);
 				}
 				else
@@ -70,7 +70,7 @@ namespace TEN::Entities::Doors
 				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 				item->Position.yRot ^= ANGLE(180);
 			}

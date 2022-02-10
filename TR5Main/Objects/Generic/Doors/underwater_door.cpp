@@ -39,8 +39,8 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION
 			&& l->ActiveState == LS_UNDERWATER_STOP
 			&& !(item->Status && item->Airborne)
-			&& Lara.waterStatus == LW_UNDERWATER
-			&& !Lara.gunStatus
+			&& Lara.Control.WaterStatus == WaterStatus::Underwater
+			&& Lara.Control.HandStatus == HandStatus::Free
 			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			l->Position.yRot ^= ANGLE(180.0f);
@@ -60,7 +60,7 @@ namespace TEN::Entities::Doors
 					AnimateItem(item);
 
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 				}
 				else
 				{
@@ -73,7 +73,7 @@ namespace TEN::Entities::Doors
 				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 				l->Position.yRot ^= ANGLE(180);
 			}

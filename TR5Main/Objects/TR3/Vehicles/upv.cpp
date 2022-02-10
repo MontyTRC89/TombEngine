@@ -331,7 +331,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	LaraInfo*& laraInfo = laraItem->Data;
 
 	if (!(TrInput & IN_ACTION) ||
-		laraInfo->gunStatus != LG_HANDS_FREE ||
+		laraInfo->Control.HandStatus != HandStatus::Free ||
 		laraItem->Airborne)
 	{
 		return false;
@@ -695,8 +695,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			UpdateItemRoom(laraItem, 0);
 
-			laraInfo->waterStatus = LW_UNDERWATER;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.WaterStatus = WaterStatus::Underwater;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->HitPoints = 0;
@@ -733,11 +733,11 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
-			laraInfo->waterStatus = LW_SURFACE;
+			laraInfo->Control.WaterStatus = WaterStatus::WaterSurface;
 			laraInfo->waterSurfaceDist = -heightFromWater;
 			laraInfo->Control.DiveCount = 11;
 			ResetLaraFlex(laraItem);
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Vehicle = NO_ITEM;
 
 			UPVItem->HitPoints = 0;
@@ -862,18 +862,18 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	if (TestUPVMount(laraItem, UPVItem))
 	{
 		laraInfo->Vehicle = itemNum;
-		laraInfo->waterStatus = LW_ABOVE_WATER;
+		laraInfo->Control.WaterStatus = WaterStatus::Dry;
 
-		if (laraInfo->gunType == WEAPON_FLARE)
+		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
 			laraInfo->Flare.ControlLeft = false;
-			laraInfo->requestGunType = laraInfo->gunType = WEAPON_NONE;
+			laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
-		laraInfo->gunStatus = LG_HANDS_BUSY;
+		laraInfo->Control.HandStatus = HandStatus::Busy;
 		laraItem->Position.xPos = UPVItem->Position.xPos;
 		laraItem->Position.yPos = UPVItem->Position.yPos;
 		laraItem->Position.zPos = UPVItem->Position.zPos;

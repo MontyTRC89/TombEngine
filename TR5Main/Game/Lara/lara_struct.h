@@ -793,23 +793,23 @@ enum LARA_ANIM
 };
 #pragma endregion
 
-enum LARA_WATER_STATUS
+enum class WaterStatus
 {
-	LW_ABOVE_WATER,
-	LW_UNDERWATER,
-	LW_SURFACE,
-	LW_FLYCHEAT,
-	LW_WADE
+	Dry,
+	Wade,
+	WaterSurface,
+	Underwater,
+	FlyCheat
 };
 
-enum LARA_GUN_STATUS
+enum class HandStatus
 {
-	LG_HANDS_FREE,
-	LG_HANDS_BUSY,
-	LG_DRAW_GUNS,
-	LG_UNDRAW_GUNS,
-	LG_READY,
-	LG_SPECIAL
+	Free,
+	Busy,
+	DrawWeapon,
+	UndrawWeapon,
+	WeaponReady,
+	Special
 };
 
 enum WeaponAmmoType
@@ -1074,18 +1074,16 @@ struct FlareData
 	bool ControlLeft;
 };
 
-struct TightropeControlData
+struct WeaponControlData
 {
-#if NEW_TIGHTROPE
-	float Balance;
-	unsigned short TimeOnTightrope;
-	bool CanDismount;
-	short TightropeItem; // maybe give Tightrope Item a property for difficulty?
-#else // !NEW_TIGHTROPE
-	byte OnCount;
-	byte Off;
-	byte Fall;
-#endif
+	short WeaponItem;
+	bool HasFired;
+	bool Fired;
+
+	LARA_WEAPON_TYPE GunType;
+	LARA_WEAPON_TYPE RequestGunType;
+	LARA_WEAPON_TYPE LastGunType;
+	HolsterInfo HolsterInfo;
 };
 
 struct RopeControlData
@@ -1108,6 +1106,20 @@ struct RopeControlData
 	int Count;
 };
 
+struct TightropeControlData
+{
+#if NEW_TIGHTROPE
+	float Balance;
+	unsigned short TimeOnTightrope;
+	bool CanDismount;
+	short TightropeItem; // maybe give Tightrope Item a property for difficulty?
+#else // !NEW_TIGHTROPE
+	byte OnCount;
+	byte Off;
+	byte Fall;
+#endif
+};
+
 struct LaraControlData
 {
 	short MoveAngle;
@@ -1115,10 +1127,8 @@ struct LaraControlData
 	int ProjectedFloorHeight;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
-
-	PHD_3DPOS ExtraHeadRot;
-	PHD_3DPOS ExtraTorsoRot;
-	PHD_VECTOR ExtraVelocity;
+	HandStatus HandStatus;
+	WaterStatus WaterStatus;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1136,8 +1146,13 @@ struct LaraControlData
 	unsigned int DiveCount;
 	unsigned int DeathCount;
 
+	WeaponControlData WeaponControl;
 	RopeControlData RopeControl;
 	TightropeControlData TightropeControl;
+
+	PHD_3DPOS ExtraHeadRot;
+	PHD_3DPOS ExtraTorsoRot;
+	PHD_VECTOR ExtraVelocity;
 
 	// Inventory stuff??
 	bool IsBusy;
@@ -1147,36 +1162,33 @@ struct LaraControlData
 struct LaraInfo
 {
 	short itemNumber;
-	LARA_GUN_STATUS gunStatus;
-	LARA_WEAPON_TYPE gunType;
-	LARA_WEAPON_TYPE requestGunType;
-	LARA_WEAPON_TYPE lastGunType;
-	LARA_WATER_STATUS waterStatus;
+
+	int waterSurfaceDist;
+
 	LaraControlData Control;
 	int hitFrame;
 	int hitDirection;
+
 	int sprintTimer;
 	int air;
-	short currentActive;
+
+	short currentActive;//
+
 	FX_INFO* SpasmEffect;
 	int SpasmEffectCount;
 	FlareData Flare;
 
-	// TODO
+	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
 	bool burn;
 	byte burnBlue;
 	bool burnSmoke;
 
 	unsigned int BurnCount;
-	short weaponItem;
-	HolsterInfo holsterInfo;
+
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-	bool hasFired;
 	bool litTorch;
-	bool fired;
-	int waterSurfaceDist;
 	PHD_VECTOR lastPos;
 	PHD_3DPOS nextCornerPos;
 	int meshPtrs[NUM_LARA_MESHES];

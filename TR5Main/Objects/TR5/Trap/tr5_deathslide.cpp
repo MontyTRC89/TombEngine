@@ -26,7 +26,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.gunStatus != LG_HANDS_FREE || l->ActiveState != LS_IDLE)
+	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.Control.HandStatus != HandStatus::Free || l->ActiveState != LS_IDLE)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
@@ -36,7 +36,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	if (TestLaraPosition(&DeathSlideBounds, item, LaraItem))
 	{
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
-		Lara.gunStatus = LG_HANDS_BUSY;
+		Lara.Control.HandStatus = HandStatus::Busy;
 
 		l->TargetState = LS_ZIPLINE_RIDE;
 		do

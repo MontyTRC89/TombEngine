@@ -2093,12 +2093,12 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara.location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
-				PrintDebugMessage("Lara.roomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
+				PrintDebugMessage("Lara.Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Lara.RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("LaraItem.BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				                  LaraItem->BoxNumber);
-				PrintDebugMessage("Lara.pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
-				PrintDebugMessage("Lara.rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
+				PrintDebugMessage("Lara.Pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+				PrintDebugMessage("Lara.Rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE,
 				                  r->z + r->zSize * WALL_SIZE);
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
@@ -2107,15 +2107,15 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara.animNumber: %d", LaraItem->AnimNumber);
-				PrintDebugMessage("Lara.frameNumber: %d", LaraItem->FrameNumber);
+				PrintDebugMessage("Lara.AnimNumber: %d", LaraItem->AnimNumber);
+				PrintDebugMessage("Lara.FrameNumber: %d", LaraItem->FrameNumber);
 				PrintDebugMessage("Lara.ActiveState: %d", LaraItem->ActiveState);
 				PrintDebugMessage("Lara.RequiredState: %d", LaraItem->RequiredState);
 				PrintDebugMessage("Lara.TargetState: %d", LaraItem->TargetState);
-				PrintDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
-				PrintDebugMessage("Lara.gunType: %d", Lara.gunType);
-				PrintDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
-				PrintDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
+				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.WeaponControl.WeaponItem);
+				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.WeaponControl.GunType);
+				PrintDebugMessage("Lara.Control.HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("Lara.Velocity, VerticalVelocity: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
 				PrintDebugMessage("Lara.Control.CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
 				break;

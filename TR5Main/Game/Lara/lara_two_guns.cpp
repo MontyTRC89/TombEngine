@@ -37,7 +37,7 @@ bool UziRight;
 
 void AnimatePistols(LARA_WEAPON_TYPE weaponType)
 {
-	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
+	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.Control.WeaponControl.GunType)];
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 	int soundPlayed = false;
 	short angleLeft[2], angleRight[2];
@@ -339,7 +339,7 @@ void undraw_pistol_mesh_right(LARA_WEAPON_TYPE weaponType)
 {
 	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 	
-	Lara.holsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
+	Lara.Control.WeaponControl.HolsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
 
 }
 
@@ -349,16 +349,16 @@ void undraw_pistol_mesh_left(LARA_WEAPON_TYPE weaponType)
 	{
 		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 		
-		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
+		Lara.Control.WeaponControl.HolsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weaponType));
 	}
 }
 
 void draw_pistol_meshes(LARA_WEAPON_TYPE weaponType)
 {
 	if(static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER){
-		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
+		Lara.Control.WeaponControl.HolsterInfo.leftHolster = HOLSTER_SLOT::Empty;
 	}
-	Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
+	Lara.Control.WeaponControl.HolsterInfo.rightHolster = HOLSTER_SLOT::Empty;
 
 	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_RHAND;
 	if (static_cast<LARA_WEAPON_TYPE>(weaponType) != LARA_WEAPON_TYPE::WEAPON_REVOLVER)
@@ -367,7 +367,7 @@ void draw_pistol_meshes(LARA_WEAPON_TYPE weaponType)
 
 void ready_pistols(LARA_WEAPON_TYPE weaponType)
 {
-	Lara.gunStatus = LG_READY;
+	Lara.Control.HandStatus = HandStatus::WeaponReady;
 	Lara.LeftArm.zRot = 0;
 	Lara.LeftArm.yRot = 0;
 	Lara.LeftArm.xRot = 0;
@@ -385,7 +385,7 @@ void ready_pistols(LARA_WEAPON_TYPE weaponType)
 
 void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 {
-	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
+	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.Control.WeaponControl.GunType)];
 	WEAPON_INFO* weapon = &Weapons[weaponType];
 
 	int frameLeft = Lara.LeftArm.frameNumber;
@@ -465,7 +465,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 	if (frameLeft == p->draw1Anim && frameRight == p->draw1Anim)
 	{
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 		Lara.LeftArm.frameNumber = 0;
 		Lara.RightArm.frameNumber = 0;
 		Lara.target = NULL;
@@ -484,7 +484,7 @@ void undraw_pistols(LARA_WEAPON_TYPE weaponType)
 
 void set_arm_info(LARA_ARM* arm, int frame)
 {
-	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
+	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.Control.WeaponControl.GunType)];
 	int animBase = Objects[p->objectNum].animIndex;
 	
 	if (frame < p->draw1Anim)
@@ -503,7 +503,7 @@ void set_arm_info(LARA_ARM* arm, int frame)
 void draw_pistols(LARA_WEAPON_TYPE weaponType)
 {
 	int frame = Lara.LeftArm.frameNumber + 1;
-	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.gunType)];
+	PISTOL_DEF* p = &PistolsTable[static_cast<int>(Lara.Control.WeaponControl.GunType)];
 
 	if (frame < p->draw1Anim || frame > p->recoilAnim - 1)
 	{

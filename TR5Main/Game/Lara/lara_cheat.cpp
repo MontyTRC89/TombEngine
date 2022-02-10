@@ -81,9 +81,9 @@ void LaraCheatyBits()
 
 				LaraItem->Position.yPos -= 128;
 
-				if (Lara.waterStatus != LW_FLYCHEAT)
+				if (Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 				{
-					Lara.waterStatus = LW_FLYCHEAT;
+					Lara.Control.WaterStatus = WaterStatus::FlyCheat;
 					SetAnimation(LaraItem, LA_DOZY);
 					LaraItem->Airborne = false;
 					LaraItem->Position.xRot = ANGLE(30);

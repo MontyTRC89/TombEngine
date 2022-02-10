@@ -251,9 +251,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (BinocularRange == 0)
 			{
-				if (Lara.gunStatus == LG_READY && ((Lara.gunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || 
-												   (Lara.gunType == WEAPON_HK) || 
-												   (Lara.gunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || 
+												   (Lara.Control.WeaponControl.GunType == WEAPON_HK) || 
+												   (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
@@ -612,7 +612,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		Camera.target.y = LaraItem->Position.yPos;
 		Camera.target.z = LaraItem->Position.zPos;
 
-		int x = Lara.weaponItem;
+		int x = Lara.Control.WeaponControl.WeaponItem;
 
 		RequiredStartPos = false;
 		InitialiseGame = false;

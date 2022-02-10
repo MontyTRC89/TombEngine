@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 			|| item->Status
 			|| item->Flags & 0x100
 			|| CurrentSequence >= 3
-			|| Lara.gunStatus
+			|| Lara.Control.HandStatus != HandStatus::Free
 			|| l->ActiveState != LS_IDLE
 			|| l->AnimNumber != LA_STAND_IDLE)
 			&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
@@ -65,7 +65,7 @@ namespace TEN::Entities::Switches
 
 				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace TEN::Entities::Switches
 		else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 		{
 			Lara.Control.IsMoving = false;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 		}
 	}
 

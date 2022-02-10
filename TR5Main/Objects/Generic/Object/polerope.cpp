@@ -34,7 +34,7 @@ namespace TEN::Entities::Generic
 
 		if (isLara &&
 			TrInput & IN_ACTION && 
-			!Lara.gunStatus && 
+			Lara.Control.HandStatus == HandStatus::Free &&
 			l->ActiveState == LS_IDLE && 
 			l->AnimNumber == LA_STAND_IDLE || Lara.Control.IsMoving &&
 			Lara.interactedItem == itemNumber)
@@ -50,7 +50,7 @@ namespace TEN::Entities::Generic
 					l->ActiveState = LS_POLE_IDLE;
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 				}
 				else
 				{
@@ -63,16 +63,16 @@ namespace TEN::Entities::Generic
 				if (Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 				item->Position.yRot = rot;
 			}
 		}
 		else if (isLara && 
 				 TrInput & IN_ACTION &&
-			     !Lara.gunStatus && 
+			     Lara.Control.HandStatus == HandStatus::Free && 
 				 l->Airborne && 
-				 l->VerticalVelocity > Lara.gunStatus && 
+				 l->VerticalVelocity > (int)Lara.Control.HandStatus && 
 				 l->ActiveState == LS_REACH || l->ActiveState == LS_JUMP_UP)
 		{
 			if (TestBoundsCollide(item, l, 100) &&
@@ -100,7 +100,7 @@ namespace TEN::Entities::Generic
 					l->Airborne = false;
 					l->VerticalVelocity = false;
 					l->ActiveState = LS_POLE_IDLE;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 					item->Position.yRot = rot;
 				}
 			}

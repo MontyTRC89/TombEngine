@@ -27,7 +27,7 @@ namespace TEN::Entities::Switches
 		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if ((TrInput & IN_ACTION)
-			&& !Lara.gunStatus
+			&& Lara.Control.HandStatus == HandStatus::Free
 			&& (l->ActiveState == LS_REACH || l->ActiveState == LS_JUMP_UP)
 			&& (l->Status || l->Airborne)
 			&& l->VerticalVelocity > 0
@@ -42,7 +42,7 @@ namespace TEN::Entities::Switches
 				l->VerticalVelocity = 0;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				l->Airborne = false;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 
 				item->TargetState = SWITCH_ON;
 				item->Status = ITEM_ACTIVE;

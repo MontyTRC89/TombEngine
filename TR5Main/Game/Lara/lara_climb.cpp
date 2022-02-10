@@ -409,7 +409,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->AnimNumber == LA_LADDER_IDLE)
 		{
 			item->TargetState = LS_JUMP_BACK;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 			Lara.Control.MoveAngle = item->Position.yRot + ANGLE(180);
 		}
 	}
@@ -980,7 +980,7 @@ bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = true;
 	item->VerticalVelocity = 1;
 
-	Lara.gunStatus = LG_HANDS_FREE;
+	Lara.Control.HandStatus = HandStatus::Free;
 
 	return true;
 }

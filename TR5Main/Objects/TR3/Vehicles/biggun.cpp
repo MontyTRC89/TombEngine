@@ -78,7 +78,7 @@ static bool BigGunTestMount(ITEM_INFO* bGunItem, ITEM_INFO* laraItem)
 	//LaraInfo*& laraInfo = lara->data; // If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 
 	if (!(TrInput & IN_ACTION) ||
-		Lara.gunStatus != LG_HANDS_FREE ||
+		Lara.Control.HandStatus != HandStatus::Free ||
 		laraItem->Airborne)
 	{
 		return false;
@@ -151,14 +151,14 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		laraInfo->Vehicle = itemNum;
 
-		if (laraInfo->gunType == WEAPON_FLARE)
+		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, false);
 			UndrawFlareMeshes(laraItem);
 
 			laraInfo->Flare.ControlLeft = false;
-			laraInfo->requestGunType = WEAPON_NONE;
-			laraInfo->gunType = WEAPON_NONE;
+			laraInfo->Control.WeaponControl.RequestGunType = WEAPON_NONE;
+			laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
 		laraItem->AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;
@@ -167,7 +167,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->ActiveState = BGUN_STATE_MOUNT;
 		laraItem->Position = bGunItem->Position;
 		laraItem->Airborne = false;
-		laraInfo->gunStatus = LG_HANDS_BUSY;
+		laraInfo->Control.HandStatus = HandStatus::Busy;
 		bGunItem->HitPoints = 1;
 		bGunInfo->flags = 0;
 		bGunInfo->xRot = BGUN_DISMOUNT_FRAME;
@@ -265,7 +265,7 @@ bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			SetAnimation(laraItem, LA_STAND_IDLE);
 			laraInfo->Vehicle = NO_ITEM;
-			laraInfo->gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 			bGunItem->HitPoints = 0;
 		}
 

@@ -59,8 +59,8 @@ void AnimateLara(ITEM_INFO* item)
 					break;
 
 				case COMMAND_ATTACK_READY:
-					if (info->gunStatus != LG_SPECIAL)
-						info->gunStatus = LG_HANDS_FREE;
+					if (info->Control.HandStatus != HandStatus::Special)
+						info->Control.HandStatus = HandStatus::Free;
 					break;
 
 				case COMMAND_SOUND_FX:
@@ -172,7 +172,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		int velocity;
 
-		if (info->waterStatus == LW_WADE && TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (info->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)

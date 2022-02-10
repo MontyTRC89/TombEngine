@@ -208,7 +208,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				AnimateItem(LaraItem);
 
 				Lara.ExtraAnim = 1;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				Lara.hitDirection = -1;
 
 				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;

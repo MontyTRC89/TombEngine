@@ -110,7 +110,7 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->ActiveState != LS_IDLE
 		|| l->AnimNumber != LA_STAND_IDLE
 		|| l->Status == ITEM_INVISIBLE
-		|| Lara.gunStatus)
+		|| Lara.Control.HandStatus != HandStatus::Free)
 		&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
 	{
 #ifdef NEW_TIGHTROPE

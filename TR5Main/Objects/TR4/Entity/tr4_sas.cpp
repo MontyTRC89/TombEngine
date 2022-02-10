@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 		if ((!(TrInput & IN_ACTION)
 			|| l->ActiveState != LS_IDLE
 			|| l->AnimNumber != LA_STAND_IDLE
-			|| Lara.gunStatus
+			|| Lara.Control.HandStatus != HandStatus::Free
 			|| l->Airborne
 			|| item->Flags & 0x3E00)
 			&& (!(Lara.Control.IsMoving) || Lara.interactedItem != itemNumber))
@@ -728,7 +728,7 @@ namespace TEN::Entities::TR4
 					l->Position.yRot = item->Position.yRot;
 					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 					item->Flags |= 0x3E00;
 					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNumber);

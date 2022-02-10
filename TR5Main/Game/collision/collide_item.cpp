@@ -440,7 +440,7 @@ bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l)
 	if (Lara.Control.IsMoving)
 	{
 		Lara.Control.IsMoving = false;
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 	}
 
 	return false;
@@ -520,7 +520,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 
 	if (!Lara.Control.IsMoving)
 	{
-		if (Lara.waterStatus != LW_UNDERWATER)
+		if (Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
 			int angle = mGetAngle(dest->xPos, dest->zPos, src->xPos, src->zPos);
 			int direction = (GetQuadrant(angle) - GetQuadrant(dest->yRot)) & 3;
@@ -529,23 +529,23 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 			{
 			case 0:
 				SetAnimation(LaraItem, LA_SIDESTEP_LEFT);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				break;
 
 			case 1:
 				SetAnimation(LaraItem, LA_WALK);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				break;
 
 			case 2:
 				SetAnimation(LaraItem, LA_SIDESTEP_RIGHT);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				break;
 
 			case 3:
 			default:
 				SetAnimation(LaraItem, LA_WALK_BACK);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				break;
 			}
 		}
@@ -767,7 +767,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 	if (lara != nullptr && lara->Control.PositionAdjustCount > 15)
 	{
 		Lara.Control.IsMoving = false;
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
@@ -842,7 +842,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.PositionAdjustCount > 15)
 	{
 		Lara.Control.IsMoving = false;
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
@@ -1757,7 +1757,9 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (TestCollision(item, l))
 			{
-				if (coll->Setup.EnableObjectPush || Lara.waterStatus == LW_UNDERWATER || Lara.waterStatus == LW_SURFACE)
+				if (coll->Setup.EnableObjectPush ||
+					Lara.Control.WaterStatus == WaterStatus::Underwater ||
+					Lara.Control.WaterStatus == WaterStatus::WaterSurface)
 				{
 					ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 0);
 				}

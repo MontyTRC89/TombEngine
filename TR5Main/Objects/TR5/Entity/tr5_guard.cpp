@@ -672,7 +672,7 @@ void GuardControl(short itemNum)
 			break;
 		case 17:
 			joint2 = 0;
-			if (!item->HitStatus && LaraItem->Velocity < 40 && !Lara.hasFired)
+			if (!item->HitStatus && LaraItem->Velocity < 40 && !Lara.Control.WeaponControl.HasFired)
 				creature->alerted = false;
 			if (creature->alerted)
 				item->TargetState = 18;

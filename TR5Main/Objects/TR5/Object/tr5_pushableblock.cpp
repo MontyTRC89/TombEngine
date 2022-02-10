@@ -380,7 +380,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		|| l->ActiveState != LS_IDLE
 		|| l->AnimNumber != LA_STAND_IDLE
 		|| l->Airborne
-		|| Lara.gunStatus
+		|| Lara.Control.HandStatus != HandStatus::Free
 		|| item->Status == ITEM_INVISIBLE
 		|| item->TriggerFlags < 0)
 		&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
@@ -485,7 +485,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->ActiveState = LS_PUSHABLE_GRAB;
 				l->TargetState = LS_PUSHABLE_GRAB;
 				Lara.Control.IsMoving = false;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				Lara.nextCornerPos.xPos = itemNum;
 				item->Position.yRot = rot;
 			}
@@ -498,7 +498,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->ActiveState = LS_PUSHABLE_GRAB;
 					l->TargetState = LS_PUSHABLE_GRAB;
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.nextCornerPos.xPos = itemNum;
 					item->Position.yRot = rot;
 				}
@@ -514,7 +514,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 			{
 				Lara.Control.IsMoving = false;
-				Lara.gunStatus = LG_HANDS_FREE;
+				Lara.Control.HandStatus = HandStatus::Free;
 			}
 			item->Position.yRot = rot;
 		}

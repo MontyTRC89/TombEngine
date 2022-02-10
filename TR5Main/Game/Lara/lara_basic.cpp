@@ -71,7 +71,7 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
 	{
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 
 		if (UseForcedFixedCamera)
 			UseForcedFixedCamera = 0;
@@ -157,7 +157,7 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_WADE)
+		if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK) [[likely]]
 			item->TargetState = LS_WALK_FORWARD;
@@ -259,7 +259,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if ((TrInput & IN_JUMP || info->Control.RunJumpQueued) &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (info->Control.RunJumpCount >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
@@ -272,7 +272,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_SPRINT && info->sprintTimer &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_SPRINT;
 		return;
@@ -280,15 +280,15 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	// TODO: Control settings option to enable/disable FORWARD+BACK as roll input.
 	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->Control.RunJumpQueued &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
-		info->waterStatus != LW_WADE)
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -296,7 +296,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_WADE)
+		if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
@@ -375,7 +375,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.CanLook = ((TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterStatus == LW_WADE) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
+	info->Control.CanLook = ((TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -406,7 +406,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (info->waterStatus == LW_WADE)
+	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			PseudoLaraAsSwampIdle(item, coll);
@@ -432,7 +432,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -442,7 +442,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -500,8 +500,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			info->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
-			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
-			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
+			(info->Control.HandStatus == HandStatus::WeaponReady && info->Control.WeaponControl.GunType != WEAPON_TORCH) ||
+			(info->Control.HandStatus == HandStatus::DrawWeapon && info->Control.WeaponControl.GunType != WEAPON_FLARE))
 		{
 			item->TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -514,8 +514,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			info->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
-			(info->gunStatus == LG_READY && info->gunType != WEAPON_TORCH) ||
-			(info->gunStatus == LG_DRAW_GUNS && info->gunType != WEAPON_FLARE))
+			(info->Control.HandStatus == HandStatus::WeaponReady && info->Control.WeaponControl.GunType != WEAPON_TORCH) ||
+			(info->Control.HandStatus == HandStatus::DrawWeapon && info->Control.WeaponControl.GunType != WEAPON_FLARE))
 		{
 			item->TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -556,7 +556,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -610,7 +610,7 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->gunStatus == LG_HANDS_FREE &&
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -818,7 +818,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterStatus == LW_WADE) ? false : true;
+	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -832,7 +832,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	else if (info->Control.TurnRate > LARA_MED_FAST_TURN_MAX)
 		info->Control.TurnRate = LARA_MED_FAST_TURN_MAX;
 
-	if (info->waterStatus == LW_WADE)
+	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			PsuedoLaraAsSwampTurnRightSlow(item, coll);
@@ -859,7 +859,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1032,7 +1032,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterStatus == LW_WADE) ? false : true;
+	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1046,7 +1046,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	else if (info->Control.TurnRate < -LARA_MED_FAST_TURN_MAX)
 		info->Control.TurnRate = -LARA_MED_FAST_TURN_MAX;
 
-	if (info->waterStatus == LW_WADE)
+	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 			PsuedoLaraAsSwampTurnLeftSlow(item, coll);
@@ -1073,7 +1073,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1323,7 +1323,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterStatus == LW_WADE) ? false : true;
+	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1335,7 +1335,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) &&
-		info->waterStatus == LW_WADE)
+		info->Control.WaterStatus == WaterStatus::Wade)
 	{
 		PseudoLaraAsSwampWalkBack(item, coll);
 		return;
@@ -1360,7 +1360,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_BACK &&
-		(TrInput & IN_WALK || info->waterStatus == LW_WADE))
+		(TrInput & IN_WALK || info->Control.WaterStatus == WaterStatus::Wade))
 	{
 		item->TargetState = LS_WALK_BACK;
 		return;
@@ -1410,7 +1410,7 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
@@ -1476,15 +1476,15 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
-		info->waterStatus != LW_WADE)
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1492,7 +1492,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		if (info->Control.WaterStatus == WaterStatus::Wade)		// Should not be possible, but here for security.
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1593,15 +1593,15 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		info->waterStatus != LW_WADE)
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)) &&
-		info->waterStatus != LW_WADE)
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
+		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1609,7 +1609,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_WADE)		// Should not be possible, but here for security.
+		if (info->Control.WaterStatus == WaterStatus::Wade)		// Should not be possible, but here for security.
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1728,7 +1728,7 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
@@ -1813,7 +1813,7 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->waterStatus == LW_WADE) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
@@ -1985,7 +1985,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterStatus == LW_WADE) ? false : true;
+	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -2019,7 +2019,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_ABOVE_WATER)
+		if (info->Control.WaterStatus == WaterStatus::Dry)
 			item->TargetState = LS_RUN_FORWARD;
 		else [[likely]]
 			item->TargetState = LS_WADE_FORWARD;
@@ -2149,7 +2149,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->gunStatus == LG_HANDS_FREE || !IsStandingWeapon(info->gunType)))
+		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -2159,7 +2159,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	// while meeting some condition allows Lara to run around in the water room. Investigate. @Sezz 2021.09.29
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->waterStatus == LW_WADE)
+		if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
@@ -2301,7 +2301,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
 			item->TargetState = LS_DEATH;
-		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->waterStatus == LW_WADE)
+		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_IDLE;
 		else
 			item->TargetState = LS_RUN_FORWARD;

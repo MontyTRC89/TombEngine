@@ -118,7 +118,7 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 	}
 	else if (HealthBarTimer > 0 ||
 		HealthBar <= 0 ||
-		Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH ||
+		Lara.Control.HandStatus == HandStatus::WeaponReady && Lara.Control.WeaponControl.GunType != WEAPON_TORCH ||
 		Lara.poisoned >= 256)
 	{
 		if (!BinocularRange)
@@ -145,8 +145,8 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 	if (Lara.Vehicle == NO_ITEM ||
 		g_Level.Items[Lara.Vehicle].ObjectNumber != ID_UPV)
 	{
-		if (Lara.waterStatus != LW_UNDERWATER &&
-			Lara.waterStatus != LW_SURFACE &&
+		if (Lara.Control.WaterStatus != WaterStatus::Underwater &&
+			Lara.Control.WaterStatus != WaterStatus::WaterSurface &&
 			!(TestEnvironment(ENV_FLAG_SWAMP, item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
 			return;
 	}

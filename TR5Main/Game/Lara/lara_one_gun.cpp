@@ -39,7 +39,7 @@ void FireHarpoon()
 	if (!ammos)
 		return;
 
-	Lara.hasFired = true;
+	Lara.Control.WeaponControl.HasFired = true;
 
 	// Create a new item for harpoon
 	short itemNumber = CreateItem();
@@ -267,7 +267,7 @@ void FireGrenade()
 	if (!ammo)
 		return;
 
-	Lara.hasFired = true;
+	Lara.Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -957,11 +957,11 @@ void draw_shotgun(int weaponType)
 {
 	ITEM_INFO* item;
 
-	if (Lara.weaponItem == NO_ITEM)
+	if (Lara.Control.WeaponControl.WeaponItem == NO_ITEM)
 	{
-		Lara.weaponItem = CreateItem();
+		Lara.Control.WeaponControl.WeaponItem = CreateItem();
 		
-		item = &g_Level.Items[Lara.weaponItem];
+		item = &g_Level.Items[Lara.Control.WeaponControl.WeaponItem];
 
 		item->ObjectNumber = WeaponObject(weaponType);
 
@@ -983,7 +983,7 @@ void draw_shotgun(int weaponType)
 	}
 	else
 	{
-		item = &g_Level.Items[Lara.weaponItem];
+		item = &g_Level.Items[Lara.Control.WeaponControl.WeaponItem];
 	}
 
 	AnimateItem(item);
@@ -992,7 +992,7 @@ void draw_shotgun(int weaponType)
 	{
 		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == Weapons[weaponType].drawFrame)
 			draw_shotgun_meshes(weaponType);
-		else if (Lara.waterStatus == LW_UNDERWATER)
+		else if (Lara.Control.WaterStatus == WaterStatus::Underwater)
 			item->TargetState = 6;
 	}
 	else
@@ -1048,7 +1048,7 @@ void AnimateShotgun(int weaponType)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
-	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
+	ITEM_INFO* item = &g_Level.Items[Lara.Control.WeaponControl.WeaponItem];
 	bool running = (weaponType == WEAPON_HK && LaraItem->Velocity != 0);
 	bool harpoonFired = false;
 
@@ -1059,7 +1059,7 @@ void AnimateShotgun(int weaponType)
 //		HKTimer = 0;
 //		HKFlag2 = 0;
 
-		if (Lara.waterStatus == LW_UNDERWATER || running)
+		if (Lara.Control.WaterStatus == WaterStatus::Underwater || running)
 			item->TargetState = WSTATE_UW_AIM;
 		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.lock == false)
 			item->TargetState = WSTATE_UNAIM;
@@ -1073,7 +1073,7 @@ void AnimateShotgun(int weaponType)
 //		HKTimer = 0;
 //		HKFlag2 = 0;
 
-		if (Lara.waterStatus == LW_UNDERWATER || running)
+		if (Lara.Control.WaterStatus == WaterStatus::Underwater || running)
 		{
 			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.lock == false)
 				item->TargetState = WSTATE_UW_UNAIM;
@@ -1090,7 +1090,7 @@ void AnimateShotgun(int weaponType)
 		{
 			item->TargetState = WSTATE_UNAIM;
 			
-			if (Lara.waterStatus != LW_UNDERWATER && !running && !harpoonFired)
+			if (Lara.Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
 			{
 				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.LeftArm.lock))
 				{
@@ -1172,7 +1172,7 @@ void AnimateShotgun(int weaponType)
 		{
 			item->TargetState = WSTATE_UW_UNAIM;
 
-			if ((Lara.waterStatus == LW_UNDERWATER || running)
+			if ((Lara.Control.WaterStatus == WaterStatus::Underwater || running)
 				&& !harpoonFired)
 			{
 				if ((TrInput & IN_ACTION) 
@@ -1529,7 +1529,7 @@ void FireCrossbow(PHD_3DPOS* pos)
 	if (!ammos)
 		return;
 
-	Lara.hasFired = true;
+	Lara.Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1636,7 +1636,7 @@ void FireRocket()
 	if (!ammos)
 		return;
 
-	Lara.hasFired = true;
+	Lara.Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1817,19 +1817,19 @@ void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
 
 void undraw_shotgun(int weapon)
 {
-	ITEM_INFO* item = &g_Level.Items[Lara.weaponItem];
+	ITEM_INFO* item = &g_Level.Items[Lara.Control.WeaponControl.WeaponItem];
 	item->TargetState = 3;
 	
 	AnimateItem(item);
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		Lara.gunStatus = LG_HANDS_FREE;
+		Lara.Control.HandStatus = HandStatus::Free;
 		Lara.target = nullptr;
 		Lara.RightArm.lock = false;
 		Lara.LeftArm.lock = false;
-		KillItem(Lara.weaponItem);
-		Lara.weaponItem = NO_ITEM;
+		KillItem(Lara.Control.WeaponControl.WeaponItem);
+		Lara.Control.WeaponControl.WeaponItem = NO_ITEM;
 		Lara.RightArm.frameNumber = 0;
 		Lara.LeftArm.frameNumber = 0;
 	}
@@ -1848,13 +1848,13 @@ void undraw_shotgun(int weapon)
 
 void undraw_shotgun_meshes(int weapon)
 {
-	Lara.holsterInfo.backHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
+	Lara.Control.WeaponControl.HolsterInfo.backHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
 	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void draw_shotgun_meshes(int weaponType)
 {
-	Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
+	Lara.Control.WeaponControl.HolsterInfo.backHolster = HOLSTER_SLOT::Empty;
 	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
@@ -1978,7 +1978,7 @@ void FireShotgun()
 
 void ready_shotgun(int weaponType)
 {
-	Lara.gunStatus = LG_READY;
+	Lara.Control.HandStatus = HandStatus::WeaponReady;
 	Lara.LeftArm.zRot = 0;
 	Lara.LeftArm.yRot = 0;
 	Lara.LeftArm.xRot = 0;

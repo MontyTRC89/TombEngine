@@ -310,7 +310,7 @@ void UseClockworkBeetle(short flag)
 		|| LaraItem->ActiveState == LS_IDLE
 		&& LaraItem->AnimNumber == LA_STAND_IDLE
 		&& !LaraItem->HitStatus
-		&& Lara.gunStatus == LG_HANDS_FREE)
+		&& Lara.Control.HandStatus == HandStatus::Free)
 	{
 		itemNum = CreateItem();
 

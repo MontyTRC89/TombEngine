@@ -71,7 +71,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
-			info->waterStatus != LW_WADE) [[likely]]
+			info->Control.WaterStatus != WaterStatus::Wade) [[likely]]
 		{
 			item->TargetState = LS_RUN_FORWARD;
 		}
@@ -83,7 +83,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ACTION &&
-		info->gunStatus == LG_HANDS_FREE)
+		info->Control.HandStatus == HandStatus::Free)
 	{
 		item->TargetState = LS_REACH;
 		return;
@@ -96,7 +96,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_WALK &&
-		info->gunStatus == LG_HANDS_FREE)
+		info->Control.HandStatus == HandStatus::Free)
 	{
 		item->TargetState = LS_SWAN_DIVE;
 		return;
@@ -736,7 +736,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ACTION &&
-		info->gunStatus == LG_HANDS_FREE)
+		info->Control.HandStatus == HandStatus::Free)
 	{
 		item->TargetState = LS_REACH;
 		return;
@@ -764,7 +764,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->gunStatus = LG_HANDS_BUSY;
+	info->Control.HandStatus = HandStatus::Busy;
 	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -813,7 +813,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeJump(item, coll))
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 
 	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	{
@@ -834,7 +834,7 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 			SetAnimation(item, LA_SWANDIVE_ROLL);
 
 		SetLaraLand(item, coll);
-		info->gunStatus = LG_HANDS_FREE;
+		info->Control.HandStatus = HandStatus::Free;
 
 		LaraSnapToHeight(item, coll);
 	}

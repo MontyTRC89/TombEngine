@@ -134,8 +134,8 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 	AnimateItem(larA);
 
 	Lara.ExtraAnim = 1;
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.gunType = WEAPON_NONE;
+	Lara.Control.HandStatus = HandStatus::Busy;
+	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 	Lara.hitDirection = -1;
 	Lara.air = -1;
 

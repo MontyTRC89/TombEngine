@@ -48,14 +48,14 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
 	l->Position.yRot += ANGLE(180);
 
-	if (TrInput & IN_ACTION && item->Status != ITEM_ACTIVE && l->ActiveState == LS_JUMP_UP && l->Airborne && Lara.gunStatus == LG_HANDS_FREE && itemIsAbove && (result || result2))
+	if (TrInput & IN_ACTION && item->Status != ITEM_ACTIVE && l->ActiveState == LS_JUMP_UP && l->Airborne && Lara.Control.HandStatus == HandStatus::Free && itemIsAbove && (result || result2))
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
 		if (result2)
 			l->Position.yRot += ANGLE(180);
 		
 		ResetLaraFlex(l);
-		Lara.gunStatus = LG_HANDS_BUSY;
+		Lara.Control.HandStatus = HandStatus::Busy;
 		l->Airborne = false;
 		l->VerticalVelocity = 0;
 		l->AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
@@ -86,7 +86,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item;
 
 	item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && item->Status != ITEM_ACTIVE && l->ActiveState == LS_IDLE && l->AnimNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE
+	if (TrInput & IN_ACTION && item->Status != ITEM_ACTIVE && l->ActiveState == LS_IDLE && l->AnimNumber == LA_STAND_IDLE && Lara.Control.HandStatus == HandStatus::Free
 		|| Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
@@ -98,7 +98,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 				l->ActiveState = LS_TRAPDOOR_FLOOR_OPEN;
 				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
-				Lara.gunStatus = LG_HANDS_BUSY;
+				Lara.Control.HandStatus = HandStatus::Busy;
 				AddActiveItem(itemNumber);
 				item->Status = ITEM_ACTIVE;
 				item->TargetState = 1;

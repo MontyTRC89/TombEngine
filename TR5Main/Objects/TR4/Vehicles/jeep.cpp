@@ -409,7 +409,7 @@ static int JeepCheckGetOff()
 			LaraItem->Position.xRot = 0;
 			LaraItem->Position.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
-			Lara.gunStatus = LG_HANDS_FREE;
+			Lara.Control.HandStatus = HandStatus::Free;
 			return false;
 		}
 	}
@@ -427,7 +427,7 @@ static int GetOnJeep(int itemNumber)
 	if (item->Flags & 0x100)
 		return 0;
 
-	if (Lara.gunStatus)
+	if (Lara.Control.HandStatus != HandStatus::Free)
 		return 0;
 
 	if (LaraItem->ActiveState != LS_IDLE)
@@ -1497,16 +1497,16 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			Lara.Vehicle = itemNumber;
 
-			if (Lara.gunType == WEAPON_FLARE)
+			if (Lara.Control.WeaponControl.GunType == WEAPON_FLARE)
 			{
 				CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 				UndrawFlareMeshes(l);
 				Lara.Flare.ControlLeft = 0;
-				Lara.requestGunType = WEAPON_NONE;
-				Lara.gunType = WEAPON_NONE;
+				Lara.Control.WeaponControl.RequestGunType = WEAPON_NONE;
+				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 			}
 
-			Lara.gunStatus = LG_HANDS_BUSY;
+			Lara.Control.HandStatus = HandStatus::Busy;
 
 			/*v4 = *(_WORD*)(Rooms + 148 * (signed short)v3->roomNumber + 72);
 			// Enable ENEMY_JEEP

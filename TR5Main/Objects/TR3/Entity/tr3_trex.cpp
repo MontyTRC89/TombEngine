@@ -32,8 +32,8 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 
 	LaraItem->HitPoints = -16384;
 	Lara.air = -1;
-	Lara.gunStatus = LG_HANDS_BUSY;
-	Lara.gunType = WEAPON_NONE;
+	Lara.Control.HandStatus = HandStatus::Busy;
+	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 
 	Camera.flags = 1;
 	Camera.targetAngle = ANGLE(170);

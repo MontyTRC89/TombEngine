@@ -239,8 +239,8 @@ namespace TEN::Entities::TR4
         }
         else
         {
-            if (Lara.gunType != WEAPON_TORCH
-                || Lara.gunStatus != LG_READY
+            if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
+                || Lara.Control.HandStatus != HandStatus::WeaponReady
                 || Lara.LeftArm.lock
                 || !(TrInput & IN_ACTION)
                 || item->TriggerFlags != 1 

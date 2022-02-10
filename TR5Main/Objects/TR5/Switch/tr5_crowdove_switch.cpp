@@ -39,7 +39,7 @@ namespace TEN::Entities::TR5
 		if (item->Flags & ONESHOT
 			|| !(item->MeshBits & 4)
 			|| (!(TrInput & IN_ACTION)
-				|| Lara.gunStatus
+				|| Lara.Control.HandStatus != HandStatus::Free
 				|| l->ActiveState != LS_IDLE
 				|| l->AnimNumber != LA_STAND_IDLE
 				|| l->Airborne)
@@ -70,7 +70,7 @@ namespace TEN::Entities::TR5
 					item->Position.yRot = oldYrot;
 					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.interactedItem = itemNum;
 				}
 				else
@@ -84,7 +84,7 @@ namespace TEN::Entities::TR5
 				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 				item->Position.yRot = oldYrot;
 			}

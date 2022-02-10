@@ -43,7 +43,7 @@ namespace TEN::Entities::Switches
 		if ((!(TrInput & IN_ACTION)
 			|| l->ActiveState != LS_IDLE
 			|| l->AnimNumber != LA_STAND_IDLE
-			|| Lara.gunStatus)
+			|| Lara.Control.HandStatus != HandStatus::Free)
 			&& (!Lara.Control.IsMoving
 				|| Lara.interactedItem != itemNum))
 		{
@@ -70,7 +70,7 @@ namespace TEN::Entities::Switches
 				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 
 				l->Position.yRot ^= (short)ANGLE(180);
@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 					l->ActiveState = LS_LEVERSWITCH_PUSH;
 					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 
 					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNum);
@@ -108,7 +108,7 @@ namespace TEN::Entities::Switches
 					l->ActiveState = LS_LEVERSWITCH_PUSH;
 					Lara.Control.IsMoving = false;
 					ResetLaraFlex(l);
-					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.Control.HandStatus = HandStatus::Busy;
 
 					item->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNum);
@@ -124,7 +124,7 @@ namespace TEN::Entities::Switches
 				if (Lara.interactedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					Lara.Control.HandStatus = HandStatus::Free;
 				}
 			}
 
