@@ -1,5 +1,6 @@
-#include "framework.h"
+#include "frameworkandsol.h"
 #include "GameScriptFog.h"
+#include "Specific/RGBAColor8Byte.h"
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
 
@@ -10,7 +11,7 @@ As seen in TR4's City of the Dead.
 void GameScriptFog::Register(sol::state* lua)
 {
 	lua->new_usertype<GameScriptFog>("Fog",
-		sol::constructors<GameScriptFog(GameScriptColor const&, short, short)>(),
+		sol::constructors<GameScriptFog(RGBAColor8Byte const&, short, short)>(),
 
 		/// (@{Color}) RGB sky color
 		//@mem color
@@ -38,7 +39,7 @@ void GameScriptFog::Register(sol::state* lua)
 @return A SkyLayer object.
 @function SkyLayer.new
 */
-GameScriptFog::GameScriptFog(GameScriptColor const& col, short minDistance, short maxDistance)
+GameScriptFog::GameScriptFog(RGBAColor8Byte const& col, short minDistance, short maxDistance)
 {
 	SetColor(col);
 	MinDistance = minDistance;
@@ -46,7 +47,7 @@ GameScriptFog::GameScriptFog(GameScriptColor const& col, short minDistance, shor
 	Enabled = true;
 }
 
-void GameScriptFog::SetColor(GameScriptColor const& col)
+void GameScriptFog::SetColor(RGBAColor8Byte const& col)
 {
 	R = col.GetR();
 	G = col.GetG();
@@ -54,3 +55,7 @@ void GameScriptFog::SetColor(GameScriptColor const& col)
 }
 
 
+RGBAColor8Byte GameScriptFog::GetColor() const
+{
+	return RGBAColor8Byte{ R, G, B };
+}

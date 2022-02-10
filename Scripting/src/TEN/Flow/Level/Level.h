@@ -41,6 +41,8 @@ struct Level : public ScriptInterfaceLevel
 	bool UnlimitedAir{ false };
 	std::vector<InventoryItem> InventoryObjects;
 
+	RGBAColor8Byte GetFogColor() const override;
+	bool GetFogEnabled() const override;
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
 	bool HasStorm() const override;
@@ -52,4 +54,6 @@ struct Level : public ScriptInterfaceLevel
 	static void Register(sol::table & parent);
 	WeatherType GetWeatherType() const override;
 	short GetMirrorRoom() const override;
+	short GetFogMinDistance() const override;
+	short GetFogMaxDistance() const override;
 };
