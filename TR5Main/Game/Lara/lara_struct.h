@@ -877,14 +877,23 @@ enum LARA_CLOTH_TYPES
 	CLOTH_WET
 };
 
-enum JumpDirection
+enum class JumpDirection
 {
-	NoDirection, // TODO: Convert to enum class and rename this to "None".
+	None,
 	Up,
 	Forward,
 	Back,
 	Left,
 	Right
+};
+
+enum class BurnType
+{
+	None,
+	Normal,
+	Smoke,
+	Blue,
+	Blue2
 };
 
 enum class HOLSTER_SLOT : int
@@ -1024,8 +1033,8 @@ struct CarriedWeaponInfo
 	bool HasSilencer;
 };
 
-#define MaxDiaryPages	64
-#define MaxStringsPerPage	8
+#define MaxDiaryPages	  64
+#define MaxStringsPerPage 8
 
 struct DiaryString
 {
@@ -1058,21 +1067,25 @@ struct LARA_ARM
 	short flash_gun;
 };
 
-#ifdef NEW_TIGHTROPE
-struct LaraTightrope
-{
-	float balance;
-	unsigned short timeOnTightrope;
-	bool canGoOff;
-	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
-};
-#endif
-
 struct FlareData
 {
-	int Life;
+	unsigned int Life;
 	int Frame;
 	bool ControlLeft;
+};
+
+struct TightropeControlData
+{
+#if NEW_TIGHTROPE
+	float Balance;
+	unsigned short TimeOnTightrope;
+	bool CanDismount;
+	short TightropeItem; // maybe give Tightrope Item a property for difficulty?
+#else // !NEW_TIGHTROPE
+	byte OnCount;
+	byte Off;
+	byte Fall;
+#endif
 };
 
 struct RopeControlData
@@ -1107,29 +1120,28 @@ struct LaraControlData
 	PHD_3DPOS ExtraTorsoRot;
 	PHD_VECTOR ExtraVelocity;
 
+	bool CanLook;
 	bool IsMoving;
 	bool RunJumpQueued;
-	bool CanLook;
 	bool KeepLow;
 	bool IsLow;
 	bool CanClimbLadder;
 	bool IsClimbingLadder;
 	bool CanMonkeySwing;
+	bool Locked;
 
-	int RunJumpCount;
-	int PoseCount;
-	int DiveCount;
-	int DeathCount;
+	unsigned int RunJumpCount;
+	unsigned int PositionAdjustCount;
+	unsigned int PoseCount;
+	unsigned int DiveCount;
+	unsigned int DeathCount;
 
 	RopeControlData RopeControl;
+	TightropeControlData TightropeControl;
 
 	// Inventory stuff??
 	bool IsBusy;
 	bool OldBusy;
-
-	// ??
-	bool Uncontrollable;
-	byte MoveCount; // Convert to int?
 };
 
 struct LaraInfo
@@ -1149,14 +1161,18 @@ struct LaraInfo
 	FX_INFO* SpasmEffect;
 	int SpasmEffectCount;
 	FlareData Flare;
-	int burnCount;
+
+	// TODO
+	BurnType BurnType;
+	bool burn;
+	byte burnBlue;
+	bool burnSmoke;
+
+	unsigned int BurnCount;
 	short weaponItem;
 	HolsterInfo holsterInfo;
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-	bool burn;
-	byte burnBlue;
-	bool burnSmoke;
 	bool hasFired;
 	bool litTorch;
 	bool fired;
@@ -1166,21 +1182,15 @@ struct LaraInfo
 	int meshPtrs[NUM_LARA_MESHES];
 	ITEM_INFO* target;
 	short targetAngles[2];
-	LARA_ARM leftArm;
-	LARA_ARM rightArm;
+	LARA_ARM LeftArm;
+	LARA_ARM RightArm;
 	CREATURE_INFO* creature;
 	short interactedItem;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
-#if NEW_TIGHTROPE
-	LaraTightrope tightrope;
-#else
-	byte tightRopeOnCount;
-	byte tightRopeOff;
-	byte tightRopeFall;
-#endif
-	/// =================================== NEW:
+
+	// NEW:
 	byte BeetleLife;
 	short hasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte smallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4

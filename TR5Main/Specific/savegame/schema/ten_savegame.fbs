@@ -79,17 +79,17 @@ table LaraArmInfo {
 	flash_gun: int32;
 }
 
-table LaraTightropeInfo {
-	balance: float;
-	time_on_tightrope: int32;
-	can_go_off: bool;
-	tightrope_item: int32;
-}
-
 table FlareData {
-	life: int32;
+	life: uint32;
 	frame: int32;
 	control_left: bool;
+}
+
+table TightropeControlData {
+	balance: float;
+	time_on_tightrope: uint32;
+	can_dismount: bool;
+	tightrope_item: int32;
 }
 
 table RopeControlData {
@@ -120,23 +120,24 @@ table LaraControlData {
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
+	can_look: bool;
 	is_moving: bool;
 	run_jump_queued: bool;
-	can_look: bool;
 	keep_low: bool;
 	is_low: bool;
 	can_climb_ladder: bool;
 	is_climbing_ladder: bool;
 	can_monkey_swing: bool;
-	run_jump_count: int32;
-	pose_count: int32;
-	dive_count: int32;
-	death_count: int32;
+	locked: bool;
+	run_jump_count: uint32;
+	position_adjust_count: uint32;
+	pose_count: uint32;
+	dive_count: uint32;
+	death_count: uint32;
 	rope_control: RopeControlData;
+	tightrope_control: TightropeControlData;
 	is_busy: bool;
 	old_busy: bool;
-	uncontrollable: bool;
-	move_count: int32;
 }
 
 table Lara {
@@ -157,14 +158,15 @@ table Lara {
 	current_active: int32;
 	spasm_effect_count: int32;
 	flare: FlareData;
+	burn_type: int32;
+	burn: bool;
+	burn_blue: int32;
+	burn_smoke: bool;
 	burn_count: int32;
 	weapon_item: int32;
 	holster_info: HolsterInfo;
 	poisoned: int32;
 	wet: [bool];
-	burn: bool;
-	burn_blue: int32;
-	burn_smoke: bool;
 	has_fired: bool;
 	lit_torch: bool;
 	fired: bool;
@@ -180,7 +182,6 @@ table Lara {
 	location: int32;
 	highest_location: int32;
 	location_pad: int32;
-	tightrope: LaraTightropeInfo;
 	beetle_life: int32;
 	has_beetle_things: int32;
 	small_waterskin: int32;

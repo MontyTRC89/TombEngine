@@ -195,7 +195,7 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TestLaraJumpUp(item, coll)) [[likely]]
 		info->Control.JumpDirection = JumpDirection::Up;
 	else
-		info->Control.JumpDirection = JumpDirection::NoDirection;
+		info->Control.JumpDirection = JumpDirection::None;
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.

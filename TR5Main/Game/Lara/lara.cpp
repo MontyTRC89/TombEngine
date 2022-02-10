@@ -417,16 +417,16 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Control.IsMoving)
 	{
-		if (info->Control.MoveCount > 90)
+		if (info->Control.PositionAdjustCount > 90)
 		{
 			info->Control.IsMoving = false;
 			info->gunStatus = LG_HANDS_FREE;
 		}
 
-		++info->Control.MoveCount;
+		++info->Control.PositionAdjustCount;
 	}
 
-	if (!info->Control.Uncontrollable)
+	if (!info->Control.Locked)
 		info->locationPad = 128;
 
 	int oldX = item->Position.xPos;

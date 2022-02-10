@@ -116,31 +116,32 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 #ifdef NEW_TIGHTROPE
 		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
 		   l->TargetState != LS_TIGHTROPE_EXIT &&
-		   !Lara.tightrope.canGoOff)
+		   !Lara.Control.TightropeControl.CanDismount)
 		{
 			if(item->Position.yRot == l->Position.yRot)
 			{
 				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
-					Lara.tightrope.canGoOff = true;
+					Lara.Control.TightropeControl.CanDismount = true;
 			}
 		}
-#else // NEW_TIGHTROPE
+
+#else // !NEW_TIGHTROPE
 		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
 		   l->TargetState != LS_TIGHTROPE_EXIT &&
-		   !Lara.tightRopeOff)
+		   !Lara.Control.TightropeControl.Off)
 		{
 			if(item->Position.yRot == l->Position.yRot)
 			{
 				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
-					Lara.tightRopeOff = 1;
+					Lara.tightRopeOff = true;
 			}
 		}
 #endif
-		
 	}
 	else
 	{
 		item->Position.yRot += -ANGLE(180);
+
 		if (TestLaraPosition(&TightRopeBounds, item, l))
 		{
 			if (MoveLaraPosition(&TightRopePos, item, l))
@@ -151,28 +152,26 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				Lara.Control.IsMoving = false;
 				ResetLaraFlex(l);
 #ifdef NEW_TIGHTROPE
-				Lara.tightrope.balance = 0;
-				Lara.tightrope.canGoOff = false;
-				Lara.tightrope.tightropeItem = itemNum;
-				Lara.tightrope.timeOnTightrope = 0;
+				Lara.Control.TightropeControl.Balance = 0;
+				Lara.Control.TightropeControl.CanDismount = false;
+				Lara.Control.TightropeControl.TightropeItem = itemNum;
+				Lara.Control.TightropeControl.TimeOnTightrope = 0;
 #else // !NEW_TIGHTROPE
 				Lara.tightRopeOnCount = 60;
 				Lara.tightRopeOff = 0;
 				Lara.tightRopeFall = 0;
 #endif
-
-				
 			}
 			else
-			{
 				Lara.interactedItem = itemNum;
-			}
+
 			item->Position.yRot += -ANGLE(180);
 		}
 		else
 		{
 			if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
 				Lara.Control.IsMoving = false;
+
 			item->Position.yRot += -ANGLE(180);
 		}
 	}

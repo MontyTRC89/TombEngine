@@ -314,7 +314,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
-		info->Control.JumpDirection = JumpDirection::NoDirection;
+		info->Control.JumpDirection = JumpDirection::None;
 
 	if ((TrInput & IN_FORWARD ||
 		!(TrInput & IN_DIRECTION) && info->Control.JumpDirection == JumpDirection::Forward) &&
@@ -359,7 +359,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->TargetState = LS_IDLE;
-	info->Control.JumpDirection = JumpDirection::NoDirection;
+	info->Control.JumpDirection = JumpDirection::None;
 }
 
 // State:		LS_JUMP_PREPARE (15)

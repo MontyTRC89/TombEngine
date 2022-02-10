@@ -551,7 +551,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAd
 		}
 
 		Lara.Control.IsMoving = true;
-		Lara.Control.MoveCount = 0;
+		Lara.Control.PositionAdjustCount = 0;
 	}
 
 	short deltaAngle = dest->xRot - src->xRot;
@@ -723,7 +723,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 
 		lara->hitDirection = (item2->Position.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
-		if ((!lara->hitFrame) && (!lara->SpasmEffectCount))
+		if (!lara->hitFrame && !lara->SpasmEffectCount)
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Position, 0);
 			lara->SpasmEffectCount = GenerateInt(15, 35);
@@ -764,7 +764,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 		item2->Position.zPos = coll->Setup.OldPosition.z;
 	}
 
-	if (lara != nullptr && lara->Control.MoveCount > 15)
+	if (lara != nullptr && lara->Control.PositionAdjustCount > 15)
 	{
 		Lara.Control.IsMoving = false;
 		Lara.gunStatus = LG_HANDS_FREE;
@@ -839,7 +839,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 		item->Position.zPos = coll->Setup.OldPosition.z;
 	}
 
-	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.MoveCount > 15)
+	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.PositionAdjustCount > 15)
 	{
 		Lara.Control.IsMoving = false;
 		Lara.gunStatus = LG_HANDS_FREE;
