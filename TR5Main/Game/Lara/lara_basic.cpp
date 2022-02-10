@@ -419,7 +419,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::NoDirection)
+		if (info->Control.JumpDirection != JumpDirection::None)
 			item->TargetState = LS_JUMP_PREPARE;
 
 		return;
@@ -845,7 +845,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::NoDirection)
+		if (info->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1059,7 +1059,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::NoDirection)
+		if (info->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1468,7 +1468,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::NoDirection)
+		if (info->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1585,7 +1585,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::NoDirection)
+		if (info->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
