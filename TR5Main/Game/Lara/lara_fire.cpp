@@ -1077,7 +1077,7 @@ void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weaponInfo)
 						{
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
 							angle[0] -= lara->Position.yRot + laraInfo->Control.ExtraTorsoRot.yRot;
-							angle[1] -= lara->Position.xRot + laraInfo->Control.ExtraTorsoRot.zRot;
+							angle[1] -= lara->Position.xRot + laraInfo->Control.ExtraTorsoRot.xRot;
 							if (angle[0] >= weaponInfo->lockAngles[0] && angle[0] <= weaponInfo->lockAngles[1] && angle[1] >= weaponInfo->lockAngles[2] && angle[1] <= weaponInfo->lockAngles[3])
 							{
 								TargetList[targets] = item;
