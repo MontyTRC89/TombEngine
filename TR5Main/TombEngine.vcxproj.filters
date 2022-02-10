@@ -302,6 +302,7 @@
     <ClCompile Include="frameworkandsol.cpp" />
     <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
+    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -665,7 +666,6 @@
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -675,8 +675,8 @@
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
-    <ClInclude Include="Scripting\GameScriptFreeFunctions.h" />
     <ClInclude Include="frameworkandsol.h" />
+    <ClInclude Include="Game\collision\collide_item.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
