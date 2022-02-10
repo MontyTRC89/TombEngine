@@ -87,14 +87,14 @@ namespace TEN::Renderer
 		if (obj->animIndex != -1)
 		{
 			ANIM_FRAME* frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
-			UpdateAnimation(NULL, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
+			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
 		}
 
 		Vector3 pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
 		// Clear just the Z-buffer so we can start drawing on top of the scene
 		ID3D11DepthStencilView* dsv;
-		m_context->OMGetRenderTargets(1, NULL, &dsv);
+		m_context->OMGetRenderTargets(1, nullptr, &dsv);
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Set vertex buffer
@@ -104,8 +104,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		m_context->VSSetShader(m_vsInventory.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsInventory.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
 		// Set matrices
 		CCameraMatrixBuffer HudCamera;
@@ -171,7 +171,7 @@ namespace TEN::Renderer
 			return;
 
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->RSSetState(m_states->CullCounterClockwise());
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
@@ -195,8 +195,8 @@ namespace TEN::Renderer
 		UINT offset = 0;
 
 		// Set shaders
-		m_context->VSSetShader(m_vsShadowMap.Get(), NULL, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1163,7 +1163,7 @@ namespace TEN::Renderer
 		// Set basic render states
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 
 		// Bind and clear render target
 		//m_context->ClearRenderTargetView(target, Colors::Black);
@@ -1188,8 +1188,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		m_context->VSSetShader(m_vsInventory.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInventory.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsInventory.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
 		// Set texture
 		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]),
@@ -1333,8 +1333,8 @@ namespace TEN::Renderer
 			vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
 		}
 
-		m_context->VSSetShader(m_vsFullScreenQuad.Get(), NULL, 0);
-		m_context->PSSetShader(m_psFullScreenQuad.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 		m_context->PSSetShaderResources(0, 1, &texture);
 		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
@@ -1391,11 +1391,11 @@ namespace TEN::Renderer
 	void Renderer11::DrawLines2D()
 	{
 		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-		m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
 		Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth,
 		                                                   m_viewport.MaxDepth);
 
@@ -1438,7 +1438,7 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 
 		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	}
 
@@ -1473,13 +1473,13 @@ namespace TEN::Renderer
 		    else
 		        effect = m_shaderTransparent->GetEffect();
 
-		    effect->SetBool(effect->GetParameterByName(NULL, "UseSkinning"), false);
-		    effect->SetInt(effect->GetParameterByName(NULL, "ModelType"), MODEL_TYPE_MOVEABLE);
+		    effect->SetBool(effect->GetParameterByName(nullptr, "UseSkinning"), false);
+		    effect->SetInt(effect->GetParameterByName(nullptr, "ModelType"), MODEL_TYPE_MOVEABLE);
 
 		    if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-		        effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_OPAQUE);
+		        effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_OPAQUE);
 		    else
-		        effect->SetInt(effect->GetParameterByName(NULL, "BlendMode"), BLENDMODE_ALPHATEST);
+		        effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_ALPHATEST);
 
 		    for (int i = 0; i < NUM_SPIDERS; i++)
 		    {
@@ -1490,9 +1490,9 @@ namespace TEN::Renderer
 		            XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
 		            XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
 		            XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
-		            effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
+		            effect->SetMatrix(effect->GetParameterByName(nullptr, "World"), &m_tempWorld);
 
-		            effect->SetVector(effect->GetParameterByName(NULL, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
+		            effect->SetVector(effect->GetParameterByName(nullptr, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
 
 		            for (int iPass = 0; iPass < cPasses; iPass++)
 		            {
@@ -1713,11 +1713,11 @@ namespace TEN::Renderer
 	void Renderer11::DrawLines3D(RenderView& view)
 	{
 		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Additive(), nullptr, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-		m_context->VSSetShader(m_vsSolid.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSolid.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1741,7 +1741,7 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 
 		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	}
 
@@ -2005,7 +2005,7 @@ namespace TEN::Renderer
 	                                     ID3D11DepthStencilView* depthTarget)
 	{
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->RSSetState(m_states->CullCounterClockwise());
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
@@ -2113,7 +2113,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : NULL);
+				PrintDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : 0);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
@@ -2154,6 +2154,16 @@ namespace TEN::Renderer
 			              );
 		              }
 		);
+
+		
+
+		for (auto& room : view.roomsToDraw)
+		{
+			for (auto& transparentFace : room->TransparentFacesToDraw)
+			{
+
+			}
+		}
 
 		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
 		{
@@ -2398,7 +2408,7 @@ namespace TEN::Renderer
 			m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
 		}
 
-		m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
+		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		// Set texture
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
@@ -2408,7 +2418,7 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
 		// Set shadow map data
-		if (shadowLight != NULL)
+		if (shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
 			m_stShadowMap.CastShadows = true;
@@ -2506,8 +2516,8 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		// Set shaders
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		// Set texture
 		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
@@ -2688,14 +2698,12 @@ namespace TEN::Renderer
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 
 		// Draw rooms and objects
-		DrawRooms(view);
-		DrawStatics(view);
-		DrawLara(false, view);
-		DrawItems(view);
+		DrawRooms(view, false);
+		DrawStatics(view, false);
+		DrawLara(false, view, false);
+		DrawItems(view, false);
 		DrawEffects(view, false);
-		DrawGunFlashes(view);
 		DrawGunShells(view);
-		DrawBaddieGunflashes(view);
 		DrawDebris(view, false);
 		DrawBats(view);
 		DrawRats(view);
@@ -2730,6 +2738,14 @@ namespace TEN::Renderer
 		DrawLines3D(view);
 
 		// Here we sort transparent faces and draw them with a simplified shaders for alpha blending
+		DrawRooms(view, true);
+		DrawStatics(view, true);
+		DrawLara(false, view, true);
+		DrawItems(view, true);
+		DrawEffects(view, true);
+		DrawGunFlashes(view);
+		DrawBaddieGunflashes(view);
+
 		DrawTransparentFaces(view);
 
 		// Draw GUI stuff at the end
@@ -2764,7 +2780,7 @@ namespace TEN::Renderer
 		// Draw shadow map
 
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		m_context->RSSetState(m_states->CullCounterClockwise());
 		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
@@ -2777,14 +2793,14 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &view.viewport);
 
 		// Opaque geometry
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 		DrawHorizonAndSky(view, depthTarget);
-		DrawRooms(view);
+		DrawRooms(view, false);
 	}
 
 	void Renderer11::DumpGameScene()
@@ -2793,7 +2809,7 @@ namespace TEN::Renderer
 		            gameCamera);
 	}
 
-	void Renderer11::DrawItems(RenderView& view)
+	void Renderer11::DrawItems(RenderView& view, bool transparent)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -2804,8 +2820,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
-		m_context->PSSetShader(m_psItems.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 		for (auto room : view.roomsToDraw)
 		{
@@ -2828,7 +2844,7 @@ namespace TEN::Renderer
 				else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
 				{
 					// Wraiths have some additional special effects
-					DrawAnimatingItem(itemToDraw, view);
+					DrawAnimatingItem(itemToDraw, view, transparent);
 					DrawWraithExtra(itemToDraw, view);
 				}
 				else if (objectNumber == ID_DARTS)
@@ -2838,13 +2854,13 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					DrawAnimatingItem(itemToDraw, view);
+					DrawAnimatingItem(itemToDraw, view, transparent);
 				}
 			}
 		}
 	}
 
-	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view)
+	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[nativeItem->roomNumber];
@@ -2882,7 +2898,7 @@ namespace TEN::Renderer
 					mesh = swapMeshObj.ObjectMeshes[k];
 			}
 
-			DrawMoveableMesh(item, mesh, room, k);
+			DrawMoveableMesh(item, mesh, room, k, transparent);
 		}
 	}
 
@@ -2904,8 +2920,8 @@ namespace TEN::Renderer
 		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
 
 		// Set shaders
-		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
-		m_context->PSSetShader(m_psItems.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 		m_stItem.World = info->item->World;
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
@@ -3014,7 +3030,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawStatics(RenderView& view)
+	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
 		// Bind vertex and index buffer
 		UINT stride = sizeof(RendererVertex);
@@ -3026,8 +3042,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind shaders
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -3055,8 +3071,15 @@ namespace TEN::Renderer
 
 					for (auto& bucket : mesh->buckets)
 					{
-						if (bucket.NumVertices == 0)
+						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+						{
 							continue;
+						}
+
+						if (bucket.NumVertices == 0)
+						{
+							continue;
+						}
 
 						if (DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
@@ -3124,7 +3147,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawRooms(RenderView& view)
+	void Renderer11::DrawRooms(RenderView& view, bool transparent)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -3136,7 +3159,7 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind pixel shaders
-		m_context->PSSetShader(m_psRooms.Get(), NULL, 0);
+		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		// Bind caustics and shadow map textures
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
@@ -3147,7 +3170,7 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
 
 		// Set shadow map data
-		if (shadowLight != NULL)
+		if (shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
 			m_stShadowMap.CastShadows = true;
@@ -3165,7 +3188,7 @@ namespace TEN::Renderer
 		numRoomsTransparentPolygons = 0;
 
 		//for (int i = 0; i < view.roomsToDraw.size(); i++)
-		for (int i = 0; i < view.roomsToDraw.size(); i++)
+		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];
@@ -3205,7 +3228,14 @@ namespace TEN::Renderer
 				for (auto& bucket : room->Buckets)
 				{
 					if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
+					{
 						continue;
+					}
+
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					{
+						continue;
+					}
 
 					if (DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
@@ -3276,13 +3306,13 @@ namespace TEN::Renderer
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
-								for (unsigned char i = 0; i < set.NumTextures; i++)
+								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
-									auto& tex = set.Textures[i];
-									m_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
-									m_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
-									m_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
-									m_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
+									auto& tex = set.Textures[j];
+									m_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
+									m_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
+									m_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
+									m_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
 								}
 								m_cbAnimated.updateData(m_stAnimated, m_context.Get());
 							}
@@ -3374,8 +3404,8 @@ namespace TEN::Renderer
 		vertices[3].Color.z = 1.0f;
 		vertices[3].Color.w = 1.0f;
 
-		m_context->VSSetShader(m_vsSky.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSky.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
 		m_stMisc.AlphaTest = true;
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -3464,14 +3494,21 @@ namespace TEN::Renderer
 		m_swapChain->Present(1, 0);
 	}
 
-	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex)
+	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent)
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		for (auto& bucket : mesh->buckets)
 		{
-			if (bucket.NumVertices == 0)
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+			{
 				continue;
+			}
+
+			if (bucket.NumVertices == 0)
+			{
+				continue;
+			}
 
 			if (DoesBlendModeRequireSorting(bucket.BlendMode))
 			{

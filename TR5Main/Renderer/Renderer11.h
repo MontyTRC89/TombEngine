@@ -460,19 +460,19 @@ namespace TEN::Renderer
 		bool SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax,
 		                           Vector3 sphereCentre, float sphereRadius);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
-		void DrawRooms(RenderView& view);
+		void DrawRooms(RenderView& view, bool transparent);
 		void DrawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void DrawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
-		void DrawItems(RenderView& view);
+		void DrawItems(RenderView& view, bool transparent);
 		void DrawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
-		void DrawAnimatingItem(RendererItem* item, RenderView& view);
+		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
 		void DrawBaddieGunflashes(RenderView& view);
-		void DrawStatics(RenderView& view);
+		void DrawStatics(RenderView& view, bool transparent);
 		void RenderShadowMap(RenderView& view);
 		void DrawWraithExtra(RendererItem* item, RenderView& view);
 		void DrawDarts(RendererItem* item, RenderView& view);
-		void DrawLara(bool shadowMap, RenderView& view);
+		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
 		void DrawSparks(RenderView& view);
 		void DrawSmokes(RenderView& view);
@@ -523,8 +523,8 @@ namespace TEN::Renderer
 		void DrawDripParticles(RenderView& view);
 		void DrawExplosionParticles(RenderView& view);
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber);
-		void DrawLaraHolsters();
-		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex);
+		void DrawLaraHolsters(bool transparent);
+		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
 		void SetBlendMode(BLEND_MODES blendMode);
 		float CalculateFrameRate();
