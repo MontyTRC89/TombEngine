@@ -2138,13 +2138,15 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 
 		return true;
 	}
+
+	return false;
 }
 
 bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, CrawlVaultTestSetup testSetup)
 {
 	int y = item->Position.yPos;
 	auto probeA = GetCollisionResult(item, item->Position.yRot, testSetup.CrossDist, -LARA_HEIGHT_CRAWL);	// Crossing.
-	auto probeB = GetCollisionResult(item, item->Position.yRot, testSetup.DestDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
+	auto probeB = GetCollisionResult(item, item->Position.yRot, testSetup.DestDist, -LARA_HEIGHT_CRAWL);	// Approximate destination.
 	auto probeMiddle = GetCollisionResult(item);
 
 	bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;

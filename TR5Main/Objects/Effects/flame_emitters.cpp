@@ -263,10 +263,10 @@ namespace TEN::Entities::Effects
 				GetLaraJointPosition((PHD_VECTOR*)&fx->pos, i);
 
 				// TR5 code?
-				if (Lara.burnCount)
+				if (Lara.BurnCount)
 				{
-					Lara.burnCount--;
-					if (!Lara.burnCount)
+					Lara.BurnCount--;
+					if (!Lara.BurnCount)
 						Lara.burnSmoke = true;
 				}
 
@@ -642,7 +642,7 @@ namespace TEN::Entities::Effects
 
 		if (Lara.gunType != WEAPON_TORCH
 			|| Lara.gunStatus != LG_READY
-			|| Lara.leftArm.lock
+			|| Lara.LeftArm.lock
 			|| Lara.litTorch == (item->Status & 1)
 			|| item->Timer == -1
 			|| !(TrInput & IN_ACTION)
@@ -705,7 +705,7 @@ namespace TEN::Entities::Effects
 				l->ActiveState = LS_MISC_CONTROL;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
-				Lara.leftArm.lock = true;
+				Lara.LeftArm.lock = true;
 				Lara.interactedItem = itemNumber;
 			}
 

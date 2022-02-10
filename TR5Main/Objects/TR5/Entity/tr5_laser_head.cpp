@@ -569,7 +569,7 @@ void LaserHeadControl(short itemNumber)
 											if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 											{
 												LaraBurn(LaraItem);
-												Lara.burnCount = 48;
+												Lara.BurnCount = 48;
 												Lara.burnBlue = 2;
 												LaraItem->HitPoints = 0;
 												break;

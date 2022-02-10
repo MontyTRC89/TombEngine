@@ -314,61 +314,61 @@ void lara_trbalance_mesh(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->Data;
 
-	item->Position.zRot = info->tightrope.balance / 4;
-	info->Control.ExtraTorsoRot.zRot = -info->tightrope.balance;
+	item->Position.zRot = info->Control.TightropeControl.Balance / 4;
+	info->Control.ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
 }
 
 void lara_trbalance_regen(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->Data;
 
-	if (info->tightrope.timeOnTightrope <= 32)
-		info->tightrope.timeOnTightrope = 0;
+	if (info->Control.TightropeControl.TimeOnTightrope <= 32)
+		info->Control.TightropeControl.TimeOnTightrope = 0;
 	else 
-		info->tightrope.timeOnTightrope -= 32;
+		info->Control.TightropeControl.TimeOnTightrope -= 32;
 
-	if (info->tightrope.balance > 0)
+	if (info->Control.TightropeControl.Balance > 0)
 	{
-		if (info->tightrope.balance <= ANGLE(0.75f))
-			info->tightrope.balance = 0;
+		if (info->Control.TightropeControl.Balance <= ANGLE(0.75f))
+			info->Control.TightropeControl.Balance = 0;
 		else
-			info->tightrope.balance -= ANGLE(0.75f);
+			info->Control.TightropeControl.Balance -= ANGLE(0.75f);
 	}
 
-	if (info->tightrope.balance < 0)
+	if (info->Control.TightropeControl.Balance < 0)
 	{
-		if (info->tightrope.balance >= -ANGLE(0.75f))
-			info->tightrope.balance = 0;
+		if (info->Control.TightropeControl.Balance >= -ANGLE(0.75f))
+			info->Control.TightropeControl.Balance = 0;
 		else
-			info->tightrope.balance += ANGLE(0.75f);
+			info->Control.TightropeControl.Balance += ANGLE(0.75f);
 	}
 }
 
 void lara_trbalance(ITEM_INFO* item)
 {
 	LaraInfo*& info = item->Data;
-	const int factor = ((info->tightrope.timeOnTightrope >> 7) & 0xFF) * 128;
+	const int factor = ((info->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
-		info->tightrope.balance += ANGLE(1.4f);
+		info->Control.TightropeControl.Balance += ANGLE(1.4f);
 	if (TrInput & IN_RIGHT)
-		info->tightrope.balance -= ANGLE(1.4f);
+		info->Control.TightropeControl.Balance -= ANGLE(1.4f);
 
-	if (info->tightrope.balance < 0)
+	if (info->Control.TightropeControl.Balance < 0)
 	{
-		info->tightrope.balance -= factor;
-		if (info->tightrope.balance <= -ANGLE(45.0f))
-			info->tightrope.balance = ANGLE(45.0f);
+		info->Control.TightropeControl.Balance -= factor;
+		if (info->Control.TightropeControl.Balance <= -ANGLE(45.0f))
+			info->Control.TightropeControl.Balance = ANGLE(45.0f);
 
 	}
-	else if (info->tightrope.balance > 0)
+	else if (info->Control.TightropeControl.Balance > 0)
 	{
-		info->tightrope.balance += factor;
-		if (info->tightrope.balance >= ANGLE(45.0f))
-			info->tightrope.balance = ANGLE(45.0f);
+		info->Control.TightropeControl.Balance += factor;
+		if (info->Control.TightropeControl.Balance >= ANGLE(45.0f))
+			info->Control.TightropeControl.Balance = ANGLE(45.0f);
 	}
 	else
-		info->tightrope.balance = GetRandomControl() & 1 ? -1 : 1;
+		info->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
 }
 
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
@@ -416,7 +416,7 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto probe = GetCollisionResult(item);
 	if (probe.Position.Floor == item->Position.yPos &&
-		info->tightrope.canGoOff)
+		info->Control.TightropeControl.CanDismount)
 	{
 		lara_trbalance_regen(item);
 		item->TargetState = LS_TIGHTROPE_EXIT;
@@ -428,13 +428,13 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll)
 		item->TargetState = LS_TIGHTROPE_IDLE;
 	}
 
-	info->tightrope.timeOnTightrope++;
+	info->Control.TightropeControl.TimeOnTightrope++;
 	lara_trbalance(item);
 	lara_trbalance_mesh(item);
 
-	if (info->tightrope.balance >= 8000)
+	if (info->Control.TightropeControl.Balance >= 8000)
 		SetAnimation(item, LA_TIGHTROPE_FALL_RIGHT);
-	else if (info->tightrope.balance <= -8000)
+	else if (info->Control.TightropeControl.Balance <= -8000)
 		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
 }
 
@@ -476,7 +476,7 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraItem->ActiveState != LS_TIGHTROPE_UNBALANCE_LEFT)
 	{
-		if (Lara.tightRopeFall)
+		if (Lara.Control.TightropeControl.Fall)
 		{
 			if (GetRandomControl() & 1)
 				item->TargetState = LS_TIGHTROPE_UNBALANCE_RIGHT;
@@ -505,16 +505,16 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 121*/
 	/*collision: lara_default_col*/
-	if (Lara.tightRopeOnCount)
-		Lara.tightRopeOnCount--;
-	else if (Lara.tightRopeOff)
+	if (Lara.Control.TightropeControl.OnCount)
+		Lara.Control.TightropeControl.OnCount--;
+	else if (Lara.Control.TightropeControl.Off)
 	{
 		short roomNumber = item->RoomNumber;
 
 		if (GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber),
 			item->Position.xPos, item->Position.yPos, item->Position.zPos) == item->Position.yPos)
 		{
-			Lara.tightRopeOff = 0;
+			Lara.Control.TightropeControl.Off = 0;
 			item->TargetState = LS_TIGHTROPE_EXIT;
 		}
 	}
@@ -526,7 +526,9 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_LOOK)
 			LookUpDown();
 
-		if ((Lara.tightRopeFall || (TrInput & (IN_BACK | IN_ROLL) || !(TrInput & IN_FORWARD)) && !Lara.tightRopeOnCount && !Lara.tightRopeOff) &&
+		if (((TrInput & (IN_BACK | IN_ROLL) || !(TrInput & IN_FORWARD) || Lara.Control.TightropeControl.Fall) &&
+			!Lara.Control.TightropeControl.OnCount &&
+			!Lara.Control.TightropeControl.Off) &&
 			item->TargetState != LS_TIGHTROPE_EXIT)
 		{
 			item->TargetState = LS_TIGHTROPE_IDLE;
@@ -540,13 +542,9 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_default_col*/
 	if (item->AnimNumber == LA_TIGHTROPE_FALL_LEFT || item->AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
 	{
-		if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+		if (TestLastFrame(item, item->AnimNumber))
 		{
-			PHD_VECTOR pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
-
+			PHD_VECTOR pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			item->Position.xPos = pos.x;
@@ -564,21 +562,21 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else
 	{
-		int undoInp, wrongInput;
+		int undoInput, wrongInput;
 		int undoAnim, undoFrame;
 
-		if (Lara.tightRopeOnCount > 0)
-			Lara.tightRopeOnCount--;
+		if (Lara.Control.TightropeControl.OnCount > 0)
+			Lara.Control.TightropeControl.OnCount--;
 
 		if (item->AnimNumber == LA_TIGHTROPE_UNBALANCE_LEFT)
 		{
-			undoInp = IN_RIGHT;
+			undoInput = IN_RIGHT;
 			wrongInput = IN_LEFT;
 			undoAnim = LA_TIGHTROPE_RECOVER_LEFT;
 		}
 		else if (item->AnimNumber == LA_TIGHTROPE_UNBALANCE_RIGHT)
 		{
-			undoInp = IN_LEFT;
+			undoInput = IN_LEFT;
 			wrongInput = IN_RIGHT;
 			undoAnim = LA_TIGHTROPE_RECOVER_RIGHT;
 		}
@@ -587,21 +585,21 @@ void lara_as_trfall(ITEM_INFO* item, COLL_INFO* coll)
 
 		undoFrame = g_Level.Anims[item->AnimNumber].frameEnd + g_Level.Anims[undoAnim].frameBase - item->FrameNumber;
 
-		if (TrInput & undoInp && Lara.tightRopeOnCount == 0)
+		if (TrInput & undoInput && Lara.Control.TightropeControl.OnCount == 0)
 		{
 			item->ActiveState = LS_TIGHTROPE_RECOVER_BALANCE;
 			item->TargetState = LS_TIGHTROPE_IDLE;
 			item->AnimNumber = undoAnim;
 			item->FrameNumber = undoFrame;
 
-			Lara.tightRopeFall--;
+			Lara.Control.TightropeControl.Fall--;
 		}
 		else
 		{
 			if (TrInput & wrongInput)
 			{
-				if (Lara.tightRopeOnCount < 10)
-					Lara.tightRopeOnCount += (GetRandomControl() & 3) + 2;
+				if (Lara.Control.TightropeControl.OnCount < 10)
+					Lara.Control.TightropeControl.OnCount += (GetRandomControl() & 3) + 2;
 			}
 		}
 	}

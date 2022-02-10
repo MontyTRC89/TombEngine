@@ -241,7 +241,7 @@ namespace TEN::Entities::TR4
         {
             if (Lara.gunType != WEAPON_TORCH
                 || Lara.gunStatus != LG_READY
-                || Lara.leftArm.lock
+                || Lara.LeftArm.lock
                 || !(TrInput & IN_ACTION)
                 || item->TriggerFlags != 1 
                 || item->ItemFlags[0] != 1
@@ -283,7 +283,7 @@ namespace TEN::Entities::TR4
                     l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
                     l->ActiveState = LS_MISC_CONTROL;
                     Lara.Flare.ControlLeft = false;
-                    Lara.leftArm.lock = true;
+                    Lara.LeftArm.lock = true;
                     item->ItemFlags[0] = 2;
                 }
                 item->Position.yRot = oldRot;

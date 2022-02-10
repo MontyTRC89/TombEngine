@@ -518,7 +518,7 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
-		if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
+		if (!Lara.RightArm.flash_gun && !Lara.LeftArm.flash_gun)
 			return true;
 
 		if (BinocularRange > 0)
@@ -595,7 +595,7 @@ namespace TEN::Renderer
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-					if (Lara.leftArm.flash_gun) 
+					if (Lara.LeftArm.flash_gun) 
 					{
 						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -609,7 +609,7 @@ namespace TEN::Renderer
 						m_numDrawCalls++;
 					}
 
-					if (Lara.rightArm.flash_gun) 
+					if (Lara.RightArm.flash_gun) 
 					{
 						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 						world = offset * world;

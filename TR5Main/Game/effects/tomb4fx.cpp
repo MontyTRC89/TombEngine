@@ -863,12 +863,12 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 	{
 		if (weaponType == WEAPON_SHOTGUN)
 		{
-			gshell->dirXrot = Lara.leftArm.yRot
+			gshell->dirXrot = Lara.LeftArm.yRot
 				+ Lara.Control.ExtraTorsoRot.yRot
 				+ LaraItem->Position.yRot
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
-			gshell->pos.yRot += Lara.leftArm.yRot 
+			gshell->pos.yRot += Lara.LeftArm.yRot 
 				+ Lara.Control.ExtraTorsoRot.yRot 
 				+ LaraItem->Position.yRot;
 			if (gshell->speed < 24)
@@ -876,7 +876,7 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 		}
 		else
 		{
-			gshell->dirXrot = Lara.leftArm.yRot 
+			gshell->dirXrot = Lara.LeftArm.yRot 
 				+ LaraItem->Position.yRot 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
@@ -884,7 +884,7 @@ void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 	}
 	else
 	{
-		gshell->dirXrot = Lara.leftArm.yRot 
+		gshell->dirXrot = Lara.LeftArm.yRot 
 			+ LaraItem->Position.yRot 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;

@@ -212,13 +212,13 @@ void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 	WEAPON_INFO* wepInfo = &Weapons[WEAPON_SNOWMOBILE];
 
 	LaraGetNewTarget(lara, wepInfo);
-	AimWeapon(lara, wepInfo, &laraInfo->rightArm);
+	AimWeapon(lara, wepInfo, &laraInfo->RightArm);
 
 	if (TrInput & SKIDOO_IN_FIRE && !skidoo->ItemFlags[0])
 	{
 		short angles[] = {
-			laraInfo->rightArm.yRot + lara->Position.yRot,
-			laraInfo->rightArm.xRot
+			laraInfo->RightArm.yRot + lara->Position.yRot,
+			laraInfo->RightArm.xRot
 		};
 		
 		if (FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles) +

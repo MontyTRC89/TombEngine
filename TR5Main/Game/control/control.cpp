@@ -131,7 +131,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		}
 
 		// Has Lara control been disabled?
-		if (Lara.Control.Uncontrollable || CurrentLevel == 0)
+		if (Lara.Control.Locked || CurrentLevel == 0)
 		{
 			if (CurrentLevel != 0)
 				DbInput = 0;
@@ -1070,7 +1070,7 @@ void CleanUp()
 
 	// Needs to be cleared or otherwise controls will lockup if user will exit to title
 	// while playing flyby with locked controls
-	Lara.Control.Uncontrollable = false;
+	Lara.Control.Locked = false;
 
 	// Weather.Clear resets lightning and wind parameters so user won't see prev weather in new level
 	Weather.Clear();

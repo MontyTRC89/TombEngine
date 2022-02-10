@@ -1649,8 +1649,8 @@ void LookLeftRight()
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
 		Lara.Vehicle == NO_ITEM &&
-		!Lara.leftArm.lock &&
-		!Lara.rightArm.lock)
+		!Lara.LeftArm.lock &&
+		!Lara.RightArm.lock)
 	{
 		Lara.Control.ExtraTorsoRot.yRot = Lara.Control.ExtraHeadRot.yRot;
 	}
@@ -1683,8 +1683,8 @@ void LookUpDown()
 	}
 	if (Lara.gunStatus != LG_HANDS_BUSY &&
 		Lara.Vehicle == NO_ITEM &&
-		!Lara.leftArm.lock &&
-		!Lara.rightArm.lock)
+		!Lara.LeftArm.lock &&
+		!Lara.RightArm.lock)
 	{
 		Lara.Control.ExtraTorsoRot.zRot = Lara.Control.ExtraHeadRot.xRot;
 	}
@@ -1712,8 +1712,8 @@ void ResetLook(ITEM_INFO* item)
 			info->Control.ExtraHeadRot.zRot = 0;
 
 		if (info->gunStatus != LG_HANDS_BUSY &&
-			!info->leftArm.lock &&
-			!info->rightArm.lock &&
+			!info->LeftArm.lock &&
+			!info->RightArm.lock &&
 			info->Vehicle == NO_ITEM)
 		{
 			info->Control.ExtraTorsoRot.zRot = info->Control.ExtraHeadRot.xRot;

@@ -128,11 +128,11 @@ void LaraInitialiseMeshes()
 		Lara.holsterInfo.backHolster = HOLSTER_SLOT::Empty;
 
 	Lara.gunStatus = LG_HANDS_FREE;
-	Lara.leftArm.frameNumber = 0;
-	Lara.rightArm.frameNumber = 0;
+	Lara.LeftArm.frameNumber = 0;
+	Lara.RightArm.frameNumber = 0;
 	Lara.target = NULL;
-	Lara.rightArm.lock = false;
-	Lara.leftArm.lock = false;
+	Lara.RightArm.lock = false;
+	Lara.LeftArm.lock = false;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item)

@@ -168,25 +168,25 @@ bool SaveGame::Save(int slot)
 	auto wetOffset = fbb.CreateVector(wet);
 
 	Save::LaraArmInfoBuilder leftArm{ fbb };
-	leftArm.add_anim_number(Lara.leftArm.animNumber);
-	leftArm.add_flash_gun(Lara.leftArm.flash_gun);
-	leftArm.add_frame_base(Lara.leftArm.frameBase);
-	leftArm.add_frame_number(Lara.leftArm.frameNumber);
-	leftArm.add_lock(Lara.leftArm.lock);
-	leftArm.add_x_rot(Lara.leftArm.xRot);
-	leftArm.add_y_rot(Lara.leftArm.yRot);
-	leftArm.add_z_rot(Lara.leftArm.zRot);
+	leftArm.add_anim_number(Lara.LeftArm.animNumber);
+	leftArm.add_flash_gun(Lara.LeftArm.flash_gun);
+	leftArm.add_frame_base(Lara.LeftArm.frameBase);
+	leftArm.add_frame_number(Lara.LeftArm.frameNumber);
+	leftArm.add_lock(Lara.LeftArm.lock);
+	leftArm.add_x_rot(Lara.LeftArm.xRot);
+	leftArm.add_y_rot(Lara.LeftArm.yRot);
+	leftArm.add_z_rot(Lara.LeftArm.zRot);
 	auto leftArmOffset = leftArm.Finish();
 
 	Save::LaraArmInfoBuilder rightArm{ fbb };
-	rightArm.add_anim_number(Lara.rightArm.animNumber);
-	rightArm.add_flash_gun(Lara.rightArm.flash_gun);
-	rightArm.add_frame_base(Lara.rightArm.frameBase);
-	rightArm.add_frame_number(Lara.rightArm.frameNumber);
-	rightArm.add_lock(Lara.rightArm.lock);
-	rightArm.add_x_rot(Lara.rightArm.xRot);
-	rightArm.add_y_rot(Lara.rightArm.yRot);
-	rightArm.add_z_rot(Lara.rightArm.zRot);
+	rightArm.add_anim_number(Lara.RightArm.animNumber);
+	rightArm.add_flash_gun(Lara.RightArm.flash_gun);
+	rightArm.add_frame_base(Lara.RightArm.frameBase);
+	rightArm.add_frame_number(Lara.RightArm.frameNumber);
+	rightArm.add_lock(Lara.RightArm.lock);
+	rightArm.add_x_rot(Lara.RightArm.xRot);
+	rightArm.add_y_rot(Lara.RightArm.yRot);
+	rightArm.add_z_rot(Lara.RightArm.zRot);
 	auto rightArmOffset = rightArm.Finish();
 
 	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
@@ -202,12 +202,12 @@ bool SaveGame::Save(int slot)
 	laraTargetAngles.push_back(Lara.targetAngles[1]);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
-	Save::LaraTightropeInfoBuilder tightRope{ fbb };
-	tightRope.add_balance(Lara.tightrope.balance);
-	tightRope.add_can_go_off(Lara.tightrope.canGoOff);
-	tightRope.add_tightrope_item(Lara.tightrope.tightropeItem);
-	tightRope.add_time_on_tightrope(Lara.tightrope.timeOnTightrope);
-	auto tightRopeOffset = tightRope.Finish();
+	Save::TightropeControlDataBuilder tightropeControl{ fbb };
+	tightropeControl.add_balance(Lara.Control.TightropeControl.Balance);
+	tightropeControl.add_can_dismount(Lara.Control.TightropeControl.CanDismount);
+	tightropeControl.add_tightrope_item(Lara.Control.TightropeControl.TightropeItem);
+	tightropeControl.add_time_on_tightrope(Lara.Control.TightropeControl.TimeOnTightrope);
+	auto tightropeControlOffset = tightropeControl.Finish();
 
 	Save::HolsterInfoBuilder holsterInfo{ fbb };
 	holsterInfo.add_back_holster((int)Lara.holsterInfo.backHolster);
@@ -245,7 +245,7 @@ bool SaveGame::Save(int slot)
 	control.add_turn_rate(Lara.Control.TurnRate);
 	control.add_projected_floor_height(Lara.Control.ProjectedFloorHeight);
 	control.add_calculated_jump_velocity(Lara.Control.CalculatedJumpVelocity);
-	control.add_jump_direction(Lara.Control.JumpDirection);
+	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_extra_head_rot(&extraHeadRot);
 	control.add_extra_torso_rot(&extraTorsoRot);
 	control.add_extra_velocity(&extraVelocity);
@@ -257,15 +257,16 @@ bool SaveGame::Save(int slot)
 	control.add_can_climb_ladder(Lara.Control.CanClimbLadder);
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
+	control.add_locked(Lara.Control.Locked);
 	control.add_run_jump_count(Lara.Control.RunJumpCount);
+	control.add_position_adjust_count(Lara.Control.PositionAdjustCount);
 	control.add_pose_count(Lara.Control.PoseCount);
 	control.add_dive_count(Lara.Control.DiveCount);
 	control.add_death_count(Lara.Control.DeathCount);
 	control.add_rope_control(ropeControlOffset);
+	control.add_tightrope_control(tightropeControlOffset);
 	control.add_is_busy(Lara.Control.IsBusy);
 	control.add_old_busy(Lara.Control.OldBusy);
-	control.add_uncontrollable(Lara.Control.Uncontrollable);
-	control.add_move_count(Lara.Control.MoveCount);
 
 	auto controlOffset = control.Finish();
 
@@ -302,9 +303,10 @@ bool SaveGame::Save(int slot)
 	lara.add_beetle_life(Lara.BeetleLife);
 	lara.add_big_waterskin(Lara.bigWaterskin);
 	lara.add_binoculars(Lara.Binoculars);
+	lara.add_burn_count(Lara.BurnCount);
+	lara.add_burn_type((int)Lara.BurnType);
 	lara.add_burn(Lara.burn);
 	lara.add_burn_blue(Lara.burnBlue);
-	lara.add_burn_count(Lara.burnCount);
 	lara.add_burn_smoke(Lara.burnSmoke);
 	lara.add_control(controlOffset);
 	lara.add_next_corner_position(&nextCornerPos);
@@ -355,7 +357,6 @@ bool SaveGame::Save(int slot)
 	lara.add_sprint_timer(Lara.sprintTimer);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
-	lara.add_tightrope(tightRopeOffset);
 	lara.add_torch(Lara.Torch);
 	lara.add_vehicle(Lara.Vehicle);
 	lara.add_water_status(Lara.waterStatus);
@@ -1171,9 +1172,10 @@ bool SaveGame::Load(int slot)
 	Lara.BeetleLife = s->lara()->beetle_life();
 	Lara.bigWaterskin = s->lara()->big_waterskin();
 	Lara.Binoculars = s->lara()->binoculars();
+	Lara.BurnCount = s->lara()->burn_count();
+	Lara.BurnType = (BurnType)s->lara()->burn_type();
 	Lara.burn = s->lara()->burn();
 	Lara.burnBlue = s->lara()->burn_blue();
-	Lara.burnCount = s->lara()->burn_count();
 	Lara.burnSmoke = s->lara()->burn_smoke();
 	Lara.Control.IsBusy = s->lara()->control()->is_busy();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
@@ -1197,14 +1199,14 @@ bool SaveGame::Load(int slot)
 	Lara.Control.KeepLow = s->lara()->control()->keep_low();
 	Lara.Control.CanLook = s->lara()->control()->can_look();
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.MoveCount = s->lara()->control()->move_count();
+	Lara.Control.PositionAdjustCount = s->lara()->control()->position_adjust_count();
 	Lara.Control.OldBusy = s->lara()->control()->old_busy();
 	Lara.Control.PoseCount = s->lara()->control()->pose_count();
 	Lara.Control.ProjectedFloorHeight = s->lara()->control()->projected_floor_height();
 	Lara.Control.RunJumpCount = s->lara()->control()->run_jump_count();
 	Lara.Control.RunJumpQueued = s->lara()->control()->run_jump_queued();
 	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
-	Lara.Control.Uncontrollable = s->lara()->control()->uncontrollable();
+	Lara.Control.Locked = s->lara()->control()->locked();
 	Lara.Crowbar = s->lara()->crowbar();
 	Lara.currentActive = s->lara()->current_active();
 	Lara.ExtraAnim = s->lara()->extra_anim();
@@ -1227,14 +1229,14 @@ bool SaveGame::Load(int slot)
 		s->lara()->last_position()->x(), 
 		s->lara()->last_position()->y(),
 		s->lara()->last_position()->z());
-	Lara.leftArm.animNumber = s->lara()->left_arm()->anim_number();
-	Lara.leftArm.flash_gun = s->lara()->left_arm()->flash_gun();
-	Lara.leftArm.frameBase = s->lara()->left_arm()->frame_base();
-	Lara.leftArm.frameNumber = s->lara()->left_arm()->frame_number();
-	Lara.leftArm.lock = s->lara()->left_arm()->lock();
-	Lara.leftArm.xRot = s->lara()->left_arm()->x_rot();
-	Lara.leftArm.yRot = s->lara()->left_arm()->y_rot();
-	Lara.leftArm.zRot = s->lara()->left_arm()->z_rot();
+	Lara.LeftArm.animNumber = s->lara()->left_arm()->anim_number();
+	Lara.LeftArm.flash_gun = s->lara()->left_arm()->flash_gun();
+	Lara.LeftArm.frameBase = s->lara()->left_arm()->frame_base();
+	Lara.LeftArm.frameNumber = s->lara()->left_arm()->frame_number();
+	Lara.LeftArm.lock = s->lara()->left_arm()->lock();
+	Lara.LeftArm.xRot = s->lara()->left_arm()->x_rot();
+	Lara.LeftArm.yRot = s->lara()->left_arm()->y_rot();
+	Lara.LeftArm.zRot = s->lara()->left_arm()->z_rot();
 	Lara.litTorch = s->lara()->lit_torch();
 	Lara.location = s->lara()->location();
 	Lara.locationPad = s->lara()->location_pad();
@@ -1252,14 +1254,14 @@ bool SaveGame::Load(int slot)
 	Lara.NumSmallMedipacks = s->lara()->num_small_medipacks();
 	Lara.poisoned = s->lara()->poisoned();
 	Lara.requestGunType = (LARA_WEAPON_TYPE)s->lara()->request_gun_type();
-	Lara.rightArm.animNumber = s->lara()->right_arm()->anim_number();
-	Lara.rightArm.flash_gun = s->lara()->right_arm()->flash_gun();
-	Lara.rightArm.frameBase = s->lara()->right_arm()->frame_base();
-	Lara.rightArm.frameNumber = s->lara()->right_arm()->frame_number();
-	Lara.rightArm.lock = s->lara()->right_arm()->lock();
-	Lara.rightArm.xRot = s->lara()->right_arm()->x_rot();
-	Lara.rightArm.yRot = s->lara()->right_arm()->y_rot();
-	Lara.rightArm.zRot = s->lara()->right_arm()->z_rot();
+	Lara.RightArm.animNumber = s->lara()->right_arm()->anim_number();
+	Lara.RightArm.flash_gun = s->lara()->right_arm()->flash_gun();
+	Lara.RightArm.frameBase = s->lara()->right_arm()->frame_base();
+	Lara.RightArm.frameNumber = s->lara()->right_arm()->frame_number();
+	Lara.RightArm.lock = s->lara()->right_arm()->lock();
+	Lara.RightArm.xRot = s->lara()->right_arm()->x_rot();
+	Lara.RightArm.yRot = s->lara()->right_arm()->y_rot();
+	Lara.RightArm.zRot = s->lara()->right_arm()->z_rot();
 	Lara.Control.RopeControl.Segment = s->lara()->control()->rope_control()->segment();
 	Lara.Control.RopeControl.Direction = s->lara()->control()->rope_control()->direction();
 	Lara.Control.RopeControl.ArcFront = s->lara()->control()->rope_control()->arc_front();
@@ -1276,6 +1278,9 @@ bool SaveGame::Load(int slot)
 	Lara.Control.RopeControl.DownVel = s->lara()->control()->rope_control()->down_vel();
 	Lara.Control.RopeControl.Flag = s->lara()->control()->rope_control()->flag();
 	Lara.Control.RopeControl.Count = s->lara()->control()->rope_control()->count();
+	Lara.Control.TightropeControl.CanDismount = s->lara()->control()->tightrope_control()->can_dismount();
+	Lara.Control.TightropeControl.TightropeItem = s->lara()->control()->tightrope_control()->tightrope_item();
+	Lara.Control.TightropeControl.TimeOnTightrope = s->lara()->control()->tightrope_control()->time_on_tightrope();
 	Lara.Secrets = s->lara()->secrets();
 	Lara.Silencer = s->lara()->silencer();
 	Lara.smallWaterskin = s->lara()->small_waterskin();
@@ -1292,10 +1297,7 @@ bool SaveGame::Load(int slot)
 	Lara.holsterInfo.backHolster = (HOLSTER_SLOT)s->lara()->holster_info()->back_holster();
 	Lara.holsterInfo.leftHolster = (HOLSTER_SLOT)s->lara()->holster_info()->left_holster();
 	Lara.holsterInfo.rightHolster = (HOLSTER_SLOT)s->lara()->holster_info()->right_holster();
-	Lara.tightrope.balance = s->lara()->tightrope()->balance();
-	Lara.tightrope.canGoOff = s->lara()->tightrope()->can_go_off();
-	Lara.tightrope.tightropeItem = s->lara()->tightrope()->tightrope_item();
-	Lara.tightrope.timeOnTightrope = s->lara()->tightrope()->time_on_tightrope();
+	Lara.Control.TightropeControl.Balance = s->lara()->control()->tightrope_control()->balance();
 
 	for (int i = 0; i < s->lara()->weapons()->size(); i++)
 	{
@@ -1312,10 +1314,10 @@ bool SaveGame::Load(int slot)
 		Lara.Weapons[i].SelectedAmmo = info->selected_ammo();
 	}
 
-	if (Lara.burn)
+	if (Lara.BurnType != BurnType::None)
 	{
 		char flag = 0;
-		Lara.burn = 0;
+		Lara.BurnType = BurnType::None;
 		if (Lara.burnSmoke)
 		{
 			flag = 1;
