@@ -28,6 +28,8 @@ namespace TEN::Renderer
 
 	void Renderer11::FreeRendererData()
 	{
+		shadowLight = nullptr;
+
 		ClearSceneItems();
 
 		m_meshPointersToMesh.clear();
