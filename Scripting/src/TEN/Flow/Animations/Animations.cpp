@@ -18,4 +18,3 @@ void Animations::Register(sol::table & parent)
 		"oscillateHang", &Animations::OscillateHang,
 		"pose", &Animations::Pose
 		);
-}
