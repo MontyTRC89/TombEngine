@@ -73,7 +73,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	item->World = m_LaraWorldMatrix;
 
 	// Update first Lara's animations
-	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.Control.ExtraTorsoRot.zRot), TO_RAD(Lara.Control.ExtraTorsoRot.yRot), TO_RAD(Lara.Control.ExtraTorsoRot.zRot));
+	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.Control.ExtraTorsoRot.xRot), TO_RAD(Lara.Control.ExtraTorsoRot.yRot), TO_RAD(Lara.Control.ExtraTorsoRot.zRot));
 	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.Control.ExtraHeadRot.xRot), TO_RAD(Lara.Control.ExtraHeadRot.yRot), TO_RAD(Lara.Control.ExtraHeadRot.zRot));
 
 	// First calculate matrices for legs, hips, head and torso
