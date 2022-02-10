@@ -150,7 +150,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.zRot != LaraItem->Position.zRot ||
 		OldCam.pos2.xRot != Lara.Control.ExtraHeadRot.xRot ||
 		OldCam.pos2.yRot != Lara.Control.ExtraHeadRot.yRot ||
-		OldCam.pos2.xPos != Lara.Control.ExtraTorsoRot.zRot ||
+		OldCam.pos2.xPos != Lara.Control.ExtraTorsoRot.xRot ||
 		OldCam.pos2.yPos != Lara.Control.ExtraTorsoRot.yRot ||
 		OldCam.pos.xPos != LaraItem->Position.xPos ||
 		OldCam.pos.yPos != LaraItem->Position.yPos ||
@@ -172,7 +172,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.zRot = LaraItem->Position.zRot;
 		OldCam.pos2.xRot = Lara.Control.ExtraHeadRot.xRot;
 		OldCam.pos2.yRot = Lara.Control.ExtraHeadRot.yRot;
-		OldCam.pos2.xPos = Lara.Control.ExtraTorsoRot.zRot;
+		OldCam.pos2.xPos = Lara.Control.ExtraTorsoRot.xRot;
 		OldCam.pos2.yPos = Lara.Control.ExtraTorsoRot.yRot;
 		OldCam.pos.xPos = LaraItem->Position.xPos;
 		OldCam.pos.yPos = LaraItem->Position.yPos;
@@ -466,7 +466,7 @@ void CombatCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.targetAngle = Lara.Control.ExtraHeadRot.yRot + Lara.Control.ExtraTorsoRot.yRot;
-		Camera.targetElevation = Lara.Control.ExtraHeadRot.xRot + Lara.Control.ExtraTorsoRot.zRot + item->Position.xRot - ANGLE(15.0f);
+		Camera.targetElevation = Lara.Control.ExtraHeadRot.xRot + Lara.Control.ExtraTorsoRot.xRot + item->Position.xRot - ANGLE(15.0f);
 	}
 
 	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
@@ -782,10 +782,10 @@ void LookCamera(ITEM_INFO* item)
 
 	short headXRot = info->Control.ExtraHeadRot.xRot;
 	short headYRot = info->Control.ExtraHeadRot.yRot;
-	short torsoXRot = info->Control.ExtraTorsoRot.zRot;
+	short torsoXRot = info->Control.ExtraTorsoRot.xRot;
 	short torsoYRot = info->Control.ExtraTorsoRot.yRot;
 
-	info->Control.ExtraTorsoRot.zRot = 0;
+	info->Control.ExtraTorsoRot.xRot = 0;
 	info->Control.ExtraTorsoRot.yRot = 0;
 	info->Control.ExtraHeadRot.xRot *= 2;
 	info->Control.ExtraHeadRot.yRot *= 2;
@@ -1049,7 +1049,7 @@ void LookCamera(ITEM_INFO* item)
 
 	info->Control.ExtraHeadRot.xRot = headXRot;
 	info->Control.ExtraHeadRot.yRot = headYRot;
-	info->Control.ExtraTorsoRot.zRot = torsoXRot;
+	info->Control.ExtraTorsoRot.xRot = torsoXRot;
 	info->Control.ExtraTorsoRot.yRot = torsoYRot;
 }
 
@@ -1094,7 +1094,7 @@ void BinocularCamera(ITEM_INFO* item)
 			info->Control.ExtraHeadRot.yRot = 0;
 			info->Control.ExtraHeadRot.xRot = 0;
 			info->Control.ExtraTorsoRot.yRot = 0;
-			info->Control.ExtraTorsoRot.zRot = 0;
+			info->Control.ExtraTorsoRot.xRot = 0;
 			Camera.type = BinocularOldCamera;
 
 			return;
@@ -1479,7 +1479,7 @@ void CalculateCamera()
 					Lara.Control.ExtraHeadRot.xRot -= ANGLE(4.0f);
 				else
 					Lara.Control.ExtraHeadRot.xRot += change;
-				Lara.Control.ExtraTorsoRot.zRot = Lara.Control.ExtraHeadRot.xRot;
+				Lara.Control.ExtraTorsoRot.xRot = Lara.Control.ExtraHeadRot.xRot;
 
 				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
 				Camera.item->LookedAt = 1;
@@ -1686,7 +1686,7 @@ void LookUpDown()
 		!Lara.LeftArm.lock &&
 		!Lara.RightArm.lock)
 	{
-		Lara.Control.ExtraTorsoRot.zRot = Lara.Control.ExtraHeadRot.xRot;
+		Lara.Control.ExtraTorsoRot.xRot = Lara.Control.ExtraHeadRot.xRot;
 	}
 }
 
@@ -1716,14 +1716,14 @@ void ResetLook(ITEM_INFO* item)
 			!info->RightArm.lock &&
 			info->Vehicle == NO_ITEM)
 		{
-			info->Control.ExtraTorsoRot.zRot = info->Control.ExtraHeadRot.xRot;
+			info->Control.ExtraTorsoRot.xRot = info->Control.ExtraHeadRot.xRot;
 			info->Control.ExtraTorsoRot.yRot = info->Control.ExtraHeadRot.yRot;
 			info->Control.ExtraTorsoRot.zRot = info->Control.ExtraHeadRot.zRot;
 		}
 		else
 		{
 			if (!info->Control.ExtraHeadRot.xRot)
-				info->Control.ExtraTorsoRot.zRot = 0;
+				info->Control.ExtraTorsoRot.xRot = 0;
 			if (!info->Control.ExtraHeadRot.yRot)
 				info->Control.ExtraTorsoRot.yRot = 0;
 			if (!info->Control.ExtraHeadRot.zRot)

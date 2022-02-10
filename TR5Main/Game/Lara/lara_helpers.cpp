@@ -327,10 +327,10 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 		info->Control.ExtraHeadRot.zRot = 0;
 
 	// Reset torso.
-	if (abs(info->Control.ExtraTorsoRot.zRot) > ANGLE(0.1f))
-		info->Control.ExtraTorsoRot.zRot += info->Control.ExtraTorsoRot.zRot / -rate;
+	if (abs(info->Control.ExtraTorsoRot.xRot) > ANGLE(0.1f))
+		info->Control.ExtraTorsoRot.xRot += info->Control.ExtraTorsoRot.xRot / -rate;
 	else
-		info->Control.ExtraTorsoRot.zRot = 0;
+		info->Control.ExtraTorsoRot.xRot = 0;
 
 	if (abs(info->Control.ExtraTorsoRot.yRot) > ANGLE(0.1f))
 		info->Control.ExtraTorsoRot.yRot += info->Control.ExtraTorsoRot.yRot / -rate;
