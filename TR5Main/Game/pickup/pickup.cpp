@@ -1077,7 +1077,7 @@ int UseSpecialItem(ITEM_INFO* item)
 
 		if (flag == 1)
 		{
-			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Position.yPos > Lara.waterSurfaceDist))
+			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Position.yPos > Lara.WaterSurfaceDist))
 			{
 				if (use < ID_WATERSKIN1_3)
 					Lara.smallWaterskin = 4;

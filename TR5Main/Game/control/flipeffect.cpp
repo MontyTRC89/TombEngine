@@ -163,12 +163,12 @@ void DrawRightPistol(ITEM_INFO* item)
 
 void ShootLeftGun(ITEM_INFO* item)
 {
-	Lara.LeftArm.flash_gun = 3;
+	Lara.LeftArm.FlashGun = 3;
 }
 
 void ShootRightGun(ITEM_INFO* item)
 {
-	Lara.RightArm.flash_gun = 3;
+	Lara.RightArm.FlashGun = 3;
 }
 
 void LaraHandsFree(ITEM_INFO* item)

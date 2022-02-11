@@ -642,7 +642,7 @@ namespace TEN::Entities::Effects
 
 		if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
-			|| Lara.LeftArm.lock
+			|| Lara.LeftArm.Locked
 			|| Lara.litTorch == (item->Status & 1)
 			|| item->Timer == -1
 			|| !(TrInput & IN_ACTION)
@@ -705,7 +705,7 @@ namespace TEN::Entities::Effects
 				l->ActiveState = LS_MISC_CONTROL;
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
-				Lara.LeftArm.lock = true;
+				Lara.LeftArm.Locked = true;
 				Lara.interactedItem = itemNumber;
 			}
 

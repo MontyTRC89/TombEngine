@@ -223,7 +223,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.ProjectedFloorHeight = vaultResult.Height;
+	info->ProjectedFloorHeight = vaultResult.Height;
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
 	info->Control.TurnRate = 0;
 
@@ -349,7 +349,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LARA_STATE)item->ActiveState))
-		info->Control.RunJumpCount = 0;
+		info->Control.Count.RunJump = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LARA_STATE)item->ActiveState))
@@ -357,22 +357,22 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset projected height value used by step function.
 	//if (!IsVaultState((LARA_STATE)item->ActiveState))
-	//	info->Control.ProjectedFloorHeight = NO_HEIGHT;
+	//	info->ProjectedFloorHeight = NO_HEIGHT;
 
 	// Reset calculated auto jump velocity.
 	//if (item->ActiveState != LS_AUTO_JUMP)
 	//	info->Control.CalculatedJumpVelocity = 0;
 
 	// Increment/reset AFK pose timer.
-	if (info->Control.PoseCount < LARA_POSE_TIME &&
+	if (info->Control.Count.Pose < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->Animations.Pose)
 	{
-		info->Control.PoseCount++;
+		info->Control.Count.Pose++;
 	}
 	else
-		info->Control.PoseCount = 0;
+		info->Control.Count.Pose = 0;
 
 	// Reset lean.
 	if (!info->Control.IsMoving || (info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))

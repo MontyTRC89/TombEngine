@@ -793,51 +793,12 @@ enum LARA_ANIM
 };
 #pragma endregion
 
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	WaterSurface,
-	Underwater,
-	FlyCheat
-};
-
-enum class HandStatus
-{
-	Free,
-	Busy,
-	DrawWeapon,
-	UndrawWeapon,
-	WeaponReady,
-	Special
-};
-
 enum WeaponAmmoType
 {
 	WEAPON_AMMO1,
 	WEAPON_AMMO2,
 	WEAPON_AMMO3,
 	MAX_AMMOTYPE
-};
-
-enum LARA_MESHES
-{
-	LM_HIPS,
-	LM_LTHIGH,
-	LM_LSHIN,
-	LM_LFOOT,
-	LM_RTHIGH,
-	LM_RSHIN,
-	LM_RFOOT,
-	LM_TORSO,
-	LM_RINARM,
-	LM_ROUTARM,
-	LM_RHAND,
-	LM_LINARM,
-	LM_LOUTARM,
-	LM_LHAND,
-	LM_HEAD,
-	NUM_LARA_MESHES
 };
 
 enum LARA_WEAPON_TYPE
@@ -870,11 +831,64 @@ enum LARA_WEAPON_TYPE_CARRIED
 	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
+enum class HOLSTER_SLOT : int
+{
+	Empty = ID_LARA_HOLSTERS,
+	Pistols = ID_LARA_HOLSTERS_PISTOLS,
+	Uzis = ID_LARA_HOLSTERS_UZIS,
+	Revolver = ID_LARA_HOLSTERS_REVOLVER,
+	Shotgun = ID_SHOTGUN_ANIM,
+	HK = ID_HK_ANIM,
+	Harpoon = ID_HARPOON_ANIM,
+	Crowssbow = ID_CROSSBOW_ANIM,
+	GrenadeLauncher = ID_GRENADE_ANIM,
+	RocketLauncher = ID_ROCKET_ANIM,
+};
+
+enum LARA_MESHES
+{
+	LM_HIPS,
+	LM_LTHIGH,
+	LM_LSHIN,
+	LM_LFOOT,
+	LM_RTHIGH,
+	LM_RSHIN,
+	LM_RFOOT,
+	LM_TORSO,
+	LM_RINARM,
+	LM_ROUTARM,
+	LM_RHAND,
+	LM_LINARM,
+	LM_LOUTARM,
+	LM_LHAND,
+	LM_HEAD,
+	NUM_LARA_MESHES
+};
+
 enum LARA_CLOTH_TYPES
 {
 	CLOTH_MISSING,
 	CLOTH_DRY,
 	CLOTH_WET
+};
+
+enum class WaterStatus
+{
+	Dry,
+	Wade,
+	WaterSurface,
+	Underwater,
+	FlyCheat
+};
+
+enum class HandStatus
+{
+	Free,
+	Busy,
+	DrawWeapon,
+	UndrawWeapon,
+	WeaponReady,
+	Special
 };
 
 enum class JumpDirection
@@ -896,29 +910,14 @@ enum class BurnType
 	Blue2
 };
 
-enum class HOLSTER_SLOT : int
-{
-	Empty = ID_LARA_HOLSTERS,
-	Pistols = ID_LARA_HOLSTERS_PISTOLS,
-	Uzis = ID_LARA_HOLSTERS_UZIS,
-	Revolver = ID_LARA_HOLSTERS_REVOLVER,
-	Shotgun = ID_SHOTGUN_ANIM,
-	HK = ID_HK_ANIM,
-	Harpoon = ID_HARPOON_ANIM,
-	Crowssbow = ID_CROSSBOW_ANIM,
-	GrenadeLauncher = ID_GRENADE_ANIM,
-	RocketLauncher = ID_ROCKET_ANIM,
-
-};
-
-struct HolsterInfo 
+struct HolsterInfo
 {
 	HOLSTER_SLOT leftHolster;
 	HOLSTER_SLOT rightHolster;
 	HOLSTER_SLOT backHolster;
 };
 
-struct Ammo 
+struct Ammo
 {
 	using CountType = uint16_t;
 private:
@@ -926,51 +925,51 @@ private:
 	bool isInfinite;
 public:
 
-	Ammo& operator --() 
+	Ammo& operator --()
 	{
 		--count;
 		return *this;
 	}
 
-	Ammo operator --(int) 
+	Ammo operator --(int)
 	{
 		Ammo tmp = *this;
 		--*this;
 		return tmp;
 	}
 
-	Ammo& operator ++() 
+	Ammo& operator ++()
 	{
 		++count;
 		return *this;
 	}
 
-	Ammo operator ++(int) 
+	Ammo operator ++(int)
 	{
 		Ammo tmp = *this;
 		++*this;
 		return tmp;
 	}
 
-	Ammo& operator =(size_t val) 
+	Ammo& operator =(size_t val)
 	{
 		count = clamp(val);
 		return *this;
 	}
 
-	bool operator ==(size_t val) 
+	bool operator ==(size_t val)
 	{
 		return count == clamp(val);
 	}
 
-	Ammo& operator =(Ammo& rhs) 
+	Ammo& operator =(Ammo& rhs)
 	{
 		count = rhs.count;
 		isInfinite = rhs.count;
 		return *this;
 	}
 
-	Ammo operator +(size_t val) 
+	Ammo operator +(size_t val)
 	{
 		Ammo tmp = *this;
 		tmp += val;
@@ -984,41 +983,41 @@ public:
 		return tmp;
 	}
 
-	Ammo& operator +=(size_t val) 
+	Ammo& operator +=(size_t val)
 	{
 		int tmp = this->count + val;
 		this->count = clamp(tmp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t val) 
+	Ammo& operator -=(size_t val)
 	{
 		int tmp = this->count - val;
 		this->count = clamp(tmp);
 		return *this;
 	}
 
-	operator bool() 
+	operator bool()
 	{
 		return isInfinite || (count > 0);
 	}
 
-	static CountType clamp(int val) 
+	static CountType clamp(int val)
 	{
 		return std::clamp(val, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
 	}
 
-	bool hasInfinite() const 
+	bool hasInfinite() const
 	{
 		return isInfinite;
 	}
 
-	CountType getCount() const 
+	CountType getCount() const
 	{
 		return count;
 	}
 
-	void setInfinite(bool infinite) 
+	void setInfinite(bool infinite)
 	{
 		isInfinite = infinite;
 	}
@@ -1055,23 +1054,21 @@ struct DiaryInfo
 	DiaryPage Pages[MaxDiaryPages];
 };
 
-struct LARA_ARM
-{
-	int frameBase;
-	int frameNumber;
-	int animNumber;
-	bool lock;
-	short yRot;
-	short xRot;
-	short zRot;
-	short flash_gun;
-};
-
 struct FlareData
 {
 	unsigned int Life;
 	int Frame;
 	bool ControlLeft;
+};
+
+struct ArmInfo
+{
+	int AnimNumber;
+	int FrameNumber;
+	int FrameBase;
+	bool Locked;
+	PHD_3DPOS Rotation;
+	short FlashGun;
 };
 
 struct WeaponControlData
@@ -1120,35 +1117,41 @@ struct TightropeControlData
 #endif
 };
 
+struct LaraCountData
+{
+	unsigned int RunJump;
+	unsigned int PositionAdjust;
+	unsigned int Pose;
+	unsigned int Dive;
+	unsigned int Death;
+};
+
 struct LaraControlData
 {
 	short MoveAngle;
 	short TurnRate;
-	int ProjectedFloorHeight;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
 	WaterStatus WaterStatus;
 
+	WeaponControlData WeaponControl;
+	RopeControlData RopeControl;
+	TightropeControlData TightropeControl;
+
 	bool CanLook;
 	bool IsMoving;
-	bool RunJumpQueued;
 	bool KeepLow;
 	bool IsLow;
 	bool CanClimbLadder;
 	bool IsClimbingLadder;
 	bool CanMonkeySwing;
+	bool RunJumpQueued;
 	bool Locked;
 
-	unsigned int RunJumpCount;
-	unsigned int PositionAdjustCount;
-	unsigned int PoseCount;
-	unsigned int DiveCount;
-	unsigned int DeathCount;
+	short WaterCurrentActive;
 
-	WeaponControlData WeaponControl;
-	RopeControlData RopeControl;
-	TightropeControlData TightropeControl;
+	LaraCountData Count;
 
 	PHD_3DPOS ExtraHeadRot;
 	PHD_3DPOS ExtraTorsoRot;
@@ -1163,20 +1166,20 @@ struct LaraInfo
 {
 	short itemNumber;
 
-	int waterSurfaceDist;
+	int ProjectedFloorHeight;
+	int WaterSurfaceDist;
 
 	LaraControlData Control;
+	FlareData Flare;
+
 	int hitFrame;
 	int hitDirection;
 
-	int sprintTimer;
-	int air;
-
-	short currentActive;//
+	int Air;
+	int SprintEnergy;
 
 	FX_INFO* SpasmEffect;
 	int SpasmEffectCount;
-	FlareData Flare;
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
@@ -1186,17 +1189,19 @@ struct LaraInfo
 
 	unsigned int BurnCount;
 
+	ArmInfo LeftArm;
+	ArmInfo RightArm;
+	ITEM_INFO* target;
+	CREATURE_INFO* creature;
+	short targetAngles[2];
+
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
 	bool litTorch;
 	PHD_VECTOR lastPos;
 	PHD_3DPOS nextCornerPos;
 	int meshPtrs[NUM_LARA_MESHES];
-	ITEM_INFO* target;
-	short targetAngles[2];
-	LARA_ARM LeftArm;
-	LARA_ARM RightArm;
-	CREATURE_INFO* creature;
+
 	short interactedItem;
 	signed char location;
 	signed char highestLocation;

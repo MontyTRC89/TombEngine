@@ -108,8 +108,8 @@ void AnimateLara(ITEM_INFO* item)
 
 				flags = cmd[1] & 0xC000;
 				if (flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
-					(flags == (int)SOUND_PLAYCONDITION::Land && (info->waterSurfaceDist >= 0 || info->waterSurfaceDist == NO_HEIGHT)) ||
-					(flags == (int)SOUND_PLAYCONDITION::Water && info->waterSurfaceDist < 0 && info->waterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+					(flags == (int)SOUND_PLAYCONDITION::Land && (info->WaterSurfaceDist >= 0 || info->WaterSurfaceDist == NO_HEIGHT)) ||
+					(flags == (int)SOUND_PLAYCONDITION::Water && info->WaterSurfaceDist < 0 && info->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
 				}
