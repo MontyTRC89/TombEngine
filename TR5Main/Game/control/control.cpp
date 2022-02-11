@@ -195,7 +195,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		int oldInput = TrInput;
 
 		// Is Lara dead?
-		if (CurrentLevel != 0 && (Lara.Control.DeathCount > 300 || Lara.Control.DeathCount > 60 && TrInput))
+		if (CurrentLevel != 0 && (Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
 		{
 			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
 		}

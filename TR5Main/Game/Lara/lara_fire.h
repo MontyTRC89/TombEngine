@@ -48,7 +48,7 @@ void LaraGun(ITEM_INFO* laraItem);
 Ammo& GetAmmo(ITEM_INFO* lara, int weaponType);
 void InitialiseNewWeapon(ITEM_INFO* lara);
 GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* lara, int weaponType);
-void AimWeapon(ITEM_INFO* lara, WEAPON_INFO* winfo, LARA_ARM* arm);
+void AimWeapon(ITEM_INFO* lara, WEAPON_INFO* winfo, ArmInfo* arm);
 void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int damage, int flag);
 FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
 void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);

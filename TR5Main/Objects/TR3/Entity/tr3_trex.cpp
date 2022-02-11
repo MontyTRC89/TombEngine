@@ -31,7 +31,7 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	LaraItem->TargetState = LS_DEATH;
 
 	LaraItem->HitPoints = -16384;
-	Lara.air = -1;
+	Lara.Air = -1;
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 

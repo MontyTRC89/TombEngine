@@ -290,48 +290,44 @@ GAME_OBJECT_ID WeaponObject(int weaponType)
 	}
 }
 
-void AimWeapon(ITEM_INFO* lara, WEAPON_INFO* weaponInfo, LARA_ARM* arm)
+void AimWeapon(ITEM_INFO* lara, WEAPON_INFO* weaponInfo, ArmInfo* arm)
 {
 	LaraInfo*& laraInfo = lara->Data;
-	short rotY, rotX, speed, x, y;
 
-	speed = weaponInfo->aimSpeed;
+	short x = 0;
+	short y = 0;
 
-	// Have target lock, so get XY angles for arms.
-	if (arm->lock)
+	// Have target lock; get XY angles for arms.
+	if (arm->Locked)
 	{
 		y = laraInfo->targetAngles[0];
 		x = laraInfo->targetAngles[1];
 	}
-	// No target lock, so aim straight.
-	else
-	{
-		y = 0;
-		x = 0;
-	}
+
+	short speed = weaponInfo->aimSpeed;
 
 	// Rotate arms on y axis toward target.
-	rotY = arm->yRot;
+	short rotY = arm->Rotation.yRot;
 	if (rotY >= (y - speed) && rotY <= (y + speed))
 		rotY = y;
 	else if (rotY < y)
 		rotY += speed;
 	else
 		rotY -= speed;
-	arm->yRot = rotY;
+	arm->Rotation.yRot = rotY;
 
 	// Rotate arms on x axis toward target.
-	rotX = arm->xRot;
+	short rotX = arm->Rotation.xRot;
 	if (rotX >= (x - speed) && rotX <= (x + speed))
 		rotX = x;
 	else if (rotX < x)
 		rotX += speed;
 	else
 		rotX -= speed;
-	arm->xRot = rotX;
+	arm->Rotation.xRot = rotX;
 
 	// TODO: Set arms to inherit rotations of parent bones.
-	arm->zRot = 0;
+	arm->Rotation.zRot = 0;
 }
 
 void SmashItem(short itemNum)
@@ -345,10 +341,10 @@ void LaraGun(ITEM_INFO* laraItem)
 {
 	LaraInfo*& laraInfo = laraItem->Data;
 
-	if (laraInfo->LeftArm.flash_gun > 0)
-		--laraInfo->LeftArm.flash_gun;
-	if (laraInfo->RightArm.flash_gun > 0)
-		--laraInfo->RightArm.flash_gun;
+	if (laraInfo->LeftArm.FlashGun > 0)
+		--laraInfo->LeftArm.FlashGun;
+	if (laraInfo->RightArm.FlashGun > 0)
+		--laraInfo->RightArm.FlashGun;
 
 	if (laraInfo->Control.WeaponControl.GunType == WEAPON_TORCH)
 	{
@@ -403,7 +399,7 @@ void LaraGun(ITEM_INFO* laraItem)
 					(laraInfo->Control.WeaponControl.RequestGunType == WEAPON_HARPOON_GUN ||
 						laraInfo->Control.WaterStatus == WaterStatus::Dry ||
 						(laraInfo->Control.WaterStatus == WaterStatus::Wade &&
-							laraInfo->waterSurfaceDist > -Weapons[laraInfo->Control.WeaponControl.GunType].gunHeight))))
+							laraInfo->WaterSurfaceDist > -Weapons[laraInfo->Control.WeaponControl.GunType].gunHeight))))
 			{
 				if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
 				{
@@ -415,8 +411,8 @@ void LaraGun(ITEM_INFO* laraItem)
 
 				laraInfo->Control.WeaponControl.GunType = laraInfo->Control.WeaponControl.RequestGunType;
 				InitialiseNewWeapon(laraItem);
-				laraInfo->RightArm.frameNumber = 0;
-				laraInfo->LeftArm.frameNumber = 0;
+				laraInfo->RightArm.FrameNumber = 0;
+				laraInfo->LeftArm.FrameNumber = 0;
 				laraInfo->Control.HandStatus = HandStatus::DrawWeapon;
 			}
 			else
@@ -440,7 +436,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		else if (laraInfo->Control.WeaponControl.GunType != WEAPON_HARPOON_GUN &&
 			laraInfo->Control.WaterStatus != WaterStatus::Dry &&
 			(laraInfo->Control.WaterStatus != WaterStatus::Wade ||
-				laraInfo->waterSurfaceDist < -Weapons[laraInfo->Control.WeaponControl.GunType].gunHeight))
+				laraInfo->WaterSurfaceDist < -Weapons[laraInfo->Control.WeaponControl.GunType].gunHeight))
 		{
 			laraInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 		}
@@ -592,15 +588,15 @@ void LaraGun(ITEM_INFO* laraItem)
 			{
 				if (laraInfo->Flare.ControlLeft)
 				{
-					if (laraInfo->LeftArm.frameNumber)
+					if (laraInfo->LeftArm.FrameNumber)
 					{
-						if (++laraInfo->LeftArm.frameNumber == 110)
-							laraInfo->LeftArm.frameNumber = 0;
+						if (++laraInfo->LeftArm.FrameNumber == 110)
+							laraInfo->LeftArm.FrameNumber = 0;
 					}
 				}
 				else
 				{
-					laraInfo->LeftArm.frameNumber = 95;
+					laraInfo->LeftArm.FrameNumber = 95;
 					laraInfo->Flare.ControlLeft = true;
 				}
 			}
@@ -608,7 +604,7 @@ void LaraGun(ITEM_INFO* laraItem)
 				laraInfo->Flare.ControlLeft = false;
 
 			DoFlareInHand(laraItem, laraInfo->Flare.Life);
-			SetFlareArm(laraItem, laraInfo->LeftArm.frameNumber);
+			SetFlareArm(laraItem, laraInfo->LeftArm.FrameNumber);
 		}
 
 		break;
@@ -620,7 +616,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			{
 				laraInfo->Flare.ControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState(laraItem->ActiveState));
 				DoFlareInHand(laraItem, laraInfo->Flare.Life);
-				SetFlareArm(laraItem, laraInfo->LeftArm.frameNumber);
+				SetFlareArm(laraItem, laraInfo->LeftArm.FrameNumber);
 			}
 		}
 
@@ -638,26 +634,26 @@ void InitialiseNewWeapon(ITEM_INFO* lara)
 {
 	LaraInfo*& laraInfo = lara->Data;
 
-	laraInfo->RightArm.frameNumber = 0;
-	laraInfo->LeftArm.frameNumber = 0;
-	laraInfo->LeftArm.zRot = 0;
-	laraInfo->LeftArm.yRot = 0;
-	laraInfo->LeftArm.xRot = 0;
-	laraInfo->RightArm.zRot = 0;
-	laraInfo->RightArm.yRot = 0;
-	laraInfo->RightArm.xRot = 0;
+	laraInfo->RightArm.FrameNumber = 0;
+	laraInfo->LeftArm.FrameNumber = 0;
+	laraInfo->LeftArm.Rotation.zRot = 0;
+	laraInfo->LeftArm.Rotation.yRot = 0;
+	laraInfo->LeftArm.Rotation.xRot = 0;
+	laraInfo->RightArm.Rotation.zRot = 0;
+	laraInfo->RightArm.Rotation.yRot = 0;
+	laraInfo->RightArm.Rotation.xRot = 0;
 	laraInfo->target = nullptr;
-	laraInfo->RightArm.lock = false;
-	laraInfo->LeftArm.lock = false;
-	laraInfo->RightArm.flash_gun = 0;
-	laraInfo->LeftArm.flash_gun = 0;
+	laraInfo->RightArm.Locked = false;
+	laraInfo->LeftArm.Locked = false;
+	laraInfo->RightArm.FlashGun = 0;
+	laraInfo->LeftArm.FlashGun = 0;
 
 	switch (laraInfo->Control.WeaponControl.GunType)
 	{
 	case WEAPON_PISTOLS:
 	case WEAPON_UZI:
-		laraInfo->RightArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		laraInfo->LeftArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		laraInfo->RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		laraInfo->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 		if (laraInfo->Control.HandStatus != HandStatus::Free)
 			draw_pistol_meshes(laraInfo->Control.WeaponControl.GunType);
 		break;
@@ -668,22 +664,22 @@ void InitialiseNewWeapon(ITEM_INFO* lara)
 	case WEAPON_GRENADE_LAUNCHER:
 	case WEAPON_HARPOON_GUN:
 	case WEAPON_ROCKET_LAUNCHER:
-		laraInfo->RightArm.frameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
-		laraInfo->LeftArm.frameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
+		laraInfo->RightArm.FrameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
+		laraInfo->LeftArm.FrameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
 		if (laraInfo->Control.HandStatus != HandStatus::Free)
 			draw_shotgun_meshes(laraInfo->Control.WeaponControl.GunType);
 		break;
 
 	case WEAPON_FLARE:
-		laraInfo->RightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
-		laraInfo->LeftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		laraInfo->RightArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		laraInfo->LeftArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 		if (laraInfo->Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(lara);
 		break;
 
 	default:
-		laraInfo->RightArm.frameBase = g_Level.Anims[lara->AnimNumber].framePtr;
-		laraInfo->LeftArm.frameBase = g_Level.Anims[lara->AnimNumber].framePtr;
+		laraInfo->RightArm.FrameBase = g_Level.Anims[lara->AnimNumber].framePtr;
+		laraInfo->LeftArm.FrameBase = g_Level.Anims[lara->AnimNumber].framePtr;
 		break;
 	}
 }
@@ -948,8 +944,8 @@ void LaraTargetInfo(ITEM_INFO* lara, WEAPON_INFO* weapon)
 
 	if (laraInfo->target == nullptr)
 	{
-		laraInfo->RightArm.lock = false;
-		laraInfo->LeftArm.lock = false;
+		laraInfo->RightArm.Locked = false;
+		laraInfo->LeftArm.Locked = false;
 		laraInfo->targetAngles[1] = 0;
 		laraInfo->targetAngles[0] = 0;
 		return;
@@ -977,34 +973,34 @@ void LaraTargetInfo(ITEM_INFO* lara, WEAPON_INFO* weapon)
 			angles[1] >= weapon->lockAngles[2] &&
 			angles[1] <= weapon->lockAngles[3])
 		{
-			laraInfo->RightArm.lock = true;
-			laraInfo->LeftArm.lock = true;
+			laraInfo->RightArm.Locked = true;
+			laraInfo->LeftArm.Locked = true;
 		}
 		else
 		{
-			if (laraInfo->LeftArm.lock)
+			if (laraInfo->LeftArm.Locked)
 			{
 				if (angles[0] < weapon->leftAngles[0] ||
 					angles[0] > weapon->leftAngles[1] ||
 					angles[1] < weapon->leftAngles[2] ||
 					angles[1] > weapon->leftAngles[3])
-					laraInfo->LeftArm.lock = false;
+					laraInfo->LeftArm.Locked = false;
 			}
 
-			if (laraInfo->RightArm.lock)
+			if (laraInfo->RightArm.Locked)
 			{
 				if (angles[0] < weapon->rightAngles[0] ||
 					angles[0] > weapon->rightAngles[1] ||
 					angles[1] < weapon->rightAngles[2] ||
 					angles[1] > weapon->rightAngles[3])
-					laraInfo->RightArm.lock = false;
+					laraInfo->RightArm.Locked = false;
 			}
 		}
 	}
 	else
 	{
-		laraInfo->RightArm.lock = false;
-		laraInfo->LeftArm.lock = false;
+		laraInfo->RightArm.Locked = false;
+		laraInfo->LeftArm.Locked = false;
 	}
 
 	laraInfo->targetAngles[0] = angles[0];

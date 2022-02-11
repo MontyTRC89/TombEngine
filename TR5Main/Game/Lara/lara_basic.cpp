@@ -97,7 +97,7 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	EaseOutLaraHeight(item, info->Control.ProjectedFloorHeight - item->Position.yPos);
+	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
 }
 
 // State:	LS_AUTO_JUMP (62)
@@ -110,7 +110,7 @@ void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->Control.ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
+	info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 }
 
 // ---------------
@@ -123,9 +123,9 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.RunJumpCount++;
-	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME - 4)
-		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME - 4;
+	info->Control.Count.RunJump++;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME - 4)
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME - 4;
 
 	if (item->HitPoints <= 0)
 	{
@@ -231,9 +231,9 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.RunJumpCount++;
-	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME)
-		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME;
+	info->Control.Count.RunJump++;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -261,7 +261,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if ((TrInput & IN_JUMP || info->Control.RunJumpQueued) &&
 		info->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (info->Control.RunJumpCount >= LARA_RUN_JUMP_TIME &&
+		if (info->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
 		{
 			item->TargetState = LS_JUMP_FORWARD;
@@ -271,7 +271,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraRunJumpQueue(item, coll);
 	}
 
-	if (TrInput & IN_SPRINT && info->sprintTimer &&
+	if (TrInput & IN_SPRINT && info->SprintEnergy &&
 		info->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_SPRINT;
@@ -528,7 +528,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Without animation blending, the AFK state's
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
-	if (info->Control.PoseCount >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
+	if (info->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		g_GameFlow->Animations.Pose)
 	{
 		item->TargetState = LS_POSE;
@@ -1276,7 +1276,7 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->HitPoints = -1;
-	info->air = -1;
+	info->Air = -1;
 
 	ShiftItem(item, coll);
 
@@ -2113,11 +2113,11 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->sprintTimer--;
+	info->SprintEnergy--;
 
-	info->Control.RunJumpCount++;
-	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME)
-		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME;
+	info->Control.Count.RunJump++;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -2163,7 +2163,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 			item->TargetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && info->sprintTimer > 0) [[likely]]
+		else if (TrInput & IN_SPRINT && info->SprintEnergy > 0) [[likely]]
 			item->TargetState = LS_SPRINT;
 		else
 			item->TargetState = LS_RUN_FORWARD;
@@ -2239,9 +2239,9 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->Data;
 
-	info->Control.RunJumpCount++;
-	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME)
-		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME;
+	info->Control.Count.RunJump++;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (TrInput & IN_LEFT)
 	{

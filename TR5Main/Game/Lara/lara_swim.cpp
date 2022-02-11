@@ -32,7 +32,7 @@ void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->HitPoints = -1;
-	Lara.air = -1;
+	Lara.Air = -1;
 	Lara.Control.HandStatus = HandStatus::Busy;
 
 	auto waterHeight = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
@@ -333,9 +333,9 @@ void SwimDive(ITEM_INFO* item)
 
 void LaraWaterCurrent(COLL_INFO* coll)
 {
-	if (Lara.currentActive)
+	if (Lara.Control.WaterCurrentActive)
 	{
-		SINK_INFO* sink = &g_Level.Sinks[Lara.currentActive - 1];
+		SINK_INFO* sink = &g_Level.Sinks[Lara.Control.WaterCurrentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, LaraItem->Position.xPos, LaraItem->Position.zPos);
 		Lara.Control.ExtraVelocity.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - Lara.Control.ExtraVelocity.x) / 16;
@@ -371,7 +371,7 @@ void LaraWaterCurrent(COLL_INFO* coll)
 
 	LaraItem->Position.xPos += Lara.Control.ExtraVelocity.x >> 8;
 	LaraItem->Position.zPos += Lara.Control.ExtraVelocity.z >> 8;
-	Lara.currentActive = 0;
+	Lara.Control.WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(LaraItem->Position.zPos - coll->Setup.OldPosition.z, LaraItem->Position.xPos - coll->Setup.OldPosition.x);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;

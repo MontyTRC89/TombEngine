@@ -2117,7 +2117,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara.Control.HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara.Velocity, VerticalVelocity: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
 				PrintDebugMessage("Lara.Control.CanClimbLadder: %d", Lara.Control.CanClimbLadder);
-				PrintDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
+				PrintDebugMessage("Lara.WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:

@@ -553,7 +553,7 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->Position.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.Control.HandStatus = HandStatus::Free;
-			Lara.sprintTimer = 120;
+			Lara.SprintEnergy = 120;
 			return true;
 		}
 
@@ -1198,14 +1198,14 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
         motorbike->revs = 0;
     }
 
-    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && Lara.sprintTimer)
+    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && Lara.SprintEnergy)
     {
         motorbike->flags |= FL_BOOST;
-        Lara.sprintTimer -= 2;
-        if (Lara.sprintTimer > MOTORBIKE_ACCEL)//hmm
+        Lara.SprintEnergy -= 2;
+        if (Lara.SprintEnergy > MOTORBIKE_ACCEL)//hmm
         {
             motorbike->flags &= ~FL_BOOST;
-            Lara.sprintTimer = 0;
+            Lara.SprintEnergy = 0;
         }
     }
     else

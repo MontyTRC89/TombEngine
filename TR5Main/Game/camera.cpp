@@ -1649,8 +1649,8 @@ void LookLeftRight()
 	}
 	if (Lara.Control.HandStatus != HandStatus::Busy &&
 		Lara.Vehicle == NO_ITEM &&
-		!Lara.LeftArm.lock &&
-		!Lara.RightArm.lock)
+		!Lara.LeftArm.Locked &&
+		!Lara.RightArm.Locked)
 	{
 		Lara.Control.ExtraTorsoRot.yRot = Lara.Control.ExtraHeadRot.yRot;
 	}
@@ -1683,8 +1683,8 @@ void LookUpDown()
 	}
 	if (Lara.Control.HandStatus != HandStatus::Busy &&
 		Lara.Vehicle == NO_ITEM &&
-		!Lara.LeftArm.lock &&
-		!Lara.RightArm.lock)
+		!Lara.LeftArm.Locked &&
+		!Lara.RightArm.Locked)
 	{
 		Lara.Control.ExtraTorsoRot.xRot = Lara.Control.ExtraHeadRot.xRot;
 	}
@@ -1712,8 +1712,8 @@ void ResetLook(ITEM_INFO* item)
 			info->Control.ExtraHeadRot.zRot = 0;
 
 		if (info->Control.HandStatus != HandStatus::Busy &&
-			!info->LeftArm.lock &&
-			!info->RightArm.lock &&
+			!info->LeftArm.Locked &&
+			!info->RightArm.Locked &&
 			info->Vehicle == NO_ITEM)
 		{
 			info->Control.ExtraTorsoRot.xRot = info->Control.ExtraHeadRot.xRot;

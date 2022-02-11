@@ -379,7 +379,7 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	LaraInfo*& laraInfo = laraItem->Data;
 	ROOM_INFO* room = &g_Level.Rooms[kayakItem->RoomNumber];
 
-	if (!laraInfo->currentActive)
+	if (!laraInfo->Control.WaterCurrentActive)
 	{
 		int absVel = abs(laraInfo->Control.ExtraVelocity.x);
 		int shift;
@@ -413,7 +413,7 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	}
 	else
 	{
-		int sinkval = laraInfo->currentActive - 1;
+		int sinkval = laraInfo->Control.WaterCurrentActive - 1;
 		
 		PHD_VECTOR target;
 		target.x = g_Level.Sinks[sinkval].x;
@@ -436,7 +436,7 @@ void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 	kayakItem->Position.xPos += laraInfo->Control.ExtraVelocity.x / 256;
 	kayakItem->Position.zPos += laraInfo->Control.ExtraVelocity.z / 256;
 
-	laraInfo->currentActive = 0;
+	laraInfo->Control.WaterCurrentActive = 0;
 }
 
 int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, PHD_VECTOR* pos)
@@ -750,7 +750,7 @@ void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 
 	case KAYAK_STATE_IDLE:
 		if (TrInput & KAYAK_IN_DISMOUNT &&
-			!laraInfo->currentActive &&
+			!laraInfo->Control.WaterCurrentActive &&
 			!laraInfo->Control.ExtraVelocity.x && !laraInfo->Control.ExtraVelocity.z)
 		{
 			if (TrInput & KAYAK_IN_LEFT && KayakCanGetOut(kayakItem, -1))

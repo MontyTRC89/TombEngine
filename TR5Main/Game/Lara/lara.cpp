@@ -417,13 +417,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Control.IsMoving)
 	{
-		if (info->Control.PositionAdjustCount > 90)
+		if (info->Control.Count.PositionAdjust > 90)
 		{
 			info->Control.IsMoving = false;
 			info->Control.HandStatus = HandStatus::Free;
 		}
 
-		++info->Control.PositionAdjustCount;
+		++info->Control.Count.PositionAdjust;
 	}
 
 	if (!info->Control.Locked)
@@ -443,8 +443,8 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		info->Control.HandStatus = HandStatus::Free;
 	}
 
-	if (item->ActiveState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
-		info->sprintTimer++;
+	if (item->ActiveState != LS_SPRINT && info->SprintEnergy < LARA_SPRINT_MAX)
+		info->SprintEnergy++;
 
 	info->Control.IsLow = false;
 
@@ -459,7 +459,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		heightFromWater = item->Position.yPos - waterHeight;
 	else
 		heightFromWater = NO_HEIGHT;
-	info->waterSurfaceDist = -heightFromWater;
+	info->WaterSurfaceDist = -heightFromWater;
 
 	if (info->Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
@@ -480,7 +480,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				if (isWater)
 				{
-					info->air = LARA_AIR_MAX;
+					info->Air = LARA_AIR_MAX;
 					info->Control.WaterStatus = WaterStatus::Underwater;
 					item->Airborne = false;
 					item->Position.yPos += 100;
@@ -573,7 +573,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->Position.zRot = 0;
 						item->Position.xRot = 0;
 						info->Control.WaterStatus = WaterStatus::WaterSurface;
-						info->Control.DiveCount = 11;
+						info->Control.Count.Dive = 11;
 						ResetLaraFlex(item);
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
@@ -589,7 +589,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->Position.zRot = 0;
 				item->Position.xRot = 0;
 				info->Control.WaterStatus = WaterStatus::WaterSurface;
-				info->Control.DiveCount = 11;
+				info->Control.Count.Dive = 11;
 				ResetLaraFlex(item);
 
 				UpdateItemRoom(item, 0);
@@ -639,7 +639,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 					item->VerticalVelocity = 0;
 					item->Position.zRot = 0;
 					item->Position.xRot = 0;
-					info->Control.DiveCount = 0;
+					info->Control.Count.Dive = 0;
 					ResetLaraFlex(item);
 
 					UpdateItemRoom(item, 0);
@@ -661,13 +661,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->HitPoints = -1;
 
-		if (info->Control.DeathCount == 0)
+		if (info->Control.Count.Death == 0)
 			StopSoundTracks();
 
-		info->Control.DeathCount++;
+		info->Control.Count.Death++;
 		if ((item->Flags & 0x100))
 		{
-			info->Control.DeathCount++;
+			info->Control.Count.Death++;
 
 			return;
 		}
@@ -677,25 +677,25 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	{
 	case WaterStatus::Dry:
 	case WaterStatus::Wade:
-		if (isSwamp	&& info->waterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
+		if (isSwamp	&& info->WaterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
 			if (item->HitPoints >= 0)
 			{
-				info->air -= 6;
-				if (info->air < 0)
+				info->Air -= 6;
+				if (info->Air < 0)
 				{
-					info->air = -1;
+					info->Air = -1;
 					item->HitPoints -= 10;
 				}
 			}
 		}
-		else if (info->air < LARA_AIR_MAX && item->HitPoints >= 0)
+		else if (info->Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
 			if (info->Vehicle == NO_ITEM) // only for the upv !!
 			{
-				info->air += 10;
-				if (info->air > LARA_AIR_MAX)
-					info->air = LARA_AIR_MAX;
+				info->Air += 10;
+				if (info->Air > LARA_AIR_MAX)
+					info->Air = LARA_AIR_MAX;
 			}
 		}
 
@@ -708,13 +708,13 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			auto level = g_GameFlow->GetLevel(CurrentLevel);
 			if (level->LaraType != LaraType::Divesuit)
-				info->air--;
+				info->Air--;
 
-			if (info->air < 0)
+			if (info->Air < 0)
 			{
 			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && info->anxiety < 251)
 			//		info->anxiety += 4;
-				info->air = -1;
+				info->Air = -1;
 				item->HitPoints -= 5;
 			}
 		}
@@ -726,9 +726,9 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	case WaterStatus::WaterSurface:
 		if (item->HitPoints >= 0)
 		{
-			info->air += 10;
-			if (info->air > LARA_AIR_MAX)
-				info->air = LARA_AIR_MAX;
+			info->Air += 10;
+			if (info->Air > LARA_AIR_MAX)
+				info->Air = LARA_AIR_MAX;
 		}
 
 		LaraSurface(item, coll);
@@ -923,7 +923,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 		ResetLook(item);
 
 	info->Control.CanLook = true;
-	info->Control.PoseCount = 0;
+	info->Control.Count.Pose = 0;
 
 	lara_control_routines[item->ActiveState](item, coll);
 
@@ -976,7 +976,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot = -ANGLE(22.0f);
 	}
 
-	if (info->currentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (info->Control.WaterCurrentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
@@ -1032,7 +1032,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 		ResetLook(item);
 
 	info->Control.CanLook = true;
-	info->Control.PoseCount = 0;
+	info->Control.Count.Pose = 0;
 
 	lara_control_routines[item->ActiveState](item, coll);
 
@@ -1042,7 +1042,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot += item->Position.zRot / -8;
 	}
 
-	if (info->currentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (info->Control.WaterCurrentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
@@ -1073,7 +1073,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) || (info->WaterSurfaceDist > 0 && info->WaterSurfaceDist != NO_HEIGHT))
 		{
 			info->Control.WaterStatus = WaterStatus::Underwater;
 			SetAnimation(item, LA_UNDERWATER_IDLE);

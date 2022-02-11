@@ -1661,13 +1661,14 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	int dist = CLICK(3);
 	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -LARA_HEIGHT_CRAWL);
 
-	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Within lower floor bound.
-		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Within lowest ceiling bound.
-		!probe.Position.FloorSlope &&								// Not a slope.
-		info->waterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
+	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
+		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
+		!probe.Position.FloorSlope &&							// Not a slope.
+		info->WaterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
+		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+			info->Flare.Life))
 	{
 		return true;
 	}
@@ -1791,7 +1792,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, dist, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
-	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->WaterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 	
 	// Check swamp depth (if applicable).
 	if (swampTooDeep)
@@ -1958,7 +1959,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestValidLedgeAngle(item, coll) &&						// Appropriate angle difference from ladder.
 		!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
-		info->Control.CanClimbLadder &&									// Ladder sector flag set.
+		info->Control.CanClimbLadder &&							// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
@@ -1978,7 +1979,7 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeMiddle = GetCollisionResult(item);
 
 	if (TestValidLedgeAngle(item, coll) &&
-		info->Control.CanClimbLadder &&									// Ladder sector flag set.
+		info->Control.CanClimbLadder &&							// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lower middle ceiling bound.
 		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&		// Within upper middle floor bound. (Synced with TestLaraAutoJump())
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
@@ -1998,7 +1999,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item);
 
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
-		info->Control.CanMonkeySwing &&									// Monkey swing sector flag set.
+		info->Control.CanMonkeySwing &&							// Monkey swing sector flag set.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
@@ -2016,7 +2017,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free)
 		return VaultTestResult{ false };
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->WaterSurfaceDist < -CLICK(3))
 		return VaultTestResult{ false };
 
 	VaultTestResult vaultResult;
@@ -2098,7 +2099,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || info->Control.HandStatus != HandStatus::Free)
 		return false;
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->waterSurfaceDist < -CLICK(3))
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && info->WaterSurfaceDist < -CLICK(3))
 		return false;
 
 	// Auto jump to ladder.

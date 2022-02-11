@@ -99,13 +99,13 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_JUMP)
 	{
-		Lara.Control.DiveCount++;
-		if (Lara.Control.DiveCount == 10)
+		Lara.Control.Count.Dive++;
+		if (Lara.Control.Count.Dive == 10)
 			SwimDive(item);
 		return;
 	}
 
-	Lara.Control.DiveCount = 0;
+	Lara.Control.Count.Dive = 0;
 	item->TargetState = LS_ONWATER_STOP;
 }
 
@@ -117,7 +117,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.Control.DiveCount = 0;
+	Lara.Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -146,7 +146,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.Control.DiveCount = 0;
+	Lara.Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -175,7 +175,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.Control.DiveCount = 0;
+	Lara.Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -204,7 +204,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.Control.DiveCount = 0;
+	Lara.Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
