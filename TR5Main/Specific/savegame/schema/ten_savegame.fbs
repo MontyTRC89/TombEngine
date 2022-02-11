@@ -112,19 +112,19 @@ table RopeControlData {
 	count: int32;
 }
 
-table LaraCountData {
-	run_jump: int32;
-	position_adjust: int32;
-	pose: int32;
-	dive: int32;
-	death: int32;
-}
-
 table TightropeControlData {
 	balance: float;
 	time_on_tightrope: uint32;
 	can_dismount: bool;
 	tightrope_item: int32;
+}
+
+table LaraCountData {
+	run_jump: uint32;
+	position_adjust: uint32;
+	pose: uint32;
+	dive: uint32;
+	death: uint32;
 }
 
 table LaraControlData {
@@ -173,7 +173,7 @@ table Lara {
 	burn: bool;
 	burn_blue: int32;
 	burn_smoke: bool;
-	burn_count: int32;
+	burn_count: uint32;
 	poisoned: int32;
 	wet: [bool];
 	lit_torch: bool;
