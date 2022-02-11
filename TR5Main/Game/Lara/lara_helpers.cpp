@@ -112,7 +112,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!item->Velocity)
 		return;
@@ -144,6 +144,19 @@ void DoLaraFallDamage(ITEM_INFO* item)
 	}
 }
 
+LaraInfo*& GetLaraInfo(ITEM_INFO* item)
+{
+	if (item->ObjectNumber != ID_LARA)
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from object with ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		
+		// TODO: I don't know what to do here. @Sezz 2022.02.12
+		return (LaraInfo*&)LaraItem->Data;
+	}
+
+	return (LaraInfo*&)item->Data;
+}
+
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = item->Position.yRot;
@@ -170,7 +183,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
@@ -202,7 +215,7 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = WALL_SIZE;
@@ -221,7 +234,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->ProjectedFloorHeight = vaultResult.Height;
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
@@ -266,7 +279,7 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 
 void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
@@ -276,7 +289,7 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->Position.yRot;
@@ -306,9 +319,36 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	oldAngle = direction;
 }
 
+void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
+{
+	if (rate < 0)
+		rate = -rate;
+
+	// Reset roll.
+	if (resetRoll)
+	{
+		if (abs(item->Position.zRot) > ANGLE(0.1f))
+			item->Position.zRot += item->Position.zRot / -rate;
+		else
+			item->Position.zRot = 0;
+	}
+
+	// Reset pitch.
+	if (resetPitch)
+	{
+		if (abs(item->Position.xRot) > ANGLE(0.1f))
+			item->Position.xRot += item->Position.xRot / -rate;
+		else
+			item->Position.xRot = 0;
+	}
+}
+
 void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
+
+	if (rate < 0)
+		rate = -rate;
 
 	// Reset head.
 	if (abs(info->Control.ExtraHeadRot.xRot) > ANGLE(0.1f))
@@ -345,7 +385,7 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LARA_STATE)item->ActiveState))
@@ -376,18 +416,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 	// Reset lean.
 	if (!info->Control.IsMoving || (info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
-	{
-		if (abs(item->Position.zRot) > ANGLE(0.1f))
-			item->Position.zRot += item->Position.zRot / -6;
-		else
-			item->Position.zRot = 0;
-	}
-
-	// Temp.
-	if (abs(item->Position.xRot) > ANGLE(0.1f))
-		item->Position.xRot += item->Position.xRot / -6;
-	else
-		item->Position.xRot = 0;
+		ResetLaraLean(item, 6);
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) &&
@@ -410,7 +439,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (info->Vehicle != NO_ITEM)
 	{

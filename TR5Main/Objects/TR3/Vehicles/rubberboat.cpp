@@ -141,7 +141,7 @@ RubberBoatMountType RubberBoatCheckGeton(short itemNum, ITEM_INFO* lara, COLL_IN
 		return RBOAT_MOUNT_NONE;
 
 	short rot = rBoat->Position.yRot - lara->Position.yRot;
-	if (Lara.Control.WaterStatus == WaterStatus::WaterSurface || Lara.Control.WaterStatus == WaterStatus::Wade)
+	if (Lara.Control.WaterStatus == WaterStatus::TreadWater || Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (rot > ANGLE(45.0f) && rot < ANGLE(135.0f))
 			getOn = RBOAT_MOUNT_LEFT;

@@ -195,7 +195,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		return mountType;
 
 	short rot = sBoatItem->Position.yRot - laraItem->Position.yRot;
-	if (laraInfo->Control.WaterStatus == WaterStatus::WaterSurface || laraInfo->Control.WaterStatus == WaterStatus::Wade)
+	if (laraInfo->Control.WaterStatus == WaterStatus::TreadWater || laraInfo->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Airborne || sBoatItem->Velocity)
 			return mountType;

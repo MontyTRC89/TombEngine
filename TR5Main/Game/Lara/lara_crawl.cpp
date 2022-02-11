@@ -34,7 +34,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
 
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -97,7 +97,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
@@ -141,7 +141,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
@@ -172,7 +172,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
@@ -229,7 +229,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -285,7 +285,7 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -345,7 +345,7 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -440,7 +440,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
@@ -484,7 +484,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -540,7 +540,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
@@ -588,7 +588,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.CanLook = false;
 	info->Control.HandStatus = HandStatus::Busy;
@@ -639,7 +639,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
@@ -685,7 +685,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -745,7 +745,7 @@ void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -803,7 +803,7 @@ void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;

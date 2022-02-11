@@ -876,7 +876,7 @@ enum class WaterStatus
 {
 	Dry,
 	Wade,
-	WaterSurface,
+	TreadWater,
 	Underwater,
 	FlyCheat
 };
@@ -1168,9 +1168,12 @@ struct LaraInfo
 
 	int ProjectedFloorHeight;
 	int WaterSurfaceDist;
+	PHD_VECTOR lastPos;
+	PHD_3DPOS nextCornerPos;
 
 	LaraControlData Control;
 	FlareData Flare;
+	bool litTorch;
 
 	int hitFrame;
 	int hitDirection;
@@ -1183,11 +1186,10 @@ struct LaraInfo
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
+	unsigned int BurnCount;
 	bool burn;
 	byte burnBlue;
 	bool burnSmoke;
-
-	unsigned int BurnCount;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
@@ -1197,9 +1199,7 @@ struct LaraInfo
 
 	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-	bool litTorch;
-	PHD_VECTOR lastPos;
-	PHD_3DPOS nextCornerPos;
+
 	int meshPtrs[NUM_LARA_MESHES];
 
 	short interactedItem;

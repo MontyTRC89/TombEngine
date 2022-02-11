@@ -733,7 +733,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
-			laraInfo->Control.WaterStatus = WaterStatus::WaterSurface;
+			laraInfo->Control.WaterStatus = WaterStatus::TreadWater;
 			laraInfo->WaterSurfaceDist = -heightFromWater;
 			laraInfo->Control.Count.Dive = 11;
 			ResetLaraFlex(laraItem);

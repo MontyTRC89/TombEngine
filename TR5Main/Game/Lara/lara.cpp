@@ -398,7 +398,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (info->Control.WeaponControl.HasFired)
 	{
@@ -572,7 +572,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 						item->VerticalVelocity = 0;
 						item->Position.zRot = 0;
 						item->Position.xRot = 0;
-						info->Control.WaterStatus = WaterStatus::WaterSurface;
+						info->Control.WaterStatus = WaterStatus::TreadWater;
 						info->Control.Count.Dive = 11;
 						ResetLaraFlex(item);
 
@@ -588,7 +588,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				item->VerticalVelocity = 0;
 				item->Position.zRot = 0;
 				item->Position.xRot = 0;
-				info->Control.WaterStatus = WaterStatus::WaterSurface;
+				info->Control.WaterStatus = WaterStatus::TreadWater;
 				info->Control.Count.Dive = 11;
 				ResetLaraFlex(item);
 
@@ -597,7 +597,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			break;
 
-		case WaterStatus::WaterSurface:
+		case WaterStatus::TreadWater:
 			if (!isWater)
 			{
 				if (heightFromWater <= WADE_DEPTH)
@@ -633,7 +633,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
 
-					info->Control.WaterStatus = WaterStatus::WaterSurface;
+					info->Control.WaterStatus = WaterStatus::TreadWater;
 					item->Position.yPos += 1 - heightFromWater;
 					item->Airborne = false;
 					item->VerticalVelocity = 0;
@@ -723,7 +723,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 		break;
 
-	case WaterStatus::WaterSurface:
+	case WaterStatus::TreadWater:
 		if (item->HitPoints >= 0)
 		{
 			info->Air += 10;
@@ -749,7 +749,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
@@ -894,7 +894,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
@@ -1001,7 +1001,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
@@ -1066,7 +1066,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	item->HitPoints = LARA_HEALTH_MAX;
 	LaraUnderWater(item, coll);
