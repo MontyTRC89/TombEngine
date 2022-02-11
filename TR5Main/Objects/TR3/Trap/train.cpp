@@ -137,7 +137,7 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 	Lara.hitDirection = -1;
-	Lara.air = -1;
+	Lara.Air = -1;
 
 	train->ItemFlags[1] = 160;
 

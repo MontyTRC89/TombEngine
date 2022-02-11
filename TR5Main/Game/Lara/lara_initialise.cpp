@@ -36,12 +36,12 @@ void InitialiseLara(int restore)
 	Lara.Control.CanLook = true;
 	Lara.itemNumber = itemNumber;
 	Lara.hitDirection = -1;
-	Lara.sprintTimer = LARA_SPRINT_MAX;
-	Lara.air = LARA_AIR_MAX;
+	Lara.SprintEnergy = LARA_SPRINT_MAX;
+	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.WeaponControl.WeaponItem = NO_ITEM;
 	PoisonFlag = 0;
 	Lara.poisoned = 0;
-	Lara.waterSurfaceDist = 100;
+	Lara.WaterSurfaceDist = 100;
 
 	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present)
 	{
@@ -128,11 +128,11 @@ void LaraInitialiseMeshes()
 		Lara.Control.WeaponControl.HolsterInfo.backHolster = HOLSTER_SLOT::Empty;
 
 	Lara.Control.HandStatus = HandStatus::Free;
-	Lara.LeftArm.frameNumber = 0;
-	Lara.RightArm.frameNumber = 0;
+	Lara.LeftArm.FrameNumber = 0;
+	Lara.RightArm.FrameNumber = 0;
 	Lara.target = NULL;
-	Lara.RightArm.lock = false;
-	Lara.LeftArm.lock = false;
+	Lara.RightArm.Locked = false;
+	Lara.LeftArm.Locked = false;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item)

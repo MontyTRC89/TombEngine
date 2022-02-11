@@ -36,9 +36,9 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	LaraInfo*& info = item->Data;
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
-	info->Control.RunJumpCount++;
-	if (info->Control.RunJumpCount > LARA_RUN_JUMP_TIME / 2)
-		info->Control.RunJumpCount = LARA_RUN_JUMP_TIME / 2;
+	info->Control.Count.RunJump++;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2)
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{

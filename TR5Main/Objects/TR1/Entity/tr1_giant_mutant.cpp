@@ -176,7 +176,7 @@ void AbortionControl(short itemNum)
 				LaraItem->Position.xRot = LaraItem->Position.zRot = 0;
 				LaraItem->Airborne = false;
 				LaraItem->HitPoints = -1;
-				Lara.air = -1;
+				Lara.Air = -1;
 				Lara.Control.HandStatus = HandStatus::Busy;
 				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
 

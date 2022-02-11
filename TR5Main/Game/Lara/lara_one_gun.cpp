@@ -82,11 +82,11 @@ void FireHarpoon()
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = Lara.LeftArm.xRot + LaraItem->Position.xRot;
+		item->Position.xRot = Lara.LeftArm.Rotation.xRot + LaraItem->Position.xRot;
 		item->Position.zRot = 0;
-		item->Position.yRot = Lara.LeftArm.yRot + LaraItem->Position.yRot;
+		item->Position.yRot = Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
 
-		if (!Lara.LeftArm.lock)
+		if (!Lara.LeftArm.Locked)
 		{
 			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
 			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
@@ -317,11 +317,11 @@ void FireGrenade()
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = LaraItem->Position.xRot + Lara.LeftArm.xRot;
-		item->Position.yRot = LaraItem->Position.yRot + Lara.LeftArm.yRot;
+		item->Position.xRot = LaraItem->Position.xRot + Lara.LeftArm.Rotation.xRot;
+		item->Position.yRot = LaraItem->Position.yRot + Lara.LeftArm.Rotation.yRot;
 		item->Position.zRot = 0;
 
-		if (!Lara.LeftArm.lock)
+		if (!Lara.LeftArm.Locked)
 		{
 			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
 			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
@@ -978,8 +978,8 @@ void draw_shotgun(int weaponType)
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
 		
-		Lara.RightArm.frameBase = Objects[item->ObjectNumber].frameBase;
-		Lara.LeftArm.frameBase = Lara.RightArm.frameBase;
+		Lara.RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
+		Lara.LeftArm.FrameBase = Lara.RightArm.FrameBase;
 	}
 	else
 	{
@@ -1000,9 +1000,9 @@ void draw_shotgun(int weaponType)
 		ready_shotgun(weaponType);
 	}
 
-	Lara.LeftArm.frameBase = Lara.RightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	Lara.LeftArm.frameNumber = Lara.RightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	Lara.LeftArm.animNumber = Lara.RightArm.animNumber = item->AnimNumber;
+	Lara.LeftArm.FrameBase = Lara.RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.LeftArm.FrameNumber = Lara.RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.LeftArm.AnimNumber = Lara.RightArm.AnimNumber = item->AnimNumber;
 }
 
 void AnimateShotgun(int weaponType)
@@ -1061,7 +1061,7 @@ void AnimateShotgun(int weaponType)
 
 		if (Lara.Control.WaterStatus == WaterStatus::Underwater || running)
 			item->TargetState = WSTATE_UW_AIM;
-		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.lock == false)
+		else if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.Locked == false)
 			item->TargetState = WSTATE_UNAIM;
 		else
 			item->TargetState = WSTATE_RECOIL;
@@ -1075,7 +1075,7 @@ void AnimateShotgun(int weaponType)
 
 		if (Lara.Control.WaterStatus == WaterStatus::Underwater || running)
 		{
-			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.lock == false)
+			if ((!(TrInput & IN_ACTION) || Lara.target) && Lara.LeftArm.Locked == false)
 				item->TargetState = WSTATE_UW_UNAIM;
 			else
 				item->TargetState = WSTATE_UW_RECOIL;
@@ -1092,7 +1092,7 @@ void AnimateShotgun(int weaponType)
 			
 			if (Lara.Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
 			{
-				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.LeftArm.lock))
+				if ((TrInput & IN_ACTION) && (!Lara.target || Lara.LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
@@ -1132,7 +1132,7 @@ void AnimateShotgun(int weaponType)
 
 					item->TargetState = WSTATE_RECOIL;
 				}
-				else if (Lara.LeftArm.lock)
+				else if (Lara.LeftArm.Locked)
 					item->TargetState = 0; 
 			}
 
@@ -1157,7 +1157,7 @@ void AnimateShotgun(int weaponType)
 				SoundEffect(SFX_HK_FIRE, &LaraItem->pos, 0);
 			}
 		}*/
-		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.LeftArm.lock)
+		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !Lara.LeftArm.Locked)
 		{
 			item->TargetState = WSTATE_UNAIM;
 		}
@@ -1177,7 +1177,7 @@ void AnimateShotgun(int weaponType)
 			{
 				if ((TrInput & IN_ACTION) 
 					&& (!Lara.target 
-						|| Lara.LeftArm.lock))
+						|| Lara.LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
@@ -1207,7 +1207,7 @@ void AnimateShotgun(int weaponType)
 
 					item->TargetState = WSTATE_UW_RECOIL;
 				}
-				else if (Lara.LeftArm.lock)
+				else if (Lara.LeftArm.Locked)
 					item->TargetState = WSTATE_UW_AIM;
 			}
 			else if (item->TargetState != WSTATE_UW_RECOIL 
@@ -1240,9 +1240,9 @@ void AnimateShotgun(int weaponType)
 
 	AnimateItem(item);
 
-	Lara.LeftArm.frameBase = Lara.RightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	Lara.LeftArm.frameNumber = Lara.RightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	Lara.LeftArm.animNumber = Lara.RightArm.animNumber = item->AnimNumber;
+	Lara.LeftArm.FrameBase = Lara.RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.LeftArm.FrameNumber = Lara.RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.LeftArm.AnimNumber = Lara.RightArm.AnimNumber = item->AnimNumber;
 }
 
 enum CROSSBOW_TYPE
@@ -1481,10 +1481,10 @@ void RifleHandler(int weaponType)
 		LaraTargetInfo(LaraItem, weapon);
 	AimWeapon(LaraItem, weapon, &Lara.LeftArm);
 
-	if (Lara.LeftArm.lock)
+	if (Lara.LeftArm.Locked)
 	{
-		Lara.Control.ExtraTorsoRot.zRot = Lara.LeftArm.xRot;
-		Lara.Control.ExtraTorsoRot.yRot = Lara.LeftArm.yRot;
+		Lara.Control.ExtraTorsoRot.zRot = Lara.LeftArm.Rotation.xRot;
+		Lara.Control.ExtraTorsoRot.yRot = Lara.LeftArm.Rotation.yRot;
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
 		{
 			Lara.Control.ExtraHeadRot = { 0, 0, 0 };
@@ -1496,7 +1496,7 @@ void RifleHandler(int weaponType)
 	else
 		AnimateShotgun(weaponType);
 
-	if (Lara.RightArm.flash_gun)
+	if (Lara.RightArm.FlashGun)
 	{
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{
@@ -1583,11 +1583,11 @@ void FireCrossbow(PHD_3DPOS* pos)
 
 			InitialiseItem(itemNumber);
 
-			item->Position.xRot = Lara.LeftArm.xRot + LaraItem->Position.xRot;
+			item->Position.xRot = Lara.LeftArm.Rotation.xRot + LaraItem->Position.xRot;
 			item->Position.zRot = 0;
-			item->Position.yRot = Lara.LeftArm.yRot + LaraItem->Position.yRot;
+			item->Position.yRot = Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
 
-			if (!Lara.LeftArm.lock)
+			if (!Lara.LeftArm.Locked)
 			{
 				item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
 				item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
@@ -1683,11 +1683,11 @@ void FireRocket()
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = LaraItem->Position.xRot + Lara.LeftArm.xRot;
-		item->Position.yRot = LaraItem->Position.yRot + Lara.LeftArm.yRot;
+		item->Position.xRot = LaraItem->Position.xRot + Lara.LeftArm.Rotation.xRot;
+		item->Position.yRot = LaraItem->Position.yRot + Lara.LeftArm.Rotation.yRot;
 		item->Position.zRot = 0;
 
-		if (!Lara.LeftArm.lock)
+		if (!Lara.LeftArm.Locked)
 		{
 			item->Position.xRot += Lara.Control.ExtraTorsoRot.zRot;
 			item->Position.yRot += Lara.Control.ExtraTorsoRot.yRot;
@@ -1826,24 +1826,24 @@ void undraw_shotgun(int weapon)
 	{
 		Lara.Control.HandStatus = HandStatus::Free;
 		Lara.target = nullptr;
-		Lara.RightArm.lock = false;
-		Lara.LeftArm.lock = false;
+		Lara.RightArm.Locked = false;
+		Lara.LeftArm.Locked = false;
 		KillItem(Lara.Control.WeaponControl.WeaponItem);
 		Lara.Control.WeaponControl.WeaponItem = NO_ITEM;
-		Lara.RightArm.frameNumber = 0;
-		Lara.LeftArm.frameNumber = 0;
+		Lara.RightArm.FrameNumber = 0;
+		Lara.LeftArm.FrameNumber = 0;
 	}
 	else if (item->ActiveState == 3 && item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 21)
 	{
 		undraw_shotgun_meshes(weapon);
 	}
 	
-	Lara.RightArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	Lara.LeftArm.frameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	Lara.RightArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	Lara.LeftArm.frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	Lara.RightArm.animNumber = item->AnimNumber;
-	Lara.LeftArm.animNumber = Lara.RightArm.animNumber;
+	Lara.RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.LeftArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	Lara.RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.LeftArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	Lara.RightArm.AnimNumber = item->AnimNumber;
+	Lara.LeftArm.AnimNumber = Lara.RightArm.AnimNumber;
 }
 
 void undraw_shotgun_meshes(int weapon)
@@ -1881,13 +1881,13 @@ void FireHK(int mode)
 
 	short angles[2];
 
-	angles[1] = Lara.LeftArm.xRot;
-	angles[0] = Lara.LeftArm.yRot + LaraItem->Position.yRot;
+	angles[1] = Lara.LeftArm.Rotation.xRot;
+	angles[0] = Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
 
-	if (!Lara.LeftArm.lock)
+	if (!Lara.LeftArm.Locked)
 	{
-		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.LeftArm.yRot + LaraItem->Position.yRot;
-		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.LeftArm.xRot;
+		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
+		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.LeftArm.Rotation.xRot;
 	}
 
 	if (mode)
@@ -1906,7 +1906,7 @@ void FireHK(int mode)
 		SmokeCountL = 12;
 		SmokeWeapon = WEAPON_HK;
 		TriggerGunShell(1, ID_GUNSHELL, WEAPON_HK);
-		Lara.RightArm.flash_gun = Weapons[WEAPON_HK].flashTime;
+		Lara.RightArm.FlashGun = Weapons[WEAPON_HK].flashTime;
 	}
 }
 
@@ -1914,13 +1914,13 @@ void FireShotgun()
 {
 	short angles[2];
 	
-	angles[1] = Lara.LeftArm.xRot;
-	angles[0] = Lara.LeftArm.yRot + LaraItem->Position.yRot;
+	angles[1] = Lara.LeftArm.Rotation.xRot;
+	angles[0] = Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
 
-	if (!Lara.LeftArm.lock)
+	if (!Lara.LeftArm.Locked)
 	{
-		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.LeftArm.yRot + LaraItem->Position.yRot;
-		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.LeftArm.xRot;
+		angles[0] = Lara.Control.ExtraTorsoRot.yRot + Lara.LeftArm.Rotation.yRot + LaraItem->Position.yRot;
+		angles[1] = Lara.Control.ExtraTorsoRot.zRot + Lara.LeftArm.Rotation.xRot;
 	}
 
 	short loopAngles[2];
@@ -1967,7 +1967,7 @@ void FireShotgun()
 				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, SmokeCountL);
 		}
 
-		Lara.RightArm.flash_gun = Weapons[WEAPON_SHOTGUN].flashTime;
+		Lara.RightArm.FlashGun = Weapons[WEAPON_SHOTGUN].flashTime;
 		
 		SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 20971524);
 		SoundEffect(Weapons[WEAPON_SHOTGUN].sampleNum, &LaraItem->Position, 0);
@@ -1979,17 +1979,17 @@ void FireShotgun()
 void ready_shotgun(int weaponType)
 {
 	Lara.Control.HandStatus = HandStatus::WeaponReady;
-	Lara.LeftArm.zRot = 0;
-	Lara.LeftArm.yRot = 0;
-	Lara.LeftArm.xRot = 0;
-	Lara.RightArm.zRot = 0;
-	Lara.RightArm.yRot = 0;
-	Lara.RightArm.xRot = 0;
-	Lara.RightArm.frameNumber = 0;
-	Lara.LeftArm.frameNumber = 0;
-	Lara.RightArm.lock = false;
-	Lara.LeftArm.lock = false;
+	Lara.LeftArm.Rotation.zRot = 0;
+	Lara.LeftArm.Rotation.yRot = 0;
+	Lara.LeftArm.Rotation.xRot = 0;
+	Lara.RightArm.Rotation.zRot = 0;
+	Lara.RightArm.Rotation.yRot = 0;
+	Lara.RightArm.Rotation.xRot = 0;
+	Lara.RightArm.FrameNumber = 0;
+	Lara.LeftArm.FrameNumber = 0;
+	Lara.RightArm.Locked = false;
+	Lara.LeftArm.Locked = false;
 	Lara.target = nullptr;
-	Lara.RightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
-	Lara.LeftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+	Lara.RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	Lara.LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
 }

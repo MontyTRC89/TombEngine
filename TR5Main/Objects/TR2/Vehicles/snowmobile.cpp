@@ -217,8 +217,8 @@ void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 	if (TrInput & SKIDOO_IN_FIRE && !skidoo->ItemFlags[0])
 	{
 		short angles[] = {
-			laraInfo->RightArm.yRot + lara->Position.yRot,
-			laraInfo->RightArm.xRot
+			laraInfo->RightArm.Rotation.yRot + lara->Position.yRot,
+			laraInfo->RightArm.Rotation.xRot
 		};
 		
 		if (FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles) +

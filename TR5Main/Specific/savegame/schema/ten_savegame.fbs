@@ -68,21 +68,19 @@ table CarriedWeaponInfo {
 	has_silencer: bool;
 }
 
-table LaraArmInfo {
-	frame_base: int32;
-	frame_number: int32;
-	anim_number: int32;
-	lock: bool;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
-	flash_gun: int32;
-}
-
 table FlareData {
 	life: uint32;
 	frame: int32;
 	control_left: bool;
+}
+
+table ArmInfo {
+	anim_number: int32;
+	frame_number: int32;
+	frame_base: int32;
+	locked: bool;
+	rotation: Vector3;
+	flash_gun: int32;
 }
 
 table WeaponControlData {
@@ -114,6 +112,14 @@ table RopeControlData {
 	count: int32;
 }
 
+table LaraCountData {
+	run_jump: int32;
+	position_adjust: int32;
+	pose: int32;
+	dive: int32;
+	death: int32;
+}
+
 table TightropeControlData {
 	balance: float;
 	time_on_tightrope: uint32;
@@ -124,31 +130,27 @@ table TightropeControlData {
 table LaraControlData {
 	move_angle: int32;
 	turn_rate: int32;
-	projected_floor_height: int32;
 	calculated_jump_velocity: int32;
 	jump_direction: int32;
 	hand_status: int32;
 	water_status: int32;
+	weapon_control: WeaponControlData;
+	rope_control: RopeControlData;
+	tightrope_control: TightropeControlData;
 	can_look: bool;
 	is_moving: bool;
-	run_jump_queued: bool;
 	keep_low: bool;
 	is_low: bool;
 	can_climb_ladder: bool;
 	is_climbing_ladder: bool;
 	can_monkey_swing: bool;
+	run_jump_queued: bool;
+	water_current_active: int32;
 	locked: bool;
-	run_jump_count: uint32;
-	position_adjust_count: uint32;
-	pose_count: uint32;
-	dive_count: uint32;
-	death_count: uint32;
+	count: LaraCountData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
-	weapon_control: WeaponControlData;
-	rope_control: RopeControlData;
-	tightrope_control: TightropeControlData;
 	is_busy: bool;
 	old_busy: bool;
 }
@@ -158,13 +160,13 @@ table Lara {
 	hit_points: int32;
 	velocity: int32;
 	vertical_velocity: int32;
+	projected_floor_height: int32;
 	water_status: int32;
 	control: LaraControlData;
 	hit_frame: int32;
 	hit_direction: int32;
-	sprint_timer: int32;
 	air: int32;
-	current_active: int32;
+	sprint_energy: int32;
 	spasm_effect_count: int32;
 	flare: FlareData;
 	burn_type: int32;
@@ -181,8 +183,8 @@ table Lara {
 	next_corner_rotation: Vector3;
 	mesh_ptrs: [int32];
 	target_angles: [int32];
-	left_arm: LaraArmInfo;
-	right_arm: LaraArmInfo;
+	left_arm: ArmInfo;
+	right_arm: ArmInfo;
 	interacted_item: int32;
 	location: int32;
 	highest_location: int32;

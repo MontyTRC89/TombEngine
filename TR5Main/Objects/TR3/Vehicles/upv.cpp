@@ -356,7 +356,7 @@ static void DoCurrent(ITEM_INFO* item)
 {
 	PHD_VECTOR target;
 
-	if (!Lara.currentActive)
+	if (!Lara.Control.WaterCurrentActive)
 	{
 		long shifter, absvel;
 
@@ -393,7 +393,7 @@ static void DoCurrent(ITEM_INFO* item)
 	{
 		long angle, dx, dz, speed, sinkval;
 
-		sinkval = Lara.currentActive - 1;
+		sinkval = Lara.Control.WaterCurrentActive - 1;
 		target.x = g_Level.Sinks[sinkval].x;
 		target.y = g_Level.Sinks[sinkval].y;
 		target.z = g_Level.Sinks[sinkval].z;
@@ -412,7 +412,7 @@ static void DoCurrent(ITEM_INFO* item)
 
 	item->Position.xPos += (Lara.Control.ExtraVelocity.x / 256);
 	item->Position.zPos += (Lara.Control.ExtraVelocity.z / 256);
-	Lara.currentActive = 0;
+	Lara.Control.WaterCurrentActive = 0;
 }
 
 static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
@@ -734,8 +734,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
 			laraInfo->Control.WaterStatus = WaterStatus::WaterSurface;
-			laraInfo->waterSurfaceDist = -heightFromWater;
-			laraInfo->Control.DiveCount = 11;
+			laraInfo->WaterSurfaceDist = -heightFromWater;
+			laraInfo->Control.Count.Dive = 11;
 			ResetLaraFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Free;
 			laraInfo->Vehicle = NO_ITEM;
@@ -983,11 +983,11 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			if (laraItem->HitPoints > 0)
 			{
-				laraInfo->air--;
+				laraInfo->Air--;
 
-				if (laraInfo->air < 0)
+				if (laraInfo->Air < 0)
 				{
-					laraInfo->air = -1;
+					laraInfo->Air = -1;
 					laraItem->HitPoints -= 5;
 				}
 			}
@@ -996,10 +996,10 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			if (laraItem->HitPoints >= 0)
 			{
-				laraInfo->air += 10;
+				laraInfo->Air += 10;
 
-				if (laraInfo->air > 1800)
-					laraInfo->air = 1800;
+				if (laraInfo->Air > 1800)
+					laraInfo->Air = 1800;
 			}
 		}
 	}

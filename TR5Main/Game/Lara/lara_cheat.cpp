@@ -90,8 +90,8 @@ void LaraCheatyBits()
 					LaraItem->VerticalVelocity = 30;
 					LaraItem->HitPoints = 1000;
 					Lara.poisoned = 0;
-					Lara.air = 1800;
-					Lara.Control.DeathCount = 0;
+					Lara.Air = 1800;
+					Lara.Control.Count.Death = 0;
 					ResetLaraFlex(LaraItem);
 				}
 			}

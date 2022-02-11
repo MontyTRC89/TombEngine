@@ -139,7 +139,7 @@ void DrawAirBar(float value)
 
 void UpdateAirBar(ITEM_INFO* item, int flash)
 {
-	if (Lara.air == LARA_AIR_MAX || item->HitPoints <= 0)
+	if (Lara.Air == LARA_AIR_MAX || item->HitPoints <= 0)
 		return;
 
 	if (Lara.Vehicle == NO_ITEM ||
@@ -147,11 +147,11 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 	{
 		if (Lara.Control.WaterStatus != WaterStatus::Underwater &&
 			Lara.Control.WaterStatus != WaterStatus::WaterSurface &&
-			!(TestEnvironment(ENV_FLAG_SWAMP, item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
+			!(TestEnvironment(ENV_FLAG_SWAMP, item) && Lara.WaterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
 			return;
 	}
 
-	int air = Lara.air;
+	int air = Lara.Air;
 	if (air < 0)
 		air = 0;
 	else if (air > LARA_AIR_MAX)
@@ -175,8 +175,8 @@ void DrawSprintBar(float value)
 
 void UpdateSprintBar()
 {
-	if (Lara.sprintTimer < LARA_SPRINT_MAX)
-		DrawSprintBar(Lara.sprintTimer / LARA_SPRINT_MAX);
+	if (Lara.SprintEnergy < LARA_SPRINT_MAX)
+		DrawSprintBar(Lara.SprintEnergy / LARA_SPRINT_MAX);
 }
 
 void DrawAllPickups()
