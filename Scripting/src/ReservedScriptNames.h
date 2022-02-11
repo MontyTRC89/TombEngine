@@ -36,6 +36,7 @@ static constexpr char const ScriptReserved_InvItem[]	= "InvItem";
 static constexpr char const ScriptReserved_RotationAxis[]	= "RotationAxis";
 static constexpr char const ScriptReserved_ItemAction[]	= "ItemAction";
 static constexpr char const ScriptReserved_ErrorMode[]	= "ErrorMode";
+static constexpr char const ScriptReserved_InventoryItem[]	= "InventoryItem";
 
 // Functions
 static constexpr char const ScriptReserved_ShowString[]			= "ShowString";

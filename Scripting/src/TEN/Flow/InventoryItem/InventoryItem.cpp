@@ -1,6 +1,7 @@
 #include "frameworkandsol.h"
 #include "InventoryItem.h"
 #include "ScriptAssert.h"
+#include "ReservedScriptNames.h"
 #include <string>
 
 /***
@@ -43,7 +44,7 @@ InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, sho
 
 void InventoryItem::Register(sol::table & parent)
 {
-	parent.new_usertype<InventoryItem>("InventoryObject",
+	parent.new_usertype<InventoryItem>(ScriptReserved_InventoryItem,
 		sol::constructors<InventoryItem(std::string const &, ItemEnumPair, short, float, Rotation const &, RotationFlags, int, ItemOptions), InventoryItem()>(),
 /*** (string) string key for the item's (localised) name. Corresponds to an entry in strings.lua.
 @mem nameKey
