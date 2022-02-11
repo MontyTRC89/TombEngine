@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
@@ -778,7 +779,7 @@ void FixedCamera(ITEM_INFO* item)
 
 void LookCamera(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	short headXRot = info->Control.ExtraHeadRot.xRot;
 	short headYRot = info->Control.ExtraHeadRot.yRot;
@@ -1073,7 +1074,7 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 
 void BinocularCamera(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	static bool exitingBinoculars = false;
 
@@ -1692,7 +1693,7 @@ void LookUpDown()
 
 void ResetLook(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
 	{

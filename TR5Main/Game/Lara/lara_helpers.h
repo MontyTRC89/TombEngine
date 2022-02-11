@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
+struct LaraInfo;
 struct ITEM_INFO;
 struct COLL_INFO;
 struct VaultTestResult;
@@ -18,6 +19,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void DoLaraFallDamage(ITEM_INFO* item);
 
+LaraInfo*& GetLaraInfo(ITEM_INFO* item);
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
@@ -30,6 +32,8 @@ void SetLaraMonkeyFallState(ITEM_INFO* item);
 void SetLaraMonkeyRelease(ITEM_INFO* item);
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
 
+void ResetLaraLean(ITEM_INFO* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
+
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);
 void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll);

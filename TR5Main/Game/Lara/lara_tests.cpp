@@ -136,7 +136,7 @@ bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
@@ -193,7 +193,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
@@ -261,7 +261,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	auto angle = info->Control.MoveAngle;
 
@@ -424,7 +424,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, float angle, bool outer)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	auto result = CornerTestResult();
 
@@ -491,7 +491,7 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, 
 
 CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	// Lara isn't in stop state yet, bypass test
 	if (item->AnimNumber != LA_REACH_TO_HANG)
@@ -610,7 +610,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
@@ -679,7 +679,7 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 	int shift, result;
 
 	if (!info->Control.CanClimbLadder)
@@ -768,7 +768,7 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 
 bool TestHangSwingIn(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	auto probe = GetCollisionResult(item, item->Position.yRot, CLICK(0.5f));
@@ -785,7 +785,7 @@ bool TestHangSwingIn(ITEM_INFO* item)
 
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	auto oldPos = item->Position;
 
@@ -906,7 +906,7 @@ COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int 
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
 		info->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
@@ -919,7 +919,7 @@ bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (info->Control.CanMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(0.5f) &&
 		(coll->Middle.Ceiling >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
@@ -933,7 +933,7 @@ bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraMonkeyFall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollisionResult(item);
@@ -954,7 +954,7 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	int heightFromFloor = GetCollisionResult(item).Position.Floor - item->Position.yPos;
 	
-	if (item->Airborne && item->VerticalVelocity >= 0 &&
+	if (item->Airborne && item->VerticalVelocity > 0 &&
 		(heightFromFloor <= std::min<int>(item->VerticalVelocity, STEPUP_HEIGHT) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
@@ -966,7 +966,7 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (coll->CollisionType == CT_FRONT ||
 		coll->Middle.FloorSlope ||
@@ -998,7 +998,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
@@ -1079,7 +1079,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function for water to ladder move
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!(TrInput & IN_ACTION) ||
 		!info->Control.CanClimbLadder ||
@@ -1150,7 +1150,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 
 void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	short roomNum = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNum);
@@ -1287,7 +1287,7 @@ bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
 
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&
 		info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
@@ -1303,7 +1303,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (abs(coll->Middle.Floor) > 0 &&
 		(coll->Middle.Floor <= STEPUP_HEIGHT ||	// Within lower floor bound...
@@ -1641,7 +1641,7 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
 		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
@@ -1655,7 +1655,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = CLICK(3);
@@ -1785,7 +1785,7 @@ bool TestLaraMonkeyShimmyRight(ITEM_INFO* item, COLL_INFO* coll)
 
 VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTestSetup testSetup)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = OFFSET_RADIUS(coll->Setup.Radius);
@@ -1950,7 +1950,7 @@ VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = OFFSET_RADIUS(coll->Setup.Radius);
@@ -1971,7 +1971,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = OFFSET_RADIUS(coll->Setup.Radius);
@@ -1993,7 +1993,7 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 
 VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	auto probe = GetCollisionResult(item);
@@ -2011,7 +2011,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 
 VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free)
@@ -2094,7 +2094,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 // Temporary solution to ladder mounts until ladders stop breaking whenever you try to do anything with them. @Sezz 2022.02.05
 bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || info->Control.HandStatus != HandStatus::Free)
 		return false;
@@ -2304,7 +2304,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testSetup)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	auto probe = GetCollisionResult(item, testSetup.Angle, testSetup.Dist, -coll->Setup.Height);

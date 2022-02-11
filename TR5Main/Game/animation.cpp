@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 
 #include "Objects/Generic/Object/rope.h"
 
@@ -21,7 +22,7 @@ BOUNDING_BOX InterpolatedBounds;
 
 void AnimateLara(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	item->FrameNumber++;
 

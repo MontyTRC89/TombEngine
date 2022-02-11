@@ -413,7 +413,7 @@ void GetLaraDeadlyBounds()
 
 void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 {
-	LaraInfo*& info = item->Data;
+	auto info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = moveAngle;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;

@@ -146,7 +146,7 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 		g_Level.Items[Lara.Vehicle].ObjectNumber != ID_UPV)
 	{
 		if (Lara.Control.WaterStatus != WaterStatus::Underwater &&
-			Lara.Control.WaterStatus != WaterStatus::WaterSurface &&
+			Lara.Control.WaterStatus != WaterStatus::TreadWater &&
 			!(TestEnvironment(ENV_FLAG_SWAMP, item) && Lara.WaterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
 			return;
 	}

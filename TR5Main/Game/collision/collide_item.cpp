@@ -1759,7 +1759,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (coll->Setup.EnableObjectPush ||
 					Lara.Control.WaterStatus == WaterStatus::Underwater ||
-					Lara.Control.WaterStatus == WaterStatus::WaterSurface)
+					Lara.Control.WaterStatus == WaterStatus::TreadWater)
 				{
 					ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 0);
 				}
