@@ -2274,8 +2274,13 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraCrawlExitDownStep(item, coll))
 	{
-		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll))
-			return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
+		if (TrInput & IN_CROUCH)
+		{
+			if (TestLaraCrawlDownStep(item, coll))
+				return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
+			else
+				return CrawlVaultTestResult{ false };
+		}
 		else [[likely]]
 			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_STEP_DOWN };
 	}
