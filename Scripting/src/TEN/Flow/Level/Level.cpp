@@ -6,7 +6,7 @@
 Stores level metadata.
 These are things things which aren't present in the compiled level file itself.
 
-@pregameclass Level
+@tenclass Flow.Level
 @pragma nostrip
 */
 

@@ -1,45 +1,46 @@
 #include "frameworkandsol.h"
 #include "Fog.h"
 #include "Specific/RGBAColor8Byte.h"
-/*** Describes a layer of moving clouds.
-As seen in TR4's City of the Dead.
+/***
+Fog
 
-@pregameclass SkyLayer
+@tenclass Flow.Fog
 @pragma nostrip
 */
  
-void GameScriptFog::Register(sol::state* lua)
+void Fog::Register(sol::table & parent)
 {
-	lua->new_usertype<GameScriptFog>("Fog",
-		sol::constructors<GameScriptFog(RGBAColor8Byte const&, short, short)>(),
+	parent.new_usertype<Fog>("Fog",
+		sol::constructors<Fog(RGBAColor8Byte const&, short, short)>(),
 
-		/// (@{Color}) RGB sky color
+		/// (@{Color}) RGB fog color
 		//@mem color
-		"color", sol::property(&GameScriptFog::SetColor),
+		"color", sol::property(&Fog::SetColor),
 
 		/*** (int) min distance.
 
 		This is the distance at which the fog starts 
 
 		@mem minDistance*/
-		"minDistance", &GameScriptFog::MinDistance,
+		"minDistance", &Fog::MinDistance,
 
 		/*** (int) max distance.
 
 		This is the distance at which the fog reaches the maximum strength
 
 		@mem maxDistance*/
-		"maxDistance", & GameScriptFog::MaxDistance
+		"maxDistance", & Fog::MaxDistance
 		);
 }
 
 /***
 @tparam Color color RGB color
-@tparam int speed cloud speed
-@return A SkyLayer object.
-@function SkyLayer.new
+@tparam int Min distance todo fix this up
+@tparam int Max distance todo fix this up
+@return A fog object.
+@function Fog.new
 */
-GameScriptFog::GameScriptFog(RGBAColor8Byte const& col, short minDistance, short maxDistance)
+Fog::Fog(RGBAColor8Byte const& col, short minDistance, short maxDistance)
 {
 	SetColor(col);
 	MinDistance = minDistance;
@@ -47,7 +48,7 @@ GameScriptFog::GameScriptFog(RGBAColor8Byte const& col, short minDistance, short
 	Enabled = true;
 }
 
-void GameScriptFog::SetColor(RGBAColor8Byte const& col)
+void Fog::SetColor(RGBAColor8Byte const& col)
 {
 	R = col.GetR();
 	G = col.GetG();
@@ -55,7 +56,7 @@ void GameScriptFog::SetColor(RGBAColor8Byte const& col)
 }
 
 
-RGBAColor8Byte GameScriptFog::GetColor() const
+RGBAColor8Byte Fog::GetColor() const
 {
 	return RGBAColor8Byte{ R, G, B };
 }
