@@ -1,5 +1,5 @@
 #include "frameworkandsol.h"
-#include "GameScriptFog.h"
+#include "Fog.h"
 #include "Specific/RGBAColor8Byte.h"
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
