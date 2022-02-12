@@ -189,7 +189,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
 			direction = ANGLE(180.0f);
 		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
-			direction = ANGLE(0.0f);
+			direction = 0;
 	}
 
 	return direction;
@@ -252,6 +252,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 
 	info->ProjectedFloorHeight = vaultResult.Height;
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
+	info->Control.ApproachTargetAngle = vaultResult.ApproachLedgeAngle;
 	info->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
@@ -338,7 +339,6 @@ void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 	if (rate < 0)
 		rate = -rate;
 
-	// Reset roll.
 	if (resetRoll)
 	{
 		if (abs(item->Position.zRot) > ANGLE(0.1f))
@@ -347,7 +347,6 @@ void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 			item->Position.zRot = 0;
 	}
 
-	// Reset pitch.
 	if (resetPitch)
 	{
 		if (abs(item->Position.xRot) > ANGLE(0.1f))
