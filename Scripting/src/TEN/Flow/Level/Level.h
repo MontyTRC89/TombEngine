@@ -3,7 +3,7 @@
 #include "Flow/SkyLayer/SkyLayer.h"
 #include "Flow/Mirror/Mirror.h"
 #include "Color/Color.h"
-#include <GameScriptFog.h>
+#include "Flow/Fog/Fog.h"
 #include "ScriptInterfaceLevel.h"
 #include "Flow/InventoryItem/InventoryItem.h"
 
