@@ -133,7 +133,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
 int  FindGridShift(int x, int z);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
 void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
-void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f);
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 

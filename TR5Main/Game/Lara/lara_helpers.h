@@ -12,6 +12,7 @@ struct VaultTestResult;
 // -----------------------------
 
 void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
+void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate = 1.0f);
 void EaseOutLaraHeight(ITEM_INFO* item, int height);
 void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);

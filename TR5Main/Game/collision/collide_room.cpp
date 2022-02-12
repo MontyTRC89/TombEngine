@@ -48,10 +48,12 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 	}
 }
 
-void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier)
+void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier, bool snapYRot)
 {
+	if (snapYRot)
+		item->Position.yRot = coll->NearestLedgeAngle;
+
 	item->Position.xRot = 0;
-	item->Position.yRot = coll->NearestLedgeAngle;
 	item->Position.zRot = 0;
 	item->Position.xPos += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Position.zPos += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
