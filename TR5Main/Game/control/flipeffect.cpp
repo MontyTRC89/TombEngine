@@ -138,12 +138,12 @@ void DrawLeftPistol(ITEM_INFO* item)
 	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
 	{
 		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_LHAND;
-		Lara.Control.WeaponControl.HolsterInfo.leftHolster = HOLSTER_SLOT::Empty;
+		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		Lara.Control.WeaponControl.HolsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
 	}
 }
 
@@ -152,12 +152,12 @@ void DrawRightPistol(ITEM_INFO* item)
 	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 	{
 		Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_RHAND;
-		Lara.Control.WeaponControl.HolsterInfo.rightHolster = HOLSTER_SLOT::Empty;
+		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-		Lara.Control.WeaponControl.HolsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
 	}
 }
 

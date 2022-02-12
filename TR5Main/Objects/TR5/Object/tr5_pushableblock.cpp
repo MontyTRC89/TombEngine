@@ -387,7 +387,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if ((l->ActiveState != LS_PUSHABLE_GRAB
 			|| (l->FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19)
-			|| Lara.nextCornerPos.xPos != itemNum))
+			|| Lara.NextCornerPos.xPos != itemNum))
 		{
 			if (!pushable->hasFloorCeiling)
 				ObjectCollision(itemNum, l, coll);
@@ -486,7 +486,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->TargetState = LS_PUSHABLE_GRAB;
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Busy;
-				Lara.nextCornerPos.xPos = itemNum;
+				Lara.NextCornerPos.xPos = itemNum;
 				item->Position.yRot = rot;
 			}
 			else
@@ -499,7 +499,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->TargetState = LS_PUSHABLE_GRAB;
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;
-					Lara.nextCornerPos.xPos = itemNum;
+					Lara.NextCornerPos.xPos = itemNum;
 					item->Position.yRot = rot;
 				}
 				else

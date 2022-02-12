@@ -546,7 +546,7 @@ ITEM_INFO* FindItem(int object_number)
 int FindItem(ITEM_INFO* item)
 {
 	if (item == LaraItem)
-		return Lara.itemNumber;
+		return Lara.ItemNumber;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])

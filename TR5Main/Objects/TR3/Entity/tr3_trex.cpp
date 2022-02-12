@@ -15,7 +15,7 @@ void LaraTyrannosaurDeath(ITEM_INFO* item)
 	item->TargetState = 8;
 
 	if (LaraItem->RoomNumber != item->RoomNumber)
-		ItemNewRoom(Lara.itemNumber, item->RoomNumber);
+		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 	LaraItem->Position.xPos = item->Position.xPos;
 	LaraItem->Position.yPos = item->Position.yPos;

@@ -45,8 +45,8 @@ table WeaponInfo {
 	object_number: uint32;
 	anim_number: uint32;
 	frame_number: uint32;
-	current_anim_state: uint32;
-	goal_anim_state: uint32;
+	active_state: uint32;
+	targetstate: uint32;
 }
 
 table HolsterInfo {
@@ -178,7 +178,6 @@ table Lara {
 	wet: [bool];
 	lit_torch: bool;
 	water_surface_dist: int32;
-	last_position: Vector3;
 	next_corner_position: Vector3;
 	next_corner_rotation: Vector3;
 	mesh_ptrs: [int32];

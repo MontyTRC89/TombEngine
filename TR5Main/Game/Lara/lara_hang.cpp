@@ -26,7 +26,7 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 
 		Lara.Control.HandStatus = HandStatus::Free;
 
-		item->Position.yRot += Lara.nextCornerPos.yRot / 2;
+		item->Position.yRot += Lara.NextCornerPos.yRot / 2;
 		return;
 	}
 
@@ -41,10 +41,10 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
-		coll->Setup.OldPosition.x = item->Position.xPos = Lara.nextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->Position.yPos = Lara.nextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->Position.zPos = Lara.nextCornerPos.zPos;
-		item->Position.yRot = Lara.nextCornerPos.yRot;
+		coll->Setup.OldPosition.x = item->Position.xPos = Lara.NextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->Position.yPos = Lara.NextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->Position.zPos = Lara.NextCornerPos.zPos;
+		item->Position.yRot = Lara.NextCornerPos.yRot;
 	}
 }
 

@@ -204,7 +204,7 @@ void ControlTeleporter(short itemNumber)
 		LaraItem->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
 		if (LaraItem->RoomNumber != roomNumber)
-			ItemNewRoom(Lara.itemNumber, roomNumber);
+			ItemNewRoom(Lara.ItemNumber, roomNumber);
 
 		if (item->Flags & ONESHOT)
 		{

@@ -361,7 +361,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
 		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.itemNumber];
+		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -2653,8 +2653,8 @@ namespace TEN::Renderer
 			RenderShadowMap(view);
 
 		// Setup Lara item
-		m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
-		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.itemNumber], view);
+		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
+		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;

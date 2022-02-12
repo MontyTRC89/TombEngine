@@ -240,7 +240,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		info->Control.RunJumpQueued = IsRunJumpQueueableState((LARA_STATE)item->TargetState);
+		info->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->TargetState);
 	}
 	else
 		info->Control.RunJumpQueued = false;
@@ -402,11 +402,11 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	auto info = GetLaraInfo(item);
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LARA_STATE)item->ActiveState))
+	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
 		info->Control.Count.RunJump = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LARA_STATE)item->ActiveState))
+	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
 		info->Control.RunJumpQueued = false;
 
 	// Reset projected height value used by step function.

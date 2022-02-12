@@ -297,7 +297,7 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 			laraItem->Position.zPos = z;
 
 			if (probe.RoomNumber != laraItem->RoomNumber)
-				ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
+				ItemNewRoom(laraInfo->ItemNumber, probe.RoomNumber);
 		}
 		laraItem->Position.yPos = y;
 
@@ -901,7 +901,7 @@ void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	laraItem->TargetState = SBOAT_STATE_MOUNT;
 
 	if (laraItem->RoomNumber != sBoatItem->RoomNumber)
-		ItemNewRoom(laraInfo->itemNumber, sBoatItem->RoomNumber);
+		ItemNewRoom(laraInfo->ItemNumber, sBoatItem->RoomNumber);
 
 	AnimateItem(laraItem);
 
@@ -1011,7 +1011,7 @@ void SpeedBoatControl(short itemNum)
 		if (probe.RoomNumber != sBoatItem->RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, probe.RoomNumber);
 		}
 
 		sBoatItem->Position.zRot += sBoatInfo->tiltAngle;

@@ -55,4 +55,4 @@ void find_target_point(ITEM_INFO* item, GAME_VECTOR* target);
 void LaraTargetInfo(ITEM_INFO* lara, WEAPON_INFO* weapon);
 bool CheckForHoldingState(int state);
 void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weapon);
-HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon);
+HolsterSlot HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon);

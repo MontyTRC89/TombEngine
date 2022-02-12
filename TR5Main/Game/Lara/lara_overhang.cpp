@@ -316,7 +316,7 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
 		auto info = (LaraInfo*&)lara->Data;
-		info->nextCornerPos.zRot = (lara->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
+		info->NextCornerPos.zRot = (lara->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
 		SetAnimation(lara, lara->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -496,7 +496,7 @@ void lara_col_slopehang(ITEM_INFO* lara, COLL_INFO* coll)
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
 		{
 			auto info = (LaraInfo*&)lara->Data;
-			SetAnimation(lara, info->nextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
+			SetAnimation(lara, info->NextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
 		}
 
 		// Shimmy control
@@ -816,7 +816,7 @@ void lara_as_sclimbend(ITEM_INFO* lara, COLL_INFO* coll)
 		break;
 	}
 
-	((LaraInfo*&)lara->Data)->nextCornerPos.zRot = 0;
+	((LaraInfo*&)lara->Data)->NextCornerPos.zRot = 0;
 	lara->Position.xRot = 0;
 }
 
@@ -1100,7 +1100,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
 				auto info = (LaraInfo*&)lara->Data;
-				info->nextCornerPos.zRot = AlignToGrab(lara);
+				info->NextCornerPos.zRot = AlignToGrab(lara);
 
 				int ceiling2 = GetCeiling(floorNow, lara->Position.xPos, lara->Position.yPos, lara->Position.zPos);
 				lara->Position.yPos = ceiling2 + HEIGHT_ADJUST;

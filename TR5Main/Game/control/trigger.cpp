@@ -729,7 +729,7 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 
 	// Burn Lara
 	if (floor->Flags.Death &&
-		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LARA_STATE)LaraItem->ActiveState) ||
+		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->ActiveState) ||
 			Lara.Control.WaterStatus != WaterStatus::Dry))
 	{
 		LavaBurn(LaraItem);
