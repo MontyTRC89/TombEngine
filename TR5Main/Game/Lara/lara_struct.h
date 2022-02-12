@@ -1148,6 +1148,7 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
+	bool ApproachTargetAngle;
 	short WaterCurrentActive;
 	LaraCountData Count;
 

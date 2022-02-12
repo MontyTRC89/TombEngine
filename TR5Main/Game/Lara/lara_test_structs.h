@@ -33,6 +33,7 @@ struct VaultTestResult
 	int Height;
 	bool SetBusyHands;
 	bool SnapToLedge;
+	bool ApproachLedgeAngle;
 	LaraState TargetState;
 };
 
