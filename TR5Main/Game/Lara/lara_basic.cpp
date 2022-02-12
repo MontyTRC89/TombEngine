@@ -97,6 +97,7 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
+	ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
 	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
 }
 

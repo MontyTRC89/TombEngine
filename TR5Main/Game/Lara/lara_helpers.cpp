@@ -36,9 +36,23 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 	int sign = copysign(1, maxAngle);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->Position.zRot += std::min(rate, (short)(abs((maxAngle * 3) / 5 - item->Position.zRot) / 3)) * sign;
+		item->Position.zRot += std::min<short>(rate, abs((maxAngle * 3) / 5 - item->Position.zRot) / 3) * sign;
 	else
-		item->Position.zRot += std::min(rate, (short)(abs(maxAngle - item->Position.zRot) / 3)) * sign;
+		item->Position.zRot += std::min<short>(rate, abs(maxAngle - item->Position.zRot) / 3) * sign;
+}
+
+void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
+{
+	auto info = GetLaraInfo(item);
+
+	if (rate < 0)
+		rate = -rate;
+
+	if (abs((short)(targetAngle - item->Position.yRot)) > ANGLE(0.1f))
+		item->Position.yRot += (short)(targetAngle - item->Position.yRot) / rate;
+	else
+		item->Position.yRot = targetAngle;
+
 }
 
 void EaseOutLaraHeight(ITEM_INFO* item, int height)
@@ -241,7 +255,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	info->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
-		SnapItemToLedge(item, coll);
+		SnapItemToLedge(item, coll, 0, false);
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
