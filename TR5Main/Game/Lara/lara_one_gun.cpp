@@ -1848,13 +1848,13 @@ void undraw_shotgun(int weapon)
 
 void undraw_shotgun_meshes(int weapon)
 {
-	Lara.Control.WeaponControl.HolsterInfo.backHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
+	Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(weapon));
 	Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void draw_shotgun_meshes(int weaponType)
 {
-	Lara.Control.WeaponControl.HolsterInfo.backHolster = HOLSTER_SLOT::Empty;
+	Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
 	Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, weaponType)].meshIndex + LM_RHAND;
 }
 

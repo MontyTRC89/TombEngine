@@ -21,7 +21,7 @@ namespace TEN::Renderer
 }
 
 #pragma region state_and_animation
-enum LARA_STATE
+enum LaraState
 {
 	// TR1
 	LS_WALK_FORWARD = 0,
@@ -208,7 +208,7 @@ enum LARA_STATE
 	NUM_LARA_STATES
 };
 
-enum LARA_ANIM
+enum LaraAnim
 {
 	// TR1
 	LA_RUN = 0,												// Run forward (looped)
@@ -831,7 +831,7 @@ enum LARA_WEAPON_TYPE_CARRIED
 	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
-enum class HOLSTER_SLOT : int
+enum class HolsterSlot : int
 {
 	Empty = ID_LARA_HOLSTERS,
 	Pistols = ID_LARA_HOLSTERS_PISTOLS,
@@ -912,9 +912,9 @@ enum class BurnType
 
 struct HolsterInfo
 {
-	HOLSTER_SLOT leftHolster;
-	HOLSTER_SLOT rightHolster;
-	HOLSTER_SLOT backHolster;
+	HolsterSlot LeftHolster;
+	HolsterSlot RightHolster;
+	HolsterSlot BackHolster;
 };
 
 struct Ammo
@@ -1148,9 +1148,7 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-
 	short WaterCurrentActive;
-
 	LaraCountData Count;
 
 	PHD_3DPOS ExtraHeadRot;
@@ -1164,16 +1162,15 @@ struct LaraControlData
 
 struct LaraInfo
 {
-	short itemNumber;
+	short ItemNumber;
 
 	int ProjectedFloorHeight;
 	int WaterSurfaceDist;
-	PHD_VECTOR lastPos;
-	PHD_3DPOS nextCornerPos;
+	PHD_3DPOS NextCornerPos;
 
 	LaraControlData Control;
 	FlareData Flare;
-	bool litTorch;
+	bool LitTorch;
 
 	int hitFrame;
 	int hitDirection;

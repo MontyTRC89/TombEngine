@@ -663,7 +663,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.itemNumber)
+			if (itemNumber == Lara.ItemNumber)
 				updateLaraAnimations(false);
 			else
 				updateItemAnimations(itemNumber, false);
@@ -685,7 +685,7 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.itemNumber)
+			if (itemNumber == Lara.ItemNumber)
 				updateLaraAnimations(false);
 			else
 				updateItemAnimations(itemNumber, false);
@@ -727,7 +727,7 @@ namespace TEN::Renderer
 
 	void Renderer11::getBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
 	{
-		if (itemNumber == Lara.itemNumber)
+		if (itemNumber == Lara.ItemNumber)
 		{
 			RendererObject& obj = *m_moveableObjects[ID_LARA];
 			*outMatrix = obj.AnimationTransforms[joint] * m_LaraWorldMatrix;

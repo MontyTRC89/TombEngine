@@ -517,10 +517,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		// Store next position
 		item->Position = cornerResult.RealPositionResult;
-		info->nextCornerPos.xPos = item->Position.xPos;
-		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
-		info->nextCornerPos.zPos = item->Position.zPos;
-		info->nextCornerPos.yRot = item->Position.yRot;
+		info->NextCornerPos.xPos = item->Position.xPos;
+		info->NextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
+		info->NextCornerPos.zPos = item->Position.zPos;
+		info->NextCornerPos.yRot = item->Position.yRot;
 		info->Control.MoveAngle = item->Position.yRot;
 		
 		item->Position = cornerResult.ProbeResult;
@@ -536,9 +536,9 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		if (info->Control.CanClimbLadder)
 		{
 			auto& angleSet = testAngle > 0 ? LeftExtRightIntTab : LeftIntRightExtTab;
-			if (GetClimbFlags(info->nextCornerPos.xPos, item->Position.yPos, info->nextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
+			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, info->NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
 			{
-				info->nextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
+				info->NextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
 				return CORNER_RESULT::INNER;
 			}
 		}
@@ -574,10 +574,10 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 
 		// Store next position
 		item->Position = cornerResult.RealPositionResult;
-		info->nextCornerPos.xPos = item->Position.xPos;
-		info->nextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
-		info->nextCornerPos.zPos = item->Position.zPos;
-		info->nextCornerPos.yRot = item->Position.yRot;
+		info->NextCornerPos.xPos = item->Position.xPos;
+		info->NextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
+		info->NextCornerPos.zPos = item->Position.zPos;
+		info->NextCornerPos.yRot = item->Position.yRot;
 		info->Control.MoveAngle = item->Position.yRot;
 
 		item->Position = cornerResult.ProbeResult;
@@ -593,9 +593,9 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		if (info->Control.CanClimbLadder)
 		{
 			auto& angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
-			if (GetClimbFlags(info->nextCornerPos.xPos, item->Position.yPos, Lara.nextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
+			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, Lara.NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
 			{
-				info->nextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
+				info->NextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
 				return CORNER_RESULT::OUTER;
 			}
 		}
@@ -1207,7 +1207,7 @@ bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
 	return false;
 }
 
-bool IsJumpState(LARA_STATE state)
+bool IsJumpState(LaraState state)
 {
 	if (state == LS_JUMP_FORWARD ||
 		state == LS_JUMP_BACK ||
@@ -1226,7 +1226,7 @@ bool IsJumpState(LARA_STATE state)
 	return false;
 }
 
-bool IsRunJumpQueueableState(LARA_STATE state)
+bool IsRunJumpQueueableState(LaraState state)
 {
 	if (state == LS_RUN_FORWARD ||
 		state == LS_STEP_UP ||
@@ -1238,7 +1238,7 @@ bool IsRunJumpQueueableState(LARA_STATE state)
 	return false;
 }
 
-bool IsRunJumpCountableState(LARA_STATE state)
+bool IsRunJumpCountableState(LaraState state)
 {
 	if (state == LS_RUN_FORWARD ||
 		state == LS_WALK_FORWARD ||
@@ -1252,7 +1252,7 @@ bool IsRunJumpCountableState(LARA_STATE state)
 	return false;
 }
 
-bool IsVaultState(LARA_STATE state)
+bool IsVaultState(LaraState state)
 {
 	if (state == LS_VAULT ||
 		state == LS_VAULT_2_STEPS ||
@@ -1289,11 +1289,14 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto info = GetLaraInfo(item);
 
-	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&
-		info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0) &&	// Flare is not being handled. TODO: Will she pose with weapons drawn?
-		info->Vehicle == NO_ITEM)									// Not in a vehicle.
+	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		return false;
+
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		info->Control.HandStatus == HandStatus::Free &&			// Hands are free.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+			info->Flare.Life) &&
+		info->Vehicle == NO_ITEM)								// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1306,9 +1309,9 @@ bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	auto info = GetLaraInfo(item);
 
 	if (abs(coll->Middle.Floor) > 0 &&
-		(coll->Middle.Floor <= STEPUP_HEIGHT ||	// Within lower floor bound...
+		(coll->Middle.Floor <= STEPUP_HEIGHT ||					// Within lower floor bound...
 			info->Control.WaterStatus == WaterStatus::Wade) &&		// OR Lara is wading.
-		coll->Middle.Floor >= -STEPUP_HEIGHT &&	// Within upper floor bound.
+		coll->Middle.Floor >= -STEPUP_HEIGHT &&					// Within upper floor bound.
 		coll->Middle.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1643,9 +1646,10 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	auto info = GetLaraInfo(item);
 
-	if (info->Control.HandStatus == HandStatus::Free &&							// Hands are free.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(info->Control.WeaponControl.GunType != WEAPON_FLARE || info->Flare.Life > 0))	// Not handling flare.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		info->Control.HandStatus == HandStatus::Free &&			// Hands are free.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+			info->Flare.Life))
 	{
 		return true;
 	}
@@ -1661,12 +1665,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	int dist = CLICK(3);
 	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -LARA_HEIGHT_CRAWL);
 
-	if ((probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
 		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
 		!probe.Position.FloorSlope &&							// Not a slope.
 		info->WaterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
-		!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
 		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
 			info->Flare.Life))
 	{

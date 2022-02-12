@@ -523,7 +523,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
     auto pos = PHD_3DPOS(item->Position.xPos, item->Position.yPos - 128, item->Position.zPos, 0, item->Position.yRot, 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	ExplodingDeath(Lara.Vehicle, -2, 256);
-	ExplodingDeath(Lara.itemNumber, -2, 258); // enable blood
+	ExplodingDeath(Lara.ItemNumber, -2, 258); // enable blood
 	LaraItem->HitPoints = 0;
 	item->Status = ITEM_DEACTIVATED;
 
@@ -1489,7 +1489,7 @@ int MotorbikeControl(void)
         if (room_number != item->RoomNumber)
         {
             ItemNewRoom(Lara.Vehicle, room_number);
-            ItemNewRoom(Lara.itemNumber, room_number);
+            ItemNewRoom(Lara.ItemNumber, room_number);
         }
 
         LaraItem->Position.xPos = item->Position.xPos;
@@ -1511,7 +1511,7 @@ int MotorbikeControl(void)
         {
             if (item->Position.yPos == item->Floor)
             {
-                ExplodingDeath(Lara.itemNumber, -1, 256);
+                ExplodingDeath(Lara.ItemNumber, -1, 256);
                 LaraItem->Flags = ONESHOT;
                 MotorBikeExplode(item);
                 return 0;

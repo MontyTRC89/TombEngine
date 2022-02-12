@@ -247,7 +247,7 @@ namespace TEN::Entities::TR4
                 || item->ItemFlags[0] != 1
                 || l->ActiveState != LS_IDLE
                 || l->AnimNumber != LA_STAND_IDLE
-                || !Lara.litTorch
+                || !Lara.LitTorch
                 || l->Airborne)
             {
                 if (l->AnimNumber != LA_TORCH_LIGHT_3

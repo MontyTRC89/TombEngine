@@ -33,7 +33,7 @@ struct VaultTestResult
 	int Height;
 	bool SetBusyHands;
 	bool SnapToLedge;
-	LARA_STATE TargetState;
+	LaraState TargetState;
 };
 
 struct CrawlVaultTestSetup
@@ -52,7 +52,7 @@ struct CrawlVaultTestSetup
 struct CrawlVaultTestResult
 {
 	bool Success;
-	LARA_STATE TargetState;
+	LaraState TargetState;
 };
 
 struct JumpTestSetup

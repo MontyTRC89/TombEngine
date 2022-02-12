@@ -802,8 +802,8 @@ struct WeaponInfoT : public flatbuffers::NativeTable {
   uint32_t object_number = 0;
   uint32_t anim_number = 0;
   uint32_t frame_number = 0;
-  uint32_t current_anim_state = 0;
-  uint32_t goal_anim_state = 0;
+  uint32_t active_state = 0;
+  uint32_t targetstate = 0;
 };
 
 struct WeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -814,8 +814,8 @@ struct WeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_OBJECT_NUMBER = 4,
     VT_ANIM_NUMBER = 6,
     VT_FRAME_NUMBER = 8,
-    VT_CURRENT_ANIM_STATE = 10,
-    VT_GOAL_ANIM_STATE = 12
+    VT_ACTIVE_STATE = 10,
+    VT_TARGETSTATE = 12
   };
   uint32_t object_number() const {
     return GetField<uint32_t>(VT_OBJECT_NUMBER, 0);
@@ -826,19 +826,19 @@ struct WeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint32_t frame_number() const {
     return GetField<uint32_t>(VT_FRAME_NUMBER, 0);
   }
-  uint32_t current_anim_state() const {
-    return GetField<uint32_t>(VT_CURRENT_ANIM_STATE, 0);
+  uint32_t active_state() const {
+    return GetField<uint32_t>(VT_ACTIVE_STATE, 0);
   }
-  uint32_t goal_anim_state() const {
-    return GetField<uint32_t>(VT_GOAL_ANIM_STATE, 0);
+  uint32_t targetstate() const {
+    return GetField<uint32_t>(VT_TARGETSTATE, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_OBJECT_NUMBER) &&
            VerifyField<uint32_t>(verifier, VT_ANIM_NUMBER) &&
            VerifyField<uint32_t>(verifier, VT_FRAME_NUMBER) &&
-           VerifyField<uint32_t>(verifier, VT_CURRENT_ANIM_STATE) &&
-           VerifyField<uint32_t>(verifier, VT_GOAL_ANIM_STATE) &&
+           VerifyField<uint32_t>(verifier, VT_ACTIVE_STATE) &&
+           VerifyField<uint32_t>(verifier, VT_TARGETSTATE) &&
            verifier.EndTable();
   }
   WeaponInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -859,11 +859,11 @@ struct WeaponInfoBuilder {
   void add_frame_number(uint32_t frame_number) {
     fbb_.AddElement<uint32_t>(WeaponInfo::VT_FRAME_NUMBER, frame_number, 0);
   }
-  void add_current_anim_state(uint32_t current_anim_state) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_CURRENT_ANIM_STATE, current_anim_state, 0);
+  void add_active_state(uint32_t active_state) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_ACTIVE_STATE, active_state, 0);
   }
-  void add_goal_anim_state(uint32_t goal_anim_state) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_GOAL_ANIM_STATE, goal_anim_state, 0);
+  void add_targetstate(uint32_t targetstate) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_TARGETSTATE, targetstate, 0);
   }
   explicit WeaponInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -881,11 +881,11 @@ inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(
     uint32_t object_number = 0,
     uint32_t anim_number = 0,
     uint32_t frame_number = 0,
-    uint32_t current_anim_state = 0,
-    uint32_t goal_anim_state = 0) {
+    uint32_t active_state = 0,
+    uint32_t targetstate = 0) {
   WeaponInfoBuilder builder_(_fbb);
-  builder_.add_goal_anim_state(goal_anim_state);
-  builder_.add_current_anim_state(current_anim_state);
+  builder_.add_targetstate(targetstate);
+  builder_.add_active_state(active_state);
   builder_.add_frame_number(frame_number);
   builder_.add_anim_number(anim_number);
   builder_.add_object_number(object_number);
@@ -2253,7 +2253,6 @@ struct LaraT : public flatbuffers::NativeTable {
   std::vector<bool> wet{};
   bool lit_torch = false;
   int32_t water_surface_dist = 0;
-  std::unique_ptr<TEN::Save::Vector3> last_position{};
   std::unique_ptr<TEN::Save::Vector3> next_corner_position{};
   std::unique_ptr<TEN::Save::Vector3> next_corner_rotation{};
   std::vector<int32_t> mesh_ptrs{};
@@ -2320,44 +2319,43 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WET = 42,
     VT_LIT_TORCH = 44,
     VT_WATER_SURFACE_DIST = 46,
-    VT_LAST_POSITION = 48,
-    VT_NEXT_CORNER_POSITION = 50,
-    VT_NEXT_CORNER_ROTATION = 52,
-    VT_MESH_PTRS = 54,
-    VT_TARGET_ANGLES = 56,
-    VT_LEFT_ARM = 58,
-    VT_RIGHT_ARM = 60,
-    VT_INTERACTED_ITEM = 62,
-    VT_LOCATION = 64,
-    VT_HIGHEST_LOCATION = 66,
-    VT_LOCATION_PAD = 68,
-    VT_BEETLE_LIFE = 70,
-    VT_HAS_BEETLE_THINGS = 72,
-    VT_SMALL_WATERSKIN = 74,
-    VT_BIG_WATERSKIN = 76,
-    VT_VEHICLE = 78,
-    VT_EXTRA_ANIM = 80,
-    VT_MINE_L = 82,
-    VT_MINE_R = 84,
-    VT_WEAPONS = 86,
-    VT_PUZZLES = 88,
-    VT_KEYS = 90,
-    VT_PICKUPS = 92,
-    VT_EXAMINES = 94,
-    VT_PUZZLES_COMBO = 96,
-    VT_KEYS_COMBO = 98,
-    VT_PICKUPS_COMBO = 100,
-    VT_EXAMINES_COMBO = 102,
-    VT_SECRETS = 104,
-    VT_LASERSIGHT = 106,
-    VT_CROWBAR = 108,
-    VT_TORCH = 110,
-    VT_SILENCER = 112,
-    VT_BINOCULARS = 114,
-    VT_NUM_LARGE_MEDIPACKS = 116,
-    VT_NUM_SMALL_MEDIPACKS = 118,
-    VT_NUM_FLARES = 120,
-    VT_TARGET_ITEM_NUMBER = 122
+    VT_NEXT_CORNER_POSITION = 48,
+    VT_NEXT_CORNER_ROTATION = 50,
+    VT_MESH_PTRS = 52,
+    VT_TARGET_ANGLES = 54,
+    VT_LEFT_ARM = 56,
+    VT_RIGHT_ARM = 58,
+    VT_INTERACTED_ITEM = 60,
+    VT_LOCATION = 62,
+    VT_HIGHEST_LOCATION = 64,
+    VT_LOCATION_PAD = 66,
+    VT_BEETLE_LIFE = 68,
+    VT_HAS_BEETLE_THINGS = 70,
+    VT_SMALL_WATERSKIN = 72,
+    VT_BIG_WATERSKIN = 74,
+    VT_VEHICLE = 76,
+    VT_EXTRA_ANIM = 78,
+    VT_MINE_L = 80,
+    VT_MINE_R = 82,
+    VT_WEAPONS = 84,
+    VT_PUZZLES = 86,
+    VT_KEYS = 88,
+    VT_PICKUPS = 90,
+    VT_EXAMINES = 92,
+    VT_PUZZLES_COMBO = 94,
+    VT_KEYS_COMBO = 96,
+    VT_PICKUPS_COMBO = 98,
+    VT_EXAMINES_COMBO = 100,
+    VT_SECRETS = 102,
+    VT_LASERSIGHT = 104,
+    VT_CROWBAR = 106,
+    VT_TORCH = 108,
+    VT_SILENCER = 110,
+    VT_BINOCULARS = 112,
+    VT_NUM_LARGE_MEDIPACKS = 114,
+    VT_NUM_SMALL_MEDIPACKS = 116,
+    VT_NUM_FLARES = 118,
+    VT_TARGET_ITEM_NUMBER = 120
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -2424,9 +2422,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t water_surface_dist() const {
     return GetField<int32_t>(VT_WATER_SURFACE_DIST, 0);
-  }
-  const TEN::Save::Vector3 *last_position() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_LAST_POSITION);
   }
   const TEN::Save::Vector3 *next_corner_position() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_POSITION);
@@ -2566,7 +2561,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVector(wet()) &&
            VerifyField<uint8_t>(verifier, VT_LIT_TORCH) &&
            VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_LAST_POSITION) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_POSITION) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_ROTATION) &&
            VerifyOffset(verifier, VT_MESH_PTRS) &&
@@ -2694,9 +2688,6 @@ struct LaraBuilder {
   }
   void add_water_surface_dist(int32_t water_surface_dist) {
     fbb_.AddElement<int32_t>(Lara::VT_WATER_SURFACE_DIST, water_surface_dist, 0);
-  }
-  void add_last_position(const TEN::Save::Vector3 *last_position) {
-    fbb_.AddStruct(Lara::VT_LAST_POSITION, last_position);
   }
   void add_next_corner_position(const TEN::Save::Vector3 *next_corner_position) {
     fbb_.AddStruct(Lara::VT_NEXT_CORNER_POSITION, next_corner_position);
@@ -2844,7 +2835,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> wet = 0,
     bool lit_torch = false,
     int32_t water_surface_dist = 0,
-    const TEN::Save::Vector3 *last_position = 0,
     const TEN::Save::Vector3 *next_corner_position = 0,
     const TEN::Save::Vector3 *next_corner_rotation = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs = 0,
@@ -2913,7 +2903,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_mesh_ptrs(mesh_ptrs);
   builder_.add_next_corner_rotation(next_corner_rotation);
   builder_.add_next_corner_position(next_corner_position);
-  builder_.add_last_position(last_position);
   builder_.add_water_surface_dist(water_surface_dist);
   builder_.add_wet(wet);
   builder_.add_poisoned(poisoned);
@@ -2975,7 +2964,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     const std::vector<uint8_t> *wet = nullptr,
     bool lit_torch = false,
     int32_t water_surface_dist = 0,
-    const TEN::Save::Vector3 *last_position = 0,
     const TEN::Save::Vector3 *next_corner_position = 0,
     const TEN::Save::Vector3 *next_corner_rotation = 0,
     const std::vector<int32_t> *mesh_ptrs = nullptr,
@@ -3049,7 +3037,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       wet__,
       lit_torch,
       water_surface_dist,
-      last_position,
       next_corner_position,
       next_corner_rotation,
       mesh_ptrs__,
@@ -5047,8 +5034,8 @@ inline void WeaponInfo::UnPackTo(WeaponInfoT *_o, const flatbuffers::resolver_fu
   { auto _e = object_number(); _o->object_number = _e; }
   { auto _e = anim_number(); _o->anim_number = _e; }
   { auto _e = frame_number(); _o->frame_number = _e; }
-  { auto _e = current_anim_state(); _o->current_anim_state = _e; }
-  { auto _e = goal_anim_state(); _o->goal_anim_state = _e; }
+  { auto _e = active_state(); _o->active_state = _e; }
+  { auto _e = targetstate(); _o->targetstate = _e; }
 }
 
 inline flatbuffers::Offset<WeaponInfo> WeaponInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5062,15 +5049,15 @@ inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferB
   auto _object_number = _o->object_number;
   auto _anim_number = _o->anim_number;
   auto _frame_number = _o->frame_number;
-  auto _current_anim_state = _o->current_anim_state;
-  auto _goal_anim_state = _o->goal_anim_state;
+  auto _active_state = _o->active_state;
+  auto _targetstate = _o->targetstate;
   return TEN::Save::CreateWeaponInfo(
       _fbb,
       _object_number,
       _anim_number,
       _frame_number,
-      _current_anim_state,
-      _goal_anim_state);
+      _active_state,
+      _targetstate);
 }
 
 inline HolsterInfoT *HolsterInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5562,7 +5549,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = wet(); if (_e) { _o->wet.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->wet[_i] = _e->Get(_i) != 0; } } }
   { auto _e = lit_torch(); _o->lit_torch = _e; }
   { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
-  { auto _e = last_position(); if (_e) _o->last_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = next_corner_position(); if (_e) _o->next_corner_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = next_corner_rotation(); if (_e) _o->next_corner_rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = mesh_ptrs(); if (_e) { _o->mesh_ptrs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_ptrs[_i] = _e->Get(_i); } } }
@@ -5632,7 +5618,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _wet = _fbb.CreateVector(_o->wet);
   auto _lit_torch = _o->lit_torch;
   auto _water_surface_dist = _o->water_surface_dist;
-  auto _last_position = _o->last_position ? _o->last_position.get() : 0;
   auto _next_corner_position = _o->next_corner_position ? _o->next_corner_position.get() : 0;
   auto _next_corner_rotation = _o->next_corner_rotation ? _o->next_corner_rotation.get() : 0;
   auto _mesh_ptrs = _fbb.CreateVector(_o->mesh_ptrs);
@@ -5694,7 +5679,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _wet,
       _lit_torch,
       _water_surface_dist,
-      _last_position,
       _next_corner_position,
       _next_corner_rotation,
       _mesh_ptrs,

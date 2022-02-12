@@ -53,8 +53,8 @@ void Renderer11::updateLaraAnimations(bool force)
 	Matrix identity;
 	Matrix world;
 
-	RendererItem *item = &m_items[Lara.itemNumber];
-	item->ItemNumber = Lara.itemNumber;
+	RendererItem *item = &m_items[Lara.ItemNumber];
+	item->ItemNumber = Lara.ItemNumber;
 
 	if (!force && item->DoneAnimations)
 		return;
@@ -200,7 +200,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	for (int m = 0; m < 15; m++)
 		laraObj.AnimationTransforms[m] = item->AnimationTransforms[m];
 
-	m_items[Lara.itemNumber].DoneAnimations = true;
+	m_items[Lara.ItemNumber].DoneAnimations = true;
 }
 
 void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
@@ -217,7 +217,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 	m_context->IASetInputLayout(m_inputLayout.Get());
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	RendererItem* item = &m_items[Lara.itemNumber];
+	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	// Set shaders
 	if (shadowMap)
@@ -309,12 +309,12 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 void Renderer11::DrawLaraHolsters()
 {
-	RendererItem* item = &m_items[Lara.itemNumber];
+	RendererItem* item = &m_items[Lara.ItemNumber];
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
-	HOLSTER_SLOT leftHolsterID = Lara.Control.WeaponControl.HolsterInfo.leftHolster;
-	HOLSTER_SLOT rightHolsterID = Lara.Control.WeaponControl.HolsterInfo.rightHolster;
-	HOLSTER_SLOT backHolsterID = Lara.Control.WeaponControl.HolsterInfo.backHolster;
+	HolsterSlot leftHolsterID = Lara.Control.WeaponControl.HolsterInfo.LeftHolster;
+	HolsterSlot rightHolsterID = Lara.Control.WeaponControl.HolsterInfo.RightHolster;
+	HolsterSlot backHolsterID = Lara.Control.WeaponControl.HolsterInfo.BackHolster;
 
 	if(m_moveableObjects[static_cast<int>(leftHolsterID)])
 	{
@@ -329,7 +329,7 @@ void Renderer11::DrawLaraHolsters()
 		drawMoveableMesh(item, mesh, room, LM_RTHIGH);
 	}
 
-	if(backHolsterID != HOLSTER_SLOT::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
+	if(backHolsterID != HolsterSlot::Empty && m_moveableObjects[static_cast<int>(backHolsterID)]){
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
 		drawMoveableMesh(item, mesh, room, LM_TORSO);

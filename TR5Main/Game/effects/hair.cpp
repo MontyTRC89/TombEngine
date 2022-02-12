@@ -160,7 +160,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[5].r = youngLara ? 0 : (int)(3.0f * (float)sphere[2].r / 4.0f);
 
 	Matrix world;
-	g_Renderer.getBoneMatrix(lara->itemNumber, LM_HEAD, &world);
+	g_Renderer.getBoneMatrix(lara->ItemNumber, LM_HEAD, &world);
 
 	if (ponytail)
 	{

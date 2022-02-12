@@ -352,7 +352,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 				age = laraInfo->Flare.Life & 0x7FFF;
 		}
 		else
-			flareItem->ItemFlags[3] = laraInfo->litTorch;
+			flareItem->ItemFlags[3] = laraInfo->LitTorch;
 
 		AddActiveItem(itemNum);
 		flareItem->Status = ITEM_ACTIVE;

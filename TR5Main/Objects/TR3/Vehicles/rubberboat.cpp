@@ -671,7 +671,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO *lara, COLL_INFO *coll)
 	lara->TargetState = 0;
 
 	if (lara->RoomNumber != item->RoomNumber)
-		ItemNewRoom(Lara.itemNumber, item->RoomNumber);
+		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 	AnimateItem(lara);
 
@@ -893,7 +893,7 @@ void RubberBoatDoGetOff(ITEM_INFO* boat)
 			LaraItem->Position.xPos = x;
 			LaraItem->Position.zPos = z;
 			if (roomNum != LaraItem->RoomNumber)
-				ItemNewRoom(Lara.itemNumber, roomNum);
+				ItemNewRoom(Lara.ItemNumber, roomNum);
 		}
 		LaraItem->Position.yPos = y;
 
@@ -999,7 +999,7 @@ void RubberBoatControl(short itemNum)
 		if (roomNumber != boat->RoomNumber)
 		{
 			ItemNewRoom(itemNum, roomNumber);
-			ItemNewRoom(Lara.itemNumber, roomNumber);
+			ItemNewRoom(Lara.ItemNumber, roomNumber);
 		}
 
 		boat->Position.zRot += binfo->tiltAngle;

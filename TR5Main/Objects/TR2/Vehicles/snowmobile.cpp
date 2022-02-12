@@ -1034,7 +1034,7 @@ bool SkidooControl(ITEM_INFO* lara, COLL_INFO* coll)
 		if (roomNumber != skidoo->RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, roomNumber);
-			ItemNewRoom(laraInfo->itemNumber, roomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, roomNumber);
 		}
 
 		AnimateItem(lara);
@@ -1050,7 +1050,7 @@ bool SkidooControl(ITEM_INFO* lara, COLL_INFO* coll)
 	if (roomNumber != skidoo->RoomNumber)
 	{
 		ItemNewRoom(laraInfo->Vehicle, roomNumber);
-		ItemNewRoom(laraInfo->itemNumber, roomNumber);
+		ItemNewRoom(laraInfo->ItemNumber, roomNumber);
 	}
 
 	if (lara->ActiveState != SKIDOO_STATE_FALLOFF)
