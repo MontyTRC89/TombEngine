@@ -247,7 +247,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, short laraKillSt
 	LaraItem->VerticalVelocity = 0;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
-		ItemNewRoom(Lara.itemNumber, item->RoomNumber);
+		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 	AnimateItem(LaraItem);
 

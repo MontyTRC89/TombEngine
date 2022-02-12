@@ -1680,7 +1680,7 @@ int JeepControl(void)
 		if (roomNumber != item->RoomNumber)
 		{
 			ItemNewRoom(Lara.Vehicle, roomNumber);
-			ItemNewRoom(Lara.itemNumber, roomNumber);
+			ItemNewRoom(Lara.ItemNumber, roomNumber);
 		}
 
 		LaraItem->Position.xPos = item->Position.xPos;

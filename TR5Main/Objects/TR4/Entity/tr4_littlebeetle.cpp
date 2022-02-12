@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 						else
 							beetle->pos.yRot -= 512;
 
-						beetle->speed = 48 - Lara.litTorch * 64 - (abs(angle) / 128);
+						beetle->speed = 48 - Lara.LitTorch * 64 - (abs(angle) / 128);
 						if (beetle->speed < -16)
 						{
 							beetle->speed = i & 0xF;

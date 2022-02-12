@@ -1387,7 +1387,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 		if (probe.RoomNumber != quad->RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, probe.RoomNumber);
 		}
 
 		lara->Position = quad->Position;
@@ -1404,7 +1404,7 @@ int QuadBikeControl(ITEM_INFO* lara, COLL_INFO* coll)
 		{
 			if (quad->Position.yPos == quad->Floor)
 			{
-				ExplodingDeath(laraInfo->itemNumber, 0xffffffff, 1);
+				ExplodingDeath(laraInfo->ItemNumber, 0xffffffff, 1);
 				lara->HitPoints = 0;
 				lara->Flags |= ONESHOT;
 				QuadbikeExplode(lara, quad);

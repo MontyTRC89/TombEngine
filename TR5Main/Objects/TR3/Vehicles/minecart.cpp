@@ -856,7 +856,7 @@ int MineCartControl(void)
 	if (roomNumber != v->RoomNumber)
 	{
 		ItemNewRoom(Lara.Vehicle, roomNumber);
-		ItemNewRoom(Lara.itemNumber, roomNumber);
+		ItemNewRoom(Lara.ItemNumber, roomNumber);
 	}
 
 	TestTriggers(v, false);

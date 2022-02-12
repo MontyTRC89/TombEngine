@@ -643,7 +643,7 @@ namespace TEN::Entities::Effects
 		if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
 			|| Lara.LeftArm.Locked
-			|| Lara.litTorch == (item->Status & 1)
+			|| Lara.LitTorch == (item->Status & 1)
 			|| item->Timer == -1
 			|| !(TrInput & IN_ACTION)
 			|| l->ActiveState != LS_IDLE

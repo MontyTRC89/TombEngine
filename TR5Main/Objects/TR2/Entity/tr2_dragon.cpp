@@ -203,7 +203,7 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 				laraitem->Velocity = 0;
 
 				if (item->RoomNumber != laraitem->RoomNumber)
-					ItemNewRoom(Lara.itemNumber, item->RoomNumber);
+					ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 				AnimateItem(LaraItem);
 

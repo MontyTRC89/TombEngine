@@ -162,7 +162,7 @@ void DoPickup(ITEM_INFO* character)
 	{
 		AddDisplayPickup(ID_BURNING_TORCH_ITEM);
 		GetFlameTorch();
-		lara->litTorch = (item->ItemFlags[3] & 1);
+		lara->LitTorch = (item->ItemFlags[3] & 1);
 
 		KillItem(pickupitem);
 		item->Position.xRot = oldXrot;

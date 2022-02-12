@@ -533,7 +533,7 @@ namespace TEN::Renderer
 
 		OBJECT_INFO* obj = &Objects[0];
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.itemNumber];
+		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));

@@ -597,7 +597,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 
 void GameScript::AssignItemsAndLara()
 {
-	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false));
+	m_lua->set("Lara", GameScriptItemInfo(Lara.ItemNumber, false));
 }
 
 /*** Special objects

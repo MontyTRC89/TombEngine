@@ -1155,28 +1155,28 @@ void LaraGetNewTarget(ITEM_INFO* lara, WEAPON_INFO* weaponInfo)
 	LaraTargetInfo(lara, weaponInfo);
 }
 
-HOLSTER_SLOT HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
+HolsterSlot HolsterSlotForWeapon(LARA_WEAPON_TYPE weapon)
 {
 	switch(weapon){
 		case WEAPON_PISTOLS:
-			return HOLSTER_SLOT::Pistols;
+			return HolsterSlot::Pistols;
 		case WEAPON_UZI:
-			return HOLSTER_SLOT::Uzis;
+			return HolsterSlot::Uzis;
 		case WEAPON_REVOLVER:
-			return HOLSTER_SLOT::Revolver;
+			return HolsterSlot::Revolver;
 		case WEAPON_SHOTGUN:
-			return HOLSTER_SLOT::Shotgun;
+			return HolsterSlot::Shotgun;
 		case WEAPON_HK:
-			return HOLSTER_SLOT::HK;
+			return HolsterSlot::HK;
 		case WEAPON_HARPOON_GUN:
-			return HOLSTER_SLOT::Harpoon;
+			return HolsterSlot::Harpoon;
 		case WEAPON_CROSSBOW:
-			return HOLSTER_SLOT::Crowssbow;
+			return HolsterSlot::Crowssbow;
 		case WEAPON_GRENADE_LAUNCHER:
-			return HOLSTER_SLOT::GrenadeLauncher;
+			return HolsterSlot::GrenadeLauncher;
 		case WEAPON_ROCKET_LAUNCHER:
-			return HOLSTER_SLOT::RocketLauncher;
+			return HolsterSlot::RocketLauncher;
 		default:
-			return HOLSTER_SLOT::Empty;
+			return HolsterSlot::Empty;
 	}
 }

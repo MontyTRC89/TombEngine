@@ -1248,7 +1248,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->VerticalVelocity = 0;
 
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
-			ItemNewRoom(laraInfo->itemNumber, kayakItem->RoomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, kayakItem->RoomNumber);
 
 		AnimateItem(laraItem);
 
@@ -1308,7 +1308,7 @@ int KayakControl(ITEM_INFO* laraItem)
 		if (kayakItem->RoomNumber != probe.RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, probe.RoomNumber);
 		}
 
 		laraItem->Position.xPos = kayakItem->Position.xPos;

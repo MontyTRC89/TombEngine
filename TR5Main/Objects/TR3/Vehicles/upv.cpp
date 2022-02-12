@@ -1028,7 +1028,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		if (probe.RoomNumber != UPVItem->RoomNumber)
 		{
 			ItemNewRoom(laraInfo->Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraInfo->itemNumber, probe.RoomNumber);
+			ItemNewRoom(laraInfo->ItemNumber, probe.RoomNumber);
 		}
 
 		laraItem->Position.xPos = UPVItem->Position.xPos;

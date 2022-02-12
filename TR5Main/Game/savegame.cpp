@@ -167,9 +167,8 @@ bool SaveGame::Save(int slot)
 		wet.push_back(Lara.wet[i] == 1);
 	auto wetOffset = fbb.CreateVector(wet);
 
-	Save::Vector3 lastPos = Save::Vector3(Lara.lastPos.x, Lara.lastPos.y, Lara.lastPos.z);
-	Save::Vector3 nextCornerPos = Save::Vector3(Lara.nextCornerPos.xPos, Lara.nextCornerPos.yPos, Lara.nextCornerPos.zPos);
-	Save::Vector3 nextCornerRot = Save::Vector3(Lara.nextCornerPos.xRot, Lara.nextCornerPos.yRot, Lara.nextCornerPos.zRot);
+	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.xPos, Lara.NextCornerPos.yPos, Lara.NextCornerPos.zPos);
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.xRot, Lara.NextCornerPos.yRot, Lara.NextCornerPos.zRot);
 
 	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.xRot, Lara.LeftArm.Rotation.yRot, Lara.LeftArm.Rotation.zRot);
 	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.xRot, Lara.RightArm.Rotation.yRot, Lara.RightArm.Rotation.zRot);
@@ -202,9 +201,9 @@ bool SaveGame::Save(int slot)
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
 	Save::HolsterInfoBuilder holsterInfo{ fbb };
-	holsterInfo.add_back_holster((int)Lara.Control.WeaponControl.HolsterInfo.backHolster);
-	holsterInfo.add_left_holster((int)Lara.Control.WeaponControl.HolsterInfo.leftHolster);
-	holsterInfo.add_right_holster((int)Lara.Control.WeaponControl.HolsterInfo.rightHolster);
+	holsterInfo.add_back_holster((int)Lara.Control.WeaponControl.HolsterInfo.BackHolster);
+	holsterInfo.add_left_holster((int)Lara.Control.WeaponControl.HolsterInfo.LeftHolster);
+	holsterInfo.add_right_holster((int)Lara.Control.WeaponControl.HolsterInfo.RightHolster);
 	auto holsterInfoOffset = holsterInfo.Finish();
 
 	Save::FlareDataBuilder flare{ fbb };
@@ -337,13 +336,12 @@ bool SaveGame::Save(int slot)
 	lara.add_hit_direction(Lara.hitDirection);
 	lara.add_hit_frame(Lara.hitFrame);
 	lara.add_interacted_item(Lara.interactedItem);
-	lara.add_item_number(Lara.itemNumber);
+	lara.add_item_number(Lara.ItemNumber);
 	lara.add_keys(keysOffset);
 	lara.add_keys_combo(keysComboOffset);
 	lara.add_lasersight(Lara.Lasersight);
-	lara.add_last_position(&lastPos);
 	lara.add_left_arm(leftArmOffset);
-	lara.add_lit_torch(Lara.litTorch);
+	lara.add_lit_torch(Lara.LitTorch);
 	lara.add_location(Lara.location);
 	lara.add_location_pad(Lara.locationPad);
 	lara.add_mesh_ptrs(meshPtrsOffset);
@@ -938,7 +936,7 @@ bool SaveGame::Load(int slot)
 			LaraItem->Location.roomNumber = roomNumber;
 			LaraItem->Location.yNumber = item->Position.yPos;
 			item->RoomNumber = roomNumber;
-			Lara.itemNumber = i;
+			Lara.ItemNumber = i;
 			LaraItem = item;
 			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
@@ -1222,9 +1220,9 @@ bool SaveGame::Load(int slot)
 	Lara.Control.WeaponControl.LastGunType = (LARA_WEAPON_TYPE)s->lara()->control()->weapon_control()->last_gun_type();
 	Lara.Control.WeaponControl.RequestGunType = (LARA_WEAPON_TYPE)s->lara()->control()->weapon_control()->request_gun_type();
 	Lara.Control.WeaponControl.WeaponItem = s->lara()->control()->weapon_control()->weapon_item();
-	Lara.Control.WeaponControl.HolsterInfo.backHolster = (HOLSTER_SLOT)s->lara()->control()->weapon_control()->holster_info()->back_holster();
-	Lara.Control.WeaponControl.HolsterInfo.leftHolster = (HOLSTER_SLOT)s->lara()->control()->weapon_control()->holster_info()->left_holster();
-	Lara.Control.WeaponControl.HolsterInfo.rightHolster = (HOLSTER_SLOT)s->lara()->control()->weapon_control()->holster_info()->right_holster();
+	Lara.Control.WeaponControl.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon_control()->holster_info()->back_holster();
+	Lara.Control.WeaponControl.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon_control()->holster_info()->left_holster();
+	Lara.Control.WeaponControl.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon_control()->holster_info()->right_holster();
 	Lara.Crowbar = s->lara()->crowbar();
 	Lara.ExtraAnim = s->lara()->extra_anim();
 	Lara.Flare.Life = s->lara()->flare()->life();
@@ -1235,12 +1233,8 @@ bool SaveGame::Load(int slot)
 	Lara.hitDirection = s->lara()->hit_direction();
 	Lara.hitFrame = s->lara()->hit_frame();
 	Lara.interactedItem = s->lara()->interacted_item();
-	Lara.itemNumber = s->lara()->item_number();
+	Lara.ItemNumber = s->lara()->item_number();
 	Lara.Lasersight = s->lara()->lasersight();
-	Lara.lastPos = PHD_VECTOR(
-		s->lara()->last_position()->x(), 
-		s->lara()->last_position()->y(),
-		s->lara()->last_position()->z());
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
 	Lara.LeftArm.FlashGun = s->lara()->left_arm()->flash_gun();
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
@@ -1249,12 +1243,12 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Rotation.xRot = s->lara()->left_arm()->rotation()->x();
 	Lara.LeftArm.Rotation.yRot = s->lara()->left_arm()->rotation()->y();
 	Lara.LeftArm.Rotation.zRot = s->lara()->left_arm()->rotation()->z();
-	Lara.litTorch = s->lara()->lit_torch();
+	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.location = s->lara()->location();
 	Lara.locationPad = s->lara()->location_pad();
 	Lara.mineL = s->lara()->mine_l();
 	Lara.mineR = s->lara()->mine_r();
-	Lara.nextCornerPos = PHD_3DPOS(
+	Lara.NextCornerPos = PHD_3DPOS(
 		s->lara()->next_corner_position()->x(),
 		s->lara()->next_corner_position()->y(),
 		s->lara()->next_corner_position()->z(),
