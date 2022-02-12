@@ -6,7 +6,8 @@ new_type("pregameclass", "Pre-game script classes", true)
 new_type("miscclass", "Misc classes", true)
 new_type("tentable", "1 Modules", true)
 new_type("tenclass", "2 Classes", true)
-new_type("enum", "3 Enums", true)
+new_type("tenprimitive", "3 Primitive Classes", true)
+new_type("enum", "4 Enums", true)
 project = "TombEngine"
 title = "TombEngine Lua API"
 description = "TombEngine scripting interface"

@@ -6,7 +6,7 @@
 Rotations are specifed as a combination of individual
 angles, in degrees, about each axis.
 All values will be clamped to [-32768, 32767].
-@tenclass Rotation
+@tenprimitive Rotation
 @pragma nostrip
 */
 

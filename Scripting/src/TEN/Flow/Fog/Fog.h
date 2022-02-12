@@ -6,7 +6,7 @@ namespace sol {
 	class state;
 }
 
-struct GameScriptFog
+struct Fog
 {
 	bool Enabled{ false };
 	byte R{ 0 };
@@ -15,10 +15,10 @@ struct GameScriptFog
 	short MinDistance{ 0 };
 	short MaxDistance{ 0 };
 
-	GameScriptFog() = default;
-	GameScriptFog(RGBAColor8Byte const& col, short minDistance, short maxDistance);
+	Fog() = default;
+	Fog(RGBAColor8Byte const& col, short minDistance, short maxDistance);
 	void SetColor(RGBAColor8Byte const& col);
 	RGBAColor8Byte GetColor() const;
 
-	static void Register(sol::state*);
+	static void Register(sol::table &);
 };
