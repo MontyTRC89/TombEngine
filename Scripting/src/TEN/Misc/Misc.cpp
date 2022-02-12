@@ -133,7 +133,7 @@ namespace Misc {
 
 	void Register(sol::state * state, sol::table & parent) {
 		sol::table table_misc{ state->lua_state(), sol::create };
-		parent.set(ScriptReserved_Inventory, table_misc);
+		parent.set(ScriptReserved_Misc, table_misc);
 
 
 		///Set and play an ambient track
