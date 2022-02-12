@@ -92,7 +92,7 @@ VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll);
-VaultTestResult TestLaraVaultAutoJump(ITEM_INFO* item, COLL_INFO* coll);
+VaultTestResult TestLaraLedgeAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll);
 VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll);
