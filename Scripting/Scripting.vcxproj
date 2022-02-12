@@ -26,7 +26,6 @@
     <ClInclude Include="include\ScriptAssert.h" />
     <ClInclude Include="include\Scripting\AudioTracks.h" />
     <ClInclude Include="include\Scripting\Flow\ScriptInterfaceFlowHandler.h" />
-    <ClInclude Include="include\Scripting\GameScriptFog.h" />
     <ClInclude Include="include\Scripting\InventorySlots.h" />
     <ClInclude Include="include\Scripting\ItemEnumPair.h" />
     <ClInclude Include="include\Scripting\LuaHandler.h" />
@@ -53,6 +52,7 @@
     <ClInclude Include="src\TEN\Color\Color.h" />
     <ClInclude Include="src\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="src\TEN\Flow\FlowHandler.h" />
+    <ClInclude Include="src\TEN\Flow\Fog\Fog.h" />
     <ClInclude Include="src\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="src\TEN\Flow\Level\Level.h" />
     <ClInclude Include="src\TEN\Flow\Mirror\Mirror.h" />
@@ -87,11 +87,11 @@
     <ClCompile Include="src\TEN\Color\Color.cpp" />
     <ClCompile Include="src\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="src\TEN\Flow\FlowHandler.cpp" />
+    <ClCompile Include="src\TEN\Flow\Fog\Fog.cpp" />
     <ClCompile Include="src\TEN\Flow\InventoryItem\InventoryItem.cpp" />
     <ClCompile Include="src\TEN\Flow\Level\Level.cpp" />
     <ClCompile Include="src\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="src\TEN\Flow\SkyLayer\SkyLayer.cpp" />
-    <ClCompile Include="src\GameScriptFog.cpp" />
     <ClCompile Include="src\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\TEN\Logic\LogicHandler.cpp" />
     <ClCompile Include="src\TEN\Misc\Misc.cpp" />
