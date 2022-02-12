@@ -3,7 +3,7 @@
 
 /***
 Settings that will be run on game startup.
-@tenclass Settings
+@tenclass Flow.Settings
 @pragma nostrip
 */
 
