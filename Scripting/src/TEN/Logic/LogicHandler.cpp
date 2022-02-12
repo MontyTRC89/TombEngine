@@ -23,7 +23,7 @@ using namespace TEN::Effects::Lightning;
 
 /***
 Functions and callbacks for level-specific logic scripts.
-@tentable Misc 
+@tentable Logic 
 @pragma nostrip
 */
 
