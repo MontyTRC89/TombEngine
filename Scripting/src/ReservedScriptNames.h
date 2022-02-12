@@ -7,6 +7,7 @@ static constexpr char const ScriptReserved_Logic[]			= "Logic";
 static constexpr char const ScriptReserved_Objects[]			= "Objects";
 static constexpr char const ScriptReserved_Strings[]			= "Strings";
 static constexpr char const ScriptReserved_Inventory[]			= "Inventory";
+static constexpr char const ScriptReserved_Misc[]			= "Misc";
 
 // Classes
 static constexpr char const ScriptReserved_Moveable[]			= "Moveable";
