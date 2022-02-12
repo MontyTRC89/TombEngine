@@ -56,6 +56,7 @@
     <ClInclude Include="src\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="src\TEN\Flow\Level\Level.h" />
     <ClInclude Include="src\TEN\Flow\Mirror\Mirror.h" />
+    <ClInclude Include="src\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="src\TEN\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="src\TEN\Inventory\InventoryHandler.h" />
     <ClInclude Include="src\TEN\Logic\LogicHandler.h" />
@@ -91,6 +92,7 @@
     <ClCompile Include="src\TEN\Flow\InventoryItem\InventoryItem.cpp" />
     <ClCompile Include="src\TEN\Flow\Level\Level.cpp" />
     <ClCompile Include="src\TEN\Flow\Mirror\Mirror.cpp" />
+    <ClCompile Include="src\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="src\TEN\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="src\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="src\TEN\Logic\LogicHandler.cpp" />
@@ -104,7 +106,6 @@
     <ClCompile Include="src\TEN\Objects\Static\Static.cpp" />
     <ClCompile Include="src\TEN\Position\Position.cpp" />
     <ClCompile Include="src\TEN\Rotation\Rotation.cpp" />
-    <ClCompile Include="src\TEN\Settings\Settings.cpp" />
     <ClCompile Include="src\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="src\TEN\Strings\StringsHandler.cpp" />
   </ItemGroup>

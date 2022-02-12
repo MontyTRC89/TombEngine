@@ -6,7 +6,7 @@
 An RGBA or RGB color.
 Components are specified in bytes; all values are clamped to [0, 255].
 
-@tenclass Color
+@tenprimitive Color
 @pragma nostrip
 */
 
