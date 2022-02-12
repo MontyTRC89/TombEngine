@@ -31,7 +31,7 @@ struct Level : public ScriptInterfaceLevel
 	SkyLayer Layer1;
 	SkyLayer Layer2;
 	bool ColAddHorizon{ false };
-	GameScriptFog Fog;
+	Fog Fog;
 	bool Storm{ false };
 	WeatherType Weather{ WeatherType::None };
 	float WeatherStrength{ 1.0f };

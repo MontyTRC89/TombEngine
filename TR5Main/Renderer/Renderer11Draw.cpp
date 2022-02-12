@@ -24,7 +24,6 @@
 #include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Objects/Generic/Object/rope.h"
-#include "Scripting/GameScriptFog.h"
 #include <chrono>
 #include <algorithm>
 #include <execution>
