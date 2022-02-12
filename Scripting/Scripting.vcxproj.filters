@@ -180,6 +180,9 @@
     <ClInclude Include="src\TEN\Flow\Fog\Fog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\TEN\Flow\Settings\Settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -251,9 +254,6 @@
     <ClCompile Include="src\TEN\Rotation\Rotation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TEN\Settings\Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\TEN\Strings\DisplayString\DisplayString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -261,6 +261,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TEN\Flow\Fog\Fog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TEN\Flow\Settings\Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

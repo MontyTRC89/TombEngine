@@ -110,7 +110,7 @@ Specify which translations in the strings table correspond to which languages.
 	InventoryItem::Register(table_flow);
 	Animations::Register(table_flow);
 	Settings::Register(table_flow);
-	GameScriptFog::Register(m_lua);
+	Fog::Register(table_flow);
 
 	MakeReadOnlyTable(ScriptReserved_WeatherType, kWeatherTypes);
 	MakeReadOnlyTable(ScriptReserved_LaraType, kLaraTypes);
