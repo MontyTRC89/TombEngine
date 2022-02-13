@@ -23,7 +23,7 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll);
 int  TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge);
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
 CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
-bool TestHangSwingIn(ITEM_INFO* item);
+bool TestHangSwingIn(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
 bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);

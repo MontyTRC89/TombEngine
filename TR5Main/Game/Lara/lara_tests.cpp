@@ -229,7 +229,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 	}
 
-	if (TestHangSwingIn(item))
+	if (TestHangSwingIn(item, coll))
 	{
 		SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
 		ResetLaraFlex(item);
@@ -766,15 +766,15 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 	return 1;
 }
 
-bool TestHangSwingIn(ITEM_INFO* item)
+bool TestHangSwingIn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	auto probe = GetCollisionResult(item, item->Position.yRot, CLICK(0.5f));
+	auto probe = GetCollisionResult(item, item->Position.yRot, OFFSET_RADIUS(coll->Setup.Radius));
 
 	if ((probe.Position.Floor - y) > 0 &&
-		(probe.Position.Ceiling - y) < -400 &&
+		(probe.Position.Ceiling - y) < -CLICK(1.6f) &&
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		return true;

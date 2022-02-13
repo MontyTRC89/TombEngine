@@ -72,7 +72,14 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.yRot += ANGLE(4);
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_JUMP)
+	{
+		Lara.Control.Count.Dive++;
+		if (Lara.Control.Count.Dive == 10)
+			SwimDive(item);
+		return;
+	}
+	else if (TrInput & IN_FORWARD)
 	{
 		item->TargetState = LS_ONWATER_FORWARD;
 		return;
@@ -95,13 +102,6 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RSTEP)
 	{
 		item->TargetState = LS_ONWATER_RIGHT;
-		return;
-	}
-	else if (TrInput & IN_JUMP)
-	{
-		Lara.Control.Count.Dive++;
-		if (Lara.Control.Count.Dive == 10)
-			SwimDive(item);
 		return;
 	}
 
