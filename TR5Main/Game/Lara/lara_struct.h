@@ -1189,7 +1189,7 @@ struct LaraInfo
 	unsigned int BurnCount;
 	bool burn;
 	byte burnBlue;
-	bool burnSmoke;
+	bool BurnSmoke;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;

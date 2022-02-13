@@ -216,6 +216,15 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	if (LaraDeflectEdge(item, coll))
+	{
+		item->TargetState = LS_SPLAT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			return;
+
+		LaraCollideStop(item, coll);
+	}
+
+	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
 	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
