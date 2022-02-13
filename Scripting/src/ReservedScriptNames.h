@@ -18,6 +18,13 @@ static constexpr char const ScriptReserved_SoundSource[]	= "SoundSource";
 static constexpr char const ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char const ScriptReserved_DisplayString[]		= "DisplayString";
 
+// Member functions
+static constexpr char const ScriptReserved_SetColor[]			= "SetColor";
+static constexpr char const ScriptReserved_GetColor[]			= "GetColor";
+static constexpr char const ScriptReserved_SetPosition[]			= "SetPosition";
+static constexpr char const ScriptReserved_GetPosition[]			= "GetPosition";
+static constexpr char const ScriptReserved_SetRotation[]			= "SetRotation";
+static constexpr char const ScriptReserved_GetRotation[]			= "GetRotation";
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
 static constexpr char const ScriptReserved_SetIntroImagePath[]	= "SetIntroImagePath";
