@@ -22,7 +22,7 @@ bool TestLaraClimbStance(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll);
 int  TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge);
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
-CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
+CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
 bool TestHangSwingIn(ITEM_INFO* item);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
 bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
@@ -45,7 +45,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
 
 #ifndef NEW_TIGHTROPE
-void GetTighRopeFallOff(int Regularity);
+void GetTighRopeFallOff(int regularity);
 #endif
 
 bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);

@@ -265,7 +265,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
+	coll->Setup.Mode = CollProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHangJump(item, coll))
@@ -668,7 +668,7 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = (item->Velocity >= 0) ? info->Control.MoveAngle : info->Control.MoveAngle + ANGLE(180.0f);
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
+	coll->Setup.Mode = CollProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHangJumpUp(item, coll))

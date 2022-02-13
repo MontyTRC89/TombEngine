@@ -489,17 +489,17 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, COLL_INFO* coll, 
 	return result;
 }
 
-CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
+CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle)
 {
 	auto info = GetLaraInfo(item);
 
 	// Lara isn't in stop state yet, bypass test
 	if (item->AnimNumber != LA_REACH_TO_HANG)
-		return CORNER_RESULT::NONE;
+		return CornerResult::None;
 
 	// Static is in the way, bypass test
 	if (coll->HitStatic)
-		return CORNER_RESULT::NONE;
+		return CornerResult::None;
 
 	// INNER CORNER TESTS
 
@@ -531,7 +531,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		info->Control.MoveAngle = oldMoveAngle;
 
 		if (result)
-			return CORNER_RESULT::INNER;
+			return CornerResult::Inner;
 
 		if (info->Control.CanClimbLadder)
 		{
@@ -539,7 +539,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, info->NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
 			{
 				info->NextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
-				return CORNER_RESULT::INNER;
+				return CornerResult::Inner;
 			}
 		}
 	}
@@ -553,11 +553,11 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	// Test if there's a material obstacles blocking outer corner pathway
 	if ((LaraFloorFront(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)) < 0) ||
 		(LaraCeilingFront(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1), coll->Setup.Height) > 0))
-		return CORNER_RESULT::NONE;
+		return CornerResult::None;
 
 	// Last chance for possible diagonal vs. non-diagonal cases: ray test
 	if (!	LaraPositionOnLOS(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
-		return CORNER_RESULT::NONE;
+		return CornerResult::None;
 
 	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
 
@@ -588,7 +588,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 		info->Control.MoveAngle = oldMoveAngle;
 
 		if (result)
-			return CORNER_RESULT::OUTER;
+			return CornerResult::Outer;
 
 		if (info->Control.CanClimbLadder)
 		{
@@ -596,7 +596,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, Lara.NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
 			{
 				info->NextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
-				return CORNER_RESULT::OUTER;
+				return CornerResult::Outer;
 			}
 		}
 	}
@@ -605,7 +605,7 @@ CORNER_RESULT TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAng
 	item->Position = oldPos;
 	info->Control.MoveAngle = oldMoveAngle;
 
-	return CORNER_RESULT::NONE;
+	return CornerResult::None;
 }
 
 bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
@@ -631,7 +631,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(2);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
+	coll->Setup.Mode = CollProbeMode::FreeFlat;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 
 	GetCollisionInfo(coll, item);
@@ -692,7 +692,7 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	// Until climb wall tests are fully refactored, we need to recalculate COLL_INFO.
 
 	auto coll2 = *coll;
-	coll2.Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
+	coll2.Setup.Mode = CollProbeMode::Quadrants;
 	GetCollisionInfo(&coll2, item);
 
 	switch (GetQuadrant(item->Position.yRot))
