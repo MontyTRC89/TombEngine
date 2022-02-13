@@ -322,7 +322,7 @@ bool SaveGame::Save(int slot)
 	lara.add_burn_type((int)Lara.BurnType);
 	lara.add_burn(Lara.burn);
 	lara.add_burn_blue(Lara.burnBlue);
-	lara.add_burn_smoke(Lara.burnSmoke);
+	lara.add_burn_smoke(Lara.BurnSmoke);
 	lara.add_control(controlOffset);
 	lara.add_next_corner_position(&nextCornerPos);
 	lara.add_next_corner_rotation(&nextCornerRot);
@@ -1181,7 +1181,7 @@ bool SaveGame::Load(int slot)
 	Lara.BurnType = (BurnType)s->lara()->burn_type();
 	Lara.burn = s->lara()->burn();
 	Lara.burnBlue = s->lara()->burn_blue();
-	Lara.burnSmoke = s->lara()->burn_smoke();
+	Lara.BurnSmoke = s->lara()->burn_smoke();
 	Lara.Control.IsBusy = s->lara()->control()->is_busy();
 	Lara.Control.CalculatedJumpVelocity = s->lara()->control()->calculated_jump_velocity();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
@@ -1320,14 +1320,14 @@ bool SaveGame::Load(int slot)
 	{
 		char flag = 0;
 		Lara.BurnType = BurnType::None;
-		if (Lara.burnSmoke)
+		if (Lara.BurnSmoke)
 		{
 			flag = 1;
-			Lara.burnSmoke = 0;
+			Lara.BurnSmoke = 0;
 		}
 		LaraBurn(LaraItem);
 		if (flag)
-			Lara.burnSmoke = 1;
+			Lara.BurnSmoke = 1;
 	}
 
 	// Rope
