@@ -19,70 +19,68 @@ int ClosestItem;
 int ClosestDist;
 PHD_VECTOR ClosestCoord;
 
-int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
+bool ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 {
-	short room;
 	int x, y, z, wx, wy, wz;
 
-	room = target->roomNumber;
-	if (target->y > GetFloorHeight(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
+	short roomNumber = target->roomNumber;
+	if (target->y > GetFloorHeight(GetFloor(target->x, target->y, target->z, &roomNumber), target->x, target->y, target->z))
 	{
 		x = (7 * (target->x - start->x) >> 3) + start->x;
 		y = (7 * (target->y - start->y) >> 3) + start->y;
 		z = (7 * (target->z - start->z) >> 3) + start->z;
+
 		for (int i = 3; i > 0; --i)
 		{
 			wx = ((target->x - x) * i >> 2) + x;
 			wy = ((target->y - y) * i >> 2) + y;
 			wz = ((target->z - z) * i >> 2) + z;
-			if (wy < GetFloorHeight(GetFloor(wx, wy, wz, &room), wx, wy, wz))
+
+			if (wy < GetFloorHeight(GetFloor(wx, wy, wz, &roomNumber), wx, wy, wz))
 				break;
 		}
+
 		target->x = wx;
 		target->y = wy;
 		target->z = wz;
-		target->roomNumber = room;
-		return 0;
+		target->roomNumber = roomNumber;
+		return false;
 	}
-	room = target->roomNumber;
-	if (target->y < GetCeiling(GetFloor(target->x, target->y, target->z, &room), target->x, target->y, target->z))
+
+	roomNumber = target->roomNumber;
+	if (target->y < GetCeiling(GetFloor(target->x, target->y, target->z, &roomNumber), target->x, target->y, target->z))
 	{
 		x = (7 * (target->x - start->x) >> 3) + start->x;
 		y = (7 * (target->y - start->y) >> 3) + start->y;
 		z = (7 * (target->z - start->z) >> 3) + start->z;
+
 		for (int i = 3; i > 0; --i)
 		{
 			wx = ((target->x - x) * i >> 2) + x;
 			wy = ((target->y - y) * i >> 2) + y;
 			wz = ((target->z - z) * i >> 2) + z;
-			if (wy > GetCeiling(GetFloor(wx, wy, wz, &room), wx, wy, wz))
+
+			if (wy > GetCeiling(GetFloor(wx, wy, wz, &roomNumber), wx, wy, wz))
 				break;
 		}
+
 		target->x = wx;
 		target->y = wy;
 		target->z = wz;
-		target->roomNumber = room;
-		return 0;
+		target->roomNumber = roomNumber;
+		return false;
 	}
-	return 1;
+
+	return true;
 }
 
-int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing)
+bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int firing)
 {
-	GAME_VECTOR target;
-	int result, hit, itemNumber, count;
-	MESH_INFO* mesh;
-	PHD_VECTOR vector;
-	ITEM_INFO* item;
-	short angle, triggerItems[8];
-	VECTOR dir;
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();
-	target.x = dest->x;
-	target.y = dest->y;
-	target.z = dest->z;
 
-	result = LOS(src, &target);
+	GAME_VECTOR target = { dest->x, dest->y, dest->z };
+	int result = LOS(src, &target);
 
 	GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
@@ -92,13 +90,14 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 		Lara.Control.WeaponControl.Fired = true;
 
 		if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
-		{
 			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
-		}
 	}
 
-	hit = 0;
-	itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
+	bool hit = false;
+
+	MESH_INFO* mesh;
+	PHD_VECTOR vector;
+	int itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != NO_LOS_ITEM)
 	{
 		target.x = vector.x - (vector.x - src->x >> 5);
@@ -129,16 +128,17 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 					}
+
 					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 				}
 				else
 				{
-					item = &g_Level.Items[itemNumber];
+					auto item = &g_Level.Items[itemNumber];
 					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
-						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit)
-							&& LaserSight)
+						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
+							LaserSight)
 						{
 							//if (!Objects[item->objectNumber].intelligent)
 							//{
@@ -170,12 +170,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 						}
 						else
 						{
-							if (DrawTarget && (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER || Lara.Control.WeaponControl.GunType == WEAPON_HK))
+							if (drawTarget && (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER ||
+								Lara.Control.WeaponControl.GunType == WEAPON_HK))
 							{
 								if (Objects[item->ObjectNumber].intelligent)
-								{
 									HitTarget(LaraItem, item, &target, Weapons[Lara.Control.WeaponControl.GunType].damage, 0);
-								}
 								else
 								{
 									// TR5
@@ -186,28 +185,19 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							else
 							{
 								if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
-								{
 									SmashObject(itemNumber);
-								}
 								else
 								{
 									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
-									{
 										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Position.yRot, item->RoomNumber);
-									}
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-									{
 										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, -5);
-									}
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-									{
 										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
-									}
+									
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
-									{
 										item->HitPoints -= Weapons[Lara.Control.WeaponControl.GunType].damage;
-									}
 								}
 							}
 						}
@@ -220,6 +210,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 							{
 								if (item->ObjectNumber == ID_SHOOT_SWITCH1)
 									ExplodeItemNode(item, Objects[item->ObjectNumber].nmeshes - 1, 0, 64);
+
 								if (item->TriggerFlags == 444 && item->ObjectNumber == ID_SHOOT_SWITCH2)
 								{
 									// TR5 ID_SWITCH_TYPE_8/ID_SHOOT_SWITCH2
@@ -233,13 +224,15 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 										ExplodeItemNode(item, Objects[item->objectNumber].nmeshes - 1, 0, 64);
 									}*/
 
-									if (item->Flags & IFLAG_ACTIVATION_MASK && (item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+									if (item->Flags & IFLAG_ACTIVATION_MASK &&
+										(item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
 										TestTriggers(item->Position.xPos, item->Position.yPos - 256, item->Position.zPos, item->RoomNumber, true, item->Flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
-										for (count = GetSwitchTrigger(item, triggerItems, 1); count > 0; --count)
+										short triggerItems[8];
+										for (int count = GetSwitchTrigger(item, triggerItems, 1); count > 0; --count)
 										{
 											AddActiveItem(triggerItems[count - 1]);
 											g_Level.Items[triggerItems[count - 1]].Status = ITEM_ACTIVE;
@@ -248,6 +241,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									}
 								}
 							}
+
 							if (item->Status != ITEM_DEACTIVATED)
 							{
 								AddActiveItem(itemNumber);
@@ -255,6 +249,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 								item->Flags |= IFLAG_ACTIVATION_MASK | 0x40;
 							}
 						}
+
 						TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
 					}
 				}
@@ -262,13 +257,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 			else
 			{
 				if (LaserSight && firing)
-				{
 					FireCrossBowFromLaserSight(src, &target);
-				}
 			}
 		}
 
-		hit = 1;
+		hit = true;
 	}
 	else
 	{
@@ -282,12 +275,13 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 			target.x -= target.x - src->x >> 5;
 			target.y -= target.y - src->y >> 5;
 			target.z -= target.z - src->z >> 5;
+
 			if (firing && !result)
 				TriggerRicochetSpark(&target, LaraItem->Position.yRot, 8, 0);
 		}
 	}
 
-	if (DrawTarget && (hit || !result))
+	if (drawTarget && (hit || !result))
 	{
 		TriggerDynamicLight(target.x, target.y, target.z, 64, 255, 0, 0);
 		LaserSightActive = 1;
@@ -352,9 +346,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 			pos.yRot = item->Position.yRot;
 
 			if (DoRayBox(start, end, box, &pos, vec, linknum))
-			{
 				end->roomNumber = LosRooms[r];
-			}
 		}
 	}
 
@@ -365,7 +357,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 	return ClosestItem;
 }
 
-int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
+bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayStart = { (float)start->x, (float)start->y, (float)start->z };
@@ -382,7 +374,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 
 	// If no collision happened, then don't test spheres
 	if (!collided)
-		return 0;
+		return false;
 
 	// Get the raw collision point
 	Vector3 collidedPoint = rayStart + distance * rayDirNormalized;
@@ -410,24 +402,25 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
 		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-		// Get the ransformed sphere of meshes
+		// Get the transformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		SPHERE spheres[34];
 		memcpy(spheres, CreatureSpheres, sizeof(SPHERE) * 34);
+
 		if (obj->nmeshes <= 0)
-			return 0;
+			return false;
 
 		meshIndex = obj->meshIndex;
 
 		for (int i = 0; i < obj->nmeshes; i++)
 		{
-			// If mesh is visibile...
+			// If mesh is visible...
 			if (item->MeshBits & (1 << i))
 			{
 				SPHERE* sphere = &CreatureSpheres[i];
 
-				// TODO: this approach is the correct one but, again, Core's math is a mistery and this test was meant
-				// to fail delberately in some way. I've so added again Core's legacy test for allowing the current game logic
+				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
+				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
 				// but after more testing we should trash it in the future and restore the new way.
 
 #if 0
@@ -472,9 +465,9 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 					SQUARE(p[2].y - p[1].y) +
 					SQUARE(p[2].z - p[1].z);
 
-				if (((r0 < 0 && r1 < 0)
-					|| (r1 > 0 && r0 > 0))
-					&& (abs(r0) <= abs(r1)))
+				if (((r0 < 0 && r1 < 0) ||
+					(r1 > 0 && r0 > 0)) &&
+					(abs(r0) <= abs(r1)))
 				{
 					r1 >>= 16;
 					if (r1)
@@ -513,11 +506,11 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 		}
 
 		if (sp < -1)
-			return 0;
+			return false;
 	}
 
 	if (distance >= ClosestDist)
-		return 0;
+		return false;
 
 	// Setup test result
 	ClosestCoord.x = hitPos->x + itemOrStaticPos->xPos;
@@ -542,7 +535,7 @@ int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS*
 		ShatterItem.flags = 0;
 	}
 
-	return 1;
+	return true;
 }
 
 bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
@@ -565,9 +558,7 @@ bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	{
 		GetFloor(end->x, end->y, end->z, &end->roomNumber);
 		if (ClipTarget(start, end) && result1 == 1 && result2 == 1)
-		{
 			return true;
-		}
 	}
 
 	return false;
@@ -575,20 +566,23 @@ bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 
 int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 {
-	int dx, dy, dz, x, y, z, flag;
-	short room, room2;
+	int x, y, z;
 	FLOOR_INFO* floor;
 
-	dx = end->x - start->x;
+	int dx = end->x - start->x;
 	if (!dx)
 		return 1;
-	dy = (end->y - start->y << 10) / dx;
-	dz = (end->z - start->z << 10) / dx;
+
+	int dy = (end->y - start->y << 10) / dx;
+	int dz = (end->z - start->z << 10) / dx;
+
 	NumberLosRooms = 1;
 	LosRooms[0] = start->roomNumber;
-	room = start->roomNumber;
-	room2 = start->roomNumber;
-	flag = 1;
+
+	short room = start->roomNumber;
+	short room2 = start->roomNumber;
+
+	int flag = 1;
 	if (dx < 0)
 	{
 		x = start->x & 0xFFFFFC00;
@@ -603,11 +597,13 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
 			{
 				flag = -1;
 				break;
 			}
+
 			floor = GetFloor(x - 1, y, z, &room);
 			if (room != room2)
 			{
@@ -615,21 +611,25 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x - 1, y, z) || y < GetCeiling(floor, x - 1, y, z))
 			{
 				flag = 0;
 				break;
 			}
+
 			x -= 1024;
 			y -= dy;
 			z -= dz;
 		}
+
 		if (flag != 1)
 		{
 			end->x = x;
 			end->y = y;
 			end->z = z;
 		}
+
 		end->roomNumber = flag ? room : room2;
 	}
 	else
@@ -646,11 +646,13 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
 			{
 				flag = -1;
 				break;
 			}
+
 			floor = GetFloor(x + 1, y, z, &room);
 			if (room != room2)
 			{
@@ -658,42 +660,50 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x + 1, y, z) || y < GetCeiling(floor, x + 1, y, z))
 			{
 				flag = 0;
 				break;
 			}
+
 			x += 1024;
 			y += dy;
 			z += dz;
 		}
+
 		if (flag != 1)
 		{
 			end->x = x;
 			end->y = y;
 			end->z = z;
 		}
+
 		end->roomNumber = flag ? room : room2;
 	}
+
 	return flag;
 }
 
 int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 {
-	int dx, dy, dz, x, y, z, flag;
-	short room, room2;
+	int  x, y, z;
 	FLOOR_INFO* floor;
 
-	dz = end->z - start->z;
+	int dz = end->z - start->z;
 	if (!dz)
 		return 1;
-	dx = (end->x - start->x << 10) / dz;
-	dy = (end->y - start->y << 10) / dz;
+
+	int dx = (end->x - start->x << 10) / dz;
+	int dy = (end->y - start->y << 10) / dz;
+
 	NumberLosRooms = 1;
 	LosRooms[0] = start->roomNumber;
-	room = start->roomNumber;
-	room2 = start->roomNumber;
-	flag = 1;
+
+	short room = start->roomNumber;
+	short room2 = start->roomNumber;
+
+	int flag = 1;
 	if (dz < 0)
 	{
 		z = start->z & 0xFFFFFC00;
@@ -708,11 +718,13 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
 			{
 				flag = -1;
 				break;
 			}
+
 			floor = GetFloor(x, y, z - 1, &room);
 			if (room != room2)
 			{
@@ -720,21 +732,25 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z - 1) || y < GetCeiling(floor, x, y, z - 1))
 			{
 				flag = 0;
 				break;
 			}
+
 			z -= 1024;
 			x -= dx;
 			y -= dy;
 		}
+
 		if (flag != 1)
 		{
 			end->x = x;
 			end->y = y;
 			end->z = z;
 		}
+
 		end->roomNumber = flag ? room : room2;
 	}
 	else
@@ -751,11 +767,13 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
 			{
 				flag = -1;
 				break;
 			}
+
 			floor = GetFloor(x, y, z + 1, &room);
 			if (room != room2)
 			{
@@ -763,23 +781,28 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 				LosRooms[NumberLosRooms] = room;
 				++NumberLosRooms;
 			}
+
 			if (y > GetFloorHeight(floor, x, y, z + 1) || y < GetCeiling(floor, x, y, z + 1))
 			{
 				flag = 0;
 				break;
 			}
+
 			z += 1024;
 			x += dx;
 			y += dy;
 		}
+
 		if (flag != 1)
 		{
 			end->x = x;
 			end->y = y;
 			end->z = z;
 		}
+
 		end->roomNumber = flag ? room : room2;
 	}
+
 	return flag;
 }
 

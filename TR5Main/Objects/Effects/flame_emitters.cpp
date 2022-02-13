@@ -267,10 +267,10 @@ namespace TEN::Entities::Effects
 				{
 					Lara.BurnCount--;
 					if (!Lara.BurnCount)
-						Lara.burnSmoke = true;
+						Lara.BurnSmoke = true;
 				}
 
-				TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - Lara.burnSmoke);
+				TriggerFireFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, -1, 255 - Lara.BurnSmoke);
 			}
 		}
 
@@ -281,7 +281,7 @@ namespace TEN::Entities::Effects
 		PHD_VECTOR pos{ 0,0,0 };
 		GetLaraJointPosition(&pos, LM_HIPS);
 
-		if (!Lara.burnSmoke)
+		if (!Lara.BurnSmoke)
 		{
 			if (Lara.burnBlue == 0)
 			{
