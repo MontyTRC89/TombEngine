@@ -66,7 +66,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
+	coll->Setup.Mode = CollProbeMode::FreeFlat;
 
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
@@ -93,11 +93,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
-			case CORNER_RESULT::INNER:
+			case CornerResult::Inner:
 				item->TargetState = LS_SHIMMY_INNER_LEFT;
 				return;
 			
-			case CORNER_RESULT::OUTER:
+			case CornerResult::Outer:
 				item->TargetState = LS_SHIMMY_OUTER_LEFT;
 				return;
 			
@@ -107,11 +107,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 			switch (TestLaraHangCorner(item, coll, -45.0f))
 			{
-			case CORNER_RESULT::INNER:
+			case CornerResult::Inner:
 				item->TargetState = LS_SHIMMY_45_INNER_LEFT;
 				return;
 
-			case CORNER_RESULT::OUTER:
+			case CornerResult::Outer:
 				item->TargetState = LS_SHIMMY_45_OUTER_LEFT;
 				return;
 
@@ -130,11 +130,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 			switch (TestLaraHangCorner(item, coll, 90.0f))
 			{
-			case CORNER_RESULT::INNER:
+			case CornerResult::Inner:
 				item->TargetState = LS_SHIMMY_INNER_RIGHT;
 				return;
 
-			case CORNER_RESULT::OUTER:
+			case CornerResult::Outer:
 				item->TargetState = LS_SHIMMY_OUTER_RIGHT;
 				return;
 
@@ -144,11 +144,11 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 			switch (TestLaraHangCorner(item, coll, 45.0f))
 			{
-			case CORNER_RESULT::INNER:
+			case CornerResult::Inner:
 				item->TargetState = LS_SHIMMY_45_INNER_RIGHT;
 				return;
 
-			case CORNER_RESULT::OUTER:
+			case CornerResult::Outer:
 				item->TargetState = LS_SHIMMY_45_OUTER_RIGHT;
 				return;
 
@@ -244,7 +244,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangleft*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
+	coll->Setup.Mode = CollProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
@@ -267,7 +267,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	/*collision: lara_col_hangright*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FLAT;
+	coll->Setup.Mode = CollProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))

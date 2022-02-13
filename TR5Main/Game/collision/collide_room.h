@@ -24,18 +24,18 @@ enum COLL_TYPE
 	CT_CLAMP = (1 << 5)			// 0x20
 };
 
-enum class COLL_PROBE_MODE
+enum class CollProbeMode
 {
-	QUADRANTS,
-	FREE_FORWARD,
-	FREE_FLAT
+	Quadrants,
+	FreeForward,
+	FreeFlat
 };
 
-enum class CORNER_RESULT
+enum class CornerResult
 {
-	NONE,
-	INNER,
-	OUTER
+	None,
+	Inner,
+	Outer
 };
 
 struct COLL_POSITION
@@ -67,7 +67,7 @@ struct COLL_RESULT
 
 struct COLL_SETUP
 {
-	COLL_PROBE_MODE Mode;		// Probe rotation mode
+	CollProbeMode Mode;			// Probe rotation mode
 
 	bool CeilingSlopeIsWall;	// Treat steep slopes on ceilings as walls
 	bool FloorSlopeIsWall;		// Treat steep slopes as walls

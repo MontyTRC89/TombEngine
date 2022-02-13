@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_two_guns.h"
@@ -339,7 +340,7 @@ void SmashItem(short itemNum)
 
 void LaraGun(ITEM_INFO* laraItem)
 {
-	LaraInfo*& laraInfo = laraItem->Data;
+	auto laraInfo = GetLaraInfo(laraItem);
 
 	if (laraInfo->LeftArm.FlashGun > 0)
 		--laraInfo->LeftArm.FlashGun;

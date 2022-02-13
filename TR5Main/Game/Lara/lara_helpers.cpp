@@ -41,6 +41,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 		item->Position.zRot += std::min<short>(rate, abs(maxAngle - item->Position.zRot) / 3) * sign;
 }
 
+// Works, but disabled for the time being. @Sezz 2022.02.13
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 {
 	auto info = GetLaraInfo(item);
@@ -62,7 +63,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	constexpr int rate = 50;
+	static constexpr int rate = 50;
 	int threshold = std::max(abs(item->Velocity) / 3 * 2, STEP_SIZE / 16);
 	int sign = std::copysign(1, height);
 	
@@ -164,8 +165,8 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 	{
 		TENLog(std::string("Attempted to fetch LaraInfo data from object with ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 		
-		// TODO: I don't know what to do here. @Sezz 2022.02.12
-		return (LaraInfo*&)LaraItem->Data;
+		auto firstLaraItem = FindItem(ID_LARA);
+		return (LaraInfo*&)firstLaraItem->Data;
 	}
 
 	return (LaraInfo*&)item->Data;
@@ -252,11 +253,13 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 
 	info->ProjectedFloorHeight = vaultResult.Height;
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
-	info->Control.ApproachTargetAngle = vaultResult.ApproachLedgeAngle;
 	info->Control.TurnRate = 0;
 
+	// Disable smooth angle adjustment for now.
+	//info->Control.ApproachTargetAngle = vaultResult.ApproachLedgeAngle;
+
 	if (vaultResult.SnapToLedge)
-		SnapItemToLedge(item, coll, 0, false);
+		SnapItemToLedge(item, coll);
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
@@ -407,14 +410,6 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
 		info->Control.RunJumpQueued = false;
-
-	// Reset projected height value used by step function.
-	//if (!IsVaultState((LARA_STATE)item->ActiveState))
-	//	info->ProjectedFloorHeight = NO_HEIGHT;
-
-	// Reset calculated auto jump velocity.
-	//if (item->ActiveState != LS_AUTO_JUMP)
-	//	info->Control.CalculatedJumpVelocity = 0;
 
 	// Increment/reset AFK pose timer.
 	if (info->Control.Count.Pose < LARA_POSE_TIME &&

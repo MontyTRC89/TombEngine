@@ -520,7 +520,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 			{
 				info->Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while Airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
 					!isSwamp &&
 					item->Airborne)
@@ -767,7 +767,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.CeilingSlopeIsWall = false;
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.NoMonkeyFlagIsWall = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
+	coll->Setup.Mode = CollProbeMode::Quadrants;
 
 	if (TrInput & IN_LOOK && info->Control.CanLook &&
 		info->ExtraAnim == NO_ITEM)
@@ -777,7 +777,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	// TODO: Move radius and height default resets above look checks when
+	// TODO: Move radius and height default resets above look checks when look feature is refactored.
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 	info->Control.CanLook = true;
@@ -912,7 +912,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
+	coll->Setup.Mode = CollProbeMode::Quadrants;
 
 	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
@@ -1021,7 +1021,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
+	coll->Setup.Mode = CollProbeMode::FreeForward;
 
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;

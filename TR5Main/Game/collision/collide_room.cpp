@@ -237,7 +237,7 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 	// Get side probe offsets depending on quadrant.
 	// If unconstrained mode is specified, don't use quadrant.
-	switch (coll->Setup.Mode == COLL_PROBE_MODE::QUADRANTS ? quadrant : -1)
+	switch (coll->Setup.Mode == CollProbeMode::Quadrants ? quadrant : -1)
 	{
 	case 0:
 		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -279,10 +279,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 		// No valid quadrant, return true probe offsets from object rotation.
 		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = (xfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		zleft  = (zfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		xright = (xfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
-		zright = (zfront * (coll->Setup.Mode == COLL_PROBE_MODE::FREE_FORWARD ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		xleft  = (xfront * (coll->Setup.Mode == CollProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		zleft  = (zfront * (coll->Setup.Mode == CollProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
+		xright = (xfront * (coll->Setup.Mode == CollProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		zright = (zfront * (coll->Setup.Mode == CollProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
 		break;
 	}
 

@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Objects/TR3/Vehicles/biggun_info.h"
 #include "Sound/sound.h"
@@ -142,7 +143,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
 	ITEM_INFO* bGunItem = &g_Level.Items[itemNum];
 	BIGGUNINFO* bGunInfo = bGunItem->Data;
-	LaraInfo*& laraInfo = laraItem->Data;
+	auto laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints <= 0 || laraInfo->Vehicle != NO_ITEM)
 		return;
@@ -179,7 +180,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	LaraInfo*& laraInfo = laraItem->Data;
+	auto laraInfo = GetLaraInfo(laraItem);
 	ITEM_INFO* bGunItem = &g_Level.Items[laraInfo->Vehicle];
 	BIGGUNINFO* bGunInfo = bGunItem->Data;
 

@@ -97,7 +97,8 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
+	// Disable smooth angle adjustment for now.
+	//ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
 	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
 }
 
@@ -113,8 +114,9 @@ void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	
 	info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 	
-	if (info->Control.ApproachTargetAngle)
-		ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
+	// Disable smooth angle adjustment for now.
+	//if (info->Control.ApproachTargetAngle)
+	//	ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
 }
 
 // ---------------
@@ -214,13 +216,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	if (LaraDeflectEdge(item, coll))
-	{
-		item->TargetState = LS_SPLAT;
-		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
-			return;
-
 		LaraCollideStop(item, coll);
-	}
 
 	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
@@ -2094,7 +2090,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (coll->Front.Floor < -STEPUP_HEIGHT &&
 			!coll->Front.FloorSlope &&
-			!TestEnvironment(ENV_FLAG_SWAMP, item)) // TODO: Check this.
+			!TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			item->TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
