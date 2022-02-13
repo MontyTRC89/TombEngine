@@ -183,6 +183,9 @@
     <ClInclude Include="src\TEN\Flow\Settings\Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\TEN\Objects\StaticIDs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">

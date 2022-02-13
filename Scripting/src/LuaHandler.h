@@ -43,6 +43,7 @@ public:
 		m_lua->create_named_table(tableName);
 
 		m_lua->safe_script("setmetatable(" + tableName + ", " + mt + ")");
+
 		// point the initial metatable variable away from its contents. this is just for cleanliness
 		m_lua->safe_script(mt + " = nil");
 		m_lua->safe_script(mtmt + " = nil");

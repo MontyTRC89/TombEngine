@@ -53,10 +53,16 @@ void Static::Register(sol::table & parent)
 		// @tparam Rotation The static's new rotation
 		ScriptReserved_SetRotation, &Static::SetRot,
 
-		/// (string) unique string identifier.
+		/// Get the static's unique string identifier
+		// @function GetName
+		// @treturn string the static's name
+		ScriptReserved_GetName, &Static::GetName,
+
+		/// Set the static's name (its unique string identifier)
 		// e.g. "my\_vase" or "oldrubble"
-		// @mem name
-		"name", sol::property(&Static::GetName, &Static::SetName),
+		// @function SetName
+		// @tparam string name The static's new name
+		ScriptReserved_SetName, &Static::SetName,
 
 		/// (int) static number
 		// @mem staticNumber
