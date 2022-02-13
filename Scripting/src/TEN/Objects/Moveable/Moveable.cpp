@@ -341,8 +341,8 @@ void Moveable::SetPos(Position const& pos)
 Rotation Moveable::GetRot() const
 {
 	return Rotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
-								int(TO_DEGREES(m_item->pos.yRot)) % 360,
-								int(TO_DEGREES(m_item->pos.zRot)) % 360);
+						int(TO_DEGREES(m_item->pos.yRot)) % 360,
+						int(TO_DEGREES(m_item->pos.zRot)) % 360);
 }
 
 void Moveable::SetRot(Rotation const& rot)

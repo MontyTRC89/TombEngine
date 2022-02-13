@@ -3,6 +3,7 @@
 #include "ScriptAssert.h"
 #include "Static.h"
 #include "Position/Position.h"
+#include "Rotation/Rotation.h"
 #include "Color/Color.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
@@ -32,13 +33,25 @@ void Static::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// (@{Position}) position in level
-		// @mem pos
-		"pos", sol::property(&Static::GetPos, &Static::SetPos),
+		/// Get the static's position
+		// @function GetPosition
+		// @treturn Position a copy of the static's position
+		ScriptReserved_GetPosition, &Static::GetPos,
 
-		/// (int) y-axis rotation
-		// @mem yRot
-		"yRot", sol::property(&Static::GetRot, &Static::SetRot),
+		/// Set the static's position
+		// @function SetPosition
+		// @tparam Position position the new position of the static 
+		ScriptReserved_SetPosition, &Static::SetPos,
+
+		/// Get the static's rotation
+		// @function GetRotation
+		// @treturn Rotation a copy of the static's rotation
+		ScriptReserved_GetRotation, &Static::GetRot,
+
+		/// Set the static's rotation
+		// @function SetRotation
+		// @tparam Rotation The static's new rotation
+		ScriptReserved_SetRotation, &Static::SetRot,
 
 		/// (string) unique string identifier.
 		// e.g. "my\_vase" or "oldrubble"
@@ -49,9 +62,15 @@ void Static::Register(sol::table & parent)
 		// @mem staticNumber
 		"staticNumber", sol::property(&Static::GetStaticNumber, &Static::SetStaticNumber),
 
-		/// (@{Color}) color of mesh
-		// @mem color
-		"color", sol::property(&Static::GetColor, &Static::SetColor),
+		/// Get the static's color
+		// @function GetColor
+		// @treturn Color a copy of the static's color
+		ScriptReserved_GetColor, &Static::GetColor,
+
+		/// Set the static's color
+		// @function SetColor
+		// @tparam Color color the new color of the static 
+		ScriptReserved_SetColor, &Static::SetColor,
 
 		/// (int) hp
 		// @mem HP
@@ -71,14 +90,22 @@ void Static::SetPos(Position const& pos)
 	m_mesh.pos.zPos = pos.z;
 }
 
-int Static::GetRot() const
+// This does not guarantee that the returned value will be identical
+// to a value written in via SetRot - only that the angle measures
+// will be mathematically equal
+// (e.g. 90 degrees = -270 degrees = 450 degrees)
+Rotation Static::GetRot() const
 {
-	return m_mesh.pos.yRot;
+	return Rotation(	int(TO_DEGREES(m_mesh.pos.xRot)) % 360,
+						int(TO_DEGREES(m_mesh.pos.yRot)) % 360,
+						int(TO_DEGREES(m_mesh.pos.zRot)) % 360);
 }
 
-void Static::SetRot(int yRot)
+void Static::SetRot(Rotation const& rot)
 {
-	m_mesh.pos.yRot = yRot;
+	m_mesh.pos.xRot = FROM_DEGREES(rot.x);
+	m_mesh.pos.yRot = FROM_DEGREES(rot.y);
+	m_mesh.pos.zRot = FROM_DEGREES(rot.z);
 }
 
 std::string Static::GetName() const

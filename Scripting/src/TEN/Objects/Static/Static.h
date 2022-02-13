@@ -8,6 +8,7 @@ namespace sol {
 }
 
 class Position;
+class Rotation;
 class ScriptColor;
 
 class Static : public NamedBase<Static, MESH_INFO &>
@@ -20,11 +21,11 @@ public:
 	Static(Static const& other) = delete;
 
 	static void Register(sol::table & parent);
+	Rotation GetRot() const;
+	void SetRot(Rotation const& rot);
 
 	Position GetPos() const;
 	void SetPos(Position const & pos);
-	int GetRot() const;
-	void SetRot(int yRot);
 	std::string GetName() const;
 	void SetName(std::string const & name);
 	int GetStaticNumber() const;
