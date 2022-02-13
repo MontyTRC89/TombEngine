@@ -69,6 +69,7 @@
     <ClInclude Include="src\TEN\Objects\ObjectsHandler.h" />
     <ClInclude Include="src\TEN\Objects\Sink\Sink.h" />
     <ClInclude Include="src\TEN\Objects\SoundSource\SoundSource.h" />
+    <ClInclude Include="src\TEN\Objects\StaticIDs.h" />
     <ClInclude Include="src\TEN\Objects\Static\Static.h" />
     <ClInclude Include="src\TEN\Position\Position.h" />
     <ClInclude Include="src\TEN\Rotation\Rotation.h" />
