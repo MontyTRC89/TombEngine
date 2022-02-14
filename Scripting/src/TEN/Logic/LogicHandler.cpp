@@ -33,7 +33,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ l
 	sol::table table_logic{ m_lua->lua_state(), sol::create };
 	parent.set(ScriptReserved_Strings, table_logic);
 
-	MakeReadOnlyTable(ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
+	MakeReadOnlyTable(table_logic, ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 
 	ResetLevelTables();
 
