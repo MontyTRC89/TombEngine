@@ -7,14 +7,14 @@
 #include "ItemEnumPair.h"
 
 /***
-Constants for items that can be used with GetInvItem and SetInvItem.
-@enum InvItem
+Constants for items that can be used with GetItem and SetItem.
+@enum InvID
 @pragma nostrip
 */
 
-/*** InvItem constants.
+/*** InvID constants.
 
-The following constants are inside InvItem.
+The following constants are inside InvID.
 
 	PISTOLS_ITEM  
 	PISTOLS_AMMO_ITEM  
@@ -236,10 +236,10 @@ The following constants are inside InvItem.
 	EXAMINE_ITEM8_COMBO1  
 	EXAMINE_ITEM8_COMBO2  
 
-@section InvItem
+@section InvID
 */
 
-/*** Table of constants to use with GetInvItem and SetInvItem.
+/*** Table of constants to use with GetItem and SetItem.
 @table CONSTANT_STRING_HERE
 */
 
