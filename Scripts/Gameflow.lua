@@ -6,6 +6,9 @@ local Level = Flow.Level
 local Color = TEN.Color
 local Rotation = TEN.Rotation
 local InventoryItem = Flow.InventoryItem
+local InvID = Flow.InvID
+local RotationAxis = Flow.RotationAxis
+local ItemAction = Flow.ItemAction
 
 -- Title level
 Flow.SetIntroImagePath("SCREENS\\MAIN.PNG")
@@ -39,7 +42,7 @@ test.layer1 = Flow.SkyLayer.new(Color.new(255, 0, 0), 15)
 test.objects = {
 	InventoryItem.new(
 		"tut1_ba_cartouche1",
-		InvItem.PUZZLE_ITEM3_COMBO1,
+		InvID.PUZZLE_ITEM3_COMBO1,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -50,7 +53,7 @@ test.objects = {
 	myObj, 
 	InventoryItem.new(
 		"tut1_ba_cartouche2",
-		InvItem.PUZZLE_ITEM3_COMBO2,
+		InvID.PUZZLE_ITEM3_COMBO2,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -60,7 +63,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_ba_cartouche",
-		InvItem.PUZZLE_ITEM3,
+		InvID.PUZZLE_ITEM3,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -70,7 +73,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_orion",
-		InvItem.PUZZLE_ITEM6,
+		InvID.PUZZLE_ITEM6,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
@@ -80,7 +83,7 @@ test.objects = {
 	),
 	InventoryItem.new(
 		"tut1_hand_sirius",
-		InvItem.PUZZLE_ITEM8,
+		InvID.PUZZLE_ITEM8,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
