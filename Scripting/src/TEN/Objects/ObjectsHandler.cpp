@@ -4,7 +4,6 @@
 #include "ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 #include "ObjectIDs.h"
-#include "StaticIDs.h"
 
 /***
 Scripts that will be run on game startup.
@@ -94,7 +93,6 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 	);
 
 	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
-	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kStaticIDs);
 }
 
 void ObjectsHandler::AssignLara()
