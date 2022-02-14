@@ -315,7 +315,7 @@ void lara_col_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 	// Engage shimmy mode if left (sidestep) or right (sidestep) key is pressed
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
-		auto info = (LaraInfo*&)lara->Data;
+		auto* info = (LaraInfo*&)lara->Data;
 		info->NextCornerPos.zRot = (lara->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
 		SetAnimation(lara, lara->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
@@ -495,7 +495,7 @@ void lara_col_slopehang(ITEM_INFO* lara, COLL_INFO* coll)
 		// Return to climbing mode
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
 		{
-			auto info = (LaraInfo*&)lara->Data;
+			auto* info = (LaraInfo*&)lara->Data;
 			SetAnimation(lara, info->NextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
 		}
 
@@ -615,7 +615,7 @@ void lara_as_slopeshimmy(ITEM_INFO* lara, COLL_INFO* coll)
 	Camera.targetDistance = 1664;
 	Camera.speed = 15;
 
-	auto info = (LaraInfo*&)lara->Data;
+	auto* info = (LaraInfo*&)lara->Data;
 
 	if (lara->AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
@@ -1099,7 +1099,7 @@ void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
-				auto info = (LaraInfo*&)lara->Data;
+				auto* info = (LaraInfo*&)lara->Data;
 				info->NextCornerPos.zRot = AlignToGrab(lara);
 
 				int ceiling2 = GetCeiling(floorNow, lara->Position.xPos, lara->Position.yPos, lara->Position.zPos);

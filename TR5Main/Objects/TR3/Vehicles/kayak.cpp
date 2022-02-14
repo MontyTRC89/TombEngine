@@ -276,7 +276,7 @@ void KayakUpdateWakeFX()
 KayakMountType KayakGetMountType(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
 	ITEM_INFO* kayakItem = &g_Level.Items[itemNum];
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->Control.HandStatus != HandStatus::Free ||
@@ -377,7 +377,7 @@ int KayakDoDynamics(int height, int fallSpeed, int* y)
 
 void KayakDoCurrent(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	ROOM_INFO* room = &g_Level.Rooms[kayakItem->RoomNumber];
 
 	if (!laraInfo->Control.WaterCurrentActive)
@@ -733,7 +733,7 @@ void KayakToBackground(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 void KayakUserInput(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 {
 	KAYAK_INFO* kayakInfo = kayakItem->Data;
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints <= 0 &&
 		laraItem->ActiveState != KAYAK_STATE_IDLE_DEATH)
@@ -1189,7 +1189,7 @@ void KayakToItemCollision(ITEM_INFO* kayakItem, ITEM_INFO* laraItem)
 
 void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	laraItem->AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
 	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
@@ -1210,7 +1210,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 
 void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints < 0 || laraInfo->Vehicle != NO_ITEM)
 		return;
@@ -1266,7 +1266,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 int KayakControl(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	ITEM_INFO* kayakItem = &g_Level.Items[laraInfo->Vehicle];
 	KAYAK_INFO* kayakInfo = (KAYAK_INFO*)kayakItem->Data;
 

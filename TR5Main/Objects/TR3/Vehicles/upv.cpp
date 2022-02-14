@@ -233,7 +233,7 @@ void SubEffects(short itemNum)
 		return;
 
 	ITEM_INFO* laraItem = LaraItem;
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	ITEM_INFO* UPVItem = &g_Level.Items[itemNum];
 	SUB_INFO* UPVInfo = UPVItem->Data;
 	PHD_VECTOR pos;
@@ -302,7 +302,7 @@ void SubEffects(short itemNum)
 
 static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraInfo->Control.ExtraVelocity.x || laraInfo->Control.ExtraVelocity.z)
 		return false;
@@ -328,7 +328,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) ||
 		laraInfo->Control.HandStatus != HandStatus::Free ||
@@ -417,7 +417,7 @@ static void DoCurrent(ITEM_INFO* item)
 
 static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	SUB_INFO* UPVInfo = UPVItem->Data;
 	COLL_INFO cinfo, * coll = &cinfo; // ??
 
@@ -498,7 +498,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	SUB_INFO* UPVInfo = UPVItem->Data;
 
 	TestUPVDismount(laraItem, UPVItem);
@@ -852,7 +852,7 @@ void NoGetOnCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 
 void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints <= 0 || laraInfo->Vehicle != NO_ITEM)
 		return;
@@ -906,7 +906,7 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	ITEM_INFO* UPVItem = &g_Level.Items[laraInfo->Vehicle];
 	SUB_INFO* UPVInfo = UPVItem->Data;
 	

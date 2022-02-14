@@ -27,7 +27,7 @@ using namespace TEN::Entities::Generic;
 
 void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 39, 98*/
 	/*collision: lara_default_col*/
@@ -44,7 +44,7 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 67*/
 	/*collison: lara_default_col*/
@@ -65,7 +65,7 @@ void lara_as_pickupflare(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*states 40, 126*/
 	/*collision: lara_default_col*/
@@ -80,7 +80,7 @@ void lara_as_switchon(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_switchoff(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 41*/
 	/*collision: lara_default_col*/
@@ -123,7 +123,7 @@ void lara_col_turnswitch(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 42*/
 	/*collision: lara_default_col*/
@@ -137,7 +137,7 @@ void lara_as_usekey(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 43*/
 	/*collision: lara_default_col*/
@@ -165,7 +165,7 @@ void lara_as_usepuzzle(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 36*/
 	/*collision: lara_default_col*/
@@ -180,7 +180,7 @@ void lara_as_pushblock(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_pullblock(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 37*/
 	/*collision: lara_default_col*/
@@ -213,7 +213,7 @@ void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 104*/
 	/*collision: lara_default_col*/
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 	ITEM_INFO* pulley = &g_Level.Items[info->interactedItem];
 
 	info->Control.CanLook = false;
@@ -313,7 +313,7 @@ void lara_as_pbleapoff(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_trbalance_mesh(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	item->Position.zRot = info->Control.TightropeControl.Balance / 4;
 	info->Control.ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
@@ -321,7 +321,7 @@ void lara_trbalance_mesh(ITEM_INFO* item)
 
 void lara_trbalance_regen(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	if (info->Control.TightropeControl.TimeOnTightrope <= 32)
 		info->Control.TightropeControl.TimeOnTightrope = 0;
@@ -347,7 +347,7 @@ void lara_trbalance_regen(ITEM_INFO* item)
 
 void lara_trbalance(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 	const int factor = ((info->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
@@ -395,7 +395,7 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -413,7 +413,7 @@ void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	auto probe = GetCollisionResult(item);
 	if (probe.Position.Floor == item->Position.yPos &&
@@ -777,7 +777,7 @@ void lara_as_climbroped(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_pole_idle()
 void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -864,7 +864,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_pole_idle()
 void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -884,7 +884,7 @@ void lara_col_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_pole_up()
 void lara_as_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -940,7 +940,7 @@ void lara_col_pole_up(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_pole_down()
 void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -993,7 +993,7 @@ void lara_as_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_pole_down()
 void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1027,7 +1027,7 @@ void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_pole_turn_clockwise()
 void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -1082,7 +1082,7 @@ void lara_col_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_pole_turn_counter_clockwise()
 void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -1139,7 +1139,7 @@ void lara_col_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_deathslide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	/*state 70*/
 	/*collision: lara_void_func*/
