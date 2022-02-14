@@ -64,9 +64,15 @@ void Static::Register(sol::table & parent)
 		// @tparam string name The static's new name
 		ScriptReserved_SetName, &Static::SetName,
 
-		/// (int) static number
-		// @mem staticNumber
-		"staticNumber", sol::property(&Static::GetStaticNumber, &Static::SetStaticNumber),
+		/// Get the static's slot number (as listed in Tomb Editor and WadTool)
+		// @function GetSlot
+		// @treturn string the static's slot number
+		ScriptReserved_GetSlot, &Static::GetSlot,
+
+		/// Set the static's slot number (as listed in Tomb Editor and WadTool)
+		// @function SetSlot
+		// @tparam int slot The static's slot number 
+		ScriptReserved_SetSlot, &Static::SetSlot,
 
 		/// Get the static's color
 		// @function GetColor
@@ -77,6 +83,16 @@ void Static::Register(sol::table & parent)
 		// @function SetColor
 		// @tparam Color color the new color of the static 
 		ScriptReserved_SetColor, &Static::SetColor,
+
+		/// Get the static's HP
+		// @function GetHP
+		// @treturn int HP the HP of the static
+		ScriptReserved_GetHP, &Static::GetHP,
+
+		/// Set the static's HP
+		// @function SetHP
+		// @tparam int HP the new hp of the static 
+		ScriptReserved_SetHP, &Static::SetHP,
 
 		/// (int) hp
 		// @mem HP
@@ -135,14 +151,14 @@ void Static::SetName(std::string const & id)
 	s_callbackSetName(id, m_mesh);
 }
 
-int Static::GetStaticNumber() const
+int Static::GetSlot() const
 {
 	return m_mesh.staticNumber;
 }
 
-void Static::SetStaticNumber(int staticNumber)
+void Static::SetSlot(int slot)
 {
-	m_mesh.staticNumber = staticNumber;
+	m_mesh.staticNumber = slot;
 }
 
 ScriptColor Static::GetColor() const
