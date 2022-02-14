@@ -112,12 +112,12 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
 
-	MakeReadOnlyTable(ScriptReserved_WeatherType, kWeatherTypes);
-	MakeReadOnlyTable(ScriptReserved_LaraType, kLaraTypes);
-	MakeReadOnlyTable(ScriptReserved_InvItem, kInventorySlots);
-	MakeReadOnlyTable(ScriptReserved_RotationAxis, kRotAxes);
-	MakeReadOnlyTable(ScriptReserved_ItemAction, kItemActions);
-	MakeReadOnlyTable(ScriptReserved_ErrorMode, kErrorModes);
+	MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
+	MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
+	MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
+	MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
+	MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
+	MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
 }
 
 FlowHandler::~FlowHandler()
@@ -180,7 +180,6 @@ void FlowHandler::SetGameFarView(byte val)
 
 void FlowHandler::LoadFlowScript()
 {
-	ExecuteScript("Scripts/Enums.lua");
 	ExecuteScript("Scripts/Gameflow.lua");
 	ExecuteScript("Scripts/Strings.lua");
 	ExecuteScript("Scripts/Settings.lua");

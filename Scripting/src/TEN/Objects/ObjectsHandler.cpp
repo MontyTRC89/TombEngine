@@ -93,8 +93,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
-	MakeReadOnlyTable(ScriptReserved_ObjID, kObjIDs);
-	MakeReadOnlyTable(ScriptReserved_ObjID, kStaticIDs);
+	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kStaticIDs);
 }
 
 void ObjectsHandler::AssignLara()

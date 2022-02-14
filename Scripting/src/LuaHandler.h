@@ -14,7 +14,7 @@ public:
 	void ExecuteScript(const std::string & luaFilename);
 	void ExecuteString(const std::string & command);
 
-	template <typename T>void MakeReadOnlyTable(std::string const& tableName, T const& container)
+	template <typename T>void MakeReadOnlyTable(sol::table & parent, std::string const& tableName, T const& container)
 	{
 		auto mt = tableName + "Meta";
 		// Put all the data in the metatable	
@@ -40,11 +40,14 @@ public:
 		// Protect the metatable
 		m_lua->safe_script(mt + ".__metatable = 'metatable is protected'");
 
-		m_lua->create_named_table(tableName);
+		auto tab = m_lua->create_named_table(tableName);
 
 		m_lua->safe_script("setmetatable(" + tableName + ", " + mt + ")");
 
 		// point the initial metatable variable away from its contents. this is just for cleanliness
+		parent.set(tableName, tab);
+
+		m_lua->safe_script(tableName + " = nil");
 		m_lua->safe_script(mt + " = nil");
 		m_lua->safe_script(mtmt + " = nil");
 	}
