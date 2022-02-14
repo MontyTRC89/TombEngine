@@ -14,7 +14,7 @@ settings.windowed = true;
 settings.drawingDistance = 102400;
 settings.showRendererSteps = false;
 settings.showDebugInfo = true;
-settings.errorMode = ErrorMode.WARN;
+settings.errorMode = Flow.ErrorMode.WARN;
 Flow.SetSettings(settings);
 
 local anims = Flow.Animations.new();
