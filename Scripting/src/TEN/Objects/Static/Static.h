@@ -28,8 +28,8 @@ public:
 	void SetPos(Position const & pos);
 	std::string GetName() const;
 	void SetName(std::string const & name);
-	int GetStaticNumber() const;
-	void SetStaticNumber(int staticNumber);
+	int GetSlot() const;
+	void SetSlot(int slot);
 	ScriptColor GetColor() const;
 	void SetColor(ScriptColor const & col);
 	int GetHP() const;
