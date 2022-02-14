@@ -27,6 +27,11 @@ static constexpr char const ScriptReserved_GetRotation[]		= "GetRotation";
 static constexpr char const ScriptReserved_SetRotation[]		= "SetRotation";
 static constexpr char const ScriptReserved_GetName[]			= "GetName";
 static constexpr char const ScriptReserved_SetName[]			= "SetName";
+static constexpr char const ScriptReserved_GetSlot[]			= "GetSlot";
+static constexpr char const ScriptReserved_SetSlot[]			= "SetSlot";
+static constexpr char const ScriptReserved_GetHP[]				= "GetHP";
+static constexpr char const ScriptReserved_SetHP[]				= "SetHP";
+
 
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
@@ -68,11 +73,11 @@ static constexpr char const ScriptReserved_CalculateHorizontalDistance[] = "Calc
 static constexpr char const ScriptReserved_ScreenToPercent[] = "ScreenToPercent";
 static constexpr char const ScriptReserved_PercentToScreen[] = "PercentToScreen";
 
-// Functions
+// Enums
 static constexpr char const ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char const ScriptReserved_DisplayStringOption[]	= "DisplayStringOption";
 
-static constexpr char const ScriptReserved_LevelVars[]				= "LevelVars";
+static constexpr char const ScriptReserved_LevelVars[]= "LevelVars";
 static constexpr char const ScriptReserved_GameVars[] = "GameVars";
 static constexpr char const ScriptReserved_LevelFuncs[] = "LevelFuncs";
 
