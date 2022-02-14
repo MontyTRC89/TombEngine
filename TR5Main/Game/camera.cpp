@@ -779,7 +779,7 @@ void FixedCamera(ITEM_INFO* item)
 
 void LookCamera(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	short headXRot = info->Control.ExtraHeadRot.xRot;
 	short headYRot = info->Control.ExtraHeadRot.yRot;
@@ -1074,7 +1074,7 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 
 void BinocularCamera(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	static bool exitingBinoculars = false;
 
@@ -1693,7 +1693,7 @@ void LookUpDown()
 
 void ResetLook(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
 	{

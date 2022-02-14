@@ -134,7 +134,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 				}
 				else
 				{
-					auto item = &g_Level.Items[itemNumber];
+					auto* item = &g_Level.Items[itemNumber];
 					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
 						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
@@ -301,11 +301,11 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 	for (int r = 0; r < NumberLosRooms; ++r)
 	{
 		PHD_3DPOS pos;
-		auto room = &g_Level.Rooms[LosRooms[r]];
+		auto* room = &g_Level.Rooms[LosRooms[r]];
 
 		for (int m = 0; m < room->mesh.size(); m++)
 		{
-			auto meshp = &room->mesh[m];
+			auto* meshp = &room->mesh[m];
 
 			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
@@ -324,7 +324,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 
 		for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
 		{
-			auto item = &g_Level.Items[linknum];
+			auto* item = &g_Level.Items[linknum];
 
 			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
 				continue;
@@ -338,7 +338,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
 				continue;
 
-			auto box = GetBoundsAccurate(item);
+			auto* box = GetBoundsAccurate(item);
 
 			pos.xPos = item->Position.xPos;
 			pos.yPos = item->Position.yPos;
@@ -811,16 +811,16 @@ bool LOSAndReturnTarget(GAME_VECTOR* start, GAME_VECTOR* target, int push)
 	int floorHeight, ceilingHeight;
 	FLOOR_INFO* floor;
 
-	auto x = start->x;
-	auto y = start->y;
-	auto z = start->z;
-	auto roomNum = start->roomNumber;
-	auto roomNum2 = roomNum;
-	auto dx = target->x - x >> 3;
-	auto dy = target->y - y >> 3;
-	auto dz = target->z - z >> 3;
-	auto flag = false;
-	auto result = false;
+	int x = start->x;
+	int y = start->y;
+	int z = start->z;
+	short roomNum = start->roomNumber;
+	short roomNum2 = roomNum;
+	int dx = target->x - x >> 3;
+	int dy = target->y - y >> 3;
+	int dz = target->z - z >> 3;
+	bool flag = false;
+	bool result = false;
 
 	int i;
 	for (i = 0; i < 8; ++i)

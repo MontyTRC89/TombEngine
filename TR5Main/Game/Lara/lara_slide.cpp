@@ -21,7 +21,7 @@
 // Collision:	lara_col_slide_forward()
 void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -78,7 +78,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_forward()
 void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -117,7 +117,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_slide_back()
 void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
@@ -171,7 +171,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_back()
 void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;

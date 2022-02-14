@@ -5,9 +5,9 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/lara_collide.h"
 #include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -44,16 +44,17 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 // Works, but disabled for the time being. @Sezz 2022.02.13
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
-	if (rate < 0)
-		rate = -rate;
+	if (!rate)
+		return;
+
+	rate = abs(rate);
 
 	if (abs((short)(targetAngle - item->Position.yRot)) > ANGLE(0.1f))
 		item->Position.yRot += (short)(targetAngle - item->Position.yRot) / rate;
 	else
 		item->Position.yRot = targetAngle;
-
 }
 
 void EaseOutLaraHeight(ITEM_INFO* item, int height)
@@ -127,7 +128,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	if (!item->Velocity)
 		return;
@@ -163,9 +164,9 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
 	if (item->ObjectNumber != ID_LARA)
 	{
-		TENLog(std::string("Attempted to fetch LaraInfo data from object with ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		TENLog(std::string("Attempted to fetch LaraInfo data from item with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 		
-		auto firstLaraItem = FindItem(ID_LARA);
+		auto* firstLaraItem = FindItem(ID_LARA);
 		return (LaraInfo*&)firstLaraItem->Data;
 	}
 
@@ -198,7 +199,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
@@ -230,7 +231,7 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = WALL_SIZE;
@@ -249,7 +250,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->ProjectedFloorHeight = vaultResult.Height;
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
@@ -287,7 +288,7 @@ void SetLaraFallBackState(ITEM_INFO* item)
 
 void SetLaraMonkeyFallState(ITEM_INFO* item)
 {
-	// Hack.
+	// HACK: Disallow release during 180 turn action.
 	if (item->ActiveState == LS_MONKEY_TURN_180)
 		return;
 
@@ -297,7 +298,7 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 
 void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
@@ -307,7 +308,7 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->Position.yRot;
@@ -339,16 +340,10 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 {
-	if (rate < 0)
-		rate = -rate;
+	if (!rate)
+		return;
 
-	if (resetRoll)
-	{
-		if (abs(item->Position.zRot) > ANGLE(0.1f))
-			item->Position.zRot += item->Position.zRot / -rate;
-		else
-			item->Position.zRot = 0;
-	}
+	rate = abs(rate);
 
 	if (resetPitch)
 	{
@@ -357,14 +352,24 @@ void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 		else
 			item->Position.xRot = 0;
 	}
+
+	if (resetRoll)
+	{
+		if (abs(item->Position.zRot) > ANGLE(0.1f))
+			item->Position.zRot += item->Position.zRot / -rate;
+		else
+			item->Position.zRot = 0;
+	}
 }
 
 void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
-	if (rate < 0)
-		rate = -rate;
+	if (!rate)
+		return;
+
+	rate = abs(rate);
 
 	// Reset head.
 	if (abs(info->Control.ExtraHeadRot.xRot) > ANGLE(0.1f))
@@ -401,7 +406,7 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
@@ -447,7 +452,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 
 void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	if (info->Vehicle != NO_ITEM)
 	{

@@ -25,7 +25,7 @@
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -115,7 +115,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_monkey_idle()
 void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
 	item->VerticalVelocity = 0;
@@ -153,7 +153,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_forward()
 void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -207,7 +207,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_monkey_forward()
 void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -241,7 +241,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_back()
 void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -288,7 +288,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_monkey_back()
 void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -322,7 +322,7 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_shimmy_left()
 void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -369,7 +369,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_monkey_shimmy_left()
 void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -403,7 +403,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_shimmy_right()
 void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -450,7 +450,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_monkey_shimmy_right()
 void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -502,7 +502,7 @@ void lara_col_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_turn_left()
 void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
@@ -570,7 +570,7 @@ void lara_col_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_monkey_turn_right()
 void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto info = GetLaraInfo(item);
+	auto* info = GetLaraInfo(item);
 
 	info->Control.ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
