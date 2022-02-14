@@ -59,31 +59,31 @@ namespace InventoryHandler
 		//(i.e. the amount the player would get from a pickup of that type).
 		//For example, giving "zero" crossbow ammo would give the player
 		//10 instead, whereas giving "zero" medkits would give the player 1 medkit.
-		//@function GiveInvItem
-		//@tparam InvItem item the item to be added
+		//@function GiveItem
+		//@tparam InvID item the item to be added
 		//@tparam int count the number of items to add (default: 0)
 		table_inventory.set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
 
 
 		//Remove x of a certain item from the inventory.
-		//As in @{GiveInvItem}, a count of 0 will remove the "default" amount of that item.
-		//@function TakeInvItem
-		//@tparam InvItem item the item to be removed
+		//As in @{GiveItem}, a count of 0 will remove the "default" amount of that item.
+		//@function TakeItem
+		//@tparam InvID item the item to be removed
 		//@tparam int count the number of items to remove (default: 0)
 		table_inventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
 
 
 		///Get the amount the player holds of an item.
-		//@function GetInvItemCount
-		//@tparam InvItem item the item to check
+		//@function GetItemCount
+		//@tparam InvID item the ID item to check
 		//@treturn int the amount of the item the player has in the inventory
 		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
 
 
 		///Set the amount of a certain item the player has in the inventory.
-		//Similar to @{GiveInvItem} but replaces with the new amount instead of adding it.
-		//@function SetInvItemCount
-		//@tparam @{InvItem} item the item to be set
+		//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
+		//@function SetItemCount
+		//@tparam @{InvID} item the ID of the item to be set
 		//@tparam int count the number of items the player will have
 		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
 	}
