@@ -36,7 +36,8 @@ Moveable::Moveable(Moveable&& other) noexcept :
 {};
 
 // todo.. how to check if item is killed outside of script?
-Moveable::~Moveable() {
+Moveable::~Moveable()
+{
 	// todo.. see if there's a better default state than -1
 	if (m_temporary && (m_num > NO_ITEM))
 	{
