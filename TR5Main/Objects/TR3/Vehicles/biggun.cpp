@@ -143,7 +143,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
 	ITEM_INFO* bGunItem = &g_Level.Items[itemNum];
 	BIGGUNINFO* bGunInfo = bGunItem->Data;
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints <= 0 || laraInfo->Vehicle != NO_ITEM)
 		return;
@@ -180,7 +180,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	ITEM_INFO* bGunItem = &g_Level.Items[laraInfo->Vehicle];
 	BIGGUNINFO* bGunInfo = bGunItem->Data;
 

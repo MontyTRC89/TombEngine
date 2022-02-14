@@ -1303,7 +1303,7 @@ bool SaveGame::Load(int slot)
 
 	for (int i = 0; i < s->lara()->weapons()->size(); i++)
 	{
-		auto info = s->lara()->weapons()->Get(i);
+		auto* info = s->lara()->weapons()->Get(i);
 
 		for (int j = 0; j < info->ammo()->size(); j++)
 		{

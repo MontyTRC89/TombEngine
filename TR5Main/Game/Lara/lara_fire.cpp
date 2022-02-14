@@ -340,7 +340,7 @@ void SmashItem(short itemNum)
 
 void LaraGun(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraInfo->LeftArm.FlashGun > 0)
 		--laraInfo->LeftArm.FlashGun;

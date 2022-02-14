@@ -85,7 +85,7 @@ void FlareControl(short itemNum)
 
 void ReadyFlare(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	laraInfo->Control.HandStatus = HandStatus::Free;
 	laraInfo->LeftArm.Rotation.xRot = 0;
@@ -101,21 +101,21 @@ void ReadyFlare(ITEM_INFO* laraItem)
 
 void UndrawFlareMeshes(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	laraInfo->meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void DrawFlareMeshes(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	laraInfo->meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	int flareFrame = laraInfo->Flare.Frame;
 	int armFrame = laraInfo->LeftArm.FrameNumber;
 
@@ -223,7 +223,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 void DrawFlare(ITEM_INFO* laraItem)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (laraItem->ActiveState == LS_PICKUP_FLARE ||
 		laraItem->ActiveState == LS_PICKUP)
@@ -269,7 +269,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 
 void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	int flareAnimNum = Objects[ID_LARA_FLARE_ANIM].animIndex;
 
 	if (armFrame >= 95)
@@ -287,7 +287,7 @@ void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
 
 void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 {
-	auto laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = GetLaraInfo(laraItem);
 	auto itemNum = CreateItem();
 
 	if (itemNum != NO_ITEM)
