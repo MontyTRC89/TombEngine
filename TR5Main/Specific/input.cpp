@@ -462,7 +462,7 @@ int S_UpdateInput()
 	InputBusy = linput;
 	TrInput = linput;
 
-	if (Lara.Control.IsBusy)
+	if (Lara.IsBusy)
 	{
 		linput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
 

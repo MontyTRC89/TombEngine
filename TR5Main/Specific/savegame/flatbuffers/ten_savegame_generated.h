@@ -1925,11 +1925,6 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   int32_t water_current_active = 0;
   bool locked = false;
   std::unique_ptr<TEN::Save::LaraCountDataT> count{};
-  std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
-  std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
-  std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
-  bool is_busy = false;
-  bool old_busy = false;
 };
 
 struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1956,12 +1951,7 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_RUN_JUMP_QUEUED = 36,
     VT_WATER_CURRENT_ACTIVE = 38,
     VT_LOCKED = 40,
-    VT_COUNT = 42,
-    VT_EXTRA_HEAD_ROT = 44,
-    VT_EXTRA_TORSO_ROT = 46,
-    VT_EXTRA_VELOCITY = 48,
-    VT_IS_BUSY = 50,
-    VT_OLD_BUSY = 52
+    VT_COUNT = 42
   };
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
@@ -2023,21 +2013,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::LaraCountData *count() const {
     return GetPointer<const TEN::Save::LaraCountData *>(VT_COUNT);
   }
-  const TEN::Save::Vector3 *extra_head_rot() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_HEAD_ROT);
-  }
-  const TEN::Save::Vector3 *extra_torso_rot() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_TORSO_ROT);
-  }
-  const TEN::Save::Vector3 *extra_velocity() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_VELOCITY);
-  }
-  bool is_busy() const {
-    return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
-  }
-  bool old_busy() const {
-    return GetField<uint8_t>(VT_OLD_BUSY, 0) != 0;
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
@@ -2064,11 +2039,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_LOCKED) &&
            VerifyOffset(verifier, VT_COUNT) &&
            verifier.VerifyTable(count()) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
-           VerifyField<uint8_t>(verifier, VT_IS_BUSY) &&
-           VerifyField<uint8_t>(verifier, VT_OLD_BUSY) &&
            verifier.EndTable();
   }
   LaraControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -2140,21 +2110,6 @@ struct LaraControlDataBuilder {
   void add_count(flatbuffers::Offset<TEN::Save::LaraCountData> count) {
     fbb_.AddOffset(LaraControlData::VT_COUNT, count);
   }
-  void add_extra_head_rot(const TEN::Save::Vector3 *extra_head_rot) {
-    fbb_.AddStruct(LaraControlData::VT_EXTRA_HEAD_ROT, extra_head_rot);
-  }
-  void add_extra_torso_rot(const TEN::Save::Vector3 *extra_torso_rot) {
-    fbb_.AddStruct(LaraControlData::VT_EXTRA_TORSO_ROT, extra_torso_rot);
-  }
-  void add_extra_velocity(const TEN::Save::Vector3 *extra_velocity) {
-    fbb_.AddStruct(LaraControlData::VT_EXTRA_VELOCITY, extra_velocity);
-  }
-  void add_is_busy(bool is_busy) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_BUSY, static_cast<uint8_t>(is_busy), 0);
-  }
-  void add_old_busy(bool old_busy) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_OLD_BUSY, static_cast<uint8_t>(old_busy), 0);
-  }
   explicit LaraControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -2187,16 +2142,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     bool run_jump_queued = false,
     int32_t water_current_active = 0,
     bool locked = false,
-    flatbuffers::Offset<TEN::Save::LaraCountData> count = 0,
-    const TEN::Save::Vector3 *extra_head_rot = 0,
-    const TEN::Save::Vector3 *extra_torso_rot = 0,
-    const TEN::Save::Vector3 *extra_velocity = 0,
-    bool is_busy = false,
-    bool old_busy = false) {
+    flatbuffers::Offset<TEN::Save::LaraCountData> count = 0) {
   LaraControlDataBuilder builder_(_fbb);
-  builder_.add_extra_velocity(extra_velocity);
-  builder_.add_extra_torso_rot(extra_torso_rot);
-  builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_count(count);
   builder_.add_water_current_active(water_current_active);
   builder_.add_tightrope_control(tightrope_control);
@@ -2208,8 +2155,6 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   builder_.add_calculated_jump_velocity(calculated_jump_velocity);
   builder_.add_turn_rate(turn_rate);
   builder_.add_move_angle(move_angle);
-  builder_.add_old_busy(old_busy);
-  builder_.add_is_busy(is_busy);
   builder_.add_locked(locked);
   builder_.add_run_jump_queued(run_jump_queued);
   builder_.add_can_monkey_swing(can_monkey_swing);
@@ -2238,6 +2183,9 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t projected_floor_height = 0;
   int32_t water_status = 0;
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
+  std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
+  std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
+  std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
   int32_t air = 0;
@@ -2263,6 +2211,8 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t location = 0;
   int32_t highest_location = 0;
   int32_t location_pad = 0;
+  bool is_busy = false;
+  bool old_busy = false;
   int32_t beetle_life = 0;
   int32_t has_beetle_things = 0;
   int32_t small_waterskin = 0;
@@ -2304,58 +2254,63 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PROJECTED_FLOOR_HEIGHT = 12,
     VT_WATER_STATUS = 14,
     VT_CONTROL = 16,
-    VT_HIT_FRAME = 18,
-    VT_HIT_DIRECTION = 20,
-    VT_AIR = 22,
-    VT_SPRINT_ENERGY = 24,
-    VT_SPASM_EFFECT_COUNT = 26,
-    VT_FLARE = 28,
-    VT_BURN_TYPE = 30,
-    VT_BURN = 32,
-    VT_BURN_BLUE = 34,
-    VT_BURN_SMOKE = 36,
-    VT_BURN_COUNT = 38,
-    VT_POISONED = 40,
-    VT_WET = 42,
-    VT_LIT_TORCH = 44,
-    VT_WATER_SURFACE_DIST = 46,
-    VT_NEXT_CORNER_POSITION = 48,
-    VT_NEXT_CORNER_ROTATION = 50,
-    VT_MESH_PTRS = 52,
-    VT_TARGET_ANGLES = 54,
-    VT_LEFT_ARM = 56,
-    VT_RIGHT_ARM = 58,
-    VT_INTERACTED_ITEM = 60,
-    VT_LOCATION = 62,
-    VT_HIGHEST_LOCATION = 64,
-    VT_LOCATION_PAD = 66,
-    VT_BEETLE_LIFE = 68,
-    VT_HAS_BEETLE_THINGS = 70,
-    VT_SMALL_WATERSKIN = 72,
-    VT_BIG_WATERSKIN = 74,
-    VT_VEHICLE = 76,
-    VT_EXTRA_ANIM = 78,
-    VT_MINE_L = 80,
-    VT_MINE_R = 82,
-    VT_WEAPONS = 84,
-    VT_PUZZLES = 86,
-    VT_KEYS = 88,
-    VT_PICKUPS = 90,
-    VT_EXAMINES = 92,
-    VT_PUZZLES_COMBO = 94,
-    VT_KEYS_COMBO = 96,
-    VT_PICKUPS_COMBO = 98,
-    VT_EXAMINES_COMBO = 100,
-    VT_SECRETS = 102,
-    VT_LASERSIGHT = 104,
-    VT_CROWBAR = 106,
-    VT_TORCH = 108,
-    VT_SILENCER = 110,
-    VT_BINOCULARS = 112,
-    VT_NUM_LARGE_MEDIPACKS = 114,
-    VT_NUM_SMALL_MEDIPACKS = 116,
-    VT_NUM_FLARES = 118,
-    VT_TARGET_ITEM_NUMBER = 120
+    VT_EXTRA_HEAD_ROT = 18,
+    VT_EXTRA_TORSO_ROT = 20,
+    VT_EXTRA_VELOCITY = 22,
+    VT_HIT_FRAME = 24,
+    VT_HIT_DIRECTION = 26,
+    VT_AIR = 28,
+    VT_SPRINT_ENERGY = 30,
+    VT_SPASM_EFFECT_COUNT = 32,
+    VT_FLARE = 34,
+    VT_BURN_TYPE = 36,
+    VT_BURN = 38,
+    VT_BURN_BLUE = 40,
+    VT_BURN_SMOKE = 42,
+    VT_BURN_COUNT = 44,
+    VT_POISONED = 46,
+    VT_WET = 48,
+    VT_LIT_TORCH = 50,
+    VT_WATER_SURFACE_DIST = 52,
+    VT_NEXT_CORNER_POSITION = 54,
+    VT_NEXT_CORNER_ROTATION = 56,
+    VT_MESH_PTRS = 58,
+    VT_TARGET_ANGLES = 60,
+    VT_LEFT_ARM = 62,
+    VT_RIGHT_ARM = 64,
+    VT_INTERACTED_ITEM = 66,
+    VT_LOCATION = 68,
+    VT_HIGHEST_LOCATION = 70,
+    VT_LOCATION_PAD = 72,
+    VT_IS_BUSY = 74,
+    VT_OLD_BUSY = 76,
+    VT_BEETLE_LIFE = 78,
+    VT_HAS_BEETLE_THINGS = 80,
+    VT_SMALL_WATERSKIN = 82,
+    VT_BIG_WATERSKIN = 84,
+    VT_VEHICLE = 86,
+    VT_EXTRA_ANIM = 88,
+    VT_MINE_L = 90,
+    VT_MINE_R = 92,
+    VT_WEAPONS = 94,
+    VT_PUZZLES = 96,
+    VT_KEYS = 98,
+    VT_PICKUPS = 100,
+    VT_EXAMINES = 102,
+    VT_PUZZLES_COMBO = 104,
+    VT_KEYS_COMBO = 106,
+    VT_PICKUPS_COMBO = 108,
+    VT_EXAMINES_COMBO = 110,
+    VT_SECRETS = 112,
+    VT_LASERSIGHT = 114,
+    VT_CROWBAR = 116,
+    VT_TORCH = 118,
+    VT_SILENCER = 120,
+    VT_BINOCULARS = 122,
+    VT_NUM_LARGE_MEDIPACKS = 124,
+    VT_NUM_SMALL_MEDIPACKS = 126,
+    VT_NUM_FLARES = 128,
+    VT_TARGET_ITEM_NUMBER = 130
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -2377,6 +2332,15 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::LaraControlData *control() const {
     return GetPointer<const TEN::Save::LaraControlData *>(VT_CONTROL);
+  }
+  const TEN::Save::Vector3 *extra_head_rot() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_HEAD_ROT);
+  }
+  const TEN::Save::Vector3 *extra_torso_rot() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_TORSO_ROT);
+  }
+  const TEN::Save::Vector3 *extra_velocity() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_VELOCITY);
   }
   int32_t hit_frame() const {
     return GetField<int32_t>(VT_HIT_FRAME, 0);
@@ -2452,6 +2416,12 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t location_pad() const {
     return GetField<int32_t>(VT_LOCATION_PAD, 0);
+  }
+  bool is_busy() const {
+    return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
+  }
+  bool old_busy() const {
+    return GetField<uint8_t>(VT_OLD_BUSY, 0) != 0;
   }
   int32_t beetle_life() const {
     return GetField<int32_t>(VT_BEETLE_LIFE, 0);
@@ -2544,6 +2514,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyOffset(verifier, VT_CONTROL) &&
            verifier.VerifyTable(control()) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
            VerifyField<int32_t>(verifier, VT_AIR) &&
@@ -2575,6 +2548,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_HIGHEST_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_PAD) &&
+           VerifyField<uint8_t>(verifier, VT_IS_BUSY) &&
+           VerifyField<uint8_t>(verifier, VT_OLD_BUSY) &&
            VerifyField<int32_t>(verifier, VT_BEETLE_LIFE) &&
            VerifyField<int32_t>(verifier, VT_HAS_BEETLE_THINGS) &&
            VerifyField<int32_t>(verifier, VT_SMALL_WATERSKIN) &&
@@ -2643,6 +2618,15 @@ struct LaraBuilder {
   }
   void add_control(flatbuffers::Offset<TEN::Save::LaraControlData> control) {
     fbb_.AddOffset(Lara::VT_CONTROL, control);
+  }
+  void add_extra_head_rot(const TEN::Save::Vector3 *extra_head_rot) {
+    fbb_.AddStruct(Lara::VT_EXTRA_HEAD_ROT, extra_head_rot);
+  }
+  void add_extra_torso_rot(const TEN::Save::Vector3 *extra_torso_rot) {
+    fbb_.AddStruct(Lara::VT_EXTRA_TORSO_ROT, extra_torso_rot);
+  }
+  void add_extra_velocity(const TEN::Save::Vector3 *extra_velocity) {
+    fbb_.AddStruct(Lara::VT_EXTRA_VELOCITY, extra_velocity);
   }
   void add_hit_frame(int32_t hit_frame) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
@@ -2718,6 +2702,12 @@ struct LaraBuilder {
   }
   void add_location_pad(int32_t location_pad) {
     fbb_.AddElement<int32_t>(Lara::VT_LOCATION_PAD, location_pad, 0);
+  }
+  void add_is_busy(bool is_busy) {
+    fbb_.AddElement<uint8_t>(Lara::VT_IS_BUSY, static_cast<uint8_t>(is_busy), 0);
+  }
+  void add_old_busy(bool old_busy) {
+    fbb_.AddElement<uint8_t>(Lara::VT_OLD_BUSY, static_cast<uint8_t>(old_busy), 0);
   }
   void add_beetle_life(int32_t beetle_life) {
     fbb_.AddElement<int32_t>(Lara::VT_BEETLE_LIFE, beetle_life, 0);
@@ -2820,6 +2810,9 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t projected_floor_height = 0,
     int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
+    const TEN::Save::Vector3 *extra_head_rot = 0,
+    const TEN::Save::Vector3 *extra_torso_rot = 0,
+    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t air = 0,
@@ -2845,6 +2838,8 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t location = 0,
     int32_t highest_location = 0,
     int32_t location_pad = 0,
+    bool is_busy = false,
+    bool old_busy = false,
     int32_t beetle_life = 0,
     int32_t has_beetle_things = 0,
     int32_t small_waterskin = 0,
@@ -2915,6 +2910,9 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_air(air);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
+  builder_.add_extra_velocity(extra_velocity);
+  builder_.add_extra_torso_rot(extra_torso_rot);
+  builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_control(control);
   builder_.add_water_status(water_status);
   builder_.add_projected_floor_height(projected_floor_height);
@@ -2929,6 +2927,8 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_lasersight(lasersight);
   builder_.add_mine_r(mine_r);
   builder_.add_mine_l(mine_l);
+  builder_.add_old_busy(old_busy);
+  builder_.add_is_busy(is_busy);
   builder_.add_lit_torch(lit_torch);
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_burn(burn);
@@ -2949,6 +2949,9 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t projected_floor_height = 0,
     int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
+    const TEN::Save::Vector3 *extra_head_rot = 0,
+    const TEN::Save::Vector3 *extra_torso_rot = 0,
+    const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
     int32_t air = 0,
@@ -2974,6 +2977,8 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t location = 0,
     int32_t highest_location = 0,
     int32_t location_pad = 0,
+    bool is_busy = false,
+    bool old_busy = false,
     int32_t beetle_life = 0,
     int32_t has_beetle_things = 0,
     int32_t small_waterskin = 0,
@@ -3022,6 +3027,9 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       projected_floor_height,
       water_status,
       control,
+      extra_head_rot,
+      extra_torso_rot,
+      extra_velocity,
       hit_frame,
       hit_direction,
       air,
@@ -3047,6 +3055,8 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       location,
       highest_location,
       location_pad,
+      is_busy,
+      old_busy,
       beetle_life,
       has_beetle_things,
       small_waterskin,
@@ -5449,11 +5459,6 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = water_current_active(); _o->water_current_active = _e; }
   { auto _e = locked(); _o->locked = _e; }
   { auto _e = count(); if (_e) _o->count = std::unique_ptr<TEN::Save::LaraCountDataT>(_e->UnPack(_resolver)); }
-  { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = is_busy(); _o->is_busy = _e; }
-  { auto _e = old_busy(); _o->old_busy = _e; }
 }
 
 inline flatbuffers::Offset<LaraControlData> LaraControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5484,11 +5489,6 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _water_current_active = _o->water_current_active;
   auto _locked = _o->locked;
   auto _count = _o->count ? CreateLaraCountData(_fbb, _o->count.get(), _rehasher) : 0;
-  auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
-  auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
-  auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
-  auto _is_busy = _o->is_busy;
-  auto _old_busy = _o->old_busy;
   return TEN::Save::CreateLaraControlData(
       _fbb,
       _move_angle,
@@ -5510,12 +5510,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _run_jump_queued,
       _water_current_active,
       _locked,
-      _count,
-      _extra_head_rot,
-      _extra_torso_rot,
-      _extra_velocity,
-      _is_busy,
-      _old_busy);
+      _count);
 }
 
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5534,6 +5529,9 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
   { auto _e = air(); _o->air = _e; }
@@ -5559,6 +5557,8 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = location(); _o->location = _e; }
   { auto _e = highest_location(); _o->highest_location = _e; }
   { auto _e = location_pad(); _o->location_pad = _e; }
+  { auto _e = is_busy(); _o->is_busy = _e; }
+  { auto _e = old_busy(); _o->old_busy = _e; }
   { auto _e = beetle_life(); _o->beetle_life = _e; }
   { auto _e = has_beetle_things(); _o->has_beetle_things = _e; }
   { auto _e = small_waterskin(); _o->small_waterskin = _e; }
@@ -5603,6 +5603,9 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _projected_floor_height = _o->projected_floor_height;
   auto _water_status = _o->water_status;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
+  auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
+  auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
+  auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
   auto _air = _o->air;
@@ -5628,6 +5631,8 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _location = _o->location;
   auto _highest_location = _o->highest_location;
   auto _location_pad = _o->location_pad;
+  auto _is_busy = _o->is_busy;
+  auto _old_busy = _o->old_busy;
   auto _beetle_life = _o->beetle_life;
   auto _has_beetle_things = _o->has_beetle_things;
   auto _small_waterskin = _o->small_waterskin;
@@ -5664,6 +5669,9 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _projected_floor_height,
       _water_status,
       _control,
+      _extra_head_rot,
+      _extra_torso_rot,
+      _extra_velocity,
       _hit_frame,
       _hit_direction,
       _air,
@@ -5689,6 +5697,8 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _location,
       _highest_location,
       _location_pad,
+      _is_busy,
+      _old_busy,
       _beetle_life,
       _has_beetle_things,
       _small_waterskin,

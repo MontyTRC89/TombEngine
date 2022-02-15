@@ -184,9 +184,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
 	info->Control.HandStatus = HandStatus::Busy;
-	info->Control.ExtraTorsoRot.zRot = 0;
-	info->Control.ExtraTorsoRot.yRot = 0;
-	info->Control.ExtraTorsoRot.zRot = 0;
+	info->ExtraTorsoRot.zRot = 0;
+	info->ExtraTorsoRot.yRot = 0;
+	info->ExtraTorsoRot.zRot = 0;
 
 	return true;
 }

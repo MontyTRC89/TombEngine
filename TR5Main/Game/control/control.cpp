@@ -232,7 +232,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						LaserSight = false;
 						AlterFOV(ANGLE(80));
 						LaraItem->MeshBits = 0xFFFFFFFF;
-						Lara.Control.IsBusy = false;
+						Lara.IsBusy = false;
 						Camera.type = BinocularOldCamera;
 
 						ResetLaraFlex(LaraItem);
@@ -258,7 +258,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
 
-					Lara.Control.IsBusy = true;
+					Lara.IsBusy = true;
 					LaserSight = true;
 				}
 			}

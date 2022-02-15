@@ -317,7 +317,7 @@ void lara_trbalance_mesh(ITEM_INFO* item)
 	auto* info = GetLaraInfo(item);
 
 	item->Position.zRot = info->Control.TightropeControl.Balance / 4;
-	info->Control.ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
+	info->ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
 }
 
 void lara_trbalance_regen(ITEM_INFO* item)
@@ -407,7 +407,7 @@ void lara_as_trexit(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->AnimNumber == LA_TIGHTROPE_END &&
 		TestLastFrame(item))
 	{
-		info->Control.ExtraTorsoRot.zRot = 0;
+		info->ExtraTorsoRot.zRot = 0;
 		item->Position.zRot = 0;
 	}
 }

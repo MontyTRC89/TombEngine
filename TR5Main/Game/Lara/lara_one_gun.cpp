@@ -295,8 +295,8 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 	if (!laraInfo->LeftArm.Locked)
 	{
-		angles[0] = laraInfo->Control.ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
-		angles[1] = laraInfo->Control.ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
+		angles[0] = laraInfo->ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+		angles[1] = laraInfo->ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
 	}
 
 	short loopAngles[2];
@@ -486,8 +486,8 @@ void FireHarpoon(ITEM_INFO* laraItem)
 
 		if (!laraInfo->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->Control.ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->Control.ExtraTorsoRot.yRot;
+			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
+			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
 		}
 
 		item->Position.zRot = 0;
@@ -713,8 +713,8 @@ void FireGrenade(ITEM_INFO* laraItem)
 
 		if (!laraInfo->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->Control.ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->Control.ExtraTorsoRot.yRot;
+			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
+			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = GRENADE_SPEED;
@@ -1178,8 +1178,8 @@ void FireRocket(ITEM_INFO* laraItem)
 
 		if (!laraInfo->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->Control.ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->Control.ExtraTorsoRot.yRot;
+			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
+			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = 512 >> 5;
@@ -1467,8 +1467,8 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 			if (!laraInfo->LeftArm.Locked)
 			{
-				item->Position.xRot += laraInfo->Control.ExtraTorsoRot.zRot;
-				item->Position.yRot += laraInfo->Control.ExtraTorsoRot.yRot;
+				item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
+				item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
 			}
 		}
 
@@ -1746,8 +1746,8 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 
 	if (!laraInfo->LeftArm.Locked)
 	{
-		angles[0] = laraInfo->Control.ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
-		angles[1] = laraInfo->Control.ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
+		angles[0] = laraInfo->ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+		angles[1] = laraInfo->ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
 	}
 
 	if (mode)
@@ -1787,11 +1787,11 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (laraInfo->LeftArm.Locked)
 	{
-		laraInfo->Control.ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot;
-		laraInfo->Control.ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot;
+		laraInfo->ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot;
+		laraInfo->ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
-			laraInfo->Control.ExtraHeadRot = { 0, 0, 0 };
+			laraInfo->ExtraHeadRot = { 0, 0, 0 };
 	}
 
 	if (weaponType == WEAPON_REVOLVER)
