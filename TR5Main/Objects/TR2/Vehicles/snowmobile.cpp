@@ -11,6 +11,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/particle/SimpleParticle.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
@@ -151,7 +152,7 @@ void SkidooBaddieCollision(ITEM_INFO* skidoo)
 	vector<short> roomsList;
 	roomsList.push_back(skidoo->RoomNumber);
 
-	ROOM_INFO* room = &g_Level.Rooms[skidoo->RoomNumber];
+	auto* room = &g_Level.Rooms[skidoo->RoomNumber];
 	for (i = 0; i < room->doors.size(); i++)
 	{
 		roomsList.push_back(room->doors[i].room);
@@ -163,7 +164,7 @@ void SkidooBaddieCollision(ITEM_INFO* skidoo)
 
 		while (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNum];
+			auto* item = &g_Level.Items[itemNum];
 
 			if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != skidoo)
 			{
@@ -208,8 +209,8 @@ void SkidooBaddieCollision(ITEM_INFO* skidoo)
 void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 {
 	LaraInfo*& laraInfo = lara->Data;
-	SKIDOO_INFO* skidooInfo = (SKIDOO_INFO*)skidoo->Data;
-	WEAPON_INFO* wepInfo = &Weapons[WEAPON_SNOWMOBILE];
+	auto* skidooInfo = (SKIDOO_INFO*)skidoo->Data;
+	auto* wepInfo = &Weapons[WEAPON_SNOWMOBILE];
 
 	LaraGetNewTarget(lara, wepInfo);
 	AimWeapon(lara, wepInfo, &laraInfo->RightArm);
@@ -221,11 +222,11 @@ void SkidooGuns(ITEM_INFO* lara, ITEM_INFO* skidoo)
 			laraInfo->RightArm.Rotation.xRot
 		};
 		
-		if (FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles) +
-			FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles))
+		if ((int)FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles) +
+			(int)FireWeapon(WEAPON_PISTOLS, laraInfo->target, lara, angles))
 		{
 			skidooInfo->flashTimer = 2;
-			SoundEffect(wepInfo->sampleNum, &lara->Position, 0);
+			SoundEffect(wepInfo->SampleNum, &lara->Position, 0);
 			skidoo->ItemFlags[0] = 4;
 		}
 	}

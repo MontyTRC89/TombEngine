@@ -623,11 +623,11 @@ namespace TEN::Entities::TR4
 
 			if (GetRandomControl() & 3)
 			{
-				grenadeItem->ItemFlags[0] = GRENADE_NORMAL;
+				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
 			}
 			else
 			{
-				grenadeItem->ItemFlags[0] = GRENADE_SUPER;
+				grenadeItem->ItemFlags[0] = (int)GrenadeType::Super;
 			}
 
 			grenadeItem->ItemFlags[2] = 1;
