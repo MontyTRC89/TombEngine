@@ -190,43 +190,40 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the ID of the object
 		ScriptReserved_GetObjectID, &Moveable::GetObjectID,
 
-/// Change the object's ID
+/// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
 // @tparam ObjectID ID the new ID 
+// @usage
+// shiva = TEN.Objects.GetMoveableByName("shiva_60")
+// shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
 		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
-/*** (int) current animation state
+/// Retrieve the index of the current animation.
+// This corresponds to the number shown in the item's animation list in WadTool.
+// @function Moveable:GetAnim
+// @treturn int the index of the active animation
+		ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
-The state number of the animation the object is currently doing.
-This corresponds to "state" number shown in the animation editor of WadTool.
-@mem currentAnimState
-*/
-		"currentAnimState", sol::property(&Moveable::GetCurrentAnimState, &Moveable::SetCurrentAnimState),
+/// Set the opject's animation to the one specified by the given index.
+// Performs no bounds checking. *Ensure the number given is correct, else
+// the program is likely to crash with an unhelpful error message.*
+// @function Moveable:SetAnim
+// @tparam int index the index of the desired anim 
+		ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
 
-/// (int) State of required animation
-// @mem requiredAnimState
-		"requiredAnimState", sol::property(&Moveable::GetRequiredAnimState, &Moveable::SetRequiredAnimState),
+/// Retrieve frame number.
+// This is the current frame of the object's active animation.
+// @function Moveable:GetFrame
+// @treturn int the current frame of the active animation
+		ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
-/// (int) State of goal animation
-// @mem goalAnimState
-		"goalAnimState", sol::property(&Moveable::GetGoalAnimState, &Moveable::SetGoalAnimState),
-
-/*** (int) animation number
-
-The index of the animation the object is currently doing.
-This corresponds to the number shown in the item's animation list in WadTool.
-@mem animNumber
-*/
-		"animNumber", sol::property(&Moveable::GetAnimNumber, &Moveable::SetAnimNumber),
-
-/*** (int) frame number
-
-Current fame of the animation the object is currently doing.
-The number of frames in an animation can be seen under the heading "End frame" in
-the WadTool animation editor.
-@mem frameNumber
-*/
-		"frameNumber", sol::property(&Moveable::GetFrameNumber, &Moveable::SetFrameNumber),
+/// Set frame number.
+// This will move the animation to the given frame.
+// The number of frames in an animation can be seen under the heading "End frame" in
+// the WadTool animation editor.
+// @function Moveable:SetFrame
+// @tparam int frame the new frame number
+		ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 
 /// (int) HP (hit points/health points) of object 
 //@raise an exception if the object is intelligent and an invalid
