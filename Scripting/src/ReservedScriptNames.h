@@ -19,6 +19,11 @@ static constexpr char const ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char const ScriptReserved_DisplayString[]		= "DisplayString";
 
 // Member functions
+static constexpr char const ScriptReserved_new[]				= "New";
+static constexpr char const ScriptReserved_newTemporary[]		= "NewTemporary";
+static constexpr char const ScriptReserved_Init[]				= "Init";
+static constexpr char const ScriptReserved_Enable[]				= "Enable";
+static constexpr char const ScriptReserved_Disable[]			= "Disable";
 static constexpr char const ScriptReserved_GetColor[]			= "GetColor";
 static constexpr char const ScriptReserved_SetColor[]			= "SetColor";
 static constexpr char const ScriptReserved_GetPosition[]		= "GetPosition";
@@ -29,6 +34,8 @@ static constexpr char const ScriptReserved_GetName[]			= "GetName";
 static constexpr char const ScriptReserved_SetName[]			= "SetName";
 static constexpr char const ScriptReserved_GetSlot[]			= "GetSlot";
 static constexpr char const ScriptReserved_SetSlot[]			= "SetSlot";
+static constexpr char const ScriptReserved_GetObjectID[]		= "GetObjectID";
+static constexpr char const ScriptReserved_SetObjectID[]		= "SetObjectID";
 static constexpr char const ScriptReserved_GetHP[]				= "GetHP";
 static constexpr char const ScriptReserved_SetHP[]				= "SetHP";
 
