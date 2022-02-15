@@ -10,6 +10,7 @@
 #include "Position/Position.h"
 #include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
+#include "ReservedScriptNames.h"
 
 /***
 Represents any object inside the game world.
@@ -49,13 +50,13 @@ Moveable::~Moveable()
 
 /*** If you create items with this you NEED to give a position, room, 
 and object number, and then call InitialiseItem before it will work.
-	@function Moveable.new
+	@function Moveable.New
 */
 
 /*** Like above, but the returned variable controls the 
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).
-	@function Moveable.newTemporary
+	@function Moveable.NewTemporary
 */
 template <bool temp> std::unique_ptr<Moveable> CreateEmpty()
 {
@@ -166,27 +167,33 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		"new", sol::overload(Create<false>, CreateEmpty<false>),
-		"newTemporary", sol::overload(Create<true>, CreateEmpty<true>),
+		ScriptReserved_new, sol::overload(Create<false>, CreateEmpty<false>),
+		ScriptReserved_newTemporary, sol::overload(Create<true>, CreateEmpty<true>),
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
 /// Initialise an item.
 //Use this if you called new with no arguments
 // @function Moveable.Init
-		"Init", &Moveable::Init,
+		ScriptReserved_Init, &Moveable::Init,
 
 /// Enable the item
 // @function Moveable:EnableItem
-		"Enable", &Moveable::EnableItem,
+		ScriptReserved_Enable, &Moveable::EnableItem,
 
 /// Disable the item
 // @function Moveable:DisableItem
-		"Disable", &Moveable::DisableItem,
+		ScriptReserved_Disable, &Moveable::DisableItem,
 
-/// (@{ObjID}) object ID 
-// @mem objectID
-		"objectID", sol::property(&Moveable::GetObjectID, &Moveable::SetObjectID),
+/// Retrieve the object ID
+// @function Moveable:GetObjectID
+// @treturn int a number representing the ID of the object
+		ScriptReserved_GetObjectID, &Moveable::GetObjectID,
+
+/// Change the object's ID
+// @function Moveable:SetObjectID
+// @tparam ObjectID ID the new ID 
+		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
 /*** (int) current animation state
 
