@@ -38,7 +38,10 @@ static constexpr char const ScriptReserved_GetObjectID[]		= "GetObjectID";
 static constexpr char const ScriptReserved_SetObjectID[]		= "SetObjectID";
 static constexpr char const ScriptReserved_GetHP[]				= "GetHP";
 static constexpr char const ScriptReserved_SetHP[]				= "SetHP";
-
+static constexpr char const ScriptReserved_GetFrameNumber[]		= "GetFrame";
+static constexpr char const ScriptReserved_SetFrameNumber[]		= "SetFrame";
+static constexpr char const ScriptReserved_GetAnimNumber[]		= "GetAnim";
+static constexpr char const ScriptReserved_SetAnimNumber[]		= "SetAnim";
 
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
