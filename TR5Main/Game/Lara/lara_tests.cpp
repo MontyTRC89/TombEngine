@@ -593,7 +593,7 @@ CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngl
 		if (info->Control.CanClimbLadder)
 		{
 			auto& angleSet = testAngle > 0 ? LeftIntRightExtTab : LeftExtRightIntTab;
-			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, Lara.NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
+			if (GetClimbFlags(info->NextCornerPos.xPos, item->Position.yPos, info->NextCornerPos.zPos, item->RoomNumber) & (short)angleSet[GetQuadrant(item->Position.yRot)])
 			{
 				info->NextCornerPos.yPos = item->Position.yPos; // Restore original Y pos for ladder tests because we don't snap to ledge height in such case.
 				return CornerResult::Outer;
@@ -1005,7 +1005,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
 
-	if (Lara.Control.HandStatus != HandStatus::Free &&
+	if (info->Control.HandStatus != HandStatus::Free &&
 		(info->Control.HandStatus != HandStatus::WeaponReady || info->Control.WeaponControl.GunType != WEAPON_FLARE))
 	{
 		return false;
@@ -1090,7 +1090,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 		return false;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free &&
+	if (info->Control.HandStatus != HandStatus::Free &&
 		(info->Control.HandStatus != HandStatus::WeaponReady || info->Control.WeaponControl.GunType != WEAPON_FLARE))
 	{
 		return false;
@@ -1192,16 +1192,16 @@ void GetTighRopeFallOff(int regularity)
 }
 #endif
 
-bool IsStandingWeapon(LARA_WEAPON_TYPE gunType)
+bool IsStandingWeapon(LaraWeaponType gunType)
 {
-	if (gunType == LARA_WEAPON_TYPE::WEAPON_SHOTGUN ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_HK ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_CROSSBOW ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_TORCH ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_GRENADE_LAUNCHER ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_HARPOON_GUN ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER ||
-		gunType == LARA_WEAPON_TYPE::WEAPON_SNOWMOBILE)
+	if (gunType == LaraWeaponType::WEAPON_SHOTGUN ||
+		gunType == LaraWeaponType::WEAPON_HK ||
+		gunType == LaraWeaponType::WEAPON_CROSSBOW ||
+		gunType == LaraWeaponType::WEAPON_TORCH ||
+		gunType == LaraWeaponType::WEAPON_GRENADE_LAUNCHER ||
+		gunType == LaraWeaponType::WEAPON_HARPOON_GUN ||
+		gunType == LaraWeaponType::WEAPON_ROCKET_LAUNCHER ||
+		gunType == LaraWeaponType::WEAPON_SNOWMOBILE)
 	{
 		return true;
 	}

@@ -6,6 +6,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
@@ -15,6 +16,8 @@
 
 void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
@@ -24,15 +27,15 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		item->Position.yPos += STEP_SIZE;
 		item->VerticalVelocity = 1;
 
-		Lara.Control.HandStatus = HandStatus::Free;
+		info->Control.HandStatus = HandStatus::Free;
 
-		item->Position.yRot += Lara.NextCornerPos.yRot / 2;
+		item->Position.yRot += info->NextCornerPos.yRot / 2;
 		return;
 	}
 
 	if (flip)
 	{
-		if (Lara.Control.IsClimbingLadder)
+		if (info->Control.IsClimbingLadder)
 		{
 			SetAnimation(item, LA_LADDER_IDLE);
 		}
@@ -41,19 +44,21 @@ void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 			SetAnimation(item, LA_REACH_TO_HANG, 21);
 		}
 
-		coll->Setup.OldPosition.x = item->Position.xPos = Lara.NextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->Position.yPos = Lara.NextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->Position.zPos = Lara.NextCornerPos.zPos;
-		item->Position.yRot = Lara.NextCornerPos.yRot;
+		coll->Setup.OldPosition.x = item->Position.xPos = info->NextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->Position.yPos = info->NextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->Position.zPos = info->NextCornerPos.zPos;
+		item->Position.yRot = info->NextCornerPos.yRot;
 	}
 }
 
 /*normal hanging and shimmying*/
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	/*state 10*/
 	/*collision: lara_col_hang*/
-	Lara.Control.IsClimbingLadder = false;
+	info->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -76,6 +81,8 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	/*state 10*/
 	/*state code: lara_as_hang*/
 	item->VerticalVelocity = 0;
@@ -158,7 +165,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	Lara.Control.MoveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 
 	TestLaraHang(item, coll);
 
@@ -204,7 +211,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			}
 
-			if (Lara.Control.CanClimbLadder &&
+			if (info->Control.CanClimbLadder &&
 				coll->Middle.Ceiling <= -256 &&
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
@@ -222,7 +229,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & IN_BACK &&
-			Lara.Control.CanClimbLadder &&
+			info->Control.CanClimbLadder &&
 			coll->Middle.Floor > 344 &&
 			item->AnimNumber == LA_REACH_TO_HANG)
 		{
@@ -253,12 +260,14 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
-	Lara.Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	Lara.Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
@@ -276,12 +285,14 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	/*state 31*/
 	/*state code: lara_as_hangright*/
-	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 }
 
 void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)

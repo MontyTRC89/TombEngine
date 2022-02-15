@@ -1214,11 +1214,11 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Locked = s->lara()->control()->locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.WaterCurrentActive = s->lara()->control()->water_current_active();
-	Lara.Control.WeaponControl.GunType = (LARA_WEAPON_TYPE)s->lara()->control()->weapon_control()->gun_type();
+	Lara.Control.WeaponControl.GunType = (LaraWeaponType)s->lara()->control()->weapon_control()->gun_type();
 	Lara.Control.WeaponControl.HasFired = s->lara()->control()->weapon_control()->has_fired();
 	Lara.Control.WeaponControl.Fired = s->lara()->control()->weapon_control()->fired();
-	Lara.Control.WeaponControl.LastGunType = (LARA_WEAPON_TYPE)s->lara()->control()->weapon_control()->last_gun_type();
-	Lara.Control.WeaponControl.RequestGunType = (LARA_WEAPON_TYPE)s->lara()->control()->weapon_control()->request_gun_type();
+	Lara.Control.WeaponControl.LastGunType = (LaraWeaponType)s->lara()->control()->weapon_control()->last_gun_type();
+	Lara.Control.WeaponControl.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon_control()->request_gun_type();
 	Lara.Control.WeaponControl.WeaponItem = s->lara()->control()->weapon_control()->weapon_item();
 	Lara.Control.WeaponControl.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon_control()->holster_info()->back_holster();
 	Lara.Control.WeaponControl.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon_control()->holster_info()->left_holster();

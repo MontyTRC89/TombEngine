@@ -17,7 +17,7 @@ using namespace TEN::Renderer;
 
 extern GameFlow *g_GameFlow;
 
-bool shouldAnimateUpperBody(const LARA_WEAPON_TYPE& weapon) {
+bool shouldAnimateUpperBody(const LaraWeaponType& weapon) {
 	ITEM_INFO& laraItem = *LaraItem;
 	LaraInfo& laraInfo = Lara;
 	switch(weapon){
