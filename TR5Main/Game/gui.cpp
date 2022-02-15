@@ -3415,8 +3415,8 @@ void combine_revolver_lasersight(int flag)
 
 	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 	{
-		undraw_pistol_mesh_right(WEAPON_REVOLVER);
-		draw_pistol_meshes(WEAPON_REVOLVER);
+		UndrawPistolMeshRight(LaraItem, WEAPON_REVOLVER);
+		DrawPistolMeshes(LaraItem, WEAPON_REVOLVER);
 	}
 }
 
@@ -3435,8 +3435,8 @@ void combine_crossbow_lasersight(int flag)
 
 	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
 	{
-		undraw_shotgun_meshes(WEAPON_CROSSBOW);
-		draw_shotgun_meshes(WEAPON_CROSSBOW);
+		UndrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
+		DrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
 	}
 }
 

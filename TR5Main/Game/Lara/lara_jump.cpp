@@ -387,8 +387,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 	default:
 		break;
 	}
-
-	item->VerticalVelocity = 0; // TODO: Check this.
+	
 	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;

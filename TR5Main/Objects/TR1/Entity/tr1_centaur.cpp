@@ -136,7 +136,7 @@ void ControlCentaurBomb(short itemNumber)
 
 			if (currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead)
 			{
-				DoExplosiveDamageOnBaddie(currentItem, item, WEAPON_CROSSBOW);
+				DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, WEAPON_CROSSBOW);
 			}
 
 			k++;
