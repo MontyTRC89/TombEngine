@@ -102,8 +102,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
 	info->Control.MoveAngle = item->Position.yRot;
-	info->Control.ExtraTorsoRot.xRot = 0;
-	info->Control.ExtraTorsoRot.yRot = 0;
+	info->ExtraTorsoRot = PHD_3DPOS();
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -445,8 +444,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
 	info->Control.MoveAngle = item->Position.yRot;
-	info->Control.ExtraTorsoRot.xRot = 0;
-	info->Control.ExtraTorsoRot.yRot = 0;
+	info->ExtraTorsoRot = PHD_3DPOS();
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
@@ -545,8 +543,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	info->Control.KeepLow = TestLaraKeepLow(item, coll);
 	info->Control.IsLow = true;
 	info->Control.MoveAngle = item->Position.yRot;
-	info->Control.ExtraTorsoRot.xRot = 0;
-	info->Control.ExtraTorsoRot.yRot = 0;
+	info->ExtraTorsoRot = PHD_3DPOS();
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;

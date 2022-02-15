@@ -701,9 +701,9 @@ void Sound_UpdateScene()
 		Camera.mikePos.y,
 		Camera.mikePos.z);
 	auto laraVel = BASS_3DVECTOR(					// Vel
-		Lara.Control.ExtraVelocity.x,
-		Lara.Control.ExtraVelocity.y,
-		Lara.Control.ExtraVelocity.z);
+		Lara.ExtraVelocity.x,
+		Lara.ExtraVelocity.y,
+		Lara.ExtraVelocity.z);
 	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
 	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
 	BASS_Set3DPosition(&mikePos,
