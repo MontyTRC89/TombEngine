@@ -265,7 +265,7 @@ int HoldStates[] =
 	-1
 };
 
-GAME_OBJECT_ID WeaponObject(LARA_WEAPON_TYPE weaponType)
+GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 {
 	switch (weaponType)
 	{
@@ -617,7 +617,7 @@ void LaraGun(ITEM_INFO* laraItem)
 	}
 }
 
-Ammo& GetAmmo(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -680,7 +680,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 	}
 }
 
-GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -782,7 +782,7 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int 
 	}
 }
 
-FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
 {
 	auto* laraInfo = GetLaraInfo(src);
 
@@ -1160,7 +1160,7 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	LaraTargetInfo(laraItem, weaponInfo);
 }
 
-HolsterSlot HolsterSlotForWeapon(LARA_WEAPON_TYPE weaponType)
+HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
 {
 	switch(weaponType)
 	{

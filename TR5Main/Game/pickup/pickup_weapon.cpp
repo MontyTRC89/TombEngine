@@ -13,7 +13,7 @@ struct WeaponPickupInfo
 	// when the player picks up a weapon they
 	// get one clip's worth of the following ammo
 	GAME_OBJECT_ID ammoID;
-	LARA_WEAPON_TYPE laraWeaponType;
+	LaraWeaponType laraWeaponType;
 };
 
 static constexpr std::array<WeaponPickupInfo, 9> kWeapons{ {

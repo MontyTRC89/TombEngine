@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
@@ -14,32 +15,42 @@
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	Lara.Control.MoveAngle = item->Position.yRot;
+	auto* info = GetLaraInfo(item);
+
+	info->Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	auto* info = GetLaraInfo(item);
+
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	auto* info = GetLaraInfo(item);
+
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	Lara.Control.MoveAngle = item->Position.yRot + ANGLE(180);
+	auto* info = GetLaraInfo(item);
+
+	info->Control.MoveAngle = item->Position.yRot + ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	Lara.Control.MoveAngle = item->Position.yRot;
+	info->Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
@@ -47,6 +58,8 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	item->VerticalVelocity -= 4;
 	if (item->VerticalVelocity < 0)
 		item->VerticalVelocity = 0;
@@ -74,8 +87,8 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		Lara.Control.Count.Dive++;
-		if (Lara.Control.Count.Dive == 10)
+		info->Control.Count.Dive++;
+		if (info->Control.Count.Dive == 10)
 			SwimDive(item);
 		return;
 	}
@@ -105,19 +118,21 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	Lara.Control.Count.Dive = 0;
+	info->Control.Count.Dive = 0;
 	item->TargetState = LS_ONWATER_STOP;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	Lara.Control.Count.Dive = 0;
+	info->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -140,13 +155,15 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	Lara.Control.Count.Dive = 0;
+	info->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -169,13 +186,15 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	Lara.Control.Count.Dive = 0;
+	info->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -198,13 +217,15 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	Lara.Control.Count.Dive = 0;
+	info->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -232,4 +253,3 @@ void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_HIPS;	//forces the camera to follow Lara instead of snapping
 }
-

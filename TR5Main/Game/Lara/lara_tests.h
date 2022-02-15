@@ -48,7 +48,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
 void GetTighRopeFallOff(int regularity);
 #endif
 
-bool IsStandingWeapon(LARA_WEAPON_TYPE gunType);
+bool IsStandingWeapon(LaraWeaponType gunType);
 bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);

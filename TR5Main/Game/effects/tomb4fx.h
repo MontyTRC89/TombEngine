@@ -216,7 +216,7 @@ int GetFreeBlood();
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void UpdateBlood();
 int GetFreeGunshell();
-void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType);
+void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 int GetFreeBubble();

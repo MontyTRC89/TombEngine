@@ -114,7 +114,7 @@ namespace TEN {
 
 				if (initial)
 				{
-					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
+					if(weaponType == LaraWeaponType::WEAPON_ROCKET_LAUNCHER){
 						float size = GenerateFloat(48, 80);
 						s.sourceSize = size * 2;
 						
@@ -151,7 +151,7 @@ namespace TEN {
 				else
 				{
 					float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
-					if(weaponType == LARA_WEAPON_TYPE::WEAPON_ROCKET_LAUNCHER){
+					if(weaponType == LaraWeaponType::WEAPON_ROCKET_LAUNCHER){
 						s.sourceColor = {0.75,0.75,1,1};
 
 					}

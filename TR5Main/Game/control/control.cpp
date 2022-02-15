@@ -338,7 +338,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
 			}
 
-			LaraCheatyBits();
+			LaraCheatyBits(LaraItem);
 			TriggerLaraDrips(LaraItem);
 
 			// Update Lara's ponytails

@@ -143,7 +143,7 @@ void DrawLeftPistol(ITEM_INFO* item)
 	else
 	{
 		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
 	}
 }
 
@@ -157,7 +157,7 @@ void DrawRightPistol(ITEM_INFO* item)
 	else
 	{
 		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
+		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
 	}
 }
 

@@ -456,18 +456,20 @@ void UpdateCameraElevation()
 
 void CombatCamera(ITEM_INFO* item)
 {
+	auto* info = GetLaraInfo(item);
+
 	Camera.target.x = item->Position.xPos;
 	Camera.target.z = item->Position.zPos;
 
-	if (Lara.target)
+	if (info->target)
 	{
-		Camera.targetAngle = Lara.targetAngles[0];
-		Camera.targetElevation = Lara.targetAngles[1] + item->Position.xRot;
+		Camera.targetAngle = info->targetAngles[0];
+		Camera.targetElevation = info->targetAngles[1] + item->Position.xRot;
 	}
 	else
 	{
-		Camera.targetAngle = Lara.Control.ExtraHeadRot.yRot + Lara.Control.ExtraTorsoRot.yRot;
-		Camera.targetElevation = Lara.Control.ExtraHeadRot.xRot + Lara.Control.ExtraTorsoRot.xRot + item->Position.xRot - ANGLE(15.0f);
+		Camera.targetAngle = info->Control.ExtraHeadRot.yRot + info->Control.ExtraTorsoRot.yRot;
+		Camera.targetElevation = info->Control.ExtraHeadRot.xRot + info->Control.ExtraTorsoRot.xRot + item->Position.xRot - ANGLE(15.0f);
 	}
 
 	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
@@ -1443,7 +1445,7 @@ void CalculateCamera()
 		fixedCamera = false;
 	}
 
-	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+	auto* bounds = GetBoundsAccurate(item);
 
 	int x;
 	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->Position.yPos - STEP_SIZE;

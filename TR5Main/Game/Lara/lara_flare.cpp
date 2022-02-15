@@ -19,13 +19,13 @@ using namespace TEN::Math::Random;
 
 constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1, 0.52947, 0.3921);
 
-void FlareControl(short itemNum)
+void FlareControl(short itemNumber)
 {
-	ITEM_INFO* flareItem = &g_Level.Items[itemNum];
+	auto* flareItem = &g_Level.Items[itemNumber];
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, flareItem))
 	{
-		KillItem(itemNum);
+		KillItem(itemNumber);
 		return;
 	}
 
@@ -59,7 +59,7 @@ void FlareControl(short itemNum)
 
 	flareItem->Position.yPos += flareItem->VerticalVelocity;
 
-	DoProjectileDynamics(itemNum, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->VerticalVelocity, zVel);
+	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->VerticalVelocity, zVel);
 
 	int& age = flareItem->Data;
 	age &= 0x7FFF;
@@ -67,7 +67,7 @@ void FlareControl(short itemNum)
 	{
 		if (!flareItem->VerticalVelocity && !flareItem->Velocity)
 		{
-			KillItem(itemNum);
+			KillItem(itemNumber);
 			return;
 		}
 	}
@@ -292,7 +292,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 
 	if (itemNum != NO_ITEM)
 	{
-		ITEM_INFO* flareItem = &g_Level.Items[itemNum];
+		auto* flareItem = &g_Level.Items[itemNum];
 		bool flag = false;
 		flareItem->ObjectNumber = objectNum;
 		flareItem->RoomNumber = laraItem->RoomNumber;
@@ -320,6 +320,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 				flareItem->Position.yRot = laraItem->Position.yRot;
 			else
 				flareItem->Position.yRot = laraItem->Position.yRot - ANGLE(45.0f);
+
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 
@@ -365,33 +366,33 @@ void DrawFlareInAir(ITEM_INFO* flareItem)
 	TENLog("DrawFlareInAir() not implemented!", LogLevel::Warning);
 }
 
-void DoFlareInHand(ITEM_INFO* laraItem, int flareAge)
+void DoFlareInHand(ITEM_INFO* laraItem, int flareLife)
 {
-	LaraInfo*& ItemInfo = laraItem->Data;
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	PHD_VECTOR pos = { 11, 32, 41 };
 	GetLaraJointPosition(&pos, LM_LHAND);
 
-	if (DoFlareLight(&pos, flareAge))
-		TriggerChaffEffects(flareAge);
+	if (DoFlareLight(&pos, flareLife))
+		TriggerChaffEffects(flareLife);
 
 	/* Hardcoded code */
 
-	if (ItemInfo->Flare.Life >= FLARE_LIFE_MAX)
+	if (laraInfo->Flare.Life >= FLARE_LIFE_MAX)
 	{
-		if (ItemInfo->Control.HandStatus == HandStatus::Free)
-			ItemInfo->Control.HandStatus = HandStatus::UndrawWeapon;
+		if (laraInfo->Control.HandStatus == HandStatus::Free)
+			laraInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 	}
-	else if (ItemInfo->Flare.Life != 0)
-		ItemInfo->Flare.Life++;
+	else if (laraInfo->Flare.Life != 0)
+		laraInfo->Flare.Life++;
 }
 
-int DoFlareLight(PHD_VECTOR* pos, int age)
+int DoFlareLight(PHD_VECTOR* pos, int flareLife)
 {
 	int r, g, b;
 	int falloff;
 
-	if (age >= FLARE_LIFE_MAX || age == 0)
+	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return 0;
 
 	auto random = GenerateFloat();
@@ -400,9 +401,9 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	int y = pos->y + (random * 120) - 256;
 	int z = pos->z + (random * 120);
 
-	if (age < 4)
+	if (flareLife < 4)
 	{
-		falloff = 12 + ((1 - (age / 4.0f)) * 16);
+		falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
 
 		r = FlareMainColor.x * 255;
 		g = FlareMainColor.y * 255;
@@ -412,7 +413,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 
 		return (random < 0.9f);
 	}
-	else if (age < (FLARE_LIFE_MAX - 90))
+	else if (flareLife < (FLARE_LIFE_MAX - 90))
 	{
 		auto multiplier = GenerateFloat(0.75f, 1.0f);
 		falloff = 12 * multiplier;
@@ -427,7 +428,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	else
 	{
 		auto multiplier = GenerateFloat(0.05f, 0.8f);
-		falloff = 12 * (1.0f - ((age - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
+		falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
 
 		r = FlareMainColor.x * 255 * multiplier;
 		g = FlareMainColor.y * 255 * multiplier;
