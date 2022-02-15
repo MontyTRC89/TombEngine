@@ -1151,17 +1151,10 @@ struct LaraControlData
 	bool RunJumpQueued;
 	bool Locked;
 	bool ApproachTargetAngle;
-	short WaterCurrentActive;
-	LaraCountData Count;
-	
-	// TODO: Move back.
-	PHD_3DPOS ExtraHeadRot;
-	PHD_3DPOS ExtraTorsoRot;
-	PHD_VECTOR ExtraVelocity;
 
-	// Inventory stuff?? Move it back.
-	bool IsBusy;
-	bool OldBusy;
+	short WaterCurrentActive;
+
+	LaraCountData Count;
 };
 
 struct LaraInfo
@@ -1171,6 +1164,10 @@ struct LaraInfo
 	LaraControlData Control;
 	FlareData Flare;
 	bool LitTorch;
+
+	PHD_3DPOS ExtraHeadRot;
+	PHD_3DPOS ExtraTorsoRot;
+	PHD_VECTOR ExtraVelocity;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
@@ -1200,11 +1197,14 @@ struct LaraInfo
 
 	byte wet[NUM_LARA_MESHES];
 	int meshPtrs[NUM_LARA_MESHES];
-
 	short interactedItem;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
+
+	// Inventory-related?
+	bool IsBusy;
+	bool OldBusy;
 
 	// NEW:
 	byte BeetleLife;

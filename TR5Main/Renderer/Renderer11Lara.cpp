@@ -73,8 +73,8 @@ void Renderer11::updateLaraAnimations(bool force)
 	item->World = m_LaraWorldMatrix;
 
 	// Update first Lara's animations
-	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.Control.ExtraTorsoRot.xRot), TO_RAD(Lara.Control.ExtraTorsoRot.yRot), TO_RAD(Lara.Control.ExtraTorsoRot.zRot));
-	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.Control.ExtraHeadRot.xRot), TO_RAD(Lara.Control.ExtraHeadRot.yRot), TO_RAD(Lara.Control.ExtraHeadRot.zRot));
+	laraObj.LinearizedBones[LM_TORSO]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraTorsoRot.xRot), TO_RAD(Lara.ExtraTorsoRot.yRot), TO_RAD(Lara.ExtraTorsoRot.zRot));
+	laraObj.LinearizedBones[LM_HEAD]->ExtraRotation = Vector3(TO_RAD(Lara.ExtraHeadRot.xRot), TO_RAD(Lara.ExtraHeadRot.yRot), TO_RAD(Lara.ExtraHeadRot.zRot));
 
 	// First calculate matrices for legs, hips, head and torso
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);

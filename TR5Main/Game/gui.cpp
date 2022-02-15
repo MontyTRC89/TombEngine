@@ -1851,7 +1851,7 @@ void GuiController::InitializeInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(14560);
-	Lara.Control.IsBusy = 0;
+	Lara.IsBusy = 0;
 	inventoryItemChosen = NO_ITEM;
 	ClearInputVariables(0);
 	useItem = 0;
@@ -1998,7 +1998,7 @@ void GuiController::UseCurrentItem()
 	long OldBinocular;
 
 	OldBinocular = BinocularRange;
-	Lara.Control.OldBusy = false;
+	Lara.OldBusy = false;
 	BinocularRange = 0;
 	LaraItem->MeshBits = -1;
 	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
@@ -2071,7 +2071,7 @@ void GuiController::UseCurrentItem()
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
-				Lara.Control.OldBusy = true;
+				Lara.OldBusy = true;
 				BinocularRange = 128;
 
 				if (Lara.Control.HandStatus != HandStatus::Free)
@@ -3164,7 +3164,7 @@ int GuiController::CallInventory(bool reset_mode)
 {
 	int return_value;
 
-	Lara.Control.OldBusy = Lara.Control.IsBusy;
+	Lara.OldBusy = Lara.IsBusy;
 
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
@@ -3245,7 +3245,7 @@ int GuiController::CallInventory(bool reset_mode)
 	if (useItem)
 		UseCurrentItem();
 
-	Lara.Control.IsBusy = Lara.Control.OldBusy;
+	Lara.IsBusy = Lara.OldBusy;
 	invMode = InventoryMode::None;
 	ClearInputVariables(0);
 

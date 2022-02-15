@@ -27,7 +27,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -155,7 +155,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -243,7 +243,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -324,7 +324,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -405,7 +405,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -504,7 +504,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -572,7 +572,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.ExtraTorsoRot = PHD_3DPOS();
+	info->ExtraTorsoRot = PHD_3DPOS();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);

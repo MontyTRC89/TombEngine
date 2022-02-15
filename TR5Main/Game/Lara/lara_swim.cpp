@@ -353,8 +353,8 @@ void LaraWaterCurrent(ITEM_INFO* item, COLL_INFO* coll)
 		auto* sink = &g_Level.Sinks[info->Control.WaterCurrentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, item->Position.xPos, item->Position.zPos);
-		info->Control.ExtraVelocity.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - info->Control.ExtraVelocity.x) / 16;
-		info->Control.ExtraVelocity.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - info->Control.ExtraVelocity.z) / 16;
+		info->ExtraVelocity.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - info->ExtraVelocity.x) / 16;
+		info->ExtraVelocity.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - info->ExtraVelocity.z) / 16;
 
 		item->Position.yPos += (sink->y - item->Position.yPos) >> 4;
 	}
@@ -362,30 +362,30 @@ void LaraWaterCurrent(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 
-		if (abs(info->Control.ExtraVelocity.x) <= 16)
-			shift = (abs(info->Control.ExtraVelocity.x) > 8) + 2;
+		if (abs(info->ExtraVelocity.x) <= 16)
+			shift = (abs(info->ExtraVelocity.x) > 8) + 2;
 		else
 			shift = 4;
-		info->Control.ExtraVelocity.x -= info->Control.ExtraVelocity.x >> shift;
+		info->ExtraVelocity.x -= info->ExtraVelocity.x >> shift;
 
-		if (abs(info->Control.ExtraVelocity.x) < 4)
-			info->Control.ExtraVelocity.x = 0;
+		if (abs(info->ExtraVelocity.x) < 4)
+			info->ExtraVelocity.x = 0;
 
-		if (abs(info->Control.ExtraVelocity.z) <= 16)
-			shift = (abs(info->Control.ExtraVelocity.z) > 8) + 2;
+		if (abs(info->ExtraVelocity.z) <= 16)
+			shift = (abs(info->ExtraVelocity.z) > 8) + 2;
 		else
 			shift = 4;
-		info->Control.ExtraVelocity.z -= info->Control.ExtraVelocity.z >> shift;
+		info->ExtraVelocity.z -= info->ExtraVelocity.z >> shift;
 
-		if (abs(info->Control.ExtraVelocity.z) < 4)
-			info->Control.ExtraVelocity.z = 0;
+		if (abs(info->ExtraVelocity.z) < 4)
+			info->ExtraVelocity.z = 0;
 
-		if (!info->Control.ExtraVelocity.x && !info->Control.ExtraVelocity.z)
+		if (!info->ExtraVelocity.x && !info->ExtraVelocity.z)
 			return;
 	}
 
-	item->Position.xPos += info->Control.ExtraVelocity.x >> 8;
-	item->Position.zPos += info->Control.ExtraVelocity.z >> 8;
+	item->Position.xPos += info->ExtraVelocity.x >> 8;
+	item->Position.zPos += info->ExtraVelocity.z >> 8;
 	info->Control.WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(item->Position.zPos - coll->Setup.OldPosition.z, item->Position.xPos - coll->Setup.OldPosition.x);

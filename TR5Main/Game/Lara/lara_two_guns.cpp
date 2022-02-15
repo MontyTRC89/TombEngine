@@ -308,27 +308,27 @@ void PistolHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (laraInfo->LeftArm.Locked && !laraInfo->RightArm.Locked)
 	{
-		laraInfo->Control.ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot / 2;
-		laraInfo->Control.ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot / 2;
+		laraInfo->ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot / 2;
+		laraInfo->ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			laraInfo->Control.ExtraHeadRot = laraInfo->Control.ExtraTorsoRot;
+			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 	else if (!laraInfo->LeftArm.Locked && laraInfo->RightArm.Locked)
 	{
-		laraInfo->Control.ExtraTorsoRot.yRot = laraInfo->RightArm.Rotation.yRot / 2;
-		laraInfo->Control.ExtraTorsoRot.zRot = laraInfo->RightArm.Rotation.xRot / 2;
+		laraInfo->ExtraTorsoRot.yRot = laraInfo->RightArm.Rotation.yRot / 2;
+		laraInfo->ExtraTorsoRot.zRot = laraInfo->RightArm.Rotation.xRot / 2;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			laraInfo->Control.ExtraHeadRot = laraInfo->Control.ExtraTorsoRot;
+			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 	else if (laraInfo->LeftArm.Locked && laraInfo->RightArm.Locked)
 	{
-		laraInfo->Control.ExtraTorsoRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
-		laraInfo->Control.ExtraTorsoRot.zRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
+		laraInfo->ExtraTorsoRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
+		laraInfo->ExtraTorsoRot.zRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
 
 		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
-			laraInfo->Control.ExtraHeadRot = laraInfo->Control.ExtraTorsoRot;
+			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 
 	AnimatePistols(laraItem, weaponType);
@@ -479,10 +479,10 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (!(TrInput & IN_LOOK))
 	{
-		laraInfo->Control.ExtraHeadRot.xRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
-		laraInfo->Control.ExtraTorsoRot.zRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
-		laraInfo->Control.ExtraHeadRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
-		laraInfo->Control.ExtraTorsoRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
+		laraInfo->ExtraHeadRot.xRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
+		laraInfo->ExtraTorsoRot.zRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
+		laraInfo->ExtraHeadRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
+		laraInfo->ExtraTorsoRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
 	}
 }
 

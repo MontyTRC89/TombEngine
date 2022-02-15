@@ -1266,7 +1266,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		item->MeshBits = -1;
-		info->Control.IsBusy = false;
+		info->IsBusy = false;
 	}
 }
 

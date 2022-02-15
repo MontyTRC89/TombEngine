@@ -304,7 +304,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
-	if (laraInfo->Control.ExtraVelocity.x || laraInfo->Control.ExtraVelocity.z)
+	if (laraInfo->ExtraVelocity.x || laraInfo->ExtraVelocity.z)
 		return false;
 
 	short moveAngle = UPVItem->Position.yRot + ANGLE(180.0f);
@@ -360,7 +360,7 @@ static void DoCurrent(ITEM_INFO* item)
 	{
 		long shifter, absvel;
 
-		absvel = abs(Lara.Control.ExtraVelocity.x);
+		absvel = abs(Lara.ExtraVelocity.x);
 
 		if (absvel > 16)
 			shifter = 4;
@@ -369,12 +369,12 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.Control.ExtraVelocity.x -= Lara.Control.ExtraVelocity.x >> shifter;
+		Lara.ExtraVelocity.x -= Lara.ExtraVelocity.x >> shifter;
 
-		if (abs(Lara.Control.ExtraVelocity.x) < 4)
-			Lara.Control.ExtraVelocity.x = 0;
+		if (abs(Lara.ExtraVelocity.x) < 4)
+			Lara.ExtraVelocity.x = 0;
 
-		absvel = abs(Lara.Control.ExtraVelocity.z);
+		absvel = abs(Lara.ExtraVelocity.z);
 		if (absvel > 16)
 			shifter = 4;
 		else if (absvel > 8)
@@ -382,11 +382,11 @@ static void DoCurrent(ITEM_INFO* item)
 		else
 			shifter = 2;
 
-		Lara.Control.ExtraVelocity.z -= Lara.Control.ExtraVelocity.z >> shifter;
-		if (abs(Lara.Control.ExtraVelocity.z) < 4)
-			Lara.Control.ExtraVelocity.z = 0;
+		Lara.ExtraVelocity.z -= Lara.ExtraVelocity.z >> shifter;
+		if (abs(Lara.ExtraVelocity.z) < 4)
+			Lara.ExtraVelocity.z = 0;
 
-		if (Lara.Control.ExtraVelocity.x == 0 && Lara.Control.ExtraVelocity.z == 0)
+		if (Lara.ExtraVelocity.x == 0 && Lara.ExtraVelocity.z == 0)
 			return;
 	}
 	else
@@ -406,12 +406,12 @@ static void DoCurrent(ITEM_INFO* item)
 		dx = phd_sin(angle * 16) * speed * 1024;
 		dz = phd_cos(angle * 16) * speed * 1024;
 
-		Lara.Control.ExtraVelocity.x += ((dx - Lara.Control.ExtraVelocity.x) / 16);
-		Lara.Control.ExtraVelocity.z += ((dz - Lara.Control.ExtraVelocity.z) / 16);
+		Lara.ExtraVelocity.x += ((dx - Lara.ExtraVelocity.x) / 16);
+		Lara.ExtraVelocity.z += ((dz - Lara.ExtraVelocity.z) / 16);
 	}
 
-	item->Position.xPos += (Lara.Control.ExtraVelocity.x / 256);
-	item->Position.zPos += (Lara.Control.ExtraVelocity.z / 256);
+	item->Position.xPos += (Lara.ExtraVelocity.x / 256);
+	item->Position.zPos += (Lara.ExtraVelocity.z / 256);
 	Lara.Control.WaterCurrentActive = 0;
 }
 
