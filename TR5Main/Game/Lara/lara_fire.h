@@ -43,19 +43,19 @@ enum WeaponState
 	WEAPON_STATE_UNDERWATER_RECOIL = 8
 };
 
-extern WeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
+extern WeaponInfo Weapons[static_cast<int>(LaraWeaponType::NUM_WEAPONS)];
 
 void SmashItem(short itemNum);
-GAME_OBJECT_ID WeaponObject(LARA_WEAPON_TYPE weaponType);
+GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
 void LaraGun(ITEM_INFO* laraItem);
-Ammo& GetAmmo(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
+Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void InitialiseNewWeapon(ITEM_INFO* laraItem);
-GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
+GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
 void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int damage, int flag);
-FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
 void FindTargetPoint(ITEM_INFO* laraItem, GAME_VECTOR* target);
 void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
 bool CheckForHoldingState(LaraState state);
 void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
-HolsterSlot HolsterSlotForWeapon(LARA_WEAPON_TYPE weaponType);
+HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType);

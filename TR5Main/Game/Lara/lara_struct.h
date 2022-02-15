@@ -801,7 +801,7 @@ enum WeaponAmmoType
 	MAX_AMMOTYPE
 };
 
-enum LARA_WEAPON_TYPE
+enum LaraWeaponType
 {
 	WEAPON_NONE,
 	WEAPON_PISTOLS,
@@ -1079,9 +1079,9 @@ struct WeaponControlData
 	bool HasFired;
 	bool Fired;
 
-	LARA_WEAPON_TYPE GunType;
-	LARA_WEAPON_TYPE RequestGunType;
-	LARA_WEAPON_TYPE LastGunType;
+	LaraWeaponType GunType;
+	LaraWeaponType RequestGunType;
+	LaraWeaponType LastGunType;
 	HolsterInfo HolsterInfo;
 };
 
@@ -1153,12 +1153,13 @@ struct LaraControlData
 	bool ApproachTargetAngle;
 	short WaterCurrentActive;
 	LaraCountData Count;
-
+	
+	// TODO: Move back.
 	PHD_3DPOS ExtraHeadRot;
 	PHD_3DPOS ExtraTorsoRot;
 	PHD_VECTOR ExtraVelocity;
 
-	// Inventory stuff??
+	// Inventory stuff?? Move it back.
 	bool IsBusy;
 	bool OldBusy;
 };
@@ -1167,22 +1168,28 @@ struct LaraInfo
 {
 	short ItemNumber;
 
-	int ProjectedFloorHeight;
-	int WaterSurfaceDist;
-	PHD_3DPOS NextCornerPos;
-
 	LaraControlData Control;
 	FlareData Flare;
 	bool LitTorch;
 
-	int hitFrame;
-	int hitDirection;
+	ArmInfo LeftArm;
+	ArmInfo RightArm;
+	ITEM_INFO* target;
+	CREATURE_INFO* creature;
+	short targetAngles[2];
 
 	int Air;
 	int SprintEnergy;
+	short poisoned;
 
+	int hitFrame;
+	int hitDirection;
 	FX_INFO* SpasmEffect;
 	int SpasmEffectCount;
+
+	int ProjectedFloorHeight;
+	int WaterSurfaceDist;
+	PHD_3DPOS NextCornerPos;
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
@@ -1191,15 +1198,7 @@ struct LaraInfo
 	byte burnBlue;
 	bool BurnSmoke;
 
-	ArmInfo LeftArm;
-	ArmInfo RightArm;
-	ITEM_INFO* target;
-	CREATURE_INFO* creature;
-	short targetAngles[2];
-
-	short poisoned;
 	byte wet[NUM_LARA_MESHES];
-
 	int meshPtrs[NUM_LARA_MESHES];
 
 	short interactedItem;
@@ -1216,7 +1215,7 @@ struct LaraInfo
 	short ExtraAnim;
 	bool mineL;
 	bool mineR;
-	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
+	CarriedWeaponInfo Weapons[static_cast<int>(LaraWeaponType::NUM_WEAPONS)];
 	DiaryInfo Diary;
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];

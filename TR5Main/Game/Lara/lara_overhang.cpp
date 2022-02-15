@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Specific/input.h"
@@ -1063,6 +1064,8 @@ void SlopeClimbDownExtra(ITEM_INFO* lara, COLL_INFO* coll)
 // Extends state 75 (AS_HANG2)
 void SlopeMonkeyExtra(ITEM_INFO* lara, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(lara);
+
 	if (!g_GameFlow->Animations.Overhang)
 		return;
 

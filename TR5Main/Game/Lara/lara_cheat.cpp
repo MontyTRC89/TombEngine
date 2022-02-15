@@ -16,6 +16,8 @@ int NoCheatCounter;
 
 void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (TrInput & IN_FORWARD)
 	{
 		item->Position.xRot -= ANGLE(3);
@@ -27,17 +29,17 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.Control.TurnRate -= 613;
+		info->Control.TurnRate -= 613;
 
-		if (Lara.Control.TurnRate < -ANGLE(6))
-			Lara.Control.TurnRate = -ANGLE(6);
+		if (info->Control.TurnRate < -ANGLE(6))
+			info->Control.TurnRate = -ANGLE(6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.Control.TurnRate += 613;
+		info->Control.TurnRate += 613;
 
-		if (Lara.Control.TurnRate > ANGLE(6))
-			Lara.Control.TurnRate = ANGLE(6);
+		if (info->Control.TurnRate > ANGLE(6))
+			info->Control.TurnRate = ANGLE(6);
 	}
 
 	if (TrInput & IN_ACTION)
@@ -47,7 +49,7 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_OPTION)
 	{
-		Lara.Control.TurnRate = -ANGLE(12);
+		info->Control.TurnRate = -ANGLE(12);
 	}
 
 	if (TrInput & IN_JUMP)
@@ -66,33 +68,35 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void LaraCheatyBits()
+void LaraCheatyBits(ITEM_INFO* item)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (g_GameFlow->FlyCheat)
 	{
 		if (KeyMap[DIK_O])
 		{
-			if (Lara.Vehicle == NO_ITEM)
+			if (info->Vehicle == NO_ITEM)
 			{
 
-				LaraCheatGetStuff();
+				LaraCheatGetStuff(item);
 
-				DelsGiveLaraItemsCheat();
+				DelsGiveLaraItemsCheat(item);
 
-				LaraItem->Position.yPos -= 128;
+				item->Position.yPos -= 128;
 
-				if (Lara.Control.WaterStatus != WaterStatus::FlyCheat)
+				if (info->Control.WaterStatus != WaterStatus::FlyCheat)
 				{
-					Lara.Control.WaterStatus = WaterStatus::FlyCheat;
-					SetAnimation(LaraItem, LA_DOZY);
-					LaraItem->Airborne = false;
-					LaraItem->Position.xRot = ANGLE(30);
-					LaraItem->VerticalVelocity = 30;
-					LaraItem->HitPoints = 1000;
-					Lara.poisoned = 0;
-					Lara.Air = 1800;
-					Lara.Control.Count.Death = 0;
-					ResetLaraFlex(LaraItem);
+					info->Control.WaterStatus = WaterStatus::FlyCheat;
+					SetAnimation(item, LA_DOZY);
+					item->Airborne = false;
+					item->Position.xRot = ANGLE(30);
+					item->VerticalVelocity = 30;
+					item->HitPoints = 1000;
+					info->poisoned = 0;
+					info->Air = 1800;
+					info->Control.Count.Death = 0;
+					ResetLaraFlex(item);
 				}
 			}
 			else if (!NoCheatCounter)
@@ -106,127 +110,131 @@ void LaraCheatyBits()
 		NoCheatCounter--;
 }
 
-void LaraCheatGetStuff()
+void LaraCheatGetStuff(ITEM_INFO* item)
 {
-	Lara.NumFlares = -1;
-	Lara.NumSmallMedipacks = -1;
-	Lara.NumLargeMedipacks = -1;
+	auto* info = GetLaraInfo(item);
+
+	info->NumFlares = -1;
+	info->NumSmallMedipacks = -1;
+	info->NumLargeMedipacks = -1;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		Lara.Crowbar = true;
+		info->Crowbar = true;
 
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
-		Lara.Lasersight = true;
+		info->Lasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		Lara.hasBeetleThings |= 1;
+		info->hasBeetleThings |= 1;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		Lara.smallWaterskin = 1;
+		info->smallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		Lara.bigWaterskin = 1;
+		info->bigWaterskin = 1;
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_REVOLVER].Present = true;
-		Lara.Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = false;
-		Lara.Weapons[WEAPON_REVOLVER].HasSilencer = false;
-		Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_REVOLVER].Present = true;
+		info->Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_REVOLVER].HasLasersight = false;
+		info->Weapons[WEAPON_REVOLVER].HasSilencer = false;
+		info->Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_UZI_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_UZI].Present = true;
-		Lara.Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_UZI].HasLasersight = false;
-		Lara.Weapons[WEAPON_UZI].HasSilencer = false;
-		Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_UZI].Present = true;
+		info->Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_UZI].HasLasersight = false;
+		info->Weapons[WEAPON_UZI].HasSilencer = false;
+		info->Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_SHOTGUN_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_SHOTGUN].Present = true;
-		Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_SHOTGUN].HasLasersight = false;
-		Lara.Weapons[WEAPON_SHOTGUN].HasSilencer = false;
-		Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_SHOTGUN].Present = true;
+		info->Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_SHOTGUN].HasLasersight = false;
+		info->Weapons[WEAPON_SHOTGUN].HasSilencer = false;
+		info->Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
 	{			
-		Lara.Weapons[WEAPON_HARPOON_GUN].Present = true;
-		Lara.Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_HARPOON_GUN].HasLasersight = false;
-		Lara.Weapons[WEAPON_HARPOON_GUN].HasSilencer = false;
-		Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_HARPOON_GUN].Present = true;
+		info->Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_HARPOON_GUN].HasLasersight = false;
+		info->Weapons[WEAPON_HARPOON_GUN].HasSilencer = false;
+		info->Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].HasSilencer = false;
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].setInfinite(true);
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].setInfinite(true);
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].HasSilencer = false;
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].setInfinite(true);
+		info->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].setInfinite(true);
 	}
 
 	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
-		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].HasLasersight = false;
-		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].HasSilencer = false;
-		Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
+		info->Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_ROCKET_LAUNCHER].HasLasersight = false;
+		info->Weapons[WEAPON_ROCKET_LAUNCHER].HasSilencer = false;
+		info->Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_HK_ITEM].loaded)
 	{
-		Lara.Weapons[WEAPON_HK].Present = true;
-		Lara.Weapons[WEAPON_HK].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_HK].HasLasersight = false;
-		Lara.Weapons[WEAPON_HK].HasSilencer = false;
-		Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_HK].Present = true;
+		info->Weapons[WEAPON_HK].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_HK].HasLasersight = false;
+		info->Weapons[WEAPON_HK].HasSilencer = false;
+		info->Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
 	{			
-		Lara.Weapons[WEAPON_CROSSBOW].Present = true;
-		Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
-		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = false;
-		Lara.Weapons[WEAPON_CROSSBOW].HasSilencer = false;
-		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].setInfinite(true);
-		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].setInfinite(true);
-		Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
+		info->Weapons[WEAPON_CROSSBOW].Present = true;
+		info->Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
+		info->Weapons[WEAPON_CROSSBOW].HasLasersight = false;
+		info->Weapons[WEAPON_CROSSBOW].HasSilencer = false;
+		info->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].setInfinite(true);
+		info->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].setInfinite(true);
+		info->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
 	}
 }
 
-void DelsGiveLaraItemsCheat()
+void DelsGiveLaraItemsCheat(ITEM_INFO* item)
 {
+	auto* info = GetLaraInfo(item);
+
 	int i;
 
 	for (i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			Lara.Puzzles[i] = 1;
-		Lara.PuzzlesCombo[2 * i] = false;
-		Lara.PuzzlesCombo[2 * i + 1] = false;
+			info->Puzzles[i] = 1;
+		info->PuzzlesCombo[2 * i] = false;
+		info->PuzzlesCombo[2 * i + 1] = false;
 	}
 	for (i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			Lara.Keys[i] = 1;
-		Lara.KeysCombo[2 * i] = false;
-		Lara.KeysCombo[2 * i + 1] = false;
+			info->Keys[i] = 1;
+		info->KeysCombo[2 * i] = false;
+		info->KeysCombo[2 * i + 1] = false;
 	}
 	for (i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			Lara.Pickups[i] = 1;
-		Lara.PickupsCombo[2 * i] = false;
-		Lara.PickupsCombo[2 * i + 1] = false;
+			info->Pickups[i] = 1;
+		info->PickupsCombo[2 * i] = false;
+		info->PickupsCombo[2 * i + 1] = false;
 	}
 	/* Hardcoded code */
 }

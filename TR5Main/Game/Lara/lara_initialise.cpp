@@ -4,6 +4,7 @@
 #include "Game/health.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -43,7 +44,7 @@ void InitialiseLara(int restore)
 	Lara.poisoned = 0;
 	Lara.WaterSurfaceDist = 100;
 
-	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_PISTOLS)].Present)
+	if (Lara.Weapons[static_cast<int>(LaraWeaponType::WEAPON_PISTOLS)].Present)
 	{
 		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlot::Pistols;
 		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlot::Pistols;
@@ -53,14 +54,11 @@ void InitialiseLara(int restore)
 		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
-	if (Lara.Weapons[static_cast<int>(LARA_WEAPON_TYPE::WEAPON_SHOTGUN)].Present)
-	{
+
+	if (Lara.Weapons[static_cast<int>(LaraWeaponType::WEAPON_SHOTGUN)].Present)
 		Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
-	}
 	else
-	{
 		Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
-	}
 
 	Lara.location = -1;
 	Lara.highestLocation = -1;
@@ -68,7 +66,7 @@ void InitialiseLara(int restore)
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
-	LARA_WEAPON_TYPE gun = WEAPON_NONE;
+	LaraWeaponType gun = WEAPON_NONE;
 
 	if (Objects[ID_HK_ITEM].loaded)
 		gun = WEAPON_HK;
@@ -78,7 +76,7 @@ void InitialiseLara(int restore)
 
 	Lara.Control.WeaponControl.LastGunType = Lara.Control.WeaponControl.GunType = Lara.Control.WeaponControl.RequestGunType = gun;
 
-	LaraInitialiseMeshes();
+	LaraInitialiseMeshes(LaraItem);
 
 	if (gun == WEAPON_PISTOLS)
 	{
@@ -106,46 +104,50 @@ void InitialiseLara(int restore)
 	Lara.BeetleLife = 3;
 }
 
-void LaraInitialiseMeshes()
+void LaraInitialiseMeshes(ITEM_INFO* item)
 {
+	auto* info = GetLaraInfo(item);
+
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		//Meshes[i] = Meshes[MESHES(ID_LARA_SKIN, i)];
 		//LARA_MESHES(ID_LARA, MESHES(ID_LARA_SKIN, i));
-		Lara.meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
+		info->meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
 	}
 
 	/* Hardcoded code */
 
-	if (Lara.Control.WeaponControl.GunType == WEAPON_HK)
-		Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
-	else if (!Lara.Weapons[WEAPON_SHOTGUN].Present)
+	if (info->Control.WeaponControl.GunType == WEAPON_HK)
+		info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
+	else if (!info->Weapons[WEAPON_SHOTGUN].Present)
 	{
-		if (Lara.Weapons[WEAPON_HK].Present)
-			Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
+		if (info->Weapons[WEAPON_HK].Present)
+			info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
 	}
 	else
-		Lara.Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
+		info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
 
-	Lara.Control.HandStatus = HandStatus::Free;
-	Lara.LeftArm.FrameNumber = 0;
-	Lara.RightArm.FrameNumber = 0;
-	Lara.target = NULL;
-	Lara.RightArm.Locked = false;
-	Lara.LeftArm.Locked = false;
+	info->Control.HandStatus = HandStatus::Free;
+	info->LeftArm.FrameNumber = 0;
+	info->RightArm.FrameNumber = 0;
+	info->target = NULL;
+	info->RightArm.Locked = false;
+	info->LeftArm.Locked = false;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item)
 {
+	auto* info = GetLaraInfo(item);
+
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		Lara.Control.WaterStatus = WaterStatus::Underwater;
+		info->Control.WaterStatus = WaterStatus::Underwater;
 		item->VerticalVelocity = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else
 	{
-		Lara.Control.WaterStatus = WaterStatus::Dry;
+		info->Control.WaterStatus = WaterStatus::Dry;
 		SetAnimation(item, LA_STAND_SOLID);
 	}
 }

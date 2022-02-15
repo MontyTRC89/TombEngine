@@ -938,7 +938,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yRot += info->Control.TurnRate;
 
 	if (level->LaraType == LaraType::Divesuit)
-		UpdateSubsuitAngles();
+		UpdateSubsuitAngles(item);
 
 	if (!info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetLaraLean(item, 1, true, false);
@@ -964,7 +964,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (info->Control.WaterCurrentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
-		LaraWaterCurrent(coll);
+		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
 
@@ -1030,7 +1030,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (info->Control.WaterCurrentActive && info->Control.WaterStatus != WaterStatus::FlyCheat)
-		LaraWaterCurrent(coll);
+		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
 
@@ -1076,7 +1076,7 @@ void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		info->Control.HandStatus = HandStatus::Free;
-		LaraInitialiseMeshes();
+		LaraInitialiseMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 	}
 }

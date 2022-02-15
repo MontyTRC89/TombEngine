@@ -2,7 +2,7 @@
 #include "Specific/trmath.h"
 
 struct ITEM_INFO;
-enum LARA_WEAPON_TYPE;
+enum LaraWeaponType;
 
 enum class GrenadeType
 {
@@ -36,13 +36,13 @@ constexpr auto ROCKET_HIT_RADIUS = 128;
 constexpr auto ROCKET_EXPLODE_RADIUS = SECTOR(2);
 constexpr auto HARPOON_HIT_RADIUS = 128;
 
-void AnimateShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
-void ReadyShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
+void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void FireShotgun(ITEM_INFO* laraItem);
-void DrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
-void UndrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
-void DrawShotgunMeshes(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
-void UndrawShotgunMeshes(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
+void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 
 void FireHarpoon(ITEM_INFO* laraItem);
 void HarpoonBoltControl(short itemNumber);
@@ -56,9 +56,9 @@ void CrossbowBoltControl(short itemNumber);
 void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GAME_VECTOR* src, GAME_VECTOR* target);
 
 void FireHK(ITEM_INFO* laraItem, int mode);
-void RifleHandler(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType);
+void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 
-void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* src, ITEM_INFO* dest, LARA_WEAPON_TYPE weaponType);
+void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* src, ITEM_INFO* dest, LaraWeaponType weaponType);
 void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag);
 void SomeSparkEffect(int x, int y, int z, int count);
 

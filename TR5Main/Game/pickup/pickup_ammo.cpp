@@ -9,7 +9,7 @@
 struct AmmoPickupInfo
 {
 	GAME_OBJECT_ID id;
-	LARA_WEAPON_TYPE laraWeaponType;
+	LaraWeaponType laraWeaponType;
 	WeaponAmmoType ammoType;
 	int amt;
 };

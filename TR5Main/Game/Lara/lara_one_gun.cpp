@@ -41,7 +41,7 @@ enum class CrossbowBoltType
 //int HKFlag = 0;
 //byte HKFlag2 = 0;
 
-void AnimateShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -269,7 +269,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
 	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber = item->AnimNumber;
 }
 
-void ReadyShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -340,7 +340,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 	}
 }
 
-void DrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -388,7 +388,7 @@ void DrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
 	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber = item->AnimNumber;
 }
 
-void UndrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -419,7 +419,7 @@ void UndrawShotgun(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
 	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber;
 }
 
-void DrawShotgunMeshes(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -427,7 +427,7 @@ void DrawShotgunMeshes(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
 	laraInfo->meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
-void UndrawShotgunMeshes(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -739,7 +739,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 
 void GrenadeControl(short itemNumber)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ItemFlags[1])
 	{
@@ -1770,7 +1770,7 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 	}
 }
 
-void RifleHandler(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
+void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -1826,7 +1826,7 @@ void RifleHandler(ITEM_INFO* laraItem, LARA_WEAPON_TYPE weaponType)
 	}
 }
 
-void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* dest, ITEM_INFO* src, LARA_WEAPON_TYPE weaponType)
+void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* dest, ITEM_INFO* src, LaraWeaponType weaponType)
 {
 	if (!(dest->Flags & 0x8000))
 	{
