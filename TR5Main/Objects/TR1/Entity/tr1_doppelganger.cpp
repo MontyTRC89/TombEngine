@@ -14,7 +14,7 @@
 // get weapon damage to damage lara instead. (*25)
 static short GetWeaponDamage(int weaponType)
 {
-	return short(Weapons[weaponType].damage) * 25;
+	return short(Weapons[weaponType].Damage) * 25;
 }
 
 ITEM_INFO* findReference(ITEM_INFO* item, short objectNum)
