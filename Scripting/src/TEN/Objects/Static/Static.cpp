@@ -92,12 +92,7 @@ void Static::Register(sol::table & parent)
 		/// Set the static's HP
 		// @function SetHP
 		// @tparam int HP the new hp of the static 
-		ScriptReserved_SetHP, &Static::SetHP,
-
-		/// (int) hp
-		// @mem HP
-		"HP", sol::property(&Static::GetHP, &Static::SetHP)
-		);
+		ScriptReserved_SetHP, &Static::SetHP);
 }
 
 Position Static::GetPos() const
