@@ -397,7 +397,7 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LOOK)
 	{
-		LookUpDown();
+		LookUpDown(item);
 	}
 
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)

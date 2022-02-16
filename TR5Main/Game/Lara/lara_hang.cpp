@@ -67,7 +67,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

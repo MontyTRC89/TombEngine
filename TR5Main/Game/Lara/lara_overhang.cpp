@@ -438,7 +438,7 @@ void lara_as_slopeclimb(ITEM_INFO* lara, COLL_INFO* coll)
 
 	Camera.flags = 1;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return;
 
 	Camera.targetElevation = -3072;
@@ -457,7 +457,7 @@ void lara_as_slopefall(ITEM_INFO* lara, COLL_INFO* coll)
 
 	Camera.flags = 1;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return;
 
 	Camera.targetElevation = -3072;
@@ -543,7 +543,7 @@ void lara_as_slopehang(ITEM_INFO* lara, COLL_INFO* coll)
 	else
 		lara->Position.xRot++;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return;
 
 	Camera.targetElevation = -1024;
@@ -609,7 +609,7 @@ void lara_as_slopeshimmy(ITEM_INFO* lara, COLL_INFO* coll)
 	else
 		lara->Position.xRot++;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return;
 
 	Camera.targetElevation = -1024;
@@ -639,7 +639,7 @@ void lara_as_slopeclimbup(ITEM_INFO* lara, COLL_INFO* coll)
 
 	Camera.flags = 1;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return; // If camera mode isn't chase (0) then don't change camera angles
 
 	Camera.targetElevation = 2048;
@@ -670,7 +670,7 @@ void lara_as_slopeclimbdown(ITEM_INFO* lara, COLL_INFO* coll)
 
 	Camera.flags = 1;
 
-	if (Camera.type != CAMERA_TYPE::CHASE_CAMERA)
+	if (Camera.type != CameraType::Chase)
 		return;
 
 	Camera.targetElevation = -3072;
