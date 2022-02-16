@@ -220,6 +220,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//167
 	lara_as_null,//168
 	lara_as_null,//169
+	lara_as_idle,//170
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -394,6 +395,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_vault,//167
 	lara_col_vault,//168
 	lara_col_vault,//169
+	lara_col_idle,//170
 };
 
 void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
