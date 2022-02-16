@@ -2103,11 +2103,14 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->Position.zRot = 0;
 
-		item->TargetState = LS_SPLAT_SOFT;
-		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->ActiveState = LS_SPLAT_SOFT;
-			return;
+			item->TargetState = LS_SPLAT_SOFT;
+			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			{
+				item->ActiveState = LS_SPLAT_SOFT;
+				return;
+			}
 		}
 
 		LaraCollideStop(item, coll);
