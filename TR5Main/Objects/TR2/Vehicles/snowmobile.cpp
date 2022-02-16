@@ -515,7 +515,7 @@ bool SkidooUserControl(ITEM_INFO* skidoo, int height, int* pitch)
 		*pitch = skidoo->Velocity + (height - skidoo->Position.yPos);
 
 		if (TrInput & IN_LOOK && skidoo->Velocity == 0)
-			LookUpDown();
+			LookUpDown(LaraItem);
 
 		if ((TrInput & SKIDOO_IN_LEFT && !(TrInput & SKIDOO_IN_BRAKE)) ||
 			(TrInput & SKIDOO_IN_RIGHT && TrInput & SKIDOO_IN_BRAKE))

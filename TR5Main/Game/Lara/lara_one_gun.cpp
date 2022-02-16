@@ -1790,7 +1790,7 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		laraInfo->ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot;
 		laraInfo->ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot;
 
-		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA && !BinocularRange)
+		if (Camera.oldType != CameraType::Look && !BinocularRange)
 			laraInfo->ExtraHeadRot = { 0, 0, 0 };
 	}
 

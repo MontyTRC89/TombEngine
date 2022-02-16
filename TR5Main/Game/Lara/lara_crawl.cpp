@@ -51,7 +51,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
 		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
@@ -240,7 +240,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
@@ -296,7 +296,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
@@ -362,7 +362,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
 		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;

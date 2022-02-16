@@ -1271,7 +1271,7 @@ int KayakControl(ITEM_INFO* laraItem)
 	KAYAK_INFO* kayakInfo = (KAYAK_INFO*)kayakItem->Data;
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(laraItem);
 
 	int ofs = kayakItem->VerticalVelocity;
 

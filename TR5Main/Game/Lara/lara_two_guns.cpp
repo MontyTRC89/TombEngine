@@ -311,7 +311,7 @@ void PistolHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		laraInfo->ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot / 2;
 		laraInfo->ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot / 2;
 
-		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
+		if (Camera.oldType != CameraType::Look)
 			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 	else if (!laraInfo->LeftArm.Locked && laraInfo->RightArm.Locked)
@@ -319,7 +319,7 @@ void PistolHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		laraInfo->ExtraTorsoRot.yRot = laraInfo->RightArm.Rotation.yRot / 2;
 		laraInfo->ExtraTorsoRot.zRot = laraInfo->RightArm.Rotation.xRot / 2;
 
-		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
+		if (Camera.oldType != CameraType::Look)
 			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 	else if (laraInfo->LeftArm.Locked && laraInfo->RightArm.Locked)
@@ -327,7 +327,7 @@ void PistolHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		laraInfo->ExtraTorsoRot.yRot = (laraInfo->LeftArm.Rotation.yRot + laraInfo->RightArm.Rotation.yRot) / 4;
 		laraInfo->ExtraTorsoRot.zRot = (laraInfo->LeftArm.Rotation.xRot + laraInfo->RightArm.Rotation.xRot) / 4;
 
-		if (Camera.oldType != CAMERA_TYPE::LOOK_CAMERA)
+		if (Camera.oldType != CameraType::Look)
 			laraInfo->ExtraHeadRot = laraInfo->ExtraTorsoRot;
 	}
 

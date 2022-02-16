@@ -1214,7 +1214,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
     if (item->Position.yPos >= (height - STEP_SIZE))
     {
         if (!motorbike->velocity && (TrInput & IN_LOOK))
-            LookUpDown();
+            LookUpDown(LaraItem);
 
         if (motorbike->velocity > 0)
         {

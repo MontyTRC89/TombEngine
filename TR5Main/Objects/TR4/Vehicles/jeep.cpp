@@ -900,7 +900,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 		if (!jeep->velocity)
 		{
 			if (TrInput & IN_LOOK)
-				LookUpDown();
+				LookUpDown(LaraItem);
 		}
 
 		if (abs(jeep->velocity) <= JEEP_MAX_SPEED / 2)

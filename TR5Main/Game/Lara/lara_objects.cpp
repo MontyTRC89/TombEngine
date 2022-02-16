@@ -376,7 +376,7 @@ void lara_trbalance(ITEM_INFO* item)
 void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 {
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	lara_trbalance_regen(item);
 	lara_trbalance_mesh(item);
@@ -472,7 +472,7 @@ void lara_as_trpose(ITEM_INFO* item, COLL_INFO* coll)
 	/*state 119*/
 	/*collision: lara_default_col*/
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	GetTighRopeFallOff(127);
 
@@ -526,7 +526,7 @@ void lara_as_trwalk(ITEM_INFO* item, COLL_INFO* coll)
 	if (item->ActiveState != LS_TIGHTROPE_UNBALANCE_LEFT)
 	{
 		if (TrInput & IN_LOOK)
-			LookUpDown();
+			LookUpDown(item);
 
 		if (((TrInput & (IN_BACK | IN_ROLL) || !(TrInput & IN_FORWARD) || info->Control.TightropeControl.Fall) &&
 			!info->Control.TightropeControl.OnCount &&
@@ -652,7 +652,7 @@ void lara_as_rope(ITEM_INFO* item, COLL_INFO* coll)
 		FallFromRope(item);
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 }
 
 void lara_col_rope(ITEM_INFO* item, COLL_INFO* coll)
@@ -800,7 +800,7 @@ void lara_as_pole_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -1050,7 +1050,7 @@ void lara_as_pole_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -1105,7 +1105,7 @@ void lara_as_pole_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{

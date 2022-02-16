@@ -120,7 +120,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (level->LaraType == LaraType::Divesuit)
 		SwimTurnSubsuit(item);

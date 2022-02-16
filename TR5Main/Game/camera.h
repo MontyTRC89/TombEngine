@@ -2,21 +2,21 @@
 #include "Game/items.h"
 #include "Specific/phd_global.h"
 
-enum class CAMERA_TYPE
+enum class CameraType
 {
-	CHASE_CAMERA,
-	FIXED_CAMERA,
-	LOOK_CAMERA,
-	COMBAT_CAMERA,
-	HEAVY_CAMERA
+	Chase,
+	Fixed,
+	Look,
+	Combat,
+	Heavy
 };
 
 struct CAMERA_INFO
 {
 	GAME_VECTOR pos; // size=16, offset=0
 	GAME_VECTOR target; // size=16, offset=16
-	CAMERA_TYPE type; // size=4, offset=32
-	CAMERA_TYPE oldType; // size=4, offset=36
+	CameraType type; // size=4, offset=32
+	CameraType oldType; // size=4, offset=36
 	int shift; // size=0, offset=40
 	int flags; // size=0, offset=44
 	bool fixedCamera; // size=0, offset=48
@@ -60,7 +60,7 @@ extern int UseForcedFixedCamera;
 extern int NumberCameras;
 extern int BinocularRange;
 extern int BinocularOn;
-extern CAMERA_TYPE BinocularOldCamera;
+extern CameraType BinocularOldCamera;
 extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
@@ -89,8 +89,8 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
 void BinocularCamera(ITEM_INFO* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
-void LookLeftRight();
-void LookUpDown();
+void LookLeftRight(ITEM_INFO* item);
+void LookUpDown(ITEM_INFO* item);
 void ResetLook(ITEM_INFO* item);
 void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);

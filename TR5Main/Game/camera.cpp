@@ -65,7 +65,7 @@ int UseForcedFixedCamera;
 int NumberCameras;
 int BinocularRange;
 int BinocularOn;
-CAMERA_TYPE BinocularOldCamera;
+CameraType BinocularOldCamera;
 bool LaserSight;
 int PhdPerspective;
 short CurrentFOV;
@@ -123,7 +123,7 @@ void InitialiseCamera()
 	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
-	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.bounce = 0;
@@ -606,7 +606,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	if (Camera.oldType == CameraType::Fixed)
 		Camera.speed = 1;
 
 	MoveCamera(&ideal, Camera.speed);
@@ -906,7 +906,7 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.zPos == item->Position.zPos &&
 		OldCam.ActiveState == item->ActiveState &&
 		OldCam.TargetState == item->TargetState &&
-		Camera.oldType == CAMERA_TYPE::LOOK_CAMERA)
+		Camera.oldType == CameraType::Look)
 	{
 		ideal.x = LookCamPosition.x;
 		ideal.y = LookCamPosition.y;
@@ -936,7 +936,7 @@ void LookCamera(ITEM_INFO* item)
 
 	CameraCollisionBounds(&ideal, (CLICK(1) - CLICK(0.25f) / 2), 1);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	if (Camera.oldType == CameraType::Fixed)
 	{
 		Camera.pos.x = ideal.x;
 		Camera.pos.y = ideal.y;
@@ -1141,7 +1141,7 @@ void BinocularCamera(ITEM_INFO* item)
 	int ty = y - (WALL_SIZE * 20 + CLICK(1)) * phd_sin(headXRot);
 	int tz = z + l * phd_cos(item->Position.yRot + headYRot);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	if (Camera.oldType == CameraType::Fixed)
 	{
 		Camera.target.x = tx;
 		Camera.target.y = ty;
@@ -1413,8 +1413,8 @@ void CalculateCamera()
 
 	if (UseForcedFixedCamera != 0)
 	{
-		Camera.type = CAMERA_TYPE::FIXED_CAMERA;
-		if (Camera.oldType != CAMERA_TYPE::FIXED_CAMERA)
+		Camera.type = CameraType::Fixed;
+		if (Camera.oldType != CameraType::Fixed)
 			Camera.speed = 1;
 	}
 
@@ -1434,7 +1434,7 @@ void CalculateCamera()
 	ITEM_INFO* item;
 	bool fixedCamera = false;
 	if (Camera.item != NULL &&
-		(Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
+		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 	{
 		item = Camera.item;
 		fixedCamera = true;
@@ -1484,16 +1484,16 @@ void CalculateCamera()
 					Lara.ExtraHeadRot.xRot += change;
 				Lara.ExtraTorsoRot.xRot = Lara.ExtraHeadRot.xRot;
 
-				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
+				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = 1;
 			}
 		}
 	}
 
-	if (Camera.type == CAMERA_TYPE::LOOK_CAMERA ||
-		Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
+	if (Camera.type == CameraType::Look ||
+		Camera.type == CameraType::Combat)
 	{
-		if (Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
+		if (Camera.type == CameraType::Combat)
 		{
 			LastTarget.x = Camera.target.x;
 			LastTarget.y = Camera.target.y;
@@ -1511,11 +1511,11 @@ void CalculateCamera()
 		else
 		{
 			Camera.target.y += (y - Camera.target.y) >> 2;
-			Camera.speed = Camera.type != CAMERA_TYPE::LOOK_CAMERA ? 8 : 4;
+			Camera.speed = Camera.type != CameraType::Look ? 8 : 4;
 		}
 
 		Camera.fixedCamera = false;
-		if (Camera.type == CAMERA_TYPE::LOOK_CAMERA)
+		if (Camera.type == CameraType::Look)
 			LookCamera(item);
 		else
 			CombatCamera(item);
@@ -1530,7 +1530,7 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA &&
+		if (Camera.type != CameraType::Chase &&
 			Camera.flags != CF_CHASE_OBJECT &&
 			(Camera.number != -1 && (SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
@@ -1567,7 +1567,7 @@ void CalculateCamera()
 		{
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
-				Camera.oldType != CAMERA_TYPE::LOOK_CAMERA &&
+				Camera.oldType != CameraType::Look &&
 				BinocularOn >= 0)
 			{
 				if (TargetSnaps <= 8)
@@ -1600,7 +1600,7 @@ void CalculateCamera()
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA && Camera.flags != CF_CHASE_OBJECT)
+		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
 			FixedCamera(item);
 		else
 			ChaseCamera(item);
@@ -1609,10 +1609,10 @@ void CalculateCamera()
 	Camera.fixedCamera = fixedCamera;
 	Camera.last = Camera.number;
 
-	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA ||
+	if (Camera.type != CameraType::Heavy ||
 		Camera.timer == -1)
 	{
-		Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
 		Camera.number = -1;
 		Camera.lastItem = Camera.item;
@@ -1625,71 +1625,75 @@ void CalculateCamera()
 	}
 }
 
-void LookLeftRight()
+void LookLeftRight(ITEM_INFO* item)
 {
-	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
+	auto* info = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (Lara.ExtraHeadRot.yRot > -ANGLE(44.0f))
+		if (info->ExtraHeadRot.yRot > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.yRot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				info->ExtraHeadRot.yRot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				Lara.ExtraHeadRot.yRot -= ANGLE(2.0f);
+				info->ExtraHeadRot.yRot -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (Lara.ExtraHeadRot.yRot < ANGLE(44.0f))
+		if (info->ExtraHeadRot.yRot < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.yRot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				info->ExtraHeadRot.yRot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				Lara.ExtraHeadRot.yRot += ANGLE(2.0f);
+				info->ExtraHeadRot.yRot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.Control.HandStatus != HandStatus::Busy &&
-		Lara.Vehicle == NO_ITEM &&
-		!Lara.LeftArm.Locked &&
-		!Lara.RightArm.Locked)
+	if (info->Control.HandStatus != HandStatus::Busy &&
+		info->Vehicle == NO_ITEM &&
+		!info->LeftArm.Locked &&
+		!info->RightArm.Locked)
 	{
-		Lara.ExtraTorsoRot.yRot = Lara.ExtraHeadRot.yRot;
+		info->ExtraTorsoRot.yRot = info->ExtraHeadRot.yRot;
 	}
 }
 
-void LookUpDown()
+void LookUpDown(ITEM_INFO* item)
 {
-	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
+	auto* info = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (Lara.ExtraHeadRot.xRot > -ANGLE(35.0f))
+		if (info->ExtraHeadRot.xRot > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.xRot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				info->ExtraHeadRot.xRot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				Lara.ExtraHeadRot.xRot -= ANGLE(2.0f);
+				info->ExtraHeadRot.xRot -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (Lara.ExtraHeadRot.xRot < ANGLE(30.0f))
+		if (info->ExtraHeadRot.xRot < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				Lara.ExtraHeadRot.xRot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				info->ExtraHeadRot.xRot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				Lara.ExtraHeadRot.xRot += ANGLE(2.0f);
+				info->ExtraHeadRot.xRot += ANGLE(2.0f);
 		}
 	}
-	if (Lara.Control.HandStatus != HandStatus::Busy &&
-		Lara.Vehicle == NO_ITEM &&
-		!Lara.LeftArm.Locked &&
-		!Lara.RightArm.Locked)
+	if (info->Control.HandStatus != HandStatus::Busy &&
+		info->Vehicle == NO_ITEM &&
+		!info->LeftArm.Locked &&
+		!info->RightArm.Locked)
 	{
-		Lara.ExtraTorsoRot.xRot = Lara.ExtraHeadRot.xRot;
+		info->ExtraTorsoRot.xRot = info->ExtraHeadRot.xRot;
 	}
 }
 
@@ -1697,7 +1701,7 @@ void ResetLook(ITEM_INFO* item)
 {
 	auto* info = GetLaraInfo(item);
 
-	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
+	if (Camera.type != CameraType::Look)
 	{
 		if (abs(info->ExtraHeadRot.xRot) > ANGLE(0.1f))
 			info->ExtraHeadRot.xRot += info->ExtraHeadRot.xRot / -8;
