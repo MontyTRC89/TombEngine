@@ -144,7 +144,6 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->Control.IsMoving)
 		return;
 
-	// TODO: If stopping and holding WALK without FORWARD, Lara can't turn. @Sezz 2021.10.09
 	if (TrInput & IN_LEFT)
 	{
 		info->Control.TurnRate -= LARA_TURN_RATE;
@@ -288,7 +287,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Control settings option to enable/disable FORWARD+BACK as roll input.
 	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->Control.RunJumpQueued &&
 		info->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -368,6 +366,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
+
+		item->TargetState = LS_SPLAT_SOFT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			return;
 
 		LaraCollideStop(item, coll);
 	}
@@ -2229,6 +2231,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 				return;
 			}
 		}
+
+		item->TargetState = LS_SPLAT_SOFT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			return;
 
 		LaraCollideStop(item, coll);
 	}
