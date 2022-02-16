@@ -260,7 +260,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	//info->Control.ApproachTargetAngle = vaultResult.ApproachLedgeAngle;
 
 	if (vaultResult.SnapToLedge)
-		SnapItemToLedge(item, coll);
+		SnapItemToLedge(item, coll, 0.2f);
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)

@@ -131,8 +131,8 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	auto* info = GetLaraInfo(item);
 
 	info->Control.Count.RunJump++;
-	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME - 4)
-		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME - 4;
+	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2) // TODO: Tune this again.
+		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{
@@ -163,7 +163,16 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK) [[likely]]
 			item->TargetState = LS_WALK_FORWARD;
@@ -304,7 +313,17 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			!TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Do not interfere with splat!
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
@@ -1624,7 +1643,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)		// Should not be possible, but here for security.
+		if (info->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -2069,7 +2088,18 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_WADE_FORWARD;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else [[likely]]
+			item->TargetState = LS_WADE_FORWARD;
+
 		return;
 	}
 
