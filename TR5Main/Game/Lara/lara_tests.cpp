@@ -2025,7 +2025,6 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & IN_ACTION) || info->Control.HandStatus != HandStatus::Free)
 		return VaultTestResult{ false };
 

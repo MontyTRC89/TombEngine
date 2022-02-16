@@ -729,7 +729,7 @@ bool SpeedBoatUserControl(ITEM_INFO* sBoatItem)
 				sBoatItem->Velocity = 0;
 
 			if (TrInput & IN_LOOK && sBoatItem->Velocity == 0)
-				LookUpDown();
+				LookUpDown(LaraItem);
 		}
 	}
 

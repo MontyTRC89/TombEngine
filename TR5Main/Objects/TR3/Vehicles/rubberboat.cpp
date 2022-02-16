@@ -621,7 +621,7 @@ int RubberBoatUserControl(ITEM_INFO *boat)
 				boat->Velocity = 0;
 
 			if (TrInput & IN_LOOK && boat->Velocity == 0)
-				LookUpDown();
+				LookUpDown(LaraItem);
 		}
 	}
 	return noTurn;

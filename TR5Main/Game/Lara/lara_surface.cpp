@@ -72,7 +72,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LOOK)
 	{
-		LookUpDown();
+		LookUpDown(item);
 		return;
 	}
 

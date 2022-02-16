@@ -1009,7 +1009,7 @@ static int QuadUserControl(ITEM_INFO* quad, int height, int* pitch)
 		if (TrInput & IN_LOOK &&
 			!quadInfo->velocity)
 		{
-			LookUpDown();
+			LookUpDown(LaraItem);
 		}
 
 		// Driving forward.

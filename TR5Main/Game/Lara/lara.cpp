@@ -765,7 +765,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK && info->Control.CanLook &&
 		info->ExtraAnim == NO_ITEM)
 	{
-		LookLeftRight();
+		LookLeftRight(item);
 	}
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
@@ -910,7 +910,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT;
 
 	if (TrInput & IN_LOOK && info->Control.CanLook)
-		LookLeftRight();
+		LookLeftRight(item);
 	else
 		ResetLook(item);
 
@@ -1016,7 +1016,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
 	if (TrInput & IN_LOOK && info->Control.CanLook)
-		LookLeftRight();
+		LookLeftRight(item);
 	else
 		ResetLook(item);
 

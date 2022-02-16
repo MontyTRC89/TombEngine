@@ -369,7 +369,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->TargetState = LS_SPLAT_SOFT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		{
+			item->ActiveState = LS_SPLAT_SOFT;
 			return;
+		}
 
 		LaraCollideStop(item, coll);
 	}
@@ -381,7 +384,7 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-// State:		LS_IDLE (2), LS_POSE (4)
+// State:		LS_IDLE (2), LS_SPLAT_SOFT (170)
 // Collision:	lara_col_idle()
 void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -401,7 +404,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	if (TrInput & IN_LOOK && info->Control.CanLook)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_JUMP))	// JUMP locks y rotation.
@@ -667,8 +670,8 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 	item->TargetState = LS_IDLE;
 }
 
-// State:		LS_IDLE (2)
-// Control:		lara_as_idle()
+// State:		LS_IDLE (2), LS_POSE (4), LS_SPLAT_SOFT (170)
+// Control:		lara_as_idle(), lara_as_pose()
 void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
@@ -725,7 +728,7 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown();
+		LookUpDown(item);
 
 	if (TestLaraPose(item, coll))
 	{
@@ -2100,13 +2103,11 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (coll->Front.Floor < -STEPUP_HEIGHT &&
-			!coll->Front.FloorSlope &&
-			!TestEnvironment(ENV_FLAG_SWAMP, item))
+		item->TargetState = LS_SPLAT_SOFT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 		{
-			item->TargetState = LS_SPLAT;
-			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
-				return;
+			item->ActiveState = LS_SPLAT_SOFT;
+			return;
 		}
 
 		LaraCollideStop(item, coll);
@@ -2234,7 +2235,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 		item->TargetState = LS_SPLAT_SOFT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		{
+			item->ActiveState = LS_SPLAT_SOFT;
 			return;
+		}
 
 		LaraCollideStop(item, coll);
 	}
