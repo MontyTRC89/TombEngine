@@ -36,20 +36,11 @@ public:
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 
-	int GetCurrentAnimState() const;
-	void SetCurrentAnimState(int animState);
-
 	int GetAnimNumber() const;
 	void SetAnimNumber(int animNumber);
 
 	int GetFrameNumber() const;
 	void SetFrameNumber(int frameNumber);
-
-	int GetRequiredAnimState() const;
-	void SetRequiredAnimState(int animState);
-
-	int GetGoalAnimState() const;
-	void SetGoalAnimState(int animState);
 
 	short GetHP() const;
 	void SetHP(short hp);
@@ -85,5 +76,4 @@ private:
 	short m_num;
 	bool m_initialised;
 	bool m_temporary;
-
 };
