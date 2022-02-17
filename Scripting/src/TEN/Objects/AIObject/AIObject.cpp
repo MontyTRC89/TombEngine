@@ -131,7 +131,6 @@ void AIObject::SetRoom(short room)
 
 short AIObject::GetTriggerFlags() const
 {
-
 	return m_aiObject.triggerFlags;
 }
 
