@@ -75,9 +75,6 @@ takes no arguments.
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
 	@tparam int room room ID item is in
-	@tparam int currentAnimState current animation state
-	@tparam int requiredAnimState required animation state
-	@tparam int goalAnimState goal animation state
 	@tparam int animNumber anim number
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
@@ -95,9 +92,6 @@ takes no arguments.
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
 		0, -- room
-		0, -- currentAnimState
-		0, -- requiredAnimState
-		0, -- goalAnimState
 		0, -- animNumber
 		0, -- frameNumber
 		0, -- HP
@@ -123,9 +117,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	Position pos,
 	Rotation rot,
 	short room,
-	int currentAnimState,
-	int requiredAnimState,
-	int goalAnimState,
 	int animNumber,
 	int frameNumber,
 	short hp,
@@ -148,9 +139,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	InitialiseItem(num);
 
 	ptr->SetName(name);
-	ptr->SetCurrentAnimState(currentAnimState);
-	ptr->SetRequiredAnimState(requiredAnimState);
-	ptr->SetGoalAnimState(goalAnimState);
 	ptr->SetAnimNumber(animNumber);
 	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
@@ -224,16 +212,26 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
 		ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
+		
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
+		ScriptReserved_GetHP, &Moveable::GetHP,
 
-/// (int) HP (hit points/health points) of object 
-//@raise an exception if the object is intelligent and an invalid
-//hp value is given
-// @mem HP
-		"HP", sol::property(&Moveable::GetHP, &Moveable::SetHP),
+/// Set current HP (hit points/health points)
+// @function Moveable:SetHP
+// @tparam int the amount of HP to give the moveable
+		ScriptReserved_SetHP, &Moveable::SetHP,
 
-/// (int) OCB (object code bit) of object
-// @mem OCB
-		"OCB", sol::property(&Moveable::GetOCB, &Moveable::SetOCB),
+/// Get OCB (object code bit) of the moveable
+// @function Moveable:GetOCB
+// @treturn int the moveable's current OCB value
+		ScriptReserved_GetOCB, &Moveable::GetOCB,
+
+/// Set OCB (object code bit) of the moveable
+// @function Moveable:SetOCB
+// @tparam int the new value for the moveable's OCB
+		ScriptReserved_SetOCB, &Moveable::SetOCB,
 
 /// (table) item flags of object (table of 8 ints)
 // @mem itemFlags 
@@ -413,36 +411,6 @@ sol::as_table_t<std::array<short, 8>> Moveable::GetItemFlags() const
 void Moveable::SetItemFlags(sol::as_table_t<std::array<short, 8>> const& arr)
 {	
 	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
-}
-
-int Moveable::GetCurrentAnimState() const
-{
-	return m_item->currentAnimState;
-}
-
-void Moveable::SetCurrentAnimState(int animState)
-{
-	m_item->currentAnimState = animState;
-}
-
-int Moveable::GetRequiredAnimState() const
-{
-	return m_item->requiredAnimState;
-}
-
-void Moveable::SetRequiredAnimState(int animState)
-{
-	m_item->requiredAnimState = animState;
-}
-
-int Moveable::GetGoalAnimState() const
-{
-	return m_item->goalAnimState;
-}
-
-void Moveable::SetGoalAnimState(int state)
-{
-	m_item->goalAnimState = state;
 }
 
 int Moveable::GetAnimNumber() const
