@@ -227,7 +227,6 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		// TODO: Set active state as well?
 		item->TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 		{
@@ -380,7 +379,8 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)))
+		if (TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
+			coll->HitTallObject)
 		{
 			item->TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
@@ -2155,7 +2155,16 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Dry)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (info->Control.WaterStatus == WaterStatus::Dry)
 			item->TargetState = LS_RUN_FORWARD;
 		else [[likely]]
 			item->TargetState = LS_WADE_FORWARD;
@@ -2360,7 +2369,8 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (coll->HitTallObject || TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)))
+		if (TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
+			coll->HitTallObject)
 		{
 			item->TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
@@ -2417,14 +2427,7 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}
 
-	// TODO: Make this state a true jump?
-	if (item->TargetState != LS_DEATH &&
-		item->TargetState != LS_IDLE &&
-		item->TargetState != LS_RUN_FORWARD &&
-		item->VerticalVelocity >= LARA_FREEFALL_SPEED)
-	{
-		item->TargetState = LS_FREEFALL;
-	}
+	item->TargetState = LS_RUN_FORWARD;
 }
 
 // State:		LS_SPRINT_DIVE (74)
