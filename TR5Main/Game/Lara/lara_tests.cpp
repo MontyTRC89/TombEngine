@@ -2279,7 +2279,6 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, COLL_INFO* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// This check is redundant, but provides for a slight optimisation.
 	if (!(TrInput & (IN_ACTION | IN_JUMP)))
 		return CrawlVaultTestResult{ false };
 
