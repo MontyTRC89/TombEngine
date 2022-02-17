@@ -32,8 +32,7 @@ public:
 	void SetSlot(int slot);
 	ScriptColor GetColor() const;
 	void SetColor(ScriptColor const & col);
-	int GetHP() const;
-	void SetHP(int hp);
+
 private:
 	MESH_INFO & m_mesh;
 	bool m_temporary;

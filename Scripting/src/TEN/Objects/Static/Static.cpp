@@ -82,17 +82,7 @@ void Static::Register(sol::table & parent)
 		/// Set the static's color
 		// @function SetColor
 		// @tparam Color color the new color of the static 
-		ScriptReserved_SetColor, &Static::SetColor,
-
-		/// Get the static's HP
-		// @function GetHP
-		// @treturn int HP the HP of the static
-		ScriptReserved_GetHP, &Static::GetHP,
-
-		/// Set the static's HP
-		// @function SetHP
-		// @tparam int HP the new hp of the static 
-		ScriptReserved_SetHP, &Static::SetHP);
+		ScriptReserved_SetColor, &Static::SetColor);
 }
 
 Position Static::GetPos() const
@@ -164,14 +154,4 @@ ScriptColor Static::GetColor() const
 void Static::SetColor(ScriptColor const & col)
 {
 	m_mesh.color = col;
-}
-
-int Static::GetHP() const
-{
-	return m_mesh.hitPoints;
-}
-
-void Static::SetHP(int hp)
-{
-	m_mesh.hitPoints = hp;
 }
