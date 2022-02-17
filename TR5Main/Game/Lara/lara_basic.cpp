@@ -87,10 +87,11 @@ void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 }
 
-// State:	LS_VAULT, LS_VAULT_2_STEPS, LS_VAULT_3_STEPS,
-//			VAULT_1_STEP_CROUCH, VAULT_2_STEPS_CROUCH, VAULT_3_STEPS_CROUCH (164, 165, 166, 167, 168, 169)
-// Control:	lara_as_null()
-void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_VAULT (164),
+//				LS_VAULT_2_STEPS (165), LS_VAULT_3_STEPS (166),
+//				VAULT_1_STEP_CROUCH (167), VAULT_2_STEPS_CROUCH (168), VAULT_3_STEPS_CROUCH (169)
+// Collision:	lara_void_func()
+void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
@@ -103,9 +104,9 @@ void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll)
 	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
 }
 
-// State:	LS_AUTO_JUMP (62)
-// Control:	lara_as_null()
-void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_AUTO_JUMP (62)
+// Collision:	lara_lara_void_func()
+void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
@@ -386,10 +387,10 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 
-		item->TargetState = LS_SPLAT_SOFT;
+		item->TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 		{
-			item->ActiveState = LS_SPLAT_SOFT;
+			item->ActiveState = LS_SOFT_SPLAT;
 			return;
 		}
 
@@ -2135,10 +2136,10 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->TargetState = LS_SPLAT_SOFT;
+			item->TargetState = LS_SOFT_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 			{
-				item->ActiveState = LS_SPLAT_SOFT;
+				item->ActiveState = LS_SOFT_SPLAT;
 				return;
 			}
 		}
@@ -2266,10 +2267,10 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 			}
 		}
 
-		item->TargetState = LS_SPLAT_SOFT;
+		item->TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 		{
-			item->ActiveState = LS_SPLAT_SOFT;
+			item->ActiveState = LS_SOFT_SPLAT;
 			return;
 		}
 

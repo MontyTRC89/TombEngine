@@ -108,7 +108,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_climbend,//59
 	lara_as_climbright,//60
 	lara_as_climbdown,//61
-	lara_void_func,//62
+	lara_as_auto_jump,//62
 	lara_void_func,//63
 	lara_void_func,//64
 	lara_as_wade_forward,//65
@@ -214,12 +214,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//161
 	lara_as_null,//162
 	lara_as_monkey_back,//163
-	lara_as_null,//164
-	lara_as_null,//165
-	lara_as_null,//166
-	lara_as_null,//167
-	lara_as_null,//168
-	lara_as_null,//169
+	lara_as_vault,//164
+	lara_as_vault,//165
+	lara_as_vault,//166
+	lara_as_vault,//167
+	lara_as_vault,//168
+	lara_as_vault,//169
 	lara_as_idle,//170
 };
 
@@ -287,7 +287,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_climbend,
 	lara_col_climbright,
 	lara_col_climbdown,
-	lara_col_auto_jump,//62
+	lara_void_func,//62
 	lara_void_func,
 	lara_void_func,
 	lara_col_wade_forward,
@@ -389,12 +389,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//161
 	lara_void_func,//162
 	lara_col_monkey_back,//163
-	lara_col_vault,//164
-	lara_col_vault,//165
-	lara_col_vault,//166
-	lara_col_vault,//167
-	lara_col_vault,//168
-	lara_col_vault,//169
+	lara_void_func,//164
+	lara_void_func,//165
+	lara_void_func,//166
+	lara_void_func,//167
+	lara_void_func,//168
+	lara_void_func,//169
 	lara_col_idle,//170
 };
 
