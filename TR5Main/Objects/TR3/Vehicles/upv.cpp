@@ -621,8 +621,8 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
-				StopSoundEffect(SFX_TR3_LITTLE_SUB_LOOP);
-				SoundEffect(SFX_TR3_LITTLE_SUB_STOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
+				StopSoundEffect(SFX_TR3_UPV_LOOP);
+				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
 			}
 		}
 
@@ -647,7 +647,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVItem->pos.xRot += ANGLE(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPVInfo->Flags |= UPV_CONTROL;
@@ -656,7 +656,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPVInfo->Flags |= UPV_CONTROL;
@@ -1044,7 +1044,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPVInfo->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2 | 4 | 0x1000000 | (UPVItem->speed * 65536));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->pos.xPos, 2 | 4 | 0x1000000 | (UPVItem->speed * 65536));
 
 		UPVItem->animNumber = Objects[ID_UPV].animIndex + (laraItem->animNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->frameNumber = g_Level.Anims[UPVItem->animNumber].frameBase + (laraItem->frameNumber - g_Level.Anims[laraItem->animNumber].frameBase);
