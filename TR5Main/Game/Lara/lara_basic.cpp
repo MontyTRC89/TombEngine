@@ -230,7 +230,10 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Set active state as well?
 		item->TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		{
+			item->ActiveState = LS_SOFT_SPLAT;
 			return;
+		}
 
 		LaraCollideStop(item, coll);
 	}
