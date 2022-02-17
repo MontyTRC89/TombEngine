@@ -227,7 +227,8 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->TargetState = LS_SPLAT;
+		// TODO: Set active state as well?
+		item->TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
 			return;
 
@@ -317,7 +318,6 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		auto vaultResult = TestLaraVault(item, coll);
 
 		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
-			!TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Do not interfere with splat!
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -410,7 +410,9 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.CanLook = ((TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
+	info->Control.CanLook = ((isSwamp && info->Control.WaterStatus == WaterStatus::Wade) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -443,7 +445,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (isSwamp)
 			PseudoLaraAsSwampIdle(item, coll);
 		else [[likely]]
 			PseudoLaraAsWadeIdle(item, coll);
@@ -696,14 +698,16 @@ void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	info->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : item->Position.yRot + ANGLE(180.0f);
-	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	info->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : (item->Position.yRot + ANGLE(180.0f));
+	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -853,7 +857,9 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
+	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -869,7 +875,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (isSwamp)
 			PsuedoLaraAsSwampTurnRightSlow(item, coll);
 		else [[likely]]
 			PsuedoLaraAsWadeTurnRightSlow(item, coll);
@@ -902,7 +908,16 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (TrInput & IN_WALK)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TrInput & IN_WALK)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -984,9 +999,20 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_WADE_FORWARD;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+			item->TargetState = LS_WADE_FORWARD;
+
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
@@ -1023,9 +1049,20 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->Control.TurnRate > LARA_SWAMP_TURN_MAX)
 		info->Control.TurnRate = LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
+	if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_WADE_FORWARD;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
+			item->TargetState = LS_WADE_FORWARD;
+
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
@@ -1067,7 +1104,9 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
+	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1083,7 +1122,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (info->Control.WaterStatus == WaterStatus::Wade)
 	{
-		if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (isSwamp)
 			PsuedoLaraAsSwampTurnLeftSlow(item, coll);
 		else [[likely]]
 			PsuedoLaraAsWadeTurnLeftSlow(item, coll);
@@ -1116,7 +1155,16 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (TrInput & IN_WALK)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if(TrInput & IN_WALK)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -1198,9 +1246,20 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD && TestLaraRunForward(item, coll))
+	if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_WADE_FORWARD;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+			item->TargetState = LS_WADE_FORWARD;
+
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
@@ -1237,9 +1296,20 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
 		info->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
 
-	if (TrInput & IN_FORWARD && TestLaraWadeForwardSwamp(item, coll))
+	if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_WADE_FORWARD;
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (TestLaraRunForward(item, coll)) [[likely]]
+			item->TargetState = LS_WADE_FORWARD;
+
 		return;
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
@@ -1358,7 +1428,9 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
+	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1369,7 +1441,7 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (info->Control.IsMoving)
 		return;
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) &&
+	if (isSwamp &&
 		info->Control.WaterStatus == WaterStatus::Wade)
 	{
 		PseudoLaraAsSwampWalkBack(item, coll);
@@ -1442,14 +1514,16 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1527,7 +1601,16 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)		// Should not be possible, but here for security.
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (info->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1644,7 +1727,16 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if(info->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1760,14 +1852,16 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1793,7 +1887,7 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -1845,14 +1939,16 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
@@ -1878,7 +1974,7 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -2020,7 +2116,9 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	info->Control.CanLook = (TestEnvironment(ENV_FLAG_SWAMP, item) && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
+	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -2029,7 +2127,7 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (isSwamp)
 	{
 		PseudoLaraAsSwampWadeForward(item, coll);
 		return;
@@ -2113,11 +2211,13 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2134,7 +2234,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (!TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (!isSwamp)
 		{
 			item->TargetState = LS_SOFT_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
@@ -2147,7 +2247,7 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestLaraStep(item, coll) || TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (TestLaraStep(item, coll) || isSwamp)
 	{
 		DoLaraStep(item, coll);
 		return;
