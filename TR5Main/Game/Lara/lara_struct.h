@@ -887,6 +887,7 @@ enum class WaterStatus
 	Wade,
 	TreadWater,
 	Underwater,
+	Swamp, // TODO
 	FlyCheat
 };
 
