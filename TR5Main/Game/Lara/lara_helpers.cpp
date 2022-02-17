@@ -33,6 +33,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 	if (!item->Velocity)
 		return;
 
+	rate = abs(rate);
 	int sign = copysign(1, maxAngle);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)

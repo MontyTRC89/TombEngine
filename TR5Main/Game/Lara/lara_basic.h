@@ -19,8 +19,8 @@ void lara_as_special(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_null(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll);
 void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_vault(ITEM_INFO* item, COLL_INFO* coll);
-void lara_col_auto_jump(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll);
 
 // ---------------
 // BASIC MOVEMENT:
