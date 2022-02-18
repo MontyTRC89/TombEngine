@@ -268,7 +268,7 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	item->Airborne = false;
+	//item->Airborne = false; // TODO: Removing this addresses an unusual landing bug Core had worked around in an obscure way. I'd like to find a proper solution someday. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
 }
