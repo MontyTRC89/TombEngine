@@ -346,6 +346,8 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
+	item->Airborne = false;
+	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1888,7 +1890,16 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (LaraDeflectEdge(item, coll))
+	{
+		item->TargetState = LS_SOFT_SPLAT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		{
+			item->ActiveState = LS_SOFT_SPLAT;
+			return;
+		}
+
 		LaraCollideStop(item, coll);
+	}
 
 	if (TestLaraStep(item, coll) || isSwamp)
 	{
@@ -1975,7 +1986,16 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (LaraDeflectEdge(item, coll))
+	{
+		item->TargetState = LS_SOFT_SPLAT;
+		if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+		{
+			item->ActiveState = LS_SOFT_SPLAT;
+			return;
+		}
+
 		LaraCollideStop(item, coll);
+	}
 
 	if (TestLaraStep(item, coll) || isSwamp)
 	{
