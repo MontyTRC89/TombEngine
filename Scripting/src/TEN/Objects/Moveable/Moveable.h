@@ -48,9 +48,6 @@ public:
 	short GetOCB() const;
 	void SetOCB(short ocb);
 
-	sol::as_table_t<std::array<short, 8>>  GetItemFlags() const;
-	void SetItemFlags(sol::as_table_t<std::array<short, 8>>  const & arr);
-
 	byte GetAIBits() const;
 	void SetAIBits(byte bits);
 
