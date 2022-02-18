@@ -2318,7 +2318,17 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	// while meeting some condition allows Lara to run around in the water room. Investigate. @Sezz 2021.09.29
 	if (TrInput & IN_FORWARD)
 	{
-		if (info->Control.WaterStatus == WaterStatus::Wade)
+		auto vaultResult = TestLaraVault(item, coll);
+
+		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+			!TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Allow immediate vault only in the case of a soft splat.
+			vaultResult.Success)
+		{
+			item->TargetState = vaultResult.TargetState;
+			SetLaraVault(item, coll, vaultResult);
+			return;
+		}
+		else if (info->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
