@@ -54,9 +54,6 @@ public:
 	byte GetAIBits() const;
 	void SetAIBits(byte bits);
 
-	short GetStatus() const;
-	void SetStatus(short status);
-
 	bool GetHitStatus() const;
 	void SetHitStatus(bool status);
 
