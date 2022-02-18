@@ -173,7 +173,7 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:DisableItem
 		ScriptReserved_Disable, &Moveable::DisableItem,
 
-/// Make the item invisible
+/// Make the item invisible. Use EnableItem to make it visible again.
 // @function Moveable:MakeInvisible
 		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
