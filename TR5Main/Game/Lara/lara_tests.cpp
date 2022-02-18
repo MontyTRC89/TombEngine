@@ -981,7 +981,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_STAND_IDLE);
 	else
 	{
-		SetAnimation(item, LA_ONWATER_TO_WADE_1CLICK);
+		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
 		item->TargetState = LS_IDLE;
 	}
 
@@ -1032,24 +1032,24 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->Animations.CrawlExtended)
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_1CLICK);
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_1CLICK);
+			SetAnimation(item, LA_ONWATER_TO_STAND_1_STEP);
 	}
 	else if (frontFloor > CLICK(0.5f))
 	{
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->Animations.CrawlExtended)
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1CLICK);
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_M1CLICK);
+			SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
 	}
 
 	else
@@ -1057,12 +1057,12 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->Animations.CrawlExtended)
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_0CLICK);
+				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_0CLICK);
+			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
