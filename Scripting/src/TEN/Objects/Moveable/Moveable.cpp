@@ -121,7 +121,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	int frameNumber,
 	short hp,
 	short ocb,
-	sol::as_table_t<std::array<short, 8>> flags,
 	byte aiBits,
 	bool active,
 	bool hitStatus
@@ -142,7 +141,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
 	ptr->SetOCB(ocb);
-	ptr->SetItemFlags(flags);
 	ptr->SetAIBits(aiBits);
 	ptr->SetActive(active);
 	ptr->SetHitStatus(hitStatus);
@@ -244,10 +242,6 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetOCB
 // @tparam int the new value for the moveable's OCB
 		ScriptReserved_SetOCB, &Moveable::SetOCB,
-
-/// (table) item flags of object (table of 8 ints)
-// @mem itemFlags 
-		"itemFlags", sol::property(&Moveable::GetItemFlags, &Moveable::SetItemFlags),
 
 /// (int) AIBits of object. Will be clamped to [0, 255]
 // @mem AIBits
@@ -402,18 +396,6 @@ byte Moveable::GetAIBits() const
 void Moveable::SetAIBits(byte bits)
 {
 	m_item->aiBits = bits;
-}
-
-sol::as_table_t<std::array<short, 8>> Moveable::GetItemFlags() const
-{	
-	std::array<short, 8> ret{};
-	memcpy(ret.data(), m_item->itemFlags, sizeof(m_item->itemFlags));
-	return ret;
-}
-
-void Moveable::SetItemFlags(sol::as_table_t<std::array<short, 8>> const& arr)
-{	
-	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
 }
 
 int Moveable::GetAnimNumber() const
