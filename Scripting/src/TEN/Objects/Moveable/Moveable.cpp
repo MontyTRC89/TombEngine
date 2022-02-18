@@ -245,15 +245,6 @@ void Moveable::Register(sol::table & parent)
 // @mem AIBits
 		"AIBits", sol::property(&Moveable::GetAIBits, &Moveable::SetAIBits),
 
-/// (int) status of object.
-// possible values:
-// 0 - not active
-// 1 - active
-// 2 - deactivated
-// 3 - invisible
-// @mem status
-		"status", sol::property(&Moveable::GetStatus, &Moveable::SetStatus),
-
 /// (bool) hit status of object
 // @mem hitStatus
 		"hitStatus", sol::property(&Moveable::GetHitStatus, &Moveable::SetHitStatus),
@@ -449,17 +440,6 @@ void Moveable::SetFrameNumber(int frameNumber)
 	{
 		ScriptWarn("Not setting frame number.");
 	}
-}
-
-
-short Moveable::GetStatus() const
-{
-	return m_item->status;
-}
-
-void Moveable::SetStatus(short status)
-{
-	m_item->status = status;
 }
 
 bool Moveable::GetActive() const
