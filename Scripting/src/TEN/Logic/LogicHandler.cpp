@@ -120,35 +120,6 @@ void AddOneSecret()
 	PlaySecretTrack();
 }
 
-/*
-void LogicHandler::MakeItemInvisible(short id)
-{
-	if (m_itemsMap.find(id) == m_itemsMap.end())
-		return;
-
-	short itemNum = m_itemsMap[id];
-
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (item->active)
-	{
-		if (Objects[item->objectNumber].intelligent)
-		{
-			if (item->status == ITEM_ACTIVE)
-			{
-				item->touchBits = 0;
-				item->status = ITEM_INVISIBLE;
-				DisableBaddieAI(itemNum);
-			}
-		}
-		else
-		{
-			item->touchBits = 0;
-			item->status = ITEM_INVISIBLE;
-		}
-	}
-}
-*/
 template <typename T>
 void LogicHandler::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
 {

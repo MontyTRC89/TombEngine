@@ -173,6 +173,10 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:DisableItem
 		ScriptReserved_Disable, &Moveable::DisableItem,
 
+/// Make the item invisible
+// @function Moveable:MakeInvisible
+		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
+
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
@@ -553,3 +557,18 @@ void Moveable::DisableItem()
 		}
 	}
 }
+
+void Moveable::MakeInvisible()
+{
+	m_item->status = ITEM_INVISIBLE;
+	if (m_item->active)
+	{
+		m_item->touchBits = 0;
+		RemoveActiveItem(m_num);
+		if (Objects[m_item->objectNumber].intelligent)
+		{
+			DisableBaddieAI(m_num);
+		}
+	}
+}
+
