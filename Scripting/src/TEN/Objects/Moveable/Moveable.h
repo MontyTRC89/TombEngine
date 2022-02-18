@@ -68,6 +68,7 @@ public:
 
 	void EnableItem();
 	void DisableItem();
+	void MakeInvisible();
 
 	void Init();
 

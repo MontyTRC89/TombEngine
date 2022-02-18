@@ -24,6 +24,7 @@ static constexpr char const ScriptReserved_newTemporary[]		= "NewTemporary";
 static constexpr char const ScriptReserved_Init[]				= "Init";
 static constexpr char const ScriptReserved_Enable[]				= "Enable";
 static constexpr char const ScriptReserved_Disable[]			= "Disable";
+static constexpr char const ScriptReserved_MakeInvisible[]		= "MakeInvisible";
 static constexpr char const ScriptReserved_GetColor[]			= "GetColor";
 static constexpr char const ScriptReserved_SetColor[]			= "SetColor";
 static constexpr char const ScriptReserved_GetPosition[]		= "GetPosition";
