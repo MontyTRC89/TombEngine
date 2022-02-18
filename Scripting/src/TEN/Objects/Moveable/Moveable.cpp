@@ -123,7 +123,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	short ocb,
 	sol::as_table_t<std::array<short, 8>> flags,
 	byte aiBits,
-	short status,
 	bool active,
 	bool hitStatus
 )
@@ -145,7 +144,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	ptr->SetOCB(ocb);
 	ptr->SetItemFlags(flags);
 	ptr->SetAIBits(aiBits);
-	ptr->SetStatus(status);
 	ptr->SetActive(active);
 	ptr->SetHitStatus(hitStatus);
 
