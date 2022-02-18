@@ -237,7 +237,7 @@ enum LaraAnim
 	LA_STAND_TO_WALK_END = 21,								// Stand > walk forward (1/2)
 	LA_JUMP_FORWARD_TO_FREEFALL_UNUSED = 22,				// Jump > fall (possibly unused?)
 																// TODO: confirm lack of dispatch for this anim.
-	LA_FREEFALL = 23,										// Freefall, after falling more than 7 clicks (looped)
+	LA_FREEFALL = 23,										// Freefall, after falling more than 7 steps (looped)
 	LA_FREEFALL_LAND = 24,									// Freefall > hard landing
 	LA_FREEFALL_DEATH = 25,									// Freefall death
 	LA_STAND_TO_JUMP_UP_START = 26,							// Stand > jump up (1/2)
@@ -257,28 +257,27 @@ enum LaraAnim
 	LA_WALK_BACK_TO_STAND_LEFT = 39,						// Walk back > stand, left foot first
 	LA_WALK_BACK = 40,										// Walk back (looped)
 	LA_STAND_TO_WALK_BACK = 41,								// Stand > walk back
-	LA_VAULT_TO_STAND_3CLICK = 42,							// Standing 3-click vault > stand
-	LA_VAULT_TO_STAND_3CLICK_TO_RUN = 43,					// Standing 3-click vault > run
-																// TODO: implement properly.
+	LA_VAULT_TO_STAND_3_STEPS = 42,							// Standing 3-step vault > stand
+	LA_VAULT_TO_STAND_3_STEPS_TO_RUN = 43,					// Standing 3-step vault > run
 	LA_TURN_RIGHT_FAST = 44,								// Rotate right quickly
-	LA_JUMP_FORWARD_TO_FREEFALL_OG = 45,					// Jump forward > fall
+	LA_HANG_IDLE = 45,										// Hang from ledge (looped)
 	LA_REACH_TO_FREEFALL_ALTERNATE_UNUSED = 46,				// Reach > freefall
 	LA_ROLL_180_START_ALTERNATE_UNUSED = 47,				// Standing roll 180 (1/2)
 	LA_ROLL_180_END_ALTERNATE_UNUSED = 48,					// Standing roll 180 (2/2)
 	LA_JUMP_FORWARD_TO_FREEFALL = 49,						// Jump forward > freefall
-	LA_VAULT_TO_STAND_2CLICK_START = 50,					// Standing 2-click vault > stand (1/2) 
-	LA_VAULT_TO_STAND_2CLICK_END = 51,						// Standing 2-click vault > stand (2/2) 
-	LA_VAULT_TO_STAND_2CLICK_END_TO_RUN = 52,				// Standing 2-click vault > stand (2/2) > run
+	LA_VAULT_TO_STAND_2_STEPS_START = 50,					// Standing 2-step vault > stand (1/2) 
+	LA_VAULT_TO_STAND_2_STEPS_END = 51,						// Standing 2-step vault > stand (2/2) 
+	LA_VAULT_TO_STAND_2_STEPS_END_TO_RUN = 52,				// Standing 2-step vault > stand (2/2) > run
 	LA_RUN_WALL_SMASH_LEFT = 53,							// Running smash > stand, left foot first
 	LA_RUN_WALL_SMASH_RIGHT = 54,							// Running smash > stand, right foot first
-	LA_RUN_UP_STEP_LEFT = 55,								// Run up 1-click, left foot first
-	LA_RUN_UP_STEP_RIGHT = 56,								// Run up 1-click, right foot first
-	LA_WALK_UP_STEP_LEFT = 57,								// Walk up 1-click, left foot first
-	LA_WALK_UP_STEP_RIGHT = 58,								// Walk up 1-click, right foot first
-	LA_WALK_DOWN_STEP_RIGHT = 59,							// Walk down 1-click, right foot first
-	LA_WALK_DOWN_STEP_LEFT = 60,							// Walk down 1-click, left foot first
-	LA_WALK_BACK_DOWN_LEFT = 61,							// Walk back down 1-click, left foot first
-	LA_WALK_BACK_DOWN_RIGHT = 62,							// Walk back down 1-click, right foot first
+	LA_RUN_UP_STEP_LEFT = 55,								// Run up a step, left foot first
+	LA_RUN_UP_STEP_RIGHT = 56,								// Run up a step, right foot first
+	LA_WALK_UP_STEP_LEFT = 57,								// Walk up a step, left foot first
+	LA_WALK_UP_STEP_RIGHT = 58,								// Walk up a step, right foot first
+	LA_WALK_DOWN_STEP_RIGHT = 59,							// Walk down a step, right foot first
+	LA_WALK_DOWN_STEP_LEFT = 60,							// Walk down a step, left foot first
+	LA_WALK_BACK_DOWN_LEFT = 61,							// Walk back down a step, left foot first
+	LA_WALK_BACK_DOWN_RIGHT = 62,							// Walk back down a step, right foot first
 	LA_WALLSWITCH_DOWN = 63,								// Activate horizontal wall switch
 	LA_WALLSWITCH_UP = 64,									// Deactivate horizontal wall switch
 	LA_SIDESTEP_LEFT = 65,									// Sidestep left (looped)
@@ -329,7 +328,7 @@ enum LaraAnim
 	LA_UNDERWATER_IDLE = 108,								// Underwater idle (looped)
 	LA_UNDERWARER_IDLE_TO_SWIM = 109,						// Underwater idle > swim forward underwater
 	LA_ONWATER_IDLE = 110,									// Tread water idle (looped)
-	LA_ONWATER_TO_STAND_1CLICK = 111,						// Pull up 1-click from tread > stand
+	LA_ONWATER_TO_STAND_1_STEP = 111,						// Pull up 1 step from tread > stand
 	LA_FREEFALL_DIVE = 112,									// Freefall > underwater
 	LA_ONWATER_DIVE_ALTERNATE_1_UNUSED = 113,				// Tread water > underwater
 	LA_UNDERWATER_RESURFACE = 114,							// Underwater > tread water
@@ -398,7 +397,7 @@ enum LaraAnim
 	LA_LADDER_HANG_TO_IDLE = 173,							// Ladder hang > ladder idle
 	LA_LADDER_TO_STAND = 174,								// Ladder idle > stand, pulling up
 	LA_UNKNOWN = 175,										// Pushed back?
-	LA_ONWATER_TO_WADE_0CLICK = 176,						// Tread water up 0-click > wade
+	LA_ONWATER_TO_WADE_0_STEP = 176,						// Tread water > wade
 																// TODO: implement this properly?
 	LA_WADE = 177,											// Wade (looped)
 	LA_RUN_TO_WADE_RIGHT = 178,								// Run > wade, right foot first
@@ -414,10 +413,10 @@ enum LaraAnim
 	LA_LADDER_SHIMMY_UP = 187,								// Ascend ladder hanging
 	LA_LADDER_SHIMMY_DOWN = 188,							// Descend ladder hanging
 	LA_DISCARD_FLARE = 189,									// Throw flare standing
-	LA_ONWATER_TO_WADE_1CLICK = 190,						// Tread water up 1-click > wade
-	LA_ONWATER_TO_STAND_0CLICK = 191,						// Pull up 0-click from thread > stand
+	LA_ONWATER_TO_WADE_1_STEP = 190,						// Tread water up a step > wade
+	LA_ONWATER_TO_STAND_0_STEP = 191,						// Pull up from tread > stand
 	LA_UNDERWATER_TO_STAND = 192,							// Underwater > stand
-	LA_ONWATER_TO_STAND_M1CLICK = 193,						// Pull up -1-click from tread > stand
+	LA_ONWATER_TO_STAND_M1_STEP = 193,						// Pull up on lower step from tread > stand
 	LA_LADDER_TO_HANG_DOWN = 194,							// Descend ladder > hang
 																// TODO: this links to regular hang at 96. Address this?
 	LA_SWITCH_SMALL_DOWN = 195,								// Activate small switch
@@ -574,7 +573,7 @@ enum LaraAnim
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
 	LA_POLE_TURN_CLOCKWISE_CONTINUE_UNUSED = 343,				// TODO: remove.
-	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clickwise on pole (2/2)
+	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
 	LA_POLE_TURN_COUNTER_CLOCKWISE_CONTINUE_UNUSED = 345,		// TODO: remove.
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
@@ -660,11 +659,11 @@ enum LaraAnim
 	LA_PICKUP_PEDESTAL_HIGH = 424,							// Standing pickup from high pedestal
 	LA_PICKUP_PEDESTAL_LOW = 425,							// Standing pickup from low pedestal
 	LA_SENET_ROLL = 426,									// Roll Senet sticks
-	LA_TORCH_LIGHT_1 = 427,									// Light torch with flame 0-1 clicks high
-	LA_TORCH_LIGHT_2 = 428,									// Light torch with flame 2-3 clicks high
-	LA_TORCH_LIGHT_3 = 429,									// Light torch with flame 4-5 clicks high
-	LA_TORCH_LIGHT_4 = 430,									// Light torch with flame 6-7 clicks high
-	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame higher than 7 clicks
+	LA_TORCH_LIGHT_1 = 427,									// Light torch with flame 0-1 steps high
+	LA_TORCH_LIGHT_2 = 428,									// Light torch with flame 2-3 steps high
+	LA_TORCH_LIGHT_3 = 429,									// Light torch with flame 4-5 steps high
+	LA_TORCH_LIGHT_4 = 430,									// Light torch with flame 6-7 steps high
+	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame higher than 7 steps
 	LA_DETONATOR_USE = 432,									// Use mine detonator
 	LA_CORRECT_POSITION_FRONT = 433,						// Adjust position forward
 	LA_CORRECT_POSITION_LEFT = 434,							// Adjust position left
@@ -714,16 +713,16 @@ enum LaraAnim
 	LA_LADDER_TO_CROUCH = 473,								// Pull up from ladder > crouch
 
 	// TombEngine
-	LA_VAULT_TO_CROUCH_1CLICK = 474, 						// Vault standing up 1-click > crouch
-	LA_VAULT_TO_CROUCH_2CLICK = 475,						// Vault standing up 2-click > crouch
-	LA_VAULT_TO_CROUCH_3CLICK = 476,						// Vault standing up 2-click > crouch
-	LA_CRAWL_JUMP_DOWN_1CLICK = 477,						// Jump down 1-click from crawl > stand
-	LA_CRAWL_JUMP_DOWN_23CLICK = 478,						// Jump down 2-3-click from crawl > stand
+	LA_VAULT_TO_CROUCH_1_STEP = 474, 						// Vault standing up 1 step > crouch
+	LA_VAULT_TO_CROUCH_2_STEP = 475,						// Vault standing up 2 steps > crouch
+	LA_VAULT_TO_CROUCH_3_STEP = 476,						// Vault standing up 2 steps > crouch
+	LA_CRAWL_JUMP_DOWN_1_STEP = 477,						// Jump down 1 step from crawl > stand
+	LA_CRAWL_JUMP_DOWN = 478,								// Jump down 2 steps and beyond from crawl > fall
 	LA_CRAWL_STEP_UP = 479,									// Crawl up step > crawl idle
 	LA_CRAWL_STEP_DOWN = 480,								// Crawl down step > crawl idle
-	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
-	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
-	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
+	LA_ONWATER_TO_CROUCH_1_STEP = 481,						// Pull up 1 step from tread > stand
+	LA_ONWATER_TO_CROUCH_0_STEP = 482,						// Pull up flat step from tread > stand
+	LA_ONWATER_TO_CROUCH_M1_STEP = 483,						// Pull up lower step from tread > stand
 	LA_LADDER_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
 	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
 	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)
@@ -794,7 +793,6 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 45,
 	// 245, 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
 };

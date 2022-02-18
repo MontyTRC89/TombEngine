@@ -88,7 +88,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 
-	if (item->AnimNumber == LA_REACH_TO_HANG)
+	if (item->AnimNumber == LA_HANG_IDLE)
 	{
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
@@ -169,7 +169,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	TestLaraHang(item, coll);
 
-	if (item->AnimNumber == LA_REACH_TO_HANG)
+	if (item->AnimNumber == LA_HANG_IDLE)
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -183,18 +183,14 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					coll->FrontRight.Floor >= coll->FrontRight.Ceiling)
 				{
 					if (TrInput & IN_WALK)
-					{
 						item->TargetState = LS_HANDSTAND;
-					}
 					else if (TrInput & IN_CROUCH)
 					{
 						item->TargetState = LS_HANG_TO_CRAWL;
 						item->RequiredState = LS_CROUCH_IDLE;
 					}
 					else
-					{
 						item->TargetState = LS_GRABBING;
-					}
 
 					return;
 				}
@@ -206,9 +202,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					item->TargetState = LS_HANG_TO_CRAWL;
 					item->RequiredState = LS_CROUCH_IDLE;
-
 					return;
-			}
+				}
 			}
 
 			if (info->Control.CanClimbLadder &&
@@ -216,13 +211,9 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
 				if (TestLaraClimbStance(item, coll))
-				{
 					item->TargetState = LS_LADDER_IDLE;
-				}
 				else if (TestLastFrame(item))
-				{
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
-				}
 			}
 
 			return;
@@ -234,13 +225,9 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			item->AnimNumber == LA_REACH_TO_HANG)
 		{
 			if (TestLaraClimbStance(item, coll))
-			{
 				item->TargetState = LS_LADDER_IDLE;
-			}
 			else if (TestLastFrame(item))
-			{
 				SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
-			}
 		}
 	}
 }
