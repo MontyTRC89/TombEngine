@@ -175,6 +175,16 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
+/// (int) status of object.
+// possible values:
+// 0 - not active
+// 1 - active
+// 2 - deactivated
+// 3 - invisible
+// @function Moveable:GetStatus
+// @treturn int a number representing the status of the object
+		ScriptReserved_GetStatus, &Moveable::GetStatus,
+
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
@@ -479,6 +489,11 @@ void Moveable::SetRoom(short room)
 		m_item->roomNumber = room;
 	else
 		ItemNewRoom(m_num, room);
+}
+
+short Moveable::GetStatus() const
+{
+	return m_item->status;
 }
 
 void Moveable::EnableItem()

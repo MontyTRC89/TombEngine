@@ -66,6 +66,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	short GetStatus() const;
 
 	void Init();
 
