@@ -45,6 +45,7 @@ static constexpr char const ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char const ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char const ScriptReserved_GetOCB[]				= "GetOCB";
 static constexpr char const ScriptReserved_SetOCB[]				= "SetOCB";
+static constexpr char const ScriptReserved_GetStatus[]			= "GetStatus";
 
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
