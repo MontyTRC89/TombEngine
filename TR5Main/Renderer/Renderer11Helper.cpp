@@ -249,9 +249,9 @@ namespace TEN::Renderer
 				if(j == 3)
 					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
 				},
-				[&j, &currentBone](BIGGUNINFO& biggun) {
+				[&j, &currentBone](BigGunInfo& biggun) {
 				if(j == 2)
-					currentBone->ExtraRotation.z = biggun.barrelZ;
+					currentBone->ExtraRotation.z = biggun.BarrelZRot;
 				},
 				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature) {
 				if(currentBone->ExtraRotationFlags & ROT_Y) {
