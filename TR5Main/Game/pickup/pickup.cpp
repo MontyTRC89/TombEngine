@@ -1056,7 +1056,7 @@ void SearchObjectControl(short itemNumber)
 	}
 }
 
-int UseSpecialItem(ITEM_INFO* item)
+bool UseSpecialItem(ITEM_INFO* item)
 {
 	int flag = 0;
 	int use = g_Gui.GetInventoryItemChosen();
@@ -1102,7 +1102,7 @@ int UseSpecialItem(ITEM_INFO* item)
 				flag = 2;
 			}
 			else
-				return 0;
+				return false;
 		}
 
 		if (flag)
@@ -1119,9 +1119,9 @@ int UseSpecialItem(ITEM_INFO* item)
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-			return 1;
+			return true;
 		}
 	}
 
-	return 0;
+	return false;
 }

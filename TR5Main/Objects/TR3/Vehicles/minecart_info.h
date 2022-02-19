@@ -1,6 +1,6 @@
 #pragma once
 
-struct CART_INFO 
+struct MinecartInfo 
 {
 	int Speed;
 	int MidPos;
