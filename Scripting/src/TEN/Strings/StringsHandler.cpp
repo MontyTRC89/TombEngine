@@ -1,5 +1,7 @@
 #include "frameworkandsol.h"
 #include "StringsHandler.h"
+
+#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Flow/FlowHandler.h"
 #include <Renderer/RenderEnums.h>
@@ -10,9 +12,11 @@ Scripts that will be run on game startup.
 @tentable Strings 
 @pragma nostrip
 */
+#endif
 
 StringsHandler::StringsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
+#if TEN_OPTIONAL_LUA
 	sol::table table_strings{ m_lua->lua_state(), sol::create };
 	parent.set(ScriptReserved_Strings, table_strings);
 
@@ -41,45 +45,64 @@ with a call to @{ShowString}, or this function will have no effect.
 		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
 		);
+#endif
 }
 
 std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisplayString(DisplayStringIDType id)
 {
+#if TEN_OPTIONAL_LUA
 	auto it = m_userDisplayStrings.find(id);
 	if (std::cend(m_userDisplayStrings) == it)
 		return std::nullopt;
+
 	return std::ref(m_userDisplayStrings.at(id));
+#else
+	return std::nullopt;
+#endif
 }
 
 bool StringsHandler::ScheduleRemoveDisplayString(DisplayStringIDType id)
 {
+#if TEN_OPTIONAL_LUA
 	auto it = m_userDisplayStrings.find(id);
 	if (std::cend(m_userDisplayStrings) == it)
 		return false;
 
 	it->second.m_deleteWhenZero = true;
 	return true;
+#else
+	return true;
+#endif
 }
 
 void StringsHandler::SetCallbackDrawString(CallbackDrawString cb)
 {
+#if TEN_OPTIONAL_LUA
 	m_callbackDrawSring = cb;
+#endif
 }
 
 bool StringsHandler::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
 {
+#if TEN_OPTIONAL_LUA
 	return m_userDisplayStrings.insert_or_assign(id, ds).second;
+#else
+	return true;
+#endif
 }
 
 void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> nSeconds)
 {
+#if TEN_OPTIONAL_LUA
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
 	it->second.m_isInfinite = !nSeconds.has_value();
+#endif
 }
 
 void StringsHandler::ProcessDisplayStrings(float dt)
 {
+#if TEN_OPTIONAL_LUA
 	auto it = std::begin(m_userDisplayStrings);
 	while (it != std::end(m_userDisplayStrings))
 	{
@@ -110,5 +133,6 @@ void StringsHandler::ProcessDisplayStrings(float dt)
 			++it;
 		}
 	}
+#endif
 }
 

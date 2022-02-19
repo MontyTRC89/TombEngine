@@ -1,4 +1,6 @@
 #include "frameworkandsol.h"
+
+#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Objects/Camera/Camera.h"
 #include "Position/Position.h"
@@ -88,4 +90,4 @@ void Camera::SetRoom(short room)
 {	
 	m_camera.roomNumber = room;
 }
-
+#endif

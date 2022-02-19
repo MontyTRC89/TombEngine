@@ -1,5 +1,7 @@
 #pragma once
 #include "frameworkandsol.h"
+
+#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Sink.h"
 #include "Position/Position.h"
@@ -106,3 +108,4 @@ void Sink::SetBoxIndex(int b)
 	m_sink.boxIndex = b;
 }
 
+#endif

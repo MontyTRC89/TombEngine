@@ -1,7 +1,9 @@
 #include "frameworkandsol.h"
+#include "ObjectsHandler.h"
+
+#if TEN_OPTIONAL_LUA
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
-#include "ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 #include "ObjectIDs.h"
 
@@ -10,9 +12,11 @@ Scripts that will be run on game startup.
 @tentable Objects 
 @pragma nostrip
 */
+#endif
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
+#if TEN_OPTIONAL_LUA
 	m_table_objects = sol::table{ m_lua->lua_state(), sol::create };
 	parent.set(ScriptReserved_Objects, m_table_objects);
 
@@ -93,10 +97,12 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandle
 	);
 
 	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+#endif
 }
 
 void ObjectsHandler::AssignLara()
 {
+#if TEN_OPTIONAL_LUA
 	m_table_objects.set("Lara", Moveable(Lara.itemNumber, false));
+#endif
 }
-

@@ -1,4 +1,5 @@
 #include "frameworkandsol.h"
+#if TEN_OPTIONAL_LUA
 #include "DisplayString.h"
 #include "ScriptAssert.h"
 #include "ReservedScriptNames.h"
@@ -206,4 +207,4 @@ GetItemCallback DisplayString::s_getItemCallback = [](DisplayStringIDType)
 	throw TENScriptException(err);
 	return std::nullopt;
 };
-
+#endif

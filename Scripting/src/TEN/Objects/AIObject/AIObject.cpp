@@ -1,5 +1,6 @@
 #pragma once
 #include "frameworkandsol.h"
+#if TEN_OPTIONAL_LUA
 #include "Objects/AIObject/AIObject.h"
 #include "ScriptAssert.h"
 #include "Position/Position.h"
@@ -158,4 +159,4 @@ void AIObject::SetBoxNumber(short bn)
 {
 	m_aiObject.boxNumber = bn;
 }
-
+#endif
