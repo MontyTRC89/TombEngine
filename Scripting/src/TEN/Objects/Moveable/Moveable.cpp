@@ -1,4 +1,6 @@
 #include "frameworkandsol.h"
+
+#ifdef TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Moveable.h"
 #include "ScriptUtil.h"
@@ -565,4 +567,4 @@ void Moveable::MakeInvisible()
 		}
 	}
 }
-
+#endif

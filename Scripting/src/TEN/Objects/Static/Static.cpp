@@ -1,5 +1,6 @@
 #pragma once
 #include "frameworkandsol.h"
+#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Static.h"
 #include "Position/Position.h"
@@ -155,3 +156,4 @@ void Static::SetColor(ScriptColor const & col)
 {
 	m_mesh.color = col;
 }
+#endif
