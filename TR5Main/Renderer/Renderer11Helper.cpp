@@ -205,15 +205,17 @@ namespace TEN::Renderer
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
-					[&j, &currentBone](QUAD_INFO& quad) {
-					if(j == 3 || j == 4) {
-						currentBone->ExtraRotation.x = TO_RAD(quad.rearRot);
-					} else if(j == 6 || j == 7) {
-						currentBone->ExtraRotation.x = TO_RAD(quad.frontRot);
-					}
+					[&j, &currentBone](QuadInfo& quad)
+				{
+					if (j == 3 || j == 4)
+						currentBone->ExtraRotation.x = TO_RAD(quad.RearRot);
+					else if (j == 6 || j == 7)
+						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
 				},
-				[&j, &currentBone](JEEP_INFO& jeep) {
-					switch(j) {
+				[&j, &currentBone](JEEP_INFO& jeep)
+				{
+					switch(j)
+					{
 					case 9:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
 						break;
@@ -231,40 +233,49 @@ namespace TEN::Renderer
 						break;
 					}
 				},
-				[&j, &currentBone](MOTORBIKE_INFO& bike) {
-				switch(j) {
+				[&j, &currentBone](MOTORBIKE_INFO& bike)
+				{
+				switch (j)
+				{
 					case 2:
 					case 4:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
 						break;
 					case 10:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
-					}
+				}
 				},
-				[&j, &currentBone](RUBBER_BOAT_INFO& boat) {
-				if(j == 2)
+				[&j, &currentBone](RUBBER_BOAT_INFO& boat)
+				{
+				if (j == 2)
 					currentBone->ExtraRotation.z = TO_RAD(boat.propRot);
 				},
-				[&j, &currentBone](SUB_INFO& upv) {
-				if(j == 3)
+				[&j, &currentBone](SUB_INFO& upv)
+				{
+				if (j == 3)
 					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
 				},
-				[&j, &currentBone](BigGunInfo& biggun) {
-				if(j == 2)
+				[&j, &currentBone](BigGunInfo& biggun)
+				{
+				if (j == 2)
 					currentBone->ExtraRotation.z = biggun.BarrelZRot;
 				},
-				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature) {
-				if(currentBone->ExtraRotationFlags & ROT_Y) {
+				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature)
+				{
+				if (currentBone->ExtraRotationFlags & ROT_Y)
+				{
 					currentBone->ExtraRotation.y = TO_RAD(creature.jointRotation[lastJoint]);
 					lastJoint++;
 				}
 
-				if(currentBone->ExtraRotationFlags & ROT_X) {
+				if (currentBone->ExtraRotationFlags & ROT_X)
+				{
 					currentBone->ExtraRotation.x = TO_RAD(creature.jointRotation[lastJoint]);
 					lastJoint++;
 				}
 
-				if(currentBone->ExtraRotationFlags & ROT_Z) {
+				if (currentBone->ExtraRotationFlags & ROT_Z)
+				{
 					currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
 					lastJoint++;
 				}
@@ -285,7 +296,8 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::UpdateItemsAnimations(RenderView& view) {
+	void Renderer11::UpdateItemsAnimations(RenderView& view)
+	{
 		Matrix translation;
 		Matrix rotation;
 
@@ -304,14 +316,13 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::FromTrAngle(Matrix *matrix, short *frameptr, int index) {
+	void Renderer11::FromTrAngle(Matrix *matrix, short *frameptr, int index)
+	{
 		short *ptr = &frameptr[0];
 
 		ptr += 9;
 		for (int i = 0; i < index; i++)
-		{
 			ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
-		}
 
 		int rot0 = *ptr++;
 		int frameMode = (rot0 & 0xc000);

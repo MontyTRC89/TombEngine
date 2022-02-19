@@ -45,7 +45,7 @@ class ITEM_DATA {
 		ITEM_INFO*,
 		CREATURE_INFO,
 		LASER_HEAD_INFO,
-		QUAD_INFO,
+		QuadInfo,
 		BigGunInfo,
 		MOTORBIKE_INFO,
 		JEEP_INFO,
@@ -59,7 +59,7 @@ class ITEM_DATA {
 		WRAITH_INFO,
 		RUBBER_BOAT_INFO,
 		PUSHABLE_INFO,
-		CART_INFO
+		MinecartInfo
 	> data;
 	public:
 	ITEM_DATA();
