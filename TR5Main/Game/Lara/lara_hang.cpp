@@ -14,43 +14,6 @@
 
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
-void SetCornerAnim(ITEM_INFO* item, COLL_INFO* coll, bool flip)
-{
-	auto* info = GetLaraInfo(item);
-
-	if (item->HitPoints <= 0)
-	{
-		SetAnimation(item, LA_FALL_START);
-
-		item->Airborne = true;
-		item->Velocity = 2;
-		item->Position.yPos += STEP_SIZE;
-		item->VerticalVelocity = 1;
-
-		info->Control.HandStatus = HandStatus::Free;
-
-		item->Position.yRot += info->NextCornerPos.yRot / 2;
-		return;
-	}
-
-	if (flip)
-	{
-		if (info->Control.IsClimbingLadder)
-		{
-			SetAnimation(item, LA_LADDER_IDLE);
-		}
-		else
-		{
-			SetAnimation(item, LA_REACH_TO_HANG, 21);
-		}
-
-		coll->Setup.OldPosition.x = item->Position.xPos = info->NextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->Position.yPos = info->NextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->Position.zPos = info->NextCornerPos.zPos;
-		item->Position.yRot = info->NextCornerPos.yRot;
-	}
-}
-
 /*normal hanging and shimmying*/
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
@@ -175,9 +138,10 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			if (coll->Front.Floor > -850 && TestValidLedge(item, coll) && !coll->HitStatic)
+			if (coll->Front.Floor > -(CLICK(3.5f) - 46) &&
+				TestValidLedge(item, coll) && !coll->HitStatic)
 			{
-				if (coll->Front.Floor < -650 &&
+				if (coll->Front.Floor < -(CLICK(2.5f) + 10) &&
 					coll->Front.Floor >= coll->Front.Ceiling &&
 					coll->FrontLeft.Floor >= coll->FrontLeft.Ceiling &&
 					coll->FrontRight.Floor >= coll->FrontRight.Ceiling)
@@ -195,10 +159,10 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 					return;
 				}
 
-				if (coll->Front.Floor < -650 &&
-					coll->Front.Floor - coll->Front.Ceiling >= -256 &&
-					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -256 &&
-					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -256)
+				if (coll->Front.Floor < -(CLICK(2.5f) + 10) &&
+					coll->Front.Floor - coll->Front.Ceiling >= -CLICK(1) &&
+					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling >= -CLICK(1) &&
+					coll->FrontRight.Floor - coll->FrontRight.Ceiling >= -CLICK(1))
 				{
 					item->TargetState = LS_HANG_TO_CRAWL;
 					item->RequiredState = LS_CROUCH_IDLE;
@@ -207,7 +171,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 
 			if (info->Control.CanClimbLadder &&
-				coll->Middle.Ceiling <= -256 &&
+				coll->Middle.Ceiling <= -CLICK(1) &&
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
 				if (TestLaraClimbStance(item, coll))
@@ -221,8 +185,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_BACK &&
 			info->Control.CanClimbLadder &&
-			coll->Middle.Floor > 344 &&
-			item->AnimNumber == LA_REACH_TO_HANG)
+			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
+			item->AnimNumber == LA_HANG_IDLE)
 		{
 			if (TestLaraClimbStance(item, coll))
 				item->TargetState = LS_LADDER_IDLE;
@@ -241,6 +205,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Mode = CollProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
+
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
 		item->TargetState = LS_HANG;
 }
@@ -251,10 +216,11 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RAD;
+
 	TestLaraHang(item, coll);
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
@@ -266,6 +232,7 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Mode = CollProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
+
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
 		item->TargetState = LS_HANG;
 }
@@ -299,5 +266,5 @@ void lara_as_corner(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnim(item, coll, TestLastFrame(item));
+	SetCornerAnimation(item, coll, TestLastFrame(item));
 }

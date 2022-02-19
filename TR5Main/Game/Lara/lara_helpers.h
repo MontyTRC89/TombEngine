@@ -1,9 +1,9 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
-struct LaraInfo;
 struct ITEM_INFO;
 struct COLL_INFO;
+struct LaraInfo;
 struct VaultTestResult;
 
 // -----------------------------
@@ -32,6 +32,7 @@ void SetLaraFallBackState(ITEM_INFO* item);
 void SetLaraMonkeyFallState(ITEM_INFO* item);
 void SetLaraMonkeyRelease(ITEM_INFO* item);
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll);
+void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip);
 
 void ResetLaraLean(ITEM_INFO* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
