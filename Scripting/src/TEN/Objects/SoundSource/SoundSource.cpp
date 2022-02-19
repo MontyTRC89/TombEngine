@@ -1,4 +1,6 @@
 #include "frameworkandsol.h"
+
+#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "SoundSource.h"
 #include "Position/Position.h"
@@ -101,3 +103,4 @@ void SoundSource::SetFlags(int flags)
 {	
 	m_soundSource.flags = flags;
 }
+#endif
