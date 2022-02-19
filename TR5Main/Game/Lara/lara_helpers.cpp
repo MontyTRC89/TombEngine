@@ -33,8 +33,9 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 	if (!item->Velocity)
 		return;
 
-	rate = abs(rate);
 	int sign = copysign(1, maxAngle);
+
+	rate = abs(rate);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
 		item->Position.zRot += std::min<short>(rate, abs((maxAngle * 3) / 5 - item->Position.zRot) / 3) * sign;
@@ -337,6 +338,39 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSnapToHeight(item, coll);
 	info->Control.MoveAngle = direction;
 	oldAngle = direction;
+}
+
+void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
+{
+	auto* info = GetLaraInfo(item);
+
+	if (item->HitPoints <= 0)
+	{
+		SetAnimation(item, LA_FALL_START);
+
+		item->Airborne = true;
+		item->Velocity = 2;
+		item->Position.yPos += STEP_SIZE;
+		item->VerticalVelocity = 1;
+
+		info->Control.HandStatus = HandStatus::Free;
+
+		item->Position.yRot += info->NextCornerPos.yRot / 2;
+		return;
+	}
+
+	if (flip)
+	{
+		if (info->Control.IsClimbingLadder)
+			SetAnimation(item, LA_LADDER_IDLE);
+		else
+			SetAnimation(item, LA_HANG_IDLE);
+
+		coll->Setup.OldPosition.x = item->Position.xPos = info->NextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->Position.yPos = info->NextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->Position.zPos = info->NextCornerPos.zPos;
+		item->Position.yRot = info->NextCornerPos.yRot;
+	}
 }
 
 void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)

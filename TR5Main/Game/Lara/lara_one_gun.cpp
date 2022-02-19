@@ -56,29 +56,13 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		PHD_VECTOR pos;
 
 		if (SmokeWeapon == WEAPON_HK)
-		{
-			pos.x = 0;
-			pos.y = 228;
-			pos.z = 96;
-		}
+			pos = { 0, 228, 96 };
 		else if (SmokeWeapon == WEAPON_SHOTGUN)
-		{
-			pos.x = 0;
-			pos.y = 228;
-			pos.z = 0;
-		}
+			pos = { 0, 228, 0 };
 		else if (SmokeWeapon == WEAPON_GRENADE_LAUNCHER)
-		{
-			pos.x = 0;
-			pos.y = 180;
-			pos.z = 80;
-		}
+			pos = { 0, 180, 80 };
 		else if (SmokeWeapon == WEAPON_ROCKET_LAUNCHER)
-		{
-			pos.x = 0;
-			pos.y = 84;
-			pos.z = 72;
-		}
+			pos = { 0, 84, 72 };
 
 		GetLaraJointPosition(&pos, LM_RHAND);
 
@@ -135,6 +119,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon(laraItem);
+
 						if (!(laraInfo->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
@@ -205,12 +190,12 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				!harpoonFired)
 			{
 				if (TrInput & IN_ACTION &&
-					(!laraInfo->target ||
-						laraInfo->LeftArm.Locked))
+					(!laraInfo->target || laraInfo->LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon(laraItem);
+
 						if (!(laraInfo->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
@@ -491,7 +476,6 @@ void FireHarpoon(ITEM_INFO* laraItem)
 		}
 
 		item->Position.zRot = 0;
-
 		item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot);
 		item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot);
 		item->HitPoints = HARPOON_TIME;
