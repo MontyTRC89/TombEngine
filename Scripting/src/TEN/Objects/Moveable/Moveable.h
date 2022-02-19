@@ -11,6 +11,8 @@ class Rotation;
 struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
+using aiBitsArray = std::array<int, 7>;
+using aiBitsType = sol::as_table_t<aiBitsArray>;
 
 class Moveable : public NamedBase<Moveable, short>
 {
@@ -48,8 +50,8 @@ public:
 	short GetOCB() const;
 	void SetOCB(short ocb);
 
-	byte GetAIBits() const;
-	void SetAIBits(byte bits);
+	aiBitsType GetAIBits() const;
+	void SetAIBits(aiBitsType const & bits);
 
 	bool GetHitStatus() const;
 	void SetHitStatus(bool status);

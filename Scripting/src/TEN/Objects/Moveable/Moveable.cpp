@@ -113,15 +113,15 @@ out of scope).
 
 template <bool temp> static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
-	std::string name,
-	Position pos,
-	Rotation rot,
+	std::string const & name,
+	Position const & pos,
+	Rotation const & rot,
 	short room,
 	int animNumber,
 	int frameNumber,
 	short hp,
 	short ocb,
-	byte aiBits,
+	aiBitsType const & aiBits,
 	bool active,
 	bool hitStatus
 )
@@ -245,6 +245,13 @@ void Moveable::Register(sol::table & parent)
 
 /// (int) AIBits of object. Will be clamped to [0, 255]
 // @mem AIBits
+// 1 - none
+// 2 - guard
+// 3 - ambush
+// 4 - patrol 1
+// 5 - modify
+// 6 - follow
+// 7 - patrol 2
 		"AIBits", sol::property(&Moveable::GetAIBits, &Moveable::SetAIBits),
 
 /// (bool) hit status of object
@@ -388,14 +395,26 @@ void Moveable::SetOCB(short ocb)
 	m_item->triggerFlags = ocb;
 }
 
-byte Moveable::GetAIBits() const
+aiBitsType Moveable::GetAIBits() const
 {
-	return m_item->aiBits;
+	static_assert(63 == ALL_AIOBJ);
+
+	aiBitsArray ret{};
+	for (int i = 0; i < ret.size(); ++i)
+	{
+		uint8_t isSet = m_item->aiBits & (1 << i);
+		ret[i] = static_cast<int>( isSet > 0);
+	}
+	return ret;
 }
 
-void Moveable::SetAIBits(byte bits)
+void Moveable::SetAIBits(aiBitsType const & bits)
 {
-	m_item->aiBits = bits;
+	for (int i = 0; i < bits.value().size(); ++i)
+	{
+		uint8_t isSet = bits.value()[i] > 0;
+		m_item->aiBits |= isSet << i;
+	}
 }
 
 int Moveable::GetAnimNumber() const
