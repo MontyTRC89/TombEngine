@@ -1,18 +1,24 @@
 #pragma once
 
-struct QUAD_INFO 
+struct QuadInfo 
 {
-	int velocity;
-	short frontRot;
-	short rearRot;
-	int revs;
-	int engineRevs;
-	short trackMesh;
-	int turnRate;
-	int leftFallspeed;
-	int rightFallspeed;
-	short momentumAngle;
-	short extraRotation;
-	int pitch;
-	char flags;
+	short TurnRate;
+	short FrontRot;
+	short RearRot;
+	short ExtraRotation;
+	short MomentumAngle;
+
+	int Velocity;
+	int LeftVerticalVelocity;
+	int RightVerticalVelocity;
+
+	int Revs;
+	int EngineRevs;
+	int Pitch;
+
+	char Flags;
+	int SmokeStart;
+	bool CanStartDrift;
+	bool DriftStarting;
+	bool NoDismount;
 };

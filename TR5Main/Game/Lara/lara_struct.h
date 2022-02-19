@@ -1136,16 +1136,16 @@ struct LaraCountData
 
 struct LaraControlData
 {
+	WeaponControlData WeaponControl;
+	RopeControlData RopeControl;
+	TightropeControlData TightropeControl;
+
 	short MoveAngle;
 	short TurnRate;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
 	WaterStatus WaterStatus;
-
-	WeaponControlData WeaponControl;
-	RopeControlData RopeControl;
-	TightropeControlData TightropeControl;
 
 	bool CanLook;
 	bool IsMoving;
