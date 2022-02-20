@@ -16,9 +16,10 @@ struct QuadInfo
 	int EngineRevs;
 	int Pitch;
 
-	char Flags;
 	int SmokeStart;
 	bool CanStartDrift;
 	bool DriftStarting;
 	bool NoDismount;
+
+	char Flags;
 };

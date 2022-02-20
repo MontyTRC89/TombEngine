@@ -28,7 +28,7 @@
 
 #define ACCELERATION		0x40000
 #define FRICTION			0x18000
-#define MAX_SPEED			0x400000
+#define MAX_VELOCITY		0x400000
 #define ROT_ACCELERATION	0x400000
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
@@ -460,7 +460,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVInfo->RotX -= WALLDEFLECT;
 		else
 		{
-			if (abs(UPVInfo->Vel) >= MAX_SPEED)
+			if (abs(UPVInfo->Vel) >= MAX_VELOCITY)
 			{
 				laraItem->TargetState = UPV_STATE_HIT;
 				UPVInfo->Vel = -UPVInfo->Vel / 2;
@@ -796,10 +796,10 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVInfo->Vel = 0;
 	}
 
-	if (UPVInfo->Vel > MAX_SPEED)
-		UPVInfo->Vel = MAX_SPEED;
-	else if (UPVInfo->Vel < -MAX_SPEED)
-		UPVInfo->Vel = -MAX_SPEED;
+	if (UPVInfo->Vel > MAX_VELOCITY)
+		UPVInfo->Vel = MAX_VELOCITY;
+	else if (UPVInfo->Vel < -MAX_VELOCITY)
+		UPVInfo->Vel = -MAX_VELOCITY;
 
 	if (UPVInfo->Rot > 0)
 	{
