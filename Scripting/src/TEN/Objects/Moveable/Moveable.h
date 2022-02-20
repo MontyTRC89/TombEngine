@@ -54,7 +54,6 @@ public:
 	void SetAIBits(aiBitsType const & bits);
 
 	bool GetHitStatus() const;
-	void SetHitStatus(bool status);
 
 	bool GetActive() const;
 	void SetActive(bool active);
