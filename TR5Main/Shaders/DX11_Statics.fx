@@ -1,7 +1,7 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
 
-cbuffer StaticMatrixBuffer : register(b1)
+cbuffer StaticMatrixBuffer : register(b8)
 {
 	float4x4 World;
 	float4 Position;

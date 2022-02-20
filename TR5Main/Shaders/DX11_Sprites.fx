@@ -5,7 +5,7 @@ cbuffer MiscBuffer : register(b3)
 	int AlphaTest;
 };
 
-cbuffer SpriteBuffer: register(b4) {
+cbuffer SpriteBuffer: register(b9) {
 	float4x4 billboardMatrix;
 	float4 color;
 	bool isBillboard;

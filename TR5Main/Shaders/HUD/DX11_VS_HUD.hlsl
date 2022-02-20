@@ -1,5 +1,5 @@
 #include "./../VertexInput.hlsli"
-cbuffer HUDBuffer : register(b0)
+cbuffer HUDBuffer : register(b10)
 {
 	float4x4 View;
 	float4x4 Projection;

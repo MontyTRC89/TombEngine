@@ -53,11 +53,17 @@ enum BLEND_MODES
 	NUM_BLENDMODES
 };
 
-enum RENDERER_CULLMODE
+enum CULL_MODES
 {
-	CULLMODE_NONE,
-	CULLMODE_CW,
-	CULLMODE_CCW
+	CULL_MODE_NONE,
+	CULL_MODE_CW,
+	CULL_MODE_CCW
+};
+
+enum DEPTH_STATES
+{
+	DEPTH_STATE_WRITE_ZBUFFER,
+	DEPTH_STATE_READ_ONLY_ZBUFFER
 };
 
 enum RENDERER_BLENDSTATE
@@ -118,24 +124,40 @@ enum ConstantBufferRegister
 	AnimatedTexturesBuffer = 6
 };
 
-enum TextureRegister
+enum TEXTURE_REGISTERS
 {
-	MainTexture = 0,
-	NormalMapTexture = 1,
-	CausticsTexture = 2,
-	ShadowMapTexture = 3,
-	ReflectionMapTexture = 4,
+	TEXTURE_COLOR_MAP = 0,
+	TEXTURE_NORMAL_MAP = 1,
+	TEXTURE_CAUSTICS = 2,
+	TEXTURE_SHADOW_MAP = 3,
+	TEXTURE_REFLECTION_MAP = 4,
 };
 
-enum SamplerStateType
+enum SAMPLER_STATES
 {
-	None = 0,
-	PointWrap = 1,
-	LinearWrap = 2,
-	LinearClamp = 3,
-	AnisotropicWrap = 4,
-	AnisotropicClamp = 5,
-	ShadowMap = 6
+	SAMPLER_NONE = 0,
+	SAMPLER_POINT_WRAP = 1,
+	SAMPLER_LINEAR_WRAP = 2,
+	SAMPLER_LINEAR_CLAMP = 3,
+	SAMPLER_ANISOTROPIC_WRAP = 4,
+	SAMPLER_ANISOTROPIC_CLAMP = 5,
+	SAMPLER_SHADOW_MAP = 6
+};
+
+enum CONSTANT_BUFFERS
+{
+	CB_CAMERA = 0,
+	CB_ITEM = 1,
+	CB_LIGHTS = 2,
+	CB_MISC = 3,
+	CB_SHADOW_LIGHT = 4,
+	CB_ROOM = 5,
+	CB_ANIMATED_TEXTURES = 6,
+	CB_POSTPROCESS = 7,
+	CB_STATIC = 8,
+	CB_SPRITE = 9,
+	CB_HUD = 10,
+	CB_HUD_BAR = 11
 };
 
 constexpr auto TEXTURE_HEIGHT = 256;

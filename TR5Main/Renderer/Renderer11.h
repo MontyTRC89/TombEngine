@@ -435,9 +435,18 @@ namespace TEN::Renderer
 
 		// Misc
 		int m_pickupRotation = 0;
-		
+
+		// Caching state changes
+		TextureBase* lastTexture;
+		BLEND_MODES lastBlendMode;
+		DEPTH_STATES lastDepthState;
+		CULL_MODES lastCullMode;
+
 		// Private functions
-		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType);
+		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
+		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
+		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
+		
 		void DrawAllStrings();
 		void FromTrAngle(Matrix* matrix, short* frameptr, int index);
 		void BuildHierarchy(RendererObject* obj);
@@ -527,6 +536,8 @@ namespace TEN::Renderer
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
 		void SetBlendMode(BLEND_MODES blendMode);
+		void SetDepthState(DEPTH_STATES depthState);
+		void SetCullMode(CULL_MODES cullMode);
 		float CalculateFrameRate();
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);

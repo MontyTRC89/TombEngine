@@ -1,6 +1,6 @@
 #include "./../VertexInput.hlsli"
 #include "./../Math.hlsli"
-cbuffer HUDBarBuffer : register(b0)
+cbuffer HUDBarBuffer : register(b11)
 {
 	float Percent;
 	int Poisoned;
