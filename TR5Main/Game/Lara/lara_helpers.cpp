@@ -485,7 +485,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yRot += info->Control.TurnRate;
 }
 
-void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
+bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
@@ -494,49 +494,44 @@ void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 		switch (g_Level.Items[info->Vehicle].ObjectNumber)
 		{
 		case ID_QUAD:
-			if (QuadBikeControl(item, coll))
-				return;
+			QuadBikeControl(item, coll);
 			break;
 
 		case ID_JEEP:
-			if (JeepControl())
-				return;
+			JeepControl();
 			break;
 
 		case ID_MOTORBIKE:
-			if (MotorbikeControl())
-				return;
+			MotorbikeControl();
 			break;
 
 		case ID_KAYAK:
-			if (KayakControl(item))
-				return;
+			KayakControl(item);
 			break;
 
 		case ID_SNOWMOBILE:
-			if (SkidooControl(item, coll))
-				return;
+			SkidooControl(item, coll);
 			break;
 
 		case ID_UPV:
-			if (SubControl(item, coll))
-				return;
+			SubControl(item, coll);
 			break;
 
 		case ID_MINECART:
-			if (MineCartControl())
-				return;
+			MineCartControl();
 			break;
 
 		case ID_BIGGUN:
-			if (BigGunControl(item, coll))
-				return;
+			BigGunControl(item, coll);
 			break;
 
 		// Boats are processed like normal items in loop.
 		default:
 			LaraGun(item);
-			return;
 		}
+
+		return true;
 	}
+
+	return false;
 }
