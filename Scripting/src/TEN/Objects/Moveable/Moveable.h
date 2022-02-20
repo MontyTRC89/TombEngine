@@ -11,7 +11,7 @@ class Rotation;
 struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
 
-using aiBitsArray = std::array<int, 7>;
+using aiBitsArray = std::array<int, 6>;
 using aiBitsType = sol::as_table_t<aiBitsArray>;
 
 class Moveable : public NamedBase<Moveable, short>
