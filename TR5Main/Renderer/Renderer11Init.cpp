@@ -21,6 +21,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	CoInitialize(NULL);
 
+
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
@@ -206,10 +207,10 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	sd.BufferDesc.RefreshRate.Denominator = 0;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.Windowed = windowed;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.Flags = 0;
 	sd.OutputWindow = handle;
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
@@ -224,17 +225,9 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	ComPtr<IDXGIFactory> dxgiFactory;
 	Utils::throwIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), &dxgiFactory));
 
-	if (reset)
-	{
-		// Always return to windowed mode otherwise crash will happen
-		m_swapChain->SetFullscreenState(false, NULL);
-	}
-
 	Utils::throwIfFailed(dxgiFactory->CreateSwapChain(m_device.Get(), &sd, &m_swapChain));
 
-
 	dxgiFactory->MakeWindowAssociation(handle, 0);
-	res = m_swapChain->SetFullscreenState(!windowed, NULL);
 
 	// Initialise the back buffer
 	m_backBufferTexture = NULL;
@@ -281,45 +274,6 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_reflectionCubemap = RenderTargetCube(m_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	// Shadow map
-	/*D3D11_TEXTURE2D_DESC depthTexDesc;
-	ZeroMemory(&depthTexDesc, sizeof(D3D11_TEXTURE2D_DESC));
-	depthTexDesc.Width = SHADOW_MAP_SIZE;
-	depthTexDesc.Height = SHADOW_MAP_SIZE;
-	depthTexDesc.MipLevels = 1;
-	depthTexDesc.ArraySize = 1;
-	depthTexDesc.SampleDesc.Count = 1;
-	depthTexDesc.SampleDesc.Quality = 0;
-	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	depthTexDesc.CPUAccessFlags = 0;
-	depthTexDesc.MiscFlags = 0;
-
-	res = m_device->CreateTexture2D(&depthTexDesc, NULL, &m_shadowMapTexture);
-	if (FAILED(res))
-		return false;
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-	dsvDesc.Format = depthTexDesc.Format;
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Texture2D.MipSlice = 0;
-
-	m_shadowMapDSV = NULL;
-	res = m_device->CreateDepthStencilView(m_shadowMapTexture, &dsvDesc, &m_shadowMapDSV);
-	if (FAILED(res))
-		return false;
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
-	shaderDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderDesc.Texture2D.MostDetailedMip = 0;
-	shaderDesc.Texture2D.MipLevels = 1;
-
-	res = m_device->CreateShaderResourceView(m_shadowMapTexture, &shaderDesc, &m_shadowMapRV);
-	if (FAILED(res))
-		return false;*/
 
 	// Initialise viewport
 	m_viewport.TopLeftX = 0;
@@ -339,17 +293,19 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	m_viewportToolkit = Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
-	if (windowed)
+	if (!windowed)
 	{
-		SetWindowLong(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, g_Configuration.Width, g_Configuration.Height,
-			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		SetWindowLongPtr(handle, GWL_STYLE, 0);
+		SetWindowLongPtr(handle, GWL_EXSTYLE, WS_EX_TOPMOST);
+		SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		ShowWindow(handle, SW_SHOWMAXIMIZED);
 	}
 	else
 	{
-		SetWindowLong(WindowsHandle, GWL_STYLE, WS_POPUPWINDOW);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0,
-			SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		SetWindowLongPtr(handle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowLongPtr(handle, GWL_EXSTYLE, 0);
+		ShowWindow(handle, SW_SHOWNORMAL);
+		SetWindowPos(handle, HWND_TOP, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 	UpdateWindow(handle);
