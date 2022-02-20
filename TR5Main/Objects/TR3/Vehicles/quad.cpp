@@ -59,7 +59,7 @@ using namespace TEN::Math::Random;
 #define MAX_MOMENTUM_TURN ANGLE(1.5f)
 #define QUAD_MAX_MOM_TURN ANGLE(150.0f)
 
-#define QUAD_MAX_HEIGHT STEP_SIZE
+#define QUAD_MAX_HEIGHT CLICK(1)
 #define QUAD_MIN_BOUNCE (MAX_VELOCITY / 2) / 256
 
 // TODO: Common controls for all vehicles + unique settings page to set them. @Sezz 2021.11.14
@@ -361,13 +361,13 @@ static void QuadBaddieCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 					int y = quadItem->Position.yPos - item->Position.yPos;
 					int z = quadItem->Position.zPos - item->Position.zPos;
 
-					if (x > -4096 && x < 4096 &&
-						z > -4096 && z < 4096 &&
-						y > -4096 && y < 4096)
+					if (x > -CLICK(8) && x < CLICK(8) &&
+						z > -CLICK(8) && z < CLICK(8) &&
+						y > -CLICK(8) && y < CLICK(8))
 					{
 						if (TestBoundsCollide(item, quadItem, QUAD_RADIUS))
 						{
-							DoLotsOfBlood(item->Position.xPos, quadItem->Position.yPos - STEP_SIZE, item->Position.zPos, quadItem->VerticalVelocity, quadItem->Position.yRot, item->RoomNumber, 3);
+							DoLotsOfBlood(item->Position.xPos, quadItem->Position.yPos - CLICK(1), item->Position.zPos, quadItem->VerticalVelocity, quadItem->Position.yRot, item->RoomNumber, 3);
 							item->HitPoints = 0;
 						}
 					}
@@ -477,7 +477,7 @@ static int DoQuadShift(ITEM_INFO* quadItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		z = 0;
 
 		probe = GetCollisionResult(old->x, pos->y, pos->z, quadItem->RoomNumber);
-		if (probe.Position.Floor < (old->y - STEP_SIZE))
+		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
 				z = -shiftZ - 1;
@@ -486,7 +486,7 @@ static int DoQuadShift(ITEM_INFO* quadItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		}
 
 		probe = GetCollisionResult(pos->x, pos->y, old->z, quadItem->RoomNumber);
-		if (probe.Position.Floor < (old->y - STEP_SIZE))
+		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
 				x = -shiftX - 1;
@@ -698,27 +698,27 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 
 	PHD_VECTOR fl;
 	int heightFrontLeft = TestQuadHeight(quadItem, QUAD_FRONT, -QUAD_SIDE, &fl);
-	if (heightFrontLeft < oldFrontLeft.y - STEP_SIZE)
+	if (heightFrontLeft < (oldFrontLeft.y - CLICK(1)))
 		rot = DoQuadShift(quadItem, &fl, &oldFrontLeft);
 
 	PHD_VECTOR mtl;
 	int hmtl = TestQuadHeight(quadItem, QUAD_FRONT / 2, -QUAD_SIDE, &mtl);
-	if (hmtl < mtlOld.y - STEP_SIZE)
+	if (hmtl < (mtlOld.y - CLICK(1)))
 		DoQuadShift(quadItem, &mtl, &mtlOld);
 
 	PHD_VECTOR mml;
 	int hmml = TestQuadHeight(quadItem, 0, -QUAD_SIDE, &mml);
-	if (hmml < mmlOld.y - STEP_SIZE)
+	if (hmml < (mmlOld.y - CLICK(1)))
 		DoQuadShift(quadItem, &mml, &mmlOld);
 
 	PHD_VECTOR mbl;
 	int hmbl = TestQuadHeight(quadItem, -QUAD_FRONT / 2, -QUAD_SIDE, &mbl);
-	if (hmbl < moldBottomLeft.y - STEP_SIZE)
+	if (hmbl < (moldBottomLeft.y - CLICK(1)))
 		DoQuadShift(quadItem, &mbl, &moldBottomLeft);
 
 	PHD_VECTOR bl;
 	int heightBackLeft = TestQuadHeight(quadItem, -QUAD_FRONT, -QUAD_SIDE, &bl);
-	if (heightBackLeft < oldBottomLeft.y - STEP_SIZE)
+	if (heightBackLeft < (oldBottomLeft.y - CLICK(1)))
 	{
 		rotAdd = DoQuadShift(quadItem, &bl, &oldBottomLeft);
 		if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
@@ -727,7 +727,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 
 	PHD_VECTOR fr;
 	int heightFrontRight = TestQuadHeight(quadItem, QUAD_FRONT, QUAD_SIDE, &fr);
-	if (heightFrontRight < oldFrontRight.y - STEP_SIZE)
+	if (heightFrontRight < (oldFrontRight.y - CLICK(1)))
 	{
 		rotAdd = DoQuadShift(quadItem, &fr, &oldFrontRight);
 		if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
@@ -736,22 +736,22 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 
 	PHD_VECTOR mtr;
 	int hmtr = TestQuadHeight(quadItem, QUAD_FRONT / 2, QUAD_SIDE, &mtr);
-	if (hmtr < (mtrOld.y - STEP_SIZE))
+	if (hmtr < (mtrOld.y - CLICK(1)))
 		DoQuadShift(quadItem, &mtr, &mtrOld);
 
 	PHD_VECTOR mmr;
 	int hmmr = TestQuadHeight(quadItem, 0, QUAD_SIDE, &mmr);
-	if (hmmr < (mmrOld.y - STEP_SIZE))
+	if (hmmr < (mmrOld.y - CLICK(1)))
 		DoQuadShift(quadItem, &mmr, &mmrOld);
 
 	PHD_VECTOR mbr;
 	int hmbr = TestQuadHeight(quadItem, -QUAD_FRONT / 2, QUAD_SIDE, &mbr);
-	if (hmbr < (moldBottomRight.y - STEP_SIZE))
+	if (hmbr < (moldBottomRight.y - CLICK(1)))
 		DoQuadShift(quadItem, &mbr, &moldBottomRight);
 
 	PHD_VECTOR br;
 	int heightBackRight = TestQuadHeight(quadItem, -QUAD_FRONT, QUAD_SIDE, &br);
-	if (heightBackRight < (oldBottomRight.y - STEP_SIZE))
+	if (heightBackRight < (oldBottomRight.y - CLICK(1)))
 	{
 		rotAdd = DoQuadShift(quadItem, &br, &oldBottomRight);
 		if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
@@ -759,7 +759,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	}
 
 	probe = GetCollisionResult(quadItem);
-	if (probe.Position.Floor < quadItem->Position.yPos - STEP_SIZE)
+	if (probe.Position.Floor < quadItem->Position.yPos - CLICK(1))
 		DoQuadShift(quadItem, (PHD_VECTOR*)&quadItem->Position, &old);
 
 	quadInfo->ExtraRotation = rot;
@@ -981,6 +981,7 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 {
 	auto* quadInfo = (QuadInfo*)quadItem->Data;
+
 	bool drive = false; // Never changes?
 
 	if (!(TrInput & QUAD_IN_DRIFT) &&
@@ -1005,7 +1006,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 			quadInfo->Revs = 0;
 	}
 
-	if (quadItem->Position.yPos >= (height - STEP_SIZE))
+	if (quadItem->Position.yPos >= (height - CLICK(1)))
 	{
 		if (TrInput & IN_LOOK && !quadInfo->Velocity)
 			LookUpDown(LaraItem);
