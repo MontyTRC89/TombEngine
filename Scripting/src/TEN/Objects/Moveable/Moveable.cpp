@@ -81,9 +81,7 @@ takes no arguments.
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
 	@tparam int OCB ocb of item
-	@tparam int itemFlags item flags 
 	@tparam int AIBits byte with AI bits
-	@tparam int status status of object
 	@tparam bool active is item active or not?
 	@tparam bool hitStatus hit status of object
 	@return reference to new Moveable object
@@ -100,9 +98,6 @@ takes no arguments.
 		0, -- OCB
 		{0,0,0,0,0,0,0,0}, -- itemFlags
 		0, -- AIBits
-		0, -- status
-		false, -- active
-		false, -- hitStatus
 		)
 	*/
 
@@ -123,9 +118,7 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	int frameNumber,
 	short hp,
 	short ocb,
-	aiBitsType const & aiBits,
-	bool active,
-	bool hitStatus
+	aiBitsType const & aiBits
 )
 {
 	short num = CreateItem();
@@ -144,8 +137,6 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 	ptr->SetHP(hp);
 	ptr->SetOCB(ocb);
 	ptr->SetAIBits(aiBits);
-	ptr->SetActive(active);
-	ptr->SetHitStatus(hitStatus);
 
 	return ptr;
 }
@@ -245,24 +236,40 @@ void Moveable::Register(sol::table & parent)
 // @tparam int the new value for the moveable's OCB
 		ScriptReserved_SetOCB, &Moveable::SetOCB,
 
-/// (int) AIBits of object. Will be clamped to [0, 255]
-// @mem AIBits
-// 1 - none
-// 2 - guard
-// 3 - ambush
-// 4 - patrol 1
-// 5 - modify
-// 6 - follow
-// 7 - patrol 2
-		"AIBits", sol::property(&Moveable::GetAIBits, &Moveable::SetAIBits),
+/// Get AIBits of object
+// This will return a table with six values, each corresponding to
+// an active behaviour. If the object is in a certain AI mode, the table will
+// have a *1* in the corresponding cell. Otherwise, the cell will hold
+// a *0*.
+// 1 - guard
+// 2 - ambush
+// 3 - patrol 1
+// 4 - modify
+// 5 - follow
+// 6 - patrol 2
+// @function Moveable:GetAIBits
+// @treturn table a table of AI bits
+		ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
+			
+/// Set AIBits of object
+// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+// (or more than one) had suddenly spawned beneath their feet.
+// @function Moveable:SetAIBits
+// @tparam table the table of AI bits
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetAIBits({1, 0, 0, 0, 0, 0})
+		ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-/// (bool) hit status of object
-// @mem hitStatus
-		"hitStatus", sol::property(&Moveable::GetHitStatus, &Moveable::SetHitStatus),
+/// Get the hit status of the object
+// @function Moveable:GetHitStatus
+// @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
+		ScriptReserved_GetHitStatus, &Moveable::GetHitStatus,
 
-/// (bool) whether or not the object is active 
-// @mem active
-		"active", sol::property(&Moveable::GetActive, &Moveable::SetActive),
+/// Determine whether the moveable is active or not 
+// @function Moveable:GetActive
+// @treturn bool true if the moveable is active
+		ScriptReserved_GetActive, &Moveable::GetActive,
 
 /// (int) room the item is in 
 // @mem room
@@ -466,11 +473,6 @@ void Moveable::SetActive(bool active)
 bool Moveable::GetHitStatus() const
 {
 	return m_item->hitStatus;
-}
-
-void Moveable::SetHitStatus(bool hitStatus)
-{
-	m_item->hitStatus = hitStatus;
 }
 
 short Moveable::GetRoom() const
