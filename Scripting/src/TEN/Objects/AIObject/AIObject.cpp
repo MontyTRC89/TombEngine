@@ -1,5 +1,6 @@
 #pragma once
 #include "frameworkandsol.h"
+
 #if TEN_OPTIONAL_LUA
 #include "Objects/AIObject/AIObject.h"
 #include "ScriptAssert.h"
