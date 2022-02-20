@@ -158,7 +158,7 @@ float2 texOffset(int u, int v) {
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) {
+	if (AlphaTest && output.w < 0.99f) {
 		discard;
 	}
 

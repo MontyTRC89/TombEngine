@@ -229,34 +229,34 @@ namespace TEN::Renderer
 		return fps;
 	}
 
-	void Renderer11::BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
+	void Renderer11::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
 	{
-		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)
 		{
-		case AnisotropicClamp:
+		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
 			break;
 
-		case AnisotropicWrap:
+		case SAMPLER_ANISOTROPIC_WRAP:
 			samplerState = m_states->AnisotropicWrap();
 			break;
 
-		case LinearClamp:
+		case SAMPLER_LINEAR_CLAMP:
 			samplerState = m_states->LinearClamp();
 			break;
 
-		case LinearWrap:
+		case SAMPLER_LINEAR_WRAP:
 			samplerState = m_states->LinearWrap();
 			break;
 
-		case PointWrap:
+		case SAMPLER_POINT_WRAP:
 			samplerState = m_states->PointWrap();
 			break;
 
-		case ShadowMap:
+		case SAMPLER_SHADOW_MAP:
 			samplerState = m_shadowSampler.Get();
 			break;
 
@@ -265,5 +265,111 @@ namespace TEN::Renderer
 		}
 
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
+	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	{
+		m_context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
+	}
+
+	void Renderer11::BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	{
+		m_context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
+	}
+
+	void Renderer11::SetBlendMode(BLEND_MODES blendMode)
+	{
+		if (blendMode != lastBlendMode)
+		{
+			switch (blendMode)
+			{
+			case BLENDMODE_ALPHABLEND:
+				m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			case BLENDMODE_ALPHATEST:
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+				break;
+
+			case BLENDMODE_OPAQUE:
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+				break;
+
+			case BLENDMODE_SUBTRACTIVE:
+				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			case BLENDMODE_ADDITIVE:
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			case BLENDMODE_SCREEN:
+				m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			case BLENDMODE_LIGHTEN:
+				m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			case BLENDMODE_EXCLUDE:
+				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+				break;
+
+			}
+
+			lastBlendMode = blendMode;
+		}
+	}
+
+	void Renderer11::SetDepthState(DEPTH_STATES depthState)
+	{
+		if (depthState != lastDepthState)
+		{
+			switch (depthState)
+			{
+			case DEPTH_STATE_READ_ONLY_ZBUFFER:
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+				break;
+
+			case DEPTH_STATE_WRITE_ZBUFFER:
+				m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+				break;
+
+			}
+
+			lastDepthState = depthState;
+		}
+	}
+
+	void Renderer11::SetCullMode(CULL_MODES cullMode)
+	{
+		if (cullMode != lastCullMode)
+		{
+			switch (cullMode)
+			{
+			case CULL_MODE_NONE:
+				m_context->RSSetState(m_states->CullNone());
+				break;
+
+			case CULL_MODE_CCW:
+				m_context->RSSetState(m_states->CullCounterClockwise());
+				break;
+
+			case CULL_MODE_CW:
+				m_context->RSSetState(m_states->CullClockwise());
+				break;
+
+			}
+
+			lastCullMode = cullMode;
+		}
 	}
 }

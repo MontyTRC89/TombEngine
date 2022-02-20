@@ -151,10 +151,10 @@ namespace TEN::Renderer
 
 				SetBlendMode(bucket.BlendMode);
 
-				BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-				            SamplerStateType::AnisotropicClamp);
-				BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-				            SamplerStateType::None);
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
+				            SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
+				            SAMPLER_NONE);
 
 				m_stMisc.AlphaTest = (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE);
 				m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -204,9 +204,9 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set texture
-		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]),
-		            SamplerStateType::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
+		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
+		            SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
 		// Set camera matrices
 		Matrix view = Matrix::CreateLookAt(lightPos,
@@ -1192,9 +1192,9 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
 
 		// Set texture
-		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]),
-		            SamplerStateType::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
+		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
+		            SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
 		if (CurrentLevel == 0)
 		{
@@ -2414,8 +2414,8 @@ namespace TEN::Renderer
 		int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
-		BindTexture(TextureRegister::CausticsTexture, m_sprites[causticsFrame].Texture, SamplerStateType::None);
-		BindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
+		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		BindTexture(TEXTURE_SHADOW_MAP, &m_shadowMap, SAMPLER_SHADOW_MAP);
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
@@ -2453,10 +2453,10 @@ namespace TEN::Renderer
 		// Draw geometry
 		if (info->animated)
 		{
-			BindTexture(TextureRegister::MainTexture, &std::get<0>(m_animatedTextures[info->texture]),
-			            SamplerStateType::AnisotropicClamp);
-			BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_animatedTextures[info->texture]),
-			            SamplerStateType::None);
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_animatedTextures[info->texture]),
+			            SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_animatedTextures[info->texture]),
+			            SAMPLER_NONE);
 
 			RendererAnimatedTextureSet& set = m_animatedTextureSets[info->texture];
 			m_stAnimated.NumFrames = set.NumTextures;
@@ -2472,10 +2472,10 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			BindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[info->texture]),
-			            SamplerStateType::AnisotropicClamp);
-			BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_roomTextures[info->texture]),
-			            SamplerStateType::None);
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_roomTextures[info->texture]),
+			            SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_roomTextures[info->texture]),
+			            SAMPLER_NONE);
 		}
 
 		SetBlendMode(info->blendMode);
@@ -2520,10 +2520,10 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		// Set texture
-		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
-		            SamplerStateType::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
-		            SamplerStateType::None);
+		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
+		            SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
+		            SAMPLER_NONE);
 
 		m_stStatic.World = info->world;
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
@@ -2613,7 +2613,7 @@ namespace TEN::Renderer
 		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
 		m_context->PSSetConstantBuffers(7, 1, m_cbPostProcessBuffer.get());
 
-		BindTexture(TextureRegister::MainTexture, &m_renderTarget, SamplerStateType::AnisotropicClamp);
+		BindTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -2664,7 +2664,7 @@ namespace TEN::Renderer
 
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
-		m_context->RSSetState(m_states->CullCounterClockwise());
+		SetCullMode(CULL_MODE_CCW);
 
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
@@ -2692,7 +2692,7 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogMaxDistance = 0;
 		}
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
@@ -2938,10 +2938,10 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
 		// Set texture
-		BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
-		            SamplerStateType::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[info->bucket->Texture]),
-		            SamplerStateType::None);
+		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
+		            SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[info->bucket->Texture]),
+		            SAMPLER_NONE);
 
 		m_stMisc.AlphaTest = false;
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -3131,11 +3131,11 @@ namespace TEN::Renderer
 									SetBlendMode(BLENDMODE_ALPHABLEND);
 								}
 
-								BindTexture(TextureRegister::MainTexture,
+								BindTexture(TEXTURE_COLOR_MAP,
 								            &std::get<0>(m_staticsTextures[bucket.Texture]),
-								            SamplerStateType::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMapTexture,
-								            &std::get<1>(m_staticsTextures[bucket.Texture]), SamplerStateType::None);
+								            SAMPLER_ANISOTROPIC_CLAMP);
+								BindTexture(TEXTURE_NORMAL_MAP,
+								            &std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
 
 								m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 								m_numDrawCalls++;
@@ -3166,8 +3166,8 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
-		BindTexture(TextureRegister::CausticsTexture, m_sprites[causticsFrame].Texture, SamplerStateType::None);
-		BindTexture(TextureRegister::ShadowMapTexture, &m_shadowMap, SamplerStateType::ShadowMap);
+		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
+		BindTexture(TEXTURE_SHADOW_MAP, &m_shadowMap, SAMPLER_SHADOW_MAP);
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
@@ -3180,38 +3180,33 @@ namespace TEN::Renderer
 			m_stShadowMap.CastShadows = false;
 		}
 		m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
-		m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
-		m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
-
-		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
 		numRoomsTransparentPolygons = 0;
 
-		//for (int i = 0; i < view.roomsToDraw.size(); i++)
 		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
+			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
 
 			m_stLights.NumLights = view.lightsToDraw.size();
 			for (int j = 0; j < view.lightsToDraw.size(); j++)
 				memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
 			m_cbLights.updateData(m_stLights, m_context.Get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
+			BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
-			m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
-			m_cbMisc.updateData(m_stMisc, m_context.Get());
-			m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
 
 			m_stRoom.AmbientColor = room->AmbientLight;
 			m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 			m_cbRoom.updateData(m_stRoom, m_context.Get());
-
-			m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
-			m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
+			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
+			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
 			for (int animated = 0; animated < 2; animated++)
 			{
@@ -3221,7 +3216,7 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					m_context->VSSetConstantBuffers(6, 1, m_cbAnimated.get());
+					BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
 					m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
 				}
 
@@ -3243,10 +3238,6 @@ namespace TEN::Renderer
 						for (int j = 0; j < bucket.Polygons.size(); j++)
 						{
 							RendererPolygon* p = &bucket.Polygons[j];
-
-							// Don't queue back-face polygons
-							Vector3 cameraVector = (roomPosition + p->centre) - cameraPosition;
-							cameraVector.Normalize();
 
 							numRoomsTransparentPolygons++;
 
@@ -3282,7 +3273,7 @@ namespace TEN::Renderer
 							{
 								m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
 								m_cbMisc.updateData(m_stMisc, m_context.Get());
-								m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+								BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 								SetBlendMode(bucket.BlendMode);
 							}
@@ -3290,7 +3281,7 @@ namespace TEN::Renderer
 							{
 								m_stMisc.AlphaTest = false;
 								m_cbMisc.updateData(m_stMisc, m_context.Get());
-								m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+								BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 								SetBlendMode(BLENDMODE_ALPHABLEND);
 							}
@@ -3298,11 +3289,11 @@ namespace TEN::Renderer
 							// Draw geometry
 							if (animated)
 							{
-								BindTexture(TextureRegister::MainTexture,
+								BindTexture(TEXTURE_COLOR_MAP,
 								            &std::get<0>(m_animatedTextures[bucket.Texture]),
-								            SamplerStateType::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMapTexture,
-								            &std::get<1>(m_animatedTextures[bucket.Texture]), SamplerStateType::None);
+								            SAMPLER_ANISOTROPIC_CLAMP);
+								BindTexture(TEXTURE_NORMAL_MAP,
+								            &std::get<1>(m_animatedTextures[bucket.Texture]), SAMPLER_NONE);
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
@@ -3318,10 +3309,10 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(TextureRegister::MainTexture, &std::get<0>(m_roomTextures[bucket.Texture]),
-								            SamplerStateType::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMapTexture,
-								            &std::get<1>(m_roomTextures[bucket.Texture]), SamplerStateType::None);
+								BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_roomTextures[bucket.Texture]),
+								            SAMPLER_ANISOTROPIC_CLAMP);
+								BindTexture(TEXTURE_NORMAL_MAP,
+								            &std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_NONE);
 							}
 
 							m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
@@ -3409,14 +3400,14 @@ namespace TEN::Renderer
 
 		m_stMisc.AlphaTest = true;
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
-		BindTexture(TextureRegister::MainTexture, &m_skyTexture, SamplerStateType::AnisotropicClamp);
+		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		SetBlendMode(BLEND_MODES::BLENDMODE_ADDITIVE);
+		SetBlendMode(BLENDMODE_ADDITIVE);
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -3429,8 +3420,8 @@ namespace TEN::Renderer
 			m_stStatic.World = (rotation * translation);
 			m_stStatic.Color = weather.SkyColor();
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
+			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 			m_primitiveBatch->Begin();
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -3452,12 +3443,8 @@ namespace TEN::Renderer
 			m_stStatic.Position = Vector4::Zero;
 			m_stStatic.Color = Vector4::One;
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
-			m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbStatic.get());
-
-			m_stMisc.AlphaTest = true;
-			m_cbMisc.updateData(m_stMisc, m_context.Get());
-			m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
@@ -3468,10 +3455,10 @@ namespace TEN::Renderer
 					if (bucket.NumVertices == 0)
 						continue;
 
-					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-					            SamplerStateType::AnisotropicClamp);
-					BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-					            SamplerStateType::None);
+					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
+					            SAMPLER_ANISOTROPIC_CLAMP);
+					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
+					            SAMPLER_NONE);
 
 					SetBlendMode(bucket.BlendMode);
 
@@ -3539,10 +3526,10 @@ namespace TEN::Renderer
 			{
 				int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
-				BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-				            SamplerStateType::AnisotropicClamp);
-				BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-				            SamplerStateType::None);
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
+				            SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
+				            SAMPLER_NONE);
 
 				for (int pass = 0; pass < passes; pass++)
 				{

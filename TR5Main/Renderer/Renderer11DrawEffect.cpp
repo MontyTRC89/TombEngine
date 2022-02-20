@@ -837,7 +837,7 @@ namespace TEN::Renderer
 					SetBlendMode(spr.BlendMode);
 				}
 
-				BindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
+				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
 				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
@@ -988,7 +988,7 @@ namespace TEN::Renderer
 	{
 		SetBlendMode(info->blendMode);
 
-		BindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
+		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0; 
@@ -1111,11 +1111,11 @@ namespace TEN::Renderer
 
 				if (!deb->isStatic) 
 				{
-					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				} 
 				else 
 				{
-					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				}
 
 				m_stMisc.AlphaTest = !transparent;
@@ -1219,52 +1219,6 @@ namespace TEN::Renderer
 		{
 			if(!s.active) continue;
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
-		}
-	}
-
-	void Renderer11::SetBlendMode(BLEND_MODES blendMode)
-	{
-		switch (blendMode)
-		{
-		case BLENDMODE_ALPHABLEND:
-			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-			break;
-		case BLENDMODE_ALPHATEST:
-			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_OPAQUE:
-			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_SUBTRACTIVE:
-			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_ADDITIVE:
-			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_SCREEN:
-			m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_LIGHTEN:
-			m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_EXCLUDE:
-			m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
 		}
 	}
 
