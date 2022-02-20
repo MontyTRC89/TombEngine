@@ -50,7 +50,7 @@ class ITEM_DATA {
 		MOTORBIKE_INFO,
 		JEEP_INFO,
 		LaraInfo*,
-		KAYAK_INFO,
+		KayakInfo,
 		DOOR_DATA,
 		SKIDOO_INFO,
 		SUB_INFO,
