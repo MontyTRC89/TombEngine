@@ -72,7 +72,14 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		item->pos.yRot += ANGLE(4);
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (TrInput & IN_JUMP)
+	{
+		Lara.diveCount++;
+		if (Lara.diveCount == 10)
+			SwimDive(item);
+		return;
+	}
+	else if (TrInput & IN_FORWARD)
 	{
 		item->goalAnimState = LS_ONWATER_FORWARD;
 		return;
@@ -95,13 +102,6 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RSTEP)
 	{
 		item->goalAnimState = LS_ONWATER_RIGHT;
-		return;
-	}
-	else if (TrInput & IN_JUMP)
-	{
-		Lara.diveCount++;
-		if (Lara.diveCount == 10)
-			SwimDive(item);
 		return;
 	}
 
