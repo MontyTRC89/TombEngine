@@ -421,6 +421,7 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 {
 	for (int i = 0; i < bits.value().size(); ++i)
 	{
+		m_item->aiBits &= ~(1 << i);
 		uint8_t isSet = bits.value()[i] > 0;
 		m_item->aiBits |= isSet << i;
 	}
