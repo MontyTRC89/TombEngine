@@ -807,7 +807,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		SnapItemToLedge(item, coll);
 
 		// TODO: When refactoring monkey swing, get rid of this.
-		if (TestHangSwingIn(item, item->pos.yRot))
+		if (TestHangSwingIn(item, coll))
 		{
 			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 			ResetLaraFlex(item);
