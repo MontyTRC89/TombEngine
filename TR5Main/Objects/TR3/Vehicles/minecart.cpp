@@ -194,7 +194,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 			if (item->collidable && item->status != ITEM_INVISIBLE && item != LaraItem && item != v)
 			{
 				OBJECT_INFO* object = &Objects[item->objectNumber];
-				if (object->collision && (object->intelligent || item->objectNumber == ID_ROLLINGBALL || item->objectNumber == ID_ANIMATING2))
+				if (object->collision && (object->intelligent || item->objectNumber == ID_ROLLINGBALL || item->objectNumber == ID_MINECART_SWITCH))
 				{
 					int x = v->pos.xPos - item->pos.xPos;
 					int y = v->pos.yPos - item->pos.yPos;
@@ -203,7 +203,7 @@ static void CartToBaddieCollision(ITEM_INFO* v)
 					{
 						if (TestBoundsCollide(item, LaraItem, CART_BADDIE_RADIUS))
 						{
-							if (item->objectNumber == ID_ANIMATING2)
+							if (item->objectNumber == ID_MINECART_SWITCH)
 							{
 								if ((item->frameNumber == g_Level.Anims[item->animNumber].frameBase) && (LaraItem->currentAnimState == CART_USE) && (LaraItem->animNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
 								{
