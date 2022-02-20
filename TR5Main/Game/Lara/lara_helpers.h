@@ -38,4 +38,4 @@ void ResetLaraLean(ITEM_INFO* item, float rate = 1.0f, bool resetRoll = true, bo
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);
-void HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll);
+bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll);

@@ -778,7 +778,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
-	HandleLaraVehicle(item, coll);
+	if (HandleLaraVehicle(item, coll))
+		return;
 
 	// Temp. debug stuff
 	//---
