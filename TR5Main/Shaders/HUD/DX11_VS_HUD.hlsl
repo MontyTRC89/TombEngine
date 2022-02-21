@@ -1,4 +1,5 @@
 #include "./../VertexInput.hlsli"
+
 cbuffer HUDBuffer : register(b10)
 {
 	float4x4 View;
@@ -11,7 +12,6 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 };
-
 
 PixelShaderInput VS(VertexShaderInput input)
 {

@@ -2524,11 +2524,11 @@ namespace TEN::Renderer
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stStatic.Color = info->color;
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 		m_stMisc.AlphaTest = false;
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->VSSetConstantBuffers(3, 1, m_cbMisc.get());
+		BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 		SetBlendMode(info->blendMode);
 
@@ -3057,7 +3057,7 @@ namespace TEN::Renderer
 				m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
 				m_stStatic.Color = msh->color;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 				RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
@@ -3114,7 +3114,7 @@ namespace TEN::Renderer
 								{
 									m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
 									m_cbMisc.updateData(m_stMisc, m_context.Get());
-									m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+									BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 									SetBlendMode(bucket.BlendMode);
 								}
@@ -3122,7 +3122,7 @@ namespace TEN::Renderer
 								{
 									m_stMisc.AlphaTest = false;
 									m_cbMisc.updateData(m_stMisc, m_context.Get());
-									m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+									BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 									SetBlendMode(BLENDMODE_ALPHABLEND);
 								}
