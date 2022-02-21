@@ -552,8 +552,7 @@ namespace TEN::Renderer
 		short zOffset = 0;
 		short rotationX = 0;
 
-		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		SetBlendMode(BLENDMODE_ADDITIVE);
 
 		if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_SHOTGUN && Lara.gunType != WEAPON_CROSSBOW) 
 		{
@@ -626,8 +625,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
 
 		return true;
 	}
@@ -660,8 +658,7 @@ namespace TEN::Renderer
 				m_cbMisc.updateData(m_stMisc, m_context.Get());
 				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+				SetBlendMode(BLENDMODE_ADDITIVE);
 
 				BITE_INFO* bites[2] = {
 					&EnemyBites[obj->biteOffset],
@@ -703,8 +700,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
 
 	}
 
@@ -843,8 +839,8 @@ namespace TEN::Renderer
 				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -868,8 +864,8 @@ namespace TEN::Renderer
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -893,8 +889,8 @@ namespace TEN::Renderer
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -918,8 +914,8 @@ namespace TEN::Renderer
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -991,9 +987,9 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0; 
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		UINT offset = 0;
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
@@ -1144,7 +1140,7 @@ namespace TEN::Renderer
 				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
 
-				m_context->RSSetState(m_states->CullNone());
+				SetCullMode(CULL_MODE_NONE);
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				m_numDrawCalls++;
 				m_primitiveBatch->End();
