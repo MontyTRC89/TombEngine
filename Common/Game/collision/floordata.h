@@ -3,7 +3,7 @@
 #include "Specific/trmath.h"
 #include "Specific/newtypes.h"
 
-constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
+constexpr auto WALL_PLANE = Vector3(0, 0, static_cast<float>(-CLICK(127)));
 
 enum class FLOOR_MATERIAL : unsigned char
 {

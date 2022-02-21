@@ -50,6 +50,8 @@ static constexpr char const ScriptReserved_GetAIBits[]			= "GetAIBits";
 static constexpr char const ScriptReserved_SetAIBits[]			= "SetAIBits";
 static constexpr char const ScriptReserved_GetHitStatus[]		= "GetHitStatus";
 static constexpr char const ScriptReserved_GetActive[]			= "GetActive";
+static constexpr char const ScriptReserved_GetRoom[]			= "GetRoom";
+static constexpr char const ScriptReserved_SetRoom[]			= "SetRoom";
 
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";

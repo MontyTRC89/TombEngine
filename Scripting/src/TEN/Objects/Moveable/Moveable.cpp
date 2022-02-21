@@ -28,7 +28,7 @@ constexpr auto LUA_CLASS_NAME{ "Moveable" };
 static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
-Moveable::Moveable(short num, bool temp) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ false }, m_temporary{ temp }
+Moveable::Moveable(short num, bool temp, bool init) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ init }, m_temporary{ temp }
 {};
 
 Moveable::Moveable(Moveable&& other) noexcept : 
@@ -64,7 +64,8 @@ template <bool temp> std::unique_ptr<Moveable> CreateEmpty()
 {
 	short num = CreateItem();	
 	ITEM_INFO * item = &g_Level.Items[num];
-	return std::make_unique<Moveable>(num, temp);
+	auto ptr = std::make_unique<Moveable>(num, temp, false);
+	return ptr;
 }
 
 /*** For more information on each parameter, see the
@@ -81,9 +82,7 @@ takes no arguments.
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
 	@tparam int OCB ocb of item
-	@tparam int AIBits byte with AI bits
-	@tparam bool active is item active or not?
-	@tparam bool hitStatus hit status of object
+	@tparam table AIBits table with AI bits
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable.new(
@@ -96,8 +95,7 @@ takes no arguments.
 		0, -- frameNumber
 		0, -- HP
 		0, -- OCB
-		{0,0,0,0,0,0,0,0}, -- itemFlags
-		0, -- AIBits
+		{0,0,0,0,0,0,0,0}, -- aiBits
 		)
 	*/
 
@@ -150,7 +148,7 @@ void Moveable::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 
 /// Initialise an item.
-//Use this if you called new with no arguments
+// Use this if you called new with no arguments
 // @function Moveable.Init
 		ScriptReserved_Init, &Moveable::Init,
 
@@ -271,13 +269,34 @@ void Moveable::Register(sol::table & parent)
 // @treturn bool true if the moveable is active
 		ScriptReserved_GetActive, &Moveable::GetActive,
 
-/// (int) room the item is in 
-// @mem room
-		"room", sol::property(&Moveable::GetRoom, &Moveable::SetRoom),
+/// Get the current room of the object
+// @function Moveable:GetRoom
+// @treturn int number representing the current room of the object
+		ScriptReserved_GetRoom, &Moveable::GetRoom,
 
-/// (@{Position}) position in level
-// @mem pos
-		"pos", sol::property(&Moveable::GetPos, &Moveable::SetPos),
+/// Set room of object 
+// This is used in conjunction with SetPosition to teleport an item to a new room.
+// @function Moveable:SetRoom
+// @tparam int ID for the new room 
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetRoom(destinationRoom)
+// sas:SetPosition(destinationPosition)
+		ScriptReserved_SetRoom, &Moveable::SetRoom,
+
+
+/// Get the object's position
+// @function Moveable:GetPosition
+// @treturn Position a copy of the moveable's position
+	ScriptReserved_GetPosition, & Moveable::GetPos,
+
+/// Set the moveable's position
+// If you are moving a moveable whose behaviour involves knowledge of room geometry,
+// (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
+// with @{Moveable:SetRoom}. Otherwise, said moveable will not behave correctly.
+// @function Moveable:SetPosition
+// @tparam Position position the new position of the moveable 
+	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// (@{Rotation}) rotation represented as degree angles about X, Y, and Z axes
 // @mem rot
@@ -409,7 +428,7 @@ aiBitsType Moveable::GetAIBits() const
 	static_assert(63 == ALL_AIOBJ);
 
 	aiBitsArray ret{};
-	for (int i = 0; i < ret.size(); ++i)
+	for (size_t i = 0; i < ret.size(); ++i)
 	{
 		uint8_t isSet = m_item->aiBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
@@ -419,7 +438,7 @@ aiBitsType Moveable::GetAIBits() const
 
 void Moveable::SetAIBits(aiBitsType const & bits)
 {
-	for (int i = 0; i < bits.value().size(); ++i)
+	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
 		m_item->aiBits &= ~(1 << i);
 		uint8_t isSet = bits.value()[i] > 0;
