@@ -19,6 +19,9 @@ void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
 void DoLaraFallDamage(ITEM_INFO* item);
+void DoLaraTightropeBalance(ITEM_INFO* item);
+void DoLaraTightropeLean(ITEM_INFO* item);
+void DoLaraTightropeBalanceRegen(ITEM_INFO* item);
 
 LaraInfo*& GetLaraInfo(ITEM_INFO* item);
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);

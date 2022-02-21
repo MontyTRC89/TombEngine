@@ -88,12 +88,8 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	auto* laraInfo = GetLaraInfo(laraItem);
 
 	laraInfo->Control.HandStatus = HandStatus::Free;
-	laraInfo->LeftArm.Rotation.xRot = 0;
-	laraInfo->LeftArm.Rotation.yRot = 0;
-	laraInfo->LeftArm.Rotation.zRot = 0;
-	laraInfo->RightArm.Rotation.xRot = 0;
-	laraInfo->RightArm.Rotation.yRot = 0;
-	laraInfo->RightArm.Rotation.zRot = 0;
+	laraInfo->LeftArm.Rotation = PHD_3DPOS();
+	laraInfo->RightArm.Rotation = PHD_3DPOS();
 	laraInfo->LeftArm.Locked = false;
 	laraInfo->RightArm.Locked = false;
 	laraInfo->target = NULL;
@@ -197,10 +193,10 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			InitialiseNewWeapon(laraItem);
 
-			laraInfo->Flare.ControlLeft = false;
 			laraInfo->target = NULL;
-			laraInfo->RightArm.Locked = false;
 			laraInfo->LeftArm.Locked = false;
+			laraInfo->RightArm.Locked = false;
+			laraInfo->Flare.ControlLeft = false;
 			laraInfo->Flare.Frame = 0;
 		}
 		else if (armFrame < 21)
@@ -285,16 +281,16 @@ void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
 	laraInfo->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
 }
 
-void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
+void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
-	auto itemNum = CreateItem();
+	auto itemNumber = CreateItem();
 
-	if (itemNum != NO_ITEM)
+	if (itemNumber != NO_ITEM)
 	{
-		auto* flareItem = &g_Level.Items[itemNum];
+		auto* flareItem = &g_Level.Items[itemNumber];
 		bool flag = false;
-		flareItem->ObjectNumber = objectNum;
+		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
 		PHD_VECTOR pos = { -16, 32, 42 };
@@ -324,7 +320,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 
-		InitialiseItem(itemNum);
+		InitialiseItem(itemNumber);
 
 		flareItem->Position.xRot = 0;
 		flareItem->Position.zRot = 0;
@@ -344,7 +340,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 		if (flag)
 			flareItem->Velocity /= 2;
 
-		if (objectNum == ID_FLARE_ITEM)
+		if (objectNumber == ID_FLARE_ITEM)
 		{
 			flareItem->Data = (int)0;
 			int& age = flareItem->Data;
@@ -356,7 +352,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNum, bool thrown)
 		else
 			flareItem->ItemFlags[3] = laraInfo->LitTorch;
 
-		AddActiveItem(itemNum);
+		AddActiveItem(itemNumber);
 		flareItem->Status = ITEM_ACTIVE;
 	}
 }

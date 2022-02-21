@@ -45,7 +45,7 @@ namespace TEN::Entities::TR5
 				|| l->Airborne)
 			&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
 		{
-			if (l->ActiveState != LS_DOVESWITCH)
+			if (l->ActiveState != LS_DOVE_SWITCH)
 				ObjectCollision(itemNum, l, coll);
 		}
 		else
@@ -57,7 +57,7 @@ namespace TEN::Entities::TR5
 				if (MoveLaraPosition(&CrowDovePos, item, l))
 				{
 					l->AnimNumber = LA_DOVESWITCH_TURN;
-					l->ActiveState = LS_DOVESWITCH;
+					l->ActiveState = LS_DOVE_SWITCH;
 					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 
 					AddActiveItem(itemNum);

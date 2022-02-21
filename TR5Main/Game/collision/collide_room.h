@@ -120,7 +120,7 @@ struct COLL_INFO
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
 
-COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height = 0, int side = 0);
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
 COLL_RESULT GetCollisionResult(int x, int y, int z, short roomNumber);
 COLL_RESULT GetCollisionResult(ITEM_INFO* item);
@@ -128,7 +128,7 @@ COLL_RESULT GetCollisionResult(ITEM_INFO* item);
 void  GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
 void  GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
-short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist);
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
@@ -140,6 +140,6 @@ void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
 
 bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room);
-bool TestEnvironment(RoomEnvFlags envType, int roomNum);
+bool TestEnvironment(RoomEnvFlags envType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item);
-bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNum);
+bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNumber);

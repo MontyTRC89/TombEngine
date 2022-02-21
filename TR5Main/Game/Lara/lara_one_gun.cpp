@@ -299,7 +299,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 	if (fired)
 	{
-		PHD_VECTOR pos{ 0, 228, 32 };
+		PHD_VECTOR pos = { 0, 228, 32 };
 		GetLaraJointPosition(&pos, LM_RHAND);
 
 		PHD_VECTOR pos2 = { pos.x, pos.y, pos.z };
