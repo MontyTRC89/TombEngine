@@ -1182,10 +1182,10 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 #ifndef NEW_TIGHTROPE
-void GetTighRopeFallOff(int regularity)
+void GetTightropeFallOff(ITEM_INFO* item, int regularity)
 {
-	if (LaraItem->HitPoints <= 0 || LaraItem->HitStatus)
-		SetAnimation(LaraItem, LA_TIGHTROPE_FALL_LEFT);
+	if (item->HitPoints <= 0 || item->HitStatus)
+		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
 
 	if (!info->tightRopeFall && !(GetRandomControl() & regularity))
 		info->tightRopeFall = 2 - ((GetRandomControl() & 0xF) != 0);
@@ -1360,7 +1360,7 @@ bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
-// For now, it supercedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
+// For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->Position.yPos;
@@ -1403,7 +1403,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testS
 	if (isSlopeDown || isSlopeUp || isDeath)
 		return false;
 
-	// Conduct "ray" test at upper floor bound and lowest ceiling bound.
+	// Conduct ray test at upper floor bound and lowest ceiling bound.
 	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
@@ -1602,7 +1602,7 @@ bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup 
 	if (isSlopeDown || isSlopeUp || isDeath)
 		return false;
 
-	// Conduct "ray" test at upper floor bound and lowest ceiling bound.
+	// Conduct ray test at upper floor bound and lowest ceiling bound.
 	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
@@ -1720,7 +1720,7 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTes
 	if (probe.Position.CeilingSlope)
 		return false;
 
-	// Conduct "ray" test at lower ceiling bound and highest floor bound.
+	// Conduct ray test at lower ceiling bound and highest floor bound.
 	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 

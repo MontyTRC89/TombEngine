@@ -114,8 +114,8 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
 	{
 #ifdef NEW_TIGHTROPE
-		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
-		   l->TargetState != LS_TIGHTROPE_EXIT &&
+		if(l->ActiveState == LS_TIGHTROPE_WALK &&
+		   l->TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !Lara.Control.TightropeControl.CanDismount)
 		{
 			if(item->Position.yRot == l->Position.yRot)
@@ -126,8 +126,8 @@ void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		}
 
 #else // !NEW_TIGHTROPE
-		if(l->ActiveState == LS_TIGHTROPE_FORWARD &&
-		   l->TargetState != LS_TIGHTROPE_EXIT &&
+		if(l->ActiveState == LS_TIGHTROPE_WALK &&
+		   l->TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !Lara.Control.TightropeControl.Off)
 		{
 			if(item->Position.yRot == l->Position.yRot)
@@ -232,7 +232,7 @@ void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			ObjectCollision(itemNumber, l, coll);
 		}
 	}
-	else if (l->ActiveState != LS_BARS_SWING)
+	else if (l->ActiveState != LS_HORIZONTAL_BAR_SWING)
 	{
 		ObjectCollision(itemNumber, l, coll);
 	}

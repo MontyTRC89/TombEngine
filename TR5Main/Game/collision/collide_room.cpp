@@ -113,11 +113,11 @@ int FindGridShift(int x, int z)
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 
-COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height, int side)
+COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int distance, int height, int side)
 {
-	auto x = item->Position.xPos + (phd_sin(angle) * dist) + (phd_cos(angle) * side);
+	auto x = item->Position.xPos + (phd_sin(angle) * distance) + (phd_cos(angle) * side);
 	auto y = item->Position.yPos + height;
-	auto z = item->Position.zPos + (phd_cos(angle) * dist) + (phd_sin(angle) * -side);
+	auto z = item->Position.zPos + (phd_cos(angle) * distance) + (phd_sin(angle) * -side);
 
 	return GetCollisionResult(x, y, z, GetRoom(item->Location, item->Position.xPos, y, item->Position.zPos).roomNumber);
 }
@@ -862,7 +862,7 @@ int GetQuadrant(short angle)
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
-short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
+short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance)
 {
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
@@ -1123,7 +1123,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& dist)
 
 	// Return upper probe result in case it returned lower distance or has hit a bridge.
 	auto usedProbe = ((finalDistance[0] < finalDistance[1]) || hitBridge) ? 0 : 1;
-	dist = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
+	distance = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
 	return finalResult[usedProbe];
 }
 
@@ -1132,9 +1132,9 @@ bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room)
 	return (room->flags & envType);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int roomNum)
+bool TestEnvironment(RoomEnvFlags envType, int roomNumber)
 {
-	return TestEnvironment(envType, &g_Level.Rooms[roomNum]);
+	return TestEnvironment(envType, &g_Level.Rooms[roomNumber]);
 }
 
 bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item)
@@ -1142,7 +1142,7 @@ bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item)
 	return TestEnvironment(envType, item->RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNum)
+bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNumber)
 {
-	return TestEnvironment(envType, GetCollisionResult(x, y, z, roomNum).RoomNumber);
+	return TestEnvironment(envType, GetCollisionResult(x, y, z, roomNumber).RoomNumber);
 }

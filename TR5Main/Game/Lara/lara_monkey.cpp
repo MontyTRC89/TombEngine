@@ -12,9 +12,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
+#include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Scripting/GameFlowScript.h"
 
 // -----------------------------
 // MONKEY SWING
@@ -46,7 +46,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	//SlopeMonkeyExtra(item, coll);
 
 	// This check is needed to prevent stealing goal state from previously set.
-	//if (item->TargetState == LS_MONKEYSWING_IDLE)
+	//if (item->TargetState == LS_MONKEY_IDLE)
 	//	return;
 
 	if (TrInput & IN_LEFT)
@@ -118,7 +118,6 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	auto* info = GetLaraInfo(item);
 
 	info->Control.MoveAngle = item->Position.yRot;
-	item->VerticalVelocity = 0;
 	item->Airborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
