@@ -285,47 +285,52 @@ namespace TEN::Renderer
 			{
 			case BLENDMODE_ALPHABLEND:
 				m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			case BLENDMODE_ALPHATEST:
 				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 				break;
 
 			case BLENDMODE_OPAQUE:
 				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 				break;
 
 			case BLENDMODE_SUBTRACTIVE:
 				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			case BLENDMODE_ADDITIVE:
 				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			case BLENDMODE_SCREEN:
 				m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			case BLENDMODE_LIGHTEN:
 				m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			case BLENDMODE_EXCLUDE:
 				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
-				SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 				break;
 
 			}
 
 			lastBlendMode = blendMode;
+		}
+
+		switch (blendMode)
+		{
+		case BLENDMODE_OPAQUE:
+		case BLENDMODE_ALPHATEST:
+			SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+			break;
+
+		default:
+			SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+			break;
+
 		}
 	}
 
@@ -341,6 +346,10 @@ namespace TEN::Renderer
 
 			case DEPTH_STATE_WRITE_ZBUFFER:
 				m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+				break;
+
+			case DEPTH_STATE_NONE:
+				m_context->OMSetDepthStencilState(m_states->DepthNone(), 0xFFFFFFFF);
 				break;
 
 			}

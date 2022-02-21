@@ -171,9 +171,8 @@ namespace TEN::Renderer
 			return;
 
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
@@ -1161,9 +1160,8 @@ namespace TEN::Renderer
 
 
 		// Set basic render states
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 
 		// Bind and clear render target
 		//m_context->ClearRenderTargetView(target, Colors::Black);
@@ -1390,9 +1388,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLines2D()
 	{
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
@@ -1437,9 +1435,8 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->End();
 
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 	}
 
 	void Renderer11::DrawSpiders(RenderView& view)
@@ -1712,9 +1709,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLines3D(RenderView& view)
 	{
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetBlendState(m_states->Additive(), nullptr, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		SetBlendMode(BLENDMODE_ADDITIVE);
+		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
@@ -1740,9 +1736,8 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->End();
 
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 	}
 
 	void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
@@ -1944,7 +1939,7 @@ namespace TEN::Renderer
 		{
 			// Set basic render states
 			SetBlendMode(BLENDMODE_OPAQUE);
-		    m_context->RSSetState(m_states->CullCounterClockwise());
+			SetCullMode(CULL_MODE_CCW);
 
 		    // Clear screen
 		    m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
@@ -2005,9 +2000,9 @@ namespace TEN::Renderer
 	                                     ID3D11DepthStencilView* depthTarget)
 	{
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
+
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &m_viewport);
 		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
@@ -2380,7 +2375,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		m_context->RSSetState(m_states->CullCounterClockwise());
+		SetCullMode(CULL_MODE_CCW);
 	}
 
 	void Renderer11::DrawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
@@ -2503,7 +2498,7 @@ namespace TEN::Renderer
 			drawnVertices += TRANSPARENT_BUCKET_SIZE;
 		}
 
-		m_context->RSSetState(m_states->CullCounterClockwise());
+		SetCullMode(CULL_MODE_CCW);
 	}
 
 	void Renderer11::DrawStaticsTransparent(RendererTransparentFaceInfo* info, RenderView& view)
@@ -2563,7 +2558,7 @@ namespace TEN::Renderer
 	                                          RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
-		m_context->RSSetState(m_states->CullCounterClockwise());
+		SetCullMode(CULL_MODE_CCW);
 
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -2780,9 +2775,8 @@ namespace TEN::Renderer
 		// Draw shadow map
 
 		// Reset GPU state
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-		m_context->RSSetState(m_states->CullCounterClockwise());
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
 
 		// Bind and clear render target
 
@@ -2793,7 +2787,9 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &view.viewport);
 
 		// Opaque geometry
-		m_context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
+
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
