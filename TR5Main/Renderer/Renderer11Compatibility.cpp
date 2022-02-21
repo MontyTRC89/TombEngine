@@ -17,6 +17,10 @@ namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
+		lastBlendMode = BLENDMODE_UNSET;
+		lastCullMode = CULL_MODE_UNSET;
+		lastDepthState = DEPTH_STATE_UNSET;
+
 		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
 		m_staticObjects.resize(MAX_STATICS);

@@ -102,12 +102,13 @@ namespace TEN::Renderer
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
-		m_context->RSSetState(m_states->CullNone());
+		
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetDepthState(DEPTH_STATE_NONE);
+		SetCullMode(CULL_MODE_NONE);
+
 		m_context->DrawIndexed(56, 0, 0);
 		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[textureSlot].meshIndex].Texture->ShaderResourceView.GetAddressOf());
-
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -122,9 +123,7 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
 		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
 		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
-		m_context->RSSetState(m_states->CullNone());
+
 		m_context->DrawIndexed(12, 0, 0);
 	}
 
@@ -144,9 +143,11 @@ namespace TEN::Renderer
 		ID3D11SamplerState* sampler = m_states->LinearClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
-		m_context->RSSetState(m_states->CullNone());
+
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetDepthState(DEPTH_STATE_NONE);
+		SetCullMode(CULL_MODE_NONE);
+
 		m_context->DrawIndexed(56, 0, 0);
 		m_context->PSSetShaderResources(0, 1, loadingBarInner.ShaderResourceView.GetAddressOf());
 
@@ -164,9 +165,7 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
 		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
 		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthNone(), NULL);
-		m_context->RSSetState(m_states->CullNone());
+
 		m_context->DrawIndexed(12, 0, 0);
 	}
 
@@ -186,7 +185,7 @@ namespace TEN::Renderer
 		auto flashColor = Weather.FlashColor();
 		if (flashColor != Vector3::Zero)
 		{
-			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+			SetBlendMode(BLENDMODE_ADDITIVE);
 			DrawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor, false);
 		}
 
@@ -196,7 +195,7 @@ namespace TEN::Renderer
 		if (!BinocularRange && !SpotcamOverlay)
 			return;
 
-		m_context->OMSetBlendState(m_states->AlphaBlend(), NULL, 0xFFFFFFFF);
+		SetBlendMode(BLENDMODE_ALPHABLEND);
 
 		if (BinocularRange && !LaserSight)
 		{
@@ -206,7 +205,7 @@ namespace TEN::Renderer
 		{
 			DrawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
 
-			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+			SetBlendMode(BLENDMODE_OPAQUE);
 
 			// Draw the aiming point
 			RendererVertex vertices[4];
