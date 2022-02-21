@@ -45,7 +45,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll);
 void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll);
 
 #ifndef NEW_TIGHTROPE
-void GetTighRopeFallOff(int regularity);
+void GetTightropeFallOff(ITEM_INFO* item, int regularity);
 #endif
 
 bool IsStandingWeapon(LaraWeaponType gunType);

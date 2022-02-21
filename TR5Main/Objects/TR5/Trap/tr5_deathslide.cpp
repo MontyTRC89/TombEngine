@@ -38,7 +38,7 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
 		Lara.Control.HandStatus = HandStatus::Busy;
 
-		l->TargetState = LS_ZIPLINE_RIDE;
+		l->TargetState = LS_ZIP_LINE;
 		do
 			AnimateItem(l);
 		while (l->ActiveState != LS_GRABBING);
@@ -101,7 +101,7 @@ void ControlDeathSlide(short itemNumber)
 		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (LaraItem->ActiveState == LS_ZIPLINE_RIDE)
+		if (LaraItem->ActiveState == LS_ZIP_LINE)
 		{
 			LaraItem->Position.xPos = item->Position.xPos;
 			LaraItem->Position.yPos = item->Position.yPos;
@@ -116,7 +116,7 @@ void ControlDeathSlide(short itemNumber)
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
-			if (LaraItem->ActiveState == LS_ZIPLINE_RIDE)
+			if (LaraItem->ActiveState == LS_ZIP_LINE)
 			{
 				LaraItem->TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);

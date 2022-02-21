@@ -348,12 +348,12 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 		case TRIGGER_TYPES::TIGHTROPE_T:
 			if (LaraItem->ActiveState >= LS_TIGHTROPE_IDLE &&
 				LaraItem->ActiveState <= LS_TIGHTROPE_RECOVER_BALANCE &&
-				LaraItem->ActiveState != LS_DOVESWITCH)
+				LaraItem->ActiveState != LS_DOVE_SWITCH)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->ActiveState == LS_DOVESWITCH ||
+			if (LaraItem->ActiveState == LS_DOVE_SWITCH ||
 				LaraItem->ActiveState == LS_CRAWL_IDLE ||
 				LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
 				LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||

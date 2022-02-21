@@ -67,7 +67,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	static constexpr int rate = 50;
-	int threshold = std::max(abs(item->Velocity) / 3 * 2, STEP_SIZE / 16);
+	int threshold = std::max(abs(item->Velocity) / 3 * 2, CLICK(1) / 16);
 	int sign = std::copysign(1, height);
 	
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
@@ -151,16 +151,78 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 void DoLaraFallDamage(ITEM_INFO* item)
 {
 	// TODO: Demagic more of these numbers.
-	int landSpeed = item->VerticalVelocity - 140;
+	int landingVelocity = item->VerticalVelocity - 140;
 
-	if (landSpeed > 0)
+	if (landingVelocity > 0)
 	{
-		if (landSpeed <= 14)
-			item->HitPoints -= LARA_HEALTH_MAX * pow(landSpeed, 2) / 196;
+		if (landingVelocity <= 14)
+			item->HitPoints -= LARA_HEALTH_MAX * pow(landingVelocity, 2) / 196;
 		else
 			item->HitPoints = 0;
 	}
 }
+
+void DoLaraTightropeBalance(ITEM_INFO* item)
+{
+	auto* info = GetLaraInfo(item);
+	const int factor = ((info->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
+
+	if (TrInput & IN_LEFT)
+		info->Control.TightropeControl.Balance += ANGLE(1.4f);
+	if (TrInput & IN_RIGHT)
+		info->Control.TightropeControl.Balance -= ANGLE(1.4f);
+
+	if (info->Control.TightropeControl.Balance < 0)
+	{
+		info->Control.TightropeControl.Balance -= factor;
+		if (info->Control.TightropeControl.Balance <= -ANGLE(45.0f))
+			info->Control.TightropeControl.Balance = ANGLE(45.0f);
+
+	}
+	else if (info->Control.TightropeControl.Balance > 0)
+	{
+		info->Control.TightropeControl.Balance += factor;
+		if (info->Control.TightropeControl.Balance >= ANGLE(45.0f))
+			info->Control.TightropeControl.Balance = ANGLE(45.0f);
+	}
+	else
+		info->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
+}
+
+void DoLaraTightropeLean(ITEM_INFO* item)
+{
+	auto* info = GetLaraInfo(item);
+
+	item->Position.zRot = info->Control.TightropeControl.Balance / 4;
+	info->ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
+}
+
+void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
+{
+	auto* info = GetLaraInfo(item);
+
+	if (info->Control.TightropeControl.TimeOnTightrope <= 32)
+		info->Control.TightropeControl.TimeOnTightrope = 0;
+	else
+		info->Control.TightropeControl.TimeOnTightrope -= 32;
+
+	if (info->Control.TightropeControl.Balance > 0)
+	{
+		if (info->Control.TightropeControl.Balance <= ANGLE(0.75f))
+			info->Control.TightropeControl.Balance = 0;
+		else
+			info->Control.TightropeControl.Balance -= ANGLE(0.75f);
+	}
+
+	if (info->Control.TightropeControl.Balance < 0)
+	{
+		if (info->Control.TightropeControl.Balance >= -ANGLE(0.75f))
+			info->Control.TightropeControl.Balance = 0;
+		else
+			info->Control.TightropeControl.Balance += ANGLE(0.75f);
+	}
+}
+
 
 LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
@@ -314,7 +376,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 
 	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->Position.yRot;
-	static short oldAngle = 1;
+	static short oldAngle = 1; // TODO: Remove this.
 
 	ShiftItem(item, coll);
 

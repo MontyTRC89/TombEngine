@@ -82,14 +82,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_surftread,
 	lara_as_surfswim,
 	lara_as_dive,
-	lara_as_pushblock,//36
-	lara_as_pullblock,//37
-	lara_as_ppready,//38
+	lara_as_pushable_push,//36
+	lara_as_pushable_pull,//37
+	lara_as_pushable_grab,//38
 	lara_as_pickup,//39
-	lara_as_switchon,//40
-	lara_as_switchoff,//41
-	lara_as_usekey,//42
-	lara_as_usepuzzle,//43
+	lara_as_switch_on,//40
+	lara_as_switch_off,//41
+	lara_as_use_key,//42
+	lara_as_use_puzzle,//43
 	lara_as_uwdeath,//44
 	lara_as_roll_forward,//45
 	lara_as_special,//46
@@ -113,10 +113,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//64
 	lara_as_wade_forward,//65
 	lara_as_waterroll,//66
-	lara_as_pickupflare,//67
+	lara_as_pickup_flare,//67
 	lara_void_func,//68
 	lara_void_func,//69
-	lara_as_deathslide,//70
+	lara_as_zip_line,//70
 	lara_as_crouch_idle,//71
 	lara_as_crouch_roll,//72
 	lara_as_sprint,//73
@@ -136,8 +136,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_controlled_no_look,
 	lara_as_controlled_no_look,
 	lara_as_controlled,
-	lara_as_ropel,
-	lara_as_roper,
+	lara_as_rope_turn_clockwise,
+	lara_as_rope_turn_counter_clockwise,
 	lara_as_controlled,
 	lara_as_controlled,
 	lara_as_controlled,
@@ -157,29 +157,29 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_corner,//108
 	lara_as_corner,//109
 	lara_as_corner,//110
-	lara_as_rope,//111
-	lara_as_climbrope,//112
-	lara_as_climbroped,//113
-	lara_as_rope,//114
-	lara_as_rope,//115
+	lara_as_rope_idle,//111
+	lara_as_rope_up,//112
+	lara_as_rope_down,//113
+	lara_as_rope_idle,//114
+	lara_as_rope_idle,//115
 	lara_void_func,
 	lara_as_controlled,
 	lara_as_swimcheat,
-	lara_as_trpose,//119
+	lara_as_tightrope_idle,//119
 	lara_as_controlled_no_look,//120
-	lara_as_trwalk,//121
-	lara_as_trfall,//122
-	lara_as_trfall,//123
+	lara_as_tightrope_walk,//121
+	lara_as_tightrope_fall,//122
+	lara_as_tightrope_fall,//123
 	lara_as_null,//124
 #ifdef NEW_TIGHTROPE
-	lara_as_trexit,//125
+	lara_as_tightrope_dismount,//125
 #else // !NEW_TIGHTROPE
 	lara_as_null,//125
 #endif
-	lara_as_switchon,//126
+	lara_as_switch_on,//126
 	lara_as_null,//127
-	lara_as_parallelbars,//128
-	lara_as_pbleapoff,//129
+	lara_as_horizontal_bar_swing,//128
+	lara_as_horizontal_bar_leap,//129
 	lara_as_null,//130
 	lara_as_controlled_no_look,//131
 	lara_as_controlled_no_look,//132
@@ -320,7 +320,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_void_func,
 	lara_void_func,
-	lara_col_turnswitch,
+	lara_col_turn_switch,
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
@@ -336,11 +336,11 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-	lara_col_rope,
+	lara_col_rope_idle,
 	lara_void_func,
 	lara_void_func,
-	lara_col_ropefwd,
-	lara_col_ropefwd,
+	lara_col_rope_swing,
+	lara_col_rope_swing,
 	lara_void_func,
 	lara_void_func,
 	lara_col_swim,

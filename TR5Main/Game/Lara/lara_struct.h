@@ -96,7 +96,7 @@ enum LaraState
 	LS_PICKUP_FLARE = 67,
 	LS_JUMP_ROLL_180 = 68,
 	LS_KICK = 69,
-	LS_ZIPLINE_RIDE = 70,
+	LS_ZIP_LINE = 70,
 
 	// TR3
 	LS_CROUCH_IDLE = 71,
@@ -145,7 +145,7 @@ enum LaraState
 	LS_ROPE_UP = 112,
 	LS_ROPE_DOWN = 113,
 	LS_ROPE_SWING = 114,
-	LS_LADDER_TO_SHIMMY = 115,
+	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
 	LS_DOUBLEDOOR_PUSH = 117,
 	LS_DOZY = 118,
@@ -153,15 +153,15 @@ enum LaraState
 	// TR5
 	LS_TIGHTROPE_IDLE = 119,
 	LS_TIGHTROPE_TURN_180 = 120,
-	LS_TIGHTROPE_FORWARD = 121,
+	LS_TIGHTROPE_WALK = 121,
 	LS_TIGHTROPE_UNBALANCE_LEFT = 122,
 	LS_TIGHTROPE_UNBALANCE_RIGHT = 123,
 	LS_TIGHTROPE_ENTER = 124,
-	LS_TIGHTROPE_EXIT = 125,
-	LS_DOVESWITCH = 126,
+	LS_TIGHTROPE_DISMOUNT = 125,
+	LS_DOVE_SWITCH = 126,
 	LS_TIGHTROPE_RECOVER_BALANCE = 127,
-	LS_BARS_SWING = 128,
-	LS_BARS_JUMP = 129,
+	LS_HORIZONTAL_BAR_SWING = 128,
+	LS_HORIZONTAL_BAR_LEAP = 129,
 	LS_UNKNOWN_1 = 130,
 	LS_RADIO_LISTENING = 131,
 	LS_RADIO_OFF = 132,
@@ -1136,16 +1136,16 @@ struct LaraCountData
 
 struct LaraControlData
 {
-	WeaponControlData WeaponControl;
-	RopeControlData RopeControl;
-	TightropeControlData TightropeControl;
-
 	short MoveAngle;
 	short TurnRate;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
 	WaterStatus WaterStatus;
+
+	WeaponControlData WeaponControl;
+	RopeControlData RopeControl;
+	TightropeControlData TightropeControl;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1193,6 +1193,7 @@ struct LaraInfo
 	int ProjectedFloorHeight;
 	int WaterSurfaceDist;
 	PHD_3DPOS NextCornerPos;
+	short interactedItem;
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
@@ -1203,7 +1204,6 @@ struct LaraInfo
 
 	byte wet[NUM_LARA_MESHES];
 	int meshPtrs[NUM_LARA_MESHES];
-	short interactedItem;
 	signed char location;
 	signed char highestLocation;
 	signed char locationPad;
