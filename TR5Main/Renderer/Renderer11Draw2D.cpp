@@ -86,43 +86,50 @@ namespace TEN::Renderer
 		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 400, 150, 8, 1, airColors);
 	}
 
-	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar,GAME_OBJECT_ID textureSlot,int frame, bool poison)
+	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison)
 	{
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
+	
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+		
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, bar->VertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
-		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture->ShaderResourceView.GetAddressOf());
-		ID3D11SamplerState* sampler = m_states->LinearClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
-		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
 		
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
+
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
+
+		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
+		BindTexture(TEXTURE_HUD, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
 
 		m_context->DrawIndexed(56, 0, 0);
 		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[textureSlot].meshIndex].Texture->ShaderResourceView.GetAddressOf());
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+		
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, bar->InnerVertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(bar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+
 		m_stHUDBar.Percent = percent;
 		m_stHUDBar.Poisoned = poison;
 		m_stHUDBar.Frame = frame;
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
-		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
-		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
+
+		BindTexture(TEXTURE_HUD, m_sprites[Objects[textureSlot].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
 
 		m_context->DrawIndexed(12, 0, 0);
 	}
@@ -132,43 +139,47 @@ namespace TEN::Renderer
 		UINT strides = sizeof(RendererVertex);
 		UINT offset = 0;
 		float color[] = { 0,0,0,1.0f };
+		
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+	
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, g_LoadingBar->VertexBufferBorder.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(g_LoadingBar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
+	
 		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShaderResources(0, 1,  loadingBarBorder.ShaderResourceView.GetAddressOf());
-		ID3D11SamplerState* sampler = m_states->LinearClamp();
-		m_context->PSSetSamplers(0, 1, &sampler);
 		m_context->PSSetShader(m_psHUDTexture.Get(), NULL, 0);
 
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
 
-		m_context->DrawIndexed(56, 0, 0);
-		m_context->PSSetShaderResources(0, 1, loadingBarInner.ShaderResourceView.GetAddressOf());
+		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
+		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
 
+		m_context->DrawIndexed(56, 0, 0);
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
+		
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetVertexBuffers(0, 1, g_LoadingBar->InnerVertexBuffer.Buffer.GetAddressOf(), &strides, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetIndexBuffer(g_LoadingBar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	
+		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
+		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+		
 		m_stHUDBar.Percent = percentage / 100.0f;
 		m_stHUDBar.Poisoned = false;
 		m_stHUDBar.Frame = 0;
 		m_cbHUDBar.updateData(m_stHUDBar, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbHUD.get());
-		m_context->PSSetConstantBuffers(0, 1, m_cbHUDBar.get());
-		m_context->VSSetShader(m_vsHUD.Get(), NULL, 0);
-		m_context->PSSetShader(m_psHUDBarColor.Get(), NULL, 0);
+		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
+		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
+
+		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
 
 		m_context->DrawIndexed(12, 0, 0);
 	}
-
 
 	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {
 		RendererLine2D line;
