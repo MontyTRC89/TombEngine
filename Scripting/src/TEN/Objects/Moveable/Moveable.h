@@ -18,7 +18,8 @@ class Moveable : public NamedBase<Moveable, short>
 {
 public:
 	using IdentifierType = short;
-	Moveable(short num, bool temporary);
+
+	Moveable(short num, bool temporary, bool init = true);
 	~Moveable();
 	Moveable& operator=(Moveable const& other) = delete;
 	Moveable(Moveable const& other) = delete;
