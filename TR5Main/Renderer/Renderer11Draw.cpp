@@ -1260,14 +1260,11 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color,
-	                                    bool cinematicBars)
+	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color)
 	{
 		RendererVertex vertices[4];
 
-		if (!cinematicBars)
-		{
-			vertices[0].Position.x = -1.0f;
+		vertices[0].Position.x = -1.0f;
 			vertices[0].Position.y = 1.0f;
 			vertices[0].Position.z = 0.0f;
 			vertices[0].UV.x = 0.0f;
@@ -1294,39 +1291,6 @@ namespace TEN::Renderer
 			vertices[3].UV.x = 0.0f;
 			vertices[3].UV.y = 1.0f;
 			vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
-		}
-		else
-		{
-			float cinematicFactor = 0.12f;
-
-			vertices[0].Position.x = -1.0f;
-			vertices[0].Position.y = 1.0f - cinematicFactor * 2;
-			vertices[0].Position.z = 0.0f;
-			vertices[0].UV.x = 0.0f;
-			vertices[0].UV.y = cinematicFactor;
-			vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
-
-			vertices[1].Position.x = 1.0f;
-			vertices[1].Position.y = 1.0f - cinematicFactor * 2;
-			vertices[1].Position.z = 0.0f;
-			vertices[1].UV.x = 1.0f;
-			vertices[1].UV.y = cinematicFactor;
-			vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
-
-			vertices[2].Position.x = 1.0f;
-			vertices[2].Position.y = -(1.0f - cinematicFactor * 2);
-			vertices[2].Position.z = 0.0f;
-			vertices[2].UV.x = 1.0f;
-			vertices[2].UV.y = 1.0f - cinematicFactor;
-			vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
-
-			vertices[3].Position.x = -1.0f;
-			vertices[3].Position.y = -(1.0f - cinematicFactor * 2);
-			vertices[3].Position.z = 0.0f;
-			vertices[3].UV.x = 0.0f;
-			vertices[3].UV.y = 1.0f - cinematicFactor;
-			vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
-		}
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
@@ -1949,8 +1913,7 @@ namespace TEN::Renderer
 		    // Draw the full screen background
 			DrawFullScreenQuad(
 				loadingScreenTexture->ShaderResourceView.Get(),
-				Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent),
-				false);
+				Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 		    m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 			DrawLoadingBar(percentage);
@@ -1998,11 +1961,11 @@ namespace TEN::Renderer
 	{
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CULL_MODE_NONE);
 
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &m_viewport);
-		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), false);
+		DrawFullScreenQuad(texture, Vector3(fade, fade, fade));
 	}
 
 	void Renderer11::RenderInventory()
@@ -2748,7 +2711,8 @@ namespace TEN::Renderer
 		UpdateAirBar(LaraItem, flash);
 		DrawAllPickups();
 
-		DrawOverlays(view); // Draw binoculars or lasersight
+		// Draw binoculars or lasersight
+		DrawOverlays(view); 
 
 		time2 = std::chrono::high_resolution_clock::now();
 		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
