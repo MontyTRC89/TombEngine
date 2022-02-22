@@ -1027,11 +1027,6 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
-	GAME_VECTOR target;
-	int x, y, z, distance;
-	ITEM_INFO* item;
-	short angle[2];
-
 	if (BinocularRange)
 	{
 		laraInfo->target = nullptr;
@@ -1056,20 +1051,22 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	{
 		if (ActiveCreatures[slot]->itemNum != NO_ITEM)
 		{
-			item = &g_Level.Items[ActiveCreatures[slot]->itemNum];
+			auto* item = &g_Level.Items[ActiveCreatures[slot]->itemNum];
 			if (item->HitPoints > 0)
 			{
-				x = item->Position.xPos - src.x;
-				y = item->Position.yPos - src.y;
-				z = item->Position.zPos - src.z;
+				int x = item->Position.xPos - src.x;
+				int y = item->Position.yPos - src.y;
+				int z = item->Position.zPos - src.z;
 				if (abs(x) <= maxDistance && abs(y) <= maxDistance && abs(z) <= maxDistance)
 				{
-					distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
 					if (distance < SQUARE(maxDistance))
 					{
+						GAME_VECTOR target;
 						FindTargetPoint(item, &target);
 						if (LOS(&src, &target))
 						{
+							short angle[2];
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
 							angle[0] -= laraItem->Position.yRot + laraInfo->ExtraTorsoRot.yRot;
 							angle[1] -= laraItem->Position.xRot + laraInfo->ExtraTorsoRot.xRot;
