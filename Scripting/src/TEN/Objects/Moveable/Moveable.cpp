@@ -16,7 +16,7 @@
 
 /***
 Represents any object inside the game world.
-Examples include statics, enemies, doors,
+Examples include traps, enemies, doors,
 pickups, and Lara herself.
 
 @tenclass Objects.Moveable
@@ -72,7 +72,7 @@ template <bool temp> std::unique_ptr<Moveable> CreateEmpty()
 associated getters and setters. If you do not know what to set for these,
 most can just be set to zero (see usage). See also the overload which
 takes no arguments.
-	@function Moveable.new
+	@function Moveable.New
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Position position position in level
@@ -85,7 +85,7 @@ takes no arguments.
 	@tparam table AIBits table with AI bits
 	@return reference to new Moveable object
 	@usage 
-	local item = Moveable.new(
+	local item = Moveable.New(
 		ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
@@ -102,7 +102,7 @@ takes no arguments.
 /*** Like the above, but the returned variable controls the 
 lifetime of the object (it will be destroyed when the variable goes
 out of scope).
-	@function Moveable.newTemporary
+	@function Moveable.NewTemporary
 	@param see_above same as above function
 */
 
@@ -221,7 +221,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Set current HP (hit points/health points)
 // @function Moveable:SetHP
-// @tparam int the amount of HP to give the moveable
+// @tparam int HP the amount of HP to give the moveable
 		ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get OCB (object code bit) of the moveable
@@ -231,7 +231,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Set OCB (object code bit) of the moveable
 // @function Moveable:SetOCB
-// @tparam int the new value for the moveable's OCB
+// @tparam int OCB the new value for the moveable's OCB
 		ScriptReserved_SetOCB, &Moveable::SetOCB,
 
 /// Get AIBits of object
@@ -253,7 +253,7 @@ void Moveable::Register(sol::table & parent)
 // Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
 // (or more than one) had suddenly spawned beneath their feet.
 // @function Moveable:SetAIBits
-// @tparam table the table of AI bits
+// @tparam table bits the table of AI bits
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
 // sas:SetAIBits({1, 0, 0, 0, 0, 0})
@@ -277,12 +277,12 @@ void Moveable::Register(sol::table & parent)
 /// Set room of object 
 // This is used in conjunction with SetPosition to teleport an item to a new room.
 // @function Moveable:SetRoom
-// @tparam int ID for the new room 
+// @tparam int ID the ID of the new room 
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
 // sas:SetRoom(destinationRoom)
 // sas:SetPosition(destinationPosition)
-		ScriptReserved_SetRoom, &Moveable::SetRoom,
+	ScriptReserved_SetRoom, &Moveable::SetRoom,
 
 
 /// Get the object's position
