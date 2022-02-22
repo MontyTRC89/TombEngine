@@ -197,7 +197,7 @@ namespace TEN::Renderer
 		if (flashColor != Vector3::Zero)
 		{
 			SetBlendMode(BLENDMODE_ADDITIVE);
-			DrawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor, false);
+			DrawFullScreenQuad(m_whiteTexture.ShaderResourceView.Get(), flashColor);
 		}
 
 		if (CurrentLevel == 0)
@@ -210,11 +210,11 @@ namespace TEN::Renderer
 
 		if (BinocularRange && !LaserSight)
 		{
-			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One);
 		}
 		else if (BinocularRange && LaserSight)
 		{
-			DrawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
+			DrawFullScreenQuad(m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One);
 
 			SetBlendMode(BLENDMODE_OPAQUE);
 
