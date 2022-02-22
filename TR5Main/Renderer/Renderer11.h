@@ -1,14 +1,15 @@
 #pragma once
 #include "Renderer/Renderer11Enums.h"
-#include "ConstantBuffers/StaticBuffer.h"
-#include "ConstantBuffers/LightBuffer.h"
-#include "ConstantBuffers/MiscBuffer.h"
-#include "ConstantBuffers/HUDBarBuffer.h"
-#include "ConstantBuffers/HUDBuffer.h"
-#include "ConstantBuffers/ShadowLightBuffer.h"
-#include "ConstantBuffers/RoomBuffer.h"
-#include "ConstantBuffers/ItemBuffer.h"
-#include "ConstantBuffers/AnimatedBuffer.h"
+#include "Renderer/ConstantBuffers/StaticBuffer.h"
+#include "Renderer/ConstantBuffers/LightBuffer.h"
+#include "Renderer/ConstantBuffers/MiscBuffer.h"
+#include "Renderer/ConstantBuffers/HUDBarBuffer.h"
+#include "Renderer/ConstantBuffers/HUDBuffer.h"
+#include "Renderer/ConstantBuffers/ShadowLightBuffer.h"
+#include "Renderer/ConstantBuffers/RoomBuffer.h"
+#include "Renderer/ConstantBuffers/ItemBuffer.h"
+#include "Renderer/ConstantBuffers/AnimatedBuffer.h"
+#include "Renderer/ConstantBuffers/AlphaTestBuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Game/items.h"
@@ -314,6 +315,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CSpriteBuffer> m_cbSprite;
 		CPostProcessBuffer m_stPostProcessBuffer;
 		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
+		CAlphaTestBuffer m_stAlphaTest;
+		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
 
 		// Text and sprites
 		std::unique_ptr<SpriteFont> m_gameFont;
@@ -538,6 +541,7 @@ namespace TEN::Renderer
 		void SetBlendMode(BLEND_MODES blendMode);
 		void SetDepthState(DEPTH_STATES depthState);
 		void SetCullMode(CULL_MODES cullMode);
+		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold);
 		float CalculateFrameRate();
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);

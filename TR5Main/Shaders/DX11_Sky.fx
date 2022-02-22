@@ -1,4 +1,6 @@
 #include "./CameraMatrixBuffer.hlsli"
+#include "./AlphaTestBuffer.hlsli"
+#include "./VertexInput.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b8)
 {
@@ -7,12 +9,6 @@ cbuffer StaticMatrixBuffer : register(b8)
 	float4 Color;
 };
 
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
-};
-
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {

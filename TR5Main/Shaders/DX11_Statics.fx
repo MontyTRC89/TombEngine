@@ -1,16 +1,12 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./VertexInput.hlsli"
+#include "./AlphaTestBuffer.hlsli"
 
 cbuffer StaticMatrixBuffer : register(b8)
 {
 	float4x4 World;
 	float4 Position;
 	float4 Color;
-};
-
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
 };
 
 struct PixelShaderInput
@@ -49,9 +45,8 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) {
-		discard;
-	}
+	
+	DoAlphaTest(output);
 
 	float3 colorMul = min(input.Color.xyz, 1.0f);
 	output.xyz = output.xyz * colorMul.xyz;
