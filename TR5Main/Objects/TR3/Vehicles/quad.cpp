@@ -361,9 +361,9 @@ static void QuadBaddieCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 					int y = quadItem->Position.yPos - item->Position.yPos;
 					int z = quadItem->Position.zPos - item->Position.zPos;
 
-					if (x > -CLICK(8) && x < CLICK(8) &&
-						z > -CLICK(8) && z < CLICK(8) &&
-						y > -CLICK(8) && y < CLICK(8))
+					if (x > -SECTOR(2) && x < SECTOR(2) &&
+						z > -SECTOR(2) && z < SECTOR(2) &&
+						y > -SECTOR(2) && y < SECTOR(2))
 					{
 						if (TestBoundsCollide(item, quadItem, QUAD_RADIUS))
 						{

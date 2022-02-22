@@ -27,7 +27,7 @@
 #include "Objects/TR2/Trap/tr2_killerstatue.h"
 /// vehicles
 #include "Objects/TR2/Vehicles/boat.h"
-#include "Objects/TR2/Vehicles/snowmobile.h"
+#include "Objects/TR2/Vehicles/skidoo.h"
 /// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"

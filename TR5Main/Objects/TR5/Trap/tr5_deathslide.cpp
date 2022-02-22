@@ -3,6 +3,7 @@
 #include "Specific/input.h"
 #include "Specific/trmath.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 #include "Game/control/box.h"
@@ -15,102 +16,109 @@ PHD_VECTOR DeathSlidePosition(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	item->Data = GAME_VECTOR();
-	GAME_VECTOR* pos = item->Data;
+	auto* pos = (GAME_VECTOR*)item->Data;
+
 	pos->x = item->Position.xPos;
 	pos->y = item->Position.yPos;
 	pos->z = item->Position.zPos;
 	pos->roomNumber = item->RoomNumber;
 }
 
-void DeathSlideCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	if (!(TrInput & IN_ACTION) || l->Airborne || Lara.Control.HandStatus != HandStatus::Free || l->ActiveState != LS_IDLE)
-		return;
+	auto* laraInfo = GetLaraInfo(laraItem);
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (item->Status != ITEM_NOT_ACTIVE)
-		return;
-
-	if (TestLaraPosition(&DeathSlideBounds, item, LaraItem))
+	if (!(TrInput & IN_ACTION) ||
+		laraItem->ActiveState != LS_IDLE ||
+		laraItem->Airborne ||
+		laraInfo->Control.HandStatus != HandStatus::Free)
 	{
-		AlignLaraPosition(&DeathSlidePosition, item, LaraItem);
-		Lara.Control.HandStatus = HandStatus::Busy;
+		return;
+	}
 
-		l->TargetState = LS_ZIP_LINE;
+	auto* zipLineItem = &g_Level.Items[itemNumber];
+	if (zipLineItem->Status != ITEM_NOT_ACTIVE)
+		return;
+
+	if (TestLaraPosition(&DeathSlideBounds, zipLineItem, laraItem))
+	{
+		AlignLaraPosition(&DeathSlidePosition, zipLineItem, laraItem);
+		laraInfo->Control.HandStatus = HandStatus::Busy;
+
+		laraItem->TargetState = LS_ZIP_LINE;
 		do
-			AnimateItem(l);
-		while (l->ActiveState != LS_GRABBING);
+			AnimateItem(laraItem);
+		while (laraItem->ActiveState != LS_GRABBING);
 
-		if (!item->Active)
+		if (!zipLineItem->Active)
 			AddActiveItem(itemNumber);
 
-		item->Status = ITEM_ACTIVE;
-		item->Flags |= ONESHOT;
+		zipLineItem->Status = ITEM_ACTIVE;
+		zipLineItem->Flags |= ONESHOT;
 	}
 }
 
 void ControlDeathSlide(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* zipLineItem = &g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_ACTIVE)
+	if (zipLineItem->Status == ITEM_ACTIVE)
 	{
-		if (!(item->Flags & ONESHOT))
+		if (!(zipLineItem->Flags & ONESHOT))
 		{
-			GAME_VECTOR* old = (GAME_VECTOR*)item->Data;
+			auto* old = (GAME_VECTOR*)zipLineItem->Data;
 
-			item->Position.xPos = old->x;
-			item->Position.yPos = old->y;
-			item->Position.zPos = old->z;
+			zipLineItem->Position.xPos = old->x;
+			zipLineItem->Position.yPos = old->y;
+			zipLineItem->Position.zPos = old->z;
 
-			if (old->roomNumber != item->RoomNumber)
+			if (old->roomNumber != zipLineItem->RoomNumber)
 				ItemNewRoom(itemNumber, old->roomNumber);
 
-			item->Status = ITEM_NOT_ACTIVE;
-			item->ActiveState = item->TargetState = 1;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			zipLineItem->Status = ITEM_NOT_ACTIVE;
+			zipLineItem->ActiveState = zipLineItem->TargetState = 1;
+			zipLineItem->AnimNumber = Objects[zipLineItem->ObjectNumber].animIndex;
+			zipLineItem->FrameNumber = g_Level.Anims[zipLineItem->AnimNumber].frameBase;
 
 			RemoveActiveItem(itemNumber);
-
 			return;
 		}
 
-		if (item->ActiveState == 1)
+		if (zipLineItem->ActiveState == 1)
 		{
-			AnimateItem(item);
+			AnimateItem(zipLineItem);
 			return;
 		}
 
-		AnimateItem(item);
+		AnimateItem(zipLineItem);
 
-		if (item->VerticalVelocity < 100)
-			item->VerticalVelocity += 5;
+		if (zipLineItem->VerticalVelocity < 100)
+			zipLineItem->VerticalVelocity += 5;
 
-		float c = phd_cos(item->Position.yRot);
-		float s = phd_sin(item->Position.yRot);
+		float c = phd_cos(zipLineItem->Position.yRot);
+		float s = phd_sin(zipLineItem->Position.yRot);
 
-		item->Position.zPos += item->VerticalVelocity * c;
-		item->Position.xPos += item->VerticalVelocity * s;
-		item->Position.yPos += item->VerticalVelocity / 4;
+		zipLineItem->Position.zPos += zipLineItem->VerticalVelocity * c;
+		zipLineItem->Position.xPos += zipLineItem->VerticalVelocity * s;
+		zipLineItem->Position.yPos += zipLineItem->VerticalVelocity / 4;
 
-		short roomNumber = item->RoomNumber;
-		GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		if (roomNumber != item->RoomNumber)
+		short roomNumber = zipLineItem->RoomNumber;
+		GetFloor(zipLineItem->Position.xPos, zipLineItem->Position.yPos, zipLineItem->Position.zPos, &roomNumber);
+		if (roomNumber != zipLineItem->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (LaraItem->ActiveState == LS_ZIP_LINE)
 		{
-			LaraItem->Position.xPos = item->Position.xPos;
-			LaraItem->Position.yPos = item->Position.yPos;
-			LaraItem->Position.zPos = item->Position.zPos;
+			LaraItem->Position.xPos = zipLineItem->Position.xPos;
+			LaraItem->Position.yPos = zipLineItem->Position.yPos;
+			LaraItem->Position.zPos = zipLineItem->Position.zPos;
 		}
 
-		int x = item->Position.xPos + 1024 * s;
-		int y = item->Position.yPos + 64;
-		int z = item->Position.zPos + 1024 * c;
+		int x = zipLineItem->Position.xPos + 1024 * s;
+		int y = zipLineItem->Position.yPos + 64;
+		int z = zipLineItem->Position.zPos + 1024 * c;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 
@@ -121,20 +129,20 @@ void ControlDeathSlide(short itemNumber)
 				LaraItem->TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
 				LaraItem->Airborne = true;
-				LaraItem->Velocity = item->VerticalVelocity;
-				LaraItem->VerticalVelocity = item->VerticalVelocity / 4;
+				LaraItem->Velocity = zipLineItem->VerticalVelocity;
+				LaraItem->VerticalVelocity = zipLineItem->VerticalVelocity / 4;
 			}
 
 			// Stop
-			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &item->Position, 0);
+			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Position, 0);
 			RemoveActiveItem(itemNumber);
-			item->Status = ITEM_NOT_ACTIVE;
-			item->Flags -= ONESHOT;
+			zipLineItem->Status = ITEM_NOT_ACTIVE;
+			zipLineItem->Flags -= ONESHOT;
 		}
 		else
 		{
 			// Whizz
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &item->Position, 0);
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Position, 0);
 		}
 	}
 }

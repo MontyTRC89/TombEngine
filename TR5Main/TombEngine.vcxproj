@@ -436,7 +436,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
-    <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h" />
+    <ClInclude Include="Objects\TR2\Vehicles\skidoo.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
@@ -748,7 +748,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpgun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpstick.cpp" />
-    <ClCompile Include="Objects\TR2\Vehicles\snowmobile.cpp" />
+    <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
