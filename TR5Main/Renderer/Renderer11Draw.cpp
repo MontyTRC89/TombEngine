@@ -2861,19 +2861,21 @@ namespace TEN::Renderer
 		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
+		// Bind item main properties
 		m_stItem.World = item->World;
 		m_stItem.Position = Vector4(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
+		// Bind lights touching that item
 		m_stLights.NumLights = item->LightsToDraw.size();
 		for (int j = 0; j < m_stLights.NumLights; j++)
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
@@ -2882,6 +2884,7 @@ namespace TEN::Renderer
 
 			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
+			// Do the swapmesh
 			if (obj->meshSwapSlot != -1 && ((nativeItem->swapMeshFlags >> k) & 1))
 			{
 				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
@@ -3043,9 +3046,9 @@ namespace TEN::Renderer
 				if (!m_staticObjects[msh->staticNumber])
 					continue;
 
-				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot),
-				                                               TO_RAD(msh->pos.zRot)) * Matrix::CreateTranslation(
-					msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+				Matrix world =
+					Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot), TO_RAD(msh->pos.zRot)) * 
+					Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
 				m_stStatic.World = world;
 				m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
 				m_stStatic.Color = msh->color;
@@ -3270,9 +3273,6 @@ namespace TEN::Renderer
 								SetBlendMode(BLENDMODE_ALPHABLEND);
 								SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
 							}
-
-							//SetBlendMode(BLENDMODE_OPAQUE);
-							//SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 							// Draw geometry
 							if (animated)
