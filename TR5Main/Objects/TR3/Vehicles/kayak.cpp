@@ -20,22 +20,22 @@ using std::vector;
 
 #define KAYAK_COLLIDE			CLICK(0.25f)
 #define DISMOUNT_DISTANCE 		CLICK(3) // TODO: Find accurate distance.
-#define KAYAK_TO_BADDIE_RADIUS	CLICK(1)
+#define KAYAK_TO_ENTITY_RADIUS	CLICK(1)
 
-#define MAX_VELOCITY			0x380000
-#define KAYAK_FRICTION		0x8000
-#define KAYAK_ROT_FRIC		0x50000
-#define KAYAK_DFLECT_ROT	0x80000
-#define KAYAK_FWD_VEL		0x180000
-#define KAYAK_FWD_ROT		0x800000
-#define KAYAK_LR_VEL		0x100000
-#define KAYAK_LR_ROT		0xc00000
-#define KAYAK_MAX_LR		0xc00000
-#define KAYAK_TURN_ROT		0x200000
-#define KAYAK_MAX_TURN		0x1000000
-#define KAYAK_TURN_BRAKE	0x8000
-#define KAYAK_HARD_ROT		0x1000000
-#define KAYAK_MAX_STAT		0x1000000
+#define MAX_VELOCITY				0x380000
+#define KAYAK_FRICTION				0x8000
+#define KAYAK_ROTATE_FRICTION		0x50000
+#define KAYAK_DEFLECT_ROTATION		0x80000
+#define KAYAK_FORWARD_VELOCITY		0x180000
+#define KAYAK_FORWARD_ROTATION		0x800000
+#define KAYAK_LEFT_RIGHT_VELOCITY	0x100000
+#define KAYAK_LEFT_RIGHT_ROTATION	0xc00000
+#define KAYAK_MAX_LEFT_RIGHT		0xc00000
+#define KAYAK_TURN_ROTATION			0x200000
+#define KAYAK_MAX_TURN				0x1000000
+#define KAYAK_TURN_BRAKE			0x8000
+#define KAYAK_HARD_ROTATION			0x1000000
+#define KAYAK_MAX_STAT				0x1000000
 
 #define HIT_BACK	1
 #define HIT_FRONT	2
@@ -50,11 +50,11 @@ using std::vector;
 #define LARA_LEG_BITS		((1 << LM_HIPS) | (1 << LM_LTHIGH) | (1 << LM_LSHIN) | (1 << LM_LFOOT) | (1 << LM_RTHIGH) | (1 << LM_RSHIN) | (1 << LM_RFOOT))
 #define NUM_WAKE_SPRITES	32
 #define WAKE_SIZE 			32
-#define WAKE_SPEED 			4
+#define WAKE_VELOCITY 		4
 #define KAYAK_X				128
 #define KAYAK_Z				128
 #define KAYAK_MAX_KICK		-80
-#define KAYAK_MIN_BOUNCE	((MAX_SPEED / 2) / 256)
+#define KAYAK_MIN_BOUNCE	((MAX_VELOCITY / 2) / 256)
 
 #define KAYAK_IN_FORWARD	IN_FORWARD
 #define KAYAK_IN_BACK		IN_BACK
@@ -66,21 +66,21 @@ using std::vector;
 
 enum KayakState
 {
-	KAYAK_STATE_BACK,
-	KAYAK_STATE_IDLE,
-	KAYAK_STATE_TURN_LEFT,
-	KAYAK_STATE_TURN_RIGHT,
-	KAYAK_STATE_MOUNT_LEFT,
-	KAYAK_STATE_IDLE_DEATH,
-	KAYAK_STATE_FORWARD,
-	KAYAK_STATE_CAPSIZE_RECOVER,	// Unused.
-	KAYAK_STATE_CAPSIZE_DEATH,		// Unused.
-	KAYAK_STATE_DISMOUNT,
-	KAYAK_STATE_HOLD_LEFT,
-	KAYAK_STATE_HOLD_RIGHT,
-	KAYAK_STATE_MOUNT_RIGHT,
-	KAYAK_STATE_DISMOUNT_LEFT,
-	KAYAK_STATE_DISMOUNT_RIGHT,
+	KAYAK_STATE_BACK = 0,
+	KAYAK_STATE_IDLE = 1,
+	KAYAK_STATE_TURN_LEFT = 2,
+	KAYAK_STATE_TURN_RIGHT = 3,
+	KAYAK_STATE_MOUNT_LEFT = 4,
+	KAYAK_STATE_IDLE_DEATH = 5,
+	KAYAK_STATE_FORWARD = 6,
+	KAYAK_STATE_CAPSIZE_RECOVER = 7,	// Unused.
+	KAYAK_STATE_CAPSIZE_DEATH = 8,		// Unused.
+	KAYAK_STATE_DISMOUNT = 9,
+	KAYAK_STATE_HOLD_LEFT = 10,
+	KAYAK_STATE_HOLD_RIGHT = 11,
+	KAYAK_STATE_MOUNT_RIGHT = 12,
+	KAYAK_STATE_DISMOUNT_LEFT = 13,
+	KAYAK_STATE_DISMOUNT_RIGHT = 14,
 };
 
 enum KayakAnim
@@ -215,10 +215,10 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 		}
 
 		int xv[2], zv[2];
-		xv[0] = WAKE_SPEED * phd_sin(angle1);
-		zv[0] = WAKE_SPEED * phd_cos(angle1);
-		xv[1] = (WAKE_SPEED + 2) * phd_sin(angle2);
-		zv[1] = (WAKE_SPEED + 2) * phd_cos(angle2);
+		xv[0] = WAKE_VELOCITY * phd_sin(angle1);
+		zv[0] = WAKE_VELOCITY * phd_cos(angle1);
+		xv[1] = (WAKE_VELOCITY + 2) * phd_sin(angle2);
+		zv[1] = (WAKE_VELOCITY + 2) * phd_cos(angle2);
 
 		WakePts[CurrentStartWake][rotate].y = kayakItem->Position.yPos + KAYAK_DRAW_SHIFT;
 		WakePts[CurrentStartWake][rotate].life = 0x40;
@@ -485,8 +485,8 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 	int xOld = old->x / SECTOR(1);
 	int zOld = old->z / SECTOR(1);
 
-	int xShift = pos->x & (WALL_SIZE - 1);
-	int zShift = pos->z & (WALL_SIZE - 1);
+	int xShift = pos->x & (SECTOR(1) - 1);
+	int zShift = pos->z & (SECTOR(1) - 1);
 
 	if (x == xOld)
 	{
@@ -504,7 +504,7 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		}
 		else
 		{
-			kayakItem->Position.zPos += WALL_SIZE - zShift;
+			kayakItem->Position.zPos += SECTOR(1) - zShift;
 			return (kayakItem->Position.xPos - pos->x);
 		}
 	}
@@ -520,7 +520,7 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		else
 		{
-			kayakItem->Position.xPos += WALL_SIZE - xShift;
+			kayakItem->Position.xPos += SECTOR(1) - xShift;
 			return (pos->z - kayakItem->Position.zPos);
 		}
 	}
@@ -530,21 +530,21 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		z = 0;
 
 		auto probe = GetCollisionResult(old->x, pos->y, pos->z, kayakItem->RoomNumber);
-		if (probe.Position.Floor < old->y - STEP_SIZE)
+		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
 				z = -zShift - 1;
 			else
-				z = WALL_SIZE - zShift;
+				z = SECTOR(1) - zShift;
 		}
 
 		probe = GetCollisionResult(pos->x, pos->y, old->z, kayakItem->RoomNumber);
-		if (probe.Position.Floor < old->y - STEP_SIZE)
+		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
 				x = -xShift - 1;
 			else
-				x = WALL_SIZE - xShift;
+				x = SECTOR(1) - xShift;
 		}
 
 		if (x && z)
@@ -839,25 +839,25 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (kayakInfo->Forward)
 			{
-				kayakInfo->TurnRate -= KAYAK_FWD_ROT;
+				kayakInfo->TurnRate -= KAYAK_FORWARD_ROTATION;
 				if (kayakInfo->TurnRate < -KAYAK_MAX_TURN)
 					kayakInfo->TurnRate = -KAYAK_MAX_TURN;
 
-				kayakInfo->Velocity += KAYAK_FWD_VEL;
+				kayakInfo->Velocity += KAYAK_FORWARD_VELOCITY;
 			}
 			else if (kayakInfo->Turn)
 			{
-				kayakInfo->TurnRate -= KAYAK_HARD_ROT;
+				kayakInfo->TurnRate -= KAYAK_HARD_ROTATION;
 				if (kayakInfo->TurnRate < -KAYAK_MAX_STAT)
 					kayakInfo->TurnRate = -KAYAK_MAX_STAT;
 			}
 			else
 			{
-				kayakInfo->TurnRate -= KAYAK_LR_ROT;
-				if (kayakInfo->TurnRate < -KAYAK_MAX_LR)
-					kayakInfo->TurnRate = -KAYAK_MAX_LR;
+				kayakInfo->TurnRate -= KAYAK_LEFT_RIGHT_ROTATION;
+				if (kayakInfo->TurnRate < -KAYAK_MAX_LEFT_RIGHT)
+					kayakInfo->TurnRate = -KAYAK_MAX_LEFT_RIGHT;
 
-				kayakInfo->Velocity += KAYAK_LR_VEL;
+				kayakInfo->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
 			}
 		}
 
@@ -899,25 +899,25 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (kayakInfo->Forward)
 			{
-				kayakInfo->TurnRate += KAYAK_FWD_ROT;
+				kayakInfo->TurnRate += KAYAK_FORWARD_ROTATION;
 				if (kayakInfo->TurnRate > KAYAK_MAX_TURN)
 					kayakInfo->TurnRate = KAYAK_MAX_TURN;
 
-				kayakInfo->Velocity += KAYAK_FWD_VEL;
+				kayakInfo->Velocity += KAYAK_FORWARD_VELOCITY;
 			}
 			else if (kayakInfo->Turn)
 			{
-				kayakInfo->TurnRate += KAYAK_HARD_ROT;
+				kayakInfo->TurnRate += KAYAK_HARD_ROTATION;
 				if (kayakInfo->TurnRate > KAYAK_MAX_STAT)
 					kayakInfo->TurnRate = KAYAK_MAX_STAT;
 			}
 			else
 			{
-				kayakInfo->TurnRate += KAYAK_LR_ROT;
-				if (kayakInfo->TurnRate > KAYAK_MAX_LR)
-					kayakInfo->TurnRate = KAYAK_MAX_LR;
+				kayakInfo->TurnRate += KAYAK_LEFT_RIGHT_ROTATION;
+				if (kayakInfo->TurnRate > KAYAK_MAX_LEFT_RIGHT)
+					kayakInfo->TurnRate = KAYAK_MAX_LEFT_RIGHT;
 
-				kayakInfo->Velocity += KAYAK_LR_VEL;
+				kayakInfo->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
 			}
 		}
 
@@ -934,14 +934,14 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (frame == 8)
 			{
-				kayakInfo->TurnRate += KAYAK_FWD_ROT;
-				kayakInfo->Velocity -= KAYAK_FWD_VEL;
+				kayakInfo->TurnRate += KAYAK_FORWARD_ROTATION;
+				kayakInfo->Velocity -= KAYAK_FORWARD_VELOCITY;
 			}
 
 			if (frame == 31)
 			{
-				kayakInfo->TurnRate -= KAYAK_FWD_ROT;
-				kayakInfo->Velocity -= KAYAK_FWD_VEL;
+				kayakInfo->TurnRate -= KAYAK_FORWARD_ROTATION;
+				kayakInfo->Velocity -= KAYAK_FORWARD_VELOCITY;
 			}
 
 			if (frame < 15 && frame & 1)
@@ -965,7 +965,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (kayakInfo->Velocity >= 0)
 			{
-				kayakInfo->TurnRate -= KAYAK_TURN_ROT;
+				kayakInfo->TurnRate -= KAYAK_TURN_ROTATION;
 				if (kayakInfo->TurnRate < -KAYAK_MAX_TURN)
 					kayakInfo->TurnRate = -KAYAK_MAX_TURN;
 
@@ -976,7 +976,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			if (kayakInfo->Velocity < 0)
 			{
-				kayakInfo->TurnRate += KAYAK_TURN_ROT;
+				kayakInfo->TurnRate += KAYAK_TURN_ROTATION;
 
 				kayakInfo->Velocity += KAYAK_TURN_BRAKE;
 				if (kayakInfo->Velocity > 0)
@@ -1001,7 +1001,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (kayakInfo->Velocity >= 0)
 			{
-				kayakInfo->TurnRate += KAYAK_TURN_ROT;
+				kayakInfo->TurnRate += KAYAK_TURN_ROTATION;
 				if (kayakInfo->TurnRate > KAYAK_MAX_TURN)
 					kayakInfo->TurnRate = KAYAK_MAX_TURN;
 
@@ -1012,7 +1012,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			if (kayakInfo->Velocity < 0)
 			{
-				kayakInfo->TurnRate -= KAYAK_TURN_ROT;
+				kayakInfo->TurnRate -= KAYAK_TURN_ROTATION;
 
 				kayakInfo->Velocity += KAYAK_TURN_BRAKE;
 				if (kayakInfo->Velocity > 0)
@@ -1119,13 +1119,13 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	;
 	if (kayakInfo->TurnRate >= 0)
 	{
-		kayakInfo->TurnRate -= KAYAK_ROT_FRIC;
+		kayakInfo->TurnRate -= KAYAK_ROTATE_FRICTION;
 		if (kayakInfo->TurnRate < 0)
 			kayakInfo->TurnRate = 0;
 	}
 	else if (kayakInfo->TurnRate < 0)
 	{
-		kayakInfo->TurnRate += KAYAK_ROT_FRIC;
+		kayakInfo->TurnRate += KAYAK_ROTATE_FRICTION;
 		if (kayakInfo->TurnRate > 0)
 			kayakInfo->TurnRate = 0;
 	}
@@ -1167,7 +1167,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 						y > -2048 && y < 2048 &&
 						z > -2048 && z < 2048)
 					{
-						if (TestBoundsCollide(item, kayakItem, KAYAK_TO_BADDIE_RADIUS))
+						if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 						{
 							DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - STEP_SIZE, laraItem->Position.zPos, kayakItem->Velocity, kayakItem->Position.yRot, laraItem->RoomNumber, 3);
 							laraItem->HitPoints -= 5;

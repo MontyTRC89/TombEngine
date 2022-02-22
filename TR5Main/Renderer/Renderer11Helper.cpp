@@ -245,10 +245,10 @@ namespace TEN::Renderer
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
 				}
 				},
-				[&j, &currentBone](RUBBER_BOAT_INFO& boat)
+				[&j, &currentBone](RubberBoatInfo& boat)
 				{
 				if (j == 2)
-					currentBone->ExtraRotation.z = TO_RAD(boat.propRot);
+					currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
 				},
 				[&j, &currentBone](SUB_INFO& upv)
 				{

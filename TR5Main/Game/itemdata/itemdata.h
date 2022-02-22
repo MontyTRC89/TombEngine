@@ -57,7 +57,7 @@ class ITEM_DATA {
 		SpeedBoatInfo,
 		GAME_VECTOR,
 		WRAITH_INFO,
-		RUBBER_BOAT_INFO,
+		RubberBoatInfo,
 		PUSHABLE_INFO,
 		MinecartInfo
 	> data;

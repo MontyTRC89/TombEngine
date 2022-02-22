@@ -45,6 +45,7 @@ struct ITEM_INFO
 	std::string LuaName;
 	GAME_OBJECT_ID ObjectNumber;
 	int BoxNumber;
+	ITEM_DATA Data;
 
 	PHD_3DPOS StartPosition;
 	PHD_3DPOS Position;
@@ -53,13 +54,12 @@ struct ITEM_INFO
 	int Floor;
 	std::vector<BONE_MUTATOR> Mutator;
 
-	int AnimNumber;
-	int FrameNumber;
+
 	int ActiveState;
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
-
-	ITEM_DATA Data;
+	int AnimNumber;
+	int FrameNumber;
 
 	uint32_t TouchBits;
 	uint32_t MeshBits;
