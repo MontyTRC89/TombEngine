@@ -308,11 +308,19 @@ void Moveable::Register(sol::table & parent)
 // @tparam Rotation The moveable's new rotation
 	ScriptReserved_SetRotation, &Moveable::SetRot,
 
-/// (string) unique string identifier.
+/// Set the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
-// @mem name
-		"name", sol::property(&Moveable::GetName, &Moveable::SetName)
-		);
+// This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
+// @function GetName
+// @treturn name the moveable's name
+	ScriptReserved_GetName, &Moveable::GetName,
+
+/// Set the moveable's name (its unique string identifier)
+// e.g. "door\_back\_room" or "cracked\_greek\_statue"
+// It cannot be blank and cannot share a name with any existing object.
+// @function SetName
+// @tparam name string the new moveable's name
+	ScriptReserved_SetName, &Moveable::SetName);
 }
 
 
