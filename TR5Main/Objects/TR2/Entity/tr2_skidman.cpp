@@ -10,17 +10,27 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
-#include "Objects/TR2/Vehicles/snowmobile.h"
+#include "Objects/TR2/Vehicles/skidoo.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-enum SKIDMAN_STATE { SMAN_EMPTY, SMAN_WAIT, SMAN_MOVING, SMAN_STARTLEFT, SMAN_STARTRIGHT, SMAN_LEFT, SMAN_RIGHT, SMAN_DEATH };
+enum SKIDMAN_STATE
+{
+	SMAN_EMPTY,
+	SMAN_WAIT,
+	SMAN_MOVING,
+	SMAN_STARTLEFT,
+	SMAN_STARTRIGHT,
+	SMAN_LEFT,
+	SMAN_RIGHT,
+	SMAN_DEATH
+};
 
 #define SMAN_MIN_TURN (ANGLE(6.0f)/3)
 #define SMAN_TARGET_ANGLE ANGLE(15.0f)
-#define SMAN_WAIT_RANGE SQUARE(WALL_SIZE*4)
+#define SMAN_WAIT_RANGE SQUARE(SECTOR(4))
 #define SMAN_DEATH_ANIM 10
 
 BITE_INFO skidooLeft = { 240, -190, 540, 0 };
@@ -53,9 +63,7 @@ void InitialiseSkidman(short itemNum)
 		g_Level.NumItems++;
 	}
 	else
-	{
 		TENLog("Can't create skidoo for rider!", LogLevel::Error);
-	}
 }
 
 void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
@@ -238,6 +246,6 @@ void SkidManControl(short riderNum)
 		item->Status = ITEM_DEACTIVATED;
 		InitialiseSkidoo(item_number);
 
-		((SKIDOO_INFO*)item->Data)->armed = true;
+		((SkidooInfo*)item->Data)->Armed = true;
 	}
 }

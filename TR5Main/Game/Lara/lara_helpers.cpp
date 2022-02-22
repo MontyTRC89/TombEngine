@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#include "Objects/TR2/Vehicles/snowmobile.h"
+#include "Objects/TR2/Vehicles/skidoo.h"
 #include "Objects/TR3/Vehicles/biggun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"

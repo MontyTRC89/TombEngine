@@ -11,21 +11,21 @@ enum class BoatMountType
 	StartPosition = 4
 };
 
-void InitialiseSpeedBoat(short itemNum);
+void InitialiseSpeedBoat(short itemNumber);
 void DoBoatWakeEffect(ITEM_INFO* sBoatItem);
 BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, COLL_INFO* coll);
 bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction);
 void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
-int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOff, int xOff, PHD_VECTOR* pos);
+int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, PHD_VECTOR* pos);
 
-void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNum);
-short SpeedBoatDoShift(ITEM_INFO* skidoo, PHD_VECTOR* pos, PHD_VECTOR* old);
+void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNumber);
+short SpeedBoatDoShift(ITEM_INFO* sBoatItem, PHD_VECTOR* pos, PHD_VECTOR* old);
 
 int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, PHD_VECTOR* moved);
-int SpeedBoatDoBoatDynamics(int height, int fallspeed, int* y);
-int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum);
-bool SpeedBoatUserControl(ITEM_INFO* sBoatItem);
+int DoSpeedBoatDynamics(int height, int verticalVelocity, int* y);
+int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber);
+bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
 void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide);
-void SpeedBoatSplash(ITEM_INFO* item, long fallspeed, long water);
-void SpeedBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
-void SpeedBoatControl(short itemNum);
+void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water);
+void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void SpeedBoatControl(short itemNumber);

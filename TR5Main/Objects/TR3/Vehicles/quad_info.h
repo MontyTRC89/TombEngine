@@ -5,8 +5,8 @@ struct QuadInfo
 	short TurnRate;
 	short FrontRot;
 	short RearRot;
-	short ExtraRotation;
 	short MomentumAngle;
+	short ExtraRotation;
 
 	int Velocity;
 	int LeftVerticalVelocity;

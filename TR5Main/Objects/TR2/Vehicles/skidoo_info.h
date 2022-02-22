@@ -1,15 +1,16 @@
 #pragma once
 
-struct SKIDOO_INFO 
+struct SkidooInfo 
 {
-	short trackMesh;
-	int skidooTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	short momentumAngle;
-	short extraRotation;
-	int pitch;
-	bool alreadyCdPlayed;
-	bool armed;
-	int flashTimer;
+	short TurnRate;
+	short MomentumAngle;
+	short ExtraRotation;
+
+	int LeftVerticalVelocity;
+	int RightVerticalVelocity;
+
+	int Pitch;
+	int FlashTimer;
+	short TrackMesh;
+	bool Armed;
 };
