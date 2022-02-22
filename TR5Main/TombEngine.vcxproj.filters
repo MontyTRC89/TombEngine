@@ -723,6 +723,7 @@
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
@@ -758,5 +759,6 @@
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
     <None Include="Shaders\ShaderLight.hlsli" />
+    <None Include="Shaders\AlphaTestBuffer.hlsli" />
   </ItemGroup>
 </Project>

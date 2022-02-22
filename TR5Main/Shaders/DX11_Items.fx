@@ -2,6 +2,7 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./VertexInput.hlsli"
+#include "./AlphaTestBuffer.hlsli"
 
 cbuffer ItemBuffer : register(b1) 
 {
@@ -20,7 +21,6 @@ cbuffer LightsBuffer : register(b2)
 
 cbuffer MiscBuffer : register(b3)
 {
-	int AlphaTest;
 	int Caustics;
 };
 
@@ -102,10 +102,8 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) 
-	{
-		discard;
-	}
+	
+	DoAlphaTest(output);
 
 	float3 colorMul = input.Color.xyz;
 

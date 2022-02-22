@@ -156,9 +156,10 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 				            SAMPLER_NONE);
 
-				m_stMisc.AlphaTest = (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE);
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+				SetAlphaTest(
+					bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+					ALPHA_TEST_THRESHOLD
+				);
 
 				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
 			}
@@ -222,9 +223,7 @@ namespace TEN::Renderer
 
 		m_stShadowMap.LightViewProjection = (view * projection);
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
@@ -372,9 +371,7 @@ namespace TEN::Renderer
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		for (int i = 0; i < 24; i++)
 		{
@@ -2434,7 +2431,6 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
 
 		m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
-		m_stMisc.AlphaTest = false;
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
 		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
@@ -2474,6 +2470,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(info->blendMode);
+		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		m_biggestRoomIndexBuffer = std::fmaxf(m_biggestRoomIndexBuffer, m_transparentFacesIndices.size());
 
@@ -2526,11 +2523,9 @@ namespace TEN::Renderer
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-		m_stMisc.AlphaTest = false;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		BindConstantBufferPS(CB_MISC, m_cbMisc.get());
-
 		SetBlendMode(info->blendMode);
+		
+		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -2939,11 +2934,9 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[info->bucket->Texture]),
 		            SAMPLER_NONE);
 
-		m_stMisc.AlphaTest = false;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 		SetBlendMode(info->blendMode);
+
+		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		int drawnVertices = 0;
 		int size = m_transparentFacesIndices.size();
@@ -3112,19 +3105,16 @@ namespace TEN::Renderer
 							{
 								if (pass == 0)
 								{
-									m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
-									m_cbMisc.updateData(m_stMisc, m_context.Get());
-									BindConstantBufferPS(CB_MISC, m_cbMisc.get());
-
 									SetBlendMode(bucket.BlendMode);
+									SetAlphaTest(
+										bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+										ALPHA_TEST_THRESHOLD
+									);
 								}
 								else
 								{
-									m_stMisc.AlphaTest = false;
-									m_cbMisc.updateData(m_stMisc, m_context.Get());
-									BindConstantBufferPS(CB_MISC, m_cbMisc.get());
-
 									SetBlendMode(BLENDMODE_ALPHABLEND);
+									SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 								}
 
 								BindTexture(TEXTURE_COLOR_MAP,
@@ -3162,14 +3152,15 @@ namespace TEN::Renderer
 		int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
 		int causticsFrame = nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : 0;
 
-		BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
-		BindTexture(TEXTURE_SHADOW_MAP, &m_shadowMap, SAMPLER_SHADOW_MAP);
+		// BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_NONE);
 
 		// Set shadow map data
 		if (shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
 			m_stShadowMap.CastShadows = true;
+
+			BindTexture(TEXTURE_SHADOW_MAP, &m_shadowMap, SAMPLER_SHADOW_MAP);
 		}
 		else
 		{
@@ -3196,6 +3187,7 @@ namespace TEN::Renderer
 			m_cbLights.updateData(m_stLights, m_context.Get());
 			BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
+			// TODO: make caustics optional in Tomb Editor
 			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
 
 			m_stRoom.AmbientColor = room->AmbientLight;
@@ -3212,8 +3204,8 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
 					m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
+					BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
 				}
 
 				for (auto& bucket : room->Buckets)
@@ -3228,7 +3220,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (DoesBlendModeRequireSorting(bucket.BlendMode))
+					if (false && DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
 						for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -3267,20 +3259,20 @@ namespace TEN::Renderer
 						{
 							if (pass == 0)
 							{
-								m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
-								m_cbMisc.updateData(m_stMisc, m_context.Get());
-								BindConstantBufferPS(CB_MISC, m_cbMisc.get());
-
 								SetBlendMode(bucket.BlendMode);
+								SetAlphaTest(
+									bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+									FAST_ALPHA_BLEND_THRESHOLD
+								);
 							}
 							else
 							{
-								m_stMisc.AlphaTest = false;
-								m_cbMisc.updateData(m_stMisc, m_context.Get());
-								BindConstantBufferPS(CB_MISC, m_cbMisc.get());
-
 								SetBlendMode(BLENDMODE_ALPHABLEND);
+								SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
 							}
+
+							//SetBlendMode(BLENDMODE_OPAQUE);
+							//SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 							// Draw geometry
 							if (animated)
@@ -3394,9 +3386,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		BindConstantBufferPS(CB_MISC, m_cbMisc.get());
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
@@ -3531,19 +3521,16 @@ namespace TEN::Renderer
 				{
 					if (pass == 0)
 					{
-						m_stMisc.AlphaTest = bucket.BlendMode == BLENDMODE_ALPHATEST;
-						m_cbMisc.updateData(m_stMisc, m_context.Get());
-						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 						SetBlendMode(bucket.BlendMode);
+						SetAlphaTest(
+							bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+							ALPHA_TEST_THRESHOLD
+						);
 					}
 					else
 					{
-						m_stMisc.AlphaTest = false;
-						m_cbMisc.updateData(m_stMisc, m_context.Get());
-						m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 						SetBlendMode(BLENDMODE_ALPHABLEND);
+						SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 					}
 
 					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);

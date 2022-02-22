@@ -544,15 +544,13 @@ namespace TEN::Renderer
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 		short length = 0;
 		short zOffset = 0;
 		short rotationX = 0;
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
+
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_SHOTGUN && Lara.gunType != WEAPON_CROSSBOW) 
 		{
@@ -654,11 +652,9 @@ namespace TEN::Renderer
 				m_cbLights.updateData(m_stLights, m_context.Get());
 				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 				SetBlendMode(BLENDMODE_ADDITIVE);
+				
+				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 				BITE_INFO* bites[2] = {
 					&EnemyBites[obj->biteOffset],
@@ -845,9 +841,7 @@ namespace TEN::Renderer
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -870,9 +864,7 @@ namespace TEN::Renderer
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -895,9 +887,7 @@ namespace TEN::Renderer
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -920,9 +910,7 @@ namespace TEN::Renderer
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -994,9 +982,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
 		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
@@ -1042,9 +1028,14 @@ namespace TEN::Renderer
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-		m_stMisc.AlphaTest = !transparent;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		if (transparent)
+		{
+			SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+		}
+		else
+		{
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		}
 
 		RendererMesh* mesh = effect->Mesh;
 
@@ -1114,9 +1105,15 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				}
 
-				m_stMisc.AlphaTest = !transparent;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+				if (transparent)
+				{
+					SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+				}
+				else
+				{
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+				}
+
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
