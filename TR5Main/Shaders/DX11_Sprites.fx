@@ -1,9 +1,6 @@
 #include "./CameraMatrixBuffer.hlsli"
-
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
-};
+#include "./AlphaTestBuffer.hlsli"
+#include "./VertexInput.hlsli"
 
 cbuffer SpriteBuffer: register(b9) {
 	float4x4 billboardMatrix;
@@ -11,7 +8,6 @@ cbuffer SpriteBuffer: register(b9) {
 	bool isBillboard;
 }
 
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {
@@ -55,6 +51,8 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
+
+	DoAlphaTest(output);
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);

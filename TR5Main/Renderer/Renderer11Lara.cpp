@@ -235,9 +235,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_LINEAR_CLAMP);
 	BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
-	m_stMisc.AlphaTest = true;
-	m_cbMisc.updateData(m_stMisc, m_context.Get());
-	m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+	SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];

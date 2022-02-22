@@ -1,5 +1,4 @@
 #include "./CameraMatrixBuffer.hlsli"
-
 #include "./VertexInput.hlsli"
 
 struct PixelShaderInput
@@ -9,9 +8,6 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 };
-
-//Texture2D Texture;
-//SamplerState Sampler;
 
 PixelShaderInput VS(VertexShaderInput input)
 {

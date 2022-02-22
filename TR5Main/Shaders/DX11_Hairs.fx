@@ -1,10 +1,5 @@
 #include "./CameraMatrixBuffer.hlsli"
-
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
-};
-
+#include "./AlphaTestBuffer.hlsli"
 #include "./VertexInput.hlsli"
 
 struct PixelShaderInput
@@ -33,8 +28,9 @@ PixelShaderInput VS(VertexShaderInput input)
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest)
-		clip(output.w - 0.5f);
+	
+	DoAlphaTest(output);
+
 	float3 colorMul = min(input.Color.xyz, 1.0f) * 2.0f;
 	output.xyz = output.xyz * colorMul.xyz;
 	output.w = 1.0f;

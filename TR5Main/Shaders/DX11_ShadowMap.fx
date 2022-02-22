@@ -1,4 +1,6 @@
 #include "./CameraMatrixBuffer.hlsli"
+#include "./AlphaTestBuffer.hlsli"
+#include "./VertexInput.hlsli"
 
 cbuffer ItemBuffer : register(b1)
 {
@@ -8,13 +10,6 @@ cbuffer ItemBuffer : register(b1)
 	float4 AmbientLight;
 };
 
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
-	int Caustics;
-};
-
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {
