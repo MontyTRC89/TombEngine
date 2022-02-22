@@ -416,7 +416,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->gravityStatus = false;
 			item->fallspeed = 0;
 			item->pos.yPos = item->floor;
-			SoundEffect(SFX_TR3_ROLLING_BALL, &item->pos, 0);
+			SoundEffect(147, &item->pos, 0);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->pos.xPos)) + (SQUARE(Camera.mikePos.z - item->pos.zPos)));
 			if (dist < 10240)
 				Camera.bounce = -40 * (10240 - dist) / 10240;
