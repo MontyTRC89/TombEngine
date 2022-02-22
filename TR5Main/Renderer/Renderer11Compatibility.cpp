@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_struct.h"
 #include <tuple>
 #include <stack>
+#include <execution>
 
 using std::optional;
 using std::stack;
@@ -320,6 +321,25 @@ namespace TEN::Renderer
 		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomsVertices.size(), roomsVertices.data());
 		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomsIndices.size(), roomsIndices.data());
 
+		std::for_each(std::execution::par_unseq,
+			m_rooms.begin(),
+			m_rooms.end(),
+			[](RendererRoom& room)
+			{
+				std::sort(
+					room.Buckets.begin(),
+					room.Buckets.end(),
+					[](RendererBucket& a, RendererBucket& b)
+					{
+						if (a.BlendMode == b.BlendMode)
+							return (a.Texture < b.Texture);
+						else
+							return (a.BlendMode < b.BlendMode);
+					}
+				);
+			}
+		);
+
 		m_numHairVertices = 0;
 		m_numHairIndices = 0;
 
@@ -346,6 +366,8 @@ namespace TEN::Renderer
 		}
 		moveablesVertices.resize(totalVertices);
 		moveablesIndices.resize(totalIndices);
+
+	
 
 		lastVertex = 0;
 		lastIndex = 0;
