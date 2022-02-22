@@ -298,9 +298,15 @@ void Moveable::Register(sol::table & parent)
 // @tparam Position position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
-/// (@{Rotation}) rotation represented as degree angles about X, Y, and Z axes
-// @mem rot
-		"rot", sol::property(&Moveable::GetRot, &Moveable::SetRot),
+/// Get the moveable's rotation
+// @function GetRotation
+// @treturn Rotation a copy of the moveable's rotation
+	ScriptReserved_GetRotation, &Moveable::GetRot,
+
+/// Set the moveable's rotation
+// @function SetRotation
+// @tparam Rotation The moveable's new rotation
+	ScriptReserved_SetRotation, &Moveable::SetRot,
 
 /// (string) unique string identifier.
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
