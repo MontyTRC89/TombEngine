@@ -1,7 +1,8 @@
 #pragma once
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+
+struct ITEM_INFO;
+struct COLL_INFO;
 
 void InitialiseMineCart(short itemNumber);
 void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
-int MineCartControl(void);
+bool MineCartControl(ITEM_INFO* laraItem);
