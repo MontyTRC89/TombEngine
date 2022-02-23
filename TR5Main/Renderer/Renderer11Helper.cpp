@@ -258,7 +258,7 @@ namespace TEN::Renderer
 				[&j, &currentBone](BigGunInfo& biggun)
 				{
 				if (j == 2)
-					currentBone->ExtraRotation.z = biggun.BarrelZRot;
+					currentBone->ExtraRotation.z = biggun.BarrelZRotation;
 				},
 				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature)
 				{
