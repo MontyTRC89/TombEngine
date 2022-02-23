@@ -2,12 +2,13 @@
 
 struct BigGunInfo
 {
-	short XRot;
-	short YRot;
-	short BarrelZRot;
+	PHD_3DPOS Rotation;
+	short BarrelZRotation;
 	short StartYRot;
 	long GunRotYAdd;
+
 	unsigned int FireCount;
-	char Flags;
 	bool BarrelRotating;
+
+	char Flags;
 };

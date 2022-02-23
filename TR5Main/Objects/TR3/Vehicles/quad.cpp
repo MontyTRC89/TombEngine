@@ -23,15 +23,15 @@
 using std::vector;
 using namespace TEN::Math::Random;
 
-#define MAX_VELOCITY	0xA000
-#define MIN_DRIFT_SPEED	0x3000
-#define BRAKE 0x0280
-#define REVERSE_ACC -0x0300
-#define MAX_BACK	-0x3000
-#define MAX_REVS 0xa000
-#define TERMINAL_FALLSPEED 240
-#define QUAD_SLIP 100
-#define QUAD_SLIP_SIDE 50
+#define MAX_VELOCITY				0xA000
+#define MIN_DRIFT_VELOCITY			0x3000
+#define BRAKE						0x0280
+#define REVERSE_ACCELERATION		-0x0300
+#define MAX_BACK					-0x3000
+#define MAX_REVS					0xa000
+#define TERMINAL_VERTICAL_VELOCITY	240
+#define QUAD_SLIP					100
+#define QUAD_SLIP_SIDE				50
 
 #define QUAD_FRONT	550
 #define QUAD_BACK  -550
@@ -39,6 +39,7 @@ using namespace TEN::Math::Random;
 #define QUAD_RADIUS	500
 #define QUAD_HEIGHT	512
 
+// TODO
 #define QUAD_HIT_LEFT  11
 #define QUAD_HIT_RIGHT 12
 #define QUAD_HIT_FRONT 13
@@ -47,20 +48,20 @@ using namespace TEN::Math::Random;
 #define DAMAGE_START  140
 #define DAMAGE_LENGTH 14
 
-#define DISMOUNT_DISTANCE 385 // Root bone offset from final frame of animation.
+#define DISMOUNT_DISTANCE 385	// Precise root bone offset derived from final frame of animation.
 
-#define QUAD_UNDO_TURN ANGLE(2.0f)
-#define QUAD_TURN_RATE (ANGLE(0.5f) + QUAD_UNDO_TURN)
-#define QUAD_TURN_MAX ANGLE(5.0f)
-#define QUAD_DRIFT_TURN_RATE (ANGLE(0.75f) + QUAD_UNDO_TURN)
-#define QUAD_DRIFT_TURN_MAX ANGLE(8.0f)
+#define QUAD_UNDO_TURN			ANGLE(2.0f)
+#define QUAD_TURN_RATE			(ANGLE(0.5f) + QUAD_UNDO_TURN)
+#define QUAD_TURN_MAX			ANGLE(5.0f)
+#define QUAD_DRIFT_TURN_RATE	(ANGLE(0.75f) + QUAD_UNDO_TURN)
+#define QUAD_DRIFT_TURN_MAX		ANGLE(8.0f)
 
 #define MIN_MOMENTUM_TURN ANGLE(3.0f)
 #define MAX_MOMENTUM_TURN ANGLE(1.5f)
 #define QUAD_MAX_MOM_TURN ANGLE(150.0f)
 
 #define QUAD_MAX_HEIGHT CLICK(1)
-#define QUAD_MIN_BOUNCE (MAX_VELOCITY / 2) / 256
+#define QUAD_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
 
 // TODO: Common controls for all vehicles + unique settings page to set them. @Sezz 2021.11.14
 #define QUAD_IN_ACCELERATE	IN_ACTION
@@ -948,7 +949,7 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 		case QUAD_STATE_FALL:
 			if (quadItem->Position.yPos == quadItem->Floor)
 				laraItem->TargetState = QUAD_STATE_LAND;
-			else if (quadItem->VerticalVelocity > TERMINAL_FALLSPEED)
+			else if (quadItem->VerticalVelocity > TERMINAL_VERTICAL_VELOCITY)
 				quadInfo->Flags |= QUAD_FLAG_IS_FALLING;
 
 			break;
@@ -1016,7 +1017,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 		{
 			if (TrInput & QUAD_IN_DRIFT &&
 				!quadInfo->DriftStarting &&
-				quadInfo->Velocity > MIN_DRIFT_SPEED)
+				quadInfo->Velocity > MIN_DRIFT_VELOCITY)
 			{
 				if (TrInput & QUAD_IN_LEFT)
 				{
@@ -1052,7 +1053,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 		{
 			if (TrInput & QUAD_IN_DRIFT &&
 				!quadInfo->DriftStarting &&
-				quadInfo->Velocity < (-MIN_DRIFT_SPEED + 0x800))
+				quadInfo->Velocity < (-MIN_DRIFT_VELOCITY + 0x800))
 			{
 				if (TrInput & QUAD_IN_LEFT)
 				{
@@ -1100,7 +1101,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 			else
 			{
 				if (quadInfo->Velocity > MAX_BACK)
-					quadInfo->Velocity += REVERSE_ACC;
+					quadInfo->Velocity += REVERSE_ACCELERATION;
 			}
 		}
 		else if (TrInput & QUAD_IN_ACCELERATE)
