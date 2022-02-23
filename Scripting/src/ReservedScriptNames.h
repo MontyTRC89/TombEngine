@@ -52,8 +52,6 @@ static constexpr char const ScriptReserved_GetHitStatus[]		= "GetHitStatus";
 static constexpr char const ScriptReserved_GetActive[]			= "GetActive";
 static constexpr char const ScriptReserved_GetRoom[]			= "GetRoom";
 static constexpr char const ScriptReserved_SetRoom[]			= "SetRoom";
-static constexpr char const ScriptReserved_GetName[]			= "GetName";
-static constexpr char const ScriptReserved_SetName[]			= "SetName";
 
 // Flow Functions
 static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
