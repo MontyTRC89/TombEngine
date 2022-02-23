@@ -2,16 +2,18 @@
 
 struct MinecartInfo 
 {
-	int Velocity;
-	int MidPos;
-	int FrontPos;
+	short TurnRot;
 	int TurnX;
 	int TurnZ;
 	short TurnLen;
-	short TurnRot;
-	short YVel;
+
+	int Velocity;
+	short VerticalVelocity;
 	short Gradient;
 	char StopDelay;
+
+	int FloorHeightMiddle;
+	int FloorHeightFront;
 
 	char Flags;
 };

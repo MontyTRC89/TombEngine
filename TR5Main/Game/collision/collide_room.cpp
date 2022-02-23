@@ -115,9 +115,12 @@ int FindGridShift(int x, int z)
 
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int distance, int height, int side)
 {
-	auto x = item->Position.xPos + (phd_sin(angle) * distance) + (phd_cos(angle) * side);
+	float s = phd_sin(angle);
+	float c = phd_cos(angle);
+
+	auto x = item->Position.xPos + (distance * s) + (side * c);
 	auto y = item->Position.yPos + height;
-	auto z = item->Position.zPos + (phd_cos(angle) * distance) + (phd_sin(angle) * -side);
+	auto z = item->Position.zPos + (distance * c) + (-side * s);
 
 	return GetCollisionResult(x, y, z, GetRoom(item->Location, item->Position.xPos, y, item->Position.zPos).roomNumber);
 }
