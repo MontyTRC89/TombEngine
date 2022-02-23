@@ -228,16 +228,14 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 
 	Utils::throwIfFailed(dxgiFactory->CreateSwapChain(m_device.Get(), &sd, &m_swapChain));
 
-	dxgiFactory->MakeWindowAssociation(handle, 0);
+	dxgiFactory->MakeWindowAssociation(handle, DXGI_MWA_NO_ALT_ENTER);
 
 	// Initialise the back buffer
 	m_backBufferTexture = NULL;
 	Utils::throwIfFailed(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast <void**>(&m_backBufferTexture)));
 
-
 	m_backBufferRTV = NULL;
 	Utils::throwIfFailed(m_device->CreateRenderTargetView(m_backBufferTexture, NULL, &m_backBufferRTV));
-
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	depthStencilDesc.Width = w;
@@ -255,10 +253,8 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 	m_depthStencilTexture = NULL;
 	Utils::throwIfFailed(m_device->CreateTexture2D(&depthStencilDesc, NULL, &m_depthStencilTexture));
 
-
 	m_depthStencilView = NULL;
 	Utils::throwIfFailed(m_device->CreateDepthStencilView(m_depthStencilTexture, NULL, &m_depthStencilView));
-
 
 	// Bind the back buffer and the depth stencil
 	m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
@@ -327,4 +323,26 @@ void TEN::Renderer::Renderer11::Create()
 #endif
 	Utils::throwIfFailed(res);
 
+}
+
+void Renderer11::ToggleFullScreen()
+{
+	Windowed = !Windowed;
+
+	if (!Windowed)
+	{
+		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
+		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, WS_EX_TOPMOST);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		ShowWindow(WindowsHandle, SW_SHOWMAXIMIZED);
+	}
+	else
+	{
+		SetWindowLongPtr(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, 0);
+		ShowWindow(WindowsHandle, SW_SHOWNORMAL);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, ScreenWidth, ScreenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
+
+	UpdateWindow(WindowsHandle);
 }
