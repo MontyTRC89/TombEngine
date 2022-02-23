@@ -82,13 +82,18 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
+	{
 		return 0;
+	}
 
-	/*if (msg == WM_SYSCOMMAND && wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)
+	// Manually handle ALT + ENTER toggle fullscreen
+	if ((msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
+		&& wParam == VK_RETURN
+		&& (HIWORD(lParam) & KF_ALTDOWN))
 	{
 		g_Renderer.ToggleFullScreen();
 		return 0;
-	}*/
+	}
 
 	if (msg > 0x10)
 	{
@@ -256,8 +261,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return false;
 	}
 
-	//g_Configuration.Width = 1920;
-	//g_Configuration.Height = 1080;
+	g_Configuration.Width = 800;
+	g_Configuration.Height = 600;
 
 	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
