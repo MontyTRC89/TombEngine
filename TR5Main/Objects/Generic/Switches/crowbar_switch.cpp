@@ -21,9 +21,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		-512, -256,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
 	PHD_VECTOR CrowbarPos2 = { 89, 0, 328 }; 
@@ -33,86 +33,81 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		256, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 	{
+		auto* laraInfo = GetLaraInfo(laraitem);
+		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
+
 		int doSwitch = 0;
-		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if ((((TrInput & IN_ACTION) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
-			&& l->ActiveState == LS_IDLE
-			&& l->AnimNumber == LA_STAND_IDLE
-			&& Lara.Control.HandStatus == HandStatus::Free
-			&& item->ItemFlags[0] == 0)
-			|| (Lara.Control.IsMoving && Lara.interactedItem == itemNum))
+		if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+			laraitem->ActiveState == LS_IDLE &&
+			laraitem->AnimNumber == LA_STAND_IDLE &&
+			laraInfo->Control.HandStatus == HandStatus::Free &&
+			switchItem->ItemFlags[0] == 0) ||
+			(laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber))
 		{
-			if (item->ActiveState == SWITCH_ON)
+			if (switchItem->ActiveState == SWITCH_ON)
 			{
-				l->Position.yRot ^= (short)ANGLE(180);
+				laraitem->Position.yRot ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(&CrowbarBounds2, item, l))
+				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraitem))
 				{
-					if (Lara.Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
+					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos2, item, l))
+						if (MoveLaraPosition(&CrowbarPos2, switchItem, laraitem))
 						{
 							doSwitch = 1;
-							l->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-							item->TargetState = SWITCH_OFF;
+							laraitem->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraitem->FrameNumber = g_Level.Anims[laraitem->AnimNumber].frameBase;
+							switchItem->TargetState = SWITCH_OFF;
 						}
 						else
-						{
-							Lara.interactedItem = itemNum;
-						}
+							laraInfo->interactedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
-					{
 						doSwitch = -1;
-					}
 				}
-				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				l->Position.yRot ^= (short)ANGLE(180);
+
+				laraitem->Position.yRot ^= (short)ANGLE(180.0f);
 			}
 			else
 			{
-				if (TestLaraPosition(&CrowbarBounds, item, l))
+				if (TestLaraPosition(&CrowbarBounds, switchItem, laraitem))
 				{
-					if (Lara.Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
+					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos, item, l))
+						if (MoveLaraPosition(&CrowbarPos, switchItem, laraitem))
 						{
 							doSwitch = 1;
-							l->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-							item->TargetState = SWITCH_ON;
+							laraitem->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraitem->FrameNumber = g_Level.Anims[laraitem->AnimNumber].frameBase;
+							switchItem->TargetState = SWITCH_ON;
 						}
 						else
-						{
-							Lara.interactedItem = itemNum;
-						}
+							laraInfo->interactedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
-					{
 						doSwitch = -1;
-					}
 				}
-				else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 			}
 		}
@@ -121,35 +116,33 @@ namespace TEN::Entities::Switches
 		{
 			if (doSwitch == -1)
 			{
-				if (Lara.Crowbar)
+				if (laraInfo->Crowbar)
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{
-					if (OldPickupPos.x != l->Position.xPos || OldPickupPos.y != l->Position.yPos || OldPickupPos.z != l->Position.zPos)
+					if (OldPickupPos.x != laraitem->Position.xPos || OldPickupPos.y != laraitem->Position.yPos || OldPickupPos.z != laraitem->Position.zPos)
 					{
-						OldPickupPos.x = l->Position.xPos;
-						OldPickupPos.y = l->Position.yPos;
-						OldPickupPos.z = l->Position.zPos;
+						OldPickupPos.x = laraitem->Position.xPos;
+						OldPickupPos.y = laraitem->Position.yPos;
+						OldPickupPos.z = laraitem->Position.zPos;
 						SayNo();
 					}
 				}
 			}
 			else
 			{
-				l->TargetState = LS_SWITCH_DOWN;
-				l->ActiveState = LS_SWITCH_DOWN;
-				Lara.Control.IsMoving = false;
-				ResetLaraFlex(l);
-				Lara.Control.HandStatus = HandStatus::Busy;
-				item->Status = ITEM_ACTIVE;
+				ResetLaraFlex(laraitem);
+				laraitem->TargetState = LS_SWITCH_DOWN;
+				laraitem->ActiveState = LS_SWITCH_DOWN;
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Busy;
+				switchItem->Status = ITEM_ACTIVE;
 
-				AddActiveItem(itemNum);
-				AnimateItem(item);
+				AddActiveItem(itemNumber);
+				AnimateItem(switchItem);
 			}
 		}
 		else
-		{
-			ObjectCollision(itemNum, l, coll);
-		}
+			ObjectCollision(itemNumber, laraitem, coll);
 	}
 }

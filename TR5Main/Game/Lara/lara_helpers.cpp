@@ -49,7 +49,10 @@ void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 	auto* info = GetLaraInfo(item);
 
 	if (!rate)
+	{
+		TENLog(std::string("ApproachLaraTargetAngle() attempted division by zero!"), LogLevel::Warning);
 		return;
+	}
 
 	rate = abs(rate);
 
@@ -438,7 +441,10 @@ void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 {
 	if (!rate)
+	{
+		TENLog(std::string("ResetLaraLean() attempted division by zero!"), LogLevel::Warning);
 		return;
+	}
 
 	rate = abs(rate);
 
@@ -464,7 +470,10 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 	auto* info = GetLaraInfo(item);
 
 	if (!rate)
+	{
+		TENLog(std::string("ResetLaraFlex() attempted division by zero!"), LogLevel::Warning);
 		return;
+	}
 
 	rate = abs(rate);
 

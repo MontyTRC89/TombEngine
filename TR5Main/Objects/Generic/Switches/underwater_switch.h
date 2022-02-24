@@ -5,7 +5,7 @@ struct COLL_INFO;
 
 namespace TEN::Entities::Switches
 {
-	void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-	void CeilingUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-	void WallUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void UnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+	void CeilingUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+	void WallUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

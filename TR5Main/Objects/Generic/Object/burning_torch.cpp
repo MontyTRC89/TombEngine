@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 #include "Game/items.h"
@@ -20,7 +21,7 @@ namespace TEN::Entities::Generic
 {
 	void TriggerTorchFlame(char fxObj, char node)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = &Sparks[GetFreeSpark()];
 
 		spark->on = true;
 
@@ -75,20 +76,21 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			if (TrInput & IN_DRAW
-				&& !(LaraItem->Airborne)
-				&& !LaraItem->VerticalVelocity
-				&& LaraItem->ActiveState != LS_JUMP_PREPARE
-				&& LaraItem->ActiveState != LS_JUMP_UP
-				&& LaraItem->ActiveState != LS_JUMP_FORWARD
-				&& LaraItem->ActiveState != LS_JUMP_BACK
-				&& LaraItem->ActiveState != LS_JUMP_LEFT
-				&& LaraItem->ActiveState != LS_JUMP_RIGHT
-				|| Lara.Control.WaterStatus == WaterStatus::Underwater)
+			if (TrInput & IN_DRAW &&
+				!LaraItem->VerticalVelocity &&
+				!LaraItem->Airborne &&
+				LaraItem->ActiveState != LS_JUMP_PREPARE &&
+				LaraItem->ActiveState != LS_JUMP_UP &&
+				LaraItem->ActiveState != LS_JUMP_FORWARD &&
+				LaraItem->ActiveState != LS_JUMP_BACK &&
+				LaraItem->ActiveState != LS_JUMP_LEFT &&
+				LaraItem->ActiveState != LS_JUMP_RIGHT ||
+				Lara.Control.WaterStatus == WaterStatus::Underwater)
 			{
 				Lara.LeftArm.Locked = true;
 				Lara.LeftArm.FrameNumber = 1;
 				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 1;
+
 				if (Lara.Control.WaterStatus == WaterStatus::Underwater)
 					Lara.LitTorch = false;
 			}
@@ -139,7 +141,9 @@ namespace TEN::Entities::Generic
 				Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 				CreateFlare(LaraItem, ID_BURNING_TORCH_ITEM, false);
 			}
+
 			break;
+
 		case 3:
 			if (LaraItem->ActiveState != LS_MISC_CONTROL)
 			{
@@ -149,7 +153,9 @@ namespace TEN::Entities::Generic
 				Lara.LitTorch = LaraItem->ItemFlags[3] & 1;
 				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 			}
+
 			break;
+
 		default:
 			break;
 		}
@@ -161,12 +167,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.LitTorch)
 		{
-			PHD_VECTOR pos;
-
-			pos.x = -32;
-			pos.y = 64;
-			pos.z = 256;
-
+			PHD_VECTOR pos = { -32, 64, 256 };
 			GetLaraJointPosition(&pos, LM_LHAND);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
@@ -197,7 +198,7 @@ namespace TEN::Entities::Generic
 
 	void TorchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		int oldX = item->Position.xPos;
 		int oldY = item->Position.yPos;
@@ -274,7 +275,7 @@ namespace TEN::Entities::Generic
 
 		if (!LOS(&pos1, &pos2))
 		{
-			int l = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z)) * STEP_SIZE;
+			int l = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2) + pow(pos1.z - pos2.z, 2)) * CLICK(1);
 
 			if (l + 8 > 31)
 				l = 31;
@@ -284,28 +285,30 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+	void FireCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* torchItem = &g_Level.Items[itemNumber];
 
-		if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
-			|| Lara.Control.HandStatus != HandStatus::WeaponReady
-			|| Lara.LeftArm.Locked
-			|| Lara.LitTorch == (item->Status == ITEM_ACTIVE)
-			|| item->Timer == -1
-			|| !(TrInput & IN_ACTION)
-			|| l->ActiveState != LS_IDLE
-			|| l->AnimNumber != LA_STAND_IDLE
-			|| l->Airborne)
+		if (
+			!(TrInput & IN_ACTION) ||
+			laraItem->ActiveState != LS_IDLE ||
+			laraItem->AnimNumber != LA_STAND_IDLE ||
+			laraItem->Airborne ||
+			laraInfo->Control.WeaponControl.GunType != WEAPON_TORCH ||
+			laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
+			laraInfo->LeftArm.Locked ||
+			laraInfo->LitTorch == (torchItem->Status == ITEM_ACTIVE) ||
+			torchItem->Timer == -1)
 		{
-			if (item->ObjectNumber == ID_BURNING_ROOTS)
-				ObjectCollision(itemNumber, l, coll);
+			if (torchItem->ObjectNumber == ID_BURNING_ROOTS)
+				ObjectCollision(itemNumber, laraItem, coll);
 		}
 		else
 		{
-			short rot = item->Position.yRot;
+			short rot = torchItem->Position.yRot;
 
-			switch (item->ObjectNumber)
+			switch (torchItem->ObjectNumber)
 			{
 			case ID_FLAME_EMITTER:
 				FireBounds.boundingBox.X1 = -256;
@@ -315,6 +318,7 @@ namespace TEN::Entities::Generic
 				FireBounds.boundingBox.Z1 = -800;
 				FireBounds.boundingBox.Z2 = 800;
 				break;
+
 			case ID_FLAME_EMITTER2:
 				FireBounds.boundingBox.X1 = -256;
 				FireBounds.boundingBox.X2 = 256;
@@ -323,6 +327,7 @@ namespace TEN::Entities::Generic
 				FireBounds.boundingBox.Z1 = -600;
 				FireBounds.boundingBox.Z2 = 600;
 				break;
+
 			case ID_BURNING_ROOTS:
 				FireBounds.boundingBox.X1 = -384;
 				FireBounds.boundingBox.X2 = 384;
@@ -333,39 +338,41 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			item->Position.yRot = l->Position.yRot;
+			torchItem->Position.yRot = laraItem->Position.yRot;
 
-			if (TestLaraPosition(&FireBounds, item, l))
+			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
-				if (item->ObjectNumber == ID_BURNING_ROOTS)
-				{
-					l->AnimNumber = LA_TORCH_LIGHT_5;
-				}
+				if (torchItem->ObjectNumber == ID_BURNING_ROOTS)
+					laraItem->AnimNumber = LA_TORCH_LIGHT_5;
 				else
 				{
-					int dy = abs(l->Position.yPos - item->Position.yPos);
-					l->ItemFlags[3] = 1;
-					l->AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
+					int dy = abs(laraItem->Position.yPos - torchItem->Position.yPos);
+					laraItem->ItemFlags[3] = 1;
+					laraItem->AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
-				l->ActiveState = LS_MISC_CONTROL;
-				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				Lara.Flare.ControlLeft = false;
-				Lara.LeftArm.Locked = true;
-				Lara.interactedItem = itemNumber;
+
+				laraItem->ActiveState = LS_MISC_CONTROL;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraInfo->Flare.ControlLeft = false;
+				laraInfo->LeftArm.Locked = true;
+				laraInfo->interactedItem = itemNumber;
 			}
 
-			item->Position.yRot = rot;
+			torchItem->Position.yRot = rot;
 		}
-		if (Lara.interactedItem == itemNumber && item->Status != ITEM_ACTIVE && l->ActiveState == LS_MISC_CONTROL)
+		if (laraItem->ActiveState == LS_MISC_CONTROL &&
+			laraInfo->interactedItem == itemNumber &&
+			torchItem->Status != ITEM_ACTIVE)
 		{
-			if (l->AnimNumber >= LA_TORCH_LIGHT_1 && l->AnimNumber <= LA_TORCH_LIGHT_5)
+			if (laraItem->AnimNumber >= LA_TORCH_LIGHT_1 &&
+				laraItem->AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (l->FrameNumber - g_Level.Anims[l->AnimNumber].frameBase == 40)
+				if (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase == 40)
 				{
-					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
-					item->Flags |= 0x3E00;
-					item->ItemFlags[3] = 0;
-					item->Status = ITEM_ACTIVE;
+					TestTriggers(torchItem, true, torchItem->Flags & IFLAG_ACTIVATION_MASK);
+					torchItem->Flags |= 0x3E00;
+					torchItem->ItemFlags[3] = 0;
+					torchItem->Status = ITEM_ACTIVE;
 					AddActiveItem(itemNumber);
 				}
 			}

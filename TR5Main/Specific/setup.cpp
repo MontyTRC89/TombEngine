@@ -187,8 +187,8 @@ void ObjectObjects()
 	obj = &Objects[ID_TIGHT_ROPE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTightRope;
-		obj->collision = TightRopeCollision;
+		obj->initialise = InitialiseTightrope;
+		obj->collision = TightropeCollision;
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
@@ -197,7 +197,7 @@ void ObjectObjects()
 	obj = &Objects[ID_PARALLEL_BARS];
 	if (obj->loaded)
 	{
-		obj->collision = ParallelBarsCollision;
+		obj->collision = HorizontalBarCollision;
 	}
 
 	obj = &Objects[ID_EARTHQUAKE];
