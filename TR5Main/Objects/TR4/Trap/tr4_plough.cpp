@@ -7,9 +7,9 @@
 
 namespace TEN::Entities::TR4
 {
-	void PloughControl(short itemNum)
+	void PloughControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->ItemFlags[3] = 50;
 
@@ -19,8 +19,6 @@ namespace TEN::Entities::TR4
 			AnimateItem(item);
 		}
 		else
-		{
 			*((int*)&item->ItemFlags) = 0;
-		}
 	}
 }

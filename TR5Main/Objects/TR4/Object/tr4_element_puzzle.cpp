@@ -5,6 +5,7 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -18,18 +19,19 @@ using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::TR4
 {
-    OBJECT_COLLISION_BOUNDS ElementPuzzleBounds = {
+    OBJECT_COLLISION_BOUNDS ElementPuzzleBounds =
+    {
         0, 0, 
         -64, 0, 
         0, 0,
-        -ANGLE(10), ANGLE(10), 
-        -ANGLE(30), ANGLE(30), 
-        -ANGLE(10), ANGLE(10)
+        -ANGLE(10.0f), ANGLE(10.0f),
+        -ANGLE(30.0f), ANGLE(30.0f),
+        -ANGLE(10.0f), ANGLE(10.0f)
     };
 
     void ElementPuzzleControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (!TriggerActive(item))
             return;
@@ -60,9 +62,7 @@ namespace TEN::Entities::TR4
                 }
             }
             else
-            {
                 on = 0;
-            }
 
             AddFire(item->Position.xPos, item->Position.yPos - 620, item->Position.zPos, 1, item->RoomNumber, on);
             TriggerDynamicLight(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 12, r, g, b);
@@ -70,14 +70,10 @@ namespace TEN::Entities::TR4
         }
 
         if (item->TriggerFlags != 3)
-        {
             return;
-        }
 
         if (item->ItemFlags[1] > 90)
-        {
             SoundEffect(SFX_TR4_JOBY_WIND, &item->Position, 0);
-        }
 
         if (item->ItemFlags[1] < 60)
         {
@@ -107,20 +103,21 @@ namespace TEN::Entities::TR4
 
         short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
         if (currentItemNumber == NO_ITEM)
-        {
             return;
-        }
 
         while (currentItemNumber != NO_ITEM)
         {
-            ITEM_INFO* currentItem = &g_Level.Items[currentItemNumber];
+            auto* currentItem = &g_Level.Items[currentItemNumber];
 
             if (currentItem->ObjectNumber != ID_FLAME_EMITTER2)
             {
-                if (currentItem->ObjectNumber == ID_ELEMENT_PUZZLE && currentItem->TriggerFlags == 1 && !currentItem->ItemFlags[3])
+                if (currentItem->ObjectNumber == ID_ELEMENT_PUZZLE &&
+                    currentItem->TriggerFlags == 1 &&
+                    !currentItem->ItemFlags[3])
                 {
                     currentItem->ItemFlags[3] = 90;
                 }
+
                 currentItemNumber = currentItem->NextItem;
                 continue;
             }
@@ -133,6 +130,7 @@ namespace TEN::Entities::TR4
                     currentItemNumber = currentItem->NextItem;
                     continue;
                 }
+
                 currentItem->ItemFlags[3] = 2;
             }
 
@@ -141,178 +139,163 @@ namespace TEN::Entities::TR4
         }
     }
 
-    void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+    void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
-        if (TestBoundsCollide(item, l, coll->Setup.Radius))
+        if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
         {
-            if (TestCollision(item, l))
+            if (TestCollision(item, laraItem))
             {
                 if (coll->Setup.EnableObjectPush)
-                {
-                    ItemPushItem(item, l, coll, 0, 0);
-                }
+                    ItemPushItem(item, laraItem, coll, 0, 0);
             }
         }
     }
 
-    void ElementPuzzleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+    void ElementPuzzleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* laraInfo = GetLaraInfo(laraItem);
+        auto* puzzleItem = &g_Level.Items[itemNumber];
 
         int flags = 0;
 
-        if (item->TriggerFlags)
+        if (puzzleItem->TriggerFlags)
         {
-            if (item->TriggerFlags == 1)
-            {
+            if (puzzleItem->TriggerFlags == 1)
                 flags = 26;
-            }
             else
             {
-                if (item->TriggerFlags != 2)
-                {
+                if (puzzleItem->TriggerFlags != 2)
                     return;
-                }
+             
                 flags = 27;
             }
         }
         else
-        {
             flags = 25;
-        }
 
-        if ((l->AnimNumber == LA_WATERSKIN_POUR_LOW
-            || l->AnimNumber == LA_WATERSKIN_POUR_HIGH)
-            && !item->ItemFlags[0])
+        if ((laraItem->AnimNumber == LA_WATERSKIN_POUR_LOW ||
+            laraItem->AnimNumber == LA_WATERSKIN_POUR_HIGH) &&
+            !puzzleItem->ItemFlags[0])
         {
-            BOUNDING_BOX* box = GetBoundsAccurate(item);
+            auto* box = GetBoundsAccurate(puzzleItem);
 
             ElementPuzzleBounds.boundingBox.X1 = box->X1;
             ElementPuzzleBounds.boundingBox.X2 = box->X2;
             ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
             ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-            short oldRot = item->Position.yRot;
-            item->Position.yRot = l->Position.yRot;
+            short oldRot = puzzleItem->Position.yRot;
+            puzzleItem->Position.yRot = laraItem->Position.yRot;
 
-            if (TestLaraPosition(&ElementPuzzleBounds, item, l))
+            if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
             {
-                if (l->AnimNumber == LA_WATERSKIN_POUR_LOW && LaraItem->ItemFlags[2] == flags)
+                if (laraItem->AnimNumber == LA_WATERSKIN_POUR_LOW && LaraItem->ItemFlags[2] == flags)
                 {
-                    l->AnimNumber = LA_WATERSKIN_POUR_HIGH;
-                    l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+                    laraItem->AnimNumber = LA_WATERSKIN_POUR_HIGH;
+                    laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
                 }
 
-                if (l->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74
-                    && LaraItem->ItemFlags[2] == flags)
+                if (laraItem->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74 &&
+                    LaraItem->ItemFlags[2] == flags)
                 {
-                    if (!item->TriggerFlags)
+                    if (!puzzleItem->TriggerFlags)
                     {
-                        item->MeshBits = 48;
-                        TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
-                        item->ItemFlags[0] = 1;
-                        item->Position.yRot = oldRot;
-
+                        puzzleItem->MeshBits = 48;
+                        TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
+                        puzzleItem->ItemFlags[0] = 1;
+                        puzzleItem->Position.yRot = oldRot;
                         return;
                     }
 
-                    if (item->TriggerFlags == 1)
+                    if (puzzleItem->TriggerFlags == 1)
                     {
-                        item->MeshBits = 3;
-                        Lara.Pickups[1]--;
-                        item->ItemFlags[0] = 1;
-                        item->Position.yRot = oldRot;
+                        puzzleItem->MeshBits = 3;
+                        laraInfo->Pickups[1]--;
+                        puzzleItem->ItemFlags[0] = 1;
+                        puzzleItem->Position.yRot = oldRot;
                         return;
                     }
 
-                    item->MeshBits = 12;
-                    TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
-                    Lara.Pickups[0]--;
-                    item->ItemFlags[0] = 1;
-
+                    puzzleItem->MeshBits = 12;
+                    TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
+                    laraInfo->Pickups[0]--;
+                    puzzleItem->ItemFlags[0] = 1;
                 }
             }
 
-            item->Position.yRot = oldRot;
+            puzzleItem->Position.yRot = oldRot;
         }
         else
         {
-            if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
-                || Lara.Control.HandStatus != HandStatus::WeaponReady
-                || Lara.LeftArm.Locked
-                || !(TrInput & IN_ACTION)
-                || item->TriggerFlags != 1 
-                || item->ItemFlags[0] != 1
-                || l->ActiveState != LS_IDLE
-                || l->AnimNumber != LA_STAND_IDLE
-                || !Lara.LitTorch
-                || l->Airborne)
+            if (laraInfo->Control.WeaponControl.GunType != WEAPON_TORCH ||
+                laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
+                laraInfo->LeftArm.Locked ||
+                !(TrInput & IN_ACTION) ||
+                puzzleItem->TriggerFlags != 1 ||
+                puzzleItem->ItemFlags[0] != 1 ||
+                laraItem->ActiveState != LS_IDLE ||
+                laraItem->AnimNumber != LA_STAND_IDLE ||
+                !laraInfo->LitTorch ||
+                laraItem->Airborne)
             {
-                if (l->AnimNumber != LA_TORCH_LIGHT_3
-                    || g_Level.Anims[LA_TORCH_LIGHT_3].frameBase + 16
-                    || item->ItemFlags[0] != 2)
+                if (laraItem->AnimNumber != LA_TORCH_LIGHT_3 ||
+                    g_Level.Anims[LA_TORCH_LIGHT_3].frameBase + 16 ||
+                    puzzleItem->ItemFlags[0] != 2)
                 {
-                    ElementPuzzleDoCollision(itemNumber, l, c);
+                    ElementPuzzleDoCollision(itemNumber, laraItem, coll);
                 }
                 else
                 {
-                    TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
+                    TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
                     AddActiveItem(itemNumber);
-                    item->Status = ITEM_ACTIVE;
-                    item->ItemFlags[0] = 3;
-                    item->Flags |= 0x3E00;
+                    puzzleItem->Status = ITEM_ACTIVE;
+                    puzzleItem->ItemFlags[0] = 3;
+                    puzzleItem->Flags |= 0x3E00;
                 }
             }
             else
             {
-                BOUNDING_BOX* box = GetBoundsAccurate(item);
+                auto* box = GetBoundsAccurate(puzzleItem);
 
                 ElementPuzzleBounds.boundingBox.X1 = box->X1;
                 ElementPuzzleBounds.boundingBox.X2 = box->X2;
                 ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
                 ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-                short oldRot = item->Position.yRot;
-                item->Position.yRot = l->Position.yRot;
+                short oldRot = puzzleItem->Position.yRot;
+                puzzleItem->Position.yRot = laraItem->Position.yRot;
 
-                if (TestLaraPosition(&ElementPuzzleBounds, item, l))
+                if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {
-                    l->AnimNumber = (abs(item->Position.yPos - l->Position.yPos) >> 8) + LA_TORCH_LIGHT_3;
-                    l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-                    l->ActiveState = LS_MISC_CONTROL;
-                    Lara.Flare.ControlLeft = false;
-                    Lara.LeftArm.Locked = true;
-                    item->ItemFlags[0] = 2;
+                    laraItem->AnimNumber = (abs(puzzleItem->Position.yPos - laraItem->Position.yPos) >> 8) + LA_TORCH_LIGHT_3;
+                    laraItem->FrameNumber = g_Level.Anims[puzzleItem->AnimNumber].frameBase;
+                    laraItem->ActiveState = LS_MISC_CONTROL;
+                    laraInfo->Flare.ControlLeft = false;
+                    laraInfo->LeftArm.Locked = true;
+                    puzzleItem->ItemFlags[0] = 2;
                 }
-                item->Position.yRot = oldRot;
+
+                puzzleItem->Position.yRot = oldRot;
             }
         }
     }
 
     void InitialiseElementPuzzle(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (item->TriggerFlags)
         {
             if (item->TriggerFlags == 1)
-            {
                 item->MeshBits = 65;
-            }
             else if (item->TriggerFlags == 2)
-            {
                 item->MeshBits = 68;
-            }
             else
-            {
                 item->MeshBits = 0;
-            }
         }
         else
-        {
             item->MeshBits = 80;
-        }
     }
 }

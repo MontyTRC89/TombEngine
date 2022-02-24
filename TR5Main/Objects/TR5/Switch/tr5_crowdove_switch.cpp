@@ -20,9 +20,9 @@ namespace TEN::Entities::TR5
 		-256, 256,
 		0, 0,
 		-512, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
 	PHD_VECTOR CrowDovePos = { 0, 0, -400 }; 
@@ -32,68 +32,69 @@ namespace TEN::Entities::TR5
 		g_Level.Items[itemNumber].MeshBits = 3;
 	}
 
-	void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void CrowDoveSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (item->Flags & ONESHOT
-			|| !(item->MeshBits & 4)
-			|| (!(TrInput & IN_ACTION)
-				|| Lara.Control.HandStatus != HandStatus::Free
-				|| l->ActiveState != LS_IDLE
-				|| l->AnimNumber != LA_STAND_IDLE
-				|| l->Airborne)
-			&& (!Lara.Control.IsMoving || Lara.interactedItem != itemNum))
+		if (switchItem->Flags & ONESHOT ||
+			!(switchItem->MeshBits & 4) ||
+			(!(TrInput & IN_ACTION) ||
+				laraItem->ActiveState != LS_IDLE ||
+				laraItem->AnimNumber != LA_STAND_IDLE ||
+				laraItem->Airborne ||
+				laraInfo->Control.HandStatus != HandStatus::Free) &&
+			(!laraInfo->Control.IsMoving || laraInfo->interactedItem != itemNumber))
 		{
-			if (l->ActiveState != LS_DOVE_SWITCH)
-				ObjectCollision(itemNum, l, coll);
+			if (laraItem->ActiveState != LS_DOVE_SWITCH)
+				ObjectCollision(itemNumber, laraItem, coll);
 		}
 		else
 		{
-			int oldYrot = item->Position.yRot;
-			item->Position.yRot = l->Position.yRot;
-			if (TestLaraPosition(&CrowDoveBounds, item, l))
+			int oldYrot = switchItem->Position.yRot;
+			switchItem->Position.yRot = laraItem->Position.yRot;
+			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&CrowDovePos, item, l))
+				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
 				{
-					l->AnimNumber = LA_DOVESWITCH_TURN;
-					l->ActiveState = LS_DOVE_SWITCH;
-					l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+					laraItem->AnimNumber = LA_DOVESWITCH_TURN;
+					laraItem->ActiveState = LS_DOVE_SWITCH;
+					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
 					// NOTE: In original TR5 the switch was used together with heavy switches.
 					// This little fix make it usable normaly and less hardcoded.
-					item->ItemFlags[0] = 0;
+					switchItem->ItemFlags[0] = 0;
 
-					item->Status = ITEM_ACTIVE;
-					item->Position.yRot = oldYrot;
-					Lara.Control.IsMoving = false;
-					ResetLaraFlex(l);
-					Lara.Control.HandStatus = HandStatus::Busy;
-					Lara.interactedItem = itemNum;
+					switchItem->Status = ITEM_ACTIVE;
+					switchItem->Position.yRot = oldYrot;
+					laraInfo->Control.IsMoving = false;
+					ResetLaraFlex(laraItem);
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					laraInfo->interactedItem = itemNumber;
 				}
 				else
-				{
-					Lara.interactedItem = itemNum;
-				}
-				item->Position.yRot = oldYrot;
+					laraInfo->interactedItem = itemNumber;
+				
+				switchItem->Position.yRot = oldYrot;
 			}
 			else
 			{
-				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				item->Position.yRot = oldYrot;
+
+				switchItem->Position.yRot = oldYrot;
 			}
 		}
 	}
 
 	void CrowDoveSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->MeshBits & 2) 
 		{
@@ -114,7 +115,7 @@ namespace TEN::Entities::TR5
 			AnimateItem(item);
 
 			if (item->ActiveState == SWITCH_OFF)
-				item->Position.yRot += ANGLE(90);
+				item->Position.yRot += ANGLE(90.0f);
 		}
 	}
 }

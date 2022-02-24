@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr4_mapper.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -18,7 +19,7 @@ namespace TEN::Entities::TR4
 
     void MapperControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (!TriggerActive(item))
             return;
@@ -29,18 +30,13 @@ namespace TEN::Entities::TR4
 
             item->MeshBits |= 2;
 
-            PHD_VECTOR pos;
-            pos.x = 0;
-            pos.y = 0;
-            pos.z = 0;
+            PHD_VECTOR pos = { 0, 0, 0 };
             GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
 
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            short roomNumber = item->RoomNumber;
-            FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-            int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+            int height = GetCollisionResult(item).Position.Floor;
 
             for (int i = 0; i < 2; i++)
             {

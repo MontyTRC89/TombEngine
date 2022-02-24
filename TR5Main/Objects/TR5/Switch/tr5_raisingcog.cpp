@@ -13,7 +13,7 @@ using namespace TEN::Entities::Switches;
 
 void InitialiseRaisingCog(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	short itemNos[32];
 	int numSwitchItems = GetSwitchTrigger(item, itemNos, 1);
@@ -22,12 +22,10 @@ void InitialiseRaisingCog(short itemNumber)
 	{
 		for (int i = 0; i < numSwitchItems; i++)
 		{
-			ITEM_INFO* currentItem = &g_Level.Items[itemNos[i]];
+			auto* currentItem = &g_Level.Items[itemNos[i]];
 
 			if (currentItem->ObjectNumber == ID_TRIGGER_TRIGGERER)
-			{
 				item->ItemFlags[1] = currentItem->RoomNumber;
-			}
 
 			if (currentItem->ObjectNumber == ID_PULLEY || currentItem->ObjectNumber == ID_TRIGGER_TRIGGERER)
 			{
@@ -41,14 +39,12 @@ void InitialiseRaisingCog(short itemNumber)
 
 void RaisingCogControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
 		if (item->ItemFlags[0] >= 3)
-		{
 			AnimateItem(item);
-		}
 		else
 		{
 			if (item->ItemFlags[2] >= 256)
@@ -65,7 +61,7 @@ void RaisingCogControl(short itemNumber)
 					{
 						for (int i = 0; i < numItems; i++)
 						{
-							ITEM_INFO* currentItem = &g_Level.Items[itemNos[i]];
+							auto* currentItem = &g_Level.Items[itemNos[i]];
 
 							if (item->ObjectNumber == ID_PULLEY)
 							{
@@ -75,9 +71,7 @@ void RaisingCogControl(short itemNumber)
 									currentItem->Collidable = true;
 								}
 								else
-								{
 									currentItem->ItemFlags[1] = 1;
-								}
 							}
 							else if (item->ObjectNumber == ID_TRIGGER_TRIGGERER)
 							{
@@ -111,9 +105,7 @@ void RaisingCogControl(short itemNumber)
 						flags = 255 - item->ItemFlags[2];
 				}
 				else
-				{
 					flags = item->ItemFlags[2];
-				}
 
 				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, (flags * 256) | 8);
 

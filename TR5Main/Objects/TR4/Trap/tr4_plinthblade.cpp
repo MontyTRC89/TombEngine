@@ -7,14 +7,12 @@
 
 namespace TEN::Entities::TR4
 {
-	void PlinthBladeControl(short itemNum)
+	void PlinthBladeControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (!TriggerActive(item))
-		{
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		}
 		else
 		{
 			int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;

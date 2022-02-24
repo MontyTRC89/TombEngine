@@ -4,22 +4,21 @@
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/animation.h"
 
 void ControlSpikyCeiling(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
 		int y = item->Position.yPos + ((item->ItemFlags[0] == 1) ? 10 : 5);
+		auto probe = GetCollisionResult(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
 
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Position.xPos, y, item->Position.zPos, &roomNumber);
-
-		if (GetFloorHeight(floor, item->Position.xPos, y, item->Position.zPos) < y + 1024)
+		if (probe.Position.Floor < (y + SECTOR(1)))
 		{
 			item->Status = ITEM_DEACTIVATED;
 			StopSoundEffect(147);
@@ -28,8 +27,8 @@ void ControlSpikyCeiling(short itemNumber)
 		{
 			item->Position.yPos = y;
 
-			if (roomNumber != item->RoomNumber)
-				ItemNewRoom(itemNumber, roomNumber);
+			if (probe.RoomNumber != item->RoomNumber)
+				ItemNewRoom(itemNumber, probe.RoomNumber);
 
 			SoundEffect(147, &item->Position, 0);
 		}
@@ -40,7 +39,7 @@ void ControlSpikyCeiling(short itemNumber)
 		LaraItem->HitPoints -= 20;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Position.xPos, item->Position.yPos + 768, LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Position.xPos, item->Position.yPos + CLICK(3), LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
 		SoundEffect(56, &item->Position, 0);

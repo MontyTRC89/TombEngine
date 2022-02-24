@@ -15,12 +15,11 @@ using namespace TEN::Effects::Lightning;
 
 void InitialiseObelisk(short itemNumber)
 {
-	ITEM_INFO* item;
-	ITEM_INFO* item2;
+	auto* item = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNumber];
 	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
 	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+
 	AddActiveItem(itemNumber);
 	item->Status = ITEM_ACTIVE;
 
@@ -28,12 +27,12 @@ void InitialiseObelisk(short itemNumber)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			item2 = &g_Level.Items[i];
+			auto* currentItem = &g_Level.Items[i];
 
-			if (item2->ObjectNumber == ID_OBELISK)
+			if (currentItem->ObjectNumber == ID_OBELISK)
 				item->ItemFlags[0]++;
 
-			if (item2->ObjectNumber == ID_ANIMATING3)
+			if (currentItem->ObjectNumber == ID_ANIMATING3)
 				item->ItemFlags[2] = i;
 		}
 	}
@@ -42,7 +41,8 @@ void InitialiseObelisk(short itemNumber)
 
 void ObeliskControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
+
 	short someNumber;
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
@@ -71,20 +71,20 @@ void ObeliskControl(short itemNumber)
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
-				pos.xPos = item->Position.xPos + (3456 * phd_sin(item->Position.yRot + ANGLE(90)));
-				pos.yPos = item->Position.yPos - 256;
-				pos.zPos = item->Position.zPos + (3456 * phd_cos(item->Position.yRot + ANGLE(90)));
+				pos.xPos = item->Position.xPos + (3456 * phd_sin(item->Position.yRot + ANGLE(90.0f)));
+				pos.yPos = item->Position.yPos - CLICK(1);
+				pos.zPos = item->Position.zPos + (3456 * phd_cos(item->Position.yRot + ANGLE(90.0f)));
 
-				pos2.xPos = item->Position.xPos + (someNumber * phd_sin(item->Position.yRot + ANGLE(90)));
+				pos2.xPos = item->Position.xPos + (someNumber * phd_sin(item->Position.yRot + ANGLE(90.0f)));
 				pos2.yPos = item->Position.yPos;
-				pos2.xPos = item->Position.zPos + (someNumber * phd_cos(item->Position.zRot + ANGLE(90)));
+				pos2.xPos = item->Position.zPos + (someNumber * phd_cos(item->Position.zRot + ANGLE(90.0f)));
 
-				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20)
-					&& abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20)
-					&& abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20)
-					&& abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20)
-					&& abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20)
-					&& abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
+					abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
+					abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20) &&
+					abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
+					abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
+					abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
 				{
 					if (!(GlobalCounter & 3))
 					{
@@ -108,9 +108,9 @@ void ObeliskControl(short itemNumber)
 
 		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
 		{
-			pos.xPos = item->Position.xPos + 8192 * phd_sin(item->Position.yRot);
+			pos.xPos = item->Position.xPos + SECTOR(8) * phd_sin(item->Position.yRot);
 			pos.yPos = item->Position.yPos;
-			pos.zPos = item->Position.zPos + 8192 * phd_cos(item->Position.yRot + ANGLE(90));
+			pos.zPos = item->Position.zPos + SECTOR(8) * phd_cos(item->Position.yRot + ANGLE(90.0f));
 
 			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
 
@@ -120,16 +120,16 @@ void ObeliskControl(short itemNumber)
 				pos2.yPos = (GetRandomControl() & 0x3FF) + pos.yPos - 512;
 				pos2.zPos = (GetRandomControl() & 0x3FF) + pos.zPos - 512;
 
-				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20)
-					&& abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20)
-					&& abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20)
-					&& abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20)
-					&& abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20)
-					&& abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
+					abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
+					abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20) &&
+					abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
+					abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
+					abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
 				{
 					if (item->ItemFlags[2] != NO_ITEM)
 					{
-						ITEM_INFO* item2 = &g_Level.Items[item->ItemFlags[2]];
+						auto* item2 = &g_Level.Items[item->ItemFlags[2]];
 						ExplodeItemNode(item2, 0, 0, 128);
 						KillItem(item->ItemFlags[2]);
 
@@ -163,26 +163,26 @@ void ObeliskControl(short itemNumber)
 	{	
 		AnimateItem(item);
 
-		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+		auto* obj = &Objects[item->ObjectNumber];
 		bool flag = false;
 
 		if (item->AnimNumber == obj->animIndex + 2)
 		{
-			item->Position.yRot -= ANGLE(90);
+			item->Position.yRot -= ANGLE(90.0f);
+
 			if (TrInput & IN_ACTION)
 			{
 				item->AnimNumber = obj->animIndex + 1;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			}
 			else
-			{
 				flag = true;
-			}
 		}
 
 		if (item->AnimNumber == obj->animIndex + 6)
 		{
-			item->Position.yRot += ANGLE(90);
+			item->Position.yRot += ANGLE(90.0f);
+
 			if (!(TrInput & IN_ACTION))
 			{
 				item->AnimNumber = obj->animIndex + 3;
@@ -206,14 +206,15 @@ void ObeliskControl(short itemNumber)
 		{
 			for (int i = 0; i < g_Level.Items.size(); i++)
 			{
-				ITEM_INFO* currentItem = &g_Level.Items[i];
+				auto* currentItem = &g_Level.Items[i];
 
 				if (currentItem->ObjectNumber == ID_PULLEY)
 				{
 					currentItem->ItemFlags[1] =
-						(item->Position.yRot != -ANGLE(90)
-							|| g_Level.Items[item->ItemFlags[0]].Position.yRot != ANGLE(90)
-							|| g_Level.Items[item->ItemFlags[1]].Position.yRot != 0 ? 0 : 1) ^ 1;
+						(item->Position.yRot != -ANGLE(90.0f) ||
+							g_Level.Items[item->ItemFlags[0]].Position.yRot != ANGLE(90.0f) ||
+							g_Level.Items[item->ItemFlags[1]].Position.yRot != 0 ? 0 : 1) ^ 1;
+
 					break;
 				}
 			}

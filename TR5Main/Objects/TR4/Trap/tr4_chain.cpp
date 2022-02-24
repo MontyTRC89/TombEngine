@@ -7,9 +7,9 @@
 
 namespace TEN::Entities::TR4
 {
-	void ChainControl(short itemNum)
+	void ChainControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TriggerFlags)
 		{

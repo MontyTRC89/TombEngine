@@ -8,7 +8,7 @@
 
 void SpringBoardControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ActiveState == 0 && LaraItem->Position.yPos == item->Position.yPos &&
 		LaraItem->Position.xPos / SECTOR(1) == item->Position.xPos / SECTOR(1) &&

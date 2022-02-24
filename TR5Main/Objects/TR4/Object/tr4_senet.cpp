@@ -19,13 +19,19 @@ char ActivePiece = -1;
 
 static PHD_VECTOR GameStixPosition = { 0, 0, -100 };
 OBJECT_COLLISION_BOUNDS GameStixBounds =
-{ -256, 256, -200, 200, -256, 256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
-
-void InitialiseGameStix(short itemNumber)
 {
-	ITEM_INFO* item;
-	
-	item = &g_Level.Items[itemNumber];
+	-256, 256,
+	-200, 200,
+	-256, 256,
+	ANGLE(-10.0f), ANGLE(10.0f),
+	ANGLE(-30.0f), ANGLE(30.0f),
+	0, 0
+};
+
+void InitialiseGameSticks(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
 	item->ItemFlags[7] = -1;
 	//not needed
 	//item->data = &item->itemFlags;
@@ -33,13 +39,14 @@ void InitialiseGameStix(short itemNumber)
 	SenetDisplacement = 0;
 }
 
-void GameStixControl(short itemNumber)
+void GameSticksControl(short itemNumber)
 {
+	auto* item = &g_Level.Items[itemNumber];
+
 	int number, x, z;
 	bool flag;
 	short piece, probedRoomNumber;
 
-	auto* item = &g_Level.Items[itemNumber];
 	if (item->ItemFlags[7] > -1)
 	{
 		if (item->HitPoints == 100)
@@ -313,7 +320,7 @@ void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
 	item->Position.yPos += STEPUP_HEIGHT;
 }
 
-void trigger_item_in_room(short room_number, int object)//originally this is in deltapak
+void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
 {
 	short num = g_Level.Rooms[room_number].itemNumber;
 	while (num != NO_ITEM)
@@ -341,8 +348,8 @@ bool CheckSenetWinner(short num)//original TR4 numbers :>
 		{
 			if (++i >= 3)
 			{
-				trigger_item_in_room(0, ID_RAISING_BLOCK2);
-				trigger_item_in_room(19, ID_RAISING_BLOCK2);
+				TriggerItemInRoom(0, ID_RAISING_BLOCK2);
+				TriggerItemInRoom(19, ID_RAISING_BLOCK2);
 				return true;
 			}
 		}
@@ -354,10 +361,10 @@ bool CheckSenetWinner(short num)//original TR4 numbers :>
 		{
 			if (++j >= 6)
 			{
-				trigger_item_in_room(20, ID_TRAPDOOR1);
-				trigger_item_in_room(21, ID_TRAPDOOR1);
-				trigger_item_in_room(22, ID_TRAPDOOR1);
-				trigger_item_in_room(81, ID_TRAPDOOR1);
+				TriggerItemInRoom(20, ID_TRAPDOOR1);
+				TriggerItemInRoom(21, ID_TRAPDOOR1);
+				TriggerItemInRoom(22, ID_TRAPDOOR1);
+				TriggerItemInRoom(81, ID_TRAPDOOR1);
 				return true;
 			}
 		}
@@ -413,41 +420,41 @@ void MakeMove(int piece, int displacement)
 	}
 }
 
-void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)
+void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[item_num];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
-		laraitem->ActiveState == LS_IDLE &&
-		laraitem->AnimNumber == LA_STAND_IDLE &&
+		laraItem->ActiveState == LS_IDLE &&
+		laraItem->AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&
-		!item->Active || Lara.Control.IsMoving && Lara.interactedItem == item_num)
+		!item->Active || Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
 	{
-		laraitem->Position.yRot ^= 0x8000;
+		laraItem->Position.yRot ^= 0x8000;
 
-		if (TestLaraPosition(&GameStixBounds, item, laraitem))
+		if (TestLaraPosition(&GameStixBounds, item, laraItem))
 		{
-			if (MoveLaraPosition(&GameStixPosition, item, laraitem))
+			if (MoveLaraPosition(&GameStixPosition, item, laraItem))
 			{
-				laraitem->AnimNumber = LA_SENET_ROLL;
-				laraitem->FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
-				laraitem->ActiveState = LS_MISC_CONTROL;
+				laraItem->AnimNumber = LA_SENET_ROLL;
+				laraItem->FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
+				laraItem->ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.ExtraTorsoRot = { 0, 0, 0 };
 				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
-				AddActiveItem(item_num);
-				laraitem->Position.yRot ^= 0x8000;
+				AddActiveItem(itemNumber);
+				laraItem->Position.yRot ^= 0x8000;
 				return;
 			}
 
-			Lara.interactedItem = item_num;
+			Lara.interactedItem = itemNumber;
 		}
 
-		laraitem->Position.yRot ^= 0x8000;
+		laraItem->Position.yRot ^= 0x8000;
 	}
 	else
-		ObjectCollision(item_num, laraitem, coll);
+		ObjectCollision(itemNumber, laraItem, coll);
 }
 
 void ControlGodHead(short itemNumber)

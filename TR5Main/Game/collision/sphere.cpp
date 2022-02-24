@@ -108,4 +108,3 @@ void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint)
 	vec->y = p.y;
 	vec->z = p.z;
 }
-
