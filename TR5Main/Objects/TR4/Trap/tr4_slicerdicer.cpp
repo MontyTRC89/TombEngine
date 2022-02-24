@@ -2,15 +2,16 @@
 #include "tr4_slicerdicer.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Specific/trmath.h"
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSlicerDicer(short itemNum)
+	void InitialiseSlicerDicer(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		int dx = phd_sin(item->Position.yRot + ANGLE(90.0f)) * 512;
 		int dz = phd_cos(item->Position.yRot + ANGLE(90.0f)) * 512;
@@ -24,9 +25,9 @@ namespace TEN::Entities::TR4
 		item->ItemFlags[3] = 50;
 	}
 
-	void SlicerDicerControl(short itemNum)
+	void SlicerDicerControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Position, 0);
@@ -37,10 +38,9 @@ namespace TEN::Entities::TR4
 
 		item->TriggerFlags += 170;
 
-		short roomNumber = item->RoomNumber;
-		GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		if (item->RoomNumber != roomNumber)
-			ItemNewRoom(itemNum, roomNumber);
+		auto probedRoomNumber = GetCollisionResult(item).RoomNumber;
+		if (item->RoomNumber != probedRoomNumber)
+			ItemNewRoom(itemNumber, probedRoomNumber);
 
 		AnimateItem(item);
 	}

@@ -11,6 +11,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -18,135 +19,130 @@
 #define TRAIN_VEL	260
 #define LARA_TRAIN_DEATH_ANIM 3;
 
-long TrainTestHeight(ITEM_INFO *item, long x, long z, short *room_number)
+long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 {
 	float s, c;
 	PHD_VECTOR pos;
 	FLOOR_INFO *floor;
 
-	c = phd_cos(item->Position.yRot);
 	s = phd_sin(item->Position.yRot);
+	c = phd_cos(item->Position.yRot);
 
 	pos.x = item->Position.xPos + z * s + x * c;
 	pos.y = item->Position.yPos - z * phd_sin(item->Position.xRot) + x * phd_sin(item->Position.zRot);
 	pos.z = item->Position.zPos + z * c - x * s;
 
-	*room_number = item->RoomNumber;
-	floor = GetFloor(pos.x, pos.y, pos.z, room_number);
-	return GetFloorHeight(floor, pos.x, pos.y, pos.z);
+	auto probe = GetCollisionResult(pos.x, pos.y, pos.z, item->RoomNumber);
+
+	*roomNumber = probe.RoomNumber;
+	return probe.Position.Floor;
 }
 
-void TrainControl(short trainNum)
+void TrainControl(short itemNumber)
 {
-	ITEM_INFO *train;
-	long fh, rh;
+	auto* item = &g_Level.Items[itemNumber];
+
+	long fh;
 	FLOOR_INFO *floor;
-	short roomNum;
-	float s, c;
+	short roomNumber;
 
-	train = &g_Level.Items[trainNum];
-
-	if (!TriggerActive(train))
+	if (!TriggerActive(item))
 		return;
 
-	if (train->ItemFlags[0] == 0)
-		train->ItemFlags[0] = train->ItemFlags[1] = TRAIN_VEL;
+	if (item->ItemFlags[0] == 0)
+		item->ItemFlags[0] = item->ItemFlags[1] = TRAIN_VEL;
 
-	c = phd_cos(train->Position.yRot);
-	s = phd_sin(train->Position.yRot);
+	float s = phd_sin(item->Position.yRot);
+	float c = phd_cos(item->Position.yRot);
 
-	train->Position.xPos += train->ItemFlags[1] * s;
-	train->Position.zPos += train->ItemFlags[1] * c;
+	item->Position.xPos += item->ItemFlags[1] * s;
+	item->Position.zPos += item->ItemFlags[1] * c;
 
-	rh = TrainTestHeight(train, 0, 5120, &roomNum);
-	train->Position.yPos = fh = TrainTestHeight(train, 0, 0, &roomNum);
+	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
+	item->Position.yPos = fh = TrainTestHeight(item, 0, 0, &roomNumber);
 
 	if (fh == NO_HEIGHT)
 	{
-		KillItem(trainNum);
+		KillItem(itemNumber);
 		return;
 	}
 
-	train->Position.yPos -= 32;// ?
+	item->Position.yPos -= 32;// ?
 
-	roomNum = train->RoomNumber;
-	GetFloor(train->Position.xPos, train->Position.yPos, train->Position.zPos, &roomNum);
+	roomNumber = item->RoomNumber;
+	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
-	if (roomNum != train->RoomNumber)
-		ItemNewRoom(trainNum, roomNum);
+	if (roomNumber != item->RoomNumber)
+		ItemNewRoom(itemNumber, roomNumber);
 
-	train->Position.xRot = -(rh - fh) * 2;
+	item->Position.xRot = -(rh - fh) * 2;
 
-	TriggerDynamicLight(train->Position.xPos + 3072 * s, train->Position.yPos, train->Position.zPos + 3072 * c, 16, 31, 31, 31);
+	TriggerDynamicLight(item->Position.xPos + SECTOR(3) * s, item->Position.yPos, item->Position.zPos + SECTOR(3) * c, 16, 31, 31, 31);
 
-	if (train->ItemFlags[1] != TRAIN_VEL)
+	if (item->ItemFlags[1] != TRAIN_VEL)
 	{
-		if ((train->ItemFlags[1] -= 48) < 0)
-			train->ItemFlags[1] = 0;
+		item->ItemFlags[1] -= 48;
+		if (item->ItemFlags[1] < 0)
+			item->ItemFlags[1] = 0;
 
 		if (!UseForcedFixedCamera)
 		{
-			ForcedFixedCamera.x = train->Position.xPos + 8192 * s;
-			ForcedFixedCamera.z = train->Position.zPos + 8192 * c;
+			ForcedFixedCamera.x = item->Position.xPos + SECTOR(8) * s;
+			ForcedFixedCamera.z = item->Position.zPos + SECTOR(8) * c;
 
-			roomNum = train->RoomNumber;
-			floor = GetFloor(ForcedFixedCamera.x, train->Position.yPos - 512, ForcedFixedCamera.z, &roomNum);
-			ForcedFixedCamera.y = GetFloorHeight(floor, ForcedFixedCamera.x, train->Position.yPos - 512, ForcedFixedCamera.z);
+			roomNumber = item->RoomNumber;
+			floor = GetFloor(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, &roomNumber);
+			ForcedFixedCamera.y = GetFloorHeight(floor, ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z);
 
-			ForcedFixedCamera.roomNumber = roomNum;
-
+			ForcedFixedCamera.roomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
 		}
 	}
 	else
-		SoundEffect(SFX_TR3_TUBE_LOOP, &train->Position, SFX_ALWAYS);
+		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Position, SFX_ALWAYS);
 }
 
-void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
+void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO *train;
-	long x, z;
-	float s, c;
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* trainItem = &g_Level.Items[itemNumber];
 
-	train = &g_Level.Items[trainNum];
-
-	if (!TestBoundsCollide(train, larA, coll->Setup.Radius))
+	if (!TestBoundsCollide(trainItem, laraItem, coll->Setup.Radius))
 		return;
-	if (!TestCollision(train, larA))
+	if (!TestCollision(trainItem, laraItem))
 		return;
 
-	SoundEffect(SFX_TR3_LARA_GENERAL_DEATH, &larA->Position, SFX_ALWAYS);
-	SoundEffect(SFX_TR3_LARA_FALLDETH, &larA->Position, SFX_ALWAYS);
+	SoundEffect(SFX_TR3_LARA_GENERAL_DEATH, &laraItem->Position, SFX_ALWAYS);
+	SoundEffect(SFX_TR3_LARA_FALLDETH, &laraItem->Position, SFX_ALWAYS);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	larA->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
-	larA->FrameNumber = g_Level.Anims[larA->AnimNumber].frameBase;
+	laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
+	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
-	larA->HitPoints = 0;
+	laraItem->HitPoints = 0;
 
-	larA->Position.yRot = train->Position.yRot;
+	laraItem->Position.yRot = trainItem->Position.yRot;
 
-	larA->VerticalVelocity = 0;
-	larA->Airborne = false;
-	larA->Velocity = 0;
+	laraItem->Velocity = 0;
+	laraItem->VerticalVelocity = 0;
+	laraItem->Airborne = false;
 
-	AnimateItem(larA);
+	AnimateItem(laraItem);
 
-	Lara.ExtraAnim = 1;
-	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
-	Lara.hitDirection = -1;
-	Lara.Air = -1;
+	laraInfo->ExtraAnim = 1;
+	laraInfo->Control.HandStatus = HandStatus::Busy;
+	laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
+	laraInfo->hitDirection = -1;
+	laraInfo->Air = -1;
 
-	train->ItemFlags[1] = 160;
+	trainItem->ItemFlags[1] = 160;
 
-	c = phd_cos(train->Position.yRot);
-	s = phd_sin(train->Position.yRot);
+	float s = phd_sin(trainItem->Position.yRot);
+	float c = phd_cos(trainItem->Position.yRot);
 
-	x = larA->Position.xPos + 256 * s;
-	z = larA->Position.zPos + 256 * c;
+	long x = laraItem->Position.xPos + CLICK(1) * s;
+	long z = laraItem->Position.zPos + CLICK(1) * c;
 
-	DoLotsOfBlood(x, larA->Position.yPos - 512, z, 1024, train->Position.yRot, larA->RoomNumber, 15);
-
+	DoLotsOfBlood(x, laraItem->Position.yPos - CLICK(2), z, SECTOR(1), trainItem->Position.yRot, laraItem->RoomNumber, 15);
 }

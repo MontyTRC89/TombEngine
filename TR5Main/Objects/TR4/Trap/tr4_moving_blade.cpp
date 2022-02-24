@@ -13,7 +13,7 @@ namespace TEN::Entities::TR4
 {
     void MovingBladeControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (TriggerActive(item))
         {
@@ -21,8 +21,6 @@ namespace TEN::Entities::TR4
             AnimateItem(item);
         }
         else
-        {
             item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-        }
     }
 }

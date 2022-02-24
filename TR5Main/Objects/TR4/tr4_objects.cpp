@@ -882,9 +882,9 @@ static void StartObject(OBJECT_INFO* obj)
 	obj = &Objects[ID_WHEEL_OF_FORTUNE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGameStix;
-		obj->control = GameStixControl;
-		obj->collision = GameStixCollision;
+		obj->initialise = InitialiseGameSticks;
+		obj->control = GameSticksControl;
+		obj->collision = GameSticksCollision;
 		g_Level.Bones[obj->boneIndex] |= 0x10;
 		g_Level.Bones[obj->boneIndex + 4] |= 0x10;
 		g_Level.Bones[obj->boneIndex + 8] |= 0x10;

@@ -12,35 +12,33 @@
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
 
-constexpr auto MAX_ROLLINGBALL_SPEED = WALL_SIZE * 3;
+constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
-void RollingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* ballItem = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, l, coll->Setup.Radius))
+	if (TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius))
 	{
-		if (TestCollision(item, l))
+		if (TestCollision(ballItem, laraItem))
 		{
-			if (TriggerActive(item) && (item->ItemFlags[0] || item->VerticalVelocity))
+			if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->VerticalVelocity))
 			{
-				LaraItem->AnimNumber = LA_BOULDER_DEATH;
-				LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
-				LaraItem->TargetState = LS_DEATH;
-				LaraItem->ActiveState = LS_DEATH;
-				LaraItem->Airborne = false;
+				laraItem->AnimNumber = LA_BOULDER_DEATH;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->TargetState = LS_DEATH;
+				laraItem->ActiveState = LS_DEATH;
+				laraItem->Airborne = false;
 			}
 			else
-			{
-				ObjectCollision(itemNumber, l, coll);
-			}
+				ObjectCollision(itemNumber, laraItem, coll);
 		}
 	}
 }
 
 void RollingBallControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -57,28 +55,26 @@ void RollingBallControl(short itemNumber)
 		if (abs(item->VerticalVelocity) > 16)
 		{
 			int distance = sqrt(
-				SQUARE(Camera.pos.x - item->Position.xPos) +
-				SQUARE(Camera.pos.y - item->Position.yPos) +
-				SQUARE(Camera.pos.z - item->Position.zPos));
+				pow(Camera.pos.x - item->Position.xPos, 2) +
+				pow(Camera.pos.y - item->Position.yPos, 2) +
+				pow(Camera.pos.z - item->Position.zPos, 2));
 
 			if (distance < 16384)
 				Camera.bounce = -(((16384 - distance) * abs(item->VerticalVelocity)) / 16384);
 		}
 
-		if (item->Position.yPos - dh < 512)
+		if ((item->Position.yPos - dh) < CLICK(2))
 			item->Position.yPos = dh;
 
 		if (item->VerticalVelocity <= 64)
 		{
-			if (abs(item->Velocity) <= 512 || (GetRandomControl() & 0x1F))
+			if (abs(item->Velocity) <= CLICK(2) || (GetRandomControl() & 0x1F))
 				item->VerticalVelocity = 0;
 			else
 				item->VerticalVelocity = -(short)(GetRandomControl() % (item->Velocity / 8));
 		}
 		else
-		{
 			item->VerticalVelocity = -(short)(item->VerticalVelocity / 4);
-		}
 	}
 
 	int frontX = item->Position.xPos;
@@ -137,16 +133,14 @@ void RollingBallControl(short itemNumber)
 	{
 		int counterZ = 0;
 
-		if (frontFarHeight - dh <= CLICK(1))
+		if ((frontFarHeight - dh) <= CLICK(1))
 		{
 			if (frontFarHeight - dh < -CLICK(4) || frontHeight - dh < -CLICK(1))
 			{
 				if (item->ItemFlags[1] <= 0)
 				{
 					if (!item->ItemFlags[1] && item->ItemFlags[0])
-					{
 						item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
-					}
 				}
 				else
 				{
@@ -155,13 +149,9 @@ void RollingBallControl(short itemNumber)
 				}
 			}
 			else if (frontHeight == dh)
-			{
 				counterZ++;
-			}
 			else
-			{
 				item->ItemFlags[1] += (frontHeight - dh) / 2;
-			}
 		}
 
 		if (backHeight - dh <= CLICK(1))
@@ -171,9 +161,7 @@ void RollingBallControl(short itemNumber)
 				if (item->ItemFlags[1] >= 0)
 				{
 					if (!item->ItemFlags[1] && item->ItemFlags[0])
-					{
 						item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
-					}
 				}
 				else
 				{
@@ -182,13 +170,9 @@ void RollingBallControl(short itemNumber)
 				}
 			}
 			else if (backHeight == dh)
-			{
 				counterZ++;
-			}
 			else
-			{
 				item->ItemFlags[1] -= (backHeight - dh) / 2;
-			}
 		}
 
 		if (counterZ == 2)
@@ -201,16 +185,14 @@ void RollingBallControl(short itemNumber)
 
 		int counterX = 0;
 
-		if (leftHeight - dh <= CLICK(1))
+		if ((leftHeight - dh) <= CLICK(1))
 		{
-			if (leftFarHeight - dh < -CLICK(4) || leftHeight - dh < -CLICK(1))
+			if ((leftFarHeight - dh) < -CLICK(4) || leftHeight - dh < -CLICK(1))
 			{
 				if (item->ItemFlags[0] >= 0)
 				{
 					if (!item->ItemFlags[0] && item->ItemFlags[1])
-					{
 						item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
-					}
 				}
 				else
 				{
@@ -219,25 +201,19 @@ void RollingBallControl(short itemNumber)
 				}
 			}
 			else if (leftHeight == dh)
-			{
 				counterX++;
-			}
 			else
-			{
 				item->ItemFlags[0] -= (leftHeight - dh) / 2;
-			}
 		}
 
-		if (rightHeight - dh <= CLICK(1))
+		if ((rightHeight - dh) <= CLICK(1))
 		{
-			if (rightFarHeight - dh < -CLICK(4) || rightHeight - dh < -CLICK(1))
+			if ((rightFarHeight - dh) < -CLICK(4) || rightHeight - dh < -CLICK(1))
 			{
 				if (item->ItemFlags[0] <= 0)
 				{
 					if (!item->ItemFlags[0] && item->ItemFlags[1])
-					{
 						item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
-					}
 				}
 				else
 				{
@@ -246,13 +222,9 @@ void RollingBallControl(short itemNumber)
 				}
 			}
 			else if (rightHeight == dh)
-			{
 				counterX++;
-			}
 			else
-			{
 				item->ItemFlags[0] += (rightHeight - dh) / 2;
-			}
 		}
 
 		if (counterX == 2)
@@ -269,15 +241,15 @@ void RollingBallControl(short itemNumber)
 	if (item->RoomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
-	if (item->ItemFlags[0] > MAX_ROLLINGBALL_SPEED)
-		item->ItemFlags[0] = MAX_ROLLINGBALL_SPEED;
-	else if (item->ItemFlags[0] < -MAX_ROLLINGBALL_SPEED)
-		item->ItemFlags[0] = -MAX_ROLLINGBALL_SPEED;
+	if (item->ItemFlags[0] > ROLLING_BALL_MAX_VELOCITY)
+		item->ItemFlags[0] = ROLLING_BALL_MAX_VELOCITY;
+	else if (item->ItemFlags[0] < -ROLLING_BALL_MAX_VELOCITY)
+		item->ItemFlags[0] = -ROLLING_BALL_MAX_VELOCITY;
 
-	if (item->ItemFlags[1] > MAX_ROLLINGBALL_SPEED)
-		item->ItemFlags[1] = MAX_ROLLINGBALL_SPEED;
-	else if (item->ItemFlags[1] < -MAX_ROLLINGBALL_SPEED)
-		item->ItemFlags[1] = -MAX_ROLLINGBALL_SPEED;
+	if (item->ItemFlags[1] > ROLLING_BALL_MAX_VELOCITY)
+		item->ItemFlags[1] = ROLLING_BALL_MAX_VELOCITY;
+	else if (item->ItemFlags[1] < -ROLLING_BALL_MAX_VELOCITY)
+		item->ItemFlags[1] = -ROLLING_BALL_MAX_VELOCITY;
 
 	short angle = 0;
 
@@ -291,14 +263,12 @@ void RollingBallControl(short itemNumber)
 		if (((angle - item->Position.yRot) & 0x7fff) >= 512)
 		{
 			if (angle <= item->Position.yRot || angle - item->Position.yRot >= 0x8000)
-				item->Position.yRot -= 512;
+				item->Position.yRot -= CLICK(2);
 			else
-				item->Position.yRot += 512;
+				item->Position.yRot += CLICK(2);
 		}
 		else
-		{
 			item->Position.yRot = angle;
-		}
 	}
 
 	item->Position.xRot -= (abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2;
@@ -308,11 +278,7 @@ void RollingBallControl(short itemNumber)
 
 void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
 {
-	int x, y, z;
-	short d;
-	ITEM_INFO* item;
-
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNum];
 
 	if (item->Status == ITEM_ACTIVE)
 	{
@@ -324,13 +290,16 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
+
 			lara->HitPoints -= 100;
-			x = lara->Position.xPos - item->Position.xPos;
-			y = (lara->Position.yPos - 350) - (item->Position.yPos - 512);
-			z = lara->Position.zPos - item->Position.zPos;				
-			d = (short)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+			int x = lara->Position.xPos - item->Position.xPos;
+			int y = (lara->Position.yPos - 350) - (item->Position.yPos - 512);
+			int z = lara->Position.zPos - item->Position.zPos;
+			short d = (short)sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+
 			if (d < 512)
 				d = 512;
+
 			x = item->Position.xPos + ((x * 512) / d);
 			y = item->Position.yPos - 512 + ((y * 512) / d);
 			z = item->Position.zPos + ((z * 512) / d);
@@ -356,10 +325,10 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll
 				Camera.targetElevation = -ANGLE(25);
 				for (int i = 0; i < 15; i++)
 				{
-					x = lara->Position.xPos + (GetRandomControl() - ANGLE(180) / 256);
-					y = lara->Position.yPos - (GetRandomControl() / 64);
-					z = lara->Position.zPos + (GetRandomControl() - ANGLE(180) / 256);
-					d = ((GetRandomControl() - ANGLE(180) / 8) + item->Position.yRot);
+					int x = lara->Position.xPos + (GetRandomControl() - ANGLE(180.0f) / 256);
+					int y = lara->Position.yPos - (GetRandomControl() / 64);
+					int z = lara->Position.zPos + (GetRandomControl() - ANGLE(180.0f) / 256);
+					short d = ((GetRandomControl() - ANGLE(180) / 8) + item->Position.yRot);
 					DoBloodSplat(x, y, z, (short)(item->Velocity * 2), d, item->RoomNumber);
 				}
 			}
@@ -374,12 +343,12 @@ void ClassicRollingBallControl(short itemNum)
 {
 	short x, z, dist, oldx, oldz, roomNum;
 	short y1, y2, ydist;
-	ITEM_INFO* item;
 	FLOOR_INFO* floor;
 	GAME_VECTOR* old;
 	ROOM_INFO* r;
 
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNum];
+
 	if (item->Status == ITEM_ACTIVE)
 	{
 		if (item->TargetState == 2)

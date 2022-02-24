@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR4
 {
-	void SpikeballControl(short itemNum);
+	void SpikeballControl(short itemNumber);
 }

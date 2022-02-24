@@ -7,15 +7,16 @@
 
 namespace TEN::Entities::TR4
 {
-	void SpikeballControl(short itemNum)
+	void SpikeballControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
 			int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
-			if ((frameNumber <= 14 || frameNumber >= 24) && (frameNumber < 138 || frameNumber > 140))
+			if ((frameNumber <= 14 || frameNumber >= 24) &&
+				(frameNumber < 138 || frameNumber > 140))
 			{
 				if (frameNumber < 141)
 					*((int*)&item->ItemFlags[0]) = 0;

@@ -3,24 +3,23 @@
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 
-void ControlSpikyWall(short itemNum)
+void ControlSpikyWall(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	/* Move wall */
+	// Move wall.
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
 		int x = item->Position.xPos + phd_sin(item->Position.yRot);
 		int z = item->Position.zPos + phd_cos(item->Position.yRot);
+		auto probe = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber);
 
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
-
-		if (GetFloorHeight(floor, x, item->Position.yPos, z) != item->Position.yPos)
+		if (probe.Position.Floor != item->Position.yPos)
 		{
 			item->Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
@@ -29,8 +28,10 @@ void ControlSpikyWall(short itemNum)
 		{
 			item->Position.xPos = x;
 			item->Position.zPos = z;
-			if (roomNumber != item->RoomNumber)
-				ItemNewRoom(itemNum, roomNumber);
+
+			if (probe.RoomNumber != item->RoomNumber)
+				ItemNewRoom(itemNumber, probe.RoomNumber);
+
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Position, 0);
 		}
 	}
@@ -40,7 +41,7 @@ void ControlSpikyWall(short itemNum)
 		LaraItem->HitPoints -= 15;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - 512, LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - CLICK(2), LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
 		SoundEffect(56, &item->Position, 0);

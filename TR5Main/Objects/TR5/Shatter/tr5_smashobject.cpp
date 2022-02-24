@@ -8,24 +8,26 @@
 
 void InitialiseSmashObject(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	item->Flags = 0;
 	item->MeshBits = 1;
 
-	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
-	FLOOR_INFO* floor = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z);
-	BOX_INFO* box = &g_Level.Boxes[floor->Box];
+	auto* room = &g_Level.Rooms[item->RoomNumber];
+
+	FLOOR_INFO* floor = GetSector(room, item->Position.xPos - room->x, item->Position.zPos - room->z);
+	auto* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
 }
 
 void SmashObject(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
-	int sector = ((item->Position.zPos - r->z) / 1024) + r->zSize * ((item->Position.xPos - r->x) / 1024);
+	auto* item = &g_Level.Items[itemNumber];
+	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	BOX_INFO* box = &g_Level.Boxes[r->floor[sector].Box];
+	int sector = ((item->Position.zPos - room->z) / 1024) + room->zSize * ((item->Position.xPos - room->x) / 1024);
+
+	auto* box = &g_Level.Boxes[room->floor[sector].Box];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 
@@ -40,6 +42,7 @@ void SmashObject(short itemNumber)
 
 	if (item->Status == ITEM_ACTIVE)
 		RemoveActiveItem(itemNumber);
+
 	item->Status = ITEM_DEACTIVATED;
 }
 

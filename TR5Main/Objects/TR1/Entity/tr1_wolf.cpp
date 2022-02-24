@@ -12,7 +12,8 @@
 
 BITE_INFO wolfBite = { 0, -14, 174, 6 };
 
-enum wolfStates {
+enum WolfState
+{
 	STATE_EMPTY, 
 	STATE_STOP, 
 	STATE_WALK, 
@@ -34,8 +35,8 @@ enum wolfStates {
 
 #define DIE_ANIM  20
 
-#define ATTACK_RANGE SQUARE(WALL_SIZE*3/2)
-#define STALK_RANGE  SQUARE(WALL_SIZE*3)
+#define ATTACK_RANGE pow(WALL_SIZE*3/2, 2)
+#define STALK_RANGE  pow(WALL_SIZE*3, 2)
 
 #define BITE_DAMAGE   100
 #define LUNGE_DAMAGE 50
@@ -44,28 +45,29 @@ enum wolfStates {
 #define SLEEP_CHANCE 0x20
 #define HOWL_CHANCE  0x180
 
-#define WALK_TURN  ANGLE(2)
-#define RUN_TURN   ANGLE(5)
-#define STALK_TURN ANGLE(2)
+#define WALK_TURN  ANGLE(2.0f)
+#define RUN_TURN   ANGLE(5.0f)
+#define STALK_TURN ANGLE(2.0f)
 
-void InitialiseWolf(short itemNum)
+void InitialiseWolf(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	ClearItem(itemNum);
+	auto* item = &g_Level.Items[itemNumber];
+	ClearItem(itemNumber);
 	item->FrameNumber = SLEEP_FRAME;
 }
 
-void WolfControl(short itemNum)
+void WolfControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
 	short head;
 	short angle;
 	short tilt;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creatureInfo = (CREATURE_INFO*)item->Data;
+
 	head = angle = tilt = 0;
 	AI_INFO info;
 
@@ -88,14 +90,14 @@ void WolfControl(short itemNum)
 		GetCreatureMood(item, &info, TIMID);
 		CreatureMood(item, &info, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creatureInfo->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case STATE_SLEEP:
 			head = 0;
 
-			if (creature->mood == ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
+			if (creatureInfo->mood == ESCAPE_MOOD || info.zoneNumber == info.enemyZone)
 			{
 				item->RequiredState = STATE_CROUCH;
 				item->TargetState = STATE_STOP;
@@ -115,9 +117,9 @@ void WolfControl(short itemNum)
 			break;
 
 		case STATE_WALK:
-			creature->maximumTurn = WALK_TURN;
+			creatureInfo->maximumTurn = WALK_TURN;
 
-			if (creature->mood != BORED_MOOD)
+			if (creatureInfo->mood != BORED_MOOD)
 			{
 				item->TargetState = STATE_STALK;
 				item->RequiredState = STATE_EMPTY;
@@ -132,30 +134,30 @@ void WolfControl(short itemNum)
 		case STATE_CROUCH:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creatureInfo->mood == ESCAPE_MOOD)
 				item->TargetState = STATE_RUN;
-			else if (info.distance < SQUARE(345) && info.bite)
+			else if (info.distance < pow(345, 2) && info.bite)
 				item->TargetState = STATE_BITE;
-			else if (creature->mood == STALK_MOOD)
+			else if (creatureInfo->mood == STALK_MOOD)
 				item->TargetState = STATE_STALK;
-			else if (creature->mood == BORED_MOOD)
+			else if (creatureInfo->mood == BORED_MOOD)
 				item->TargetState = STATE_STOP;
 			else
 				item->TargetState = STATE_RUN;
 			break;
 
 		case STATE_STALK:
-			creature->maximumTurn = STALK_TURN;
+			creatureInfo->maximumTurn = STALK_TURN;
 
-			if (creature->mood == ESCAPE_MOOD)
+			if (creatureInfo->mood == ESCAPE_MOOD)
 				item->TargetState = STATE_RUN;
-			else if (info.distance < SQUARE(345) && info.bite)
+			else if (info.distance < pow(345, 2) && info.bite)
 				item->TargetState = STATE_BITE;
-			else if (info.distance > SQUARE(3072))
+			else if (info.distance > pow(3072, 2))
 				item->TargetState = STATE_RUN;
-			else if (creature->mood == ATTACK_MOOD)
+			else if (creatureInfo->mood == ATTACK_MOOD)
 			{
-				if (!info.ahead || info.distance > SQUARE(1536) ||
+				if (!info.ahead || info.distance > pow(1536, 2) ||
 					(info.enemyFacing < FRONT_ARC && info.enemyFacing > -FRONT_ARC))
 					item->TargetState = STATE_RUN;
 			}
@@ -164,12 +166,12 @@ void WolfControl(short itemNum)
 				item->RequiredState = STATE_HOWL;
 				item->TargetState = STATE_CROUCH;
 			}
-			else if (creature->mood == BORED_MOOD)
+			else if (creatureInfo->mood == BORED_MOOD)
 				item->TargetState = STATE_CROUCH;
 			break;
 
 		case 3:
-			creature->maximumTurn = RUN_TURN;
+			creatureInfo->maximumTurn = RUN_TURN;
 			tilt = angle;
 
 			if (info.ahead && info.distance < ATTACK_RANGE)
@@ -186,12 +188,12 @@ void WolfControl(short itemNum)
 					item->RequiredState = STATE_EMPTY;
 				}
 			}
-			else if (creature->mood == STALK_MOOD && info.distance < STALK_RANGE)
+			else if (creatureInfo->mood == STALK_MOOD && info.distance < STALK_RANGE)
 			{
 				item->RequiredState = STATE_STALK;
 				item->TargetState = STATE_CROUCH;
 			}
-			else if (creature->mood == BORED_MOOD)
+			else if (creatureInfo->mood == BORED_MOOD)
 				item->TargetState = STATE_CROUCH;
 			break;
 
@@ -221,5 +223,5 @@ void WolfControl(short itemNum)
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

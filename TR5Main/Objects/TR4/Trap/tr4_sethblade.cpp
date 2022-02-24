@@ -8,9 +8,9 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSethBlade(short itemNum)
+	void InitialiseSethBlade(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 		item->TargetState = 2;
@@ -19,9 +19,9 @@ namespace TEN::Entities::TR4
 		item->ItemFlags[2] = abs(item->TriggerFlags);
 	}
 
-	void SethBladeControl(short itemNum)
+	void SethBladeControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		*((int*)&item->ItemFlags) = 0;
 
@@ -30,9 +30,7 @@ namespace TEN::Entities::TR4
 			if (item->ActiveState == 2)
 			{
 				if (item->ItemFlags[2] > 1)
-				{
 					item->ItemFlags[2]--;
-				}
 				else if (item->ItemFlags[2] == 1)
 				{
 					item->TargetState = 1;
@@ -41,9 +39,7 @@ namespace TEN::Entities::TR4
 				else if (item->ItemFlags[2] == 0)
 				{
 					if (item->TriggerFlags > 0)
-					{
 						item->ItemFlags[2] = item->TriggerFlags;
-					}
 				}
 			}
 			else
