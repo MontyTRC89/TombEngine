@@ -12,66 +12,75 @@
 
 static PHD_VECTOR SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
-{ -512, 512, -100, 100, -512, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
+{
+	-512, 512,
+	-100, 100,
+	-512, 0,
+	ANGLE(-10.0f), ANGLE(10.0f),
+	ANGLE(-30.0f), ANGLE(30.0f),
+	0, 0
+};
 
-void InitialiseSarcophagus(short itemNum)
+void InitialiseSarcophagus(short itemNumber)
 {
 
 }
 
-void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* sarcItem = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
-		item->Status != ITEM_ACTIVE &&
-		l->ActiveState == LS_IDLE &&
-		l->AnimNumber == LA_STAND_IDLE &&
-		Lara.Control.HandStatus == HandStatus::Free ||
-		Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+		laraItem->ActiveState == LS_IDLE &&
+		laraItem->AnimNumber == LA_STAND_IDLE &&
+		laraInfo->Control.HandStatus == HandStatus::Free &&
+		sarcItem->Status != ITEM_ACTIVE ||
+		laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 	{
-		if (TestLaraPosition(&SarcophagusBounds, item, l))
+		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
 		{
-			if (MoveLaraPosition(&SarcophagusPosition, item, l))
+			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
 			{
-				l->AnimNumber = LA_PICKUP_SARCOPHAGUS;
-				l->ActiveState = LS_MISC_CONTROL;
-				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				item->Flags |= IFLAG_ACTIVATION_MASK;
+				laraItem->AnimNumber = LA_PICKUP_SARCOPHAGUS;
+				laraItem->ActiveState = LS_MISC_CONTROL;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				sarcItem->Flags |= IFLAG_ACTIVATION_MASK;
 
-				AddActiveItem(itemNum);
-				item->Status = ITEM_ACTIVE;
+				AddActiveItem(itemNumber);
+				sarcItem->Status = ITEM_ACTIVE;
 
-				Lara.Control.IsMoving = false;
-				ResetLaraFlex(l);
-				Lara.Control.HandStatus = HandStatus::Busy;
+				laraInfo->Control.IsMoving = false;
+				ResetLaraFlex(laraItem);
+				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-			{
-				Lara.interactedItem = itemNum;
-			}
+				laraInfo->interactedItem = itemNumber;
 		}
-		else if (Lara.Control.IsMoving)
+		else if (laraInfo->Control.IsMoving)
 		{
-			if (Lara.interactedItem == itemNum)
+			if (laraInfo->interactedItem == itemNumber)
 			{
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Free;
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 		}
 	}
-	else if (l->AnimNumber != LA_PICKUP_SARCOPHAGUS || l->FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+	else if (laraItem->AnimNumber != LA_PICKUP_SARCOPHAGUS ||
+		laraItem->FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
-		ObjectCollision(itemNum, l, coll);
+		ObjectCollision(itemNumber, laraItem, coll);
 	}
 	else
 	{
-		short linknum;
-		for (linknum = g_Level.Items[g_Level.Rooms[item->RoomNumber].itemNumber].NextItem; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
+		short linkNumber;
+		for (linkNumber = g_Level.Items[g_Level.Rooms[sarcItem->RoomNumber].itemNumber].NextItem; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
-			ITEM_INFO* currentItem = &g_Level.Items[linknum];
+			auto* currentItem = &g_Level.Items[linkNumber];
 
-			if (linknum != itemNum && currentItem->Position.xPos == item->Position.xPos && currentItem->Position.zPos == item->Position.zPos)
+			if (linkNumber != itemNumber &&
+				currentItem->Position.xPos == sarcItem->Position.xPos &&
+				currentItem->Position.zPos == sarcItem->Position.zPos)
 			{
 				if (Objects[currentItem->ObjectNumber].isPickup)
 				{

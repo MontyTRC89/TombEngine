@@ -28,10 +28,9 @@ namespace TEN::Entities::TR4
 
 	void InitialiseTeethSpikes(short itemNumber)
 	{
-		ITEM_INFO* item;
 		int angle;
 
-		item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 		item->Status = ITEM_INVISIBLE;
 
 		// Set mutators to 0 by default

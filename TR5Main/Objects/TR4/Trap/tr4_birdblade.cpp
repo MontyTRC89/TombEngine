@@ -7,9 +7,9 @@
 
 namespace TEN::Entities::TR4
 {
-	void BirdBladeControl(short itemNum)
+	void BirdBladeControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->ItemFlags[3] = 100;
 

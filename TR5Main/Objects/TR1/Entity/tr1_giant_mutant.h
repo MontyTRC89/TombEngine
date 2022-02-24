@@ -1,3 +1,3 @@
 #pragma once
 
-void AbortionControl(short itemNum);
+void AbortionControl(short itemNumber);

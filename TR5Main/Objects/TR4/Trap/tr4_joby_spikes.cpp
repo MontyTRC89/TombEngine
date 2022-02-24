@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr4_joby_spikes.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Sound/sound.h"
@@ -12,7 +13,7 @@ namespace TEN::Entities::TR4
 {
     void InitialiseJobySpikes(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
 		// Set bone mutators to 0 by default
 		for (int i = 0; i < item->Mutator.size(); i++)
@@ -21,27 +22,24 @@ namespace TEN::Entities::TR4
         item->Position.yRot = GetRandomControl() * 1024;
         item->ItemFlags[2] = GetRandomControl() & 1;
 
-        short roomNumber = item->RoomNumber;
-        FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-        int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+        auto probe = GetCollisionResult(item);
 
         // TODO: check this optimized division
-        //v6 = 1321528399i64 * ((height - GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos)) << 12);
+        //v6 = 1321528399i64 * ((probe.Position.Floor - probe.Position.Ceiling) << 12);
         //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
 
-        item->ItemFlags[3] = (short)((height - GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos)) * 1024 * 12 / 13);
+        item->ItemFlags[3] = (short)((probe.Position.Floor - probe.Position.Ceiling) * 1024 * 12 / 13);
     }
 
     void JobySpikesControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (!TriggerActive(item))
             return;
 
         ANIM_FRAME* framePtr[2];
         int rate;
-
         SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
         GetFrame(LaraItem, framePtr, &rate);
 
@@ -52,9 +50,9 @@ namespace TEN::Entities::TR4
         {
             if (item->Position.yPos + dl > dy)
             {
-                if (abs(item->Position.xPos - LaraItem->Position.xPos) < 512)
+                if (abs(item->Position.xPos - LaraItem->Position.xPos) < CLICK(2))
                 {
-                    if (abs(item->Position.zPos - LaraItem->Position.zPos) < 512)
+                    if (abs(item->Position.zPos - LaraItem->Position.zPos) < CLICK(2))
                     {
                         int x = (GetRandomControl() & 0x7F) + LaraItem->Position.xPos - 64;
                         int y = dy + GetRandomControl() % (item->Position.yPos - dy + dl);

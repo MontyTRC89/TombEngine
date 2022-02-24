@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR4
 {
-	void PlinthBladeControl(short itemNum);
+	void PlinthBladeControl(short itemNumber);
 }

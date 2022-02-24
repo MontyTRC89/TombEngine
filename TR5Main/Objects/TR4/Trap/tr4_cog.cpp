@@ -12,9 +12,9 @@
 
 namespace TEN::Entities::TR4
 {
-    void CogControl(short itemNum)
+    void CogControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNum];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (TriggerActive(item))
         {
@@ -32,34 +32,31 @@ namespace TEN::Entities::TR4
             }
         }
         else if (item->TriggerFlags == 2)
-        {
             item->Status |= ITEM_INVISIBLE;
-        }
     }
 
-    void CogCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+    void CogCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* cogItem = &g_Level.Items[itemNumber];
         
-        if (item->Status != ITEM_INVISIBLE)
+        if (cogItem->Status != ITEM_INVISIBLE)
         {
-            if (TestBoundsCollide(item, l, coll->Setup.Radius))
+            if (TestBoundsCollide(cogItem, laraItem, coll->Setup.Radius))
             {
-                if (TriggerActive(item))
+                if (TriggerActive(cogItem))
                 {
                     DoBloodSplat(
-                        (GetRandomControl() & 0x3F) + l->Position.xPos - 32, 
-                        (GetRandomControl() & 0x1F) + item->Position.yPos - 16, 
-                        (GetRandomControl() & 0x3F) + l->Position.zPos - 32, 
+                        (GetRandomControl() & 0x3F) + laraItem->Position.xPos - 32, 
+                        (GetRandomControl() & 0x1F) + cogItem->Position.yPos - 16, 
+                        (GetRandomControl() & 0x3F) + laraItem->Position.zPos - 32, 
                         (GetRandomControl() & 3) + 2, 
                         2 * GetRandomControl(),
-                        l->RoomNumber);
-                    LaraItem->HitPoints -= 10;
+                        laraItem->RoomNumber);
+
+                    laraItem->HitPoints -= 10;
                 }
                 else if (coll->Setup.EnableObjectPush)
-                {
-                    ItemPushItem(item, l, coll, 0, 0);
-                }
+                    ItemPushItem(cogItem, laraItem, coll, 0, 0);
             }
         }
     }

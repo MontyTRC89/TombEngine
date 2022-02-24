@@ -5,5 +5,5 @@ struct COLL_INFO;
 
 namespace TEN::Entities::TR4
 {
-	void ChainControl(short itemNum);
+	void ChainControl(short itemNumber);
 }

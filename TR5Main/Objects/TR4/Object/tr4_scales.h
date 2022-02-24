@@ -2,5 +2,5 @@
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 
-void ScalesControl(short itemNum);
-void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void ScalesControl(short itemNumber);
+void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);

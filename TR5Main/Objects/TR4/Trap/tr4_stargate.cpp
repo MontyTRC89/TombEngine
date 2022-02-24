@@ -25,9 +25,9 @@ namespace TEN::Entities::TR4
 		0, -96, 96
 	};
 
-	void StargateControl(short itemNum)
+	void StargateControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 		item->ItemFlags[3] = 50;
 
 		if (TriggerActive(item))
@@ -37,19 +37,17 @@ namespace TEN::Entities::TR4
 			AnimateItem(item);
 		}
 		else
-		{
 			item->ItemFlags[0] = 0;
-		}
 	}
 
-	void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
+	void StargateCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->Status == ITEM_INVISIBLE)
 			return;
 
-		if (TestBoundsCollide(item, l, c->Setup.Radius))
+		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -57,11 +55,11 @@ namespace TEN::Entities::TR4
 				GlobalCollisionBounds.Y1 = StargateBounds[3 * i + 1];
 				GlobalCollisionBounds.Z1 = StargateBounds[3 * i + 2];
 
-				if (TestWithGlobalCollisionBounds(item, l, c))
-					ItemPushItem(item, l, c, 0, 2);
+				if (TestWithGlobalCollisionBounds(item, laraItem, coll))
+					ItemPushItem(item, laraItem, coll, 0, 2);
 			}
 
-			int result = TestCollision(item, l);
+			int result = TestCollision(item, laraItem);
 			if (result)
 			{
 				result &= item->ItemFlags[0];
@@ -85,20 +83,21 @@ namespace TEN::Entities::TR4
 							int oldY = LaraItem->Position.yPos;
 							int oldZ = LaraItem->Position.zPos;
 
-							if (ItemPushItem(item, l, c, flags & 1, 2))
+							if (ItemPushItem(item, laraItem, coll, flags & 1, 2))
 							{
 								if ((flags & 1) &&
-									(oldX != LaraItem->Position.xPos 
-									|| oldY != LaraItem->Position.yPos 
-									|| oldZ != LaraItem->Position.zPos) &&
+									(oldX != LaraItem->Position.xPos ||
+									oldY != LaraItem->Position.yPos ||
+									oldZ != LaraItem->Position.zPos) &&
 									TriggerActive(item))
 								{
-									DoBloodSplat((GetRandomControl() & 0x3F) + l->Position.xPos - 32,
+									DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Position.xPos - 32,
 										(GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16,
-										(GetRandomControl() & 0x3F) + l->Position.zPos - 32,
+										(GetRandomControl() & 0x3F) + laraItem->Position.zPos - 32,
 										(GetRandomControl() & 3) + 2,
 										2 * GetRandomControl(),
-										l->RoomNumber);
+										laraItem->RoomNumber);
+
 									LaraItem->HitPoints -= 100;
 								}
 							}

@@ -1,3 +1,3 @@
 #pragma once
 
-void NatlaControl(short itemNum);
+void NatlaControl(short itemNumber);

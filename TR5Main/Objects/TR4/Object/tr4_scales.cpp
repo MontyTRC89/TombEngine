@@ -16,11 +16,18 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 
 OBJECT_COLLISION_BOUNDS ScalesBounds =
-{ -1408, -1408, 0, 0, -512, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
-
-void ScalesControl(short itemNum)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	-1408, -1408,
+	0, 0,
+	-512, 512,
+	ANGLE(-10.0f), ANGLE(10.0f),
+	ANGLE(-30.0f), ANGLE(30.0f),
+	ANGLE(-10.0f), ANGLE(10.0f)
+};
+
+void ScalesControl(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameEnd)
 	{
@@ -32,7 +39,7 @@ void ScalesControl(short itemNum)
 	{
 		if (Objects[item->ObjectNumber].animIndex)
 		{
-			RemoveActiveItem(itemNum);
+			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;
 			item->ItemFlags[1] = 0;
 
@@ -52,6 +59,7 @@ void ScalesControl(short itemNum)
 					if (--sw <= 0)
 						break;
 				}
+
 				g_Level.Items[itemNos[sw]].Flags = 1024;
 			}
 
@@ -66,7 +74,7 @@ void ScalesControl(short itemNum)
 	if (item->ActiveState == 2)
 	{
 		flags = -512;
-		RemoveActiveItem(itemNum);
+		RemoveActiveItem(itemNumber);
 		item->Status = ITEM_NOT_ACTIVE;
 	}
 	else
@@ -79,13 +87,13 @@ void ScalesControl(short itemNum)
 	AnimateItem(item);
 }
 
-void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, l, LARA_RAD))
+	if (TestBoundsCollide(item, laraItem, LARA_RAD))
 	{
-		if (l->AnimNumber != LA_WATERSKIN_POUR_LOW && l->AnimNumber != LA_WATERSKIN_POUR_HIGH || item->ActiveState != 1)
+		if (laraItem->AnimNumber != LA_WATERSKIN_POUR_LOW && laraItem->AnimNumber != LA_WATERSKIN_POUR_HIGH || item->ActiveState != 1)
 		{
 			GlobalCollisionBounds.X1 = 640;
 			GlobalCollisionBounds.X2 = 1280;
@@ -94,79 +102,71 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			GlobalCollisionBounds.Z1 = -256;
 			GlobalCollisionBounds.Z2 = 384;
 
-			ItemPushItem(item, l, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, 0, 2);
 
 			GlobalCollisionBounds.X1 = -256;
 			GlobalCollisionBounds.X2 = 256;
 
-			ItemPushItem(item, l, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, 0, 2);
 
 			GlobalCollisionBounds.X1 = -1280;
 			GlobalCollisionBounds.X2 = -640;
 
-			ItemPushItem(item, l, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, 0, 2);
 		}
 		else
 		{
 			short rotY = item->Position.yRot;
-			item->Position.yRot = (short)(l->Position.yRot + ANGLE(45)) & 0xC000;
+			item->Position.yRot = (short)(laraItem->Position.yRot + ANGLE(45.0f)) & 0xC000;
 
 			ScalesBounds.boundingBox.X1 = -1408;
 			ScalesBounds.boundingBox.X2 = -640;
 			ScalesBounds.boundingBox.Z1 = -512;
 			ScalesBounds.boundingBox.Z2 = 0;
 
-			if (TestLaraPosition(&ScalesBounds, item, l))
+			if (TestLaraPosition(&ScalesBounds, item, laraItem))
 			{
-				l->AnimNumber = LA_WATERSKIN_POUR_HIGH;
-				l->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				laraItem->AnimNumber = LA_WATERSKIN_POUR_HIGH;
+				laraItem->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->Position.yRot = rotY;
 			}
-			else if (l->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
+			else if (laraItem->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
-				SoundEffect(SFX_TR4_POUR, &l->Position, 0);
+				SoundEffect(SFX_TR4_POUR, &laraItem->Position, 0);
 				item->Position.yRot = rotY;
 			}
-			else if (l->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+			else if (laraItem->FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 			{
-				AddActiveItem(itemNum);
+				AddActiveItem(itemNumber);
 				item->Status = ITEM_ACTIVE;
 
-				if (l->ItemFlags[3] < item->TriggerFlags)
+				if (laraItem->ItemFlags[3] < item->TriggerFlags)
 				{
 					item->TargetState = 4;
 					item->Position.yRot = rotY;
 				}
-				else if (l->ItemFlags[3] == item->TriggerFlags)
+				else if (laraItem->ItemFlags[3] == item->TriggerFlags)
 				{
 					item->TargetState = 2;
 					item->Position.yRot = rotY;
 				}
 				else
-				{
 					item->TargetState = 3;
-				}
 			}
 			else
-			{
 				item->Position.yRot = rotY;
-			}
 		}
 	}
 	
-	if (l->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
-		l->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
-		l->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
-		l->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
+	if (laraItem->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
+		laraItem->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
+		laraItem->FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
+		laraItem->FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
-		PHD_VECTOR pos;
-		pos.x = 0;
-		pos.y = 0;
-		pos.z = 0;
-
+		PHD_VECTOR pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, LM_LHAND);
 
-		DRIP_STRUCT* drip = &Drips[GetFreeDrip()];
+		auto* drip = &Drips[GetFreeDrip()];
 		drip->x = pos.x;
 		drip->y = pos.y;
 		drip->z = pos.z;
@@ -177,6 +177,6 @@ void ScalesCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		drip->yVel = (GetRandomControl() & 0x1F) + 32;
 		drip->gravity = (GetRandomControl() & 0x1F) + 32;
 		drip->life = (GetRandomControl() & 0x1F) + 16;
-		drip->roomNumber = l->RoomNumber;
+		drip->roomNumber = laraItem->RoomNumber;
 	}
 }

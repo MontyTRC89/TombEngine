@@ -7,9 +7,9 @@
 
 namespace TEN::Entities::TR4
 {
-	void FourBladesControl(short itemNum)
+	void FourBladesControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (!TriggerActive(item))
 		{
@@ -19,7 +19,9 @@ namespace TEN::Entities::TR4
 		else
 		{
 			int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-			if (frameNumber <= 5 || frameNumber >= 58 || frameNumber >= 8 && frameNumber <= 54)
+			if (frameNumber <= 5 ||
+				frameNumber >= 58 ||
+				frameNumber >= 8 && frameNumber <= 54)
 			{
 				*((int*)&item->ItemFlags[0]) = 0;
 			}
