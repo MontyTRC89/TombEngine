@@ -11,6 +11,7 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
@@ -27,60 +28,59 @@ namespace TEN::Entities::Doors
 		-256, 256, 
 		-1024, 0, 
 		-1024, 0, 
-		-ANGLE(80), ANGLE(80),
-		-ANGLE(80), ANGLE(80),
-		-ANGLE(80), ANGLE(80)
+		-ANGLE(80.0f), ANGLE(80.0f),
+		-ANGLE(80.0f), ANGLE(80.0f),
+		-ANGLE(80.0f), ANGLE(80.0f)
 	};
 
-	void UnderwaterDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void UnderwaterDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* doorItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION
-			&& l->ActiveState == LS_UNDERWATER_STOP
-			&& !(item->Status && item->Airborne)
-			&& Lara.Control.WaterStatus == WaterStatus::Underwater
-			&& Lara.Control.HandStatus == HandStatus::Free
-			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+		if (TrInput & IN_ACTION &&
+			laraItem->ActiveState == LS_UNDERWATER_STOP &&
+			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
+			!(doorItem->Status && doorItem->Airborne) &&
+			laraInfo->Control.HandStatus == HandStatus::Free ||
+			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 		{
-			l->Position.yRot ^= ANGLE(180.0f);
+			laraItem->Position.yRot ^= ANGLE(180.0f);
 
-			if (TestLaraPosition(&UnderwaterDoorBounds, item, l))
+			if (TestLaraPosition(&UnderwaterDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&UnderwaterDoorPos, item, l))
+				if (MoveLaraPosition(&UnderwaterDoorPos, doorItem, laraItem))
 				{
-					SetAnimation(l, LA_UNDERWATER_DOOR_OPEN);
-					l->VerticalVelocity = 0;
-					item->Status = ITEM_ACTIVE;
+					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
+					laraItem->VerticalVelocity = 0;
+					doorItem->Status = ITEM_ACTIVE;
 
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
-					item->TargetState = LS_RUN_FORWARD;
+					doorItem->TargetState = LS_RUN_FORWARD;
 
-					AnimateItem(item);
+					AnimateItem(doorItem);
 
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Busy;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-				{
-					Lara.interactedItem = itemNum;
-				}
-				l->Position.yRot ^= ANGLE(180);
+					laraInfo->interactedItem = itemNumber;
+
+				laraItem->Position.yRot ^= ANGLE(180.0f);
 			}
 			else
 			{
-				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				l->Position.yRot ^= ANGLE(180);
+
+				laraItem->Position.yRot ^= ANGLE(180.0f);
 			}
 		}
-		else if (item->Status == ITEM_ACTIVE)
-		{
-			ObjectCollision(itemNum, l, coll);
-		}
+		else if (doorItem->Status == ITEM_ACTIVE)
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }

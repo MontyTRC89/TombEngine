@@ -11,5 +11,5 @@ namespace TEN::Entities::Switches
 	extern byte CurrentSequence;
 
 	void FullBlockSwitchControl(short itemNumber);
-	void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

@@ -11,5 +11,5 @@ namespace TEN::Entities::Generic
 	void GetFlameTorch();
 	void TorchControl(short itemNumber);
 	void LaraTorch(PHD_VECTOR* src, PHD_VECTOR* target, int rot, int color);
-	void FireCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+	void FireCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

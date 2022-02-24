@@ -28,51 +28,54 @@ namespace TEN::Entities::Doors
 		-384, 384, 
 		0, 0, 
 		-1024, 512, 
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10),
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f),
 	};
 
-	void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void DoubleDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* doorItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION
-			&& l->ActiveState == LS_IDLE
-			&& l->AnimNumber == LA_STAND_IDLE
-			&& !(item->Status && item->Airborne)
-			&& !(l->HitStatus)
-			&& Lara.Control.HandStatus == HandStatus::Free
-			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+		if (TrInput & IN_ACTION &&
+			laraItem->ActiveState == LS_IDLE &&
+			laraItem->AnimNumber == LA_STAND_IDLE &&
+			!laraItem->HitStatus &&
+			!(doorItem->Status && doorItem->Airborne) &&
+			laraInfo->Control.HandStatus == HandStatus::Free ||
+			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 		{
-			item->Position.yRot ^= ANGLE(180);
-			if (TestLaraPosition(&DoubleDoorBounds, item, l))
+			doorItem->Position.yRot ^= ANGLE(180.0f);
+
+			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&DoubleDoorPos, item, l))
+				if (MoveLaraPosition(&DoubleDoorPos, doorItem, laraItem))
 				{
-					SetAnimation(l, LA_DOUBLEDOOR_OPEN_PUSH);
+					SetAnimation(laraItem, LA_DOUBLEDOOR_OPEN_PUSH);
 
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
-					item->Status = ITEM_ACTIVE;
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Busy;
-					ResetLaraFlex(l);
+					ResetLaraFlex(laraItem);
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					doorItem->Status = ITEM_ACTIVE;
 				}
 				else
-				{
-					Lara.interactedItem = itemNum;
-				}
-				item->Position.yRot ^= ANGLE(180);
+					laraInfo->interactedItem = itemNumber;
+
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 			}
 			else
 			{
-				if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+				if (laraInfo->Control.IsMoving &&
+					laraInfo->interactedItem == itemNumber)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				item->Position.yRot ^= ANGLE(180);
+
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 			}
 		}
 	}
