@@ -9,5 +9,5 @@ namespace TEN::Entities::Switches
 	constexpr auto COG_DOOR_SPEED = 12;
 
 	void CogSwitchControl(short itemNumber);
-	void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void CogSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

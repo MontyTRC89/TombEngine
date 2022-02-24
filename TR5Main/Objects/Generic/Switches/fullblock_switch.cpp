@@ -17,9 +17,9 @@ namespace TEN::Entities::Switches
 		-384, 384,
 		0, 256,
 		0, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
 	PHD_VECTOR FullBlockSwitchPos = { 0, 0, 0 };
@@ -29,79 +29,80 @@ namespace TEN::Entities::Switches
 	byte Sequences[3];
 	byte CurrentSequence;
 
-	void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if ((!(TrInput & IN_ACTION)
-			|| item->Status
-			|| item->Flags & 0x100
-			|| CurrentSequence >= 3
-			|| Lara.Control.HandStatus != HandStatus::Free
-			|| l->ActiveState != LS_IDLE
-			|| l->AnimNumber != LA_STAND_IDLE)
-			&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
+		if ((!(TrInput & IN_ACTION) ||
+			laraItem->ActiveState != LS_IDLE ||
+			laraItem->AnimNumber != LA_STAND_IDLE ||
+			laraInfo->Control.HandStatus != HandStatus::Free ||
+			switchItem->Status ||
+			switchItem->Flags & 0x100 ||
+			CurrentSequence >= 3) &&
+			(!laraInfo->Control.IsMoving || laraInfo->interactedItem !=itemNumber))
 		{
-			ObjectCollision(itemNum, l, coll);
+			ObjectCollision(itemNumber, laraItem, coll);
 			return;
 		}
 
-		if (TestLaraPosition(&FullBlockSwitchBounds, item, l))
+		if (TestLaraPosition(&FullBlockSwitchBounds, switchItem, laraItem))
 		{
-			if (MoveLaraPosition(&FullBlockSwitchPos, item, l))
+			if (MoveLaraPosition(&FullBlockSwitchPos, switchItem, laraItem))
 			{
-				if (item->ActiveState == 1)
+				if (switchItem->ActiveState == 1)
 				{
-					l->ActiveState = LS_SWITCH_DOWN;
-					l->AnimNumber = LA_BUTTON_GIANT_PUSH;
-					item->TargetState = 0;
+					laraItem->ActiveState = LS_SWITCH_DOWN;
+					laraItem->AnimNumber = LA_BUTTON_GIANT_PUSH;
+					switchItem->TargetState = 0;
 				}
-				l->TargetState = LS_IDLE;
-				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				item->Status = ITEM_ACTIVE;
 
-				AddActiveItem(itemNum);
-				AnimateItem(item);
+				laraItem->TargetState = LS_IDLE;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				switchItem->Status = ITEM_ACTIVE;
 
-				Lara.Control.IsMoving = false;
-				ResetLaraFlex(l);
-				Lara.Control.HandStatus = HandStatus::Busy;
+				AddActiveItem(itemNumber);
+				AnimateItem(switchItem);
+
+				ResetLaraFlex(laraItem);
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-			{
-				Lara.interactedItem = itemNum;
-			}
+				laraInfo->interactedItem = itemNumber;
 		}
-		else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+		else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 		{
-			Lara.Control.IsMoving = false;
-			Lara.Control.HandStatus = HandStatus::Free;
+			laraInfo->Control.IsMoving = false;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 		}
 	}
 
 	void FullBlockSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
 
-		if (item->AnimNumber != Objects[item->ObjectNumber].animIndex + 2
-			|| CurrentSequence >= 3
-			|| item->ItemFlags[0])
+		if (switchItem->AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
+			CurrentSequence >= 3 ||
+			switchItem->ItemFlags[0])
 		{
 			if (CurrentSequence >= 4)
 			{
-				item->ItemFlags[0] = 0;
-				item->TargetState = SWITCH_ON;
-				item->Status = ITEM_NOT_ACTIVE;
+				switchItem->ItemFlags[0] = 0;
+				switchItem->TargetState = SWITCH_ON;
+				switchItem->Status = ITEM_NOT_ACTIVE;
+
 				if (++CurrentSequence >= 7)
 					CurrentSequence = 0;
 			}
 		}
 		else
 		{
-			item->ItemFlags[0] = 1;
-			Sequences[CurrentSequence++] = item->TriggerFlags;
+			switchItem->ItemFlags[0] = 1;
+			Sequences[CurrentSequence++] = switchItem->TriggerFlags;
 		}
 
-		AnimateItem(item);
+		AnimateItem(switchItem);
 	}
 }

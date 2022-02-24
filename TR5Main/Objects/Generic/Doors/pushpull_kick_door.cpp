@@ -11,6 +11,7 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
 #include "Specific/trmath.h"
@@ -28,6 +29,7 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PUSH = 2,
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
+
 	PHD_VECTOR PullDoorPos(-201, 0, 322);
 	PHD_VECTOR PushDoorPos(201, 0, -702);
 	PHD_VECTOR KickDoorPos(0, 0, -917);
@@ -37,119 +39,112 @@ namespace TEN::Entities::Doors
 		-384, 384,
 		0, 0,
 		-1024, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10),
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f),
 	};
 
-	void PushPullKickDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void PushPullKickDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* doorItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION
-			&& l->ActiveState == LS_IDLE
-			&& l->AnimNumber == LA_STAND_IDLE
-			&& item->Status != ITEM_ACTIVE
-			&& !(l->HitStatus)
-			&& Lara.Control.HandStatus == HandStatus::Free
-			|| Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+		if (TrInput & IN_ACTION &&
+			laraItem->ActiveState == LS_IDLE &&
+			laraItem->AnimNumber == LA_STAND_IDLE &&
+			!laraItem->HitStatus &&
+			doorItem->Status != ITEM_ACTIVE &&
+			laraInfo->Control.HandStatus == HandStatus::Free ||
+			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
 		{
 			bool pull = false;
 
-			if (l->RoomNumber == item->RoomNumber)
+			if (laraItem->RoomNumber == doorItem->RoomNumber)
 			{
-				item->Position.yRot ^= ANGLE(180);
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 				pull = true;
 			}
 
-			if (TestLaraPosition(&PushPullKickDoorBounds, item, l))
+			if (TestLaraPosition(&PushPullKickDoorBounds, doorItem, laraItem))
 			{
 				bool openTheDoor = false;
 
 				if (pull)
 				{
-					if (MoveLaraPosition(&PullDoorPos, item, l))
+					if (MoveLaraPosition(&PullDoorPos, doorItem, laraItem))
 					{
-						SetAnimation(l, LA_DOOR_OPEN_PULL);
-						item->TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
+						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
+						doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
 						openTheDoor = true;
 					}
 					else
-					{
-						Lara.interactedItem = itemNum;
-					}
+						laraInfo->interactedItem = itemNumber;
 				}
 				else
 				{
-					if (item->ObjectNumber >= ID_KICK_DOOR1)
+					if (doorItem->ObjectNumber >= ID_KICK_DOOR1)
 					{
-						if (MoveLaraPosition(&KickDoorPos, item, l))
+						if (MoveLaraPosition(&KickDoorPos, doorItem, laraItem))
 						{
-							SetAnimation(l, LA_DOOR_OPEN_KICK);
-							item->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
+							doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
-						{
-							Lara.interactedItem = itemNum;
-						}
+							laraInfo->interactedItem = itemNumber;
 					}
 					else
 					{
-						if (MoveLaraPosition(&PushDoorPos, item, l))
+						if (MoveLaraPosition(&PushDoorPos, doorItem, laraItem))
 						{
-							SetAnimation(l, LA_DOOR_OPEN_PUSH);
-							item->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
+							doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
-						{
-							Lara.interactedItem = itemNum;
-						}
+							laraInfo->interactedItem = itemNumber;
 					}
 				}
 
 				if (openTheDoor)
 				{
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
-					item->Status = ITEM_ACTIVE;
-					l->ActiveState = LS_MISC_CONTROL;
-					l->TargetState = LS_IDLE;
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Busy;
+					laraItem->ActiveState = LS_MISC_CONTROL;
+					laraItem->TargetState = LS_IDLE;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					doorItem->Status = ITEM_ACTIVE;
 				}
 			}
-			else if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
+			else if (laraInfo->Control.IsMoving &&
+				laraInfo->interactedItem == itemNumber)
 			{
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Free;
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 
 			if (pull)
-				item->Position.yRot ^= ANGLE(180);
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 		}
-		else if (item->ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
-			DoorCollision(itemNum, l, coll);
+		else if (doorItem->ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
+			DoorCollision(itemNumber, laraItem, coll);
 	}
 
 	void PushPullKickDoorControl(short itemNumber)
 	{
-		ITEM_INFO* item;
-		DOOR_DATA* door;
+		auto* doorItem = &g_Level.Items[itemNumber];
+		auto* doorData = (DOOR_DATA*)doorItem->Data;
 
-		item = &g_Level.Items[itemNumber];
-		door = (DOOR_DATA*)item->Data;
-
-		if (!door->opened)
+		if (!doorData->opened)
 		{
-			OpenThatDoor(&door->d1, door);
-			OpenThatDoor(&door->d2, door);
-			OpenThatDoor(&door->d1flip, door);
-			OpenThatDoor(&door->d2flip, door);
-			door->opened = true;
+			OpenThatDoor(&doorData->d1, doorData);
+			OpenThatDoor(&doorData->d2, doorData);
+			OpenThatDoor(&doorData->d1flip, doorData);
+			OpenThatDoor(&doorData->d2flip, doorData);
+			doorData->opened = true;
 		}
 
-		AnimateItem(item);
+		AnimateItem(doorItem);
 	}
 }

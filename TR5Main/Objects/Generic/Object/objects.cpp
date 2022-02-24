@@ -19,15 +19,29 @@ int lastWaterfallY = 0;
 
 PHD_VECTOR TightRopePos = { 0, 0, 0 };
 OBJECT_COLLISION_BOUNDS TightRopeBounds =
-{ -256, 256, 0, 0, -256, 256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+{
+	-256, 256,
+	0, 0,
+	-256, 256,
+	ANGLE(-10.0f), ANGLE(10.0f),
+	ANGLE(-30.0f), ANGLE(30.0f),
+	ANGLE(-10.0f), ANGLE(10.0f)
+};
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
-{ -640, 640, 704, 832, -96, 96, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
+{
+	-640, 640,
+	704, 832,
+	-96, 96,
+	ANGLE(-10.0f), ANGLE(10.0f),
+	ANGLE(-30.0f), ANGLE(30.0f),
+	ANGLE(-10.0f), ANGLE(10.0f)
+};
 
 void ControlAnimatingSlots(short itemNumber)
 {
 	// TODO: TR5 has here a series of hardcoded OCB codes, this function actually is just a placeholder
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 		AnimateItem(item);
@@ -35,7 +49,7 @@ void ControlAnimatingSlots(short itemNumber)
 
 void ControlTriggerTriggerer(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &item->RoomNumber);
 
 	if (floor->Flags.MarkTriggerer)
@@ -81,7 +95,7 @@ void AnimateWaterfalls()
 
 void ControlWaterfall(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	int dx = item->Position.xPos - LaraItem->Position.xPos;
 	int dy = item->Position.yPos - LaraItem->Position.yPos;
@@ -102,219 +116,194 @@ void ControlWaterfall(short itemNumber)
 	}
 }
 
-void TightRopeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
-	if (((TrInput & IN_ACTION) == 0
-		|| l->ActiveState != LS_IDLE
-		|| l->AnimNumber != LA_STAND_IDLE
-		|| l->Status == ITEM_INVISIBLE
-		|| Lara.Control.HandStatus != HandStatus::Free)
-		&& (!Lara.Control.IsMoving || Lara.interactedItem !=itemNum))
+	if ((!(TrInput & IN_ACTION) ||
+		laraItem->ActiveState != LS_IDLE ||
+		laraItem->AnimNumber != LA_STAND_IDLE ||
+		laraItem->Status == ITEM_INVISIBLE ||
+		laraInfo->Control.HandStatus != HandStatus::Free) &&
+		(!laraInfo->Control.IsMoving || laraInfo->interactedItem !=itemNumber))
 	{
 #ifdef NEW_TIGHTROPE
-		if(l->ActiveState == LS_TIGHTROPE_WALK &&
-		   l->TargetState != LS_TIGHTROPE_DISMOUNT &&
-		   !Lara.Control.TightropeControl.CanDismount)
+		if (laraItem->ActiveState == LS_TIGHTROPE_WALK &&
+		   laraItem->TargetState != LS_TIGHTROPE_DISMOUNT &&
+		   !laraInfo->Control.TightropeControl.CanDismount)
 		{
-			if(item->Position.yRot == l->Position.yRot)
+			if (tightropeItem->Position.yRot == laraItem->Position.yRot)
 			{
-				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
-					Lara.Control.TightropeControl.CanDismount = true;
+				if (abs(tightropeItem->Position.xPos - laraItem->Position.xPos) + abs(tightropeItem->Position.zPos - laraItem->Position.zPos) < 640)
+					laraInfo->Control.TightropeControl.CanDismount = true;
 			}
 		}
 
 #else // !NEW_TIGHTROPE
-		if(l->ActiveState == LS_TIGHTROPE_WALK &&
-		   l->TargetState != LS_TIGHTROPE_DISMOUNT &&
-		   !Lara.Control.TightropeControl.Off)
+		if (laraItem->ActiveState == LS_TIGHTROPE_WALK &&
+		   laraItem->TargetState != LS_TIGHTROPE_DISMOUNT &&
+		   !laraInfo->Control.TightropeControl.Off)
 		{
-			if(item->Position.yRot == l->Position.yRot)
+			if (item->Position.yRot == laraItem->Position.yRot)
 			{
-				if(abs(item->Position.xPos - l->Position.xPos) + abs(item->Position.zPos - l->Position.zPos) < 640)
-					Lara.tightRopeOff = true;
+				if (abs(item->Position.xPos - laraItem->Position.xPos) + abs(item->Position.zPos - laraItem->Position.zPos) < 640)
+					laraInfo->tightRopeOff = true;
 			}
 		}
 #endif
 	}
 	else
 	{
-		item->Position.yRot += -ANGLE(180);
+		tightropeItem->Position.yRot += -ANGLE(180.0f);
 
-		if (TestLaraPosition(&TightRopeBounds, item, l))
+		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
-			if (MoveLaraPosition(&TightRopePos, item, l))
+			if (MoveLaraPosition(&TightRopePos, tightropeItem, laraItem))
 			{
-				l->ActiveState = LS_TIGHTROPE_ENTER;
-				l->AnimNumber = LA_TIGHTROPE_START;
-				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-				Lara.Control.IsMoving = false;
-				ResetLaraFlex(l);
+				laraItem->ActiveState = LS_TIGHTROPE_ENTER;
+				laraItem->AnimNumber = LA_TIGHTROPE_START;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraInfo->Control.IsMoving = false;
+				ResetLaraFlex(laraItem);
 #ifdef NEW_TIGHTROPE
-				Lara.Control.TightropeControl.Balance = 0;
-				Lara.Control.TightropeControl.CanDismount = false;
-				Lara.Control.TightropeControl.TightropeItem = itemNum;
-				Lara.Control.TightropeControl.TimeOnTightrope = 0;
+				laraInfo->Control.TightropeControl.Balance = 0;
+				laraInfo->Control.TightropeControl.CanDismount = false;
+				laraInfo->Control.TightropeControl.TightropeItem = itemNumber;
+				laraInfo->Control.TightropeControl.TimeOnTightrope = 0;
 #else // !NEW_TIGHTROPE
-				Lara.tightRopeOnCount = 60;
-				Lara.tightRopeOff = 0;
-				Lara.tightRopeFall = 0;
+				laraInfo->Control.TightropeControl.OnCount = 60;
+				laraInfo->Control.TightropeControl.Off = 0;
+				laraInfo->Control.TightropeControl.Fall = 0;
 #endif
 			}
 			else
-				Lara.interactedItem = itemNum;
+				laraInfo->interactedItem = itemNumber;
 
-			item->Position.yRot += -ANGLE(180);
+			tightropeItem->Position.yRot += -ANGLE(180.0f);
 		}
 		else
 		{
-			if (Lara.Control.IsMoving && Lara.interactedItem == itemNum)
-				Lara.Control.IsMoving = false;
+			if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				laraInfo->Control.IsMoving = false;
 
-			item->Position.yRot += -ANGLE(180);
+			tightropeItem->Position.yRot += -ANGLE(180.0f);
 		}
 	}
 }
 
-void ParallelBarsCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && l->ActiveState == LS_REACH && l->AnimNumber == LA_REACH)
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* barItem = &g_Level.Items[itemNumber];
+
+	if (TrInput & IN_ACTION &&
+		laraItem->ActiveState == LS_REACH &&
+		laraItem->AnimNumber == LA_REACH)
 	{
-		int test1 = TestLaraPosition(&ParallelBarsBounds, item, l);
+		int test1 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;
 		if (!test1)
 		{
-			item->Position.yRot += -ANGLE(180);
-			test2 = TestLaraPosition(&ParallelBarsBounds, item, l);
-			item->Position.yRot += -ANGLE(180);
+			barItem->Position.yRot += -ANGLE(180.0f);
+			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
+			barItem->Position.yRot += -ANGLE(180);
 		}
 
 		if (test1 || test2)
 		{
-			l->ActiveState = LS_MISC_CONTROL;
-			l->AnimNumber = LA_SWINGBAR_GRAB;
-			l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
-			l->VerticalVelocity = false;
-			l->Airborne = false;
+			laraItem->ActiveState = LS_MISC_CONTROL;
+			laraItem->AnimNumber = LA_SWINGBAR_GRAB;
+			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+			laraItem->VerticalVelocity = false;
+			laraItem->Airborne = false;
 
-			ResetLaraFlex(item);
+			ResetLaraFlex(barItem);
 
 			if (test1)
-				l->Position.yRot = item->Position.yRot;
+				laraItem->Position.yRot = barItem->Position.yRot;
 			else
-				l->Position.yRot = item->Position.yRot + -ANGLE(180);
+				laraItem->Position.yRot = barItem->Position.yRot + -ANGLE(180.0f);
 
-			PHD_VECTOR pos1;
-			pos1.x = 0;
-			pos1.y = -128;
-			pos1.z = 512;
-
-			PHD_VECTOR pos2;
-			pos2.x = 0;
-			pos2.y = -128;
-			pos2.z = 512;
-
+			PHD_VECTOR pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
+
+			PHD_VECTOR pos2 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
-			if (l->Position.yRot & 0x4000)
-				l->Position.xPos += item->Position.xPos - ((pos1.x + pos2.x) >> 1);
+			if (laraItem->Position.yRot & 0x4000)
+				laraItem->Position.xPos += barItem->Position.xPos - ((pos1.x + pos2.x) >> 1);
 			else
-				l->Position.zPos += item->Position.zPos - ((pos1.z + pos2.z) / 2);
-			l->Position.yPos += item->Position.yPos - ((pos1.y + pos2.y) / 2);
+				laraItem->Position.zPos += barItem->Position.zPos - ((pos1.z + pos2.z) / 2);
+			laraItem->Position.yPos += barItem->Position.yPos - ((pos1.y + pos2.y) / 2);
 
-			Lara.interactedItem = itemNumber;
+			laraInfo->interactedItem = itemNumber;
 		}
 		else
-		{
-			ObjectCollision(itemNumber, l, coll);
-		}
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
-	else if (l->ActiveState != LS_HORIZONTAL_BAR_SWING)
-	{
-		ObjectCollision(itemNumber, l, coll);
-	}
+	else if (laraItem->ActiveState != LS_HORIZONTAL_BAR_SWING)
+		ObjectCollision(itemNumber, laraItem, coll);
 }
 
 void CutsceneRopeControl(short itemNumber) 
 {
-	ITEM_INFO* item;
-	PHD_VECTOR pos1;
-	PHD_VECTOR pos2;
-	int dx;
-	int dy;
-	int dz;
+	auto* ropeItem = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNumber];
+	PHD_VECTOR pos1 = { -128, -72, -16 };
+	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[2]], &pos1, 0);
 
-	pos1.x = -128;
-	pos1.y = -72;
-	pos1.z = -16;
-	GetJointAbsPosition(&g_Level.Items[item->ItemFlags[2]], &pos1, 0);
+	PHD_VECTOR pos2 = { 830, -12, 0 };
+	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[3]], &pos2, 0);
 
-	pos2.x = 830;
-	pos2.z = -12;
-	pos2.y = 0;
-	GetJointAbsPosition(&g_Level.Items[item->ItemFlags[3]], &pos2, 0);
+	ropeItem->Position.xPos = pos2.x;
+	ropeItem->Position.yPos = pos2.y;
+	ropeItem->Position.zPos = pos2.z;
 
-	item->Position.xPos = pos2.x;
-	item->Position.yPos = pos2.y;
-	item->Position.zPos = pos2.z;
+	int dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
+	int dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
+	int dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
-	dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
-	dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
-	dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
-
-	item->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	item->Position.xRot = -4869;
+	ropeItem->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
+	ropeItem->Position.xRot = -4869;
 }
 
-void HybridCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll) 
+void HybridCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll) 
 {
-	ITEM_INFO* item;
-
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	/*if (gfCurrentLevel == LVL5_SINKING_SUBMARINE)
 	{
 		if (item->frameNumber < g_Level.Anims[item->animNumber].frame_end)
 		{
-			ObjectCollision(itemNum, laraitem, coll);
+			ObjectCollision(itemNumber, laraitem, coll);
 		}
 	}*/
 }
 
-void InitialiseTightRope(short itemNumber)
+void InitialiseTightrope(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* tightropeItem = &g_Level.Items[itemNumber];
 
-	if (item->Position.yRot > 0)
+	if (tightropeItem->Position.yRot > 0)
 	{
-		if (item->Position.yRot == ANGLE(90))
-			item->Position.xPos -= 256;
+		if (tightropeItem->Position.yRot == ANGLE(90.0f))
+			tightropeItem->Position.xPos -= 256;
 	}
-	else if (item->Position.yRot)
+	else if (tightropeItem->Position.yRot)
 	{
-		if (item->Position.yRot == -ANGLE(180))
-		{
-			item->Position.zPos += 256;
-		}
-		else if (item->Position.yRot == -ANGLE(90))
-		{
-			item->Position.xPos += 256;
-		}
+		if (tightropeItem->Position.yRot == -ANGLE(180.0f))
+			tightropeItem->Position.zPos += CLICK(1);
+		else if (tightropeItem->Position.yRot == -ANGLE(90.0f))
+			tightropeItem->Position.xPos += CLICK(1);
 	}
 	else
-	{
-		item->Position.zPos -= 256;
-	}
+		tightropeItem->Position.zPos -= CLICK(1);
 }
 
 void InitialiseAnimating(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*auto* item = &g_Level.Items[itemNumber];
 	item->ActiveState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
 	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
@@ -322,7 +311,7 @@ void InitialiseAnimating(short itemNumber)
 
 void AnimatingControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -342,11 +331,10 @@ void AnimatingControl(short itemNumber)
 
 void HighObject2Control(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
-
 
 	if (!item->ItemFlags[2])
 	{
@@ -359,7 +347,7 @@ void HighObject2Control(short itemNumber)
 
 	if (--item->ItemFlags[2] < 15)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = &Sparks[GetFreeSpark()];
 		spark->on = 1;
 		spark->sR = -1;
 		spark->sB = 16;

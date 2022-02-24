@@ -5,5 +5,5 @@ struct COLL_INFO;
 
 namespace TEN::Entities::Switches
 {
-	void RailSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void RailSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

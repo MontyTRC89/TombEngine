@@ -25,52 +25,52 @@ namespace TEN::Entities::Doors
 {
 	void SequenceDoorControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		DOOR_DATA* door = (DOOR_DATA*)item->Data;
+		auto* doorItem = &g_Level.Items[itemNumber];
+		auto* doorData = (DOOR_DATA*)doorItem->Data;
 
 		if (CurrentSequence == 3)
 		{
-			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == item->TriggerFlags)
+			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == doorItem->TriggerFlags)
 			{
-				if (item->ActiveState == 1)
-					item->TargetState = 1;
+				if (doorItem->ActiveState == 1)
+					doorItem->TargetState = 1;
 				else
-					item->TargetState = 0;
+					doorItem->TargetState = 0;
 
-				TestTriggers(item, true);
+				TestTriggers(doorItem, true);
 			}
 
 			CurrentSequence = 4;
 		}
 
-		if (item->ActiveState == item->TargetState)
+		if (doorItem->ActiveState == doorItem->TargetState)
 		{
-			if (item->ActiveState == 1)
+			if (doorItem->ActiveState == 1)
 			{
-				if (!door->opened)
+				if (!doorData->opened)
 				{
-					OpenThatDoor(&door->d1, door);
-					OpenThatDoor(&door->d2, door);
-					OpenThatDoor(&door->d1flip, door);
-					OpenThatDoor(&door->d2flip, door);
-					door->opened = true;
-					item->Flags |= 0x3E;
+					OpenThatDoor(&doorData->d1, doorData);
+					OpenThatDoor(&doorData->d2, doorData);
+					OpenThatDoor(&doorData->d1flip, doorData);
+					OpenThatDoor(&doorData->d2flip, doorData);
+					doorData->opened = true;
+					doorItem->Flags |= 0x3E;
 				}
 			}
 			else
 			{
-				if (door->opened)
+				if (doorData->opened)
 				{
-					ShutThatDoor(&door->d1, door);
-					ShutThatDoor(&door->d2, door);
-					ShutThatDoor(&door->d1flip, door);
-					ShutThatDoor(&door->d2flip, door);
-					door->opened = false;
-					item->Flags &= 0xC1;
+					ShutThatDoor(&doorData->d1, doorData);
+					ShutThatDoor(&doorData->d2, doorData);
+					ShutThatDoor(&doorData->d1flip, doorData);
+					ShutThatDoor(&doorData->d2flip, doorData);
+					doorData->opened = false;
+					doorItem->Flags &= 0xC1;
 				}
 			}
 		}
 
-		AnimateItem(item);
+		AnimateItem(doorItem);
 	}
 }

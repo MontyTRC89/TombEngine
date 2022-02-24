@@ -12,5 +12,5 @@ namespace TEN::Entities::Switches
 	};
 	
 	void SwitchControl(short itemNumber);
-	void SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void SwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

@@ -6,5 +6,5 @@ struct COLL_INFO;
 namespace TEN::Entities::Doors
 {
 	void InitialiseSteelDoor(short itemNumber);
-	void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
 }

@@ -16,11 +16,9 @@
 
 void ProcessExplodingSwitchType8(ITEM_INFO* item) 
 {
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
+	PHD_VECTOR pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, 0);
+
 	TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
 	ExplodeItemNode(item, Objects[item->ObjectNumber].nmeshes - 1, 0, 64);
 	item->MeshBits |= 1 << ((Objects[item->ObjectNumber].nmeshes & 0xFF) - 2);
@@ -28,15 +26,16 @@ void ProcessExplodingSwitchType8(ITEM_INFO* item)
 
 void InitialiseShootSwitch(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (item->TriggerFlags == 444)
-		item->MeshBits &= ~(1 << (Objects[item->ObjectNumber].nmeshes - 2));
+	auto* switchItem = &g_Level.Items[itemNumber];
+
+	if (switchItem->TriggerFlags == 444)
+		switchItem->MeshBits &= ~(1 << (Objects[switchItem->ObjectNumber].nmeshes - 2));
 }
 
-void ShootSwitchCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void ShootSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* switchItem = &g_Level.Items[itemNumber];
 
-	if (item->ObjectNumber == ID_SHOOT_SWITCH1 && !(item->MeshBits & 1))
-		item->Status = ITEM_INVISIBLE;
+	if (switchItem->ObjectNumber == ID_SHOOT_SWITCH1 && !(switchItem->MeshBits & 1))
+		switchItem->Status = ITEM_INVISIBLE;
 }
