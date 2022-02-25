@@ -471,7 +471,7 @@ enum LaraAnim
 	LA_SPRINT_ROLL_TO_RUN_LEFT_END_ALTERNATE_UNUSED = 242,			// Sprint roll, left foot first > run (3/3)
 	LA_SPRINT_TO_RUN_LEFT = 243,									// Sprint > run, left foot first
 	LA_SPRINT_TO_RUN_RIGHT = 244,									// Sprint > run, right foot first
-	LA_STAND_TO_CROUCH_END = 245,									// Stand > crouch (2/2)
+	LA_KNEE_DEATH = 245,											// TR1 knee death
 	LA_SLIDE_TO_RUN = 246,											// Slide forward > run
 	LA_CROUCH_ROLL_FORWARD_START = 247,								// Crouch roll forward (1/3)
 	LA_JUMP_FORWARD_TO_REACH_1 = 248,								// Jump forward > reach, 1st opportunity
@@ -793,7 +793,7 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 245, 265, 266, 268, 273, 274, 278, 280,
+	// 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
 };
 #pragma endregion
