@@ -2746,7 +2746,7 @@ namespace TEN::Renderer
 
 		// Bars
 		int flash = FlashIt();
-		UpdateSprintBar();
+		UpdateSprintBar(LaraItem);
 		UpdateHealthBar(LaraItem, flash);
 		UpdateAirBar(LaraItem, flash);
 		DrawAllPickups();

@@ -1116,19 +1116,19 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	switch ((unsigned short)rot / ANGLE(90.0f))
 	{
 	case NORTH:
-		item->Position.zPos = (item->Position.zPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		item->Position.zPos = (item->Position.zPos | (SECTOR(1) - 1)) - LARA_RAD - 1;
 		break;
 
 	case EAST:
-		item->Position.xPos = (item->Position.xPos | (WALL_SIZE - 1)) - LARA_RAD - 1;
+		item->Position.xPos = (item->Position.xPos | (SECTOR(1) - 1)) - LARA_RAD - 1;
 		break;
 
 	case SOUTH:
-		item->Position.zPos = (item->Position.zPos & -WALL_SIZE) + LARA_RAD + 1;
+		item->Position.zPos = (item->Position.zPos & -SECTOR(1)) + LARA_RAD + 1;
 		break;
 
 	case WEST:
-		item->Position.xPos = (item->Position.xPos & -WALL_SIZE) + LARA_RAD + 1;
+		item->Position.xPos = (item->Position.xPos & -SECTOR(1)) + LARA_RAD + 1;
 		break;
 	}
 
@@ -1138,11 +1138,11 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 
 	item->Position.yRot = rot;
 	item->Position.yPos -= 10;//otherwise she falls back into the water
-	item->Position.zRot = 0;
 	item->Position.xRot = 0;
-	item->Airborne = false;
+	item->Position.zRot = 0;
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	info->Control.HandStatus = HandStatus::Busy;
 	info->Control.WaterStatus = WaterStatus::Dry;
 	info->Control.TurnRate = 0;
@@ -2317,7 +2317,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	auto probe = GetCollisionResult(item, testSetup.Angle, testSetup.Dist, -coll->Setup.Height);
+	auto probe = GetCollisionResult(item, testSetup.Angle, testSetup.Distance, -coll->Setup.Height);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 	bool isWading = testSetup.CheckWadeStatus ? (info->Control.WaterStatus == WaterStatus::Wade) : false;
@@ -2331,7 +2331,7 @@ bool TestLaraJumpTolerance(ITEM_INFO* item, COLL_INFO* coll, JumpTestSetup testS
 		return false;
 
 	// Assess jump feasibility toward location ahead.
-	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Dist) &&						// Avoid jumping through corners.
+	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Distance) &&						// Avoid jumping through corners.
 		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
@@ -2412,7 +2412,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offs
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, WALL_SIZE, true, CollidedItems, nullptr, 0) && CollidedItems[0])
+	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, 0) && CollidedItems[0])
 	{
 		auto laraBox = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
 
