@@ -70,6 +70,8 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0) [[unlikely]]
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
 			info->Control.WaterStatus != WaterStatus::Wade)
 		{
@@ -124,13 +126,6 @@ void lara_col_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		SetLaraLand(item, coll);
-		return;
-	}
-
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
@@ -155,6 +150,8 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -178,13 +175,6 @@ void lara_col_freefall(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
-
-	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		SetLaraLand(item, coll);
-		return;
-	}
 
 	LaraSlideEdgeJump(item, coll);
 }
@@ -227,6 +217,8 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -271,13 +263,6 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraHangJump(item, coll))
 		return;
-
-	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		SetLaraLand(item, coll);
-		return;
-	}
 
 	LaraSlideEdgeJump(item, coll);
 
@@ -369,6 +354,8 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+
 	info->Control.MoveAngle = item->Position.yRot;
 	switch (info->Control.JumpDirection)
 	{
@@ -388,11 +375,11 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 		break;
 	}
 	
-	coll->Setup.LowerFloorBound = TestEnvironment(ENV_FLAG_SWAMP, item) ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
+	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;		// Security.
-	coll->Setup.FloorSlopeIsWall = TestEnvironment(ENV_FLAG_SWAMP, item) ? false : true;	// Security.
+	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;	// Security.
+	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;	// Security.
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -463,6 +450,8 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -517,6 +506,8 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -572,6 +563,8 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -624,7 +617,9 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraLand(item, coll))
 	{
 		if (item->HitPoints <= 0)
-			item->TargetState = LS_DEATH; // TODO
+			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -678,13 +673,6 @@ void lara_col_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraHangJumpUp(item, coll))
 		return;
 
-	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		SetLaraLand(item, coll);
-		return;
-	}
-
 	if (coll->Middle.Ceiling >= 0 ||
 		coll->CollisionType == CT_TOP ||
 		coll->CollisionType == CT_TOP_FRONT ||
@@ -732,6 +720,8 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -790,6 +780,31 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
+	// TODO
+	if (TestLaraLand(item, coll))
+	{
+		if (item->HitPoints <= 0)
+			item->TargetState = LS_DEATH; //
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
+		else if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
+			g_GameFlow->Animations.CrawlspaceSwandive)
+		{
+			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
+			//item->goalAnimState = LS_CROUCH_IDLE;
+			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
+		}
+		else [[likely]]
+		{
+			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
+			//item->goalAnimState = LS_IDLE;
+		}
+
+		SetLaraLand(item, coll);
+		info->Control.HandStatus = HandStatus::Free;
+		return;
+	}
+
 	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
 		item->TargetState = LS_FREEFALL_DIVE;
@@ -804,7 +819,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
-	auto bounds = GetBoundsAccurate(item);
+	auto* bounds = GetBoundsAccurate(item);
 	int realHeight = bounds->Y2 - bounds->Y1;
 
 	info->Control.MoveAngle = item->Position.yRot;
@@ -824,29 +839,29 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		info->Control.HandStatus = HandStatus::Free;
 	}
 
-	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
-	{
-		auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
+	//if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
+	//{
+	//	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 
-		if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
-		else if (info->Control.KeepLow ||
-			abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
-			g_GameFlow->Animations.CrawlspaceSwandive)
-		{
-			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
+	//	if (TestLaraSlide(item, coll))
+	//		SetLaraSlideState(item, coll);
+	//	else if (info->Control.KeepLow ||
+	//		abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
+	//		g_GameFlow->Animations.CrawlspaceSwandive)
+	//	{
+	//		SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
 
-			if (!info->Control.KeepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
-				MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
-		}
-		else [[likely]]
-			SetAnimation(item, LA_SWANDIVE_ROLL);
+	//		if (!info->Control.KeepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
+	//			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
+	//	}
+	//	else [[likely]]
+	//		SetAnimation(item, LA_SWANDIVE_ROLL);
 
-		SetLaraLand(item, coll);
-		info->Control.HandStatus = HandStatus::Free;
+	//	SetLaraLand(item, coll);
+	//	info->Control.HandStatus = HandStatus::Free;
 
-		LaraSnapToHeight(item, coll);
-	}
+	//	LaraSnapToHeight(item, coll);
+	//}
 }
 
 // State:		LS_FREEFALL_DIVE (53)
@@ -863,6 +878,8 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0 || item->VerticalVelocity >= LARA_FREEFALL_DIVE_DEATH_SPEED)
 			item->TargetState = LS_DEATH; // TODO: Something about this is bugged.
+		else if (TestLaraSlide(item, coll))
+			SetLaraSlideState(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 

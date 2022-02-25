@@ -422,13 +422,6 @@ void LaraJumpCollision(ITEM_INFO* item, COLL_INFO* coll, short moveAngle)
 	coll->Setup.ForwardAngle = info->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraSlide(item, coll) && TestLaraLand(item, coll))
-	{
-		SetLaraSlideState(item, coll);
-		SetLaraLand(item, coll);
-		return;
-	}
-
 	LaraDeflectEdgeJump(item, coll);
 }
 
