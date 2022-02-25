@@ -817,7 +817,12 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeJump(item, coll))
+	{
+		item->Position.xPos = coll->Setup.OldPosition.x;
+		item->Position.yPos = coll->Setup.OldPosition.y;
+		item->Position.zPos = coll->Setup.OldPosition.z;
 		info->Control.HandStatus = HandStatus::Free;
+	}
 
 	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	{
