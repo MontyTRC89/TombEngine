@@ -744,16 +744,14 @@ void GuiController::FillDisplayOptions()
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
-	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
-	CurrentSettings.videoMode = 0;
-	for (int i = 0; i < adapter->DisplayModes.size(); i++)
+	CurrentSettings.selectedScreenResolution = 0;
+	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
-		RendererDisplayMode* mode = &adapter->DisplayModes[i];
-		if (mode->Width == CurrentSettings.conf.Width && mode->Height == CurrentSettings.conf.Height &&
-			mode->RefreshRate == CurrentSettings.conf.RefreshRate)
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
+		if (screenResolution.x == CurrentSettings.conf.Width 
+			&& screenResolution.y == CurrentSettings.conf.Height)
 		{
-			CurrentSettings.videoMode = i;
+			CurrentSettings.selectedScreenResolution = i;
 			break;
 		}
 	}
@@ -761,9 +759,6 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	vector<RendererVideoAdapter>* adapters = g_Renderer.GetAdapters();
-	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
-
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
@@ -784,8 +779,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			if (CurrentSettings.videoMode > 0)
-				CurrentSettings.videoMode--;
+			if (CurrentSettings.selectedScreenResolution > 0)
+				CurrentSettings.selectedScreenResolution--;
 			break;
 
 		case 1:
@@ -816,8 +811,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
-				CurrentSettings.videoMode++;
+			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
+				CurrentSettings.selectedScreenResolution++;
 			break;
 
 		case 1:
@@ -869,17 +864,16 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		if (selected_option == 5)
 		{
 			// Save the configuration
-			RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
-			CurrentSettings.conf.Width = mode->Width;
-			CurrentSettings.conf.Height = mode->Height;
-			CurrentSettings.conf.RefreshRate = mode->RefreshRate;
+			auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.selectedScreenResolution];
+			CurrentSettings.conf.Width = screenResolution.x;
+			CurrentSettings.conf.Height = screenResolution.y;
 
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
 			SaveConfiguration();
 
 			// Reset screen and go back
-			g_Renderer.ChangeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
-				CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
+			g_Renderer.ChangeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height, 
+				CurrentSettings.conf.Windowed);
 
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
 			selected_option = pause ? 1 : 0;
