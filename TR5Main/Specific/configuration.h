@@ -78,6 +78,7 @@ struct GameConfiguration {
 	int JoyWalk;
 	int shadowMapSize = 1024;
 	std::vector<VectorInt2> SupportedScreenResolutions;
+	std::string AdapterName;
 };
 
 void LoadResolutionsInCombobox(HWND handle);

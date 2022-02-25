@@ -43,4 +43,27 @@ namespace TEN::Renderer
 		ScreenHeight = height;
 		Windowed = windowed;
 	}
+
+	std::string Renderer11::GetDefaultAdapterName()
+	{
+		HRESULT res;
+
+		IDXGIFactory* dxgiFactory = NULL;
+		Utils::throwIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+
+		IDXGIAdapter* dxgiAdapter = NULL;
+
+		dxgiFactory->EnumAdapters(0, &dxgiAdapter);
+
+		DXGI_ADAPTER_DESC adapterDesc;
+		UINT stringLength;
+		char videoCardDescription[128];
+
+		dxgiAdapter->GetDesc(&adapterDesc);
+		int error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
+
+		dxgiFactory->Release();
+		
+		return std::string(videoCardDescription);
+	}
 }

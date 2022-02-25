@@ -640,6 +640,7 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
+		std::string GetDefaultAdapterName();
 	};
 
 	extern Renderer11 g_Renderer;
