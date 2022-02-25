@@ -12,11 +12,11 @@ void InitialiseHighObject1(short itemNumber)
 	int y = 0;
 	int z = 0;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* currentItem = &g_Level.Items[i];
+		auto* currentItem = &g_Level.Items[i];
 
 		if (currentItem->ObjectNumber != ID_TRIGGER_TRIGGERER)
 		{
@@ -53,12 +53,12 @@ void InitialiseHighObject1(short itemNumber)
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		ITEM_INFO* currentItem = &g_Level.Items[i];
+		auto* currentItem = &g_Level.Items[i];
 
-		if (currentItem->ObjectNumber == ID_PULLEY
-			&& currentItem->Position.xPos == x
-			&& currentItem->Position.yPos == y
-			&& currentItem->Position.zPos == z)
+		if (currentItem->ObjectNumber == ID_PULLEY &&
+			currentItem->Position.xPos == x &&
+			currentItem->Position.yPos == y &&
+			currentItem->Position.zPos == z)
 		{
 			item->ItemFlags[2] |= i;
 			break;
@@ -68,7 +68,7 @@ void InitialiseHighObject1(short itemNumber)
 
 void ControlHighObject1(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 	{
@@ -78,8 +78,9 @@ void ControlHighObject1(short itemNumber)
 
 			if (!item->ItemFlags[1])
 			{
-				ITEM_INFO* targetItem = &g_Level.Items[item->ItemFlags[3] & 0xFF];
+				auto* targetItem = &g_Level.Items[item->ItemFlags[3] & 0xFF];
 				targetItem->Flags = (item->Flags & 0xC1FF) | 0x20;
+
 				item->ItemFlags[0] = 6;
 				item->ItemFlags[1] = 768;
 				TestTriggers(item, true);
@@ -104,24 +105,23 @@ void ControlHighObject1(short itemNumber)
 						flags = (768 - item->ItemFlags[1]) / 8;
 				}
 				else
-				{
 					flags = item->ItemFlags[1] / 8;
-				}
 
 				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, (flags * 256) | 8);
 
 				item->Position.yPos += 8;
 
-				ITEM_INFO* targetItem = &g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF];
+				auto* targetItem = &g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF];
 				targetItem->Flags |= 0x20u;
 				targetItem->Position.yPos = item->Position.yPos - 560;
 			}
 
 			if (item->ItemFlags[1] < -60)
 			{
-				ITEM_INFO* targetItem = &g_Level.Items[item->ItemFlags[2] & 0xFF];
+				auto* targetItem = &g_Level.Items[item->ItemFlags[2] & 0xFF];
 				targetItem->ItemFlags[1] = 0;
 				targetItem->Flags |= 0x20u;
+
 				item->ItemFlags[0] = 0;
 				item->ItemFlags[1] = 0;
 
@@ -129,7 +129,6 @@ void ControlHighObject1(short itemNumber)
 
 				item->Flags &= 0xC1FF;
 				item->Status = ITEM_NOT_ACTIVE;
-
 				return;
 			}
 		}
@@ -141,7 +140,8 @@ void ControlHighObject1(short itemNumber)
 			item->ItemFlags[0] = 5;
 			item->ItemFlags[1] = 0;
 		}
-		else if (item->ItemFlags[0] == 5 && !item->ItemFlags[1] && g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF].Flags < 0)
+		else if (item->ItemFlags[0] == 5 && !item->ItemFlags[1] &&
+			g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF].Flags < 0)
 		{
 			DoFlipMap(3);
 			FlipMap[3] ^= 0x3E00u;
@@ -161,7 +161,7 @@ void ControlHighObject1(short itemNumber)
 				item->ItemFlags[0] = 4;
 
 				short targetItemNumber = item->ItemFlags[3] & 0xFF;
-				ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
+				auto* targetItem = &g_Level.Items[targetItemNumber];
 
 				AddActiveItem(targetItemNumber);
 
@@ -174,7 +174,6 @@ void ControlHighObject1(short itemNumber)
 				targetItem->ItemFlags[1] = 1;
 				targetItem->Flags |= 0x20;
 				targetItem->Flags &= 0xC1FF;
-
 				return;
 			}
 
@@ -182,7 +181,6 @@ void ControlHighObject1(short itemNumber)
 
 			item->Flags &= 0xC1FF;
 			item->Status = ITEM_NOT_ACTIVE;
-
 			return;
 		}
 
@@ -196,9 +194,7 @@ void ControlHighObject1(short itemNumber)
 				flags = 255 - item->ItemFlags[1];
 		}
 		else
-		{
 			flags = item->ItemFlags[1];
-		}
 
 		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, (flags * 256) | 8);
 
@@ -206,7 +202,7 @@ void ControlHighObject1(short itemNumber)
 		item->Position.yPos -= 16;
 
 		short targetItemNumber = (item->ItemFlags[3] / 256) & 0xFF;
-		ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
+		auto* targetItem = &g_Level.Items[targetItemNumber];
 		targetItem->Flags |= 0x20;
 		targetItem->Position.yPos = item->Position.yPos - 560;
 	}

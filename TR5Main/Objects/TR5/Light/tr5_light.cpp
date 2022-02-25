@@ -10,7 +10,7 @@
 
 void PulseLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -34,23 +34,25 @@ void PulseLightControl(short itemNumber)
 
 void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
 {
-	GAME_VECTOR source, target;
-
-	source.x = x;
-	source.y = y;
-	source.z = z;
+	GAME_VECTOR start;
+	start.x = x;
+	start.y = y;
+	start.z = z;
 	GetFloor(x, y, z, &room);
-	source.roomNumber = room;
-	target.x = x + 16384 * phd_sin(16 * angle);
-	target.y = y;
-	target.z = z + 16384 * phd_cos(16 * angle);
-	if (!LOS(&source, &target))
-		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
+	start.roomNumber = room;
+
+	GAME_VECTOR end;
+	end.x = x + 16384 * phd_sin(16 * angle);
+	end.y = y;
+	end.z = z + 16384 * phd_cos(16 * angle);
+
+	if (!LOS(&start, &end))
+		TriggerDynamicLight(end.x, end.y, end.z, falloff, r, g, b);
 }
 
 void StrobeLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -80,7 +82,7 @@ void StrobeLightControl(short itemNumber)
 
 void ColorLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -97,7 +99,7 @@ void ColorLightControl(short itemNumber)
 
 void ElectricalLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 	{
@@ -117,20 +119,14 @@ void ElectricalLightControl(short itemNumber)
 		else if (item->ItemFlags[0] >= 96)
 		{
 			if (item->ItemFlags[0] >= 160)
-			{
 				intensity = 255 - (GetRandomControl() & 0x1F);
-			}
 			else
 			{
 				intensity = 96 - (GetRandomControl() & 0x1F);
 				if (!(GetRandomControl() & 0x1F) && item->ItemFlags[0] > 128)
-				{
 					item->ItemFlags[0] = 160;
-				}
 				else
-				{
 					item->ItemFlags[0]++;
-				}
 			}
 		}
 		else
@@ -167,9 +163,7 @@ void ElectricalLightControl(short itemNumber)
 				SoundEffect(SFX_TR5_ELEC_LIGHT_CRACKLES, &item->Position, 32 * (intensity & 0xFFFFFFF8) | 8);
 		}
 		else
-		{
 			return;
-		}
 	}
 
 	TriggerDynamicLight(
@@ -184,22 +178,17 @@ void ElectricalLightControl(short itemNumber)
 
 void BlinkingLightControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
 		item->ItemFlags[0]--;
 
 		if (item->ItemFlags[0] >= 3)
-		{
 			item->MeshBits = 1;
-		}
 		else
 		{
-			PHD_VECTOR pos;
-			pos.x = 0;
-			pos.y = 0;
-			pos.z = 0;
+			PHD_VECTOR pos = { 0, 0, 0 };
 			GetJointAbsPosition(item, &pos, 0);
 
 			TriggerDynamicLight(

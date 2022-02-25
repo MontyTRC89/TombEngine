@@ -27,13 +27,13 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH; // TODO
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 	{
-		// Not yet.
+		// TODO: Prepped for another time.
 		/*if (g_GameFlow->Animations.SlideExtended)
 		{
 			if (TrInput & IN_LEFT)
@@ -80,6 +80,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	item->Airborne = false;
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -124,13 +125,13 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH; // TODO
+		item->TargetState = LS_DEATH;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 	{
-		// Not yet.
+		// TODO: Prepped for another time.
 		/*if (g_GameFlow->Animations.SlideExtended)
 		{
 			if (TrInput & IN_LEFT)
@@ -173,6 +174,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	item->Airborne = false;
 	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
