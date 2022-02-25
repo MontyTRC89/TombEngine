@@ -412,8 +412,7 @@ namespace TEN::Renderer
 		char stringBuffer[255];
 		int y = 400;
 		short lastY;
-		RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
-		RendererDisplayMode* mode = &adapter->DisplayModes[g_Gui.GetCurrentSettings().videoMode];
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
 		__int64 title_option = g_Gui.GetSelectedOption();
 		Menu title_menu = g_Gui.GetMenuToDisplay();
 
@@ -557,7 +556,7 @@ namespace TEN::Renderer
 				           title_option == 0 ? PRINTSTRING_BLINK : 0));
 
 			ZeroMemory(stringBuffer, 255);
-			sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+			sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
 			DrawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
 			           PRINTSTRING_OUTLINE | (title_option == 0 ? PRINTSTRING_BLINK : 0));
@@ -727,8 +726,7 @@ namespace TEN::Renderer
 	{
 		char stringBuffer[255];
 		int y;
-		RendererVideoAdapter* adapter = &m_adapters[g_Configuration.Adapter];
-		RendererDisplayMode* mode = &adapter->DisplayModes[g_Gui.GetCurrentSettings().videoMode];
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
 		Menu pause_menu = g_Gui.GetMenuToDisplay();
 		__int64 pause_option = g_Gui.GetSelectedOption();
 
@@ -806,7 +804,7 @@ namespace TEN::Renderer
 				           pause_option == 0 ? PRINTSTRING_BLINK : 0));
 
 			ZeroMemory(stringBuffer, 255);
-			sprintf(stringBuffer, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+			sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
 			DrawString(400, y, stringBuffer, PRINTSTRING_COLOR_WHITE,
 			           PRINTSTRING_OUTLINE | (pause_option == 0 ? PRINTSTRING_BLINK : 0));
@@ -2026,7 +2024,8 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
-				PrintDebugMessage("GPU: %s", m_adapters[g_Configuration.Adapter].Name.c_str());
+				//PrintDebugMessage("GPU: %s", m_adapters[g_Configuration.Adapter].Name.c_str());
+				PrintDebugMessage("Resolution: %d x %d", ScreenWidth, ScreenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);

@@ -4,7 +4,7 @@
 
 namespace TEN::Renderer 
 {
-	void Renderer11::ChangeScreenResolution(int width, int height, int frequency, bool windowed) 
+	void Renderer11::ChangeScreenResolution(int width, int height, bool windowed) 
 	{
 		HRESULT res;
 
@@ -37,7 +37,7 @@ namespace TEN::Renderer
 
 		Utils::throwIfFailed( m_swapChain->ResizeTarget(mode));
 
-		InitialiseScreen(width, height, frequency, windowed, WindowsHandle, true);
+		InitialiseScreen(width, height, windowed, WindowsHandle, true);
 
 		ScreenWidth = width;
 		ScreenHeight = height;

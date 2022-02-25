@@ -13,7 +13,7 @@ using namespace TEN::Renderer;
 using std::vector;
 extern GameConfiguration g_Configuration;
 
-void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool windowed, HWND handle)
+void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND handle)
 {
 	HRESULT res;
 
@@ -21,11 +21,10 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 
 	CoInitialize(NULL);
 
-
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
-	InitialiseScreen(w, h, refreshRate, windowed, handle, false);
+	InitialiseScreen(w, h, windowed, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
@@ -197,7 +196,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, int refreshRate, bool w
 	initQuad(m_device.Get());
 }
 
-void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset)
+void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset)
 {
 	HRESULT res;
 
@@ -312,7 +311,7 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, int refreshRate, 
 void TEN::Renderer::Renderer11::Create()
 {
 
-	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; // {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_11_1};
+	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; 
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 
@@ -322,7 +321,6 @@ void TEN::Renderer::Renderer11::Create()
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, /*D3D11_CREATE_DEVICE_DEBUG*/ NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
 #endif
 	Utils::throwIfFailed(res);
-
 }
 
 void Renderer11::ToggleFullScreen()

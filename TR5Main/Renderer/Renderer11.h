@@ -527,7 +527,7 @@ namespace TEN::Renderer
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color);
 		bool IsRoomUnderwater(short roomNumber);
 		bool IsInRoom(int x, int y, int z, short roomNumber);
-		void InitialiseScreen(int w, int h, int refreshRate, bool windowed, HWND handle, bool reset);
+		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
 		void InitialiseBars();
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
@@ -559,6 +559,7 @@ namespace TEN::Renderer
 		Texture2D CreateDefaultNormalTexture();
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
+		Vector2 GetScreenResolution();
 
 		template <typename C>
 		ConstantBuffer<C> CreateConstantBuffer()
@@ -591,8 +592,8 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		void EnumerateVideoModes();
-		void Initialise(int w, int h, int refreshRate, bool windowed, HWND handle);
+		std::vector<VectorInt2> EnumerateScreenResolutions();
+		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov);
@@ -627,7 +628,7 @@ namespace TEN::Renderer
 		void AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
 		void AddSphere(Vector3 center, float radius, Vector4 color);
 		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
-		void ChangeScreenResolution(int width, int height, int frequency, bool windowed);
+		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void ResetAnimations();
 		void UpdateLaraAnimations(bool force);
