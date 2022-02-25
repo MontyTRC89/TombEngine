@@ -2,13 +2,14 @@
 #include "tr5_fallingceiling.h"
 #include "Game/items.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 
 void FallingCeilingControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ActiveState)
 	{
@@ -27,17 +28,15 @@ void FallingCeilingControl(short itemNumber)
 	AnimateItem(item);
 
 	if (item->Status == ITEM_DEACTIVATED)
-	{
 		RemoveActiveItem(itemNumber);
-	}
 	else
 	{
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		auto probe = GetCollisionResult(item);
 
-		if (roomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, roomNumber);
+		item->Floor = probe.Position.Floor;
+
+		if (probe.RoomNumber != item->RoomNumber)
+			ItemNewRoom(itemNumber, probe.RoomNumber);
 
 		if (item->ActiveState == 1)
 		{

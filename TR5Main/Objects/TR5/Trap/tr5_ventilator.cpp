@@ -42,13 +42,13 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 		}
 	}
 
-	if (abs(Camera.pos.x - x) <= 7168)
+	if (abs(Camera.pos.x - x) <= SECTOR(7))
 	{
-		if (abs(Camera.pos.y - y) <= 7168)
+		if (abs(Camera.pos.y - y) <= SECTOR(7))
 		{
-			if (abs(Camera.pos.z - z) <= 7168)
+			if (abs(Camera.pos.z - z) <= SECTOR(7))
 			{
-				SPARKS* spark = &Sparks[GetFreeSpark()];
+				auto* spark = &Sparks[GetFreeSpark()];
 
 				spark->on = 1;
 				spark->sR = 0;
@@ -127,7 +127,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 
 void InitialiseVentilator(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	item->ItemFlags[0] = item->TriggerFlags * SECTOR(1);
 	if (item->ItemFlags[0] < 2048)
@@ -136,7 +136,7 @@ void InitialiseVentilator(short itemNumber)
 
 void VentilatorControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
 
@@ -144,9 +144,7 @@ void VentilatorControl(short itemNumber)
 	int zChange = 0;
 
 	if (TriggerActive(item))
-	{
 		xChange = 1;
-	}
 	else
 	{
 		xChange = 1;
@@ -158,22 +156,16 @@ void VentilatorControl(short itemNumber)
 				return;
 		}
 		else
-		{
 			item->TargetState = 1;
-		}
 	}
 
 	int speed = 0;
 	if (item->ActiveState == 1)
-	{
 		speed = g_Level.Anims[item->AnimNumber].frameEnd - item->FrameNumber;
-	}
 	else
-	{
 		speed = 128;
-	}
 
-	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+	auto* bounds = GetBoundsAccurate(item);
 	BOUNDING_BOX effectBounds;
 
 	effectBounds.Y1 = item->Position.yPos + bounds->Y1;
@@ -242,8 +234,10 @@ void VentilatorControl(short itemNumber)
 					if (z1 < item->ItemFlags[0])
 					{
 						int dz = 96 * zChange * (item->ItemFlags[0] - z1) / item->ItemFlags[0];
+
 						if (item->ActiveState == 1)
 							dz = speed * dz / 120;
+
 						LaraItem->Position.zPos += dz;
 					}
 				}
@@ -263,8 +257,10 @@ void VentilatorControl(short itemNumber)
 					if (x1 < item->ItemFlags[0])
 					{
 						int dx = 96 * xChange * (item->ItemFlags[0] - x1) / item->ItemFlags[0];
+
 						if (item->ActiveState == 1)
 							dx = speed * dx / 120;
+
 						LaraItem->Position.xPos += dx;
 					}
 				}
@@ -284,9 +280,11 @@ void VentilatorControl(short itemNumber)
 		VentilatorEffect(&effectBounds, 1, 0, speed);
 		VentilatorEffect(&effectBounds, -1, 0, speed);
 
-		if (LaraItem->Position.xPos >= effectBounds.X1 && LaraItem->Position.xPos <= effectBounds.X2)
+		if (LaraItem->Position.xPos >= effectBounds.X1 &&
+			LaraItem->Position.xPos <= effectBounds.X2)
 		{
-			if (LaraItem->Position.zPos >= effectBounds.Z1 && LaraItem->Position.zPos <= effectBounds.Z2)
+			if (LaraItem->Position.zPos >= effectBounds.Z1 &&
+				LaraItem->Position.zPos <= effectBounds.Z2)
 			{
 				int y = effectBounds.Y2;
 
@@ -294,16 +292,20 @@ void VentilatorControl(short itemNumber)
 				{
 					if (effectBounds.Y1 - LaraItem->Position.yPos >= item->ItemFlags[0])
 						return;
+
 					y = 96 * (effectBounds.Y2 - item->ItemFlags[0]) / item->ItemFlags[0];
 				}
 				else
 				{
 					if (LaraItem->Position.yPos - effectBounds.Y2 >= item->ItemFlags[0])
 						return;
+
 					y = 96 * (item->ItemFlags[0] - (LaraItem->Position.yPos - effectBounds.Y2)) / item->ItemFlags[0];
 				}
+
 				if (item->ActiveState == 1)
 					y = speed * y / 120;
+
 				LaraItem->Position.yPos += y;
 			}
 		}

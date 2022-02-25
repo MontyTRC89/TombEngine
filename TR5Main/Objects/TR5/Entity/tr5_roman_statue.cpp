@@ -52,7 +52,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 		short fxNumber = CreateNewEffect(item->RoomNumber);
 		if (fxNumber != -1)
 		{
-			FX_INFO* fx = &EffectList[fxNumber];
+			auto* fx = &EffectList[fxNumber];
 
 			fx->pos.xPos = pos->x;
 			fx->pos.yPos = pos->y;
@@ -74,7 +74,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 
 	if (!(GetRandomControl() & 0xF))
 	{
-		SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+		auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
 		spark->on = 1;
 		spark->sShade = 0;
@@ -103,7 +103,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 
 static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->dG = g;
 	spark->sG = g;
@@ -133,13 +133,14 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 
 static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;
 	spark->sR = 0;
 	spark->sG = 0;
 	spark->sB = 0;
 	spark->dR = 64;
+
 	if (flags)
 	{
 		spark->dG = (GetRandomControl() & 0x3F) - 64;
@@ -150,6 +151,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 		spark->dB = (GetRandomControl() & 0x3F) - 64;
 		spark->dG = spark->dB / 2;
 	}
+
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
 	spark->life = 16;
@@ -169,18 +171,20 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 
 static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;
 	spark->sR = 0;
 	spark->sB = (GetRandomControl() & 0x3F) - 96;
 	spark->dB = (GetRandomControl() & 0x3F) - 96;
 	spark->dR = 0;
+
 	if (factor < 16)
 	{
 		spark->sB = (factor * spark->sB) / 16;
 		spark->dB = (factor * spark->dB) / 16;
 	}
+
 	spark->sG = spark->sB / 2;
 	spark->dG = spark->dB / 2;
 	spark->fadeToBlack = 4;
@@ -213,7 +217,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		auto* fx = &EffectList[fxNum];
 
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos;
@@ -232,7 +236,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -266,7 +270,7 @@ void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj)
 
 void InitialiseRomanStatue(short itemNum)
 {
-    ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNum];
     
 	ClearItem(itemNum);
     
@@ -291,8 +295,8 @@ void RomanStatueControl(short itemNumber)
 	short joint1 = 0;
 	short joint0 = 0;
 	
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = (CREATURE_INFO*)item->Data;
 	
 	int oldSwapMeshFlags = item->SwapMeshFlags;
 
@@ -375,9 +379,7 @@ void RomanStatueControl(short itemNumber)
 			creature->flags = 0;
 			
 			if (creature->mood == ATTACK_MOOD)
-			{
 				creature->maximumTurn = ANGLE(2);
-			}
 			else
 			{
 				creature->maximumTurn = 0;
@@ -386,31 +388,23 @@ void RomanStatueControl(short itemNumber)
 			
 			joint2 = info.angle;
 			
-			if (item->AIBits
-				|| !(GetRandomControl() & 0x1F)
-				&& (info.distance > SQUARE(1024)
-					|| creature->mood != ATTACK_MOOD))
+			if (item->AIBits ||
+				!(GetRandomControl() & 0x1F) &&
+				(info.distance > pow(SECTOR(1), 2) ||
+					creature->mood != ATTACK_MOOD))
 			{
 				joint2 = AIGuard((CREATURE_INFO*)creature);
 			}
 			else if (info.angle > 20480 || info.angle < -20480)
-			{
 				item->TargetState = STATE_ROMAN_STATUE_TURN_180;
-			}
-			else if (info.ahead && info.distance < SQUARE(1024))
+			else if (info.ahead && info.distance < pow(SECTOR(1), 2))
 			{
 				if (info.bite & ((GetRandomControl() & 3) == 0))
-				{
 					item->TargetState = STATE_ROMAN_STATUE_ATTACK1;
-				}
 				else if (GetRandomControl() & 1)
-				{
 					item->TargetState = STATE_ROMAN_STATUE_ATTACK2;
-				}
 				else
-				{
 					item->TargetState = STATE_ROMAN_STATUE_ATTACK3;
-				}
 			}
 			else
 			{
@@ -420,6 +414,7 @@ void RomanStatueControl(short itemNumber)
 					item->ItemFlags[0] = 5;
 					break;
 				}
+
 				if (item->TriggerFlags == 1)
 				{
 					if (Targetable(item, &info) && GetRandomControl() & 1)
@@ -428,11 +423,13 @@ void RomanStatueControl(short itemNumber)
 						break;
 					}
 				}
-				if (item->TriggerFlags || info.distance >= SQUARE(2560) || !info.bite)
+
+				if (item->TriggerFlags || info.distance >= pow(SECTOR(2.5f), 2) || !info.bite)
 				{
 					item->TargetState = STATE_ROMAN_STATUE_WALK;
 					break;
 				}
+
 				item->TargetState = STATE_ROMAN_STATUE_ATTACK1;
 			}
 			
@@ -466,9 +463,7 @@ void RomanStatueControl(short itemNumber)
 						deltaFrame2 = 16;
 				}
 				else
-				{
 					deltaFrame2 = 4 * (62 - deltaFrame);
-				}
 				
 				color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 				
@@ -581,17 +576,15 @@ void RomanStatueControl(short itemNumber)
 		case STATE_ROMAN_STATUE_ATTACK4:                                  
 			creature->maximumTurn = 0;
 
-			if (abs(info.angle) >= ANGLE(2))
+			if (abs(info.angle) >= ANGLE(2.0f))
 			{
 				if (info.angle >= 0)
-					item->Position.yRot += ANGLE(2);
+					item->Position.yRot += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2);
+					item->Position.yRot -= ANGLE(2.0f);
 			}
 			else
-			{
 				item->Position.yRot += info.angle;
-			}
 
 			if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 10)
 			{
@@ -670,9 +663,7 @@ void RomanStatueControl(short itemNumber)
 						TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
 					}
 					else
-					{
 						TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
-					}
 				}
 			}
 			
@@ -697,9 +688,7 @@ void RomanStatueControl(short itemNumber)
 						item->Position.yRot -= ANGLE(2);
 				}
 				else
-				{
 					item->Position.yRot += info.angle;
-				}
 			}
 
 			if (info.distance < SQUARE(1024))

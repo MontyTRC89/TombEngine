@@ -28,32 +28,33 @@ using namespace TEN::Entities::Generic;
 
 BITE_INFO ImpBite = { 0, 0x64, 0, 9 };
 
-void InitialiseImp(short itemNum)
+void InitialiseImp(short itemNumber)
 {
-    ITEM_INFO* item;
-    short stateid;
+	auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNum];
-    ClearItem(itemNum);
+	ClearItem(itemNumber);
 
-    if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
-    {
-        stateid = STATE_IMP_START_ROLL;
-        item->AnimNumber = Objects[ID_IMP].animIndex + 8;
-    }
-    else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
-    {
-        stateid = STATE_IMP_START_CLIMB;
-        item->AnimNumber = Objects[ID_IMP].animIndex + 7;
-    }
-    else
-    {
-        stateid = 1;
-        item->AnimNumber = Objects[ID_IMP].animIndex + 1;
-    }
-    item->TargetState = stateid;
-    item->ActiveState = stateid;
-    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	short stateID;
+
+	if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
+	{
+		stateID = STATE_IMP_START_ROLL;
+		item->AnimNumber = Objects[ID_IMP].animIndex + 8;
+	}
+	else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
+	{
+		stateID = STATE_IMP_START_CLIMB;
+		item->AnimNumber = Objects[ID_IMP].animIndex + 7;
+	}
+	else
+	{
+		stateID = 1;
+		item->AnimNumber = Objects[ID_IMP].animIndex + 1;
+	}
+
+	item->TargetState = stateID;
+	item->ActiveState = stateID;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 static void ImpThrowStones(ITEM_INFO* item)
