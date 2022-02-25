@@ -36,7 +36,7 @@ void lara_as_pickup(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item))
 		item->TargetState = GetNextAnimState(item);
@@ -53,7 +53,7 @@ void lara_as_pickup_flare(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
 		info->Control.HandStatus = HandStatus::Free;
@@ -74,7 +74,7 @@ void lara_as_switch_on(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 	Camera.speed = 6;
 }
 
@@ -89,7 +89,7 @@ void lara_as_switch_off(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 	Camera.speed = 6;
 }
 
@@ -130,7 +130,7 @@ void lara_as_use_key(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 }
 
 // State:		LS_USE_PUZZLE (43)
@@ -144,7 +144,7 @@ void lara_as_use_puzzle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = WALL_SIZE;
+	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item) && item->ItemFlags[0])
 	{
