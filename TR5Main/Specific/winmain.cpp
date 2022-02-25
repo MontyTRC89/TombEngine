@@ -323,9 +323,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return false;
 	}
 
-	g_Configuration.Width = 800;
-	g_Configuration.Height = 600;
-
 	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
