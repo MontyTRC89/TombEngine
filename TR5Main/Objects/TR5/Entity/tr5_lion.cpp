@@ -14,11 +14,11 @@
 BITE_INFO LionBite1 = { -2, -10, 250, 21 };
 BITE_INFO LionBite2 = { -2, -10, 132, 21 };
 
-void InitialiseLion(short itemNum)
+void InitialiseLion(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -26,18 +26,18 @@ void InitialiseLion(short itemNum)
 	item->ActiveState = 1;
 }
 
-void LionControl(short itemNum)
+void LionControl(short itemNumber)
 {
+	auto* item = &g_Level.Items[itemNumber];
+
 	short joint0 = 0;
 	short angle = 0;
 	short tilt = 0;
 	short joint1 = 0;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-
-	if (CreatureActive(itemNum))
+	if (CreatureActive(itemNumber))
 	{
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		auto* creature = (CREATURE_INFO*)item->Data;
 
 		if (item->HitPoints <= 0)
 		{
@@ -67,17 +67,20 @@ void LionControl(short itemNum)
 			{
 			case 1:
 				creature->maximumTurn = 0;
+
 				if (item->RequiredState)
 				{
 					item->TargetState = item->RequiredState;
 					break;
 				}
+
 				if (!creature->mood)
 				{
 					if (!(GetRandomControl() & 0x3F))
 						item->TargetState = 2;
 					break;
 				}
+
 				if (info.ahead)
 				{
 					if (item->TouchBits & 0x200048)
@@ -85,17 +88,20 @@ void LionControl(short itemNum)
 						item->TargetState = 7;
 						break;
 					}
-					if (info.distance < SQUARE(1024))
+
+					if (info.distance < pow(SECTOR(1), 2))
 					{
 						item->TargetState = 4;
 						break;
 					}
 				}
+
 				item->TargetState = 3;
 				break;
 
 			case 2:
-				creature->maximumTurn = ANGLE(2);
+				creature->maximumTurn = ANGLE(2.0f);
+
 				if (!creature->mood)
 				{
 					if (GetRandomControl() < 128)
@@ -106,21 +112,19 @@ void LionControl(short itemNum)
 				}
 				else
 					item->TargetState = 1;
+
 				break;
 
 			case 3:
-				creature->maximumTurn = ANGLE(5);
+				creature->maximumTurn = ANGLE(5.0f);
 				tilt = angle;
+
 				if (creature->mood)
 				{
-					if (info.ahead && info.distance < SQUARE(1024))
-					{
+					if (info.ahead && info.distance < pow(SECTOR(1), 2))
 						item->TargetState = 1;
-					}
 					else if (item->TouchBits & 0x200048 && info.ahead)
-					{
 						item->TargetState = 1;
-					}
 					else if (creature->mood != ESCAPE_MOOD)
 					{
 						if (GetRandomControl() < 128)
@@ -131,9 +135,8 @@ void LionControl(short itemNum)
 					}
 				}
 				else
-				{
 					item->TargetState = 1;
-				}
+				
 				break;
 
 			case 4:
@@ -144,9 +147,11 @@ void LionControl(short itemNum)
 					CreatureEffect2(item, &LionBite1, 10, item->Position.yRot, DoBloodSplat);
 					item->RequiredState = 1;
 				}
+
 				break;
 			case 7:
 				creature->maximumTurn = ANGLE(1);
+
 				if (!item->RequiredState && item->TouchBits & 0x200048)
 				{
 					CreatureEffect2(item, &LionBite2, 10, item->Position.yRot, DoBloodSplat);
@@ -154,6 +159,7 @@ void LionControl(short itemNum)
 					LaraItem->HitStatus = true;
 					item->RequiredState = 1;
 				}
+
 				break;
 			}
 		}
@@ -162,5 +168,5 @@ void LionControl(short itemNum)
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

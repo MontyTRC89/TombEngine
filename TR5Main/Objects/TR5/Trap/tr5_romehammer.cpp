@@ -5,7 +5,8 @@
 
 void InitialiseRomeHammer(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
+
 	item->ItemFlags[0] = 2;
 	item->ItemFlags[3] = 250;
 }

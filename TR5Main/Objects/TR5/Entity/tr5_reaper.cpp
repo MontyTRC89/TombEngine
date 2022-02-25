@@ -8,25 +8,24 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-void InitialiseReaper(short itemNum)
+void InitialiseReaper(short itemNumber)
 {
-    ITEM_INFO* item;
+	ClearItem(itemNumber);
 
-    ClearItem(itemNum);
+	auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNum];
-    item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-    item->TargetState = 2;
-    item->ActiveState = 2;
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->TargetState = 2;
+	item->ActiveState = 2;
 }
 
 void ReaperControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = (CREATURE_INFO*)item->Data;
 
 		if (item->AIBits)
 			GetAITarget(creature);
@@ -38,10 +37,10 @@ void ReaperControl(short itemNumber)
 		GetCreatureMood(item, &info, TIMID);
 		CreatureMood(item, &info, TIMID);
 
-		short angle = CreatureTurn(item, ANGLE(2));
+		short angle = CreatureTurn(item, ANGLE(2.0f));
 
-		if (item->ActiveState == 2 
-			&& !(GetRandomControl() & 0x3F))
+		if (item->ActiveState == 2 &&
+			!(GetRandomControl() & 0x3F))
 			item->TargetState = 1;
 
 		if (creature->reachedGoal)
@@ -60,6 +59,6 @@ void ReaperControl(short itemNumber)
 
 		item->Position.xRot = -12288;
 		CreatureAnimation(itemNumber, angle, 0);
-		CreatureUnderwater(item, 1024);
+		CreatureUnderwater(item, SECTOR(1));
 	}
 }

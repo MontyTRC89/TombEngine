@@ -11,7 +11,16 @@
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
 
-OBJECT_COLLISION_BOUNDS DeathSlideBounds = { -256, 256, -100, 100, 256, 512, 0, 0, -ANGLE(25.0f), ANGLE(25.0f), 0, 0 };
+OBJECT_COLLISION_BOUNDS DeathSlideBounds =
+{
+	-256, 256,
+	-100, 100,
+	256, 512,
+	0, 0,
+	-ANGLE(25.0f), ANGLE(25.0f),
+	0, 0
+};
+
 PHD_VECTOR DeathSlidePosition(0, 0, 371);
 
 void InitialiseDeathSlide(short itemNumber)
