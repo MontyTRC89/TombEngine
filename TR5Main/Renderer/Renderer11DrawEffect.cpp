@@ -722,8 +722,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawUnderwaterDust(RenderView& view) 
 	{
-		return;
-
 		if (m_firstUnderwaterDustParticles) {
 			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 				m_underwaterDustParticles[i].Reset = true;
@@ -757,7 +755,15 @@ namespace TEN::Renderer
 			dust->Life++;
 			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-			AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, { 12, 12 }, BLENDMODE_ADDITIVE,view);
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], 
+				Vector3(dust->X, dust->Y, dust->Z),
+				Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
+				0.0f,
+				1.0f, 
+				{ 24, 24 },
+				BLENDMODE_ADDITIVE,
+				view);
 
 			if (dust->Life >= 32)
 				dust->Reset = true;
@@ -771,8 +777,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
-		int currentBlendMode = -1;
-
+		
 		for (auto& spr : view.spritesToDraw) 
 		{
 			// Calculate matrices for sprites
@@ -823,16 +828,65 @@ namespace TEN::Renderer
 			else
 			{
 				// Draw sprites immediately
-				if (spr.BlendMode != currentBlendMode)
-				{
-					currentBlendMode = spr.BlendMode;
-					SetBlendMode(spr.BlendMode);
-				}
+				SetBlendMode(spr.BlendMode);
 
 				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+				
+				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) 
+				{
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
+				{
+					UINT stride = sizeof(RendererVertex);
+					UINT offset = 0;
+
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
+
+					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
+					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					m_context->IASetInputLayout(m_inputLayout.Get());
+					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
+					
+					m_stSprite.billboardMatrix = spriteMatrix;
+					m_stSprite.color = spr.color;
+					m_stSprite.isBillboard = true;
+					m_cbSprite.updateData(m_stSprite, m_context.Get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
+					m_context->Draw(4, 0);
+
+				}
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
 					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -851,57 +905,13 @@ namespace TEN::Renderer
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_context->Draw(4, 0);
 
 				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-					
-					m_stSprite.billboardMatrix = spriteMatrix;
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = true;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-					m_context->Draw(4, 0);
-
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
-					UINT stride = sizeof(RendererVertex);
-					UINT offset = 0;
-					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-					SetCullMode(CULL_MODE_NONE);
-
-					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					m_context->IASetInputLayout(m_inputLayout.Get());
-					m_context->IASetVertexBuffers(0, 1, quadVertexBuffer.GetAddressOf(), &stride, &offset);
-					
-					m_stSprite.billboardMatrix = spriteMatrix;
-					m_stSprite.color = spr.color;
-					m_stSprite.isBillboard = true;
-					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
-					m_context->Draw(4, 0);
-
-				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
 					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -951,10 +961,12 @@ namespace TEN::Renderer
 					v3.UV.x = spr.Sprite->UV[3].x;
 					v3.UV.y = spr.Sprite->UV[3].y;
 					v3.Color = spr.color;
+					
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = false;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_primitiveBatch->Begin();
 					m_primitiveBatch->DrawTriangle(v0, v1, v3);
 					m_primitiveBatch->DrawTriangle(v1, v2, v3);
