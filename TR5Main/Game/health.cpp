@@ -123,9 +123,9 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 				DrawHealthBarOverlay(item, 0);
 		}
 	}
-	else if (HealthBarTimer > 0 ||
-		HealthBar <= 0 ||
-		info->Control.HandStatus == HandStatus::WeaponReady && info->Control.WeaponControl.GunType != WEAPON_TORCH ||
+	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
+		info->Control.HandStatus == HandStatus::WeaponReady &&
+		info->Control.WeaponControl.GunType != WEAPON_TORCH ||
 		info->poisoned >= 256)
 	{
 		if (!BinocularRange)
@@ -165,6 +165,7 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 		air = 0;
 	else if (air > LARA_AIR_MAX)
 		air = LARA_AIR_MAX;
+
 	if (air <= (LARA_AIR_MAX / 4))
 	{
 		if (flash)
@@ -192,7 +193,7 @@ void UpdateSprintBar(ITEM_INFO* item)
 
 void DrawAllPickups()
 {
-	DisplayPickup* pickup = &Pickups[CurrentPickup];
+	auto* pickup = &Pickups[CurrentPickup];
 
 	if (pickup->Life > 0)
 	{
@@ -231,7 +232,6 @@ void DrawAllPickups()
 		if (i == MAX_COLLECTED_PICKUPS)
 		{
 			CurrentPickup = 0;
-
 			return;
 		}
 	}
@@ -242,7 +242,7 @@ void DrawAllPickups()
 
 void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 {
-	DisplayPickup* pickup = Pickups;
+	auto* pickup = Pickups;
 
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
@@ -250,7 +250,6 @@ void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 		{
 			pickup->Life = 45;
 			pickup->ObjectNumber = objectNumber;
-
 			break;
 		}
 
