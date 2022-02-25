@@ -125,13 +125,7 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (GetCollisionResult(item).Position.FloorSlope &&
-		!TestEnvironment(ENV_FLAG_SWAMP, item))
-	{
-		return true;
-	}
-
-	return false;
+	return (GetCollisionResult(item).Position.FloorSlope && !TestEnvironment(ENV_FLAG_SWAMP, item));
 }
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
@@ -921,7 +915,7 @@ bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
-	if (info->Control.CanMonkeySwing && abs(coll->Middle.Ceiling) <= CLICK(0.5f) &&
+	if (info->Control.CanMonkeySwing && coll->Middle.Ceiling <= CLICK(0.5f) &&
 		(coll->Middle.Ceiling >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
 		abs(coll->Middle.Ceiling + coll->Middle.Floor + coll->Setup.Height) > LARA_HEIGHT_MONKEY)
 	{
