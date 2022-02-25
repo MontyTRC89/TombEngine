@@ -16,7 +16,7 @@ using namespace TEN::Floordata;
 
 void InitialiseRaisingBlock(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
@@ -39,7 +39,7 @@ void InitialiseRaisingBlock(short itemNumber)
 
 void ControlRaisingBlock(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -69,9 +69,7 @@ void ControlRaisingBlock(short itemNumber)
 		}
 
 		if (item->TriggerFlags < 0)
-		{
 			item->ItemFlags[1] = 1;
-		}
 		else if (item->ItemFlags[1] < 4096)
 		{
 			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
@@ -157,12 +155,12 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 
 	if (bboxHeight.has_value())
 	{
-		auto item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		auto bounds = GetBoundsAccurate(item);
-		auto height = abs(bounds->Y2 - bounds->Y1);
+		auto* bounds = GetBoundsAccurate(item);
+		int height = abs(bounds->Y2 - bounds->Y1);
 
-		auto currentHeight = item->Position.yPos - height * item->ItemFlags[1] / 4096;
+		int currentHeight = item->Position.yPos - height * item->ItemFlags[1] / 4096;
 		return std::optional{ currentHeight };
 	}
 

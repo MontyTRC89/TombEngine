@@ -1371,11 +1371,12 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // State:		LS_DEATH (8)
-// Control:	lara_as_death()
+// Control:		lara_as_death()
 void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
+	item->Airborne = false;
 	info->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;

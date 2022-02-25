@@ -16,7 +16,7 @@ using namespace TEN::Floordata;
 
 void InitialiseExpandingPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
@@ -37,7 +37,7 @@ void InitialiseExpandingPlatform(short itemNumber)
 
 bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ItemFlags[1] <= 0)
 		return false;
@@ -50,27 +50,27 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 	auto bounds = GetBoundsAccurate(item);
 	auto halfWidth = abs(bounds->Z2 - bounds->Z1) / 2;
 
-	if (item->Position.yRot == ANGLE(90))
+	if (item->Position.yRot == ANGLE(90.0f))
 	{
-		auto xBorder = item->Position.xPos + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Position.xPos + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (x < xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Position.yRot == ANGLE(270))
+	else if (item->Position.yRot == ANGLE(270.0f))
 	{
-		auto xBorder = item->Position.xPos - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Position.xPos - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (x > xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
 	else if (item->Position.yRot == 0)
 	{
-		auto zBorder = item->Position.zPos + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Position.zPos + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (z < zBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
-	else if (item->Position.yRot == ANGLE(180))
+	else if (item->Position.yRot == ANGLE(180.0f))
 	{
-		auto zBorder = item->Position.zPos - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Position.zPos - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
 		if (z > zBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
@@ -80,7 +80,7 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 
 bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margin)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ItemFlags[1] <= 0)
 		return false;
@@ -101,29 +101,29 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 
 	if (item->Position.yRot == ANGLE(90))
 	{
-		auto xBorder = item->Position.xPos + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
-		auto xBorder2 = item->Position.xPos + halfWidth;
+		int xBorder = item->Position.xPos + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder2 = item->Position.xPos + halfWidth;
 		if (x < xBorder || zb != itemzb || x > xBorder2)
 			return false;
 	}
 	else if (item->Position.yRot == ANGLE(270))
 	{
-		auto xBorder = item->Position.xPos - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
-		auto xBorder2 = item->Position.xPos - halfWidth;
+		int xBorder = item->Position.xPos - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder2 = item->Position.xPos - halfWidth;
 		if (x > xBorder || zb != itemzb || x < xBorder2)
 			return false;
 	}
 	else if (item->Position.yRot == 0)
 	{
-		auto zBorder = item->Position.zPos + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
-		auto zBorder2 = item->Position.zPos + halfWidth;
+		int zBorder = item->Position.zPos + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder2 = item->Position.zPos + halfWidth;
 		if (z < zBorder || xb != itemxb || z > zBorder2)
 			return false;
 	}
 	else if (item->Position.yRot == ANGLE(180))
 	{
-		auto zBorder = item->Position.zPos - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
-		auto zBorder2 = item->Position.zPos - halfWidth;
+		int zBorder = item->Position.zPos - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder2 = item->Position.zPos - halfWidth;
 		if (z > zBorder || xb != itemxb || z < zBorder2)
 			return false;
 	}
@@ -133,7 +133,8 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 
 void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
+
 	short angle = item->Position.yRot;
 	int xShift = 0;
 	int zShift = 0;
@@ -148,26 +149,26 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 		//Slide Lara if on top of platform
 		if (LaraItem->Position.yPos < height - 32 || LaraItem->Position.yPos > height + 32)
 			return;
-		if (angle == ANGLE(0))
+		if (angle == 0)
 			zShift = isExpanding ? -16 : 16;
-		else if (angle == ANGLE(180))
+		else if (angle == ANGLE(180.0f))
 			zShift = isExpanding ? 16 : -16;
-		else if (angle == ANGLE(90))
+		else if (angle == ANGLE(90.0f))
 			xShift = isExpanding ? -16 : 16;
-		else if (angle == -ANGLE(90))
+		else if (angle == -ANGLE(90.0f))
 			xShift = isExpanding ? 16 : -16;
 	} 
 	else if (isExpanding && 
 		IsInFrontOfExpandingPlatform(itemNumber, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, LaraCollision.Setup.Radius))
 	{
 		//Push Lara if in front of expanding platform
-		if (angle == ANGLE(0))
+		if (angle == 0)
 			zShift = -LaraCollision.Setup.Radius / 6;
-		else if (angle == ANGLE(180))
+		else if (angle == ANGLE(180.0f))
 			zShift = LaraCollision.Setup.Radius / 6;
-		else if (angle == ANGLE(90))
+		else if (angle == ANGLE(90.0f))
 			xShift = -LaraCollision.Setup.Radius / 6;
-		else if (angle == -ANGLE(90))
+		else if (angle == -ANGLE(90.0f))
 			xShift = LaraCollision.Setup.Radius / 6;
 	}
 
@@ -185,25 +186,22 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 
 void ControlExpandingPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
 		if (!item->ItemFlags[2])
-		{
 			item->ItemFlags[2] = 1;
-		}
 
 		if (item->TriggerFlags < 0)
-		{
 			item->ItemFlags[1] = 1;
-		}
 		else if (item->ItemFlags[1] < 4096)
 		{
 			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
 
 			item->ItemFlags[1] += 64;
 			ShiftLaraOnPlatform(itemNumber, true);
+
 			if (item->TriggerFlags > 0)
 			{
 				if (abs(item->Position.xPos - Camera.pos.x) < 10240 &&
@@ -278,19 +276,19 @@ int ExpandingPlatformCeilingBorder(short itemNumber)
 
 void ExpandingPlatformUpdateMutators(short itemNumber)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	auto bounds = GetBoundsAccurate(item);
-	auto normalizedThickness = item->ItemFlags[1] / 4096.0f;
-	auto width = abs(bounds->Z2 - bounds->Z1) / 2;
-	auto offset = width * normalizedThickness;
+	auto* bounds = GetBoundsAccurate(item);
+	float normalizedThickness = item->ItemFlags[1] / 4096.0f;
+	int width = abs(bounds->Z2 - bounds->Z1) / 2;
+	float offset = width * normalizedThickness;
 
 	// Update bone mutators
 	float zTranslate = 0.0f;
-	if (item->Position.yRot == ANGLE(0))   zTranslate =  width  - offset;
-	if (item->Position.yRot == ANGLE(90))  zTranslate = -offset + width;
-	if (item->Position.yRot == ANGLE(180)) zTranslate = -offset + width;
-	if (item->Position.yRot == ANGLE(270)) zTranslate =  width  - offset;
+	if (item->Position.yRot == 0)   zTranslate =  width  - offset;
+	if (item->Position.yRot == ANGLE(90.0f))  zTranslate = -offset + width;
+	if (item->Position.yRot == ANGLE(180.0f)) zTranslate = -offset + width;
+	if (item->Position.yRot == ANGLE(270.0f)) zTranslate =  width  - offset;
 
 	for (int i = 0; i < item->Mutator.size(); i++)
 	{

@@ -14,7 +14,7 @@ using namespace TEN::Floordata;
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	item->ItemFlags[0] = item->Position.yPos;
 	item->ItemFlags[1] = 1;
@@ -23,25 +23,23 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 
 void TwoBlocksPlatformControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
 		if (item->TriggerFlags)
 		{
 			if (item->Position.yPos > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
-			{
 				item->Position.yPos -= item->TriggerFlags & 0xF;
-			}
 
-			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-			item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			auto probe = GetCollisionResult(item);
 
-			if (roomNumber != item->RoomNumber)
+			item->Floor = probe.Position.Floor;
+
+			if (probe.RoomNumber != item->RoomNumber)
 			{
 				UpdateBridgeItem(itemNumber, true);
-				ItemNewRoom(itemNumber, roomNumber);
+				ItemNewRoom(itemNumber, probe.RoomNumber);
 				UpdateBridgeItem(itemNumber);
 			}
 		}
@@ -55,9 +53,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 				if (LaraItem->Position.yPos <= item->Position.yPos + 32)
 				{
 					if (item->Position.yPos < height)
-					{
 						onObject = true;
-					}
 				}
 			}
 
@@ -69,9 +65,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			if (item->ItemFlags[1] < 0)
 			{
 				if (item->Position.yPos <= item->ItemFlags[0])
-				{
 					item->ItemFlags[1] = 1;
-				}
 				else
 				{
 					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
@@ -81,9 +75,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			else if (item->ItemFlags[1] > 0)
 			{
 				if (item->Position.yPos >= item->ItemFlags[0] + 128)
-				{
 					item->ItemFlags[1] = -1;
-				}
 				else
 				{
 					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
@@ -96,7 +88,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!item->MeshBits)
 		return std::nullopt;
@@ -106,7 +98,7 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!item->MeshBits)
 		return std::nullopt;
