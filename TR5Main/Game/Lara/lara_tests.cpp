@@ -798,10 +798,10 @@ bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle)
 	return !res;
 }
 
-bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
+bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int distance)
 {
-	short angle1 = angle + ANGLE(15.0f);
-	short angle2 = angle - ANGLE(15.0f);
+	short angleLeft = angle - ANGLE(15.0f);
+	short angleRight = angle + ANGLE(15.0f);
 
 	auto start = GAME_VECTOR(
 		item->Position.xPos,
@@ -810,24 +810,23 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist)
 		item->RoomNumber);
 
 	auto end1 = GAME_VECTOR(
-		item->Position.xPos + dist * phd_sin(angle1),
+		item->Position.xPos + distance * phd_sin(angleLeft),
 		item->Position.yPos - STEPUP_HEIGHT,
-		item->Position.zPos + dist * phd_cos(angle1),
+		item->Position.zPos + distance * phd_cos(angleLeft),
 		item->RoomNumber);
 
 	auto end2 = GAME_VECTOR(
-		item->Position.xPos + dist * phd_sin(angle2),
+		item->Position.xPos + distance * phd_sin(angleRight),
 		item->Position.yPos - STEPUP_HEIGHT,
-		item->Position.zPos + dist * phd_cos(angle2),
+		item->Position.zPos + distance * phd_cos(angleRight),
 		item->RoomNumber);
 
 	bool result1 = LOS(&start, &end1);
 	bool result2 = LOS(&start, &end2);
-
 	return (!result1 && !result2);
 }
 
-bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
+bool LaraPositionOnLOS(ITEM_INFO* item, short angle, int distance)
 {
 	auto start1 = GAME_VECTOR(
 		item->Position.xPos,
@@ -842,15 +841,15 @@ bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 		item->RoomNumber);
 	
 	auto end1 = GAME_VECTOR(
-		item->Position.xPos + dist * phd_sin(ang),
+		item->Position.xPos + distance * phd_sin(angle),
 		item->Position.yPos - LARA_HEADROOM,
-		item->Position.zPos + dist * phd_cos(ang),
+		item->Position.zPos + distance * phd_cos(angle),
 		item->RoomNumber);
 
 	auto end2 = GAME_VECTOR(
-		item->Position.xPos + dist * phd_sin(ang),
+		item->Position.xPos + distance * phd_sin(angle),
 		item->Position.yPos - LARA_HEIGHT + LARA_HEADROOM,
-		item->Position.zPos + dist * phd_cos(ang),
+		item->Position.zPos + distance * phd_cos(angle),
 		item->RoomNumber);
 
 	auto result1 = LOS(&start1, &end1);
@@ -859,14 +858,14 @@ bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist)
 	return (!result1 && !result2);
 }
 
-int LaraFloorFront(ITEM_INFO* item, short ang, int dist)
+int LaraFloorFront(ITEM_INFO* item, short angle, int distance)
 {
-	return LaraCollisionFront(item, ang, dist).Position.Floor;
+	return LaraCollisionFront(item, angle, distance).Position.Floor;
 }
 
-COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
+COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short angle, int distance)
 {
-	auto probe = GetCollisionResult(item, ang, dist, -LARA_HEIGHT);
+	auto probe = GetCollisionResult(item, angle, distance, -LARA_HEIGHT);
 
 	if (probe.Position.Floor != NO_HEIGHT)
 		probe.Position.Floor -= item->Position.yPos;
@@ -874,26 +873,26 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist)
 	return probe;
 }
 
-COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h)
+COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height)
 {
-	int x = item->Position.xPos + dist * phd_sin(ang);
-	int y = item->Position.yPos - h;
-	int z = item->Position.zPos + dist * phd_cos(ang);
+	int x = item->Position.xPos + distance * phd_sin(angle);
+	int y = item->Position.yPos - height;
+	int z = item->Position.zPos + distance * phd_cos(angle);
 
 	return GetCollisionResult(x, y, z, GetCollisionResult(item->Position.xPos, y, item->Position.zPos, item->RoomNumber).RoomNumber);
 }
 
-int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h)
+int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height)
 {
-	return LaraCeilingCollisionFront(item, ang, dist, h).Position.Ceiling;
+	return LaraCeilingCollisionFront(item, angle, distance, height).Position.Ceiling;
 }
 
-COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h)
+COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height)
 {
-	auto probe = GetCollisionResult(item, ang, dist, -h);
+	auto probe = GetCollisionResult(item, angle, distance, -height);
 
 	if (probe.Position.Ceiling != NO_HEIGHT)
-		probe.Position.Ceiling += h - item->Position.yPos;
+		probe.Position.Ceiling += height - item->Position.yPos;
 
 	return probe;
 }
@@ -1264,18 +1263,21 @@ bool IsVaultState(LaraState state)
 	return false;
 }
 
-bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side)
+bool TestLaraSplat(ITEM_INFO* item, int distance, int height, int side)
 {
+	float s = phd_sin(item->Position.yRot);
+	float c = phd_cos(item->Position.yRot);
+
 	auto start = GAME_VECTOR(
-		item->Position.xPos + (phd_cos(item->Position.yRot) * side),
+		item->Position.xPos + (side * c),
 		item->Position.yPos + height,
-		item->Position.zPos + (phd_sin(item->Position.yRot) * -side),
+		item->Position.zPos + (-side * s),
 		item->RoomNumber);
 
 	auto end = GAME_VECTOR(
-		item->Position.xPos + (phd_sin(item->Position.yRot) * dist) + (phd_cos(item->Position.yRot) * side),
+		item->Position.xPos + (distance * s) + (side * c),
 		item->Position.yPos + height,
-		item->Position.zPos + (phd_cos(item->Position.yRot) * dist) + (phd_sin(item->Position.yRot) * -side),
+		item->Position.zPos + (distance * c) + (-side * s),
 		item->RoomNumber);
 
 	return !LOS(&start, &end);
@@ -1358,8 +1360,8 @@ bool TestLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->Position.yPos;
-	int dist = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probe = GetCollisionResult(item, testSetup.Angle, dist, -coll->Setup.Height);
+	int distance = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probe = GetCollisionResult(item, testSetup.Angle, distance, -coll->Setup.Height);
 
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
@@ -1557,8 +1559,8 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup)
 {
 	int y = item->Position.yPos;
-	int dist = OFFSET_RADIUS(LARA_RAD_CRAWL);
-	auto probe = GetCollisionResult(item, testSetup.Angle, dist, -LARA_HEIGHT_CRAWL);
+	int distance = OFFSET_RADIUS(LARA_RAD_CRAWL);
+	auto probe = GetCollisionResult(item, testSetup.Angle, distance, -LARA_HEIGHT_CRAWL);
 
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
@@ -1638,28 +1640,13 @@ bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraCrawlMoveTolerance(item, coll, testSetup);
 }
 
-bool TestLaraCrouchToCrawl(ITEM_INFO* item)
-{
-	auto* info = GetLaraInfo(item);
-
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		info->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
-			info->Flare.Life))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = CLICK(3);
-	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -LARA_HEIGHT_CRAWL);
+	int distance = CLICK(3);
+	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
 		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
@@ -1676,11 +1663,26 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraCrouchToCrawl(ITEM_INFO* item)
+{
+	auto* info = GetLaraInfo(item);
+
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		info->Control.HandStatus == HandStatus::Free &&			// Hands are free.
+		(info->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+			info->Flare.Life))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestSetup testSetup)
 {
 	int y = item->Position.yPos - LARA_HEIGHT_MONKEY;
-	int dist = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probe = GetCollisionResult(item, testSetup.Angle, dist);
+	int distance = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probe = GetCollisionResult(item, testSetup.Angle, distance);
 
 	auto start1 = GAME_VECTOR(
 		item->Position.xPos,
@@ -1788,8 +1790,8 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, dist, -coll->Setup.Height);
+	int distance = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && info->WaterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
@@ -1799,7 +1801,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 		return VaultTestResult{ false };
 
 	// HACK: Where the probe finds that the wall in front is formed by a ceiling or the space between the floor and ceiling is a clamp,
-	// any climable floor in a room above will be missed.
+	// any climbable floor in a room above will be missed.
 	// Raise y position of probe point by increments of CLICK(0.5f) to find this potential vault candidate location.
 	int yOffset = testSetup.LowerCeilingBound;
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height...
@@ -1807,7 +1809,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, COLL_INFO* coll, VaultTe
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMax) &&		// OR clamp is too large (future-proofing; not possible right now).
 		yOffset > (testSetup.UpperCeilingBound - coll->Setup.Height))								// Offset is not too high.
 	{
-		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, dist, yOffset);
+		probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, distance, yOffset);
 		yOffset -= std::max<int>(CLICK(0.5f), testSetup.ClampMin);
 	}
 
@@ -1959,8 +1961,8 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, dist, -coll->Setup.Height);
+	int distance = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
 	if (TestValidLedgeAngle(item, coll) &&						// Appropriate angle difference from ladder.
@@ -1980,8 +1982,8 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 	auto* info = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, dist, -coll->Setup.Height);
+	int distance = OFFSET_RADIUS(coll->Setup.Radius);
+	auto probeFront = GetCollisionResult(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
 	if (TestValidLedgeAngle(item, coll) &&
@@ -2398,6 +2400,13 @@ bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	};
 
 	return TestLaraJumpTolerance(item, coll, testSetup);
+}
+
+bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
+
+	return (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT);
 }
 
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)

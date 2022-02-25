@@ -32,17 +32,18 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 
 	if (x != 0)
 	{
-		auto s = phd_sin(angle);
-		auto c = phd_cos(angle);
+		float s = phd_sin(angle);
+		float c = phd_cos(angle);
+
 		item->Position.xPos += round(x * s);
 		item->Position.zPos += round(x * c);
 	}
 
 	if (y != 0)
 	{
+		float s = phd_sin(angle + ANGLE(90.0f));
+		float c = phd_cos(angle + ANGLE(90.0f));
 
-		auto s = phd_sin(angle + ANGLE(90));
-		auto c = phd_cos(angle + ANGLE(90));
 		item->Position.xPos += round(y * s);
 		item->Position.zPos += round(y * c);
 	}
