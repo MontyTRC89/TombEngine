@@ -780,14 +780,14 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
-	// TODO
 	if (TestLaraLand(item, coll))
 	{
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH; //
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
-		else if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
+		// TODO: Landing on edge of crawlspace.
+		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
 			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
@@ -796,7 +796,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else [[likely]]
 		{
-			SetAnimation(item, LA_SWANDIVE_ROLL, 0);
+			SetAnimation(item, LA_SWANDIVE_ROLL);
 			//item->goalAnimState = LS_IDLE;
 		}
 
@@ -819,12 +819,12 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* info = GetLaraInfo(item);
+
 	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = bounds->Y2 - bounds->Y1;
+	int realHeight = (bounds->Y2 - bounds->Y1) * 0.7f;
 
 	info->Control.MoveAngle = item->Position.yRot;
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	coll->Setup.Height = std::max<int>(LARA_HEIGHT_CRAWL, realHeight * 0.7f);
+	coll->Setup.Height = std::max<int>(realHeight, LARA_HEIGHT_CRAWL);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -833,11 +833,14 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (LaraDeflectEdgeJump(item, coll))
 	{
+		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
 		item->Position.xPos = coll->Setup.OldPosition.x;
 		item->Position.yPos = coll->Setup.OldPosition.y;
 		item->Position.zPos = coll->Setup.OldPosition.z;
 		info->Control.HandStatus = HandStatus::Free;
 	}
+
+	// Old crawlspace dive implementation:
 
 	//if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	//{

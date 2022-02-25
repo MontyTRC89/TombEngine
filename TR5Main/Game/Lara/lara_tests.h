@@ -25,14 +25,14 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll);
 CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngle);
 bool TestHangSwingIn(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraHangSideways(ITEM_INFO* item, COLL_INFO* coll, short angle);
-bool LaraPositionOnLOS(ITEM_INFO* item, short ang, int dist);
-bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int dist);
+bool LaraPositionOnLOS(ITEM_INFO* item, short angle, int distance);
+bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int distance);
 
-int LaraFloorFront(ITEM_INFO* item, short ang, int dist);
-int LaraCeilingFront(ITEM_INFO* item, short ang, int dist, int h);
-COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short ang, int dist);
-COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short ang, int dist, int h);
-COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short ang, int dist, int h);
+int LaraFloorFront(ITEM_INFO* item, short angle, int distance);
+int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height);
+COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short angle, int distance);
+COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height);
+COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height);
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll);
@@ -54,7 +54,7 @@ bool IsRunJumpQueueableState(LaraState state);
 bool IsRunJumpCountableState(LaraState state);
 bool IsVaultState(LaraState state);
 
-bool TestLaraSplat(ITEM_INFO* item, int dist, int height, int side = 0);
+bool TestLaraSplat(ITEM_INFO* item, int distance, int height, int side = 0);
 bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraStep(ITEM_INFO* item, COLL_INFO* coll);
@@ -77,8 +77,8 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MoveTestSetup testSetup);
 bool TestLaraCrawlForward(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlBack(ITEM_INFO* item, COLL_INFO* coll);
-bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, COLL_INFO* coll, MonkeyMoveTestSetup testSetup);
 bool TestLaraMonkeyForward(ITEM_INFO* item, COLL_INFO* coll);
@@ -114,6 +114,7 @@ bool TestLaraJumpBack(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpLeft(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll);
+bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll);
 
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset = 0.0f);
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll);
