@@ -2024,7 +2024,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
-				//PrintDebugMessage("GPU: %s", m_adapters[g_Configuration.Adapter].Name.c_str());
+				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
 				PrintDebugMessage("Resolution: %d x %d", ScreenWidth, ScreenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);

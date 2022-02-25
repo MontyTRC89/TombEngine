@@ -288,6 +288,7 @@ void InitDefaultConfiguration()
 	g_Configuration.Height = currentScreenResolution.y;
 	g_Configuration.shadowMapSize = 512;
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
+	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
 }
 
 bool LoadConfiguration()
