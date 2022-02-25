@@ -2634,18 +2634,28 @@ namespace TEN::Renderer
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		GameScriptFog fog = g_GameFlow->GetLevel(CurrentLevel)->Fog;
-		if (fog.Enabled)
+		if (!cameraConstantBuffer.CameraUnderwater)
 		{
-			cameraConstantBuffer.FogColor = Vector4(fog.R / 255.0f, fog.G / 255.0f, fog.B / 255.0f, 1.0f);
-			cameraConstantBuffer.FogMinDistance = fog.MinDistance;
-			cameraConstantBuffer.FogMaxDistance = fog.MaxDistance;
+			if (fog.Enabled)
+			{
+				cameraConstantBuffer.FogColor = Vector4(fog.R / 255.0f, fog.G / 255.0f, fog.B / 255.0f, 1.0f);
+				cameraConstantBuffer.FogMinDistance = fog.MinDistance;
+				cameraConstantBuffer.FogMaxDistance = fog.MaxDistance;
+			}
+			else
+			{
+				cameraConstantBuffer.FogMaxDistance = 0;
+			}
 		}
 		else
 		{
-			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogColor = m_rooms[Camera.pos.roomNumber].AmbientLight;
+			cameraConstantBuffer.FogMinDistance = UNDERWATER_FOG_MIN_DISTANCE;
+			cameraConstantBuffer.FogMaxDistance = UNDERWATER_FOG_MAX_DISTANCE;
 		}
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
+		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
 
 		// Draw the horizon and the sky
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
