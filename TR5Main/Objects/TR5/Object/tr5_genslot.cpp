@@ -33,7 +33,7 @@ void GenSlot1Control(short itemNumber)
 				pos.y = -350;
 				pos.z = 0;
 
-				GetJointAbsPosition(item, &pos, i + 1);
+				GetJointAbsPosition(item,&pos, i + 1);
 
 				if (pos.x > DeadlyBounds[0]
 					&& pos.x < DeadlyBounds[1]
