@@ -320,6 +320,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	auto* info = GetLaraInfo(item);
 
 	info->ProjectedFloorHeight = vaultResult.Height;
+	info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
 	info->Control.TurnRate = 0;
 
