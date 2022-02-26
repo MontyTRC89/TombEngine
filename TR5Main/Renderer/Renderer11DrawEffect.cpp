@@ -981,22 +981,13 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
-	{
-		SetBlendMode(info->blendMode);
-
-		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
-
+	{	
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
 		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
 
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1007,7 +998,15 @@ namespace TEN::Renderer
 		m_stSprite.color = Vector4::One;
 		m_stSprite.isBillboard = false;
 		m_cbSprite.updateData(m_stSprite, m_context.Get());
-		m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
+		SetBlendMode(info->blendMode);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
 		m_context->Draw(m_transparentFacesVertices.size(), 0);
 
 		m_numDrawCalls++;
