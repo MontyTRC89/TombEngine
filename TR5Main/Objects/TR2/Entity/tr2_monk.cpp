@@ -6,11 +6,12 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO monkBite = { -23,16,265, 14 };
+BITE_INFO MonkBite = { -23,16,265, 14 };
 
 extern bool MonksAttackLara;
 
@@ -19,15 +20,12 @@ void MonkControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item, *enemy;
-	CREATURE_INFO* monk;
-	short angle, torso, tilt;
-	AI_INFO info;
-	int random;
+	auto* item = &g_Level.Items[itemNum];
+	auto* info = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	monk = (CREATURE_INFO*)item->Data;
-	torso = angle = tilt = 0;
+	short torso = 0;
+	short angle = 0;
+	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -41,76 +39,60 @@ void MonkControl(short itemNum)
 	else
 	{
 		if (MonksAttackLara)
-			monk->enemy = LaraItem;
+			info->enemy = LaraItem;
 
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		if (!MonksAttackLara && monk->enemy == LaraItem)
-			monk->enemy = NULL;
+		if (!MonksAttackLara && info->enemy == LaraItem)
+			info->enemy = NULL;
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, monk->maximumTurn);
+		GetCreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &AIInfo, VIOLENT);
+		angle = CreatureTurn(item, info->maximumTurn);
 
-		if (info.ahead)
-			torso = info.angle;
+		if (AIInfo.ahead)
+			torso = AIInfo.angle;
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			monk->flags &= 0x0FFF;
+			info->flags &= 0x0FFF;
 
-			if (!MonksAttackLara && info.ahead && Lara.target == item)
-			{
+			if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
 				break;
-			}
-			else if (monk->mood == BORED_MOOD)
-			{
+			else if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			}
-			else if (monk->mood == ESCAPE_MOOD)
-			{
+			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x7000)
 					item->TargetState = 4;
 				else
 					item->TargetState = 11;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-			{
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 7;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-			{
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 2;
-			}
 			else
-			{
 				item->TargetState = 3;
-			}
+			
 			break;
 
 		case 11:
-			monk->flags &= 0x0FFF;
+			info->flags &= 0x0FFF;
 
-			if (!MonksAttackLara && info.ahead && Lara.target == item)
-			{
+			if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
 				break;
-			}
-			else if (monk->mood == BORED_MOOD)
-			{
+			else if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			}
-			else if (monk->mood == ESCAPE_MOOD)
-			{
+			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 			{
-				random = GetRandomControl();
+				auto random = GetRandomControl();
 				if (random < 0x3000)
 					item->TargetState = 5;
 				else if (random < 0x6000)
@@ -118,22 +100,19 @@ void MonkControl(short itemNum)
 				else
 					item->TargetState = 1;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-			{
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 2;
-			}
 			else
-			{
 				item->TargetState = 3;
-			}
+			
 			break;
 
 		case 2:
-			monk->maximumTurn = ANGLE(3);
+			info->maximumTurn = ANGLE(3.0f);
 
-			if (monk->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 			{
-				if (!MonksAttackLara && info.ahead && Lara.target == item)
+				if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
 				{
 					if (GetRandomControl() < 0x4000)
 						item->TargetState = 1;
@@ -141,65 +120,58 @@ void MonkControl(short itemNum)
 						item->TargetState = 11;
 				}
 			}
-			else if (monk->mood == ESCAPE_MOOD)
-			{
+			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
 				else
 					item->TargetState = 11;
 			}
-			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-			{
+			else if (!AIInfo.ahead || AIInfo.distance > pow(SECTOR(2), 2))
 				item->TargetState = 3;
-			}
+			
 			break;
 
 		case 3:
-			monk->flags &= 0x0FFF;
-			monk->maximumTurn = ANGLE(4);
+			info->flags &= 0x0FFF;
+			info->maximumTurn = ANGLE(4.0f);
 
 			if (MonksAttackLara)
-				monk->maximumTurn += ANGLE(1);
+				info->maximumTurn += ANGLE(1.0f);
 
 			tilt = angle / 4;
 
-			if (monk->mood == BORED_MOOD)
-			{
+			if (info->mood == BORED_MOOD)
 				item->TargetState = 1;
-			}
-			else if (monk->mood == ESCAPE_MOOD)
-			{
+			else if (info->mood == ESCAPE_MOOD)
 				break;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
 				else
 					item->TargetState = 11;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 3))
-			{
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(3), 2))
 				item->TargetState = 10;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
 				else
 					item->TargetState = 11;
 			}
+
 			break;
 
 		case 8:
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE / 2))
+			if (!AIInfo.ahead || AIInfo.distance > pow(SECTOR(0.5f), 2))
 				item->TargetState = 11;
 			else
 				item->TargetState = 6;
+
 			break;
 
 		case 4:
@@ -207,35 +179,36 @@ void MonkControl(short itemNum)
 		case 6:
 		case 7:
 		case 10:
-			enemy = monk->enemy;
+			auto* enemy = info->enemy;
 			if (enemy == LaraItem)
 			{
-				if (!(monk->flags & 0xF000) && (item->TouchBits & 0x4000))
+				if (!(info->flags & 0xF000) && item->TouchBits & 0x4000)
 				{
-					LaraItem->HitPoints -= 150;
-					LaraItem->HitStatus = true;
-
-					monk->flags |= 0x1000;
+					info->flags |= 0x1000;
 					SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
-					CreatureEffect(item, &monkBite, DoBloodSplat);
+					CreatureEffect(item, &MonkBite, DoBloodSplat);
+
+					enemy->HitPoints -= 150;
+					enemy->HitStatus = true;
 				}
 			}
 			else
 			{
-				if (!(monk->flags & 0xf000) && enemy)
+				if (!(info->flags & 0xf000) && enemy)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < (STEP_SIZE * 2) &&
-						abs(enemy->Position.yPos - item->Position.yPos) < (STEP_SIZE * 2) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < (STEP_SIZE * 2))
+					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(2) &&
+						abs(enemy->Position.yPos - item->Position.yPos) < CLICK(2) &&
+						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(2))
 					{
+						info->flags |= 0x1000;
+						SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
+
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = true;
-
-						monk->flags |= 0x1000;
-						SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
 					}
 				}
 			}
+
 			break;
 		}
 	}

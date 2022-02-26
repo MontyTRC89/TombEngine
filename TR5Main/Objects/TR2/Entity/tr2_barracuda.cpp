@@ -6,18 +6,20 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO barracudaBite = { 2, -60, 121, 7 };
+BITE_INFO BarracudaBite = { 2, -60, 121, 7 };
 
-void BarracudaControl(short itemNum)
+void BarracudaControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
+
 	short angle = 0;
 	short head = 0;
 
@@ -30,77 +32,81 @@ void BarracudaControl(short itemNum)
 			item->ActiveState = 6;
 		}
 
-		CreatureFloat(itemNum);
+		CreatureFloat(itemNumber);
 		return;
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AIInfo, TIMID);
+		CreatureMood(item, &AIInfo, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->flags = 0;
+			info->flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (info.ahead && info.distance < 680)
+			else if (AIInfo.ahead && AIInfo.distance < 680)
 				item->TargetState = 4;
-			else if (creature->mood == STALK_MOOD)
+			else if (info->mood == STALK_MOOD)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
+
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(2);
+			info->maximumTurn = ANGLE(2.0f);
 
-			if (creature->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 				break;
-			else if (info.ahead && (item->TouchBits & 0xE0))
+			else if (AIInfo.ahead && (item->TouchBits & 0xE0))
 				item->TargetState = 1;
-			else if (creature->mood != STALK_MOOD)
+			else if (info->mood != STALK_MOOD)
 				item->TargetState = 3;
+
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(4);
-			creature->flags = 0;
+			info->maximumTurn = ANGLE(4.0f);
+			info->flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (info.ahead && info.distance < 340)
+			else if (AIInfo.ahead && AIInfo.distance < 340)
 				item->TargetState = 5;
-			else if (info.ahead && info.distance < 680)
+			else if (AIInfo.ahead && AIInfo.distance < 680)
 				item->TargetState = 1;
-			else if (creature->mood == STALK_MOOD)
+			else if (info->mood == STALK_MOOD)
 				item->TargetState = 2;
+
 			break;
 
 		case 4:
 		case 5:
-			if (info.ahead)
-				head = info.angle;
+			if (AIInfo.ahead)
+				head = AIInfo.angle;
 
-			if (!creature->flags && (item->TouchBits & 0xE0))
+			if (!info->flags && (item->TouchBits & 0xE0))
 			{
+				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
+				info->flags = 1;
+
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;
-				CreatureEffect(item, &barracudaBite, DoBloodSplat);
-
-				creature->flags = 1;
 			}
+
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNum, angle, 0);
-	CreatureUnderwater(item, STEP_SIZE);
+	CreatureAnimation(itemNumber, angle, 0);
+	CreatureUnderwater(item, CLICK(1));
 }

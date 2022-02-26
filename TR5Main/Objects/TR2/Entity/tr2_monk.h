@@ -1,3 +1,3 @@
 #pragma once
 
-void MonkControl(short itemNum);
+void MonkControl(short itemNumber);
