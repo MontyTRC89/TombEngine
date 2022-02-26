@@ -114,8 +114,6 @@ void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
-	
 	// Disable smooth angle adjustment for now.
 	//if (info->Control.ApproachTargetAngle)
 	//	ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);

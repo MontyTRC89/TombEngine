@@ -2113,6 +2113,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 	auto vaultResult = TestLaraLadderAutoJump(item, coll);
 	if (vaultResult.Success)
 	{
+		// TODO: Somehow harmonise CalculatedJumpVelocity to work for both ledge and ladder auto jumps, because otherwise there will be a need for an odd workaround in the future.
 		info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult.Height - item->Position.yPos + CLICK(0.2f)), -CLICK(7.1f)));
 		item->AnimNumber = LA_STAND_SOLID;
 		item->FrameNumber = GetFrameNumber(item, 0);
