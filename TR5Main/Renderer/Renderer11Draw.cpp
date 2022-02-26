@@ -2110,27 +2110,16 @@ namespace TEN::Renderer
 		              }
 		);
 
-		
-
-		for (auto& room : view.roomsToDraw)
-		{
-			for (auto& transparentFace : room->TransparentFacesToDraw)
-			{
-
-			}
-		}
-
 		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
 		{
 			RendererRoom& room = *view.roomsToDraw[r];
 
 			int size = room.TransparentFacesToDraw.size();
 			int currentBlendMode = -1;
-			int altas = -1;
+			int texture = -1;
 			int lastType = 0;
 
 			std::vector<RendererVertex> vertices;
-			//vertices.reserve(50000);
 
 			m_transparentFacesVertices.clear();
 			m_transparentFacesIndices.clear();
@@ -3197,7 +3186,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (false && DoesBlendModeRequireSorting(bucket.BlendMode))
+					if (DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
 						for (int j = 0; j < bucket.Polygons.size(); j++)
