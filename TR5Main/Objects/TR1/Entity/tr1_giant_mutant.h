@@ -1,3 +1,3 @@
 #pragma once
 
-void AbortionControl(short itemNumber);
+void GiantMutantControl(short itemNumber);

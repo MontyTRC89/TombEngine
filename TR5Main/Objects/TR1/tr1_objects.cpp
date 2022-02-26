@@ -123,7 +123,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = AbortionControl;
+		obj->control = GiantMutantControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->HitPoints = 500;
 		obj->hitEffect = HIT_BLOOD;

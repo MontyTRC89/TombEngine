@@ -205,18 +205,14 @@ void AlertNearbyGuards(ITEM_INFO* item)
 
 void AlertAllGuards(short itemNumber) 
 {
-	ITEM_INFO* target;
-	CREATURE_INFO* creature;
-	short objNumber;
-
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
-		creature = ActiveCreatures[i];
+		auto* creature = ActiveCreatures[i];
 		if (creature->itemNum == NO_ITEM)
 			continue;
 
-		target = &g_Level.Items[creature->itemNum];
-		objNumber = g_Level.Items[itemNumber].ObjectNumber;
+		auto* target = &g_Level.Items[creature->itemNum];
+		short objNumber = g_Level.Items[itemNumber].ObjectNumber;
 		if (objNumber == target->ObjectNumber)
 		{
 			if (target->Status == ITEM_ACTIVE)
@@ -1112,7 +1108,7 @@ CREATURE_AI_PRIORITY GetCreatureLOTPriority(ITEM_INFO* item) {
 #endif
 int CreatureActive(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (!Objects[item->ObjectNumber].intelligent)
 		return false; // Object is not a creature

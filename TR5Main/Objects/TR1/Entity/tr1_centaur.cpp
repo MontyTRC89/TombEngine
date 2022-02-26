@@ -10,65 +10,72 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-
-enum CentaurAnims
-{ 
-	CENTAUR_EMPTY, 
-	CENTAUR_STOP, 
-	CENTAUR_SHOOT, 
-	CENTAUR_RUN, 
-	CENTAUR_AIM, 
-	CENTAUR_DEATH, 
-	CENTAUR_WARNING};
 
 BITE_INFO CentaurRocket = { 11, 415, 41, 13 };
 BITE_INFO CentaurRear = { 50, 30, 0, 5 };
 
 #define BOMB_SPEED 256
 #define CENTAUR_TOUCH 0x30199
-#define CENTAUR_DIE_ANIM 8
 #define CENTAUR_TURN ANGLE(4.0f)
 #define CENTAUR_REAR_CHANCE 0x60
-#define CENTAUR_REAR_RANGE pow(SECTOR(3) / 2, 2)
-#define FLYER_PART_DAMAGE 100
+#define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
+
+#define FLYER_PART_DAMAGE   100
 #define CENTAUR_REAR_DAMAGE 200
+
+enum CentaurState
+{
+	CENTAUR_STATE_NONE = 0,
+	CENTAUR_STATE_IDLE = 1,
+	CENTAUR_STATE_SHOOT = 2,
+	CENTAUR_STATE_RUN = 3,
+	CENTAUR_STATE_AIM = 4,
+	CENTAUR_STATE_DEATH = 5,
+	CENTAUR_STATE_WARNING = 6
+};
+
+// TODO
+enum CentaurAnim
+{
+	CENTAUR_ANIM_DEATH = 8,
+};
 
 void ControlCentaurBomb(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int oldX = item->Position.xPos;
-	int oldY = item->Position.yPos;
-	int oldZ = item->Position.zPos;
-
 	bool aboveWater = false;
+	PHD_VECTOR oldPos = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
 
 	item->Position.zRot += ANGLE(35.0f);
-	if (!(g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER))
+	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
 		item->Position.xRot -= ANGLE(1.0f);
-		if (item->Position.xRot < -16384)
-			item->Position.xRot = -16384;
+		if (item->Position.xRot < -ANGLE(90.0f))
+			item->Position.xRot = -ANGLE(90.0f);
 
-		item->VerticalVelocity = -BOMB_SPEED * phd_sin(item->Position.xRot);
-		item->Velocity = BOMB_SPEED * phd_cos(item->Position.xRot);
 		aboveWater = true;
+		item->Velocity = BOMB_SPEED * phd_cos(item->Position.xRot);
+		item->VerticalVelocity = -BOMB_SPEED * phd_sin(item->Position.xRot);
 	}
 	else
 	{
 		aboveWater = true;
 		item->VerticalVelocity += 3;
+
 		if (item->Velocity)
 		{
-			item->Position.zRot += (((item->Velocity / 4) + 7) * ANGLE(1));
+			item->Position.zRot += ((item->Velocity / 4) + 7) * ANGLE(1.0f);
+
 			if (item->RequiredState)
-				item->Position.yRot += (((item->Velocity / 2) + 7) * ANGLE(1));
+				item->Position.yRot += ((item->Velocity / 2) + 7) * ANGLE(1.0f);
 			else
-				item->Position.xRot += (((item->Velocity / 2) + 7) * ANGLE(1));
+				item->Position.xRot += ((item->Velocity / 2) + 7) * ANGLE(1.0f);
 
 		}
 	}
@@ -82,9 +89,9 @@ void ControlCentaurBomb(short itemNumber)
 	if (probe.Position.Floor < item->Position.yPos ||
 		probe.Position.Ceiling > item->Position.yPos)
 	{
-		item->Position.xPos = oldX;
-		item->Position.yPos = oldY;
-		item->Position.zPos = oldZ;
+		item->Position.xPos = oldPos.x;
+		item->Position.yPos = oldPos.y;
+		item->Position.zPos = oldPos.z;
 
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 			TriggerUnderwaterExplosion(item, 0);
@@ -93,9 +100,9 @@ void ControlCentaurBomb(short itemNumber)
 			item->Position.yPos -= CLICK(0.5f);
 			TriggerShockwave(&item->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 			for (int x = 0; x < 2; x++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		return;
@@ -107,15 +114,10 @@ void ControlCentaurBomb(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
 		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 
-	int n = 0;
-	bool foundCollidedObjects = false;
-
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 0);
 
 	if (!CollidedItems[0] && !CollidedMeshes[0])
 		return;
-
-	foundCollidedObjects = true;
 
 	if (CollidedItems[0])
 	{
@@ -124,10 +126,14 @@ void ControlCentaurBomb(short itemNumber)
 		int k = 0;
 		do
 		{
-			auto* currentObj = &Objects[currentItem->ObjectNumber];
+			auto* currentObject = &Objects[currentItem->ObjectNumber];
 
-			if (currentObj->intelligent && currentObj->collision && currentItem->Status == ITEM_ACTIVE && !currentObj->undead)
+			if (currentItem->Status == ITEM_ACTIVE &&
+				currentObject->intelligent && !currentObject->undead &&
+				currentObject->collision)
+			{
 				DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, WEAPON_CROSSBOW);
+			}
 
 			k++;
 			currentItem = CollidedItems[k];
@@ -136,42 +142,43 @@ void ControlCentaurBomb(short itemNumber)
 	}
 }
 
-static void RocketGun(ITEM_INFO* v)
+static void RocketGun(ITEM_INFO* centaurItem)
 {
-	short itemNum;
-	itemNum = CreateItem();
-	if (itemNum != NO_ITEM)
-	{
-		auto* item = &g_Level.Items[itemNum];
+	short itemNumber;
+	itemNumber = CreateItem();
 
-		item->ObjectNumber = ID_PROJ_BOMB;
-		item->Shade = 16 * 256;
-		item->RoomNumber = v->RoomNumber;
+	if (itemNumber != NO_ITEM)
+	{
+		auto* projectileItem = &g_Level.Items[itemNumber];
+
+		projectileItem->ObjectNumber = ID_PROJ_BOMB;
+		projectileItem->Shade = 16 * 256;
+		projectileItem->RoomNumber = centaurItem->RoomNumber;
 
 		PHD_VECTOR pos = { 11, 415, 41 };
-		GetJointAbsPosition(v, &pos, 13);
+		GetJointAbsPosition(centaurItem, &pos, 13);
 
-		item->Position.xPos = pos.x;
-		item->Position.yPos = pos.y;
-		item->Position.zPos = pos.z;
-		InitialiseItem(itemNum);
+		projectileItem->Position.xPos = pos.x;
+		projectileItem->Position.yPos = pos.y;
+		projectileItem->Position.zPos = pos.z;
+		InitialiseItem(itemNumber);
 
-		item->Position.xRot = 0;
-		item->Position.yRot = v->Position.yRot;
-		item->Position.zRot = 0;
+		projectileItem->Position.xRot = 0;
+		projectileItem->Position.yRot = centaurItem->Position.yRot;
+		projectileItem->Position.zRot = 0;
 
-		item->VerticalVelocity = -BOMB_SPEED * phd_cos(item->Position.xRot);
-		item->Velocity = BOMB_SPEED *phd_cos(item->Position.xRot);
-		item->ItemFlags[0] = 1;
+		projectileItem->Velocity = BOMB_SPEED * phd_cos(projectileItem->Position.xRot);
+		projectileItem->VerticalVelocity = -BOMB_SPEED * phd_cos(projectileItem->Position.xRot);
+		projectileItem->ItemFlags[0] = 1;
 
-		AddActiveItem(itemNum);
+		AddActiveItem(itemNumber);
 	}
 }
 
 void CentaurControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* creatureInfo = (CREATURE_INFO*)item->Data;
+	auto* info = GetCreatureInfo(item);
 
 	if (!CreatureActive(itemNumber))
 		return;
@@ -181,87 +188,86 @@ void CentaurControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != CENTAUR_DEATH)
+		if (item->ActiveState != CENTAUR_STATE_DEATH)
 		{
-			item->AnimNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_DIE_ANIM;
+			item->AnimNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_ANIM_DEATH;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CENTAUR_DEATH;
+			item->ActiveState = CENTAUR_STATE_DEATH;
 		}
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		if (info.ahead)
-			head = info.angle;
+		if (AIInfo.ahead)
+			head = AIInfo.angle;
 
-		CreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &AIInfo, VIOLENT);
 
 		angle = CreatureTurn(item, CENTAUR_TURN);
 
 		switch (item->ActiveState)
 		{
-		case CENTAUR_STOP:
+		case CENTAUR_STATE_IDLE:
 			CreatureJoint(item, 17, 0);
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info.bite && info.distance < CENTAUR_REAR_RANGE)
-				item->TargetState = CENTAUR_RUN;
-			else if (Targetable(item, &info))
-				item->TargetState = CENTAUR_AIM;
+			else if (AIInfo.bite && AIInfo.distance < CENTAUR_REAR_RANGE)
+				item->TargetState = CENTAUR_STATE_RUN;
+			else if (Targetable(item, &AIInfo))
+				item->TargetState = CENTAUR_STATE_AIM;
 			else
-				item->TargetState = CENTAUR_RUN;
+				item->TargetState = CENTAUR_STATE_RUN;
 
 			break;
 
-		case CENTAUR_RUN:
-			if (info.bite && info.distance < CENTAUR_REAR_RANGE)
+		case CENTAUR_STATE_RUN:
+			if (AIInfo.bite && AIInfo.distance < CENTAUR_REAR_RANGE)
 			{
-				item->RequiredState = CENTAUR_WARNING;
-				item->TargetState = CENTAUR_STOP;
+				item->RequiredState = CENTAUR_STATE_WARNING;
+				item->TargetState = CENTAUR_STATE_IDLE;
 			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item, &AIInfo))
 			{
-				item->RequiredState = CENTAUR_AIM;
-				item->TargetState = CENTAUR_STOP;
+				item->RequiredState = CENTAUR_STATE_AIM;
+				item->TargetState = CENTAUR_STATE_IDLE;
 			}
 			else if (GetRandomControl() < CENTAUR_REAR_CHANCE)
 			{
-				item->RequiredState = CENTAUR_WARNING;
-				item->TargetState = CENTAUR_STOP;
+				item->RequiredState = CENTAUR_STATE_WARNING;
+				item->TargetState = CENTAUR_STATE_IDLE;
 			}
 
 			break;
 
-		case CENTAUR_AIM:
+		case CENTAUR_STATE_AIM:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (Targetable(item, &info))
-				item->TargetState = CENTAUR_SHOOT;
+			else if (Targetable(item, &AIInfo))
+				item->TargetState = CENTAUR_STATE_SHOOT;
 			else
-				item->TargetState = CENTAUR_STOP;
+				item->TargetState = CENTAUR_STATE_IDLE;
 
 			break;
 
-		case CENTAUR_SHOOT:
+		case CENTAUR_STATE_SHOOT:
 			if (!item->RequiredState)
 			{
-				item->RequiredState = CENTAUR_AIM;
+				item->RequiredState = CENTAUR_STATE_AIM;
 				RocketGun(item);
 			}
 
 			break;
 
-		case CENTAUR_WARNING:
+		case CENTAUR_STATE_WARNING:
 			if (!item->RequiredState && item->TouchBits & CENTAUR_TOUCH)
 			{
 				CreatureEffect(item, &CentaurRear, DoBloodSplat);
+				item->RequiredState = CENTAUR_STATE_IDLE;
 
 				LaraItem->HitPoints -= CENTAUR_REAR_DAMAGE;
 				LaraItem->HitStatus = 1;
-
-				item->RequiredState = CENTAUR_STOP;
 			}
 
 			break;
