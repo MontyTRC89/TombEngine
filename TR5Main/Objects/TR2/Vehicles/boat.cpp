@@ -16,6 +16,39 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+#define BOAT_UNDO_TURN		ANGLE(0.25f)
+#define BOAT_TURN			(ANGLE(0.25f) / 2)
+#define BOAT_MAX_TURN		ANGLE(4.0f)
+#define BOAT_MAX_VELOCITY	110
+#define BOAT_SLOW_SPEED		(BOAT_MAX_VELOCITY / 3)
+#define BOAT_FAST_SPEED		(BOAT_MAX_VELOCITY + 75)
+#define BOAT_MIN_SPEED		20
+#define BOAT_ACCELERATION	5
+#define BOAT_BRAKE			5
+#define BOAT_SLOWDOWN		1
+#define BOAT_REVERSE		-2	// -5
+#define BOAT_MAX_BACK		-20
+#define BOAT_MAX_KICK		-80
+#define BOAT_SLIP			10
+#define BOAT_SIDE_SLIP		30
+#define BOAT_FRONT			750
+#define BOAT_SIDE			300
+#define BOAT_RADIUS			500
+#define BOAT_SNOW			500
+#define BOAT_MAX_HEIGHT		CLICK(1)
+#define DISMOUNT_DIST		SECTOR(1)
+#define BOAT_WAKE			700
+#define BOAT_SOUND_CEILING	SECTOR(5)
+#define BOAT_TIP			(BOAT_FRONT + 250)
+
+#define	SBOAT_IN_ACCELERATE	IN_FORWARD
+#define	SBOAT_IN_REVERSE	IN_BACK
+#define	SBOAT_IN_LEFT		(IN_LEFT | IN_LSTEP)
+#define	SBOAT_IN_RIGHT		(IN_RIGHT | IN_RSTEP)
+#define	SBOAT_IN_SPEED		(IN_ACTION | IN_SPRINT)
+#define SBOAT_IN_SLOW		IN_WALK
+#define	SBOAT_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
+
 enum SpeedBoatState
 {
 	SBOAT_STATE_MOUNT,
@@ -50,39 +83,6 @@ enum SpeedBoatAnim
 	SBOAT_ANIM_LEAP_END = 17,
 	SBOAT_ANIM_DEATH = 18
 };
-
-#define BOAT_UNDO_TURN		ANGLE(0.25f)
-#define BOAT_TURN			(ANGLE(0.25f) / 2)
-#define BOAT_MAX_TURN		ANGLE(4.0f)
-#define BOAT_MAX_VELOCITY	110
-#define BOAT_SLOW_SPEED		(BOAT_MAX_VELOCITY / 3)
-#define BOAT_FAST_SPEED		(BOAT_MAX_VELOCITY + 75)
-#define BOAT_MIN_SPEED		20
-#define BOAT_ACCELERATION	5
-#define BOAT_BRAKE			5
-#define BOAT_SLOWDOWN		1
-#define BOAT_REVERSE		-2	// -5
-#define BOAT_MAX_BACK		-20
-#define BOAT_MAX_KICK		-80
-#define BOAT_SLIP			10
-#define BOAT_SIDE_SLIP		30
-#define BOAT_FRONT			750
-#define BOAT_SIDE			300
-#define BOAT_RADIUS			500
-#define BOAT_SNOW			500
-#define BOAT_MAX_HEIGHT		CLICK(1)
-#define DISMOUNT_DIST		SECTOR(1)
-#define BOAT_WAKE			700
-#define BOAT_SOUND_CEILING	SECTOR(5)
-#define BOAT_TIP			(BOAT_FRONT + 250)
-
-#define	SBOAT_IN_ACCELERATE	IN_FORWARD
-#define	SBOAT_IN_REVERSE	IN_BACK
-#define	SBOAT_IN_LEFT		(IN_LEFT | IN_LSTEP)
-#define	SBOAT_IN_RIGHT		(IN_RIGHT | IN_RSTEP)
-#define	SBOAT_IN_SPEED		(IN_ACTION | IN_SPRINT)
-#define SBOAT_IN_SLOW		IN_WALK
-#define	SBOAT_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
 
 void InitialiseSpeedBoat(short itemNumber)
 {
