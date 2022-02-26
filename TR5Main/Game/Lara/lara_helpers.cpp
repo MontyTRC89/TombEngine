@@ -231,7 +231,7 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
 	if (item->ObjectNumber != ID_LARA)
 	{
-		TENLog(std::string("Attempted to fetch LaraInfo data from item with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 		
 		auto* firstLaraItem = FindItem(ID_LARA);
 		return (LaraInfo*&)firstLaraItem->Data;
