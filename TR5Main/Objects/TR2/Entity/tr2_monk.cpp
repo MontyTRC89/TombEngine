@@ -11,16 +11,28 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO MonkBite = { -23,16,265, 14 };
-
 extern bool MonksAttackLara;
 
-void MonkControl(short itemNum)
+BITE_INFO MonkBite = { -23,16,265, 14 };
+
+// TODO
+enum MonkState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum MonkAnim
+{
+
+};
+
+void MonkControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 	auto* info = GetCreatureInfo(item);
 
 	short torso = 0;
@@ -215,5 +227,5 @@ void MonkControl(short itemNum)
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, torso);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

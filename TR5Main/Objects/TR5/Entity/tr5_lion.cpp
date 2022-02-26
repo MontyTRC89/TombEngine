@@ -8,6 +8,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
@@ -30,18 +31,19 @@ void LionControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short joint0 = 0;
 	short angle = 0;
 	short tilt = 0;
+	short joint0 = 0;
 	short joint1 = 0;
 
 	if (CreatureActive(itemNumber))
 	{
-		auto* creature = (CREATURE_INFO*)item->Data;
+		auto* creature = GetCreatureInfo(item);
 
 		if (item->HitPoints <= 0)
 		{
 			item->HitPoints = 0;
+
 			if (item->ActiveState != 5)
 			{
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
@@ -51,14 +53,14 @@ void LionControl(short itemNumber)
 		}
 		else
 		{
-			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			AI_INFO aiInfo;
+			CreatureAIInfo(item, &aiInfo);
 
-			if (info.ahead)
-				joint1 = info.angle;
+			if (aiInfo.ahead)
+				joint1 = aiInfo.angle;
 
-			GetCreatureMood(item, &info, VIOLENT);
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &aiInfo, VIOLENT);
+			CreatureMood(item, &aiInfo, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 			joint0 = -16 * angle;
@@ -81,7 +83,7 @@ void LionControl(short itemNumber)
 					break;
 				}
 
-				if (info.ahead)
+				if (aiInfo.ahead)
 				{
 					if (item->TouchBits & 0x200048)
 					{
@@ -89,7 +91,7 @@ void LionControl(short itemNumber)
 						break;
 					}
 
-					if (info.distance < pow(SECTOR(1), 2))
+					if (aiInfo.distance < pow(SECTOR(1), 2))
 					{
 						item->TargetState = 4;
 						break;
@@ -121,9 +123,9 @@ void LionControl(short itemNumber)
 
 				if (creature->mood)
 				{
-					if (info.ahead && info.distance < pow(SECTOR(1), 2))
+					if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 						item->TargetState = 1;
-					else if (item->TouchBits & 0x200048 && info.ahead)
+					else if (item->TouchBits & 0x200048 && aiInfo.ahead)
 						item->TargetState = 1;
 					else if (creature->mood != ESCAPE_MOOD)
 					{
@@ -142,22 +144,24 @@ void LionControl(short itemNumber)
 			case 4:
 				if (!item->RequiredState && item->TouchBits & 0x200048)
 				{
-					LaraItem->HitPoints -= 200;
-					LaraItem->HitStatus = true;
 					CreatureEffect2(item, &LionBite1, 10, item->Position.yRot, DoBloodSplat);
 					item->RequiredState = 1;
+
+					LaraItem->HitPoints -= 200;
+					LaraItem->HitStatus = true;
 				}
 
 				break;
 			case 7:
-				creature->maximumTurn = ANGLE(1);
+				creature->maximumTurn = ANGLE(1.0f);
 
 				if (!item->RequiredState && item->TouchBits & 0x200048)
 				{
 					CreatureEffect2(item, &LionBite2, 10, item->Position.yRot, DoBloodSplat);
+					item->RequiredState = 1;
+
 					LaraItem->HitPoints -= 60;
 					LaraItem->HitStatus = true;
-					item->RequiredState = 1;
 				}
 
 				break;

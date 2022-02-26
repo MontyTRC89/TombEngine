@@ -18,7 +18,7 @@
 
 namespace TEN::Entities::TR4
 {
-	enum SAS_STATES
+	enum SASState
 	{
 		STATE_SAS_EMPTY,
 		STATE_SAS_STOP,
@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 		STATE_SAS_BLIND
 	};
 
-	enum SAS_ANIM
+	enum SASAnim
 	{
 		ANIMATION_SAS_WALK,
 		ANIMATION_SAS_RUN,

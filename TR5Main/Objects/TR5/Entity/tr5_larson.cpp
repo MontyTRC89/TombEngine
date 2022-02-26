@@ -11,18 +11,18 @@
 #include "Game/control/control.h"
 #include "Game/animation.h"
 
-#define STATE_TR5_LARSON_STOP		1
-#define STATE_TR5_LARSON_WALK		2
-#define STATE_TR5_LARSON_RUN		3
-#define STATE_TR5_LARSON_AIM		4
-#define STATE_TR5_LARSON_DIE		5
-#define STATE_TR5_LARSON_IDLE		6
-#define STATE_TR5_LARSON_ATTACK		7
+#define STATE_TR5_LARSON_STOP	1
+#define STATE_TR5_LARSON_WALK	2
+#define STATE_TR5_LARSON_RUN	3
+#define STATE_TR5_LARSON_AIM	4
+#define STATE_TR5_LARSON_DIE	5
+#define STATE_TR5_LARSON_IDLE	6
+#define STATE_TR5_LARSON_ATTACK	7
 
-#define ANIMATION_TR5_PIERRE_DIE	12
-#define ANIMATION_TR5_LARSON_DIE	15
+#define ANIMATION_TR5_PIERRE_DIE 12
+#define ANIMATION_TR5_LARSON_DIE 15
 
-#define TR5_LARSON_MIN_HP			40
+#define TR5_LARSON_MIN_HP 40
 
 BITE_INFO LarsonGun = { -55, 200, 5, 14 };
 BITE_INFO PierreGun1 = { 60, 200, 0, 11 };
@@ -45,11 +45,11 @@ void InitialiseLarson(short itemNum)
 	item->ItemFlags[3] = item->TriggerFlags;
 	short rotY = item->Position.yRot;
 
-	if (rotY > 4096 && rotY < 28672)
+	if (rotY > ANGLE(22.5f) && rotY < 28672)
 	{
 		item->Position.xPos += STEPUP_HEIGHT;
 	}
-	else if (rotY < -4096 && rotY > -28672)
+	else if (rotY < -ANGLE(22.5f) && rotY > -28672)
 	{
 		item->Position.xPos -= STEPUP_HEIGHT;
 	}
@@ -68,13 +68,13 @@ void LarsonControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 	
-	short joint0 = 0;
 	short tilt = 0;
 	short angle = 0;
-	short joint2 = 0;
+	short joint0 = 0;
 	short joint1 = 0;
+	short joint2 = 0;
 	
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
 	
 	// In Streets of Rome when Larson HP are below 40 he runs way

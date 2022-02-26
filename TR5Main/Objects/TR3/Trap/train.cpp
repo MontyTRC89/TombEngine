@@ -21,13 +21,10 @@
 
 long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 {
-	float s, c;
+	float s = phd_sin(item->Position.yRot);
+	float c = phd_cos(item->Position.yRot);
+
 	PHD_VECTOR pos;
-	FLOOR_INFO *floor;
-
-	s = phd_sin(item->Position.yRot);
-	c = phd_cos(item->Position.yRot);
-
 	pos.x = item->Position.xPos + z * s + x * c;
 	pos.y = item->Position.yPos - z * phd_sin(item->Position.xRot) + x * phd_sin(item->Position.zRot);
 	pos.z = item->Position.zPos + z * c - x * s;
@@ -42,10 +39,6 @@ void TrainControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	long fh;
-	FLOOR_INFO *floor;
-	short roomNumber;
-
 	if (!TriggerActive(item))
 		return;
 
@@ -58,10 +51,12 @@ void TrainControl(short itemNumber)
 	item->Position.xPos += item->ItemFlags[1] * s;
 	item->Position.zPos += item->ItemFlags[1] * c;
 
+	short roomNumber;
 	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
-	item->Position.yPos = fh = TrainTestHeight(item, 0, 0, &roomNumber);
+	long floorHeight = TrainTestHeight(item, 0, 0, &roomNumber);
+	item->Position.yPos = floorHeight;
 
-	if (fh == NO_HEIGHT)
+	if (floorHeight == NO_HEIGHT)
 	{
 		KillItem(itemNumber);
 		return;
@@ -69,13 +64,11 @@ void TrainControl(short itemNumber)
 
 	item->Position.yPos -= 32;// ?
 
-	roomNumber = item->RoomNumber;
-	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
+	if (probedRoomNumber != item->RoomNumber)
+		ItemNewRoom(itemNumber, probedRoomNumber);
 
-	if (roomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
-
-	item->Position.xRot = -(rh - fh) * 2;
+	item->Position.xRot = -(rh - floorHeight) * 2;
 
 	TriggerDynamicLight(item->Position.xPos + SECTOR(3) * s, item->Position.yPos, item->Position.zPos + SECTOR(3) * c, 16, 31, 31, 31);
 
@@ -90,9 +83,7 @@ void TrainControl(short itemNumber)
 			ForcedFixedCamera.x = item->Position.xPos + SECTOR(8) * s;
 			ForcedFixedCamera.z = item->Position.zPos + SECTOR(8) * c;
 
-			roomNumber = item->RoomNumber;
-			floor = GetFloor(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, &roomNumber);
-			ForcedFixedCamera.y = GetFloorHeight(floor, ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z);
+			ForcedFixedCamera.y = GetCollisionResult(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
 			ForcedFixedCamera.roomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
@@ -121,9 +112,7 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
 	laraItem->HitPoints = 0;
-
 	laraItem->Position.yRot = trainItem->Position.yRot;
-
 	laraItem->Velocity = 0;
 	laraItem->VerticalVelocity = 0;
 	laraItem->Airborne = false;

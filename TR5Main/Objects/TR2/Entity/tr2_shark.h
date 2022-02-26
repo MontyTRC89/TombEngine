@@ -1,3 +1,3 @@
 #pragma once
 
-void SharkControl(short itemNum);
+void SharkControl(short itemNumber);
