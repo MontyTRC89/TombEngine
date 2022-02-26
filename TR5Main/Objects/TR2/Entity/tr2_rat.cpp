@@ -7,18 +7,32 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO ratBite = { 0, 0, 57, 2 };
+BITE_INFO RatBite = { 0, 0, 57, 2 };
 
-void RatControl(short itemNum)
+// TODO
+enum RatState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum RatAnim
+{
+
+};
+
+void RatControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
+
 	short head = 0;
 	short angle = 0;
 	short random = 0;
@@ -34,21 +48,21 @@ void RatControl(short itemNum)
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		if (info.ahead)
-			head = info.angle;
+		if (AIInfo.ahead)
+			head = AIInfo.angle;
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AIInfo, TIMID);
+		CreatureMood(item, &AIInfo, TIMID);
 
-		angle = CreatureTurn(item, ANGLE(6));
+		angle = CreatureTurn(item, ANGLE(6.0f));
 
 		switch (item->ActiveState)
 		{
 		case 4:
-			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
+			if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
@@ -56,26 +70,28 @@ void RatControl(short itemNum)
 				else if (random > 0xA00)
 					item->RequiredState = 1;
 			}
-			else if (info.distance < SQUARE(340))
+			else if (AIInfo.distance < pow(340, 2))
 				item->RequiredState = 5;
 			else
 				item->RequiredState = 1;
 
 			if (item->RequiredState)
 				item->TargetState = 2;
+
 			break;
 
 		case 2:
-			creature->maximumTurn = 0;
+			info->maximumTurn = 0;
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
+
 			break;
 
 		case 1:
-			creature->maximumTurn = ANGLE(6);
+			info->maximumTurn = ANGLE(6.0f);
 
-			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
+			if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
 			{
 				random = (short)GetRandomControl();
 				if (random < 0x500)
@@ -86,27 +102,31 @@ void RatControl(short itemNum)
 				else if (random < 0xA00)
 					item->TargetState = 2;
 			}
-			else if (info.ahead && info.distance < SQUARE(340))
+			else if (AIInfo.ahead && AIInfo.distance < pow(340, 2))
 				item->TargetState = 2;
+
 			break;
 
 		case 5:
-			if (!item->RequiredState && (item->TouchBits & 0x7F))
+			if (!item->RequiredState && item->TouchBits & 0x7F)
 			{
-				CreatureEffect(item, &ratBite, DoBloodSplat);
+				CreatureEffect(item, &RatBite, DoBloodSplat);
+				item->RequiredState = 2;
+
 				LaraItem->HitPoints -= 20;
 				LaraItem->HitStatus = true;
-				item->RequiredState = 2;
 			}
+
 			break;
 
 		case 3:
 			if (GetRandomControl() < 0x500)
 				item->TargetState = 2;
+
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

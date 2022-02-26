@@ -1,3 +1,3 @@
 #pragma once
 
-void BarracudaControl(short itemNum);
+void BarracudaControl(short itemNumber);
