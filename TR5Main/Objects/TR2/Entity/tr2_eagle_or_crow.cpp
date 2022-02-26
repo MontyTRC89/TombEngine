@@ -6,16 +6,30 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO eagleBite = { 15, 46, 21, 6 };
-BITE_INFO crowBite = { 2, 10, 60, 14 };
+BITE_INFO EagleBite = { 15, 46, 21, 6 };
+BITE_INFO CrowBite = { 2, 10, 60, 14 };
 
-void InitialiseEagle(short itemNum)
+// TODO
+enum EagleState
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	ClearItem(itemNum);
+
+};
+
+// TODO
+enum EagleAnim
+{
+
+};
+
+void InitialiseEagle(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	ClearItem(itemNumber);
 
 	if (item->ObjectNumber == ID_CROW)
 	{
@@ -31,13 +45,13 @@ void InitialiseEagle(short itemNum)
 	}
 }
 
-void EagleControl(short itemNum)
+void EagleControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
 
 	short angle = 0;
 
@@ -49,10 +63,11 @@ void EagleControl(short itemNum)
 			if (item->Position.yPos > item->Floor)
 			{
 				item->Position.yPos = item->Floor;
-				item->Airborne = 0;
 				item->VerticalVelocity = 0;
+				item->Airborne = false;
 				item->TargetState = 5;
 			}
+
 			break;
 
 		case 5:
@@ -67,77 +82,84 @@ void EagleControl(short itemNum)
 
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = 4;
-			item->Airborne = 1;
 			item->Velocity = 0;
+			item->Airborne = true;
 			break;
 		}
 		item->Position.xRot = 0;
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &AIInfo, TIMID);
 
-		angle = CreatureTurn(item, ANGLE(3));
+		angle = CreatureTurn(item, ANGLE(3.0f));
 
 		switch (item->ActiveState)
 		{
 		case 7:
 			item->Position.yPos = item->Floor;
-			if (creature->mood != BORED_MOOD)
+
+			if (info->mood != BORED_MOOD)
 				item->TargetState = 1;
+
 			break;
 
 		case 2:
 			item->Position.yPos = item->Floor;
-			if (creature->mood == BORED_MOOD)
+
+			if (info->mood == BORED_MOOD)
 				break;
 			else
 				item->TargetState = 1;
+
 			break;
 
 		case 1:
-			creature->flags = 0;
+			info->flags = 0;
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			if (creature->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (info.ahead && info.distance < SQUARE(512))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 				item->TargetState = 6;
 			else
 				item->TargetState = 3;
+
 			break;
 
 		case 3:
-			if (creature->mood == BORED_MOOD)
+			if (info->mood == BORED_MOOD)
 			{
 				item->RequiredState = 2;
 				item->TargetState = 1;
 			}
-			else if (info.ahead && info.distance < SQUARE(512))
+			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
 				item->TargetState = 6;
+
 			break;
 
 		case 6:
-			if (!creature->flags && item->TouchBits)
+			if (!info->flags && item->TouchBits)
 			{
 				LaraItem->HitPoints -= 20;
 				LaraItem->HitStatus = true;
 
 				if (item->ObjectNumber == ID_CROW)
-					CreatureEffect(item, &crowBite, DoBloodSplat);
+					CreatureEffect(item, &CrowBite, DoBloodSplat);
 				else
-					CreatureEffect(item, &eagleBite, DoBloodSplat);
+					CreatureEffect(item, &EagleBite, DoBloodSplat);
 
-				creature->flags = 1;
+				info->flags = 1;
 			}
+
 			break;
 		}
 	}
 
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }
