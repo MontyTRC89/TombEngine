@@ -6,25 +6,35 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO birdyBiteL = { 0, 224, 0, 19 };
-BITE_INFO birdyBiteR = { 0, 224, 0, 22 };
+BITE_INFO BirdMonsterBiteLeft = { 0, 224, 0, 19 };
+BITE_INFO BirdMonsterBiteRight = { 0, 224, 0, 22 };
 
-void BirdMonsterControl(short itemNum)
+// TODO
+enum BirdMonsterState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum BirdMonsterAnim
+{
+
+};
+
+void BirdMonsterControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* monster;
-	AI_INFO info;
-	short angle, head;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	monster = (CREATURE_INFO*)item->Data;
-	angle = head = 0;
+	short angle = 0;
+	short head = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -37,103 +47,117 @@ void BirdMonsterControl(short itemNum)
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		if (info.ahead)
-			head = info.angle;
+		if (AIInfo.ahead)
+			head = AIInfo.angle;
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, monster->maximumTurn);
+		GetCreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &AIInfo, VIOLENT);
+		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			monster->maximumTurn = 0;
+			info->maximumTurn = 0;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
+			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 3;
 				else
 					item->TargetState = 10;
 			}
-			else if (info.ahead && (monster->mood == BORED_MOOD || monster->mood == STALK_MOOD))
+			else if (AIInfo.ahead && (info->mood == BORED_MOOD || info->mood == STALK_MOOD))
 			{
-				if (info.zoneNumber != info.enemyZone)
+				if (AIInfo.zoneNumber != AIInfo.enemyZone)
 				{
 					item->TargetState = 2;
-					monster->mood = ESCAPE_MOOD;
+					info->mood = ESCAPE_MOOD;
 				}
 				else
 					item->TargetState = 8;
 			}
 			else
-			{
 				item->TargetState = 2;
-			}
+			
 			break;
+
 		case 8:
-			monster->maximumTurn = 0;
+			info->maximumTurn = 0;
 
-			if (monster->mood != BORED_MOOD || !info.ahead)
+			if (info->mood != BORED_MOOD || !AIInfo.ahead)
 				item->TargetState = 1;
+			
 			break;
+
 		case 2:
-			monster->maximumTurn = ANGLE(4);
+			info->maximumTurn = ANGLE(4.0f);
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
+			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 5;
-			else if ((monster->mood == BORED_MOOD || monster->mood == STALK_MOOD) && info.ahead)
+			else if ((info->mood == BORED_MOOD || info->mood == STALK_MOOD) && AIInfo.ahead)
 				item->TargetState = 1;
+			
 			break;
-		case 3:
-			monster->flags = 0;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
+		case 3:
+			info->flags = 0;
+
+			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 4;
 			else
 				item->TargetState = 1;
-			break;
-		case 5:
-			monster->flags = 0;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
+			break;
+
+		case 5:
+			info->flags = 0;
+
+			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
 			else
 				item->TargetState = 1;
-			break;
-		case 10:
-			monster->flags = 0;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
+			break;
+
+		case 10:
+			info->flags = 0;
+
+			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 11;
 			else
 				item->TargetState = 1;
+
 			break;
+
 		case 4:
 		case 6:
 		case 11:
 		case 7:
-			if (!(monster->flags & 1) && (item->TouchBits & 0x600000))
+			if (!(info->flags & 1) && item->TouchBits & 0x600000)
 			{
-				CreatureEffect(item, &birdyBiteR, DoBloodSplat);
+				CreatureEffect(item, &BirdMonsterBiteRight, DoBloodSplat);
+				info->flags |= 1;
+
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
-				monster->flags |= 1;
 			}
 
-			if (!(monster->flags & 2) && (item->TouchBits & 0x0C0000))
+			if (!(info->flags & 2) && item->TouchBits & 0x0C0000)
 			{
-				CreatureEffect(item, &birdyBiteL, DoBloodSplat);
+				CreatureEffect(item, &BirdMonsterBiteLeft, DoBloodSplat);
+				info->flags |= 2;
+
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
-				monster->flags |= 2;
 			}
+
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNum, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 }

@@ -5,21 +5,38 @@
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO silencerGun = { 3, 331, 56, 10 };
+BITE_INFO SilencerGunBite = { 3, 331, 56, 10 };
 
-void SilencerControl(short itemNum)
+// TODO
+enum SilencerState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum SilencerAnim
+{
+
+};
+
+void SilencerControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* silencer = (CREATURE_INFO*)item->Data;
-	AI_INFO info;
-	short angle = 0, torso_y = 0, torso_x = 0, head_y = 0, tilt = 0;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
+
+	short angle = 0;
+	short torsoY = 0;
+	short torsoX = 0;
+	short head = 0;
+	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -32,42 +49,47 @@ void SilencerControl(short itemNum)
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, silencer->maximumTurn);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
+
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
+
+		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 3:
-			if (info.ahead)
-				head_y = info.angle;
-			silencer->maximumTurn = 0;
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
+			info->maximumTurn = 0;
+
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
+
 			break;
 
 		case 4:
-			if (info.ahead)
-				head_y = info.angle;
-			silencer->maximumTurn = 0;
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
+			info->maximumTurn = 0;
 
-			if (silencer->mood == ESCAPE_MOOD)
+			if (info->mood == ESCAPE_MOOD)
 			{
 				item->RequiredState = 2;
 				item->TargetState = 3;
 			}
 			else
 			{
-				if (Targetable(item, &info))
+				if (Targetable(item, &aiInfo))
 				{
 					item->RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 					item->TargetState = 3;
 				}
 
-				if (silencer->mood == ATTACK_MOOD || !info.ahead)
+				if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
 				{
-					if (info.distance >= 0x400000)
+					if (aiInfo.distance >= 0x400000)
 					{
 						item->RequiredState = 2;
 						item->TargetState = 3;
@@ -95,144 +117,152 @@ void SilencerControl(short itemNum)
 					}
 				}
 			}
-			break;
-		case 1:
-			if (info.ahead)
-				head_y = info.angle;
-			silencer->maximumTurn = 910;
 
-			if (silencer->mood == ESCAPE_MOOD)
-			{
+			break;
+
+		case 1:
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
+
+			info->maximumTurn = 910;
+
+			if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 2;
-			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item, &aiInfo))
 			{
 				item->RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 				item->TargetState = 3;
 			}
 			else
 			{
-
-				if (info.distance > 0x400000 || !info.ahead)
+				if (aiInfo.distance > 0x400000 || !aiInfo.ahead)
 					item->TargetState = 2;
-				if (silencer->mood == BORED_MOOD && GetRandomControl() < 0x300)
+				if (info->mood == BORED_MOOD && GetRandomControl() < 0x300)
 					item->TargetState = 3;
 			}
+
 			break;
+
 		case 2:
-			if (info.ahead)
-				head_y = info.angle;
-			silencer->maximumTurn = 910;
-			silencer->flags = 0;
-			tilt = (angle / 4);
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
-			if (silencer->mood == ESCAPE_MOOD)
+			info->maximumTurn = ANGLE(5.0f);
+			info->flags = 0;
+			tilt = angle / 4;
+
+			if (info->mood == ESCAPE_MOOD)
 			{
-				if (Targetable(item, &info))
+				if (Targetable(item, &aiInfo))
 					item->TargetState = 9;
+
 				break;
+
 			}
 
-			if (Targetable(item, &info))
+			if (Targetable(item, &aiInfo))
 			{
-				if (info.distance >= 0x400000 && info.zoneNumber == info.enemyZone)
+				if (aiInfo.distance >= 0x400000 && aiInfo.zoneNumber == aiInfo.enemyZone)
 					item->TargetState = 9;
+
 				break;
 			}
-			else if (silencer->mood == ATTACK_MOOD)
+			else if (info->mood == ATTACK_MOOD)
 				item->TargetState = (GetRandomControl() >= 0x4000) ? 3 : 2;
 			else
 				item->TargetState = 3;
+
 			break;
 
 		case 5:
-			if (info.ahead)
-				head_y = info.angle;
-			silencer->maximumTurn = 0;
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
-			if (Targetable(item, &info))
+			info->maximumTurn = 0;
+
+			if (Targetable(item, &aiInfo))
 			{
 				item->RequiredState = 6;
 				item->TargetState = 3;
 			}
 			else
 			{
-				if (silencer->mood == ATTACK_MOOD || GetRandomControl() < 0x100)
+				if (info->mood == ATTACK_MOOD || GetRandomControl() < 0x100)
 					item->TargetState = 3;
-				if (!info.ahead)
+				if (!aiInfo.ahead)
 					item->TargetState = 3;
 			}
+
 			break;
 
 		case 6:
 		case 10:
-			silencer->maximumTurn = 0;
-			silencer->flags = 0;
+			info->maximumTurn = 0;
+			info->flags = 0;
 
-			if (info.ahead)
+			if (aiInfo.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoY = aiInfo.angle;
+				torsoX = aiInfo.xAngle;
 			}
 			else
-			{
-				head_y = info.angle;
-			}
+				head = aiInfo.angle;
 
-			if (silencer->mood == ESCAPE_MOOD)
+			if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			else if (Targetable(item, &info))
+			else if (Targetable(item, &aiInfo))
 				item->TargetState = item->ActiveState != 6 ? 11 : 7;
 			else
 				item->TargetState = 3;
+
 			break;
+
 		case 7:
 		case 11:
-			silencer->maximumTurn = 0;
+			info->maximumTurn = 0;
 
-			if (info.ahead)
+			if (aiInfo.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoY = aiInfo.angle;
+				torsoX = aiInfo.xAngle;
 			}
 			else
+				head = aiInfo.angle;
+
+			if (!info->flags)
 			{
-				head_y = info.angle;
+				ShotLara(item, &aiInfo, &SilencerGunBite, torsoY, 50);
+				info->flags = 1;
 			}
 
-			if (!silencer->flags)
-			{
-				ShotLara(item, &info, &silencerGun, torso_y, 50);
-				silencer->flags = 1;
-			}
 			break;
-		case 9:
-			silencer->maximumTurn = 910;
 
-			if (info.ahead)
+		case 9:
+			info->maximumTurn = ANGLE(5.0f);
+
+			if (aiInfo.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoY = aiInfo.angle;
+				torsoX = aiInfo.xAngle;
 			}
 			else
-			{
-				head_y = info.angle;
-			}
+				head = aiInfo.angle;
 
 			if (!item->RequiredState)
 			{
-				if (!ShotLara(item, &info, &silencerGun, torso_y, 50))
+				if (!ShotLara(item, &aiInfo, &SilencerGunBite, torsoY, 50))
 					item->TargetState = 2;
 
 				item->RequiredState = 9;
 			}
+
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torso_y);
-	CreatureJoint(item, 1, torso_x);
-	CreatureJoint(item, 2, head_y);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureJoint(item, 0, torsoY);
+	CreatureJoint(item, 1, torsoX);
+	CreatureJoint(item, 2, head);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

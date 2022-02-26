@@ -12,9 +12,8 @@
 
 void InitialiseAutoGuns(short itemNumber)
 {
-    ITEM_INFO* item;
+    auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNumber];
     item->MeshBits = 1024;
     //5702 bytes!?
 	//item->data = game_malloc<uint8_t>(5702);
@@ -24,7 +23,7 @@ void InitialiseAutoGuns(short itemNumber)
 
 static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 {
-	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+	auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
 	spark->on = 1;
 	spark->sShade = 0;
@@ -53,7 +52,7 @@ static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 
 void AutoGunsControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -63,16 +62,10 @@ void AutoGunsControl(short itemNumber)
 
 			item->MeshBits = 1664;
 
-			GAME_VECTOR pos1;
-			pos1.x = 0;
-			pos1.y = 0;
-			pos1.z = -64;
+			GAME_VECTOR pos1 = { 0, 0, -64 };
 			GetJointAbsPosition(item, (PHD_VECTOR*)&pos1, 8);
 
-			GAME_VECTOR pos2;
-			pos2.x = 0;
-			pos2.y = 0;
-			pos2.z = 0;
+			GAME_VECTOR pos2 = { 0, 0, 0 };
 			GetLaraJointPosition((PHD_VECTOR*)&pos2, 0);
 
 			pos1.roomNumber = item->RoomNumber;

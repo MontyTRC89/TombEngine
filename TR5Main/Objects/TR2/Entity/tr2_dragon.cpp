@@ -22,53 +22,58 @@
 #define DRAGON_DEAD_ANIM 22
 #define DRAGON_LIVE_TIME (30*11)
 #define DRAGON_ALMOST_LIVE 100
-#define DRAGON_WALK_TURN ANGLE(2)
-#define DRAGON_NEED_TURN ANGLE(1)
-#define DRAGON_TURN_TURN ANGLE(1)
-#define DRAGON_CLOSE_RANGE SQUARE(WALL_SIZE*3)
-#define DRAGON_STOP_RANGE SQUARE(WALL_SIZE*6)
+#define DRAGON_STATE_WALK_TURN ANGLE(2.0f)
+#define DRAGON_NEED_TURN ANGLE(1.0f)
+#define DRAGON_TURN_TURN ANGLE(1.0f)
+#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
+#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
 #define DRAGON_FLAME_SPEED 200
 #define DRAGON_TOUCH_R 0x0fe
 #define DRAGON_TOUCH_L 0x7f000000
-#define BOOM_TIME (130)
-#define BOOM_TIME_MIDDLE (140)
-#define BOOM_TIME_END (150)
-#define BARTOLI_RANGE (WALL_SIZE*9)
+#define BOOM_TIME 130
+#define BOOM_TIME_MIDDLE 140
+#define BOOM_TIME_END 150
+#define BARTOLI_RANGE SECTOR(9)
 #define DRAGON_CLOSE 900
 #define DRAGON_FAR 2300
-#define DRAGON_MID ((DRAGON_CLOSE+DRAGON_FAR)/2)
-#define DRAGON_LCOL -512
-#define DRAGON_RCOL +512
+#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
+#define DRAGON_LCOL -CLICK(2)
+#define DRAGON_RCOL CLICK(2)
 
-BITE_INFO dragonMouthBite = { 35, 171, 1168, 12 };
+BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
 
-enum DRAGON_STATE 
+enum DragonState
 {
-	DRAGON_EMPTY,
-	DRAGON_WALK,
-	DRAGON_LEFT,
-	DRAGON_RIGHT,
-	DRAGON_AIM1,
-	DRAGON_FIRE1,
-	DRAGON_STOP,
-	DRAGON_TURNLEFT,
-	DRAGON_TURNRIGHT,
-	DRAGON_SWIPELEFT,
-	DRAGON_SWIPERIGHT,
-	DRAGON_DEATH
+	DRAGON_STATE_NONE = 0,
+	DRAGON_STATE_WALK = 1,
+	DRAGON_STATE_LEFT = 2,
+	DRAGON_STATE_RIGHT = 3,
+	DRAGON_STATE_AIM_1 = 4,
+	DRAGON_STATE_FIRE_1 = 5,
+	DRAGON_STATE_IDLE = 6,
+	DRAGON_STATE_TURN_LEFT = 7,
+	DRAGON_STATE_TURN_RIGHT = 8,
+	DRAGON_STATE_SWIPE_LEFT = 9,
+	DRAGON_STATE_SWIPE_RIGHT = 10,
+	DRAGON_STATE_DEATH = 11
+};
+
+// TODO
+enum DragonAnim
+{
+
 };
 
 static void createBartoliLight(short ItemIndex, int type)
 {
-	ITEM_INFO* item;
-	item = &g_Level.Items[ItemIndex];
+	auto* item = &g_Level.Items[ItemIndex];
 
 	if (type == 0)
-		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - STEP_SIZE, item->Position.zPos, (GetRandomControl() & 150) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200);
+		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - CLICK(1), item->Position.zPos, (GetRandomControl() & 150) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200);
 	else if (type == 1)
-		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - STEP_SIZE, item->Position.zPos, (GetRandomControl() & 75) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
+		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - CLICK(1), item->Position.zPos, (GetRandomControl() & 75) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
 	else if (type == 2)
-		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - STEP_SIZE, item->Position.zPos, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
+		TriggerDynamicLight(item->Position.xPos, item->Position.yPos - CLICK(1), item->Position.zPos, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
 }
 
 static short dragonFire(int x, int y, int z, short speed, short yrot, short roomNumber)
@@ -112,62 +117,61 @@ static void createExplosion(ITEM_INFO* item)
 	}
 }
 
-static void createDragonBone(short front_number)
+static void createDragonBone(short frontNumber)
 {
-	short bone_back, bone_front;
-	ITEM_INFO* back_dragon, *front_dragon, *item;
+	short boneBack, boneFront;
+	ITEM_INFO* dragonBack, *dragonFront, *item;
 
-	bone_front = CreateItem();
-	bone_back = CreateItem();
+	boneFront = CreateItem();
+	boneBack = CreateItem();
 
-	if (bone_back != NO_ITEM && bone_front != NO_ITEM)
+	if (boneBack != NO_ITEM && boneFront != NO_ITEM)
 	{
-		item = &g_Level.Items[front_number];
+		item = &g_Level.Items[frontNumber];
 
-		back_dragon = &g_Level.Items[bone_back];
-		back_dragon->ObjectNumber = ID_DRAGON_BONE_BACK;
-		back_dragon->Position.xPos = item->Position.xPos;
-		back_dragon->Position.yPos = item->Position.yPos;
-		back_dragon->Position.zPos = item->Position.zPos;
-		back_dragon->Position.xRot = back_dragon->Position.zRot = 0;
-		back_dragon->Position.yRot = item->Position.yRot;
-		back_dragon->RoomNumber = item->RoomNumber;
+		dragonBack = &g_Level.Items[boneBack];
+		dragonBack->ObjectNumber = ID_DRAGON_BONE_BACK;
+		dragonBack->Position.xPos = item->Position.xPos;
+		dragonBack->Position.yPos = item->Position.yPos;
+		dragonBack->Position.zPos = item->Position.zPos;
+		dragonBack->Position.xRot = dragonBack->Position.zRot = 0;
+		dragonBack->Position.yRot = item->Position.yRot;
+		dragonBack->RoomNumber = item->RoomNumber;
 
-		InitialiseItem(bone_back);
+		InitialiseItem(boneBack);
 
-		front_dragon = &g_Level.Items[bone_front];
-		front_dragon->ObjectNumber = ID_DRAGON_BONE_FRONT;
-		front_dragon->Position.xPos = item->Position.xPos;
-		front_dragon->Position.yPos = item->Position.yPos;
-		front_dragon->Position.zPos = item->Position.zPos;
-		front_dragon->Position.xRot = front_dragon->Position.zRot = 0;
-		front_dragon->Position.yRot = item->Position.yRot;
-		front_dragon->RoomNumber = item->RoomNumber;
+		dragonFront = &g_Level.Items[boneFront];
+		dragonFront->ObjectNumber = ID_DRAGON_BONE_FRONT;
+		dragonFront->Position.xPos = item->Position.xPos;
+		dragonFront->Position.yPos = item->Position.yPos;
+		dragonFront->Position.zPos = item->Position.zPos;
+		dragonFront->Position.xRot = dragonFront->Position.zRot = 0;
+		dragonFront->Position.yRot = item->Position.yRot;
+		dragonFront->RoomNumber = item->RoomNumber;
 
-		InitialiseItem(bone_front);
+		InitialiseItem(boneFront);
 
-		front_dragon->MeshBits = 0xFF3FFFFF;
+		dragonFront->MeshBits = 0xFF3FFFFF;
 	}
 }
 
-void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item;
 	int rx, rz, shift, side_shift, angle;
 	int anim, frame;
 	float c, s;
 
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
-	if (!TestCollision(item, laraitem))
+	if (!TestCollision(item, laraItem))
 		return;
 
-	if (item->ActiveState == DRAGON_DEATH)
+	if (item->ActiveState == DRAGON_STATE_DEATH)
 	{
-		rx = laraitem->Position.xPos - item->Position.xPos;
-		rz = laraitem->Position.zPos - item->Position.zPos;
+		rx = laraItem->Position.xPos - item->Position.xPos;
+		rz = laraItem->Position.zPos - item->Position.zPos;
 		c = phd_cos(item->Position.yRot);
 		s = phd_sin(item->Position.yRot);
 
@@ -178,31 +182,31 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
-			angle = laraitem->Position.yRot - item->Position.yRot;
+			angle = laraItem->Position.yRot - item->Position.yRot;
 
 			anim = item->AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 			frame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 			if ((anim == DRAGON_DEAD_ANIM || (anim == DRAGON_DEAD_ANIM + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
-				(TrInput & IN_ACTION) && item->ObjectNumber == ID_DRAGON_BACK && !laraitem->Airborne &&
+				(TrInput & IN_ACTION) && item->ObjectNumber == ID_DRAGON_BACK && !laraItem->Airborne &&
 				shift <= DRAGON_MID && shift > DRAGON_CLOSE - 350 && side_shift > -350 && side_shift < 350 &&
 				angle > 0x4000 - ANGLE(30) && angle < 0x4000 + ANGLE(30))
 			{
-				laraitem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				laraitem->FrameNumber = g_Level.Anims[laraitem->AnimNumber].frameBase;
-				laraitem->ActiveState = 0;
-				laraitem->TargetState = 7;
+				laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->ActiveState = 0;
+				laraItem->TargetState = 7;
 
-				laraitem->Position.xPos = item->Position.xPos;
-				laraitem->Position.yPos = item->Position.yPos;
-				laraitem->Position.zPos = item->Position.zPos;
-				laraitem->Position.yRot = item->Position.yRot;
-				laraitem->Position.xRot = item->Position.xRot;
-				laraitem->Position.zRot = item->Position.zRot;
-				laraitem->VerticalVelocity = 0;
-				laraitem->Airborne = false;
-				laraitem->Velocity = 0;
+				laraItem->Position.xPos = item->Position.xPos;
+				laraItem->Position.yPos = item->Position.yPos;
+				laraItem->Position.zPos = item->Position.zPos;
+				laraItem->Position.yRot = item->Position.yRot;
+				laraItem->Position.xRot = item->Position.xRot;
+				laraItem->Position.zRot = item->Position.zRot;
+				laraItem->VerticalVelocity = 0;
+				laraItem->Airborne = false;
+				laraItem->Velocity = 0;
 
-				if (item->RoomNumber != laraitem->RoomNumber)
+				if (item->RoomNumber != laraItem->RoomNumber)
 					ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 				AnimateItem(LaraItem);
@@ -223,14 +227,14 @@ void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 			else
 				shift = DRAGON_FAR - shift;
 
-			laraitem->Position.xPos += shift * c;
-			laraitem->Position.zPos -= shift * s;
+			laraItem->Position.xPos += shift * c;
+			laraItem->Position.zPos -= shift * s;
 
 			return;
 		}
 	}
 
-	ItemPushItem(item, laraitem, coll, 1, 0);
+	ItemPushItem(item, laraItem, coll, 1, 0);
 }
 
 void DragonControl(short backNum)
@@ -256,11 +260,11 @@ void DragonControl(short backNum)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != DRAGON_DEATH)
+		if (item->ActiveState != DRAGON_STATE_DEATH)
 		{
 			item->AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = item->TargetState = DRAGON_DEATH;
+			item->ActiveState = item->TargetState = DRAGON_STATE_DEATH;
 			dragon->flags = 0;
 		}
 		else if (dragon->flags >= 0)
@@ -268,7 +272,7 @@ void DragonControl(short backNum)
 			createBartoliLight(itemNum, 1);
 			dragon->flags++;
 			if (dragon->flags == DRAGON_LIVE_TIME)
-				item->TargetState = DRAGON_STOP;
+				item->TargetState = DRAGON_STATE_IDLE;
 			if (dragon->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 				item->HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 		}
@@ -306,9 +310,9 @@ void DragonControl(short backNum)
 
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, DRAGON_WALK_TURN);
+		angle = CreatureTurn(item, DRAGON_STATE_WALK_TURN);
 
-		ahead = (info.ahead && info.distance > DRAGON_CLOSE_RANGE && info.distance < DRAGON_STOP_RANGE);
+		ahead = (info.ahead && info.distance > DRAGON_CLOSE_RANGE && info.distance < DRAGON_STATE_IDLE_RANGE);
 
 		if (item->TouchBits)
 		{
@@ -318,31 +322,31 @@ void DragonControl(short backNum)
 
 		switch (item->ActiveState)
 		{
-		case DRAGON_STOP:
+		case DRAGON_STATE_IDLE:
 			item->Position.yRot -= angle;
 
 			if (!ahead)
 			{
-				if (info.distance > DRAGON_STOP_RANGE || !info.ahead)
-					item->TargetState = DRAGON_WALK;
+				if (info.distance > DRAGON_STATE_IDLE_RANGE || !info.ahead)
+					item->TargetState = DRAGON_STATE_WALK;
 				else if (info.ahead && info.distance < DRAGON_CLOSE_RANGE && !dragon->flags)
 				{
 					dragon->flags = 1;
 					if (info.angle < 0)
-						item->TargetState = DRAGON_SWIPELEFT;
+						item->TargetState = DRAGON_STATE_SWIPE_LEFT;
 					else
-						item->TargetState = DRAGON_SWIPERIGHT;
+						item->TargetState = DRAGON_STATE_SWIPE_RIGHT;
 				}
 				else if (info.angle < 0)
-					item->TargetState = DRAGON_TURNLEFT;
+					item->TargetState = DRAGON_STATE_TURN_LEFT;
 				else
-					item->TargetState = DRAGON_TURNRIGHT;
+					item->TargetState = DRAGON_STATE_TURN_RIGHT;
 			}
 			else
-				item->TargetState = DRAGON_AIM1;
+				item->TargetState = DRAGON_STATE_AIM_1;
 			break;
 
-		case DRAGON_SWIPELEFT:
+		case DRAGON_STATE_SWIPE_LEFT:
 			if (item->TouchBits & DRAGON_TOUCH_L)
 			{
 				LaraItem->HitStatus = true;
@@ -351,7 +355,7 @@ void DragonControl(short backNum)
 			}
 			break;
 
-		case DRAGON_SWIPERIGHT:
+		case DRAGON_STATE_SWIPE_RIGHT:
 			if (item->TouchBits & DRAGON_TOUCH_R)
 			{
 				LaraItem->HitStatus = true;
@@ -360,48 +364,48 @@ void DragonControl(short backNum)
 			}
 			break;
 
-		case DRAGON_WALK:
+		case DRAGON_STATE_WALK:
 			dragon->flags = 0;
 
 			if (ahead)
-				item->TargetState = DRAGON_STOP;
+				item->TargetState = DRAGON_STATE_IDLE;
 			else if (angle < -DRAGON_NEED_TURN)
 			{
-				if (info.distance < DRAGON_STOP_RANGE && info.ahead)
-					item->TargetState = DRAGON_STOP;
+				if (info.distance < DRAGON_STATE_IDLE_RANGE && info.ahead)
+					item->TargetState = DRAGON_STATE_IDLE;
 				else
-					item->TargetState = DRAGON_LEFT;
+					item->TargetState = DRAGON_STATE_LEFT;
 			}
 			else if (angle > DRAGON_NEED_TURN)
 			{
-				if (info.distance < DRAGON_STOP_RANGE && info.ahead)
-					item->TargetState = DRAGON_STOP;
+				if (info.distance < DRAGON_STATE_IDLE_RANGE && info.ahead)
+					item->TargetState = DRAGON_STATE_IDLE;
 				else
-					item->TargetState = DRAGON_RIGHT;
+					item->TargetState = DRAGON_STATE_RIGHT;
 			}
 			break;
 
-		case DRAGON_LEFT:
+		case DRAGON_STATE_LEFT:
 			if (angle > -DRAGON_NEED_TURN || ahead)
-				item->TargetState = DRAGON_WALK;
+				item->TargetState = DRAGON_STATE_WALK;
 			break;
 
-		case DRAGON_RIGHT:
+		case DRAGON_STATE_RIGHT:
 			if (angle < DRAGON_NEED_TURN || ahead)
-				item->TargetState = DRAGON_WALK;
+				item->TargetState = DRAGON_STATE_WALK;
 			break;
 
-		case DRAGON_TURNLEFT:
+		case DRAGON_STATE_TURN_LEFT:
 			dragon->flags = 0;
 			item->Position.yRot += -(ANGLE(1) - angle);
 			break;
 
-		case DRAGON_TURNRIGHT:
+		case DRAGON_STATE_TURN_RIGHT:
 			dragon->flags = 0;
 			item->Position.yRot += (ANGLE(1) - angle);
 			break;
 
-		case DRAGON_AIM1:
+		case DRAGON_STATE_AIM_1:
 			item->Position.yRot -= angle;
 			if (info.ahead)
 				head = -info.angle;
@@ -409,16 +413,16 @@ void DragonControl(short backNum)
 			if (ahead)
 			{
 				dragon->flags = 30;
-				item->TargetState = DRAGON_FIRE1;
+				item->TargetState = DRAGON_STATE_FIRE_1;
 			}
 			else
 			{
 				dragon->flags = 0;
-				item->TargetState = DRAGON_AIM1;
+				item->TargetState = DRAGON_STATE_AIM_1;
 			}
 			break;
 
-		case DRAGON_FIRE1:
+		case DRAGON_STATE_FIRE_1:
 			item->Position.yRot -= angle;
 			if (info.ahead)
 				head = -info.angle;
@@ -428,11 +432,11 @@ void DragonControl(short backNum)
 			if (dragon->flags)
 			{
 				if (info.ahead)
-					CreatureEffect(item, &dragonMouthBite, dragonFire);
+					CreatureEffect(item, &DragonMouthBite, dragonFire);
 				dragon->flags--;
 			}
 			else
-				item->TargetState = DRAGON_STOP;
+				item->TargetState = DRAGON_STATE_IDLE;
 			break;
 		}
 	}
@@ -455,10 +459,10 @@ void DragonControl(short backNum)
 
 void InitialiseBartoli(short itemNum)
 {
-	ITEM_INFO* item, *back, *front;
+	ITEM_INFO* back, *front;
 	short back_item, front_item;
 
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNum];
 	item->Position.xPos -= STEP_SIZE * 2;
 	item->Position.zPos -= STEP_SIZE * 2;
 
@@ -501,10 +505,10 @@ void InitialiseBartoli(short itemNum)
 
 void BartoliControl(short itemNum)
 {
-	ITEM_INFO* item, *back, *front;
-	short front_item, back_item;
+	ITEM_INFO* back, *front;
+	short frontItem, back_item;
 
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNum];
 
 	if (item->Timer)
 	{
@@ -516,25 +520,30 @@ void BartoliControl(short itemNum)
 		createBartoliLight(itemNum, 1);
 		AnimateItem(item);
 
-		if (item->Timer == BOOM_TIME || item->Timer == BOOM_TIME + 10 || item->Timer == BOOM_TIME + 20)
+		if (item->Timer == BOOM_TIME ||
+			item->Timer == BOOM_TIME + 10 ||
+			item->Timer == BOOM_TIME + 20)
 		{
-			front_item = CreateItem();
-			if (front_item != NO_ITEM)
+			frontItem = CreateItem();
+			if (frontItem != NO_ITEM)
 			{
-				front = &g_Level.Items[front_item];
+				front = &g_Level.Items[frontItem];
+
 				if (item->Timer == BOOM_TIME)
 					front->ObjectNumber = ID_SPHERE_OF_DOOM;
 				else if (item->Timer == BOOM_TIME + 10)
 					front->ObjectNumber = ID_SPHERE_OF_DOOM2;
 				else
 					front->ObjectNumber = ID_SPHERE_OF_DOOM3;
+
 				front->Position.xPos = item->Position.xPos;
 				front->Position.yPos = item->Position.yPos + STEP_SIZE;
 				front->Position.zPos = item->Position.zPos;
 				front->RoomNumber = item->RoomNumber;
 				front->Shade = -1;
-				InitialiseItem(front_item);
-				AddActiveItem(front_item);
+
+				InitialiseItem(frontItem);
+				AddActiveItem(frontItem);
 				front->Status = ITEM_ACTIVE;
 			}
 		}
@@ -543,19 +552,20 @@ void BartoliControl(short itemNum)
 			back_item = (short)item->Data;
 			back = &g_Level.Items[back_item];
 
-			front_item = (short)back->Data;
-			front = &g_Level.Items[front_item];
+			frontItem = (short)back->Data;
+			front = &g_Level.Items[frontItem];
 
 			front->TouchBits = back->TouchBits = 0;
-			EnableBaddieAI(front_item, 1);
-			AddActiveItem(front_item);
+			EnableBaddieAI(frontItem, 1);
+			AddActiveItem(frontItem);
 			AddActiveItem(back_item);
 			back->Status = ITEM_ACTIVE;
 
 			KillItem(itemNum);
 		}
 	}
-	else if (abs(LaraItem->Position.xPos - item->Position.xPos) < BARTOLI_RANGE && abs(LaraItem->Position.zPos - item->Position.zPos) < BARTOLI_RANGE)
+	else if (abs(LaraItem->Position.xPos - item->Position.xPos) < BARTOLI_RANGE &&
+		abs(LaraItem->Position.zPos - item->Position.zPos) < BARTOLI_RANGE)
 	{
 		item->Timer = 1;
 	}

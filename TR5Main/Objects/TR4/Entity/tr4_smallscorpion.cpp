@@ -6,36 +6,50 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-BITE_INFO smallScorpionBiteInfo1 = { 0, 0, 0, 0 };
-BITE_INFO smallScorpionBiteInfo2 = { 0, 0, 0, 23 };
+BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
+BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 
-enum SMALL_SCORPION_STATES {
-	SMALL_SCORPION_STOP = 1,
-	SMALL_SCORPION_WALK = 2,
-	SMALL_SCORPION_RUN = 3,
-	SMALL_SCORPION_ATTACK1 = 4,
-	SMALL_SCORPION_ATTACK2 = 5,
-	SMALL_SCORPION_DEATH1 = 6,
-	SMALL_SCORPION_DEATH2 = 7
+enum SmallScorionState
+{
+	SSCORPION_STATE_IDLE = 1,
+	SSCORPION_STATE_WALK = 2,
+	SSCORPION_STATE_RUN = 3,
+	SSCORPION_STATE_ATTACK_1 = 4,
+	SSCORPION_STATE_ATTACK_2 = 5,
+	SSCORPION_STATE_DEATH_1 = 6,
+	SSCORPION_STATE_DEATH_2 = 7
+};
+
+// TODO
+enum SmallScorpionAnim
+{
+
 };
 
 void InitialiseSmallScorpion(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	item->AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
 	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = SMALL_SCORPION_STOP;
-	item->ActiveState = SMALL_SCORPION_STOP;
+	item->TargetState = SSCORPION_STATE_IDLE;
+	item->ActiveState = SSCORPION_STATE_IDLE;
 }
 
 void SmallScorpionControl(short itemNumber)
 {
+	if (!CreatureActive(itemNumber))
+		return;
+
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
+
 	short angle = 0;
 	short head = 0;
 	short neck = 0;
@@ -45,20 +59,15 @@ void SmallScorpionControl(short itemNumber)
 	short joint2 = 0;
 	short joint3 = 0;
 
-	if (!CreatureActive(itemNumber))
-		return;
-
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
-		if (item->ActiveState != SMALL_SCORPION_DEATH1 && item->ActiveState != SMALL_SCORPION_DEATH2)
+		if (item->ActiveState != SSCORPION_STATE_DEATH_1 &&
+			item->ActiveState != SSCORPION_STATE_DEATH_2)
 		{
 			item->AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = SMALL_SCORPION_DEATH1;
+			item->ActiveState = SSCORPION_STATE_DEATH_1;
 		}
 	}
 	else
@@ -68,87 +77,74 @@ void SmallScorpionControl(short itemNumber)
 		int laraDistance = dx * dx + dz * dz;
 
 		if (item->AIBits & GUARD)
-			GetAITarget(creature);
+			GetAITarget(info);
 		else
-			creature->enemy = LaraItem;
+			info->enemy = LaraItem;
 
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AIInfo;
+		CreatureAIInfo(item, &AIInfo);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &AIInfo, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
 		{
-		case SMALL_SCORPION_STOP:
-			creature->maximumTurn = 0;
-			creature->flags = 0;
-			if (info.distance > SQUARE(341))
+		case SSCORPION_STATE_IDLE:
+			info->maximumTurn = 0;
+			info->flags = 0;
+
+			if (AIInfo.distance > pow(341, 2))
+				item->TargetState = SSCORPION_STATE_WALK;
+			else if (AIInfo.bite)
 			{
-				item->TargetState = SMALL_SCORPION_WALK;
-			}
-			else if (info.bite)
-			{
-				creature->maximumTurn = ANGLE(6);
+				info->maximumTurn = ANGLE(6.0f);
 				if (GetRandomControl() & 1)
-				{
-					item->TargetState = SMALL_SCORPION_ATTACK1;
-				}
+					item->TargetState = SSCORPION_STATE_ATTACK_1;
 				else
-				{
-					item->TargetState = SMALL_SCORPION_ATTACK2;
-				}
+					item->TargetState = SSCORPION_STATE_ATTACK_2;
 			}
-			else if (!info.ahead)
-			{
-				item->TargetState = SMALL_SCORPION_RUN;
-			}
+			else if (!AIInfo.ahead)
+				item->TargetState = SSCORPION_STATE_RUN;
+			
 			break;
 
-		case SMALL_SCORPION_WALK:
-			creature->maximumTurn = ANGLE(6);
-			if (info.distance >= SQUARE(341))
+		case SSCORPION_STATE_WALK:
+			info->maximumTurn = ANGLE(6.0f);
+			if (AIInfo.distance >= pow(341, 2))
 			{
-				if (info.distance > SQUARE(213))
-				{
-					item->TargetState = SMALL_SCORPION_RUN;
-				}
+				if (AIInfo.distance > pow(213, 2))
+					item->TargetState = SSCORPION_STATE_RUN;
 			}
 			else
-			{
-				item->TargetState = SMALL_SCORPION_STOP;
-			}
+				item->TargetState = SSCORPION_STATE_IDLE;
+			
 			break;
 
-		case SMALL_SCORPION_RUN:
-			creature->maximumTurn = ANGLE(8);
-			if (info.distance < SQUARE(341))
-			{
-				item->TargetState = SMALL_SCORPION_STOP;
-			}
+		case SSCORPION_STATE_RUN:
+			info->maximumTurn = ANGLE(8.0f);
+
+			if (AIInfo.distance < pow(341, 2))
+				item->TargetState = SSCORPION_STATE_IDLE;
+			
 			break;
 
-		case SMALL_SCORPION_ATTACK1:
-		case SMALL_SCORPION_ATTACK2:
-			creature->maximumTurn = 0;
-			if (abs(info.angle) >= ANGLE(6))
+		case SSCORPION_STATE_ATTACK_1:
+		case SSCORPION_STATE_ATTACK_2:
+			info->maximumTurn = 0;
+
+			if (abs(AIInfo.angle) >= ANGLE(6.0f))
 			{
-				if (info.angle >= 0)
-				{
-					item->Position.yRot += ANGLE(6);
-				}
+				if (AIInfo.angle >= 0)
+					item->Position.yRot += ANGLE(6.0f);
 				else
-				{
-					item->Position.yRot -= ANGLE(6);
-				}
+					item->Position.yRot -= ANGLE(6.0f);
 			}
 			else
-			{
-				item->Position.yRot += info.angle;
-			}
-			if (!creature->flags)
+				item->Position.yRot += AIInfo.angle;
+			
+			if (!info->flags)
 			{
 				if (item->TouchBits & 0x1B00100)
 				{
@@ -159,24 +155,25 @@ void SmallScorpionControl(short itemNumber)
 						LaraItem->HitPoints -= 20;
 						LaraItem->HitStatus = true;
 
+						short rotation;
 						BITE_INFO* biteInfo;
-						short rot;
-
-						if (item->ActiveState == SMALL_SCORPION_ATTACK1)
+						if (item->ActiveState == SSCORPION_STATE_ATTACK_1)
 						{
-							rot = item->Position.yRot + -ANGLE(180);
-							biteInfo = &smallScorpionBiteInfo1;
+							rotation = item->Position.yRot + -ANGLE(180.0f);
+							biteInfo = &SmallScorpionBiteInfo1;
 						}
 						else
 						{
-							rot = item->Position.yRot + -ANGLE(180);
-							biteInfo = &smallScorpionBiteInfo2;
+							rotation = item->Position.yRot + -ANGLE(180.0f);
+							biteInfo = &SmallScorpionBiteInfo2;
 						}
-						CreatureEffect2(item, biteInfo, 3, rot, DoBloodSplat);
-						creature->flags = 1;
+
+						CreatureEffect2(item, biteInfo, 3, rotation, DoBloodSplat);
+						info->flags = 1;
 					}
 				}
 			}
+
 			break;
 		}
 	}
