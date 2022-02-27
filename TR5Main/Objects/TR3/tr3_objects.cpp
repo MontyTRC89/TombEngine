@@ -161,7 +161,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_TYRANNOSAUR];
 	if (obj->loaded)
 	{
-		obj->control = TyrannosaurControl;
+		obj->control = TRexControl;
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 800;
 		obj->hitEffect = HIT_BLOOD;

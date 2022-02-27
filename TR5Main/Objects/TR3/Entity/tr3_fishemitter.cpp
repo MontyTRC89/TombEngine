@@ -33,14 +33,12 @@ unsigned char FishRanges[1][3] =
 int PirahnaHitWait = false;
 int CarcassItem = NO_ITEM;
 
-
 void SetupShoal(int shoalNumber)
 {
 		LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
 		LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
 		LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
 }
-
 
 void SetupFish(int leader, ITEM_INFO* item)
 {
@@ -78,8 +76,8 @@ void ControlFish(short itemNumber)
 	int pirahnaAttack = 0;
 	int angle = 0;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	ITEM_INFO* enemy = item;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* enemy = item;
 
 	if (!TriggerActive(item))
 		return;
