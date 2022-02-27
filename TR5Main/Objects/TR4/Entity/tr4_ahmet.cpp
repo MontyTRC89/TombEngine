@@ -19,7 +19,7 @@ using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
 {
-    enum AHMET_STATE
+    enum AhmetState
     {
         STATE_AHMET_EMPTY,
         STATE_AHMET_IDLE,

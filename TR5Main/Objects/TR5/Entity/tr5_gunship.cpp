@@ -16,7 +16,7 @@ int GunShipCounter = 0;
 
 void ControlGunShip(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -56,12 +56,12 @@ void ControlGunShip(short itemNumber)
 		start.y = GetRandomControl() + item->Position.yPos - 128;
 		start.z = GetRandomControl() + item->Position.zPos - 128;
 		start.roomNumber = item->RoomNumber;
-		int los = LOS(&start, &end);
+		bool los = LOS(&start, &end);
 
 		end.x = 3 * pos.x - 2 * start.x;
 		end.y = 3 * pos.y - 2 * start.y;
 		end.z = 3 * pos.z - 2 * start.z;
-		int los2 = LOS(&start, &end);
+		bool los2 = LOS(&start, &end);
 
 		if (los)
 			GunShipCounter = 1;
@@ -116,12 +116,12 @@ void ControlGunShip(short itemNumber)
 		}
 		else
 		{
-			ITEM_INFO* hitItem = &g_Level.Items[objOnLos];
+			auto* hitItem = &g_Level.Items[objOnLos];
 
 			if (hitItem->ObjectNumber != ID_LARA)
 			{
-				if (hitItem->ObjectNumber >= ID_SMASH_OBJECT1
-					&& hitItem->ObjectNumber <= ID_SMASH_OBJECT8)
+				if (hitItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
+					hitItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
 					ExplodeItemNode(hitItem, 0, 0, 128);
 					SmashObject(objOnLos);
@@ -149,12 +149,15 @@ void ControlGunShip(short itemNumber)
 
 		if (GunShipCounter < 15)
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
+
 			spark->on = 1;
 			spark->sR = spark->dR = (GetRandomControl() & 0x7F) + -128;
 			spark->sG = (spark->dR / 2) + (GetRandomControl() & 0x7F);
+
 			if (spark->sG > spark->sR)
 				spark->sG = spark->sR;
+
 			spark->sB = 0;
 			spark->dB = 0;
 			spark->dR = 0;

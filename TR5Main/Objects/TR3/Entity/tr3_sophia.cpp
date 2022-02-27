@@ -21,7 +21,7 @@ enum { NORMAL_BOLT, LARGE_BOLT, SUMMON_BOLT };
 enum { RIGHT_PRONG, ICONPOS, LEFT_PRONG };
 enum { ATTACK_HEAD, ATTACK_HAND1, ATTACK_HAND2 };
 
-enum londonboss_state
+enum SophiaState
 {
 	LONDONBOSS_EMPTY,
 	LONDONBOSS_STAND,
@@ -46,10 +46,10 @@ enum londonboss_state
 #define LONDONBOSS_SUMMON_ANIM 2
 #define	LONDONBOSS_GODOWN_ANIM 21
 #define LONDONBOSS_VAULT_SHIFT 96
-#define LONDONBOSS_AWARE_DISTANCE SQUARE(WALL_SIZE)
+#define LONDONBOSS_AWARE_DISTANCE pow(SECTOR(1), 2)
 #define LONDONBOSS_WALK_TURN ANGLE(4)
 #define LONDONBOSS_RUN_TURN ANGLE(7)
-#define LONDONBOSS_WALK_RANGE SQUARE(WALL_SIZE)
+#define LONDONBOSS_WALK_RANGE pow(SECTOR(1), 2)
 #define LONDONBOSS_WALK_CHANCE 0x100
 #define LONDONBOSS_LAUGH_CHANCE 0x100
 #define LONDONBOSS_TURN ANGLE(2.0f)
@@ -57,12 +57,12 @@ enum londonboss_state
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-static void TriggerLaserBolt(PHD_VECTOR* pos, ITEM_INFO* item, long type, short yang)
+static void TriggerLaserBolt(PHD_VECTOR* pos, ITEM_INFO* item, long type, short yAngle)
 {
 	
 }
 
-static void TriggerPlasmaBallFlame(short fx_number, long type, long xv, long yv, long zv)
+static void TriggerPlasmaBallFlame(short fxNumber, long type, long xv, long yv, long zv)
 {
 	
 }
@@ -82,20 +82,20 @@ static void ExplodeLondonBoss(ITEM_INFO* item)
 	
 }
 
-static void LondonBossDie(short item_number)
+static void LondonBossDie(short itemNumber)
 {
-	ITEM_INFO* item;
-	item = &g_Level.Items[item_number];
+	auto* item = &g_Level.Items[itemNumber];
+
 	item->Collidable = false;
 	item->HitPoints = -16384;
 
-	KillItem(item_number);
-	DisableBaddieAI(item_number);
+	KillItem(itemNumber);
+	DisableBaddieAI(itemNumber);
 
 	item->Flags |= ONESHOT;
 }
 
-void ControlLaserBolts(short item_number)
+void ControlLaserBolts(short itemNumber)
 {
 	
 }
@@ -105,12 +105,12 @@ void ControlLondBossPlasmaBall(short fx_number)
 	
 }
 
-void InitialiseLondonBoss(short item_number)
+void InitialiseLondonBoss(short itemNumber)
 {
 	
 }
 
-void LondonBossControl(short item_number)
+void LondonBossControl(short itemNumber)
 {
 	
 }

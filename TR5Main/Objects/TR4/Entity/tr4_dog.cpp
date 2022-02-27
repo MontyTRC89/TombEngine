@@ -11,7 +11,7 @@
 
 namespace TEN::Entities::TR4
 {
-	enum DOG_STATES
+	enum DogStates
 	{
 		STATE_DOG_NONE = 0,
 		STATE_DOG_STOP = 1,

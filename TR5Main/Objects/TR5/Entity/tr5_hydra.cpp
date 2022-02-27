@@ -7,39 +7,54 @@
 #include "Game/animation.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-#define STATE_HYDRA_STOP			0
-#define STATE_HYDRA_BITE_ATTACK1	1
-#define STATE_HYDRA_AIM				2
-#define STATE_HYDRA_HURT			4
-#define STATE_HYDRA_BITE_ATTACK2	7
-#define STATE_HYDRA_BITE_ATTACK3	8
-#define STATE_HYDRA_BITE_ATTACK4	9
-#define STATE_HYDRA_DEATH			11
 
-BITE_INFO HydraBite{ 0, 0, 0, 0x0B };
+BITE_INFO HydraBite = { 0, 0, 0, 11 };
 
-void InitialiseHydra(short itemNum)
+// TODO
+enum HydraState
 {
-    ITEM_INFO* item;
+	HYDRA_STATE_STOP = 0,
+	HYDRA_STATE_BITE_ATTACK1 = 1,
+	HYDRA_STATE_AIM = 2,
 
-    item = &g_Level.Items[itemNum];
-    ClearItem(itemNum);
-    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-    item->FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->AnimNumber].frameBase;
-    item->TargetState = STATE_HYDRA_STOP;
-    item->ActiveState = STATE_HYDRA_STOP;
+	HYDRA_STATE_HURT = 4,
 
-    if (item->TriggerFlags == 1)
-        item->Position.zPos += 384;
+	HYDRA_STATE_BITE_ATTACK2 = 7,
+	HYDRA_STATE_BITE_ATTACK3 = 8,
+	HYDRA_STATE_BITE_ATTACK4 = 9,
 
-    if (item->TriggerFlags == 2)
-        item->Position.zPos -= 384;
+	HYDRA_STATE_DEATH = 11
+};
 
-    item->Position.yRot = ANGLE(90);
-    item->Position.xPos -= 256;
+// TODO
+enum HydraAnim
+{
+
+};
+
+void InitialiseHydra(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	ClearItem(itemNumber);
+	
+	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->AnimNumber].frameBase;
+	item->TargetState = HYDRA_STATE_STOP;
+	item->ActiveState = HYDRA_STATE_STOP;
+
+	if (item->TriggerFlags == 1)
+		item->Position.zPos += CLICK(1.5f);
+
+	if (item->TriggerFlags == 2)
+		item->Position.zPos -= CLICK(1.5f);
+
+	item->Position.yRot = ANGLE(90.0f);
+	item->Position.xPos -= CLICK(1);
 }
 
 static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
@@ -47,7 +62,8 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 	short fxNum = CreateNewEffect(roomNumber);
 	if (fxNum != NO_ITEM)
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+		auto* fx = &EffectList[fxNum];
+
 		fx->pos.xPos = pos->xPos;
 		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.zPos = pos->zPos;
@@ -65,7 +81,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 
 void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = true;
 	spark->sB = 0;
@@ -91,10 +107,12 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 	spark->friction = 68;
 	spark->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
 	spark->rotAng = GetRandomControl() & 0xFFF;
+
 	if (GetRandomControl() & 1)
 		spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
 	else
 		spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
+
 	spark->gravity = 0;
 	spark->maxYvel = 0;
 	spark->scalar = 1;
@@ -104,18 +122,20 @@ void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
 
 static void TriggerHydraSparks(short itemNumber, int frame)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 	
 	spark->on = 1;
 	spark->sB = 0;
 	spark->sR = (GetRandomControl() & 0x3F) - 96;
 	spark->dR = (GetRandomControl() & 0x3F) - 96;
 	spark->dB = 0;
+
 	if (frame < 16)
 	{
 		spark->sR = frame * spark->sR / 16;
 		spark->dR = frame * spark->dR / 16;
 	}
+
 	spark->sG = spark->sR / 2;
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
@@ -147,63 +167,53 @@ void HydraControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	short tilt = 0;
-	short joint3 = 0;
-	short joint2 = 0;
-	short joint1 = 0;
-	short joint0 = 0;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	short tilt = 0;
+	short joint0 = 0;
+	short joint1 = 0;
+	short joint2 = 0;
+	short joint3 = 0;
 
 	if (item->HitPoints > 0)
 	{
 		if (item->AIBits)
-		{
-			GetAITarget(creature);
-		}
-		else if (creature->hurtByLara)
-		{
-			creature->enemy = LaraItem;
-		}
+			GetAITarget(info);
+		else if (info->hurtByLara)
+			info->enemy = LaraItem;
 
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
-		if (item->ActiveState != 5
-			&& item->ActiveState != 10
-			&& item->ActiveState != STATE_HYDRA_DEATH)
+		if (item->ActiveState != 5 &&
+			item->ActiveState != 10 &&
+			item->ActiveState != HYDRA_STATE_DEATH)
 		{
-			if (abs(info.angle) >= ANGLE(1))
+			if (abs(aiInfo.angle) >= ANGLE(1.0f))
 			{
-				if (info.angle > 0)
-					item->Position.yRot += ANGLE(1);
+				if (aiInfo.angle > 0)
+					item->Position.yRot += ANGLE(1.0f);
 				else
-					item->Position.yRot -= ANGLE(1);
+					item->Position.yRot -= ANGLE(1.0f);
 			}
 			else
-			{
-				item->Position.yRot += info.angle;
-			}
+				item->Position.yRot += aiInfo.angle;
 
 			if (item->TriggerFlags == 1)
-			{
-				tilt = -512;
-			}
+				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
-			{
-				tilt = 512;
-			}
+				tilt = ANGLE(2.8f);
 		}
 
 		if (item->ActiveState != 12)
 		{
-			joint1 = info.angle / 2;
-			joint3 = info.angle / 2;
-			joint2 = -info.xAngle;
+			joint1 = aiInfo.angle / 2;
+			joint3 = aiInfo.angle / 2;
+			joint2 = -aiInfo.xAngle;
 		}
 
 		joint0 = -joint1;
@@ -212,61 +222,54 @@ void HydraControl(short itemNumber)
 		PHD_VECTOR pos1, pos2;
 		short angles[2];
 		short roomNumber;
-		PHD_3DPOS pos;
 
 		switch (item->ActiveState)
 		{
-		case STATE_HYDRA_STOP:
-			creature->maximumTurn = ANGLE(1);
-			creature->flags = 0;
+		case HYDRA_STATE_STOP:
+			info->maximumTurn = ANGLE(1.0f);
+			info->flags = 0;
 
 			if (item->TriggerFlags == 1)
-			{
-				tilt = -512;
-			}
+				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
-			{
-				tilt = 512;
-			}
+				tilt = ANGLE(2.8f);
 
-			if (info.distance >= SQUARE(1792) && GetRandomControl() & 0x1F)
+			if (aiInfo.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
 			{
-				if (info.distance >= SQUARE(2048) && GetRandomControl() & 0x1F)
+				if (aiInfo.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
 				{
 					if (!(GetRandomControl() & 0xF))
-						item->TargetState = STATE_HYDRA_AIM;
+						item->TargetState = HYDRA_STATE_AIM;
 				}
 				else
-				{
-					item->TargetState = STATE_HYDRA_BITE_ATTACK1;
-				}
+					item->TargetState = HYDRA_STATE_BITE_ATTACK1;
 			}
 			else
-			{
 				item->TargetState = 6;
-			}
+			
 			break;
 
-		case STATE_HYDRA_BITE_ATTACK1:
-		case STATE_HYDRA_BITE_ATTACK2:
-		case STATE_HYDRA_BITE_ATTACK3:
-		case STATE_HYDRA_BITE_ATTACK4:
-			creature->maximumTurn = 0;
+		case HYDRA_STATE_BITE_ATTACK1:
+		case HYDRA_STATE_BITE_ATTACK2:
+		case HYDRA_STATE_BITE_ATTACK3:
+		case HYDRA_STATE_BITE_ATTACK4:
+			info->maximumTurn = 0;
 
-			if (creature->flags == 0)
+			if (info->flags == 0)
 			{
 				if (item->TouchBits & 0x400)
 				{
+					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
+					info->flags = 1;
+
 					LaraItem->HitPoints -= 120;
 					LaraItem->HitStatus = true;
-					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
-					creature->flags = 1;
 				}
 
-				if (item->HitStatus && info.distance < SQUARE(1792))
+				if (item->HitStatus && aiInfo.distance <  pow(CLICK(7), 2))
 				{
-					distance = sqrt(info.distance);
-					damage = 5 - distance / 1024;
+					distance = sqrt(aiInfo.distance);
+					damage = 5 - distance / SECTOR(1);
 
 					if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
 						damage *= 3;
@@ -274,15 +277,16 @@ void HydraControl(short itemNumber)
 					if (damage > 0)
 					{
 						item->HitPoints -= damage;
-						item->TargetState = STATE_HYDRA_HURT;
+						item->TargetState = HYDRA_STATE_HURT;
 						CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
 					}
 				}
 			}
+
 			break;
 
-		case STATE_HYDRA_AIM:
-			creature->maximumTurn = 0;
+		case HYDRA_STATE_AIM:
+			info->maximumTurn = 0;
 
 			if (item->HitStatus)
 			{
@@ -290,12 +294,12 @@ void HydraControl(short itemNumber)
 				/*item->HitPoints = 0;
 				break;*/
 
-				damage = 6 - sqrt(info.distance) / 1024;
+				damage = 6 - sqrt(aiInfo.distance) / 1024;
 
 				if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
 					damage *= 3;
 
-				if ((GetRandomControl() & 0xF) < damage && info.distance < SQUARE(10240) && damage > 0)
+				if ((GetRandomControl() & 0xF) < damage && aiInfo.distance < SQUARE(10240) && damage > 0)
 				{
 					item->HitPoints -= damage;
 					item->TargetState = 4;
@@ -304,38 +308,33 @@ void HydraControl(short itemNumber)
 			}
 
 			if (item->TriggerFlags == 1)
-			{
-				tilt = -512;
-			}
+				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
-			{
-				tilt = 512;
-			}
+				tilt = ANGLE(2.8f);
 
 			if (!(GlobalCounter & 3))
 			{
 				frame = ((g_Level.Anims[item->AnimNumber].frameBase - item->FrameNumber) / 8) + 1;
 				if (frame > 16)
 					frame = 16;
+
 				TriggerHydraSparks(itemNumber, frame);
 			}
+
 			break;
 
 		case 3:
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 			{
-				pos1.x = 0;
-				pos1.y = 1024;
-				pos1.z = 40;
+				pos1 = { 0, 1024, 40 };
 				GetJointAbsPosition(item, &pos1, 10);
 
-				pos2.x = 0;
-				pos2.y = 144;
-				pos2.z = 40;
+				pos2 = { 0, 144, 40 };
 				GetJointAbsPosition(item, &pos2, 10);
 
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
+				PHD_3DPOS pos;
 				pos.xPos = pos1.x;
 				pos.yPos = pos1.y;
 				pos.zPos = pos1.z;
@@ -349,54 +348,47 @@ void HydraControl(short itemNumber)
 				// TEST: uncomment this for making HYDRA not firing bubbles
 				HydraBubblesAttack(&pos, roomNumber, 1);
 			}
+
 			break;
 
 		case 6:
-			creature->maximumTurn = ANGLE(1);
-			creature->flags = 0;
+			info->maximumTurn = ANGLE(1.0f);
+			info->flags = 0;
 
 			if (item->TriggerFlags == 1)
-			{
-				tilt = -512;
-			}
+				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
-			{
-				tilt = 512;
-			}
+				tilt = ANGLE(2.8f);
 
-			if (info.distance >= SQUARE(768))
+			if (aiInfo.distance >= pow(CLICK(3), 2))
 			{
-				if (info.distance >= SQUARE(1280))
+				if (aiInfo.distance >= pow(CLICK(5), 2))
 				{
-					if (info.distance >= SQUARE(1792))
+					if (aiInfo.distance >= pow(CLICK(7), 2))
 						item->TargetState = 0;
 					else
 						item->TargetState = 9;
 				}
 				else
-				{
 					item->TargetState = 8;
-				}
 			}
 			else
-			{
 				item->TargetState = 7;
-			}
+			
 			break;
 
 		default:
 			break;
-
 		}
 	}
 	else
 	{
 		item->HitPoints = 0;
 
-		if (item->ActiveState != STATE_HYDRA_DEATH)
+		if (item->ActiveState != HYDRA_STATE_DEATH)
 		{
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
-			item->ActiveState = STATE_HYDRA_DEATH;
+			item->ActiveState = HYDRA_STATE_DEATH;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 		}
 
