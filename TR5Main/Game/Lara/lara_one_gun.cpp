@@ -1141,7 +1141,7 @@ void AnimateShotgun(int weaponType)
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_LARA_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->pos, 0);
+				SoundEffect(1129, &LaraItem->pos, 0);
 //				HKFlag = 0;
 			}
 		}
@@ -1215,7 +1215,7 @@ void AnimateShotgun(int weaponType)
 				&& !(Lara.Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_LARA_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &LaraItem->pos, 0);
+				SoundEffect(1129, &LaraItem->pos, 0);
 //				HKFlag = 0;
 			}
 /*			else if (HKFlag)
