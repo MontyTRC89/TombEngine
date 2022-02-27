@@ -99,9 +99,8 @@ void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	// Disable smooth angle adjustment for now.
-	//ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
 	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
+	ApproachLaraTargetAngle(item, info->TargetAngle, 2.5f);
 }
 
 // State:		LS_AUTO_JUMP (62)
@@ -114,9 +113,7 @@ void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	// Disable smooth angle adjustment for now.
-	//if (info->Control.ApproachTargetAngle)
-	//	ApproachLaraTargetAngle(item, coll->NearestLedgeAngle, 2.5f);
+	ApproachLaraTargetAngle(item, info->TargetAngle, 2.5f);
 }
 
 // ---------------
