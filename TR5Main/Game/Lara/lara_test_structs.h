@@ -34,6 +34,7 @@ struct VaultTestResult
 	bool SetBusyHands;
 	bool SnapToLedge;
 	bool ApproachLedgeAngle;
+	bool SetJumpVelocity;
 	LaraState TargetState;
 };
 
