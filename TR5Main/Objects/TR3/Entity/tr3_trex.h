@@ -1,5 +1,5 @@
 #pragma once
 #include "Game/items.h"
 
-void LaraTyrannosaurDeath(ITEM_INFO* item);
-void TyrannosaurControl(short itemNum);
+void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem);
+void TRexControl(short itemNumber);
