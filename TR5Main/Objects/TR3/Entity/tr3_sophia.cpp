@@ -38,6 +38,12 @@ enum SophiaState
 	LONDONBOSS_GODOWN
 };
 
+// TODO
+enum SophiaAnim
+{
+
+};
+
 #define	LONDONBOSS_VAULT2_ANIM 9
 #define	LONDONBOSS_VAULT3_ANIM 18
 #define	LONDONBOSS_VAULT4_ANIM 15
@@ -45,6 +51,7 @@ enum SophiaState
 #define	LONDONBOSS_STND2SUM_ANIM 1
 #define LONDONBOSS_SUMMON_ANIM 2
 #define	LONDONBOSS_GODOWN_ANIM 21
+
 #define LONDONBOSS_VAULT_SHIFT 96
 #define LONDONBOSS_AWARE_DISTANCE pow(SECTOR(1), 2)
 #define LONDONBOSS_WALK_TURN ANGLE(4)
@@ -90,7 +97,7 @@ static void LondonBossDie(short itemNumber)
 	item->HitPoints = -16384;
 
 	KillItem(itemNumber);
-	DisableBaddieAI(itemNumber);
+	DisableEntityAI(itemNumber);
 
 	item->Flags |= ONESHOT;
 }
@@ -100,7 +107,7 @@ void ControlLaserBolts(short itemNumber)
 	
 }
 
-void ControlLondBossPlasmaBall(short fx_number)
+void ControlLondBossPlasmaBall(short fxNumber)
 {
 	
 }

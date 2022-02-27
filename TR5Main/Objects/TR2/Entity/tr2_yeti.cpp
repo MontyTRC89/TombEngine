@@ -7,33 +7,50 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO yetiBiteR = { 12, 101, 19, 10 };
-BITE_INFO yetiBiteL = { 12, 101, 19, 13 };
+BITE_INFO YetiBiteRight = { 12, 101, 19, 10 };
+BITE_INFO YetiBiteLeft = { 12, 101, 19, 13 };
 
-void InitialiseYeti(short itemNum)
+// TODO
+enum YetiState
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	ClearItem(itemNum);
+
+};
+
+// TODO
+enum YetiAnim
+{
+
+};
+
+void InitialiseYeti(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	ClearItem(itemNumber);
+	
 	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
 	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 	item->ActiveState = g_Level.Anims[item->AnimNumber].ActiveState;
 }
 
-void YetiControl(short itemNum)
+void YetiControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* yeti = (CREATURE_INFO*)item->Data;
-	AI_INFO info;
-	short angle = 0, torso = 0, head = 0, tilt = 0;
-	bool lara_alive;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* info = GetCreatureInfo(item);
 
-	lara_alive = (LaraItem->HitPoints > 0);
+	bool laraAlive = LaraItem->HitPoints > 0;
+
+	short angle = 0;
+	short torso = 0;
+	short head = 0;
+	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -46,76 +63,61 @@ void YetiControl(short itemNum)
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, yeti->maximumTurn);
+		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 2:
-			if (info.ahead)
-				head = info.angle;
+			info->maximumTurn = 0;
+			info->flags = 0;
 
-			yeti->flags = 0;
-			yeti->maximumTurn = 0;
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
-			if (yeti->mood == ESCAPE_MOOD)
-			{
+			if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 1;
-			}
 			else if (item->RequiredState)
-			{
 				item->TargetState = item->RequiredState;
-			}
-			else if (yeti->mood == BORED_MOOD)
+			else if (info->mood == BORED_MOOD)
 			{
-				if (GetRandomControl() < 0x100 || !lara_alive)
+				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
 				else if (GetRandomControl() < 0x200)
 					item->TargetState = 9;
 				else if (GetRandomControl() < 0x300)
 					item->TargetState = 3;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2) && GetRandomControl() < 0x4000)
-			{
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2) && GetRandomControl() < 0x4000)
 				item->TargetState = 4;
-			}
-			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
-			{
+			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 5;
-			}
-			else if (yeti->mood == STALK_MOOD)
-			{
+			else if (info->mood == STALK_MOOD)
 				item->TargetState = 3;
-			}
 			else
-			{
 				item->TargetState = 1;
-			}
+			
 			break;
-		case 7:
-			if (info.ahead)
-				head = info.angle;
 
-			if (yeti->mood == ESCAPE_MOOD || item->HitStatus)
-			{
+		case 7:
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
+
+			if (info->mood == ESCAPE_MOOD || item->HitStatus)
 				item->TargetState = 2;
-			}
-			else if (yeti->mood == BORED_MOOD)
+			else if (info->mood == BORED_MOOD)
 			{
-				if (lara_alive)
+				if (laraAlive)
 				{
 					if (GetRandomControl() < 0x100)
-					{
 						item->TargetState = 2;
-					}
 					else if (GetRandomControl() < 0x200)
-					{
 						item->TargetState = 9;
-					}
 					else if (GetRandomControl() < 0x300)
 					{
 						item->TargetState = 2;
@@ -124,28 +126,22 @@ void YetiControl(short itemNum)
 				}
 			}
 			else if (GetRandomControl() < 0x200)
-			{
 				item->TargetState = 2;
-			}
+			
 			break;
-		case 9:
-			if (info.ahead)
-				head = info.angle;
 
-			if (yeti->mood == ESCAPE_MOOD || item->HitStatus)
-			{
+		case 9:
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
+
+			if (info->mood == ESCAPE_MOOD || item->HitStatus)
 				item->TargetState = 2;
-			}
-			else if (yeti->mood == BORED_MOOD)
+			else if (info->mood == BORED_MOOD)
 			{
-				if (GetRandomControl() < 0x100 || !lara_alive)
-				{
+				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
-				}
 				else if (GetRandomControl() < 0x200)
-				{
 					item->TargetState = 2;
-				}
 				else if (GetRandomControl() < 0x300)
 				{
 					item->TargetState = 2;
@@ -153,23 +149,21 @@ void YetiControl(short itemNum)
 				}
 			}
 			else if (GetRandomControl() < 0x200)
-			{
 				item->TargetState = 2;
-			}
+			
 			break;
+
 		case 3:
-			if (info.ahead)
-				head = info.angle;
+			info->maximumTurn = ANGLE(4.0f);
 
-			yeti->maximumTurn = ANGLE(4);
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
-			if (yeti->mood == ESCAPE_MOOD)
-			{
+			if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 1;
-			}
-			else if (yeti->mood == BORED_MOOD)
+			else if (info->mood == BORED_MOOD)
 			{
-				if (GetRandomControl() < 0x100 || !lara_alive)
+				if (GetRandomControl() < 0x100 || !laraAlive)
 				{
 					item->TargetState = 2;
 					item->RequiredState = 7;
@@ -180,107 +174,106 @@ void YetiControl(short itemNum)
 					item->RequiredState = 9;
 				}
 				else if (GetRandomControl() < 0x300)
-				{
 					item->TargetState = 2;
-				}
 			}
-			else if (yeti->mood == ATTACK_MOOD)
+			else if (info->mood == ATTACK_MOOD)
 			{
-				if (info.ahead && info.distance < SQUARE(STEP_SIZE))
+				if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 					item->TargetState = 2;
-				else if (info.distance < SQUARE(WALL_SIZE * 2))
+				else if (aiInfo.distance < pow(SECTOR(2), 2))
 					item->TargetState = 1;
 			}
+
 			break;
+
 		case 1:
-			if (info.ahead)
-				head = info.angle;
+			info->maximumTurn = ANGLE(6.0f);
+			tilt = angle / 4;
+			info->flags = 0;
 
-			yeti->flags = 0;
-			yeti->maximumTurn = ANGLE(6);
-			tilt = (angle / 4);
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
-			if (yeti->mood == ESCAPE_MOOD)
-			{
+			if (info->mood == ESCAPE_MOOD)
 				break;
-			}
-			else if (yeti->mood == BORED_MOOD)
-			{
+			else if (info->mood == BORED_MOOD)
 				item->TargetState = 3;
-			}
-			else if (info.ahead && info.distance < SQUARE(STEP_SIZE))
-			{
+			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 2;
-			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-			{
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
-			}
-			else if (yeti->mood == STALK_MOOD)
-			{
+			else if (info->mood == STALK_MOOD)
 				item->TargetState = 3;
-			}
+			
 			break;
-		case 4:
-			if (info.ahead)
-				torso = info.angle;
 
-			if (!yeti->flags && (item->TouchBits & 0x1400))
+		case 4:
+			if (aiInfo.ahead)
+				torso = aiInfo.angle;
+
+			if (!info->flags && item->TouchBits & 0x1400)
 			{
-				CreatureEffect(item, &yetiBiteR, DoBloodSplat);
+				CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+				info->flags = 1;
+
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;
-
-				yeti->flags = 1;
 			}
-			break;
-		case 5:
-			if (info.ahead)
-				torso = info.angle;
-			yeti->maximumTurn = ANGLE(4);
 
-			if (!yeti->flags && (item->TouchBits & (0x0700 | 0x1400)))
+			break;
+
+		case 5:
+			info->maximumTurn = ANGLE(4.0f);
+
+			if (aiInfo.ahead)
+				torso = aiInfo.angle;
+
+			if (!info->flags && item->TouchBits & (0x0700 | 0x1400))
 			{
 				if (item->TouchBits & 0x0700)
-					CreatureEffect(item, &yetiBiteL, DoBloodSplat);
+					CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
 				if (item->TouchBits & 0x1400)
-					CreatureEffect(item, &yetiBiteR, DoBloodSplat);
+					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+
+				info->flags = 1;
 
 				LaraItem->HitPoints -= 150;
 				LaraItem->HitStatus = true;
-
-				yeti->flags = 1;
 			}
-			break;
-		case 6:
-			if (info.ahead)
-				torso = info.angle;
 
-			if (!yeti->flags && (item->TouchBits & (0x0700 | 0x1400)))
+			break;
+
+		case 6:
+			if (aiInfo.ahead)
+				torso = aiInfo.angle;
+
+			if (!info->flags && item->TouchBits & (0x0700 | 0x1400))
 			{
 				if (item->TouchBits & 0x0700)
-					CreatureEffect(item, &yetiBiteL, DoBloodSplat);
+					CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
 				if (item->TouchBits & 0x1400)
-					CreatureEffect(item, &yetiBiteR, DoBloodSplat);
+					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+
+				info->flags = 1;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
-
-				yeti->flags = 1;
 			}
+
 			break;
+
 		case 10:
 		case 11:
 		case 12:
 		case 13:
-			yeti->maximumTurn = 0;
+			info->maximumTurn = 0;
 			break;
 		}
 	}
 
-	if (!lara_alive)
+	if (!laraAlive)
 	{
-		yeti->maximumTurn = 0;
+		info->maximumTurn = 0;
 		CreatureKill(item, 31, 14, 103);
 		return;
 	}
@@ -291,23 +284,26 @@ void YetiControl(short itemNum)
 
 	if (item->ActiveState < 10)
 	{
-		switch (CreatureVault(itemNum, angle, 2, 300))
+		switch (CreatureVault(itemNumber, angle, 2, 300))
 		{
 		case 2:
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 34;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = 10;
 			break;
+
 		case 3:
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 33;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = 11;
 			break;
+
 		case 4:
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = 12;
 			break;
+
 		case -4:
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -317,6 +313,6 @@ void YetiControl(short itemNum)
 	}
 	else
 	{
-		CreatureAnimation(itemNum, angle, tilt);
+		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

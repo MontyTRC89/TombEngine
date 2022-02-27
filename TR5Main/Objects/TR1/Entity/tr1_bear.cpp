@@ -14,37 +14,32 @@
 BITE_INFO BearBite = { 0, 96, 335, 14 };
 
 #define TOUCH 0x2406C
-
 #define ROAR_CHANCE 0x50
 #define REAR_CHANCE 0x300
 #define DROP_CHANCE 0x600
-
-#define REAR_RANGE   pow(SECTOR(2), 2)
+#define REAR_RANGE pow(SECTOR(2), 2)
 #define ATTACK_RANGE pow(SECTOR(1), 2)
-#define PAT_RANGE    pow(600, 2)
-
-#define RUN_TURN  ANGLE(5.0f)
+#define PAT_RANGE pow(600, 2)
+#define RUN_TURN ANGLE(5.0f)
 #define WALK_TURN ANGLE(2.0f)
-
 #define EAT_RANGE pow(CLICK(3), 2)
-
 #define CHARGE_DAMAGE 3
-#define SLAM_DAMAGE   200
+#define SLAM_DAMAGE 200
 #define ATTACK_DAMAGE 200
-#define PAT_DAMAGE    400
+#define PAT_DAMAGE 400
 
 enum BearState
 {
-	BEAR_STATE_STROLL,
-	BEAR_STATE_IDLE,
-	BEAR_STATE_WALK,
-	BEAR_STATE_RUN,
-	BEAR_STATE_REAR,
-	BEAR_STATE_ROAR,
-	BEAR_STATE_ATTACK_1,
-	BEAR_STATE_ATTACK_2,
-	BEAR_STATE_CHOMP,
-	BEAR_STATE_DEATH
+	BEAR_STATE_STROLL = 0,
+	BEAR_STATE_IDLE = 1,
+	BEAR_STATE_WALK = 2,
+	BEAR_STATE_RUN = 3,
+	BEAR_STATE_REAR = 4,
+	BEAR_STATE_ROAR = 5,
+	BEAR_STATE_ATTACK_1 = 6,
+	BEAR_STATE_ATTACK_2 = 7,
+	BEAR_STATE_CHOMP = 8,
+	BEAR_STATE_DEATH = 9
 };
 
 // TODO
@@ -109,14 +104,14 @@ void BearControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = CreatureTurn(item, info->maximumTurn);
 
@@ -130,7 +125,7 @@ void BearControl(short itemNumber)
 		case BEAR_STATE_IDLE:
 			if (laraDead)
 			{
-				if (AIInfo.bite && AIInfo.distance < EAT_RANGE)
+				if (aiInfo.bite && aiInfo.distance < EAT_RANGE)
 					item->TargetState = BEAR_STATE_CHOMP;
 				else
 					item->TargetState = BEAR_STATE_STROLL;
@@ -147,7 +142,7 @@ void BearControl(short itemNumber)
 		case BEAR_STATE_STROLL:
 			info->maximumTurn = WALK_TURN;
 
-			if (laraDead && item->TouchBits & TOUCH && AIInfo.ahead)
+			if (laraDead && item->TouchBits & TOUCH && aiInfo.ahead)
 				item->TargetState = BEAR_STATE_IDLE;
 			else if (info->mood != BORED_MOOD)
 			{
@@ -175,14 +170,14 @@ void BearControl(short itemNumber)
 
 			if (info->mood == BORED_MOOD || laraDead)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (AIInfo.ahead && !item->RequiredState)
+			else if (aiInfo.ahead && !item->RequiredState)
 			{
-				if (!info->flags && AIInfo.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
+				if (!info->flags && aiInfo.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
 					item->RequiredState = BEAR_STATE_REAR;
 					item->TargetState = BEAR_STATE_IDLE;
 				}
-				else if (AIInfo.distance < ATTACK_RANGE)
+				else if (aiInfo.distance < ATTACK_RANGE)
 					item->TargetState = BEAR_STATE_ATTACK_1;
 			}
 
@@ -198,7 +193,7 @@ void BearControl(short itemNumber)
 				item->TargetState = item->RequiredState;
 			else if (info->mood == BORED_MOOD || info->mood == ESCAPE_MOOD)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (AIInfo.bite && AIInfo.distance < PAT_RANGE)
+			else if (aiInfo.bite && aiInfo.distance < PAT_RANGE)
 				item->TargetState = BEAR_STATE_ATTACK_2;
 			else
 				item->TargetState = BEAR_STATE_WALK;
@@ -211,7 +206,7 @@ void BearControl(short itemNumber)
 				item->RequiredState = BEAR_STATE_STROLL;
 				item->TargetState = BEAR_STATE_REAR;
 			}
-			else if (AIInfo.ahead && (item->TouchBits & TOUCH))
+			else if (aiInfo.ahead && (item->TouchBits & TOUCH))
 				item->TargetState = BEAR_STATE_REAR;
 			else if (info->mood == ESCAPE_MOOD)
 			{
@@ -223,7 +218,7 @@ void BearControl(short itemNumber)
 				item->RequiredState = BEAR_STATE_ROAR;
 				item->TargetState = BEAR_STATE_REAR;
 			}
-			else if (AIInfo.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
+			else if (aiInfo.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
 			{
 				item->RequiredState = BEAR_STATE_IDLE;
 				item->TargetState = BEAR_STATE_REAR;

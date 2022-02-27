@@ -48,14 +48,14 @@ void RatControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, TIMID);
-		CreatureMood(item, &AIInfo, TIMID);
+		GetCreatureMood(item, &aiInfo, TIMID);
+		CreatureMood(item, &aiInfo, TIMID);
 
 		angle = CreatureTurn(item, ANGLE(6.0f));
 
@@ -70,7 +70,7 @@ void RatControl(short itemNumber)
 				else if (random > 0xA00)
 					item->RequiredState = 1;
 			}
-			else if (AIInfo.distance < pow(340, 2))
+			else if (aiInfo.distance < pow(340, 2))
 				item->RequiredState = 5;
 			else
 				item->RequiredState = 1;
@@ -102,7 +102,7 @@ void RatControl(short itemNumber)
 				else if (random < 0xA00)
 					item->TargetState = 2;
 			}
-			else if (AIInfo.ahead && AIInfo.distance < pow(340, 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(340, 2))
 				item->TargetState = 2;
 
 			break;

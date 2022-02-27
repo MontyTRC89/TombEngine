@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Specific/trmath.h"
 
-#define NATLA_NEAR_DEATH 200
+BITE_INFO NatlaGunBite = { 5, 220, 7, 4 };
 
 enum NatlaState
 {
@@ -28,8 +28,7 @@ enum NatlaState
 	NATLA_STATE_DEATH
 };
 
-BITE_INFO NatlaGunBite = { 5, 220, 7, 4 };
-
+#define NATLA_NEAR_DEATH 200
 #define NATLA_FLYMODE 0x8000
 #define NATLA_TIMER   0x7fff
 #define NATLA_FIRE_ARC ANGLE(30.0f)
@@ -56,7 +55,7 @@ void NatlaControl(short itemNumber)
 	int shoot;
 	short timer = info->flags & NATLA_TIMER;
 
-	AI_INFO AIInfo;
+	AI_INFO aiInfo;
 
 	if (item->HitPoints <= 0 && item->HitPoints > -16384)
 		item->TargetState = NATLA_STATE_DEATH;
@@ -65,16 +64,16 @@ void NatlaControl(short itemNumber)
 		info->LOT.step = CLICK(1);
 		info->LOT.drop = -CLICK(1);
 		info->LOT.fly = NO_FLYING;
-		CreatureAIInfo(item, &AIInfo);
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = CreatureTurn(item, NATLA_RUN_TURN);
-		shoot = (AIInfo.angle > -NATLA_FIRE_ARC && AIInfo.angle < NATLA_FIRE_ARC && Targetable(item, &AIInfo));
+		shoot = (aiInfo.angle > -NATLA_FIRE_ARC && aiInfo.angle < NATLA_FIRE_ARC && Targetable(item, &aiInfo));
 
 		if (facing)
 		{
@@ -172,9 +171,9 @@ void NatlaControl(short itemNumber)
 		info->LOT.step = CLICK(1);
 		info->LOT.drop = -CLICK(1);
 		info->LOT.fly = NO_FLYING;
-		CreatureAIInfo(item, &AIInfo);
+		CreatureAIInfo(item, &aiInfo);
 
-		shoot = (AIInfo.angle > -NATLA_FIRE_ARC && AIInfo.angle < NATLA_FIRE_ARC && Targetable(item, &AIInfo));
+		shoot = (aiInfo.angle > -NATLA_FIRE_ARC && aiInfo.angle < NATLA_FIRE_ARC && Targetable(item, &aiInfo));
 
 		if (item->ActiveState == NATLA_STATE_FLY && (info->flags & NATLA_FLYMODE))
 		{
@@ -182,34 +181,34 @@ void NatlaControl(short itemNumber)
 				info->flags -= NATLA_FLYMODE;
 
 			if (!(info->flags & NATLA_FLYMODE))
-				CreatureMood(item, &AIInfo, VIOLENT);
+				CreatureMood(item, &aiInfo, VIOLENT);
 
 			info->LOT.step = SECTOR(20);
 			info->LOT.drop = -SECTOR(20);
 			info->LOT.fly = CLICK(0.25f) / 2;
 
-			CreatureAIInfo(item, &AIInfo);
+			CreatureAIInfo(item, &aiInfo);
 		}
 		else if (!shoot)
 			info->flags |= NATLA_FLYMODE;
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
 		if (item->ActiveState != NATLA_STATE_FLY || (info->flags & NATLA_FLYMODE))
-			CreatureMood(item, &AIInfo, TIMID);
+			CreatureMood(item, &aiInfo, TIMID);
 
 		item->Position.yRot -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
 		if (item->ActiveState == NATLA_STATE_FLY)
 		{
-			if (AIInfo.angle > NATLA_FLY_TURN)
+			if (aiInfo.angle > NATLA_FLY_TURN)
 				facing += NATLA_FLY_TURN;
-			else if (AIInfo.angle < -NATLA_FLY_TURN)
+			else if (aiInfo.angle < -NATLA_FLY_TURN)
 				facing -= NATLA_FLY_TURN;
 			else
-				facing += AIInfo.angle;
+				facing += aiInfo.angle;
 
 			item->Position.yRot += facing;
 		}

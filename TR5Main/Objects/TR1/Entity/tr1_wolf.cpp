@@ -85,14 +85,14 @@ void WolfControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, TIMID);
-		CreatureMood(item, &AIInfo, TIMID);
+		GetCreatureMood(item, &aiInfo, TIMID);
+		CreatureMood(item, &aiInfo, TIMID);
 
 		angle = CreatureTurn(item, info->maximumTurn);
 
@@ -101,7 +101,7 @@ void WolfControl(short itemNumber)
 		case WOLF_STATE_SLEEP:
 			head = 0;
 
-			if (info->mood == ESCAPE_MOOD || AIInfo.zoneNumber == AIInfo.enemyZone)
+			if (info->mood == ESCAPE_MOOD || aiInfo.zoneNumber == aiInfo.enemyZone)
 			{
 				item->RequiredState = WOLF_STATE_CROUCH;
 				item->TargetState = WOLF_STATE_IDLE;
@@ -142,7 +142,7 @@ void WolfControl(short itemNumber)
 				item->TargetState = item->RequiredState;
 			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = WOLF_STATE_RUN;
-			else if (AIInfo.distance < pow(345, 2) && AIInfo.bite)
+			else if (aiInfo.distance < pow(345, 2) && aiInfo.bite)
 				item->TargetState = WOLF_STATE_BITE;
 			else if (info->mood == STALK_MOOD)
 				item->TargetState = WOLF_STATE_STALK;
@@ -158,14 +158,14 @@ void WolfControl(short itemNumber)
 
 			if (info->mood == ESCAPE_MOOD)
 				item->TargetState = WOLF_STATE_RUN;
-			else if (AIInfo.distance < pow(345, 2) && AIInfo.bite)
+			else if (aiInfo.distance < pow(345, 2) && aiInfo.bite)
 				item->TargetState = WOLF_STATE_BITE;
-			else if (AIInfo.distance > pow(SECTOR(3), 2))
+			else if (aiInfo.distance > pow(SECTOR(3), 2))
 				item->TargetState = WOLF_STATE_RUN;
 			else if (info->mood == ATTACK_MOOD)
 			{
-				if (!AIInfo.ahead || AIInfo.distance > pow(SECTOR(1.5f), 2) ||
-					(AIInfo.enemyFacing < FRONT_ARC && AIInfo.enemyFacing > -FRONT_ARC))
+				if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(1.5f), 2) ||
+					(aiInfo.enemyFacing < FRONT_ARC && aiInfo.enemyFacing > -FRONT_ARC))
 				{
 					item->TargetState = WOLF_STATE_RUN;
 				}
@@ -184,10 +184,10 @@ void WolfControl(short itemNumber)
 			info->maximumTurn = RUN_TURN;
 			tilt = angle;
 
-			if (AIInfo.ahead && AIInfo.distance < ATTACK_RANGE)
+			if (aiInfo.ahead && aiInfo.distance < ATTACK_RANGE)
 			{
-				if (AIInfo.distance > (ATTACK_RANGE / 2) &&
-					(AIInfo.enemyFacing > FRONT_ARC || AIInfo.enemyFacing < -FRONT_ARC))
+				if (aiInfo.distance > (ATTACK_RANGE / 2) &&
+					(aiInfo.enemyFacing > FRONT_ARC || aiInfo.enemyFacing < -FRONT_ARC))
 				{
 					item->RequiredState = WOLF_STATE_STALK;
 					item->TargetState = WOLF_STATE_CROUCH;
@@ -198,7 +198,7 @@ void WolfControl(short itemNumber)
 					item->RequiredState = WOLF_STATE_NONE;
 				}
 			}
-			else if (info->mood == STALK_MOOD && AIInfo.distance < STALK_RANGE)
+			else if (info->mood == STALK_MOOD && aiInfo.distance < STALK_RANGE)
 			{
 				item->RequiredState = WOLF_STATE_STALK;
 				item->TargetState = WOLF_STATE_CROUCH;
@@ -224,7 +224,7 @@ void WolfControl(short itemNumber)
 
 		case WOLF_STATE_BITE:
 			if (!item->RequiredState &&
-				item->TouchBits & TOUCH && AIInfo.ahead)
+				item->TouchBits & TOUCH && aiInfo.ahead)
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
 				LaraItem->HitPoints -= BITE_DAMAGE;

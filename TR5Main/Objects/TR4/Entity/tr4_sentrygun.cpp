@@ -209,7 +209,7 @@ namespace TEN::Entities::TR4
 		else
 		{
 			ExplodingDeath(itemNum, -1, 257);
-			DisableBaddieAI(itemNum);
+			DisableEntityAI(itemNum);
 			KillItem(itemNum);
 
 			item->Flags |= 1u;

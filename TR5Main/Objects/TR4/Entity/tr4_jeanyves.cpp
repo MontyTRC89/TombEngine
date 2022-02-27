@@ -9,18 +9,18 @@
 
 void InitialiseJeanYves(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	auto* item = &g_Level.Items[itemNumber];
+	auto* objectInfo = &Objects[item->ObjectNumber];
 	
 	item->TargetState = 1;
 	item->ActiveState = 1;
-	item->AnimNumber = obj->animIndex;
+	item->AnimNumber = objectInfo->animIndex;
 	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 }
 
 void JeanYvesControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags >= Lara.highestLocation)
 	{

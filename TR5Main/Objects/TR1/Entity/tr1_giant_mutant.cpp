@@ -29,20 +29,21 @@
 
 enum GiantMutantState
 {
-	MUTANT_STATE_NONE,
-	MUTANT_STATE_IDLE,
-	MUTANT_STATE_TURN_LEFT,
-	MUTANT_STATE_TURN_RIGHT,
-	MUTANT_STATE_ATTACK_1,
-	MUTANT_STATE_ATTACK_2,
-	MUTANT_STATE_ATTACK_3,
-	MUTANT_STATE_FORWARD,
-	MUTANT_STATE_SET,
-	MUTANT_STATE_FALL,
-	MUTANT_STATE_DEATH,
-	MUTANT_STATE_KILL
+	MUTANT_STATE_NONE = 0,
+	MUTANT_STATE_IDLE = 1,
+	MUTANT_STATE_TURN_LEFT = 2,
+	MUTANT_STATE_TURN_RIGHT = 3,
+	MUTANT_STATE_ATTACK_1 = 4,
+	MUTANT_STATE_ATTACK_2 = 5,
+	MUTANT_STATE_ATTACK_3 = 6,
+	MUTANT_STATE_FORWARD = 7,
+	MUTANT_STATE_SET = 8,
+	MUTANT_STATE_FALL = 9,
+	MUTANT_STATE_DEATH = 10,
+	MUTANT_STATE_KILL = 11
 };
 
+// TODO
 enum GianMutantAnim
 {
 	MUTANT_ANIM_DEATH = 13,
@@ -70,14 +71,14 @@ void GiantMutantControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = (short)phd_atan(info->target.z - item->Position.zPos, info->target.x - item->Position.xPos) - item->Position.yRot;
 
@@ -104,11 +105,11 @@ void GiantMutantControl(short itemNumber)
 				item->TargetState = MUTANT_STATE_TURN_RIGHT;
 			else if (angle < -MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_TURN_LEFT;
-			else if (AIInfo.distance < MUTANT_ATTACK_RANGE)
+			else if (aiInfo.distance < MUTANT_ATTACK_RANGE)
 			{
 				if (LaraItem->HitPoints <= MUTANT_ATTACK_DAMAGE)
 				{
-					if (AIInfo.distance < MUTANT_CLOSE_RANGE)
+					if (aiInfo.distance < MUTANT_CLOSE_RANGE)
 						item->TargetState = MUTANT_STATE_ATTACK_3;
 					else
 						item->TargetState = MUTANT_STATE_FORWARD;
@@ -133,7 +134,7 @@ void GiantMutantControl(short itemNumber)
 
 			if (angle > MUTANT_NEED_TURN || angle < -MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_IDLE;
-			else if (AIInfo.distance < MUTANT_ATTACK_RANGE)
+			else if (aiInfo.distance < MUTANT_ATTACK_RANGE)
 				item->TargetState = MUTANT_STATE_IDLE;
 
 			break;
