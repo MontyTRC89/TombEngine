@@ -1846,7 +1846,6 @@ VaultTestResult TestLaraVault2Steps(ITEM_INFO* item, COLL_INFO* coll)
 	testResult.Height += CLICK(2);
 	testResult.SetBusyHands = true;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = false;
 	return testResult;
 }
@@ -1867,7 +1866,6 @@ VaultTestResult TestLaraVault3Steps(ITEM_INFO* item, COLL_INFO* coll)
 	testResult.Height += CLICK(3);
 	testResult.SetBusyHands = true;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = false;
 	return testResult;
 }
@@ -1888,7 +1886,6 @@ VaultTestResult TestLaraVault1StepToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 	testResult.Height += CLICK(1);
 	testResult.SetBusyHands = true;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = false;
 	return testResult;
 }
@@ -1909,7 +1906,6 @@ VaultTestResult TestLaraVault2StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 	testResult.Height += CLICK(2);
 	testResult.SetBusyHands = true;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = false;
 	return testResult;
 }
@@ -1930,7 +1926,6 @@ VaultTestResult TestLaraVault3StepsToCrouch(ITEM_INFO* item, COLL_INFO* coll)
 	testResult.Height += CLICK(3);
 	testResult.SetBusyHands = true;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = false;
 	return testResult;
 }
@@ -1951,7 +1946,6 @@ VaultTestResult TestLaraLedgeAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
 	testResult.SetBusyHands = false;
 	testResult.SnapToLedge = true;
-	testResult.ApproachLedgeAngle = true;
 	testResult.SetJumpVelocity = true;
 	return testResult;
 }
@@ -1971,7 +1965,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
 	{
-		return VaultTestResult{ true, probeMiddle.Position.Ceiling, false, true, true, true };
+		return VaultTestResult{ true, probeMiddle.Position.Ceiling, false, true, true };
 	}
 
 	return VaultTestResult{ false };
@@ -1993,7 +1987,7 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, COLL_INFO* coll)
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
-		return VaultTestResult{ true, NO_HEIGHT, true, true, true, false };
+		return VaultTestResult{ true, NO_HEIGHT, true, true, false };
 	}
 
 	return VaultTestResult{ false };
@@ -2011,7 +2005,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
-		return VaultTestResult{ true, probe.Position.Ceiling, false, false, false, true };
+		return VaultTestResult{ true, probe.Position.Ceiling, false, false, true };
 	}
 
 	return VaultTestResult{ false };

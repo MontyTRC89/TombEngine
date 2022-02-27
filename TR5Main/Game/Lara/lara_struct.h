@@ -1156,7 +1156,6 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-	bool ApproachTargetAngle;
 
 	short WaterCurrentActive;
 
@@ -1191,9 +1190,10 @@ struct LaraInfo
 	int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
+	short TargetAngle; // savegame
 	int WaterSurfaceDist;
-	PHD_3DPOS NextCornerPos;
 	short interactedItem;
+	PHD_3DPOS NextCornerPos;
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
