@@ -65,7 +65,7 @@ enum GAME_OBJECT_ID : short
 	ID_RUBBER_BOAT,									// TR3 / (TR4 TRNG)
 	ID_BIGGUN_ANIMS,
 	ID_BIGGUN,										// TR3
-	ID_MINECART_SWITCH,                             //NEW - Added to un-hardcode Minecart switch from ANIMATING_2
+	
 
 	ID_VEHICLE_SMASHABLE_FLOOR = 90, // NEW
 	ID_VEHICLE_SMASHABLE_WALL, // NEW
