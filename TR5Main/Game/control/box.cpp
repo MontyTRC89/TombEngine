@@ -21,11 +21,11 @@
 #define ESCAPE_DIST SECTOR(5)
 #define STALK_DIST SECTOR(3)
 #define REACHED_GOAL_RADIUS 640
-#define ATTACK_RANGE SQUARE(SECTOR(3))
+#define ATTACK_RANGE pow(SECTOR(3), 2)
 #define ESCAPE_CHANCE  0x800
 #define RECOVER_CHANCE 0x100
 #define BIFF_AVOID_TURN 1536
-#define FEELER_DISTANCE 512
+#define FEELER_DISTANCE CLICK(2)
 #define FEELER_ANGLE ANGLE(45.0f)
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
@@ -365,7 +365,7 @@ void CreatureFloat(short itemNumber)
 			item->Position.yPos = waterLevel;
 			item->Collidable = false;
 			item->Status = ITEM_DEACTIVATED;
-			DisableBaddieAI(itemNumber);
+			DisableEntityAI(itemNumber);
 			RemoveActiveItem(itemNumber);
 			item->AfterDeath = 1;
 		}
@@ -834,7 +834,7 @@ void CreatureDie(short itemNumber, int explode)
 		RemoveActiveItem(itemNumber);
 	}
 
-	DisableBaddieAI(itemNumber);
+	DisableEntityAI(itemNumber);
 	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
 	DropBaddyPickups(item);
 }

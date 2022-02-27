@@ -15,16 +15,16 @@
 int SlotsUsed;
 std::vector<CREATURE_INFO*> ActiveCreatures;
 
-void InitialiseLOTarray(int itemNum)
+void InitialiseLOTarray(int itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	
-	CREATURE_INFO* creature = item->Data;
-	if(!creature->LOT.initialised) {
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = (CREATURE_INFO*)item->Data;
+
+	if(!creature->LOT.initialised)
+	{
 		creature->LOT.node = std::vector<BOX_NODE>(g_Level.Boxes.size(), BOX_NODE{});
 		creature->LOT.initialised = true;
 	}
-	
 }
 
 int EnableBaddieAI(short itemNum, int always)
@@ -97,11 +97,10 @@ int EnableBaddieAI(short itemNum, int always)
 	return true;
 }
 
-void DisableBaddieAI(short itemNumber)
+void DisableEntityAI(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-	
 	
 	if (creature)
 	{
@@ -109,7 +108,6 @@ void DisableBaddieAI(short itemNumber)
 		KillItem(creature->aiTargetNum);
 		ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
 		item->Data = nullptr;
-
 	}
 }
 

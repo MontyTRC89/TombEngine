@@ -71,7 +71,7 @@ void SmallSpiderControl(short itemNum)
 		if (item->ActiveState != 7)
 		{
 			ExplodingDeath(itemNum, -1, 256);
-			DisableBaddieAI(itemNum);
+			DisableEntityAI(itemNum);
 			item->ActiveState = 7;
 			KillItem(itemNum);
 		}

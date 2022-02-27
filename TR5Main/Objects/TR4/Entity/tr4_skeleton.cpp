@@ -724,7 +724,7 @@ namespace TEN::Entities::TR4
 					{
 						ExplodingDeath(itemNumber, -1, 929);
 						KillItem(itemNumber);
-						DisableBaddieAI(itemNumber);
+						DisableEntityAI(itemNumber);
 						//Savegame.Kills++;
 					}
 				}

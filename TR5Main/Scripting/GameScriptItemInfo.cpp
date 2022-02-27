@@ -569,7 +569,7 @@ void GameScriptItemInfo::DisableItem()
 				m_item->TouchBits = 0;
 				m_item->Status = ITEM_DEACTIVATED;
 				RemoveActiveItem(m_num);
-				DisableBaddieAI(m_num);
+				DisableEntityAI(m_num);
 			}
 		}
 		else

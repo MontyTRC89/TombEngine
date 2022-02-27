@@ -134,7 +134,7 @@ void ScorpionControl(short itemNumber)
 						
 						if (currentItem->ObjectNumber == ID_TROOPS && currentItem->TriggerFlags == 1)
 						{
-							DisableBaddieAI(linkNumber);
+							DisableEntityAI(linkNumber);
 							KillItem(linkNumber);
 							currentItem->Flags |= IFLAG_KILLED;
 							break;

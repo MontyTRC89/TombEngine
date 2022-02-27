@@ -47,14 +47,14 @@ void BirdMonsterControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 		angle = CreatureTurn(item, info->maximumTurn);
 
 		switch (item->ActiveState)
@@ -62,16 +62,16 @@ void BirdMonsterControl(short itemNumber)
 		case 1:
 			info->maximumTurn = 0;
 
-			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
+			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 3;
 				else
 					item->TargetState = 10;
 			}
-			else if (AIInfo.ahead && (info->mood == BORED_MOOD || info->mood == STALK_MOOD))
+			else if (aiInfo.ahead && (info->mood == BORED_MOOD || info->mood == STALK_MOOD))
 			{
-				if (AIInfo.zoneNumber != AIInfo.enemyZone)
+				if (aiInfo.zoneNumber != aiInfo.enemyZone)
 				{
 					item->TargetState = 2;
 					info->mood = ESCAPE_MOOD;
@@ -87,7 +87,7 @@ void BirdMonsterControl(short itemNumber)
 		case 8:
 			info->maximumTurn = 0;
 
-			if (info->mood != BORED_MOOD || !AIInfo.ahead)
+			if (info->mood != BORED_MOOD || !aiInfo.ahead)
 				item->TargetState = 1;
 			
 			break;
@@ -95,9 +95,9 @@ void BirdMonsterControl(short itemNumber)
 		case 2:
 			info->maximumTurn = ANGLE(4.0f);
 
-			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
+			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 5;
-			else if ((info->mood == BORED_MOOD || info->mood == STALK_MOOD) && AIInfo.ahead)
+			else if ((info->mood == BORED_MOOD || info->mood == STALK_MOOD) && aiInfo.ahead)
 				item->TargetState = 1;
 			
 			break;
@@ -105,7 +105,7 @@ void BirdMonsterControl(short itemNumber)
 		case 3:
 			info->flags = 0;
 
-			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
+			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 4;
 			else
 				item->TargetState = 1;
@@ -115,7 +115,7 @@ void BirdMonsterControl(short itemNumber)
 		case 5:
 			info->flags = 0;
 
-			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
+			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
 			else
 				item->TargetState = 1;
@@ -125,7 +125,7 @@ void BirdMonsterControl(short itemNumber)
 		case 10:
 			info->flags = 0;
 
-			if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
+			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 11;
 			else
 				item->TargetState = 1;

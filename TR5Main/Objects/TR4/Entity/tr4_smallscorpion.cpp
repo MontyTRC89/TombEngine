@@ -81,11 +81,11 @@ void SmallScorpionControl(short itemNumber)
 		else
 			info->enemy = LaraItem;
 
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = CreatureTurn(item, info->maximumTurn);
 
@@ -95,9 +95,9 @@ void SmallScorpionControl(short itemNumber)
 			info->maximumTurn = 0;
 			info->flags = 0;
 
-			if (AIInfo.distance > pow(341, 2))
+			if (aiInfo.distance > pow(341, 2))
 				item->TargetState = SSCORPION_STATE_WALK;
-			else if (AIInfo.bite)
+			else if (aiInfo.bite)
 			{
 				info->maximumTurn = ANGLE(6.0f);
 				if (GetRandomControl() & 1)
@@ -105,16 +105,16 @@ void SmallScorpionControl(short itemNumber)
 				else
 					item->TargetState = SSCORPION_STATE_ATTACK_2;
 			}
-			else if (!AIInfo.ahead)
+			else if (!aiInfo.ahead)
 				item->TargetState = SSCORPION_STATE_RUN;
 			
 			break;
 
 		case SSCORPION_STATE_WALK:
 			info->maximumTurn = ANGLE(6.0f);
-			if (AIInfo.distance >= pow(341, 2))
+			if (aiInfo.distance >= pow(341, 2))
 			{
-				if (AIInfo.distance > pow(213, 2))
+				if (aiInfo.distance > pow(213, 2))
 					item->TargetState = SSCORPION_STATE_RUN;
 			}
 			else
@@ -125,7 +125,7 @@ void SmallScorpionControl(short itemNumber)
 		case SSCORPION_STATE_RUN:
 			info->maximumTurn = ANGLE(8.0f);
 
-			if (AIInfo.distance < pow(341, 2))
+			if (aiInfo.distance < pow(341, 2))
 				item->TargetState = SSCORPION_STATE_IDLE;
 			
 			break;
@@ -134,15 +134,15 @@ void SmallScorpionControl(short itemNumber)
 		case SSCORPION_STATE_ATTACK_2:
 			info->maximumTurn = 0;
 
-			if (abs(AIInfo.angle) >= ANGLE(6.0f))
+			if (abs(aiInfo.angle) >= ANGLE(6.0f))
 			{
-				if (AIInfo.angle >= 0)
+				if (aiInfo.angle >= 0)
 					item->Position.yRot += ANGLE(6.0f);
 				else
 					item->Position.yRot -= ANGLE(6.0f);
 			}
 			else
-				item->Position.yRot += AIInfo.angle;
+				item->Position.yRot += aiInfo.angle;
 			
 			if (!info->flags)
 			{

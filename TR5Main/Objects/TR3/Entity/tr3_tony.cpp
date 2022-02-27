@@ -190,9 +190,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 			sptr->rotAdd = (GetRandomControl() & 15) + 16;
 	}
 	else
-	{
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
-	}
 
 	sptr->fxObj = (unsigned char)fxNumber;
 	sptr->def = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
@@ -457,7 +455,7 @@ static void TonyBossDie(short itemNum)
 	item->HitPoints = -16384;
 	
 	KillItem(itemNum);
-	DisableBaddieAI(itemNum);
+	DisableEntityAI(itemNum);
 
 	item->Flags |= ONESHOT;
 }

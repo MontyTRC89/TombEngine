@@ -194,7 +194,7 @@ void KillActiveBaddies(ITEM_INFO* item)
 				if (*(int*)&item != 0xABCDEF)
 				{
 					RemoveActiveItem(itemNum);
-					DisableBaddieAI(itemNum);
+					DisableEntityAI(itemNum);
 					targetItem->Flags |= IFLAG_INVISIBLE;
 				}
 			}

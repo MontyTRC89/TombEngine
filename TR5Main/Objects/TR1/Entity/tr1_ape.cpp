@@ -158,18 +158,18 @@ void ApeControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, TIMID);
-		CreatureMood(item, &AIInfo, TIMID);
+		GetCreatureMood(item, &aiInfo, TIMID);
+		CreatureMood(item, &aiInfo, TIMID);
 
 		angle = CreatureTurn(item, creatureInfo->maximumTurn);
 
-		if (item->HitStatus || AIInfo.distance < PANIC_RANGE)
+		if (item->HitStatus || aiInfo.distance < PANIC_RANGE)
 			creatureInfo->flags |= APE_FLAG_ATTACK;
 
 		short random;
@@ -190,10 +190,10 @@ void ApeControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (AIInfo.bite && AIInfo.distance < ATTACK_RANGE)
+			else if (aiInfo.bite && aiInfo.distance < ATTACK_RANGE)
 				item->TargetState = APE_STATE_ATTACK;
 			else if (!(creatureInfo->flags & APE_FLAG_ATTACK) &&
-				AIInfo.zoneNumber == AIInfo.enemyZone && AIInfo.ahead)
+				aiInfo.zoneNumber == aiInfo.enemyZone && aiInfo.ahead)
 			{
 				random = (short)(GetRandomControl() / 32);
 				if (random < JUMP_CHANCE)
@@ -222,12 +222,12 @@ void ApeControl(short itemNumber)
 			creatureInfo->maximumTurn = RUN_TURN;
 
 			if (creatureInfo->flags == 0 &&
-				AIInfo.angle > -DISPLAY_ANGLE &&
-				AIInfo.angle < DISPLAY_ANGLE)
+				aiInfo.angle > -DISPLAY_ANGLE &&
+				aiInfo.angle < DISPLAY_ANGLE)
 			{
 				item->TargetState = APE_STATE_IDLE;
 			}
-			else if (AIInfo.ahead && item->TouchBits & TOUCH)
+			else if (aiInfo.ahead && item->TouchBits & TOUCH)
 			{
 				item->RequiredState = APE_STATE_ATTACK;
 				item->TargetState = APE_STATE_IDLE;

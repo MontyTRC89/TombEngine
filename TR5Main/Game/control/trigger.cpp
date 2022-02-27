@@ -498,7 +498,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				if (item->Active && Objects[item->ObjectNumber].intelligent)
 				{
 					item->HitPoints = NOT_TARGETABLE;
-					DisableBaddieAI(value);
+					DisableEntityAI(value);
 					KillItem(value);
 				}
 			}
