@@ -323,11 +323,12 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
 	info->Control.TurnRate = 0;
 
-	// Disable smooth angle adjustment for now.
-	//info->Control.ApproachTargetAngle = vaultResult.ApproachLedgeAngle;
-
 	if (vaultResult.SnapToLedge)
-		SnapItemToLedge(item, coll, 0.2f);
+	{
+		// Disable smooth angle adjustment for now.
+		SnapItemToLedge(item, coll, 0.2f/*, false*/);
+		info->TargetAngle = /*coll->NearestLedgeAngle*/ item->Position.yRot;
+	}
 
 	if (vaultResult.SetJumpVelocity)
 		info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
