@@ -297,7 +297,7 @@ void EnemyJeepControl(short itemNumber)
 			{
 				item->Status = ITEM_INVISIBLE;
 				RemoveActiveItem(itemNumber);
-				DisableBaddieAI(itemNumber);
+				DisableEntityAI(itemNumber);
 			}
 
 			if (Lara.location >= item->ItemFlags[3] || !(target->Flags & 4))

@@ -241,7 +241,7 @@ void SkidManControl(short riderNum)
 		rider->HitPoints = -16384;
 		rider->Flags |= ONESHOT;
 
-		DisableBaddieAI(item_number);
+		DisableEntityAI(item_number);
 		item->ObjectNumber = ID_SNOWMOBILE;
 		item->Status = ITEM_DEACTIVATED;
 		InitialiseSkidoo(item_number);

@@ -80,22 +80,22 @@ void WildBoarControl(short itemNumber)
 			}
 		}
 
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
 
 		if (item->Flags)
 			info->mood = ESCAPE_MOOD;
 
-		CreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = CreatureTurn(item, info->maximumTurn);
 
-		if (AIInfo.ahead)
+		if (aiInfo.ahead)
 		{
-			joint1 = AIInfo.angle / 2;
-			joint3 = AIInfo.angle / 2;
+			joint1 = aiInfo.angle / 2;
+			joint3 = aiInfo.angle / 2;
 		}
 
 		switch (item->ActiveState)
@@ -103,7 +103,7 @@ void WildBoarControl(short itemNumber)
 		case 1:
 			info->maximumTurn = 0;
 
-			if (AIInfo.ahead && AIInfo.distance || item->Flags)
+			if (aiInfo.ahead && aiInfo.distance || item->Flags)
 				item->TargetState = 2;
 			else if (GetRandomControl() & 0x7F)
 			{
@@ -118,7 +118,7 @@ void WildBoarControl(short itemNumber)
 		case 3:
 			info->maximumTurn = 0;
 
-			if (AIInfo.ahead && AIInfo.distance)
+			if (aiInfo.ahead && aiInfo.distance)
 				item->TargetState = 1;
 			else if (!(GetRandomControl() & 0x7F))
 				item->TargetState = 1;
@@ -126,7 +126,7 @@ void WildBoarControl(short itemNumber)
 			break;
 
 		case 2:
-			if (AIInfo.distance >= 0x400000)
+			if (aiInfo.distance >= 0x400000)
 			{
 				info->maximumTurn = 1092;
 				item->Flags = 0;
@@ -134,11 +134,11 @@ void WildBoarControl(short itemNumber)
 			else
 			{
 				info->maximumTurn = 546;
-				joint0 = -AIInfo.distance;
-				joint2 = -AIInfo.distance;
+				joint0 = -aiInfo.distance;
+				joint2 = -aiInfo.distance;
 			}
 
-			if (!item->Flags && (AIInfo.distance < 0x10000 && AIInfo.bite))
+			if (!item->Flags && (aiInfo.distance < 0x10000 && aiInfo.bite))
 			{
 				item->TargetState = 4;
 

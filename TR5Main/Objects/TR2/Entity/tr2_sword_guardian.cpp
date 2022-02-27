@@ -63,7 +63,7 @@ void SwordGuardianControl(short itemNum)
 			//item->objectNumber = ID_SAS;
 			ExplodingDeath(itemNum, -1, 256);
 			//item->objectNumber = ID_SWAT;
-			DisableBaddieAI(itemNum);
+			DisableEntityAI(itemNum);
 			KillItem(itemNum);
 			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;

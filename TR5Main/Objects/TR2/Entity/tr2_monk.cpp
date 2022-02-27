@@ -53,40 +53,40 @@ void MonkControl(short itemNumber)
 		if (MonksAttackLara)
 			info->enemy = LaraItem;
 
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
 		if (!MonksAttackLara && info->enemy == LaraItem)
 			info->enemy = NULL;
 
-		GetCreatureMood(item, &AIInfo, VIOLENT);
-		CreatureMood(item, &AIInfo, VIOLENT);
+		GetCreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 		angle = CreatureTurn(item, info->maximumTurn);
 
-		if (AIInfo.ahead)
-			torso = AIInfo.angle;
+		if (aiInfo.ahead)
+			torso = aiInfo.angle;
 
 		switch (item->ActiveState)
 		{
 		case 1:
 			info->flags &= 0x0FFF;
 
-			if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
+			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
 			else if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
 			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x7000)
 					item->TargetState = 4;
 				else
 					item->TargetState = 11;
 			}
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(1), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 				item->TargetState = 7;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -96,13 +96,13 @@ void MonkControl(short itemNumber)
 		case 11:
 			info->flags &= 0x0FFF;
 
-			if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
+			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
 			else if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
 			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				auto random = GetRandomControl();
 				if (random < 0x3000)
@@ -112,7 +112,7 @@ void MonkControl(short itemNumber)
 				else
 					item->TargetState = 1;
 			}
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -124,7 +124,7 @@ void MonkControl(short itemNumber)
 
 			if (info->mood == BORED_MOOD)
 			{
-				if (!MonksAttackLara && AIInfo.ahead && Lara.target == item)
+				if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				{
 					if (GetRandomControl() < 0x4000)
 						item->TargetState = 1;
@@ -134,14 +134,14 @@ void MonkControl(short itemNumber)
 			}
 			else if (info->mood == ESCAPE_MOOD)
 				item->TargetState = 3;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
 				else
 					item->TargetState = 11;
 			}
-			else if (!AIInfo.ahead || AIInfo.distance > pow(SECTOR(2), 2))
+			else if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(2), 2))
 				item->TargetState = 3;
 			
 			break;
@@ -159,16 +159,16 @@ void MonkControl(short itemNumber)
 				item->TargetState = 1;
 			else if (info->mood == ESCAPE_MOOD)
 				break;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
 				else
 					item->TargetState = 11;
 			}
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(3), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(3), 2))
 				item->TargetState = 10;
-			else if (AIInfo.ahead && AIInfo.distance < pow(SECTOR(2), 2))
+			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
@@ -179,7 +179,7 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 8:
-			if (!AIInfo.ahead || AIInfo.distance > pow(SECTOR(0.5f), 2))
+			if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(0.5f), 2))
 				item->TargetState = 11;
 			else
 				item->TargetState = 6;

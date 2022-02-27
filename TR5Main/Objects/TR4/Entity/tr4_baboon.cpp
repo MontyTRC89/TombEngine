@@ -116,7 +116,7 @@ static void KillRespawnedBaboon(short itemNumber, bool remove = false)
     item->Status = ITEM_DEACTIVATED; // wont triggered again...
     if (remove)
         item->ItemFlags[0] = NO_BABOON;
-    DisableBaddieAI(itemNumber); // desactivate this AI or you will get crash later...
+    DisableEntityAI(itemNumber); // desactivate this AI or you will get crash later...
 }
 
 static bool CheckRespawnedBaboon(short itemNumber)
@@ -175,7 +175,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
     item->AfterDeath = 0;
     item->Status = ITEM_INVISIBLE;
 
-    DisableBaddieAI(itemNumber);
+    DisableEntityAI(itemNumber);
     if (item->ObjectNumber == ID_BABOON_NORMAL)
     {
         if (item->TriggerFlags == 1)

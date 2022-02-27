@@ -12,6 +12,18 @@
 
 BITE_INFO BarracudaBite = { 2, -60, 121, 7 };
 
+// TODO
+enum BarracudaState
+{
+
+};
+
+// TODO
+enum BarracudaAnim
+{
+
+};
+
 void BarracudaControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
@@ -37,11 +49,11 @@ void BarracudaControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		GetCreatureMood(item, &AIInfo, TIMID);
-		CreatureMood(item, &AIInfo, TIMID);
+		GetCreatureMood(item, &aiInfo, TIMID);
+		CreatureMood(item, &aiInfo, TIMID);
 
 		angle = CreatureTurn(item, info->maximumTurn);
 
@@ -52,7 +64,7 @@ void BarracudaControl(short itemNumber)
 
 			if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (AIInfo.ahead && AIInfo.distance < 680)
+			else if (aiInfo.ahead && aiInfo.distance < 680)
 				item->TargetState = 4;
 			else if (info->mood == STALK_MOOD)
 				item->TargetState = 2;
@@ -66,7 +78,7 @@ void BarracudaControl(short itemNumber)
 
 			if (info->mood == BORED_MOOD)
 				break;
-			else if (AIInfo.ahead && (item->TouchBits & 0xE0))
+			else if (aiInfo.ahead && (item->TouchBits & 0xE0))
 				item->TargetState = 1;
 			else if (info->mood != STALK_MOOD)
 				item->TargetState = 3;
@@ -79,9 +91,9 @@ void BarracudaControl(short itemNumber)
 
 			if (info->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (AIInfo.ahead && AIInfo.distance < 340)
+			else if (aiInfo.ahead && aiInfo.distance < 340)
 				item->TargetState = 5;
-			else if (AIInfo.ahead && AIInfo.distance < 680)
+			else if (aiInfo.ahead && aiInfo.distance < 680)
 				item->TargetState = 1;
 			else if (info->mood == STALK_MOOD)
 				item->TargetState = 2;
@@ -90,8 +102,8 @@ void BarracudaControl(short itemNumber)
 
 		case 4:
 		case 5:
-			if (AIInfo.ahead)
-				head = AIInfo.angle;
+			if (aiInfo.ahead)
+				head = aiInfo.angle;
 
 			if (!info->flags && (item->TouchBits & 0xE0))
 			{

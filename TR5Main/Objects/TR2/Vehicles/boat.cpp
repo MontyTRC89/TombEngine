@@ -36,7 +36,7 @@
 #define BOAT_RADIUS			500
 #define BOAT_SNOW			500
 #define BOAT_MAX_HEIGHT		CLICK(1)
-#define DISMOUNT_DIST		SECTOR(1)
+#define DISMOUNT_DISTANCE		SECTOR(1)
 #define BOAT_WAKE			700
 #define BOAT_SOUND_CEILING	SECTOR(5)
 #define BOAT_TIP			(BOAT_FRONT + 250)
@@ -51,23 +51,23 @@
 
 enum SpeedBoatState
 {
-	SBOAT_STATE_MOUNT,
-	SBOAT_STATE_IDLE,
-	SBOAT_STATE_MOVING,
-	SBOAT_STATE_DISMOUNT_RIGHT,
-	SBOAT_STATE_DISMOUNT_LEFT,
-	SBOAT_STATE_HIT,
-	SBOAT_STATE_FALL,
-	SBOAT_STATE_TURN_RIGHT,
-	SBOAT_STATE_DEATH,
-	SBOAT_STATE_TURN_LEFT
+	SBOAT_STATE_MOUNT = 0,
+	SBOAT_STATE_IDLE = 1,
+	SBOAT_STATE_MOVING = 2,
+	SBOAT_STATE_DISMOUNT_RIGHT = 3,
+	SBOAT_STATE_DISMOUNT_LEFT = 4,
+	SBOAT_STATE_HIT = 5,
+	SBOAT_STATE_FALL = 6,
+	SBOAT_STATE_TURN_RIGHT = 7,
+	SBOAT_STATE_DEATH = 8,
+	SBOAT_STATE_TURN_LEFT = 9
 };
 
 enum SpeedBoatAnim
 {
 	SBOAT_ANIM_MOUNT_LEFT = 0,
-	SBOAT_ANIM_IDLE = 1, // ?
-	SBOAT_ANIM_FORWARD = 2, // ?
+	SBOAT_ANIM_IDLE = 1,	// ?
+	SBOAT_ANIM_FORWARD = 2,	// ?
 
 	SBOAT_ANIM_DISMOUNT_LEFT = 5,
 	SBOAT_ANIM_MOUNT_JUMP = 6,
@@ -243,9 +243,9 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 	else
 		angle = sBoatItem->Position.yRot + ANGLE(90.0f);
 
-	int x = sBoatItem->Position.xPos + DISMOUNT_DIST * phd_sin(angle);
+	int x = sBoatItem->Position.xPos + DISMOUNT_DISTANCE * phd_sin(angle);
 	int y = sBoatItem->Position.yPos;
-	int z = sBoatItem->Position.zPos + DISMOUNT_DIST * phd_cos(angle);
+	int z = sBoatItem->Position.zPos + DISMOUNT_DISTANCE * phd_cos(angle);
 	auto probe = GetCollisionResult(x, y, z, sBoatItem->RoomNumber);
 
 	if ((probe.Position.Floor - sBoatItem->Position.yPos) < -CLICK(2))
@@ -639,7 +639,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNum)
 
 bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 {
-	SpeedBoatInfo* sBoatInfo = (SpeedBoatInfo*)sBoatItem->Data;
+	auto* sBoatInfo = (SpeedBoatInfo*)sBoatItem->Data;
 
 	bool noTurn = true;
 	int maxVelocity;
@@ -915,7 +915,7 @@ void SpeedBoatControl(short itemNumber)
 {
 	auto* laraItem = LaraItem;
 	auto* laraInfo = GetLaraInfo(laraItem);
-	auto sBoatItem = &g_Level.Items[itemNumber];
+	auto* sBoatItem = &g_Level.Items[itemNumber];
 	auto* sBoatInfo = (SpeedBoatInfo*)sBoatItem->Data;
 
 	int collide = SpeedBoatDynamics(laraItem, itemNumber);

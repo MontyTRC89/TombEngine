@@ -16,16 +16,15 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO CentaurRocket = { 11, 415, 41, 13 };
-BITE_INFO CentaurRear = { 50, 30, 0, 5 };
+BITE_INFO CentaurRocketBite = { 11, 415, 41, 13 };
+BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
 
 #define BOMB_SPEED 256
 #define CENTAUR_TOUCH 0x30199
 #define CENTAUR_TURN ANGLE(4.0f)
 #define CENTAUR_REAR_CHANCE 0x60
 #define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
-
-#define FLYER_PART_DAMAGE   100
+#define FLYER_PART_DAMAGE 100
 #define CENTAUR_REAR_DAMAGE 200
 
 enum CentaurState
@@ -197,13 +196,13 @@ void CentaurControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		CreatureMood(item, &AIInfo, VIOLENT);
+		CreatureMood(item, &aiInfo, VIOLENT);
 
 		angle = CreatureTurn(item, CENTAUR_TURN);
 
@@ -213,9 +212,9 @@ void CentaurControl(short itemNumber)
 			CreatureJoint(item, 17, 0);
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (AIInfo.bite && AIInfo.distance < CENTAUR_REAR_RANGE)
+			else if (aiInfo.bite && aiInfo.distance < CENTAUR_REAR_RANGE)
 				item->TargetState = CENTAUR_STATE_RUN;
-			else if (Targetable(item, &AIInfo))
+			else if (Targetable(item, &aiInfo))
 				item->TargetState = CENTAUR_STATE_AIM;
 			else
 				item->TargetState = CENTAUR_STATE_RUN;
@@ -223,12 +222,12 @@ void CentaurControl(short itemNumber)
 			break;
 
 		case CENTAUR_STATE_RUN:
-			if (AIInfo.bite && AIInfo.distance < CENTAUR_REAR_RANGE)
+			if (aiInfo.bite && aiInfo.distance < CENTAUR_REAR_RANGE)
 			{
 				item->RequiredState = CENTAUR_STATE_WARNING;
 				item->TargetState = CENTAUR_STATE_IDLE;
 			}
-			else if (Targetable(item, &AIInfo))
+			else if (Targetable(item, &aiInfo))
 			{
 				item->RequiredState = CENTAUR_STATE_AIM;
 				item->TargetState = CENTAUR_STATE_IDLE;
@@ -244,7 +243,7 @@ void CentaurControl(short itemNumber)
 		case CENTAUR_STATE_AIM:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (Targetable(item, &AIInfo))
+			else if (Targetable(item, &aiInfo))
 				item->TargetState = CENTAUR_STATE_SHOOT;
 			else
 				item->TargetState = CENTAUR_STATE_IDLE;
@@ -263,7 +262,7 @@ void CentaurControl(short itemNumber)
 		case CENTAUR_STATE_WARNING:
 			if (!item->RequiredState && item->TouchBits & CENTAUR_TOUCH)
 			{
-				CreatureEffect(item, &CentaurRear, DoBloodSplat);
+				CreatureEffect(item, &CentaurRearBite, DoBloodSplat);
 				item->RequiredState = CENTAUR_STATE_IDLE;
 
 				LaraItem->HitPoints -= CENTAUR_REAR_DAMAGE;

@@ -12,11 +12,12 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+static BITE_INFO BigRatBite = { 0, -11, 108, 3 };
+
 #define BIG_RAT_RUN_TURN  ANGLE(6.0f)
 #define BIG_RAT_SWIM_TURN ANGLE(3.0f)
 
 constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
-
 constexpr auto BIG_RAT_TOUCH = 0x300018f;
 constexpr auto BIG_RAT_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 constexpr auto BIG_RAT_VISIBILITY_RANGE = SQUARE(SECTOR(5));
@@ -58,8 +59,6 @@ enum BigRatAnim
 	BIG_RAT_ANIM_RUN_TO_SWIM = 12,
 	BIG_RAT_ANIM_SWIM_TO_RUN = 13
 };
-
-static BITE_INFO BigRatBite = { 0, -11, 108, 3 };
 
 void InitialiseBigRat(short itemNumber)
 {
@@ -150,14 +149,14 @@ void BigRatControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO AIInfo;
-		CreatureAIInfo(item, &AIInfo);
+		AI_INFO aiInfo;
+		CreatureAIInfo(item, &aiInfo);
 
-		if (AIInfo.ahead)
-			head = AIInfo.angle;
+		if (aiInfo.ahead)
+			head = aiInfo.angle;
 
-		GetCreatureMood(item, &AIInfo, TIMID);
-		CreatureMood(item, &AIInfo, TIMID);
+		GetCreatureMood(item, &aiInfo, TIMID);
+		CreatureMood(item, &aiInfo, TIMID);
 		angle = CreatureTurn(item, info->maximumTurn);
 
 		if (item->AIBits & ALL_AIOBJ)
@@ -165,8 +164,8 @@ void BigRatControl(short itemNumber)
 		else if (info->hurtByLara)
 			info->enemy = LaraItem;
 
-		if ((item->HitStatus || AIInfo.distance < BIG_RAT_ALERT_RANGE) ||
-			(TargetVisible(item, &AIInfo) && AIInfo.distance < BIG_RAT_VISIBILITY_RANGE))
+		if ((item->HitStatus || aiInfo.distance < BIG_RAT_ALERT_RANGE) ||
+			(TargetVisible(item, &aiInfo) && aiInfo.distance < BIG_RAT_VISIBILITY_RANGE))
 		{
 			if (!info->alerted)
 				info->alerted = true;
@@ -179,7 +178,7 @@ void BigRatControl(short itemNumber)
 		case BIG_RAT_STATE_IDLE:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (AIInfo.bite && AIInfo.distance < BIG_RAT_BITE_RANGE)
+			else if (aiInfo.bite && aiInfo.distance < BIG_RAT_BITE_RANGE)
 				item->TargetState = BIG_RAT_STATE_BITE_ATTACK;
 			else
 				item->TargetState = BIG_RAT_STATE_RUN;
@@ -197,11 +196,11 @@ void BigRatControl(short itemNumber)
 				break;
 			}
 
-			if (AIInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 				item->TargetState = BIG_RAT_STATE_IDLE;
-			else if (AIInfo.bite && AIInfo.distance < BIG_RAT_CHARGE_RANGE)
+			else if (aiInfo.bite && aiInfo.distance < BIG_RAT_CHARGE_RANGE)
 				item->TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
-			else if (AIInfo.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
+			else if (aiInfo.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
 			{
 				item->RequiredState = BIG_RAT_STATE_POSE;
 				item->TargetState = BIG_RAT_STATE_IDLE;
@@ -210,7 +209,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_BITE_ATTACK:
-			if (!item->RequiredState && AIInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (!item->RequiredState && aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 				item->RequiredState = BIG_RAT_STATE_IDLE;
@@ -222,7 +221,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_CHARGE_ATTACK:
-			if (!item->RequiredState && AIInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (!item->RequiredState && aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 				item->RequiredState = BIG_RAT_STATE_RUN;
@@ -249,13 +248,13 @@ void BigRatControl(short itemNumber)
 				break;
 			}
 
-			if (AIInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
+			if (aiInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
 				item->TargetState = BIG_RAT_STATE_SWIM_ATTACK;
 
 			break;
 
 		case BIG_RAT_STATE_SWIM_ATTACK:
-			if (!item->RequiredState && AIInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
+			if (!item->RequiredState && aiInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 

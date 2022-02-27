@@ -27,7 +27,7 @@ using namespace TEN::Math::Random;
 #define DAMAGE_START	140
 #define DAMAGE_LENGTH	14
 
-#define SKIDOO_DISMOUNT_DIST 295
+#define SKIDOO_DISMOUNT_DISTANCE 295
 
 #define SKIDOO_UNDO_TURN			ANGLE(2.0f)
 #define SKIDOO_TURN					(ANGLE(0.5f) + SKIDOO_UNDO_TURN)
@@ -175,9 +175,9 @@ bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
 	else
 		angle = skidooItem->Position.yRot - ANGLE(90.0f);
 
-	int x = skidooItem->Position.xPos - SKIDOO_DISMOUNT_DIST * phd_sin(angle);
+	int x = skidooItem->Position.xPos - SKIDOO_DISMOUNT_DISTANCE * phd_sin(angle);
 	int y = skidooItem->Position.yPos;
-	int z = skidooItem->Position.zPos - SKIDOO_DISMOUNT_DIST * phd_cos(angle);
+	int z = skidooItem->Position.zPos - SKIDOO_DISMOUNT_DISTANCE * phd_cos(angle);
 	auto probe = GetCollisionResult(x, y, z, skidooItem->RoomNumber);
 
 	if ((probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT) ||
@@ -206,8 +206,8 @@ bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 				laraItem->Position.yRot -= ANGLE(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_IDLE);
-			laraItem->Position.xPos -= SKIDOO_DISMOUNT_DIST * phd_sin(laraItem->Position.yRot);
-			laraItem->Position.zPos -= SKIDOO_DISMOUNT_DIST * phd_cos(laraItem->Position.yRot);
+			laraItem->Position.xPos -= SKIDOO_DISMOUNT_DISTANCE * phd_sin(laraItem->Position.yRot);
+			laraItem->Position.zPos -= SKIDOO_DISMOUNT_DISTANCE * phd_cos(laraItem->Position.yRot);
 			laraItem->Position.xRot = 0;
 			laraItem->Position.zRot = 0;
 			laraInfo->Vehicle = NO_ITEM;
