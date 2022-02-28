@@ -1132,6 +1132,7 @@ struct LaraCountData
 	unsigned int Pose;
 	unsigned int Dive;
 	unsigned int Death;
+	unsigned int NoCheat; // TODO: Savegame
 };
 
 struct LaraControlData
@@ -1182,7 +1183,7 @@ struct LaraInfo
 
 	int Air;
 	int SprintEnergy;
-	short poisoned;
+	short Poisoned;
 
 	int hitFrame;
 	int hitDirection;
@@ -1190,7 +1191,7 @@ struct LaraInfo
 	int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
-	short TargetAngle; // savegame
+	short TargetAngle; // TODO: Savegame
 	int WaterSurfaceDist;
 	short interactedItem;
 	PHD_3DPOS NextCornerPos;

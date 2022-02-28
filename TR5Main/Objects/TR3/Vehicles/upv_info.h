@@ -1,6 +1,6 @@
 #pragma once
 
-struct SUB_INFO
+struct UPVInfo
 {
 	int Vel;
 	int Rot;

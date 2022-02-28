@@ -2087,7 +2087,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.Poisoned)
 			{
 				SayNo();
 				return;
@@ -2098,7 +2098,7 @@ void GuiController::UseCurrentItem()
 				if (Lara.NumSmallMedipacks != -1)
 					Lara.NumSmallMedipacks--;
 
-				Lara.poisoned = 0;
+				Lara.Poisoned = 0;
 				LaraItem->HitPoints += 500;
 
 				if (LaraItem->HitPoints > 1000)
@@ -2114,7 +2114,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.Poisoned)
 			{
 				SayNo();
 				return;
@@ -2125,7 +2125,7 @@ void GuiController::UseCurrentItem()
 				if (Lara.NumLargeMedipacks != -1)
 					Lara.NumLargeMedipacks--;
 
-				Lara.poisoned = 0;
+				Lara.Poisoned = 0;
 				LaraItem->HitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);

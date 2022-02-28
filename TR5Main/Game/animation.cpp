@@ -22,7 +22,7 @@ BOUNDING_BOX InterpolatedBounds;
 
 void AnimateLara(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->FrameNumber++;
 
@@ -52,16 +52,16 @@ void AnimateLara(ITEM_INFO* item)
 					item->VerticalVelocity = *(cmd++);
 					item->Velocity = *(cmd++);
 					item->Airborne = true;
-					if (info->Control.CalculatedJumpVelocity)
+					if (lara->Control.CalculatedJumpVelocity)
 					{
-						item->VerticalVelocity = info->Control.CalculatedJumpVelocity;
-						info->Control.CalculatedJumpVelocity = 0;
+						item->VerticalVelocity = lara->Control.CalculatedJumpVelocity;
+						lara->Control.CalculatedJumpVelocity = 0;
 					}
 					break;
 
 				case COMMAND_ATTACK_READY:
-					if (info->Control.HandStatus != HandStatus::Special)
-						info->Control.HandStatus = HandStatus::Free;
+					if (lara->Control.HandStatus != HandStatus::Special)
+						lara->Control.HandStatus = HandStatus::Free;
 					break;
 
 				case COMMAND_SOUND_FX:
@@ -109,8 +109,8 @@ void AnimateLara(ITEM_INFO* item)
 
 				flags = cmd[1] & 0xC000;
 				if (flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
-					(flags == (int)SOUND_PLAYCONDITION::Land && (info->WaterSurfaceDist >= 0 || info->WaterSurfaceDist == NO_HEIGHT)) ||
-					(flags == (int)SOUND_PLAYCONDITION::Water && info->WaterSurfaceDist < 0 && info->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+					(flags == (int)SOUND_PLAYCONDITION::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+					(flags == (int)SOUND_PLAYCONDITION::Water && lara->WaterSurfaceDist < 0 && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 				{
 					SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
 				}
@@ -173,7 +173,7 @@ void AnimateLara(ITEM_INFO* item)
 	{
 		int velocity;
 
-		if (info->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)
@@ -189,11 +189,11 @@ void AnimateLara(ITEM_INFO* item)
 		item->Velocity = velocity >> 16;
 	}
 
-	if (info->Control.RopeControl.Ptr != -1)
+	if (lara->Control.RopeControl.Ptr != -1)
 		DelAlignLaraToRope(item);
 
-	if (!info->Control.IsMoving)
-		MoveItem(item, info->Control.MoveAngle, item->Velocity, lateral);
+	if (!lara->Control.IsMoving)
+		MoveItem(item, lara->Control.MoveAngle, item->Velocity, lateral);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

@@ -21,7 +21,7 @@
 // Collision:	lara_col_slide_forward()
 void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -38,17 +38,17 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				info->Control.TurnRate -= LARA_TURN_RATE;
-				if (info->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					info->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate -= LARA_TURN_RATE;
+				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				info->Control.TurnRate += LARA_TURN_RATE;
-				if (info->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					info->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate += LARA_TURN_RATE;
+				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -78,14 +78,14 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_forward()
 void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->Airborne = false;
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -118,7 +118,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_slide_back()
 void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
@@ -136,17 +136,17 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				info->Control.TurnRate -= LARA_TURN_RATE;
-				if (info->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					info->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate -= LARA_TURN_RATE;
+				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				info->Control.TurnRate += LARA_TURN_RATE;
-				if (info->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					info->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate += LARA_TURN_RATE;
+				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -172,14 +172,14 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_slide_back()
 void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->Airborne = false;
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))

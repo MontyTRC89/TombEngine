@@ -327,8 +327,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	// Engage shimmy mode if left (sidestep) or right (sidestep) key is pressed
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
-		auto* info = (LaraInfo*&)item->Data;
-		info->NextCornerPos.zRot = (item->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
+		auto* lara = GetLaraInfo(item);
+		lara->NextCornerPos.zRot = (item->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
 		SetAnimation(item, item->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -403,7 +403,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		// Get floor_info 256 downstream of Lara
+		// Get floor_lara 256 downstream of Lara
 		auto floorNext = (FLOOR_INFO*)GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
 		if ((GetClimbFlags(GetCollisionResult(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos).BottomBlock) & climbOrient) &&
@@ -507,8 +507,8 @@ void lara_col_slopehang(ITEM_INFO* item, COLL_INFO* coll)
 		// Return to climbing mode
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
 		{
-			auto* info = GetLaraInfo(item);
-			SetAnimation(item, info->NextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
+			auto* lara = GetLaraInfo(item);
+			SetAnimation(item, lara->NextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
 		}
 
 		// Shimmy control
@@ -628,16 +628,16 @@ void lara_as_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetDistance = CLICK(6.5f);
 	Camera.speed = 15;
 
-	auto* info = (LaraInfo*&)item->Data;
+	auto* lara = GetLaraInfo(item);
 
 	if (item->AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
-		info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+		lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 		Camera.targetAngle = -ANGLE(22.5f);
 	}
 	else
 	{
-		info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
+		lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 		Camera.targetAngle = ANGLE(22.5f);
 	}
 }
@@ -1076,7 +1076,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 // Extends state 75 (AS_HANG2)
 void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!g_GameFlow->Animations.Overhang)
 		return;
@@ -1114,8 +1114,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
-				auto* info = (LaraInfo*&)item->Data;
-				info->NextCornerPos.zRot = AlignToGrab(item);
+				lara->NextCornerPos.zRot = AlignToGrab(item);
 
 				int ceiling2 = GetCeiling(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 				item->Position.yPos = ceiling2 + HEIGHT_ADJUST;

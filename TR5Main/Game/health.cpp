@@ -33,31 +33,31 @@ bool EnableSmoothHealthBar = true;
 
 void DrawHealthBarOverlay(ITEM_INFO* item, int value)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
 	{
 		int color2 = 0;
-		if (info->poisoned)
+		if (lara->Poisoned)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, info->poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->Poisoned);
 	}
 }
 
 void DrawHealthBar(ITEM_INFO* item, float value)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, info->poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->Poisoned);
 }
 
 void UpdateHealthBar(ITEM_INFO* item, int flash)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	auto HitPoints = item->HitPoints;
 
@@ -124,9 +124,9 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 		}
 	}
 	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
-		info->Control.HandStatus == HandStatus::WeaponReady &&
-		info->Control.WeaponControl.GunType != WEAPON_TORCH ||
-		info->poisoned >= 256)
+		lara->Control.HandStatus == HandStatus::WeaponReady &&
+		lara->Control.WeaponControl.GunType != WEAPON_TORCH ||
+		lara->Poisoned >= 256)
 	{
 		if (!BinocularRange)
 			DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
@@ -146,21 +146,21 @@ void DrawAirBar(float value)
 
 void UpdateAirBar(ITEM_INFO* item, int flash)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Air == LARA_AIR_MAX || item->HitPoints <= 0)
+	if (lara->Air == LARA_AIR_MAX || item->HitPoints <= 0)
 		return;
 
-	if (info->Vehicle == NO_ITEM ||
-		g_Level.Items[info->Vehicle].ObjectNumber != ID_UPV)
+	if (lara->Vehicle == NO_ITEM ||
+		g_Level.Items[lara->Vehicle].ObjectNumber != ID_UPV)
 	{
-		if (info->Control.WaterStatus != WaterStatus::Underwater &&
-			info->Control.WaterStatus != WaterStatus::TreadWater &&
-			!(TestEnvironment(ENV_FLAG_SWAMP, item) && info->WaterSurfaceDist < -(CLICK(3) - 1)))
+		if (lara->Control.WaterStatus != WaterStatus::Underwater &&
+			lara->Control.WaterStatus != WaterStatus::TreadWater &&
+			!(TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -(CLICK(3) - 1)))
 			return;
 	}
 
-	int air = info->Air;
+	int air = lara->Air;
 	if (air < 0)
 		air = 0;
 	else if (air > LARA_AIR_MAX)
@@ -185,10 +185,10 @@ void DrawSprintBar(float value)
 
 void UpdateSprintBar(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->SprintEnergy < LARA_SPRINT_MAX)
-		DrawSprintBar(info->SprintEnergy / LARA_SPRINT_MAX);
+	if (lara->SprintEnergy < LARA_SPRINT_MAX)
+		DrawSprintBar(lara->SprintEnergy / LARA_SPRINT_MAX);
 }
 
 void DrawAllPickups()

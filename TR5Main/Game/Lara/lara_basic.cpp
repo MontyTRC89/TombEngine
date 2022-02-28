@@ -35,15 +35,15 @@ void lara_void_func(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_default_col(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
 }
@@ -63,15 +63,15 @@ void lara_as_null(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
 	if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
 	{
-		info->Control.HandStatus = HandStatus::Free;
+		lara->Control.HandStatus = HandStatus::Free;
 
 		if (UseForcedFixedCamera)
 			UseForcedFixedCamera = 0;
@@ -80,9 +80,9 @@ void lara_as_controlled(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 }
@@ -93,27 +93,27 @@ void lara_as_controlled_no_look(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_void_func()
 void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	EaseOutLaraHeight(item, info->ProjectedFloorHeight - item->Position.yPos);
-	ApproachLaraTargetAngle(item, info->TargetAngle, 2.5f);
+	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Position.yPos);
+	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
 }
 
 // State:		LS_AUTO_JUMP (62)
 // Collision:	lara_lara_void_func()
 void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	ApproachLaraTargetAngle(item, info->TargetAngle, 2.5f);
+	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
 }
 
 // ---------------
@@ -124,11 +124,11 @@ void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_walk_forward()
 void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.Count.RunJump++;
-	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2) // TODO: Tune this again.
-		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
+	lara->Control.Count.RunJump++;
+	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2) // TODO: Tune this again.
+		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{
@@ -137,22 +137,22 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// TODO: Implement item alignment properly someday. @Sezz 2021.11.01
-	if (info->Control.IsMoving)
+	if (lara->Control.IsMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_MED_TURN_MAX)
-			info->Control.TurnRate = -LARA_MED_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_MED_TURN_MAX)
-			info->Control.TurnRate = LARA_MED_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
@@ -161,14 +161,14 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (info->Control.WaterStatus == WaterStatus::Wade)
+		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK) [[likely]]
 			item->TargetState = LS_WALK_FORWARD;
@@ -185,9 +185,9 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_walk_forward()
 void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
@@ -196,7 +196,7 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -246,11 +246,11 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_run_forward()
 void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.Count.RunJump++;
-	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.RunJump++;
+	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -260,25 +260,25 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_FAST_TURN_MAX)
-			info->Control.TurnRate = -LARA_FAST_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
+			lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_FAST_TURN_MAX)
-			info->Control.TurnRate = LARA_FAST_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
+			lara->Control.TurnRate = LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	if ((TrInput & IN_JUMP || info->Control.RunJumpQueued) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_JUMP || lara->Control.RunJumpQueued) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (info->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
+		if (lara->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
 		{
 			item->TargetState = LS_JUMP_FORWARD;
@@ -288,23 +288,23 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 		SetLaraRunJumpQueue(item, coll);
 	}
 
-	if (TrInput & IN_SPRINT && info->SprintEnergy &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_SPRINT && lara->SprintEnergy &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_SPRINT;
 		return;
 	}
 
-	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !info->Control.RunJumpQueued &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !lara->Control.RunJumpQueued &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -314,14 +314,14 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (info->Control.WaterStatus == WaterStatus::Wade)
+		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
@@ -338,16 +338,16 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_run_forward()
 void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
 
@@ -408,11 +408,11 @@ void lara_col_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_idle()
 void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.CanLook = ((isSwamp && info->Control.WaterStatus == WaterStatus::Wade) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
+	lara->Control.CanLook = ((isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) || item->AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -425,25 +425,25 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (TrInput & IN_LOOK && info->Control.CanLook)
+	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookUpDown(item);
 
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_JUMP))	// JUMP locks y rotation.
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT &&
 		!(TrInput & IN_JUMP))
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
-	if (info->Control.WaterStatus == WaterStatus::Wade)
+	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
 			PseudoLaraAsSwampIdle(item, coll);
@@ -456,7 +456,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::None)
+		if (lara->Control.JumpDirection != JumpDirection::None)
 			item->TargetState = LS_JUMP_PREPARE;
 
 		return;
@@ -469,7 +469,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -479,7 +479,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -536,9 +536,9 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		if (TrInput & IN_SPRINT ||
-			info->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
-			(info->Control.HandStatus == HandStatus::WeaponReady && info->Control.WeaponControl.GunType != WEAPON_TORCH) ||
-			(info->Control.HandStatus == HandStatus::DrawWeapon && info->Control.WeaponControl.GunType != WEAPON_FLARE))
+			lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.WeaponControl.GunType != WEAPON_TORCH) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.WeaponControl.GunType != WEAPON_FLARE))
 		{
 			item->TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -550,9 +550,9 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	else if (TrInput & IN_RIGHT)
 	{
 		if (TrInput & IN_SPRINT ||
-			info->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
-			(info->Control.HandStatus == HandStatus::WeaponReady && info->Control.WeaponControl.GunType != WEAPON_TORCH) ||
-			(info->Control.HandStatus == HandStatus::DrawWeapon && info->Control.WeaponControl.GunType != WEAPON_FLARE))
+			lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.WeaponControl.GunType != WEAPON_TORCH) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.WeaponControl.GunType != WEAPON_FLARE))
 		{
 			item->TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -565,7 +565,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Without animation blending, the AFK state's
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
-	if (info->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
+	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		g_GameFlow->Animations.Pose)
 	{
 		item->TargetState = LS_POSE;
@@ -580,12 +580,12 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in wade-height water.
 void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->TargetState = LS_JUMP_PREPARE;
-		info->Control.JumpDirection = JumpDirection::Up;
+		lara->Control.JumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -593,7 +593,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -641,13 +641,13 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -696,19 +696,19 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_idle(), lara_as_pose()
 void lara_col_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	info->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : (item->Position.yRot + ANGLE(180.0f));
+	lara->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : (item->Position.yRot + ANGLE(180.0f));
 	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
 	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -779,21 +779,21 @@ void lara_as_pose(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_run_back()
 void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_MED_TURN_MAX)
-			info->Control.TurnRate = -LARA_MED_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_MED_TURN_MAX)
-			info->Control.TurnRate = LARA_MED_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
@@ -811,16 +811,16 @@ void lara_as_run_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_run_back()
 void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -855,11 +855,11 @@ void lara_col_run_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_right_slow()
 void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -867,13 +867,13 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate += LARA_TURN_RATE;
-	if (info->Control.TurnRate < 0)
-		info->Control.TurnRate = 0;
-	else if (info->Control.TurnRate > LARA_MED_FAST_TURN_MAX)
-		info->Control.TurnRate = LARA_MED_FAST_TURN_MAX;
+	lara->Control.TurnRate += LARA_TURN_RATE;
+	if (lara->Control.TurnRate < 0)
+		lara->Control.TurnRate = 0;
+	else if (lara->Control.TurnRate > LARA_MED_FAST_TURN_MAX)
+		lara->Control.TurnRate = LARA_MED_FAST_TURN_MAX;
 
-	if (info->Control.WaterStatus == WaterStatus::Wade)
+	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
 			PsuedoLaraAsSwampTurnRightSlow(item, coll);
@@ -886,7 +886,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::None)
+		if (lara->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -900,7 +900,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -910,7 +910,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -970,10 +970,10 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->TargetState = LS_TURN_RIGHT_SLOW;
 
-			if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 		}
-		else if (info->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+		else if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
 			item->TargetState = LS_TURN_RIGHT_FAST;
 		else [[likely]]
 			item->TargetState = LS_TURN_RIGHT_SLOW;
@@ -987,15 +987,15 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning right slowly in wade-height water.
 void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Control.TurnRate > LARA_WADE_TURN_MAX)
-		info->Control.TurnRate = LARA_WADE_TURN_MAX;
+	if (lara->Control.TurnRate > LARA_WADE_TURN_MAX)
+		lara->Control.TurnRate = LARA_WADE_TURN_MAX;
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->TargetState = LS_JUMP_PREPARE;
-		info->Control.JumpDirection = JumpDirection::Up;
+		lara->Control.JumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -1003,7 +1003,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -1044,16 +1044,16 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning right slowly in swamps.
 void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Control.TurnRate > LARA_SWAMP_TURN_MAX)
-		info->Control.TurnRate = LARA_SWAMP_TURN_MAX;
+	if (lara->Control.TurnRate > LARA_SWAMP_TURN_MAX)
+		lara->Control.TurnRate = LARA_SWAMP_TURN_MAX;
 
 	if (TrInput & IN_FORWARD)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -1102,11 +1102,11 @@ void lara_col_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_left_slow()
 void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1114,13 +1114,13 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate -= LARA_TURN_RATE;
-	if (info->Control.TurnRate > 0)
-		info->Control.TurnRate = 0;
-	else if (info->Control.TurnRate < -LARA_MED_FAST_TURN_MAX)
-		info->Control.TurnRate = -LARA_MED_FAST_TURN_MAX;
+	lara->Control.TurnRate -= LARA_TURN_RATE;
+	if (lara->Control.TurnRate > 0)
+		lara->Control.TurnRate = 0;
+	else if (lara->Control.TurnRate < -LARA_MED_FAST_TURN_MAX)
+		lara->Control.TurnRate = -LARA_MED_FAST_TURN_MAX;
 
-	if (info->Control.WaterStatus == WaterStatus::Wade)
+	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
 			PsuedoLaraAsSwampTurnLeftSlow(item, coll);
@@ -1133,7 +1133,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::None)
+		if (lara->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1147,7 +1147,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1157,7 +1157,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -1217,10 +1217,10 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			item->TargetState = LS_TURN_LEFT_SLOW;
 
-			if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 		}
-		else if (info->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+		else if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
 			item->TargetState = LS_TURN_LEFT_FAST;
 		else [[likely]]
 			item->TargetState = LS_TURN_RIGHT_SLOW;
@@ -1234,15 +1234,15 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning left slowly in wade-height water.
 void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Control.TurnRate < -LARA_WADE_TURN_MAX)
-		info->Control.TurnRate = -LARA_WADE_TURN_MAX;
+	if (lara->Control.TurnRate < -LARA_WADE_TURN_MAX)
+		lara->Control.TurnRate = -LARA_WADE_TURN_MAX;
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->TargetState = LS_JUMP_PREPARE;
-		info->Control.JumpDirection = JumpDirection::Up;
+		lara->Control.JumpDirection = JumpDirection::Up;
 		return;
 	}
 
@@ -1250,7 +1250,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -1291,16 +1291,16 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for turning left slowly in swamps.
 void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
-		info->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
+	if (lara->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
+		lara->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
 
 	if (TrInput & IN_FORWARD)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -1349,9 +1349,9 @@ void lara_col_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_death()
 void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -1361,7 +1361,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		item->MeshBits = -1;
-		info->IsBusy = false;
+		lara->IsBusy = false;
 	}
 }
 
@@ -1369,20 +1369,20 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_death()
 void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->Airborne = false;
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.Radius = LARA_RAD_DEATH;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	StopSoundEffect(SFX_TR4_LARA_FALL);
 	item->HitPoints = -1;
-	info->Air = -1;
+	lara->Air = -1;
 
 	ShiftItem(item, coll);
 
@@ -1397,24 +1397,24 @@ void lara_col_death(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_splat()
 void lara_as_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 }
 
 // State:		LS_SPLAT (12)
 // Control:		lara_as_splat()
 void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	ShiftItem(item, coll);
@@ -1427,11 +1427,11 @@ void lara_col_splat(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_walk_back()
 void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1439,11 +1439,11 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (info->Control.IsMoving)
+	if (lara->Control.IsMoving)
 		return;
 
 	if (isSwamp &&
-		info->Control.WaterStatus == WaterStatus::Wade)
+		lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		PseudoLaraAsSwampWalkBack(item, coll);
 		return;
@@ -1451,24 +1451,24 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
 	if (TrInput & IN_BACK &&
-		(TrInput & IN_WALK || info->Control.WaterStatus == WaterStatus::Wade))
+		(TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade))
 	{
 		item->TargetState = LS_WALK_BACK;
 		return;
@@ -1480,22 +1480,22 @@ void lara_as_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for walking back in swamps.
 void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX / 3)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX / 3;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX / 3)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX / 3;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX / 3)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX / 3;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX / 3)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX / 3;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 	}
@@ -1513,20 +1513,20 @@ void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_walk_back()
 void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
+	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
 	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -1561,7 +1561,7 @@ void lara_col_walk_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_right_fast()
 void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1569,16 +1569,16 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate += LARA_TURN_RATE;
-	if (info->Control.TurnRate < LARA_MED_TURN_MAX)
-		info->Control.TurnRate = LARA_MED_TURN_MAX;
-	else if (info->Control.TurnRate > LARA_FAST_TURN_MAX)
-		info->Control.TurnRate = LARA_FAST_TURN_MAX;
+	lara->Control.TurnRate += LARA_TURN_RATE;
+	if (lara->Control.TurnRate < LARA_MED_TURN_MAX)
+		lara->Control.TurnRate = LARA_MED_TURN_MAX;
+	else if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
+		lara->Control.TurnRate = LARA_FAST_TURN_MAX;
 
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::None)
+		if (lara->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1586,15 +1586,15 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1604,14 +1604,14 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (info->Control.WaterStatus == WaterStatus::Wade)
+		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1687,7 +1687,7 @@ void lara_col_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_turn_left_fast()
 void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1695,16 +1695,16 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate -= LARA_TURN_RATE;
-	if (info->Control.TurnRate > -LARA_MED_TURN_MAX)
-		info->Control.TurnRate = -LARA_MED_TURN_MAX;
-	else if (info->Control.TurnRate < -LARA_FAST_TURN_MAX)
-		info->Control.TurnRate = -LARA_FAST_TURN_MAX;
+	lara->Control.TurnRate -= LARA_TURN_RATE;
+	if (lara->Control.TurnRate > -LARA_MED_TURN_MAX)
+		lara->Control.TurnRate = -LARA_MED_TURN_MAX;
+	else if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
+		lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
 
 	if (TrInput & IN_JUMP)
 	{
 		SetLaraJumpDirection(item, coll);
-		if (info->Control.JumpDirection != JumpDirection::None)
+		if (lara->Control.JumpDirection != JumpDirection::None)
 		{
 			item->TargetState = LS_JUMP_PREPARE;
 			return;
@@ -1712,15 +1712,15 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_ROLL &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1730,14 +1730,14 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if(info->Control.WaterStatus == WaterStatus::Wade)
+		else if(lara->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (TestLaraRunForward(item, coll))
 			{
@@ -1812,9 +1812,9 @@ void lara_col_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_step_right()
 void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1822,20 +1822,20 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (info->Control.IsMoving)
+	if (lara->Control.IsMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_RSTEP)
@@ -1851,20 +1851,20 @@ void lara_as_step_right(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_step_right()
 void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
 	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -1908,9 +1908,9 @@ void lara_col_step_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_step_left()
 void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1918,20 +1918,20 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (info->Control.IsMoving)
+	if (lara->Control.IsMoving)
 		return;
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 	}
 
 	if (TrInput & IN_LSTEP)
@@ -1947,20 +1947,20 @@ void lara_as_step_left(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_step_left()
 void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
-	coll->Setup.LowerFloorBound = (info->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
+	coll->Setup.LowerFloorBound = (lara->Control.WaterStatus == WaterStatus::Wade) ? NO_LOWER_BOUND : CLICK(0.8f);
 	coll->Setup.UpperFloorBound = -CLICK(0.8f);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;
 	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2004,9 +2004,9 @@ void lara_col_step_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll_back()
 void lara_as_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 
 	if (TrInput & IN_ROLL)
 	{
@@ -2021,16 +2021,16 @@ void lara_as_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_roll_back()
 void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	Camera.laraNode = 0;
 	GetCollisionInfo(coll, item);
 
@@ -2065,9 +2065,9 @@ void lara_col_roll_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_roll_forward()
 void lara_as_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 
 	// TODO: Change swandive roll anim state to something sensible.
 	if (TrInput & IN_FORWARD &&
@@ -2090,16 +2090,16 @@ void lara_as_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_roll_forward()
 void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2133,11 +2133,11 @@ void lara_col_roll_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_wade_forward()
 void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.CanLook = (isSwamp && info->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -2154,17 +2154,17 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_FAST_TURN_MAX)
-			info->Control.TurnRate = -LARA_FAST_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
+			lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_FAST_TURN_MAX)
-			info->Control.TurnRate = LARA_FAST_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
+			lara->Control.TurnRate = LARA_FAST_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
@@ -2173,14 +2173,14 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (info->Control.WaterStatus == WaterStatus::Dry)
+		else if (lara->Control.WaterStatus == WaterStatus::Dry)
 			item->TargetState = LS_RUN_FORWARD;
 		else [[likely]]
 			item->TargetState = LS_WADE_FORWARD;
@@ -2194,21 +2194,21 @@ void lara_as_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Pseudo-state for wading in swamps.
 void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
-			info->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SWAMP_TURN_MAX)
-			info->Control.TurnRate = LARA_SWAMP_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SWAMP_TURN_MAX)
+			lara->Control.TurnRate = LARA_SWAMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
 	}
@@ -2217,7 +2217,7 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			vaultResult.Success)
 		{
 			item->TargetState = vaultResult.TargetState;
@@ -2237,16 +2237,16 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_wade_forward()
 void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2283,13 +2283,13 @@ void lara_col_wade_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_sprint()
 void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->SprintEnergy--;
+	lara->SprintEnergy--;
 
-	info->Control.Count.RunJump++;
-	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.RunJump++;
+	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -2299,17 +2299,17 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -2321,7 +2321,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(info->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(info->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -2333,7 +2333,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && info->Control.HandStatus == HandStatus::Free &&
+		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
 			!TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Allow immediate vault only in the case of a soft splat.
 			vaultResult.Success)
 		{
@@ -2341,11 +2341,11 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (info->Control.WaterStatus == WaterStatus::Wade)
+		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->TargetState = LS_WALK_FORWARD;
-		else if (TrInput & IN_SPRINT && info->SprintEnergy > 0) [[likely]]
+		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) [[likely]]
 			item->TargetState = LS_SPRINT;
 		else
 			item->TargetState = LS_RUN_FORWARD;
@@ -2360,14 +2360,14 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_sprint()
 void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -2427,25 +2427,25 @@ void lara_col_sprint(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_sprint_dive()
 void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.Count.RunJump++;
-	if (info->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		info->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.RunJump++;
+	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
+		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			info->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
 
 		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
 	}
@@ -2457,14 +2457,14 @@ void lara_as_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_col_sprint_dive()
 void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = (item->Velocity >= 0) ? item->Position.yRot : item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
@@ -2476,7 +2476,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (item->Velocity < 0)
-		info->Control.MoveAngle = item->Position.yRot; // ???
+		lara->Control.MoveAngle = item->Position.yRot; // ???
 
 	if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
 	{
@@ -2484,7 +2484,7 @@ void lara_col_sprint_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (item->HitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
 			item->TargetState = LS_DEATH;
-		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || info->Control.WaterStatus == WaterStatus::Wade)
+		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade)
 			item->TargetState = LS_IDLE;
 		else
 			item->TargetState = LS_RUN_FORWARD;

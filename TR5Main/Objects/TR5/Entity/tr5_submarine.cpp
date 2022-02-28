@@ -513,9 +513,7 @@ void TorpedoControl(short itemNumber)
 				dry = -512;
 		}
 		else
-		{
 			dry = 512;
-		}
 
 		item->Position.yRot += dry;
 		item->Position.xRot += drx;
