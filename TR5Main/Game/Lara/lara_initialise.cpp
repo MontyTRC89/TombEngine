@@ -41,7 +41,7 @@ void InitialiseLara(int restore)
 	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.WeaponControl.WeaponItem = NO_ITEM;
 	PoisonFlag = 0;
-	Lara.poisoned = 0;
+	Lara.Poisoned = 0;
 	Lara.WaterSurfaceDist = 100;
 
 	if (Lara.Weapons[static_cast<int>(LaraWeaponType::WEAPON_PISTOLS)].Present)
@@ -106,48 +106,48 @@ void InitialiseLara(int restore)
 
 void LaraInitialiseMeshes(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		//Meshes[i] = Meshes[MESHES(ID_LARA_SKIN, i)];
 		//LARA_MESHES(ID_LARA, MESHES(ID_LARA_SKIN, i));
-		info->meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
+		lara->meshPtrs[i] = Objects[ID_LARA_SKIN].meshIndex + i;
 	}
 
 	/* Hardcoded code */
 
-	if (info->Control.WeaponControl.GunType == WEAPON_HK)
-		info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
-	else if (!info->Weapons[WEAPON_SHOTGUN].Present)
+	if (lara->Control.WeaponControl.GunType == WEAPON_HK)
+		lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
+	else if (!lara->Weapons[WEAPON_SHOTGUN].Present)
 	{
-		if (info->Weapons[WEAPON_HK].Present)
-			info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
+		if (lara->Weapons[WEAPON_HK].Present)
+			lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::HK;
 	}
 	else
-		info->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
+		lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
 
-	info->Control.HandStatus = HandStatus::Free;
-	info->LeftArm.FrameNumber = 0;
-	info->RightArm.FrameNumber = 0;
-	info->target = NULL;
-	info->RightArm.Locked = false;
-	info->LeftArm.Locked = false;
+	lara->Control.HandStatus = HandStatus::Free;
+	lara->LeftArm.FrameNumber = 0;
+	lara->RightArm.FrameNumber = 0;
+	lara->target = NULL;
+	lara->RightArm.Locked = false;
+	lara->LeftArm.Locked = false;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		info->Control.WaterStatus = WaterStatus::Underwater;
+		lara->Control.WaterStatus = WaterStatus::Underwater;
 		item->VerticalVelocity = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else
 	{
-		info->Control.WaterStatus = WaterStatus::Dry;
+		lara->Control.WaterStatus = WaterStatus::Dry;
 		SetAnimation(item, LA_STAND_SOLID);
 	}
 }

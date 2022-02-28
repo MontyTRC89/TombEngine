@@ -34,7 +34,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
 
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -54,15 +54,15 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
-		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			info->Control.HandStatus == HandStatus::Free &&
+			lara->Control.HandStatus == HandStatus::Free &&
 			g_GameFlow->Animations.CrouchRoll)
 		{
 			item->TargetState = LS_CROUCH_ROLL;
@@ -97,12 +97,12 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	info->Control.IsLow = true;
-	info->Control.MoveAngle = item->Position.yRot;
-	info->ExtraTorsoRot = PHD_3DPOS();
+	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.IsLow = true;
+	lara->Control.MoveAngle = item->Position.yRot;
+	lara->ExtraTorsoRot = PHD_3DPOS();
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -117,7 +117,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->Control.HandStatus = HandStatus::Free;
+		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
@@ -140,26 +140,26 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
+	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_CROUCH_ROLL_TURN_MAX)
-			info->Control.TurnRate = -LARA_CROUCH_ROLL_TURN_MAX;
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_CROUCH_ROLL_TURN_MAX)
+			lara->Control.TurnRate = -LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_TURN_RATE;
-		if (info->Control.TurnRate > LARA_CROUCH_ROLL_TURN_MAX)
-			info->Control.TurnRate = LARA_CROUCH_ROLL_TURN_MAX;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_CROUCH_ROLL_TURN_MAX)
+			lara->Control.TurnRate = LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -171,11 +171,11 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	info->Control.IsLow = true;
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.IsLow = true;
+	lara->Control.MoveAngle = item->Position.yRot;
 	item->Airborne = 0;
 	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -198,7 +198,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraFall(item, coll))
 	{
 		SetLaraFallState(item);
-		info->Control.HandStatus = HandStatus::Free;
+		lara->Control.HandStatus = HandStatus::Free;
 		item->Velocity /= 3;				// Truncate speed to prevent flying off.
 		return;
 	}
@@ -228,7 +228,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -242,10 +242,10 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
@@ -284,7 +284,7 @@ void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -298,10 +298,10 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->Animations.CrouchRoll)
@@ -344,9 +344,9 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.HandStatus = HandStatus::Busy;
+	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -365,21 +365,21 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
-		info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(info->Control.WeaponControl.GunType) &&
+			!IsStandingWeapon(lara->Control.WeaponControl.GunType) &&
 			item->AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
 			item->TargetState = LS_CROUCH_IDLE;
-			info->Control.HandStatus = HandStatus::Free;
+			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
@@ -432,23 +432,23 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->TargetState = LS_CROUCH_IDLE;
-	info->Control.HandStatus = HandStatus::Free;
+	lara->Control.HandStatus = HandStatus::Free;
 }
 
 // State:		LS_CRAWL_IDLE (80)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	info->Control.IsLow = true;
-	info->Control.MoveAngle = item->Position.yRot;
-	info->ExtraTorsoRot.xRot = 0;
-	info->ExtraTorsoRot.yRot = 0;
+	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.IsLow = true;
+	lara->Control.MoveAngle = item->Position.yRot;
+	lara->ExtraTorsoRot.xRot = 0;
+	lara->ExtraTorsoRot.yRot = 0;
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -483,9 +483,9 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.HandStatus = HandStatus::Busy;
+	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -498,23 +498,23 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			info->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			info->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -539,13 +539,13 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	info->Control.IsLow = true;
-	info->Control.MoveAngle = item->Position.yRot;
-	info->ExtraTorsoRot.xRot = 0;
-	info->ExtraTorsoRot.yRot = 0;
+	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.IsLow = true;
+	lara->Control.MoveAngle = item->Position.yRot;
+	lara->ExtraTorsoRot.xRot = 0;
+	lara->ExtraTorsoRot.yRot = 0;
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -556,7 +556,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -587,10 +587,10 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.CanLook = false;
-	info->Control.HandStatus = HandStatus::Busy;
+	lara->Control.CanLook = false;
+	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -603,23 +603,23 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		info->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			info->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		info->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (info->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			info->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -638,11 +638,11 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.KeepLow = TestLaraKeepLow(item, coll);
-	info->Control.IsLow = true;
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
+	lara->Control.IsLow = true;
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	item->Airborne = false;
 	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
@@ -653,7 +653,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.FloorSlopeIsPit = true;
 	coll->Setup.FloorSlopeIsWall = true;
 	coll->Setup.DeathFlagIsPit = true;
-	coll->Setup.ForwardAngle = info->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -684,9 +684,9 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.HandStatus = HandStatus::Busy;
+	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -697,10 +697,10 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -744,9 +744,9 @@ void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.HandStatus = HandStatus::Busy;
+	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(24.0f);
@@ -757,10 +757,10 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || info->Control.KeepLow) &&
-		info->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
@@ -802,7 +802,7 @@ void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -811,12 +811,12 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
-		info->Control.MoveAngle = item->Position.yRot;
+		lara->Control.MoveAngle = item->Position.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = info->Control.MoveAngle;
+		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
 		MoveItem(item, item->Position.yRot, -CLICK(1));
 		GetCollisionInfo(coll, item);
@@ -824,7 +824,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
-		info->Control.HandStatus = HandStatus::Busy;
+		lara->Control.HandStatus = HandStatus::Busy;
 		item->Position.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
 		item->Airborne = true;
 		item->Velocity = 2;

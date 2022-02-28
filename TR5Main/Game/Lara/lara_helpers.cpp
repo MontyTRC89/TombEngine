@@ -46,7 +46,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 // Works, but disabled for the time being. @Sezz 2022.02.13
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!rate)
 	{
@@ -133,7 +133,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 
 void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!item->Velocity)
 		return;
@@ -141,13 +141,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
-	info->ExtraTorsoRot.zRot += std::min(abs(rate), abs(maxAngle - info->ExtraTorsoRot.zRot) / 6) * sign;
+	lara->ExtraTorsoRot.zRot += std::min(abs(rate), abs(maxAngle - lara->ExtraTorsoRot.zRot) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->ActiveState != LS_CRAWL_BACK)
 	{
-		info->ExtraHeadRot.zRot = info->ExtraTorsoRot.zRot / 2;
-		info->ExtraHeadRot.yRot = info->ExtraHeadRot.zRot;
+		lara->ExtraHeadRot.zRot = lara->ExtraTorsoRot.zRot / 2;
+		lara->ExtraHeadRot.yRot = lara->ExtraHeadRot.zRot;
 	}
 }
 
@@ -167,62 +167,62 @@ void DoLaraFallDamage(ITEM_INFO* item)
 
 void DoLaraTightropeBalance(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
-	const int factor = ((info->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
+	auto* lara = GetLaraInfo(item);
+	const int factor = ((lara->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
-		info->Control.TightropeControl.Balance += ANGLE(1.4f);
+		lara->Control.TightropeControl.Balance += ANGLE(1.4f);
 	if (TrInput & IN_RIGHT)
-		info->Control.TightropeControl.Balance -= ANGLE(1.4f);
+		lara->Control.TightropeControl.Balance -= ANGLE(1.4f);
 
-	if (info->Control.TightropeControl.Balance < 0)
+	if (lara->Control.TightropeControl.Balance < 0)
 	{
-		info->Control.TightropeControl.Balance -= factor;
-		if (info->Control.TightropeControl.Balance <= -ANGLE(45.0f))
-			info->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.TightropeControl.Balance -= factor;
+		if (lara->Control.TightropeControl.Balance <= -ANGLE(45.0f))
+			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
 
 	}
-	else if (info->Control.TightropeControl.Balance > 0)
+	else if (lara->Control.TightropeControl.Balance > 0)
 	{
-		info->Control.TightropeControl.Balance += factor;
-		if (info->Control.TightropeControl.Balance >= ANGLE(45.0f))
-			info->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.TightropeControl.Balance += factor;
+		if (lara->Control.TightropeControl.Balance >= ANGLE(45.0f))
+			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
 	}
 	else
-		info->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
+		lara->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
 }
 
 void DoLaraTightropeLean(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	item->Position.zRot = info->Control.TightropeControl.Balance / 4;
-	info->ExtraTorsoRot.zRot = -info->Control.TightropeControl.Balance;
+	item->Position.zRot = lara->Control.TightropeControl.Balance / 4;
+	lara->ExtraTorsoRot.zRot = -lara->Control.TightropeControl.Balance;
 }
 
 void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Control.TightropeControl.TimeOnTightrope <= 32)
-		info->Control.TightropeControl.TimeOnTightrope = 0;
+	if (lara->Control.TightropeControl.TimeOnTightrope <= 32)
+		lara->Control.TightropeControl.TimeOnTightrope = 0;
 	else
-		info->Control.TightropeControl.TimeOnTightrope -= 32;
+		lara->Control.TightropeControl.TimeOnTightrope -= 32;
 
-	if (info->Control.TightropeControl.Balance > 0)
+	if (lara->Control.TightropeControl.Balance > 0)
 	{
-		if (info->Control.TightropeControl.Balance <= ANGLE(0.75f))
-			info->Control.TightropeControl.Balance = 0;
+		if (lara->Control.TightropeControl.Balance <= ANGLE(0.75f))
+			lara->Control.TightropeControl.Balance = 0;
 		else
-			info->Control.TightropeControl.Balance -= ANGLE(0.75f);
+			lara->Control.TightropeControl.Balance -= ANGLE(0.75f);
 	}
 
-	if (info->Control.TightropeControl.Balance < 0)
+	if (lara->Control.TightropeControl.Balance < 0)
 	{
-		if (info->Control.TightropeControl.Balance >= -ANGLE(0.75f))
-			info->Control.TightropeControl.Balance = 0;
+		if (lara->Control.TightropeControl.Balance >= -ANGLE(0.75f))
+			lara->Control.TightropeControl.Balance = 0;
 		else
-			info->Control.TightropeControl.Balance += ANGLE(0.75f);
+			lara->Control.TightropeControl.Balance += ANGLE(0.75f);
 	}
 }
 
@@ -266,39 +266,39 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
 	{
-		info->Control.JumpDirection = JumpDirection::Forward;
+		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
 	else if (TrInput & IN_BACK &&
 		TestLaraJumpBack(item, coll))
 	{
-		info->Control.JumpDirection = JumpDirection::Back;
+		lara->Control.JumpDirection = JumpDirection::Back;
 	}
 	else if (TrInput & IN_LEFT &&
 		TestLaraJumpLeft(item, coll))
 	{
-		info->Control.JumpDirection = JumpDirection::Left;
+		lara->Control.JumpDirection = JumpDirection::Left;
 	}
 	else if (TrInput & IN_RIGHT &&
 		TestLaraJumpRight(item, coll))
 	{
-		info->Control.JumpDirection = JumpDirection::Right;
+		lara->Control.JumpDirection = JumpDirection::Right;
 	}
 	else if (TestLaraJumpUp(item, coll)) [[likely]]
-		info->Control.JumpDirection = JumpDirection::Up;
+		lara->Control.JumpDirection = JumpDirection::Up;
 	else
-		info->Control.JumpDirection = JumpDirection::None;
+		lara->Control.JumpDirection = JumpDirection::None;
 }
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int dist = WALL_SIZE;
@@ -309,29 +309,29 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		info->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->TargetState);
+		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->TargetState);
 	}
 	else
-		info->Control.RunJumpQueued = false;
+		lara->Control.RunJumpQueued = false;
 }
 
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->ProjectedFloorHeight = vaultResult.Height;
-	info->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : info->Control.HandStatus;
-	info->Control.TurnRate = 0;
+	lara->ProjectedFloorHeight = vaultResult.Height;
+	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
+	lara->Control.TurnRate = 0;
 
 	if (vaultResult.SnapToLedge)
 	{
 		// Disable smooth angle adjustment for now.
 		SnapItemToLedge(item, coll, 0.2f/*, false*/);
-		info->TargetAngle = /*coll->NearestLedgeAngle*/ item->Position.yRot;
+		lara->TargetAngle = /*coll->NearestLedgeAngle*/ item->Position.yRot;
 	}
 
 	if (vaultResult.SetJumpVelocity)
-		info->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(info->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
+		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(lara->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 }
 
 void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
@@ -369,17 +369,17 @@ void SetLaraMonkeyFallState(ITEM_INFO* item)
 
 void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->Velocity = 2;
 	item->VerticalVelocity = 1;
 	item->Airborne = true;
-	info->Control.HandStatus = HandStatus::Free;
+	lara->Control.HandStatus = HandStatus::Free;
 }
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->Position.yRot;
@@ -405,13 +405,13 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	LaraSnapToHeight(item, coll);
-	info->Control.MoveAngle = direction;
+	lara->Control.MoveAngle = direction;
 	oldAngle = direction;
 }
 
 void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -422,23 +422,23 @@ void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		item->Position.yPos += STEP_SIZE;
 		item->VerticalVelocity = 1;
 
-		info->Control.HandStatus = HandStatus::Free;
+		lara->Control.HandStatus = HandStatus::Free;
 
-		item->Position.yRot += info->NextCornerPos.yRot / 2;
+		item->Position.yRot += lara->NextCornerPos.yRot / 2;
 		return;
 	}
 
 	if (flip)
 	{
-		if (info->Control.IsClimbingLadder)
+		if (lara->Control.IsClimbingLadder)
 			SetAnimation(item, LA_LADDER_IDLE);
 		else
 			SetAnimation(item, LA_HANG_IDLE);
 
-		coll->Setup.OldPosition.x = item->Position.xPos = info->NextCornerPos.xPos;
-		coll->Setup.OldPosition.y = item->Position.yPos = info->NextCornerPos.yPos;
-		coll->Setup.OldPosition.z = item->Position.zPos = info->NextCornerPos.zPos;
-		item->Position.yRot = info->NextCornerPos.yRot;
+		coll->Setup.OldPosition.x = item->Position.xPos = lara->NextCornerPos.xPos;
+		coll->Setup.OldPosition.y = item->Position.yPos = lara->NextCornerPos.yPos;
+		coll->Setup.OldPosition.z = item->Position.zPos = lara->NextCornerPos.zPos;
+		item->Position.yRot = lara->NextCornerPos.yRot;
 	}
 }
 
@@ -471,7 +471,7 @@ void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 
 void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!rate)
 	{
@@ -482,63 +482,63 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 	rate = abs(rate);
 
 	// Reset head.
-	if (abs(info->ExtraHeadRot.xRot) > ANGLE(0.1f))
-		info->ExtraHeadRot.xRot += info->ExtraHeadRot.xRot / -rate;
+	if (abs(lara->ExtraHeadRot.xRot) > ANGLE(0.1f))
+		lara->ExtraHeadRot.xRot += lara->ExtraHeadRot.xRot / -rate;
 	else
-		info->ExtraHeadRot.xRot = 0;
+		lara->ExtraHeadRot.xRot = 0;
 
-	if (abs(info->ExtraHeadRot.yRot) > ANGLE(0.1f))
-		info->ExtraHeadRot.yRot += info->ExtraHeadRot.yRot / -rate;
+	if (abs(lara->ExtraHeadRot.yRot) > ANGLE(0.1f))
+		lara->ExtraHeadRot.yRot += lara->ExtraHeadRot.yRot / -rate;
 	else
-		info->ExtraHeadRot.yRot = 0;
+		lara->ExtraHeadRot.yRot = 0;
 
-	if (abs(info->ExtraHeadRot.zRot) > ANGLE(0.1f))
-		info->ExtraHeadRot.zRot += info->ExtraHeadRot.zRot / -rate;
+	if (abs(lara->ExtraHeadRot.zRot) > ANGLE(0.1f))
+		lara->ExtraHeadRot.zRot += lara->ExtraHeadRot.zRot / -rate;
 	else
-		info->ExtraHeadRot.zRot = 0;
+		lara->ExtraHeadRot.zRot = 0;
 
 	// Reset torso.
-	if (abs(info->ExtraTorsoRot.xRot) > ANGLE(0.1f))
-		info->ExtraTorsoRot.xRot += info->ExtraTorsoRot.xRot / -rate;
+	if (abs(lara->ExtraTorsoRot.xRot) > ANGLE(0.1f))
+		lara->ExtraTorsoRot.xRot += lara->ExtraTorsoRot.xRot / -rate;
 	else
-		info->ExtraTorsoRot.xRot = 0;
+		lara->ExtraTorsoRot.xRot = 0;
 
-	if (abs(info->ExtraTorsoRot.yRot) > ANGLE(0.1f))
-		info->ExtraTorsoRot.yRot += info->ExtraTorsoRot.yRot / -rate;
+	if (abs(lara->ExtraTorsoRot.yRot) > ANGLE(0.1f))
+		lara->ExtraTorsoRot.yRot += lara->ExtraTorsoRot.yRot / -rate;
 	else
-		info->ExtraTorsoRot.yRot = 0;
+		lara->ExtraTorsoRot.yRot = 0;
 
-	if (abs(info->ExtraTorsoRot.zRot) > ANGLE(0.1f))
-		info->ExtraTorsoRot.zRot += info->ExtraTorsoRot.zRot / -rate;
+	if (abs(lara->ExtraTorsoRot.zRot) > ANGLE(0.1f))
+		lara->ExtraTorsoRot.zRot += lara->ExtraTorsoRot.zRot / -rate;
 	else
-		info->ExtraTorsoRot.zRot = 0;
+		lara->ExtraTorsoRot.zRot = 0;
 }
 
 void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
-		info->Control.Count.RunJump = 0;
+		lara->Control.Count.RunJump = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
-		info->Control.RunJumpQueued = false;
+		lara->Control.RunJumpQueued = false;
 
 	// Increment/reset AFK pose timer.
-	if (info->Control.Count.Pose < LARA_POSE_TIME &&
+	if (lara->Control.Count.Pose < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->Animations.Pose)
 	{
-		info->Control.Count.Pose++;
+		lara->Control.Count.Pose++;
 	}
 	else
-		info->Control.Count.Pose = 0;
+		lara->Control.Count.Pose = 0;
 
 	// Reset lean.
-	if (!info->Control.IsMoving || (info->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
+	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 		ResetLaraLean(item, 6);
 
 	// Reset crawl flex.
@@ -550,23 +550,23 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	// Reset turn rate.
-	int sign = copysign(1, info->Control.TurnRate);
-	if (abs(info->Control.TurnRate) > ANGLE(2.0f))
-		info->Control.TurnRate -= ANGLE(2.0f) * sign;
-	else if (abs(info->Control.TurnRate) > ANGLE(0.5f))
-		info->Control.TurnRate -= ANGLE(0.5f) * sign;
+	int sign = copysign(1, lara->Control.TurnRate);
+	if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
+		lara->Control.TurnRate -= ANGLE(2.0f) * sign;
+	else if (abs(lara->Control.TurnRate) > ANGLE(0.5f))
+		lara->Control.TurnRate -= ANGLE(0.5f) * sign;
 	else
-		info->Control.TurnRate = 0;
-	item->Position.yRot += info->Control.TurnRate;
+		lara->Control.TurnRate = 0;
+	item->Position.yRot += lara->Control.TurnRate;
 }
 
 bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	if (info->Vehicle != NO_ITEM)
+	if (lara->Vehicle != NO_ITEM)
 	{
-		switch (g_Level.Items[info->Vehicle].ObjectNumber)
+		switch (g_Level.Items[lara->Vehicle].ObjectNumber)
 		{
 		case ID_QUAD:
 			QuadBikeControl(item, coll);

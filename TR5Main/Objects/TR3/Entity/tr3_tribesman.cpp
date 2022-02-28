@@ -356,7 +356,7 @@ void TribemanDartsControl(short itemNum)
 
 		GetCreatureMood(item, &info, (info.zoneNumber == info.enemyZone ? VIOLENT : TIMID));
 
-		if (item->HitStatus && Lara.poisoned >= 0x100 && creature->mood == BORED_MOOD)
+		if (item->HitStatus && Lara.Poisoned >= 0x100 && creature->mood == BORED_MOOD)
 			creature->mood = ESCAPE_MOOD;
 
 		CreatureMood(item, &info, TIMID);

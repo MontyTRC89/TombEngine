@@ -17,11 +17,11 @@
 /*normal hanging and shimmying*/
 void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	/*state 10*/
 	/*collision: lara_col_hang*/
-	info->Control.IsClimbingLadder = false;
+	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
 	{
@@ -44,7 +44,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	/*state 10*/
 	/*state code: lara_as_hang*/
@@ -128,7 +128,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 	}
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 
 	TestLaraHang(item, coll);
 
@@ -170,7 +170,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 				}
 			}
 
-			if (info->Control.CanClimbLadder &&
+			if (lara->Control.CanClimbLadder &&
 				coll->Middle.Ceiling <= -CLICK(1) &&
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
@@ -184,7 +184,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		}
 
 		if (TrInput & IN_BACK &&
-			info->Control.CanClimbLadder &&
+			lara->Control.CanClimbLadder &&
 			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
 			item->AnimNumber == LA_HANG_IDLE)
 		{
@@ -212,15 +212,15 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RAD;
 
 	TestLaraHang(item, coll);
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 }
 
 void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
@@ -239,14 +239,14 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	/*state 31*/
 	/*state code: lara_as_hangright*/
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 }
 
 void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)

@@ -444,7 +444,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	obj = &Objects[ID_UPV];
 	if (obj->loaded)
 	{
-		obj->initialise = SubInitialise;
+		obj->initialise = UPVInitialise;
 		obj->control = SubEffects;
 		obj->collision = SubCollision;
 	//	obj->drawRoutine = SubDraw;

@@ -342,14 +342,14 @@ int S_UpdateInput()
 	{
 		if (medipack_timeout == 0)
 		{
-			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.poisoned)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.Poisoned)
 			{
 				if (Lara.NumSmallMedipacks != 0)
 				{
 					if (Lara.NumSmallMedipacks != -1)
 						Lara.NumSmallMedipacks--;
 
-					Lara.poisoned = 0;
+					Lara.Poisoned = 0;
 					LaraItem->HitPoints += 500;
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);//Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
 
@@ -369,14 +369,14 @@ int S_UpdateInput()
 	{
 		if (medipack_timeout == 0)
 		{
-			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.poisoned)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.Poisoned)
 			{
 				if (Lara.NumLargeMedipacks != 0)
 				{
 					if (Lara.NumLargeMedipacks != -1)
 						Lara.NumLargeMedipacks--;
 
-					Lara.poisoned = 0;
+					Lara.Poisoned = 0;
 					LaraItem->HitPoints += 1000;
 
 					if (LaraItem->HitPoints > 1000)

@@ -18,6 +18,29 @@
 
 using std::vector;
 
+#define DISMOUNT_DISTANCE 330
+#define CART_DEC -1536
+#define CART_MIN_SPEED 2560
+#define CART_MIN_VEL 32
+#define TURN_DEATH_VEL 128
+#define CART_FORWARD_GRADIENT -128
+#define CART_BACK_GRADIENT 128
+#define CART_JUMP_VELOCITY 64512
+#define CART_GRAVITY (SECTOR(1) + 1)
+#define CART_MAX_VERTICAL_VELOCITY 16128
+#define TERMINAL_ANGLE SECTOR(4)
+#define CART_RADIUS 100
+#define CART_HEIGHT CLICK(3)
+#define CART_NHITS 25
+#define CART_ENTITY_RADIUS CLICK(1)
+
+#define CART_IN_SWIPE		IN_ACTION
+#define CART_IN_DUCK		IN_CROUCH
+#define CART_IN_DISMOUNT	IN_ROLL
+#define CART_IN_BRAKE		(IN_BACK | IN_JUMP)
+#define CART_IN_LEFT		IN_LEFT
+#define CART_IN_RIGHT		IN_RIGHT
+
 enum MinecartState
 {
 	CART_STATE_MOUNT,
@@ -107,88 +130,65 @@ enum MinecartFlags
 	CART_FLAG_DEAD = 128
 };
 
-#define DISMOUNT_DISTANCE 330
-#define CART_DEC -1536
-#define CART_MIN_SPEED 2560
-#define CART_MIN_VEL 32
-#define TURN_DEATH_VEL 128
-#define CART_FORWARD_GRADIENT -128
-#define CART_BACK_GRADIENT 128
-#define CART_JUMP_VELOCITY 64512
-#define CART_GRAVITY (SECTOR(1) + 1)
-#define CART_MAX_VERTICAL_VELOCITY 16128
-#define TERMINAL_ANGLE SECTOR(4)
-#define CART_RADIUS 100
-#define CART_HEIGHT CLICK(3)
-#define CART_NHITS 25
-#define CART_ENTITY_RADIUS CLICK(1)
-
-#define CART_IN_SWIPE		IN_ACTION
-#define CART_IN_DUCK		IN_CROUCH
-#define CART_IN_DISMOUNT	IN_ROLL
-#define CART_IN_BRAKE		(IN_BACK | IN_JUMP)
-#define CART_IN_LEFT		IN_LEFT
-#define CART_IN_RIGHT		IN_RIGHT
-
 void InitialiseMineCart(short itemNumber)
 {
-	auto* cartItem = &g_Level.Items[itemNumber];
-	cartItem->Data = MinecartInfo();
-	auto* cartInfo = (MinecartInfo*)cartItem->Data;
+	auto* minecartItem = &g_Level.Items[itemNumber];
+	minecartItem->Data = MinecartInfo();
+	auto* minecart = (MinecartInfo*)minecartItem->Data;
 
-	cartInfo->Velocity = 0;
-	cartInfo->VerticalVelocity = 0;
-	cartInfo->Gradient = 0;
-	cartInfo->Flags = NULL;
+	minecart->Velocity = 0;
+	minecart->VerticalVelocity = 0;
+	minecart->Gradient = 0;
+	minecart->Flags = NULL;
 }
 
-static int TestMinecartHeight(ITEM_INFO* cartItem, int xOffset, int zOffset)
+static int TestMinecartHeight(ITEM_INFO* minecartItem, int xOffset, int zOffset)
 {
-	float s = phd_sin(cartItem->Position.yRot);
-	float c = phd_cos(cartItem->Position.yRot);
+	float s = phd_sin(minecartItem->Position.yRot);
+	float c = phd_cos(minecartItem->Position.yRot);
 
 	PHD_VECTOR pos;
-	pos.x = cartItem->Position.xPos + zOffset * s + xOffset * c;
-	pos.y = cartItem->Position.yPos - zOffset * phd_sin(cartItem->Position.xRot) + xOffset * phd_sin(cartItem->Position.zRot);
-	pos.z = cartItem->Position.zPos + zOffset * c - xOffset * s;
+	pos.x = minecartItem->Position.xPos + zOffset * s + xOffset * c;
+	pos.y = minecartItem->Position.yPos - zOffset * phd_sin(minecartItem->Position.xRot) + xOffset * phd_sin(minecartItem->Position.zRot);
+	pos.z = minecartItem->Position.zPos + zOffset * c - xOffset * s;
 
-	return GetCollisionResult(pos.x, pos.y, pos.z, cartItem->RoomNumber).Position.Floor;
+	return GetCollisionResult(pos.x, pos.y, pos.z, minecartItem->RoomNumber).Position.Floor;
 }
 
-static short GetMinecartCollision(ITEM_INFO* cartItem, short angle, int distance)
+static short GetMinecartCollision(ITEM_INFO* minecartItem, short angle, int distance)
 {
-	auto probe = GetCollisionResult(cartItem, angle, distance, -LARA_HEIGHT);
+	auto probe = GetCollisionResult(minecartItem, angle, distance, -LARA_HEIGHT);
 
 	if (probe.Position.Floor != NO_HEIGHT)
-		probe.Position.Floor -= cartItem->Position.yPos;
+		probe.Position.Floor -= minecartItem->Position.yPos;
 
 	return (short)probe.Position.Floor;
 }
 
-static bool GetInMineCart(ITEM_INFO* cartItem, ITEM_INFO* laraItem, COLL_INFO* coll)
+static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	if (!(TrInput & CART_IN_SWIPE) || laraInfo->Control.HandStatus != HandStatus::Free ||
+	if (!(TrInput & CART_IN_SWIPE) || lara->Control.HandStatus != HandStatus::Free ||
 		laraItem->Airborne)
 	{
 		return false;
 	}
 
-	if (!TestBoundsCollide(cartItem, laraItem, coll->Setup.Radius))
+	if (!TestBoundsCollide(minecartItem, laraItem, coll->Setup.Radius))
 		return false;
 
-	if (!TestCollision(cartItem, laraItem))
+	if (!TestCollision(minecartItem, laraItem))
 		return false;
 
-	int x = laraItem->Position.xPos - cartItem->Position.xPos;
-	int z = laraItem->Position.zPos - cartItem->Position.zPos;
+	int x = laraItem->Position.xPos - minecartItem->Position.xPos;
+	int z = laraItem->Position.zPos - minecartItem->Position.zPos;
 
 	int distance = pow(x, 2) + pow(z, 2);
 	if (distance > pow(CLICK(2), 2))
 		return false;
 
-	if (GetCollisionResult(cartItem).Position.Floor < -32000)
+	if (GetCollisionResult(minecartItem).Position.Floor < -32000)
 		return false;
 
 	return true;
@@ -196,24 +196,24 @@ static bool GetInMineCart(ITEM_INFO* cartItem, ITEM_INFO* laraItem, COLL_INFO* c
 
 static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* cartItem = &g_Level.Items[laraInfo->Vehicle];
+	auto* lara = GetLaraInfo(laraItem);
+	auto* minecartItem = &g_Level.Items[lara->Vehicle];
 	
 	short angle;
 	if (direction < 0)
-		angle = cartItem->Position.yRot + ANGLE(90.0f);
+		angle = minecartItem->Position.yRot + ANGLE(90.0f);
 	else
-		angle = cartItem->Position.yRot - ANGLE(90.0f);
+		angle = minecartItem->Position.yRot - ANGLE(90.0f);
 
-	auto probe = GetCollisionResult(cartItem, angle, -DISMOUNT_DISTANCE);
+	auto probe = GetCollisionResult(minecartItem, angle, -DISMOUNT_DISTANCE);
 
 	if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if (abs(probe.Position.Floor - cartItem->Position.yPos) > CLICK(2))
+	if (abs(probe.Position.Floor - minecartItem->Position.yPos) > CLICK(2))
 		return false;
 
-	if ((probe.Position.Ceiling - cartItem->Position.yPos) > -LARA_HEIGHT ||
+	if ((probe.Position.Ceiling - minecartItem->Position.yPos) > -LARA_HEIGHT ||
 		(probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT)
 	{
 		return false;
@@ -222,12 +222,12 @@ static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 	return true;
 }
 
-static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
+static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 {
 	vector<short> roomsList;
-	roomsList.push_back(cartItem->RoomNumber);
+	roomsList.push_back(minecartItem->RoomNumber);
 
-	auto* room = &g_Level.Rooms[cartItem->RoomNumber];
+	auto* room = &g_Level.Rooms[minecartItem->RoomNumber];
 	for (int i = 0; i < room->doors.size(); i++)
 		roomsList.push_back(room->doors[i].room);
 
@@ -240,18 +240,18 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
 			auto* item = &g_Level.Items[itemNumber];
 			if (item->Collidable &&
 				item->Status != ITEM_INVISIBLE &&
-				item != laraItem && item != cartItem)
+				item != laraItem && item != minecartItem)
 			{
 				auto* object = &Objects[item->ObjectNumber];
 				if (object->collision &&
 					(object->intelligent || item->ObjectNumber == ID_ROLLINGBALL || item->ObjectNumber == ID_ANIMATING2))
 				{
-					int x = cartItem->Position.xPos - item->Position.xPos;
-					int y = cartItem->Position.yPos - item->Position.yPos;
-					int z = cartItem->Position.zPos - item->Position.zPos;
-					if (x > -2048 && x < 2048 &&
-						y > -2048 && y < 2048 &&
-						z > -2048 && z < 2048)
+					int x = minecartItem->Position.xPos - item->Position.xPos;
+					int y = minecartItem->Position.yPos - item->Position.yPos;
+					int z = minecartItem->Position.zPos - item->Position.zPos;
+					if (x > -SECTOR(2) && x < SECTOR(2) &&
+						y > -SECTOR(2) && y < SECTOR(2) &&
+						z > -SECTOR(2) && z < SECTOR(2))
 					{
 						if (TestBoundsCollide(item, laraItem, CART_ENTITY_RADIUS))
 						{
@@ -276,7 +276,7 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
 							}
 							else
 							{
-								DoLotsOfBlood(item->Position.xPos, cartItem->Position.yPos - CLICK(1), item->Position.zPos, GetRandomControl() & 3, cartItem->Position.yRot, item->RoomNumber, 3);
+								DoLotsOfBlood(item->Position.xPos, minecartItem->Position.yPos - CLICK(1), item->Position.zPos, GetRandomControl() & 3, minecartItem->Position.yRot, item->RoomNumber, 3);
 								item->HitPoints = 0;
 							}
 						}
@@ -289,150 +289,150 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
 	}
 }
 
-static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
+static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* cartInfo = (MinecartInfo*)cartItem->Data;
+	auto* lara = GetLaraInfo(laraItem);
+	auto* minecart = (MinecartInfo*)minecartItem->Data;
 
-	if (cartInfo->StopDelay)
-		cartInfo->StopDelay--;
+	if (minecart->StopDelay)
+		minecart->StopDelay--;
 
-	if ((laraInfo->mineL && laraInfo->mineR && !cartInfo->StopDelay) &&
-		(cartItem->Position.xPos & 0x380 == 512 ||
-			cartItem->Position.zRot & 0x380 == 512))
+	if ((lara->mineL && lara->mineR && !minecart->StopDelay) &&
+		(minecartItem->Position.xPos & 0x380 == 512 ||
+			minecartItem->Position.zRot & 0x380 == 512))
 	{
-		if (cartInfo->Velocity < 0xf000)
+		if (minecart->Velocity < 0xf000)
 		{
-			cartItem->Velocity = 0;
-			cartInfo->Velocity = 0;
-			cartInfo->Flags |= CART_FLAG_STOPPED | CART_FLAG_CONTROL;
+			minecartItem->Velocity = 0;
+			minecart->Velocity = 0;
+			minecart->Flags |= CART_FLAG_STOPPED | CART_FLAG_CONTROL;
 			return;
 		}
 		else
-			cartInfo->StopDelay = 16;
+			minecart->StopDelay = 16;
 	}
 
-	if ((laraInfo->mineL || laraInfo->mineR) &&
-		!(laraInfo->mineL && laraInfo->mineR) &&
-		!cartInfo->StopDelay &&
-		!(cartInfo->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
+	if ((lara->mineL || lara->mineR) &&
+		!(lara->mineL && lara->mineR) &&
+		!minecart->StopDelay &&
+		!(minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
 	{
 		short angle;
-		unsigned short rotation = (((unsigned short)cartItem->Position.yRot) / ANGLE(90.0f)) | (laraInfo->mineL * 4);
+		unsigned short rotation = (((unsigned short)minecartItem->Position.yRot) / ANGLE(90.0f)) | (lara->mineL * 4);
 
 		switch (rotation)
 		{
 		case 0:
-			cartInfo->TurnX = (cartItem->Position.xPos + 4096) & ~1023;
-			cartInfo->TurnZ = cartItem->Position.zPos & ~1023;
+			minecart->TurnX = (minecartItem->Position.xPos + 4096) & ~1023;
+			minecart->TurnZ = minecartItem->Position.zPos & ~1023;
 			break;
 
 		case 1:
-			cartInfo->TurnX = cartItem->Position.xPos & ~1023;
-			cartInfo->TurnZ = (cartItem->Position.zPos - 4096) | 1023;
+			minecart->TurnX = minecartItem->Position.xPos & ~1023;
+			minecart->TurnZ = (minecartItem->Position.zPos - 4096) | 1023;
 			break;
 
 		case 2:
-			cartInfo->TurnX = (cartItem->Position.xPos - 4096) | 1023;
-			cartInfo->TurnZ = cartItem->Position.zPos | 1023;
+			minecart->TurnX = (minecartItem->Position.xPos - 4096) | 1023;
+			minecart->TurnZ = minecartItem->Position.zPos | 1023;
 			break;
 
 		case 3:
-			cartInfo->TurnX = cartItem->Position.xPos | 1023;
-			cartInfo->TurnZ = (cartItem->Position.zPos + 4096) & ~1023;
+			minecart->TurnX = minecartItem->Position.xPos | 1023;
+			minecart->TurnZ = (minecartItem->Position.zPos + 4096) & ~1023;
 			break;
 
 		case 4:
-			cartInfo->TurnX = (cartItem->Position.xPos - 4096) | 1023;
-			cartInfo->TurnZ = cartItem->Position.zPos & ~1023;
+			minecart->TurnX = (minecartItem->Position.xPos - 4096) | 1023;
+			minecart->TurnZ = minecartItem->Position.zPos & ~1023;
 			break;
 
 		case 5:
-			cartInfo->TurnX = cartItem->Position.xPos & ~1023;
-			cartInfo->TurnZ = (cartItem->Position.zPos + 4096) & ~1023;
+			minecart->TurnX = minecartItem->Position.xPos & ~1023;
+			minecart->TurnZ = (minecartItem->Position.zPos + 4096) & ~1023;
 			break;
 
 		case 6:
-			cartInfo->TurnX = (cartItem->Position.xPos + 4096) & ~1023;
-			cartInfo->TurnZ = cartItem->Position.zPos | 1023;
+			minecart->TurnX = (minecartItem->Position.xPos + 4096) & ~1023;
+			minecart->TurnZ = minecartItem->Position.zPos | 1023;
 			break;
 
 		case 7:
-			cartInfo->TurnX = cartItem->Position.xPos | 1023;
-			cartInfo->TurnZ = (cartItem->Position.zPos - 4096) | 1023;
+			minecart->TurnX = minecartItem->Position.xPos | 1023;
+			minecart->TurnZ = (minecartItem->Position.zPos - 4096) | 1023;
 			break;
 		}
 
-		angle = mGetAngle(cartItem->Position.xPos, cartItem->Position.zPos, cartInfo->TurnX, cartInfo->TurnZ) & 0x3fff;
+		angle = mGetAngle(minecartItem->Position.xPos, minecartItem->Position.zPos, minecart->TurnX, minecart->TurnZ) & 0x3fff;
 
 		if (rotation < 4)
 		{
-			cartInfo->TurnRot = cartItem->Position.yRot;
-			cartInfo->TurnLen = angle;
+			minecart->TurnRot = minecartItem->Position.yRot;
+			minecart->TurnLen = angle;
 		}
 		else
 		{
-			cartInfo->TurnRot = cartItem->Position.yRot;
+			minecart->TurnRot = minecartItem->Position.yRot;
 
 			if (angle)
 				angle = ANGLE(90.0f) - angle;
 
-			cartInfo->TurnLen = angle;
+			minecart->TurnLen = angle;
 		}
 
-		cartInfo->Flags |= (laraInfo->mineL) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
+		minecart->Flags |= (lara->mineL) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
 	}
 
-	if (cartInfo->Velocity < CART_MIN_SPEED)
-		cartInfo->Velocity = CART_MIN_SPEED;
+	if (minecart->Velocity < CART_MIN_SPEED)
+		minecart->Velocity = CART_MIN_SPEED;
 
-	cartInfo->Velocity += -cartInfo->Gradient * 4;
+	minecart->Velocity += -minecart->Gradient * 4;
 
-	cartInfo->Velocity /= 256; // TODO: Then why use the huge values in the first place??
-	if (cartItem->Velocity < CART_MIN_VEL)
+	minecart->Velocity /= 256; // TODO: Then why use the huge values in the first place??
+	if (minecartItem->Velocity < CART_MIN_VEL)
 	{
-		cartItem->Velocity = CART_MIN_VEL;
+		minecartItem->Velocity = CART_MIN_VEL;
 		StopSoundEffect(209);
 
-		if (cartInfo->VerticalVelocity)
+		if (minecart->VerticalVelocity)
 			StopSoundEffect(210);
 		else
-			SoundEffect(210, &cartItem->Position, 2);
+			SoundEffect(210, &minecartItem->Position, 2);
 	}
 	else
 	{
 		StopSoundEffect(210);
 
-		if (cartInfo->VerticalVelocity)
+		if (minecart->VerticalVelocity)
 			StopSoundEffect(209);
 		else
-			SoundEffect(209, &cartItem->Position, (2 | 4) + 0x1000000 + (cartItem->Velocity * 32768));
+			SoundEffect(209, &minecartItem->Position, (2 | 4) + 0x1000000 + (minecartItem->Velocity * 32768));
 	}
 
-	if (cartInfo->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
+	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 	{
-		cartInfo->TurnLen += cartItem->Velocity * 3;
-		if (cartInfo->TurnLen > ANGLE(90.0f))
+		minecart->TurnLen += minecartItem->Velocity * 3;
+		if (minecart->TurnLen > ANGLE(90.0f))
 		{
-			if (cartInfo->Flags & CART_FLAG_TURNING_LEFT)
-				cartItem->Position.yRot = cartInfo->TurnRot - ANGLE(90.0f);
+			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
+				minecartItem->Position.yRot = minecart->TurnRot - ANGLE(90.0f);
 			else
-				cartItem->Position.yRot = cartInfo->TurnRot + ANGLE(90.0f);
+				minecartItem->Position.yRot = minecart->TurnRot + ANGLE(90.0f);
 
-			cartInfo->Flags &= ~(CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT);
+			minecart->Flags &= ~(CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT);
 		}
 		else
 		{
-			if (cartInfo->Flags & CART_FLAG_TURNING_LEFT)
-				cartItem->Position.yRot = cartInfo->TurnRot - cartInfo->TurnLen;
+			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
+				minecartItem->Position.yRot = minecart->TurnRot - minecart->TurnLen;
 			else
-				cartItem->Position.yRot = cartInfo->TurnRot + cartInfo->TurnLen;
+				minecartItem->Position.yRot = minecart->TurnRot + minecart->TurnLen;
 		}
 
-		if (cartInfo->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
+		if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 		{
-			unsigned short quadrant = ((unsigned short)cartItem->Position.yRot) / ANGLE(90.0f);
-			unsigned short degree = cartItem->Position.yRot & 16383;
+			unsigned short quadrant = ((unsigned short)minecartItem->Position.yRot) / ANGLE(90.0f);
+			unsigned short degree = minecartItem->Position.yRot & 16383;
 
 			float x, z;
 			switch (quadrant)
@@ -458,67 +458,67 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* cartItem)
 				break;
 			}
 
-			if (cartInfo->Flags & CART_FLAG_TURNING_LEFT)
+			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
 			{
 				x = -x;
 				z = -z;
 			}
 
-			cartItem->Position.xPos = cartInfo->TurnX + x * 3584;
-			cartItem->Position.zPos = cartInfo->TurnZ + z * 3584;
+			minecartItem->Position.xPos = minecart->TurnX + x * 3584;
+			minecartItem->Position.zPos = minecart->TurnZ + z * 3584;
 		}
 	}
 	else
 	{
-		cartItem->Position.xPos += cartItem->Velocity * phd_sin(cartItem->Position.yRot);
-		cartItem->Position.zPos += cartItem->Velocity * phd_cos(cartItem->Position.yRot);
+		minecartItem->Position.xPos += minecartItem->Velocity * phd_sin(minecartItem->Position.yRot);
+		minecartItem->Position.zPos += minecartItem->Velocity * phd_cos(minecartItem->Position.yRot);
 	}
 
-	cartInfo->FloorHeightMiddle = TestMinecartHeight(cartItem, 0, 0);
+	minecart->FloorHeightMiddle = TestMinecartHeight(minecartItem, 0, 0);
 
-	if (!cartInfo->VerticalVelocity)
+	if (!minecart->VerticalVelocity)
 	{
-		cartInfo->FloorHeightFront = TestMinecartHeight(cartItem, 0, CLICK(1));
-		cartInfo->Gradient = cartInfo->FloorHeightMiddle - cartInfo->FloorHeightFront;
-		cartItem->Position.yPos = cartInfo->FloorHeightMiddle;
+		minecart->FloorHeightFront = TestMinecartHeight(minecartItem, 0, CLICK(1));
+		minecart->Gradient = minecart->FloorHeightMiddle - minecart->FloorHeightFront;
+		minecartItem->Position.yPos = minecart->FloorHeightMiddle;
 	}
 	else
 	{
-		if (cartItem->Position.yPos > cartInfo->FloorHeightMiddle)
+		if (minecartItem->Position.yPos > minecart->FloorHeightMiddle)
 		{
-			if (cartInfo->VerticalVelocity > 0)
-				SoundEffect(202, &cartItem->Position, 2);
+			if (minecart->VerticalVelocity > 0)
+				SoundEffect(202, &minecartItem->Position, 2);
 
-			cartItem->Position.yPos = cartInfo->FloorHeightMiddle;
-			cartInfo->VerticalVelocity = 0;
+			minecartItem->Position.yPos = minecart->FloorHeightMiddle;
+			minecart->VerticalVelocity = 0;
 		}
 		else
 		{
-			cartInfo->VerticalVelocity += CART_GRAVITY;
-			if (cartInfo->VerticalVelocity > CART_MAX_VERTICAL_VELOCITY)
-				cartInfo->VerticalVelocity = CART_MAX_VERTICAL_VELOCITY;
+			minecart->VerticalVelocity += CART_GRAVITY;
+			if (minecart->VerticalVelocity > CART_MAX_VERTICAL_VELOCITY)
+				minecart->VerticalVelocity = CART_MAX_VERTICAL_VELOCITY;
 
-			cartItem->Position.yPos += cartInfo->VerticalVelocity / 256;
+			minecartItem->Position.yPos += minecart->VerticalVelocity / 256;
 		}
 	}
 
-	cartItem->Position.xRot = cartInfo->Gradient * 32;
+	minecartItem->Position.xRot = minecart->Gradient * 32;
 
-	if (cartInfo->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
+	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 	{
-		short val = cartItem->Position.yRot & 16383;
-		if (cartInfo->Flags & CART_FLAG_TURNING_RIGHT)
-			cartItem->Position.zRot = -(val * cartItem->Velocity) / 512;
+		short val = minecartItem->Position.yRot & 16383;
+		if (minecart->Flags & CART_FLAG_TURNING_RIGHT)
+			minecartItem->Position.zRot = -(val * minecartItem->Velocity) / 512;
 		else
-			cartItem->Position.zRot = ((ANGLE(90.0f) - val) * cartItem->Velocity) / 512;
+			minecartItem->Position.zRot = ((ANGLE(90.0f) - val) * minecartItem->Velocity) / 512;
 	}
 	else
-		cartItem->Position.zRot -= cartItem->Position.zRot / 8;
+		minecartItem->Position.zRot -= minecartItem->Position.zRot / 8;
 }
 
-static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* cartInfo)
+static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartInfo* minecart)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	short floorHeight;
 
@@ -531,11 +531,11 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->TargetState = CART_STATE_DUCK;
 		else if (TrInput & CART_IN_BRAKE)
 			laraItem->TargetState = CART_STATE_BRAKE;
-		else if (cartInfo->Velocity == CART_MIN_VEL || cartInfo->Flags & CART_FLAG_STOPPED)
+		else if (minecart->Velocity == CART_MIN_VEL || minecart->Flags & CART_FLAG_STOPPED)
 			laraItem->TargetState = CART_STATE_IDLE;
-		else if (cartInfo->Gradient < CART_FORWARD_GRADIENT)
+		else if (minecart->Gradient < CART_FORWARD_GRADIENT)
 			laraItem->TargetState = CART_STATE_FORWARD;
-		else if (cartInfo->Gradient > CART_BACK_GRADIENT)
+		else if (minecart->Gradient > CART_BACK_GRADIENT)
 			laraItem->TargetState = CART_STATE_BACK;
 		else if (TrInput & CART_IN_LEFT)
 			laraItem->TargetState = CART_STATE_LEFT;
@@ -551,7 +551,7 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->TargetState = CART_STATE_DUCK;
 		else if (TrInput & CART_IN_BRAKE)
 			laraItem->TargetState = CART_STATE_BRAKE;
-		else if (cartInfo->Gradient > CART_FORWARD_GRADIENT)
+		else if (minecart->Gradient > CART_FORWARD_GRADIENT)
 			laraItem->TargetState = CART_STATE_MOVE;
 
 		break;
@@ -563,7 +563,7 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->TargetState = CART_STATE_DUCK;
 		else if (TrInput & CART_IN_BRAKE)
 			laraItem->TargetState = CART_STATE_BRAKE;
-		else if (cartInfo->Gradient < CART_BACK_GRADIENT)
+		else if (minecart->Gradient < CART_BACK_GRADIENT)
 			laraItem->TargetState = CART_STATE_MOVE;
 
 		break;
@@ -595,30 +595,30 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 		break;
 
 	case CART_STATE_IDLE:
-		if (!(cartInfo->Flags & CART_FLAG_CONTROL))
+		if (!(minecart->Flags & CART_FLAG_CONTROL))
 		{
-			SoundEffect(211, &cartItem->Position, 2);
-			cartInfo->Flags |= CART_FLAG_CONTROL;
-			cartInfo->StopDelay = 64;
+			SoundEffect(211, &minecartItem->Position, 2);
+			minecart->Flags |= CART_FLAG_CONTROL;
+			minecart->StopDelay = 64;
 		}
 
-		if (TrInput & CART_IN_DISMOUNT && cartInfo->Flags & CART_FLAG_STOPPED)
+		if (TrInput & CART_IN_DISMOUNT && minecart->Flags & CART_FLAG_STOPPED)
 		{
 			if (TrInput & CART_IN_LEFT && TestMinecartDismount(laraItem, -1))
 			{
 				laraItem->TargetState = CART_STATE_DISMOUNT;
-				cartInfo->Flags &= ~CART_FLAG_RDIR;
+				minecart->Flags &= ~CART_FLAG_RDIR;
 			}
 			else if (TrInput & CART_IN_RIGHT && TestMinecartDismount(laraItem, 1))
 			{
 				laraItem->TargetState = CART_STATE_DISMOUNT;
-				cartInfo->Flags |= CART_FLAG_RDIR;
+				minecart->Flags |= CART_FLAG_RDIR;
 			}
 		}
 
 		if (TrInput & CART_IN_DUCK)
 			laraItem->TargetState = CART_STATE_DUCK;
-		else if (cartInfo->Velocity > CART_MIN_VEL)
+		else if (minecart->Velocity > CART_MIN_VEL)
 			laraItem->TargetState = CART_STATE_MOVE;
 
 		break;
@@ -643,14 +643,14 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->TargetState = CART_STATE_DUCK;
 			StopSoundEffect(219);
 		}
-		else if (!(TrInput & CART_IN_BRAKE) || cartInfo->Flags & CART_FLAG_STOPPED)
+		else if (!(TrInput & CART_IN_BRAKE) || minecart->Flags & CART_FLAG_STOPPED)
 		{
 			laraItem->TargetState = CART_STATE_MOVE;
 			StopSoundEffect(219);
 		}
 		else
 		{
-			cartInfo->Velocity += CART_DEC;
+			minecart->Velocity += CART_DEC;
 			SoundEffect(219, &laraItem->Position, 2);
 		}
 
@@ -663,14 +663,14 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 	case CART_STATE_DISMOUNT:
 		if (laraItem->AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 7)
 		{
-			if (laraItem->FrameNumber == GetFrameNumber(cartItem, 20) &&
-				cartInfo->Flags & CART_FLAG_MESH)
+			if (laraItem->FrameNumber == GetFrameNumber(minecartItem, 20) &&
+				minecart->Flags & CART_FLAG_MESH)
 			{
-				laraInfo->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
-				cartInfo->Flags &= ~CART_FLAG_MESH;
+				lara->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+				minecart->Flags &= ~CART_FLAG_MESH;
 			}
 
-			if (cartInfo->Flags & CART_FLAG_RDIR)
+			if (minecart->Flags & CART_FLAG_RDIR)
 				laraItem->TargetState = CART_STATE_DISMOUNT_RIGHT;
 			else
 				laraItem->TargetState = CART_STATE_DISMOUNT_LEFT;
@@ -691,11 +691,11 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->Position.xRot = 0;
 			laraItem->Position.yRot = ANGLE(90.0f);
 			laraItem->Position.zRot = 0;
-			cartItem->Position.yRot + ANGLE(90.0f);
+			minecartItem->Position.yRot + ANGLE(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
-			laraInfo->Control.HandStatus = HandStatus::Free;
-			laraInfo->Vehicle = NO_ITEM;
+			lara->Control.HandStatus = HandStatus::Free;
+			lara->Vehicle = NO_ITEM;
 		}
 
 		break;
@@ -713,26 +713,26 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			laraItem->Position.xRot = 0;
 			laraItem->Position.yRot = ANGLE(90.0f);
 			laraItem->Position.zRot = 0;
-			cartItem->Position.yRot + ANGLE(90.0f);
+			minecartItem->Position.yRot + ANGLE(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
-			laraInfo->Control.HandStatus = HandStatus::Free;
-			laraInfo->Vehicle = NO_ITEM;
+			lara->Control.HandStatus = HandStatus::Free;
+			lara->Vehicle = NO_ITEM;
 		}
 
 		break;
 
 	case CART_STATE_MOUNT:
 		if (laraItem->AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 5 &&
-			laraItem->FrameNumber == GetFrameNumber(cartItem, 20) &&
-			!cartInfo->Flags & CART_FLAG_MESH)
+			laraItem->FrameNumber == GetFrameNumber(minecartItem, 20) &&
+			!minecart->Flags & CART_FLAG_MESH)
 		{
-			MESH tmp = g_Level.Meshes[laraInfo->meshPtrs[LM_RHAND]];
+			MESH tmp = g_Level.Meshes[lara->meshPtrs[LM_RHAND]];
 
-			laraInfo->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+			lara->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 			g_Level.Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
 
-			cartInfo->Flags |= CART_FLAG_MESH;
+			minecart->Flags |= CART_FLAG_MESH;
 		}
 
 		break;
@@ -747,21 +747,21 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 		Camera.targetElevation = -ANGLE(45.0f);
 		Camera.targetDistance = SECTOR(2);
 
-		floorHeight = GetMinecartCollision(cartItem, cartItem->Position.yRot, CLICK(2));
+		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Position.yRot, CLICK(2));
 		if (floorHeight > -CLICK(1) &&
 			floorHeight < CLICK(1))
 		{
 			if (Wibble & 7 == 0)
-				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &cartItem->Position, 2);
+				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &minecartItem->Position, 2);
 
-			cartItem->Position.xPos += TURN_DEATH_VEL * phd_sin(cartItem->Position.yRot);
-			cartItem->Position.zPos += TURN_DEATH_VEL * phd_cos(cartItem->Position.yRot);
+			minecartItem->Position.xPos += TURN_DEATH_VEL * phd_sin(minecartItem->Position.yRot);
+			minecartItem->Position.zPos += TURN_DEATH_VEL * phd_cos(minecartItem->Position.yRot);
 		}
 		else
 		{
 			if (laraItem->AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 30)
 			{
-				cartInfo->Flags |= CART_FLAG_NO_ANIM;
+				minecart->Flags |= CART_FLAG_NO_ANIM;
 				laraItem->HitPoints = -1;
 			}
 		}
@@ -770,51 +770,51 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 
 	case CART_STATE_HIT:
 		if (laraItem->HitPoints <= 0 &&
-			laraItem->FrameNumber == GetFrameNumber(cartItem, 34) + 28)
+			laraItem->FrameNumber == GetFrameNumber(minecartItem, 34) + 28)
 		{
-			laraItem->FrameNumber = GetFrameNumber(cartItem, 34) + 28;
-			cartItem->Velocity = 0;
-			cartInfo->Flags = (cartInfo->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_NO_ANIM;
-			cartInfo->Velocity = 0;
+			laraItem->FrameNumber = GetFrameNumber(minecartItem, 34) + 28;
+			minecartItem->Velocity = 0;
+			minecart->Flags = (minecart->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_NO_ANIM;
+			minecart->Velocity = 0;
 		}
 
 		break;
 	}
 
-	if (laraInfo->Vehicle != NO_ITEM &&
-		!(cartInfo->Flags & CART_FLAG_NO_ANIM))
+	if (lara->Vehicle != NO_ITEM &&
+		!(minecart->Flags & CART_FLAG_NO_ANIM))
 	{
 		AnimateItem(laraItem);
 
-		cartItem->AnimNumber = Objects[ID_MINECART].animIndex + (laraItem->AnimNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
-		cartItem->FrameNumber = g_Level.Anims[cartItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		minecartItem->AnimNumber = Objects[ID_MINECART].animIndex + (laraItem->AnimNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
+		minecartItem->FrameNumber = g_Level.Anims[minecartItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
 	}
 	if (laraItem->ActiveState != CART_TURN_DEATH &&
 		laraItem->ActiveState != CART_WALL_DEATH &&
 		laraItem->HitPoints > 0)
 	{
-		if (cartItem->Position.zRot > TERMINAL_ANGLE ||
-			cartItem->Position.zRot < -TERMINAL_ANGLE)
+		if (minecartItem->Position.zRot > TERMINAL_ANGLE ||
+			minecartItem->Position.zRot < -TERMINAL_ANGLE)
 		{
 			laraItem->AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
 			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 			laraItem->ActiveState = laraItem->TargetState = CART_TURN_DEATH;
-			cartItem->Velocity = 0;
-			cartInfo->Flags = (cartInfo->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_STOPPED | CART_FLAG_DEAD;
-			cartInfo->Velocity = 0;
+			minecartItem->Velocity = 0;
+			minecart->Flags = (minecart->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_STOPPED | CART_FLAG_DEAD;
+			minecart->Velocity = 0;
 			return;
 		}
 
-		floorHeight = GetMinecartCollision(cartItem, cartItem->Position.yRot, CLICK(2));
+		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Position.yRot, CLICK(2));
 		if (floorHeight < -CLICK(2))
 		{
 			laraItem->AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 23;
 			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 			laraItem->ActiveState = laraItem->TargetState = CART_WALL_DEATH;
 			laraItem->HitPoints = -1;
-			cartItem->Velocity = 0;
-			cartInfo->Flags = (cartInfo->Flags & ~CART_FLAG_CONTROL) | (CART_FLAG_STOPPED | CART_FLAG_DEAD);
-			cartInfo->Velocity = 0;
+			minecartItem->Velocity = 0;
+			minecart->Flags = (minecart->Flags & ~CART_FLAG_CONTROL) | (CART_FLAG_STOPPED | CART_FLAG_DEAD);
+			minecart->Velocity = 0;
 			return;
 		}
 
@@ -823,7 +823,7 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 		{
 			COLL_INFO coll;
 			coll.Setup.Radius = CART_RADIUS;
-			DoObjectCollision(cartItem, &coll);
+			DoObjectCollision(minecartItem, &coll);
 
 			if (coll.HitStatic)
 			{
@@ -832,9 +832,9 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 				laraItem->AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 				laraItem->ActiveState = laraItem->TargetState = CART_STATE_HIT;
-				DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - CLICK(3), laraItem->Position.zPos, cartItem->Velocity, cartItem->Position.yRot, laraItem->RoomNumber, 3);
+				DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - CLICK(3), laraItem->Position.zPos, minecartItem->Velocity, minecartItem->Position.yRot, laraItem->RoomNumber, 3);
 
-				hits = CART_NHITS * short(cartInfo->Velocity / 2048);
+				hits = CART_NHITS * short(minecart->Velocity / 2048);
 				if (hits < 20)
 					hits = 20;
 
@@ -843,39 +843,39 @@ static void DoUserInput(ITEM_INFO* cartItem, ITEM_INFO* laraItem, MinecartInfo* 
 			}
 		}
 
-		if (floorHeight > CLICK(2.25f) && !cartInfo->VerticalVelocity)
-			cartInfo->VerticalVelocity = CART_JUMP_VELOCITY;
+		if (floorHeight > CLICK(2.25f) && !minecart->VerticalVelocity)
+			minecart->VerticalVelocity = CART_JUMP_VELOCITY;
 
-		CartToEntityCollision(laraItem, cartItem);
+		CartToEntityCollision(laraItem, minecartItem);
 	}
 }
 
 void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	if (laraItem->HitPoints < 0 || laraInfo->Vehicle != NO_ITEM)
+	if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 		return;
 
-	auto* cartItem = &g_Level.Items[itemNumber];
+	auto* minecartItem = &g_Level.Items[itemNumber];
 
-	int mount = GetInMineCart(cartItem, laraItem, coll);
+	int mount = GetInMineCart(minecartItem, laraItem, coll);
 	if (mount)
 	{
-		laraInfo->Vehicle = itemNumber;
+		lara->Vehicle = itemNumber;
 
-		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, FALSE);
 			UndrawFlareMeshes(laraItem);
-			laraInfo->Flare.ControlLeft = false;
-			laraInfo->Control.WeaponControl.RequestGunType = WEAPON_NONE;
-			laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Flare.ControlLeft = false;
+			lara->Control.WeaponControl.RequestGunType = WEAPON_NONE;
+			lara->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
-		laraInfo->Control.HandStatus = HandStatus::Busy;
+		lara->Control.HandStatus = HandStatus::Busy;
 
-		short angle = short(mGetAngle(cartItem->Position.xPos, cartItem->Position.zPos, laraItem->Position.xPos, laraItem->Position.zPos) - cartItem->Position.yRot);
+		short angle = short(mGetAngle(minecartItem->Position.xPos, minecartItem->Position.zPos, laraItem->Position.xPos, laraItem->Position.zPos) - minecartItem->Position.yRot);
 		if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
 			laraItem->AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_MOUNT_RIGHT;
 		else
@@ -885,12 +885,12 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->TargetState = CART_STATE_MOUNT;
 		laraItem->ActiveState = CART_STATE_MOUNT;
 
-		laraItem->Position.xPos = cartItem->Position.xPos;
-		laraItem->Position.yPos = cartItem->Position.yPos;
-		laraItem->Position.zPos = cartItem->Position.zPos;
-		laraItem->Position.xRot = cartItem->Position.xRot;
-		laraItem->Position.yRot = cartItem->Position.yRot;
-		laraItem->Position.zRot = cartItem->Position.zRot;
+		laraItem->Position.xPos = minecartItem->Position.xPos;
+		laraItem->Position.yPos = minecartItem->Position.yPos;
+		laraItem->Position.zPos = minecartItem->Position.zPos;
+		laraItem->Position.xRot = minecartItem->Position.xRot;
+		laraItem->Position.yRot = minecartItem->Position.yRot;
+		laraItem->Position.zRot = minecartItem->Position.zRot;
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);
@@ -898,45 +898,45 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 bool MineCartControl(ITEM_INFO* laraItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* cartItem = &g_Level.Items[laraInfo->Vehicle];
+	auto* lara = GetLaraInfo(laraItem);
+	auto* minecartItem = &g_Level.Items[lara->Vehicle];
 
-	if (!cartItem->Data) 
+	if (!minecartItem->Data) 
 	{
 		TENLog("Minecart data is nullptr!", LogLevel::Error);
 		return false; 
 	}
-	auto* cartInfo = (MinecartInfo*)cartItem->Data;
+	auto* minecart = (MinecartInfo*)minecartItem->Data;
 
-	DoUserInput(cartItem, laraItem, cartInfo);
+	DoUserInput(minecartItem, laraItem, minecart);
 
-	if (cartInfo->Flags & CART_FLAG_CONTROL)
-		MoveCart(laraItem, cartItem);
+	if (minecart->Flags & CART_FLAG_CONTROL)
+		MoveCart(laraItem, minecartItem);
 
-	if (laraInfo->Vehicle != NO_ITEM)
+	if (lara->Vehicle != NO_ITEM)
 	{
-		laraItem->Position.xPos = cartItem->Position.xPos;
-		laraItem->Position.yPos = cartItem->Position.yPos;
-		laraItem->Position.zPos = cartItem->Position.zPos;
-		laraItem->Position.xRot = cartItem->Position.xRot;
-		laraItem->Position.yRot = cartItem->Position.yRot;
-		laraItem->Position.zRot = cartItem->Position.zRot;
+		laraItem->Position.xPos = minecartItem->Position.xPos;
+		laraItem->Position.yPos = minecartItem->Position.yPos;
+		laraItem->Position.zPos = minecartItem->Position.zPos;
+		laraItem->Position.xRot = minecartItem->Position.xRot;
+		laraItem->Position.yRot = minecartItem->Position.yRot;
+		laraItem->Position.zRot = minecartItem->Position.zRot;
 	}
 
-	short probedRoomNumber = GetCollisionResult(cartItem).RoomNumber;
-	if (probedRoomNumber != cartItem->RoomNumber)
+	short probedRoomNumber = GetCollisionResult(minecartItem).RoomNumber;
+	if (probedRoomNumber != minecartItem->RoomNumber)
 	{
-		ItemNewRoom(laraInfo->Vehicle, probedRoomNumber);
-		ItemNewRoom(laraInfo->ItemNumber, probedRoomNumber);
+		ItemNewRoom(lara->Vehicle, probedRoomNumber);
+		ItemNewRoom(lara->ItemNumber, probedRoomNumber);
 	}
 
-	TestTriggers(cartItem, false);
+	TestTriggers(minecartItem, false);
 
-	if (!(cartInfo->Flags & CART_FLAG_DEAD))
+	if (!(minecart->Flags & CART_FLAG_DEAD))
 	{
 		Camera.targetElevation = -ANGLE(45.0f);
 		Camera.targetDistance = SECTOR(2);
 	}
 
-	return (laraInfo->Vehicle == NO_ITEM) ? false : true;
+	return (lara->Vehicle == NO_ITEM) ? false : true;
 }

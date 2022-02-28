@@ -52,57 +52,57 @@ enum BigGunAnim
 
 enum BigGunFlags
 {
-	BGUN_FLAG_NONE = 0,
 	BGUN_FLAG_UP_DOWN = 1,
 	BGUN_FLAG_AUTO_ROT = 2,
 	BGUN_FLAG_DISMOUNT = 4,
 	BGUN_FLAG_FIRE = 8
 };
 
-void BigGunInitialise(short itemNum)
+void BigGunInitialise(short itemNumber)
 {
-	auto* bGunItem = &g_Level.Items[itemNum];
-	bGunItem->Data = BigGunInfo();
-	auto* bGunInfo = (BigGunInfo*)bGunItem->Data;
+	auto* bigGunItem = &g_Level.Items[itemNumber];
+	bigGunItem->Data = BigGunInfo();
+	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
-	bGunInfo->Rotation.xRot = BGUN_DISMOUNT_FRAME;
-	bGunInfo->Rotation.zRot = 0;
-	bGunInfo->StartYRot = bGunItem->Position.yRot;
-	bGunInfo->GunRotYAdd = 0;
-	bGunInfo->FireCount = 0;
-	bGunInfo->Flags = BGUN_FLAG_NONE;
-	bGunInfo->BarrelRotating = false;
+	bigGun->Rotation.xRot = BGUN_DISMOUNT_FRAME;
+	bigGun->Rotation.zRot = 0;
+	bigGun->StartYRot = bigGunItem->Position.yRot;
+	bigGun->GunRotYAdd = 0;
+	bigGun->FireCount = 0;
+	bigGun->Flags = 0;
+	bigGun->BarrelRotating = false;
 }
 
-static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bGunItem)
+static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 {
-	//LaraInfo*& laraInfo = lara->data; // If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
+	// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
+	auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
 
 	if (!(TrInput & IN_ACTION) ||
-		Lara.Control.HandStatus != HandStatus::Free ||
+		lara->Control.HandStatus != HandStatus::Free ||
 		laraItem->Airborne)
 	{
 		return false;
 	}
 
-	int x = laraItem->Position.xPos - bGunItem->Position.xPos;
-	int y = laraItem->Position.yPos - bGunItem->Position.yPos;
-	int z = laraItem->Position.zPos - bGunItem->Position.zPos;
+	int x = laraItem->Position.xPos - bigGunItem->Position.xPos;
+	int y = laraItem->Position.yPos - bigGunItem->Position.yPos;
+	int z = laraItem->Position.zPos - bigGunItem->Position.zPos;
 
 	int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 	if (distance > 30000)
 		return false;
 
-	short deltaAngle = abs(laraItem->Position.yRot - bGunItem->Position.yRot);
+	short deltaAngle = abs(laraItem->Position.yRot - bigGunItem->Position.yRot);
 	if (deltaAngle > ANGLE(35.0f) || deltaAngle < -ANGLE(35.0f))
 		return false;
 
 	return true;
 }
 
-void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bGunItem)
+void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 {
-	auto* bGunInfo = (BigGunInfo*)bGunItem->Data;
+	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
 	short itemNumber = CreateItem();
 	auto* projectileItem = &g_Level.Items[itemNumber];
@@ -113,7 +113,7 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bGunItem)
 		projectileItem->RoomNumber = laraItem->RoomNumber;
 
 		PHD_VECTOR pos = { 0, 0, CLICK(1) }; // CLICK(1) or 520?
-		GetJointAbsPosition(bGunItem, &pos, 2);
+		GetJointAbsPosition(bigGunItem, &pos, 2);
 			
 		projectileItem->Position.xPos = pos.x;
 		projectileItem->Position.yPos = pos.y;
@@ -121,8 +121,8 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bGunItem)
 
 		InitialiseItem(itemNumber);
 
-		projectileItem->Position.xRot = -((bGunInfo->Rotation.xRot - 32) * ANGLE(1.0f));
-		projectileItem->Position.yRot = bGunItem->Position.yRot;
+		projectileItem->Position.xRot = -((bigGun->Rotation.xRot - 32) * ANGLE(1.0f));
+		projectileItem->Position.yRot = bigGunItem->Position.yRot;
 		projectileItem->Position.zRot = 0;
 		projectileItem->Velocity = 16;
 		projectileItem->ItemFlags[0] = BGUN_FLAG_UP_DOWN;
@@ -141,37 +141,37 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bGunItem)
 
 void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* bGunItem = &g_Level.Items[itemNum];
-	auto* bGunInfo = (BigGunInfo*)bGunItem->Data;
+	auto* lara = GetLaraInfo(laraItem);
+	auto* bigGunItem = &g_Level.Items[itemNum];
+	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
-	if (laraItem->HitPoints <= 0 || laraInfo->Vehicle != NO_ITEM)
+	if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
 		return;
 
-	if (BigGunTestMount(bGunItem, laraItem))
+	if (BigGunTestMount(bigGunItem, laraItem))
 	{
-		laraInfo->Vehicle = itemNum;
+		lara->Vehicle = itemNum;
 
-		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, false);
 			UndrawFlareMeshes(laraItem);
 
-			laraInfo->Flare.ControlLeft = false;
-			laraInfo->Control.WeaponControl.RequestGunType = WEAPON_NONE;
-			laraInfo->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Flare.ControlLeft = false;
+			lara->Control.WeaponControl.RequestGunType = WEAPON_NONE;
+			lara->Control.WeaponControl.GunType = WEAPON_NONE;
 		}
 
 		laraItem->AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;
 		laraItem->FrameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT].frameBase;
 		laraItem->TargetState = BGUN_STATE_MOUNT;
 		laraItem->ActiveState = BGUN_STATE_MOUNT;
-		laraItem->Position = bGunItem->Position;
+		laraItem->Position = bigGunItem->Position;
 		laraItem->Airborne = false;
-		laraInfo->Control.HandStatus = HandStatus::Busy;
-		bGunItem->HitPoints = 1;
-		bGunInfo->Flags = BGUN_FLAG_NONE;
-		bGunInfo->Rotation.xRot = BGUN_DISMOUNT_FRAME;
+		lara->Control.HandStatus = HandStatus::Busy;
+		bigGunItem->HitPoints = 1;
+		bigGun->Flags = 0;
+		bigGun->Rotation.xRot = BGUN_DISMOUNT_FRAME;
 
 	}
 	else
@@ -180,80 +180,80 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* bGunItem = &g_Level.Items[laraInfo->Vehicle];
-	auto* bGunInfo = (BigGunInfo*)bGunItem->Data;
+	auto* lara = GetLaraInfo(laraItem);
+	auto* bigGunItem = &g_Level.Items[lara->Vehicle];
+	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
-	if (bGunInfo->Flags & BGUN_FLAG_UP_DOWN)
+	if (bigGun->Flags & BGUN_FLAG_UP_DOWN)
 	{
-		if (bGunInfo->BarrelRotating)
-			bGunInfo->BarrelZRotation--;
+		if (bigGun->BarrelRotating)
+			bigGun->BarrelZRotation--;
 
-		if (!bGunInfo->BarrelZRotation)
-			bGunInfo->BarrelRotating = false;
+		if (!bigGun->BarrelZRotation)
+			bigGun->BarrelRotating = false;
 
 		if (TrInput & BGUN_IN_DISMOUNT || laraItem->HitPoints <= 0)
-			bGunInfo->Flags = BGUN_FLAG_AUTO_ROT;
+			bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 		else
 		{
-			if (TrInput & BGUN_IN_FIRE && bGunInfo->FireCount == 0)
+			if (TrInput & BGUN_IN_FIRE && bigGun->FireCount == 0)
 			{
-				BigGunFire(laraItem, bGunItem);
-				bGunInfo->FireCount = RECOIL_TIME;
-				bGunInfo->BarrelZRotation = RECOIL_Z;
-				bGunInfo->BarrelRotating = true;
+				BigGunFire(laraItem, bigGunItem);
+				bigGun->FireCount = RECOIL_TIME;
+				bigGun->BarrelZRotation = RECOIL_Z;
+				bigGun->BarrelRotating = true;
 			}
 
 			if (TrInput & BGUN_IN_LEFT)
 			{
-				if (bGunInfo->GunRotYAdd > 0)
-					bGunInfo->GunRotYAdd /= 2;
+				if (bigGun->GunRotYAdd > 0)
+					bigGun->GunRotYAdd /= 2;
 
-				bGunInfo->GunRotYAdd -= BGUN_TURN_RATE;
-				if (bGunInfo->GunRotYAdd < -BGUN_TURN_MAX)
-					bGunInfo->GunRotYAdd = -BGUN_TURN_MAX;
+				bigGun->GunRotYAdd -= BGUN_TURN_RATE;
+				if (bigGun->GunRotYAdd < -BGUN_TURN_MAX)
+					bigGun->GunRotYAdd = -BGUN_TURN_MAX;
 			}
 			else if (TrInput & BGUN_IN_RIGHT)
 			{
-				if (bGunInfo->GunRotYAdd < 0)
-					bGunInfo->GunRotYAdd /= 2;
+				if (bigGun->GunRotYAdd < 0)
+					bigGun->GunRotYAdd /= 2;
 
-				bGunInfo->GunRotYAdd += BGUN_TURN_RATE;
-				if (bGunInfo->GunRotYAdd > BGUN_TURN_MAX)
-					bGunInfo->GunRotYAdd = BGUN_TURN_MAX;
+				bigGun->GunRotYAdd += BGUN_TURN_RATE;
+				if (bigGun->GunRotYAdd > BGUN_TURN_MAX)
+					bigGun->GunRotYAdd = BGUN_TURN_MAX;
 			}
 			else
 			{
-				bGunInfo->GunRotYAdd -= bGunInfo->GunRotYAdd / 4;
-				if (abs(bGunInfo->GunRotYAdd) < BGUN_TURN_RATE)
-					bGunInfo->GunRotYAdd = 0;
+				bigGun->GunRotYAdd -= bigGun->GunRotYAdd / 4;
+				if (abs(bigGun->GunRotYAdd) < BGUN_TURN_RATE)
+					bigGun->GunRotYAdd = 0;
 			}
 
-			bGunInfo->Rotation.zRot += bGunInfo->GunRotYAdd / 4;
+			bigGun->Rotation.zRot += bigGun->GunRotYAdd / 4;
 
-			if (TrInput & BGUN_IN_UP && bGunInfo->Rotation.xRot < BGUN_UP_DOWN_FRAMES)
-				bGunInfo->Rotation.xRot++;			
-			else if (TrInput & BGUN_IN_DOWN && bGunInfo->Rotation.xRot)
-				bGunInfo->Rotation.xRot--;
+			if (TrInput & BGUN_IN_UP && bigGun->Rotation.xRot < BGUN_UP_DOWN_FRAMES)
+				bigGun->Rotation.xRot++;			
+			else if (TrInput & BGUN_IN_DOWN && bigGun->Rotation.xRot)
+				bigGun->Rotation.xRot--;
 		}
 	}
 
-	if (bGunInfo->Flags & BGUN_FLAG_AUTO_ROT)
+	if (bigGun->Flags & BGUN_FLAG_AUTO_ROT)
 	{
-		if (bGunInfo->Rotation.xRot == BGUN_DISMOUNT_FRAME)
+		if (bigGun->Rotation.xRot == BGUN_DISMOUNT_FRAME)
 		{
 			laraItem->AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_DISMOUNT;
 			laraItem->FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_DISMOUNT].frameBase;
 			laraItem->ActiveState = BGUN_STATE_DISMOUNT;
 			laraItem->TargetState = BGUN_STATE_DISMOUNT;
-			bGunInfo->GunRotYAdd = 0;
-			bGunInfo->BarrelRotating = false;
-			bGunInfo->Flags = BGUN_FLAG_DISMOUNT;
+			bigGun->GunRotYAdd = 0;
+			bigGun->BarrelRotating = false;
+			bigGun->Flags = BGUN_FLAG_DISMOUNT;
 		}
-		else if (bGunInfo->Rotation.xRot > BGUN_DISMOUNT_FRAME)
-			bGunInfo->Rotation.xRot--;
-		else if (bGunInfo->Rotation.xRot < BGUN_DISMOUNT_FRAME)
-			bGunInfo->Rotation.xRot++;
+		else if (bigGun->Rotation.xRot > BGUN_DISMOUNT_FRAME)
+			bigGun->Rotation.xRot--;
+		else if (bigGun->Rotation.xRot < BGUN_DISMOUNT_FRAME)
+			bigGun->Rotation.xRot++;
 	}
 
 	switch (laraItem->ActiveState)
@@ -261,38 +261,38 @@ bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	case BGUN_STATE_MOUNT:
 	case BGUN_STATE_DISMOUNT:
 		AnimateItem(laraItem);
-		bGunItem->AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
-		bGunItem->FrameNumber = g_Level.Anims[bGunItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		bigGunItem->AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
+		bigGunItem->FrameNumber = g_Level.Anims[bigGunItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
 
-		if (bGunInfo->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
+		if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
 		{
 			SetAnimation(laraItem, LA_STAND_IDLE);
-			laraInfo->Vehicle = NO_ITEM;
-			laraInfo->Control.HandStatus = HandStatus::Free;
-			bGunItem->HitPoints = 0;
+			lara->Vehicle = NO_ITEM;
+			lara->Control.HandStatus = HandStatus::Free;
+			bigGunItem->HitPoints = 0;
 		}
 
 		break;
 
 	case BGUN_STATE_UP_DOWN:
 		laraItem->AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_UP_DOWN;
-		laraItem->FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_UP_DOWN].frameBase + bGunInfo->Rotation.xRot;
-		bGunItem->AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
-		bGunItem->FrameNumber = g_Level.Anims[bGunItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		laraItem->FrameNumber = g_Level.Anims[Objects[ID_BIGGUN].animIndex + BGUN_ANIM_UP_DOWN].frameBase + bigGun->Rotation.xRot;
+		bigGunItem->AnimNumber = Objects[ID_BIGGUN].animIndex + (laraItem->AnimNumber - Objects[ID_BIGGUN_ANIMS].animIndex);
+		bigGunItem->FrameNumber = g_Level.Anims[bigGunItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
 
-		if (bGunInfo->FireCount > 0)
-			bGunInfo->FireCount--;
+		if (bigGun->FireCount > 0)
+			bigGun->FireCount--;
 		else
-			bGunInfo->FireCount = 0;
+			bigGun->FireCount = 0;
 
-		bGunInfo->Flags = BGUN_FLAG_UP_DOWN;
+		bigGun->Flags = BGUN_FLAG_UP_DOWN;
 		break;
 	}
 	
 	Camera.targetElevation = -ANGLE(15.0f);
 
-	bGunItem->Position.yRot = bGunInfo->StartYRot + bGunInfo->Rotation.zRot;
-	laraItem->Position.yRot = bGunItem->Position.yRot;
+	bigGunItem->Position.yRot = bigGun->StartYRot + bigGun->Rotation.zRot;
+	laraItem->Position.yRot = bigGunItem->Position.yRot;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 

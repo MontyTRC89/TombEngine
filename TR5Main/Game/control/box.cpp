@@ -2063,24 +2063,24 @@ TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
-void AdjustStopperFlag(ITEM_INFO* item, int dir, bool set)
+void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set)
 {
 	int x = item->Position.xPos;
 	int z = item->Position.zPos;
 
-	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
+	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	FLOOR_INFO* floor = GetSector(r, x - r->x, z - r->z);
+	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = set;
 
-	x = item->Position.xPos + 1024 * phd_sin(dir);
-	z = item->Position.zPos + 1024 * phd_cos(dir);
+	x = item->Position.xPos + 1024 * phd_sin(direction);
+	z = item->Position.zPos + 1024 * phd_cos(direction);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(x, item->Position.yPos, z, &roomNumber);
-	r = &g_Level.Rooms[roomNumber];
+	room = &g_Level.Rooms[roomNumber];
 
-	floor = GetSector(r, x - r->x, z - r->z);
+	floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = set;
 }
 
@@ -2088,7 +2088,7 @@ void InitialiseItemBoxData()
 {
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{
-		auto item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 
 		if (item->Active && item->Data.is<PUSHABLE_INFO>())
 			ClearMovableBlockSplitters(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
@@ -2110,14 +2110,16 @@ void InitialiseItemBoxData()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int fl = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
-				STATIC_INFO* st = &StaticObjects[mesh.staticNumber];
-				if (fl <= mesh.pos.yPos - st->collisionBox.Y2 + 512 && fl < mesh.pos.yPos - st->collisionBox.Y1)
+				int floorHeight = floor->FloorHeight(mesh.pos.xPos, mesh.pos.zPos);
+				auto* staticInfo = &StaticObjects[mesh.staticNumber];
+
+				if (floorHeight <= mesh.pos.yPos - staticInfo->collisionBox.Y2 + 512 &&
+					floorHeight < mesh.pos.yPos - staticInfo->collisionBox.Y1)
 				{
-					if (st->collisionBox.X1 == 0 || st->collisionBox.X2 == 0 ||
-						st->collisionBox.Z1 == 0 || st->collisionBox.Z2 == 0 ||
-						((st->collisionBox.X1 < 0) ^ (st->collisionBox.X2 < 0)) &&
-						((st->collisionBox.Z1 < 0) ^ (st->collisionBox.Z2 < 0)))
+					if (staticInfo->collisionBox.X1 == 0 || staticInfo->collisionBox.X2 == 0 ||
+						staticInfo->collisionBox.Z1 == 0 || staticInfo->collisionBox.Z2 == 0 ||
+						((staticInfo->collisionBox.X1 < 0) ^ (staticInfo->collisionBox.X2 < 0)) &&
+						((staticInfo->collisionBox.Z1 < 0) ^ (staticInfo->collisionBox.Z2 < 0)))
 					{
 						floor->Stopper = true;
 					}

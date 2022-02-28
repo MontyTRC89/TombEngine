@@ -234,12 +234,12 @@ void lara_as_climbing(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_climbright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+		lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -258,12 +258,12 @@ void lara_as_climbright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_col_climbleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+		lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -381,9 +381,9 @@ void lara_col_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.IsClimbingLadder = true;
+	lara->Control.IsClimbingLadder = true;
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -403,20 +403,20 @@ void lara_as_climbstnc(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->TargetState = LS_LADDER_LEFT;
-		info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+		lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->TargetState = LS_LADDER_RIGHT;
-		info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+		lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	}
 	else if (TrInput & IN_JUMP)
 	{
 		if (item->AnimNumber == LA_LADDER_IDLE)
 		{
 			item->TargetState = LS_JUMP_BACK;
-			info->Control.HandStatus = HandStatus::Free;
-			info->Control.MoveAngle = item->Position.yRot + ANGLE(180);
+			lara->Control.HandStatus = HandStatus::Free;
+			lara->Control.MoveAngle = item->Position.yRot + ANGLE(180);
 		}
 	}
 
@@ -596,7 +596,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 
 int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	int result = 0;
 
@@ -604,7 +604,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		return 0;
 
 	auto oldPos = item->Position;
-	auto oldRot = info->Control.MoveAngle;
+	auto oldRot = lara->Control.MoveAngle;
 
 	short angle = GetQuadrant(item->Position.yRot);
 	int x, z;
@@ -624,10 +624,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (GetClimbFlags(x, item->Position.yPos, z, item->RoomNumber) & (short)LeftExtRightIntTab[angle])
 	{
-		info->NextCornerPos.xPos = item->Position.xPos = x;
-		info->NextCornerPos.yPos = item->Position.yPos;
-		info->NextCornerPos.zPos = item->Position.zPos = z;
-		info->NextCornerPos.yRot = item->Position.yRot = info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+		lara->NextCornerPos.xPos = item->Position.xPos = x;
+		lara->NextCornerPos.yPos = item->Position.yPos;
+		lara->NextCornerPos.zPos = item->Position.zPos = z;
+		lara->NextCornerPos.yRot = item->Position.yRot = lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -636,7 +636,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (!result)
 	{
 		item->Position = oldPos;
-		info->Control.MoveAngle = oldRot;
+		lara->Control.MoveAngle = oldRot;
 
 		switch (angle)
 		{
@@ -665,10 +665,10 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (GetClimbFlags(x, item->Position.yPos, z, item->RoomNumber) & (short)LeftIntRightExtTab[angle])
 		{
-			info->NextCornerPos.xPos = item->Position.xPos = x;
-			info->NextCornerPos.yPos = item->Position.yPos;
-			info->NextCornerPos.zPos = item->Position.zPos = z;
-			info->NextCornerPos.yRot = item->Position.yRot = info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+			lara->NextCornerPos.xPos = item->Position.xPos = x;
+			lara->NextCornerPos.yPos = item->Position.yPos;
+			lara->NextCornerPos.zPos = item->Position.zPos = z;
+			lara->NextCornerPos.yRot = item->Position.yRot = lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
@@ -680,14 +680,14 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->Position = oldPos;
-	info->Control.MoveAngle = oldRot;
+	lara->Control.MoveAngle = oldRot;
 
 	return result;
 }
 
 int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	int result = 0;
 
@@ -695,7 +695,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 		return 0;
 
 	auto oldPos = item->Position;
-	auto oldRot = info->Control.MoveAngle;
+	auto oldRot = lara->Control.MoveAngle;
 
 	short angle = GetQuadrant(item->Position.yRot);
 	int x, z;
@@ -715,10 +715,10 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (GetClimbFlags(x, item->Position.yPos, z, item->RoomNumber) & (short)LeftIntRightExtTab[angle])
 	{
-		info->NextCornerPos.xPos = item->Position.xPos = x;
-		info->NextCornerPos.yPos = item->Position.yPos;
-		info->NextCornerPos.zPos = item->Position.zPos = z;
-		info->NextCornerPos.yRot = item->Position.yRot = info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+		lara->NextCornerPos.xPos = item->Position.xPos = x;
+		lara->NextCornerPos.yPos = item->Position.yPos;
+		lara->NextCornerPos.zPos = item->Position.zPos = z;
+		lara->NextCornerPos.yRot = item->Position.yRot = lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -727,7 +727,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	if (!result)
 	{
 		item->Position = oldPos;
-		info->Control.MoveAngle = oldRot;
+		lara->Control.MoveAngle = oldRot;
 
 		switch (angle)
 		{
@@ -756,10 +756,10 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (GetClimbFlags(x, item->Position.yPos, z, item->RoomNumber) & (short)LeftExtRightIntTab[angle])
 		{
-			info->NextCornerPos.xPos = item->Position.xPos = x;
-			info->NextCornerPos.yPos = item->Position.yPos;
-			info->NextCornerPos.zPos = item->Position.zPos = z;
-			info->NextCornerPos.yRot = item->Position.yRot = info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+			lara->NextCornerPos.xPos = item->Position.xPos = x;
+			lara->NextCornerPos.yPos = item->Position.yPos;
+			lara->NextCornerPos.zPos = item->Position.zPos = z;
+			lara->NextCornerPos.yRot = item->Position.yRot = lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 
 			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;
@@ -771,18 +771,18 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	item->Position = oldPos;
-	info->Control.MoveAngle = oldRot;
+	lara->Control.MoveAngle = oldRot;
 
 	return result;
 }
 
 int LaraTestClimb(ITEM_INFO* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	*shift = 0;
 	int hang = 1;
-	if (!info->Control.CanClimbLadder)
+	if (!lara->Control.CanClimbLadder)
 		return 0;
 
 	short roomNumber = itemRoom;
@@ -976,7 +976,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 
 bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	short roomNumber = item->RoomNumber;
 
@@ -994,7 +994,7 @@ bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
 	item->Airborne = true;
 	item->VerticalVelocity = 1;
 
-	info->Control.HandStatus = HandStatus::Free;
+	lara->Control.HandStatus = HandStatus::Free;
 
 	return true;
 }

@@ -117,7 +117,7 @@ void CobraControl(short itemNumber)
 
 				LaraItem->HitPoints -= 80;
 				LaraItem->HitStatus = true;
-				Lara.poisoned = 0x100;
+				Lara.Poisoned = 0x100;
 
 				CreatureEffect(item, &CobraBite, DoBloodSplat);
 			}
