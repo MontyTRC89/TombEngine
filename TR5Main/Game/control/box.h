@@ -115,8 +115,6 @@ struct BITE_INFO
 	}
 };
 
-
-
 struct EntityStoringInfo
 {
 	// position of the entity

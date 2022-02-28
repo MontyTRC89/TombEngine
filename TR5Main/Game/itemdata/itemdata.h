@@ -54,7 +54,7 @@ class ITEM_DATA
 		KayakInfo,
 		DOOR_DATA,
 		SkidooInfo,
-		SUB_INFO,
+		UPVInfo,
 		SpeedBoatInfo,
 		GAME_VECTOR,
 		WRAITH_INFO,
@@ -67,7 +67,6 @@ class ITEM_DATA
 
 	template<typename D>
 	ITEM_DATA(D&& type) : data(std::move(type)) {}
-
 
 	// conversion operators to keep original syntax!
 	// TODO: should be removed later and
@@ -94,6 +93,7 @@ class ITEM_DATA
 
 		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
 	}
+
 	/* Uncommented, we want to store pointers to global data, too (LaraInfo for example)
 	template<typename T>
 	ITEM_DATA& operator=(T* newData)
@@ -102,6 +102,7 @@ class ITEM_DATA
 		return *this;
 	}
 	*/
+
 	ITEM_DATA& operator=(std::nullptr_t null)
 	{
 		data = nullptr;
@@ -138,6 +139,7 @@ class ITEM_DATA
 			},
 		data);
 	}
+
 	template<typename T>
 	bool is() const
 	{

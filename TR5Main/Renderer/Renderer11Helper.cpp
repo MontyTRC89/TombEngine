@@ -250,7 +250,7 @@ namespace TEN::Renderer
 				if (j == 2)
 					currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
 				},
-				[&j, &currentBone](SUB_INFO& upv)
+				[&j, &currentBone](UPVInfo& upv)
 				{
 				if (j == 3)
 					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);

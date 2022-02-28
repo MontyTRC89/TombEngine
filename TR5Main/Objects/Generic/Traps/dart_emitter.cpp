@@ -16,7 +16,7 @@ namespace TEN::Entities::Traps
 		{
 			LaraItem->HitPoints -= 25;
 			LaraItem->HitStatus = true;
-			Lara.poisoned += 160;
+			Lara.Poisoned += 160;
 			DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}

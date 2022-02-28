@@ -22,9 +22,9 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (item->Status != ITEM_INVISIBLE)
 	{

@@ -352,7 +352,7 @@ bool SaveGame::Save(int slot)
 	lara.add_old_busy(Lara.OldBusy);
 	lara.add_puzzles(puzzlesOffset);
 	lara.add_puzzles_combo(puzzlesComboOffset);
-	lara.add_poisoned(Lara.poisoned);
+	lara.add_poisoned(Lara.Poisoned);
 	lara.add_pickups(pickupsOffset);
 	lara.add_pickups_combo(pickupsComboOffset);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
@@ -1257,7 +1257,7 @@ bool SaveGame::Load(int slot)
 	Lara.NumLargeMedipacks = s->lara()->num_large_medipacks();
 	Lara.NumSmallMedipacks = s->lara()->num_small_medipacks();
 	Lara.OldBusy = s->lara()->old_busy();
-	Lara.poisoned = s->lara()->poisoned();
+	Lara.Poisoned = s->lara()->poisoned();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.FlashGun = s->lara()->right_arm()->flash_gun();

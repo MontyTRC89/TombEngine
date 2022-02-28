@@ -15,42 +15,42 @@
 
 void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
-	info->Control.MoveAngle = item->Position.yRot + ANGLE(180);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180);
 	LaraSurfaceCollision(item, coll);
 }
 
 void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	info->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
@@ -58,7 +58,7 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	item->VerticalVelocity -= 4;
 	if (item->VerticalVelocity < 0)
@@ -87,8 +87,8 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		info->Control.Count.Dive++;
-		if (info->Control.Count.Dive == 10)
+		lara->Control.Count.Dive++;
+		if (lara->Control.Count.Dive == 10)
 			SwimDive(item);
 		return;
 	}
@@ -118,13 +118,13 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.Count.Dive = 0;
+	lara->Control.Count.Dive = 0;
 	item->TargetState = LS_ONWATER_STOP;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -132,7 +132,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.Count.Dive = 0;
+	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -155,7 +155,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -163,7 +163,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.Count.Dive = 0;
+	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -186,7 +186,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -194,7 +194,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.Count.Dive = 0;
+	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -217,7 +217,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* info = GetLaraInfo(item);
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -225,7 +225,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	info->Control.Count.Dive = 0;
+	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
 	{
