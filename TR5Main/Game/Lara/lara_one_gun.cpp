@@ -43,7 +43,7 @@ enum class CrossbowBoltType
 
 void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	//	if (HKTimer)
 	//	{
@@ -70,7 +70,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
-	auto* item = &g_Level.Items[laraInfo->Control.WeaponControl.WeaponItem];
+	auto* item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
 	bool running = (weaponType == WEAPON_HK && laraItem->Velocity != 0);
 	bool harpoonFired = false;
 
@@ -81,9 +81,9 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		//		HKTimer = 0;
 		//		HKFlag2 = 0;
 
-		if (laraInfo->Control.WaterStatus == WaterStatus::Underwater || running)
+		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
 			item->TargetState = WEAPON_STATE_UNDERWATER_AIM;
-		else if ((!(TrInput & IN_ACTION) || laraInfo->target) && laraInfo->LeftArm.Locked == false)
+		else if ((!(TrInput & IN_ACTION) || lara->target) && lara->LeftArm.Locked == false)
 			item->TargetState = WEAPON_STATE_UNAIM;
 		else
 			item->TargetState = WEAPON_STATE_RECOIL;
@@ -95,9 +95,9 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		//		HKTimer = 0;
 		//		HKFlag2 = 0;
 
-		if (laraInfo->Control.WaterStatus == WaterStatus::Underwater || running)
+		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
 		{
-			if ((!(TrInput & IN_ACTION) || laraInfo->target) && laraInfo->LeftArm.Locked == false)
+			if ((!(TrInput & IN_ACTION) || lara->target) && lara->LeftArm.Locked == false)
 				item->TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 			else
 				item->TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
@@ -112,15 +112,15 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			item->TargetState = WEAPON_STATE_UNAIM;
 
-			if (laraInfo->Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
+			if (lara->Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
 			{
-				if ((TrInput & IN_ACTION) && (!laraInfo->target || laraInfo->LeftArm.Locked))
+				if ((TrInput & IN_ACTION) && (!lara->target || lara->LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(laraInfo->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
+						if (!(lara->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
 					else if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -134,7 +134,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 						FireHK(laraItem, 0);
 						//						HKFlag = 1;
 
-						if (laraInfo->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[WEAPON_HK].HasSilencer)
 							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						else
 						{
@@ -147,13 +147,13 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 					item->TargetState = WEAPON_STATE_RECOIL;
 				}
-				else if (laraInfo->LeftArm.Locked)
+				else if (lara->LeftArm.Locked)
 					item->TargetState = 0;
 			}
 
 			if (item->TargetState != WEAPON_STATE_RECOIL &&
 				//				HKFlag &&
-				!(laraInfo->Weapons[WEAPON_HK].HasSilencer))
+				!(lara->Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_TR5_HK_FIRE);
 				SoundEffect(SFX_TR5_HK_STOP, &laraItem->Position, 0);
@@ -162,7 +162,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		}
 		/*		else if (HKFlag)
 				{
-					if (laraInfo->Weapons[WEAPON_HK].HasSilencer)
+					if (lara->Weapons[WEAPON_HK].HasSilencer)
 						SoundEffect(SFX_HK_SILENCED, 0, 0);
 					else
 					{
@@ -170,7 +170,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 						SoundEffect(SFX_HK_FIRE, &laraItem->pos, 0);
 					}
 				}*/
-		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !laraInfo->LeftArm.Locked)
+		else if (weaponType == WEAPON_SHOTGUN && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
 			item->TargetState = WEAPON_STATE_UNAIM;
 
 		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 12 &&
@@ -186,26 +186,26 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			item->TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
-			if ((laraInfo->Control.WaterStatus == WaterStatus::Underwater || running) &&
+			if ((lara->Control.WaterStatus == WaterStatus::Underwater || running) &&
 				!harpoonFired)
 			{
 				if (TrInput & IN_ACTION &&
-					(!laraInfo->target || laraInfo->LeftArm.Locked))
+					(!lara->target || lara->LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(laraInfo->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
+						if (!(lara->Weapons[WEAPON_HARPOON_GUN].Ammo->getCount() & 3))
 							harpoonFired = true;
 					}
-					else if (weaponType == WEAPON_HK)// && (/*!(laraInfo->HKtypeCarried & 0x18) || */!HKTimer))
+					else if (weaponType == WEAPON_HK)// && (/*!(lara->HKtypeCarried & 0x18) || */!HKTimer))
 					{
 						FireHK(laraItem, 1);
 						//						HKFlag = 1;
 						item->TargetState = 8;
 
-						if (laraInfo->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[WEAPON_HK].HasSilencer)
 							SoundEffect(14, 0, 0);
 						else
 						{
@@ -218,12 +218,12 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 					item->TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 				}
-				else if (laraInfo->LeftArm.Locked)
+				else if (lara->LeftArm.Locked)
 					item->TargetState = WEAPON_STATE_UNDERWATER_AIM;
 			}
 			else if (item->TargetState != WEAPON_STATE_UNDERWATER_RECOIL &&
 				//				HKFlag &&
-				!(laraInfo->Weapons[WEAPON_HK].HasSilencer))
+				!(lara->Weapons[WEAPON_HK].HasSilencer))
 			{
 				StopSoundEffect(SFX_TR5_HK_FIRE);
 				SoundEffect(SFX_TR5_HK_STOP, &laraItem->Position, 0);
@@ -231,7 +231,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			}
 			/*			else if (HKFlag)
 						{
-							if (laraInfo->Weapons[WEAPON_HK].HasSilencer)
+							if (lara->Weapons[WEAPON_HK].HasSilencer)
 								SoundEffect(SFX_HK_SILENCED, 0, 0);
 							else
 							{
@@ -249,51 +249,51 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(item);
 
-	laraInfo->LeftArm.FrameBase = laraInfo->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	laraInfo->LeftArm.FrameNumber = laraInfo->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber = item->AnimNumber;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->AnimNumber;
 }
 
 void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	laraInfo->Control.HandStatus = HandStatus::WeaponReady;
-	laraInfo->LeftArm.Rotation = PHD_3DPOS();
-	laraInfo->RightArm.Rotation = PHD_3DPOS();
-	laraInfo->LeftArm.FrameNumber = 0;
-	laraInfo->RightArm.FrameNumber = 0;
-	laraInfo->LeftArm.Locked = false;
-	laraInfo->RightArm.Locked = false;
-	laraInfo->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	laraInfo->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	laraInfo->target = nullptr;
+	lara->Control.HandStatus = HandStatus::WeaponReady;
+	lara->LeftArm.Rotation = PHD_3DPOS();
+	lara->RightArm.Rotation = PHD_3DPOS();
+	lara->LeftArm.FrameNumber = 0;
+	lara->RightArm.FrameNumber = 0;
+	lara->LeftArm.Locked = false;
+	lara->RightArm.Locked = false;
+	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->target = nullptr;
 }
 
 void FireShotgun(ITEM_INFO* laraItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	short angles[2];
-	angles[1] = laraInfo->LeftArm.Rotation.xRot;
-	angles[0] = laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+	angles[1] = lara->LeftArm.Rotation.xRot;
+	angles[0] = lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 
-	if (!laraInfo->LeftArm.Locked)
+	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = laraInfo->ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
-		angles[1] = laraInfo->ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
+		angles[0] = lara->ExtraTorsoRot.yRot + lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+		angles[1] = lara->ExtraTorsoRot.zRot + lara->LeftArm.Rotation.xRot;
 	}
 
 	short loopAngles[2];
 	bool fired = false;
-	int value = (laraInfo->Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
+	int value = (lara->Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
 
 	for (int i = 0; i < 6; i++)
 	{
 		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
 		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
 
-		if (FireWeapon(WEAPON_SHOTGUN, laraInfo->target, laraItem, loopAngles) != FireWeaponType::NoAmmo)
+		if (FireWeapon(WEAPON_SHOTGUN, lara->target, laraItem, loopAngles) != FireWeaponType::NoAmmo)
 			fired = true;
 	}
 
@@ -316,7 +316,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, SmokeCountL);
 		}
 
-		laraInfo->RightArm.FlashGun = Weapons[WEAPON_SHOTGUN].FlashTime;
+		lara->RightArm.FlashGun = Weapons[WEAPON_SHOTGUN].FlashTime;
 
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Position, 20971524);
 		SoundEffect(Weapons[WEAPON_SHOTGUN].SampleNum, &laraItem->Position, 0);
@@ -327,14 +327,14 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	ITEM_INFO* item;
 
-	if (laraInfo->Control.WeaponControl.WeaponItem == NO_ITEM)
+	if (lara->Control.WeaponControl.WeaponItem == NO_ITEM)
 	{
-		laraInfo->Control.WeaponControl.WeaponItem = CreateItem();
-		item = &g_Level.Items[laraInfo->Control.WeaponControl.WeaponItem];
+		lara->Control.WeaponControl.WeaponItem = CreateItem();
+		item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
 		item->ObjectNumber = WeaponObject(weaponType);
 
 		if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -350,11 +350,11 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
 
-		laraInfo->RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
-		laraInfo->LeftArm.FrameBase = laraInfo->RightArm.FrameBase;
+		lara->RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
+		lara->LeftArm.FrameBase = lara->RightArm.FrameBase;
 	}
 	else
-		item = &g_Level.Items[laraInfo->Control.WeaponControl.WeaponItem];
+		item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
 
 	AnimateItem(item);
 
@@ -362,73 +362,73 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	{
 		if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == Weapons[weaponType].DrawFrame)
 			DrawShotgunMeshes(laraItem, weaponType);
-		else if (laraInfo->Control.WaterStatus == WaterStatus::Underwater)
+		else if (lara->Control.WaterStatus == WaterStatus::Underwater)
 			item->TargetState = 6;
 	}
 	else
 		ReadyShotgun(laraItem, weaponType);
 
-	laraInfo->LeftArm.FrameBase = laraInfo->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	laraInfo->LeftArm.FrameNumber = laraInfo->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber = item->AnimNumber;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->AnimNumber;
 }
 
 void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	auto* item = &g_Level.Items[laraInfo->Control.WeaponControl.WeaponItem];
+	auto* item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
 	item->TargetState = 3;
 
 	AnimateItem(item);
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		laraInfo->Control.HandStatus = HandStatus::Free;
-		laraInfo->target = nullptr;
-		laraInfo->RightArm.Locked = false;
-		laraInfo->LeftArm.Locked = false;
-		KillItem(laraInfo->Control.WeaponControl.WeaponItem);
-		laraInfo->Control.WeaponControl.WeaponItem = NO_ITEM;
-		laraInfo->RightArm.FrameNumber = 0;
-		laraInfo->LeftArm.FrameNumber = 0;
+		lara->Control.HandStatus = HandStatus::Free;
+		lara->target = nullptr;
+		lara->RightArm.Locked = false;
+		lara->LeftArm.Locked = false;
+		KillItem(lara->Control.WeaponControl.WeaponItem);
+		lara->Control.WeaponControl.WeaponItem = NO_ITEM;
+		lara->RightArm.FrameNumber = 0;
+		lara->LeftArm.FrameNumber = 0;
 	}
 	else if (item->ActiveState == 3 && item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 21)
 		UndrawShotgunMeshes(laraItem, weaponType);
 
-	laraInfo->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	laraInfo->LeftArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
-	laraInfo->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	laraInfo->LeftArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
-	laraInfo->RightArm.AnimNumber = item->AnimNumber;
-	laraInfo->LeftArm.AnimNumber = laraInfo->RightArm.AnimNumber;
+	lara->RightArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[item->AnimNumber].framePtr;
+	lara->RightArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	lara->LeftArm.FrameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+	lara->RightArm.AnimNumber = item->AnimNumber;
+	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber;
 }
 
 void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	laraInfo->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
-	laraInfo->meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
+	lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
+	lara->meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
 void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	laraInfo->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
-	laraInfo->meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+	lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
+	lara->meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void FireHarpoon(ITEM_INFO* laraItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	Ammo& ammos = GetAmmo(laraItem, WEAPON_HARPOON_GUN);
 	if (!ammos)
 		return;
 
-	laraInfo->Control.WeaponControl.HasFired = true;
+	lara->Control.WeaponControl.HasFired = true;
 
 	// Create a new item for harpoon
 	short itemNumber = CreateItem();
@@ -446,10 +446,8 @@ void FireHarpoon(ITEM_INFO* laraItem)
 		PHD_VECTOR jointPos = { -2, 373, 77 };
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
-		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-
-		if (height >= jointPos.y)
+		int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+		if (floorHeight >= jointPos.y)
 		{
 			item->Position.xPos = jointPos.x;
 			item->Position.yPos = jointPos.y;
@@ -465,14 +463,14 @@ void FireHarpoon(ITEM_INFO* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = laraInfo->LeftArm.Rotation.xRot + laraItem->Position.xRot;
+		item->Position.xRot = lara->LeftArm.Rotation.xRot + laraItem->Position.xRot;
+		item->Position.yRot = lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 		item->Position.zRot = 0;
-		item->Position.yRot = laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 
-		if (!laraInfo->LeftArm.Locked)
+		if (!lara->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
+			item->Position.xRot += lara->ExtraTorsoRot.xRot;
+			item->Position.yRot += lara->ExtraTorsoRot.yRot;
 		}
 
 		item->Position.zRot = 0;
@@ -540,12 +538,11 @@ void HarpoonBoltControl(short itemNumber)
 		return;
 	}
 
-	roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	auto probe = GetCollisionResult(item);
 
 	// Check if bolt has hit a solid wall
-	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
-		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
+	if (probe.Position.Floor < item->Position.yPos ||
+		probe.Position.Ceiling > item->Position.yPos)
 	{
 		// I have hit a solid wall, this is the end for the bolt
 		item->HitPoints--;
@@ -557,7 +554,7 @@ void HarpoonBoltControl(short itemNumber)
 		ItemNewRoom(itemNumber, roomNumber);
 
 	// If now in water and before in land, add a ripple
-	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
+	if (TestEnvironment(ENV_FLAG_WATER, item) && aboveWater)
 		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 
 	int n = 0;
@@ -639,7 +636,7 @@ void HarpoonBoltControl(short itemNumber)
 
 void FireGrenade(ITEM_INFO* laraItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	int x = 0;
 	int y = 0;
@@ -649,7 +646,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 	if (!ammo)
 		return;
 
-	laraInfo->Control.WeaponControl.HasFired = true;
+	lara->Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -667,9 +664,8 @@ void FireGrenade(ITEM_INFO* laraItem)
 		item->Position.yPos = y = jointPos.y;
 		item->Position.zPos = z = jointPos.z;
 
-		FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
-		int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-		if (height < jointPos.y)
+		int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+		if (floorHeight < jointPos.y)
 		{
 			item->Position.xPos = laraItem->Position.xPos;
 			item->Position.yPos = jointPos.y;
@@ -691,14 +687,14 @@ void FireGrenade(ITEM_INFO* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = laraItem->Position.xRot + laraInfo->LeftArm.Rotation.xRot;
-		item->Position.yRot = laraItem->Position.yRot + laraInfo->LeftArm.Rotation.yRot;
+		item->Position.xRot = laraItem->Position.xRot + lara->LeftArm.Rotation.xRot;
+		item->Position.yRot = laraItem->Position.yRot + lara->LeftArm.Rotation.yRot;
 		item->Position.zRot = 0;
 
-		if (!laraInfo->LeftArm.Locked)
+		if (!lara->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
+			item->Position.xRot += lara->ExtraTorsoRot.zRot;
+			item->Position.yRot += lara->ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = GRENADE_SPEED;
@@ -714,7 +710,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 		if (!ammo.hasInfinite())
 			(ammo)--;
 
-		item->ItemFlags[0] = laraInfo->Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
+		item->ItemFlags[0] = lara->Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo;
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -871,22 +867,15 @@ void GrenadeControl(short itemNumber)
 	item->Position.yPos += yv;
 	item->Position.zPos += zv;
 
-	FLOOR_INFO* floor;
-	int height;
-	int ceiling;
-	short roomNumber;
-
 	// Grenades that originate from first grenade when special ammo is selected
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
 	{
-		roomNumber = item->RoomNumber;
-		
-		floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-		ceiling = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-
-		if (height < item->Position.yPos || ceiling > item->Position.yPos)
+		auto probe = GetCollisionResult(item);
+		if (probe.Position.Floor < item->Position.yPos ||
+			probe.Position.Ceiling > item->Position.yPos)
+		{
 			item->HitPoints = 1;
+		}
 	}
 	else
 	{
@@ -900,8 +889,7 @@ void GrenadeControl(short itemNumber)
 		item->Position.yRot = sYrot;
 	}
 
-	roomNumber = item->RoomNumber;
-	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
 
 	// TODO: splash effect
 	/*
@@ -974,7 +962,7 @@ void GrenadeControl(short itemNumber)
 					if (CollidedItems[i] == NULL)
 						break;
 
-					ITEM_INFO* currentItem = CollidedItems[i];
+					auto* currentItem = CollidedItems[i];
 
 					if (currentItem->ObjectNumber < ID_SMASH_OBJECT1 || currentItem->ObjectNumber > ID_SMASH_OBJECT16)
 					{
@@ -988,7 +976,7 @@ void GrenadeControl(short itemNumber)
 							if ((currentItem->Flags & IFLAG_ACTIVATION_MASK) &&
 								(currentItem->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 							{
-								TestTriggers(currentItem->Position.xPos, currentItem->Position.yPos - 256, currentItem->Position.zPos, roomNumber, true, IFLAG_ACTIVATION_MASK);
+								TestTriggers(currentItem->Position.xPos, currentItem->Position.yPos - CLICK(1), currentItem->Position.zPos, probedRoomNumber, true, IFLAG_ACTIVATION_MASK);
 							}
 							else
 							{
@@ -1113,13 +1101,13 @@ void GrenadeControl(short itemNumber)
 
 void FireRocket(ITEM_INFO* laraItem)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	Ammo& ammos = GetAmmo(laraItem, WEAPON_ROCKET_LAUNCHER);
 	if (!ammos)
 		return;
 
-	laraInfo->Control.WeaponControl.HasFired = true;
+	lara->Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1156,14 +1144,14 @@ void FireRocket(ITEM_INFO* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Position.xRot = laraItem->Position.xRot + laraInfo->LeftArm.Rotation.xRot;
-		item->Position.yRot = laraItem->Position.yRot + laraInfo->LeftArm.Rotation.yRot;
+		item->Position.xRot = laraItem->Position.xRot + lara->LeftArm.Rotation.xRot;
+		item->Position.yRot = laraItem->Position.yRot + lara->LeftArm.Rotation.yRot;
 		item->Position.zRot = 0;
 
-		if (!laraInfo->LeftArm.Locked)
+		if (!lara->LeftArm.Locked)
 		{
-			item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
-			item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
+			item->Position.xRot += lara->ExtraTorsoRot.zRot;
+			item->Position.yRot += lara->ExtraTorsoRot.yRot;
 		}
 
 		item->Velocity = 512 >> 5;
@@ -1192,13 +1180,13 @@ void RocketControl(short itemNumber)
 	bool abovewater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		if (item->Velocity > ROCKET_SPEED / 4)
-			item->Velocity -= (item->Velocity / 4);
+		if (item->Velocity > (ROCKET_SPEED / 4))
+			item->Velocity -= item->Velocity / 4;
 		else
 		{
 			item->Velocity += (item->Velocity / 4) + 4;
 
-			if (item->Velocity > ROCKET_SPEED / 4)
+			if (item->Velocity > (ROCKET_SPEED / 4))
 				item->Velocity = ROCKET_SPEED / 4;
 		}
 
@@ -1218,7 +1206,7 @@ void RocketControl(short itemNumber)
 
 	// Calculate offset in rocket direction for fire and smoke sparks
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Position.yRot - ANGLE(180)),
+		TO_RAD(item->Position.yRot - ANGLE(180.0f)),
 		TO_RAD(item->Position.xRot),
 		TO_RAD(item->Position.zRot)
 	) * Matrix::CreateTranslation(0, 0, -64);
@@ -1248,10 +1236,9 @@ void RocketControl(short itemNumber)
 	bool explode = false;
 	
 	// Check if solid wall and then decide if explode or not
-	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
-		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
+	auto probe = GetCollisionResult(item);
+	if (probe.Position.Floor < item->Position.yPos ||
+		probe.Position.Ceiling > item->Position.yPos)
 	{
 		item->Position.xPos = oldX;
 		item->Position.yPos = oldY;
@@ -1260,8 +1247,8 @@ void RocketControl(short itemNumber)
 	}
 
 	// Has bolt changed room?
-	if (item->RoomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	if (item->RoomNumber != probe.RoomNumber)
+		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	// If now in water and before in land, add a ripple
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && abovewater)
@@ -1387,13 +1374,13 @@ void RocketControl(short itemNumber)
 
 void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	Ammo& ammos = GetAmmo(laraItem, WEAPON_CROSSBOW);
 	if (!ammos)
 		return;
 
-	laraInfo->Control.WeaponControl.HasFired = true;
+	lara->Control.WeaponControl.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1426,10 +1413,8 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 			item->RoomNumber = laraItem->RoomNumber;
 
-			FLOOR_INFO* floor = GetFloor(jointPos.x, jointPos.y, jointPos.z, &item->RoomNumber);
-			int height = GetFloorHeight(floor, jointPos.x, jointPos.y, jointPos.z);
-
-			if (height >= jointPos.y)
+			int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+			if (floorHeight >= jointPos.y)
 			{
 				item->Position.xPos = jointPos.x;
 				item->Position.yPos = jointPos.y;
@@ -1445,14 +1430,14 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 			InitialiseItem(itemNumber);
 
-			item->Position.xRot = laraInfo->LeftArm.Rotation.xRot + laraItem->Position.xRot;
+			item->Position.xRot = lara->LeftArm.Rotation.xRot + laraItem->Position.xRot;
 			item->Position.zRot = 0;
-			item->Position.yRot = laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+			item->Position.yRot = lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 
-			if (!laraInfo->LeftArm.Locked)
+			if (!lara->LeftArm.Locked)
 			{
-				item->Position.xRot += laraInfo->ExtraTorsoRot.zRot;
-				item->Position.yRot += laraInfo->ExtraTorsoRot.yRot;
+				item->Position.xRot += lara->ExtraTorsoRot.zRot;
+				item->Position.yRot += lara->ExtraTorsoRot.yRot;
 			}
 		}
 
@@ -1460,7 +1445,7 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 		AddActiveItem(itemNumber);
 
-		item->ItemFlags[0] = laraInfo->Weapons[WEAPON_CROSSBOW].SelectedAmmo;
+		item->ItemFlags[0] = lara->Weapons[WEAPON_CROSSBOW].SelectedAmmo;
 
 		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
 
@@ -1493,20 +1478,19 @@ void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GAME_VECTOR* src, GAME_VECT
 
 void CrossbowBoltControl(short itemNumber)
 {
-	auto* laraInfo = GetLaraInfo(LaraItem);
+	auto* lara = GetLaraInfo(LaraItem);
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
 	int oldX = item->Position.xPos;
 	int oldY = item->Position.yPos;
 	int oldZ = item->Position.zPos;
-	short roomNumber = item->RoomNumber;
 
 	bool aboveWater = false;
 	bool explode = false;
 
 	// Update speed and check if above water
-	if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		PHD_VECTOR bubblePos = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
 
@@ -1514,7 +1498,7 @@ void CrossbowBoltControl(short itemNumber)
 			item->Velocity -= (item->Velocity >> 4);
 
 		if (GlobalCounter & 1)
-			CreateBubble(&bubblePos, roomNumber, 4, 7, 0, 0, 0, 0);
+			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
 
 		aboveWater = false;
 	}
@@ -1526,12 +1510,11 @@ void CrossbowBoltControl(short itemNumber)
 	item->Position.yPos += item->Velocity * phd_sin(-item->Position.xRot);
 	item->Position.zPos += item->Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 
-	roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-	
+	auto probe = GetCollisionResult(item);
+
 	// Check if bolt has hit a solid wall
-	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos ||
-		GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
+	if (probe.Position.Floor < item->Position.yPos ||
+		probe.Position.Ceiling > item->Position.yPos)
 	{
 		// I have hit a solid wall, this is the end for the bolt
 		item->Position.xPos = oldX;
@@ -1551,14 +1534,14 @@ void CrossbowBoltControl(short itemNumber)
 	}
 
 	// Has bolt changed room?
-	if (item->RoomNumber != roomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	if (item->RoomNumber != probe.RoomNumber)
+		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	// If now in water and before in land, add a ripple
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
 		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 
-	int radius = (explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS);
+	int radius = explode ? CROSSBOW_EXPLODE_RADIUS : CROSSBOW_HIT_RADIUS;
 	bool foundCollidedObjects = false;
 
 	for (int n = 0; n < 2; n++)
@@ -1707,13 +1690,13 @@ void CrossbowBoltControl(short itemNumber)
 
 void FireHK(ITEM_INFO* laraItem, int mode)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-	/*	if (laraInfo->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+	/*	if (lara->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
 		{
 			HKTimer = 12;
 		}
-		else if (laraInfo->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+		else if (lara->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
 		{
 			HKCounter++;
 			if (HKCounter == 5)
@@ -1725,13 +1708,13 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 
 	short angles[2];
 
-	angles[1] = laraInfo->LeftArm.Rotation.xRot;
-	angles[0] = laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+	angles[1] = lara->LeftArm.Rotation.xRot;
+	angles[0] = lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 
-	if (!laraInfo->LeftArm.Locked)
+	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = laraInfo->ExtraTorsoRot.yRot + laraInfo->LeftArm.Rotation.yRot + laraItem->Position.yRot;
-		angles[1] = laraInfo->ExtraTorsoRot.zRot + laraInfo->LeftArm.Rotation.xRot;
+		angles[0] = lara->ExtraTorsoRot.yRot + lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
+		angles[1] = lara->ExtraTorsoRot.zRot + lara->LeftArm.Rotation.xRot;
 	}
 
 	if (mode)
@@ -1745,18 +1728,18 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 		Weapons[WEAPON_HK].Damage = 3;
 	}
 
-	if (FireWeapon(WEAPON_HK, laraInfo->target, laraItem, angles) != FireWeaponType::NoAmmo)
+	if (FireWeapon(WEAPON_HK, lara->target, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
 		SmokeCountL = 12;
 		SmokeWeapon = WEAPON_HK;
 		TriggerGunShell(1, ID_GUNSHELL, WEAPON_HK);
-		laraInfo->RightArm.FlashGun = Weapons[WEAPON_HK].FlashTime;
+		lara->RightArm.FlashGun = Weapons[WEAPON_HK].FlashTime;
 	}
 }
 
 void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (BinocularRange)
 		return; // Never handle weapons when in binocular mode!
@@ -1767,15 +1750,15 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	if (TrInput & IN_ACTION)
 		LaraTargetInfo(laraItem, weapon);
 
-	AimWeapon(laraItem, weapon, &laraInfo->LeftArm);
+	AimWeapon(laraItem, weapon, &lara->LeftArm);
 
-	if (laraInfo->LeftArm.Locked)
+	if (lara->LeftArm.Locked)
 	{
-		laraInfo->ExtraTorsoRot.zRot = laraInfo->LeftArm.Rotation.xRot;
-		laraInfo->ExtraTorsoRot.yRot = laraInfo->LeftArm.Rotation.yRot;
+		lara->ExtraTorsoRot.zRot = lara->LeftArm.Rotation.xRot;
+		lara->ExtraTorsoRot.yRot = lara->LeftArm.Rotation.yRot;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			laraInfo->ExtraHeadRot = { 0, 0, 0 };
+			lara->ExtraHeadRot = { 0, 0, 0 };
 	}
 
 	if (weaponType == WEAPON_REVOLVER)
@@ -1783,7 +1766,7 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	else
 		AnimateShotgun(laraItem, weaponType);
 
-	if (laraInfo->RightArm.FlashGun)
+	if (lara->RightArm.FlashGun)
 	{
 		if (weaponType == WEAPON_SHOTGUN || weaponType == WEAPON_HK)
 		{

@@ -791,7 +791,10 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Say no.
 	static bool dbNo = false;
 	if (KeyMap[DIK_N] && !dbNo)
+	{
+		item->Airborne = !item->Airborne;
 		SayNo();
+	}
 	dbNo = KeyMap[DIK_N] ? true : false;
 
 	static PHD_3DPOS posO = item->Position;

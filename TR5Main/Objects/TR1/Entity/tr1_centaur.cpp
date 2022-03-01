@@ -177,7 +177,7 @@ static void RocketGun(ITEM_INFO* centaurItem)
 void CentaurControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	if (!CreatureActive(itemNumber))
 		return;
@@ -196,13 +196,13 @@ void CentaurControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		CreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, CENTAUR_TURN);
 
@@ -212,9 +212,9 @@ void CentaurControl(short itemNumber)
 			CreatureJoint(item, 17, 0);
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite && aiInfo.distance < CENTAUR_REAR_RANGE)
+			else if (AI.bite && AI.distance < CENTAUR_REAR_RANGE)
 				item->TargetState = CENTAUR_STATE_RUN;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 				item->TargetState = CENTAUR_STATE_AIM;
 			else
 				item->TargetState = CENTAUR_STATE_RUN;
@@ -222,12 +222,12 @@ void CentaurControl(short itemNumber)
 			break;
 
 		case CENTAUR_STATE_RUN:
-			if (aiInfo.bite && aiInfo.distance < CENTAUR_REAR_RANGE)
+			if (AI.bite && AI.distance < CENTAUR_REAR_RANGE)
 			{
 				item->RequiredState = CENTAUR_STATE_WARNING;
 				item->TargetState = CENTAUR_STATE_IDLE;
 			}
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 			{
 				item->RequiredState = CENTAUR_STATE_AIM;
 				item->TargetState = CENTAUR_STATE_IDLE;
@@ -243,7 +243,7 @@ void CentaurControl(short itemNumber)
 		case CENTAUR_STATE_AIM:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 				item->TargetState = CENTAUR_STATE_SHOOT;
 			else
 				item->TargetState = CENTAUR_STATE_IDLE;

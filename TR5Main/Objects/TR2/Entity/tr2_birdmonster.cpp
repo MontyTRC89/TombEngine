@@ -31,7 +31,7 @@ void BirdMonsterControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 	short head = 0;
@@ -47,34 +47,34 @@ void BirdMonsterControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
-		angle = CreatureTurn(item, info->maximumTurn);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->maximumTurn = 0;
+			creature->maximumTurn = 0;
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 3;
 				else
 					item->TargetState = 10;
 			}
-			else if (aiInfo.ahead && (info->mood == BORED_MOOD || info->mood == STALK_MOOD))
+			else if (AI.ahead && (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD))
 			{
-				if (aiInfo.zoneNumber != aiInfo.enemyZone)
+				if (AI.zoneNumber != AI.enemyZone)
 				{
 					item->TargetState = 2;
-					info->mood = ESCAPE_MOOD;
+					creature->mood = ESCAPE_MOOD;
 				}
 				else
 					item->TargetState = 8;
@@ -85,27 +85,27 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 8:
-			info->maximumTurn = 0;
+			creature->maximumTurn = 0;
 
-			if (info->mood != BORED_MOOD || !aiInfo.ahead)
+			if (creature->mood != BORED_MOOD || !AI.ahead)
 				item->TargetState = 1;
 			
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(4.0f);
+			creature->maximumTurn = ANGLE(4.0f);
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->TargetState = 5;
-			else if ((info->mood == BORED_MOOD || info->mood == STALK_MOOD) && aiInfo.ahead)
+			else if ((creature->mood == BORED_MOOD || creature->mood == STALK_MOOD) && AI.ahead)
 				item->TargetState = 1;
 			
 			break;
 
 		case 3:
-			info->flags = 0;
+			creature->flags = 0;
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				item->TargetState = 4;
 			else
 				item->TargetState = 1;
@@ -113,9 +113,9 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 5:
-			info->flags = 0;
+			creature->flags = 0;
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
 			else
 				item->TargetState = 1;
@@ -123,9 +123,9 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 10:
-			info->flags = 0;
+			creature->flags = 0;
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				item->TargetState = 11;
 			else
 				item->TargetState = 1;
@@ -136,19 +136,19 @@ void BirdMonsterControl(short itemNumber)
 		case 6:
 		case 11:
 		case 7:
-			if (!(info->flags & 1) && item->TouchBits & 0x600000)
+			if (!(creature->flags & 1) && item->TouchBits & 0x600000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteRight, DoBloodSplat);
-				info->flags |= 1;
+				creature->flags |= 1;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
 			}
 
-			if (!(info->flags & 2) && item->TouchBits & 0x0C0000)
+			if (!(creature->flags & 2) && item->TouchBits & 0x0C0000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteLeft, DoBloodSplat);
-				info->flags |= 2;
+				creature->flags |= 2;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
