@@ -54,7 +54,7 @@ void BearControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short head = 0;
 	short angle = 0;
@@ -79,20 +79,20 @@ void BearControl(short itemNumber)
 			case BEAR_STATE_REAR:
 			{
 				item->TargetState = BEAR_STATE_DEATH;
-				info->flags = 1;
+				creature->flags = 1;
 				break;
 			}
 			case BEAR_STATE_IDLE:
 			{
 				item->TargetState = BEAR_STATE_DEATH;
-				info->flags = 0;
+				creature->flags = 0;
 				break;
 			}
 			case BEAR_STATE_DEATH:
 			{
-				if (info->flags && item->TouchBits & TOUCH)
+				if (creature->flags && item->TouchBits & TOUCH)
 				{
-					info->flags = 0;
+					creature->flags = 0;
 
 					LaraItem->HitPoints -= SLAM_DAMAGE;
 					LaraItem->HitStatus = 1;
@@ -104,19 +104,19 @@ void BearControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
 		if (item->HitStatus)
-			info->flags = 1;
+			creature->flags = 1;
 
 		const bool laraDead = LaraItem->HitPoints <= 0;
 
@@ -125,14 +125,14 @@ void BearControl(short itemNumber)
 		case BEAR_STATE_IDLE:
 			if (laraDead)
 			{
-				if (aiInfo.bite && aiInfo.distance < EAT_RANGE)
+				if (AI.bite && AI.distance < EAT_RANGE)
 					item->TargetState = BEAR_STATE_CHOMP;
 				else
 					item->TargetState = BEAR_STATE_STROLL;
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood == BORED_MOOD)
+			else if (creature->mood == BORED_MOOD)
 				item->TargetState = BEAR_STATE_STROLL;
 			else
 				item->TargetState = BEAR_STATE_RUN;
@@ -140,15 +140,15 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_STROLL:
-			info->maximumTurn = WALK_TURN;
+			creature->maximumTurn = WALK_TURN;
 
-			if (laraDead && item->TouchBits & TOUCH && aiInfo.ahead)
+			if (laraDead && item->TouchBits & TOUCH && AI.ahead)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (info->mood != BORED_MOOD)
+			else if (creature->mood != BORED_MOOD)
 			{
 				item->TargetState = BEAR_STATE_IDLE;
 
-				if (info->mood == ESCAPE_MOOD)
+				if (creature->mood == ESCAPE_MOOD)
 					item->RequiredState = BEAR_STATE_STROLL;
 			}
 			else if (GetRandomControl() < ROAR_CHANCE)
@@ -160,7 +160,7 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_RUN:
-			info->maximumTurn = RUN_TURN;
+			creature->maximumTurn = RUN_TURN;
 
 			if (item->TouchBits & TOUCH)
 			{
@@ -168,32 +168,32 @@ void BearControl(short itemNumber)
 				LaraItem->HitStatus = true;
 			}
 
-			if (info->mood == BORED_MOOD || laraDead)
+			if (creature->mood == BORED_MOOD || laraDead)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (aiInfo.ahead && !item->RequiredState)
+			else if (AI.ahead && !item->RequiredState)
 			{
-				if (!info->flags && aiInfo.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
+				if (!creature->flags && AI.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
 					item->RequiredState = BEAR_STATE_REAR;
 					item->TargetState = BEAR_STATE_IDLE;
 				}
-				else if (aiInfo.distance < ATTACK_RANGE)
+				else if (AI.distance < ATTACK_RANGE)
 					item->TargetState = BEAR_STATE_ATTACK_1;
 			}
 
 			break;
 
 		case BEAR_STATE_REAR:
-			if (info->flags)
+			if (creature->flags)
 			{
 				item->RequiredState = BEAR_STATE_STROLL;
 				item->TargetState = BEAR_STATE_IDLE;
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood == BORED_MOOD || info->mood == ESCAPE_MOOD)
+			else if (creature->mood == BORED_MOOD || creature->mood == ESCAPE_MOOD)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (aiInfo.bite && aiInfo.distance < PAT_RANGE)
+			else if (AI.bite && AI.distance < PAT_RANGE)
 				item->TargetState = BEAR_STATE_ATTACK_2;
 			else
 				item->TargetState = BEAR_STATE_WALK;
@@ -201,24 +201,24 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_WALK:
-			if (info->flags)
+			if (creature->flags)
 			{
 				item->RequiredState = BEAR_STATE_STROLL;
 				item->TargetState = BEAR_STATE_REAR;
 			}
-			else if (aiInfo.ahead && (item->TouchBits & TOUCH))
+			else if (AI.ahead && (item->TouchBits & TOUCH))
 				item->TargetState = BEAR_STATE_REAR;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (creature->mood == ESCAPE_MOOD)
 			{
 				item->TargetState = BEAR_STATE_REAR;
 				item->RequiredState = BEAR_STATE_STROLL;
 			}
-			else if (info->mood == BORED_MOOD || GetRandomControl() < ROAR_CHANCE)
+			else if (creature->mood == BORED_MOOD || GetRandomControl() < ROAR_CHANCE)
 			{
 				item->RequiredState = BEAR_STATE_ROAR;
 				item->TargetState = BEAR_STATE_REAR;
 			}
-			else if (aiInfo.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
+			else if (AI.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
 			{
 				item->RequiredState = BEAR_STATE_IDLE;
 				item->TargetState = BEAR_STATE_REAR;

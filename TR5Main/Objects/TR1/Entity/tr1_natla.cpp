@@ -44,36 +44,36 @@ void NatlaControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 	short facing = 0;
-	short gun = info->jointRotation[0] * 7 / 8;
+	short gun = creature->jointRotation[0] * 7 / 8;
 
 	int shoot;
-	short timer = info->flags & NATLA_TIMER;
+	short timer = creature->flags & NATLA_TIMER;
 
-	AI_INFO aiInfo;
+	AI_INFO AI;
 
 	if (item->HitPoints <= 0 && item->HitPoints > -16384)
 		item->TargetState = NATLA_STATE_DEATH;
 	else if (item->HitPoints <= NATLA_NEAR_DEATH)
 	{
-		info->LOT.step = CLICK(1);
-		info->LOT.drop = -CLICK(1);
-		info->LOT.fly = NO_FLYING;
-		CreatureAIInfo(item, &aiInfo);
+		creature->LOT.step = CLICK(1);
+		creature->LOT.drop = -CLICK(1);
+		creature->LOT.fly = NO_FLYING;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, NATLA_RUN_TURN);
-		shoot = (aiInfo.angle > -NATLA_FIRE_ARC && aiInfo.angle < NATLA_FIRE_ARC && Targetable(item, &aiInfo));
+		shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC && Targetable(item, &AI));
 
 		if (facing)
 		{
@@ -143,7 +143,7 @@ void NatlaControl(short itemNumber)
 			if (timer == NATLA_DEATH_TIME)
 			{
 				item->TargetState = NATLA_STATE_STAND;
-				info->flags = 0;
+				creature->flags = 0;
 				timer = 0;
 				item->HitPoints = NATLA_NEAR_DEATH;
 			}
@@ -168,47 +168,47 @@ void NatlaControl(short itemNumber)
 	}
 	else
 	{
-		info->LOT.step = CLICK(1);
-		info->LOT.drop = -CLICK(1);
-		info->LOT.fly = NO_FLYING;
-		CreatureAIInfo(item, &aiInfo);
+		creature->LOT.step = CLICK(1);
+		creature->LOT.drop = -CLICK(1);
+		creature->LOT.fly = NO_FLYING;
+		CreatureAIInfo(item, &AI);
 
-		shoot = (aiInfo.angle > -NATLA_FIRE_ARC && aiInfo.angle < NATLA_FIRE_ARC && Targetable(item, &aiInfo));
+		shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC && Targetable(item, &AI));
 
-		if (item->ActiveState == NATLA_STATE_FLY && (info->flags & NATLA_FLYMODE))
+		if (item->ActiveState == NATLA_STATE_FLY && (creature->flags & NATLA_FLYMODE))
 		{
-			if (info->flags & NATLA_FLYMODE && shoot && GetRandomControl() < NATLA_LAND_CHANCE)
-				info->flags -= NATLA_FLYMODE;
+			if (creature->flags & NATLA_FLYMODE && shoot && GetRandomControl() < NATLA_LAND_CHANCE)
+				creature->flags -= NATLA_FLYMODE;
 
-			if (!(info->flags & NATLA_FLYMODE))
-				CreatureMood(item, &aiInfo, VIOLENT);
+			if (!(creature->flags & NATLA_FLYMODE))
+				CreatureMood(item, &AI, VIOLENT);
 
-			info->LOT.step = SECTOR(20);
-			info->LOT.drop = -SECTOR(20);
-			info->LOT.fly = CLICK(0.25f) / 2;
+			creature->LOT.step = SECTOR(20);
+			creature->LOT.drop = -SECTOR(20);
+			creature->LOT.fly = CLICK(0.25f) / 2;
 
-			CreatureAIInfo(item, &aiInfo);
+			CreatureAIInfo(item, &AI);
 		}
 		else if (!shoot)
-			info->flags |= NATLA_FLYMODE;
+			creature->flags |= NATLA_FLYMODE;
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		if (item->ActiveState != NATLA_STATE_FLY || (info->flags & NATLA_FLYMODE))
-			CreatureMood(item, &aiInfo, TIMID);
+		if (item->ActiveState != NATLA_STATE_FLY || (creature->flags & NATLA_FLYMODE))
+			CreatureMood(item, &AI, TIMID);
 
 		item->Position.yRot -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
 		if (item->ActiveState == NATLA_STATE_FLY)
 		{
-			if (aiInfo.angle > NATLA_FLY_TURN)
+			if (AI.angle > NATLA_FLY_TURN)
 				facing += NATLA_FLY_TURN;
-			else if (aiInfo.angle < -NATLA_FLY_TURN)
+			else if (AI.angle < -NATLA_FLY_TURN)
 				facing -= NATLA_FLY_TURN;
 			else
-				facing += aiInfo.angle;
+				facing += AI.angle;
 
 			item->Position.yRot += facing;
 		}
@@ -223,7 +223,7 @@ void NatlaControl(short itemNumber)
 		case NATLA_STATE_IDLE:
 			timer = 0;
 
-			if (info->flags & NATLA_FLYMODE)
+			if (creature->flags & NATLA_FLYMODE)
 				item->TargetState = NATLA_STATE_FLY;
 			else
 				item->TargetState = NATLA_STATE_AIM;
@@ -231,7 +231,7 @@ void NatlaControl(short itemNumber)
 			break;
 
 		case NATLA_STATE_FLY:
-			if (!(info->flags & NATLA_FLYMODE) && item->Position.yPos == item->Floor)
+			if (!(creature->flags & NATLA_FLYMODE) && item->Position.yPos == item->Floor)
 				item->TargetState = NATLA_STATE_IDLE;
 
 			if (timer >= 30)
@@ -288,7 +288,7 @@ void NatlaControl(short itemNumber)
 		CreatureJoint(item, 0, gun);
 
 	timer++;
-	info->flags = (info->flags & NATLA_FLYMODE) + timer;
+	creature->flags = (creature->flags & NATLA_FLYMODE) + timer;
 
 	item->Position.yRot -= facing;
 	CreatureAnimation(itemNumber, angle, tilt);

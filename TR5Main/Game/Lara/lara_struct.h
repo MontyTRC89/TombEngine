@@ -1088,7 +1088,7 @@ struct WeaponControlData
 	LaraWeaponType GunType;
 	LaraWeaponType RequestGunType;
 	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo;
+	HolsterInfo HolsterInfo; // TODO
 };
 
 struct RopeControlData

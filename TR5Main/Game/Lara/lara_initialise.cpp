@@ -66,24 +66,24 @@ void InitialiseLara(int restore)
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
-	LaraWeaponType gun = WEAPON_NONE;
+	LaraWeaponType weapon = WEAPON_NONE;
 
 	if (Objects[ID_HK_ITEM].loaded)
-		gun = WEAPON_HK;
+		weapon = WEAPON_HK;
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
-		gun = WEAPON_PISTOLS;
+		weapon = WEAPON_PISTOLS;
 
-	Lara.Control.WeaponControl.LastGunType = Lara.Control.WeaponControl.GunType = Lara.Control.WeaponControl.RequestGunType = gun;
+	Lara.Control.WeaponControl.LastGunType = Lara.Control.WeaponControl.GunType = Lara.Control.WeaponControl.RequestGunType = weapon;
 
 	LaraInitialiseMeshes(LaraItem);
 
-	if (gun == WEAPON_PISTOLS)
+	if (weapon == WEAPON_PISTOLS)
 	{
 		Lara.Weapons[WEAPON_PISTOLS].Present = true;
 		Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
-	else if (gun == WEAPON_HK)
+	else if (weapon == WEAPON_HK)
 	{
 		Lara.Weapons[WEAPON_HK].Present = true;
 		Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = 100;

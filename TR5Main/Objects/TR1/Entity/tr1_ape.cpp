@@ -64,17 +64,17 @@ enum ApeFlags
 void ApeVault(short itemNumber, short angle)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
-	if (info->flags & APE_FLAG_TURN_LEFT)
+	if (creature->flags & APE_FLAG_TURN_LEFT)
 	{
 		item->Position.yRot -= ANGLE(90.0f);
-		info->flags -= APE_FLAG_TURN_LEFT;
+		creature->flags -= APE_FLAG_TURN_LEFT;
 	}
 	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
 		item->Position.yRot += ANGLE(90.0f);
-		info->flags -= APE_FLAG_TURN_RIGHT;
+		creature->flags -= APE_FLAG_TURN_RIGHT;
 	}
 
 	long long xx = item->Position.zPos / SECTOR(1);
@@ -158,18 +158,18 @@ void ApeControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, TIMID);
-		CreatureMood(item, &aiInfo, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
 		angle = CreatureTurn(item, creatureInfo->maximumTurn);
 
-		if (item->HitStatus || aiInfo.distance < PANIC_RANGE)
+		if (item->HitStatus || AI.distance < PANIC_RANGE)
 			creatureInfo->flags |= APE_FLAG_ATTACK;
 
 		short random;
@@ -190,10 +190,10 @@ void ApeControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite && aiInfo.distance < ATTACK_RANGE)
+			else if (AI.bite && AI.distance < ATTACK_RANGE)
 				item->TargetState = APE_STATE_ATTACK;
 			else if (!(creatureInfo->flags & APE_FLAG_ATTACK) &&
-				aiInfo.zoneNumber == aiInfo.enemyZone && aiInfo.ahead)
+				AI.zoneNumber == AI.enemyZone && AI.ahead)
 			{
 				random = (short)(GetRandomControl() / 32);
 				if (random < JUMP_CHANCE)
@@ -222,12 +222,12 @@ void ApeControl(short itemNumber)
 			creatureInfo->maximumTurn = RUN_TURN;
 
 			if (creatureInfo->flags == 0 &&
-				aiInfo.angle > -DISPLAY_ANGLE &&
-				aiInfo.angle < DISPLAY_ANGLE)
+				AI.angle > -DISPLAY_ANGLE &&
+				AI.angle < DISPLAY_ANGLE)
 			{
 				item->TargetState = APE_STATE_IDLE;
 			}
-			else if (aiInfo.ahead && item->TouchBits & TOUCH)
+			else if (AI.ahead && item->TouchBits & TOUCH)
 			{
 				item->RequiredState = APE_STATE_ATTACK;
 				item->TargetState = APE_STATE_IDLE;

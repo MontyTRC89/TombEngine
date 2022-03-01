@@ -30,7 +30,7 @@ void BarracudaControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 	short head = 0;
@@ -49,24 +49,24 @@ void BarracudaControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, TIMID);
-		CreatureMood(item, &aiInfo, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->flags = 0;
+			creature->flags = 0;
 
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (aiInfo.ahead && aiInfo.distance < 680)
+			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 4;
-			else if (info->mood == STALK_MOOD)
+			else if (creature->mood == STALK_MOOD)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -74,41 +74,41 @@ void BarracudaControl(short itemNumber)
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(2.0f);
+			creature->maximumTurn = ANGLE(2.0f);
 
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				break;
-			else if (aiInfo.ahead && (item->TouchBits & 0xE0))
+			else if (AI.ahead && (item->TouchBits & 0xE0))
 				item->TargetState = 1;
-			else if (info->mood != STALK_MOOD)
+			else if (creature->mood != STALK_MOOD)
 				item->TargetState = 3;
 
 			break;
 
 		case 3:
-			info->maximumTurn = ANGLE(4.0f);
-			info->flags = 0;
+			creature->maximumTurn = ANGLE(4.0f);
+			creature->flags = 0;
 
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				item->TargetState = 2;
-			else if (aiInfo.ahead && aiInfo.distance < 340)
+			else if (AI.ahead && AI.distance < 340)
 				item->TargetState = 5;
-			else if (aiInfo.ahead && aiInfo.distance < 680)
+			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 1;
-			else if (info->mood == STALK_MOOD)
+			else if (creature->mood == STALK_MOOD)
 				item->TargetState = 2;
 
 			break;
 
 		case 4:
 		case 5:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (!info->flags && (item->TouchBits & 0xE0))
+			if (!creature->flags && (item->TouchBits & 0xE0))
 			{
 				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
-				info->flags = 1;
+				creature->flags = 1;
 
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;
