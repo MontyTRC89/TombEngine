@@ -127,8 +127,8 @@ void lara_as_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2) // TODO: Tune this again.
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
+	if (lara->Control.Count.RunJump > (LARA_RUN_JUMP_TIME / 2 + 4))
+		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2 + 4;
 
 	if (item->HitPoints <= 0)
 	{

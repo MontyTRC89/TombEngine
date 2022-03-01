@@ -51,7 +51,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 	item->VerticalVelocity = 0;
 	item->Airborne = false;
 
-	if (item->AnimNumber == LA_HANG_IDLE)
+	if (item->AnimNumber == LA_REACH_TO_HANG ||
+		item->AnimNumber == LA_HANG_IDLE)
 	{
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
@@ -132,7 +133,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 
 	TestLaraHang(item, coll);
 
-	if (item->AnimNumber == LA_HANG_IDLE)
+	if (item->AnimNumber == LA_REACH_TO_HANG ||
+		item->AnimNumber == LA_HANG_IDLE)
 	{
 		TestForObjectOnLedge(item, coll);
 
@@ -186,7 +188,8 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_BACK &&
 			lara->Control.CanClimbLadder &&
 			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
-			item->AnimNumber == LA_HANG_IDLE)
+			(item->AnimNumber == LA_REACH_TO_HANG ||
+				item->AnimNumber == LA_HANG_IDLE))
 		{
 			if (TestLaraClimbStance(item, coll))
 				item->TargetState = LS_LADDER_IDLE;
