@@ -83,7 +83,7 @@ void InitialiseBigRat(short itemNumber)
 
 static bool RatIsInWater(ITEM_INFO* item)
 {
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	EntityStoringInfo storingInfo;
 	storingInfo.x = item->Position.xPos;
@@ -96,16 +96,16 @@ static bool RatIsInWater(ITEM_INFO* item)
 
 	if (storingInfo.waterDepth != NO_HEIGHT)
 	{
-		info->LOT.step = SECTOR(20);
-		info->LOT.drop = -SECTOR(20);
-		info->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
+		creature->LOT.step = SECTOR(20);
+		creature->LOT.drop = -SECTOR(20);
+		creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
 		return true;
 	}
 	else
 	{
-		info->LOT.step = CLICK(1);
-		info->LOT.drop = -CLICK(1);
-		info->LOT.fly = NO_FLYING;
+		creature->LOT.step = CLICK(1);
+		creature->LOT.drop = -CLICK(1);
+		creature->LOT.fly = NO_FLYING;
 		return false;
 	}
 }
@@ -116,7 +116,7 @@ void BigRatControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 	auto* objectInfo = &Objects[item->ObjectNumber];
 
 	short head = 0;
@@ -149,26 +149,26 @@ void BigRatControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, TIMID);
-		CreatureMood(item, &aiInfo, TIMID);
-		angle = CreatureTurn(item, info->maximumTurn);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
 		if (item->AIBits & ALL_AIOBJ)
-			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+			GetAITarget(creature);
+		else if (creature->hurtByLara)
+			creature->enemy = LaraItem;
 
-		if ((item->HitStatus || aiInfo.distance < BIG_RAT_ALERT_RANGE) ||
-			(TargetVisible(item, &aiInfo) && aiInfo.distance < BIG_RAT_VISIBILITY_RANGE))
+		if ((item->HitStatus || AI.distance < BIG_RAT_ALERT_RANGE) ||
+			(TargetVisible(item, &AI) && AI.distance < BIG_RAT_VISIBILITY_RANGE))
 		{
-			if (!info->alerted)
-				info->alerted = true;
+			if (!creature->alerted)
+				creature->alerted = true;
 
 			AlertAllGuards(itemNumber);
 		}
@@ -178,7 +178,7 @@ void BigRatControl(short itemNumber)
 		case BIG_RAT_STATE_IDLE:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite && aiInfo.distance < BIG_RAT_BITE_RANGE)
+			else if (AI.bite && AI.distance < BIG_RAT_BITE_RANGE)
 				item->TargetState = BIG_RAT_STATE_BITE_ATTACK;
 			else
 				item->TargetState = BIG_RAT_STATE_RUN;
@@ -186,7 +186,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_RUN:
-			info->maximumTurn = BIG_RAT_RUN_TURN;
+			creature->maximumTurn = BIG_RAT_RUN_TURN;
 
 			if (RatIsInWater(item))
 			{
@@ -196,11 +196,11 @@ void BigRatControl(short itemNumber)
 				break;
 			}
 
-			if (aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 				item->TargetState = BIG_RAT_STATE_IDLE;
-			else if (aiInfo.bite && aiInfo.distance < BIG_RAT_CHARGE_RANGE)
+			else if (AI.bite && AI.distance < BIG_RAT_CHARGE_RANGE)
 				item->TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
-			else if (aiInfo.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
+			else if (AI.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
 			{
 				item->RequiredState = BIG_RAT_STATE_POSE;
 				item->TargetState = BIG_RAT_STATE_IDLE;
@@ -209,7 +209,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_BITE_ATTACK:
-			if (!item->RequiredState && aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (!item->RequiredState && AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 				item->RequiredState = BIG_RAT_STATE_IDLE;
@@ -221,7 +221,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_CHARGE_ATTACK:
-			if (!item->RequiredState && aiInfo.ahead && (item->TouchBits & BIG_RAT_TOUCH))
+			if (!item->RequiredState && AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 				item->RequiredState = BIG_RAT_STATE_RUN;
@@ -233,13 +233,13 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_POSE:
-			if (info->mood != BORED_MOOD || GetRandomControl() < BIG_RAT_POSE_CHANCE)
+			if (creature->mood != BORED_MOOD || GetRandomControl() < BIG_RAT_POSE_CHANCE)
 				item->TargetState = BIG_RAT_STATE_IDLE;
 
 			break;
 
 		case BIG_RAT_STATE_SWIM:
-			info->maximumTurn = BIG_RAT_SWIM_TURN;
+			creature->maximumTurn = BIG_RAT_SWIM_TURN;
 
 			if (!RatIsInWater(item))
 			{
@@ -248,13 +248,13 @@ void BigRatControl(short itemNumber)
 				break;
 			}
 
-			if (aiInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
+			if (AI.ahead && item->TouchBits & BIG_RAT_TOUCH)
 				item->TargetState = BIG_RAT_STATE_SWIM_ATTACK;
 
 			break;
 
 		case BIG_RAT_STATE_SWIM_ATTACK:
-			if (!item->RequiredState && aiInfo.ahead && item->TouchBits & BIG_RAT_TOUCH)
+			if (!item->RequiredState && AI.ahead && item->TouchBits & BIG_RAT_TOUCH)
 			{
 				CreatureEffect(item, &BigRatBite, DoBloodSplat);
 

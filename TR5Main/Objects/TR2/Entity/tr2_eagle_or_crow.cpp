@@ -51,7 +51,7 @@ void EagleControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 
@@ -103,7 +103,7 @@ void EagleControl(short itemNumber)
 		case 7:
 			item->Position.yPos = item->Floor;
 
-			if (info->mood != BORED_MOOD)
+			if (creature->mood != BORED_MOOD)
 				item->TargetState = 1;
 
 			break;
@@ -111,7 +111,7 @@ void EagleControl(short itemNumber)
 		case 2:
 			item->Position.yPos = item->Floor;
 
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				break;
 			else
 				item->TargetState = 1;
@@ -119,11 +119,11 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 1:
-			info->flags = 0;
+			creature->flags = 0;
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 				item->TargetState = 2;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 				item->TargetState = 6;
@@ -133,7 +133,7 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 3:
-			if (info->mood == BORED_MOOD)
+			if (creature->mood == BORED_MOOD)
 			{
 				item->RequiredState = 2;
 				item->TargetState = 1;
@@ -144,7 +144,7 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 6:
-			if (!info->flags && item->TouchBits)
+			if (!creature->flags && item->TouchBits)
 			{
 				LaraItem->HitPoints -= 20;
 				LaraItem->HitStatus = true;
@@ -154,7 +154,7 @@ void EagleControl(short itemNumber)
 				else
 					CreatureEffect(item, &EagleBite, DoBloodSplat);
 
-				info->flags = 1;
+				creature->flags = 1;
 			}
 
 			break;

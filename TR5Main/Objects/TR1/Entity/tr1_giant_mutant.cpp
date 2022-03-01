@@ -55,7 +55,7 @@ void GiantMutantControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short head = 0;
 	short angle = 0;
@@ -71,16 +71,16 @@ void GiantMutantControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)phd_atan(info->target.z - item->Position.zPos, info->target.x - item->Position.xPos) - item->Position.yRot;
+		angle = (short)phd_atan(creature->target.z - item->Position.zPos, creature->target.x - item->Position.xPos) - item->Position.yRot;
 
 		if (item->TouchBits)
 		{
@@ -99,17 +99,17 @@ void GiantMutantControl(short itemNumber)
 			if (LaraItem->HitPoints <= 0)
 				break;
 
-			info->flags = 0;
+			creature->flags = 0;
 
 			if (angle > MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_TURN_RIGHT;
 			else if (angle < -MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_TURN_LEFT;
-			else if (aiInfo.distance < MUTANT_ATTACK_RANGE)
+			else if (AI.distance < MUTANT_ATTACK_RANGE)
 			{
 				if (LaraItem->HitPoints <= MUTANT_ATTACK_DAMAGE)
 				{
-					if (aiInfo.distance < MUTANT_CLOSE_RANGE)
+					if (AI.distance < MUTANT_CLOSE_RANGE)
 						item->TargetState = MUTANT_STATE_ATTACK_3;
 					else
 						item->TargetState = MUTANT_STATE_FORWARD;
@@ -134,16 +134,16 @@ void GiantMutantControl(short itemNumber)
 
 			if (angle > MUTANT_NEED_TURN || angle < -MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_IDLE;
-			else if (aiInfo.distance < MUTANT_ATTACK_RANGE)
+			else if (AI.distance < MUTANT_ATTACK_RANGE)
 				item->TargetState = MUTANT_STATE_IDLE;
 
 			break;
 
 		case MUTANT_STATE_TURN_RIGHT:
-			if (!info->flags)
-				info->flags = item->FrameNumber;
-			else if (item->FrameNumber - info->flags > 16 &&
-				item->FrameNumber - info->flags < 23)
+			if (!creature->flags)
+				creature->flags = item->FrameNumber;
+			else if (item->FrameNumber - creature->flags > 16 &&
+				item->FrameNumber - creature->flags < 23)
 			{
 				item->Position.yRot += ANGLE(14.0f);
 			}
@@ -154,10 +154,10 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_TURN_LEFT:
-			if (!info->flags)
-				info->flags = item->FrameNumber;
-			else if (item->FrameNumber - info->flags > 13 &&
-				item->FrameNumber - info->flags < 23)
+			if (!creature->flags)
+				creature->flags = item->FrameNumber;
+			else if (item->FrameNumber - creature->flags > 13 &&
+				item->FrameNumber - creature->flags < 23)
 			{
 				item->Position.yRot -= ANGLE(9.0f);
 			}
@@ -168,9 +168,9 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_ATTACK_1:
-			if (!info->flags && item->TouchBits & MUTANT_TRIGHT)
+			if (!creature->flags && item->TouchBits & MUTANT_TRIGHT)
 			{
-				info->flags = 1;
+				creature->flags = 1;
 
 				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;
@@ -179,9 +179,9 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_ATTACK_2:
-			if (!info->flags && item->TouchBits & MUTANT_TOUCH)
+			if (!creature->flags && item->TouchBits & MUTANT_TOUCH)
 			{
-				info->flags = 1;
+				creature->flags = 1;
 
 				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;

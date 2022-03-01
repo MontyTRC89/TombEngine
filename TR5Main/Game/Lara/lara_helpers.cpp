@@ -301,7 +301,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = WALL_SIZE;
+	int dist = SECTOR(1);
 	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
@@ -416,15 +416,12 @@ void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-
-		item->Airborne = true;
-		item->Velocity = 2;
-		item->Position.yPos += STEP_SIZE;
-		item->VerticalVelocity = 1;
-
-		lara->Control.HandStatus = HandStatus::Free;
-
+		item->Position.yPos += CLICK(1);
 		item->Position.yRot += lara->NextCornerPos.yRot / 2;
+		item->Velocity = 2;
+		item->VerticalVelocity = 1;
+		item->Airborne = true;
+		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}
 
