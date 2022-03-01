@@ -2395,8 +2395,14 @@ bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
+	
+	if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT ||
+		TestLaraKeepLow(item, coll))
+	{
+		return true;
+	}
 
-	return (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT);
+	return false;
 }
 
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)
