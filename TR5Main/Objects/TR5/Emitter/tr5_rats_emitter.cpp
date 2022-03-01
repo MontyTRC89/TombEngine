@@ -204,7 +204,7 @@ void UpdateRats()
 
 				short oldRoomNumber = rat->roomNumber;
 
-				FLOOR_INFO* floor = GetFloor(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, &rat->roomNumber);
+				FLOOR_INFO* floor = GetFloor(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos,&rat->roomNumber);
 				int height = GetFloorHeight(floor, rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
 
 				// if height is higher than 5 clicks 
@@ -288,12 +288,12 @@ void UpdateRats()
 					{
 						AddWaterSparks(rat->pos.xPos, r->maxceiling, rat->pos.zPos, 16);
 						SetupRipple(rat->pos.xPos, r->maxceiling, rat->pos.zPos, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-						SoundEffect(SFX_TR5_RATSPLASH, &rat->pos, 0);
+						SoundEffect(1080,&rat->pos, 0);
 					}
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(SFX_TR5_RATS_1, &rat->pos, 0);
+					SoundEffect(1079,&rat->pos, 0);
 			}
 		}
 	}
