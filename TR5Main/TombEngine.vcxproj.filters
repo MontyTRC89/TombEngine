@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="framework.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -285,7 +284,6 @@
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
-    <ClCompile Include="Scripting\GameScriptFog.cpp" />
     <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
@@ -299,13 +297,10 @@
     <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
-    <ClCompile Include="frameworkandsol.cpp" />
-    <ClCompile Include="Scripting\GameScriptFreeFunctions.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
+    <ClCompile Include="framework.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\effects\bubble.h" />
@@ -660,7 +655,6 @@
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
-    <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
@@ -675,8 +669,8 @@
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
-    <ClInclude Include="frameworkandsol.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
+    <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
