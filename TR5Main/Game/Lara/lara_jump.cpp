@@ -789,11 +789,12 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
-		// TODO: Landing on edge of crawlspace.
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
 			item->TargetState = LS_CROUCH_IDLE;
+
+			// HACK: Move Lara forward to avoid standing up or falling out when landing on an edge.
 			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
 		}
 		else [[likely]]
@@ -838,32 +839,6 @@ void lara_col_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.zPos = coll->Setup.OldPosition.z;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
-
-	// Old crawlspace dive implementation:
-
-	//if (coll->Middle.Floor <= 0 && item->VerticalVelocity > 0)
-	//{
-	//	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
-
-	//	if (TestLaraSlide(item, coll))
-	//		SetLaraSlideState(item, coll);
-	//	else if (lara->Control.KeepLow ||
-	//		abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT &&
-	//		g_GameFlow->Animations.CrawlspaceSwandive)
-	//	{
-	//		SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
-
-	//		if (!lara->Control.KeepLow) // HACK: If Lara landed on the edge, shift forward to avoid standing up or falling out.
-	//			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
-	//	}
-	//	else [[likely]]
-	//		SetAnimation(item, LA_SWANDIVE_ROLL);
-
-	//	SetLaraLand(item, coll);
-	//	lara->Control.HandStatus = HandStatus::Free;
-
-	//	LaraSnapToHeight(item, coll);
-	//}
 }
 
 // State:		LS_FREEFALL_DIVE (53)
