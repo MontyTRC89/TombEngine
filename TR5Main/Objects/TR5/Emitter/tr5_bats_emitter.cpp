@@ -226,6 +226,6 @@ void UpdateBats()
 	{
 		BAT_STRUCT* bat = &Bats[minIndex];
 		if (!(GetRandomControl() & 4))
-			SoundEffect(SFX_TR5_BATS_1, &bat->pos, 0);
+			SoundEffect(157,&bat->pos, 0);
 	}
 }
