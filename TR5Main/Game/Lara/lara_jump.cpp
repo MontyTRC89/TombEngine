@@ -638,13 +638,16 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		item->Velocity -= 2;
 		if (item->Velocity < -5)
 			item->Velocity = -5;
+	}
+	else
+		item->Velocity = (item->Velocity < 0) ? -2 : 2;
 
+	if (item->Velocity < 0)
+	{
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
 		item->Position.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Velocity) - item->Position.xRot) / 3);
 		lara->ExtraHeadRot.yRot += (ANGLE(10.0f) - item->Position.zRot) / 3;
 	}
-	else
-		item->Velocity = item->Velocity <= 0 ? -2 : 2;
 
 	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
 	{
@@ -783,22 +786,18 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraLand(item, coll))
 	{
 		if (item->HitPoints <= 0)
-			item->TargetState = LS_DEATH; //
+			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
 		// TODO: Landing on edge of crawlspace.
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->Animations.CrawlspaceSwandive)
 		{
-			SetAnimation(item, LA_SPRINT_TO_CROUCH_LEFT, 10);
-			//item->goalAnimState = LS_CROUCH_IDLE;
+			item->TargetState = LS_CROUCH_IDLE;
 			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f));
 		}
 		else [[likely]]
-		{
-			SetAnimation(item, LA_SWANDIVE_ROLL);
-			//item->goalAnimState = LS_IDLE;
-		}
+			item->TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
 		lara->Control.HandStatus = HandStatus::Free;
