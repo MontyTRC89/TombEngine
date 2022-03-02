@@ -34,7 +34,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.SlideExtended)
+		/*if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			if (TrInput & IN_LEFT)
 			{
@@ -132,7 +132,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.SlideExtended)
+		/*if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			if (TrInput & IN_LEFT)
 			{

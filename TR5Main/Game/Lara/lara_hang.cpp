@@ -35,7 +35,6 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollProbeMode::FreeFlat;
-
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 

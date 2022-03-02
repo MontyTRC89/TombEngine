@@ -282,11 +282,11 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int distance;
 		if (item->Position.yRot == barItem->Position.yRot)
-			distance = barItem->TriggerFlags / 100 - 2;
+			distance = (barItem->TriggerFlags / 100) - 2;
 		else
-			distance = barItem->TriggerFlags % 100 - 2;
+			distance = (barItem->TriggerFlags % 100) - 2;
 
-		item->Velocity = 20 * distance + 58;
+		item->Velocity = (20 * distance) + 58;
 		item->VerticalVelocity = -(20 * distance + 64);
 	}
 

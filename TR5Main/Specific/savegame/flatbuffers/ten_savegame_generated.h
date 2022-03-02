@@ -33,13 +33,13 @@ struct CarriedWeaponInfo;
 struct CarriedWeaponInfoBuilder;
 struct CarriedWeaponInfoT;
 
-struct FlareData;
-struct FlareDataBuilder;
-struct FlareDataT;
-
 struct ArmInfo;
 struct ArmInfoBuilder;
 struct ArmInfoT;
+
+struct FlareData;
+struct FlareDataBuilder;
+struct FlareDataT;
 
 struct WeaponControlData;
 struct WeaponControlDataBuilder;
@@ -52,6 +52,10 @@ struct RopeControlDataT;
 struct TightropeControlData;
 struct TightropeControlDataBuilder;
 struct TightropeControlDataT;
+
+struct SubsuitControlData;
+struct SubsuitControlDataBuilder;
+struct SubsuitControlDataT;
 
 struct LaraCountData;
 struct LaraCountDataBuilder;
@@ -1169,86 +1173,6 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfoDirect(
 
 flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const CarriedWeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct FlareDataT : public flatbuffers::NativeTable {
-  typedef FlareData TableType;
-  uint32_t life = 0;
-  int32_t frame = 0;
-  bool control_left = false;
-};
-
-struct FlareData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FlareDataT NativeTableType;
-  typedef FlareDataBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_LIFE = 4,
-    VT_FRAME = 6,
-    VT_CONTROL_LEFT = 8
-  };
-  uint32_t life() const {
-    return GetField<uint32_t>(VT_LIFE, 0);
-  }
-  int32_t frame() const {
-    return GetField<int32_t>(VT_FRAME, 0);
-  }
-  bool control_left() const {
-    return GetField<uint8_t>(VT_CONTROL_LEFT, 0) != 0;
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_LIFE) &&
-           VerifyField<int32_t>(verifier, VT_FRAME) &&
-           VerifyField<uint8_t>(verifier, VT_CONTROL_LEFT) &&
-           verifier.EndTable();
-  }
-  FlareDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(FlareDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<FlareData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct FlareDataBuilder {
-  typedef FlareData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_life(uint32_t life) {
-    fbb_.AddElement<uint32_t>(FlareData::VT_LIFE, life, 0);
-  }
-  void add_frame(int32_t frame) {
-    fbb_.AddElement<int32_t>(FlareData::VT_FRAME, frame, 0);
-  }
-  void add_control_left(bool control_left) {
-    fbb_.AddElement<uint8_t>(FlareData::VT_CONTROL_LEFT, static_cast<uint8_t>(control_left), 0);
-  }
-  explicit FlareDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<FlareData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<FlareData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<FlareData> CreateFlareData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t life = 0,
-    int32_t frame = 0,
-    bool control_left = false) {
-  FlareDataBuilder builder_(_fbb);
-  builder_.add_frame(frame);
-  builder_.add_life(life);
-  builder_.add_control_left(control_left);
-  return builder_.Finish();
-}
-
-struct FlareData::Traits {
-  using type = FlareData;
-  static auto constexpr Create = CreateFlareData;
-};
-
-flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct ArmInfoT : public flatbuffers::NativeTable {
   typedef ArmInfo TableType;
   int32_t anim_number = 0;
@@ -1361,6 +1285,86 @@ struct ArmInfo::Traits {
 };
 
 flatbuffers::Offset<ArmInfo> CreateArmInfo(flatbuffers::FlatBufferBuilder &_fbb, const ArmInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FlareDataT : public flatbuffers::NativeTable {
+  typedef FlareData TableType;
+  uint32_t life = 0;
+  int32_t frame = 0;
+  bool control_left = false;
+};
+
+struct FlareData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FlareDataT NativeTableType;
+  typedef FlareDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LIFE = 4,
+    VT_FRAME = 6,
+    VT_CONTROL_LEFT = 8
+  };
+  uint32_t life() const {
+    return GetField<uint32_t>(VT_LIFE, 0);
+  }
+  int32_t frame() const {
+    return GetField<int32_t>(VT_FRAME, 0);
+  }
+  bool control_left() const {
+    return GetField<uint8_t>(VT_CONTROL_LEFT, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_FRAME) &&
+           VerifyField<uint8_t>(verifier, VT_CONTROL_LEFT) &&
+           verifier.EndTable();
+  }
+  FlareDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FlareDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FlareData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FlareDataBuilder {
+  typedef FlareData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_life(uint32_t life) {
+    fbb_.AddElement<uint32_t>(FlareData::VT_LIFE, life, 0);
+  }
+  void add_frame(int32_t frame) {
+    fbb_.AddElement<int32_t>(FlareData::VT_FRAME, frame, 0);
+  }
+  void add_control_left(bool control_left) {
+    fbb_.AddElement<uint8_t>(FlareData::VT_CONTROL_LEFT, static_cast<uint8_t>(control_left), 0);
+  }
+  explicit FlareDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<FlareData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FlareData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FlareData> CreateFlareData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t life = 0,
+    int32_t frame = 0,
+    bool control_left = false) {
+  FlareDataBuilder builder_(_fbb);
+  builder_.add_frame(frame);
+  builder_.add_life(life);
+  builder_.add_control_left(control_left);
+  return builder_.Finish();
+}
+
+struct FlareData::Traits {
+  using type = FlareData;
+  static auto constexpr Create = CreateFlareData;
+};
+
+flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct WeaponControlDataT : public flatbuffers::NativeTable {
   typedef WeaponControlData TableType;
@@ -1801,6 +1805,139 @@ struct TightropeControlData::Traits {
 
 flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SubsuitControlDataT : public flatbuffers::NativeTable {
+  typedef SubsuitControlData TableType;
+  int32_t x_rot = 0;
+  int32_t d_x_rot = 0;
+  std::vector<int32_t> velocity{};
+  int32_t vertical_velocity = 0;
+  int32_t x_rot_vel = 0;
+  uint32_t hit_count = 0;
+};
+
+struct SubsuitControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SubsuitControlDataT NativeTableType;
+  typedef SubsuitControlDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_X_ROT = 4,
+    VT_D_X_ROT = 6,
+    VT_VELOCITY = 8,
+    VT_VERTICAL_VELOCITY = 10,
+    VT_X_ROT_VEL = 12,
+    VT_HIT_COUNT = 14
+  };
+  int32_t x_rot() const {
+    return GetField<int32_t>(VT_X_ROT, 0);
+  }
+  int32_t d_x_rot() const {
+    return GetField<int32_t>(VT_D_X_ROT, 0);
+  }
+  const flatbuffers::Vector<int32_t> *velocity() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_VELOCITY);
+  }
+  int32_t vertical_velocity() const {
+    return GetField<int32_t>(VT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t x_rot_vel() const {
+    return GetField<int32_t>(VT_X_ROT_VEL, 0);
+  }
+  uint32_t hit_count() const {
+    return GetField<uint32_t>(VT_HIT_COUNT, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_X_ROT) &&
+           VerifyField<int32_t>(verifier, VT_D_X_ROT) &&
+           VerifyOffset(verifier, VT_VELOCITY) &&
+           verifier.VerifyVector(velocity()) &&
+           VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_X_ROT_VEL) &&
+           VerifyField<uint32_t>(verifier, VT_HIT_COUNT) &&
+           verifier.EndTable();
+  }
+  SubsuitControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SubsuitControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<SubsuitControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SubsuitControlDataBuilder {
+  typedef SubsuitControlData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_x_rot(int32_t x_rot) {
+    fbb_.AddElement<int32_t>(SubsuitControlData::VT_X_ROT, x_rot, 0);
+  }
+  void add_d_x_rot(int32_t d_x_rot) {
+    fbb_.AddElement<int32_t>(SubsuitControlData::VT_D_X_ROT, d_x_rot, 0);
+  }
+  void add_velocity(flatbuffers::Offset<flatbuffers::Vector<int32_t>> velocity) {
+    fbb_.AddOffset(SubsuitControlData::VT_VELOCITY, velocity);
+  }
+  void add_vertical_velocity(int32_t vertical_velocity) {
+    fbb_.AddElement<int32_t>(SubsuitControlData::VT_VERTICAL_VELOCITY, vertical_velocity, 0);
+  }
+  void add_x_rot_vel(int32_t x_rot_vel) {
+    fbb_.AddElement<int32_t>(SubsuitControlData::VT_X_ROT_VEL, x_rot_vel, 0);
+  }
+  void add_hit_count(uint32_t hit_count) {
+    fbb_.AddElement<uint32_t>(SubsuitControlData::VT_HIT_COUNT, hit_count, 0);
+  }
+  explicit SubsuitControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<SubsuitControlData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<SubsuitControlData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x_rot = 0,
+    int32_t d_x_rot = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> velocity = 0,
+    int32_t vertical_velocity = 0,
+    int32_t x_rot_vel = 0,
+    uint32_t hit_count = 0) {
+  SubsuitControlDataBuilder builder_(_fbb);
+  builder_.add_hit_count(hit_count);
+  builder_.add_x_rot_vel(x_rot_vel);
+  builder_.add_vertical_velocity(vertical_velocity);
+  builder_.add_velocity(velocity);
+  builder_.add_d_x_rot(d_x_rot);
+  builder_.add_x_rot(x_rot);
+  return builder_.Finish();
+}
+
+struct SubsuitControlData::Traits {
+  using type = SubsuitControlData;
+  static auto constexpr Create = CreateSubsuitControlData;
+};
+
+inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlDataDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x_rot = 0,
+    int32_t d_x_rot = 0,
+    const std::vector<int32_t> *velocity = nullptr,
+    int32_t vertical_velocity = 0,
+    int32_t x_rot_vel = 0,
+    uint32_t hit_count = 0) {
+  auto velocity__ = velocity ? _fbb.CreateVector<int32_t>(*velocity) : 0;
+  return TEN::Save::CreateSubsuitControlData(
+      _fbb,
+      x_rot,
+      d_x_rot,
+      velocity__,
+      vertical_velocity,
+      x_rot_vel,
+      hit_count);
+}
+
+flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraCountDataT : public flatbuffers::NativeTable {
   typedef LaraCountData TableType;
   uint32_t run_jump = 0;
@@ -1808,6 +1945,7 @@ struct LaraCountDataT : public flatbuffers::NativeTable {
   uint32_t pose = 0;
   uint32_t dive = 0;
   uint32_t death = 0;
+  uint32_t no_cheat = 0;
 };
 
 struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1819,7 +1957,8 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_POSITION_ADJUST = 6,
     VT_POSE = 8,
     VT_DIVE = 10,
-    VT_DEATH = 12
+    VT_DEATH = 12,
+    VT_NO_CHEAT = 14
   };
   uint32_t run_jump() const {
     return GetField<uint32_t>(VT_RUN_JUMP, 0);
@@ -1836,6 +1975,9 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   uint32_t death() const {
     return GetField<uint32_t>(VT_DEATH, 0);
   }
+  uint32_t no_cheat() const {
+    return GetField<uint32_t>(VT_NO_CHEAT, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_RUN_JUMP) &&
@@ -1843,6 +1985,7 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_POSE) &&
            VerifyField<uint32_t>(verifier, VT_DIVE) &&
            VerifyField<uint32_t>(verifier, VT_DEATH) &&
+           VerifyField<uint32_t>(verifier, VT_NO_CHEAT) &&
            verifier.EndTable();
   }
   LaraCountDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1869,6 +2012,9 @@ struct LaraCountDataBuilder {
   void add_death(uint32_t death) {
     fbb_.AddElement<uint32_t>(LaraCountData::VT_DEATH, death, 0);
   }
+  void add_no_cheat(uint32_t no_cheat) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_NO_CHEAT, no_cheat, 0);
+  }
   explicit LaraCountDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1886,8 +2032,10 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(
     uint32_t position_adjust = 0,
     uint32_t pose = 0,
     uint32_t dive = 0,
-    uint32_t death = 0) {
+    uint32_t death = 0,
+    uint32_t no_cheat = 0) {
   LaraCountDataBuilder builder_(_fbb);
+  builder_.add_no_cheat(no_cheat);
   builder_.add_death(death);
   builder_.add_dive(dive);
   builder_.add_pose(pose);
@@ -1914,6 +2062,7 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::WeaponControlDataT> weapon_control{};
   std::unique_ptr<TEN::Save::RopeControlDataT> rope_control{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope_control{};
+  std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit_control{};
   bool can_look = false;
   bool is_moving = false;
   bool keep_low = false;
@@ -1941,17 +2090,18 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WEAPON_CONTROL = 16,
     VT_ROPE_CONTROL = 18,
     VT_TIGHTROPE_CONTROL = 20,
-    VT_CAN_LOOK = 22,
-    VT_IS_MOVING = 24,
-    VT_KEEP_LOW = 26,
-    VT_IS_LOW = 28,
-    VT_CAN_CLIMB_LADDER = 30,
-    VT_IS_CLIMBING_LADDER = 32,
-    VT_CAN_MONKEY_SWING = 34,
-    VT_RUN_JUMP_QUEUED = 36,
-    VT_WATER_CURRENT_ACTIVE = 38,
-    VT_LOCKED = 40,
-    VT_COUNT = 42
+    VT_SUBSUIT_CONTROL = 22,
+    VT_CAN_LOOK = 24,
+    VT_IS_MOVING = 26,
+    VT_KEEP_LOW = 28,
+    VT_IS_LOW = 30,
+    VT_CAN_CLIMB_LADDER = 32,
+    VT_IS_CLIMBING_LADDER = 34,
+    VT_CAN_MONKEY_SWING = 36,
+    VT_RUN_JUMP_QUEUED = 38,
+    VT_WATER_CURRENT_ACTIVE = 40,
+    VT_LOCKED = 42,
+    VT_COUNT = 44
   };
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
@@ -1979,6 +2129,9 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::TightropeControlData *tightrope_control() const {
     return GetPointer<const TEN::Save::TightropeControlData *>(VT_TIGHTROPE_CONTROL);
+  }
+  const TEN::Save::SubsuitControlData *subsuit_control() const {
+    return GetPointer<const TEN::Save::SubsuitControlData *>(VT_SUBSUIT_CONTROL);
   }
   bool can_look() const {
     return GetField<uint8_t>(VT_CAN_LOOK, 0) != 0;
@@ -2027,6 +2180,8 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(rope_control()) &&
            VerifyOffset(verifier, VT_TIGHTROPE_CONTROL) &&
            verifier.VerifyTable(tightrope_control()) &&
+           VerifyOffset(verifier, VT_SUBSUIT_CONTROL) &&
+           verifier.VerifyTable(subsuit_control()) &&
            VerifyField<uint8_t>(verifier, VT_CAN_LOOK) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOVING) &&
            VerifyField<uint8_t>(verifier, VT_KEEP_LOW) &&
@@ -2076,6 +2231,9 @@ struct LaraControlDataBuilder {
   }
   void add_tightrope_control(flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope_control) {
     fbb_.AddOffset(LaraControlData::VT_TIGHTROPE_CONTROL, tightrope_control);
+  }
+  void add_subsuit_control(flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit_control) {
+    fbb_.AddOffset(LaraControlData::VT_SUBSUIT_CONTROL, subsuit_control);
   }
   void add_can_look(bool can_look) {
     fbb_.AddElement<uint8_t>(LaraControlData::VT_CAN_LOOK, static_cast<uint8_t>(can_look), 0);
@@ -2132,6 +2290,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     flatbuffers::Offset<TEN::Save::WeaponControlData> weapon_control = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope_control = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope_control = 0,
+    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit_control = 0,
     bool can_look = false,
     bool is_moving = false,
     bool keep_low = false,
@@ -2146,6 +2305,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   LaraControlDataBuilder builder_(_fbb);
   builder_.add_count(count);
   builder_.add_water_current_active(water_current_active);
+  builder_.add_subsuit_control(subsuit_control);
   builder_.add_tightrope_control(tightrope_control);
   builder_.add_rope_control(rope_control);
   builder_.add_weapon_control(weapon_control);
@@ -2181,6 +2341,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t velocity = 0;
   int32_t vertical_velocity = 0;
   int32_t projected_floor_height = 0;
+  int32_t target_angle = 0;
   int32_t water_status = 0;
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
@@ -2252,65 +2413,66 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_VELOCITY = 8,
     VT_VERTICAL_VELOCITY = 10,
     VT_PROJECTED_FLOOR_HEIGHT = 12,
-    VT_WATER_STATUS = 14,
-    VT_CONTROL = 16,
-    VT_EXTRA_HEAD_ROT = 18,
-    VT_EXTRA_TORSO_ROT = 20,
-    VT_EXTRA_VELOCITY = 22,
-    VT_HIT_FRAME = 24,
-    VT_HIT_DIRECTION = 26,
-    VT_AIR = 28,
-    VT_SPRINT_ENERGY = 30,
-    VT_SPASM_EFFECT_COUNT = 32,
-    VT_FLARE = 34,
-    VT_BURN_TYPE = 36,
-    VT_BURN = 38,
-    VT_BURN_BLUE = 40,
-    VT_BURN_SMOKE = 42,
-    VT_BURN_COUNT = 44,
-    VT_POISONED = 46,
-    VT_WET = 48,
-    VT_LIT_TORCH = 50,
-    VT_WATER_SURFACE_DIST = 52,
-    VT_NEXT_CORNER_POSITION = 54,
-    VT_NEXT_CORNER_ROTATION = 56,
-    VT_MESH_PTRS = 58,
-    VT_TARGET_ANGLES = 60,
-    VT_LEFT_ARM = 62,
-    VT_RIGHT_ARM = 64,
-    VT_INTERACTED_ITEM = 66,
-    VT_LOCATION = 68,
-    VT_HIGHEST_LOCATION = 70,
-    VT_LOCATION_PAD = 72,
-    VT_IS_BUSY = 74,
-    VT_OLD_BUSY = 76,
-    VT_BEETLE_LIFE = 78,
-    VT_HAS_BEETLE_THINGS = 80,
-    VT_SMALL_WATERSKIN = 82,
-    VT_BIG_WATERSKIN = 84,
-    VT_VEHICLE = 86,
-    VT_EXTRA_ANIM = 88,
-    VT_MINE_L = 90,
-    VT_MINE_R = 92,
-    VT_WEAPONS = 94,
-    VT_PUZZLES = 96,
-    VT_KEYS = 98,
-    VT_PICKUPS = 100,
-    VT_EXAMINES = 102,
-    VT_PUZZLES_COMBO = 104,
-    VT_KEYS_COMBO = 106,
-    VT_PICKUPS_COMBO = 108,
-    VT_EXAMINES_COMBO = 110,
-    VT_SECRETS = 112,
-    VT_LASERSIGHT = 114,
-    VT_CROWBAR = 116,
-    VT_TORCH = 118,
-    VT_SILENCER = 120,
-    VT_BINOCULARS = 122,
-    VT_NUM_LARGE_MEDIPACKS = 124,
-    VT_NUM_SMALL_MEDIPACKS = 126,
-    VT_NUM_FLARES = 128,
-    VT_TARGET_ITEM_NUMBER = 130
+    VT_TARGET_ANGLE = 14,
+    VT_WATER_STATUS = 16,
+    VT_CONTROL = 18,
+    VT_EXTRA_HEAD_ROT = 20,
+    VT_EXTRA_TORSO_ROT = 22,
+    VT_EXTRA_VELOCITY = 24,
+    VT_HIT_FRAME = 26,
+    VT_HIT_DIRECTION = 28,
+    VT_AIR = 30,
+    VT_SPRINT_ENERGY = 32,
+    VT_SPASM_EFFECT_COUNT = 34,
+    VT_FLARE = 36,
+    VT_BURN_TYPE = 38,
+    VT_BURN = 40,
+    VT_BURN_BLUE = 42,
+    VT_BURN_SMOKE = 44,
+    VT_BURN_COUNT = 46,
+    VT_POISONED = 48,
+    VT_WET = 50,
+    VT_LIT_TORCH = 52,
+    VT_WATER_SURFACE_DIST = 54,
+    VT_NEXT_CORNER_POSITION = 56,
+    VT_NEXT_CORNER_ROTATION = 58,
+    VT_MESH_PTRS = 60,
+    VT_TARGET_ANGLES = 62,
+    VT_LEFT_ARM = 64,
+    VT_RIGHT_ARM = 66,
+    VT_INTERACTED_ITEM = 68,
+    VT_LOCATION = 70,
+    VT_HIGHEST_LOCATION = 72,
+    VT_LOCATION_PAD = 74,
+    VT_IS_BUSY = 76,
+    VT_OLD_BUSY = 78,
+    VT_BEETLE_LIFE = 80,
+    VT_HAS_BEETLE_THINGS = 82,
+    VT_SMALL_WATERSKIN = 84,
+    VT_BIG_WATERSKIN = 86,
+    VT_VEHICLE = 88,
+    VT_EXTRA_ANIM = 90,
+    VT_MINE_L = 92,
+    VT_MINE_R = 94,
+    VT_WEAPONS = 96,
+    VT_PUZZLES = 98,
+    VT_KEYS = 100,
+    VT_PICKUPS = 102,
+    VT_EXAMINES = 104,
+    VT_PUZZLES_COMBO = 106,
+    VT_KEYS_COMBO = 108,
+    VT_PICKUPS_COMBO = 110,
+    VT_EXAMINES_COMBO = 112,
+    VT_SECRETS = 114,
+    VT_LASERSIGHT = 116,
+    VT_CROWBAR = 118,
+    VT_TORCH = 120,
+    VT_SILENCER = 122,
+    VT_BINOCULARS = 124,
+    VT_NUM_LARGE_MEDIPACKS = 126,
+    VT_NUM_SMALL_MEDIPACKS = 128,
+    VT_NUM_FLARES = 130,
+    VT_TARGET_ITEM_NUMBER = 132
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -2326,6 +2488,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t projected_floor_height() const {
     return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
+  }
+  int32_t target_angle() const {
+    return GetField<int32_t>(VT_TARGET_ANGLE, 0);
   }
   int32_t water_status() const {
     return GetField<int32_t>(VT_WATER_STATUS, 0);
@@ -2511,6 +2676,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_ANGLE) &&
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyOffset(verifier, VT_CONTROL) &&
            verifier.VerifyTable(control()) &&
@@ -2612,6 +2778,9 @@ struct LaraBuilder {
   }
   void add_projected_floor_height(int32_t projected_floor_height) {
     fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
+  }
+  void add_target_angle(int32_t target_angle) {
+    fbb_.AddElement<int32_t>(Lara::VT_TARGET_ANGLE, target_angle, 0);
   }
   void add_water_status(int32_t water_status) {
     fbb_.AddElement<int32_t>(Lara::VT_WATER_STATUS, water_status, 0);
@@ -2808,6 +2977,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t velocity = 0,
     int32_t vertical_velocity = 0,
     int32_t projected_floor_height = 0,
+    int32_t target_angle = 0,
     int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
@@ -2915,6 +3085,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_control(control);
   builder_.add_water_status(water_status);
+  builder_.add_target_angle(target_angle);
   builder_.add_projected_floor_height(projected_floor_height);
   builder_.add_vertical_velocity(vertical_velocity);
   builder_.add_velocity(velocity);
@@ -2947,6 +3118,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t velocity = 0,
     int32_t vertical_velocity = 0,
     int32_t projected_floor_height = 0,
+    int32_t target_angle = 0,
     int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
@@ -3025,6 +3197,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       velocity,
       vertical_velocity,
       projected_floor_height,
+      target_angle,
       water_status,
       control,
       extra_head_rot,
@@ -5169,38 +5342,6 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffer
       _has_silencer);
 }
 
-inline FlareDataT *FlareData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<FlareDataT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void FlareData::UnPackTo(FlareDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = life(); _o->life = _e; }
-  { auto _e = frame(); _o->frame = _e; }
-  { auto _e = control_left(); _o->control_left = _e; }
-}
-
-inline flatbuffers::Offset<FlareData> FlareData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateFlareData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FlareDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _life = _o->life;
-  auto _frame = _o->frame;
-  auto _control_left = _o->control_left;
-  return TEN::Save::CreateFlareData(
-      _fbb,
-      _life,
-      _frame,
-      _control_left);
-}
-
 inline ArmInfoT *ArmInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<ArmInfoT>();
   UnPackTo(_o.get(), _resolver);
@@ -5240,6 +5381,38 @@ inline flatbuffers::Offset<ArmInfo> CreateArmInfo(flatbuffers::FlatBufferBuilder
       _locked,
       _rotation,
       _flash_gun);
+}
+
+inline FlareDataT *FlareData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FlareDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FlareData::UnPackTo(FlareDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = frame(); _o->frame = _e; }
+  { auto _e = control_left(); _o->control_left = _e; }
+}
+
+inline flatbuffers::Offset<FlareData> FlareData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFlareData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FlareDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _life = _o->life;
+  auto _frame = _o->frame;
+  auto _control_left = _o->control_left;
+  return TEN::Save::CreateFlareData(
+      _fbb,
+      _life,
+      _frame,
+      _control_left);
 }
 
 inline WeaponControlDataT *WeaponControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5392,6 +5565,47 @@ inline flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flat
       _tightrope_item);
 }
 
+inline SubsuitControlDataT *SubsuitControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<SubsuitControlDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SubsuitControlData::UnPackTo(SubsuitControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x_rot(); _o->x_rot = _e; }
+  { auto _e = d_x_rot(); _o->d_x_rot = _e; }
+  { auto _e = velocity(); if (_e) { _o->velocity.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->velocity[_i] = _e->Get(_i); } } }
+  { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
+  { auto _e = x_rot_vel(); _o->x_rot_vel = _e; }
+  { auto _e = hit_count(); _o->hit_count = _e; }
+}
+
+inline flatbuffers::Offset<SubsuitControlData> SubsuitControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSubsuitControlData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SubsuitControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x_rot = _o->x_rot;
+  auto _d_x_rot = _o->d_x_rot;
+  auto _velocity = _fbb.CreateVector(_o->velocity);
+  auto _vertical_velocity = _o->vertical_velocity;
+  auto _x_rot_vel = _o->x_rot_vel;
+  auto _hit_count = _o->hit_count;
+  return TEN::Save::CreateSubsuitControlData(
+      _fbb,
+      _x_rot,
+      _d_x_rot,
+      _velocity,
+      _vertical_velocity,
+      _x_rot_vel,
+      _hit_count);
+}
+
 inline LaraCountDataT *LaraCountData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraCountDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -5406,6 +5620,7 @@ inline void LaraCountData::UnPackTo(LaraCountDataT *_o, const flatbuffers::resol
   { auto _e = pose(); _o->pose = _e; }
   { auto _e = dive(); _o->dive = _e; }
   { auto _e = death(); _o->death = _e; }
+  { auto _e = no_cheat(); _o->no_cheat = _e; }
 }
 
 inline flatbuffers::Offset<LaraCountData> LaraCountData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5421,13 +5636,15 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatB
   auto _pose = _o->pose;
   auto _dive = _o->dive;
   auto _death = _o->death;
+  auto _no_cheat = _o->no_cheat;
   return TEN::Save::CreateLaraCountData(
       _fbb,
       _run_jump,
       _position_adjust,
       _pose,
       _dive,
-      _death);
+      _death,
+      _no_cheat);
 }
 
 inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5448,6 +5665,7 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = weapon_control(); if (_e) _o->weapon_control = std::unique_ptr<TEN::Save::WeaponControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = rope_control(); if (_e) _o->rope_control = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope_control(); if (_e) _o->tightrope_control = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = subsuit_control(); if (_e) _o->subsuit_control = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = can_look(); _o->can_look = _e; }
   { auto _e = is_moving(); _o->is_moving = _e; }
   { auto _e = keep_low(); _o->keep_low = _e; }
@@ -5478,6 +5696,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _weapon_control = _o->weapon_control ? CreateWeaponControlData(_fbb, _o->weapon_control.get(), _rehasher) : 0;
   auto _rope_control = _o->rope_control ? CreateRopeControlData(_fbb, _o->rope_control.get(), _rehasher) : 0;
   auto _tightrope_control = _o->tightrope_control ? CreateTightropeControlData(_fbb, _o->tightrope_control.get(), _rehasher) : 0;
+  auto _subsuit_control = _o->subsuit_control ? CreateSubsuitControlData(_fbb, _o->subsuit_control.get(), _rehasher) : 0;
   auto _can_look = _o->can_look;
   auto _is_moving = _o->is_moving;
   auto _keep_low = _o->keep_low;
@@ -5500,6 +5719,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _weapon_control,
       _rope_control,
       _tightrope_control,
+      _subsuit_control,
       _can_look,
       _is_moving,
       _keep_low,
@@ -5527,6 +5747,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = velocity(); _o->velocity = _e; }
   { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
   { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
+  { auto _e = target_angle(); _o->target_angle = _e; }
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
@@ -5601,6 +5822,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _velocity = _o->velocity;
   auto _vertical_velocity = _o->vertical_velocity;
   auto _projected_floor_height = _o->projected_floor_height;
+  auto _target_angle = _o->target_angle;
   auto _water_status = _o->water_status;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
@@ -5667,6 +5889,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _velocity,
       _vertical_velocity,
       _projected_floor_height,
+      _target_angle,
       _water_status,
       _control,
       _extra_head_rot,
