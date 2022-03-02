@@ -68,8 +68,8 @@ public:
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name) override;
 
-	void								GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) override;
-	void								SetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) override;
+	void								GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const override;
+	void								SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) override;
 	void								ResetVariables();
 
 	void								InitCallbacks() override;

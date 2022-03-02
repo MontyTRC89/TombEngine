@@ -32,11 +32,8 @@ public:
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
 	virtual void ExecuteFunction(std::string const& luaFileName) = 0;
 
-	//todo make this const correct
-	virtual void SetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) = 0;
-
-	//todo make this const correct
-	virtual void GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) = 0;
+	virtual void SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) = 0;
+	virtual void GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;
