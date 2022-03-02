@@ -200,6 +200,11 @@ bool SaveGame::Save(int slot)
 	laraTargetAngles.push_back(Lara.targetAngles[1]);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
+	std::vector<int> subsuitVelocity{};
+	subsuitVelocity.push_back(Lara.Control.SubsuitControl.Velocity[0]);
+	subsuitVelocity.push_back(Lara.Control.SubsuitControl.Velocity[1]);
+	auto subsuitVelocityOffset = fbb.CreateVector(subsuitVelocity);
+
 	Save::HolsterInfoBuilder holsterInfo{ fbb };
 	holsterInfo.add_back_holster((int)Lara.Control.WeaponControl.HolsterInfo.BackHolster);
 	holsterInfo.add_left_holster((int)Lara.Control.WeaponControl.HolsterInfo.LeftHolster);
@@ -248,12 +253,22 @@ bool SaveGame::Save(int slot)
 	tightropeControl.add_time_on_tightrope(Lara.Control.TightropeControl.TimeOnTightrope);
 	auto tightropeControlOffset = tightropeControl.Finish();
 
+	Save::SubsuitControlDataBuilder subsuitControl{ fbb };
+	subsuitControl.add_x_rot(Lara.Control.SubsuitControl.XRot);
+	subsuitControl.add_d_x_rot(Lara.Control.SubsuitControl.DXRot);
+	subsuitControl.add_velocity(subsuitVelocityOffset);
+	subsuitControl.add_vertical_velocity(Lara.Control.SubsuitControl.VerticalVelocity);
+	subsuitControl.add_x_rot_vel(Lara.Control.SubsuitControl.XRotVel);
+	subsuitControl.add_hit_count(Lara.Control.SubsuitControl.HitCount);
+	auto subsuitControlOffset = subsuitControl.Finish();
+
 	Save::LaraCountDataBuilder count{ fbb };
-	count.add_run_jump(Lara.Control.Count.RunJump);
-	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
-	count.add_pose(Lara.Control.Count.Pose);
-	count.add_dive(Lara.Control.Count.Dive);
 	count.add_death(Lara.Control.Count.Death);
+	count.add_dive(Lara.Control.Count.Dive);
+	count.add_no_cheat(Lara.Control.Count.NoCheat);
+	count.add_pose(Lara.Control.Count.Pose);
+	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
+	count.add_run_jump(Lara.Control.Count.RunJump);
 	auto countOffset = count.Finish();
 
 	Save::LaraControlDataBuilder control{ fbb };
@@ -276,8 +291,8 @@ bool SaveGame::Save(int slot)
 	control.add_water_current_active(Lara.Control.WaterCurrentActive);
 	control.add_weapon_control(weaponControlOffset);
 	control.add_rope_control(ropeControlOffset);
+	control.add_subsuit_control(subsuitControlOffset);
 	control.add_tightrope_control(tightropeControlOffset);
-
 	auto controlOffset = control.Finish();
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
@@ -362,6 +377,7 @@ bool SaveGame::Save(int slot)
 	lara.add_small_waterskin(Lara.smallWaterskin);
 	lara.add_spasm_effect_count(Lara.SpasmEffectCount);
 	lara.add_sprint_energy(Lara.SprintEnergy);
+	lara.add_target_angle(Lara.TargetAngle);
 	lara.add_target_angles(laraTargetAnglesOffset);
 	lara.add_target_item_number(Lara.target - g_Level.Items.data());
 	lara.add_torch(Lara.Torch);
@@ -1186,6 +1202,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.Count.Dive = s->lara()->control()->count()->dive();
+	Lara.Control.Count.NoCheat = s->lara()->control()->count()->no_cheat();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
 	Lara.Control.Count.RunJump = s->lara()->control()->count()->run_jump();
@@ -1283,6 +1300,13 @@ bool SaveGame::Load(int slot)
 	Lara.Control.RopeControl.DownVel = s->lara()->control()->rope_control()->down_vel();
 	Lara.Control.RopeControl.Flag = s->lara()->control()->rope_control()->flag();
 	Lara.Control.RopeControl.Count = s->lara()->control()->rope_control()->count();
+	Lara.Control.SubsuitControl.XRot = s->lara()->control()->subsuit_control()->x_rot();
+	Lara.Control.SubsuitControl.DXRot = s->lara()->control()->subsuit_control()->d_x_rot();
+	Lara.Control.SubsuitControl.Velocity[0] = s->lara()->control()->subsuit_control()->velocity()->Get(0);
+	Lara.Control.SubsuitControl.Velocity[1] = s->lara()->control()->subsuit_control()->velocity()->Get(1);
+	Lara.Control.SubsuitControl.VerticalVelocity = s->lara()->control()->subsuit_control()->vertical_velocity();
+	Lara.Control.SubsuitControl.XRotVel = s->lara()->control()->subsuit_control()->x_rot_vel();
+	Lara.Control.SubsuitControl.HitCount = s->lara()->control()->subsuit_control()->hit_count();
 	Lara.Control.TightropeControl.CanDismount = s->lara()->control()->tightrope_control()->can_dismount();
 	Lara.Control.TightropeControl.TightropeItem = s->lara()->control()->tightrope_control()->tightrope_item();
 	Lara.Control.TightropeControl.TimeOnTightrope = s->lara()->control()->tightrope_control()->time_on_tightrope();
@@ -1292,6 +1316,7 @@ bool SaveGame::Load(int slot)
 	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
+	Lara.TargetAngle = s->lara()->target_angle();
 	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
 	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
 	Lara.Torch = s->lara()->torch();
