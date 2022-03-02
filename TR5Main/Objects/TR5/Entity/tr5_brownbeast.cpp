@@ -115,7 +115,7 @@ void ControlBrowsBeast(short itemNumber)
 			if (distance < pow(SECTOR(1), 2) || info->mood != ATTACK_MOOD)
 				item->TargetState = 1;
 
-			SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Position, 0);
+			SoundEffect(SFX_TR5_IMPBARRELROLL, &item->Position, 0);
 			break;
 
 		case 4:

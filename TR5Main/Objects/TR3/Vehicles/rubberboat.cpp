@@ -1032,9 +1032,9 @@ void RubberBoatControl(short itemNumber)
 	rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
 
 	if (rBoatItem->Velocity > 8)
-		SoundEffect(SFX_TR3_BOAT_MOVING, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_MOVING, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 	else if (drive)
-		SoundEffect(SFX_TR3_BOAT_IDLE, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_IDLE, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 
 	if (lara->Vehicle != itemNumber)
 		return;
