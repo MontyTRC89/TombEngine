@@ -300,7 +300,7 @@ local strings = {
 		""
 	},
 	crossbow_ammo1 = {
-		"Crossbow Normal Ammo",
+		"Crossbow (Normal Ammo)",
 		"",
 		"",
 		"",
@@ -310,7 +310,7 @@ local strings = {
 		""
 	},
 	crossbow_ammo2 = {
-		"Crossbow Poison Ammo",
+		"Crossbow (Poison Ammo)",
 		"",
 		"",
 		"",
@@ -320,7 +320,7 @@ local strings = {
 		""
 	},
 	crossbow_ammo3 = {
-		"Crossbow Explosive Ammo",
+		"Crossbow (Explosive Ammo)",
 		"",
 		"",
 		"",
@@ -490,7 +490,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo1 = {
-		"Grenadegun Normal Ammo",
+		"Grenadegun (Normal Ammo)",
 		"",
 		"",
 		"",
@@ -500,7 +500,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo2 = {
-		"Grenadegun Super Ammo",
+		"Grenadegun (Super Ammo)",
 		"",
 		"",
 		"",
@@ -519,8 +519,8 @@ local strings = {
 		"",
 		""
 	},
-	harpoon = {
-		"Harpoon",
+	HARPOON_ITEM = {
+		"Harpoon Launcher",
 		"",
 		"",
 		"",
@@ -530,7 +530,7 @@ local strings = {
 		""
 	},
 	harpoon_ammo = {
-		"Harpoon Ammo",
+		"Harpoon Launcher Ammo",
 		"",
 		"",
 		"",
@@ -570,7 +570,7 @@ local strings = {
 		""
 	},
 	hk_burst_mode = {
-		"HK Nurst mode",
+		"HK Burst mode",
 		"",
 		"",
 		"",
@@ -600,7 +600,7 @@ local strings = {
 		""
 	},
 	hk_sniper_mode = {
-		"HK Sniper mode",
+		"HK (Sniper mode)",
 		"",
 		"",
 		"",
@@ -819,8 +819,8 @@ local strings = {
 		"",
 		""
 	},
-	separe = {
-		"Separe",
+	separate = {
+		"Separate",
 		"",
 		"",
 		"",
@@ -901,6 +901,16 @@ local strings = {
 	},
 	special_sound_fx = {
 		"Special Sound FX",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+SILENCER_ITEM = {
+	"Silencer",
 		"",
 		"",
 		"",
