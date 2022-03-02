@@ -346,7 +346,7 @@ write:
 
 And in the script file for the level with the boss, you could write:
 
-	if GameVars.playerSnoopedInDraws then
+	if GameVars.playerSnoopedInDrawers then
 		PlayAudioTrack("how_dare_you.wav")
 	end
 
