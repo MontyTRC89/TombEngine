@@ -1125,7 +1125,6 @@ struct TightropeControlData
 #endif
 };
 
-// TODO: Savegame
 struct SubsuitControlData
 {
 	short XRot;

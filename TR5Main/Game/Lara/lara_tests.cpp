@@ -2405,6 +2405,21 @@ bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	auto probe = GetCollisionResult(item);
+
+	if (probe.Position.Floor == item->Position.yPos &&
+		lara->Control.TightropeControl.CanDismount)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset)
 {
 	static constexpr auto poleProbeCollRadius = 16.0f;
