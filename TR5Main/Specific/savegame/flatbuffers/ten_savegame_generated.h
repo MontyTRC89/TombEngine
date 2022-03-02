@@ -85,6 +85,18 @@ struct Pendulum;
 struct PendulumBuilder;
 struct PendulumT;
 
+struct ScriptNumber;
+struct ScriptNumberBuilder;
+struct ScriptNumberT;
+
+struct ScriptBool;
+struct ScriptBoolBuilder;
+struct ScriptBoolT;
+
+struct ScriptString;
+struct ScriptStringBuilder;
+struct ScriptStringT;
+
 struct SaveGameHeader;
 struct SaveGameHeaderBuilder;
 struct SaveGameHeaderT;
@@ -4013,6 +4025,251 @@ struct Pendulum::Traits {
 
 flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fbb, const PendulumT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct ScriptNumberT : public flatbuffers::NativeTable {
+  typedef ScriptNumber TableType;
+  std::string key{};
+  double value = 0.0;
+};
+
+struct ScriptNumber FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ScriptNumberT NativeTableType;
+  typedef ScriptNumberBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_KEY = 4,
+    VT_VALUE = 6
+  };
+  const flatbuffers::String *key() const {
+    return GetPointer<const flatbuffers::String *>(VT_KEY);
+  }
+  double value() const {
+    return GetField<double>(VT_VALUE, 0.0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_KEY) &&
+           verifier.VerifyString(key()) &&
+           VerifyField<double>(verifier, VT_VALUE) &&
+           verifier.EndTable();
+  }
+  ScriptNumberT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ScriptNumberT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ScriptNumber> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptNumberT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ScriptNumberBuilder {
+  typedef ScriptNumber Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_key(flatbuffers::Offset<flatbuffers::String> key) {
+    fbb_.AddOffset(ScriptNumber::VT_KEY, key);
+  }
+  void add_value(double value) {
+    fbb_.AddElement<double>(ScriptNumber::VT_VALUE, value, 0.0);
+  }
+  explicit ScriptNumberBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ScriptNumber> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ScriptNumber>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ScriptNumber> CreateScriptNumber(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> key = 0,
+    double value = 0.0) {
+  ScriptNumberBuilder builder_(_fbb);
+  builder_.add_value(value);
+  builder_.add_key(key);
+  return builder_.Finish();
+}
+
+struct ScriptNumber::Traits {
+  using type = ScriptNumber;
+  static auto constexpr Create = CreateScriptNumber;
+};
+
+inline flatbuffers::Offset<ScriptNumber> CreateScriptNumberDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *key = nullptr,
+    double value = 0.0) {
+  auto key__ = key ? _fbb.CreateString(key) : 0;
+  return TEN::Save::CreateScriptNumber(
+      _fbb,
+      key__,
+      value);
+}
+
+flatbuffers::Offset<ScriptNumber> CreateScriptNumber(flatbuffers::FlatBufferBuilder &_fbb, const ScriptNumberT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ScriptBoolT : public flatbuffers::NativeTable {
+  typedef ScriptBool TableType;
+  std::string key{};
+  bool value = false;
+};
+
+struct ScriptBool FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ScriptBoolT NativeTableType;
+  typedef ScriptBoolBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_KEY = 4,
+    VT_VALUE = 6
+  };
+  const flatbuffers::String *key() const {
+    return GetPointer<const flatbuffers::String *>(VT_KEY);
+  }
+  bool value() const {
+    return GetField<uint8_t>(VT_VALUE, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_KEY) &&
+           verifier.VerifyString(key()) &&
+           VerifyField<uint8_t>(verifier, VT_VALUE) &&
+           verifier.EndTable();
+  }
+  ScriptBoolT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ScriptBoolT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ScriptBool> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptBoolT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ScriptBoolBuilder {
+  typedef ScriptBool Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_key(flatbuffers::Offset<flatbuffers::String> key) {
+    fbb_.AddOffset(ScriptBool::VT_KEY, key);
+  }
+  void add_value(bool value) {
+    fbb_.AddElement<uint8_t>(ScriptBool::VT_VALUE, static_cast<uint8_t>(value), 0);
+  }
+  explicit ScriptBoolBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ScriptBool> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ScriptBool>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ScriptBool> CreateScriptBool(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> key = 0,
+    bool value = false) {
+  ScriptBoolBuilder builder_(_fbb);
+  builder_.add_key(key);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+struct ScriptBool::Traits {
+  using type = ScriptBool;
+  static auto constexpr Create = CreateScriptBool;
+};
+
+inline flatbuffers::Offset<ScriptBool> CreateScriptBoolDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *key = nullptr,
+    bool value = false) {
+  auto key__ = key ? _fbb.CreateString(key) : 0;
+  return TEN::Save::CreateScriptBool(
+      _fbb,
+      key__,
+      value);
+}
+
+flatbuffers::Offset<ScriptBool> CreateScriptBool(flatbuffers::FlatBufferBuilder &_fbb, const ScriptBoolT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ScriptStringT : public flatbuffers::NativeTable {
+  typedef ScriptString TableType;
+  std::string key{};
+  std::string value{};
+};
+
+struct ScriptString FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ScriptStringT NativeTableType;
+  typedef ScriptStringBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_KEY = 4,
+    VT_VALUE = 6
+  };
+  const flatbuffers::String *key() const {
+    return GetPointer<const flatbuffers::String *>(VT_KEY);
+  }
+  const flatbuffers::String *value() const {
+    return GetPointer<const flatbuffers::String *>(VT_VALUE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_KEY) &&
+           verifier.VerifyString(key()) &&
+           VerifyOffset(verifier, VT_VALUE) &&
+           verifier.VerifyString(value()) &&
+           verifier.EndTable();
+  }
+  ScriptStringT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ScriptStringT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ScriptString> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptStringT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ScriptStringBuilder {
+  typedef ScriptString Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_key(flatbuffers::Offset<flatbuffers::String> key) {
+    fbb_.AddOffset(ScriptString::VT_KEY, key);
+  }
+  void add_value(flatbuffers::Offset<flatbuffers::String> value) {
+    fbb_.AddOffset(ScriptString::VT_VALUE, value);
+  }
+  explicit ScriptStringBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ScriptString> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ScriptString>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ScriptString> CreateScriptString(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> key = 0,
+    flatbuffers::Offset<flatbuffers::String> value = 0) {
+  ScriptStringBuilder builder_(_fbb);
+  builder_.add_value(value);
+  builder_.add_key(key);
+  return builder_.Finish();
+}
+
+struct ScriptString::Traits {
+  using type = ScriptString;
+  static auto constexpr Create = CreateScriptString;
+};
+
+inline flatbuffers::Offset<ScriptString> CreateScriptStringDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *key = nullptr,
+    const char *value = nullptr) {
+  auto key__ = key ? _fbb.CreateString(key) : 0;
+  auto value__ = value ? _fbb.CreateString(value) : 0;
+  return TEN::Save::CreateScriptString(
+      _fbb,
+      key__,
+      value__);
+}
+
+flatbuffers::Offset<ScriptString> CreateScriptString(flatbuffers::FlatBufferBuilder &_fbb, const ScriptStringT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SaveGameHeaderT : public flatbuffers::NativeTable {
   typedef SaveGameHeader TableType;
   std::string level_name{};
@@ -4325,6 +4582,12 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptBoolT>> script_bool_level{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptNumberT>> script_number_level{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptStringT>> script_string_level{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptBoolT>> script_bool_game{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptNumberT>> script_number_game{};
+  std::vector<std::unique_ptr<TEN::Save::ScriptStringT>> script_string_game{};
 };
 
 struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4358,7 +4621,13 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CD_FLAGS = 50,
     VT_ROPE = 52,
     VT_PENDULUM = 54,
-    VT_ALTERNATE_PENDULUM = 56
+    VT_ALTERNATE_PENDULUM = 56,
+    VT_SCRIPT_BOOL_LEVEL = 58,
+    VT_SCRIPT_NUMBER_LEVEL = 60,
+    VT_SCRIPT_STRING_LEVEL = 62,
+    VT_SCRIPT_BOOL_GAME = 64,
+    VT_SCRIPT_NUMBER_GAME = 66,
+    VT_SCRIPT_STRING_GAME = 68
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -4441,6 +4710,24 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Pendulum *alternate_pendulum() const {
     return GetPointer<const TEN::Save::Pendulum *>(VT_ALTERNATE_PENDULUM);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *script_bool_level() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *>(VT_SCRIPT_BOOL_LEVEL);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *script_number_level() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *>(VT_SCRIPT_NUMBER_LEVEL);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>> *script_string_level() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>> *>(VT_SCRIPT_STRING_LEVEL);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *script_bool_game() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *>(VT_SCRIPT_BOOL_GAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *script_number_game() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *>(VT_SCRIPT_NUMBER_GAME);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>> *script_string_game() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>> *>(VT_SCRIPT_STRING_GAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_HEADER) &&
@@ -4501,6 +4788,24 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(pendulum()) &&
            VerifyOffset(verifier, VT_ALTERNATE_PENDULUM) &&
            verifier.VerifyTable(alternate_pendulum()) &&
+           VerifyOffset(verifier, VT_SCRIPT_BOOL_LEVEL) &&
+           verifier.VerifyVector(script_bool_level()) &&
+           verifier.VerifyVectorOfTables(script_bool_level()) &&
+           VerifyOffset(verifier, VT_SCRIPT_NUMBER_LEVEL) &&
+           verifier.VerifyVector(script_number_level()) &&
+           verifier.VerifyVectorOfTables(script_number_level()) &&
+           VerifyOffset(verifier, VT_SCRIPT_STRING_LEVEL) &&
+           verifier.VerifyVector(script_string_level()) &&
+           verifier.VerifyVectorOfTables(script_string_level()) &&
+           VerifyOffset(verifier, VT_SCRIPT_BOOL_GAME) &&
+           verifier.VerifyVector(script_bool_game()) &&
+           verifier.VerifyVectorOfTables(script_bool_game()) &&
+           VerifyOffset(verifier, VT_SCRIPT_NUMBER_GAME) &&
+           verifier.VerifyVector(script_number_game()) &&
+           verifier.VerifyVectorOfTables(script_number_game()) &&
+           VerifyOffset(verifier, VT_SCRIPT_STRING_GAME) &&
+           verifier.VerifyVector(script_string_game()) &&
+           verifier.VerifyVectorOfTables(script_string_game()) &&
            verifier.EndTable();
   }
   SaveGameT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -4593,6 +4898,24 @@ struct SaveGameBuilder {
   void add_alternate_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum) {
     fbb_.AddOffset(SaveGame::VT_ALTERNATE_PENDULUM, alternate_pendulum);
   }
+  void add_script_bool_level(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>>> script_bool_level) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_BOOL_LEVEL, script_bool_level);
+  }
+  void add_script_number_level(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>>> script_number_level) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_NUMBER_LEVEL, script_number_level);
+  }
+  void add_script_string_level(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>>> script_string_level) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_STRING_LEVEL, script_string_level);
+  }
+  void add_script_bool_game(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>>> script_bool_game) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_BOOL_GAME, script_bool_game);
+  }
+  void add_script_number_game(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>>> script_number_game) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_NUMBER_GAME, script_number_game);
+  }
+  void add_script_string_game(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>>> script_string_game) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_STRING_GAME, script_string_game);
+  }
   explicit SaveGameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -4632,10 +4955,22 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>>> script_bool_level = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>>> script_number_level = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>>> script_string_level = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptBool>>> script_bool_game = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptNumber>>> script_number_game = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScriptString>>> script_string_game = 0) {
   SaveGameBuilder builder_(_fbb);
   builder_.add_oneshot_position(oneshot_position);
   builder_.add_ambient_position(ambient_position);
+  builder_.add_script_string_game(script_string_game);
+  builder_.add_script_number_game(script_number_game);
+  builder_.add_script_bool_game(script_bool_game);
+  builder_.add_script_string_level(script_string_level);
+  builder_.add_script_number_level(script_number_level);
+  builder_.add_script_bool_level(script_bool_level);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
@@ -4697,7 +5032,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<int32_t> *cd_flags = nullptr,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *script_bool_level = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *script_number_level = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptString>> *script_string_level = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptBool>> *script_bool_game = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptNumber>> *script_number_game = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ScriptString>> *script_string_game = nullptr) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
@@ -4712,6 +5053,12 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
   auto oneshot_track__ = oneshot_track ? _fbb.CreateString(oneshot_track) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
+  auto script_bool_level__ = script_bool_level ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptBool>>(*script_bool_level) : 0;
+  auto script_number_level__ = script_number_level ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptNumber>>(*script_number_level) : 0;
+  auto script_string_level__ = script_string_level ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptString>>(*script_string_level) : 0;
+  auto script_bool_game__ = script_bool_game ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptBool>>(*script_bool_game) : 0;
+  auto script_number_game__ = script_number_game ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptNumber>>(*script_number_game) : 0;
+  auto script_string_game__ = script_string_game ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptString>>(*script_string_game) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       header,
@@ -4740,7 +5087,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       cd_flags__,
       rope,
       pendulum,
-      alternate_pendulum);
+      alternate_pendulum,
+      script_bool_level__,
+      script_number_level__,
+      script_string_level__,
+      script_bool_game__,
+      script_number_game__,
+      script_string_game__);
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5840,6 +6193,93 @@ inline flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuild
       _node);
 }
 
+inline ScriptNumberT *ScriptNumber::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ScriptNumberT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ScriptNumber::UnPackTo(ScriptNumberT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = key(); if (_e) _o->key = _e->str(); }
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline flatbuffers::Offset<ScriptNumber> ScriptNumber::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptNumberT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateScriptNumber(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ScriptNumber> CreateScriptNumber(flatbuffers::FlatBufferBuilder &_fbb, const ScriptNumberT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ScriptNumberT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _key = _o->key.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->key);
+  auto _value = _o->value;
+  return TEN::Save::CreateScriptNumber(
+      _fbb,
+      _key,
+      _value);
+}
+
+inline ScriptBoolT *ScriptBool::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ScriptBoolT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ScriptBool::UnPackTo(ScriptBoolT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = key(); if (_e) _o->key = _e->str(); }
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline flatbuffers::Offset<ScriptBool> ScriptBool::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptBoolT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateScriptBool(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ScriptBool> CreateScriptBool(flatbuffers::FlatBufferBuilder &_fbb, const ScriptBoolT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ScriptBoolT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _key = _o->key.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->key);
+  auto _value = _o->value;
+  return TEN::Save::CreateScriptBool(
+      _fbb,
+      _key,
+      _value);
+}
+
+inline ScriptStringT *ScriptString::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ScriptStringT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ScriptString::UnPackTo(ScriptStringT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = key(); if (_e) _o->key = _e->str(); }
+  { auto _e = value(); if (_e) _o->value = _e->str(); }
+}
+
+inline flatbuffers::Offset<ScriptString> ScriptString::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptStringT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateScriptString(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ScriptString> CreateScriptString(flatbuffers::FlatBufferBuilder &_fbb, const ScriptStringT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ScriptStringT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _key = _o->key.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->key);
+  auto _value = _o->value.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->value);
+  return TEN::Save::CreateScriptString(
+      _fbb,
+      _key,
+      _value);
+}
+
 inline SaveGameHeaderT *SaveGameHeader::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<SaveGameHeaderT>();
   UnPackTo(_o.get(), _resolver);
@@ -5967,6 +6407,12 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
+  { auto _e = script_bool_level(); if (_e) { _o->script_bool_level.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_bool_level[_i] = std::unique_ptr<TEN::Save::ScriptBoolT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = script_number_level(); if (_e) { _o->script_number_level.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_number_level[_i] = std::unique_ptr<TEN::Save::ScriptNumberT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = script_string_level(); if (_e) { _o->script_string_level.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_string_level[_i] = std::unique_ptr<TEN::Save::ScriptStringT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = script_bool_game(); if (_e) { _o->script_bool_game.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_bool_game[_i] = std::unique_ptr<TEN::Save::ScriptBoolT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = script_number_game(); if (_e) { _o->script_number_game.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_number_game[_i] = std::unique_ptr<TEN::Save::ScriptNumberT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = script_string_game(); if (_e) { _o->script_string_game.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->script_string_game[_i] = std::unique_ptr<TEN::Save::ScriptStringT>(_e->Get(_i)->UnPack(_resolver)); } } }
 }
 
 inline flatbuffers::Offset<SaveGame> SaveGame::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -6004,6 +6450,12 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
+  auto _script_bool_level = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptBool>> (_o->script_bool_level.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptBool(*__va->__fbb, __va->__o->script_bool_level[i].get(), __va->__rehasher); }, &_va );
+  auto _script_number_level = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptNumber>> (_o->script_number_level.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptNumber(*__va->__fbb, __va->__o->script_number_level[i].get(), __va->__rehasher); }, &_va );
+  auto _script_string_level = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptString>> (_o->script_string_level.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptString(*__va->__fbb, __va->__o->script_string_level[i].get(), __va->__rehasher); }, &_va );
+  auto _script_bool_game = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptBool>> (_o->script_bool_game.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptBool(*__va->__fbb, __va->__o->script_bool_game[i].get(), __va->__rehasher); }, &_va );
+  auto _script_number_game = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptNumber>> (_o->script_number_game.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptNumber(*__va->__fbb, __va->__o->script_number_game[i].get(), __va->__rehasher); }, &_va );
+  auto _script_string_game = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScriptString>> (_o->script_string_game.size(), [](size_t i, _VectorArgs *__va) { return CreateScriptString(*__va->__fbb, __va->__o->script_string_game[i].get(), __va->__rehasher); }, &_va );
   return TEN::Save::CreateSaveGame(
       _fbb,
       _header,
@@ -6032,7 +6484,13 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _cd_flags,
       _rope,
       _pendulum,
-      _alternate_pendulum);
+      _alternate_pendulum,
+      _script_bool_level,
+      _script_number_level,
+      _script_string_level,
+      _script_bool_game,
+      _script_number_game,
+      _script_string_game);
 }
 
 inline const TEN::Save::SaveGame *GetSaveGame(const void *buf) {

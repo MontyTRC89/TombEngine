@@ -26,6 +26,7 @@
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Scripting/ScriptInterfaceLevel.h"
+#include "Scripting/ScriptInterfaceGame.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -708,6 +709,32 @@ bool SaveGame::Save(int slot)
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
+	std::vector<flatbuffers::Offset<Save::ScriptString>> levelStringVec;
+	std::vector<flatbuffers::Offset<Save::ScriptString>> gameStringVec;
+	std::map<std::string, VarSaveType> levelVars;
+	std::map<std::string, VarSaveType> gameVars;
+	g_GameScript->GetVariables(levelVars, gameVars);
+
+	auto strFunc = [&](auto const & varVec, auto& saveVec)
+	{
+		for (auto const& s : varVec)
+		{
+			if (std::holds_alternative<std::string>(s.second))
+			{
+				auto keyOffset = fbb.CreateString(s.first);
+				auto valOffset = fbb.CreateString(std::get<std::string>(s.second));
+				Save::ScriptStringBuilder scriptStringInfo{ fbb };
+				scriptStringInfo.add_key(keyOffset);
+				scriptStringInfo.add_value(valOffset);
+				saveVec.push_back(scriptStringInfo.Finish());
+			}
+		}
+		return fbb.CreateVector(saveVec);
+	};
+
+	auto levelStringsOffset = strFunc(levelVars, levelStringVec);
+	auto gameStringsOffset = strFunc(levelVars, gameStringVec);
+
 	Save::SaveGameBuilder sgb{ fbb };
 
 	sgb.add_header(headerOffset);
@@ -740,6 +767,9 @@ bool SaveGame::Save(int slot)
 		sgb.add_pendulum(pendulumOffset);
 		sgb.add_alternate_pendulum(alternatePendulumOffset);
 	}
+
+	sgb.add_script_string_game(gameStringsOffset);
+	sgb.add_script_string_level(levelStringsOffset);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1377,6 +1407,23 @@ bool SaveGame::Load(int slot)
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
 	}
+
+	std::map<std::string, VarSaveType> levelVars;
+	std::map<std::string, VarSaveType> gameVars;
+
+	auto stringLevelVec = s->script_string_level();
+	for (auto const& str : *stringLevelVec)
+	{
+		levelVars.insert(std::pair(str->key()->str(), str->value()->str()));
+	}
+
+	auto stringGameVec = s->script_string_game();
+	for (auto const& str : *stringGameVec)
+	{
+		gameVars.insert(std::pair(str->key()->str(), str->value()->str()));
+	}
+
+	g_GameScript->SetVariables(levelVars, gameVars);
 
 	return true;
 }

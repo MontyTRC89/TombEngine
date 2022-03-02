@@ -67,14 +67,9 @@ public:
 
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name) override;
-	void								MakeItemInvisible(short id);
 
-
-	// Variables
-	template <typename T>
-	void								GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
-	template <typename T>
-	void								SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals);
+	void								GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) override;
+	void								SetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) override;
 	void								ResetVariables();
 
 	void								InitCallbacks() override;
