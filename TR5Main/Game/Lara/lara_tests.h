@@ -116,6 +116,8 @@ bool TestLaraJumpRight(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll);
 
+bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll);
+
 bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offset = 0.0f);
 bool TestLaraPoleUp(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraPoleDown(ITEM_INFO* item, COLL_INFO* coll);
