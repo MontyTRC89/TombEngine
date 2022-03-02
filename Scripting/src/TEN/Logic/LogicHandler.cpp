@@ -148,54 +148,46 @@ void AddOneSecret()
 #endif
 }
 
-template <typename T>
-void LogicHandler::GetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
+
+void LogicHandler::SetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals)
 {
 #if TEN_OPTIONAL_LUA
-	for (const auto& it : m_locals.variables)
-	{
-		if (it.second.is<T>())
-			locals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
-	}
-	for (const auto& it : m_globals.variables)
-	{
-		if (it.second.is<T>())
-			globals.insert(std::pair<std::string, T>(it.first, it.second.as<T>()));
-	}
-#endif
-}
-
-#if TEN_OPTIONAL_LUA
-template void LogicHandler::GetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-template void LogicHandler::GetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-template void LogicHandler::GetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
-
-template <typename T>
-void LogicHandler::SetVariables(std::map<std::string, T>& locals, std::map<std::string, T>& globals)
-{
-	//TODO Look into serialising tables from these maps, too -- squidshire, 24/08/2021
 	m_locals.variables.clear();
 	for (const auto& it : locals)
 	{
 		m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
 	}
+	m_globals.variables.clear();
 	for (const auto& it : globals)
 	{
 		m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
 	}
+#endif
 }
 
-template void LogicHandler::SetVariables<bool>(std::map<std::string, bool>& locals, std::map<std::string, bool>& globals);
-template void LogicHandler::SetVariables<float>(std::map<std::string, float>& locals, std::map<std::string, float>& globals);
-template void LogicHandler::SetVariables<std::string>(std::map<std::string, std::string>& locals, std::map<std::string, std::string>& globals);
+void LogicHandler::GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals)
+{
+#if TEN_OPTIONAL_LUA
+	for (const auto& it : m_locals.variables)
+	{
+		locals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
+	}
+	for (const auto& it : m_globals.variables)
+	{
+		globals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
+	}
+#endif
+}
+
 
 template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
 {
+#if TEN_OPTIONAL_LUA
 	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ERROR_MODE::TERMINATE);
 	return std::make_unique<R>(map.at(name), false);
-}
 #endif
+}
 
 /*** Special objects
 @section specialobjects
