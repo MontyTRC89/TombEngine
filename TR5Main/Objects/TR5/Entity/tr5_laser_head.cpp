@@ -267,7 +267,7 @@ void LaserHeadControl(short itemNumber)
 				g_Level.Items[creature->puzzleItem].Position.yPos = item->Position.yPos;
 				TestTriggers(item, true);
 
-				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Position, 0x800004);
+				SoundEffect(SFX_TR5_GODHEADBLAST, &item->Position, 0x800004);
 				SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 20971524);
 				SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0);
 				SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 4194308);
@@ -416,7 +416,7 @@ void LaserHeadControl(short itemNumber)
 			{
 				if (item->ItemFlags[3] <= 90)
 				{
-					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Position, 0);
+					SoundEffect(SFX_TR5_GODHEADCHARGE, &item->Position, 0);
 					LaserHeadCharge(item);
 					item->ItemFlags[3]++;
 				}
@@ -476,7 +476,7 @@ void LaserHeadControl(short itemNumber)
 									&& LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
-									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Position, 0);
+									SoundEffect(SFX_TR5_GODHEADLASERLOOPS, &item->Position, 0);
 
 									LaserHeadData.fireArcs[i]->pos1.x = src.x;
 									LaserHeadData.fireArcs[i]->pos1.y = src.y;
@@ -488,8 +488,8 @@ void LaserHeadControl(short itemNumber)
 									src.roomNumber = item->RoomNumber;
 									LaserHeadData.LOS[i] = LOS(&src, &dest);
 									//LaserHeadData.fireArcs[i] = TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
-									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
-									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Position, 0);
+									StopSoundEffect(SFX_TR5_GODHEADCHARGE);
+									SoundEffect(SFX_TR5_GODHEADBLAST, &item->Position, 0);
 								}
 
 								LIGHTNING_INFO* currentArc = LaserHeadData.fireArcs[i];

@@ -179,8 +179,8 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->ItemFlags[0] == 70)
 		{
-			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
-			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);
+			SoundEffect(SFX_TR5_LIFTHITFLOOR1, 0, 0);
+			SoundEffect(SFX_TR5_LIFTHITFLOOR2, 0, 0);
 		}
 
 		LaraItem->AnimNumber = LA_ELEVATOR_RECOVER;
