@@ -18,9 +18,6 @@
     <ClInclude Include="frameworkandsol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ScriptUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
