@@ -752,7 +752,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			floorHeight < CLICK(1))
 		{
 			if (Wibble & 7 == 0)
-				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &minecartItem->Position, 2);
+				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Position, 2);
 
 			minecartItem->Position.xPos += TURN_DEATH_VEL * phd_sin(minecartItem->Position.yRot);
 			minecartItem->Position.zPos += TURN_DEATH_VEL * phd_cos(minecartItem->Position.yRot);

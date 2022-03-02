@@ -311,7 +311,7 @@ void GuardControl(short itemNum)
 				item->ItemFlags[0]++;
 				if (item->ItemFlags[0] > 60 && !(GetRandomControl() & 0xF))
 				{
-					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Position, 0);
+					SoundEffect(SFX_TR5_BIOBREATHEOUT, &item->Position, 0);
 					item->ItemFlags[0] = 0;
 				}
 			}
