@@ -841,6 +841,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
+	g_Level.LuaFunctionNames.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -969,6 +970,19 @@ void LoadAIObjects()
 	}
 }
 
+void LoadLuaFunctionNames()
+{
+	int luaFunctionsCount = ReadInt32();
+	for (int i = 0; i < luaFunctionsCount; i++)
+	{
+		byte numBytes = ReadInt8();
+		char buffer[255];
+		ReadBytes(buffer, numBytes);
+		auto luaFunctionName = std::string(buffer, buffer + numBytes);
+		g_Level.LuaFunctionNames.push_back(luaFunctionName);
+	}
+}
+
 FILE* FileOpen(const char* fileName)
 {
 	FILE* ptr = fopen(fileName, "rb");
@@ -1075,6 +1089,9 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadItems();
 		LoadAIObjects();
+
+		LoadLuaFunctionNames();
+
 		LoadSamples();
 		g_Renderer.updateProgress(80);
 
