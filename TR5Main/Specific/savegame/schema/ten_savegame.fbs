@@ -68,12 +68,6 @@ table CarriedWeaponInfo {
 	has_silencer: bool;
 }
 
-table FlareData {
-	life: uint32;
-	frame: int32;
-	control_left: bool;
-}
-
 table ArmInfo {
 	anim_number: int32;
 	frame_number: int32;
@@ -81,6 +75,12 @@ table ArmInfo {
 	locked: bool;
 	rotation: Vector3;
 	flash_gun: int32;
+}
+
+table FlareData {
+	life: uint32;
+	frame: int32;
+	control_left: bool;
 }
 
 table WeaponControlData {
@@ -119,12 +119,22 @@ table TightropeControlData {
 	tightrope_item: int32;
 }
 
+table SubsuitControlData {
+	x_rot: int32;
+	d_x_rot: int32;
+	velocity: [int32];
+	vertical_velocity: int32;
+	x_rot_vel: int32;
+	hit_count: uint32;
+}
+
 table LaraCountData {
 	run_jump: uint32;
 	position_adjust: uint32;
 	pose: uint32;
 	dive: uint32;
 	death: uint32;
+	no_cheat: uint32;
 }
 
 table LaraControlData {
@@ -137,6 +147,7 @@ table LaraControlData {
 	weapon_control: WeaponControlData;
 	rope_control: RopeControlData;
 	tightrope_control: TightropeControlData;
+	subsuit_control: SubsuitControlData;
 	can_look: bool;
 	is_moving: bool;
 	keep_low: bool;
@@ -156,6 +167,7 @@ table Lara {
 	velocity: int32;
 	vertical_velocity: int32;
 	projected_floor_height: int32;
+	target_angle: int32;
 	water_status: int32;
 	control: LaraControlData;
 	extra_head_rot: Vector3;

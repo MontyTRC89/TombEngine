@@ -1062,13 +1062,6 @@ struct DiaryInfo
 	DiaryPage Pages[MaxDiaryPages];
 };
 
-struct FlareData
-{
-	unsigned int Life;
-	int Frame;
-	bool ControlLeft;
-};
-
 struct ArmInfo
 {
 	int AnimNumber;
@@ -1077,6 +1070,13 @@ struct ArmInfo
 	bool Locked;
 	PHD_3DPOS Rotation;
 	short FlashGun;
+};
+
+struct FlareData
+{
+	unsigned int Life;
+	int Frame;
+	bool ControlLeft;
 };
 
 struct WeaponControlData
@@ -1088,7 +1088,7 @@ struct WeaponControlData
 	LaraWeaponType GunType;
 	LaraWeaponType RequestGunType;
 	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo; // TODO
+	HolsterInfo HolsterInfo;
 };
 
 struct RopeControlData
@@ -1115,14 +1115,27 @@ struct TightropeControlData
 {
 #if NEW_TIGHTROPE
 	float Balance;
-	unsigned short TimeOnTightrope;
+	unsigned int TimeOnTightrope;
 	bool CanDismount;
 	short TightropeItem; // maybe give Tightrope Item a property for difficulty?
 #else // !NEW_TIGHTROPE
-	byte OnCount;
+	unsigned int OnCount;
 	byte Off;
 	byte Fall;
 #endif
+};
+
+// TODO: Savegame
+struct SubsuitControlData
+{
+	short XRot;
+	short DXRot;
+	int Velocity[2];
+	int VerticalVelocity;
+
+	// TODO: These appear to be unused.
+	short XRotVel;
+	unsigned short HitCount;
 };
 
 struct LaraCountData
@@ -1132,7 +1145,7 @@ struct LaraCountData
 	unsigned int Pose;
 	unsigned int Dive;
 	unsigned int Death;
-	unsigned int NoCheat; // TODO: Savegame
+	unsigned int NoCheat;
 };
 
 struct LaraControlData
@@ -1147,6 +1160,7 @@ struct LaraControlData
 	WeaponControlData WeaponControl;
 	RopeControlData RopeControl;
 	TightropeControlData TightropeControl;
+	SubsuitControlData SubsuitControl;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1191,7 +1205,7 @@ struct LaraInfo
 	int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
-	short TargetAngle; // TODO: Savegame
+	short TargetAngle;
 	int WaterSurfaceDist;
 	short interactedItem;
 	PHD_3DPOS NextCornerPos;

@@ -99,12 +99,12 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot = PHD_3DPOS();
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -173,11 +173,11 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
-	item->Airborne = 0;
-	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
@@ -441,13 +441,13 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
-	item->VerticalVelocity = 0;
-	item->Airborne = false;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -541,13 +541,13 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
@@ -640,11 +640,11 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.

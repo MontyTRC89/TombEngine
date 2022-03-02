@@ -24,14 +24,12 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		lara->Control.TurnRate -= ANGLE(3.4f);
-
 		if (lara->Control.TurnRate < -ANGLE(6.0f))
 			lara->Control.TurnRate = -ANGLE(6.0f);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		lara->Control.TurnRate += ANGLE(3.4f);
-
 		if (lara->Control.TurnRate > ANGLE(6.0f))
 			lara->Control.TurnRate = ANGLE(6.0f);
 	}
@@ -45,7 +43,6 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		item->VerticalVelocity += 16;
-
 		if (item->VerticalVelocity > 400)
 			item->VerticalVelocity = 400;
 	}

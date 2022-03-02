@@ -43,7 +43,6 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 		item->Position.zRot += std::min<short>(rate, abs(maxAngle - item->Position.zRot) / 3) * sign;
 }
 
-// Works, but disabled for the time being. @Sezz 2022.02.13
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 {
 	auto* lara = GetLaraInfo(item);
@@ -244,7 +243,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = item->Position.yRot;
 
-	//if (g_GameFlow->Animations.SlideExtended)
+	//if (g_GameFlow->Animations.HasSlideExtended)
 	//{
 	//	// TODO: Get true slope direction.
 	//}
