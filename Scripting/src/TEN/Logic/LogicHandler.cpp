@@ -149,7 +149,7 @@ void AddOneSecret()
 }
 
 
-void LogicHandler::SetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals)
+void LogicHandler::SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals)
 {
 #if TEN_OPTIONAL_LUA
 	m_locals.variables.clear();
@@ -165,7 +165,7 @@ void LogicHandler::SetVariables(std::map<std::string, VarSaveType>& locals, std:
 #endif
 }
 
-void LogicHandler::GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals)
+void LogicHandler::GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const
 {
 #if TEN_OPTIONAL_LUA
 	for (const auto& it : m_locals.variables)
