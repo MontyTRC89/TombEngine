@@ -1085,6 +1085,10 @@ struct WeaponControlData
 	bool HasFired;
 	bool Fired;
 
+	// TODO: Savegame
+	bool UziLeft;
+	bool UziRight;
+
 	LaraWeaponType GunType;
 	LaraWeaponType RequestGunType;
 	LaraWeaponType LastGunType;
