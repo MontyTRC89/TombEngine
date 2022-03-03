@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
@@ -14,58 +15,50 @@
 #define ROCKET_DAMAGE 100
 #define DIVER_HARPOON_DAMAGE 50
 
-#define SHARD_SPEED  250
-#define ROCKET_SPEED 220
-#define NATLAGUN_SPEED 400
+#define SHARD_VELOCITY  250
+#define ROCKET_VELOCITY 220
+#define NATLAGUN_VELOCITY 400
 
 void ShootAtLara(FX_INFO *fx)
 {
-	int x, y, z, distance;
-	BOUNDING_BOX* bounds;
+	int x = LaraItem->Position.xPos - fx->pos.xPos;
+	int y = LaraItem->Position.yPos - fx->pos.yPos;
+	int z = LaraItem->Position.zPos - fx->pos.zPos;
 
-	x = LaraItem->Position.xPos - fx->pos.xPos;
-	y = LaraItem->Position.yPos - fx->pos.yPos;
-	z = LaraItem->Position.zPos - fx->pos.zPos;
-
-	bounds = GetBoundsAccurate(LaraItem);
+	auto* bounds = GetBoundsAccurate(LaraItem);
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 3 / 4;
 
-	distance = sqrt(SQUARE(x) + SQUARE(z));
+	int distance = sqrt(pow(x, 2) + pow(z, 2));
 	fx->pos.xRot = -phd_atan(distance, y);
 	fx->pos.yRot = phd_atan(z, x);
 
-	/* Random scatter (only a little bit else it's too hard to avoid) */
+	// Random scatter (only a little bit else it's too hard to avoid).
 	fx->pos.xRot += (GetRandomControl() - 0x4000) / 0x40;
 	fx->pos.yRot += (GetRandomControl() - 0x4000) / 0x40;
 }
 
 void ControlMissile(short fxNumber)
 {
-	FX_INFO *fx;
-	FLOOR_INFO *floor;
-	short roomNumber;
-	int speed;
-
-	fx = &EffectList[fxNumber];
+	auto* fx = &EffectList[fxNumber];
 	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON && !(g_Level.Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
-		fx->pos.xRot -= ONE_DEGREE;
+		fx->pos.xRot -= ANGLE(1.0f);
 
 	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	speed = fx->speed * phd_cos(fx->pos.xRot);
+	int speed = fx->speed * phd_cos(fx->pos.xRot);
 	fx->pos.zPos += speed * phd_cos(fx->pos.yRot);
 	fx->pos.xPos += speed * phd_sin(fx->pos.yRot);
-	roomNumber = fx->roomNumber;
-	floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 
-	/* Check for hitting something */
-	if (fx->pos.yPos >= GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos) ||
-		fx->pos.yPos <= GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos))
+	auto probe = GetCollisionResult(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+
+	// Check for hitting something.
+	if (fx->pos.yPos >= probe.Position.Floor ||
+		fx->pos.yPos <= probe.Position.Ceiling)
 	{
 		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_SCUBA_HARPOON)
 		{
-			/* Change shard into ricochet */
+			// Change shard into ricochet.
 			//			fx->speed = 0;
 			//			fx->frameNumber = -GetRandomControl()/11000;
 			//			fx->counter = 6;
@@ -80,10 +73,10 @@ void ControlMissile(short fxNumber)
 		return;
 	}
 
-	if (roomNumber != fx->roomNumber)
-		EffectNewRoom(fxNumber, roomNumber);
+	if (probe.RoomNumber != fx->roomNumber)
+		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	/* Check for hitting Lara */
+	// Check for hitting Lara.
 	/*if (fx->objectNumber == DRAGON_FIRE)
 	{
 		if (ItemNearLara(&fx->pos, 350))
@@ -108,14 +101,15 @@ void ControlMissile(short fxNumber)
 			SoundEffect(317, &fx->pos, 0);
 			KillEffect(fxNumber);
 		}
-	LaraItem->HitStatus = 1;
+
+		LaraItem->HitStatus = 1;
 
 		fx->pos.yRot = LaraItem->Position.yRot;
 		fx->speed = LaraItem->Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
 
-	/* Create bubbles in wake of harpoon bolt */
+	// Create bubbles in wake of harpoon bolt.
 	//if (fx->objectNumber == ID_SCUBA_HARPOON && g_Level.Rooms[fx->roomNumber].flags & 1)
 	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
@@ -128,42 +122,41 @@ void ControlMissile(short fxNumber)
 		fx->pos.zRot += 30 * ONE_DEGREE;*/
 }
 
-void ControlNatlaGun(short fx_number)
+void ControlNatlaGun(short fxNumber)
 {
-	FX_INFO* fx, *newfx;
-	OBJECT_INFO* object;
-	FLOOR_INFO* floor;
-	short roomNumber;
-	int x, y, z;
+	auto* fx = &EffectList[fxNumber];
+	auto* object = &Objects[fx->objectNumber];
 
-	fx = &EffectList[fx_number];
-	object = &Objects[fx->objectNumber];
 	fx->frameNumber--;
 	if (fx->frameNumber <= Objects[fx->objectNumber].nmeshes)
-		KillEffect(fx_number);
+		KillEffect(fxNumber);
 
 	/* If first frame, then start another explosion at next position */
 	if (fx->frameNumber == -1)
 	{
-		z = fx->pos.zPos + fx->speed * phd_cos(fx->pos.yRot);
-		x = fx->pos.xPos + fx->speed * phd_sin(fx->pos.yRot);
-		y = fx->pos.yPos;
-		roomNumber = fx->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
+		int z = fx->pos.zPos + fx->speed * phd_cos(fx->pos.yRot);
+		int x = fx->pos.xPos + fx->speed * phd_sin(fx->pos.yRot);
+		int y = fx->pos.yPos;
 
-		/* Don't create one if hit a wall */
-		if (y >= GetFloorHeight(floor, x, y, z) || y <= GetCeiling(floor, x, y, z))
-			return;
+		auto probe = GetCollisionResult(x, y, z, fx->roomNumber);
 
-		fx_number = CreateNewEffect(roomNumber);
-		if (fx_number != NO_ITEM)
+		// Don't create one if hit a wall.
+		if (y >= probe.Position.Floor ||
+			y <= probe.Position.Ceiling)
 		{
-			newfx = &EffectList[fx_number];
+			return;
+		}
+
+		fxNumber = CreateNewEffect(probe.RoomNumber);
+		if (fxNumber != NO_ITEM)
+		{
+			auto* newfx = &EffectList[fxNumber];
+
 			newfx->pos.xPos = x;
 			newfx->pos.yPos = y;
 			newfx->pos.zPos = z;
 			newfx->pos.yRot = fx->pos.yRot;
-			newfx->roomNumber = roomNumber;
+			newfx->roomNumber = probe.RoomNumber;
 			newfx->speed = fx->speed;
 			newfx->frameNumber = 0;
 			newfx->objectNumber = ID_PROJ_NATLA;
@@ -171,77 +164,71 @@ void ControlNatlaGun(short fx_number)
 	}
 }
 
-short ShardGun(int x, int y, int z, short speed, short yrot, short roomNumber)
+short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
-	if (fx_number != NO_ITEM)
+	short fxNumber = CreateNewEffect(roomNumber);
+	if (fxNumber != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		auto* fx = &EffectList[fxNumber];
+
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = SHARD_SPEED;
+		fx->pos.yRot = yRot;
+		fx->speed = SHARD_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_SHARD;
 		fx->shade = 14 * 256;
 		ShootAtLara(fx);
 	}
 
-	return (fx_number);
+	return fxNumber;
 }
 
-short BombGun(int x, int y, int z, short speed, short yrot, short roomNumber)
+short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
-	if (fx_number != NO_ITEM)
+	short fxNumber = CreateNewEffect(roomNumber);
+	if (fxNumber != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		auto* fx = &EffectList[fxNumber];
+
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = ROCKET_SPEED;
+		fx->pos.yRot = yRot;
+		fx->speed = ROCKET_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_BOMB;
 		fx->shade = 16 * 256;
 		ShootAtLara(fx);
 	}
 
-	return (fx_number);
+	return fxNumber;
 }
 
-short NatlaGun(int x, int y, int z, short speed, short yrot, short roomNumber)
+short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	short fx_number;
-	FX_INFO* fx;
-
-	fx_number = CreateNewEffect(roomNumber);
-	if (fx_number != NO_ITEM)
+	short fxNumber = CreateNewEffect(roomNumber);
+	if (fxNumber != NO_ITEM)
 	{
-		fx = &EffectList[fx_number];
+		auto* fx = &EffectList[fxNumber];
+
 		fx->pos.xPos = x;
 		fx->pos.yPos = y;
 		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yrot;
-		fx->speed = NATLAGUN_SPEED;
+		fx->pos.yRot = yRot;
+		fx->speed = NATLAGUN_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;
 		fx->shade = 16 * 256;
 		ShootAtLara(fx);
 	}
 
-	return (fx_number);
+	return fxNumber;
 }

@@ -474,8 +474,8 @@ void FireHarpoon(ITEM_INFO* laraItem)
 		}
 
 		item->Position.zRot = 0;
-		item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot);
-		item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot);
+		item->Velocity = HARPOON_VELOCITY * phd_cos(item->Position.xRot);
+		item->VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Position.xRot);
 		item->HitPoints = HARPOON_TIME;
 
 		AddActiveItem(itemNumber);
@@ -507,8 +507,8 @@ void HarpoonBoltControl(short itemNumber)
 			if (item->Position.xRot < -ANGLE(90.0f))
 				item->Position.xRot = -ANGLE(90.0f);
 
-			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot);
-			item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot);
+			item->VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Position.xRot);
+			item->Velocity = HARPOON_VELOCITY * phd_cos(item->Position.xRot);
 			aboveWater = true;
 		}
 		else
@@ -518,8 +518,8 @@ void HarpoonBoltControl(short itemNumber)
 				CreateBubble((PHD_VECTOR*)&item->Position, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 			
 			TriggerRocketSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 64);
-			item->VerticalVelocity = -HARPOON_SPEED * phd_sin(item->Position.xRot) / 2;
-			item->Velocity = HARPOON_SPEED * phd_cos(item->Position.xRot) / 2;
+			item->VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Position.xRot) / 2;
+			item->Velocity = HARPOON_VELOCITY * phd_cos(item->Position.xRot) / 2;
 			aboveWater = false;
 		}
 
@@ -697,7 +697,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 			item->Position.yRot += lara->ExtraTorsoRot.yRot;
 		}
 
-		item->Velocity = GRENADE_SPEED;
+		item->Velocity = GRENADE_VELOCITY;
 		item->VerticalVelocity = -512 * phd_sin(item->Position.xRot);
 		item->ActiveState = item->Position.xRot;
 		item->TargetState = item->Position.yRot;
@@ -1180,14 +1180,14 @@ void RocketControl(short itemNumber)
 	bool abovewater = false;
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		if (item->Velocity > (ROCKET_SPEED / 4))
+		if (item->Velocity > (ROCKET_VELOCITY / 4))
 			item->Velocity -= item->Velocity / 4;
 		else
 		{
 			item->Velocity += (item->Velocity / 4) + 4;
 
-			if (item->Velocity > (ROCKET_SPEED / 4))
-				item->Velocity = ROCKET_SPEED / 4;
+			if (item->Velocity > (ROCKET_VELOCITY / 4))
+				item->Velocity = ROCKET_VELOCITY / 4;
 		}
 
 		item->Position.zRot += (((item->Velocity / 8) + 3) * ANGLE(1.0f));
@@ -1195,7 +1195,7 @@ void RocketControl(short itemNumber)
 	}
 	else
 	{
-		if (item->Velocity < ROCKET_SPEED)
+		if (item->Velocity < ROCKET_VELOCITY)
 			item->Velocity += (item->Velocity / 4) + 4;
 
 		item->Position.zRot += (((item->Velocity / 4) + 7) * ANGLE(1.0f));

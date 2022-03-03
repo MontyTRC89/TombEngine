@@ -139,8 +139,6 @@ struct WAKE_PTS
 };
 
 WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
-byte CurrentStartWake = 0;
-byte WakeShade = 0;
 
 void InitialiseKayak(short itemNumber)
 {
@@ -155,8 +153,9 @@ void InitialiseKayak(short itemNumber)
 	kayak->RightVerticalVelocity = 0;
 	kayak->LeftRightCount = 0;
 	kayak->OldPos = kayakItem->Position;
+	kayak->CurrentStartWake = 0;
+	kayak->WakeShade = 0;
 	kayak->Flags = 0;
-
 
 	for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 	{
@@ -172,7 +171,9 @@ void KayakDraw(ITEM_INFO* kayakItem)
 
 void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 {
-	if (WakePts[CurrentStartWake][rotate].life)
+	auto* kayak = (KayakInfo*)kayakItem->Data;
+
+	if (WakePts[kayak->CurrentStartWake][rotate].life)
 		return;
 
 	float s = phd_sin(kayakItem->Position.yRot);
@@ -220,21 +221,21 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 		xv[1] = (WAKE_VELOCITY + 2) * phd_sin(angle2);
 		zv[1] = (WAKE_VELOCITY + 2) * phd_cos(angle2);
 
-		WakePts[CurrentStartWake][rotate].y = kayakItem->Position.yPos + KAYAK_DRAW_SHIFT;
-		WakePts[CurrentStartWake][rotate].life = 0x40;
+		WakePts[kayak->CurrentStartWake][rotate].y = kayakItem->Position.yPos + KAYAK_DRAW_SHIFT;
+		WakePts[kayak->CurrentStartWake][rotate].life = 0x40;
 
 		for (int i = 0; i < 2; i++)
 		{
-			WakePts[CurrentStartWake][rotate].x[i] = x;
-			WakePts[CurrentStartWake][rotate].z[i] = z;
-			WakePts[CurrentStartWake][rotate].xvel[i] = xv[i];
-			WakePts[CurrentStartWake][rotate].zvel[i] = zv[i];
+			WakePts[kayak->CurrentStartWake][rotate].x[i] = x;
+			WakePts[kayak->CurrentStartWake][rotate].z[i] = z;
+			WakePts[kayak->CurrentStartWake][rotate].xvel[i] = xv[i];
+			WakePts[kayak->CurrentStartWake][rotate].zvel[i] = zv[i];
 		}
 
 		if (rotate == 1)
 		{
-			CurrentStartWake++;
-			CurrentStartWake &= (NUM_WAKE_SPRITES - 1);
+			kayak->CurrentStartWake++;
+			kayak->CurrentStartWake &= (NUM_WAKE_SPRITES - 1);
 		}
 	}
 }
@@ -425,9 +426,9 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		int dx = target.x - laraItem->Position.xPos;
 		int dz = target.z - laraItem->Position.zPos;
 
-		int speed = g_Level.Sinks[sinkval].strength;
-		dx = phd_sin(angle * 16) * speed * 1024;
-		dz = phd_cos(angle * 16) * speed * 1024;
+		int velocity = g_Level.Sinks[sinkval].strength;
+		dx = phd_sin(angle * 16) * velocity * 1024;
+		dz = phd_cos(angle * 16) * velocity * 1024;
 
 		lara->ExtraVelocity.x += (dx - lara->ExtraVelocity.x) / 16;
 		lara->ExtraVelocity.z += (dz - lara->ExtraVelocity.z) / 16;
@@ -813,6 +814,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			if (!frame)
 				kayak->LeftRightCount = 0;
 
+			// TODO: Sort out the bitwise operations.
 			if (frame == 2 && !(kayak->LeftRightCount & 0x80))
 				kayak->LeftRightCount++;
 
@@ -1354,13 +1356,13 @@ bool KayakControl(ITEM_INFO* laraItem)
 		!lara->ExtraVelocity.x &&
 		!lara->ExtraVelocity.z)
 	{
-		if (WakeShade)
-			WakeShade--;
+		if (kayak->WakeShade)
+			kayak->WakeShade--;
 	}
 	else
 	{
-		if (WakeShade < 16)
-			WakeShade++;
+		if (kayak->WakeShade < 16)
+			kayak->WakeShade++;
 	}
 
 	KayakUpdateWakeFX();
