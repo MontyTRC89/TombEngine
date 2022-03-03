@@ -585,7 +585,7 @@ bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_UPV:
-			SubControl(item, coll);
+			UPVControl(item, coll);
 			break;
 
 		case ID_MINECART:
