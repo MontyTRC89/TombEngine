@@ -851,7 +851,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);	// Should never occur before VerticalVelocity reaches death speed, but here for consistency.
+		DoLaraFallDamage(item);	// Should never occur before VerticalVelocity reaches death velocity, but here for consistency.
 
 		if (item->HitPoints <= 0 || item->VerticalVelocity >= LARA_FREEFALL_DIVE_DEATH_VELOCITY)
 			item->TargetState = LS_DEATH;

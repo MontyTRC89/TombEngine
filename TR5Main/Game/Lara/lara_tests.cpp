@@ -2113,6 +2113,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		lara->TargetAngle = item->Position.yRot;
 		AnimateLara(item);
 
 		return true;
