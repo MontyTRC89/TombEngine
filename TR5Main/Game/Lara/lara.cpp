@@ -791,10 +791,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Say no.
 	static bool dbNo = false;
 	if (KeyMap[DIK_N] && !dbNo)
-	{
-		item->Airborne = !item->Airborne;
 		SayNo();
-	}
 	dbNo = KeyMap[DIK_N] ? true : false;
 
 	static PHD_3DPOS posO = item->Position;
@@ -819,28 +816,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	
 	// Forward 1 unit.
 	if (KeyMap[DIK_I])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot));
-	}
+		MoveItem(item, item->Position.yRot, 1);
 	// Back 1 unit.
 	else if (KeyMap[DIK_K])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot + ANGLE(180.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot + ANGLE(180.0f)));
-	}
+		MoveItem(item, item->Position.yRot + ANGLE(180.0f), 1);
 	// Left 1 unit.
 	else if (KeyMap[DIK_J])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot - ANGLE(90.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot - ANGLE(90.0f)));
-	}
+		MoveItem(item, item->Position.yRot - ANGLE(90.0f), 1);
 	// Right 1 unit.
 	else if (KeyMap[DIK_L])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot + ANGLE(90.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot + ANGLE(90.0f)));
-	}
+		MoveItem(item, item->Position.yRot + ANGLE(90.0f), 1);
 
 	//---
 
