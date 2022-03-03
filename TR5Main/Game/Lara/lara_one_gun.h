@@ -4,6 +4,29 @@
 struct ITEM_INFO;
 enum LaraWeaponType;
 
+#define PELLET_SCATTER ANGLE(20.0f)
+
+constexpr auto HARPOON_DRAW_ANIM = 1;
+constexpr auto ROCKET_DRAW_ANIM = 0;
+constexpr auto HARPOON_VELOCITY = CLICK(1);
+constexpr auto HARPOON_TIME = 300;
+constexpr auto ROCKET_VELOCITY = CLICK(2);
+constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
+constexpr auto MAX_GRENADE_VERTICAL_VELOCITY = CLICK(0.5f);
+constexpr auto GRENADE_Y_OFFSET = 180;
+constexpr auto GRENADE_Z_OFFSET = 80;
+constexpr auto CROSSBOW_DAMAGE = 5;
+constexpr auto CROSSBOW_AMMO1 = 1;
+constexpr auto CROSSBOW_AMMO2 = 2;
+constexpr auto CROSSBOW_AMMO3 = 2;
+constexpr auto CROSSBOW_HIT_RADIUS = CLICK(0.5f);
+constexpr auto CROSSBOW_EXPLODE_RADIUS = SECTOR(2);
+constexpr auto GRENADE_HIT_RADIUS = CLICK(0.5f);
+constexpr auto GRENADE_EXPLODE_RADIUS = SECTOR(2);
+constexpr auto ROCKET_HIT_RADIUS = CLICK(0.5f);
+constexpr auto ROCKET_EXPLODE_RADIUS = SECTOR(2);
+constexpr auto HARPOON_HIT_RADIUS = CLICK(0.5f);
+
 enum class GrenadeType
 {
 	Normal,
@@ -12,29 +35,6 @@ enum class GrenadeType
 	Ultra,
 	Flags
 };
-
-#define PELLET_SCATTER ANGLE(20.0f)
-
-constexpr auto HARPOON_DRAW_ANIM = 1;
-constexpr auto ROCKET_DRAW_ANIM = 0;
-constexpr auto HARPOON_SPEED = 256;
-constexpr auto HARPOON_TIME = 300;
-constexpr auto ROCKET_SPEED = 512;
-constexpr auto GRENADE_SPEED = 128;
-constexpr auto MAX_GRENADE_FALLSPEED = 128;
-constexpr auto GRENADE_YOFF = 180;
-constexpr auto GRENADE_ZOFF = 80;
-constexpr auto CROSSBOW_DAMAGE = 5;
-constexpr auto CROSSBOW_AMMO1 = 1;
-constexpr auto CROSSBOW_AMMO2 = 2;
-constexpr auto CROSSBOW_AMMO3 = 2;
-constexpr auto CROSSBOW_HIT_RADIUS = 128;
-constexpr auto CROSSBOW_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto GRENADE_HIT_RADIUS = 128;
-constexpr auto GRENADE_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto ROCKET_HIT_RADIUS = 128;
-constexpr auto ROCKET_EXPLODE_RADIUS = SECTOR(2);
-constexpr auto HARPOON_HIT_RADIUS = 128;
 
 void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);

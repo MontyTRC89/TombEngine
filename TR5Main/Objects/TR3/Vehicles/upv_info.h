@@ -2,10 +2,12 @@
 
 struct UPVInfo
 {
-	int Vel;
+	int Velocity;
 	int Rot;
-	int RotX;
+	int XRot;
 	short FanRot;
+	unsigned int HarpoonTimer;
+	bool HarpoonLeft;
+
 	char Flags;
-	char WeaponTimer;
 };

@@ -17,5 +17,8 @@ struct KayakInfo
 	bool Forward;
 	bool TrueWater;
 
+	int CurrentStartWake;
+	int WakeShade;
+
 	char Flags;
 };
