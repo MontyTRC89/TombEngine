@@ -247,36 +247,18 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	if (!coll->FloorTiltX && !coll->FloorTiltZ)
 		return direction;
 
-	// Get true slope direction.
-	if (g_GameFlow->Animations.HasSlideExtended)
-	{
-		float normalisedTiltX = 0;
-		if (coll->FloorTiltX)
-			normalisedTiltX = coll->FloorTiltX / abs(coll->FloorTiltX);
+	float normalisedTiltX = coll->FloorTiltX ? (coll->FloorTiltX / abs(coll->FloorTiltX)) : 0;
+	float normalisedTiltZ = coll->FloorTiltZ ? (coll->FloorTiltZ / abs(coll->FloorTiltZ)) : 0;
 
-		float normalisedTiltZ = 0;
-		if (coll->FloorTiltZ)
-			normalisedTiltZ = coll->FloorTiltZ / abs(coll->FloorTiltZ);
+	float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
+	float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
 
-		float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
-		float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
+	// Find true slope direction. TODO: Bugged around one cardinal direction...
+	direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
 
-		direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
-	}
-	// Get nearest cardinal slope direction.
-	// TODO: Simplify.
-	else
-	{
-		if (coll->FloorTiltX > 2)
-			direction = -ANGLE(90.0f);
-		else if (coll->FloorTiltX < -2)
-			direction = ANGLE(90.0f);
-
-		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
-			direction = ANGLE(180.0f);
-		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
-			direction = 0;
-	}
+	// Find nearest cardinal slope direction.
+	if (!g_GameFlow->Animations.HasSlideExtended)
+		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
 	return direction;
 }
@@ -354,7 +336,7 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	//item->Airborne = false; // TODO: Removing this addresses an unusual landing bug Core had worked around in an obscure way. I'd like to find a proper solution someday. @Sezz 2022.02.18
+	//item->Airborne = false; // TODO: Removing this works around an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
 }
@@ -396,20 +378,20 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
-	short delta = direction - item->Position.yRot;
+	short deltaAngle = direction - item->Position.yRot;
 
 	// Slide backward.
-	if (abs(delta) > ANGLE(90.0f))
+	if (abs(deltaAngle) > ANGLE(90.0f))
 	{
-		if (item->ActiveState == LS_SLIDE_BACK && abs(short(delta - ANGLE(180.0f))) <= -ANGLE(180.0f))
+		if (item->ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
 	// Slide forward.
-	else
+	else [[likely]]
 	{
-		if (item->ActiveState == LS_SLIDE_FORWARD && abs(delta) <= ANGLE(180.0f))
+		if (item->ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
