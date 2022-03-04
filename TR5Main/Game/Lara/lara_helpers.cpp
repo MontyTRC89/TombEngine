@@ -152,15 +152,15 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 
 void DoLaraFallDamage(ITEM_INFO* item)
 {
-	// TODO: Demagic more of these numbers.
-	int landingVelocity = item->VerticalVelocity - 140;
-
-	if (landingVelocity > 0)
+	if (item->VerticalVelocity >= LARA_FREEFALL_DAMAGE_VELOCITY)
 	{
-		if (landingVelocity <= 14)
-			item->HitPoints -= LARA_HEALTH_MAX * pow(landingVelocity, 2) / 196;
-		else
+		if (item->VerticalVelocity >= LARA_FREEFALL_DEATH_VELOCITY)
 			item->HitPoints = 0;
+		else [[likely]]
+		{
+			int base = item->VerticalVelocity - (LARA_FREEFALL_DAMAGE_VELOCITY - 1);
+			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
+		}
 	}
 }
 
@@ -250,10 +250,10 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	float normalisedTiltX = coll->FloorTiltX ? (coll->FloorTiltX / abs(coll->FloorTiltX)) : 0;
 	float normalisedTiltZ = coll->FloorTiltZ ? (coll->FloorTiltZ / abs(coll->FloorTiltZ)) : 0;
 
-	float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
-	float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
+	short xAngle = FROM_RAD(asin(-normalisedTiltX));
+	short zAngle = FROM_RAD(acos(-normalisedTiltZ));
 
-	// Find true slope direction. TODO: Bugged around one cardinal direction...
+	// Find true slope direction.
 	direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
 
 	// Find nearest cardinal slope direction.
@@ -379,6 +379,8 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
 	short deltaAngle = direction - item->Position.yRot;
+
+	// TODO: Take inertia into consideration before switching animations if already sliding.
 
 	// Slide backward.
 	if (abs(deltaAngle) > ANGLE(90.0f))
