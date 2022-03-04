@@ -59,7 +59,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 			}*/
 		}
 		else
-			item->Position.yRot = direction;
+			ApproachLaraTargetAngle(item, direction);
 
 		// TODO: Make the limited jump range equal to the steepness of the slope.
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
@@ -165,7 +165,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 			}*/
 		}
 		else
-			item->Position.yRot = direction;
+			ApproachLaraTargetAngle(item, direction);
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
 		{
@@ -210,7 +210,6 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	// TODO: Stop stumbling when changing directions.
 	if (TestLaraSlide(item, coll))
 		SetLaraSlideState(item, coll);
 

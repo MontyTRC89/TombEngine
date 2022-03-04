@@ -395,30 +395,25 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	short direction = GetLaraSlideDirection(item, coll);
 	short delta = direction - item->Position.yRot;
-	static short oldAngle = 1; // TODO: Remove this.
 
-	ShiftItem(item, coll);
-
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	// Slide backward.
+	if (abs(delta) > ANGLE(90.0f))
 	{
-		if (item->ActiveState == LS_SLIDE_BACK && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_BACK && abs(short(delta - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
+	// Slide forward.
 	else
 	{
-		if (item->ActiveState == LS_SLIDE_FORWARD && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_FORWARD && abs(delta) <= ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
 	}
-
-	oldAngle = direction;
 }
 
 void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
