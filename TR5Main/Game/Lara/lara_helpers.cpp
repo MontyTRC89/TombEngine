@@ -244,8 +244,7 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	short direction = item->Position.yRot;
 
 	// Get true slope direction.
-	// TODO: Make it an option for the LD.
-	if (true/*g_GameFlow->Animations.HasSlideExtended*/)
+	if (g_GameFlow->Animations.HasSlideExtended)
 	{
 		if ((abs(coll->FloorTiltX) > 2 || abs(coll->FloorTiltZ) > 2))
 		{
@@ -261,9 +260,6 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 			float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
 
 			direction = (xAngle * abs(coll->FloorTiltX) + zAngle * abs(coll->FloorTiltZ)) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
-
-			//float xAngle = phd_atan(CLICK(1) * coll->FloorTiltX, SECTOR(1));
-			//float zAngle = phd_atan(CLICK(1) * coll->FloorTiltZ, SECTOR(1));
 		}
 	}
 	// Get nearest cardinal slope direction.
@@ -546,7 +542,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (lara->Control.Count.Pose < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
-		g_GameFlow->Animations.Pose)
+		g_GameFlow->Animations.HasPose)
 	{
 		lara->Control.Count.Pose++;
 	}

@@ -566,7 +566,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
 	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		g_GameFlow->Animations.Pose)
+		g_GameFlow->Animations.HasPose)
 	{
 		item->TargetState = LS_POSE;
 		return;
