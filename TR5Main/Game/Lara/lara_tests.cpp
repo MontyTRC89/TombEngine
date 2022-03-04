@@ -556,7 +556,7 @@ CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngl
 		return CornerResult::None;
 
 	// Last chance for possible diagonal vs. non-diagonal cases: ray test
-	if (!	LaraPositionOnLOS(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
+	if (!LaraPositionOnLOS(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
 		return CornerResult::None;
 
 	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
