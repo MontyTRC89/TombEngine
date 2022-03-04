@@ -2416,6 +2416,11 @@ bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
+bool TestLaraSlideJump(ITEM_INFO* item, short slideDirection)
+{
+	return (abs((short)(slideDirection - item->Position.yRot)) <= ANGLE(45.0f));
+}
+
 bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);

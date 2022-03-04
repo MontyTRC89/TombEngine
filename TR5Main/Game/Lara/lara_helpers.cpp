@@ -243,26 +243,28 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = item->Position.yRot;
 
+	// Ground is flat.
+	if (!coll->FloorTiltX && !coll->FloorTiltZ)
+		return direction;
+
 	// Get true slope direction.
 	if (g_GameFlow->Animations.HasSlideExtended)
 	{
-		if ((abs(coll->FloorTiltX) > 2 || abs(coll->FloorTiltZ) > 2))
-		{
-			float normalisedTiltX = 0;
-			if (coll->FloorTiltX)
-				normalisedTiltX = coll->FloorTiltX / abs(coll->FloorTiltX);
+		float normalisedTiltX = 0;
+		if (coll->FloorTiltX)
+			normalisedTiltX = coll->FloorTiltX / abs(coll->FloorTiltX);
 
-			float normalisedTiltZ = 0;
-			if (coll->FloorTiltZ)
-				normalisedTiltZ = coll->FloorTiltZ / abs(coll->FloorTiltZ);
+		float normalisedTiltZ = 0;
+		if (coll->FloorTiltZ)
+			normalisedTiltZ = coll->FloorTiltZ / abs(coll->FloorTiltZ);
 
-			float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
-			float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
+		float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
+		float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
 
-			direction = (xAngle * abs(coll->FloorTiltX) + zAngle * abs(coll->FloorTiltZ)) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
-		}
+		direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
 	}
 	// Get nearest cardinal slope direction.
+	// TODO: Simplify.
 	else
 	{
 		if (coll->FloorTiltX > 2)
@@ -340,9 +342,8 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 
 	if (vaultResult.SnapToLedge)
 	{
-		// Disable smooth angle adjustment for now.
-		SnapItemToLedge(item, coll, 0.2f/*, false*/);
-		lara->TargetAngle = /*coll->NearestLedgeAngle*/ item->Position.yRot;
+		SnapItemToLedge(item, coll, 0.2f, false);
+		lara->TargetAngle = coll->NearestLedgeAngle;
 	}
 
 	if (vaultResult.SetJumpVelocity)
@@ -408,7 +409,6 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
-		item->Position.yRot = direction + ANGLE(180.0f);
 	}
 	else
 	{
@@ -416,11 +416,8 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
-		item->Position.yRot = direction;
 	}
 
-	LaraSnapToHeight(item, coll);
-	lara->Control.MoveAngle = direction;
 	oldAngle = direction;
 }
 
