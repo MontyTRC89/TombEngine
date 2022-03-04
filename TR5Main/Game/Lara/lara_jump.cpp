@@ -790,7 +790,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
-			g_GameFlow->Animations.CrawlspaceSwandive)
+			g_GameFlow->Animations.HasCrawlspaceDive)
 		{
 			item->TargetState = LS_CROUCH_IDLE;
 
