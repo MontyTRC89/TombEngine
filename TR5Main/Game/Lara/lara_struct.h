@@ -872,11 +872,11 @@ enum LARA_MESHES
 	NUM_LARA_MESHES
 };
 
-enum LARA_CLOTH_TYPES
+enum class ClothType
 {
-	CLOTH_MISSING,
-	CLOTH_DRY,
-	CLOTH_WET
+	None,
+	Dry,
+	Wet
 };
 
 enum class WaterStatus
@@ -885,7 +885,6 @@ enum class WaterStatus
 	Wade,
 	TreadWater,
 	Underwater,
-	Swamp, // TODO
 	FlyCheat
 };
 
