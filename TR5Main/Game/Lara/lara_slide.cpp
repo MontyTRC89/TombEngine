@@ -94,7 +94,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor >= CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallState(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -188,7 +188,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor >= CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackState(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);

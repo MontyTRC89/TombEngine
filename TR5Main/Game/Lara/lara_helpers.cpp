@@ -243,11 +243,31 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = item->Position.yRot;
 
-	//if (g_GameFlow->Animations.HasSlideExtended)
-	//{
-	//	// TODO: Get true slope direction.
-	//}
-	//else
+	// Get true slope direction.
+	// TODO: Make it an option for the LD.
+	if (true/*g_GameFlow->Animations.HasSlideExtended*/)
+	{
+		if ((abs(coll->FloorTiltX) > 2 || abs(coll->FloorTiltZ) > 2))
+		{
+			float normalisedTiltX = 0;
+			if (coll->FloorTiltX)
+				normalisedTiltX = coll->FloorTiltX / abs(coll->FloorTiltX);
+
+			float normalisedTiltZ = 0;
+			if (coll->FloorTiltZ)
+				normalisedTiltZ = coll->FloorTiltZ / abs(coll->FloorTiltZ);
+
+			float xAngle = asin(-normalisedTiltX) * -ANGLE(180.0f) / PI;
+			float zAngle = acos(-normalisedTiltZ) * -ANGLE(180.0f) / PI;
+
+			direction = (xAngle * abs(coll->FloorTiltX) + zAngle * abs(coll->FloorTiltZ)) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
+
+			//float xAngle = phd_atan(CLICK(1) * coll->FloorTiltX, SECTOR(1));
+			//float zAngle = phd_atan(CLICK(1) * coll->FloorTiltZ, SECTOR(1));
+		}
+	}
+	// Get nearest cardinal slope direction.
+	else
 	{
 		if (coll->FloorTiltX > 2)
 			direction = -ANGLE(90.0f);

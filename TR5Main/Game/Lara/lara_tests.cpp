@@ -30,10 +30,10 @@ using namespace TEN::Floordata;
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	// Determine probe base left/right points
-	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
-	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
 
 	// Determine probe top point
 	int y = item->Position.yPos - coll->Setup.Height;
@@ -67,7 +67,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 		return false;
 
 	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
@@ -98,7 +98,7 @@ bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Temporary. coll->Setup.Radius is currently only set to
+	// HACK: coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
 	auto radius = (item->ActiveState == LS_CROUCH_IDLE ||
@@ -125,7 +125,17 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return (GetCollisionResult(item).Position.FloorSlope && !TestEnvironment(ENV_FLAG_SWAMP, item));
+	int y = item->Position.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (abs(probe.Position.Floor - y) <= CLICK(1) &&
+		probe.Position.FloorSlope &&
+		!TestEnvironment(ENV_FLAG_SWAMP, item))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
