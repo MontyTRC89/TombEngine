@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -34,9 +35,9 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.HasSlideExtended)
+		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			if (TrInput & IN_LEFT)
+			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -51,8 +52,8 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-		}*/
+			}*/
+		}
 
 		if (TrInput & IN_JUMP)
 		{
@@ -132,9 +133,9 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraSlide(item, coll))
 	{
 		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.HasSlideExtended)
+		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			if (TrInput & IN_LEFT)
+			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -149,8 +150,8 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-		}*/
+			}*/
+		}
 
 		if (TrInput & IN_JUMP)
 		{

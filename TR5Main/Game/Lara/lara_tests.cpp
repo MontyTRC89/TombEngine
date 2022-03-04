@@ -1030,7 +1030,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
@@ -1042,7 +1042,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
@@ -1055,7 +1055,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
@@ -2050,7 +2050,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up two steps.
 		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
 		if (vaultResult.Success &&
-			g_GameFlow->Animations.CrawlExtended)
+			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
 			return vaultResult;
@@ -2067,7 +2067,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up three steps.
 		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
 		if (vaultResult.Success &&
-			g_GameFlow->Animations.CrawlExtended)
+			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
 			return vaultResult;
@@ -2088,7 +2088,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to monkey swing.
 	vaultResult = TestLaraMonkeyAutoJump(item, coll);
 	if (vaultResult.Success &&
-		g_GameFlow->Animations.MonkeyAutoJump)
+		g_GameFlow->Animations.HasMonkeyAutoJump)
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
 		return vaultResult;
