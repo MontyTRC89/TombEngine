@@ -34,9 +34,13 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 	{
-		// TODO: Prepped for another time.
+		short direction = GetLaraSlideDirection(item, coll);
+
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
+			ApproachLaraTargetAngle(item, direction, 12);
+
+			// TODO: Prepped for another time.
 			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
@@ -54,8 +58,11 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}*/
 		}
+		else
+			item->Position.yRot = direction;
 
-		if (TrInput & IN_JUMP)
+		// TODO: Make the limited jump range equal to the steepness of the slope.
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
 		{
 			item->TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -107,6 +114,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraDeflectEdge(item, coll);
 
+	// TODO
 	if (TestLaraStep(item, coll))
 	{
 		LaraSnapToHeight(item, coll);
@@ -132,9 +140,13 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 	{
-		// TODO: Prepped for another time.
+		short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
+			ApproachLaraTargetAngle(item, direction, 12);
+
+			// TODO: Prepped for another time.
 			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
@@ -152,8 +164,10 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}*/
 		}
+		else
+			item->Position.yRot = direction;
 
-		if (TrInput & IN_JUMP)
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
 		{
 			item->TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -196,6 +210,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
+	// TODO: Stop stumbling when changing directions.
 	if (TestLaraSlide(item, coll))
 		SetLaraSlideState(item, coll);
 
