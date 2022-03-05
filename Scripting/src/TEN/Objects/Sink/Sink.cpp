@@ -73,18 +73,22 @@ std::string Sink::GetName() const
 
 void Sink::SetName(std::string const & id) 
 {
-	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
+	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
+	{
+		return;
+	}
 
-	// remove the old name if we have one
-	s_callbackRemoveName(m_sink.luaName);
-
-	// un-register any other sinks using this name.
-	// maybe we should throw an error if another sink
-	// already uses the name...
-	s_callbackRemoveName(id);
-	m_sink.luaName = id;
-	// todo add error checking
-	s_callbackSetName(id, m_sink);
+	if (s_callbackSetName(id, m_sink))
+	{
+		// remove the old name if we have one
+		s_callbackRemoveName(m_sink.luaName);
+		m_sink.luaName = id;
+	}
+	else
+	{
+		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
+		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+	}
 }
 
 int Sink::GetStrength() const
