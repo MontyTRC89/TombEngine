@@ -13,7 +13,7 @@
 #include "tr4_horseman.h" // OFF
 #include "tr4_jeanyves.h" // OK
 #include "tr4_knighttemplar.h" // OK
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
 #include "tr4_sentrygun.h" // OK
@@ -767,8 +767,8 @@ static void StartBaddy(OBJECT_INFO* obj)
 	obj = &Objects[ID_LITTLE_BEETLE];
 	if (obj->loaded)
 	{
-		obj->initialise = TEN::Entities::TR4::InitialiseScarabs;
-		obj->control = TEN::Entities::TR4::ScarabsControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseBeetleSwarm;
+		obj->control = TEN::Entities::TR4::BeetleSwarmControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
@@ -1223,5 +1223,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_SCARABS * sizeof(SCARAB_STRUCT));
+	ZeroMemory(TEN::Entities::TR4::BeetleSwarm, TEN::Entities::TR4::NUM_BEETLES * sizeof(BeetleInfo));
 }

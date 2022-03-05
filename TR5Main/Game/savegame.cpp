@@ -17,7 +17,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
@@ -634,19 +634,19 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::ScarabInfo>> scarabs;
 	for (int i = 0; i < NUM_BATS; i++)
 	{
-		SCARAB_STRUCT* scarab = &Scarabs[i];
+		BeetleInfo* scarab = &BeetleSwarm[i];
 
 		Save::ScarabInfoBuilder scarabInfo{ fbb };
 
-		scarabInfo.add_flags(scarab->flags);
-		scarabInfo.add_on(scarab->on);
-		scarabInfo.add_room_number(scarab->roomNumber);
-		scarabInfo.add_x(scarab->pos.xPos);
-		scarabInfo.add_y(scarab->pos.yPos);
-		scarabInfo.add_z(scarab->pos.zPos);
-		scarabInfo.add_x_rot(scarab->pos.xRot);
-		scarabInfo.add_y_rot(scarab->pos.yRot);
-		scarabInfo.add_z_rot(scarab->pos.zRot);
+		scarabInfo.add_flags(scarab->Flags);
+		scarabInfo.add_on(scarab->On);
+		scarabInfo.add_room_number(scarab->RoomNumber);
+		scarabInfo.add_x(scarab->Position.xPos);
+		scarabInfo.add_y(scarab->Position.yPos);
+		scarabInfo.add_z(scarab->Position.zPos);
+		scarabInfo.add_x_rot(scarab->Position.xRot);
+		scarabInfo.add_y_rot(scarab->Position.yRot);
+		scarabInfo.add_z_rot(scarab->Position.zRot);
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1114,17 +1114,17 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->scarabs()->size(); i++)
 	{
 		auto scarabInfo = s->scarabs()->Get(i);
-		SCARAB_STRUCT* scarab = &Scarabs[i];
+		BeetleInfo* scarab = &BeetleSwarm[i];
 
-		scarab->on = scarabInfo->on();
-		scarab->flags = scarabInfo->flags();
-		scarab->roomNumber = scarabInfo->room_number();
-		scarab->pos.xPos = scarabInfo->x();
-		scarab->pos.yPos = scarabInfo->y();
-		scarab->pos.zPos = scarabInfo->z();
-		scarab->pos.xRot = scarabInfo->x_rot();
-		scarab->pos.yRot = scarabInfo->y_rot();
-		scarab->pos.zRot = scarabInfo->z_rot();
+		scarab->On = scarabInfo->on();
+		scarab->Flags = scarabInfo->flags();
+		scarab->RoomNumber = scarabInfo->room_number();
+		scarab->Position.xPos = scarabInfo->x();
+		scarab->Position.yPos = scarabInfo->y();
+		scarab->Position.zPos = scarabInfo->z();
+		scarab->Position.xRot = scarabInfo->x_rot();
+		scarab->Position.yRot = scarabInfo->y_rot();
+		scarab->Position.zRot = scarabInfo->z_rot();
 	}
 
 	JustLoaded = 1;	
