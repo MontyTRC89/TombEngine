@@ -33,12 +33,12 @@ void KnightTemplarControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* objectInfo = &Objects[item->ObjectNumber];
+	auto* object = &Objects[item->ObjectNumber];
 
-	if (item->AnimNumber == objectInfo->animIndex ||
-		item->AnimNumber - objectInfo->animIndex == 1 ||
-		item->AnimNumber - objectInfo->animIndex == 11 ||
-		item->AnimNumber - objectInfo->animIndex == 12)
+	if (item->AnimNumber == object->animIndex ||
+		item->AnimNumber - object->animIndex == 1 ||
+		item->AnimNumber - object->animIndex == 11 ||
+		item->AnimNumber - object->animIndex == 12)
 	{
 		if (GetRandomControl() & 1)
 		{
@@ -57,9 +57,9 @@ void KnightTemplarControl(short itemNumber)
 	short joint1 = 0;
 	short joint2 = 0;
 
-	// Knight is immortal
-	if (item->HitPoints < objectInfo->HitPoints)
-		item->HitPoints = objectInfo->HitPoints;
+	// Knight is immortal.
+	if (item->HitPoints < object->HitPoints)
+		item->HitPoints = object->HitPoints;
 
 	if (item->AIBits)
 		GetAITarget(info);
@@ -95,7 +95,7 @@ void KnightTemplarControl(short itemNumber)
 		item->TargetState = 2;
 		info->flags = 0;
 
-		if (aiInfo.distance > SQUARE(682))
+		if (aiInfo.distance > pow(682, 2))
 		{
 			if (Lara.target == item)
 				item->TargetState = 6;
@@ -110,9 +110,9 @@ void KnightTemplarControl(short itemNumber)
 		break;
 
 	case 2:
-		info->maximumTurn = ANGLE(7);
+		info->maximumTurn = ANGLE(7.0f);
 
-		if (Lara.target == item || aiInfo.distance <= SQUARE(682))
+		if (Lara.target == item || aiInfo.distance <= pow(682, 2))
 			item->TargetState = 1;
 
 		break;
@@ -122,12 +122,12 @@ void KnightTemplarControl(short itemNumber)
 	case 5:
 		info->maximumTurn = 0;
 
-		if (abs(aiInfo.angle) >= ANGLE(1))
+		if (abs(aiInfo.angle) >= ANGLE(1.0f))
 		{
 			if (aiInfo.angle >= 0)
-				item->Position.yRot += ANGLE(1);
+				item->Position.yRot += ANGLE(1.0f);
 			else
-				item->Position.yRot -= ANGLE(1);
+				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
 			item->Position.yRot += aiInfo.angle;
@@ -170,9 +170,6 @@ void KnightTemplarControl(short itemNumber)
 			{
 				if (item->TouchBits & 0xC00)
 				{
-					LaraItem->HitPoints -= 120;
-					LaraItem->HitStatus = true;
-
 					CreatureEffect2(
 						item,
 						&KnightTemplarBite,
@@ -181,6 +178,9 @@ void KnightTemplarControl(short itemNumber)
 						DoBloodSplat);
 
 					info->flags = 1;
+
+					LaraItem->HitPoints -= 120;
+					LaraItem->HitStatus = true;
 				}
 			}
 		}
@@ -188,12 +188,12 @@ void KnightTemplarControl(short itemNumber)
 	case 6:
 		info->maximumTurn = 0;
 
-		if (abs(aiInfo.angle) >= ANGLE(1))
+		if (abs(aiInfo.angle) >= ANGLE(1.0f))
 		{
 			if (aiInfo.angle >= 0)
-				item->Position.yRot += ANGLE(1);
+				item->Position.yRot += ANGLE(1.0f);
 			else
-				item->Position.yRot -= ANGLE(1);
+				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
 			item->Position.yRot += aiInfo.angle;
@@ -205,7 +205,7 @@ void KnightTemplarControl(short itemNumber)
 			else
 				item->TargetState = 8;
 		}
-		else if (aiInfo.distance <= SQUARE(682) || Lara.target != item)
+		else if (aiInfo.distance <= pow(682, 2) || Lara.target != item)
 			item->TargetState = 1;
 		else
 			item->TargetState = 6;

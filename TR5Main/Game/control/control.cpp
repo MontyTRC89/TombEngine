@@ -34,7 +34,7 @@
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
@@ -390,7 +390,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		UpdateScarabs();
+		UpdateBeetleSwarm();
 		UpdateLocusts();
 		AnimateWaterfalls();
 
