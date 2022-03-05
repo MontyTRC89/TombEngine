@@ -152,13 +152,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 
 void DoLaraFallDamage(ITEM_INFO* item)
 {
-	if (item->VerticalVelocity >= LARA_FREEFALL_DAMAGE_VELOCITY)
+	if (item->VerticalVelocity >= LARA_DAMAGE_VELOCITY)
 	{
-		if (item->VerticalVelocity >= LARA_FREEFALL_DEATH_VELOCITY)
+		if (item->VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
 		else [[likely]]
 		{
-			int base = item->VerticalVelocity - (LARA_FREEFALL_DAMAGE_VELOCITY - 1);
+			int base = item->VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 	}
@@ -228,15 +228,13 @@ void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 
 LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
-	if (item->ObjectNumber != ID_LARA)
-	{
-		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-		
-		auto* firstLaraItem = FindItem(ID_LARA);
-		return (LaraInfo*&)firstLaraItem->Data;
-	}
+	if (item->ObjectNumber == ID_LARA)
+		return (LaraInfo*&)item->Data;
 
-	return (LaraInfo*&)item->Data;
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+
+	auto* firstLaraItem = FindItem(ID_LARA);
+	return (LaraInfo*&)firstLaraItem->Data;
 }
 
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
