@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-	#define BAT_ANGLE ANGLE(20.0f)
+#define BAT_ANGLE ANGLE(20.0f)
 
 	constexpr auto BAT_ANIM_FALLING = 3;
 	constexpr auto BAT_ANIM_IDLE = 5;
@@ -33,6 +33,12 @@ namespace TEN::Entities::TR4
 		BAT_STATE_FALL,
 		BAT_STATE_DEATH,
 		BAT_STATE_IDLE
+	};
+
+	// TODO
+	enum BatAnim
+	{
+
 	};
 
 	static bool isBatCollideTarget(ITEM_INFO* item)
