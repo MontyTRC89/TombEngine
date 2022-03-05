@@ -111,6 +111,7 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeBack = GetCollisionResult(item, item->Position.yRot + ANGLE(180.0f), radius, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
+	// TODO: Assess clamp instead?
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches. @Sezz 2021.10.15
 	if ((probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||	// Front is not a clamp.

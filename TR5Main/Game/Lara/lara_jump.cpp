@@ -138,7 +138,7 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = item->Velocity * 0.95f;
 
-	if (item->VerticalVelocity == LARA_FREEFALL_DEATH_VELOCITY &&
+	if (item->VerticalVelocity == LARA_DEATH_VELOCITY &&
 		item->HitPoints > 0)
 	{
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Position, 0);
@@ -785,6 +785,8 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
+		DoLaraFallDamage(item);
+
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
@@ -851,7 +853,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		if (item->VerticalVelocity >= LARA_FREEFALL_DIVE_DEATH_VELOCITY ||
+		if (item->VerticalVelocity >= LARA_DIVE_DEATH_VELOCITY ||
 			item->HitPoints <= 0)
 		{
 			item->TargetState = LS_DEATH;
