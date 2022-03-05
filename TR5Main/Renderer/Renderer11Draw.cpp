@@ -15,7 +15,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "RenderView/RenderView.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/weather.h"
@@ -1625,22 +1625,22 @@ namespace TEN::Renderer
 			for (int m = 0; m < 32; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int i = 0; i < TEN::Entities::TR4::NUM_SCARABS; i++)
+			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				SCARAB_STRUCT* beetle = &TEN::Entities::TR4::Scarabs[i];
+				BeetleInfo* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
 
-				if (beetle->on)
+				if (beetle->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
-						Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->pos.yRot), TO_RAD(beetle->pos.xRot),
-					                                                 TO_RAD(beetle->pos.zRot));
+						Matrix::CreateTranslation(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Position.yRot), TO_RAD(beetle->Position.xRot),
+					                                                 TO_RAD(beetle->Position.zRot));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+					m_stItem.Position = Vector4(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, 1.0f);
+					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)

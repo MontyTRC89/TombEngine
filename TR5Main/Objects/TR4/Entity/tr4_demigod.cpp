@@ -13,39 +13,47 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
-	enum DEMIGOD_STATES
+	enum DemigodState
 	{
-		STATE_DEMIGOD_STOP = 0,
+		STATE_DEMIGOD_IDLE = 0,
 		STATE_DEMIGOD_WALK = 1,
 		STATE_DEMIGOD_RUN = 2,
 		STATE_DEMIGOD_AIM = 3,
 		STATE_DEMIGOD_ATTACK = 4,
 		STATE_DEMIGOD_START_FLY = 5,
 		STATE_DEMIGOD_FLY = 6,
-		STATE_DEMIGOD_STOP_FLY = 7,
-		STATE_DEMIGOD_DEATH1 = 8,
+		STATE_DEMIGOD_IDLE_FLY = 7,
+		STATE_DEMIGOD_DEATH_1 = 8,
 		STATE_DEMIGOD_CIRCLE_AIM = 9,
 		STATE_DEMIGOD_CIRCLE_ATTACK = 10,
 		STATE_DEMIGOD_GROUND_AIM = 11,
 		STATE_DEMIGOD_GROUND_ATTACK = 12,
 		STATE_DEMIGOD_HAMMER_AIM = 13,
 		STATE_DEMIGOD_HAMMER_ATTACK = 14,
-		STATE_DEMIGOD_DEATH2 = 15
+		STATE_DEMIGOD_DEATH_2 = 15
 	};
 
-	void TriggerDemigodMissileFlame(short fxNum, short xVel, short yVel, short zVel)
+	// TODO
+	enum DemigodAnim
 	{
-		FX_INFO* fx = &EffectList[fxNum];
+
+	};
+
+	void TriggerDemigodMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
+	{
+		auto* fx = &EffectList[fxNumber];
 
 		int dx = LaraItem->Position.xPos - fx->pos.xPos;
 		int dz = LaraItem->Position.zPos - fx->pos.zPos;
 
-		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			if (fx->flag1 == 3 || fx->flag1 == 4)
@@ -66,6 +74,7 @@ namespace TEN::Entities::TR4
 				spark->dB = 0;
 				spark->dG = spark->dR - (GetRandomControl() & 0x1F);
 			}
+
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 			spark->transType = TransTypeEnum::COLADD;
@@ -79,17 +88,15 @@ namespace TEN::Entities::TR4
 			spark->friction = 68;
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
+
 			if (GetRandomControl() & 1)
-			{
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			}
 			else
-			{
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-			}
+
 			spark->gravity = 0;
 			spark->maxYvel = 0;
-			spark->fxObj = fxNum;
+			spark->fxObj = fxNumber;
 			spark->scalar = 2;
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
@@ -98,24 +105,26 @@ namespace TEN::Entities::TR4
 
 	void TriggerDemigodMissile(PHD_3DPOS* pos, short roomNumber, int flags)
 	{
-		short fxNum = CreateNewEffect(roomNumber);
-		if (fxNum != -1)
+		short fxNumber = CreateNewEffect(roomNumber);
+		if (fxNumber != -1)
 		{
-			FX_INFO* fx = &EffectList[fxNum];
+			FX_INFO* fx = &EffectList[fxNumber];
 
 			fx->pos.xPos = pos->xPos;
 			fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.zPos = pos->zPos;
 
 			fx->pos.xRot = pos->xRot;
+
 			if (flags < 4)
 				fx->pos.yRot = pos->yRot;
 			else
 				fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
+
 			fx->pos.zRot = 0;
 
 			fx->roomNumber = roomNumber;
-			fx->counter = 2 * GetRandomControl() + -ANGLE(180);
+			fx->counter = 2 * GetRandomControl() + -ANGLE(180.0f);
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -125,7 +134,7 @@ namespace TEN::Entities::TR4
 
 	void DoDemigodEffects(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		short animIndex = item->AnimNumber - Objects[item->ObjectNumber].animIndex;
 
@@ -133,19 +142,10 @@ namespace TEN::Entities::TR4
 		{
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 			{
-				PHD_VECTOR pos1;
-				PHD_VECTOR pos2;
-
-				pos1.x = -544;
-				pos1.y = 96;
-				pos1.z = 0;
-
+				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
 
-				pos2.x = -900;
-				pos2.y = 96;
-				pos2.z = 0;
-
+				PHD_VECTOR pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
 				short angles[2];
@@ -160,13 +160,9 @@ namespace TEN::Entities::TR4
 				pos.zRot = 0;
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
-				{
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
-				}
 				else
-				{
 					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
-				}
 			}
 		}
 		else if (animIndex == 19)
@@ -174,19 +170,10 @@ namespace TEN::Entities::TR4
 
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 			{
-				PHD_VECTOR pos1;
-				PHD_VECTOR pos2;
-
-				pos1.x = -544;
-				pos1.y = 96;
-				pos1.z = 0;
-
+				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
 
-				pos2.x = -900;
-				pos2.y = 96;
-				pos2.z = 0;
-
+				PHD_VECTOR pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
 				short angles[2];
@@ -201,13 +188,9 @@ namespace TEN::Entities::TR4
 				pos.zRot = 0;
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
-				{
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
-				}
 				else
-				{
 					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
-				}
 			}
 		}
 		else if (animIndex == 16)
@@ -217,16 +200,8 @@ namespace TEN::Entities::TR4
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				PHD_VECTOR pos1;
-				PHD_VECTOR pos2;
-
-				pos1.x = 0;
-				pos1.y = 0;
-				pos1.z = 192;
-
-				pos2.x = 0;
-				pos2.y = 0;
-				pos2.z = 384;
+				PHD_VECTOR pos1 = { 0, 0, 192 };
+				PHD_VECTOR pos2 = { 0, 0, 384 };
 
 				if (GlobalCounter & 1)
 				{
@@ -264,7 +239,7 @@ namespace TEN::Entities::TR4
 		{
 			for (int i = 0; i < something; i++)
 			{
-				SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+				auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
 				spark->on = true;
 				spark->sShade = 0;
@@ -285,23 +260,17 @@ namespace TEN::Entities::TR4
 				{
 					spark->flags = 16;
 					spark->rotAng = GetRandomControl() & 0xFFF;
+
 					if (GetRandomControl() & 1)
-					{
 						spark->rotAdd = -64 - (GetRandomControl() & 0x3F);
-					}
 					else
-					{
 						spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
-					}
 				}
 				else if (g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WIND)
-				{
 					spark->flags = 256;
-				}
 				else
-				{
 					spark->flags = SP_NONE;
-				}
+				
 				spark->gravity = -4 - (GetRandomControl() & 3);
 				spark->maxYvel = -4 - (GetRandomControl() & 3);
 				spark->dSize = ((GetRandomControl() & 0x3F) + 64);
@@ -315,14 +284,14 @@ namespace TEN::Entities::TR4
 
 	void InitialiseDemigod(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
 
 		item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->TargetState = STATE_DEMIGOD_STOP;
+		item->TargetState = STATE_DEMIGOD_IDLE;
 		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = STATE_DEMIGOD_STOP;
+		item->ActiveState = STATE_DEMIGOD_IDLE;
 
 		/*if (g_Level.NumItems > 0)
 		{
@@ -346,15 +315,18 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		int someitemNumber = item->ItemFlags[0];
-		if (someitemNumber && g_Level.Items[someitemNumber].Status == ITEM_ACTIVE && g_Level.Items[someitemNumber].Active)
+		auto* item = &g_Level.Items[itemNumber];
+
+		int someItemNumber = item->ItemFlags[0];
+		if (someItemNumber &&
+			g_Level.Items[someItemNumber].Status == ITEM_ACTIVE &&
+			g_Level.Items[someItemNumber].Active)
 		{
 			item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 			return;
 		}
 
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		auto* creature = GetCreatureInfo(item);
 
 		short tilt = 0;
 		short angle = 0;
@@ -366,20 +338,21 @@ namespace TEN::Entities::TR4
 		if (item->HitPoints <= 0)
 		{
 			item->HitPoints = 0;
-			if (item->ActiveState != STATE_DEMIGOD_DEATH1 
-				&& item->ActiveState != STATE_DEMIGOD_DEATH2)
+
+			if (item->ActiveState != STATE_DEMIGOD_DEATH_1 &&
+				item->ActiveState != STATE_DEMIGOD_DEATH_2)
 			{
-				if (item->ActiveState == STATE_DEMIGOD_WALK 
-					|| item->ActiveState == STATE_DEMIGOD_RUN)
+				if (item->ActiveState == STATE_DEMIGOD_WALK ||
+					item->ActiveState == STATE_DEMIGOD_RUN)
 				{
 					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
-					item->ActiveState = STATE_DEMIGOD_DEATH2;
+					item->ActiveState = STATE_DEMIGOD_DEATH_2;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				}
 				else
 				{
 					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-					item->ActiveState = STATE_DEMIGOD_DEATH1;
+					item->ActiveState = STATE_DEMIGOD_DEATH_1;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				}
 			}
@@ -389,81 +362,80 @@ namespace TEN::Entities::TR4
 			if (item->AIBits)
 				GetAITarget(creature);
 
-			AI_INFO info;
-			AI_INFO laraInfo;
-
 			int dx = 0;
 			int dy = 0;
 			int dz = 0;
 
-			CreatureAIInfo(item, &info);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
+			AI_INFO laraAI;
 			if (creature->enemy == LaraItem)
 			{
-				laraInfo.ahead = info.ahead;
-				laraInfo.angle = info.angle;
-				laraInfo.xAngle = 0;
+				laraAI.ahead = AI.ahead;
+				laraAI.angle = AI.angle;
+				laraAI.xAngle = 0;
 			}
 			else
 			{
 				dx = LaraItem->Position.xPos - item->Position.xPos;
 				dz = LaraItem->Position.zPos - item->Position.zPos;
-				laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
-				laraInfo.xAngle = 0;
+				laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+				laraAI.xAngle = 0;
 
-				laraInfo.ahead = true;
-				if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
-					laraInfo.ahead = false;
+				laraAI.ahead = true;
+				if (laraAI.angle <= -ANGLE(90.0f) || laraAI.angle >= ANGLE(90.0f))
+					laraAI.ahead = false;
 
 				dx = abs(dx);
 				dy = item->Position.yPos - LaraItem->Position.yPos;
 				dz = abs(dz);
 
 				if (dx <= dz)
-					laraInfo.xAngle = phd_atan(dz + (dx >> 1), dy);
+					laraAI.xAngle = phd_atan(dz + (dx >> 1), dy);
 				else
-					laraInfo.xAngle = phd_atan(dx + (dz >> 1), dy);
+					laraAI.xAngle = phd_atan(dx + (dz >> 1), dy);
 			}
 
-			GetCreatureMood(item, &info, VIOLENT);
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 
-			if (laraInfo.ahead)
+			if (laraAI.ahead)
 			{
-				joint0 = laraInfo.angle >> 1;
-				joint1 = -laraInfo.xAngle;
-				joint2 = laraInfo.angle >> 1;
-				joint3 = laraInfo.angle >> 1;
+				joint0 = laraAI.angle >> 1;
+				joint1 = -laraAI.xAngle;
+				joint2 = laraAI.angle >> 1;
+				joint3 = laraAI.angle >> 1;
 			}
-			else if (info.ahead)
+			else if (AI.ahead)
 			{
-				joint0 = info.angle >> 1;
-				joint1 = -info.xAngle;
-				joint2 = info.angle >> 1;
-				joint3 = info.angle >> 1;
+				joint0 = AI.angle >> 1;
+				joint1 = -AI.xAngle;
+				joint2 = AI.angle >> 1;
+				joint3 = AI.angle >> 1;
 			}
 
 			switch (item->ActiveState)
 			{
-			case STATE_DEMIGOD_STOP:
+			case STATE_DEMIGOD_IDLE:
 				creature->maximumTurn = 0;
 
-				if (info.ahead)
-					joint1 = -info.xAngle;
+				if (AI.ahead)
+					joint1 = -AI.xAngle;
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (info.distance >= SQUARE(3072))
+					if (AI.distance >= pow(SECTOR(3), 2))
 					{
 						item->TargetState = STATE_DEMIGOD_WALK;
 						break;
 					}
-					if (info.bite
-						|| LaraItem->ActiveState >= LS_LADDER_IDLE
-						&& LaraItem->ActiveState <= LS_LADDER_DOWN
-						&& !Lara.location)
+					if (AI.bite ||
+						LaraItem->ActiveState >= LS_LADDER_IDLE &&
+						LaraItem->ActiveState <= LS_LADDER_DOWN &&
+						!Lara.location)
 					{
 						item->TargetState = STATE_DEMIGOD_HAMMER_AIM;
 						break;
@@ -471,23 +443,26 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (Targetable(item, &info))
+					if (Targetable(item, &AI))
 					{
 						creature->flags = 1;
+
 						if (item->ObjectNumber == ID_DEMIGOD2)
 							item->TargetState = STATE_DEMIGOD_AIM;
 						else
 							item->TargetState = STATE_DEMIGOD_GROUND_AIM;
+
 						break;
 					}
 
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (info.distance <= SQUARE(2048) || info.distance >= SQUARE(5120))
+						if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
 						{
 							item->TargetState = STATE_DEMIGOD_WALK;
 							break;
 						}
+
 						if (!(GetRandomControl() & 3))
 						{
 							item->TargetState = STATE_DEMIGOD_CIRCLE_AIM;
@@ -496,115 +471,106 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (info.distance <= SQUARE(3072) || item->ObjectNumber != ID_DEMIGOD2)
+				if (AI.distance <= pow(SECTOR(3), 2) || item->ObjectNumber != ID_DEMIGOD2)
 				{
 					item->TargetState = STATE_DEMIGOD_WALK;
 					break;
 				}
 
 				item->TargetState = STATE_DEMIGOD_FLY;
-
 				break;
 
 			case STATE_DEMIGOD_WALK:
-				creature->maximumTurn = ANGLE(7);
+				creature->maximumTurn = ANGLE(7.0f);
 
-				if (info.distance < SQUARE(2048))
+				if (AI.distance < pow(SECTOR(2), 2))
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (info.distance < SQUARE(3072))
+					if (AI.distance < pow(SECTOR(3), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_STOP;
+						item->TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 				}
 				else
 				{
-					if (Targetable(item, &info))
+					if (Targetable(item, &AI))
 					{
-						item->TargetState = STATE_DEMIGOD_STOP;
+						item->TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 
 				}
 
-				if (info.distance > SQUARE(3072))
+				if (AI.distance > pow(SECTOR(3), 2))
 				{
 					if (item->ObjectNumber == ID_DEMIGOD2)
-					{
 						item->TargetState = STATE_DEMIGOD_FLY;
-					}
 					else
-					{
 						item->TargetState = STATE_DEMIGOD_RUN;
-					}
 				}
 
 				break;
 
 			case STATE_DEMIGOD_RUN:
-				creature->maximumTurn = ANGLE(7);
+				creature->maximumTurn = ANGLE(7.0f);
 
-				if (info.distance < SQUARE(2048))
+				if (AI.distance < pow(SECTOR(2), 2))
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
-					if (info.distance < SQUARE(3072))
+					if (AI.distance < pow(SECTOR(3), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_STOP;
+						item->TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 				}
 				else
 				{
-					if (Targetable(item, &info) || item->ObjectNumber == ID_DEMIGOD3 && info.distance > SQUARE(2048))
+					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > pow(SECTOR(2), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_STOP;
+						item->TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 
-					if (info.distance < SQUARE(3072))
-					{
+					if (AI.distance < pow(SECTOR(3), 2))
 						item->TargetState = STATE_DEMIGOD_WALK;
-					}
 				}
 
 				break;
 
 			case STATE_DEMIGOD_AIM:
-				if (info.ahead)
-				{
-					joint1 = -info.xAngle;
-				}
-
 				creature->maximumTurn = 0;
+
+				if (AI.ahead)
+					joint1 = -AI.xAngle;
 
 				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
-					if (info.angle >= ANGLE(7))
-						item->Position.yRot += ANGLE(7);
-					else if (info.angle <= -ANGLE(7))
-						item->Position.yRot += -ANGLE(7);
+					if (AI.angle >= ANGLE(7.0f))
+						item->Position.yRot += ANGLE(7.0f);
+					else if (AI.angle <= -ANGLE(7))
+						item->Position.yRot += -ANGLE(7.0f);
 					else
-						item->Position.yRot += info.angle;
+						item->Position.yRot += AI.angle;
 				}
 
-				if (Targetable(item, &info) || creature->flags)
+				if (Targetable(item, &AI) || creature->flags)
 				{
 					item->TargetState = STATE_DEMIGOD_ATTACK;
 					creature->flags = 0;
 				}
 				else
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 					creature->flags = 0;
 				}
 
@@ -616,66 +582,59 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_FLY:
-				creature->maximumTurn = ANGLE(7);
+				creature->maximumTurn = ANGLE(7.0f);
 
-				if (Targetable(item, &info))
-				{
-					item->TargetState = STATE_DEMIGOD_STOP_FLY;
-				}
+				if (Targetable(item, &AI))
+					item->TargetState = STATE_DEMIGOD_IDLE_FLY;
 
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_AIM:
-				creature->maximumTurn = ANGLE(7);
-				if (!Targetable(item, &info) && info.distance < SQUARE(5120))
-				{
+				creature->maximumTurn = ANGLE(7.0f);
+				if (!Targetable(item, &AI) && AI.distance < pow(SECTOR(5), 2))
 					item->TargetState = STATE_DEMIGOD_CIRCLE_ATTACK;
-				}
 
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_ATTACK:
-				creature->maximumTurn = ANGLE(7);
+				creature->maximumTurn = ANGLE(7.0f);
 
 				DoDemigodEffects(itemNumber);
 
-				if (!Targetable(item, &info) || info.distance < SQUARE(5120) || !GetRandomControl())
+				if (!Targetable(item, &AI) || AI.distance < pow(SECTOR(5), 2) || !GetRandomControl())
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 
 				break;
 
 			case STATE_DEMIGOD_GROUND_AIM:
+				creature->maximumTurn = 0;
 				joint2 = joint0;
 				joint0 = 0;
 
-				if (info.ahead)
-				{
-					joint1 = -info.xAngle;
-				}
-
-				creature->maximumTurn = 0;
+				if (AI.ahead)
+					joint1 = -AI.xAngle;
 
 				if (item->AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
-					if (info.angle >= ANGLE(7))
-						item->Position.yRot += ANGLE(7);
-					else if (info.angle <= -ANGLE(7))
-						item->Position.yRot += -ANGLE(7);
+					if (AI.angle >= ANGLE(7.0f))
+						item->Position.yRot += ANGLE(7.0f);
+					else if (AI.angle <= -ANGLE(7.0f))
+						item->Position.yRot += -ANGLE(7.0f);
 					else
-						item->Position.yRot += info.angle;
+						item->Position.yRot += AI.angle;
 				}
 
-				if (Targetable(item, &info) || creature->flags)
+				if (Targetable(item, &AI) || creature->flags)
 				{
 					item->TargetState = STATE_DEMIGOD_GROUND_ATTACK;
 					creature->flags = 0;
 				}
 				else
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 					creature->flags = 0;
 				}
 
@@ -686,50 +645,39 @@ namespace TEN::Entities::TR4
 				joint2 = joint0;
 				joint0 = 0;
 
-				if (info.angle >= ANGLE(7))
-					item->Position.yRot += ANGLE(7);
-				else if (info.angle <= -ANGLE(7))
-					item->Position.yRot += -ANGLE(7);
+				if (AI.angle >= ANGLE(7.0f))
+					item->Position.yRot += ANGLE(7.0f);
+				else if (AI.angle <= -ANGLE(7.0f))
+					item->Position.yRot += -ANGLE(7.0f);
 				else
-					item->Position.yRot += info.angle;
+					item->Position.yRot += AI.angle;
 
-				if (info.distance >= SQUARE(3072)
-					|| !info.bite
-					&& (LaraItem->ActiveState < LS_LADDER_IDLE
-						|| LaraItem->ActiveState > LS_LADDER_DOWN 
-						|| Lara.location))
+				if (AI.distance >= pow(SECTOR(3), 2) ||
+					!AI.bite &&
+					(LaraItem->ActiveState < LS_LADDER_IDLE ||
+						LaraItem->ActiveState > LS_LADDER_DOWN ||
+						Lara.location))
 				{
-					item->TargetState = STATE_DEMIGOD_STOP;
+					item->TargetState = STATE_DEMIGOD_IDLE;
 				}
 				else
-				{
 					item->TargetState = STATE_DEMIGOD_HAMMER_ATTACK;
-				}
 
 				break;
 
 			case STATE_DEMIGOD_HAMMER_ATTACK:
 				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 26)
 				{
-					PHD_VECTOR pos;
-
-					pos.x = 80;
-					pos.y = -8;
-					pos.z = -40;
-
+					PHD_VECTOR pos = { 80, -8, -40 };
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;
 					FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 					int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 					if (height == NO_HEIGHT)
-					{
 						pos.y = pos.y - 128;
-					}
 					else
-					{
 						pos.y = height - 128;
-					}
 
 					TriggerShockwave((PHD_3DPOS*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
@@ -752,7 +700,6 @@ namespace TEN::Entities::TR4
 
 			default:
 				break;
-
 			}
 		}
 
