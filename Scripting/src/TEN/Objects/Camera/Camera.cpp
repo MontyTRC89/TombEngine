@@ -6,9 +6,10 @@
 #include "Position/Position.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
+#include "Specific/level.h"
 
 /***
-Camera info
+Basic cameras that can point at Lara or at a CAMERA_TARGET.
 
 @tenclass Objects.Camera
 @pragma nostrip
@@ -33,18 +34,36 @@ void Camera::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// (@{Position}) position in level
-		// @mem pos
-		"pos", sol::property(&Camera::GetPos, &Camera::SetPos),
+		/// Get the camera's position
+		// @function GetPosition
+		// @treturn Position a copy of the camera's position
+		ScriptReserved_GetPosition, &Camera::GetPos,
 
-		/// (string) unique string identifier.
-		// e.g. "flyby\_start" or "big\_door\_hint"
-		// @mem name
-		"name", sol::property(&Camera::GetName, &Camera::SetName),
+		/// Set the camera's position
+		// @function SetPosition
+		// @tparam Position position the new position of the camera 
+		ScriptReserved_SetPosition, &Camera::SetPos,
 
-		/// (string) room number
-		// @mem room
-		"room", sol::property(&Camera::GetRoom, &Camera::SetRoom)
+		/// Get the camera's unique string identifier
+		// @function GetName
+		// @treturn string the camera's name
+		ScriptReserved_GetName, &Camera::GetName,
+
+		/// Set the camera's name (its unique string identifier)
+		// @function SetName
+		// @tparam string name The camera's new name
+		ScriptReserved_SetName, &Camera::SetName,
+
+		/// Get the current room of the camera
+		// @function Camera:GetRoom
+		// @treturn int number representing the current room of the camera
+		ScriptReserved_GetRoom, &Camera::GetRoom,
+
+		/// Set room of camera 
+		// This is used in conjunction with SetPosition to teleport the camera to a new room.
+		// @function Camera:SetRoom
+		// @tparam int ID the ID of the new room 
+		ScriptReserved_SetRoom, &Camera::SetRoom
 		);
 }
 
@@ -67,18 +86,22 @@ std::string Camera::GetName() const
 
 void Camera::SetName(std::string const & id) 
 {
-	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
+	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
+	{
+		return;
+	}
 
-	// remove the old name if we have one
-	s_callbackRemoveName(m_camera.luaName);
-
-	// un-register any other objects using this name.
-	// maybe we should throw an error if another object
-	// already uses the name...
-	s_callbackRemoveName(id);
-	m_camera.luaName = id;
-	// todo add error checking
-	s_callbackSetName(id, m_camera);
+	if (s_callbackSetName(id, m_camera))
+	{
+		// remove the old name if we have one
+		s_callbackRemoveName(m_camera.luaName);
+		m_camera.luaName = id;
+	}
+	else
+	{
+		ScriptAssertF(false, "Could not add name {} - does a camera with this name already exist?", id);
+		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+	}
 }
 
 short Camera::GetRoom() const
@@ -88,6 +111,14 @@ short Camera::GetRoom() const
 
 void Camera::SetRoom(short room)
 {	
+	const size_t nRooms = g_Level.Rooms.size();
+	if (room < 0 || static_cast<size_t>(room) >= nRooms)
+	{
+		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", room, nRooms);
+		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
+		return;
+	}
+
 	m_camera.roomNumber = room;
 }
 #endif
