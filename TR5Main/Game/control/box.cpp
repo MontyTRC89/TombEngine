@@ -2003,7 +2003,7 @@ void InitialiseItemBoxData()
 	{
 		auto* currentItem = &g_Level.Items[i];
 
-		if (currentItem->Active && currentItem->Data.is<PUSHABLE_INFO>())
+		if (currentItem->Active && currentItem->Data.is<PushableInfo>())
 			ClearMovableBlockSplitters(currentItem->Position.xPos, currentItem->Position.yPos, currentItem->Position.zPos, currentItem->RoomNumber);
 	}
 
