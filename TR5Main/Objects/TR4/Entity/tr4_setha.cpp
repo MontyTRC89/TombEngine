@@ -34,7 +34,7 @@ void SethaControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 
 	int x = item->Position.xPos;
 	int y = item->Position.yPos;
@@ -86,20 +86,20 @@ void SethaControl(short itemNumber)
 		if (item->AIBits & AMBUSH)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 		CreatureAIInfo(item, &info);
 
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->LOT.isJumping = false;
-			creature->flags = 0;
+			creature->LOT.IsJumping = false;
+			creature->Flags = 0;
 
 			if (item->RequiredState)
 			{
@@ -172,7 +172,7 @@ void SethaControl(short itemNumber)
 			}
 			else
 			{
-				if (creature->reachedGoal)
+				if (creature->ReachedGoal)
 				{
 					item->TargetState = 14;
 					break;
@@ -180,7 +180,7 @@ void SethaControl(short itemNumber)
 				else
 				{
 					item->AIBits = AMBUSH;
-					creature->hurtByLara = true;
+					creature->HurtByLara = true;
 				}
 			}
 
@@ -189,11 +189,11 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 2u:
-			creature->maximumTurn = ANGLE(7);
+			creature->MaxTurn = ANGLE(7);
 			if (info.bite 
 				&& info.distance < SQUARE(4096) 
 				|| canJump 
-				|| creature->reachedGoal)
+				|| creature->ReachedGoal)
 			{
 				item->TargetState = 1;
 			}
@@ -204,11 +204,11 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(11);
+			creature->MaxTurn = ANGLE(11);
 			if (info.bite 
 				&& info.distance < SQUARE(4096)
 				|| canJump 
-				|| creature->reachedGoal)
+				|| creature->ReachedGoal)
 			{
 				item->TargetState = 1;
 			}
@@ -224,12 +224,12 @@ void SethaControl(short itemNumber)
 				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 15
 					&& item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				{
-					creature->reachedGoal = true;
-					creature->maximumTurn = 0;
+					creature->ReachedGoal = true;
+					creature->MaxTurn = 0;
 				}
 			}
 
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits)
 				{
@@ -239,7 +239,7 @@ void SethaControl(short itemNumber)
 						{
 							LaraItem->HitPoints -= 200;
 							LaraItem->HitStatus = true;
-							creature->flags = 1;
+							creature->Flags = 1;
 							CreatureEffect2(
 								item,
 								&SethaBite1,
@@ -252,7 +252,7 @@ void SethaControl(short itemNumber)
 						{
 							LaraItem->HitPoints -= 200;
 							LaraItem->HitStatus = true;
-							creature->flags = 1;
+							creature->Flags = 1;
 							CreatureEffect2(
 								item,
 								&SethaBite2,
@@ -267,8 +267,8 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 5:
-			creature->reachedGoal = true;
-			creature->maximumTurn = 0;
+			creature->ReachedGoal = true;
+			creature->MaxTurn = 0;
 			break;
 
 		case 7:
@@ -284,7 +284,7 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			
 			if (abs(info.angle) >= ANGLE(3))
 			{
@@ -302,7 +302,7 @@ void SethaControl(short itemNumber)
 				item->Position.yRot += info.angle;
 			}
 
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits)
 				{
@@ -311,7 +311,7 @@ void SethaControl(short itemNumber)
 					{
 						LaraItem->HitPoints -= 250;
 						LaraItem->HitStatus = true;
-						creature->flags = 1;
+						creature->Flags = 1;
 						CreatureEffect2(
 							item,
 							&SethaBite1,
@@ -325,7 +325,7 @@ void SethaControl(short itemNumber)
 			if (LaraItem->HitPoints < 0)
 			{
 				CreatureKill(item, 14, 9, 443);
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				return;
 			}
 
@@ -336,9 +336,9 @@ void SethaControl(short itemNumber)
 		case 13:
 		case 15:
 			if (item->ActiveState==15)
-				creature->target.y = LaraItem->Position.yPos;
+				creature->Target.y = LaraItem->Position.yPos;
 		
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (abs(info.angle) >= ANGLE(3))
 			{
@@ -363,10 +363,10 @@ void SethaControl(short itemNumber)
 		case 14:
 			if (item->AnimNumber != Objects[item->AnimNumber].animIndex + 26)
 			{
-				creature->LOT.fly = 16;
+				creature->LOT.Fly = 16;
 				item->Airborne = false;
-				creature->maximumTurn = 0;
-				creature->target.y = LaraItem->Position.yPos;
+				creature->MaxTurn = 0;
+				creature->Target.y = LaraItem->Position.yPos;
 
 				if (abs(info.angle) >= ANGLE(3))
 				{
@@ -395,7 +395,7 @@ void SethaControl(short itemNumber)
 			}
 			else
 			{
-				creature->LOT.fly = 0;
+				creature->LOT.Fly = 0;
 				item->Airborne = true;
 				if (item->Position.yPos - item->Floor > 0)
 				{
@@ -415,7 +415,7 @@ void SethaControl(short itemNumber)
 	{
 		if ((Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN || Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
 			&& info.distance < SQUARE(2048)
-			&& !(creature->LOT.isJumping))
+			&& !(creature->LOT.IsJumping))
 		{
 			if (item->ActiveState != 12)
 			{

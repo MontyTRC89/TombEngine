@@ -47,14 +47,14 @@ void MPGunControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	short torsoY = 0;
 	short torsoX = 0;
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->FiredWeapon)
+	if (creature->FiredWeapon)
 	{
 		PHD_VECTOR pos;
 
@@ -63,8 +63,8 @@ void MPGunControl(short itemNumber)
 		pos.z = mpgunBite.z;
 
 		GetJointAbsPosition(item, &pos, mpgunBite.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, (item->FiredWeapon * 2) + 4, 24, 16, 4);
-		item->FiredWeapon--;
+		TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
+		creature->FiredWeapon--;
 	}
 
 	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
@@ -112,7 +112,7 @@ void MPGunControl(short itemNumber)
 			GetAITarget(creature);
 		else
 		{
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 			dx = LaraItem->Position.xPos - item->Position.xPos;
 			dz = LaraItem->Position.zPos - item->Position.zPos;
@@ -121,11 +121,11 @@ void MPGunControl(short itemNumber)
 			
 			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
-				CREATURE_INFO* currentCreature = ActiveCreatures[slot];
-				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
+				CreatureInfo* currentCreature = ActiveCreatures[slot];
+				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					continue;
 
-				target = &g_Level.Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->ItemNumber];
 				if (target->ObjectNumber != ID_LARA)
 					continue;
 
@@ -133,13 +133,13 @@ void MPGunControl(short itemNumber)
 				dz = target->Position.zPos - item->Position.zPos;
 				int distance = SQUARE(dx) + SQUARE(dz);
 				if (distance < laraInfo.distance)
-					creature->enemy = target;
+					creature->Enemy = target;
 			}
 		}
 
 		CreatureAIInfo(item, &info);
 
-		if (creature->enemy == LaraItem)
+		if (creature->Enemy == LaraItem)
 		{
 			laraInfo.angle = info.angle;
 			laraInfo.distance = info.distance;
@@ -152,10 +152,10 @@ void MPGunControl(short itemNumber)
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
-		GetCreatureMood(item, &info, creature->enemy != LaraItem ? VIOLENT : TIMID);
-		CreatureMood(item, &info, creature->enemy != LaraItem ? VIOLENT : TIMID);
+		GetCreatureMood(item, &info, creature->Enemy != LaraItem ? VIOLENT : TIMID);
+		CreatureMood(item, &info, creature->Enemy != LaraItem ? VIOLENT : TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		int x = item->Position.xPos + WALL_SIZE * phd_sin(item->Position.yRot + laraInfo.angle);
 		int y = item->Position.yPos;
@@ -167,21 +167,21 @@ void MPGunControl(short itemNumber)
 
 		bool cover = (item->Position.yPos > (height + 768) && item->Position.yPos < (height + 1152) && laraInfo.distance > SQUARE(1024));
 
-		ITEM_INFO* enemy = creature->enemy; 
-		creature->enemy = LaraItem;
+		ITEM_INFO* enemy = creature->Enemy; 
+		creature->Enemy = LaraItem;
 		if (laraInfo.distance < SQUARE(1024) || item->HitStatus || TargetVisible(item, &laraInfo)) 
 		{
-			if (!creature->alerted)
+			if (!creature->Alerted)
 				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Position, 0);
 			AlertAllGuards(itemNumber);
 		}
-		creature->enemy = enemy;
+		creature->Enemy = enemy;
 
 		switch (item->ActiveState)
 		{
 		case MPGUN_WAIT:
 			head = laraInfo.angle;
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 17 ||
 				item->AnimNumber == Objects[item->ObjectNumber].animIndex + 27 ||
@@ -212,7 +212,7 @@ void MPGunControl(short itemNumber)
 				item->TargetState = MPGUN_DUCK;
 			else if (item->RequiredState == MPGUN_DUCK)
 				item->TargetState = MPGUN_DUCK;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = MPGUN_RUN;
 			else if (Targetable(item, &info))
 			{
@@ -224,7 +224,7 @@ void MPGunControl(short itemNumber)
 				else
 					item->TargetState = MPGUN_AIM3;
 			}
-			else if (creature->mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (creature->Mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048))))
 			{
 				if (info.ahead)
 					item->TargetState = MPGUN_WAIT;
@@ -237,7 +237,7 @@ void MPGunControl(short itemNumber)
 
 		case MPGUN_WALK:
 			head = laraInfo.angle;	
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 			if (item->AIBits & PATROL1)
 			{
 				item->TargetState = MPGUN_WALK;
@@ -248,7 +248,7 @@ void MPGunControl(short itemNumber)
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = MPGUN_RUN;
 			else if (Targetable(item, &info))
 			{
@@ -257,7 +257,7 @@ void MPGunControl(short itemNumber)
 				else
 					item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (info.ahead)
 					item->TargetState = MPGUN_WALK;
@@ -272,7 +272,7 @@ void MPGunControl(short itemNumber)
 			if (info.ahead)
 				head = info.angle;
 
-			creature->maximumTurn = ANGLE(10);
+			creature->MaxTurn = ANGLE(10);
 			tilt = angle / 2;
 			if (item->AIBits & GUARD)
 				item->TargetState = MPGUN_WAIT;
@@ -281,11 +281,11 @@ void MPGunControl(short itemNumber)
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				break;
-			else if (Targetable(item, &info) || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (Targetable(item, &info) || ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048))))
 				item->TargetState = MPGUN_WAIT;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = MPGUN_WALK;
 			break;
 
@@ -399,7 +399,7 @@ void MPGunControl(short itemNumber)
 			if (info.ahead)
 				head = info.angle;
 
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (Targetable(item, &info))
 				item->TargetState = MPGUN_DUCKAIM;
@@ -410,7 +410,7 @@ void MPGunControl(short itemNumber)
 			break;
 
 		case MPGUN_DUCKAIM:
-			creature->maximumTurn = ONE_DEGREE;
+			creature->MaxTurn = ONE_DEGREE;
 
 			if (info.ahead)
 				torsoY = info.angle;
@@ -437,7 +437,7 @@ void MPGunControl(short itemNumber)
 			if (info.ahead)
 				head = info.angle;
 
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (Targetable(item, &info) || item->HitStatus || !cover || (info.ahead && !(GetRandomControl() & 0x1F)))
 				item->TargetState = MPGUN_DUCKED;

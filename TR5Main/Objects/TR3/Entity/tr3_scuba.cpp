@@ -75,7 +75,7 @@ void ScubaControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO *)item->Data;
+	CreatureInfo* creature = (CreatureInfo *)item->Data;
 	int waterHeight;
 	short angle = 0;
 	short head = 0;
@@ -119,9 +119,9 @@ void ScubaControl(short itemNumber)
 			shoot = LOS(&start, &target);
 			if (shoot)
 			{
-				creature->target.x = LaraItem->Position.xPos;
-				creature->target.y = LaraItem->Position.yPos;
-				creature->target.z = LaraItem->Position.zPos;
+				creature->Target.x = LaraItem->Position.xPos;
+				creature->Target.y = LaraItem->Position.yPos;
+				creature->Target.z = LaraItem->Position.zPos;
 			}
 
 			if (info.angle < -ANGLE(45) || info.angle > ANGLE(45))
@@ -143,31 +143,31 @@ void ScubaControl(short itemNumber)
 		else
 			shoot = false;
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 		waterHeight = GetWaterSurface(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber) + WALL_SIZE / 2;
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->maximumTurn = ANGLE(3);
+			creature->MaxTurn = ANGLE(3);
 			if (shoot)
 				neck = -info.angle;
 
-			if (creature->target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.fly)
+			if (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly)
 				item->TargetState = 2;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				break;
 			else if (shoot)
 				item->TargetState = 4;
 			break;
 
 		case 4:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (shoot)
 				neck = -info.angle;
 
-			if (!shoot || creature->mood == MoodType::Escape || (creature->target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.fly))
+			if (!shoot || creature->Mood == MoodType::Escape || (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly))
 				item->TargetState = 1;
 			else
 				item->TargetState = 3;
@@ -177,35 +177,35 @@ void ScubaControl(short itemNumber)
 			if (shoot)
 				neck = -info.angle;
 
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->VerticalVelocity, item->Position.yRot, item->RoomNumber);
-				creature->flags = 1;
+				creature->Flags = 1;
 			}
 			break;
 
 
 		case 2:
-			creature->maximumTurn = ANGLE(3);
+			creature->MaxTurn = ANGLE(3);
 
 			if (shoot)
 				head = info.angle;
 
-			if (creature->target.y > waterHeight)
+			if (creature->Target.y > waterHeight)
 				item->TargetState = 1;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				break;
 			else if (shoot)
 				item->TargetState = 6;
 			break;
 
 		case 6:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (shoot)
 				head = info.angle;
 
-			if (!shoot || creature->mood == MoodType::Escape || creature->target.y > waterHeight)
+			if (!shoot || creature->Mood == MoodType::Escape || creature->Target.y > waterHeight)
 				item->TargetState = 2;
 			else
 				item->TargetState = 7;
@@ -215,10 +215,10 @@ void ScubaControl(short itemNumber)
 			if (shoot)
 				head = info.angle;
 
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->VerticalVelocity, item->Position.yRot, item->RoomNumber);
-				creature->flags = 1;
+				creature->Flags = 1;
 			}
 			break;
 			

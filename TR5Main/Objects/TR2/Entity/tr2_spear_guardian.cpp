@@ -14,23 +14,23 @@
 BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
 BITE_INFO spearRightBite = { 0, 0, 920, 18 };
 
-static void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
+static void XianDamage(ITEM_INFO* item, CreatureInfo* xian, int damage)
 {
-	if (!(xian->flags & 1) && (item->TouchBits & 0x40000))
+	if (!(xian->Flags & 1) && (item->TouchBits & 0x40000))
 	{
 		LaraItem->HitPoints -= damage;
 		LaraItem->HitStatus = true;
 		CreatureEffect(item, &spearRightBite, DoBloodSplat);
-		xian->flags |= 1;
+		xian->Flags |= 1;
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
 	}
 
-	if (!(xian->flags & 2) && (item->TouchBits & 0x800))
+	if (!(xian->Flags & 2) && (item->TouchBits & 0x800))
 	{
 		LaraItem->HitPoints -= damage;
 		LaraItem->HitStatus = true;
 		CreatureEffect(item, &spearLeftBite, DoBloodSplat);
-		xian->flags |= 2;
+		xian->Flags |= 2;
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
 	}
 }
@@ -57,13 +57,13 @@ void SpearGuardianControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* xian;
+	CreatureInfo* xian;
 	short angle, head, neck, tilt;
 	int random, lara_alive;
 	AI_INFO info;
 
 	item = &g_Level.Items[itemNum];
-	xian = (CREATURE_INFO*)item->Data;
+	xian = (CreatureInfo*)item->Data;
 	head = neck = angle = tilt = 0;
 	lara_alive = (LaraItem->HitPoints > 0);
 
@@ -86,7 +86,7 @@ void SpearGuardianControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, xian->maximumTurn);
+		angle = CreatureTurn(item, xian->MaxTurn);
 
 		if (item->ActiveState != 18)
 			item->MeshBits = 0xFFFFFFFF;
@@ -94,22 +94,22 @@ void SpearGuardianControl(short itemNum)
 		switch (item->ActiveState)
 		{
 		case 18:
-			if (!xian->flags)
+			if (!xian->Flags)
 			{
 				item->MeshBits = (item->MeshBits << 1) + 1;
-				xian->flags = 3;
+				xian->Flags = 3;
 			}
 			else
-				xian->flags--;
+				xian->Flags--;
 			break;
 
 		case 1:
 			if (info.ahead)
 				neck = info.angle;
 
-			xian->maximumTurn = 0;
+			xian->MaxTurn = 0;
 
-			if (xian->mood == MoodType::Bored)
+			if (xian->Mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -127,11 +127,11 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				neck = info.angle;
 
-			xian->maximumTurn = 0;
+			xian->MaxTurn = 0;
 
-			if (xian->mood == MoodType::Escape)
+			if (xian->Mood == MoodType::Escape)
 				item->TargetState = 3;
-			else if (xian->mood == MoodType::Bored)
+			else if (xian->Mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -149,11 +149,11 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				neck = info.angle;
 
-			xian->maximumTurn = ANGLE(3);
+			xian->MaxTurn = ANGLE(3);
 
-			if (xian->mood == MoodType::Escape)
+			if (xian->Mood == MoodType::Escape)
 				item->TargetState = 4;
-			else if (xian->mood == MoodType::Bored)
+			else if (xian->Mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -178,11 +178,11 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				neck = info.angle;
 
-			xian->maximumTurn = ANGLE(5);
+			xian->MaxTurn = ANGLE(5);
 
-			if (xian->mood == MoodType::Escape)
+			if (xian->Mood == MoodType::Escape)
 				break;
-			else if (xian->mood == MoodType::Bored)
+			else if (xian->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;
@@ -197,7 +197,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
 				item->TargetState = 1;
 			else
@@ -208,7 +208,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3 / 2))
 				item->TargetState = 3;
 			else
@@ -219,7 +219,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
 				item->TargetState = 3;
 			else
@@ -230,7 +230,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
 				item->TargetState = 3;
 			else
@@ -241,7 +241,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
 				item->TargetState = 2;
 			else
@@ -252,7 +252,7 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead)
 				head = info.angle;
 
-			xian->flags = 0;
+			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
 				item->TargetState = 4;
 			else

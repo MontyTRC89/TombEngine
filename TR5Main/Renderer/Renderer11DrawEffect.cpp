@@ -22,6 +22,7 @@
 #include "Renderer/RendererSprites.h"
 #include "Game/effects/lightning.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
@@ -646,8 +647,16 @@ namespace TEN::Renderer
 				// Does the item need gunflash?
 				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
-				if (obj->biteOffset == -1 || !nativeItem->FiredWeapon)
+
+				if (obj->biteOffset == -1)
 					continue;
+
+				if (nativeItem->Data.is<CreatureInfo>())
+				{
+					auto* creature = GetCreatureInfo(nativeItem);
+					if (!creature->FiredWeapon)
+						continue;
+				}
 
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];

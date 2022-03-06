@@ -17,6 +17,7 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_two_guns.h"
+#include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -1591,7 +1592,13 @@ void CrossbowBoltControl(short itemNumber)
 
 						// Poisoned ammos
 						if (item->ItemFlags[0] == (int)CrossbowBoltType::Poison)
-							currentItem->Poisoned = true;
+						{
+							if (currentItem->Data.is<CreatureInfo>())
+							{
+								auto* creature = GetCreatureInfo(currentItem);
+								creature->Poisoned = true;
+							}
+						}
 					}
 				}
 				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)

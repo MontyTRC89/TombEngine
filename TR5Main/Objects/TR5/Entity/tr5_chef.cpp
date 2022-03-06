@@ -73,14 +73,14 @@ void ControlChef(short itemNumber)
 	{
 		if (item->AIBits)
 			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+		else if (info->HurtByLara)
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		AI_INFO aiLaraInfo;
 		CreatureAIInfo(item, &aiInfo);
 
-		if (info->enemy == LaraItem)
+		if (info->Enemy == LaraItem)
 		{
 			aiLaraInfo.angle = aiInfo.angle;
 			aiLaraInfo.distance = aiInfo.distance;
@@ -102,7 +102,7 @@ void ControlChef(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		short angle = CreatureTurn(item, info->maximumTurn);
+		short angle = CreatureTurn(item, info->MaxTurn);
 
 		if (aiInfo.ahead)
 		{
@@ -111,7 +111,7 @@ void ControlChef(short itemNumber)
 			joint2 = aiInfo.angle / 2;
 		}
 
-		info->maximumTurn = 0;
+		info->MaxTurn = 0;
 
 		switch (item->ActiveState)
 		{
@@ -124,14 +124,14 @@ void ControlChef(short itemNumber)
 					TargetVisible(item, &aiLaraInfo)))
 			{
 				item->TargetState = CHEF_STATE_TURN_180;
-				info->alerted = true;
+				info->Alerted = true;
 				item->AIBits = 0;
 			}
 
 			break;
 
 		case CHEF_STATE_TURN_180:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
 			if (aiInfo.angle > 0)
 				item->Position.yRot -= ANGLE(2.0f);
@@ -143,7 +143,7 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_ATTACK:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
 			if (abs(aiInfo.angle) >= ANGLE(2.0f))
 			{
@@ -155,7 +155,7 @@ void ControlChef(short itemNumber)
 			else
 				item->Position.yRot += aiInfo.angle;
 
-			if (!info->flags)
+			if (!info->Flags)
 			{
 				if (item->TouchBits & 0x2000)
 				{
@@ -163,7 +163,7 @@ void ControlChef(short itemNumber)
 					{
 						CreatureEffect2(item, &ChefBite, 20, item->Position.yRot, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
-						info->flags = 1;
+						info->Flags = 1;
 
 						LaraItem->HitPoints -= 80;
 						LaraItem->HitStatus = true;
@@ -174,14 +174,14 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_AIM:
-			info->maximumTurn = ANGLE(2.0f);
-			info->flags = 0;
+			info->MaxTurn = ANGLE(2.0f);
+			info->Flags = 0;
 
 			if (aiInfo.distance >= pow(682, 2))
 			{
 				if (aiInfo.angle > ANGLE(112.5f) || aiInfo.angle < -ANGLE(112.5f))
 					item->TargetState = CHEF_STATE_TURN_180;
-				else if (info->mood == MoodType::Attack)
+				else if (info->Mood == MoodType::Attack)
 					item->TargetState = CHEF_STATE_WALK;
 			}
 			else if (aiInfo.bite)
@@ -190,12 +190,12 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_WALK:
-			info->maximumTurn = ANGLE(7.0f);
+			info->MaxTurn = ANGLE(7.0f);
 
 			if (aiInfo.distance < pow(682, 2) ||
 				aiInfo.angle > ANGLE(112.5f) ||
 				aiInfo.angle < -ANGLE(112.5f) ||
-				info->mood != MoodType::Attack)
+				info->Mood != MoodType::Attack)
 			{
 				item->TargetState = CHEF_STATE_AIM;
 			}

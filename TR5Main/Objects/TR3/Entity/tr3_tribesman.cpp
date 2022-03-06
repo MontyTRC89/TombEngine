@@ -42,7 +42,7 @@ void TribemanAxeControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*) item->Data;
+	CreatureInfo* creature = (CreatureInfo*) item->Data;
 
 	short head = 0;
 	short angle = 0;
@@ -67,27 +67,27 @@ void TribemanAxeControl(short itemNum)
 		CreatureAIInfo(item, &info);
 
 		GetCreatureMood(item, &info, VIOLENT);
-		if (creature->enemy == LaraItem && creature->hurtByLara && info.distance > SQUARE(3072) && info.enemyFacing < ANGLE(67) && info.enemyFacing > -ANGLE(67))
-			creature->mood = MoodType::Escape;
+		if (creature->Enemy == LaraItem && creature->HurtByLara && info.distance > SQUARE(3072) && info.enemyFacing < ANGLE(67) && info.enemyFacing > -ANGLE(67))
+			creature->Mood = MoodType::Escape;
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 		if (info.ahead)
 			head = info.angle;
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->maximumTurn = ANGLE(4);
-			creature->flags = 0;
+			creature->MaxTurn = ANGLE(4);
+			creature->Flags = 0;
 
-			if (creature->mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 2;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
@@ -119,16 +119,16 @@ void TribemanAxeControl(short itemNum)
 			break;
 
 		case 11:
-			creature->maximumTurn = ANGLE(4);
-			creature->flags = 0;
+			creature->MaxTurn = ANGLE(4);
+			creature->Flags = 0;
 
-			if (creature->mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 2;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
@@ -149,13 +149,13 @@ void TribemanAxeControl(short itemNum)
 			break;
 
 		case 2:
-			creature->flags = 0;
-			creature->maximumTurn = ANGLE(9);
+			creature->Flags = 0;
+			creature->MaxTurn = ANGLE(9);
 			tilt = angle / 8;
 
-			if (creature->mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 			{
-				creature->maximumTurn /= 4;
+				creature->MaxTurn /= 4;
 				if (GetRandomControl() < 0x100)
 				{
 					if (GetRandomControl() < 0x2000)
@@ -164,7 +164,7 @@ void TribemanAxeControl(short itemNum)
 						item->TargetState = 11;
 				}
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (info.ahead && info.distance < SQUARE(682))
 			{
@@ -178,13 +178,13 @@ void TribemanAxeControl(short itemNum)
 			break;
 
 		case 3:
-			creature->flags = 0;
-			creature->maximumTurn = ANGLE(6);
+			creature->Flags = 0;
+			creature->MaxTurn = ANGLE(6);
 			tilt = angle / 4;
 
-			if (creature->mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 			{
-				creature->maximumTurn /= 4;
+				creature->MaxTurn /= 4;
 				if (GetRandomControl() < 0x100)
 				{
 					if (GetRandomControl() < 0x4000)
@@ -193,7 +193,7 @@ void TribemanAxeControl(short itemNum)
 						item->TargetState = 11;
 				}
 			}
-			else if (creature->mood == MoodType::Escape && Lara.target != item && info.ahead)
+			else if (creature->Mood == MoodType::Escape && Lara.target != item && info.ahead)
 				item->TargetState = 11;
 			else if (info.bite || info.distance < SQUARE(2048))
 			{
@@ -208,7 +208,7 @@ void TribemanAxeControl(short itemNum)
 			break;
 
 		case 8:
-			creature->maximumTurn = ANGLE(4);
+			creature->MaxTurn = ANGLE(4);
 			if (info.bite || info.distance < SQUARE(682))
 				item->TargetState = 6;
 			else
@@ -221,14 +221,14 @@ void TribemanAxeControl(short itemNum)
 		case 10:
 		case 12:
 			item->ItemFlags[0] = 1;
-			creature->maximumTurn = ANGLE(4);
-			creature->flags = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+			creature->MaxTurn = ANGLE(4);
+			creature->Flags = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
 
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				if ((item->TouchBits & 0x2000) &&
-					creature->flags >= tribesmanAxeHit[item->ActiveState][0] &&
-					creature->flags <= tribesmanAxeHit[item->ActiveState][1])
+					creature->Flags >= tribesmanAxeHit[item->ActiveState][0] &&
+					creature->Flags <= tribesmanAxeHit[item->ActiveState][1])
 				{
 					LaraItem->HitPoints -= tribesmanAxeHit[item->ActiveState][2];
 					LaraItem->HitStatus = true;
@@ -241,16 +241,16 @@ void TribemanAxeControl(short itemNum)
 			}
 			else
 			{
-				if (creature->enemy)
+				if (creature->Enemy)
 				{
-					if (abs(creature->enemy->Position.xPos - item->Position.xPos) < 512 &&
-						abs(creature->enemy->Position.yPos - item->Position.yPos) < 512 &&
-						abs(creature->enemy->Position.zPos - item->Position.zPos) < 512 &&
-						creature->flags >= tribesmanAxeHit[item->ActiveState][0] &&
-						creature->flags <= tribesmanAxeHit[item->ActiveState][1])
+					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < 512 &&
+						abs(creature->Enemy->Position.yPos - item->Position.yPos) < 512 &&
+						abs(creature->Enemy->Position.zPos - item->Position.zPos) < 512 &&
+						creature->Flags >= tribesmanAxeHit[item->ActiveState][0] &&
+						creature->Flags <= tribesmanAxeHit[item->ActiveState][1])
 					{
-						creature->enemy->HitPoints -= 2;
-						creature->enemy->HitStatus = true;
+						creature->Enemy->HitPoints -= 2;
+						creature->Enemy->HitStatus = true;
 
 						CreatureEffect(item, &tribesmanAxeBite, DoBloodSplat);
 
@@ -325,7 +325,7 @@ void TribemanDartsControl(short itemNum)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO *)item->Data;
+	CreatureInfo* creature = (CreatureInfo *)item->Data;
 	
 	short headX = 0;
 	short headY = 0;
@@ -356,12 +356,12 @@ void TribemanDartsControl(short itemNum)
 
 		GetCreatureMood(item, &info, (info.zoneNumber == info.enemyZone ? VIOLENT : TIMID));
 
-		if (item->HitStatus && Lara.Poisoned >= 0x100 && creature->mood == MoodType::Bored)
-			creature->mood = MoodType::Escape;
+		if (item->HitStatus && Lara.Poisoned >= 0x100 && creature->Mood == MoodType::Bored)
+			creature->Mood = MoodType::Escape;
 
 		CreatureMood(item, &info, TIMID);
 
-		angle = CreatureTurn(item, creature->mood == MoodType::Bored ? ANGLE(2) : creature->maximumTurn);
+		angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? ANGLE(2) : creature->MaxTurn);
 		if (info.ahead)
 		{
 			headY = info.angle / 2;
@@ -369,7 +369,7 @@ void TribemanDartsControl(short itemNum)
 		}
 
 		if (item->HitStatus || 
-			(creature->enemy == LaraItem && (info.distance < 1024 || 
+			(creature->Enemy == LaraItem && (info.distance < 1024 || 
 				TargetVisible(item, &info)) && (abs(LaraItem->Position.yPos - item->Position.yPos) < 2048))) 
 			AlertAllGuards(itemNum);
 
@@ -381,19 +381,19 @@ void TribemanDartsControl(short itemNum)
 				torsoY = info.angle;
 				torsoX = info.xAngle / 2;
 			}
-			creature->flags &= 0x0FFF;
-			creature->maximumTurn = ANGLE(2);
+			creature->Flags &= 0x0FFF;
+			creature->MaxTurn = ANGLE(2);
 			if (item->AIBits & GUARD)
 			{
 				headY = AIGuard(creature);
 				torsoY = 0;
 				torsoX = 0;
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (!(GetRandomControl() & 0xFF))
 					item->TargetState = 11;
 				break;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
@@ -406,7 +406,7 @@ void TribemanDartsControl(short itemNum)
 				item->TargetState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 4;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x200)
 					item->TargetState = 2;
@@ -418,19 +418,19 @@ void TribemanDartsControl(short itemNum)
 			break;
 
 		case 11:
-			creature->flags &= 0x0FFF;
-			creature->maximumTurn = ANGLE(2);
+			creature->Flags &= 0x0FFF;
+			creature->MaxTurn = ANGLE(2);
 			if (item->AIBits & GUARD)
 			{
 				headY = AIGuard(creature);
 				torsoY = 0;
 				torsoX = 0;
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (!(GetRandomControl() & 0xFF))
 					item->TargetState = 1;
 				break;
 			}
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
@@ -443,14 +443,14 @@ void TribemanDartsControl(short itemNum)
 				item->TargetState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 1;
-			else if (creature->mood == MoodType::Bored && GetRandomControl() < 0x200)
+			else if (creature->Mood == MoodType::Bored && GetRandomControl() < 0x200)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(9);
+			creature->MaxTurn = ANGLE(9);
 
 			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
 				item->TargetState = 11;
@@ -458,9 +458,9 @@ void TribemanDartsControl(short itemNum)
 				item->TargetState = 2;
 			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 1;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = 3;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() > 0x200)
 					item->TargetState = 2;
@@ -474,8 +474,8 @@ void TribemanDartsControl(short itemNum)
 			break;
 
 		case 3:
-			creature->flags &= 0x0FFF;
-			creature->maximumTurn = ANGLE(6);
+			creature->Flags &= 0x0FFF;
+			creature->MaxTurn = ANGLE(6);
 			tilt = angle / 4;
 
 			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
@@ -484,9 +484,9 @@ void TribemanDartsControl(short itemNum)
 				item->TargetState = 1;
 			if (item->AIBits & GUARD)
 				item->TargetState = 11;
-			else if (creature->mood == MoodType::Escape && Lara.target != item && info.ahead)
+			else if (creature->Mood == MoodType::Escape && Lara.target != item && info.ahead)
 				item->TargetState = 11;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = 1;
 			break;
 
@@ -503,7 +503,7 @@ void TribemanDartsControl(short itemNum)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (abs(info.angle) < ANGLE(2))
 				item->Position.yRot += info.angle;
 			else if (info.angle < 0)
@@ -520,14 +520,14 @@ void TribemanDartsControl(short itemNum)
 			break;
 
 		case 6:
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
-				if (!(creature->flags & 0xf000) && (item->TouchBits & 0x2400))
+				if (!(creature->Flags & 0xf000) && (item->TouchBits & 0x2400))
 				{
 					LaraItem->HitPoints -= 100;
 					LaraItem->HitStatus = true;
 
-					creature->flags |= 0x1000;
+					creature->Flags |= 0x1000;
 
 					SoundEffect(70, &item->Position, 0);
 
@@ -536,15 +536,15 @@ void TribemanDartsControl(short itemNum)
 			}
 			else
 			{
-				if (!(creature->flags & 0xf000) && creature->enemy)
+				if (!(creature->Flags & 0xf000) && creature->Enemy)
 				{
-					if (abs(creature->enemy->Position.xPos - item->Position.xPos) < SQUARE(512) &&
-						abs(creature->enemy->Position.yPos - item->Position.yPos) < SQUARE(512) &&
-						abs(creature->enemy->Position.zPos - item->Position.zPos) < SQUARE(512))
+					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < SQUARE(512) &&
+						abs(creature->Enemy->Position.yPos - item->Position.yPos) < SQUARE(512) &&
+						abs(creature->Enemy->Position.zPos - item->Position.zPos) < SQUARE(512))
 					{
-						creature->enemy->HitPoints -= 5;
-						creature->enemy->HitStatus = true;
-						creature->flags |= 0x1000;
+						creature->Enemy->HitPoints -= 5;
+						creature->Enemy->HitStatus = true;
+						creature->Flags |= 0x1000;
 
 						SoundEffect(70, &item->Position, 0);
 					}

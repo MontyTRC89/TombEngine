@@ -85,13 +85,13 @@ namespace TEN::Entities::TR4
 			if (item->AIBits)
 				GetAITarget(creature);
 			else
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
 			int distance;
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 				distance = AI.distance;
 			else
 			{
@@ -110,13 +110,13 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			if (creature->mood == MoodType::Bored)
-				creature->maximumTurn /= 2;
+			if (creature->Mood == MoodType::Bored)
+				creature->MaxTurn /= 2;
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = 4 * angle;
 
-			if (creature->hurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
+			if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
 			{
 				AlertAllGuards(itemNumber);
 				item->AIBits &= ~MODIFY;
@@ -132,14 +132,14 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (creature->mood != MoodType::Bored && item->AIBits != MODIFY)
+				if (creature->Mood != MoodType::Bored && item->AIBits != MODIFY)
 					item->TargetState = DOG_STATE_STOP;
 				else
 				{
-					creature->flags++;
-					creature->maximumTurn = 0;
+					creature->Flags++;
+					creature->MaxTurn = 0;
 
-					if (creature->flags > 300 && random < 128)
+					if (creature->Flags > 300 && random < 128)
 						item->TargetState = DOG_STATE_STOP;
 				}
 
@@ -147,7 +147,7 @@ namespace TEN::Entities::TR4
 
 			case DOG_STATE_STOP:
 			case DOG_STATE_CROUCH:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (item->ActiveState == DOG_STATE_CROUCH && item->RequiredState)
 				{
@@ -186,7 +186,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (creature->mood == MoodType::Escape)
+					if (creature->Mood == MoodType::Escape)
 					{
 						if (Lara.target == item || !AI.ahead || item->HitStatus)
 						{
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (creature->mood != MoodType::Bored)
+					if (creature->Mood != MoodType::Bored)
 					{
 						item->RequiredState = DOG_STATE_RUN;
 
@@ -209,8 +209,8 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					creature->flags = 0;
-					creature->maximumTurn = ANGLE(1.0f);
+					creature->Flags = 0;
+					creature->MaxTurn = ANGLE(1.0f);
 
 					if (random < 256)
 					{
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR4
 							if (item->ActiveState == DOG_STATE_STOP)
 							{
 								item->TargetState = DOG_STATE_SLEEP;
-								creature->flags = 0;
+								creature->Flags = 0;
 								break;
 							}
 						}
@@ -244,7 +244,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_WALK:
-				creature->maximumTurn = ANGLE(3.0f);
+				creature->MaxTurn = ANGLE(3.0f);
 
 				if (item->AIBits & PATROL1)
 				{
@@ -252,7 +252,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (creature->mood == MoodType::Bored && random < 256)
+				if (creature->Mood == MoodType::Bored && random < 256)
 				{
 					item->TargetState = DOG_STATE_STOP;
 					break;
@@ -262,14 +262,14 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_RUN:
-				creature->maximumTurn = ANGLE(6.0f);
+				creature->MaxTurn = ANGLE(6.0f);
 
-				if (creature->mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 				{
 					if (Lara.target != item && AI.ahead)
 						item->TargetState = DOG_STATE_CROUCH;
 				}
-				else if (creature->mood != MoodType::Bored)
+				else if (creature->Mood != MoodType::Bored)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 						item->TargetState = DOG_STATE_JUMP_ATTACK;
@@ -285,11 +285,11 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_STALK:
-				creature->maximumTurn = ANGLE(3.0f);
+				creature->MaxTurn = ANGLE(3.0f);
 
-				if (creature->mood != MoodType::Bored)
+				if (creature->Mood != MoodType::Bored)
 				{
-					if (creature->mood == MoodType::Escape)
+					if (creature->Mood == MoodType::Escape)
 						item->TargetState = DOG_STATE_RUN;
 					else if (AI.bite && AI.distance < pow(341, 2))
 					{

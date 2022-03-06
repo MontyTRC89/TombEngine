@@ -98,8 +98,8 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-		ITEM_INFO* enemyItem = creature->enemy;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
+		ITEM_INFO* enemyItem = creature->Enemy;
 
 		short tilt = 0;
 		short angle = 0;
@@ -108,7 +108,7 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 
 		// Handle SAS firing
-		if (item->FiredWeapon)
+		if (creature->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 
@@ -118,7 +118,7 @@ namespace TEN::Entities::TR4
 
 			GetJointAbsPosition(item, &pos, sasGun.meshNum);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
-			item->FiredWeapon--;
+			creature->FiredWeapon--;
 		}
 
 		if (item->HitPoints > 0)
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR4
 			if (item->AIBits)
 				GetAITarget(creature);
 			else
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 
 			AI_INFO info;
 
@@ -137,7 +137,7 @@ namespace TEN::Entities::TR4
 
 			CreatureAIInfo(item, &info);
 
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				ang = info.angle;
 				distance = info.distance;
@@ -150,14 +150,14 @@ namespace TEN::Entities::TR4
 				distance = dx * dx + dz * dz;
 			}
 
-			GetCreatureMood(item, &info, creature->enemy != LaraItem);
+			GetCreatureMood(item, &info, creature->Enemy != LaraItem);
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && info.bite)
-				creature->mood = MoodType::Escape;
+				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &info, creature->enemy != LaraItem);
-			angle = CreatureTurn(item, creature->maximumTurn);
+			CreatureMood(item, &info, creature->Enemy != LaraItem);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus)
 				AlertAllGuards(itemNumber);
@@ -168,8 +168,8 @@ namespace TEN::Entities::TR4
 			switch (item->ActiveState)
 			{
 			case STATE_SAS_STOP:
-				creature->flags = 0;
-				creature->maximumTurn = 0;
+				creature->Flags = 0;
+				creature->MaxTurn = 0;
 				joint2 = ang;
 				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_WALK_TO_STAND)
 				{
@@ -248,19 +248,19 @@ namespace TEN::Entities::TR4
 						}
 						else
 						{
-							if (creature->mood == MoodType::Escape)
+							if (creature->Mood == MoodType::Escape)
 							{
 								item->TargetState = STATE_SAS_RUN;
 							}
 							else
 							{
-								if ((creature->alerted
-									|| creature->mood != MoodType::Bored)
+								if ((creature->Alerted
+									|| creature->Mood != MoodType::Bored)
 									&& (!(item->AIBits & FOLLOW)
-										|| !creature->reachedGoal
+										|| !creature->ReachedGoal
 										&& distance <= SQUARE(2048)))
 								{
-									if (creature->mood == MoodType::Bored
+									if (creature->Mood == MoodType::Bored
 										|| info.distance <= SQUARE(2048))
 									{
 										item->TargetState = STATE_SAS_WALK;
@@ -285,8 +285,8 @@ namespace TEN::Entities::TR4
 
 			case STATE_SAS_WAIT:
 				joint2 = ang;
-				creature->flags = 0;
-				creature->maximumTurn = 0;
+				creature->Flags = 0;
+				creature->MaxTurn = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 				else if (Targetable(item, &info)
-					|| creature->mood != MoodType::Bored
+					|| creature->Mood != MoodType::Bored
 					|| !info.ahead
 					|| item->AIBits & MODIFY
 					|| Lara.Vehicle != NO_ITEM)
@@ -307,8 +307,8 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_SAS_WALK:
-				creature->flags = 0;
-				creature->maximumTurn = ANGLE(5);
+				creature->Flags = 0;
+				creature->MaxTurn = ANGLE(5);
 				joint2 = ang;
 
 				if (item->AIBits & PATROL1)
@@ -319,7 +319,7 @@ namespace TEN::Entities::TR4
 					|| !(item->AIBits & MODIFY)
 					&& item->AIBits)
 				{
-					if (creature->mood == MoodType::Escape)
+					if (creature->Mood == MoodType::Escape)
 					{
 						item->TargetState = STATE_SAS_RUN;
 					}
@@ -327,7 +327,7 @@ namespace TEN::Entities::TR4
 					{
 						if (item->AIBits & GUARD
 							|| item->AIBits & FOLLOW
-							&& (creature->reachedGoal
+							&& (creature->ReachedGoal
 								|| distance > SQUARE(2048)))
 						{
 							item->TargetState = STATE_SAS_STOP;
@@ -343,7 +343,7 @@ namespace TEN::Entities::TR4
 							}
 							item->TargetState = STATE_SAS_WALK_AIM;
 						}
-						else if (creature->mood != MoodType::Bored)
+						else if (creature->Mood != MoodType::Bored)
 						{
 							if (info.distance > SQUARE(2048))
 							{
@@ -366,7 +366,7 @@ namespace TEN::Entities::TR4
 			case STATE_SAS_RUN:
 				if (info.ahead)
 					joint2 = info.angle;
-				creature->maximumTurn = ANGLE(10);
+				creature->MaxTurn = ANGLE(10);
 				tilt = angle / 2;
 
 				if (Lara.Vehicle != NO_ITEM)
@@ -380,14 +380,14 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & GUARD
 					|| item->AIBits & FOLLOW
-					&& (creature->reachedGoal
+					&& (creature->ReachedGoal
 						|| distance > SQUARE(2048)))
 				{
 					item->TargetState = STATE_SAS_WALK;
 					break;
 				}
 
-				if (creature->mood != MoodType::Escape)
+				if (creature->Mood != MoodType::Escape)
 				{
 					if (Targetable(item, &info))
 					{
@@ -395,8 +395,8 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						if (creature->mood != MoodType::Bored
-							|| creature->mood == MoodType::Stalk
+						if (creature->Mood != MoodType::Bored
+							|| creature->Mood == MoodType::Stalk
 							&& item->AIBits & FOLLOW
 							&& info.distance < SQUARE(2048))
 						{
@@ -409,7 +409,7 @@ namespace TEN::Entities::TR4
 			case STATE_SAS_SIGHT_AIM:
 			case STATE_SAS_HOLD_AIM:
 			case STATE_SAS_KNEEL_AIM:
-				creature->flags = 0;
+				creature->Flags = 0;
 				if (info.ahead)
 				{
 					joint1 = info.xAngle;
@@ -441,7 +441,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_SAS_WALK_AIM:
-				creature->flags = 0;
+				creature->Flags = 0;
 				if (info.ahead)
 				{
 					joint1 = info.xAngle;
@@ -487,7 +487,7 @@ namespace TEN::Entities::TR4
 
 				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 20)
 				{
-					if (!creature->enemy->Velocity)
+					if (!creature->Enemy->Velocity)
 					{
 						angle2 += (GetRandomControl() & 0x1FF) - 256;
 						joint1 = angle2;
@@ -511,7 +511,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TargetState != STATE_SAS_STOP
 						&& item->TargetState != STATE_SAS_KNEEL_STOP
-						&& (creature->mood == MoodType::Escape
+						&& (creature->Mood == MoodType::Escape
 							|| !Targetable(item, &info)))
 					{
 						if (item->ActiveState == STATE_SAS_HOLD_SHOOT)
@@ -527,13 +527,13 @@ namespace TEN::Entities::TR4
 					joint1 = info.xAngle;
 				}
 
-				if (creature->flags)
-					creature->flags -= 1;
+				if (creature->Flags)
+					creature->Flags -= 1;
 				else
 				{
 					ShotLara(item, &info, &sasGun, joint0, 15);
-					creature->flags = 5;
-					item->FiredWeapon = 3;
+					creature->Flags = 5;
+					creature->FiredWeapon = 3;
 				}
 				break;
 
@@ -549,7 +549,7 @@ namespace TEN::Entities::TR4
 			if (WeaponEnemyTimer > 100
 				&& item->ActiveState != STATE_SAS_BLIND)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + ANIMATION_SAS_BLIND;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase + (GetRandomControl() & 7);
 				item->ActiveState = STATE_SAS_BLIND;

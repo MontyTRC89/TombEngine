@@ -79,7 +79,7 @@ void SmallScorpionControl(short itemNumber)
 		if (item->AIBits & GUARD)
 			GetAITarget(info);
 		else
-			info->enemy = LaraItem;
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		CreatureAIInfo(item, &aiInfo);
@@ -87,19 +87,19 @@ void SmallScorpionControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case SSCORPION_STATE_IDLE:
-			info->maximumTurn = 0;
-			info->flags = 0;
+			info->MaxTurn = 0;
+			info->Flags = 0;
 
 			if (aiInfo.distance > pow(341, 2))
 				item->TargetState = SSCORPION_STATE_WALK;
 			else if (aiInfo.bite)
 			{
-				info->maximumTurn = ANGLE(6.0f);
+				info->MaxTurn = ANGLE(6.0f);
 				if (GetRandomControl() & 1)
 					item->TargetState = SSCORPION_STATE_ATTACK_1;
 				else
@@ -111,7 +111,7 @@ void SmallScorpionControl(short itemNumber)
 			break;
 
 		case SSCORPION_STATE_WALK:
-			info->maximumTurn = ANGLE(6.0f);
+			info->MaxTurn = ANGLE(6.0f);
 			if (aiInfo.distance >= pow(341, 2))
 			{
 				if (aiInfo.distance > pow(213, 2))
@@ -123,7 +123,7 @@ void SmallScorpionControl(short itemNumber)
 			break;
 
 		case SSCORPION_STATE_RUN:
-			info->maximumTurn = ANGLE(8.0f);
+			info->MaxTurn = ANGLE(8.0f);
 
 			if (aiInfo.distance < pow(341, 2))
 				item->TargetState = SSCORPION_STATE_IDLE;
@@ -132,7 +132,7 @@ void SmallScorpionControl(short itemNumber)
 
 		case SSCORPION_STATE_ATTACK_1:
 		case SSCORPION_STATE_ATTACK_2:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
 			if (abs(aiInfo.angle) >= ANGLE(6.0f))
 			{
@@ -144,7 +144,7 @@ void SmallScorpionControl(short itemNumber)
 			else
 				item->Position.yRot += aiInfo.angle;
 			
-			if (!info->flags)
+			if (!info->Flags)
 			{
 				if (item->TouchBits & 0x1B00100)
 				{
@@ -169,7 +169,7 @@ void SmallScorpionControl(short itemNumber)
 						}
 
 						CreatureEffect2(item, biteInfo, 3, rotation, DoBloodSplat);
-						info->flags = 1;
+						info->Flags = 1;
 					}
 				}
 			}

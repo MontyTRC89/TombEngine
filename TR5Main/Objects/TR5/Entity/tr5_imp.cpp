@@ -133,13 +133,13 @@ void ImpControl(short itemNumber)
 		{
 			if (item->AIBits)
 				GetAITarget(info);
-			else if (info->hurtByLara)
-				info->enemy = LaraItem;
+			else if (info->HurtByLara)
+				info->Enemy = LaraItem;
 
 			AI_INFO aiInfo;
 			CreatureAIInfo(item, &aiInfo);
 			
-			if (info->enemy == LaraItem)
+			if (info->Enemy == LaraItem)
 				angle2 = aiInfo.angle;
 			else
 				angle2 = phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos) - item->Position.yRot;
@@ -163,11 +163,11 @@ void ImpControl(short itemNumber)
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
 			if (item->ActiveState == IMP_STATE_SCARED)
-				info->mood = MoodType::Escape;
+				info->Mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
-			angle1 = CreatureTurn(item, info->maximumTurn);
+			angle1 = CreatureTurn(item, info->MaxTurn);
 			joint0 = aiInfo.xAngle / 2;
 			joint1 = aiInfo.angle / 2;
 			joint2 = aiInfo.xAngle / 2;
@@ -181,7 +181,7 @@ void ImpControl(short itemNumber)
 			switch (item->ActiveState)
 			{
 			case IMP_STATE_WALK:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 				if (aiInfo.distance <= pow(SECTOR(2), 2))
 				{
 					if (aiInfo.distance < pow(SECTOR(2), 2))
@@ -193,8 +193,8 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_IDLE:
-				info->maximumTurn = -1;
-				info->flags = 0;
+				info->MaxTurn = -1;
+				info->Flags = 0;
 
 				if (aiInfo.bite && aiInfo.distance < pow(170, 2) && item->TriggerFlags < 10)
 				{
@@ -221,7 +221,7 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_RUN:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 
 				if (aiInfo.distance >= pow(SECTOR(0.5f), 2))
 				{
@@ -235,9 +235,9 @@ void ImpControl(short itemNumber)
 
 			case IMP_STATE_ATTACK_1:
 			case IMP_STATE_ATTACK_2:
-				info->maximumTurn = -1;
+				info->MaxTurn = -1;
 
-				if (info->flags == 0 &&
+				if (info->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
 					CreatureEffect2(item, &ImpBite, 10, item->Position.yRot, DoBloodSplat);
@@ -249,16 +249,16 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_SCARED:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 				break;
 
 			case IMP_STATE_START_CLIMB:
 			case IMP_STATE_START_ROLL:
-				info->maximumTurn = 0;
+				info->MaxTurn = 0;
 				break;
 
 			case IMP_STATE_THROW_STONES:
-				info->maximumTurn = -1;
+				info->MaxTurn = -1;
 
 				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 40)
 					ImpThrowStones(item);
@@ -281,9 +281,9 @@ void ImpControl(short itemNumber)
 			}
 		}
 
-		if (info->maximumTurn == -1)
+		if (info->MaxTurn == -1)
 		{
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 			if (abs(angle2) >= ANGLE(2.0f))
 			{
 				if (angle2 >= 0)

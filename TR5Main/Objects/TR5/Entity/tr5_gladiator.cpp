@@ -45,7 +45,7 @@ void ControlGladiator(short itemNumber)
 		int i;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
 
 		if (item->HitPoints <= 0)
 		{
@@ -63,9 +63,9 @@ void ControlGladiator(short itemNumber)
 			{
 				GetAITarget(creature);
 			}
-			else if (creature->hurtByLara)
+			else if (creature->HurtByLara)
 			{
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 			}
 
 			AI_INFO info;
@@ -77,7 +77,7 @@ void ControlGladiator(short itemNumber)
 			short rot;
 			int distance;
 
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				distance = info.distance;
 				rot = info.angle;
@@ -97,7 +97,7 @@ void ControlGladiator(short itemNumber)
 			GetCreatureMood(item, &info, VIOLENT);
 			CreatureMood(item, &info, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 			
 			if (info.ahead)
 			{
@@ -109,14 +109,14 @@ void ControlGladiator(short itemNumber)
 			switch (item->ActiveState)
 			{
 			case 1:
-				creature->flags = 0;
+				creature->Flags = 0;
 				joint2 = rot;
-				creature->maximumTurn = (-(int)(creature->mood != MoodType::Bored)) & 0x16C;
+				creature->MaxTurn = (-(int)(creature->Mood != MoodType::Bored)) & 0x16C;
 				
 				if (item->AIBits & GUARD 
 					|| !(GetRandomControl() & 0x1F) 
 					&& (info.distance > SQUARE(1024)
-						|| creature->mood != MoodType::Attack))
+						|| creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard(creature);
 					break;
@@ -128,7 +128,7 @@ void ControlGladiator(short itemNumber)
 				}
 				else
 				{
-					if (creature->mood == MoodType::Escape)
+					if (creature->Mood == MoodType::Escape)
 					{
 						if (Lara.target != item
 							&& info.ahead
@@ -140,9 +140,9 @@ void ControlGladiator(short itemNumber)
 					}
 					else
 					{
-						if (creature->mood == MoodType::Bored
+						if (creature->Mood == MoodType::Bored
 							|| item->AIBits & FOLLOW 
-							&& (creature->reachedGoal 
+							&& (creature->ReachedGoal 
 								|| distance > SQUARE(2048)))
 						{
 							if (item->RequiredState)
@@ -182,20 +182,20 @@ void ControlGladiator(short itemNumber)
 				break;
 
 			case 2:
-				creature->flags = 0;
+				creature->Flags = 0;
 				joint2 = rot;
-				creature->maximumTurn = creature->mood != MoodType::Bored ? ANGLE(7) : ANGLE(2);
+				creature->MaxTurn = creature->Mood != MoodType::Bored ? ANGLE(7) : ANGLE(2);
 
 				if (item->AIBits & PATROL1)
 				{
 					item->TargetState = 2;
 					joint2 = 0;
 				}
-				else if (creature->mood == MoodType::Escape)
+				else if (creature->Mood == MoodType::Escape)
 				{
 					item->TargetState = 3;
 				}
-				else if (creature->mood != MoodType::Bored)
+				else if (creature->Mood != MoodType::Bored)
 				{
 					if (info.distance < SQUARE(1024))
 					{
@@ -221,20 +221,20 @@ void ControlGladiator(short itemNumber)
 				break;
 
 			case 3:
-				creature->LOT.isJumping = false;
+				creature->LOT.IsJumping = false;
 				if (info.ahead)
 					joint2 = info.angle;
-				creature->maximumTurn = ANGLE(11);
+				creature->MaxTurn = ANGLE(11);
 				tilt = angle / 2;
 
 				if (item->AIBits & GUARD)
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					item->TargetState = 1;
 					break;
 				}
 
-				if (creature->mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 				{
 					if (Lara.target != item && info.ahead)
 					{
@@ -245,14 +245,14 @@ void ControlGladiator(short itemNumber)
 				}
 
 				if (item->AIBits & FOLLOW 
-					&& (creature->reachedGoal 
+					&& (creature->ReachedGoal 
 						|| distance > SQUARE(2048)))
 				{
 					item->TargetState = 1;
 					break;
 				}
 
-				if (creature->mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Bored)
 				{
 					item->TargetState = 2;
 					break;
@@ -293,7 +293,7 @@ void ControlGladiator(short itemNumber)
 			case 9:
 			case 10:
 			case 11:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (abs(info.angle) >= ANGLE(7))
 				{
 					if (info.angle >= 0)
@@ -338,7 +338,7 @@ void ControlGladiator(short itemNumber)
 						}
 					}
 
-					if (!creature->flags)
+					if (!creature->Flags)
 					{
 						if (item->TouchBits & 0x6000)
 						{
@@ -346,7 +346,7 @@ void ControlGladiator(short itemNumber)
 							LaraItem->HitStatus = true;
 							CreatureEffect2(item, &GladiatorBite, 10, item->Position.yRot, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
-							creature->flags = 1;
+							creature->Flags = 1;
 						}
 					}
 				}

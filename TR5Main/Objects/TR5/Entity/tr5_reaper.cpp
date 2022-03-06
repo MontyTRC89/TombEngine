@@ -31,7 +31,7 @@ void ReaperControl(short itemNumber)
 		if (item->AIBits)
 			GetAITarget(info);
 		else
-			info->enemy = LaraItem;
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		CreatureAIInfo(item, &aiInfo);
@@ -45,17 +45,17 @@ void ReaperControl(short itemNumber)
 			!(GetRandomControl() & 0x3F))
 			item->TargetState = 1;
 
-		if (info->reachedGoal)
+		if (info->ReachedGoal)
 		{
-			if (info->enemy)
+			if (info->Enemy)
 			{
-				if (info->enemy->Flags & 2)
+				if (info->Enemy->Flags & 2)
 					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
 
 				item->ItemFlags[3]++;
 
-				info->reachedGoal = false;
-				info->enemy = NULL;
+				info->ReachedGoal = false;
+				info->Enemy = NULL;
 			}
 		}
 

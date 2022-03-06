@@ -123,7 +123,7 @@ void ScorpionControl(short itemNumber)
 				item->ActiveState = BSCORPION_STATE_DEATH;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->Status = ITEM_INVISIBLE;
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				
 				short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (linkNumber != NO_ITEM)
@@ -166,25 +166,25 @@ void ScorpionControl(short itemNumber)
 			GetAITarget(creature);
 		else
 		{
-			if (creature->hurtByLara && item->ActiveState != BSCORPION_STATE_TROOPS_ATTACK)
-				creature->enemy = LaraItem;
+			if (creature->HurtByLara && item->ActiveState != BSCORPION_STATE_TROOPS_ATTACK)
+				creature->Enemy = LaraItem;
 			else
 			{
-				creature->enemy = NULL;
+				creature->Enemy = NULL;
 				int minDistance = 0x7FFFFFFF;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					auto* currentCreatureInfo = ActiveCreatures[i];
 
-					if (currentCreatureInfo->itemNum != NO_ITEM && currentCreatureInfo->itemNum != itemNumber)
+					if (currentCreatureInfo->ItemNumber != NO_ITEM && currentCreatureInfo->ItemNumber != itemNumber)
 					{
-						auto* currentItem = &g_Level.Items[currentCreatureInfo->itemNum];
+						auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
 
 						if (currentItem->ObjectNumber != ID_LARA)
 						{
 							if (currentItem->ObjectNumber != ID_BIG_SCORPION &&
-								(currentItem != LaraItem || creature->hurtByLara))
+								(currentItem != LaraItem || creature->HurtByLara))
 							{
 								int dx = currentItem->Position.xPos - item->Position.xPos;
 								int dy = currentItem->Position.yPos - item->Position.yPos;
@@ -195,7 +195,7 @@ void ScorpionControl(short itemNumber)
 								if (distance < minDistance)
 								{
 									minDistance = distance;
-									creature->enemy = currentItem;
+									creature->Enemy = currentItem;
 								}
 							}
 						}
@@ -210,13 +210,13 @@ void ScorpionControl(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case BSCORPION_STATE_IDLE:
-			creature->maximumTurn = 0;
-			creature->flags = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
 			if (info.distance > pow(1365, 2))
 			{
@@ -226,11 +226,11 @@ void ScorpionControl(short itemNumber)
 
 			if (info.bite)
 			{
-				creature->maximumTurn = ANGLE(2.0f);
+				creature->MaxTurn = ANGLE(2.0f);
 
 				if (GetRandomControl() & 1 &&
-					creature->enemy->HitPoints <= 15 &&
-					creature->enemy->ObjectNumber == ID_TROOPS)
+					creature->Enemy->HitPoints <= 15 &&
+					creature->Enemy->ObjectNumber == ID_TROOPS)
 				{
 					item->TargetState = BSCORPION_STATE_ATTACK_1;
 				}
@@ -243,7 +243,7 @@ void ScorpionControl(short itemNumber)
 			break;
 
 		case BSCORPION_STATE_WALK:
-			creature->maximumTurn = ANGLE(2.0f);
+			creature->MaxTurn = ANGLE(2.0f);
 
 			if (info.distance < pow(1365, 2))
 				item->TargetState = BSCORPION_STATE_IDLE;
@@ -253,7 +253,7 @@ void ScorpionControl(short itemNumber)
 			break;
 
 		case BSCORPION_STATE_RUN:
-			creature->maximumTurn = ANGLE(3.0f);
+			creature->MaxTurn = ANGLE(3.0f);
 
 			if (info.distance < pow(1365, 2))
 				item->TargetState = BSCORPION_STATE_IDLE;
@@ -262,7 +262,7 @@ void ScorpionControl(short itemNumber)
 
 		case BSCORPION_STATE_ATTACK_1:
 		case BSCORPION_STATE_ATTACK_2:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (abs(info.angle) >= ANGLE(2.0f))
 			{
@@ -274,22 +274,22 @@ void ScorpionControl(short itemNumber)
 			else
 				item->Position.yRot += info.angle;
 
-			if (creature->flags)
+			if (creature->Flags)
 				break;
 
-			if (creature->enemy &&
-				creature->enemy != LaraItem &&
+			if (creature->Enemy &&
+				creature->Enemy != LaraItem &&
 				info.distance < pow(1365, 2))
 			{
-				creature->enemy->HitPoints -= 15;
-				if (creature->enemy->HitPoints <= 0)
+				creature->Enemy->HitPoints -= 15;
+				if (creature->Enemy->HitPoints <= 0)
 				{
 					item->TargetState = BSCORPION_STATE_SPECIAL_DEATH;
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 				}
 
-				creature->enemy->HitStatus = true;
-				creature->flags = 1;
+				creature->Enemy->HitStatus = true;
+				creature->Flags = 1;
 
 				CreatureEffect2(
 					item,
@@ -324,11 +324,11 @@ void ScorpionControl(short itemNumber)
 						DoBloodSplat);
 				}
 
-				creature->flags = 1;
+				creature->Flags = 1;
 				if (LaraItem->HitPoints <= 0)
 				{
 					CreatureKill(item, 6, 7, 442);
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					return;
 				}
 			}
@@ -336,17 +336,17 @@ void ScorpionControl(short itemNumber)
 			break;
 
 		case BSCORPION_STATE_TROOPS_ATTACK:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 			{
 				item->TriggerFlags++;
 			}
-			if (creature->enemy &&
-				creature->enemy->HitPoints <= 0 ||
+			if (creature->Enemy &&
+				creature->Enemy->HitPoints <= 0 ||
 				item->TriggerFlags > 6)
 			{
 				item->TargetState = BSCORPION_STATE_SPECIAL_DEATH;
-				creature->enemy->HitPoints = 0;
+				creature->Enemy->HitPoints = 0;
 			}
 
 			break;

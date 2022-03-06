@@ -10,12 +10,12 @@
 
 using std::vector;
 
-CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
+CreatureInfo* GetCreatureInfo(ITEM_INFO* item)
 {
-    return (CREATURE_INFO*)item->Data;
+    return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
+void TargetNearestEntity(ITEM_INFO* item, CreatureInfo* creature)
 {
 	int bestDistance = MAXINT;
 	for (int i = 0; i < g_Level.NumItems; i++)
@@ -36,7 +36,7 @@ void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
 			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 			if (distance < bestDistance)
 			{
-				creature->enemy = target;
+				creature->Enemy = target;
 				bestDistance = distance;
 			}
 		}

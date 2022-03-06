@@ -66,15 +66,15 @@ void ApeVault(short itemNumber, short angle)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	if (creature->flags & APE_FLAG_TURN_LEFT)
+	if (creature->Flags & APE_FLAG_TURN_LEFT)
 	{
 		item->Position.yRot -= ANGLE(90.0f);
-		creature->flags -= APE_FLAG_TURN_LEFT;
+		creature->Flags -= APE_FLAG_TURN_LEFT;
 	}
 	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
 		item->Position.yRot += ANGLE(90.0f);
-		creature->flags -= APE_FLAG_TURN_RIGHT;
+		creature->Flags -= APE_FLAG_TURN_RIGHT;
 	}
 
 	long long xx = item->Position.zPos / SECTOR(1);
@@ -167,32 +167,32 @@ void ApeControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creatureInfo->maximumTurn);
+		angle = CreatureTurn(item, creatureInfo->MaxTurn);
 
 		if (item->HitStatus || AI.distance < PANIC_RANGE)
-			creatureInfo->flags |= APE_FLAG_ATTACK;
+			creatureInfo->Flags |= APE_FLAG_ATTACK;
 
 		short random;
 
 		switch (item->ActiveState)
 		{
 		case APE_STATE_IDLE:
-			if (creatureInfo->flags & APE_FLAG_TURN_LEFT)
+			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
 				item->Position.yRot -= ANGLE(90);
-				creatureInfo->flags -= APE_FLAG_TURN_LEFT;
+				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
 			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
 				item->Position.yRot += ANGLE(90);
-				creatureInfo->flags -= APE_FLAG_TURN_RIGHT;
+				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
 			else if (AI.bite && AI.distance < ATTACK_RANGE)
 				item->TargetState = APE_STATE_ATTACK;
-			else if (!(creatureInfo->flags & APE_FLAG_ATTACK) &&
+			else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 				AI.zoneNumber == AI.enemyZone && AI.ahead)
 			{
 				random = (short)(GetRandomControl() / 32);
@@ -205,12 +205,12 @@ void ApeControl(short itemNumber)
 				else if (random < RUNLEFT_CHANCE)
 				{
 					item->TargetState = APE_STATE_RUN_LEFT;
-					creatureInfo->maximumTurn = 0;
+					creatureInfo->MaxTurn = 0;
 				}
 				else
 				{
 					item->TargetState = APE_STATE_RUN_RIGHT;
-					creatureInfo->maximumTurn = 0;
+					creatureInfo->MaxTurn = 0;
 				}
 			}
 			else
@@ -219,9 +219,9 @@ void ApeControl(short itemNumber)
 			break;
 
 		case APE_STATE_RUN:
-			creatureInfo->maximumTurn = RUN_TURN;
+			creatureInfo->MaxTurn = RUN_TURN;
 
-			if (creatureInfo->flags == 0 &&
+			if (creatureInfo->Flags == 0 &&
 				AI.angle > -DISPLAY_ANGLE &&
 				AI.angle < DISPLAY_ANGLE)
 			{
@@ -232,7 +232,7 @@ void ApeControl(short itemNumber)
 				item->RequiredState = APE_STATE_ATTACK;
 				item->TargetState = APE_STATE_IDLE;
 			}
-			else if (creatureInfo->mood != MoodType::Escape)
+			else if (creatureInfo->Mood != MoodType::Escape)
 			{
 				random = (short)GetRandomControl();
 				if (random < JUMP_CHANCE)
@@ -255,20 +255,20 @@ void ApeControl(short itemNumber)
 			break;
 
 		case APE_STATE_RUN_LEFT:
-			if (!(creatureInfo->flags & APE_FLAG_TURN_RIGHT))
+			if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 			{
 				item->Position.yRot -= ANGLE(90);
-				creatureInfo->flags |= APE_FLAG_TURN_RIGHT;
+				creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 			}
 
 			item->TargetState = APE_STATE_IDLE;
 			break;
 
 		case APE_STATE_RUN_RIGHT:
-			if (!(creatureInfo->flags & APE_FLAG_TURN_LEFT))
+			if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 			{
 				item->Position.yRot += ANGLE(90);
-				creatureInfo->flags |= APE_FLAG_TURN_LEFT;
+				creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 			}
 
 			item->TargetState = APE_STATE_IDLE;
