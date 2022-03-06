@@ -115,8 +115,8 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	lara->Control.Count.Dive = 0;
 	item->TargetState = LS_ONWATER_STOP;
+	lara->Control.Count.Dive = 0;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)

@@ -390,22 +390,19 @@ int DoFlareLight(PHD_VECTOR* pos, int flareLife)
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return 0;
 
-	auto random = GenerateFloat();
+	float random = GenerateFloat();
 
 	int x = pos->x + (random * 120);
 	int y = pos->y + (random * 120) - CLICK(1);
 	int z = pos->z + (random * 120);
 
-	int r, g, b;
-	int falloff;
-
 	if (flareLife < 4)
 	{
-		falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
+		int falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
 
-		r = FlareMainColor.x * 255;
-		g = FlareMainColor.y * 255;
-		b = FlareMainColor.z * 255;
+		int r = FlareMainColor.x * 255;
+		int g = FlareMainColor.y * 255;
+		int b = FlareMainColor.z * 255;
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
@@ -413,24 +410,24 @@ int DoFlareLight(PHD_VECTOR* pos, int flareLife)
 	}
 	else if (flareLife < (FLARE_LIFE_MAX - 90))
 	{
-		auto multiplier = GenerateFloat(0.75f, 1.0f);
-		falloff = 12 * multiplier;
+		float multiplier = GenerateFloat(0.75f, 1.0f);
+		int falloff = 12 * multiplier;
 
-		r = FlareMainColor.x * 255 * multiplier;
-		g = FlareMainColor.y * 255 * multiplier;
-		b = FlareMainColor.z * 255 * multiplier;
+		int r = FlareMainColor.x * 255 * multiplier;
+		int g = FlareMainColor.y * 255 * multiplier;
+		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		return (random < 0.4f);
 	}
 	else
 	{
-		auto multiplier = GenerateFloat(0.05f, 0.8f);
-		falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
+		float multiplier = GenerateFloat(0.05f, 0.8f);
+		int falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
 
-		r = FlareMainColor.x * 255 * multiplier;
-		g = FlareMainColor.y * 255 * multiplier;
-		b = FlareMainColor.z * 255 * multiplier;
+		int r = FlareMainColor.x * 255 * multiplier;
+		int g = FlareMainColor.y * 255 * multiplier;
+		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		return (random < 0.3f);

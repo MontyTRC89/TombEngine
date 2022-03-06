@@ -39,6 +39,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			ApproachLaraTargetAngle(item, direction, 12);
+			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
 			/*if (TrInput & IN_LEFT)
@@ -145,6 +146,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			ApproachLaraTargetAngle(item, direction, 12);
+			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
 			/*if (TrInput & IN_LEFT)

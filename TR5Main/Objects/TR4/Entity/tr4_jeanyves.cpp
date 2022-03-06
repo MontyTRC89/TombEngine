@@ -39,8 +39,8 @@ void JeanYvesControl(short itemNumber)
 		if (Lara.highestLocation > 3)
 			Lara.highestLocation = 3;
 
-		short state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
-		short animNumber = Objects[item->ObjectNumber].animIndex + state;
+		int state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
+		int animNumber = Objects[item->ObjectNumber].animIndex + state;
 		state++;
 
 		item->TargetState = item->ActiveState = state;

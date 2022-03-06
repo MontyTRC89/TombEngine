@@ -450,8 +450,8 @@ void lara_as_tightrope_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber),
 			item->Position.xPos, item->Position.yPos, item->Position.zPos) == item->Position.yPos)
 		{
-			lara->Control.TightropeControl.Off = 0;
 			item->TargetState = LS_TIGHTROPE_DISMOUNT;
+			lara->Control.TightropeControl.Off = 0;
 		}
 	}
 	else
