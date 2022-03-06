@@ -68,7 +68,8 @@ static void TriggerHarpyFlame(short itemNumber, byte number, int size)
 	int dx = LaraItem->Position.xPos - item->Position.xPos;
 	int dz = LaraItem->Position.zPos - item->Position.zPos;
 
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
 		auto* spark = &Sparks[GetFreeSpark()];
 

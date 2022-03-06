@@ -254,11 +254,24 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	// Find true slope direction.
 	direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
 
+	// HACK: In one corner, avoids sliding in the wrong direction because I don't understand the maths of this function. @Sezz
+	if (coll->FloorTiltX < 0 && coll->FloorTiltZ > 0)
+		direction = direction + ANGLE(180.0f);
+
 	// Find nearest cardinal slope direction.
 	if (!g_GameFlow->Animations.HasSlideExtended)
 		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
 	return direction;
+}
+
+void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
+{
+	int y = item->Position.yPos;
+	int frontHeight = GetCollisionResult(item, item->Position.yRot, coll->Setup.Radius, -coll->Setup.Height).Position.Floor - y;
+	int backHeight = GetCollisionResult(item, item->Position.yRot + ANGLE(180.0f), coll->Setup.Radius, -coll->Setup.Height).Position.Floor - y;
+	
+	// TODO
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
