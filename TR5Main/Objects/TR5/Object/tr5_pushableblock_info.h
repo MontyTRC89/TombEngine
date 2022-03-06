@@ -1,6 +1,6 @@
 #pragma once
 
-struct PUSHABLE_INFO
+struct PushableInfo
 {
 	int height;				// height for collision, also in floor procedure
 	int weight;

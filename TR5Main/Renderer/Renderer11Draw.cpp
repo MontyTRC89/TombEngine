@@ -2986,7 +2986,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->Data;
+		WraithInfo* info = (WraithInfo*)nativeItem->Data;
 
 		for (int j = 0; j <= 4; j++)
 		{
@@ -3015,8 +3015,8 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < 7; i++)
 			{
-				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
-				Vector3 p2 = Vector3(info[i + 1].xPos, info[i + 1].yPos, info[i + 1].zPos);
+				Vector3 p1 = Vector3(info[i].Position.xPos, info[i].Position.yPos, info[i].Position.zPos);
+				Vector3 p2 = Vector3(info[i + 1].Position.xPos, info[i + 1].Position.yPos, info[i + 1].Position.zPos);
 
 				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}

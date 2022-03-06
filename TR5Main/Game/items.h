@@ -46,7 +46,6 @@ struct ITEM_INFO
 	GAME_OBJECT_ID ObjectNumber;
 	int BoxNumber;
 	ITEM_DATA Data;
-
 	bool Active;
 	short NextItem;
 	short NextActive;
