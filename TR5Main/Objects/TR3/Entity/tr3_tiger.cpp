@@ -57,7 +57,7 @@ void TigerControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, 1);
 
 		if (info->alerted && aiInfo.zoneNumber != aiInfo.enemyZone)
-			info->mood = ESCAPE_MOOD;
+			info->mood = MoodType::Escape;
 
 		CreatureMood(item, &aiInfo, 1);
 
@@ -69,14 +69,14 @@ void TigerControl(short itemNumber)
 			info->maximumTurn = 0;
 			info->flags = 0;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && aiInfo.ahead)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
 			}
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				short random = GetRandomControl();
 				if (random < 0x60)
@@ -94,7 +94,7 @@ void TigerControl(short itemNumber)
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
+			else if (info->mood != MoodType::Attack && GetRandomControl() < 0x60)
 				item->TargetState = 5;
 			else
 				item->TargetState = 3;
@@ -104,7 +104,7 @@ void TigerControl(short itemNumber)
 		case 2:
 			info->maximumTurn = ANGLE(3.0f);
 
-			if (info->mood == ESCAPE_MOOD || info->mood == ATTACK_MOOD)
+			if (info->mood == MoodType::Escape || info->mood == MoodType::Attack)
 				item->TargetState = 3;
 			else if (GetRandomControl() < 0x60)
 			{
@@ -117,7 +117,7 @@ void TigerControl(short itemNumber)
 		case 3:
 			info->maximumTurn = ANGLE(6.0f);
 
-			if (info->mood == BORED_MOOD)
+			if (info->mood == MoodType::Bored)
 				item->TargetState = 1;
 			else if (info->flags && aiInfo.ahead)
 				item->TargetState = 1;
@@ -128,12 +128,12 @@ void TigerControl(short itemNumber)
 				else
 					item->TargetState = 7;
 			}
-			else if (info->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
+			else if (info->mood != MoodType::Attack && GetRandomControl() < 0x60)
 			{
 				item->RequiredState = 5;
 				item->TargetState = 1;
 			}
-			else if (info->mood == ESCAPE_MOOD && Lara.target != item && aiInfo.ahead)
+			else if (info->mood == MoodType::Escape && Lara.target != item && aiInfo.ahead)
 				item->TargetState = 1;
 
 			info->flags = 0;

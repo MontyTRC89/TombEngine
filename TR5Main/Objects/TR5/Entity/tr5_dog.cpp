@@ -87,7 +87,7 @@ void Tr5DogControl(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		if (!creature->mood)
+		if (creature->mood == MoodType::Bored)
 			creature->maximumTurn /= 2;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
@@ -109,7 +109,7 @@ void Tr5DogControl(short itemNumber)
 		case 8:
 			joint1 = 0;
 			joint2 = 0;
-			if (creature->mood && (item->AIBits) != MODIFY)
+			if (creature->mood != MoodType::Bored && (item->AIBits) != MODIFY)
 			{
 				item->TargetState = 1;
 			}
@@ -159,7 +159,7 @@ void Tr5DogControl(short itemNumber)
 					break;
 				}
 
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->mood == MoodType::Escape)
 				{
 					if (Lara.target == item || !info.ahead || item->HitStatus)
 					{
@@ -173,7 +173,7 @@ void Tr5DogControl(short itemNumber)
 					break;
 				}
 
-				if (creature->mood)
+				if (creature->mood != MoodType::Bored)
 				{
 					item->RequiredState = 3;
 					if (item->ActiveState == 1)
@@ -221,7 +221,7 @@ void Tr5DogControl(short itemNumber)
 				break;
 			}
 
-			if (!creature->mood && random < 256)
+			if (creature->mood == MoodType::Bored && random < 256)
 			{
 				item->TargetState = 1;
 				break;
@@ -231,12 +231,12 @@ void Tr5DogControl(short itemNumber)
 
 		case 3:
 			creature->maximumTurn = ANGLE(6);
-			if (creature->mood == ESCAPE_MOOD)
+			if (creature->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead)
 					item->TargetState = 9;
 			}
-			else if (creature->mood)
+			else if (creature->mood != MoodType::Bored)
 			{
 				if (info.bite && info.distance < SQUARE(1024))
 				{
@@ -256,9 +256,9 @@ void Tr5DogControl(short itemNumber)
 
 		case 5:
 			creature->maximumTurn = ANGLE(3);
-			if (creature->mood)
+			if (creature->mood != MoodType::Bored)
 			{
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->mood == MoodType::Escape)
 				{
 					item->TargetState = 3;
 				}

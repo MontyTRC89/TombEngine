@@ -242,7 +242,7 @@ void HitmanControl(short itemNumber)
 				if (!(GlobalCounter & 7))
 					item->HitPoints--;
 
-				creature->mood = ESCAPE_MOOD;
+				creature->mood = MoodType::Escape;
 
 				if (item->HitPoints <= 0)
 				{
@@ -336,7 +336,7 @@ void HitmanControl(short itemNumber)
 							}
 							else if (!creature->monkeyAhead)
 							{
-								if (creature->mood)
+								if (creature->mood != MoodType::Bored)
 								{
 									if (info.distance < SQUARE(3072) || item->AIBits & FOLLOW)
 										item->TargetState = STATE_HITMAN_WALK;

@@ -108,7 +108,7 @@ void RaptorControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		if (info->mood == BORED_MOOD)
+		if (info->mood == MoodType::Bored)
 			info->maximumTurn /= 2;
 
 		angle = CreatureTurn(item, info->maximumTurn);
@@ -131,9 +131,9 @@ void RaptorControl(short itemNumber)
 				item->TargetState = 8;
 			else if (aiInfo.bite && aiInfo.distance < pow(SECTOR(1.5f), 2))
 				item->TargetState = 4;
-			else if (info->mood == ESCAPE_MOOD && Lara.target != item && aiInfo.ahead && !item->HitStatus)
+			else if (info->mood == MoodType::Escape && Lara.target != item && aiInfo.ahead && !item->HitStatus)
 				item->TargetState = 1;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -144,7 +144,7 @@ void RaptorControl(short itemNumber)
 			info->maximumTurn = ANGLE(2.0f);
 			info->flags &= ~1;
 
-			if (info->mood != BORED_MOOD)
+			if (info->mood != MoodType::Bored)
 				item->TargetState = 1;
 			else if (aiInfo.ahead && GetRandomControl() < 0x80)
 			{
@@ -178,12 +178,12 @@ void RaptorControl(short itemNumber)
 						item->TargetState = 7;
 				}
 			}
-			else if (aiInfo.ahead && info->mood != ESCAPE_MOOD && GetRandomControl() < 0x80)
+			else if (aiInfo.ahead && info->mood != MoodType::Escape && GetRandomControl() < 0x80)
 			{
 				item->RequiredState = 6;
 				item->TargetState = 1;
 			}
-			else if (info->mood == BORED_MOOD || (info->mood == ESCAPE_MOOD && Lara.target != item && aiInfo.ahead))
+			else if (info->mood == MoodType::Bored || (info->mood == MoodType::Escape && Lara.target != item && aiInfo.ahead))
 				item->TargetState = 1;
 
 			break;

@@ -183,7 +183,7 @@ void ShivaControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		if (shiva->mood == ESCAPE_MOOD)
+		if (shiva->mood == MoodType::Escape)
 		{
 			shiva->target.x = LaraItem->Position.xPos;
 			shiva->target.z = LaraItem->Position.zPos;
@@ -241,7 +241,7 @@ void ShivaControl(short itemNumber)
 
 			shiva->maximumTurn = 0;
 
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->mood == MoodType::Escape)
 			{
 				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
 				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
@@ -255,7 +255,7 @@ void ShivaControl(short itemNumber)
 				else
 					item->TargetState = 2;
 			}
-			else if (shiva->mood == BORED_MOOD)
+			else if (shiva->mood == MoodType::Bored)
 			{
 				int random = GetRandomControl();
 				if (random < 0x400)
@@ -289,7 +289,7 @@ void ShivaControl(short itemNumber)
 			if (AI.ahead)
 				headY = AI.angle;
 
-			if (item->HitStatus || shiva->mood == ESCAPE_MOOD)
+			if (item->HitStatus || shiva->mood == MoodType::Escape)
 				shiva->flags = 4;
 
 			if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
@@ -315,9 +315,9 @@ void ShivaControl(short itemNumber)
 			if (AI.ahead)
 				headY = AI.angle;
 
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->mood == MoodType::Escape)
 				item->TargetState = 0;
-			else if (shiva->mood == BORED_MOOD)
+			else if (shiva->mood == MoodType::Bored)
 				item->TargetState = 0;
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{

@@ -313,14 +313,14 @@ void BaboonControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->mood == ESCAPE_MOOD)
+			else if (baboon->mood == MoodType::Escape)
 			{
 				if (AI.ahead && Lara.target != item)
 					item->TargetState = BABOON_IDLE;
 				else
 					item->TargetState = BABOON_RUN;
 			}
-			else if (baboon->mood == ATTACK_MOOD)
+			else if (baboon->mood == MoodType::Attack)
 			{
 				if (!(item->AIBits & FOLLOW) || (!item->Airborne && AI.distance <= BABOON_RUNROLL_RANGE))
 				{
@@ -368,9 +368,9 @@ void BaboonControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->mood != ESCAPE_MOOD)
+			else if (baboon->mood != MoodType::Escape)
 			{
-				if (baboon->mood == BORED_MOOD)
+				if (baboon->mood == MoodType::Bored)
 				{
 					if (item->RequiredState)
 						item->TargetState = item->RequiredState;
@@ -409,16 +409,16 @@ void BaboonControl(short itemNumber)
 
 			if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->mood == BORED_MOOD)
+			else if (baboon->mood == MoodType::Bored)
 			{
 				if (item->AIBits & FOLLOW)
 					item->TargetState = BABOON_WALK;
 				else if (GetRandomControl() < 256)
 					item->TargetState = BABOON_SIT_IDLE;
 			}
-			else if (baboon->mood == ESCAPE_MOOD)
+			else if (baboon->mood == MoodType::Escape)
 				item->TargetState = BABOON_RUN;
-			else if (baboon->mood == ATTACK_MOOD)
+			else if (baboon->mood == MoodType::Attack)
 			{
 				if (AI.bite && AI.distance < BABOON_ATK_RANGE)
 					item->TargetState = BABOON_IDLE;
@@ -434,14 +434,14 @@ void BaboonControl(short itemNumber)
 
 			if (item->AIBits & GUARD)
 				item->TargetState = BABOON_IDLE;
-			else if (baboon->mood == ESCAPE_MOOD)
+			else if (baboon->mood == MoodType::Escape)
 			{
 				if (AI.ahead && Lara.target != item)
 					item->TargetState = BABOON_IDLE;
 			}
 			else if (item->AIBits & FOLLOW && (item->Airborne || AI.distance > BABOON_FOLLOW_RANGE))
 				item->TargetState = BABOON_IDLE;
-			else if (baboon->mood == ATTACK_MOOD)
+			else if (baboon->mood == MoodType::Attack)
 			{
 				if (AI.distance < BABOON_ATK_RANGE)
 					item->TargetState = BABOON_IDLE;

@@ -93,7 +93,7 @@ void WorkerShotgunControl(short itemNumber)
 				headX = aiInfo.xAngle;
 			}
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 			{
 				item->TargetState = 5;
 			}
@@ -104,7 +104,7 @@ void WorkerShotgunControl(short itemNumber)
 				else
 					item->TargetState = 1;
 			}
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->mood == MoodType::Attack || !aiInfo.ahead)
 				item->TargetState = (aiInfo.distance <= 0x400000) ? 1 : 5;
 			else
 				item->TargetState = 3;
@@ -120,7 +120,7 @@ void WorkerShotgunControl(short itemNumber)
 
 			if (Targetable(item, &aiInfo))
 				item->TargetState = 4;
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->mood == MoodType::Attack || !aiInfo.ahead)
 				item->TargetState = 2;
 			
 			break;
@@ -134,7 +134,7 @@ void WorkerShotgunControl(short itemNumber)
 				headX = aiInfo.xAngle;
 			}
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 5;
 			else if (Targetable(item, &aiInfo))
 			{
@@ -143,7 +143,7 @@ void WorkerShotgunControl(short itemNumber)
 				else
 					item->TargetState = 6;
 			}
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->mood == MoodType::Attack || !aiInfo.ahead)
 			{
 				if (aiInfo.distance > 0x400000)
 					item->TargetState = 5;
@@ -163,11 +163,11 @@ void WorkerShotgunControl(short itemNumber)
 				headY = aiInfo.angle;
 			}
 
-			if (info->mood != ESCAPE_MOOD)
+			if (info->mood != MoodType::Escape)
 			{
 				if (Targetable(item, &aiInfo))
 					item->TargetState = 1;
-				else if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
+				else if (info->mood == MoodType::Bored || info->mood == MoodType::Stalk)
 					item->TargetState = 1;
 			}
 			
@@ -204,7 +204,7 @@ void WorkerShotgunControl(short itemNumber)
 			}
 
 			if (item->ActiveState == 4 && item->TargetState != 2 &&
-				(info->mood == ESCAPE_MOOD || aiInfo.distance > 0x900000 || !Targetable(item, &aiInfo)))
+				(info->mood == MoodType::Escape || aiInfo.distance > 0x900000 || !Targetable(item, &aiInfo)))
 			{
 				item->TargetState = 2;
 			}

@@ -155,7 +155,7 @@ void ScubaControl(short itemNumber)
 
 			if (creature->target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.fly)
 				item->TargetState = 2;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				break;
 			else if (shoot)
 				item->TargetState = 4;
@@ -167,7 +167,7 @@ void ScubaControl(short itemNumber)
 			if (shoot)
 				neck = -info.angle;
 
-			if (!shoot || creature->mood == ESCAPE_MOOD || (creature->target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.fly))
+			if (!shoot || creature->mood == MoodType::Escape || (creature->target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.fly))
 				item->TargetState = 1;
 			else
 				item->TargetState = 3;
@@ -193,7 +193,7 @@ void ScubaControl(short itemNumber)
 
 			if (creature->target.y > waterHeight)
 				item->TargetState = 1;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				break;
 			else if (shoot)
 				item->TargetState = 6;
@@ -205,7 +205,7 @@ void ScubaControl(short itemNumber)
 			if (shoot)
 				head = info.angle;
 
-			if (!shoot || creature->mood == ESCAPE_MOOD || creature->target.y > waterHeight)
+			if (!shoot || creature->mood == MoodType::Escape || creature->target.y > waterHeight)
 				item->TargetState = 2;
 			else
 				item->TargetState = 7;

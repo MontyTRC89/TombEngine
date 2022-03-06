@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 					item->TargetState = AHMET_STATE_WALK;
 					headY = 0;
 				}
-				else if (creature->mood == ATTACK_MOOD && creature->mood != ESCAPE_MOOD)
+				else if (creature->mood == MoodType::Attack && creature->mood != MoodType::Escape)
 				{
 					if (AI.bite && AI.distance < AHMET_STAND_DUALATK_RANGE)
 						item->TargetState = AHMET_STATE_STAND_DUALATK;
@@ -233,7 +233,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
 					item->TargetState = AHMET_STATE_IDLE;
-				else if (creature->mood == ESCAPE_MOOD || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
+				else if (creature->mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
 					item->TargetState = AHMET_STATE_RUN;
 				
 				break;
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 				creature->maximumTurn = AHMET_RUN_ANGLE;
 				creature->flags = 0;
 
-				if (item->AIBits & GUARD || (creature->mood == BORED_MOOD || creature->mood == ESCAPE_MOOD) && (Lara.target == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
+				if (item->AIBits & GUARD || (creature->mood == MoodType::Bored || creature->mood == MoodType::Escape) && (Lara.target == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
 					item->TargetState = AHMET_STATE_IDLE;
 				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
 					item->TargetState = AHMET_STATE_WALK;

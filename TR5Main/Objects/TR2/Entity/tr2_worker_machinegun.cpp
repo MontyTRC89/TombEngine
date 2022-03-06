@@ -68,7 +68,7 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood == ESCAPE_MOOD)
+			if (machinegun->mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -79,7 +79,7 @@ void WorkerMachineGunControl(short itemNum)
 				else
 					item->TargetState = 2;
 			}
-			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
+			else if (machinegun->mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance <= 0x400000)
 					item->TargetState = 2;
@@ -101,7 +101,7 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood == ESCAPE_MOOD)
+			if (machinegun->mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -112,7 +112,7 @@ void WorkerMachineGunControl(short itemNum)
 				else
 					item->TargetState = 6;
 			}
-			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
+			else if (machinegun->mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance > 0x400000)
 					item->TargetState = 3;
@@ -132,13 +132,13 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood != ESCAPE_MOOD)
+			if (machinegun->mood != MoodType::Escape)
 			{
 				if (Targetable(item, &info))
 				{
 					item->TargetState = 2;
 				}
-				else if (machinegun->mood == BORED_MOOD || machinegun->mood == STALK_MOOD)
+				else if (machinegun->mood == MoodType::Bored || machinegun->mood == MoodType::Stalk)
 				{
 					item->TargetState = 2;
 				}
@@ -158,7 +158,7 @@ void WorkerMachineGunControl(short itemNum)
 			}
 			else
 			{
-				if (machinegun->mood == ATTACK_MOOD)
+				if (machinegun->mood == MoodType::Attack)
 				{
 					item->TargetState = 1;
 				}
@@ -227,7 +227,7 @@ void WorkerMachineGunControl(short itemNum)
 				machinegun->flags = 5;
 			}
 
-			if (item->TargetState != 1 && (machinegun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->TargetState != 1 && (machinegun->mood == MoodType::Escape || info.distance > 0x900000 || !Targetable(item, &info)))
 			{
 				item->TargetState = 1;
 			}

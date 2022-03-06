@@ -74,7 +74,7 @@ void SilencerControl(short itemNumber)
 				head = aiInfo.angle;
 			info->maximumTurn = 0;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 			{
 				item->RequiredState = 2;
 				item->TargetState = 3;
@@ -87,7 +87,7 @@ void SilencerControl(short itemNumber)
 					item->TargetState = 3;
 				}
 
-				if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+				if (info->mood == MoodType::Attack || !aiInfo.ahead)
 				{
 					if (aiInfo.distance >= 0x400000)
 					{
@@ -126,7 +126,7 @@ void SilencerControl(short itemNumber)
 
 			info->maximumTurn = 910;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 2;
 			else if (Targetable(item, &aiInfo))
 			{
@@ -137,7 +137,7 @@ void SilencerControl(short itemNumber)
 			{
 				if (aiInfo.distance > 0x400000 || !aiInfo.ahead)
 					item->TargetState = 2;
-				if (info->mood == BORED_MOOD && GetRandomControl() < 0x300)
+				if (info->mood == MoodType::Bored && GetRandomControl() < 0x300)
 					item->TargetState = 3;
 			}
 
@@ -151,7 +151,7 @@ void SilencerControl(short itemNumber)
 			info->flags = 0;
 			tilt = angle / 4;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 			{
 				if (Targetable(item, &aiInfo))
 					item->TargetState = 9;
@@ -167,7 +167,7 @@ void SilencerControl(short itemNumber)
 
 				break;
 			}
-			else if (info->mood == ATTACK_MOOD)
+			else if (info->mood == MoodType::Attack)
 				item->TargetState = (GetRandomControl() >= 0x4000) ? 3 : 2;
 			else
 				item->TargetState = 3;
@@ -187,7 +187,7 @@ void SilencerControl(short itemNumber)
 			}
 			else
 			{
-				if (info->mood == ATTACK_MOOD || GetRandomControl() < 0x100)
+				if (info->mood == MoodType::Attack || GetRandomControl() < 0x100)
 					item->TargetState = 3;
 				if (!aiInfo.ahead)
 					item->TargetState = 3;
@@ -208,7 +208,7 @@ void SilencerControl(short itemNumber)
 			else
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (Targetable(item, &aiInfo))
 				item->TargetState = item->ActiveState != 6 ? 11 : 7;

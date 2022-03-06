@@ -297,11 +297,11 @@ void GuardControl(short itemNum)
 			if (item->HitPoints >= Objects[ID_SCIENTIST].HitPoints)
 			{
 				if (creature->enemy == LaraItem)
-					creature->mood = BORED_MOOD;
+					creature->mood = MoodType::Bored;
 			}
 			else
 			{
-				creature->mood = ESCAPE_MOOD;
+				creature->mood = MoodType::Escape;
 			}
 		}
 		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_NO_LENSFLARE) // CHECK
@@ -319,7 +319,7 @@ void GuardControl(short itemNum)
 			{
 				if (!(GlobalCounter & 7))
 					item->HitPoints--;
-				creature->mood = ESCAPE_MOOD;
+				creature->mood = MoodType::Escape;
 				if (item->HitPoints <= 0)
 				{
 					item->ActiveState = STATE_GUARD_DEATH2;
@@ -432,7 +432,7 @@ void GuardControl(short itemNum)
 			{
 				item->TargetState = STATE_GUARD_HUNTING_IDLE;
 			}
-			else if (creature->mood)
+			else if (creature->mood != MoodType::Bored)
 			{
 				if (info.distance < 0x900000 || item->AIBits & FOLLOW)
 				{
@@ -1144,7 +1144,7 @@ void Mafia2Control(short itemNum)
 						creature->LOT.isJumping = true;
 						break;
 					}
-					if (creature->mood)
+					if (creature->mood != MoodType::Bored)
 					{
 						if (info.distance >= SQUARE(3072))
 							item->TargetState = STATE_MAFIA2_WALK;

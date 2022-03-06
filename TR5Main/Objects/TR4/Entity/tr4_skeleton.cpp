@@ -241,7 +241,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &info, VIOLENT);
 
 			if (!(item->MeshBits & 0x200))
-				creature->mood = ESCAPE_MOOD;
+				creature->mood = MoodType::Escape;
 
 			CreatureMood(item, &info, VIOLENT);
 
@@ -334,11 +334,11 @@ namespace TEN::Entities::TR4
 			case 2:
 				creature->flags = 0;
 				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != ESCAPE_MOOD ? ANGLE(2) : 0;
+				creature->maximumTurn = creature->mood != MoodType::Escape ? ANGLE(2) : 0;
 				if (item->AIBits & GUARD
 					|| !(GetRandomControl() & 0x1F) 
 					&& (info.distance > SQUARE(1024) 
-						|| creature->mood != ATTACK_MOOD))
+						|| creature->mood != MoodType::Attack))
 				{
 					if (!(GetRandomControl() & 0x3F))
 					{
@@ -391,7 +391,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						if (creature->mood == ESCAPE_MOOD)
+						if (creature->mood == MoodType::Escape)
 						{
 							if (Lara.target == item 
 								|| !info.ahead 
@@ -403,7 +403,7 @@ namespace TEN::Entities::TR4
 							}
 							item->TargetState = 2;
 						}
-						else if (creature->mood == BORED_MOOD ||
+						else if (creature->mood == MoodType::Bored ||
 							item->AIBits & FOLLOW &&
 							(creature->reachedGoal ||
 								laraInfo.distance > SQUARE(2048)))
@@ -468,7 +468,7 @@ namespace TEN::Entities::TR4
 			case 15:
 				creature->flags = 0;
 				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != BORED_MOOD ? 1092 : 364;
+				creature->maximumTurn = creature->mood != MoodType::Bored ? 1092 : 364;
 				if (item->AIBits & PATROL1)
 				{
 					item->TargetState = 15;
@@ -492,11 +492,11 @@ namespace TEN::Entities::TR4
 						item->TargetState = 2;
 						break;
 					}
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 					{
 						item->TargetState = 16;
 					}
-					else if (creature->mood != BORED_MOOD)
+					else if (creature->mood != MoodType::Bored)
 					{
 						if (info.distance >= SQUARE(682))
 						{
@@ -553,7 +553,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 					{
 						if (Lara.target != item && info.ahead && (item->MeshBits & 0x200))
 							item->TargetState = 2;
@@ -562,7 +562,7 @@ namespace TEN::Entities::TR4
 					{
 						item->TargetState = 2;
 					}
-					else if (creature->mood != BORED_MOOD)
+					else if (creature->mood != MoodType::Bored)
 					{
 						if (info.ahead && info.distance < SQUARE(2048))
 						{

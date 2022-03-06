@@ -155,7 +155,7 @@ void SkidManControl(short riderNum)
 		switch (item->ActiveState)
 		{
 		case SMAN_WAIT:
-			if (skidman->mood == BORED_MOOD)
+			if (skidman->mood == MoodType::Bored)
 				break;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				break;
@@ -163,7 +163,7 @@ void SkidManControl(short riderNum)
 			break;
 
 		case SMAN_MOVING:
-			if (skidman->mood == BORED_MOOD)
+			if (skidman->mood == MoodType::Bored)
 				item->TargetState = SMAN_WAIT;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				item->TargetState = SMAN_WAIT;

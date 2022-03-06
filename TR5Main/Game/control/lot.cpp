@@ -120,7 +120,7 @@ void InitialiseSlot(short itemNum, short slot)
 	CREATURE_INFO* creature = item->Data;
 	InitialiseLOTarray(itemNum);
 	creature->itemNum = itemNum;
-	creature->mood = BORED_MOOD;
+	creature->mood = MoodType::Bored;
 	creature->jointRotation[0] = 0;
 	creature->jointRotation[1] = 0;
 	creature->jointRotation[2] = 0;

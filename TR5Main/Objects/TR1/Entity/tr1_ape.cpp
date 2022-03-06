@@ -232,7 +232,7 @@ void ApeControl(short itemNumber)
 				item->RequiredState = APE_STATE_ATTACK;
 				item->TargetState = APE_STATE_IDLE;
 			}
-			else if (creatureInfo->mood != ESCAPE_MOOD)
+			else if (creatureInfo->mood != MoodType::Escape)
 			{
 				random = (short)GetRandomControl();
 				if (random < JUMP_CHANCE)

@@ -425,7 +425,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_jump_ahead(creature->jumpAhead);
 			creatureBuilder.add_maximum_turn(creature->maximumTurn);
 			creatureBuilder.add_monkey_ahead(creature->monkeyAhead);
-			creatureBuilder.add_mood(creature->mood);
+			creatureBuilder.add_mood((int)creature->mood);
 			creatureBuilder.add_patrol2(creature->patrol2);
 			creatureBuilder.add_reached_goal(creature->reachedGoal);
 
@@ -1029,7 +1029,7 @@ bool SaveGame::Load(int slot)
 			creature->jumpAhead = savedCreature->jump_ahead();
 			creature->maximumTurn = savedCreature->maximum_turn();
 			creature->monkeyAhead = savedCreature->monkey_ahead();
-			creature->mood = (MOOD_TYPE)savedCreature->mood();
+			creature->mood = (MoodType)savedCreature->mood();
 			creature->patrol2 = savedCreature->patrol2();
 			creature->reachedGoal = savedCreature->reached_goal();
 		}

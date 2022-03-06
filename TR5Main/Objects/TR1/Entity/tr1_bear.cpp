@@ -132,7 +132,7 @@ void BearControl(short itemNumber)
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 				item->TargetState = BEAR_STATE_STROLL;
 			else
 				item->TargetState = BEAR_STATE_RUN;
@@ -144,11 +144,11 @@ void BearControl(short itemNumber)
 
 			if (laraDead && item->TouchBits & TOUCH && AI.ahead)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (creature->mood != BORED_MOOD)
+			else if (creature->mood != MoodType::Bored)
 			{
 				item->TargetState = BEAR_STATE_IDLE;
 
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->mood == MoodType::Escape)
 					item->RequiredState = BEAR_STATE_STROLL;
 			}
 			else if (GetRandomControl() < ROAR_CHANCE)
@@ -168,7 +168,7 @@ void BearControl(short itemNumber)
 				LaraItem->HitStatus = true;
 			}
 
-			if (creature->mood == BORED_MOOD || laraDead)
+			if (creature->mood == MoodType::Bored || laraDead)
 				item->TargetState = BEAR_STATE_IDLE;
 			else if (AI.ahead && !item->RequiredState)
 			{
@@ -191,7 +191,7 @@ void BearControl(short itemNumber)
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == BORED_MOOD || creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Bored || creature->mood == MoodType::Escape)
 				item->TargetState = BEAR_STATE_IDLE;
 			else if (AI.bite && AI.distance < PAT_RANGE)
 				item->TargetState = BEAR_STATE_ATTACK_2;
@@ -208,12 +208,12 @@ void BearControl(short itemNumber)
 			}
 			else if (AI.ahead && (item->TouchBits & TOUCH))
 				item->TargetState = BEAR_STATE_REAR;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				item->TargetState = BEAR_STATE_REAR;
 				item->RequiredState = BEAR_STATE_STROLL;
 			}
-			else if (creature->mood == BORED_MOOD || GetRandomControl() < ROAR_CHANCE)
+			else if (creature->mood == MoodType::Bored || GetRandomControl() < ROAR_CHANCE)
 			{
 				item->RequiredState = BEAR_STATE_ROAR;
 				item->TargetState = BEAR_STATE_REAR;

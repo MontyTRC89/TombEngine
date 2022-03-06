@@ -87,7 +87,7 @@ void TRexControl(short itemNumber)
 		if (item->TouchBits)
 			LaraItem->HitPoints -= (item->ActiveState == 3) ? 10 : 1;
 
-		info->flags = (info->mood != ESCAPE_MOOD && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
+		info->flags = (info->mood != MoodType::Escape && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
 
 		if (aiInfo.distance > pow(1500, 2) &&
 			aiInfo.distance < pow(SECTOR(4), 2)
@@ -103,7 +103,7 @@ void TRexControl(short itemNumber)
 				item->TargetState = item->RequiredState;
 			else if (aiInfo.distance < pow(1500, 2) && aiInfo.bite)
 				item->TargetState = 7;
-			else if (info->mood == BORED_MOOD || info->flags)
+			else if (info->mood == MoodType::Bored || info->flags)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -112,7 +112,7 @@ void TRexControl(short itemNumber)
 		case 2:
 			info->maximumTurn = ANGLE(2.0f);
 
-			if (info->mood != BORED_MOOD || !info->flags)
+			if (info->mood != MoodType::Bored || !info->flags)
 				item->TargetState = 1;
 			else if (aiInfo.ahead && GetRandomControl() < 0x200)
 			{
@@ -129,12 +129,12 @@ void TRexControl(short itemNumber)
 				item->TargetState = 1;
 			else if (info->flags)
 				item->TargetState = 1;
-			else if (info->mood != ESCAPE_MOOD && aiInfo.ahead && GetRandomControl() < 0x200)
+			else if (info->mood != MoodType::Escape && aiInfo.ahead && GetRandomControl() < 0x200)
 			{
 				item->RequiredState = 6;
 				item->TargetState = 1;
 			}
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = 1;
 
 			break;

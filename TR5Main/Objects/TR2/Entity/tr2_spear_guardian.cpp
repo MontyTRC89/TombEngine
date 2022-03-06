@@ -109,7 +109,7 @@ void SpearGuardianControl(short itemNum)
 
 			xian->maximumTurn = 0;
 
-			if (xian->mood == BORED_MOOD)
+			if (xian->mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -129,9 +129,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->maximumTurn = 0;
 
-			if (xian->mood == ESCAPE_MOOD)
+			if (xian->mood == MoodType::Escape)
 				item->TargetState = 3;
-			else if (xian->mood == BORED_MOOD)
+			else if (xian->mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -151,9 +151,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->maximumTurn = ANGLE(3);
 
-			if (xian->mood == ESCAPE_MOOD)
+			if (xian->mood == MoodType::Escape)
 				item->TargetState = 4;
-			else if (xian->mood == BORED_MOOD)
+			else if (xian->mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
@@ -180,9 +180,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->maximumTurn = ANGLE(5);
 
-			if (xian->mood == ESCAPE_MOOD)
+			if (xian->mood == MoodType::Escape)
 				break;
-			else if (xian->mood == BORED_MOOD)
+			else if (xian->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x4000)
 					item->TargetState = 1;

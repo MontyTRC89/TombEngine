@@ -183,14 +183,14 @@ void MPStickControl(short itemNumber)
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BATON_WALK;
 
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead && !item->HitStatus)
 					item->TargetState = BATON_STOP;
 				else
 					item->TargetState = BATON_RUN;
 			}
-			else if (creature->mood == BORED_MOOD || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (creature->mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
 			{
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
@@ -219,9 +219,9 @@ void MPStickControl(short itemNumber)
 				item->TargetState = BATON_WALK;
 				head = 0;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = BATON_RUN;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 				{
@@ -248,7 +248,7 @@ void MPStickControl(short itemNumber)
 
 			if (item->AIBits & GUARD)
 				item->TargetState = BATON_WAIT;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && info.ahead)
 					item->TargetState = BATON_STOP;
@@ -256,7 +256,7 @@ void MPStickControl(short itemNumber)
 			}
 			else if ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
 				item->TargetState = BATON_STOP;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 				item->TargetState = BATON_WALK;
 			else if (info.ahead && info.distance < SQUARE(1024))
 				item->TargetState = BATON_WALK;
