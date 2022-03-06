@@ -102,12 +102,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_freefall_dive,//53
 	lara_as_gymnast,//54
 	lara_as_waterout,//55
-	lara_as_climbstnc,//56
-	lara_as_climbing,//57
-	lara_as_climbleft,//58
-	lara_as_climbend,//59
-	lara_as_climbright,//60
-	lara_as_climbdown,//61
+	lara_as_climb_idle,//56
+	lara_as_climb_up,//57
+	lara_as_climb_left,//58
+	lara_as_climb_end,//59
+	lara_as_climb_right,//60
+	lara_as_climb_down,//61
 	lara_as_auto_jump,//62
 	lara_void_func,//63
 	lara_void_func,//64
@@ -200,8 +200,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//147
 	lara_as_null,//148
 	lara_as_slopefall,//149
-	lara_as_stepoff_left,
-	lara_as_stepoff_right,
+	lara_as_climb_stepoff_left,
+	lara_as_climb_stepoff_right,
 	lara_as_turn_left_fast,
 	lara_as_controlled,
 	lara_as_controlled,
@@ -281,12 +281,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_freefall_dive,//53
 	lara_default_col,
 	lara_default_col,
-	lara_col_climbstnc,
-	lara_col_climbing,
-	lara_col_climbleft,
-	lara_col_climbend,
-	lara_col_climbright,
-	lara_col_climbdown,
+	lara_col_climb_idle,
+	lara_col_climb_up,
+	lara_col_climb_left,
+	lara_col_climb_end,
+	lara_col_climb_right,
+	lara_col_climb_down,
 	lara_void_func,//62
 	lara_void_func,
 	lara_void_func,

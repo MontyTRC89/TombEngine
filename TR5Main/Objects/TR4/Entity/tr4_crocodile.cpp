@@ -13,6 +13,8 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_room.h"
 
+static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+
 #define CROC_STATE_WALK_ANGLE ANGLE(3.0f)
 #define CROC_SWIM_ANGLE ANGLE(3.0f)
 #define CROC_STATE_RUN_ANGLE ANGLE(5.0f)
@@ -25,8 +27,6 @@ constexpr auto CROC_STATE_RUN_RANGE = SQUARE(SECTOR(1));
 constexpr auto CROC_MAXRUN_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 constexpr auto CROC_ATTACK_RANGE = SQUARE(CLICK(3)); // NOTE: TR4 is CLICK(3), but the crocodile not go near lara to do damage in certain case !
 constexpr auto CROC_TOUCHBITS = 768;
-
-static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
 
 enum CrocodileState
 {
@@ -113,13 +113,13 @@ void CrocodileControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
-	auto* objectInfo = &Objects[item->ObjectNumber];
+	auto* creature = GetCreatureInfo(item);
+	auto* object = &Objects[item->ObjectNumber];
 
 	short angle = 0;
 	short boneAngle = 0;
 
-	AI_INFO aiInfo;
+	AI_INFO AI;
 
 	if (item->HitPoints <= 0)
 	{
@@ -127,14 +127,14 @@ void CrocodileControl(short itemNumber)
 		{
 			if (TestEnvironment(ENV_FLAG_WATER, item))
 			{
-				item->AnimNumber = objectInfo->animIndex + CROC_ANIM_UNDERWATER_DEATH;
+				item->AnimNumber = object->animIndex + CROC_ANIM_UNDERWATER_DEATH;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->ActiveState = CROC_STATE_UNDERWATER_DEATH;
 				item->TargetState = CROC_STATE_UNDERWATER_DEATH;
 			}
 			else
 			{
-				item->AnimNumber = objectInfo->animIndex + CROC_ANIM_DEATH;
+				item->AnimNumber = object->animIndex + CROC_ANIM_DEATH;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->ActiveState = CROC_STATE_DEATH;
 				item->TargetState = CROC_STATE_DEATH;
@@ -147,22 +147,22 @@ void CrocodileControl(short itemNumber)
 	else
 	{
 		if (item->AIBits & ALL_AIOBJ)
-			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+			GetAITarget(creature);
+		else if (creature->hurtByLara)
+			creature->enemy = LaraItem;
 
-		CreatureAIInfo(item, &aiInfo);
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		if ((item->HitStatus || aiInfo.distance < CROC_ALERT_RANGE) ||
-			(TargetVisible(item, &aiInfo) && aiInfo.distance < CROC_VISIBILITY_RANGE))
+		if ((item->HitStatus || AI.distance < CROC_ALERT_RANGE) ||
+			(TargetVisible(item, &AI) && AI.distance < CROC_VISIBILITY_RANGE))
 		{
-			if (!info->alerted)
-				info->alerted = true;
+			if (!creature->alerted)
+				creature->alerted = true;
 
 			AlertAllGuards(itemNumber);
 		}
@@ -172,7 +172,7 @@ void CrocodileControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case CROC_STATE_IDLE:
-			info->maximumTurn = 0;
+			creature->maximumTurn = 0;
 
 			if (item->AIBits & GUARD)
 			{
@@ -193,11 +193,11 @@ void CrocodileControl(short itemNumber)
 				else if (item->ItemFlags[0] > 1024)
 					item->ItemFlags[0] = 1024;
 			}
-			else if (aiInfo.bite && aiInfo.distance < CROC_ATTACK_RANGE)
+			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
 				item->TargetState = CROC_STATE_ATTACK;
 			else
 			{
-				if (aiInfo.ahead && aiInfo.distance < CROC_STATE_RUN_RANGE)
+				if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
 					item->TargetState = CROC_STATE_WALK;
 				else
 					item->TargetState = CROC_STATE_RUN;
@@ -206,7 +206,7 @@ void CrocodileControl(short itemNumber)
 			break;
 
 		case CROC_STATE_WALK:
-			info->maximumTurn = CROC_STATE_WALK_ANGLE;
+			creature->maximumTurn = CROC_STATE_WALK_ANGLE;
 
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
@@ -218,15 +218,15 @@ void CrocodileControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite && aiInfo.distance < CROC_ATTACK_RANGE)
+			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
 				item->TargetState = CROC_STATE_IDLE;
-			else if (!aiInfo.ahead || aiInfo.distance > CROC_MAXRUN_RANGE)
+			else if (!AI.ahead || AI.distance > CROC_MAXRUN_RANGE)
 				item->TargetState = CROC_STATE_RUN;
 
 			break;
 
 		case CROC_STATE_RUN:
-			info->maximumTurn = CROC_STATE_RUN_ANGLE;
+			creature->maximumTurn = CROC_STATE_RUN_ANGLE;
 
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
@@ -238,9 +238,9 @@ void CrocodileControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite && aiInfo.distance < CROC_ATTACK_RANGE)
+			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
 				item->TargetState = CROC_STATE_IDLE;
-			else if (aiInfo.ahead && aiInfo.distance < CROC_STATE_RUN_RANGE)
+			else if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
 				item->TargetState = CROC_STATE_WALK;
 
 			break;
@@ -249,7 +249,7 @@ void CrocodileControl(short itemNumber)
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				item->RequiredState = 0;
 
-			if (aiInfo.bite && item->TouchBits & CROC_TOUCHBITS)
+			if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
 			{
 				if (!item->RequiredState)
 				{
@@ -266,12 +266,12 @@ void CrocodileControl(short itemNumber)
 			break;
 
 		case CROC_STATE_UNDERWATER_SWIM:
-			info->maximumTurn = CROC_SWIM_ANGLE;
+			creature->maximumTurn = CROC_SWIM_ANGLE;
 
 			// Water to land transition.
 			if (!CrocodileIsInWater(item))
 			{
-				item->AnimNumber = objectInfo->animIndex + CROC_ANIM_LAND_MODE;
+				item->AnimNumber = object->animIndex + CROC_ANIM_LAND_MODE;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->RequiredState = CROC_STATE_WALK;
 				item->ActiveState = CROC_STATE_WALK;
@@ -281,7 +281,7 @@ void CrocodileControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (aiInfo.bite)
+			else if (AI.bite)
 			{
 				if (item->TouchBits & 768)
 					item->TargetState = CROC_STATE_UNDERWATER_ATTACK;
@@ -293,7 +293,7 @@ void CrocodileControl(short itemNumber)
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				item->RequiredState = CROC_STATE_NONE_1;
 
-			if (aiInfo.bite && item->TouchBits & CROC_TOUCHBITS)
+			if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
 			{
 				if (!item->RequiredState)
 				{
@@ -316,8 +316,8 @@ void CrocodileControl(short itemNumber)
 		item->ActiveState == CROC_STATE_ATTACK ||
 		item->ActiveState == CROC_STATE_UNDERWATER_ATTACK)
 	{
-		boneRot.bone0 = aiInfo.angle;
-		boneRot.bone1 = aiInfo.angle;
+		boneRot.bone0 = AI.angle;
+		boneRot.bone1 = AI.angle;
 		boneRot.bone2 = 0;
 		boneRot.bone3 = 0;
 	}

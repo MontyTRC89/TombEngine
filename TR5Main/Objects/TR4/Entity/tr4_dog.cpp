@@ -15,6 +15,9 @@ namespace TEN::Entities::TR4
 	BYTE DogAnims[] = { 20, 21, 22, 20 };
 	BITE_INFO DogBite = { 0, 0, 100, 3 };
 
+	constexpr auto DOG_CROUCH_ATTACK_DAMAGE = 10;
+	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
+
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,
@@ -35,9 +38,6 @@ namespace TEN::Entities::TR4
 	{
 
 	};
-
-	constexpr auto DOG_CROUCH_ATTACK_DAMAGE = 10;
-	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
 	void InitialiseTr4Dog(short itemNumber)
 	{
