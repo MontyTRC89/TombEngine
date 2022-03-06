@@ -170,7 +170,6 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t trigger_flags = 0;
   int32_t carried_item = 0;
   int32_t after_death = 0;
-  int32_t fired_weapon = 0;
   std::vector<int32_t> item_flags{};
   std::unique_ptr<TEN::Save::Position> position{};
   bool triggered = false;
@@ -180,7 +179,6 @@ struct ItemT : public flatbuffers::NativeTable {
   bool hit_stauts = false;
   bool collidable = false;
   bool looked_at = false;
-  bool poisoned = false;
   int32_t ai_bits = 0;
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
@@ -210,21 +208,19 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TRIGGER_FLAGS = 36,
     VT_CARRIED_ITEM = 38,
     VT_AFTER_DEATH = 40,
-    VT_FIRED_WEAPON = 42,
-    VT_ITEM_FLAGS = 44,
-    VT_POSITION = 46,
-    VT_TRIGGERED = 48,
-    VT_ACTIVE = 50,
-    VT_STATUS = 52,
-    VT_AIRBORNE = 54,
-    VT_HIT_STAUTS = 56,
-    VT_COLLIDABLE = 58,
-    VT_LOOKED_AT = 60,
-    VT_POISONED = 62,
-    VT_AI_BITS = 64,
-    VT_SWAP_MESH_FLAGS = 66,
-    VT_DATA_TYPE = 68,
-    VT_DATA = 70
+    VT_ITEM_FLAGS = 42,
+    VT_POSITION = 44,
+    VT_TRIGGERED = 46,
+    VT_ACTIVE = 48,
+    VT_STATUS = 50,
+    VT_AIRBORNE = 52,
+    VT_HIT_STAUTS = 54,
+    VT_COLLIDABLE = 56,
+    VT_LOOKED_AT = 58,
+    VT_AI_BITS = 60,
+    VT_SWAP_MESH_FLAGS = 62,
+    VT_DATA_TYPE = 64,
+    VT_DATA = 66
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -283,9 +279,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t after_death() const {
     return GetField<int32_t>(VT_AFTER_DEATH, 0);
   }
-  int32_t fired_weapon() const {
-    return GetField<int32_t>(VT_FIRED_WEAPON, 0);
-  }
   const flatbuffers::Vector<int32_t> *item_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ITEM_FLAGS);
   }
@@ -312,9 +305,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool looked_at() const {
     return GetField<uint8_t>(VT_LOOKED_AT, 0) != 0;
-  }
-  bool poisoned() const {
-    return GetField<uint8_t>(VT_POISONED, 0) != 0;
   }
   int32_t ai_bits() const {
     return GetField<int32_t>(VT_AI_BITS, 0);
@@ -416,7 +406,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_TRIGGER_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_CARRIED_ITEM) &&
            VerifyField<int32_t>(verifier, VT_AFTER_DEATH) &&
-           VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
            VerifyOffset(verifier, VT_ITEM_FLAGS) &&
            verifier.VerifyVector(item_flags()) &&
            VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
@@ -427,7 +416,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
-           VerifyField<uint8_t>(verifier, VT_POISONED) &&
            VerifyField<int32_t>(verifier, VT_AI_BITS) &&
            VerifyField<int32_t>(verifier, VT_SWAP_MESH_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
@@ -589,9 +577,6 @@ struct ItemBuilder {
   void add_after_death(int32_t after_death) {
     fbb_.AddElement<int32_t>(Item::VT_AFTER_DEATH, after_death, 0);
   }
-  void add_fired_weapon(int32_t fired_weapon) {
-    fbb_.AddElement<int32_t>(Item::VT_FIRED_WEAPON, fired_weapon, 0);
-  }
   void add_item_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> item_flags) {
     fbb_.AddOffset(Item::VT_ITEM_FLAGS, item_flags);
   }
@@ -618,9 +603,6 @@ struct ItemBuilder {
   }
   void add_looked_at(bool looked_at) {
     fbb_.AddElement<uint8_t>(Item::VT_LOOKED_AT, static_cast<uint8_t>(looked_at), 0);
-  }
-  void add_poisoned(bool poisoned) {
-    fbb_.AddElement<uint8_t>(Item::VT_POISONED, static_cast<uint8_t>(poisoned), 0);
   }
   void add_ai_bits(int32_t ai_bits) {
     fbb_.AddElement<int32_t>(Item::VT_AI_BITS, ai_bits, 0);
@@ -666,7 +648,6 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t trigger_flags = 0,
     int32_t carried_item = 0,
     int32_t after_death = 0,
-    int32_t fired_weapon = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> item_flags = 0,
     const TEN::Save::Position *position = 0,
     bool triggered = false,
@@ -676,7 +657,6 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
-    bool poisoned = false,
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
@@ -688,7 +668,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_status(status);
   builder_.add_position(position);
   builder_.add_item_flags(item_flags);
-  builder_.add_fired_weapon(fired_weapon);
   builder_.add_after_death(after_death);
   builder_.add_carried_item(carried_item);
   builder_.add_trigger_flags(trigger_flags);
@@ -709,7 +688,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_touch_bits(touch_bits);
   builder_.add_floor(floor);
   builder_.add_data_type(data_type);
-  builder_.add_poisoned(poisoned);
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
   builder_.add_hit_stauts(hit_stauts);
@@ -745,7 +723,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t trigger_flags = 0,
     int32_t carried_item = 0,
     int32_t after_death = 0,
-    int32_t fired_weapon = 0,
     const std::vector<int32_t> *item_flags = nullptr,
     const TEN::Save::Position *position = 0,
     bool triggered = false,
@@ -755,7 +732,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
-    bool poisoned = false,
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
@@ -782,7 +758,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       trigger_flags,
       carried_item,
       after_death,
-      fired_weapon,
       item_flags__,
       position,
       triggered,
@@ -792,7 +767,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       hit_stauts,
       collidable,
       looked_at,
-      poisoned,
       ai_bits,
       swap_mesh_flags,
       data_type,
@@ -5108,7 +5082,6 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = trigger_flags(); _o->trigger_flags = _e; }
   { auto _e = carried_item(); _o->carried_item = _e; }
   { auto _e = after_death(); _o->after_death = _e; }
-  { auto _e = fired_weapon(); _o->fired_weapon = _e; }
   { auto _e = item_flags(); if (_e) { _o->item_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->item_flags[_i] = _e->Get(_i); } } }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
   { auto _e = triggered(); _o->triggered = _e; }
@@ -5118,7 +5091,6 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = hit_stauts(); _o->hit_stauts = _e; }
   { auto _e = collidable(); _o->collidable = _e; }
   { auto _e = looked_at(); _o->looked_at = _e; }
-  { auto _e = poisoned(); _o->poisoned = _e; }
   { auto _e = ai_bits(); _o->ai_bits = _e; }
   { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
@@ -5152,7 +5124,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _trigger_flags = _o->trigger_flags;
   auto _carried_item = _o->carried_item;
   auto _after_death = _o->after_death;
-  auto _fired_weapon = _o->fired_weapon;
   auto _item_flags = _fbb.CreateVector(_o->item_flags);
   auto _position = _o->position ? _o->position.get() : 0;
   auto _triggered = _o->triggered;
@@ -5162,7 +5133,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _hit_stauts = _o->hit_stauts;
   auto _collidable = _o->collidable;
   auto _looked_at = _o->looked_at;
-  auto _poisoned = _o->poisoned;
   auto _ai_bits = _o->ai_bits;
   auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
@@ -5188,7 +5158,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _trigger_flags,
       _carried_item,
       _after_death,
-      _fired_weapon,
       _item_flags,
       _position,
       _triggered,
@@ -5198,7 +5167,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _hit_stauts,
       _collidable,
       _looked_at,
-      _poisoned,
       _ai_bits,
       _swap_mesh_flags,
       _data_type,

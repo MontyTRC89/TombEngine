@@ -25,7 +25,6 @@ table Item {
     trigger_flags: int32;
     carried_item: int32;
     after_death: int32;
-    fired_weapon: int32;
     item_flags: [int32];
 	position: Position;
 	triggered: bool;
@@ -35,7 +34,6 @@ table Item {
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
-	poisoned: bool;
 	ai_bits: int32;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
