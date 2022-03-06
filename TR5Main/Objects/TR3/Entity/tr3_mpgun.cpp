@@ -212,7 +212,7 @@ void MPGunControl(short itemNumber)
 				item->TargetState = MPGUN_DUCK;
 			else if (item->RequiredState == MPGUN_DUCK)
 				item->TargetState = MPGUN_DUCK;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = MPGUN_RUN;
 			else if (Targetable(item, &info))
 			{
@@ -224,7 +224,7 @@ void MPGunControl(short itemNumber)
 				else
 					item->TargetState = MPGUN_AIM3;
 			}
-			else if (creature->mood == BORED_MOOD || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (creature->mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
 			{
 				if (info.ahead)
 					item->TargetState = MPGUN_WAIT;
@@ -248,7 +248,7 @@ void MPGunControl(short itemNumber)
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = MPGUN_RUN;
 			else if (Targetable(item, &info))
 			{
@@ -257,7 +257,7 @@ void MPGunControl(short itemNumber)
 				else
 					item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 			{
 				if (info.ahead)
 					item->TargetState = MPGUN_WALK;
@@ -281,11 +281,11 @@ void MPGunControl(short itemNumber)
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				break;
 			else if (Targetable(item, &info) || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
 				item->TargetState = MPGUN_WAIT;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 				item->TargetState = MPGUN_WALK;
 			break;
 

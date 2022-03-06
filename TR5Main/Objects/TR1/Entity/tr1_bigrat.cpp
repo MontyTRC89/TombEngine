@@ -233,7 +233,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_POSE:
-			if (creature->mood != BORED_MOOD || GetRandomControl() < BIG_RAT_POSE_CHANCE)
+			if (creature->mood != MoodType::Bored || GetRandomControl() < BIG_RAT_POSE_CHANCE)
 				item->TargetState = BIG_RAT_STATE_IDLE;
 
 			break;

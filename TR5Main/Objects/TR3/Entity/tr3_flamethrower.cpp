@@ -341,7 +341,7 @@ void FlameThrowerControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = 2;
 			else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->hurtByLara))
 			{
@@ -350,9 +350,9 @@ void FlameThrowerControl(short itemNumber)
 				else
 					item->TargetState = 2;
 			}
-			else if (creature->mood == BORED_MOOD && AI.ahead && !(GetRandomControl() & 0xFF))
+			else if (creature->mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
 				item->TargetState = 4;
-			else if (creature->mood == ATTACK_MOOD || !(GetRandomControl() & 0xFF))
+			else if (creature->mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
 				item->TargetState = 2;
 			
 			break;
@@ -372,7 +372,7 @@ void FlameThrowerControl(short itemNumber)
 			else if ((Targetable(item, &AI) &&
 				AI.distance < pow(SECTOR(4), 2) &&
 				(realEnemy != LaraItem || creature->hurtByLara) ||
-				creature->mood != BORED_MOOD ||
+				creature->mood != MoodType::Bored ||
 				!(GetRandomControl() & 0xFF)))
 			{
 				item->TargetState = 1;
@@ -394,7 +394,7 @@ void FlameThrowerControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = 2;
 			else if (Targetable(item, &AI) && 
 				(realEnemy != LaraItem || creature->hurtByLara))
@@ -404,7 +404,7 @@ void FlameThrowerControl(short itemNumber)
 				else
 					item->TargetState = 9;
 			}
-			else if (creature->mood == BORED_MOOD && AI.ahead)
+			else if (creature->mood == MoodType::Bored && AI.ahead)
 				item->TargetState = 1;
 			else
 				item->TargetState = 2;

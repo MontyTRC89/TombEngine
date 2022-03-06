@@ -181,7 +181,7 @@ void ControlChef(short itemNumber)
 			{
 				if (aiInfo.angle > ANGLE(112.5f) || aiInfo.angle < -ANGLE(112.5f))
 					item->TargetState = CHEF_STATE_TURN_180;
-				else if (info->mood == ATTACK_MOOD)
+				else if (info->mood == MoodType::Attack)
 					item->TargetState = CHEF_STATE_WALK;
 			}
 			else if (aiInfo.bite)
@@ -195,7 +195,7 @@ void ControlChef(short itemNumber)
 			if (aiInfo.distance < pow(682, 2) ||
 				aiInfo.angle > ANGLE(112.5f) ||
 				aiInfo.angle < -ANGLE(112.5f) ||
-				info->mood != ATTACK_MOOD)
+				info->mood != MoodType::Attack)
 			{
 				item->TargetState = CHEF_STATE_AIM;
 			}

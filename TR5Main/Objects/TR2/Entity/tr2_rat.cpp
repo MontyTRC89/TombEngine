@@ -62,7 +62,7 @@ void RatControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case 4:
-			if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
+			if (info->mood == MoodType::Bored || info->mood == MoodType::Stalk)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
@@ -91,7 +91,7 @@ void RatControl(short itemNumber)
 		case 1:
 			info->maximumTurn = ANGLE(6.0f);
 
-			if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
+			if (info->mood == MoodType::Bored || info->mood == MoodType::Stalk)
 			{
 				random = (short)GetRandomControl();
 				if (random < 0x500)

@@ -378,7 +378,7 @@ void RomanStatueControl(short itemNumber)
 		case STATE_ROMAN_STATUE_STOP:    
 			creature->flags = 0;
 			
-			if (creature->mood == ATTACK_MOOD)
+			if (creature->mood == MoodType::Attack)
 				creature->maximumTurn = ANGLE(2);
 			else
 			{
@@ -391,7 +391,7 @@ void RomanStatueControl(short itemNumber)
 			if (item->AIBits ||
 				!(GetRandomControl() & 0x1F) &&
 				(info.distance > pow(SECTOR(1), 2) ||
-					creature->mood != ATTACK_MOOD))
+					creature->mood != MoodType::Attack))
 			{
 				joint2 = AIGuard((CREATURE_INFO*)creature);
 			}
@@ -673,7 +673,7 @@ void RomanStatueControl(short itemNumber)
 			creature->flags = 0;
 			joint2 = info.angle;
 
-			if (creature->mood == ATTACK_MOOD)
+			if (creature->mood == MoodType::Attack)
 			{
 				creature->maximumTurn = ANGLE(7);
 			}

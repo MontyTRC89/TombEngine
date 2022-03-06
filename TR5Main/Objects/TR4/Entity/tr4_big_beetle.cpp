@@ -89,7 +89,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
 			if (info->flags)
-				info->mood = ESCAPE_MOOD;
+				info->mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
@@ -184,7 +184,7 @@ namespace TEN::Entities::TR4
 				else if (!item->HitStatus &&
 					item->AIBits != MODIFY &&
 					GetRandomControl() >= 384 &&
-					(info->mood && GetRandomControl() >= 128 ||
+					(info->mood != MoodType::Bored && GetRandomControl() >= 128 ||
 						info->hurtByLara ||
 						item->AIBits == MODIFY))
 				{

@@ -203,7 +203,7 @@ void TroopsControl(short itemNumber)
 
 		// Vehicle handling
 		if (Lara.Vehicle != NO_ITEM && info.bite)
-			creature->mood = ESCAPE_MOOD;
+			creature->mood = MoodType::Escape;
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
@@ -256,7 +256,7 @@ void TroopsControl(short itemNumber)
 				item->TargetState = STATE_TROOPS_WALK;
 				joint2 = 0;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				item->TargetState = STATE_TROOPS_RUN;
 			}
@@ -281,12 +281,12 @@ void TroopsControl(short itemNumber)
 			else
 			{
 				if ((creature->alerted 
-					|| creature->mood != BORED_MOOD)
+					|| creature->mood != MoodType::Bored)
 					&& (!(item->AIBits & FOLLOW) 
 						|| !(item->AIBits & MODIFY) 
 						&& distance <= SQUARE(2048)))
 				{
-					if (!creature->mood || info.distance <= SQUARE(2048))
+					if (creature->mood == MoodType::Bored || info.distance <= SQUARE(2048))
 					{
 						item->TargetState = STATE_TROOPS_WALK;
 						break;
@@ -310,7 +310,7 @@ void TroopsControl(short itemNumber)
 			{
 				item->TargetState = STATE_TROOPS_WALK;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				item->TargetState = STATE_TROOPS_RUN;
 			}
@@ -334,7 +334,7 @@ void TroopsControl(short itemNumber)
 						item->TargetState = STATE_TROOPS_AIM2;
 					}
 				}
-				else if (creature->mood != BORED_MOOD)
+				else if (creature->mood != MoodType::Bored)
 				{
 					if (info.distance > SQUARE(2048))
 					{
@@ -364,14 +364,14 @@ void TroopsControl(short itemNumber)
 			{
 				item->TargetState = STATE_TROOPS_WALK;
 			}
-			else if (creature->mood != ESCAPE_MOOD)
+			else if (creature->mood != MoodType::Escape)
 			{
 				if (Targetable(item, &info))
 				{
 					item->TargetState = STATE_TROOPS_WALK;
 				}
-				else if (creature->mood == BORED_MOOD 
-					|| creature->mood == STALK_MOOD 
+				else if (creature->mood == MoodType::Bored 
+					|| creature->mood == MoodType::Stalk 
 					&& !(item->AIBits & FOLLOW) 
 					&& info.distance < SQUARE(2048))
 				{
@@ -398,7 +398,7 @@ void TroopsControl(short itemNumber)
 			{
 				item->TargetState = STATE_TROOPS_ATTACK1;
 			}
-			else if (creature->mood != BORED_MOOD || !info.ahead)
+			else if (creature->mood != MoodType::Bored || !info.ahead)
 			{
 				item->TargetState = STATE_TROOPS_STOP;
 			}
@@ -468,7 +468,7 @@ void TroopsControl(short itemNumber)
 
 		case STATE_TROOPS_ATTACK3:
 			if (item->TargetState != STATE_TROOPS_STOP
-				&& (creature->mood == ESCAPE_MOOD || 
+				&& (creature->mood == MoodType::Escape || 
 					info.distance > SQUARE(3072) || 
 					!Targetable(item, &info)))
 			{

@@ -61,11 +61,11 @@ void SharkControl(short itemNumber)
 		case 1:
 			info->maximumTurn = ANGLE(0.5f);
 
-			if (info->mood == BORED_MOOD)
+			if (info->mood == MoodType::Bored)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2))
 				item->TargetState = 0;
-			else if (info->mood == ESCAPE_MOOD || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
+			else if (info->mood == MoodType::Escape || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
 				item->TargetState = 2;
 
 			break;
@@ -74,9 +74,9 @@ void SharkControl(short itemNumber)
 			info->maximumTurn = ANGLE(2.0f);
 			info->flags = 0;
 
-			if (info->mood == BORED_MOOD)
+			if (info->mood == MoodType::Bored)
 				item->TargetState = 1;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(1365, 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
 			{

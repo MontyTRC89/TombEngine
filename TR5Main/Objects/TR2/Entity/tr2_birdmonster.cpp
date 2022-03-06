@@ -69,12 +69,12 @@ void BirdMonsterControl(short itemNumber)
 				else
 					item->TargetState = 10;
 			}
-			else if (AI.ahead && (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD))
+			else if (AI.ahead && (creature->mood == MoodType::Bored || creature->mood == MoodType::Stalk))
 			{
 				if (AI.zoneNumber != AI.enemyZone)
 				{
 					item->TargetState = 2;
-					creature->mood = ESCAPE_MOOD;
+					creature->mood = MoodType::Escape;
 				}
 				else
 					item->TargetState = 8;
@@ -87,7 +87,7 @@ void BirdMonsterControl(short itemNumber)
 		case 8:
 			creature->maximumTurn = 0;
 
-			if (creature->mood != BORED_MOOD || !AI.ahead)
+			if (creature->mood != MoodType::Bored || !AI.ahead)
 				item->TargetState = 1;
 			
 			break;
@@ -97,7 +97,7 @@ void BirdMonsterControl(short itemNumber)
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->TargetState = 5;
-			else if ((creature->mood == BORED_MOOD || creature->mood == STALK_MOOD) && AI.ahead)
+			else if ((creature->mood == MoodType::Bored || creature->mood == MoodType::Stalk) && AI.ahead)
 				item->TargetState = 1;
 			
 			break;

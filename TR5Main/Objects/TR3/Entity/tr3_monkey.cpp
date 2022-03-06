@@ -125,7 +125,7 @@ void MonkeyControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 
 		if (Lara.Vehicle != NO_ITEM)
-			creature->mood = ESCAPE_MOOD;
+			creature->mood = MoodType::Escape;
 
 		CreatureMood(item, &AI, VIOLENT);
 
@@ -162,9 +162,9 @@ void MonkeyControl(short itemNumber)
 
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = 3;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 			{
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
@@ -217,14 +217,14 @@ void MonkeyControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && AI.ahead)
 					item->TargetState = 3;
 				else
 					item->TargetState = 4;
 			}
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 			{
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
@@ -350,9 +350,9 @@ void MonkeyControl(short itemNumber)
 				item->TargetState = 2;
 				torsoY = 0;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 				item->TargetState = 4;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 256)
 					item->TargetState = 6;
@@ -371,7 +371,7 @@ void MonkeyControl(short itemNumber)
 
 			if (item->AIBits & GUARD)
 				item->TargetState = 3;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && AI.ahead)
 					item->TargetState = 3;
@@ -379,7 +379,7 @@ void MonkeyControl(short itemNumber)
 			}
 			else if ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 				item->TargetState = 3;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->mood == MoodType::Bored)
 				item->TargetState = 9;
 			else if (AI.distance < pow(682, 2))
 				item->TargetState = 3;

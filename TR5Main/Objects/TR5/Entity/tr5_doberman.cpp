@@ -60,7 +60,7 @@ void DobermanControl(short itemNumber)
 			{
 			case 1:
 				creature->maximumTurn = ANGLE(3);
-				if (creature->mood)
+				if (creature->mood != MoodType::Bored)
 				{
 					item->TargetState = 2;
 				}
@@ -90,7 +90,7 @@ void DobermanControl(short itemNumber)
 			case 2:
 				tilt = angle;
 				creature->maximumTurn = ANGLE(6);
-				if (!creature->mood)
+				if (creature->mood == MoodType::Bored)
 				{
 					item->TargetState = 3;
 					break;
@@ -102,9 +102,9 @@ void DobermanControl(short itemNumber)
 			case 3:
 				creature->maximumTurn = 0;
 				creature->flags = 0;
-				if (creature->mood)
+				if (creature->mood != MoodType::Bored)
 				{
-					if (creature->mood != ESCAPE_MOOD 
+					if (creature->mood != MoodType::Escape 
 						&& info.distance < SQUARE(341)
 						&& info.ahead)
 						item->TargetState = 7;
@@ -141,21 +141,21 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 4:
-				if (creature->mood || GetRandomControl() < 1280)
+				if (creature->mood != MoodType::Bored || GetRandomControl() < 1280)
 				{
 					item->TargetState = 3;
 				}
 				break;
 
 			case 5:
-				if (creature->mood || GetRandomControl() < 256)
+				if (creature->mood != MoodType::Bored || GetRandomControl() < 256)
 				{
 					item->TargetState = 3;
 				}
 				break;
 
 			case 6:
-				if (creature->mood || GetRandomControl() < 512)
+				if (creature->mood != MoodType::Bored || GetRandomControl() < 512)
 				{
 					item->TargetState = 3;
 				}

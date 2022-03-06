@@ -471,7 +471,7 @@ void VonCroyControl(short itemNumber)
 			}
 		}
 
-		if (creature->mood == ATTACK_MOOD &&
+		if (creature->mood == MoodType::Attack &&
 			!(creature->jumpAhead) &&
 			info.distance > SQUARE(1024))
 		{

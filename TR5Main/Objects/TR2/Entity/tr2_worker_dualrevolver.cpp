@@ -60,7 +60,7 @@ void WorkerDualGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (dual->mood == ATTACK_MOOD || LaraItem->HitPoints > 0)
+			if (dual->mood == MoodType::Attack || LaraItem->HitPoints > 0)
 			{
 				if (Targetable(item, &info))
 				{
@@ -73,16 +73,16 @@ void WorkerDualGunControl(short itemNum)
 				{
 					switch (dual->mood)
 					{
-					case ATTACK_MOOD:
+					case MoodType::Attack:
 						if (info.distance > 0x19000000 || !info.ahead)
 							item->TargetState = 4;
 						else
 							item->TargetState = 3;
 						break;
-					case ESCAPE_MOOD:
+					case MoodType::Escape:
 						item->TargetState = 4;
 						break;
-					case STALK_MOOD:
+					case MoodType::Stalk:
 						item->TargetState = 3;
 						break;
 
@@ -122,11 +122,11 @@ void WorkerDualGunControl(short itemNum)
 				}
 			}
 
-			if (dual->mood == ESCAPE_MOOD)
+			if (dual->mood == MoodType::Escape)
 			{
 				item->TargetState = 4;
 			}
-			else if (dual->mood == ATTACK_MOOD || dual->mood == STALK_MOOD)
+			else if (dual->mood == MoodType::Attack || dual->mood == MoodType::Stalk)
 			{
 				if (info.distance > 0x19000000 || !info.ahead)
 					item->TargetState = 4;
@@ -166,7 +166,7 @@ void WorkerDualGunControl(short itemNum)
 					item->TargetState = 3;
 				}
 			}
-			else if (dual->mood == ATTACK_MOOD)
+			else if (dual->mood == MoodType::Attack)
 			{
 				if (info.ahead && info.distance < 0x19000000)
 					item->TargetState = 3;

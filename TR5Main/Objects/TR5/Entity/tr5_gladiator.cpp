@@ -111,12 +111,12 @@ void ControlGladiator(short itemNumber)
 			case 1:
 				creature->flags = 0;
 				joint2 = rot;
-				creature->maximumTurn = (-(creature->mood != 0)) & 0x16C;
+				creature->maximumTurn = (-(int)(creature->mood != MoodType::Bored)) & 0x16C;
 				
 				if (item->AIBits & GUARD 
 					|| !(GetRandomControl() & 0x1F) 
 					&& (info.distance > SQUARE(1024)
-						|| creature->mood != ATTACK_MOOD))
+						|| creature->mood != MoodType::Attack))
 				{
 					joint2 = AIGuard(creature);
 					break;
@@ -128,7 +128,7 @@ void ControlGladiator(short itemNumber)
 				}
 				else
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 					{
 						if (Lara.target != item
 							&& info.ahead
@@ -140,7 +140,7 @@ void ControlGladiator(short itemNumber)
 					}
 					else
 					{
-						if (!creature->mood 
+						if (creature->mood == MoodType::Bored
 							|| item->AIBits & FOLLOW 
 							&& (creature->reachedGoal 
 								|| distance > SQUARE(2048)))
@@ -184,18 +184,18 @@ void ControlGladiator(short itemNumber)
 			case 2:
 				creature->flags = 0;
 				joint2 = rot;
-				creature->maximumTurn = creature->mood != BORED_MOOD ? ANGLE(7) : ANGLE(2);
+				creature->maximumTurn = creature->mood != MoodType::Bored ? ANGLE(7) : ANGLE(2);
 
 				if (item->AIBits & PATROL1)
 				{
 					item->TargetState = 2;
 					joint2 = 0;
 				}
-				else if (creature->mood == ESCAPE_MOOD)
+				else if (creature->mood == MoodType::Escape)
 				{
 					item->TargetState = 3;
 				}
-				else if (creature->mood)
+				else if (creature->mood != MoodType::Bored)
 				{
 					if (info.distance < SQUARE(1024))
 					{
@@ -234,7 +234,7 @@ void ControlGladiator(short itemNumber)
 					break;
 				}
 
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->mood == MoodType::Escape)
 				{
 					if (Lara.target != item && info.ahead)
 					{
@@ -252,7 +252,7 @@ void ControlGladiator(short itemNumber)
 					break;
 				}
 
-				if (!creature->mood)
+				if (creature->mood == MoodType::Bored)
 				{
 					item->TargetState = 2;
 					break;

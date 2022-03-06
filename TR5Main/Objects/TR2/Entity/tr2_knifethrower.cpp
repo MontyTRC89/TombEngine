@@ -120,11 +120,11 @@ void KnifeThrowerControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (Targetable(item, &aiInfo))
 				item->TargetState = 8;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(6), 2))
 					item->TargetState = 2;
@@ -142,7 +142,7 @@ void KnifeThrowerControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (Targetable(item, &aiInfo))
 			{
@@ -153,7 +153,7 @@ void KnifeThrowerControl(short itemNumber)
 				else
 					item->TargetState = 6;
 			}
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
 					item->TargetState = 1;
@@ -174,7 +174,7 @@ void KnifeThrowerControl(short itemNumber)
 			{
 				item->TargetState = 2;
 			}
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
 					item->TargetState = 1;

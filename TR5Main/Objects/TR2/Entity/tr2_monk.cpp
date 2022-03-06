@@ -73,9 +73,9 @@ void MonkControl(short itemNumber)
 
 			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = 2;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -98,9 +98,9 @@ void MonkControl(short itemNumber)
 
 			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = 2;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -122,7 +122,7 @@ void MonkControl(short itemNumber)
 		case 2:
 			info->maximumTurn = ANGLE(3.0f);
 
-			if (info->mood == BORED_MOOD)
+			if (info->mood == MoodType::Bored)
 			{
 				if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				{
@@ -132,7 +132,7 @@ void MonkControl(short itemNumber)
 						item->TargetState = 11;
 				}
 			}
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -155,9 +155,9 @@ void MonkControl(short itemNumber)
 
 			tilt = angle / 4;
 
-			if (info->mood == BORED_MOOD)
+			if (info->mood == MoodType::Bored)
 				item->TargetState = 1;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
