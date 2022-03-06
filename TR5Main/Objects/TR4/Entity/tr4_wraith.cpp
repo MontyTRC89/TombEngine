@@ -7,6 +7,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/trmath.h"
 #include "Sound/sound.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Objects/Generic/Traps/traps.h"
 #include "Game/people.h"
@@ -21,49 +22,43 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto WRAITH_COUNT = 8;
 
-	short WraithSpeed = 64;
+	auto WraithVelocity = 64;
 
 	void InitialiseWraith(short itemNumber)
 	{
-		ITEM_INFO* item;
+		auto* item = &g_Level.Items[itemNumber];
 
-		item = &g_Level.Items[itemNumber];
+		item->Data = WraithInfo();
+		auto* wraith = (WraithInfo*)item->Data;
 
-		item->Data = WRAITH_INFO();
-		WRAITH_INFO* wraithData = item->Data;
-
+		item->VerticalVelocity = WraithVelocity;
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[6] = 0;
-		item->VerticalVelocity = WraithSpeed;
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
-			wraithData->xPos = item->Position.xPos;
-			wraithData->yPos = item->Position.yPos;
-			wraithData->zPos = item->Position.zPos;
-			wraithData->zRot = 0;
-			wraithData->yPos = 0;
-			wraithData->xPos = 0;
-			wraithData->r = 0;
-			wraithData->g = 0;
-			wraithData->b = 0;
+			wraith->Position.xPos = item->Position.xPos;
+			wraith->Position.yPos = item->Position.yPos;
+			wraith->Position.zPos = item->Position.zPos;
+			wraith->Position.zRot = 0;
+			wraith->Position.yPos = 0;
+			wraith->Position.xPos = 0;
+			wraith->r = 0;
+			wraith->g = 0;
+			wraith->b = 0;
 
-			wraithData++;
+			wraith++;
 		}
 	}
 
 	void WraithControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Position, 0);
 
 		// HitPoints stores the target of wraith
-		ITEM_INFO* target;
-		if (item->ItemFlags[6])
-			target = &g_Level.Items[item->ItemFlags[6]];
-		else
-			target = LaraItem;
+		auto* target = item->ItemFlags[6] ? &g_Level.Items[item->ItemFlags[6]] : LaraItem;
 
 		int x, y, z, distance, dx, dy, dz, oldX, oldY, oldZ;
 
@@ -72,22 +67,22 @@ namespace TEN::Entities::TR4
 			x = target->Position.xPos - item->Position.xPos;
 			y = target->Position.yPos;
 			z = target->Position.zPos - item->Position.zPos;
-			distance = SQUARE(x) + SQUARE(z);
-			dy = abs((distance / 8192) - 512);
+			distance = pow(x, 2) + pow(z, 2);
+			dy = abs((distance / SECTOR(8)) - SECTOR(0.5f));
 		}
 		else
 		{
-			ROOM_INFO* room = &g_Level.Rooms[LaraItem->RoomNumber];
+			auto* room = &g_Level.Rooms[LaraItem->RoomNumber];
 
-			x = room->x + room->xSize * 1024 / 2 - item->Position.xPos;
-			z = room->z + room->zSize * 1024 / 2 - item->Position.zPos;
+			x = room->x + room->xSize * SECTOR(1) / 2 - item->Position.xPos;
+			z = room->z + room->zSize * SECTOR(1) / 2 - item->Position.zPos;
 
-			distance = SQUARE(x) + SQUARE(z);
-			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - 768);
+			distance = pow(x, 2) + pow(z, 2);
+			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - CLICK(1));
 			y = room->y + ((room->minfloor - room->maxceiling) / 2);
 		}
 
-		dy = y - item->Position.yPos - dy - 128;
+		dy = y - item->Position.yPos - dy - CLICK(0.5f);
 		short angleH = phd_atan(z, x) - item->Position.yRot;
 
 		short angleV = 0;
@@ -98,72 +93,58 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Position.xRot;
 
-		int speed = 8 * WraithSpeed / item->VerticalVelocity;
+		int velocity = 8 * (WraithVelocity / item->VerticalVelocity);
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
 			if (angleH >= 0)
 			{
 				if (item->ItemFlags[2] <= 0)
-				{
 					item->ItemFlags[2] = 1;
-				}
 				else
 				{
-					item->ItemFlags[2] += speed;
+					item->ItemFlags[2] += velocity;
 					item->Position.yRot += item->ItemFlags[2];
 				}
 			}
 			else if (item->ItemFlags[2] >= 0)
-			{
 				item->ItemFlags[2] = -1;
-			}
 			else
 			{
-				item->ItemFlags[2] -= speed;
+				item->ItemFlags[2] -= velocity;
 				item->Position.yRot += item->ItemFlags[2];
 			}
 		}
 		else
-		{
 			item->Position.yRot += angleH;
-		}
 
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{
 			if (angleV >= 0)
 			{
 				if (item->ItemFlags[3] <= 0)
-				{
 					item->ItemFlags[3] = 1;
-				}
 				else
 				{
-					item->ItemFlags[3] += speed;
+					item->ItemFlags[3] += velocity;
 					item->Position.xRot += item->ItemFlags[3];
 				}
 			}
 			else if (item->ItemFlags[3] >= 0)
-			{
 				item->ItemFlags[3] = -1;
-			}
 			else
 			{
-				item->ItemFlags[3] -= speed;
+				item->ItemFlags[3] -= velocity;
 				item->Position.xRot += item->ItemFlags[3];
 			}
 		}
 		else
-		{
 			item->Position.xRot += angleV;
-		}
 
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-		int ceiling = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		auto probe = GetCollisionResult(item);
+
 		bool hitWall = false;
-		if (height < item->Position.yPos || ceiling > item->Position.yPos)
+		if (probe.Position.Floor < item->Position.yPos || probe.Position.Ceiling > item->Position.yPos)
 			hitWall = true;
 
 		oldX = item->Position.xPos;
@@ -179,11 +160,11 @@ namespace TEN::Entities::TR4
 		{
 			ItemNewRoom(itemNumber, outsideRoom);
 
-			auto r = &g_Level.Rooms[outsideRoom];
-			short linkNum = NO_ITEM;
-			for (linkNum = r->itemNumber; linkNum != NO_ITEM; linkNum = g_Level.Items[linkNum].NextItem)
+			auto* room = &g_Level.Rooms[outsideRoom];
+			short linkNumber = NO_ITEM;
+			for (linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{
-				ITEM_INFO* target = &g_Level.Items[linkNum];
+				auto* target = &g_Level.Items[linkNumber];
 
 				if (target->Active)
 				{
@@ -196,10 +177,8 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			if (linkNum != NO_ITEM)
-			{
-				item->ItemFlags[6] = linkNum;
-			}
+			if (linkNumber != NO_ITEM)
+				item->ItemFlags[6] = linkNumber;
 		}
 
 		if (item->ObjectNumber != ID_WRAITH3)
@@ -225,59 +204,50 @@ namespace TEN::Entities::TR4
 								}
 							}
 						}
+
 						KillItem(itemNumber);
 					}
 				}
 				else
-				{
 					item->ItemFlags[1] = -1;
-				}
 			}
 			else
 			{
 				item->ItemFlags[1]--;
 				if (item->ItemFlags[1] < 0)
-				{
 					item->ItemFlags[1] = 0;
-				}
 			}
 		}
 
-		if (distance >= 28900 || abs(item->Position.yPos - target->Position.yPos + 384) >= 256)
+		if (distance >= 28900 || abs(item->Position.yPos - target->Position.yPos + CLICK(1.5f)) >= CLICK(1))
 		{
 			if (Wibble & 16)
 			{
-				if (item->VerticalVelocity < WraithSpeed)
-				{
+				if (item->VerticalVelocity < WraithVelocity)
 					item->VerticalVelocity++;
-				}
+				
 				if (item->ItemFlags[6])
 				{
 					if (item->ItemFlags[7])
-					{
 						item->ItemFlags[7]--;
-					}
 				}
 			}
 		}
 		else
 		{
 			if (item->VerticalVelocity > 32)
-			{
 				item->VerticalVelocity -= 12;
-			}
+			
 			if (target == LaraItem)
 			{
-				target->HitPoints -= distance / 1024;
+				target->HitPoints -= distance / SECTOR(1);
 
 				// WRAITH1 can burn Lara
 				if (item->ObjectNumber == ID_WRAITH1)
 				{
 					item->ItemFlags[1] += 400;
 					if (item->ItemFlags[1] > 8000)
-					{
 						LaraBurn(LaraItem);
-					}
 				}
 			}
 			else if (target->ObjectNumber == ID_ANIMATING10)
@@ -291,12 +261,13 @@ namespace TEN::Entities::TR4
 					item->Position.zPos = target->Position.zPos;
 					WraithExplosionEffect(item, 96, 96, 96, -32);
 					WraithExplosionEffect(item, 48, 48, 48, 48);
+
 					target->TriggerFlags--;
 					target->HitPoints = 0;
+
 					if (target->TriggerFlags > 0)
-					{
 						target->FrameNumber = g_Level.Anims[target->AnimNumber].frameBase;
-					}
+
 					KillItem(itemNumber);
 				}
 			}
@@ -315,41 +286,38 @@ namespace TEN::Entities::TR4
 		}
 
 		// Check if WRAITH is going below floor or above ceiling and trigger sparks
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos
-			|| GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos)
+		probe = GetCollisionResult(item);
+
+		if (probe.Position.Floor < item->Position.yPos ||
+			probe.Position.Ceiling > item->Position.yPos)
 		{
 			if (!hitWall)
-			{
-				WraithWallsEffect(oldX, oldY, oldZ, item->Position.yRot + -ANGLE(180), item->ObjectNumber);
-			}
+				WraithWallsEffect(oldX, oldY, oldZ, item->Position.yRot + -ANGLE(180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
-		{
 			WraithWallsEffect(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Position.yRot, item->ObjectNumber);
-		}
 
 		// Update WRAITH nodes
-		WRAITH_INFO* creature = (WRAITH_INFO*)item->Data;
+		auto* creature = (WraithInfo*)item->Data;
+
 		int j = 0;
 		for (int i = WRAITH_COUNT - 1; i > 0; i--)
 		{
-			creature[i - 1].xPos += (creature[i - 1].xRot / 16);
-			creature[i - 1].yPos += (creature[i - 1].yRot / 16);
-			creature[i - 1].zPos += (creature[i - 1].zRot / 16);
+			creature[i - 1].Position.xPos += (creature[i - 1].Position.xRot / 16);
+			creature[i - 1].Position.yPos += (creature[i - 1].Position.yRot / 16);
+			creature[i - 1].Position.zPos += (creature[i - 1].Position.zRot / 16);
 
-			creature[i - 1].xRot -= (creature[i - 1].xRot / 16);
-			creature[i - 1].yRot -= (creature[i - 1].yRot / 16);
-			creature[i - 1].zRot -= (creature[i - 1].zRot / 16);
+			creature[i - 1].Position.xRot -= (creature[i - 1].Position.xRot / 16);
+			creature[i - 1].Position.yRot -= (creature[i - 1].Position.yRot / 16);
+			creature[i - 1].Position.zRot -= (creature[i - 1].Position.zRot / 16);
 
-			creature[i].xPos = creature[i - 1].xPos;
-			creature[i].yPos = creature[i - 1].yPos;
-			creature[i].zPos = creature[i - 1].zPos;
+			creature[i].Position.xPos = creature[i - 1].Position.xPos;
+			creature[i].Position.yPos = creature[i - 1].Position.yPos;
+			creature[i].Position.zPos = creature[i - 1].Position.zPos;
 
-			creature[i].xRot = creature[i - 1].xRot;
-			creature[i].yRot = creature[i - 1].yRot;
-			creature[i].zRot = creature[i - 1].zRot;
+			creature[i].Position.xRot = creature[i - 1].Position.xRot;
+			creature[i].Position.yRot = creature[i - 1].Position.yRot;
+			creature[i].Position.zRot = creature[i - 1].Position.zRot;
 
 			if (item->ObjectNumber == ID_WRAITH1)
 			{
@@ -373,31 +341,31 @@ namespace TEN::Entities::TR4
 			j++;
 		}
 
-		creature[0].xPos = item->Position.xPos;
-		creature[0].yPos = item->Position.yPos;
-		creature[0].zPos = item->Position.zPos;
+		creature[0].Position.xPos = item->Position.xPos;
+		creature[0].Position.yPos = item->Position.yPos;
+		creature[0].Position.zPos = item->Position.zPos;
 
-		creature[0].xRot = 4 * (item->Position.xPos - oldX);
-		creature[0].yRot = 4 * (item->Position.yPos - oldY);
-		creature[0].zRot = 4 * (item->Position.zPos - oldZ);
+		creature[0].Position.xRot = 4 * (item->Position.xPos - oldX);
+		creature[0].Position.yRot = 4 * (item->Position.yPos - oldY);
+		creature[0].Position.zRot = 4 * (item->Position.zPos - oldZ);
 
 		// Standard WRAITH drawing code
 		DrawWraith(
 			item->Position.xPos,
 			item->Position.yPos,
 			item->Position.zPos,
-			creature[0].xRot,
-			creature[0].yRot,
-			creature[0].zRot,
+			creature[0].Position.xRot,
+			creature[0].Position.yRot,
+			creature[0].Position.zRot,
 			item->ObjectNumber);
 
 		DrawWraith(
 			(oldX + item->Position.xPos) / 2,
 			(oldY + item->Position.yPos) / 2,
 			(oldZ + item->Position.zPos) / 2,
-			creature[0].xRot,
-			creature[0].yRot,
-			creature[0].zRot,
+			creature[0].Position.xRot,
+			creature[0].Position.yRot,
+			creature[0].Position.zRot,
 			item->ObjectNumber);
 
 		// Lighting for WRAITH
@@ -416,9 +384,9 @@ namespace TEN::Entities::TR4
 		}
 
 		TriggerDynamicLight(
-			creature[0].xPos,
-			creature[0].yPos,
-			creature[0].zPos,
+			creature[0].Position.xPos,
+			creature[0].Position.yPos,
+			creature[0].Position.zPos,
 			16,
 			r, g, b);
 	}
@@ -431,22 +399,21 @@ namespace TEN::Entities::TR4
 		item->Position.yPos -= 384;
 
 		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, 0, 0);
-		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(45), 0);
-		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(90), 0);
-		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(135), 0);
+		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(45.0f), 0);
+		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(90.0f), 0);
+		TriggerShockwave(&item->Position, inner, outer, speed, r, g, b, 24, ANGLE(135.0f), 0);
 
 		item->Position.yPos += 384;
 	}
 
-	void DrawWraith(int x, int y, int z, short xVel, short yVel, short zVel, int objNumber)
+	void DrawWraith(int x, int y, int z, short xVelocity, short yVelocity, short zVelocity, int objectNumber)
 	{
-		unsigned char size, life;
-		BYTE color;
-		SPARKS* spark;
-		spark = &Sparks[GetFreeSpark()];
+		auto* spark = &Sparks[GetFreeSpark()];
 		spark->on = 1;
 
-		if (objNumber == ID_WRAITH1)
+		BYTE color;
+
+		if (objectNumber == ID_WRAITH1)
 		{
 			spark->sR = (GetRandomControl() & 0x1F) + -128;
 			spark->sB = 24;
@@ -455,7 +422,8 @@ namespace TEN::Entities::TR4
 			spark->dB = 24;
 			spark->dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else if (objNumber == ID_WRAITH2) {
+		else if (objectNumber == ID_WRAITH2)
+		{
 			spark->sB = (GetRandomControl() & 0x1F) + -128;
 			spark->sR = 24;
 			spark->sG = (GetRandomControl() & 0x1F) + -128;
@@ -463,7 +431,8 @@ namespace TEN::Entities::TR4
 			spark->dR = 24;
 			spark->dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else {
+		else
+		{
 			color = (GetRandomControl() & 0x1F) + 64;
 			spark->dG = color;
 			spark->dR = color;
@@ -476,7 +445,7 @@ namespace TEN::Entities::TR4
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 7;
 		spark->transType = TransTypeEnum::COLADD;
-		life = (GetRandomControl() & 7) + 12;
+		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark->life = life;
 		spark->sLife = life;
 		spark->x = (GetRandomControl() & 0x1F) + x - 16;
@@ -484,24 +453,24 @@ namespace TEN::Entities::TR4
 		spark->friction = 85;
 		spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 		spark->z = (GetRandomControl() & 0x1F) + z - 16;
-		spark->xVel = xVel;
-		spark->yVel = yVel;
-		spark->zVel = zVel;
+		spark->xVel = xVelocity;
+		spark->yVel = yVelocity;
+		spark->zVel = zVelocity;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
 		spark->scalar = 2;
 		spark->dSize = 2;
-		size = (GetRandomControl() & 0x1F) + 48;
+		unsigned char size = (GetRandomControl() & 0x1F) + 48;
 		spark->sSize = size;
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(int x, int y, int z, short yrot, short objNumber)
+	void WraithWallsEffect(int x, int y, int z, short yRot, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;
 
-		if (objNumber == ID_WRAITH1)
+		if (objectNumber == ID_WRAITH1)
 		{
 			sR = (GetRandomControl() & 0x1F) + -128;
 			sB = 24;
@@ -510,7 +479,7 @@ namespace TEN::Entities::TR4
 			dB = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else if (objNumber == ID_WRAITH2) {
+		else if (objectNumber == ID_WRAITH2) {
 			sB = (GetRandomControl() & 0x1F) + -128;
 			sR = 24;
 			sG = (GetRandomControl() & 0x1F) + -128;
@@ -530,7 +499,8 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < 15; i++)
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
+
 			spark->on = true;
 			spark->sR = dR;
 			spark->sG = dG;
@@ -547,7 +517,7 @@ namespace TEN::Entities::TR4
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			short rot = yrot + GetRandomControl() - ANGLE(90);
+			short rot = yRot + GetRandomControl() - ANGLE(90);
 			short velocity = ((GetRandomControl() & 0x3FF) + 1024);
 			spark->xVel = velocity * phd_sin(rot);
 			spark->yVel = (GetRandomControl() & 0x7F) - 64;
@@ -566,26 +536,26 @@ namespace TEN::Entities::TR4
 
 	void KillWraith(ITEM_INFO* item)
 	{
-		ITEM_INFO* item2;
-		item2 = nullptr;
+		ITEM_INFO* item2 = nullptr;
 
 		if (NextItemActive != NO_ITEM)
 		{
 			for (; NextItemActive != NO_ITEM;)
 			{
-				item2 = &g_Level.Items[NextItemActive];
+				auto* item2 = &g_Level.Items[NextItemActive];
 				if (item2->ObjectNumber == ID_WRAITH3 && !item2->HitPoints)
-				{
 					break;
-				}
+				
 				if (item2->NextActive == NO_ITEM)
 				{
 					FlipEffect = -1;
 					return;
 				}
 			}
+
 			item2->HitPoints = item - g_Level.Items.data();
 		}
+
 		FlipEffect = -1;
 	}
 }

@@ -372,8 +372,8 @@ void InitialiseJeep(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	
-	JEEP_INFO* jeep;
-	item->Data = JEEP_INFO();
+	JeepInfo* jeep;
+	item->Data = JeepInfo();
 	jeep = item->Data;
 
 	jeep->velocity = 0;
@@ -500,7 +500,7 @@ static int GetOnJeep(int itemNumber)
 
 static int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 {
-	JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+	JeepInfo* jeep = (JeepInfo*)item->Data;
 
 	if (jeep->unknown2 != 0)
 		return 0;
@@ -630,7 +630,7 @@ static void JeepExplode(ITEM_INFO* item)
 
 int JeepDynamics(ITEM_INFO* item)
 {
-	JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+	JeepInfo* jeep = (JeepInfo*)item->Data;
 
 	PHD_VECTOR f_old, b_old, mm_old, mt_old, mb_old;
 
@@ -882,7 +882,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 	if (LaraItem->ActiveState == JS_GETOFF || LaraItem->TargetState == JS_GETOFF)
 		TrInput = 0;
 	
-	JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+	JeepInfo* jeep = (JeepInfo*)item->Data;
 
 	if (jeep->revs <= 16)
 		jeep->revs = 0;
@@ -1026,7 +1026,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 
 static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 {
-	JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+	JeepInfo* jeep = (JeepInfo*)item->Data;
 	bool dismount;
 	if (item->Position.yPos != item->Floor && 
 		LaraItem->ActiveState != JS_JUMP && 
@@ -1555,7 +1555,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 
 			int anim = LaraItem->AnimNumber;
 
-			JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+			JeepInfo* jeep = (JeepInfo*)item->Data;
 			jeep->revs = 0;
 			jeep->unknown2 = 0;
 
@@ -1569,7 +1569,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 int JeepControl(void)
 {
 	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
-	JEEP_INFO* jeep = (JEEP_INFO*)item->Data;
+	JeepInfo* jeep = (JeepInfo*)item->Data;
 
 	int drive = -1;
 	bool dead = 0;

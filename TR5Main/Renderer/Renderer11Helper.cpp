@@ -212,7 +212,7 @@ namespace TEN::Renderer
 					else if (j == 6 || j == 7)
 						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
 				},
-				[&j, &currentBone](JEEP_INFO& jeep)
+				[&j, &currentBone](JeepInfo& jeep)
 				{
 					switch(j)
 					{
@@ -233,7 +233,7 @@ namespace TEN::Renderer
 						break;
 					}
 				},
-				[&j, &currentBone](MOTORBIKE_INFO& bike)
+				[&j, &currentBone](MotorbikeInfo& bike)
 				{
 				switch (j)
 				{
