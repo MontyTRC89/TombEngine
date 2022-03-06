@@ -40,13 +40,13 @@ void InvisibleGhostControl(short itemNumber)
 		
 	if (item->AIBits)
 		GetAITarget(info);
-	else if (info->hurtByLara)
-		info->enemy = LaraItem;
+	else if (info->HurtByLara)
+		info->Enemy = LaraItem;
 
 	AI_INFO aiInfo;
 	CreatureAIInfo(item, &aiInfo);
 
-	angle = CreatureTurn(item, info->maximumTurn);
+	angle = CreatureTurn(item, info->MaxTurn);
 	if (abs(aiInfo.angle) >= ANGLE(3.0f))
 	{
 		if (aiInfo.angle > 0)
@@ -64,11 +64,11 @@ void InvisibleGhostControl(short itemNumber)
 		joint1 = aiInfo.xAngle;
 	}
 
-	info->maximumTurn = 0;
+	info->MaxTurn = 0;
 		
 	if (item->ActiveState == 1)
 	{
-		info->flags = 0;
+		info->Flags = 0;
 
 		if (aiInfo.distance < pow(614, 2))
 		{
@@ -80,12 +80,12 @@ void InvisibleGhostControl(short itemNumber)
 	}
 	else if (item->ActiveState > 1 &&
 		item->ActiveState <= 3 &&
-		!info->flags &&
+		!info->Flags &&
 		item->TouchBits & 0x9470 &&
 		item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 18)
 	{
 		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Position.yRot, DoBloodSplat);
-		info->flags = 1;
+		info->Flags = 1;
 
 		LaraItem->HitPoints -= 400;
 		LaraItem->HitStatus = true;

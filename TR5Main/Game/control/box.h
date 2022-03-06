@@ -4,8 +4,8 @@
 
 struct ITEM_INFO;
 struct BITE_INFO;
-struct CREATURE_INFO;
-struct LOT_INFO;
+struct CreatureInfo;
+struct LOTInfo;
 
 enum TARGET_TYPE
 {
@@ -186,15 +186,15 @@ constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent);
-void FindAITargetObject(CREATURE_INFO* creature, short objectNumber);
-void GetAITarget(CREATURE_INFO* creature);
+void FindAITargetObject(CreatureInfo* creature, short objectNumber);
+void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
-void DropBaddyPickups(ITEM_INFO* item);
+void DropEntityPickups(ITEM_INFO* item);
 int MoveCreature3DPos(PHD_3DPOS* srcPos, PHD_3DPOS* destPos, int velocity, short angleDif, int angleAdd);
 void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angadd);
-bool SameZone(CREATURE_INFO* creature, ITEM_INFO* target);
-void FindAITargetObject(CREATURE_INFO* creature, short objNum);
-short AIGuard(CREATURE_INFO* creature);
+bool SameZone(CreatureInfo* creature, ITEM_INFO* target);
+void FindAITargetObject(CreatureInfo* creature, short objNum);
+short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ITEM_INFO* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState);
@@ -206,18 +206,18 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required);
 void CreatureTilt(ITEM_INFO* item, short angle);
 short CreatureTurn(ITEM_INFO* item, short maxTurn);
 void CreatureDie(short itemNumber, int explode);
-int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOT_INFO* LOT);
+int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber);
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
-void TargetBox(LOT_INFO* LOT, int boxNumber);
-int UpdateLOT(LOT_INFO* LOT, int expansion);
-int SearchLOT(LOT_INFO* LOT, int expansion);
+void TargetBox(LOTInfo* LOT, int boxNumber);
+int UpdateLOT(LOTInfo* LOT, int expansion);
+int SearchLOT(LOTInfo* LOT, int expansion);
 int CreatureActive(short itemNumber);
 void InitialiseCreature(short itemNumber);
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI);
-TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOT_INFO* LOT);
+TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set);
 void InitialiseItemBoxData();

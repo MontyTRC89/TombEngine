@@ -42,13 +42,13 @@ void SwordGuardianControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* sword;
+	CreatureInfo* sword;
 	AI_INFO info;
 	short angle, head, torso;
 	bool lara_alive;
 
 	item = &g_Level.Items[itemNum];
-	sword = (CREATURE_INFO*)item->Data;
+	sword = (CreatureInfo*)item->Data;
 	angle = head = torso = 0;
 	lara_alive = (LaraItem->HitPoints > 0);
 
@@ -73,20 +73,20 @@ void SwordGuardianControl(short itemNum)
 	}
 	else
 	{
-		sword->LOT.step = STEP_SIZE;
-		sword->LOT.drop = -STEP_SIZE;
-		sword->LOT.fly = NO_FLYING;
-		sword->LOT.zone = ZONE_BASIC;
+		sword->LOT.Step = STEP_SIZE;
+		sword->LOT.Drop = -STEP_SIZE;
+		sword->LOT.Fly = NO_FLYING;
+		sword->LOT.Zone = ZONE_BASIC;
 		CreatureAIInfo(item, &info);
 
 		if (item->ActiveState == 8)
 		{
 			if (info.zoneNumber != info.enemyZone)
 			{
-				sword->LOT.step = WALL_SIZE * 20;
-				sword->LOT.drop = -WALL_SIZE * 20;
-				sword->LOT.fly = STEP_SIZE / 4;
-				sword->LOT.zone = ZONE_FLYER;
+				sword->LOT.Step = WALL_SIZE * 20;
+				sword->LOT.Drop = -WALL_SIZE * 20;
+				sword->LOT.Fly = STEP_SIZE / 4;
+				sword->LOT.Zone = ZONE_FLYER;
 				CreatureAIInfo(item, &info);
 			}
 		}
@@ -94,7 +94,7 @@ void SwordGuardianControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, sword->maximumTurn);
+		angle = CreatureTurn(item, sword->MaxTurn);
 
 		if (item->ActiveState != 9)
 			item->MeshBits = 0xFFFFFFFF;
@@ -102,21 +102,21 @@ void SwordGuardianControl(short itemNum)
 		switch (item->ActiveState)
 		{
 		case 9:
-			sword->maximumTurn = 0;
+			sword->MaxTurn = 0;
 
-			if (!sword->flags)
+			if (!sword->Flags)
 			{
 				item->MeshBits = (item->MeshBits << 1) + 1;
-				sword->flags = 3;
+				sword->Flags = 3;
 			}
 			else
 			{
-				sword->flags--;
+				sword->Flags--;
 			}
 			break;
 
 		case 1:
-			sword->maximumTurn = 0;
+			sword->MaxTurn = 0;
 
 			if (info.ahead)
 				head = info.angle;
@@ -145,7 +145,7 @@ void SwordGuardianControl(short itemNum)
 			break;
 
 		case 2:
-			sword->maximumTurn = ANGLE(9);
+			sword->MaxTurn = ANGLE(9);
 
 			if (info.ahead)
 				head = info.angle;
@@ -164,7 +164,7 @@ void SwordGuardianControl(short itemNum)
 			break;
 
 		case 3:
-			sword->flags = 0;
+			sword->Flags = 0;
 
 			if (info.ahead)
 				torso = info.angle;
@@ -176,7 +176,7 @@ void SwordGuardianControl(short itemNum)
 			break;
 
 		case 5:
-			sword->flags = 0;
+			sword->Flags = 0;
 
 			if (info.ahead)
 				torso = info.angle;
@@ -188,7 +188,7 @@ void SwordGuardianControl(short itemNum)
 			break;
 
 		case 10:
-			sword->flags = 0;
+			sword->Flags = 0;
 
 			if (info.ahead)
 				torso = info.angle;
@@ -200,14 +200,14 @@ void SwordGuardianControl(short itemNum)
 			break;
 
 		case 8:
-			sword->maximumTurn = ANGLE(7);
+			sword->MaxTurn = ANGLE(7);
 
 			if (info.ahead)
 				head = info.angle;
 
 			SwordGuardianFly(item);
 
-			if (!sword->LOT.fly)
+			if (!sword->LOT.Fly)
 				item->TargetState = 1;
 			break;
 
@@ -217,12 +217,12 @@ void SwordGuardianControl(short itemNum)
 			if (info.ahead)
 				torso = info.angle;
 
-			if (!sword->flags && (item->TouchBits & 0xC000))
+			if (!sword->Flags && (item->TouchBits & 0xC000))
 			{
 				LaraItem->HitPoints -= 300;
 				LaraItem->HitStatus = true;
 				CreatureEffect(item, &swordBite, DoBloodSplat);
-				sword->flags = 1;
+				sword->Flags = 1;
 			}
 			break;
 		}

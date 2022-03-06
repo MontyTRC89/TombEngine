@@ -43,7 +43,7 @@ void SphinxControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 	int x = item->Position.xPos + 614 * phd_sin(item->Position.yRot);
@@ -91,18 +91,18 @@ void SphinxControl(short itemNumber)
 	if (item->AIBits)
 		GetAITarget(creature);
 	else
-		creature->enemy = LaraItem;
+		creature->Enemy = LaraItem;
 
 	AI_INFO info;
 	CreatureAIInfo(item, &info);
 
-	if (creature->enemy != LaraItem)
+	if (creature->Enemy != LaraItem)
 		phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);
 
-	short angle = CreatureTurn(item, creature->maximumTurn);
+	short angle = CreatureTurn(item, creature->MaxTurn);
 
 	int dx = abs(item->ItemFlags[2] - (short)item->Position.xPos);
 	int dz = abs(item->ItemFlags[3] - (short)item->Position.zPos);
@@ -110,7 +110,7 @@ void SphinxControl(short itemNumber)
 	switch (item->ActiveState)
 	{
 	case SPHINX_SLEEPING:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->TriggerFlags)
 		{
@@ -125,7 +125,7 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_ALERTED:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->TriggerFlags)
 		{
@@ -140,7 +140,7 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_WALK:
-		creature->maximumTurn = ANGLE(3);
+		creature->MaxTurn = ANGLE(3);
 
 		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->RequiredState == SPHINX_RUN)
 		{
@@ -158,9 +158,9 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_RUN:
-		creature->maximumTurn = 60;
+		creature->MaxTurn = 60;
 
-		if (creature->flags == 0)
+		if (creature->Flags == 0)
 		{
 			if (item->TouchBits & 0x40)
 			{
@@ -172,7 +172,7 @@ void SphinxControl(short itemNumber)
 					DoBloodSplat);
 
 				LaraItem->HitPoints -= 200;
-				creature->flags = 1;
+				creature->Flags = 1;
 			}
 		}
 
@@ -187,13 +187,13 @@ void SphinxControl(short itemNumber)
 		{
 			item->TargetState = SPHINX_HIT;
 			item->RequiredState = SPHINX_WALK_BACK;
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 		}
 
 		break;
 
 	case SPHINX_WALK_BACK:
-		creature->maximumTurn = ANGLE(3);
+		creature->MaxTurn = ANGLE(3);
 		if (info.distance > SQUARE(2048) || height2 > item->Position.yPos + 256 || height2 < item->Position.yPos - 256)
 		{
 			item->TargetState = SPHINX_STOP;
@@ -223,7 +223,7 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_STOP:
-		creature->flags = 0;
+		creature->Flags = 0;
 
 		if (item->RequiredState == SPHINX_WALK_BACK)
 		{

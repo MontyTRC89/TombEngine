@@ -254,11 +254,11 @@ void FlameThrowerControl(short itemNumber)
 	{
 		if (item->AIBits)
 			GetAITarget(creature);
-		else if (creature->hurtByLara)
-			creature->enemy = LaraItem;
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 		else
 		{
-			creature->enemy = NULL;
+			creature->Enemy = NULL;
 
 			ITEM_INFO* target = NULL;
 			int minDistance = INT_MAX;
@@ -266,10 +266,10 @@ void FlameThrowerControl(short itemNumber)
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
 				auto* currentCreature = ActiveCreatures[i];
-				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
+				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					continue;
 
-				target = &g_Level.Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->ItemNumber];
 				if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0)
 					continue;
 
@@ -279,7 +279,7 @@ void FlameThrowerControl(short itemNumber)
 				int distance = pow(x, 2) + pow(z, 2);
 				if (distance < minDistance)
 				{
-					creature->enemy = target;
+					creature->Enemy = target;
 					minDistance = distance;
 				}
 			}
@@ -289,13 +289,13 @@ void FlameThrowerControl(short itemNumber)
 		CreatureAIInfo(item, &AI);
 
 		AI_INFO laraAI;
-		if (creature->enemy == LaraItem)
+		if (creature->Enemy == LaraItem)
 		{
 			laraAI.angle = AI.angle;
 			laraAI.distance = AI.distance;
 
-			if (!creature->hurtByLara)
-				creature->enemy = NULL;
+			if (!creature->HurtByLara)
+				creature->Enemy = NULL;
 		}
 		else
 		{
@@ -311,13 +311,13 @@ void FlameThrowerControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		auto* realEnemy = creature->enemy; 
+		auto* realEnemy = creature->Enemy; 
 
 		if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
 		{
-			if (!creature->alerted)
+			if (!creature->Alerted)
 				SoundEffect(300, &item->Position, 0);
 
 			AlertAllGuards(itemNumber);
@@ -326,8 +326,8 @@ void FlameThrowerControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->maximumTurn = 0;
-			creature->flags = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 			head = laraAI.angle;
 
 			if (item->AIBits & GUARD)
@@ -341,18 +341,18 @@ void FlameThrowerControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = 2;
-			else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->hurtByLara))
+			else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->HurtByLara))
 			{
 				if (AI.distance < pow(SECTOR(4), 2))
 					item->TargetState = 10;
 				else
 					item->TargetState = 2;
 			}
-			else if (creature->mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
+			else if (creature->Mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
 				item->TargetState = 4;
-			else if (creature->mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
+			else if (creature->Mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
 				item->TargetState = 2;
 			
 			break;
@@ -371,8 +371,8 @@ void FlameThrowerControl(short itemNumber)
 			}
 			else if ((Targetable(item, &AI) &&
 				AI.distance < pow(SECTOR(4), 2) &&
-				(realEnemy != LaraItem || creature->hurtByLara) ||
-				creature->mood != MoodType::Bored ||
+				(realEnemy != LaraItem || creature->HurtByLara) ||
+				creature->Mood != MoodType::Bored ||
 				!(GetRandomControl() & 0xFF)))
 			{
 				item->TargetState = 1;
@@ -381,8 +381,8 @@ void FlameThrowerControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->flags = 0;
-			creature->maximumTurn = ANGLE(5.0f);
+			creature->Flags = 0;
+			creature->MaxTurn = ANGLE(5.0f);
 			head = laraAI.angle;
 
 			if (item->AIBits & GUARD)
@@ -394,17 +394,17 @@ void FlameThrowerControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = 2;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = 2;
 			else if (Targetable(item, &AI) && 
-				(realEnemy != LaraItem || creature->hurtByLara))
+				(realEnemy != LaraItem || creature->HurtByLara))
 			{
 				if (AI.distance < pow(SECTOR(4), 2))
 					item->TargetState = 1;
 				else
 					item->TargetState = 9;
 			}
-			else if (creature->mood == MoodType::Bored && AI.ahead)
+			else if (creature->Mood == MoodType::Bored && AI.ahead)
 				item->TargetState = 1;
 			else
 				item->TargetState = 2;
@@ -412,7 +412,7 @@ void FlameThrowerControl(short itemNumber)
 			break;
 
 		case 10:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead)
 			{
@@ -421,7 +421,7 @@ void FlameThrowerControl(short itemNumber)
 
 				if (Targetable(item, &AI) &&
 					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->hurtByLara))
+					(realEnemy != LaraItem || creature->HurtByLara))
 				{
 					item->TargetState = 11;
 				}
@@ -432,7 +432,7 @@ void FlameThrowerControl(short itemNumber)
 			break;
 
 		case 9:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead)
 			{
@@ -441,7 +441,7 @@ void FlameThrowerControl(short itemNumber)
 
 				if (Targetable(item, &AI) &&
 					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->hurtByLara))
+					(realEnemy != LaraItem || creature->HurtByLara))
 				{
 					item->TargetState = 6;
 				}
@@ -452,8 +452,8 @@ void FlameThrowerControl(short itemNumber)
 			break;
 
 		case 11:
-			if (creature->flags < 40)
-				creature->flags += (creature->flags / 4) + 1;
+			if (creature->Flags < 40)
+				creature->Flags += (creature->Flags / 4) + 1;
 
 			if (AI.ahead)
 			{
@@ -462,7 +462,7 @@ void FlameThrowerControl(short itemNumber)
 
 				if (Targetable(item, &AI) &&
 					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->hurtByLara))
+					(realEnemy != LaraItem || creature->HurtByLara))
 				{
 					item->TargetState = 11;
 				}
@@ -472,8 +472,8 @@ void FlameThrowerControl(short itemNumber)
 			else
 				item->TargetState = 1;
 
-			if (creature->flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->flags);
+			if (creature->Flags < 40)
+				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
 			else
 			{
 				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);
@@ -487,8 +487,8 @@ void FlameThrowerControl(short itemNumber)
 			break;
 			
 		case 6:
-			if (creature->flags < 40)
-				creature->flags += (creature->flags / 4) + 1;
+			if (creature->Flags < 40)
+				creature->Flags += (creature->Flags / 4) + 1;
 
 			if (AI.ahead)
 			{
@@ -497,7 +497,7 @@ void FlameThrowerControl(short itemNumber)
 
 				if (Targetable(item, &AI) &&
 					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->hurtByLara))
+					(realEnemy != LaraItem || creature->HurtByLara))
 				{
 					item->TargetState = 6;
 				}
@@ -507,8 +507,8 @@ void FlameThrowerControl(short itemNumber)
 			else
 				item->TargetState = 2;
 
-			if (creature->flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->flags);
+			if (creature->Flags < 40)
+				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
 			else
 			{
 				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);

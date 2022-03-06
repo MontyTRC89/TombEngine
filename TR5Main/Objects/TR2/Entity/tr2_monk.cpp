@@ -51,17 +51,17 @@ void MonkControl(short itemNumber)
 	else
 	{
 		if (MonksAttackLara)
-			info->enemy = LaraItem;
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		CreatureAIInfo(item, &aiInfo);
 
-		if (!MonksAttackLara && info->enemy == LaraItem)
-			info->enemy = NULL;
+		if (!MonksAttackLara && info->Enemy == LaraItem)
+			info->Enemy = NULL;
 
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (aiInfo.ahead)
 			torso = aiInfo.angle;
@@ -69,13 +69,13 @@ void MonkControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->flags &= 0x0FFF;
+			info->Flags &= 0x0FFF;
 
 			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 2;
-			else if (info->mood == MoodType::Escape)
+			else if (info->Mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -94,13 +94,13 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 11:
-			info->flags &= 0x0FFF;
+			info->Flags &= 0x0FFF;
 
 			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				break;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 2;
-			else if (info->mood == MoodType::Escape)
+			else if (info->Mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -120,9 +120,9 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(3.0f);
+			info->MaxTurn = ANGLE(3.0f);
 
-			if (info->mood == MoodType::Bored)
+			if (info->Mood == MoodType::Bored)
 			{
 				if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
 				{
@@ -132,7 +132,7 @@ void MonkControl(short itemNumber)
 						item->TargetState = 11;
 				}
 			}
-			else if (info->mood == MoodType::Escape)
+			else if (info->Mood == MoodType::Escape)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -147,17 +147,17 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 3:
-			info->flags &= 0x0FFF;
-			info->maximumTurn = ANGLE(4.0f);
+			info->Flags &= 0x0FFF;
+			info->MaxTurn = ANGLE(4.0f);
 
 			if (MonksAttackLara)
-				info->maximumTurn += ANGLE(1.0f);
+				info->MaxTurn += ANGLE(1.0f);
 
 			tilt = angle / 4;
 
-			if (info->mood == MoodType::Bored)
+			if (info->Mood == MoodType::Bored)
 				item->TargetState = 1;
-			else if (info->mood == MoodType::Escape)
+			else if (info->Mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -191,12 +191,12 @@ void MonkControl(short itemNumber)
 		case 6:
 		case 7:
 		case 10:
-			auto* enemy = info->enemy;
+			auto* enemy = info->Enemy;
 			if (enemy == LaraItem)
 			{
-				if (!(info->flags & 0xF000) && item->TouchBits & 0x4000)
+				if (!(info->Flags & 0xF000) && item->TouchBits & 0x4000)
 				{
-					info->flags |= 0x1000;
+					info->Flags |= 0x1000;
 					SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
 					CreatureEffect(item, &MonkBite, DoBloodSplat);
 
@@ -206,13 +206,13 @@ void MonkControl(short itemNumber)
 			}
 			else
 			{
-				if (!(info->flags & 0xf000) && enemy)
+				if (!(info->Flags & 0xf000) && enemy)
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(2) &&
 						abs(enemy->Position.yPos - item->Position.yPos) < CLICK(2) &&
 						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(2))
 					{
-						info->flags |= 0x1000;
+						info->Flags |= 0x1000;
 						SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
 
 						enemy->HitPoints -= 5;

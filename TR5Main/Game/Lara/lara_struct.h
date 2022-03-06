@@ -11,7 +11,7 @@
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
 
-struct CREATURE_INFO;
+struct CreatureInfo;
 struct ITEM_INFO;
 struct FX_INFO;
 
@@ -1194,7 +1194,7 @@ struct LaraInfo
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
 	ITEM_INFO* target;
-	CREATURE_INFO* creature;
+	CreatureInfo* creature;
 	short targetAngles[2];
 
 	int Air;

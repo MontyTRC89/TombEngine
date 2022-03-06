@@ -96,16 +96,16 @@ static bool RatIsInWater(ITEM_INFO* item)
 
 	if (storingInfo.waterDepth != NO_HEIGHT)
 	{
-		creature->LOT.step = SECTOR(20);
-		creature->LOT.drop = -SECTOR(20);
-		creature->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
+		creature->LOT.Step = SECTOR(20);
+		creature->LOT.Drop = -SECTOR(20);
+		creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 		return true;
 	}
 	else
 	{
-		creature->LOT.step = CLICK(1);
-		creature->LOT.drop = -CLICK(1);
-		creature->LOT.fly = NO_FLYING;
+		creature->LOT.Step = CLICK(1);
+		creature->LOT.Drop = -CLICK(1);
+		creature->LOT.Fly = NO_FLYING;
 		return false;
 	}
 }
@@ -157,18 +157,18 @@ void BigRatControl(short itemNumber)
 
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (item->AIBits & ALL_AIOBJ)
 			GetAITarget(creature);
-		else if (creature->hurtByLara)
-			creature->enemy = LaraItem;
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
 		if ((item->HitStatus || AI.distance < BIG_RAT_ALERT_RANGE) ||
 			(TargetVisible(item, &AI) && AI.distance < BIG_RAT_VISIBILITY_RANGE))
 		{
-			if (!creature->alerted)
-				creature->alerted = true;
+			if (!creature->Alerted)
+				creature->Alerted = true;
 
 			AlertAllGuards(itemNumber);
 		}
@@ -186,7 +186,7 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_RUN:
-			creature->maximumTurn = BIG_RAT_RUN_TURN;
+			creature->MaxTurn = BIG_RAT_RUN_TURN;
 
 			if (RatIsInWater(item))
 			{
@@ -233,13 +233,13 @@ void BigRatControl(short itemNumber)
 			break;
 
 		case BIG_RAT_STATE_POSE:
-			if (creature->mood != MoodType::Bored || GetRandomControl() < BIG_RAT_POSE_CHANCE)
+			if (creature->Mood != MoodType::Bored || GetRandomControl() < BIG_RAT_POSE_CHANCE)
 				item->TargetState = BIG_RAT_STATE_IDLE;
 
 			break;
 
 		case BIG_RAT_STATE_SWIM:
-			creature->maximumTurn = BIG_RAT_SWIM_TURN;
+			creature->MaxTurn = BIG_RAT_SWIM_TURN;
 
 			if (!RatIsInWater(item))
 			{

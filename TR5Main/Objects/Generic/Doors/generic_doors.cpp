@@ -399,7 +399,7 @@ namespace TEN::Entities::Doors
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					ActiveCreatures[i]->LOT.targetBox = NO_BOX;
+					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
 				}
 			}
 		}
@@ -433,7 +433,7 @@ namespace TEN::Entities::Doors
 				g_Level.Boxes[boxIndex].flags |= BLOCKED;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
-					ActiveCreatures[i]->LOT.targetBox = NO_BOX;
+					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
 			}
 		}
 	}

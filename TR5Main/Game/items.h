@@ -47,6 +47,10 @@ struct ITEM_INFO
 	int BoxNumber;
 	ITEM_DATA Data;
 
+	bool Active;
+	short NextItem;
+	short NextActive;
+
 	PHD_3DPOS StartPosition;
 	PHD_3DPOS Position;
 	ROOM_VECTOR Location;
@@ -54,18 +58,11 @@ struct ITEM_INFO
 	int Floor;
 	std::vector<BONE_MUTATOR> Mutator;
 
-
 	int ActiveState;
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
 	int AnimNumber;
 	int FrameNumber;
-
-	uint32_t TouchBits;
-	uint32_t MeshBits;
-
-	short NextItem;
-	short NextActive;
 
 	short Velocity;
 	short VerticalVelocity;
@@ -74,9 +71,9 @@ struct ITEM_INFO
 	short HitPoints;
 	short Timer;
 	short Shade;
-	short CarriedItem;
-	short AfterDeath;
-	short FiredWeapon;
+
+	uint32_t TouchBits;
+	uint32_t MeshBits;
 
 	short ItemFlags[8];
 	short TriggerFlags;
@@ -84,18 +81,17 @@ struct ITEM_INFO
 	uint8_t AIBits; // AIObjectType enum
 	uint32_t SwapMeshFlags;
 
-	bool Active;
 	short Status; // ItemStatus enum
 	bool HitStatus;
 	bool Collidable;
 	bool LookedAt;
-	bool Poisoned;
 	bool InDrawRoom;
-	bool Friendly;
 
 	short DrawRoom;
 	short Tosspad;
-	short LocationAI;
+
+	short AfterDeath;		// TODO: Move to CreatureInfo
+	short CarriedItem;		// TODO: Move to CreatureInfo
 };
 
 // used by fx->shade !

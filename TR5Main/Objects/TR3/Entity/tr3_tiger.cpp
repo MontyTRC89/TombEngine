@@ -56,27 +56,27 @@ void TigerControl(short itemNumber)
 
 		GetCreatureMood(item, &aiInfo, 1);
 
-		if (info->alerted && aiInfo.zoneNumber != aiInfo.enemyZone)
-			info->mood = MoodType::Escape;
+		if (info->Alerted && aiInfo.zoneNumber != aiInfo.enemyZone)
+			info->Mood = MoodType::Escape;
 
 		CreatureMood(item, &aiInfo, 1);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->maximumTurn = 0;
-			info->flags = 0;
+			info->MaxTurn = 0;
+			info->Flags = 0;
 
-			if (info->mood == MoodType::Escape)
+			if (info->Mood == MoodType::Escape)
 			{
 				if (Lara.target != item && aiInfo.ahead)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
 			}
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 			{
 				short random = GetRandomControl();
 				if (random < 0x60)
@@ -89,12 +89,12 @@ void TigerControl(short itemNumber)
 				item->TargetState = 6;
 			else if (aiInfo.bite && aiInfo.distance < pow(SECTOR(1), 2))
 			{
-				info->maximumTurn = ANGLE(3.0f);
+				info->MaxTurn = ANGLE(3.0f);
 				item->TargetState = 8;
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood != MoodType::Attack && GetRandomControl() < 0x60)
+			else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
 				item->TargetState = 5;
 			else
 				item->TargetState = 3;
@@ -102,9 +102,9 @@ void TigerControl(short itemNumber)
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(3.0f);
+			info->MaxTurn = ANGLE(3.0f);
 
-			if (info->mood == MoodType::Escape || info->mood == MoodType::Attack)
+			if (info->Mood == MoodType::Escape || info->Mood == MoodType::Attack)
 				item->TargetState = 3;
 			else if (GetRandomControl() < 0x60)
 			{
@@ -115,11 +115,11 @@ void TigerControl(short itemNumber)
 			break;
 
 		case 3:
-			info->maximumTurn = ANGLE(6.0f);
+			info->MaxTurn = ANGLE(6.0f);
 
-			if (info->mood == MoodType::Bored)
+			if (info->Mood == MoodType::Bored)
 				item->TargetState = 1;
-			else if (info->flags && aiInfo.ahead)
+			else if (info->Flags && aiInfo.ahead)
 				item->TargetState = 1;
 			else if (aiInfo.bite && aiInfo.distance < pow(SECTOR(1.5f), 2))
 			{
@@ -128,24 +128,24 @@ void TigerControl(short itemNumber)
 				else
 					item->TargetState = 7;
 			}
-			else if (info->mood != MoodType::Attack && GetRandomControl() < 0x60)
+			else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
 			{
 				item->RequiredState = 5;
 				item->TargetState = 1;
 			}
-			else if (info->mood == MoodType::Escape && Lara.target != item && aiInfo.ahead)
+			else if (info->Mood == MoodType::Escape && Lara.target != item && aiInfo.ahead)
 				item->TargetState = 1;
 
-			info->flags = 0;
+			info->Flags = 0;
 			break;
 
 		case 6:
 		case 7:
 		case 8:
-			if (!info->flags && item->TouchBits & 0x7FDC000)
+			if (!info->Flags && item->TouchBits & 0x7FDC000)
 			{
 				CreatureEffect(item, &TigerBite, DoBloodSplat);
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitStatus = true;
 				LaraItem->HitPoints -= 90;

@@ -44,7 +44,7 @@ class ITEM_DATA
 		long double,
 		std::array<short, 4>,
 		ITEM_INFO*,
-		CREATURE_INFO,
+		CreatureInfo,
 		LASER_HEAD_INFO,
 		QuadInfo,
 		BigGunInfo,

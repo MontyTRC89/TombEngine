@@ -399,35 +399,39 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
-			&& itemToSerialize.Data.is<CREATURE_INFO>())
+			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
 			std::vector<int> jointRotations;
 			for (int i = 0; i < 4; i++)
-				jointRotations.push_back(creature->jointRotation[i]);
+				jointRotations.push_back(creature->JointRotation[i]);
 			auto jointRotationsOffset = fbb.CreateVector(jointRotations);
 
 			Save::CreatureBuilder creatureBuilder{ fbb };
 
-			creatureBuilder.add_alerted(creature->alerted);
-			creatureBuilder.add_can_jump(creature->LOT.canJump);
-			creatureBuilder.add_can_monkey(creature->LOT.canMonkey);
-			creatureBuilder.add_enemy(creature->enemy - g_Level.Items.data());
-			creatureBuilder.add_flags(creature->flags);
-			creatureBuilder.add_head_left(creature->headLeft);
-			creatureBuilder.add_head_right(creature->headRight);
-			creatureBuilder.add_hurt_by_lara(creature->hurtByLara);
-			creatureBuilder.add_is_amphibious(creature->LOT.isAmphibious);
-			creatureBuilder.add_is_jumping(creature->LOT.isJumping);
-			creatureBuilder.add_is_monkeying(creature->LOT.isMonkeying);
+			creatureBuilder.add_alerted(creature->Alerted);
+			creatureBuilder.add_can_jump(creature->LOT.CanJump);
+			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
+			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
+			creatureBuilder.add_flags(creature->Flags);
+			creatureBuilder.add_head_left(creature->HeadLeft);
+			creatureBuilder.add_head_right(creature->HeadRight);
+			creatureBuilder.add_hurt_by_lara(creature->HurtByLara);
+			creatureBuilder.add_is_amphibious(creature->LOT.IsAmphibious);
+			creatureBuilder.add_is_jumping(creature->LOT.IsJumping);
+			creatureBuilder.add_is_monkeying(creature->LOT.IsMonkeying);
 			creatureBuilder.add_joint_rotation(jointRotationsOffset);
-			creatureBuilder.add_jump_ahead(creature->jumpAhead);
-			creatureBuilder.add_maximum_turn(creature->maximumTurn);
-			creatureBuilder.add_monkey_ahead(creature->monkeyAhead);
-			creatureBuilder.add_mood((int)creature->mood);
-			creatureBuilder.add_patrol2(creature->patrol2);
-			creatureBuilder.add_reached_goal(creature->reachedGoal);
+			creatureBuilder.add_jump_ahead(creature->JumpAhead);
+			creatureBuilder.add_maximum_turn(creature->MaxTurn);
+			creatureBuilder.add_monkey_ahead(creature->MonkeySwingAhead);
+			creatureBuilder.add_mood((int)creature->Mood);
+			creatureBuilder.add_patrol2(creature->Patrol);
+			creatureBuilder.add_reached_goal(creature->ReachedGoal);
+
+			// TODO
+			//creatureBuilder.add_fired_weapon(creature->FiredWeapon);
+			//creatureBuilder.add_poisoned(creature->Poisoned);
 
 			creatureOffset = creatureBuilder.Finish();
 		} 
@@ -448,7 +452,6 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
 		serializedItem.add_active_state(itemToSerialize.ActiveState);
 		serializedItem.add_vertical_velocity(itemToSerialize.VerticalVelocity);
-		serializedItem.add_fired_weapon(itemToSerialize.FiredWeapon);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
 		serializedItem.add_frame_number(itemToSerialize.FrameNumber);
@@ -469,14 +472,13 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_status(itemToSerialize.Status);
 		serializedItem.add_airborne(itemToSerialize.Airborne);
 		serializedItem.add_hit_stauts(itemToSerialize.HitStatus);
-		serializedItem.add_poisoned(itemToSerialize.Poisoned);
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
 		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshFlags);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
-			&& itemToSerialize.Data.is<CREATURE_INFO>())
+			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
@@ -998,7 +1000,6 @@ bool SaveGame::Load(int slot)
 		item->Airborne = savedItem->airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
-		item->Poisoned = savedItem->poisoned();
 
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent)
@@ -1012,26 +1013,30 @@ bool SaveGame::Load(int slot)
 			if (savedCreature == nullptr)
 				continue;
 
-			creature->alerted = savedCreature->alerted();
-			creature->LOT.canJump = savedCreature->can_jump();
-			creature->LOT.canMonkey = savedCreature->can_monkey();
+			creature->Alerted = savedCreature->alerted();
+			creature->LOT.CanJump = savedCreature->can_jump();
+			creature->LOT.CanMonkey = savedCreature->can_monkey();
 			if (savedCreature->enemy() >= 0)
-				creature->enemy = &g_Level.Items[savedCreature->enemy()];
-			creature->flags = savedCreature->flags();
-			creature->headLeft = savedCreature->head_left();
-			creature->headRight = savedCreature->head_right();
-			creature->hurtByLara = savedCreature->hurt_by_lara();
-			creature->LOT.isAmphibious = savedCreature->is_amphibious();
-			creature->LOT.isJumping = savedCreature->is_jumping();
-			creature->LOT.isMonkeying = savedCreature->is_monkeying();
+				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
+			creature->Flags = savedCreature->flags();
+			creature->HeadLeft = savedCreature->head_left();
+			creature->HeadRight = savedCreature->head_right();
+			creature->HurtByLara = savedCreature->hurt_by_lara();
+			creature->LOT.IsAmphibious = savedCreature->is_amphibious();
+			creature->LOT.IsJumping = savedCreature->is_jumping();
+			creature->LOT.IsMonkeying = savedCreature->is_monkeying();
 			for (int j = 0; j < 4; j++)
-				creature->jointRotation[j] = savedCreature->joint_rotation()->Get(j);
-			creature->jumpAhead = savedCreature->jump_ahead();
-			creature->maximumTurn = savedCreature->maximum_turn();
-			creature->monkeyAhead = savedCreature->monkey_ahead();
-			creature->mood = (MoodType)savedCreature->mood();
-			creature->patrol2 = savedCreature->patrol2();
-			creature->reachedGoal = savedCreature->reached_goal();
+				creature->JointRotation[j] = savedCreature->joint_rotation()->Get(j);
+			creature->JumpAhead = savedCreature->jump_ahead();
+			creature->MaxTurn = savedCreature->maximum_turn();
+			creature->MonkeySwingAhead = savedCreature->monkey_ahead();
+			creature->Mood = (MoodType)savedCreature->mood();
+			creature->Patrol = savedCreature->patrol2();
+			creature->ReachedGoal = savedCreature->reached_goal();
+
+			// TODO
+			//creature->FiredWeapon = savedCreature->fired_weapon();
+			//creature->Poisoned = savedCreature->poisoned();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{

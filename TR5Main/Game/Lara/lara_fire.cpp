@@ -721,8 +721,8 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int 
 
 	target->HitStatus = true;
 
-	if (target->Data.is<CREATURE_INFO>())
-		((CREATURE_INFO*)target->Data)->hurtByLara = true;
+	if (target->Data.is<CreatureInfo>())
+		((CreatureInfo*)target->Data)->HurtByLara = true;
 
 	auto* obj = &Objects[target->ObjectNumber];
 
@@ -1049,9 +1049,9 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	int targets = 0;
 	for (int slot = 0; slot < ActiveCreatures.size(); ++slot)
 	{
-		if (ActiveCreatures[slot]->itemNum != NO_ITEM)
+		if (ActiveCreatures[slot]->ItemNumber != NO_ITEM)
 		{
-			auto* item = &g_Level.Items[ActiveCreatures[slot]->itemNum];
+			auto* item = &g_Level.Items[ActiveCreatures[slot]->ItemNumber];
 			if (item->HitPoints > 0)
 			{
 				int x = item->Position.xPos - src.x;

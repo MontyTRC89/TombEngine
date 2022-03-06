@@ -153,10 +153,10 @@ void GuideControl(short itemNumber)
 			{
 				auto* currentCreatureInfo = ActiveCreatures[i];
 
-				if (currentCreatureInfo->itemNum == NO_ITEM || currentCreatureInfo->itemNum == itemNumber)
+				if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
 					continue;
 
-				auto* currentItem = &g_Level.Items[currentCreatureInfo->itemNum];
+				auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
 
 				if (currentItem->ObjectNumber != ID_GUIDE &&
 					abs(currentItem->Position.yPos - item->Position.yPos) <= 512)
@@ -184,20 +184,20 @@ void GuideControl(short itemNumber)
 		}
 	}
 
-	auto* enemy = creature->enemy;
+	auto* enemy = creature->Enemy;
 	if (foundEnemy)
-		creature->enemy = foundEnemy;
+		creature->Enemy = foundEnemy;
 
 	CreatureAIInfo(item, &AI);
 
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
 
-	angle = CreatureTurn(item, creature->maximumTurn);
+	angle = CreatureTurn(item, creature->MaxTurn);
 
 	if (foundEnemy)
 	{
-		creature->enemy = enemy;
+		creature->Enemy = enemy;
 		enemy = foundEnemy;
 	}
 
@@ -212,9 +212,9 @@ void GuideControl(short itemNumber)
 	switch (item->ActiveState)
 	{
 	case GUIDE_STATE_IDLE:
-		creature->maximumTurn = 0;
-		creature->flags = 0;
-		creature->LOT.isJumping = false;
+		creature->MaxTurn = 0;
+		creature->Flags = 0;
+		creature->LOT.IsJumping = false;
 		joint2 = AI.angle / 2;
 
 		if (laraAI.ahead)
@@ -244,7 +244,7 @@ void GuideControl(short itemNumber)
 		else if (Lara.location >= item->ItemFlags[3] ||
 			item->ItemFlags[1] != 2)
 		{
-			if (!creature->reachedGoal || foundEnemy)
+			if (!creature->ReachedGoal || foundEnemy)
 			{
 				if (item->SwapMeshFlags == 0x40000)
 					item->TargetState = 40;
@@ -260,8 +260,8 @@ void GuideControl(short itemNumber)
 			{
 				if (!enemy->Flags)
 				{
-					creature->reachedGoal = false;
-					creature->enemy = NULL;
+					creature->ReachedGoal = false;
+					creature->Enemy = NULL;
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					break;
@@ -318,7 +318,7 @@ void GuideControl(short itemNumber)
 				}
 				else
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					item->RequiredState = 42 - (AI.ahead != 0);
 				}
 			}
@@ -329,8 +329,8 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_WALK:
-		creature->maximumTurn = ANGLE(7.0f);
-		creature->LOT.isJumping = false;
+		creature->MaxTurn = ANGLE(7.0f);
+		creature->LOT.IsJumping = false;
 
 		if (laraAI.ahead)
 		{
@@ -350,12 +350,12 @@ void GuideControl(short itemNumber)
 			item->TargetState = GUIDE_STATE_IDLE;
 			item->RequiredState = GUIDE_STATE_IGNITE_TORCH; 
 		}
-		else if (creature->reachedGoal)
+		else if (creature->ReachedGoal)
 		{
 			if (!enemy->Flags)
 			{
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				break;
@@ -371,7 +371,7 @@ void GuideControl(short itemNumber)
 					AI.distance >= 0x200000 &&
 					(item->SwapMeshFlags & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 				{
-					if (creature->enemy == LaraItem)
+					if (creature->Enemy == LaraItem)
 					{
 						if (AI.distance >= pow(SECTOR(2), 2))
 						{
@@ -397,7 +397,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_RUN:
-		creature->maximumTurn = ANGLE(11.0f);
+		creature->MaxTurn = ANGLE(11.0f);
 		tilt = angle / 2;
 
 		if (AI.ahead)
@@ -410,12 +410,12 @@ void GuideControl(short itemNumber)
 			break;
 		}
 
-		if (creature->reachedGoal)
+		if (creature->ReachedGoal)
 		{
 			if (!enemy->Flags)
 			{
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				break;
@@ -525,7 +525,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_LOOK_BACK:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
 			item->Position.yRot -= 399;
@@ -533,7 +533,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_TORCH_ATTACK:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		if (AI.ahead)
 		{
@@ -552,7 +552,7 @@ void GuideControl(short itemNumber)
 		else
 			item->Position.yRot += AI.angle;
 
-		if (!creature->flags)
+		if (!creature->Flags)
 		{
 			if (enemy)
 			{
@@ -573,7 +573,7 @@ void GuideControl(short itemNumber)
 							item->AIBits = FOLLOW;
 
 						enemy->HitStatus = true;
-						creature->flags = 1;
+						creature->Flags = 1;
 
 						CreatureEffect2(
 							item,
@@ -589,7 +589,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 35:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
 			item->Position.yRot += 399;
@@ -616,8 +616,8 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				item->TargetState = GUIDE_STATE_IDLE;
@@ -670,8 +670,8 @@ void GuideControl(short itemNumber)
 
 		if (someFlag)
 		{
-			creature->reachedGoal = false;
-			creature->enemy = NULL;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
 		}
@@ -692,8 +692,8 @@ void GuideControl(short itemNumber)
 				TestTriggers(item, true);
 
 				item->Position.yRot = enemy->Position.yRot;
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				break;
@@ -721,8 +721,8 @@ void GuideControl(short itemNumber)
 
 				TestTriggers(item, true);
 
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				break;
@@ -746,8 +746,8 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 40:
-		creature->LOT.isJumping;
-		creature->maximumTurn = ANGLE(7.0f);
+		creature->LOT.IsJumping;
+		creature->MaxTurn = ANGLE(7.0f);
 
 		if (laraAI.ahead)
 		{
@@ -757,13 +757,13 @@ void GuideControl(short itemNumber)
 		else
 			joint2 = laraAI.angle;
 
-		if (!(creature->reachedGoal))
+		if (!(creature->ReachedGoal))
 			break;
 
 		if (!enemy->Flags)
 		{
-			creature->reachedGoal = false;
-			creature->enemy = NULL;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
 			break;
@@ -772,8 +772,8 @@ void GuideControl(short itemNumber)
 		{
 			TestTriggers(item, true);
 			
-			creature->reachedGoal = false;
-			creature->enemy = NULL;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
 		}
@@ -790,7 +790,7 @@ void GuideControl(short itemNumber)
 
 	case 41:
 	case 42:
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 		MoveCreature3DPos(&item->Position, &enemy->Position, 15, enemy->Position.yRot - item->Position.yRot, ANGLE(10.0f));
 
 	default:

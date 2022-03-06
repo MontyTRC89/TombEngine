@@ -180,8 +180,8 @@ void HydraControl(short itemNumber)
 	{
 		if (item->AIBits)
 			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+		else if (info->HurtByLara)
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		CreatureAIInfo(item, &aiInfo);
@@ -226,8 +226,8 @@ void HydraControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case HYDRA_STATE_STOP:
-			info->maximumTurn = ANGLE(1.0f);
-			info->flags = 0;
+			info->MaxTurn = ANGLE(1.0f);
+			info->Flags = 0;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
@@ -253,14 +253,14 @@ void HydraControl(short itemNumber)
 		case HYDRA_STATE_BITE_ATTACK2:
 		case HYDRA_STATE_BITE_ATTACK3:
 		case HYDRA_STATE_BITE_ATTACK4:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
-			if (info->flags == 0)
+			if (info->Flags == 0)
 			{
 				if (item->TouchBits & 0x400)
 				{
 					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
-					info->flags = 1;
+					info->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
 					LaraItem->HitStatus = true;
@@ -286,7 +286,7 @@ void HydraControl(short itemNumber)
 			break;
 
 		case HYDRA_STATE_AIM:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
 			if (item->HitStatus)
 			{
@@ -352,8 +352,8 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 6:
-			info->maximumTurn = ANGLE(1.0f);
-			info->flags = 0;
+			info->MaxTurn = ANGLE(1.0f);
+			info->Flags = 0;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);

@@ -69,22 +69,22 @@ void YetiControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 2:
-			info->maximumTurn = 0;
-			info->flags = 0;
+			info->MaxTurn = 0;
+			info->Flags = 0;
 
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == MoodType::Escape)
+			if (info->Mood == MoodType::Escape)
 				item->TargetState = 1;
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
@@ -97,7 +97,7 @@ void YetiControl(short itemNumber)
 				item->TargetState = 4;
 			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 5;
-			else if (info->mood == MoodType::Stalk)
+			else if (info->Mood == MoodType::Stalk)
 				item->TargetState = 3;
 			else
 				item->TargetState = 1;
@@ -108,9 +108,9 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == MoodType::Escape || item->HitStatus)
+			if (info->Mood == MoodType::Escape || item->HitStatus)
 				item->TargetState = 2;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 			{
 				if (laraAlive)
 				{
@@ -134,9 +134,9 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == MoodType::Escape || item->HitStatus)
+			if (info->Mood == MoodType::Escape || item->HitStatus)
 				item->TargetState = 2;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
@@ -154,14 +154,14 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 3:
-			info->maximumTurn = ANGLE(4.0f);
+			info->MaxTurn = ANGLE(4.0f);
 
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == MoodType::Escape)
+			if (info->Mood == MoodType::Escape)
 				item->TargetState = 1;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 				{
@@ -176,7 +176,7 @@ void YetiControl(short itemNumber)
 				else if (GetRandomControl() < 0x300)
 					item->TargetState = 2;
 			}
-			else if (info->mood == MoodType::Attack)
+			else if (info->Mood == MoodType::Attack)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 					item->TargetState = 2;
@@ -187,22 +187,22 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 1:
-			info->maximumTurn = ANGLE(6.0f);
+			info->MaxTurn = ANGLE(6.0f);
 			tilt = angle / 4;
-			info->flags = 0;
+			info->Flags = 0;
 
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == MoodType::Escape)
+			if (info->Mood == MoodType::Escape)
 				break;
-			else if (info->mood == MoodType::Bored)
+			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 2;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
-			else if (info->mood == MoodType::Stalk)
+			else if (info->Mood == MoodType::Stalk)
 				item->TargetState = 3;
 			
 			break;
@@ -211,10 +211,10 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				torso = aiInfo.angle;
 
-			if (!info->flags && item->TouchBits & 0x1400)
+			if (!info->Flags && item->TouchBits & 0x1400)
 			{
 				CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;
@@ -223,19 +223,19 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 5:
-			info->maximumTurn = ANGLE(4.0f);
+			info->MaxTurn = ANGLE(4.0f);
 
 			if (aiInfo.ahead)
 				torso = aiInfo.angle;
 
-			if (!info->flags && item->TouchBits & (0x0700 | 0x1400))
+			if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
 			{
 				if (item->TouchBits & 0x0700)
 					CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
 				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
 
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitPoints -= 150;
 				LaraItem->HitStatus = true;
@@ -247,14 +247,14 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				torso = aiInfo.angle;
 
-			if (!info->flags && item->TouchBits & (0x0700 | 0x1400))
+			if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
 			{
 				if (item->TouchBits & 0x0700)
 					CreatureEffect(item, &YetiBiteLeft, DoBloodSplat);
 				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
 
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
@@ -266,14 +266,14 @@ void YetiControl(short itemNumber)
 		case 11:
 		case 12:
 		case 13:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 			break;
 		}
 	}
 
 	if (!laraAlive)
 	{
-		info->maximumTurn = 0;
+		info->MaxTurn = 0;
 		CreatureKill(item, 31, 14, 103);
 		return;
 	}

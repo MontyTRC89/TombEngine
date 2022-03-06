@@ -136,15 +136,15 @@ namespace TEN::Entities::TR4
 			return false;
 	}
 
-	static void RotateHeadToTarget(ITEM_INFO* item, CREATURE_INFO* creature, int joint, short& headAngle)
+	static void RotateHeadToTarget(ITEM_INFO* item, CreatureInfo* creature, int joint, short& headAngle)
 	{
-		if (creature->enemy == nullptr)
+		if (creature->Enemy == nullptr)
 		{
 			headAngle = item->Position.yRot;
 			return;
 		}
 
-		auto* enemy = creature->enemy;
+		auto* enemy = creature->Enemy;
 		PHD_VECTOR pos = { 0, 0, 0 };
 		GetJointAbsPosition(item, &pos, joint);
 
@@ -253,8 +253,8 @@ namespace TEN::Entities::TR4
 
 		if (item->AIBits & ALL_AIOBJ)
 			GetAITarget(mutant);
-		else if (mutant->hurtByLara)
-			mutant->enemy = LaraItem;
+		else if (mutant->HurtByLara)
+			mutant->Enemy = LaraItem;
 		else
 			TargetNearestEntity(item, mutant);
 
@@ -264,7 +264,7 @@ namespace TEN::Entities::TR4
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		mutant->maximumTurn = 0;
+		mutant->MaxTurn = 0;
 		angle = CreatureTurn(item, 0);
 
 		switch (item->ActiveState)
