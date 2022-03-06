@@ -51,29 +51,29 @@ void HammerheadControl(short itemNumber)
 		{
 			if (item->AIBits)
 				GetAITarget(creature);
-			else if (creature->hurtByLara)
-				creature->enemy = LaraItem;
+			else if (creature->HurtByLara)
+				creature->Enemy = LaraItem;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
-			if (creature->enemy != LaraItem)
+			if (creature->Enemy != LaraItem)
 				phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
 
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			short angle = CreatureTurn(item, creature->maximumTurn);
+			short angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->ActiveState)
 			{
 			case HAMMERHEAD_STATE_IDLE:
 				item->TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
-				creature->flags = 0;
+				creature->Flags = 0;
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_SLOW:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (AI.distance <= pow(SECTOR(1), 2))
 				{
@@ -92,12 +92,12 @@ void HammerheadControl(short itemNumber)
 				break;
 
 			case HAMMERHEAD_STATE_ATTACK:
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x3400)
 					{
 						CreatureEffect(item, &HammerheadBite, DoBloodSplat);
-						creature->flags = 1;
+						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 120;
 						LaraItem->HitStatus = true;

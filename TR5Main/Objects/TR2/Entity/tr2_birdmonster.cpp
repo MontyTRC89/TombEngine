@@ -55,12 +55,12 @@ void BirdMonsterControl(short itemNumber)
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
@@ -69,12 +69,12 @@ void BirdMonsterControl(short itemNumber)
 				else
 					item->TargetState = 10;
 			}
-			else if (AI.ahead && (creature->mood == MoodType::Bored || creature->mood == MoodType::Stalk))
+			else if (AI.ahead && (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk))
 			{
 				if (AI.zoneNumber != AI.enemyZone)
 				{
 					item->TargetState = 2;
-					creature->mood = MoodType::Escape;
+					creature->Mood = MoodType::Escape;
 				}
 				else
 					item->TargetState = 8;
@@ -85,25 +85,25 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (creature->mood != MoodType::Bored || !AI.ahead)
+			if (creature->Mood != MoodType::Bored || !AI.ahead)
 				item->TargetState = 1;
 			
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(4.0f);
+			creature->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->TargetState = 5;
-			else if ((creature->mood == MoodType::Bored || creature->mood == MoodType::Stalk) && AI.ahead)
+			else if ((creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk) && AI.ahead)
 				item->TargetState = 1;
 			
 			break;
 
 		case 3:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				item->TargetState = 4;
@@ -113,7 +113,7 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 5:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
@@ -123,7 +123,7 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 10:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 				item->TargetState = 11;
@@ -136,19 +136,19 @@ void BirdMonsterControl(short itemNumber)
 		case 6:
 		case 11:
 		case 7:
-			if (!(creature->flags & 1) && item->TouchBits & 0x600000)
+			if (!(creature->Flags & 1) && item->TouchBits & 0x600000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteRight, DoBloodSplat);
-				creature->flags |= 1;
+				creature->Flags |= 1;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;
 			}
 
-			if (!(creature->flags & 2) && item->TouchBits & 0x0C0000)
+			if (!(creature->Flags & 2) && item->TouchBits & 0x0C0000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteLeft, DoBloodSplat);
-				creature->flags |= 2;
+				creature->Flags |= 2;
 
 				LaraItem->HitPoints -= 200;
 				LaraItem->HitStatus = true;

@@ -94,14 +94,14 @@ void WolfControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case WOLF_STATE_SLEEP:
 			head = 0;
 
-			if (creature->mood == MoodType::Escape || AI.zoneNumber == AI.enemyZone)
+			if (creature->Mood == MoodType::Escape || AI.zoneNumber == AI.enemyZone)
 			{
 				item->RequiredState = WOLF_STATE_CROUCH;
 				item->TargetState = WOLF_STATE_IDLE;
@@ -122,9 +122,9 @@ void WolfControl(short itemNumber)
 			break;
 
 		case WOLF_STATE_WALK:
-			creature->maximumTurn = WALK_TURN;
+			creature->MaxTurn = WALK_TURN;
 
-			if (creature->mood != MoodType::Bored)
+			if (creature->Mood != MoodType::Bored)
 			{
 				item->TargetState = WOLF_STATE_STALK;
 				item->RequiredState = WOLF_STATE_NONE;
@@ -140,13 +140,13 @@ void WolfControl(short itemNumber)
 		case WOLF_STATE_CROUCH:
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = WOLF_STATE_RUN;
 			else if (AI.distance < pow(345, 2) && AI.bite)
 				item->TargetState = WOLF_STATE_BITE;
-			else if (creature->mood == MoodType::Stalk)
+			else if (creature->Mood == MoodType::Stalk)
 				item->TargetState = WOLF_STATE_STALK;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = WOLF_STATE_IDLE;
 			else
 				item->TargetState = WOLF_STATE_RUN;
@@ -154,15 +154,15 @@ void WolfControl(short itemNumber)
 			break;
 
 		case WOLF_STATE_STALK:
-			creature->maximumTurn = STALK_TURN;
+			creature->MaxTurn = STALK_TURN;
 
-			if (creature->mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->TargetState = WOLF_STATE_RUN;
 			else if (AI.distance < pow(345, 2) && AI.bite)
 				item->TargetState = WOLF_STATE_BITE;
 			else if (AI.distance > pow(SECTOR(3), 2))
 				item->TargetState = WOLF_STATE_RUN;
-			else if (creature->mood == MoodType::Attack)
+			else if (creature->Mood == MoodType::Attack)
 			{
 				if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
 					(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
@@ -175,13 +175,13 @@ void WolfControl(short itemNumber)
 				item->RequiredState = WOLF_STATE_HOWL;
 				item->TargetState = WOLF_STATE_CROUCH;
 			}
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = WOLF_STATE_CROUCH;
 
 			break;
 
 		case WOLF_STATE_RUN:
-			creature->maximumTurn = RUN_TURN;
+			creature->MaxTurn = RUN_TURN;
 			tilt = angle;
 
 			if (AI.ahead && AI.distance < ATTACK_RANGE)
@@ -198,12 +198,12 @@ void WolfControl(short itemNumber)
 					item->RequiredState = WOLF_STATE_NONE;
 				}
 			}
-			else if (creature->mood == MoodType::Stalk && AI.distance < STALK_RANGE)
+			else if (creature->Mood == MoodType::Stalk && AI.distance < STALK_RANGE)
 			{
 				item->RequiredState = WOLF_STATE_STALK;
 				item->TargetState = WOLF_STATE_CROUCH;
 			}
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = WOLF_STATE_CROUCH;
 
 			break;

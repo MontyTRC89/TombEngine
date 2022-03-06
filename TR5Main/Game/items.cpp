@@ -343,7 +343,6 @@ void InitialiseItem(short itemNumber)
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
-	item->Poisoned = false;
 	item->AIBits = 0;
 
 	item->Timer = 0;
@@ -362,7 +361,6 @@ void InitialiseItem(short itemNumber)
 
 	item->TouchBits = 0;
 	item->AfterDeath = 0;
-	item->FiredWeapon = 0;
 	item->SwapMeshFlags = 0;
 
 	if (item->Flags & IFLAG_INVISIBLE)

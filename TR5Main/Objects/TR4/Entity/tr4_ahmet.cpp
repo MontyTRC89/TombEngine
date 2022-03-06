@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 
 			CreatureAIInfo(item, &AI);
 
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
@@ -163,8 +163,8 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, TRUE);
 			CreatureMood(item, &AI, TRUE);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
-			creature->enemy = LaraItem;
+			angle = CreatureTurn(item, creature->MaxTurn);
+			creature->Enemy = LaraItem;
 
 			if (laraAI.distance < AHMET_AWARE_DISTANCE ||
 				item->HitStatus ||
@@ -179,8 +179,8 @@ namespace TEN::Entities::TR4
 			switch (item->ActiveState)
 			{
 			case AHMET_STATE_IDLE:
-				creature->maximumTurn = 0;
-				creature->flags = 0;
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 					item->TargetState = AHMET_STATE_WALK;
 					headY = 0;
 				}
-				else if (creature->mood == MoodType::Attack && creature->mood != MoodType::Escape)
+				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
 				{
 					if (AI.bite && AI.distance < AHMET_STAND_DUALATK_RANGE)
 						item->TargetState = AHMET_STATE_STAND_DUALATK;
@@ -224,7 +224,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case AHMET_STATE_WALK:
-				creature->maximumTurn = AHMET_WALK_ANGLE;
+				creature->MaxTurn = AHMET_WALK_ANGLE;
 
 				if (item->AIBits & PATROL1)
 				{
@@ -233,16 +233,16 @@ namespace TEN::Entities::TR4
 				}
 				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
 					item->TargetState = AHMET_STATE_IDLE;
-				else if (creature->mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
+				else if (creature->Mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
 					item->TargetState = AHMET_STATE_RUN;
 				
 				break;
 
 			case AHMET_STATE_RUN:
-				creature->maximumTurn = AHMET_RUN_ANGLE;
-				creature->flags = 0;
+				creature->MaxTurn = AHMET_RUN_ANGLE;
+				creature->Flags = 0;
 
-				if (item->AIBits & GUARD || (creature->mood == MoodType::Bored || creature->mood == MoodType::Escape) && (Lara.target == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
+				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.target == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
 					item->TargetState = AHMET_STATE_IDLE;
 				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
 					item->TargetState = AHMET_STATE_WALK;
@@ -250,7 +250,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case AHMET_STATE_STAND_DUALATK:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) >= 910)
 				{
@@ -262,18 +262,18 @@ namespace TEN::Entities::TR4
 				else
 					item->Position.yRot += AI.angle;
 
-				if (!(creature->flags & 1) && item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
+				if (!(creature->Flags & 1) && item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
 				{
 					CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
-					creature->flags |= 1;
+					creature->Flags |= 1;
 
 					LaraItem->HitStatus = true;
 					LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
 				}
-				else if (!(creature->flags & 2) && item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 32) && (item->TouchBits & AHMET_RIGHT_TOUCH))
+				else if (!(creature->Flags & 2) && item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 32) && (item->TouchBits & AHMET_RIGHT_TOUCH))
 				{
 					CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
-					creature->flags |= 2;
+					creature->Flags |= 2;
 
 					LaraItem->HitStatus = true;
 					LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
@@ -282,7 +282,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case AHMET_STATE_JUMP_BITE:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START)
 				{
@@ -298,13 +298,13 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->flags & 1) && item->AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK)
+					if (!(creature->Flags & 1) && item->AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK)
 					{
 						if (item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 11) &&
 							item->TouchBits & AHMET_LEFT_TOUCH)
 						{
 							CreatureEffect2(item, &AhmetBiteJaw, 10, -1, DoBloodSplat);
-							creature->flags |= 1;
+							creature->Flags |= 1;
 
 							LaraItem->HitStatus = true;
 							LaraItem->HitPoints -= AHMET_JAW_DAMAGE;
@@ -315,7 +315,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case AHMET_STATE_JUMP_DUALATK:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (item->AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START))
 				{
@@ -331,22 +331,22 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->flags & 1) &&
+					if (!(creature->Flags & 1) &&
 						item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 14) &&
 						item->TouchBits & AHMET_LEFT_TOUCH)
 					{
 						CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
-						creature->flags |= 1;
+						creature->Flags |= 1;
 
 						LaraItem->HitStatus = true;
 						LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
 					}
-					else if (!(creature->flags & 2) &&
+					else if (!(creature->Flags & 2) &&
 						item->FrameNumber > (g_Level.Anims[item->AnimNumber].frameBase + 22) &&
 						item->TouchBits & AHMET_RIGHT_TOUCH)
 					{
 						CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
-						creature->flags |= 2;
+						creature->Flags |= 2;
 
 						LaraItem->HitStatus = true;
 						LaraItem->HitPoints -= AHMET_HAND_DAMAGE;

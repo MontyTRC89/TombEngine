@@ -88,29 +88,29 @@ namespace TEN::Entities::TR4
 
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
-			if (info->flags)
-				info->mood = MoodType::Escape;
+			if (info->Flags)
+				info->Mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
-			angle = CreatureTurn(item, info->maximumTurn);
+			angle = CreatureTurn(item, info->MaxTurn);
 
 			if (item->HitStatus ||
 				aiInfo.distance > pow(SECTOR(3), 2) ||
 				!(GetRandomControl() & 0x7F))
 			{
-				info->flags = 0;
+				info->Flags = 0;
 			}
 
 			switch (item->ActiveState)
 			{
 			case 1:
 				item->Position.yPos = item->Floor;
-				info->maximumTurn = ANGLE(1.0f);
+				info->MaxTurn = ANGLE(1.0f);
 
 				if (item->HitStatus ||
 					item->AIBits == MODIFY ||
-					info->hurtByLara ||
+					info->HurtByLara ||
 					aiInfo.distance < pow(SECTOR(3), 2))
 				{
 					item->TargetState = 2;
@@ -119,7 +119,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 3:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
@@ -132,7 +132,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 4u:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 
 				if (aiInfo.ahead)
 				{
@@ -147,7 +147,7 @@ namespace TEN::Entities::TR4
 					item->TargetState = 9;
 				}
 
-				if (!info->flags)
+				if (!info->Flags)
 				{
 					if (item->TouchBits & 0x60)
 					{
@@ -161,14 +161,14 @@ namespace TEN::Entities::TR4
 							-1,
 							DoBloodSplat);
 
-						info->flags = 1;
+						info->Flags = 1;
 					}
 				}
 
 				break;
 
 			case 5:
-				info->flags = 0;
+				info->Flags = 0;
 
 				item->Position.yPos += 51;
 				if (item->Position.yPos > item->Floor)
@@ -177,20 +177,20 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 9u:
-				info->maximumTurn = ANGLE(7.0f);
+				info->MaxTurn = ANGLE(7.0f);
 
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
 				else if (!item->HitStatus &&
 					item->AIBits != MODIFY &&
 					GetRandomControl() >= 384 &&
-					(info->mood != MoodType::Bored && GetRandomControl() >= 128 ||
-						info->hurtByLara ||
+					(info->Mood != MoodType::Bored && GetRandomControl() >= 128 ||
+						info->HurtByLara ||
 						item->AIBits == MODIFY))
 				{
 					if (aiInfo.ahead)
 					{
-						if (aiInfo.distance < pow(CLICK(1), 2) && !info->flags)
+						if (aiInfo.distance < pow(CLICK(1), 2) && !info->Flags)
 							item->TargetState = 4;
 					}
 				}

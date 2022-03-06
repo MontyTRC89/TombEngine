@@ -92,8 +92,8 @@ void MummyControl(short itemNumber)
 
 	if (item->AIBits)
 		GetAITarget(creature);
-	else if (creature->hurtByLara)
-		creature->enemy = LaraItem;
+	else if (creature->HurtByLara)
+		creature->Enemy = LaraItem;
 
 	AI_INFO AI;
 	CreatureAIInfo(item, &AI);
@@ -138,7 +138,7 @@ void MummyControl(short itemNumber)
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					item->ActiveState = MUMMY_STATE_COLLAPSE;
 					item->Position.yRot += AI.angle;
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 				}
 			}
 		}
@@ -148,7 +148,7 @@ void MummyControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (AI.ahead)
 		{
@@ -160,8 +160,8 @@ void MummyControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case MUMMY_STATE_IDLE:
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.distance <= pow(SECTOR(0.5f), 2) ||
 				AI.distance >= pow(SECTOR(7), 2))
@@ -187,14 +187,14 @@ void MummyControl(short itemNumber)
 		case MUMMY_STATE_WALK:
 			if (item->TriggerFlags == 1)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
 					item->TriggerFlags = 0;
 			}
 			else
 			{
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (AI.distance >= pow(SECTOR(3), 2))
 				{
@@ -208,8 +208,8 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_WALK_ARMS_UP:
-			creature->flags = 0;
-			creature->maximumTurn = ANGLE(7.0f);
+			creature->Flags = 0;
+			creature->MaxTurn = ANGLE(7.0f);
 
 			if (AI.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -231,7 +231,7 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_ARMS_CROSSED:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags > -1)
 				item->TargetState = MUMMY_STATE_WALK;
@@ -239,7 +239,7 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_LYING_DOWN:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->HitPoints = 0;
 			joint0 = 0;
 			joint1 = 0;
@@ -255,7 +255,7 @@ void MummyControl(short itemNumber)
 
 		case MUMMY_STATE_WALK_HIT:
 		case MUMMY_STATE_HIT:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (abs(AI.angle) >= ANGLE(7.0f))
 			{
@@ -267,7 +267,7 @@ void MummyControl(short itemNumber)
 			else
 				item->Position.yRot += AI.angle;
 
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits & 0x4800)
 				{
@@ -296,7 +296,7 @@ void MummyControl(short itemNumber)
 								DoBloodSplat);
 						}
 
-						creature->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 			}

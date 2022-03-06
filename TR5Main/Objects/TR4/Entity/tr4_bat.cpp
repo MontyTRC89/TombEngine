@@ -64,7 +64,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* target;
-		CREATURE_INFO* slots;
+		CreatureInfo* slots;
 		int distance, bestdistance;
 		short angle;
 
@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
 				GetAITarget(info);
 			else
 			{
-				info->enemy = LaraItem;
+				info->Enemy = LaraItem;
 
 				// NOTE: it seems weird, bat could target any enemy including dogs for example
 
@@ -120,8 +120,8 @@ namespace TEN::Entities::TR4
 
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
-			if (info->flags)
-				info->mood = MoodType::Escape;
+			if (info->Flags)
+				info->Mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
@@ -132,22 +132,22 @@ namespace TEN::Entities::TR4
 			case BAT_STATE_IDLE:
 				if (aiInfo.distance < BAT_TARGETING_RANGE
 					|| item->HitStatus
-					|| info->hurtByLara)
+					|| info->HurtByLara)
 					item->TargetState = BAT_STATE_START;
 
 				break;
 
 			case BAT_STATE_FLY:
 				if (aiInfo.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
-					info->flags = 0;
+					info->Flags = 0;
 
-				if (!info->flags)
+				if (!info->Flags)
 				{
 					if (item->TouchBits
-						|| info->enemy != LaraItem
+						|| info->Enemy != LaraItem
 						&& aiInfo.distance < BAT_ATTACK_RANGE
 						&& aiInfo.ahead
-						&& abs(item->Position.yPos - info->enemy->Position.yPos) < BAT_TARGET_YPOS)
+						&& abs(item->Position.yPos - info->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 					{
 						item->TargetState = BAT_STATE_ATTACK;
 					}
@@ -156,25 +156,25 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_ATTACK:
-				if (!info->flags
+				if (!info->Flags
 					&& (item->TouchBits
-						|| info->enemy != LaraItem)
+						|| info->Enemy != LaraItem)
 					&& aiInfo.distance < BAT_ATTACK_RANGE
 					&& aiInfo.ahead &&
-					abs(item->Position.yPos - info->enemy->Position.yPos) < BAT_TARGET_YPOS)
+					abs(item->Position.yPos - info->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
-					if (info->enemy == LaraItem)
+					if (info->Enemy == LaraItem)
 					{
 						LaraItem->HitPoints -= BAT_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
-					info->flags = 1;
+					info->Flags = 1;
 				}
 				else
 				{
 					item->TargetState = BAT_STATE_FLY;
-					info->mood = MoodType::Bored;
+					info->Mood = MoodType::Bored;
 				}
 
 				break;

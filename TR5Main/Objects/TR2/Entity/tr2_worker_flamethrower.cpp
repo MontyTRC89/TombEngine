@@ -58,13 +58,13 @@ void WorkerFlamethrower(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* flame;
+	CreatureInfo* flame;
 	AI_INFO info;
 	PHD_VECTOR pos;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
 	item = &g_Level.Items[itemNum];
-	flame = (CREATURE_INFO*)item->Data;
+	flame = (CreatureInfo*)item->Data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
 	pos.x = workerFlameThrower.x;
@@ -96,13 +96,13 @@ void WorkerFlamethrower(short itemNum)
 		CreatureAIInfo(item, &info);
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, flame->maximumTurn);
+		angle = CreatureTurn(item, flame->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			flame->flags = 0;
-			flame->maximumTurn = 0;
+			flame->Flags = 0;
+			flame->MaxTurn = 0;
 
 			if (info.ahead)
 			{
@@ -110,7 +110,7 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood == MoodType::Escape)
+			if (flame->Mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -121,7 +121,7 @@ void WorkerFlamethrower(short itemNum)
 				else
 					item->TargetState = 2;
 			}
-			else if (flame->mood == MoodType::Attack || !info.ahead)
+			else if (flame->Mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance <= SQUARE(WALL_SIZE * 2))
 					item->TargetState = 2;
@@ -135,7 +135,7 @@ void WorkerFlamethrower(short itemNum)
 			break;
 
 		case 2:
-			flame->maximumTurn = ANGLE(5);
+			flame->MaxTurn = ANGLE(5);
 
 			if (info.ahead)
 			{
@@ -143,7 +143,7 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood == MoodType::Escape)
+			if (flame->Mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -154,7 +154,7 @@ void WorkerFlamethrower(short itemNum)
 				else
 					item->TargetState = 6;
 			}
-			else if (flame->mood == MoodType::Attack || !info.ahead)
+			else if (flame->Mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance > SQUARE(WALL_SIZE * 2))
 					item->TargetState = 3;
@@ -166,7 +166,7 @@ void WorkerFlamethrower(short itemNum)
 			break;
 
 		case 3:
-			flame->maximumTurn = ANGLE(10);
+			flame->MaxTurn = ANGLE(10);
 
 			if (info.ahead)
 			{
@@ -174,13 +174,13 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood != MoodType::Escape)
+			if (flame->Mood != MoodType::Escape)
 			{
 				if (Targetable(item, &info))
 				{
 					item->TargetState = 2;
 				}
-				else if (flame->mood == MoodType::Bored || flame->mood == MoodType::Stalk)
+				else if (flame->Mood == MoodType::Bored || flame->Mood == MoodType::Stalk)
 				{
 					item->TargetState = 2;
 				}
@@ -200,7 +200,7 @@ void WorkerFlamethrower(short itemNum)
 			}
 			else
 			{
-				if (flame->mood == MoodType::Attack)
+				if (flame->Mood == MoodType::Attack)
 				{
 					item->TargetState = 1;
 				}
@@ -219,7 +219,7 @@ void WorkerFlamethrower(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (item->TargetState != 1 && (flame->mood == MoodType::Escape || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
+			if (item->TargetState != 1 && (flame->Mood == MoodType::Escape || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
 			{
 				item->TargetState = 1;
 			}
@@ -227,7 +227,7 @@ void WorkerFlamethrower(short itemNum)
 
 		case 8:
 		case 9:
-			flame->flags = 0;
+			flame->Flags = 0;
 
 			if (info.ahead)
 			{

@@ -296,7 +296,7 @@ void RomanStatueControl(short itemNumber)
 	short joint0 = 0;
 	
 	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = (CREATURE_INFO*)item->Data;
+	auto* creature = (CreatureInfo*)item->Data;
 	
 	int oldSwapMeshFlags = item->SwapMeshFlags;
 
@@ -338,7 +338,7 @@ void RomanStatueControl(short itemNumber)
 
 	if (item->HitPoints > 0)
 	{
-		creature->enemy = LaraItem;
+		creature->Enemy = LaraItem;
 
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
@@ -346,7 +346,7 @@ void RomanStatueControl(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 		
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 		
 		if (info.ahead)
 		{
@@ -355,7 +355,7 @@ void RomanStatueControl(short itemNumber)
 			joint1 = info.xAngle;
 		}
 
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		PHD_VECTOR pos, pos1, pos2;
 		int deltaFrame, deltaFrame2, frameNumber;
@@ -376,13 +376,13 @@ void RomanStatueControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case STATE_ROMAN_STATUE_STOP:    
-			creature->flags = 0;
+			creature->Flags = 0;
 			
-			if (creature->mood == MoodType::Attack)
-				creature->maximumTurn = ANGLE(2);
+			if (creature->Mood == MoodType::Attack)
+				creature->MaxTurn = ANGLE(2);
 			else
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->TargetState = STATE_ROMAN_STATUE_WALK;
 			}
 			
@@ -391,9 +391,9 @@ void RomanStatueControl(short itemNumber)
 			if (item->AIBits ||
 				!(GetRandomControl() & 0x1F) &&
 				(info.distance > pow(SECTOR(1), 2) ||
-					creature->mood != MoodType::Attack))
+					creature->Mood != MoodType::Attack))
 			{
-				joint2 = AIGuard((CREATURE_INFO*)creature);
+				joint2 = AIGuard((CreatureInfo*)creature);
 			}
 			else if (info.angle > 20480 || info.angle < -20480)
 				item->TargetState = STATE_ROMAN_STATUE_TURN_180;
@@ -574,7 +574,7 @@ void RomanStatueControl(short itemNumber)
 		case STATE_ROMAN_STATUE_ATTACK2:
 		case STATE_ROMAN_STATUE_ATTACK3:
 		case STATE_ROMAN_STATUE_ATTACK4:                                  
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (abs(info.angle) >= ANGLE(2.0f))
 			{
@@ -620,7 +620,7 @@ void RomanStatueControl(short itemNumber)
 					}
 				}
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0xC000)
 					{
@@ -628,7 +628,7 @@ void RomanStatueControl(short itemNumber)
 						LaraItem->HitStatus = true;
 						CreatureEffect2(item, &RomanStatueBite, 20, item->Position.yRot, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
-						creature->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 
@@ -670,16 +670,16 @@ void RomanStatueControl(short itemNumber)
 			break;
 
 		case STATE_ROMAN_STATUE_WALK:
-			creature->flags = 0;
+			creature->Flags = 0;
 			joint2 = info.angle;
 
-			if (creature->mood == MoodType::Attack)
+			if (creature->Mood == MoodType::Attack)
 			{
-				creature->maximumTurn = ANGLE(7);
+				creature->MaxTurn = ANGLE(7);
 			}
 			else
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (abs(info.angle) >= ANGLE(2))
 				{
 					if (info.angle > 0)
@@ -720,8 +720,8 @@ void RomanStatueControl(short itemNumber)
 			break;
 
 		case STATE_ROMAN_STATUE_TURN_180: 
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 
 			if (info.angle > 0)
 				item->Position.yRot -= ANGLE(2);
@@ -734,8 +734,8 @@ void RomanStatueControl(short itemNumber)
 			break;
 
 		case STATE_ROMAN_STATUE_ENERGY_ATTACK:
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 			
 			if (RomanStatueData.counter)
 			{

@@ -67,9 +67,9 @@ void CobraControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, 1);
 		CreatureMood(item, &aiInfo, 1);
 
-		info->target.x = LaraItem->Position.xPos;
-		info->target.z = LaraItem->Position.zPos;
-		angle = CreatureTurn(item, info->maximumTurn);
+		info->Target.x = LaraItem->Position.xPos;
+		info->Target.z = LaraItem->Position.zPos;
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (aiInfo.ahead)
 			head = aiInfo.angle;
@@ -84,7 +84,7 @@ void CobraControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->flags = 0;
+			info->Flags = 0;
 			if (aiInfo.distance > pow(SECTOR(2.5f), 2))
 				item->TargetState = 3;
 			else if (LaraItem->HitPoints > 0 &&
@@ -96,7 +96,7 @@ void CobraControl(short itemNumber)
 			break;
 
 		case 3:
-			info->flags = 0;
+			info->Flags = 0;
 			if (item->HitPoints != -16384)
 			{
 				item->ItemFlags[2] = item->HitPoints;
@@ -111,9 +111,9 @@ void CobraControl(short itemNumber)
 			break;
 
 		case 2:
-			if (info->flags != 1 && item->TouchBits & 0x2000)
+			if (info->Flags != 1 && item->TouchBits & 0x2000)
 			{
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitPoints -= 80;
 				LaraItem->HitStatus = true;

@@ -62,15 +62,15 @@ void ControlBrowsBeast(short itemNumber)
 	{
 		if (item->AIBits)
 			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+		else if (info->HurtByLara)
+			info->Enemy = LaraItem;
 
 		AI_INFO aiInfo;
 		CreatureAIInfo(item, &aiInfo);
 
 		int distance;
 
-		if (info->enemy == LaraItem)
+		if (info->Enemy == LaraItem)
 			distance = aiInfo.distance;
 		else
 		{
@@ -84,14 +84,14 @@ void ControlBrowsBeast(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
-		info->maximumTurn = ANGLE(7.0f);
+		angle = CreatureTurn(item, info->MaxTurn);
+		info->MaxTurn = ANGLE(7.0f);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->flags = 0;
-			if (info->mood == MoodType::Attack)
+			info->Flags = 0;
+			if (info->Mood == MoodType::Attack)
 			{
 				if (distance <= pow(SECTOR(1), 2))
 				{
@@ -112,7 +112,7 @@ void ControlBrowsBeast(short itemNumber)
 
 		case 2:
 		case 3:
-			if (distance < pow(SECTOR(1), 2) || info->mood != MoodType::Attack)
+			if (distance < pow(SECTOR(1), 2) || info->Mood != MoodType::Attack)
 				item->TargetState = 1;
 
 			SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Position, 0);
@@ -120,7 +120,7 @@ void ControlBrowsBeast(short itemNumber)
 
 		case 4:
 		case 6:
-			info->maximumTurn = 0;
+			info->MaxTurn = 0;
 
 			if (abs(aiInfo.angle) >= ANGLE(2.0f))
 			{
@@ -132,7 +132,7 @@ void ControlBrowsBeast(short itemNumber)
 			else
 				item->Position.yRot += aiInfo.angle;
 
-			if (info->flags)
+			if (info->Flags)
 				break;
 
 			if (item->TouchBits & 0x3C000)
@@ -143,7 +143,7 @@ void ControlBrowsBeast(short itemNumber)
 						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 25)
 					{
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Position.yRot, DoBloodSplat);
-						info->flags |= 1;
+						info->Flags |= 1;
 
 						LaraItem->HitPoints -= 150;
 						LaraItem->HitStatus = true;
@@ -157,7 +157,7 @@ void ControlBrowsBeast(short itemNumber)
 						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 16)
 					{
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Position.yRot, DoBloodSplat);
-						info->flags |= 1;
+						info->Flags |= 1;
 
 						LaraItem->HitPoints -= 150;
 						LaraItem->HitStatus = true;
@@ -175,7 +175,7 @@ void ControlBrowsBeast(short itemNumber)
 					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 20)
 				{
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Position.yRot, DoBloodSplat);
-					info->flags |= 2;
+					info->Flags |= 2;
 
 					LaraItem->HitPoints -= 150;
 					LaraItem->HitStatus = true;
@@ -189,7 +189,7 @@ void ControlBrowsBeast(short itemNumber)
 					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 43)
 				{
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Position.yRot, DoBloodSplat);
-					info->flags |= 2;
+					info->Flags |= 2;
 
 					LaraItem->HitPoints -= 150;
 					LaraItem->HitStatus = true;

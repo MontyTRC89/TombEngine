@@ -93,16 +93,16 @@ static bool CrocodileIsInWater(ITEM_INFO* item)
 
 	if (storingInfo.waterDepth != NO_HEIGHT)
 	{
-		info->LOT.step = SECTOR(20);
-		info->LOT.drop = -SECTOR(20);
-		info->LOT.fly = CROC_SWIM_SPEED;
+		info->LOT.Step = SECTOR(20);
+		info->LOT.Drop = -SECTOR(20);
+		info->LOT.Fly = CROC_SWIM_SPEED;
 		return true;
 	}
 	else
 	{
-		info->LOT.step = CLICK(1);
-		info->LOT.drop = -CLICK(1);
-		info->LOT.fly = NO_FLYING;
+		info->LOT.Step = CLICK(1);
+		info->LOT.Drop = -CLICK(1);
+		info->LOT.Fly = NO_FLYING;
 		return false;
 	}
 }
@@ -148,21 +148,21 @@ void CrocodileControl(short itemNumber)
 	{
 		if (item->AIBits & ALL_AIOBJ)
 			GetAITarget(creature);
-		else if (creature->hurtByLara)
-			creature->enemy = LaraItem;
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
 		CreatureAIInfo(item, &AI);
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if ((item->HitStatus || AI.distance < CROC_ALERT_RANGE) ||
 			(TargetVisible(item, &AI) && AI.distance < CROC_VISIBILITY_RANGE))
 		{
-			if (!creature->alerted)
-				creature->alerted = true;
+			if (!creature->Alerted)
+				creature->Alerted = true;
 
 			AlertAllGuards(itemNumber);
 		}
@@ -172,7 +172,7 @@ void CrocodileControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case CROC_STATE_IDLE:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (item->AIBits & GUARD)
 			{
@@ -206,7 +206,7 @@ void CrocodileControl(short itemNumber)
 			break;
 
 		case CROC_STATE_WALK:
-			creature->maximumTurn = CROC_STATE_WALK_ANGLE;
+			creature->MaxTurn = CROC_STATE_WALK_ANGLE;
 
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
@@ -226,7 +226,7 @@ void CrocodileControl(short itemNumber)
 			break;
 
 		case CROC_STATE_RUN:
-			creature->maximumTurn = CROC_STATE_RUN_ANGLE;
+			creature->MaxTurn = CROC_STATE_RUN_ANGLE;
 
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
@@ -266,7 +266,7 @@ void CrocodileControl(short itemNumber)
 			break;
 
 		case CROC_STATE_UNDERWATER_SWIM:
-			creature->maximumTurn = CROC_SWIM_ANGLE;
+			creature->MaxTurn = CROC_SWIM_ANGLE;
 
 			// Water to land transition.
 			if (!CrocodileIsInWater(item))

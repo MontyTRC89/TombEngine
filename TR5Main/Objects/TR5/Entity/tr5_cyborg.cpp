@@ -86,7 +86,7 @@ void HitmanControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
 		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 		short angle = 0;
@@ -140,21 +140,21 @@ void HitmanControl(short itemNumber)
 		else
 			canJump2blocks = true;
 
-		if (item->FiredWeapon)
+		if (creature->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 			pos.x = HitmanGun.x;
 			pos.y = HitmanGun.y;
 			pos.z = HitmanGun.z;
 			GetJointAbsPosition(item, &pos, HitmanGun.meshNum);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
-			item->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
+			creature->FiredWeapon--;
 		}
 
 		if (item->AIBits)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 		AI_INFO info, laraInfo;
 		CreatureAIInfo(item, &info);
@@ -208,7 +208,7 @@ void HitmanControl(short itemNumber)
 						item->AnimNumber = obj->animIndex + 69;
 						item->HitPoints = 0;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-						DropBaddyPickups(item);
+						DropEntityPickups(item);
 					}
 					break;
 				case 10:
@@ -222,7 +222,7 @@ void HitmanControl(short itemNumber)
 
 		if (item->HitPoints > 0)
 		{
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				laraInfo.angle = info.angle;
 				laraInfo.distance = info.distance;
@@ -232,17 +232,17 @@ void HitmanControl(short itemNumber)
 				int dx = LaraItem->Position.xPos - item->Position.xPos;
 				int dz = LaraItem->Position.zPos - item->Position.zPos;
 				laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
-				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
+				laraInfo.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &info, creature->enemy != LaraItem);
+			GetCreatureMood(item, &info, creature->Enemy != LaraItem);
 
 			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_NO_LENSFLARE) // Gassed room?
 			{
 				if (!(GlobalCounter & 7))
 					item->HitPoints--;
 
-				creature->mood = MoodType::Escape;
+				creature->Mood = MoodType::Escape;
 
 				if (item->HitPoints <= 0)
 				{
@@ -252,9 +252,9 @@ void HitmanControl(short itemNumber)
 				}
 			}
 
-			CreatureMood(item, &info, creature->enemy != LaraItem);
+			CreatureMood(item, &info, creature->Enemy != LaraItem);
 			
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 			
 			if (laraInfo.distance < SQUARE(2048) 
 				&& LaraItem->Velocity> 20
@@ -263,7 +263,7 @@ void HitmanControl(short itemNumber)
 			{
 				if (!(item->AIBits & FOLLOW))
 				{
-					creature->enemy = LaraItem;
+					creature->Enemy = LaraItem;
 					AlertAllGuards(itemNumber);
 				}
 			}
@@ -275,10 +275,10 @@ void HitmanControl(short itemNumber)
 			switch (item->ActiveState)
 			{
 			case STATE_HITMAN_STOP:
-				creature->LOT.isJumping = false;
+				creature->LOT.IsJumping = false;
 				joint2 = laraInfo.angle;
-				creature->flags = 0;
-				creature->maximumTurn = 0;
+				creature->Flags = 0;
+				creature->MaxTurn = 0;
 
 				if (info.ahead && item->AIBits != GUARD)
 				{
@@ -326,17 +326,17 @@ void HitmanControl(short itemNumber)
 						{
 							if (canJump1block || canJump2blocks)
 							{
-								creature->maximumTurn = 0;
+								creature->MaxTurn = 0;
 								item->AnimNumber = obj->animIndex + 22;
 								item->ActiveState = STATE_HITMAN_JUMP;
 								item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 								if (canJump2blocks)
 									item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
-								creature->LOT.isJumping = true;
+								creature->LOT.IsJumping = true;
 							}
-							else if (!creature->monkeyAhead)
+							else if (!creature->MonkeySwingAhead)
 							{
-								if (creature->mood != MoodType::Bored)
+								if (creature->Mood != MoodType::Bored)
 								{
 									if (info.distance < SQUARE(3072) || item->AIBits & FOLLOW)
 										item->TargetState = STATE_HITMAN_WALK;
@@ -363,8 +363,8 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_WALK:
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = ANGLE(5);
+				creature->LOT.IsJumping = false;
+				creature->MaxTurn = ANGLE(5);
 				if (Targetable(item, &info)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
@@ -376,15 +376,15 @@ void HitmanControl(short itemNumber)
 				{
 					if (canJump1block || canJump2blocks)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->AnimNumber = obj->animIndex + 22;
 						item->ActiveState = STATE_HITMAN_JUMP;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						if (canJump2blocks)
 							item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
-						creature->LOT.isJumping = true;
+						creature->LOT.IsJumping = true;
 					}
-					else if (!creature->monkeyAhead)
+					else if (!creature->MonkeySwingAhead)
 					{
 						if (info.distance >= SQUARE(1024))
 						{
@@ -407,8 +407,8 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_RUN:
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = ANGLE(10);
+				creature->LOT.IsJumping = false;
+				creature->MaxTurn = ANGLE(10);
 
 				if (Targetable(item, &info)
 					&& (info.distance < SQUARE(4096) 
@@ -419,17 +419,17 @@ void HitmanControl(short itemNumber)
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					item->AnimNumber = obj->animIndex + 22;
 					item->ActiveState = STATE_HITMAN_JUMP;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					if (canJump2blocks)
 						item->TargetState = STATE_HITMAN_JUMP_2BLOCKS;
-					creature->LOT.isJumping = true;
+					creature->LOT.IsJumping = true;
 				}
 				else
 				{
-					if (creature->monkeyAhead)
+					if (creature->MonkeySwingAhead)
 					{
 						item->TargetState = STATE_HITMAN_STOP;
 					}
@@ -439,10 +439,10 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_START_END_MONKEY:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				
-				if (item->BoxNumber == creature->LOT.targetBox 
-					|| !creature->monkeyAhead)
+				if (item->BoxNumber == creature->LOT.TargetBox 
+					|| !creature->MonkeySwingAhead)
 				{
 					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
@@ -456,12 +456,12 @@ void HitmanControl(short itemNumber)
 				break;
 
 			case STATE_HITMAN_MONKEY:
-				creature->LOT.isMonkeying = true;
-				creature->LOT.isJumping = true;
-				creature->maximumTurn = ANGLE(5);
+				creature->LOT.IsMonkeying = true;
+				creature->LOT.IsJumping = true;
+				creature->MaxTurn = ANGLE(5);
 				
-				if (item->BoxNumber == creature->LOT.targetBox
-					|| !creature->monkeyAhead)
+				if (item->BoxNumber == creature->LOT.TargetBox
+					|| !creature->MonkeySwingAhead)
 				{
 					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
@@ -473,8 +473,8 @@ void HitmanControl(short itemNumber)
 			case STATE_HITMAN_AIM:
 				joint0 = laraInfo.angle / 2;
 				joint2 = laraInfo.angle / 2;
-				creature->flags = 0;
-				creature->maximumTurn = 0;
+				creature->Flags = 0;
+				creature->MaxTurn = 0;
 
 				if (info.ahead)
 					joint1 = info.xAngle;
@@ -506,7 +506,7 @@ void HitmanControl(short itemNumber)
 				if (info.ahead)
 					joint1 = info.xAngle;
 
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (abs(info.angle) >= ANGLE(2))
 				{
@@ -524,7 +524,7 @@ void HitmanControl(short itemNumber)
 					&& item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 16
 					&& ((byte)item->FrameNumber - (byte)g_Level.Anims[item->AnimNumber].frameBase) & 1)
 				{
-					item->FiredWeapon = 1;
+					creature->FiredWeapon = 1;
 					ShotLara(item, &info, &HitmanGun, joint0, 12);
 				}
 				break;
@@ -574,21 +574,21 @@ void HitmanControl(short itemNumber)
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
 
-		if (creature->reachedGoal)
+		if (creature->ReachedGoal)
 		{
-			if (creature->enemy)
+			if (creature->Enemy)
 			{
 				TestTriggers(
-					creature->enemy->Position.xPos,
-					creature->enemy->Position.yPos,
-					creature->enemy->Position.zPos, roomNumber, true);
+					creature->Enemy->Position.xPos,
+					creature->Enemy->Position.yPos,
+					creature->Enemy->Position.zPos, roomNumber, true);
 				
 				item->RequiredState = STATE_HITMAN_WALK;
 
-				if (creature->enemy->Flags & 2)
+				if (creature->Enemy->Flags & 2)
 					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
 
-				if (creature->enemy->Flags & 8)
+				if (creature->Enemy->Flags & 8)
 				{
 					item->RequiredState = STATE_HITMAN_STOP;
 					item->TriggerFlags = 300;
@@ -596,8 +596,8 @@ void HitmanControl(short itemNumber)
 				}
 				
 				item->ItemFlags[3]++;
-				creature->reachedGoal = false;
-				creature->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 			}
 		}
 		
@@ -610,42 +610,42 @@ void HitmanControl(short itemNumber)
 			switch (CreatureVault(itemNumber, angle, 2, 260) + 4)
 			{
 			case 0:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 35;
 				item->ActiveState = 25;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 1:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 41;
 				item->ActiveState = 24;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 2:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 42;
 				item->ActiveState = 23;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 6:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 29;
 				item->ActiveState = 19;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 7:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 28;
 				item->ActiveState = 18;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				break;
 
 			case 8:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = obj->animIndex + 27;
 				item->ActiveState = 17;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;

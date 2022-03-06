@@ -91,7 +91,7 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNum))
 			return;
 
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
 
 		AI_INFO info = {};
 		int c = 0;
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR4
 				CreatureAIInfo(item, &info);
 				item->Position.yPos += 512;
 
-				int deltaAngle = info.angle - creature->jointRotation[0];
+				int deltaAngle = info.angle - creature->JointRotation[0];
 
 				info.ahead = true;
 				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 								c = 0;
 								item->ItemFlags[0] = 2;
 
-								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
+								ShotLara(item, &info, &sentryGunBite, creature->JointRotation[0], 5);
 								SoundEffect(SFX_TR4_AUTOGUNS, &item->Position, 0);
 
 								item->ItemFlags[2] += 256;
@@ -163,7 +163,7 @@ namespace TEN::Entities::TR4
 							}
 						}
 
-						deltaAngle = c + info.angle - creature->jointRotation[0];
+						deltaAngle = c + info.angle - creature->JointRotation[0];
 						if (deltaAngle <= ANGLE(10))
 						{
 							if (deltaAngle < -ANGLE(10))
@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 							deltaAngle = ANGLE(10);
 						}
 
-						creature->jointRotation[0] += deltaAngle;
+						creature->JointRotation[0] += deltaAngle;
 
 						CreatureJoint(item, 1, -info.xAngle);
 					}
@@ -189,11 +189,11 @@ namespace TEN::Entities::TR4
 					item->ItemFlags[2] = 0;
 				}
 
-				creature->jointRotation[3] += item->ItemFlags[2];
-				creature->jointRotation[2] += item->ItemFlags[1];
+				creature->JointRotation[3] += item->ItemFlags[2];
+				creature->JointRotation[2] += item->ItemFlags[1];
 
-				if (creature->jointRotation[2] > ANGLE(90) ||
-					creature->jointRotation[2] < -ANGLE(90))
+				if (creature->JointRotation[2] > ANGLE(90) ||
+					creature->JointRotation[2] < -ANGLE(90))
 				{
 					item->ItemFlags[1] = -item->ItemFlags[1];
 				}

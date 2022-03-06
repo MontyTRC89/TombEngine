@@ -217,7 +217,7 @@ namespace TEN::Entities::TR4
 				item->ActiveState = 8;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
-				creature->enemy = NULL;
+				creature->Enemy = NULL;
 				horseItem->TargetState = HORSEMAN_STATE_HORSE_RUN;
 			}
 		}
@@ -225,14 +225,14 @@ namespace TEN::Entities::TR4
 		{
 			if (item->AIBits)
 				GetAITarget(creature);
-			else if (creature->hurtByLara)
-				creature->enemy = LaraItem;
+			else if (creature->HurtByLara)
+				creature->Enemy = LaraItem;
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
 			AI_INFO laraAI;
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				laraAI.angle = AI.angle;
 				laraAI.distance = AI.distance;
@@ -301,33 +301,33 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			creature->hurtByLara = false;
+			creature->HurtByLara = false;
 
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->ActiveState)
 			{
 			case HORSEMAN_STATE_HORSE_RUN:
-				creature->maximumTurn = ANGLE(3.0f);
+				creature->MaxTurn = ANGLE(3.0f);
 				horseItem->TargetState = HORSEMAN_STATE_HORSE_WALK;
 				if (item->RequiredState)
 				{
 					item->TargetState = 17;
 					horseItem->TargetState = HORSEMAN_STATE_MOUNT_HORSE;
 				}
-				else if (creature->flags ||
-					creature->reachedGoal ||
+				else if (creature->Flags ||
+					creature->ReachedGoal ||
 					item->HitStatus &&
 					!GetRandomControl())
 				{
 					if (laraAI.distance > pow(SECTOR(4), 2) ||
-						creature->reachedGoal)
+						creature->ReachedGoal)
 					{
-						creature->flags = 0;
-						creature->enemy = LaraItem;
+						creature->Flags = 0;
+						creature->Enemy = LaraItem;
 
 						if (laraAI.angle > -8192 && laraAI.angle < 0x2000)
 						{
@@ -356,13 +356,13 @@ namespace TEN::Entities::TR4
 									AI.distance < pow(1365, 2) &&
 									AI.angle < ANGLE(20.0f)))
 							{
-								creature->maximumTurn = 0;
+								creature->MaxTurn = 0;
 								item->TargetState = 6;
 							}
 						}
 						else
 						{
-							creature->maximumTurn = 0;
+							creature->MaxTurn = 0;
 							item->TargetState = 7;
 						}
 					}
@@ -384,13 +384,13 @@ namespace TEN::Entities::TR4
 										AI.distance < pow(1365, 2) &&
 										AI.angle < ANGLE(20.0f)))
 								{
-									creature->maximumTurn = 0;
+									creature->MaxTurn = 0;
 									item->TargetState = 6;
 								}
 							}
 							else
 							{
-								creature->maximumTurn = 0;
+								creature->MaxTurn = 0;
 								item->TargetState = 7;
 							}
 						}
@@ -400,30 +400,30 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 2:
-				creature->maximumTurn = 273;
+				creature->MaxTurn = 273;
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->reachedGoal || creature->enemy == LaraItem)
+				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal || creature->Enemy == LaraItem)
 				{
 					item->TargetState = HORSEMAN_STATE_HORSE_RUN;
 					horseItem->TargetState = HORSEMAN_STATE_HORSE_WALK;
-					creature->reachedGoal = false;
-					creature->enemy = LaraItem;
-					creature->flags = 0;
+					creature->ReachedGoal = false;
+					creature->Enemy = LaraItem;
+					creature->Flags = 0;
 				}
 
 				break;
 
 			case 3:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				horseItem->TargetState = HORSEMAN_STATE_HORSE_RUN;
 
-				if (creature->flags)
+				if (creature->Flags)
 				{
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3] = -(item->ItemFlags[3] != 1) + 2;
 				}
 				else
-					creature->flags = 0;
+					creature->Flags = 0;
 
 				if (item->RequiredState)
 				{
@@ -431,7 +431,7 @@ namespace TEN::Entities::TR4
 					horseItem->TargetState = HORSEMAN_STATE_HORSE_WALK;
 					horseItem->Flags = 0;
 				}
-				else if (creature->reachedGoal ||
+				else if (creature->ReachedGoal ||
 					!horseItem->Flags &&
 					AI.distance < pow(SECTOR(1), 2) &&
 					AI.bite &&
@@ -440,7 +440,7 @@ namespace TEN::Entities::TR4
 				{
 					item->TargetState = HORSEMAN_STATE_HORSE_REARING;
 
-					if (creature->reachedGoal)
+					if (creature->ReachedGoal)
 						item->RequiredState = 17;
 					
 					horseItem->Flags = 0;
@@ -455,7 +455,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 4:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
 				{
@@ -497,7 +497,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 6:
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x60)
 					{
@@ -509,7 +509,7 @@ namespace TEN::Entities::TR4
 							item->Position.yRot,
 							DoBloodSplat);
 
-						creature->flags = 1;
+						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 250;
 						LaraItem->HitStatus = true;
@@ -521,7 +521,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 7:
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x4000)
 					{
@@ -533,7 +533,7 @@ namespace TEN::Entities::TR4
 							item->Position.yRot,
 							DoBloodSplat);
 
-						creature->flags = 1;
+						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 100;
 						LaraItem->HitStatus = true;
@@ -543,8 +543,8 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 9:
-				creature->maximumTurn = 0;
-				creature->flags = 0;
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (!item->AIBits || item->ItemFlags[3])
 				{
@@ -561,10 +561,10 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 10:
-				creature->maximumTurn = ANGLE(3.0f);
-				creature->flags = 0;
+				creature->MaxTurn = ANGLE(3.0f);
+				creature->Flags = 0;
 
-				if (creature->reachedGoal)
+				if (creature->ReachedGoal)
 				{
 					item->AIBits = 0;
 					item->ItemFlags[1] = 1;
@@ -576,14 +576,14 @@ namespace TEN::Entities::TR4
 					item->Position.yRot = horseItem->Position.yRot;
 					item->Position.zRot = horseItem->Position.zRot;
 
-					creature->reachedGoal = false;
-					creature->enemy = NULL;
+					creature->ReachedGoal = false;
+					creature->Enemy = NULL;
 
 					item->AnimNumber = Objects[ID_HORSEMAN].animIndex + 14;
 					item->ActiveState = HORSEMAN_STATE_MOUNT_HORSE;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					break;
 				}
 
@@ -614,7 +614,7 @@ namespace TEN::Entities::TR4
 			case 12:
 			case 13:
 			case 14:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (abs(AI.angle) >= ANGLE(3.0f))
 				{
 					if (AI.angle >= 0)
@@ -625,7 +625,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Position.yRot += AI.angle;
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x4000)
 					{
@@ -639,7 +639,7 @@ namespace TEN::Entities::TR4
 							item->Position.yRot,
 							DoBloodSplat);
 
-						creature->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 
@@ -652,8 +652,8 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 17:
-				creature->reachedGoal = false;
-				creature->maximumTurn = 546;
+				creature->ReachedGoal = false;
+				creature->MaxTurn = 546;
 
 				if (!horseItem->Flags)
 				{
@@ -696,7 +696,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x460)
 					{
@@ -723,7 +723,7 @@ namespace TEN::Entities::TR4
 							LaraItem->HitPoints -= 150;
 						}
 
-						creature->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 
@@ -734,11 +734,11 @@ namespace TEN::Entities::TR4
 					horseItem->FrameNumber = g_Level.Anims[horseItem->AnimNumber].frameBase;
 				}
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->reachedGoal)
+				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal)
 				{
-					creature->reachedGoal = false;
-					creature->flags = 0;
-					creature->enemy = LaraItem;
+					creature->ReachedGoal = false;
+					creature->Flags = 0;
+					creature->Enemy = LaraItem;
 				}
 				else if (!AI.ahead)
 				{

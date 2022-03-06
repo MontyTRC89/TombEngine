@@ -370,7 +370,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			AI_INFO laraAI;
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				laraAI.ahead = AI.ahead;
 				laraAI.angle = AI.angle;
@@ -400,7 +400,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (laraAI.ahead)
 			{
@@ -420,7 +420,7 @@ namespace TEN::Entities::TR4
 			switch (item->ActiveState)
 			{
 			case STATE_DEMIGOD_IDLE:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
@@ -445,7 +445,7 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &AI))
 					{
-						creature->flags = 1;
+						creature->Flags = 1;
 
 						if (item->ObjectNumber == ID_DEMIGOD2)
 							item->TargetState = STATE_DEMIGOD_AIM;
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_WALK:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
@@ -518,7 +518,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_RUN:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
@@ -548,7 +548,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_AIM:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
@@ -563,15 +563,15 @@ namespace TEN::Entities::TR4
 						item->Position.yRot += AI.angle;
 				}
 
-				if (Targetable(item, &AI) || creature->flags)
+				if (Targetable(item, &AI) || creature->Flags)
 				{
 					item->TargetState = STATE_DEMIGOD_ATTACK;
-					creature->flags = 0;
+					creature->Flags = 0;
 				}
 				else
 				{
 					item->TargetState = STATE_DEMIGOD_IDLE;
-					creature->flags = 0;
+					creature->Flags = 0;
 				}
 
 				break;
@@ -582,7 +582,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_FLY:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (Targetable(item, &AI))
 					item->TargetState = STATE_DEMIGOD_IDLE_FLY;
@@ -590,14 +590,14 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_AIM:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 				if (!Targetable(item, &AI) && AI.distance < pow(SECTOR(5), 2))
 					item->TargetState = STATE_DEMIGOD_CIRCLE_ATTACK;
 
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_ATTACK:
-				creature->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				DoDemigodEffects(itemNumber);
 
@@ -610,7 +610,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_GROUND_AIM:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				joint2 = joint0;
 				joint0 = 0;
 
@@ -627,21 +627,21 @@ namespace TEN::Entities::TR4
 						item->Position.yRot += AI.angle;
 				}
 
-				if (Targetable(item, &AI) || creature->flags)
+				if (Targetable(item, &AI) || creature->Flags)
 				{
 					item->TargetState = STATE_DEMIGOD_GROUND_ATTACK;
-					creature->flags = 0;
+					creature->Flags = 0;
 				}
 				else
 				{
 					item->TargetState = STATE_DEMIGOD_IDLE;
-					creature->flags = 0;
+					creature->Flags = 0;
 				}
 
 				break;
 
 			case STATE_DEMIGOD_HAMMER_AIM:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				joint2 = joint0;
 				joint0 = 0;
 

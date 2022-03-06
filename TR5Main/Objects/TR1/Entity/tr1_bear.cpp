@@ -79,20 +79,20 @@ void BearControl(short itemNumber)
 			case BEAR_STATE_REAR:
 			{
 				item->TargetState = BEAR_STATE_DEATH;
-				creature->flags = 1;
+				creature->Flags = 1;
 				break;
 			}
 			case BEAR_STATE_IDLE:
 			{
 				item->TargetState = BEAR_STATE_DEATH;
-				creature->flags = 0;
+				creature->Flags = 0;
 				break;
 			}
 			case BEAR_STATE_DEATH:
 			{
-				if (creature->flags && item->TouchBits & TOUCH)
+				if (creature->Flags && item->TouchBits & TOUCH)
 				{
-					creature->flags = 0;
+					creature->Flags = 0;
 
 					LaraItem->HitPoints -= SLAM_DAMAGE;
 					LaraItem->HitStatus = 1;
@@ -113,10 +113,10 @@ void BearControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (item->HitStatus)
-			creature->flags = 1;
+			creature->Flags = 1;
 
 		const bool laraDead = LaraItem->HitPoints <= 0;
 
@@ -132,7 +132,7 @@ void BearControl(short itemNumber)
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = BEAR_STATE_STROLL;
 			else
 				item->TargetState = BEAR_STATE_RUN;
@@ -140,15 +140,15 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_STROLL:
-			creature->maximumTurn = WALK_TURN;
+			creature->MaxTurn = WALK_TURN;
 
 			if (laraDead && item->TouchBits & TOUCH && AI.ahead)
 				item->TargetState = BEAR_STATE_IDLE;
-			else if (creature->mood != MoodType::Bored)
+			else if (creature->Mood != MoodType::Bored)
 			{
 				item->TargetState = BEAR_STATE_IDLE;
 
-				if (creature->mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 					item->RequiredState = BEAR_STATE_STROLL;
 			}
 			else if (GetRandomControl() < ROAR_CHANCE)
@@ -160,7 +160,7 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_RUN:
-			creature->maximumTurn = RUN_TURN;
+			creature->MaxTurn = RUN_TURN;
 
 			if (item->TouchBits & TOUCH)
 			{
@@ -168,11 +168,11 @@ void BearControl(short itemNumber)
 				LaraItem->HitStatus = true;
 			}
 
-			if (creature->mood == MoodType::Bored || laraDead)
+			if (creature->Mood == MoodType::Bored || laraDead)
 				item->TargetState = BEAR_STATE_IDLE;
 			else if (AI.ahead && !item->RequiredState)
 			{
-				if (!creature->flags && AI.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
+				if (!creature->Flags && AI.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
 					item->RequiredState = BEAR_STATE_REAR;
 					item->TargetState = BEAR_STATE_IDLE;
@@ -184,14 +184,14 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_REAR:
-			if (creature->flags)
+			if (creature->Flags)
 			{
 				item->RequiredState = BEAR_STATE_STROLL;
 				item->TargetState = BEAR_STATE_IDLE;
 			}
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (creature->mood == MoodType::Bored || creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
 				item->TargetState = BEAR_STATE_IDLE;
 			else if (AI.bite && AI.distance < PAT_RANGE)
 				item->TargetState = BEAR_STATE_ATTACK_2;
@@ -201,19 +201,19 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_WALK:
-			if (creature->flags)
+			if (creature->Flags)
 			{
 				item->RequiredState = BEAR_STATE_STROLL;
 				item->TargetState = BEAR_STATE_REAR;
 			}
 			else if (AI.ahead && (item->TouchBits & TOUCH))
 				item->TargetState = BEAR_STATE_REAR;
-			else if (creature->mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				item->TargetState = BEAR_STATE_REAR;
 				item->RequiredState = BEAR_STATE_STROLL;
 			}
-			else if (creature->mood == MoodType::Bored || GetRandomControl() < ROAR_CHANCE)
+			else if (creature->Mood == MoodType::Bored || GetRandomControl() < ROAR_CHANCE)
 			{
 				item->RequiredState = BEAR_STATE_ROAR;
 				item->TargetState = BEAR_STATE_REAR;
