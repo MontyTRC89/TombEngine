@@ -48,7 +48,7 @@ void SmallScorpionControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 	short head = 0;
@@ -77,44 +77,44 @@ void SmallScorpionControl(short itemNumber)
 		int laraDistance = dx * dx + dz * dz;
 
 		if (item->AIBits & GUARD)
-			GetAITarget(info);
+			GetAITarget(creature);
 		else
-			info->Enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case SSCORPION_STATE_IDLE:
-			info->MaxTurn = 0;
-			info->Flags = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
-			if (aiInfo.distance > pow(341, 2))
+			if (AI.distance > pow(341, 2))
 				item->TargetState = SSCORPION_STATE_WALK;
-			else if (aiInfo.bite)
+			else if (AI.bite)
 			{
-				info->MaxTurn = ANGLE(6.0f);
+				creature->MaxTurn = ANGLE(6.0f);
 				if (GetRandomControl() & 1)
 					item->TargetState = SSCORPION_STATE_ATTACK_1;
 				else
 					item->TargetState = SSCORPION_STATE_ATTACK_2;
 			}
-			else if (!aiInfo.ahead)
+			else if (!AI.ahead)
 				item->TargetState = SSCORPION_STATE_RUN;
 			
 			break;
 
 		case SSCORPION_STATE_WALK:
-			info->MaxTurn = ANGLE(6.0f);
-			if (aiInfo.distance >= pow(341, 2))
+			creature->MaxTurn = ANGLE(6.0f);
+			if (AI.distance >= pow(341, 2))
 			{
-				if (aiInfo.distance > pow(213, 2))
+				if (AI.distance > pow(213, 2))
 					item->TargetState = SSCORPION_STATE_RUN;
 			}
 			else
@@ -123,28 +123,28 @@ void SmallScorpionControl(short itemNumber)
 			break;
 
 		case SSCORPION_STATE_RUN:
-			info->MaxTurn = ANGLE(8.0f);
+			creature->MaxTurn = ANGLE(8.0f);
 
-			if (aiInfo.distance < pow(341, 2))
+			if (AI.distance < pow(341, 2))
 				item->TargetState = SSCORPION_STATE_IDLE;
 			
 			break;
 
 		case SSCORPION_STATE_ATTACK_1:
 		case SSCORPION_STATE_ATTACK_2:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (abs(aiInfo.angle) >= ANGLE(6.0f))
+			if (abs(AI.angle) >= ANGLE(6.0f))
 			{
-				if (aiInfo.angle >= 0)
+				if (AI.angle >= 0)
 					item->Position.yRot += ANGLE(6.0f);
 				else
 					item->Position.yRot -= ANGLE(6.0f);
 			}
 			else
-				item->Position.yRot += aiInfo.angle;
+				item->Position.yRot += AI.angle;
 			
-			if (!info->Flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits & 0x1B00100)
 				{
@@ -169,7 +169,7 @@ void SmallScorpionControl(short itemNumber)
 						}
 
 						CreatureEffect2(item, biteInfo, 3, rotation, DoBloodSplat);
-						info->Flags = 1;
+						creature->Flags = 1;
 					}
 				}
 			}

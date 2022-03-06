@@ -145,7 +145,7 @@ void LagoonWitchControl(short itemNumber)
 			if (enemy)
 			{
 				if (enemy->Flags & 2)
-					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;

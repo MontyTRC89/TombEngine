@@ -49,7 +49,7 @@ void KnightTemplarControl(short itemNumber)
 		}
 	}
 
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short tilt = 0;
 	short angle = 0;
@@ -62,27 +62,27 @@ void KnightTemplarControl(short itemNumber)
 		item->HitPoints = object->HitPoints;
 
 	if (item->AIBits)
-		GetAITarget(info);
-	else if (info->HurtByLara)
-		info->Enemy = LaraItem;
+		GetAITarget(creature);
+	else if (creature->HurtByLara)
+		creature->Enemy = LaraItem;
 
-	AI_INFO aiInfo;
-	CreatureAIInfo(item, &aiInfo);
+	AI_INFO AI;
+	CreatureAIInfo(item, &AI);
 
 	int a = 0;
-	if (info->Enemy != LaraItem)
+	if (creature->Enemy != LaraItem)
 		a = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
 
-	GetCreatureMood(item, &aiInfo, VIOLENT);
-	CreatureMood(item, &aiInfo, VIOLENT);
+	GetCreatureMood(item, &AI, VIOLENT);
+	CreatureMood(item, &AI, VIOLENT);
 
-	angle = CreatureTurn(item, info->MaxTurn);
+	angle = CreatureTurn(item, creature->MaxTurn);
 
-	if (aiInfo.ahead)
+	if (AI.ahead)
 	{
-		joint0 = aiInfo.angle / 2;
-		joint1 = aiInfo.xAngle;
-		joint2 = aiInfo.angle / 2;
+		joint0 = AI.angle / 2;
+		joint1 = AI.xAngle;
+		joint2 = AI.angle / 2;
 	}
 
 	int frameBase = 0;
@@ -91,11 +91,11 @@ void KnightTemplarControl(short itemNumber)
 	switch (item->ActiveState)
 	{
 	case 1:
-		info->MaxTurn = ANGLE(2.0f);
+		creature->MaxTurn = ANGLE(2.0f);
 		item->TargetState = 2;
-		info->Flags = 0;
+		creature->Flags = 0;
 
-		if (aiInfo.distance > pow(682, 2))
+		if (AI.distance > pow(682, 2))
 		{
 			if (Lara.target == item)
 				item->TargetState = 6;
@@ -110,9 +110,9 @@ void KnightTemplarControl(short itemNumber)
 		break;
 
 	case 2:
-		info->MaxTurn = ANGLE(7.0f);
+		creature->MaxTurn = ANGLE(7.0f);
 
-		if (Lara.target == item || aiInfo.distance <= pow(682, 2))
+		if (Lara.target == item || AI.distance <= pow(682, 2))
 			item->TargetState = 1;
 
 		break;
@@ -120,17 +120,17 @@ void KnightTemplarControl(short itemNumber)
 	case 3:
 	case 4:
 	case 5:
-		info->MaxTurn = 0;
+		creature->MaxTurn = 0;
 
-		if (abs(aiInfo.angle) >= ANGLE(1.0f))
+		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
-			if (aiInfo.angle >= 0)
+			if (AI.angle >= 0)
 				item->Position.yRot += ANGLE(1.0f);
 			else
 				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
-			item->Position.yRot += aiInfo.angle;
+			item->Position.yRot += AI.angle;
 
 		frameNumber = item->FrameNumber;
 		frameBase = g_Level.Anims[item->AnimNumber].frameBase;
@@ -166,7 +166,7 @@ void KnightTemplarControl(short itemNumber)
 				}
 			}
 
-			if (!info->Flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits & 0xC00)
 				{
@@ -177,7 +177,7 @@ void KnightTemplarControl(short itemNumber)
 						-1,
 						DoBloodSplat);
 
-					info->Flags = 1;
+					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
 					LaraItem->HitStatus = true;
@@ -186,17 +186,17 @@ void KnightTemplarControl(short itemNumber)
 		}
 
 	case 6:
-		info->MaxTurn = 0;
+		creature->MaxTurn = 0;
 
-		if (abs(aiInfo.angle) >= ANGLE(1.0f))
+		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
-			if (aiInfo.angle >= 0)
+			if (AI.angle >= 0)
 				item->Position.yRot += ANGLE(1.0f);
 			else
 				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
-			item->Position.yRot += aiInfo.angle;
+			item->Position.yRot += AI.angle;
 
 		if (item->HitStatus)
 		{
@@ -205,7 +205,7 @@ void KnightTemplarControl(short itemNumber)
 			else
 				item->TargetState = 8;
 		}
-		else if (aiInfo.distance <= pow(682, 2) || Lara.target != item)
+		else if (AI.distance <= pow(682, 2) || Lara.target != item)
 			item->TargetState = 1;
 		else
 			item->TargetState = 6;

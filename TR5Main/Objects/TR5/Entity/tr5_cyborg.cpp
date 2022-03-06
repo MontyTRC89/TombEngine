@@ -586,7 +586,7 @@ void HitmanControl(short itemNumber)
 				item->RequiredState = STATE_HITMAN_WALK;
 
 				if (creature->Enemy->Flags & 2)
-					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
 				if (creature->Enemy->Flags & 8)
 				{

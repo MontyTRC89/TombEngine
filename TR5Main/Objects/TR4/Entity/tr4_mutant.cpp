@@ -244,7 +244,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* mutant = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		OBJECT_BONES mutantJoint;
 		int frameNumber;
@@ -252,19 +252,20 @@ namespace TEN::Entities::TR4
 		short headY = 0;
 
 		if (item->AIBits & ALL_AIOBJ)
-			GetAITarget(mutant);
-		else if (mutant->HurtByLara)
-			mutant->Enemy = LaraItem;
+			GetAITarget(creature);
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 		else
-			TargetNearestEntity(item, mutant);
+			TargetNearestEntity(item, creature);
 
 		AI_INFO AI;
 		MutantAIFix(item, &AI);
-		RotateHeadToTarget(item, mutant, 9, headY);
+
+		RotateHeadToTarget(item, creature, 9, headY);
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		mutant->MaxTurn = 0;
+		creature->MaxTurn = 0;
 		angle = CreatureTurn(item, 0);
 
 		switch (item->ActiveState)
