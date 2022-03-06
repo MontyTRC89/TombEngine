@@ -91,7 +91,7 @@ void ControlBrowsBeast(short itemNumber)
 		{
 		case 1:
 			info->flags = 0;
-			if (info->mood == ATTACK_MOOD)
+			if (info->mood == MoodType::Attack)
 			{
 				if (distance <= pow(SECTOR(1), 2))
 				{
@@ -112,7 +112,7 @@ void ControlBrowsBeast(short itemNumber)
 
 		case 2:
 		case 3:
-			if (distance < pow(SECTOR(1), 2) || info->mood != ATTACK_MOOD)
+			if (distance < pow(SECTOR(1), 2) || info->mood != MoodType::Attack)
 				item->TargetState = 1;
 
 			SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Position, 0);

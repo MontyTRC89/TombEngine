@@ -76,8 +76,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_jump_left,//27
 	lara_as_jump_up,//28
 	lara_as_fall_back,//29
-	lara_as_hangleft,//30
-	lara_as_hangright,//31
+	lara_as_shimmy_left,//30
+	lara_as_shimmy_right,//31
 	lara_as_slide_back,//32
 	lara_as_surftread,
 	lara_as_surfswim,
@@ -100,7 +100,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//51
 	lara_as_swan_dive,//52
 	lara_as_freefall_dive,//53
-	lara_as_gymnast,//54
+	lara_as_handstand,//54
 	lara_as_waterout,//55
 	lara_as_climb_idle,//56
 	lara_as_climb_up,//57
@@ -255,8 +255,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_left,//27
 	lara_col_jump_up,//28
 	lara_col_fall_back,//29
-	lara_col_hangleft,
-	lara_col_hangright,
+	lara_col_shimmy_left,
+	lara_col_shimmy_right,
 	lara_col_slide_back,//32
 	lara_col_surftread,
 	lara_col_surfswim,

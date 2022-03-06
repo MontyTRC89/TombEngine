@@ -154,7 +154,7 @@ namespace TEN::Entities::TR4
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && info.bite)
-				creature->mood = ESCAPE_MOOD;
+				creature->mood = MoodType::Escape;
 
 			CreatureMood(item, &info, creature->enemy != LaraItem);
 			angle = CreatureTurn(item, creature->maximumTurn);
@@ -248,19 +248,19 @@ namespace TEN::Entities::TR4
 						}
 						else
 						{
-							if (creature->mood == ESCAPE_MOOD)
+							if (creature->mood == MoodType::Escape)
 							{
 								item->TargetState = STATE_SAS_RUN;
 							}
 							else
 							{
 								if ((creature->alerted
-									|| creature->mood != BORED_MOOD)
+									|| creature->mood != MoodType::Bored)
 									&& (!(item->AIBits & FOLLOW)
 										|| !creature->reachedGoal
 										&& distance <= SQUARE(2048)))
 								{
-									if (creature->mood == BORED_MOOD
+									if (creature->mood == MoodType::Bored
 										|| info.distance <= SQUARE(2048))
 									{
 										item->TargetState = STATE_SAS_WALK;
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 				else if (Targetable(item, &info)
-					|| creature->mood != BORED_MOOD
+					|| creature->mood != MoodType::Bored
 					|| !info.ahead
 					|| item->AIBits & MODIFY
 					|| Lara.Vehicle != NO_ITEM)
@@ -319,7 +319,7 @@ namespace TEN::Entities::TR4
 					|| !(item->AIBits & MODIFY)
 					&& item->AIBits)
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 					{
 						item->TargetState = STATE_SAS_RUN;
 					}
@@ -343,7 +343,7 @@ namespace TEN::Entities::TR4
 							}
 							item->TargetState = STATE_SAS_WALK_AIM;
 						}
-						else if (creature->mood)
+						else if (creature->mood != MoodType::Bored)
 						{
 							if (info.distance > SQUARE(2048))
 							{
@@ -387,7 +387,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (creature->mood != ESCAPE_MOOD)
+				if (creature->mood != MoodType::Escape)
 				{
 					if (Targetable(item, &info))
 					{
@@ -395,8 +395,8 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						if (creature->mood != BORED_MOOD
-							|| creature->mood == STALK_MOOD
+						if (creature->mood != MoodType::Bored
+							|| creature->mood == MoodType::Stalk
 							&& item->AIBits & FOLLOW
 							&& info.distance < SQUARE(2048))
 						{
@@ -511,7 +511,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TargetState != STATE_SAS_STOP
 						&& item->TargetState != STATE_SAS_KNEEL_STOP
-						&& (creature->mood == ESCAPE_MOOD
+						&& (creature->mood == MoodType::Escape
 							|| !Targetable(item, &info)))
 					{
 						if (item->ActiveState == STATE_SAS_HOLD_SHOOT)

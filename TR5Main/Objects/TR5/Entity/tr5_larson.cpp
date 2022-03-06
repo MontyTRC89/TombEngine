@@ -197,9 +197,9 @@ void LarsonControl(short itemNumber)
 				}
 				else
 				{
-					if (creature->mood)
+					if (creature->mood != MoodType::Bored)
 					{
-						if (creature->mood == ESCAPE_MOOD)
+						if (creature->mood == MoodType::Escape)
 							item->TargetState = STATE_TR5_LARSON_RUN;
 						else
 							item->TargetState = STATE_TR5_LARSON_WALK;
@@ -217,14 +217,14 @@ void LarsonControl(short itemNumber)
 				joint2 = info.angle;
 			
 			creature->maximumTurn = ANGLE(7);
-			if (!creature->mood && GetRandomControl() < 96)
+			if (creature->mood == MoodType::Bored && GetRandomControl() < 96)
 			{
 				item->RequiredState = STATE_TR5_LARSON_IDLE;
 				item->TargetState = STATE_TR5_LARSON_STOP;
 				break;
 			}
 
-			if (creature->mood == ESCAPE_MOOD || item->AIBits & AMBUSH)
+			if (creature->mood == MoodType::Escape || item->AIBits & AMBUSH)
 			{
 				item->RequiredState = STATE_TR5_LARSON_RUN;
 				item->TargetState = STATE_TR5_LARSON_STOP;
@@ -255,7 +255,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->TargetState = STATE_TR5_LARSON_RUN;
 			}
-			else if (creature->mood || GetRandomControl() >= 96)
+			else if (creature->mood != MoodType::Bored || GetRandomControl() >= 96)
 			{
 				if (Targetable(item, &info))
 				{
@@ -308,7 +308,7 @@ void LarsonControl(short itemNumber)
 			if (info.ahead)
 				joint1 = info.xAngle;
 
-			if (creature->mood)
+			if (creature->mood != MoodType::Bored)
 			{
 				item->TargetState = STATE_TR5_LARSON_STOP;
 			}
@@ -352,7 +352,7 @@ void LarsonControl(short itemNumber)
 				}
 				item->FiredWeapon = 2;
 			}
-			if (creature->mood == ESCAPE_MOOD && GetRandomControl() > 0x2000)
+			if (creature->mood == MoodType::Escape && GetRandomControl() > 0x2000)
 				item->RequiredState = STATE_TR5_LARSON_STOP;
 			break;
 

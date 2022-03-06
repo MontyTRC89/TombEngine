@@ -62,11 +62,11 @@ void BarracudaControl(short itemNumber)
 		case 1:
 			creature->flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				item->TargetState = 2;
 			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 4;
-			else if (creature->mood == STALK_MOOD)
+			else if (creature->mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -76,11 +76,11 @@ void BarracudaControl(short itemNumber)
 		case 2:
 			creature->maximumTurn = ANGLE(2.0f);
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				break;
 			else if (AI.ahead && (item->TouchBits & 0xE0))
 				item->TargetState = 1;
-			else if (creature->mood != STALK_MOOD)
+			else if (creature->mood != MoodType::Stalk)
 				item->TargetState = 3;
 
 			break;
@@ -89,13 +89,13 @@ void BarracudaControl(short itemNumber)
 			creature->maximumTurn = ANGLE(4.0f);
 			creature->flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				item->TargetState = 2;
 			else if (AI.ahead && AI.distance < 340)
 				item->TargetState = 5;
 			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 1;
-			else if (creature->mood == STALK_MOOD)
+			else if (creature->mood == MoodType::Stalk)
 				item->TargetState = 2;
 
 			break;

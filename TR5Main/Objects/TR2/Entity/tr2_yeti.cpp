@@ -80,11 +80,11 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 1;
 			else if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
@@ -97,7 +97,7 @@ void YetiControl(short itemNumber)
 				item->TargetState = 4;
 			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 5;
-			else if (info->mood == STALK_MOOD)
+			else if (info->mood == MoodType::Stalk)
 				item->TargetState = 3;
 			else
 				item->TargetState = 1;
@@ -108,9 +108,9 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD || item->HitStatus)
+			if (info->mood == MoodType::Escape || item->HitStatus)
 				item->TargetState = 2;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (laraAlive)
 				{
@@ -134,9 +134,9 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD || item->HitStatus)
+			if (info->mood == MoodType::Escape || item->HitStatus)
 				item->TargetState = 2;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 					item->TargetState = 7;
@@ -159,9 +159,9 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				item->TargetState = 1;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100 || !laraAlive)
 				{
@@ -176,7 +176,7 @@ void YetiControl(short itemNumber)
 				else if (GetRandomControl() < 0x300)
 					item->TargetState = 2;
 			}
-			else if (info->mood == ATTACK_MOOD)
+			else if (info->mood == MoodType::Attack)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 					item->TargetState = 2;
@@ -194,15 +194,15 @@ void YetiControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->mood == MoodType::Escape)
 				break;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
 				item->TargetState = 2;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 				item->TargetState = 6;
-			else if (info->mood == STALK_MOOD)
+			else if (info->mood == MoodType::Stalk)
 				item->TargetState = 3;
 			
 			break;

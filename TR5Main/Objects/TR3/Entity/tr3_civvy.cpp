@@ -133,7 +133,7 @@ void CivvyControl(short itemNumber)
 			aiInfo.enemyFacing < 0x3000 &&
 			aiInfo.enemyFacing > -0x3000)
 		{
-			info->mood = ESCAPE_MOOD;
+			info->mood = MoodType::Escape;
 		}
 
 		CreatureMood(item, &aiInfo, VIOLENT);
@@ -183,14 +183,14 @@ void CivvyControl(short itemNumber)
 			else if (item->AIBits & PATROL1)
 				item->TargetState = CIVVY_WALK;
 
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && aiInfo.ahead)
 					item->TargetState = CIVVY_STOP;
 				else
 					item->TargetState = CIVVY_RUN;
 			}
-			else if (info->mood == BORED_MOOD ||
+			else if (info->mood == MoodType::Bored ||
 				(item->AIBits & FOLLOW && (info->reachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2))))
 			{
 				if (item->RequiredState)
@@ -220,9 +220,9 @@ void CivvyControl(short itemNumber)
 				item->TargetState = CIVVY_WALK;
 				head = 0;
 			}
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 				item->TargetState = CIVVY_RUN;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < CIVVY_WAIT_CHANCE)
 				{
@@ -248,7 +248,7 @@ void CivvyControl(short itemNumber)
 
 			if (item->AIBits & GUARD)
 				item->TargetState = CIVVY_WAIT;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->mood == MoodType::Escape)
 			{
 				if (Lara.target != item && aiInfo.ahead)
 					item->TargetState = CIVVY_STOP;
@@ -256,7 +256,7 @@ void CivvyControl(short itemNumber)
 			}
 			else if ((item->AIBits & FOLLOW) && (info->reachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2)))
 				item->TargetState = CIVVY_STOP;
-			else if (info->mood == BORED_MOOD)
+			else if (info->mood == MoodType::Bored)
 				item->TargetState = CIVVY_WALK;
 			else if (aiInfo.ahead && aiInfo.distance < CIVVY_WALK_RANGE)
 				item->TargetState = CIVVY_WALK;

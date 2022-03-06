@@ -76,7 +76,7 @@ void LionControl(short itemNumber)
 					break;
 				}
 
-				if (!creature->mood)
+				if (creature->mood == MoodType::Bored)
 				{
 					if (!(GetRandomControl() & 0x3F))
 						item->TargetState = 2;
@@ -104,7 +104,7 @@ void LionControl(short itemNumber)
 			case 2:
 				creature->maximumTurn = ANGLE(2.0f);
 
-				if (!creature->mood)
+				if (creature->mood == MoodType::Bored)
 				{
 					if (GetRandomControl() < 128)
 					{
@@ -121,13 +121,13 @@ void LionControl(short itemNumber)
 				creature->maximumTurn = ANGLE(5.0f);
 				tilt = angle;
 
-				if (creature->mood)
+				if (creature->mood != MoodType::Bored)
 				{
 					if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
 						item->TargetState = 1;
 					else if (item->TouchBits & 0x200048 && aiInfo.ahead)
 						item->TargetState = 1;
-					else if (creature->mood != ESCAPE_MOOD)
+					else if (creature->mood != MoodType::Escape)
 					{
 						if (GetRandomControl() < 128)
 						{

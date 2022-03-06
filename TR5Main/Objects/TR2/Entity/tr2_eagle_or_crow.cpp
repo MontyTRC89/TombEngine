@@ -103,7 +103,7 @@ void EagleControl(short itemNumber)
 		case 7:
 			item->Position.yPos = item->Floor;
 
-			if (creature->mood != BORED_MOOD)
+			if (creature->mood != MoodType::Bored)
 				item->TargetState = 1;
 
 			break;
@@ -111,7 +111,7 @@ void EagleControl(short itemNumber)
 		case 2:
 			item->Position.yPos = item->Floor;
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				break;
 			else
 				item->TargetState = 1;
@@ -123,7 +123,7 @@ void EagleControl(short itemNumber)
 
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				item->TargetState = 2;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 				item->TargetState = 6;
@@ -133,7 +133,7 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 3:
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 			{
 				item->RequiredState = 2;
 				item->TargetState = 1;

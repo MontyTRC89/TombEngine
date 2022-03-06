@@ -55,20 +55,20 @@ struct LOT_INFO
 	bool initialised;
 };
 
-enum MOOD_TYPE 
+enum class MoodType 
 {
-	BORED_MOOD,
-	ATTACK_MOOD,
-	ESCAPE_MOOD,
-	STALK_MOOD
+	Bored,
+	Attack,
+	Escape,
+	Stalk
 };
 
-enum class CREATURE_AI_PRIORITY 
+enum class CreatureAIPriority
 {
-	HIGH,
-	MEDIUM,
-	LOW,
-	NONE
+	None,
+	High,
+	Medium,
+	Low
 };
 
 struct CREATURE_INFO 
@@ -84,7 +84,7 @@ struct CREATURE_INFO
 	bool patrol2;
 	bool jumpAhead;
 	bool monkeyAhead;
-	MOOD_TYPE mood;
+	MoodType mood;
 	ITEM_INFO* enemy;
 	short aiTargetNum;
 	ITEM_INFO* aiTarget;
@@ -93,7 +93,7 @@ struct CREATURE_INFO
 	PHD_VECTOR target;
 	LOT_INFO LOT;
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
-	CREATURE_AI_PRIORITY priority;
+	CreatureAIPriority priority;
 	size_t framesSinceLOTUpdate;
 #endif
 };

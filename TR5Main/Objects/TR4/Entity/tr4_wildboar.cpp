@@ -86,7 +86,7 @@ void WildBoarControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 
 		if (item->Flags)
-			info->mood = ESCAPE_MOOD;
+			info->mood = MoodType::Escape;
 
 		CreatureMood(item, &aiInfo, VIOLENT);
 

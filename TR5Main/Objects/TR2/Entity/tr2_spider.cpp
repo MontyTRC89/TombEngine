@@ -88,7 +88,7 @@ void SmallSpiderControl(short itemNum)
 		case 1:
 			spider->flags = 0;
 
-			if (spider->mood == BORED_MOOD)
+			if (spider->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 2;
@@ -99,25 +99,25 @@ void SmallSpiderControl(short itemNum)
 			{
 				item->TargetState = 4;
 			}
-			else if (spider->mood == STALK_MOOD)
+			else if (spider->mood == MoodType::Stalk)
 			{
 				item->TargetState = 2;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->mood == MoodType::Escape || spider->mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 2:
-			if (spider->mood == BORED_MOOD)
+			if (spider->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 1;
 				else
 					break;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->mood == MoodType::Escape || spider->mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
@@ -126,7 +126,7 @@ void SmallSpiderControl(short itemNum)
 		case 3:
 			spider->flags = 0;
 
-			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+			if (spider->mood == MoodType::Bored || spider->mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else if (info.ahead && item->TouchBits)
 				item->TargetState = 1;
@@ -192,7 +192,7 @@ void BigSpiderControl(short itemNum)
 		case 1:
 			spider->flags = 0;
 
-			if (spider->mood == BORED_MOOD)
+			if (spider->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x200)
 					item->TargetState = 2;
@@ -203,25 +203,25 @@ void BigSpiderControl(short itemNum)
 			{
 				item->TargetState = 4;
 			}
-			else if (spider->mood == STALK_MOOD)
+			else if (spider->mood == MoodType::Stalk)
 			{
 				item->TargetState = 2;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->mood == MoodType::Escape || spider->mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 2:
-			if (spider->mood == BORED_MOOD)
+			if (spider->mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x200)
 					item->TargetState = 1;
 				else
 					break;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->mood == MoodType::Escape || spider->mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
@@ -230,7 +230,7 @@ void BigSpiderControl(short itemNum)
 		case 3:
 			spider->flags = 0;
 
-			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+			if (spider->mood == MoodType::Bored || spider->mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else if (info.ahead && item->TouchBits)
 				item->TargetState = 1;

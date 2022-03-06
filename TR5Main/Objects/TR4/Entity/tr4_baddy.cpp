@@ -549,7 +549,7 @@ namespace TEN::Entities::TR4
 
 			// Vehicle handling
 			if (Lara.Vehicle != NO_ITEM && info.bite)
-				currentCreature->mood = ESCAPE_MOOD;
+				currentCreature->mood = MoodType::Escape;
 
 			CreatureMood(item, &info, VIOLENT);
 
@@ -859,7 +859,7 @@ namespace TEN::Entities::TR4
 					item->ActiveState = STATE_BADDY_STOP;
 					break;
 				}
-				if (currentCreature->mood == ATTACK_MOOD &&
+				if (currentCreature->mood == MoodType::Attack &&
 					!(currentCreature->jumpAhead) &&
 					info.distance > SQUARE(1024))
 				{

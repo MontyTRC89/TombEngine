@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->mood == MoodType::Bored)
 				creature->maximumTurn /= 2;
 
 			angle = CreatureTurn(item, creature->maximumTurn);
@@ -132,7 +132,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				if (creature->mood && item->AIBits != MODIFY)
+				if (creature->mood != MoodType::Bored && item->AIBits != MODIFY)
 					item->TargetState = DOG_STATE_STOP;
 				else
 				{
@@ -186,7 +186,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 					{
 						if (Lara.target == item || !AI.ahead || item->HitStatus)
 						{
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (creature->mood != BORED_MOOD)
+					if (creature->mood != MoodType::Bored)
 					{
 						item->RequiredState = DOG_STATE_RUN;
 
@@ -252,7 +252,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (!creature->mood && random < 256)
+				if (creature->mood == MoodType::Bored && random < 256)
 				{
 					item->TargetState = DOG_STATE_STOP;
 					break;
@@ -264,12 +264,12 @@ namespace TEN::Entities::TR4
 			case DOG_STATE_RUN:
 				creature->maximumTurn = ANGLE(6.0f);
 
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->mood == MoodType::Escape)
 				{
 					if (Lara.target != item && AI.ahead)
 						item->TargetState = DOG_STATE_CROUCH;
 				}
-				else if (creature->mood)
+				else if (creature->mood != MoodType::Bored)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 						item->TargetState = DOG_STATE_JUMP_ATTACK;
@@ -287,9 +287,9 @@ namespace TEN::Entities::TR4
 			case DOG_STATE_STALK:
 				creature->maximumTurn = ANGLE(3.0f);
 
-				if (creature->mood)
+				if (creature->mood != MoodType::Bored)
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->mood == MoodType::Escape)
 						item->TargetState = DOG_STATE_RUN;
 					else if (AI.bite && AI.distance < pow(341, 2))
 					{

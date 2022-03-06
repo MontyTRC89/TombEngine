@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
 			if (info->flags)
-				info->mood = ESCAPE_MOOD;
+				info->mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->TargetState = BAT_STATE_FLY;
-					info->mood = BORED_MOOD;
+					info->mood = MoodType::Bored;
 				}
 
 				break;

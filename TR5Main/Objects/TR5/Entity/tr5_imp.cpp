@@ -163,7 +163,7 @@ void ImpControl(short itemNumber)
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
 			if (item->ActiveState == IMP_STATE_SCARED)
-				info->mood = ESCAPE_MOOD;
+				info->mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 

@@ -1023,7 +1023,7 @@ int SearchLOT(LOT_INFO* LOT, int depth)
 
 
 #if CREATURE_AI_PRIORITY_OPTIMIZATION
-CREATURE_AI_PRIORITY GetCreatureLOTPriority(ITEM_INFO* item)
+CreatureAIPriority GetCreatureLOTPriority(ITEM_INFO* item)
 {
 	Vector3 itemPos = Vector3(item->Position.xPos, item->Position.yPos, item->Position.zPos);
 	Vector3 cameraPos = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1031,15 +1031,18 @@ CREATURE_AI_PRIORITY GetCreatureLOTPriority(ITEM_INFO* item)
 
 	distance /= SECTOR(1);
 	if (distance <= HIGH_PRIO_RANGE)
-		return CREATURE_AI_PRIORITY::HIGH;
-	if (distance <= MEDIUM_PRIO_RANGE)
-		return CREATURE_AI_PRIORITY::MEDIUM;
-	if (distance <= LOW_PRIO_RANGE)
-		return CREATURE_AI_PRIORITY::LOW;
+		return CreatureAIPriority::High;
 
-	return CREATURE_AI_PRIORITY::NONE;
+	if (distance <= MEDIUM_PRIO_RANGE)
+		return CreatureAIPriority::Medium;
+
+	if (distance <= LOW_PRIO_RANGE)
+		return CreatureAIPriority::Low;
+
+	return CreatureAIPriority::None;
 }
 #endif
+
 int CreatureActive(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -1490,7 +1493,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 	{
 		switch (creature->mood)
 		{
-		case BORED_MOOD:
+		case MoodType::Bored:
 			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 			if (ValidBox(item, AI->zoneNumber, boxNumber) &&
 				!(GetRandomControl() & 0x0F))
@@ -1498,7 +1501,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 				if (StalkBox(item, enemy, boxNumber) && enemy->HitPoints > 0 && creature->enemy)
 				{
 					TargetBox(LOT, boxNumber);
-					creature->mood = BORED_MOOD;
+					creature->mood = MoodType::Bored;
 				}
 				else if (LOT->requiredBox == NO_BOX)
 					TargetBox(LOT, boxNumber);
@@ -1506,7 +1509,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 
 			break;
 
-		case ATTACK_MOOD:
+		case MoodType::Attack:
 			LOT->target.x = enemy->Position.xPos;
 			LOT->target.y = enemy->Position.yPos;
 			LOT->target.z = enemy->Position.zPos;
@@ -1520,7 +1523,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 
 			break;
 
-		case ESCAPE_MOOD:
+		case MoodType::Escape:
 			boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
 			if (ValidBox(item, AI->zoneNumber, boxNumber) && LOT->requiredBox == NO_BOX)
 			{
@@ -1529,13 +1532,13 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 				else if (AI->zoneNumber == AI->enemyZone && StalkBox(item, enemy, boxNumber) && !violent)
 				{
 					TargetBox(LOT, boxNumber);
-					creature->mood = STALK_MOOD;
+					creature->mood = MoodType::Stalk;
 				}
 			}
 
 			break;
 
-		case STALK_MOOD:
+		case MoodType::Stalk:
 			if (LOT->requiredBox == NO_BOX || !StalkBox(item, enemy, LOT->requiredBox))
 			{
 				boxNumber = LOT->node[GetRandomControl() * LOT->zoneCount >> 15].boxNumber;
@@ -1547,7 +1550,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 					{
 						TargetBox(LOT, boxNumber);
 						if (AI->zoneNumber != AI->enemyZone)
-							creature->mood = BORED_MOOD;
+							creature->mood = MoodType::Bored;
 					}
 				}
 			}
@@ -1564,17 +1567,17 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 
 	switch(creature->priority)
 	{
-		case CREATURE_AI_PRIORITY::HIGH:
+		case CreatureAIPriority::High:
 			shouldUpdateTarget = true;
 			break;
 
-		case CREATURE_AI_PRIORITY::MEDIUM:
+		case CreatureAIPriority::Medium:
 			if (creature->framesSinceLOTUpdate > std::pow(FRAME_PRIO_BASE, FRAME_PRIO_EXP))
 				shouldUpdateTarget = true;
 
 			break;
 
-		case CREATURE_AI_PRIORITY::LOW:
+		case CreatureAIPriority::Low:
 			if (creature->framesSinceLOTUpdate > std::pow(FRAME_PRIO_BASE, FRAME_PRIO_EXP * 2))
 				shouldUpdateTarget = true;
 
@@ -1640,13 +1643,13 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
 	if (item->BoxNumber == NO_BOX || creature->LOT.node[item->BoxNumber].searchNumber == (creature->LOT.searchNumber | BLOCKED_SEARCH))
 		creature->LOT.requiredBox = NO_BOX;
 
-	if (creature->mood != ATTACK_MOOD &&
+	if (creature->mood != MoodType::Attack &&
 		creature->LOT.requiredBox != NO_BOX)
 	{
 		if (!ValidBox(item, AI->zoneNumber, creature->LOT.targetBox))
 		{
 			if (AI->zoneNumber == AI->enemyZone)
-				creature->mood = BORED_MOOD;
+				creature->mood = MoodType::Bored;
 
 			creature->LOT.requiredBox = NO_BOX;
 		}
@@ -1655,33 +1658,33 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
 	auto mood = creature->mood;
 	if (!enemy)
 	{
-		creature->mood = BORED_MOOD;
+		creature->mood = MoodType::Bored;
 		enemy = LaraItem;
 	}
 	else if (enemy->HitPoints <= 0 && enemy == LaraItem)
-		creature->mood = BORED_MOOD;
+		creature->mood = MoodType::Bored;
 	else if (isViolent)
 	{
 		switch (creature->mood)
 		{
-			case BORED_MOOD:
-			case STALK_MOOD:
+			case MoodType::Bored:
+			case MoodType::Stalk:
 				if (AI->zoneNumber == AI->enemyZone)
-					creature->mood = ATTACK_MOOD;
+					creature->mood = MoodType::Attack;
 				else if (item->HitStatus)
-					creature->mood = ESCAPE_MOOD;
+					creature->mood = MoodType::Escape;
 
 				break;
 
-			case ATTACK_MOOD:
+			case MoodType::Attack:
 				if (AI->zoneNumber != AI->enemyZone)
-					creature->mood = BORED_MOOD;
+					creature->mood = MoodType::Bored;
 
 				break;
 
-			case ESCAPE_MOOD:
+			case MoodType::Escape:
 				if (AI->zoneNumber == AI->enemyZone)
-					creature->mood = ATTACK_MOOD;
+					creature->mood = MoodType::Attack;
 
 				break;
 		}
@@ -1690,42 +1693,42 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
 	{
 		switch (creature->mood)
 		{
-			case BORED_MOOD:
-			case STALK_MOOD:
+			case MoodType::Bored:
+			case MoodType::Stalk:
 				if (creature->alerted &&
 					AI->zoneNumber != AI->enemyZone)
 				{
 					if (AI->distance > SECTOR(3))
-						creature->mood = STALK_MOOD;
+						creature->mood = MoodType::Stalk;
 					else
-						creature->mood = BORED_MOOD;
+						creature->mood = MoodType::Bored;
 				}
 				else if (AI->zoneNumber == AI->enemyZone)
 				{
 					if (AI->distance < ATTACK_RANGE ||
-						(creature->mood == STALK_MOOD &&
+						(creature->mood == MoodType::Stalk &&
 							LOT->requiredBox == NO_BOX))
-						creature->mood = ATTACK_MOOD;
+						creature->mood = MoodType::Attack;
 					else
-						creature->mood = STALK_MOOD;
+						creature->mood = MoodType::Stalk;
 				}
 
 				break;
 
-			case ATTACK_MOOD:
+			case MoodType::Attack:
 				if (item->HitStatus &&
 					(GetRandomControl() < ESCAPE_CHANCE ||
 						AI->zoneNumber != AI->enemyZone))
-					creature->mood = STALK_MOOD;
+					creature->mood = MoodType::Stalk;
 				else if (AI->zoneNumber != AI->enemyZone && AI->distance > SECTOR(6))
-					creature->mood = BORED_MOOD;
+					creature->mood = MoodType::Bored;
 
 				break;
 
-			case ESCAPE_MOOD:
+			case MoodType::Escape:
 				if (AI->zoneNumber == AI->enemyZone &&
 					GetRandomControl() < RECOVER_CHANCE)
-					creature->mood = STALK_MOOD;
+					creature->mood = MoodType::Stalk;
 
 				break;
 		}
@@ -1733,7 +1736,7 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
 
 	if (mood != creature->mood)
 	{
-		if (mood == ATTACK_MOOD)
+		if (mood == MoodType::Attack)
 			TargetBox(LOT, LOT->targetBox);
 
 		LOT->requiredBox = NO_BOX;

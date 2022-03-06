@@ -110,7 +110,7 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood == ESCAPE_MOOD)
+			if (flame->mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -121,7 +121,7 @@ void WorkerFlamethrower(short itemNum)
 				else
 					item->TargetState = 2;
 			}
-			else if (flame->mood == ATTACK_MOOD || !info.ahead)
+			else if (flame->mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance <= SQUARE(WALL_SIZE * 2))
 					item->TargetState = 2;
@@ -143,7 +143,7 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood == ESCAPE_MOOD)
+			if (flame->mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -154,7 +154,7 @@ void WorkerFlamethrower(short itemNum)
 				else
 					item->TargetState = 6;
 			}
-			else if (flame->mood == ATTACK_MOOD || !info.ahead)
+			else if (flame->mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance > SQUARE(WALL_SIZE * 2))
 					item->TargetState = 3;
@@ -174,13 +174,13 @@ void WorkerFlamethrower(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (flame->mood != ESCAPE_MOOD)
+			if (flame->mood != MoodType::Escape)
 			{
 				if (Targetable(item, &info))
 				{
 					item->TargetState = 2;
 				}
-				else if (flame->mood == BORED_MOOD || flame->mood == STALK_MOOD)
+				else if (flame->mood == MoodType::Bored || flame->mood == MoodType::Stalk)
 				{
 					item->TargetState = 2;
 				}
@@ -200,7 +200,7 @@ void WorkerFlamethrower(short itemNum)
 			}
 			else
 			{
-				if (flame->mood == ATTACK_MOOD)
+				if (flame->mood == MoodType::Attack)
 				{
 					item->TargetState = 1;
 				}
@@ -219,7 +219,7 @@ void WorkerFlamethrower(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (item->TargetState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
+			if (item->TargetState != 1 && (flame->mood == MoodType::Escape || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
 			{
 				item->TargetState = 1;
 			}
