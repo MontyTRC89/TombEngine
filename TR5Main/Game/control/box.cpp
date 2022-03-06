@@ -1229,7 +1229,7 @@ void GetAITarget(CreatureInfo* creature)
 			{
 				item->AIBits |= MODIFY;
 				// NOTE: added in TR5
-				//item->itemFlags[3] = (item->TOSSPAD & 0xFF);
+				//item->itemFlags[3] = (creature->Tosspad & 0xFF);
 			}
 		}
 		else if (!creature->Patrol)

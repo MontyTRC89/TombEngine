@@ -83,7 +83,7 @@ struct CreatureInfo
 	bool HeadLeft;
 	bool HeadRight;
 
-	bool Patrol;			// Unused? savegame
+	bool Patrol;	// Unused? savegame
 	bool Alerted;
 	bool ReachedGoal;
 	bool JumpAhead;
@@ -92,10 +92,10 @@ struct CreatureInfo
 	bool Poisoned;//savegame
 	bool HurtByLara;
 
+	uint32_t TouchBits;//savegame
+	short Tosspad;//savegame
 	short LocationAI;//savegame
 	short FiredWeapon;//savegame
-	//short CarriedItem;	// In ITEM_INFO.
-	//short AfterDeath;		// In ITEM_INFO.
 
 	MoodType Mood;
 	ITEM_INFO* Enemy;

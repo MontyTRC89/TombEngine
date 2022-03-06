@@ -343,7 +343,6 @@ void InitialiseItem(short itemNumber)
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
-	item->AIBits = 0;
 
 	item->Timer = 0;
 
