@@ -414,7 +414,9 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_can_jump(creature->LOT.CanJump);
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
 			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
+			creatureBuilder.add_fired_weapon(creature->FiredWeapon);
 			creatureBuilder.add_flags(creature->Flags);
+			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
 			creatureBuilder.add_head_right(creature->HeadRight);
 			creatureBuilder.add_hurt_by_lara(creature->HurtByLara);
@@ -423,16 +425,14 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_is_monkeying(creature->LOT.IsMonkeying);
 			creatureBuilder.add_joint_rotation(jointRotationsOffset);
 			creatureBuilder.add_jump_ahead(creature->JumpAhead);
+			creatureBuilder.add_location_ai(creature->LocationAI);
 			creatureBuilder.add_maximum_turn(creature->MaxTurn);
-			creatureBuilder.add_monkey_ahead(creature->MonkeySwingAhead);
+			creatureBuilder.add_monkey_swing_ahead(creature->MonkeySwingAhead);
 			creatureBuilder.add_mood((int)creature->Mood);
-			creatureBuilder.add_patrol2(creature->Patrol);
+			creatureBuilder.add_patrol(creature->Patrol);
+			creatureBuilder.add_poisoned(creature->Poisoned);
 			creatureBuilder.add_reached_goal(creature->ReachedGoal);
-
-			// TODO
-			//creatureBuilder.add_fired_weapon(creature->FiredWeapon);
-			//creatureBuilder.add_poisoned(creature->Poisoned);
-
+			creatureBuilder.add_tosspad(creature->Tosspad);
 			creatureOffset = creatureBuilder.Finish();
 		} 
 
@@ -1018,10 +1018,13 @@ bool SaveGame::Load(int slot)
 			creature->LOT.CanMonkey = savedCreature->can_monkey();
 			if (savedCreature->enemy() >= 0)
 				creature->Enemy = &g_Level.Items[savedCreature->enemy()];
+			creature->FiredWeapon = savedCreature->fired_weapon();
 			creature->Flags = savedCreature->flags();
+			creature->Friendly = savedCreature->friendly();
 			creature->HeadLeft = savedCreature->head_left();
 			creature->HeadRight = savedCreature->head_right();
 			creature->HurtByLara = savedCreature->hurt_by_lara();
+			creature->LocationAI = savedCreature->location_ai();
 			creature->LOT.IsAmphibious = savedCreature->is_amphibious();
 			creature->LOT.IsJumping = savedCreature->is_jumping();
 			creature->LOT.IsMonkeying = savedCreature->is_monkeying();
@@ -1029,14 +1032,12 @@ bool SaveGame::Load(int slot)
 				creature->JointRotation[j] = savedCreature->joint_rotation()->Get(j);
 			creature->JumpAhead = savedCreature->jump_ahead();
 			creature->MaxTurn = savedCreature->maximum_turn();
-			creature->MonkeySwingAhead = savedCreature->monkey_ahead();
+			creature->MonkeySwingAhead = savedCreature->monkey_swing_ahead();
 			creature->Mood = (MoodType)savedCreature->mood();
-			creature->Patrol = savedCreature->patrol2();
+			creature->Patrol = savedCreature->patrol();
+			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
-
-			// TODO
-			//creature->FiredWeapon = savedCreature->fired_weapon();
-			//creature->Poisoned = savedCreature->poisoned();
+			creature->Tosspad = savedCreature->tosspad();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{

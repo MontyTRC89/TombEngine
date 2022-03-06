@@ -83,19 +83,18 @@ struct CreatureInfo
 	bool HeadLeft;
 	bool HeadRight;
 
-	bool Patrol;	// Unused? savegame
+	bool Patrol;			// Unused?
 	bool Alerted;
 	bool ReachedGoal;
 	bool JumpAhead;
 	bool MonkeySwingAhead;
-	bool Friendly;//savegame
-	bool Poisoned;//savegame
+	bool Friendly;
+	bool Poisoned;
 	bool HurtByLara;
 
-	uint32_t TouchBits;//savegame
-	short Tosspad;//savegame
-	short LocationAI;//savegame
-	short FiredWeapon;//savegame
+	short Tosspad;
+	short LocationAI;
+	short FiredWeapon;
 
 	MoodType Mood;
 	ITEM_INFO* Enemy;
