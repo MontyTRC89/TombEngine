@@ -220,7 +220,7 @@ void BaboonControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* baboon = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short headY = 0;
 	short tilt = 0;
@@ -243,7 +243,7 @@ void BaboonControl(short itemNumber)
 	}
 	else
 	{
-		GetAITarget(baboon);
+		GetAITarget(creature);
 
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
@@ -257,31 +257,31 @@ void BaboonControl(short itemNumber)
 			laraAI.angle = phd_atan(dx, dz) - item->Position.yRot;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
-			if (baboon->Enemy == nullptr || baboon->Enemy == LaraItem)
-				baboon->Enemy = nullptr;
+			if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
+				creature->Enemy = nullptr;
 		}
 		else
 		{
 			laraAI.angle = AI.angle;
 			laraAI.distance = AI.distance;
-			baboon->Enemy = LaraItem;
+			creature->Enemy = LaraItem;
 		}
 
 		GetCreatureMood(item, &AI, TRUE);
 		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, baboon->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (baboon->Enemy != nullptr && baboon->Enemy != LaraItem && baboon->Enemy->ObjectNumber == ID_AI_FOLLOW)
+		if (creature->Enemy != nullptr && creature->Enemy != LaraItem && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
 		{
-			if (baboon->ReachedGoal &&
-				abs(item->Position.xPos - baboon->Enemy->Position.xPos) < CLICK(1) &&
-				abs(item->Position.yPos - baboon->Enemy->Position.yPos) < CLICK(1) &&
-				abs(item->Position.zPos - baboon->Enemy->Position.zPos) < CLICK(1))
+			if (creature->ReachedGoal &&
+				abs(item->Position.xPos - creature->Enemy->Position.xPos) < CLICK(1) &&
+				abs(item->Position.yPos - creature->Enemy->Position.yPos) < CLICK(1) &&
+				abs(item->Position.zPos - creature->Enemy->Position.zPos) < CLICK(1))
 			{
-				item->Position.xPos = baboon->Enemy->Position.xPos;
-				item->Position.yPos = baboon->Enemy->Position.yPos;
-				item->Position.zPos = baboon->Enemy->Position.zPos;
-				item->Position.yRot = baboon->Enemy->Position.yRot;
+				item->Position.xPos = creature->Enemy->Position.xPos;
+				item->Position.yPos = creature->Enemy->Position.yPos;
+				item->Position.zPos = creature->Enemy->Position.zPos;
+				item->Position.yRot = creature->Enemy->Position.yRot;
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->TargetState = BABOON_ACTIVATE_SWITCH;
@@ -290,19 +290,19 @@ void BaboonControl(short itemNumber)
 
 				TestTriggers(item, true);
 
-				baboon->Enemy = nullptr;
+				creature->Enemy = nullptr;
 			}
 		}
 
 		switch (item->ActiveState)
 		{
 		case BABOON_IDLE:
-			baboon->MaxTurn = 0;
-			baboon->Flags = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
 			if (item->AIBits & GUARD)
 			{
-				AIGuard(baboon);
+				AIGuard(creature);
 				if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 1)
@@ -313,14 +313,14 @@ void BaboonControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (AI.ahead && Lara.target != item)
 					item->TargetState = BABOON_IDLE;
 				else
 					item->TargetState = BABOON_RUN;
 			}
-			else if (baboon->Mood == MoodType::Attack)
+			else if (creature->Mood == MoodType::Attack)
 			{
 				if (!(item->AIBits & FOLLOW) || (!item->Airborne && AI.distance <= BABOON_RUNROLL_RANGE))
 				{
@@ -355,12 +355,12 @@ void BaboonControl(short itemNumber)
 			break;
 
 		case BABOON_SIT_IDLE:
-			baboon->MaxTurn = 0;
-			baboon->Flags = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
 			if (item->AIBits & GUARD)
 			{
-				AIGuard(baboon);
+				AIGuard(creature);
 				if (GetRandomControl() & 0xF)
 					item->TargetState = BABOON_SIT_EAT;
 				else if (GetRandomControl() & 0xA)
@@ -368,9 +368,9 @@ void BaboonControl(short itemNumber)
 			}
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->Mood != MoodType::Escape)
+			else if (creature->Mood != MoodType::Escape)
 			{
-				if (baboon->Mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Bored)
 				{
 					if (item->RequiredState)
 						item->TargetState = item->RequiredState;
@@ -405,20 +405,20 @@ void BaboonControl(short itemNumber)
 			break;
 
 		case BABOON_WALK:
-			baboon->MaxTurn = BABOON_WALK_ANGLE;
+			creature->MaxTurn = BABOON_WALK_ANGLE;
 
 			if (item->AIBits & PATROL1)
 				item->TargetState = BABOON_WALK;
-			else if (baboon->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (item->AIBits & FOLLOW)
 					item->TargetState = BABOON_WALK;
 				else if (GetRandomControl() < 256)
 					item->TargetState = BABOON_SIT_IDLE;
 			}
-			else if (baboon->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = BABOON_RUN;
-			else if (baboon->Mood == MoodType::Attack)
+			else if (creature->Mood == MoodType::Attack)
 			{
 				if (AI.bite && AI.distance < BABOON_ATK_RANGE)
 					item->TargetState = BABOON_IDLE;
@@ -429,19 +429,19 @@ void BaboonControl(short itemNumber)
 			break;
 
 		case BABOON_RUN:
-			baboon->MaxTurn = BABOON_RUN_ANGLE;
+			creature->MaxTurn = BABOON_RUN_ANGLE;
 			tilt = angle / 2;
 
 			if (item->AIBits & GUARD)
 				item->TargetState = BABOON_IDLE;
-			else if (baboon->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 			{
 				if (AI.ahead && Lara.target != item)
 					item->TargetState = BABOON_IDLE;
 			}
 			else if (item->AIBits & FOLLOW && (item->Airborne || AI.distance > BABOON_FOLLOW_RANGE))
 				item->TargetState = BABOON_IDLE;
-			else if (baboon->Mood == MoodType::Attack)
+			else if (creature->Mood == MoodType::Attack)
 			{
 				if (AI.distance < BABOON_ATK_RANGE)
 					item->TargetState = BABOON_IDLE;
@@ -454,12 +454,12 @@ void BaboonControl(short itemNumber)
 			break;
 
 		case BABOON_PICKUP:
-			baboon->MaxTurn = 0;
+			creature->MaxTurn = 0;
 			// NOTE: baboon not use it ! (only TR3 one)
 			break;
 
 		case BABOON_ACTIVATE_SWITCH:
-			baboon->MaxTurn = 0;
+			creature->MaxTurn = 0;
 			item->HitPoints = NOT_TARGETABLE;
 
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 212)
@@ -505,7 +505,7 @@ void BaboonControl(short itemNumber)
 		case BABOON_ATK1:
 		case BABOON_JUMPATK:
 		case BABOON_SUPERJUMPATK:
-			baboon->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.ahead)
 				headY = AI.angle;
@@ -520,13 +520,13 @@ void BaboonControl(short itemNumber)
 			else
 				item->Position.yRot += AI.angle;
 
-			if (baboon->Flags == 0 &&
+			if (creature->Flags == 0 &&
 				(item->TouchBits & BABOON_TOUCHBITS ||
 					item->TouchBits & BABOON_RIGHT_TOUCHBITS ||
 					item->TouchBits & BABOON_JUMP_TOUCHBITS))
 			{
 				CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
-				baboon->Flags = 1;
+				creature->Flags = 1;
 
 				LaraItem->HitPoints -= BABOON_DAMAGE;
 				LaraItem->HitStatus = true;

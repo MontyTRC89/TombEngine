@@ -69,17 +69,17 @@ namespace TEN::Entities::TR4
 		short angle;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		angle = 0;
 
 		if (item->HitPoints > 0)
 		{
 			if (item->AIBits)
-				GetAITarget(info);
+				GetAITarget(creature);
 			else
 			{
-				info->Enemy = LaraItem;
+				creature->Enemy = LaraItem;
 
 				// NOTE: it seems weird, bat could target any enemy including dogs for example
 
@@ -120,8 +120,8 @@ namespace TEN::Entities::TR4
 
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
-			if (info->Flags)
-				info->Mood = MoodType::Escape;
+			if (creature->Flags)
+				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
@@ -132,22 +132,22 @@ namespace TEN::Entities::TR4
 			case BAT_STATE_IDLE:
 				if (aiInfo.distance < BAT_TARGETING_RANGE
 					|| item->HitStatus
-					|| info->HurtByLara)
+					|| creature->HurtByLara)
 					item->TargetState = BAT_STATE_START;
 
 				break;
 
 			case BAT_STATE_FLY:
 				if (aiInfo.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
-					info->Flags = 0;
+					creature->Flags = 0;
 
-				if (!info->Flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits
-						|| info->Enemy != LaraItem
+						|| creature->Enemy != LaraItem
 						&& aiInfo.distance < BAT_ATTACK_RANGE
 						&& aiInfo.ahead
-						&& abs(item->Position.yPos - info->Enemy->Position.yPos) < BAT_TARGET_YPOS)
+						&& abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 					{
 						item->TargetState = BAT_STATE_ATTACK;
 					}
@@ -156,25 +156,25 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_ATTACK:
-				if (!info->Flags
+				if (!creature->Flags
 					&& (item->TouchBits
-						|| info->Enemy != LaraItem)
+						|| creature->Enemy != LaraItem)
 					&& aiInfo.distance < BAT_ATTACK_RANGE
 					&& aiInfo.ahead &&
-					abs(item->Position.yPos - info->Enemy->Position.yPos) < BAT_TARGET_YPOS)
+					abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
-					if (info->Enemy == LaraItem)
+					if (creature->Enemy == LaraItem)
 					{
 						LaraItem->HitPoints -= BAT_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
-					info->Flags = 1;
+					creature->Flags = 1;
 				}
 				else
 				{
 					item->TargetState = BAT_STATE_FLY;
-					info->Mood = MoodType::Bored;
+					creature->Mood = MoodType::Bored;
 				}
 
 				break;

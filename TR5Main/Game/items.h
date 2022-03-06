@@ -71,13 +71,11 @@ struct ITEM_INFO
 	short Timer;
 	short Shade;
 
-	uint32_t TouchBits;
 	uint32_t MeshBits;
 
 	short ItemFlags[8];
 	short TriggerFlags;
 	uint16_t Flags; // ItemFlags enum
-	uint8_t AIBits; // AIObjectType enum
 	uint32_t SwapMeshFlags;
 
 	short Status; // ItemStatus enum
@@ -86,11 +84,13 @@ struct ITEM_INFO
 	bool LookedAt;
 	bool InDrawRoom;
 
-	short DrawRoom;
-	short Tosspad;
+	short DrawRoom;	// Unused?
 
-	short AfterDeath;		// TODO: Move to CreatureInfo
-	short CarriedItem;		// TODO: Move to CreatureInfo
+	// TODO: Move to CreatureInfo?
+	uint32_t TouchBits;
+	uint8_t AIBits; // AIObjectType enum.
+	short AfterDeath;
+	short CarriedItem;
 };
 
 // used by fx->shade !

@@ -1,11 +1,12 @@
 #pragma once
-
 #include "GameScriptNamedBase.h"
 
-namespace sol {
+namespace sol
+{
 	class state;
 	template <typename T> struct as_table_t;
 }
+
 class GameScriptPosition;
 class GameScriptRotation;
 struct ITEM_INFO;

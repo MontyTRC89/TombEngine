@@ -31,7 +31,7 @@ void WildBoarControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 	short head = 0;
@@ -49,10 +49,10 @@ void WildBoarControl(short itemNumber)
 		int laraDistance = dx * dx + dz * dz;
 
 		if (item->AIBits & GUARD)
-			GetAITarget(info);
+			GetAITarget(creature);
 		else
 		{
-			info->Enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 			int minDistance = 0x7FFFFFFF;
 
@@ -73,41 +73,41 @@ void WildBoarControl(short itemNumber)
 					if (distance < minDistance &&
 						distance < laraDistance)
 					{
-						info->Enemy = target;
+						creature->Enemy = target;
 						minDistance = distance;
 					}
 				}
 			}
 		}
 
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
 
 		if (item->Flags)
-			info->Mood = MoodType::Escape;
+			creature->Mood = MoodType::Escape;
 
-		CreatureMood(item, &aiInfo, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (aiInfo.ahead)
+		if (AI.ahead)
 		{
-			joint1 = aiInfo.angle / 2;
-			joint3 = aiInfo.angle / 2;
+			joint1 = AI.angle / 2;
+			joint3 = AI.angle / 2;
 		}
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (aiInfo.ahead && aiInfo.distance || item->Flags)
+			if (AI.ahead && AI.distance || item->Flags)
 				item->TargetState = 2;
 			else if (GetRandomControl() & 0x7F)
 			{
-				joint1 = AIGuard(info) / 2;
+				joint1 = AIGuard(creature) / 2;
 				joint3 = joint1;
 			}
 			else
@@ -116,9 +116,9 @@ void WildBoarControl(short itemNumber)
 			break;
 
 		case 3:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (aiInfo.ahead && aiInfo.distance)
+			if (AI.ahead && AI.distance)
 				item->TargetState = 1;
 			else if (!(GetRandomControl() & 0x7F))
 				item->TargetState = 1;
@@ -126,26 +126,26 @@ void WildBoarControl(short itemNumber)
 			break;
 
 		case 2:
-			if (aiInfo.distance >= 0x400000)
+			if (AI.distance >= 0x400000)
 			{
-				info->MaxTurn = 1092;
+				creature->MaxTurn = 1092;
 				item->Flags = 0;
 			}
 			else
 			{
-				info->MaxTurn = 546;
-				joint0 = -aiInfo.distance;
-				joint2 = -aiInfo.distance;
+				creature->MaxTurn = 546;
+				joint0 = -AI.distance;
+				joint2 = -AI.distance;
 			}
 
-			if (!item->Flags && (aiInfo.distance < 0x10000 && aiInfo.bite))
+			if (!item->Flags && (AI.distance < 0x10000 && AI.bite))
 			{
 				item->TargetState = 4;
 
-				if (info->Enemy == LaraItem)
+				if (creature->Enemy == LaraItem)
 				{
-					info->Enemy->HitPoints -= 30;
-					info->Enemy->HitStatus = true;
+					creature->Enemy->HitPoints -= 30;
+					creature->Enemy->HitStatus = true;
 				}
 
 				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Position.yRot, DoBloodSplat);
@@ -155,7 +155,7 @@ void WildBoarControl(short itemNumber)
 			break;
 
 		case 4:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 			break;
 		}
 	}

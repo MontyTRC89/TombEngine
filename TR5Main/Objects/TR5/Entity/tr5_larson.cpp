@@ -371,9 +371,9 @@ void LarsonControl(short itemNumber)
 			short floorHeight = item->ItemFlags[2] & 0xFF00;
 			ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 			
-			int x = r->x + (item->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
+			int x = r->x + (creature->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
 			int y = r->minfloor + floorHeight;
-			int z = r->z + (item->Tosspad & 0xFF) * SECTOR(1) + 512;
+			int z = r->z + (creature->Tosspad & 0xFF) * SECTOR(1) + 512;
 
 			TestTriggers(x, y, z, roomNumber, true);
 

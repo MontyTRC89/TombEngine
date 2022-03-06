@@ -351,7 +351,7 @@ void SubmarineControl(short itemNumber)
 		if (creature->Enemy)
 		{
 			if (creature->Flags & 2)
-				item->ItemFlags[3] = LOBYTE(item->Tosspad) - 1;
+				item->ItemFlags[3] = LOBYTE(creature->Tosspad) - 1;
 
 			item->ItemFlags[3]++;
 			creature->ReachedGoal = false;
