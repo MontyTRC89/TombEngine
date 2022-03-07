@@ -11,7 +11,6 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-
 BITE_INFO HydraBite = { 0, 0, 0, 11 };
 
 // TODO

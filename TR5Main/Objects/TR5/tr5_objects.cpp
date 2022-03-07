@@ -287,6 +287,7 @@ static void StartBaddy(OBJECT_INFO *obj)
 			animIndex = Objects[ID_GUARD1].animIndex;
 		else
 			animIndex = Objects[ID_SWAT].animIndex;
+
 		obj->animIndex = animIndex;
 		obj->biteOffset = 4;
 		obj->initialise = InitialiseGuard;
@@ -518,9 +519,9 @@ static void StartBaddy(OBJECT_INFO *obj)
 	if (obj->loaded)
 	{
 		obj->biteOffset = 5;
-		obj->initialise = InitialiseHitman;
+		obj->initialise = InitialiseCyborg;
 		obj->collision = CreatureCollision;
-		obj->control = HitmanControl;
+		obj->control = CyborgControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_RICOCHET;

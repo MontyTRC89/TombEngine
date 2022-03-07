@@ -39,12 +39,12 @@ void KillItem(short itemNumber)
 			NextItemActive = item->NextActive;
 		else
 		{
-			short linknum;
-			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextActive)
+			short linkNumber;
+			for (linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
-				if (g_Level.Items[linknum].NextActive == itemNumber)
+				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
-					g_Level.Items[linknum].NextActive = item->NextActive;
+					g_Level.Items[linkNumber].NextActive = item->NextActive;
 					break;
 				}
 			}
@@ -56,12 +56,12 @@ void KillItem(short itemNumber)
 				g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 			else
 			{
-				short linknum;
-				for (linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
+				short linkNumber;
+				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 				{
-					if (g_Level.Items[linknum].NextItem == itemNumber)
+					if (g_Level.Items[linkNumber].NextItem == itemNumber)
 					{
-						g_Level.Items[linknum].NextItem = item->NextItem;
+						g_Level.Items[linkNumber].NextItem = item->NextItem;
 						break;
 					}
 				}
@@ -87,20 +87,20 @@ void KillItem(short itemNumber)
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	short currentItemNum = room->itemNumber;
 
-	while (currentItemNum != NO_ITEM)
+	short currentItemNumber = room->itemNumber;
+	while (currentItemNumber != NO_ITEM)
 	{
-		auto* item = &g_Level.Items[currentItemNum];
+		auto* item = &g_Level.Items[currentItemNumber];
 
 		if (item->ObjectNumber == objectNumber)
 		{
-			RemoveActiveItem(currentItemNum);
+			RemoveActiveItem(currentItemNumber);
 			item->Status = ITEM_NOT_ACTIVE;
 			item->Flags &= 0xC1;
 		}
 
-		currentItemNum = item->NextItem;
+		currentItemNumber = item->NextItem;
 	}
 }
 
@@ -144,11 +144,11 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 				room->itemNumber = item->NextItem;
 			else
 			{
-				for (short linknum = room->itemNumber; linknum != -1; linknum = g_Level.Items[linknum].NextItem)
+				for (short linkNumber = room->itemNumber; linkNumber != -1; linkNumber = g_Level.Items[linkNumber].NextItem)
 				{
-					if (g_Level.Items[linknum].NextItem == itemNumber)
+					if (g_Level.Items[linkNumber].NextItem == itemNumber)
 					{
-						g_Level.Items[linknum].NextItem = item->NextItem;
+						g_Level.Items[linkNumber].NextItem = item->NextItem;
 						break;
 					}
 				}
@@ -247,6 +247,7 @@ short CreateNewEffect(short roomNum)
 	{
 		auto* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
+
 		auto* room = &g_Level.Rooms[roomNum];
 		fx->roomNumber = roomNum;
 		fx->nextFx = room->fxNumber;
@@ -259,15 +260,14 @@ short CreateNewEffect(short roomNum)
 	return fxNumber;
 }
 
-void InitialiseFXArray(int allocmem)
+void InitialiseFXArray(int allocateMemory)
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
 
-	FX_INFO* fx;
 	for (int i = 0; i < NUM_EFFECTS; i++)
 	{
-		fx = &EffectList[i];
+		auto* fx = &EffectList[i];
 		fx->nextFx = i + 1;
 	}
 
@@ -282,11 +282,11 @@ void RemoveDrawnItem(short itemNumber)
 		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 	else
 	{
-		for (short linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
+		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
-			if (g_Level.Items[linknum].NextItem == itemNumber)
+			if (g_Level.Items[linkNumber].NextItem == itemNumber)
 			{
-				g_Level.Items[linknum].NextItem = item->NextItem;
+				g_Level.Items[linkNumber].NextItem = item->NextItem;
 				break;
 			}
 		}
@@ -303,11 +303,11 @@ void RemoveActiveItem(short itemNumber)
 			NextItemActive = g_Level.Items[itemNumber].NextActive;
 		else
 		{
-			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextActive)
+			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
-				if (g_Level.Items[linknum].NextActive == itemNumber)
+				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
-					g_Level.Items[linknum].NextActive = g_Level.Items[itemNumber].NextActive;
+					g_Level.Items[linkNumber].NextActive = g_Level.Items[itemNumber].NextActive;
 					break;
 				}
 			}
@@ -414,16 +414,16 @@ short CreateItem()
 	return itemNumber;
 }
 
-void InitialiseItemArray(int numberOfItems)
+void InitialiseItemArray(int totalItem)
 {
 	auto* item = &g_Level.Items[g_Level.NumItems];
 
 	NextItemActive = NO_ITEM;
 	NextItemFree = g_Level.NumItems;
 
-	if (g_Level.NumItems + 1 < numberOfItems)
+	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for (int i = g_Level.NumItems + 1; i < numberOfItems; i++, item++)
+		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
 			item->NextItem = i;
 			item->Active = false;
