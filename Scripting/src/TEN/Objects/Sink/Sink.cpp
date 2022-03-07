@@ -33,24 +33,37 @@ void Sink::Register(sol::table& parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// (@{Position}) position in level
-		// @mem pos
-		"pos", sol::property(&Sink::GetPos, &Sink::SetPos),
+		/// Get the sink's position
+		// @function GetPosition
+		// @treturn Position a copy of the sink's position
+		ScriptReserved_GetPosition, &Sink::GetPos,
 
-		/// (string) unique string identifier.
+		/// Set the sink's position
+		// @function SetPosition
+		// @tparam Position position the new position of the sink 
+		ScriptReserved_SetPosition, &Sink::SetPos,
+
+		/// Get the sink's unique string identifier
 		// e.g. "strong\_river\_current" or "propeller\_death\_sink"
-		// @mem name
-		"name", sol::property(&Sink::GetName, &Sink::SetName),
+		// @function GetName
+		// @treturn string the sink's name
+		ScriptReserved_GetName, &Sink::GetName,
 
-		/// (int) strength.
-		// Strength of the sink, with higher numbers providing stronger currents. Will be clamped to [1, 32].
-		// @mem strength
-		"strength", sol::property(&Sink::GetStrength, &Sink::SetStrength),
+		/// Set the sink's name (its unique string identifier)
+		// @function SetName
+		// @tparam string name The sink's new name
+		ScriptReserved_SetName, &Sink::SetName,
 
-		/// (int) box index.
-		// I don't know what this does and it's not actually in the engine yet
-		// @mem boxIndex
-		"boxIndex", sol::property(&Sink::GetBoxIndex, &Sink::SetBoxIndex)
+		/// Get the sink's strength
+		// @function GetStrength
+		// @treturn int the sink's current strength
+		ScriptReserved_GetStrength, &Sink::GetStrength,
+
+		/// Set the strength of the sink
+		// Higher numbers provide stronger currents. Will be clamped to [1, 32].
+		// @function SetStrength
+		// @tparam int strength The sink's new strength
+		ScriptReserved_SetStrength, &Sink::SetStrength
 		);
 }
 
@@ -99,17 +112,6 @@ int Sink::GetStrength() const
 void Sink::SetStrength(int str)
 {
 	m_sink.strength = std::clamp(str, 1, 32);
-}
-
-int Sink::GetBoxIndex() const
-{
-
-	return m_sink.boxIndex;
-}
-
-void Sink::SetBoxIndex(int b)
-{
-	m_sink.boxIndex = b;
 }
 
 #endif
