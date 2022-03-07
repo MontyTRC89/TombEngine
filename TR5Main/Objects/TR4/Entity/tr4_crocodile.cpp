@@ -336,7 +336,7 @@ void CrocodileControl(short itemNumber)
 	CreatureJoint(item, 3, boneRot.bone3);
 
 	if (item->ActiveState < CROC_STATE_UNDERWATER_SWIM)
-		CalcItemToFloorRotation(item, 2);
+		CalculateItemRotationToSurface(item, 2.0f);
 
 	CreatureAnimation(itemNumber, angle, 0);
 

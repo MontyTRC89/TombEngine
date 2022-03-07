@@ -137,7 +137,10 @@ void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
-void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
+
+short GetSurfaceBearingAngle(float xTilt, float zTilt);
+short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
 bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room);
 bool TestEnvironment(RoomEnvFlags envType, int roomNumber);
