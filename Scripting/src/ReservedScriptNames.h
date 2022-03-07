@@ -54,53 +54,56 @@ static constexpr char const ScriptReserved_GetHitStatus[]		= "GetHitStatus";
 static constexpr char const ScriptReserved_GetActive[]			= "GetActive";
 static constexpr char const ScriptReserved_GetRoom[]			= "GetRoom";
 static constexpr char const ScriptReserved_SetRoom[]			= "SetRoom";
+static constexpr char const ScriptReserved_GetStrength[]		= "GetStrength";
+static constexpr char const ScriptReserved_SetStrength[]		= "SetStrength";
+
 
 // Flow Functions
-static constexpr char const ScriptReserved_AddLevel[]			= "AddLevel";
-static constexpr char const ScriptReserved_SetIntroImagePath[]	= "SetIntroImagePath";
-static constexpr char const ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
-static constexpr char const ScriptReserved_SetFarView[]	= "SetFarView";
-static constexpr char const ScriptReserved_SetSettings[]	= "SetSettings";
-static constexpr char const ScriptReserved_SetAnimations[]	= "SetAnimations";
+static constexpr char const ScriptReserved_AddLevel[]				= "AddLevel";
+static constexpr char const ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
+static constexpr char const ScriptReserved_SetTitleScreenImagePath[]= "SetTitleScreenImagePath";
+static constexpr char const ScriptReserved_SetFarView[]				= "SetFarView";
+static constexpr char const ScriptReserved_SetSettings[]			= "SetSettings";
+static constexpr char const ScriptReserved_SetAnimations[]			= "SetAnimations";
 
 // Flow Functions
-static constexpr char const ScriptReserved_SetStrings[]	= "SetStrings";
+static constexpr char const ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char const ScriptReserved_SetLanguageNames[]	= "SetLanguageNames";
 
 // Flow Tables
 static constexpr char const ScriptReserved_WeatherType[]	= "WeatherType";
-static constexpr char const ScriptReserved_LaraType[]	= "LaraType";
-static constexpr char const ScriptReserved_InvItem[]	= "InvID";
+static constexpr char const ScriptReserved_LaraType[]		= "LaraType";
+static constexpr char const ScriptReserved_InvItem[]		= "InvID";
 static constexpr char const ScriptReserved_RotationAxis[]	= "RotationAxis";
-static constexpr char const ScriptReserved_ItemAction[]	= "ItemAction";
-static constexpr char const ScriptReserved_ErrorMode[]	= "ErrorMode";
+static constexpr char const ScriptReserved_ItemAction[]		= "ItemAction";
+static constexpr char const ScriptReserved_ErrorMode[]		= "ErrorMode";
 static constexpr char const ScriptReserved_InventoryItem[]	= "InventoryItem";
 
 // Functions
-static constexpr char const ScriptReserved_ShowString[]			= "ShowString";
-static constexpr char const ScriptReserved_HideString[]			= "HideString";
-static constexpr char const ScriptReserved_SetAmbientTrack[] = "SetAmbientTrack";
-static constexpr char const ScriptReserved_PlayAudioTrack[] = "PlayAudioTrack";
-static constexpr char const ScriptReserved_GiveInvItem[] = "GiveItem";
-static constexpr char const ScriptReserved_TakeInvItem[] = "TakeItem";
-static constexpr char const ScriptReserved_GetInvItemCount[] = "GetItemCount";
-static constexpr char const ScriptReserved_SetInvItemCount[] = "SetItemCount";
-static constexpr char const ScriptReserved_GetMoveableByName[] = "GetMoveableByName";
-static constexpr char const ScriptReserved_GetStaticByName[] = "GetStaticByName";
-static constexpr char const ScriptReserved_GetCameraByName[] = "GetCameraByName";
-static constexpr char const ScriptReserved_GetSinkByName[] = "GetSinkByName";
-static constexpr char const ScriptReserved_GetAIObjectByName[] = "GetAIObjectByName";
-static constexpr char const ScriptReserved_GetSoundSourceByName[] = "GetSoundSourceByName";
-static constexpr char const ScriptReserved_CalculateDistance[] = "CalculateDistance";
-static constexpr char const ScriptReserved_CalculateHorizontalDistance[] = "CalculateHorizontalDistance";
-static constexpr char const ScriptReserved_ScreenToPercent[] = "ScreenToPercent";
-static constexpr char const ScriptReserved_PercentToScreen[] = "PercentToScreen";
+static constexpr char const ScriptReserved_ShowString[]					= "ShowString";
+static constexpr char const ScriptReserved_HideString[]					= "HideString";
+static constexpr char const ScriptReserved_SetAmbientTrack[]			= "SetAmbientTrack";
+static constexpr char const ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
+static constexpr char const ScriptReserved_GiveInvItem[]				= "GiveItem";
+static constexpr char const ScriptReserved_TakeInvItem[]				= "TakeItem";
+static constexpr char const ScriptReserved_GetInvItemCount[]			= "GetItemCount";
+static constexpr char const ScriptReserved_SetInvItemCount[]			= "SetItemCount";
+static constexpr char const ScriptReserved_GetMoveableByName[]			= "GetMoveableByName";
+static constexpr char const ScriptReserved_GetStaticByName[]			= "GetStaticByName";
+static constexpr char const ScriptReserved_GetCameraByName[]			= "GetCameraByName";
+static constexpr char const ScriptReserved_GetSinkByName[]				= "GetSinkByName";
+static constexpr char const ScriptReserved_GetAIObjectByName[]			= "GetAIObjectByName";
+static constexpr char const ScriptReserved_GetSoundSourceByName[]		= "GetSoundSourceByName";
+static constexpr char const ScriptReserved_CalculateDistance[]			= "CalculateDistance";
+static constexpr char const ScriptReserved_CalculateHorizontalDistance[]= "CalculateHorizontalDistance";
+static constexpr char const ScriptReserved_ScreenToPercent[]			= "ScreenToPercent";
+static constexpr char const ScriptReserved_PercentToScreen[]			= "PercentToScreen";
 
 // Enums
 static constexpr char const ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char const ScriptReserved_DisplayStringOption[]	= "DisplayStringOption";
 
-static constexpr char const ScriptReserved_LevelVars[]= "LevelVars";
-static constexpr char const ScriptReserved_GameVars[] = "GameVars";
-static constexpr char const ScriptReserved_LevelFuncs[] = "LevelFuncs";
+static constexpr char const ScriptReserved_LevelVars[]	= "LevelVars";
+static constexpr char const ScriptReserved_GameVars[]	= "GameVars";
+static constexpr char const ScriptReserved_LevelFuncs[]	= "LevelFuncs";
 
