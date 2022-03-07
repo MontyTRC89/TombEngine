@@ -190,18 +190,18 @@ void SubmarineControl(short itemNumber)
 	else
 		creature->Enemy = LaraItem;
 
-	AI_INFO info, laraInfo;
-	CreatureAIInfo(item, &info);
+	AI_INFO AI, laraInfo;
+	CreatureAIInfo(item, &AI);
 
-	GetCreatureMood(item, &info, VIOLENT);
-	CreatureMood(item, &info, VIOLENT);
+	GetCreatureMood(item, &AI, VIOLENT);
+	CreatureMood(item, &AI, VIOLENT);
 
 	short angle = CreatureTurn(item, creature->MaxTurn);
 
 	if (creature->Enemy == LaraItem)
 	{
-		laraInfo.angle = info.angle;
-		laraInfo.distance = info.distance;
+		laraInfo.angle = AI.angle;
+		laraInfo.distance = AI.distance;
 	}
 	else
 	{
@@ -234,7 +234,7 @@ void SubmarineControl(short itemNumber)
 
 	creature->MaxTurn = ANGLE(2.0f);
 
-	short joint = info.xAngle - ANGLE(45.0f);
+	short joint = AI.xAngle - ANGLE(45.0f);
 
 	if (creature->Flags < item->TriggerFlags)
 		creature->Flags++;
@@ -260,7 +260,7 @@ void SubmarineControl(short itemNumber)
 		else
 			item->TargetState = 0;
 
-		if (info.distance < pow(SECTOR(1), 2))
+		if (AI.distance < pow(SECTOR(1), 2))
 		{
 			creature->MaxTurn = 0;
 			if (abs(laraInfo.angle) >= ANGLE(2.0f))

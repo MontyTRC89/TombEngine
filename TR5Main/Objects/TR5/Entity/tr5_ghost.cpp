@@ -33,10 +33,10 @@ void InvisibleGhostControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
+	short angle = 0;
 	short joint0 = 0;
 	short joint2 = 0;
 	short joint1 = 0;
-	short angle = 0;
 		
 	if (item->AIBits)
 		GetAITarget(creature);
