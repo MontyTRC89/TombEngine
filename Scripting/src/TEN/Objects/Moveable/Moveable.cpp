@@ -86,7 +86,7 @@ takes no arguments.
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable.New(
-		ObjID.PISTOLS_ITEM, -- object id
+		TEN.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
@@ -95,7 +95,7 @@ takes no arguments.
 		0, -- frameNumber
 		0, -- HP
 		0, -- OCB
-		{0,0,0,0,0,0,0,0}, -- aiBits
+		{0,0,0,0,0,0} -- aiBits
 		)
 	*/
 
@@ -209,7 +209,8 @@ void Moveable::Register(sol::table & parent)
 /// Set frame number.
 // This will move the animation to the given frame.
 // The number of frames in an animation can be seen under the heading "End frame" in
-// the WadTool animation editor.
+// the WadTool animation editor. If the animation has no frames, the only valid argument
+// is -1.
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
 		ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
@@ -486,9 +487,9 @@ void Moveable::SetFrameNumber(int frameNumber)
 	auto const fBase = g_Level.Anims[m_item->animNumber].frameBase;
 	auto const fEnd = g_Level.Anims[m_item->animNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
-	bool cond = (frameNumber < frameCount);
-	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";
-	if (ScriptAssertF(cond, err, frameNumber, m_item->animNumber, frameCount))
+	bool cond = frameNumber < frameCount;
+	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
+	if (ScriptAssertF(cond, err, frameNumber, m_item->animNumber, frameCount-1))
 	{
 		m_item->frameNumber = frameNumber + fBase;
 	}
