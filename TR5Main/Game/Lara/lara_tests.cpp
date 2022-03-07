@@ -2419,7 +2419,8 @@ bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraSlideJump(ITEM_INFO* item, short slideDirection)
 {
-	return (abs((short)(slideDirection - item->Position.yRot)) <= ANGLE(45.0f));
+	auto probe = GetCollisionResult(item);
+	return (abs((short)(slideDirection - item->Position.yRot)) <= abs(GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y)));
 }
 
 bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)

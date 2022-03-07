@@ -815,12 +815,11 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 // New function for rotating item along XZ slopes.
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
-// Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
+// Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
 // Warning: dont set it to 0 !!!!
-
-void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short xOffset, short zOffset)
 {
-	if (!radiusDivide)
+	if (!radiusDivisor)
 		return;
 
 	GAME_VECTOR pos = {};
@@ -829,9 +828,9 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	pos.z = item->Position.zPos;
 	pos.roomNumber = item->RoomNumber;
 
-	auto bounds = GetBoundsAccurate(item);
+	auto* bounds = GetBoundsAccurate(item);
 	auto radiusX = bounds->X2;
-	auto radiusZ = bounds->Z2 / radiusDivide; // Need divide in any case else it's too much !
+	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
 	auto frontX = phd_sin(item->Position.yRot) * radiusZ;
@@ -854,13 +853,13 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Position.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
-	item->Position.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
+	item->Position.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	item->Position.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
 int GetQuadrant(short angle)
 {
-	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
+	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
@@ -1129,6 +1128,17 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance)
 	auto usedProbe = ((finalDistance[0] < finalDistance[1]) || hitBridge) ? 0 : 1;
 	distance = finalDistance[usedProbe] - (coll->Setup.Radius - frontalOffset);
 	return finalResult[usedProbe];
+}
+
+short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
+{
+	short stepAngleIncrement = ANGLE(45.0f) / 3;
+	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
+}
+
+short GetSurfaceBearingAngle(float xTilt, float zTilt)
+{
+	return (short)phd_atan(-zTilt, -xTilt);
 }
 
 bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room)
