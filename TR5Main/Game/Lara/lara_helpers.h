@@ -27,7 +27,6 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item);
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);
 
 void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll);
-
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
 void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult);

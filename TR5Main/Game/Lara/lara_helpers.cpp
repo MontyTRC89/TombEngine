@@ -225,7 +225,6 @@ void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 	}
 }
 
-
 LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
 	if (item->ObjectNumber == ID_LARA)
@@ -240,38 +239,32 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = item->Position.yRot;
+	auto probe = GetCollisionResult(item);
 
 	// Ground is flat.
-	if (!coll->FloorTiltX && !coll->FloorTiltZ)
+	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
 		return direction;
 
-	float normalisedTiltX = coll->FloorTiltX ? (coll->FloorTiltX / abs(coll->FloorTiltX)) : 0;
-	float normalisedTiltZ = coll->FloorTiltZ ? (coll->FloorTiltZ / abs(coll->FloorTiltZ)) : 0;
+	direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
-	short xAngle = FROM_RAD(asin(-normalisedTiltX));
-	short zAngle = FROM_RAD(acos(-normalisedTiltZ));
-
-	// Find true slope direction.
-	direction = ((xAngle * abs(coll->FloorTiltX)) + (zAngle * abs(coll->FloorTiltZ))) / (abs(coll->FloorTiltX) + abs(coll->FloorTiltZ));
-
-	// HACK: In one corner, avoids sliding in the wrong direction because I don't understand the maths of this function. @Sezz
-	if (coll->FloorTiltX < 0 && coll->FloorTiltZ > 0)
-		direction = direction + ANGLE(180.0f);
-
-	// Find nearest cardinal slope direction.
+	// Determine nearest cardinal direction of surface bearing.
 	if (!g_GameFlow->Animations.HasSlideExtended)
 		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
 	return direction;
 }
 
+// TODO: Doesn't work. Make slope speed dynamic, rather than tied to the animation.
 void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 {
-	int y = item->Position.yPos;
-	int frontHeight = GetCollisionResult(item, item->Position.yRot, coll->Setup.Radius, -coll->Setup.Height).Position.Floor - y;
-	int backHeight = GetCollisionResult(item, item->Position.yRot + ANGLE(180.0f), coll->Setup.Radius, -coll->Setup.Height).Position.Floor - y;
-	
-	// TODO
+	//CalcItemToFloorRotation(item, 1, ANGLE(30.0f));
+
+	int velocity = 50;
+	short steepness = GetSurfaceSteepnessAngle(coll->FloorTiltX, coll->FloorTiltZ);
+	short direction = GetSurfaceBearingAngle(coll->FloorTiltX, coll->FloorTiltZ);
+
+	// TODO: Use ExtraVelocity for this?
+	item->Velocity += velocity * steepness * phd_sin(direction);
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
