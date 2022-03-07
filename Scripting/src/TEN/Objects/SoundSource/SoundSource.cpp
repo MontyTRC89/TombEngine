@@ -31,23 +31,37 @@ void SoundSource::Register(sol::table & parent)
 	parent.new_usertype<SoundSource>(ScriptReserved_SoundSource,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
+		
+		/// Get the sound source's position
+		// @function GetPosition
+		// @treturn Position a copy of the sound source's position
+		ScriptReserved_GetPosition, &SoundSource::GetPos,
 
-		/// (@{Position}) position in level
-		// @mem pos
-		"pos", sol::property(&SoundSource::GetPos, &SoundSource::SetPos),
+		/// Set the sound source's position
+		// @function SetPosition
+		// @tparam Position position the new position of the sound source 
+		ScriptReserved_SetPosition, &SoundSource::SetPos,
 
-		/// (string) unique string identifier.
-		// e.g. "machine\_sound\_1" or "discordant\_humming"
-		// @mem name
-		"name", sol::property(&SoundSource::GetName, &SoundSource::SetName),
+		/// Get the sound source's unique string identifier
+		// @function GetName
+		// @treturn string the sound source's name
+		ScriptReserved_GetName, &SoundSource::GetName,
 
-		/// (int) sound ID 
-		// @mem soundID
-		"soundID", sol::property(&SoundSource::GetSoundID, &SoundSource::SetSoundID),
+		/// Set the sound source's name (its unique string identifier)
+		// @function SetName
+		// @tparam string name The sound source's new name
+		ScriptReserved_SetName, &SoundSource::SetName,
 
-		/// (int) flags 
-		// @mem flags
-		"flags", sol::property(&SoundSource::GetFlags, &SoundSource::SetFlags)
+		/// Get the sound source's unique int identifier
+		// @function GetSoundID
+		// @treturn int the ID of the sound
+		ScriptReserved_GetSoundID, &SoundSource::GetSoundID,
+
+		/// Set the sound source's ID 
+		// __TODO__ this and getSoundID should use enums
+		// @function SetSoundID
+		// @tparam int name The sound source's new name
+		ScriptReserved_SetSoundID, &SoundSource::SetSoundID
 	);
 }
 
@@ -96,15 +110,5 @@ int SoundSource::GetSoundID() const
 void SoundSource::SetSoundID(int soundID)
 {	
 	m_soundSource.soundId = soundID;
-}
-
-int SoundSource::GetFlags() const
-{
-	return m_soundSource.flags;
-}
-
-void SoundSource::SetFlags(int flags)
-{	
-	m_soundSource.flags = flags;
 }
 #endif
