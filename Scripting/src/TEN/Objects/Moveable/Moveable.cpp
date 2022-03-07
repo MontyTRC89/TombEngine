@@ -120,14 +120,14 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 )
 {
 	short num = CreateItem();
-	auto ptr = std::make_unique<Moveable>(num, temp);
+	auto ptr = std::make_unique<Moveable>(num, temp, false);
 
 	ITEM_INFO* item = &g_Level.Items[num];
 	ptr->SetPos(pos);
 	ptr->SetRot(rot);
 	ptr->SetRoom(room);
 	ptr->SetObjectID(objID);
-	InitialiseItem(num);
+	ptr->Init();
 
 	ptr->SetName(name);
 	ptr->SetAnimNumber(animNumber);
