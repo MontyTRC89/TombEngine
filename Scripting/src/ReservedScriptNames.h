@@ -1,22 +1,22 @@
 #pragma once
 
 // Tables
-static constexpr char const ScriptReserved_TEN[]				= "TEN";
+static constexpr char const ScriptReserved_TEN[]			= "TEN";
 static constexpr char const ScriptReserved_Flow[]			= "Flow";
 static constexpr char const ScriptReserved_Logic[]			= "Logic";
-static constexpr char const ScriptReserved_Objects[]			= "Objects";
-static constexpr char const ScriptReserved_Strings[]			= "Strings";
-static constexpr char const ScriptReserved_Inventory[]			= "Inventory";
+static constexpr char const ScriptReserved_Objects[]		= "Objects";
+static constexpr char const ScriptReserved_Strings[]		= "Strings";
+static constexpr char const ScriptReserved_Inventory[]		= "Inventory";
 static constexpr char const ScriptReserved_Misc[]			= "Misc";
 
 // Classes
-static constexpr char const ScriptReserved_Moveable[]			= "Moveable";
+static constexpr char const ScriptReserved_Moveable[]		= "Moveable";
 static constexpr char const ScriptReserved_Static[]			= "Static";
 static constexpr char const ScriptReserved_Camera[]			= "Camera";
 static constexpr char const ScriptReserved_Sink[]			= "Sink";
 static constexpr char const ScriptReserved_SoundSource[]	= "SoundSource";
-static constexpr char const ScriptReserved_AIObject[]			= "AIObject";
-static constexpr char const ScriptReserved_DisplayString[]		= "DisplayString";
+static constexpr char const ScriptReserved_AIObject[]		= "AIObject";
+static constexpr char const ScriptReserved_DisplayString[]	= "DisplayString";
 
 // Member functions
 static constexpr char const ScriptReserved_new[]				= "New";
@@ -39,6 +39,8 @@ static constexpr char const ScriptReserved_GetSlot[]			= "GetSlot";
 static constexpr char const ScriptReserved_SetSlot[]			= "SetSlot";
 static constexpr char const ScriptReserved_GetObjectID[]		= "GetObjectID";
 static constexpr char const ScriptReserved_SetObjectID[]		= "SetObjectID";
+static constexpr char const ScriptReserved_GetSoundID[]			= "GetSoundID";
+static constexpr char const ScriptReserved_SetSoundID[]			= "SetSoundID";
 static constexpr char const ScriptReserved_GetHP[]				= "GetHP";
 static constexpr char const ScriptReserved_SetHP[]				= "SetHP";
 static constexpr char const ScriptReserved_GetFrameNumber[]		= "GetFrame";
