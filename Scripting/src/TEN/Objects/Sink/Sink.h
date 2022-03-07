@@ -14,6 +14,7 @@ public:
 	using IdentifierType = std::reference_wrapper<SINK_INFO>;
 	Sink(SINK_INFO& ref, bool temp);
 	~Sink();
+
 	Sink& operator=(Sink const& other) = delete;
 	Sink(Sink const& other) = delete;
 
@@ -23,9 +24,6 @@ public:
 
 	int GetStrength() const;
 	void SetStrength(int strength);
-
-	int GetBoxIndex() const;
-	void SetBoxIndex(int Room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);
