@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 
 					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.target == item || !AI.ahead || item->HitStatus)
+						if (Lara.TargetEntity == item || !AI.ahead || item->HitStatus)
 						{
 							item->RequiredState = DOG_STATE_RUN;
 							item->TargetState = DOG_STATE_CROUCH;
@@ -266,7 +266,7 @@ namespace TEN::Entities::TR4
 
 				if (creature->Mood == MoodType::Escape)
 				{
-					if (Lara.target != item && AI.ahead)
+					if (Lara.TargetEntity != item && AI.ahead)
 						item->TargetState = DOG_STATE_CROUCH;
 				}
 				else if (creature->Mood != MoodType::Bored)

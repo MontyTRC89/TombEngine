@@ -97,7 +97,7 @@ void KnightTemplarControl(short itemNumber)
 
 		if (AI.distance > pow(682, 2))
 		{
-			if (Lara.target == item)
+			if (Lara.TargetEntity == item)
 				item->TargetState = 6;
 		}
 		else if (GetRandomControl() & 1)
@@ -112,7 +112,7 @@ void KnightTemplarControl(short itemNumber)
 	case 2:
 		creature->MaxTurn = ANGLE(7.0f);
 
-		if (Lara.target == item || AI.distance <= pow(682, 2))
+		if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
 			item->TargetState = 1;
 
 		break;
@@ -205,7 +205,7 @@ void KnightTemplarControl(short itemNumber)
 			else
 				item->TargetState = 8;
 		}
-		else if (AI.distance <= pow(682, 2) || Lara.target != item)
+		else if (AI.distance <= pow(682, 2) || Lara.TargetEntity != item)
 			item->TargetState = 1;
 		else
 			item->TargetState = 6;

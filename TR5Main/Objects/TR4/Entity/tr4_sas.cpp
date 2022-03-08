@@ -697,7 +697,7 @@ namespace TEN::Entities::TR4
 			|| Lara.Control.HandStatus != HandStatus::Free
 			|| l->Airborne
 			|| item->Flags & 0x3E00)
-			&& (!(Lara.Control.IsMoving) || Lara.interactedItem != itemNumber))
+			&& (!(Lara.Control.IsMoving) || Lara.InteractedItem != itemNumber))
 		{
 			if (item->Status == ITEM_ACTIVE)
 			{
@@ -735,7 +735,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					Lara.interactedItem = itemNumber;
+					Lara.InteractedItem = itemNumber;
 				}
 			}
 		}

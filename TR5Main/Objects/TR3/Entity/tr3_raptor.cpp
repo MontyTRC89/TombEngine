@@ -131,7 +131,7 @@ void RaptorControl(short itemNumber)
 				item->TargetState = 8;
 			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
 				item->TargetState = 4;
-			else if (creature->Mood == MoodType::Escape && Lara.target != item && AI.ahead && !item->HitStatus)
+			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
 				item->TargetState = 1;
 			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = 2;
@@ -183,7 +183,7 @@ void RaptorControl(short itemNumber)
 				item->RequiredState = 6;
 				item->TargetState = 1;
 			}
-			else if (creature->Mood == MoodType::Bored || (creature->Mood == MoodType::Escape && Lara.target != item && AI.ahead))
+			else if (creature->Mood == MoodType::Bored || (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead))
 				item->TargetState = 1;
 
 			break;

@@ -373,7 +373,7 @@ void GuardControl(short itemNum)
 					joint1 = info.xAngle;
 				}
 			}
-			if (item->ObjectNumber == ID_SCIENTIST && item == Lara.target)
+			if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 			{
 				item->TargetState = STATE_GUARD_SURREND;
 			}
@@ -748,7 +748,7 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_USE_COMPUTER:
-			if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.target)
+			if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.TargetEntity)
 				&& (GetRandomControl() & 0x7F || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
 			{
 				if (item->AIBits & GUARD)
@@ -770,7 +770,7 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_SURREND:
-			if (item != Lara.target && !(GetRandomControl() & 0x3F))
+			if (item != Lara.TargetEntity && !(GetRandomControl() & 0x3F))
 			{
 				if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
 					item->RequiredState = STATE_GUARD_USE_COMPUTER;

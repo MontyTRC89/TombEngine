@@ -63,8 +63,9 @@ struct ITEM_INFO
 	int AnimNumber;
 	int FrameNumber;
 
-	short Velocity;
-	short VerticalVelocity;
+	int Velocity;
+	int LateralVelocity;
+	int VerticalVelocity;
 	bool Airborne;
 
 	short HitPoints;

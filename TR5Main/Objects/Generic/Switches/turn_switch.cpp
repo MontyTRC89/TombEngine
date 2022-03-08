@@ -59,7 +59,7 @@ namespace TEN::Entities::Switches
 			laraItem->Airborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ActiveState == TURN_SWITCH_STOP ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(&TurnSwitchBoundsA, switchItem, laraItem))
 			{
@@ -76,7 +76,7 @@ namespace TEN::Entities::Switches
 					doSwitch = -1;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 			}
 			else
 			{
@@ -93,9 +93,9 @@ namespace TEN::Entities::Switches
 						doSwitch = 1;
 					}
 					else
-						laraInfo->interactedItem = itemNumber;
+						laraInfo->InteractedItem = itemNumber;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

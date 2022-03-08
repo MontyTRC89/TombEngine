@@ -126,7 +126,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->AnimNumber != LA_STAND_IDLE ||
 		laraItem->Status == ITEM_INVISIBLE ||
 		laraInfo->Control.HandStatus != HandStatus::Free) &&
-		(!laraInfo->Control.IsMoving || laraInfo->interactedItem !=itemNumber))
+		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem !=itemNumber))
 	{
 #ifdef NEW_TIGHTROPE
 		if (laraItem->ActiveState == LS_TIGHTROPE_WALK &&
@@ -178,13 +178,13 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 #endif
 			}
 			else
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 
 			tightropeItem->Position.yRot += -ANGLE(180.0f);
 		}
 		else
 		{
-			if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
 			tightropeItem->Position.yRot += -ANGLE(180.0f);
@@ -237,7 +237,7 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 				laraItem->Position.zPos += barItem->Position.zPos - ((pos1.z + pos2.z) / 2);
 			laraItem->Position.yPos += barItem->Position.yPos - ((pos1.y + pos2.y) / 2);
 
-			laraInfo->interactedItem = itemNumber;
+			laraInfo->InteractedItem = itemNumber;
 		}
 		else
 			ObjectCollision(itemNumber, laraItem, coll);

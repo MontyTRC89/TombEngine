@@ -569,7 +569,7 @@ namespace TEN::Entities::TR4
 				currentCreature->Alerted = true;
 			}
 
-			if (item != Lara.target 
+			if (item != Lara.TargetEntity 
 				|| laraInfo.distance <= 942 
 				|| laraInfo.angle <= -ANGLE(56.25f) 
 				|| laraInfo.angle >= ANGLE(56.25f))
@@ -665,7 +665,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_SWORD_NINJA
-					&& item == Lara.target
+					&& item == Lara.TargetEntity
 					&& laraInfo.ahead
 					&& laraInfo.distance > SQUARE(682))
 				{
@@ -1228,7 +1228,7 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = 0;
 				ClampRotation(&item->Position, info.angle, ANGLE(11));
 				if (laraInfo.distance < SQUARE(682) ||
-					item != Lara.target)
+					item != Lara.TargetEntity)
 				{
 					item->TargetState = STATE_BADDY_UNKNOWN_9;
 				}

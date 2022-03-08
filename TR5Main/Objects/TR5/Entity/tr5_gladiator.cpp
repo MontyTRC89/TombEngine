@@ -131,7 +131,7 @@ void ControlGladiator(short itemNumber)
 			{
 				if (creature->Mood == MoodType::Escape)
 				{
-					if (Lara.target != item &&
+					if (Lara.TargetEntity != item &&
 						AI.ahead &&
 						!item->HitStatus)
 					{
@@ -154,7 +154,7 @@ void ControlGladiator(short itemNumber)
 						break;
 					}
 						
-					if (Lara.target == item &&
+					if (Lara.TargetEntity == item &&
 						unknown &&
 						distance < pow(SECTOR(1.5f), 2) &&
 						GetRandomControl() & 1 &&
@@ -232,7 +232,7 @@ void ControlGladiator(short itemNumber)
 
 			if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && AI.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 				{
 					item->TargetState = 1;
 					break;
@@ -274,7 +274,7 @@ void ControlGladiator(short itemNumber)
 					break;
 				}
 			}
-			else if (Lara.target != item ||
+			else if (Lara.TargetEntity != item ||
 				!(GetRandomControl() & 0x7F))
 			{
 				item->TargetState = 1;
@@ -284,7 +284,7 @@ void ControlGladiator(short itemNumber)
 			break;
 
 		case 5:
-			if (Lara.target != item)
+			if (Lara.TargetEntity != item)
 				item->TargetState = 1;
 
 			break;

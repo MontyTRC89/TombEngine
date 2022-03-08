@@ -84,7 +84,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
 			item->TargetState = WEAPON_STATE_UNDERWATER_AIM;
-		else if ((!(TrInput & IN_ACTION) || lara->target) && lara->LeftArm.Locked == false)
+		else if ((!(TrInput & IN_ACTION) || lara->TargetEntity) && lara->LeftArm.Locked == false)
 			item->TargetState = WEAPON_STATE_UNAIM;
 		else
 			item->TargetState = WEAPON_STATE_RECOIL;
@@ -98,7 +98,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 		if (lara->Control.WaterStatus == WaterStatus::Underwater || running)
 		{
-			if ((!(TrInput & IN_ACTION) || lara->target) && lara->LeftArm.Locked == false)
+			if ((!(TrInput & IN_ACTION) || lara->TargetEntity) && lara->LeftArm.Locked == false)
 				item->TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 			else
 				item->TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
@@ -115,7 +115,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 			if (lara->Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
 			{
-				if ((TrInput & IN_ACTION) && (!lara->target || lara->LeftArm.Locked))
+				if ((TrInput & IN_ACTION) && (!lara->TargetEntity || lara->LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
@@ -191,7 +191,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				!harpoonFired)
 			{
 				if (TrInput & IN_ACTION &&
-					(!lara->target || lara->LeftArm.Locked))
+					(!lara->TargetEntity || lara->LeftArm.Locked))
 				{
 					if (weaponType == WEAPON_HARPOON_GUN)
 					{
@@ -268,7 +268,7 @@ void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->RightArm.Locked = false;
 	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
 	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	lara->target = nullptr;
+	lara->TargetEntity = nullptr;
 }
 
 void FireShotgun(ITEM_INFO* laraItem)
@@ -294,7 +294,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
 		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
 
-		if (FireWeapon(WEAPON_SHOTGUN, lara->target, laraItem, loopAngles) != FireWeaponType::NoAmmo)
+		if (FireWeapon(WEAPON_SHOTGUN, lara->TargetEntity, laraItem, loopAngles) != FireWeaponType::NoAmmo)
 			fired = true;
 	}
 
@@ -386,7 +386,7 @@ void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	if (item->Status == ITEM_DEACTIVATED)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
-		lara->target = nullptr;
+		lara->TargetEntity = nullptr;
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
 		KillItem(lara->Control.WeaponControl.WeaponItem);
@@ -1735,7 +1735,7 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 		Weapons[WEAPON_HK].Damage = 3;
 	}
 
-	if (FireWeapon(WEAPON_HK, lara->target, laraItem, angles) != FireWeaponType::NoAmmo)
+	if (FireWeapon(WEAPON_HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
 		SmokeCountL = 12;
 		SmokeWeapon = WEAPON_HK;

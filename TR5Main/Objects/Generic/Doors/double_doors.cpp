@@ -44,7 +44,7 @@ namespace TEN::Entities::Doors
 			!laraItem->HitStatus &&
 			!(doorItem->Status && doorItem->Airborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			doorItem->Position.yRot ^= ANGLE(180.0f);
 
@@ -62,14 +62,14 @@ namespace TEN::Entities::Doors
 					doorItem->Status = ITEM_ACTIVE;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 
 				doorItem->Position.yRot ^= ANGLE(180.0f);
 			}
 			else
 			{
 				if (laraInfo->Control.IsMoving &&
-					laraInfo->interactedItem == itemNumber)
+					laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

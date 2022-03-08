@@ -68,8 +68,8 @@ void KillItem(short itemNumber)
 			}
 		}
 
-		if (item == Lara.target)
-			Lara.target = NULL;
+		if (item == Lara.TargetEntity)
+			Lara.TargetEntity = NULL;
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);

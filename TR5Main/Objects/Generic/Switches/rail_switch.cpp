@@ -47,7 +47,7 @@ namespace TEN::Entities::Switches
 			laraItem->AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free) &&
 			(!laraInfo->Control.IsMoving ||
-				laraInfo->interactedItem != itemNumber))
+				laraInfo->InteractedItem != itemNumber))
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
@@ -65,9 +65,9 @@ namespace TEN::Entities::Switches
 						flag = 1;
 					}
 					else
-						laraInfo->interactedItem = itemNumber;
+						laraInfo->InteractedItem = itemNumber;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -114,11 +114,11 @@ namespace TEN::Entities::Switches
 					AnimateItem(switchItem);
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 			}
 			else if (laraInfo->Control.IsMoving)
 			{
-				if (laraInfo->interactedItem == itemNumber)
+				if (laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

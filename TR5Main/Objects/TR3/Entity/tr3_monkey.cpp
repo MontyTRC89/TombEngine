@@ -219,7 +219,7 @@ void MonkeyControl(short itemNumber)
 				item->TargetState = 2;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && AI.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 					item->TargetState = 3;
 				else
 					item->TargetState = 4;
@@ -373,7 +373,7 @@ void MonkeyControl(short itemNumber)
 				item->TargetState = 3;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && AI.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 					item->TargetState = 3;
 				break;
 			}

@@ -134,7 +134,7 @@ namespace TEN::Entities::TR4
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 				item->ActiveState = AHMET_STATE_DIE;
 				item->TargetState = AHMET_STATE_DIE;
-				Lara.interactedItem = itemNumber;
+				Lara.InteractedItem = itemNumber;
 			}
 
 			TriggerAhmetDeathEffect(item);
@@ -215,7 +215,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (Lara.target == item || !AI.ahead)
+					if (Lara.TargetEntity == item || !AI.ahead)
 						item->TargetState = AHMET_STATE_RUN;
 					else
 						item->TargetState = AHMET_STATE_IDLE;
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = AHMET_RUN_ANGLE;
 				creature->Flags = 0;
 
-				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.target == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
+				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.TargetEntity == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
 					item->TargetState = AHMET_STATE_IDLE;
 				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
 					item->TargetState = AHMET_STATE_WALK;
