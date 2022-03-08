@@ -95,7 +95,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	// Shooting action for right arm.
 	int frameRight = lara->RightArm.FrameNumber;  // frame number of DRAW_END?
-	if ((TrInput & IN_ACTION && !lara->target) || lara->RightArm.Locked)
+	if ((TrInput & IN_ACTION && !lara->TargetEntity) || lara->RightArm.Locked)
 	{
 		// POINT ARMS FORWARD
 		// at or beyond (2) DRAW_END start frame AND before (0) SHOOT_START end frame...
@@ -115,7 +115,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 					angleRight[0] = lara->RightArm.Rotation.yRot + laraItem->Position.yRot;
 					angleRight[1] = lara->RightArm.Rotation.xRot;
 
-					if (FireWeapon(weaponType, lara->target, laraItem, angleRight) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleRight) != FireWeaponType::NoAmmo)
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = (int)weaponType;
@@ -191,7 +191,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	// Shooting for left arm.
 	int frameLeft = lara->LeftArm.FrameNumber;
-	if ((TrInput & IN_ACTION && !lara->target) || lara->LeftArm.Locked)
+	if ((TrInput & IN_ACTION && !lara->TargetEntity) || lara->LeftArm.Locked)
 	{
 		if ((frameLeft >= 0) && (frameLeft < p->Draw1Anim2))
 			frameLeft++;
@@ -202,7 +202,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				angleLeft[0] = lara->LeftArm.Rotation.yRot + laraItem->Position.yRot;
 				angleLeft[1] = lara->LeftArm.Rotation.xRot;
 
-				if (FireWeapon(weaponType, lara->target, laraItem, angleLeft) != FireWeaponType::NoAmmo)
+				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleLeft) != FireWeaponType::NoAmmo)
 				{
 					if (weaponType == LaraWeaponType::WEAPON_REVOLVER)
 					{
@@ -337,7 +337,7 @@ void ReadyPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->RightArm.Rotation = PHD_3DPOS();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->target = nullptr;
+	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
@@ -456,7 +456,7 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->Control.HandStatus = HandStatus::Free;
 		lara->LeftArm.FrameNumber = 0;
 		lara->RightArm.FrameNumber = 0;
-		lara->target = NULL;
+		lara->TargetEntity = NULL;
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
 	}

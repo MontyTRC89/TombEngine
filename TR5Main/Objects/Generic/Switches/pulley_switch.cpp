@@ -49,7 +49,7 @@ namespace TEN::Entities::Switches
 			laraItem->AnimNumber == LA_STAND_IDLE &&
 			laraItem->Airborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			short oldYrot = switchItem->Position.yRot;
 			switchItem->Position.yRot = laraItem->Position.yRot;
@@ -79,16 +79,16 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.IsMoving = false;
 					ResetLaraFlex(laraItem);
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 				
 				switchItem->Position.yRot = oldYrot;
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

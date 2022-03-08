@@ -71,7 +71,7 @@ void TigerControl(short itemNumber)
 
 			if (info->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && aiInfo.ahead)
+				if (Lara.TargetEntity != item && aiInfo.ahead)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
@@ -133,7 +133,7 @@ void TigerControl(short itemNumber)
 				item->RequiredState = 5;
 				item->TargetState = 1;
 			}
-			else if (info->Mood == MoodType::Escape && Lara.target != item && aiInfo.ahead)
+			else if (info->Mood == MoodType::Escape && Lara.TargetEntity != item && aiInfo.ahead)
 				item->TargetState = 1;
 
 			info->Flags = 0;

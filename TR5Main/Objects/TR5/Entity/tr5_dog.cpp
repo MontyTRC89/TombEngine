@@ -161,7 +161,7 @@ void Tr5DogControl(short itemNumber)
 
 				if (creature->Mood == MoodType::Escape)
 				{
-					if (Lara.target == item || !info.ahead || item->HitStatus)
+					if (Lara.TargetEntity == item || !info.ahead || item->HitStatus)
 					{
 						item->RequiredState = 3;
 						item->TargetState = 9;
@@ -233,7 +233,7 @@ void Tr5DogControl(short itemNumber)
 			creature->MaxTurn = ANGLE(6);
 			if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead)
+				if (Lara.TargetEntity != item && info.ahead)
 					item->TargetState = 9;
 			}
 			else if (creature->Mood != MoodType::Bored)

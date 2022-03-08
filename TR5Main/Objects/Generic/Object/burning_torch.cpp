@@ -355,13 +355,13 @@ namespace TEN::Entities::Generic
 				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 				laraInfo->Flare.ControlLeft = false;
 				laraInfo->LeftArm.Locked = true;
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 			}
 
 			torchItem->Position.yRot = rot;
 		}
 		if (laraItem->ActiveState == LS_MISC_CONTROL &&
-			laraInfo->interactedItem == itemNumber &&
+			laraInfo->InteractedItem == itemNumber &&
 			torchItem->Status != ITEM_ACTIVE)
 		{
 			if (laraItem->AnimNumber >= LA_TORCH_LIGHT_1 &&

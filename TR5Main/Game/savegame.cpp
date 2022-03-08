@@ -196,8 +196,8 @@ bool SaveGame::Save(int slot)
 	auto rightArmOffset = rightArm.Finish();
 
 	std::vector<int> laraTargetAngles{};
-	laraTargetAngles.push_back(Lara.targetAngles[0]);
-	laraTargetAngles.push_back(Lara.targetAngles[1]);
+	laraTargetAngles.push_back(Lara.TargetArmAngles[0]);
+	laraTargetAngles.push_back(Lara.TargetArmAngles[1]);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
 	std::vector<int> subsuitVelocity{};
@@ -348,7 +348,7 @@ bool SaveGame::Save(int slot)
 	lara.add_highest_location(Lara.highestLocation);
 	lara.add_hit_direction(Lara.hitDirection);
 	lara.add_hit_frame(Lara.hitFrame);
-	lara.add_interacted_item(Lara.interactedItem);
+	lara.add_interacted_item(Lara.InteractedItem);
 	lara.add_is_busy(Lara.IsBusy);
 	lara.add_item_number(Lara.ItemNumber);
 	lara.add_keys(keysOffset);
@@ -379,7 +379,7 @@ bool SaveGame::Save(int slot)
 	lara.add_sprint_energy(Lara.SprintEnergy);
 	lara.add_target_angle(Lara.TargetAngle);
 	lara.add_target_angles(laraTargetAnglesOffset);
-	lara.add_target_item_number(Lara.target - g_Level.Items.data());
+	lara.add_target_item_number(Lara.TargetEntity - g_Level.Items.data());
 	lara.add_torch(Lara.Torch);
 	lara.add_vehicle(Lara.Vehicle);
 	lara.add_water_surface_dist(Lara.WaterSurfaceDist);
@@ -1252,7 +1252,7 @@ bool SaveGame::Load(int slot)
 	Lara.highestLocation = s->lara()->highest_location();
 	Lara.hitDirection = s->lara()->hit_direction();
 	Lara.hitFrame = s->lara()->hit_frame();
-	Lara.interactedItem = s->lara()->interacted_item();
+	Lara.InteractedItem = s->lara()->interacted_item();
 	Lara.IsBusy = s->lara()->is_busy();
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.Lasersight = s->lara()->lasersight();
@@ -1321,10 +1321,10 @@ bool SaveGame::Load(int slot)
 	Lara.smallWaterskin = s->lara()->small_waterskin();
 	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
-	Lara.target = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
+	Lara.TargetEntity = (s->lara()->target_item_number() >= 0 ? &g_Level.Items[s->lara()->target_item_number()] : nullptr);
 	Lara.TargetAngle = s->lara()->target_angle();
-	Lara.targetAngles[0] = s->lara()->target_angles()->Get(0);
-	Lara.targetAngles[1] = s->lara()->target_angles()->Get(1);
+	Lara.TargetArmAngles[0] = s->lara()->target_angles()->Get(0);
+	Lara.TargetArmAngles[1] = s->lara()->target_angles()->Get(1);
 	Lara.Torch = s->lara()->torch();
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->water_status();

@@ -62,8 +62,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			ApproachLaraTargetAngle(item, direction);
 
-		// TODO: Make the limited jump range equal to the steepness of the slope.
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -169,7 +168,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		else
 			ApproachLaraTargetAngle(item, direction);
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, direction))
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);

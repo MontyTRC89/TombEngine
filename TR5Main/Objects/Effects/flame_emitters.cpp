@@ -706,13 +706,13 @@ namespace TEN::Entities::Effects
 				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
-				Lara.interactedItem = itemNumber;
+				Lara.InteractedItem = itemNumber;
 			}
 
 			item->Position.yRot = oldYrot;
 		}
 
-		if (Lara.interactedItem == itemNumber
+		if (Lara.InteractedItem == itemNumber
 			&& item->Status != ITEM_ACTIVE
 			&& l->ActiveState == LS_MISC_CONTROL)
 		{

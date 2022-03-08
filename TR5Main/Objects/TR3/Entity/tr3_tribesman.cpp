@@ -89,7 +89,7 @@ void TribemanAxeControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
@@ -130,7 +130,7 @@ void TribemanAxeControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
@@ -193,7 +193,7 @@ void TribemanAxeControl(short itemNum)
 						item->TargetState = 11;
 				}
 			}
-			else if (creature->Mood == MoodType::Escape && Lara.target != item && info.ahead)
+			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && info.ahead)
 				item->TargetState = 11;
 			else if (info.bite || info.distance < SQUARE(2048))
 			{
@@ -395,7 +395,7 @@ void TribemanDartsControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
@@ -432,7 +432,7 @@ void TribemanDartsControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
@@ -484,7 +484,7 @@ void TribemanDartsControl(short itemNum)
 				item->TargetState = 1;
 			if (item->AIBits & GUARD)
 				item->TargetState = 11;
-			else if (creature->Mood == MoodType::Escape && Lara.target != item && info.ahead)
+			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && info.ahead)
 				item->TargetState = 11;
 			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = 1;

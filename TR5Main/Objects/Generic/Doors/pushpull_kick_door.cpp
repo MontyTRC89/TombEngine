@@ -55,7 +55,7 @@ namespace TEN::Entities::Doors
 			!laraItem->HitStatus &&
 			doorItem->Status != ITEM_ACTIVE &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			bool pull = false;
 
@@ -78,7 +78,7 @@ namespace TEN::Entities::Doors
 						openTheDoor = true;
 					}
 					else
-						laraInfo->interactedItem = itemNumber;
+						laraInfo->InteractedItem = itemNumber;
 				}
 				else
 				{
@@ -91,7 +91,7 @@ namespace TEN::Entities::Doors
 							openTheDoor = true;
 						}
 						else
-							laraInfo->interactedItem = itemNumber;
+							laraInfo->InteractedItem = itemNumber;
 					}
 					else
 					{
@@ -102,7 +102,7 @@ namespace TEN::Entities::Doors
 							openTheDoor = true;
 						}
 						else
-							laraInfo->interactedItem = itemNumber;
+							laraInfo->InteractedItem = itemNumber;
 					}
 				}
 
@@ -118,7 +118,7 @@ namespace TEN::Entities::Doors
 				}
 			}
 			else if (laraInfo->Control.IsMoving &&
-				laraInfo->interactedItem == itemNumber)
+				laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;

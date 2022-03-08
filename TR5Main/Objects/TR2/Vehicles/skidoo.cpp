@@ -403,8 +403,8 @@ void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 			lara->RightArm.Rotation.xRot
 		};
 		
-		if ((int)FireWeapon(WEAPON_PISTOLS, lara->target, laraItem, angles) +
-			(int)FireWeapon(WEAPON_PISTOLS, lara->target, laraItem, angles))
+		if ((int)FireWeapon(WEAPON_PISTOLS, lara->TargetEntity, laraItem, angles) +
+			(int)FireWeapon(WEAPON_PISTOLS, lara->TargetEntity, laraItem, angles))
 		{
 			skidoo->FlashTimer = 2;
 			SoundEffect(weapon->SampleNum, &laraItem->Position, 0);

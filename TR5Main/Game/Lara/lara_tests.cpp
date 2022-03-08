@@ -2417,10 +2417,13 @@ bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 	return false;
 }
 
-bool TestLaraSlideJump(ITEM_INFO* item, short slideDirection)
+bool TestLaraSlideJump(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto probe = GetCollisionResult(item);
-	return (abs((short)(slideDirection - item->Position.yRot)) <= abs(GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y)));
+
+	short direction = GetLaraSlideDirection(item, coll);
+	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	return (abs((short)(direction - item->Position.yRot)) <= abs(steepness));
 }
 
 bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)

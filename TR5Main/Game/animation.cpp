@@ -141,7 +141,7 @@ void AnimateLara(ITEM_INFO* item)
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
 		lateral += anim->Xacceleration * (item->FrameNumber - anim->frameBase);
-	lateral >>= 16;
+	item->LateralVelocity = lateral >>= 16;
 
 	if (item->Airborne)
 	{
@@ -189,11 +189,15 @@ void AnimateLara(ITEM_INFO* item)
 		item->Velocity = velocity >> 16;
 	}
 
+	item->Velocity += lara->ExtraVelocity.x;
+	item->VerticalVelocity += lara->ExtraVelocity.y;
+	item->LateralVelocity += lara->ExtraVelocity.z;
+
 	if (lara->Control.RopeControl.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		MoveItem(item, lara->Control.MoveAngle, item->Velocity, lateral);
+		MoveItem(item, lara->Control.MoveAngle, item->Velocity, item->LateralVelocity);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

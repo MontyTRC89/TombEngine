@@ -185,7 +185,7 @@ void CivvyControl(short itemNumber)
 
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && AI.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 					item->TargetState = CIVVY_STOP;
 				else
 					item->TargetState = CIVVY_RUN;
@@ -250,7 +250,7 @@ void CivvyControl(short itemNumber)
 				item->TargetState = CIVVY_WAIT;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && AI.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 					item->TargetState = CIVVY_STOP;
 				break;
 			}
