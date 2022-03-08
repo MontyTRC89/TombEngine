@@ -2122,7 +2122,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target HitPoints: %d", Lara.target ? Lara.target->HitPoints : NULL);
+				PrintDebugMessage("target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : NULL);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}

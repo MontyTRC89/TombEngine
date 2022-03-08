@@ -185,7 +185,7 @@ void MPStickControl(short itemNumber)
 
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = BATON_STOP;
 				else
 					item->TargetState = BATON_RUN;
@@ -250,7 +250,7 @@ void MPStickControl(short itemNumber)
 				item->TargetState = BATON_WAIT;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead)
+				if (Lara.TargetEntity != item && info.ahead)
 					item->TargetState = BATON_STOP;
 				break;
 			}

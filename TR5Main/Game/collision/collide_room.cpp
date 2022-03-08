@@ -25,9 +25,9 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Shift.z = 0;
 }
 
-void MoveItem(ITEM_INFO* item, short angle, int x, int y)
+void MoveItem(ITEM_INFO* item, short angle, int x, int z)
 {
-	if (!x && !y)
+	if (!x && !z)
 		return;
 
 	if (x != 0)
@@ -39,13 +39,13 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 		item->Position.zPos += round(x * c);
 	}
 
-	if (y != 0)
+	if (z != 0)
 	{
 		float s = phd_sin(angle + ANGLE(90.0f));
 		float c = phd_cos(angle + ANGLE(90.0f));
 
-		item->Position.xPos += round(y * s);
-		item->Position.zPos += round(y * c);
+		item->Position.xPos += round(z * s);
+		item->Position.zPos += round(z * c);
 	}
 }
 
@@ -820,7 +820,10 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short xOffset, short zOffset)
 {
 	if (!radiusDivisor)
+	{
+		TENLog(std::string("CalculateItemRotationToSurface() attempted division by zero!"), LogLevel::Warning);
 		return;
+	}
 
 	GAME_VECTOR pos = {};
 	pos.x = item->Position.xPos;
@@ -1132,7 +1135,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance)
 
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 {
-	short stepAngleIncrement = ANGLE(45.0f) / 3;
+	short stepAngleIncrement = ANGLE(45.0f) / 4;
 	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
 }
 
@@ -1141,22 +1144,22 @@ short GetSurfaceBearingAngle(float xTilt, float zTilt)
 	return (short)phd_atan(-zTilt, -xTilt);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room)
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
 {
-	return (room->flags & envType);
+	return (room->flags & environmentType);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 {
-	return TestEnvironment(envType, &g_Level.Rooms[roomNumber]);
+	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item)
+bool TestEnvironment(RoomEnvFlags environmentType, ITEM_INFO* item)
 {
-	return TestEnvironment(envType, item->RoomNumber);
+	return TestEnvironment(environmentType, item->RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
-	return TestEnvironment(envType, GetCollisionResult(x, y, z, roomNumber).RoomNumber);
+	return TestEnvironment(environmentType, GetCollisionResult(x, y, z, roomNumber).RoomNumber);
 }

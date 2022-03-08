@@ -109,14 +109,14 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ActiveState == SWITCH_OFF ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(&CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(&CeilingUnderwaterSwitchPos1, switchItem, laraItem))
 					flag = 1;
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 			}
 			else
 			{
@@ -127,7 +127,7 @@ namespace TEN::Entities::Switches
 					if (MoveLaraPosition(&CeilingUnderwaterSwitchPos2, switchItem, laraItem))
 						flag = 1;
 					else
-						laraInfo->interactedItem = itemNumber;
+						laraInfo->InteractedItem = itemNumber;
 				}
 
 				laraItem->Position.yRot ^= 0x8000;

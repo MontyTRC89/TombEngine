@@ -36,7 +36,7 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 		laraItem->AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		sarcItem->Status != ITEM_ACTIVE ||
-		laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
 		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
 		{
@@ -55,11 +55,11 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 		}
 		else if (laraInfo->Control.IsMoving)
 		{
-			if (laraInfo->interactedItem == itemNumber)
+			if (laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;

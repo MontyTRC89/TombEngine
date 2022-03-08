@@ -257,14 +257,14 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 // TODO: Doesn't work. Make slope speed dynamic, rather than tied to the animation.
 void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 {
-	//CalcItemToFloorRotation(item, 1, ANGLE(30.0f));
+	auto* lara = GetLaraInfo(item);
 
 	int velocity = 50;
 	short steepness = GetSurfaceSteepnessAngle(coll->FloorTiltX, coll->FloorTiltZ);
 	short direction = GetSurfaceBearingAngle(coll->FloorTiltX, coll->FloorTiltZ);
 
-	// TODO: Use ExtraVelocity for this?
-	item->Velocity += velocity * steepness * phd_sin(direction);
+	//lara->ExtraVelocity.x = velocity;// *steepness* phd_sin(direction);
+	MoveItem(item, coll->Setup.ForwardAngle, velocity);
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -304,8 +304,8 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = SECTOR(1);
-	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -coll->Setup.Height);
+	int distance = SECTOR(1);
+	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
@@ -387,7 +387,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Take inertia into consideration before switching animations if already sliding.
 
 	// Slide backward.
-	if (abs(deltaAngle) > ANGLE(90.0f))
+	/*if (abs(deltaAngle) > ANGLE(90.0f))
 	{
 		if (item->ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
@@ -395,7 +395,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
 	// Slide forward.
-	else [[likely]]
+	else [[likely]]*/
 	{
 		if (item->ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
 			return;

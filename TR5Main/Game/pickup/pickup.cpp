@@ -293,7 +293,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				l->ActiveState == LS_UNDERWATER_STOP && 
 				lara->Control.HandStatus == HandStatus::Free &&
-				TestLaraPosition(&PickUpBoundsUW, item, l) || lara->Control.IsMoving && lara->interactedItem == itemNum)
+				TestLaraPosition(&PickUpBoundsUW, item, l) || lara->Control.IsMoving && lara->InteractedItem == itemNum)
 			{
 				if (TestLaraPosition(&PickUpBoundsUW, item, l))
 				{
@@ -317,13 +317,13 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
-					lara->interactedItem = itemNum;
+					lara->InteractedItem = itemNum;
 				}
 				else
 				{
 					if (lara->Control.IsMoving)
 					{
-						if (lara->interactedItem == itemNum)
+						if (lara->InteractedItem == itemNum)
 						{
 							getThisItemPlease = itemNum;
 							Lara.Control.IsMoving = false;
@@ -354,7 +354,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (!lara->Control.IsMoving)
 		{
-			if (lara->interactedItem == itemNum)
+			if (lara->InteractedItem == itemNum)
 			{
 				if (l->ActiveState != LS_PICKUP && l->ActiveState != LS_HOLE)
 				{
@@ -375,7 +375,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 
-		if (lara->interactedItem != itemNum)
+		if (lara->InteractedItem != itemNum)
 		{
 			item->Position.xRot = oldXrot;
 			item->Position.yRot = oldYrot;
@@ -394,7 +394,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			if (lara->Control.IsMoving)
 			{
-				if (lara->interactedItem == itemNum)
+				if (lara->InteractedItem == itemNum)
 				{
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Free;
@@ -413,7 +413,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			l->ActiveState = LS_HOLE;
 			flag = 1;
 		}
-		lara->interactedItem = itemNum;
+		lara->InteractedItem = itemNum;
 		break;
 
 	case 2: // Pickup with crowbar
@@ -428,7 +428,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 
-			if (lara->interactedItem == itemNum)
+			if (lara->InteractedItem == itemNum)
 			{
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Free;
@@ -473,7 +473,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			flag = 1;
 		}
 
-		lara->interactedItem = itemNum;
+		lara->InteractedItem = itemNum;
 		break;
 
 	case 3:
@@ -517,7 +517,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				}
 				flag = 1;
 			}
-			lara->interactedItem = itemNum;
+			lara->InteractedItem = itemNum;
 			break;
 		}
 
@@ -529,7 +529,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			return;
 		}
 		
-		if (lara->interactedItem == itemNum)
+		if (lara->InteractedItem == itemNum)
 		{
 			Lara.Control.IsMoving = false;
 			Lara.Control.HandStatus = HandStatus::Free;
@@ -558,7 +558,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			AddActiveItem(itemNum);
 			flag = 1;
 		}
-		lara->interactedItem = itemNum;
+		lara->InteractedItem = itemNum;
 		break;
 
 	default:
@@ -572,7 +572,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				return;
 			}
 			
-			if (lara->interactedItem == itemNum)
+			if (lara->InteractedItem == itemNum)
 			{
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Free;
@@ -597,7 +597,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				l->AnimNumber = LA_CROUCH_PICKUP_FLARE;
 				l->ActiveState = LS_PICKUP_FLARE;
 				flag = 1;
-				lara->interactedItem = itemNum;
+				lara->InteractedItem = itemNum;
 				break;
 			}
 			getThisItemPlease = itemNum;
@@ -615,7 +615,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 				if (item->ObjectNumber == ID_FLARE_ITEM)
 				{
 					l->TargetState = LS_CROUCH_IDLE;
-					lara->interactedItem = itemNum;
+					lara->InteractedItem = itemNum;
 				}
 				else
 				{
@@ -628,7 +628,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			{
 				if (!MoveLaraPosition(&PickUpPosition, item, l))
 				{
-					lara->interactedItem = itemNum;
+					lara->InteractedItem = itemNum;
 					break;
 				}
 
@@ -639,7 +639,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					l->AnimNumber = LA_PICKUP;
 					l->ActiveState = LS_PICKUP_FLARE;
 					flag = 1;
-					lara->interactedItem = itemNum;
+					lara->InteractedItem = itemNum;
 					break;
 				}
 				else
@@ -651,7 +651,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 			}
 		}
 		flag = 1;
-		lara->interactedItem = itemNum;
+		lara->InteractedItem = itemNum;
 	}
 
 	if (flag)
@@ -900,7 +900,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 		&& Lara.Control.HandStatus == HandStatus::Free 
 		&& (item->Status == ITEM_NOT_ACTIVE 
 			&& item->ObjectNumber != ID_SEARCH_OBJECT4 || !item->ItemFlags[0])
-		|| Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
+		|| Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
 		bounds = GetBoundsAccurate(item);
 		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
@@ -944,10 +944,10 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* lar
 			}
 			else
 			{
-				Lara.interactedItem = itemNumber;
+				Lara.InteractedItem = itemNumber;
 			}
 		}
-		else if (Lara.Control.IsMoving && Lara.interactedItem ==  itemNumber)
+		else if (Lara.Control.IsMoving && Lara.InteractedItem ==  itemNumber)
 		{
 			Lara.Control.IsMoving = false;
 			Lara.Control.HandStatus = HandStatus::Free;

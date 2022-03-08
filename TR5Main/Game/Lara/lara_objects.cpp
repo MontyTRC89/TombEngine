@@ -209,7 +209,7 @@ void lara_as_pushable_grab(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* pulleyItem = &g_Level.Items[lara->interactedItem];
+	auto* pulleyItem = &g_Level.Items[lara->InteractedItem];
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableSpasm = false;
@@ -274,7 +274,7 @@ void lara_as_horizontal_bar_swing(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_horizontal_bar_leap(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* barItem = &g_Level.Items[lara->interactedItem];
+	auto* barItem = &g_Level.Items[lara->InteractedItem];
 
 	item->Airborne = true;
 

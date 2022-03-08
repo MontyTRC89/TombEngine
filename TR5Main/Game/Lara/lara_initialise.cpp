@@ -130,7 +130,7 @@ void LaraInitialiseMeshes(ITEM_INFO* item)
 	lara->Control.HandStatus = HandStatus::Free;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->target = NULL;
+	lara->TargetEntity = NULL;
 	lara->RightArm.Locked = false;
 	lara->LeftArm.Locked = false;
 }

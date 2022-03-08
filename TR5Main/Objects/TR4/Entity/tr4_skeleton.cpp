@@ -255,7 +255,7 @@ namespace TEN::Entities::TR4
 				creature->Alerted = true;
 			creature->Enemy = tempEnemy;
 
-			if (item != Lara.target || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
+			if (item != Lara.TargetEntity || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
 			{
 				jumpLeft = false;
 				jumpRight = false;
@@ -393,7 +393,7 @@ namespace TEN::Entities::TR4
 					{
 						if (creature->Mood == MoodType::Escape)
 						{
-							if (Lara.target == item 
+							if (Lara.TargetEntity == item 
 								|| !info.ahead 
 								|| item->HitStatus 
 								|| !(item->MeshBits & 0x200))
@@ -417,7 +417,7 @@ namespace TEN::Entities::TR4
 								item->TargetState = 15;
 							}
 						}
-						else if (Lara.target == item
+						else if (Lara.TargetEntity == item
 							&& laraInfo.angle
 							&& laraInfo.distance < SQUARE(2048)
 							&& GetRandomControl() & 1
@@ -555,7 +555,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.target != item && info.ahead && (item->MeshBits & 0x200))
+						if (Lara.TargetEntity != item && info.ahead && (item->MeshBits & 0x200))
 							item->TargetState = 2;
 					}
 					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048)))
@@ -691,7 +691,7 @@ namespace TEN::Entities::TR4
 						item->TargetState = 2;
 					}
 				}
-				else if (Lara.target != item || item->MeshBits != -1 || Lara.Control.WeaponControl.GunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.WeaponControl.GunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
 				{
 					item->TargetState = 2;
 				}

@@ -132,8 +132,8 @@ void SkidManControl(short riderNum)
 			rider->FrameNumber = g_Level.Anims[rider->AnimNumber].frameBase;
 			rider->ActiveState = SMAN_DEATH;
 
-			if (Lara.target == item)
-				Lara.target = NULL;
+			if (Lara.TargetEntity == item)
+				Lara.TargetEntity = NULL;
 		}
 		else
 			AnimateItem(rider);

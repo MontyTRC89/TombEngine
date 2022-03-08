@@ -302,8 +302,8 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	// Have target lock; get XY angles for arms.
 	if (arm->Locked)
 	{
-		y = laraInfo->targetAngles[0];
-		x = laraInfo->targetAngles[1];
+		y = laraInfo->TargetArmAngles[0];
+		x = laraInfo->TargetArmAngles[1];
 	}
 
 	int speed = weaponInfo->AimSpeed;
@@ -632,7 +632,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 	laraInfo->RightArm.FrameNumber = 0;
 	laraInfo->LeftArm.Rotation = PHD_3DPOS();
 	laraInfo->RightArm.Rotation = PHD_3DPOS();
-	laraInfo->target = nullptr;
+	laraInfo->TargetEntity = nullptr;
 	laraInfo->LeftArm.Locked = false;
 	laraInfo->RightArm.Locked = false;
 	laraInfo->LeftArm.FlashGun = 0;
@@ -936,12 +936,12 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
-	if (laraInfo->target == nullptr)
+	if (laraInfo->TargetEntity == nullptr)
 	{
 		laraInfo->RightArm.Locked = false;
 		laraInfo->LeftArm.Locked = false;
-		laraInfo->targetAngles[1] = 0;
-		laraInfo->targetAngles[0] = 0;
+		laraInfo->TargetArmAngles[1] = 0;
+		laraInfo->TargetArmAngles[0] = 0;
 		return;
 	}
 
@@ -957,7 +957,7 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	src.roomNumber = laraItem->RoomNumber;
 
 	GAME_VECTOR targetPoint;
-	FindTargetPoint(laraInfo->target, &targetPoint);
+	FindTargetPoint(laraInfo->TargetEntity, &targetPoint);
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
 	angles[0] -= laraItem->Position.yRot;
@@ -1000,8 +1000,8 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		laraInfo->LeftArm.Locked = false;
 	}
 
-	laraInfo->targetAngles[0] = angles[0];
-	laraInfo->targetAngles[1] = angles[1];
+	laraInfo->TargetArmAngles[0] = angles[0];
+	laraInfo->TargetArmAngles[1] = angles[1];
 }
 
 bool CheckForHoldingState(LaraState state)
@@ -1029,7 +1029,7 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 	if (BinocularRange)
 	{
-		laraInfo->target = nullptr;
+		laraInfo->TargetEntity = nullptr;
 		return;
 	}
 
@@ -1091,28 +1091,28 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 	TargetList[targets] = NULL;
 	if (!TargetList[0])
-		laraInfo->target = NULL;
+		laraInfo->TargetEntity = NULL;
 	else
 	{
 		for (int slot = 0; slot < MAX_TARGETS; ++slot)
 		{
 			if (!TargetList[slot])
-				laraInfo->target = NULL;
+				laraInfo->TargetEntity = NULL;
 
-			if (TargetList[slot] == laraInfo->target)
+			if (TargetList[slot] == laraInfo->TargetEntity)
 				break;
 		}
 
 		if (laraInfo->Control.HandStatus != HandStatus::Free || TrInput & IN_LOOKSWITCH)
 		{
-			if (!laraInfo->target)
+			if (!laraInfo->TargetEntity)
 			{
-				laraInfo->target = bestItem;
+				laraInfo->TargetEntity = bestItem;
 				LastTargets[0] = NULL;
 			}
 			else if (TrInput & IN_LOOKSWITCH)
 			{
-				laraInfo->target = NULL;
+				laraInfo->TargetEntity = NULL;
 				bool flag = true;
 
 				for (int match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
@@ -1129,8 +1129,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 					if (!loop)
 					{
-						laraInfo->target = TargetList[match];
-						if (laraInfo->target)
+						laraInfo->TargetEntity = TargetList[match];
+						if (laraInfo->TargetEntity)
 							flag = false;
 
 						break;
@@ -1139,19 +1139,19 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 				if (flag)
 				{
-					laraInfo->target = bestItem;
+					laraInfo->TargetEntity = bestItem;
 					LastTargets[0] = NULL;
 				}
 			}
 		}
 	}
 
-	if (laraInfo->target != LastTargets[0])
+	if (laraInfo->TargetEntity != LastTargets[0])
 	{
 		for (int slot = 7; slot > 0; --slot)
 			LastTargets[slot] = LastTargets[slot - 1];
 		
-		LastTargets[0] = laraInfo->target;
+		LastTargets[0] = laraInfo->TargetEntity;
 	}
 
 	LaraTargetInfo(laraItem, weaponInfo);

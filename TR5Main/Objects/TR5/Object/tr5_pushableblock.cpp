@@ -126,7 +126,7 @@ void PushableBlockControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* info = (PushableInfo*)item->Data;
 
-	Lara.interactedItem = itemNumber;
+	Lara.InteractedItem = itemNumber;
 
 	PHD_VECTOR pos = { 0, 0, 0 };
 
@@ -393,7 +393,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 		laraInfo->Control.HandStatus != HandStatus::Free ||
 		pushableItem->Status == ITEM_INVISIBLE ||
 		pushableItem->TriggerFlags < 0) &&
-		(!laraInfo->Control.IsMoving || laraInfo->interactedItem != itemNumber))
+		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 	{
 		if ((laraItem->ActiveState != LS_PUSHABLE_GRAB ||
 			(laraItem->FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19) ||
@@ -514,14 +514,14 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 				}
 				else
 				{
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 					pushableItem->Position.yRot = rot;
 				}
 			}
 		}
 		else
 		{
-			if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;

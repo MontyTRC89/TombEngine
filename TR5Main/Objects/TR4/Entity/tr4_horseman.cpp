@@ -646,7 +646,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 15:
-				if (Lara.target != item || AI.bite && AI.distance < pow(682, 2))
+				if (Lara.TargetEntity != item || AI.bite && AI.distance < pow(682, 2))
 					item->TargetState = 9;
 
 				break;

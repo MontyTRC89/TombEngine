@@ -71,7 +71,7 @@ void MonkControl(short itemNumber)
 		case 1:
 			info->Flags &= 0x0FFF;
 
-			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
+			if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				break;
 			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 2;
@@ -96,7 +96,7 @@ void MonkControl(short itemNumber)
 		case 11:
 			info->Flags &= 0x0FFF;
 
-			if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
+			if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				break;
 			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 2;
@@ -124,7 +124,7 @@ void MonkControl(short itemNumber)
 
 			if (info->Mood == MoodType::Bored)
 			{
-				if (!MonksAttackLara && aiInfo.ahead && Lara.target == item)
+				if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				{
 					if (GetRandomControl() < 0x4000)
 						item->TargetState = 1;

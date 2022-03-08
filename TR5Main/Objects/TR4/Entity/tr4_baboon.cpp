@@ -315,7 +315,7 @@ void BaboonControl(short itemNumber)
 				item->TargetState = BABOON_WALK;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (AI.ahead && Lara.target != item)
+				if (AI.ahead && Lara.TargetEntity != item)
 					item->TargetState = BABOON_IDLE;
 				else
 					item->TargetState = BABOON_RUN;
@@ -436,7 +436,7 @@ void BaboonControl(short itemNumber)
 				item->TargetState = BABOON_IDLE;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (AI.ahead && Lara.target != item)
+				if (AI.ahead && Lara.TargetEntity != item)
 					item->TargetState = BABOON_IDLE;
 			}
 			else if (item->AIBits & FOLLOW && (item->Airborne || AI.distance > BABOON_FOLLOW_RANGE))

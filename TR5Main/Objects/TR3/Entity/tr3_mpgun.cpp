@@ -208,7 +208,7 @@ void MPGunControl(short itemNumber)
 				head = 0;
 			}
 
-			else if (cover && (Lara.target == item || item->HitStatus))
+			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
 				item->TargetState = MPGUN_DUCK;
 			else if (item->RequiredState == MPGUN_DUCK)
 				item->TargetState = MPGUN_DUCK;
@@ -243,7 +243,7 @@ void MPGunControl(short itemNumber)
 				item->TargetState = MPGUN_WALK;
 				head = 0;
 			}
-			else if (cover && (Lara.target == item || item->HitStatus))
+			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
 			{
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;
@@ -276,7 +276,7 @@ void MPGunControl(short itemNumber)
 			tilt = angle / 2;
 			if (item->AIBits & GUARD)
 				item->TargetState = MPGUN_WAIT;
-			else if (cover && (Lara.target == item || item->HitStatus))
+			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
 			{
 				item->RequiredState = MPGUN_DUCK;
 				item->TargetState = MPGUN_WAIT;

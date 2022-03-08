@@ -879,7 +879,7 @@ enum class ClothType
 	Wet
 };
 
-enum class WaterStatus
+enum class WaterStatus // TODO: Rename to something more encompassing of its actual function.
 {
 	Dry,
 	Wade,
@@ -1193,9 +1193,9 @@ struct LaraInfo
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	ITEM_INFO* target;
-	CreatureInfo* creature;
-	short targetAngles[2];
+	ITEM_INFO* TargetEntity; // TODO: savegame
+	CreatureInfo* Creature; // Unused?
+	short TargetArmAngles[2]; // TODO: savegame
 
 	int Air;
 	int SprintEnergy;
@@ -1207,9 +1207,9 @@ struct LaraInfo
 	int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
-	short TargetAngle;
+	short TargetAngle; // TODO: Expand this feature for other applications.
 	int WaterSurfaceDist;
-	short interactedItem;
+	short InteractedItem;
 	PHD_3DPOS NextCornerPos;
 
 	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.

@@ -92,7 +92,7 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	lara->RightArm.Rotation = PHD_3DPOS();
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->target = NULL;
+	lara->TargetEntity = NULL;
 }
 
 void UndrawFlareMeshes(ITEM_INFO* laraItem)
@@ -140,7 +140,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 				InitialiseNewWeapon(laraItem);
 
-				lara->target = NULL;
+				lara->TargetEntity = NULL;
 				lara->RightArm.Locked = false;
 				lara->LeftArm.Locked = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
@@ -194,7 +194,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			InitialiseNewWeapon(laraItem);
 
-			lara->target = NULL;
+			lara->TargetEntity = NULL;
 			lara->LeftArm.Locked = false;
 			lara->RightArm.Locked = false;
 			lara->Flare.ControlLeft = false;

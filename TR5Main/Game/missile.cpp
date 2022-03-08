@@ -15,9 +15,9 @@
 #define ROCKET_DAMAGE 100
 #define DIVER_HARPOON_DAMAGE 50
 
-#define SHARD_VELOCITY  250
-#define ROCKET_VELOCITY 220
-#define NATLAGUN_VELOCITY 400
+#define SHARD_VELOCITY     250
+#define ROCKET_VELOCITY    220
+#define NATLA_GUN_VELOCITY 400
 
 void ShootAtLara(FX_INFO *fx)
 {
@@ -26,7 +26,7 @@ void ShootAtLara(FX_INFO *fx)
 	int z = LaraItem->Position.zPos - fx->pos.zPos;
 
 	auto* bounds = GetBoundsAccurate(LaraItem);
-	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 3 / 4;
+	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
 	fx->pos.xRot = -phd_atan(distance, y);
@@ -42,13 +42,17 @@ void ControlMissile(short fxNumber)
 	auto* fx = &EffectList[fxNumber];
 	printf("ControlMissile\n");
 
-	if (fx->objectNumber == ID_SCUBA_HARPOON && !(g_Level.Rooms[fx->roomNumber].flags & 1) && fx->pos.xRot > -0x3000)
+	if (fx->objectNumber == ID_SCUBA_HARPOON &&
+		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
+			fx->pos.xRot > -0x3000);
+	{
 		fx->pos.xRot -= ANGLE(1.0f);
+	}
 
 	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	int speed = fx->speed * phd_cos(fx->pos.xRot);
-	fx->pos.zPos += speed * phd_cos(fx->pos.yRot);
-	fx->pos.xPos += speed * phd_sin(fx->pos.yRot);
+	int velocity = fx->speed * phd_cos(fx->pos.xRot);
+	fx->pos.zPos += velocity * phd_cos(fx->pos.yRot);
+	fx->pos.xPos += velocity * phd_sin(fx->pos.yRot);
 
 	auto probe = GetCollisionResult(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 
@@ -150,16 +154,16 @@ void ControlNatlaGun(short fxNumber)
 		fxNumber = CreateNewEffect(probe.RoomNumber);
 		if (fxNumber != NO_ITEM)
 		{
-			auto* newfx = &EffectList[fxNumber];
+			auto* fxNew = &EffectList[fxNumber];
 
-			newfx->pos.xPos = x;
-			newfx->pos.yPos = y;
-			newfx->pos.zPos = z;
-			newfx->pos.yRot = fx->pos.yRot;
-			newfx->roomNumber = probe.RoomNumber;
-			newfx->speed = fx->speed;
-			newfx->frameNumber = 0;
-			newfx->objectNumber = ID_PROJ_NATLA;
+			fxNew->pos.xPos = x;
+			fxNew->pos.yPos = y;
+			fxNew->pos.zPos = z;
+			fxNew->pos.yRot = fx->pos.yRot;
+			fxNew->roomNumber = probe.RoomNumber;
+			fxNew->speed = fx->speed;
+			fxNew->frameNumber = 0;
+			fxNew->objectNumber = ID_PROJ_NATLA;
 		}
 	}
 }
@@ -223,7 +227,7 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->roomNumber = roomNumber;
 		fx->pos.xRot = fx->pos.zRot = 0;
 		fx->pos.yRot = yRot;
-		fx->speed = NATLAGUN_VELOCITY;
+		fx->speed = NATLA_GUN_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;
 		fx->shade = 16 * 256;
