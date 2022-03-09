@@ -70,6 +70,7 @@ static constexpr char const ScriptReserved_SetAnimations[]			= "SetAnimations";
 
 // Flow Functions
 static constexpr char const ScriptReserved_SetStrings[]			= "SetStrings";
+static constexpr char const ScriptReserved_GetString[]			= "GetString";
 static constexpr char const ScriptReserved_SetLanguageNames[]	= "SetLanguageNames";
 
 // Flow Tables
