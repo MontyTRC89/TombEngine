@@ -38,12 +38,12 @@ void DrawHealthBarOverlay(ITEM_INFO* item, int value)
 	if (CurrentLevel)
 	{
 		int color2 = 0;
-		if (lara->Poisoned)
+		if (lara->PoisonPotency)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->Poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
 	}
 }
 
@@ -52,7 +52,7 @@ void DrawHealthBar(ITEM_INFO* item, float value)
 	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->Poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
 }
 
 void UpdateHealthBar(ITEM_INFO* item, int flash)
@@ -125,8 +125,8 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 	}
 	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
 		lara->Control.HandStatus == HandStatus::WeaponReady &&
-		lara->Control.WeaponControl.GunType != WEAPON_TORCH ||
-		lara->Poisoned >= 256)
+		lara->Control.Weapon.GunType != WEAPON_TORCH ||
+		lara->PoisonPotency)
 	{
 		if (!BinocularRange)
 			DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);

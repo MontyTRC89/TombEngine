@@ -355,13 +355,13 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
         {
             Lara.Vehicle = itemNumber;
 
-            if (Lara.Control.WeaponControl.GunType == WEAPON_FLARE)
+            if (Lara.Control.Weapon.GunType == WEAPON_FLARE)
             {
                 CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
                 UndrawFlareMeshes(laraitem);
                 Lara.Flare.ControlLeft = false;
-                Lara.Control.WeaponControl.GunType = WEAPON_NONE;
-                Lara.Control.WeaponControl.RequestGunType = WEAPON_NONE;
+                Lara.Control.Weapon.GunType = WEAPON_NONE;
+                Lara.Control.Weapon.RequestGunType = WEAPON_NONE;
                 Lara.Flare.Life = 0;
             }
 
@@ -390,7 +390,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             laraitem->Position.zPos = item->Position.zPos;
             laraitem->Position.yRot = item->Position.yRot;
             ResetLaraFlex(laraitem);
-            Lara.hitDirection = -1;
+            Lara.HitDirection = -1;
             AnimateItem(laraitem);
             motorbike->revs = 0;
             item->Collidable = true;
@@ -1360,7 +1360,7 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even
     motorbike = GetMotorbikeInfo(item);
 
     Lara.Control.HandStatus = HandStatus::Busy;
-    Lara.hitDirection = -1;
+    Lara.HitDirection = -1;
     lara->ActiveState = BIKE_IDLE;
     lara->TargetState = BIKE_IDLE;
     lara->AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_IDLE;

@@ -85,12 +85,12 @@ void FlashOrange(ITEM_INFO* item)
 
 void MeshSwapToPour(ITEM_INFO* item)
 {
-	Lara.meshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
+	Lara.MeshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ITEM_INFO* item)
 {
-	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void Pickup(ITEM_INFO* item)
@@ -135,29 +135,29 @@ void SetFog(ITEM_INFO* item)
 
 void DrawLeftPistol(ITEM_INFO* item)
 {
-	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
+	if (Lara.MeshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
 	{
-		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_LHAND;
-		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		Lara.MeshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_LHAND;
+		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
 	{
-		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		Lara.Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
+		Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
 	}
 }
 
 void DrawRightPistol(ITEM_INFO* item)
 {
-	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+	if (Lara.MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 	{
-		Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_RHAND;
-		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlot::Empty;
+		Lara.MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_RHAND;
+		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
 	{
-		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-		Lara.Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
+		Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(static_cast<LaraWeaponType>(WEAPON_PISTOLS));
 	}
 }
 
@@ -210,17 +210,17 @@ void LaraLocationPad(ITEM_INFO* item)
 {
 	FlipEffect = -1;
 
-	Lara.location = TriggerTimer;
-	Lara.locationPad = TriggerTimer;
+	Lara.Location = TriggerTimer;
+	Lara.LocationPad = TriggerTimer;
 }
 
 void LaraLocation(ITEM_INFO* item)
 {
 	FlipEffect = -1;
 
-	Lara.location = TriggerTimer;
-	if (Lara.highestLocation < TriggerTimer)
-		Lara.highestLocation = TriggerTimer;
+	Lara.Location = TriggerTimer;
+	if (Lara.HighestLocation < TriggerTimer)
+		Lara.HighestLocation = TriggerTimer;
 }
 
 void ExplosionFX(ITEM_INFO* item)
@@ -232,10 +232,10 @@ void ExplosionFX(ITEM_INFO* item)
 
 void SwapCrowbar(ITEM_INFO* item)
 {
-	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
-		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
+	if (Lara.MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+		Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
 	else 
-		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void ActivateKey(ITEM_INFO* item)

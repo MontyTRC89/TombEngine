@@ -557,7 +557,7 @@ void HarpyControl(short itemNumber)
 					DoBloodSplat);
 
 				if (creature->Enemy == LaraItem)
-					Lara.Poisoned += 2048;
+					Lara.PoisonPotency += 8;
 
 				creature->Flags = 1;
 			}

@@ -1084,7 +1084,6 @@ struct WeaponControlData
 	bool HasFired;
 	bool Fired;
 
-	// TODO: Savegame
 	bool UziLeft;
 	bool UziRight;
 
@@ -1140,6 +1139,12 @@ struct SubsuitControlData
 	unsigned short HitCount;
 };
 
+struct MinecartControlData
+{
+	bool Left;
+	bool Right;
+};
+
 struct LaraCountData
 {
 	unsigned int RunJump;
@@ -1158,11 +1163,7 @@ struct LaraControlData
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
 	WaterStatus WaterStatus;
-
-	WeaponControlData WeaponControl;
-	RopeControlData RopeControl;
-	TightropeControlData TightropeControl;
-	SubsuitControlData SubsuitControl;
+	LaraCountData Count;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1174,9 +1175,11 @@ struct LaraControlData
 	bool RunJumpQueued;
 	bool Locked;
 
-	short WaterCurrentActive;
-
-	LaraCountData Count;
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+	MinecartControlData Minecart;
 };
 
 struct LaraInfo
@@ -1190,55 +1193,57 @@ struct LaraInfo
 	PHD_3DPOS ExtraHeadRot;
 	PHD_3DPOS ExtraTorsoRot;
 	PHD_VECTOR ExtraVelocity;
+	short WaterCurrentActive;
+	PHD_VECTOR WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	ITEM_INFO* TargetEntity; // TODO: savegame
-	CreatureInfo* Creature; // Unused?
-	short TargetArmAngles[2]; // TODO: savegame
+	ITEM_INFO* TargetEntity;
+	CreatureInfo* Creature;	// Unused?
+	short TargetArmAngles[2];
 
 	int Air;
 	int SprintEnergy;
-	short Poisoned;
+	int PoisonPotency;
 
-	int hitFrame;
-	int hitDirection;
+	int HitFrame;
+	int HitDirection;
 	FX_INFO* SpasmEffect;
-	int SpasmEffectCount;
+	unsigned int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
-	short TargetAngle; // TODO: Expand this feature for other applications.
+	short TargetAngle;	// Target facing angle.
 	int WaterSurfaceDist;
 	short InteractedItem;
 	PHD_3DPOS NextCornerPos;
 
-	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
+	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
 	unsigned int BurnCount;
-	bool burn;
-	byte burnBlue;
+	bool Burn;
+	byte BurnBlue;
 	bool BurnSmoke;
 
-	byte wet[NUM_LARA_MESHES];
-	int meshPtrs[NUM_LARA_MESHES];
-	signed char location;
-	signed char highestLocation;
-	signed char locationPad;
+	byte Wet[NUM_LARA_MESHES];
+	int MeshPtrs[NUM_LARA_MESHES];
+	signed char Location;
+	signed char HighestLocation;
+	signed char LocationPad;
 
 	// Inventory-related?
 	bool IsBusy;
 	bool OldBusy;
 
 	// NEW:
+
 	byte BeetleLife;
-	short hasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte smallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
-	byte bigWaterskin;		// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
+	short HasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte SmallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
+	byte BigWaterskin;		// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
 	short Vehicle;
 	short ExtraAnim;
-	bool mineL;
-	bool mineR;
 	CarriedWeaponInfo Weapons[static_cast<int>(LaraWeaponType::NUM_WEAPONS)];
+
 	DiaryInfo Diary;
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];

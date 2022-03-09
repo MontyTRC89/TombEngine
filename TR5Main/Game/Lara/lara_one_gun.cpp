@@ -71,7 +71,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
 	}
 
-	auto* item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
+	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	bool running = (weaponType == WEAPON_HK && laraItem->Velocity != 0);
 	bool harpoonFired = false;
 
@@ -332,10 +332,10 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	ITEM_INFO* item;
 
-	if (lara->Control.WeaponControl.WeaponItem == NO_ITEM)
+	if (lara->Control.Weapon.WeaponItem == NO_ITEM)
 	{
-		lara->Control.WeaponControl.WeaponItem = CreateItem();
-		item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
+		lara->Control.Weapon.WeaponItem = CreateItem();
+		item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 		item->ObjectNumber = WeaponObject(weaponType);
 
 		if (weaponType == WEAPON_ROCKET_LAUNCHER)
@@ -355,7 +355,7 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->LeftArm.FrameBase = lara->RightArm.FrameBase;
 	}
 	else
-		item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
+		item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 
 	AnimateItem(item);
 
@@ -378,7 +378,7 @@ void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto* item = &g_Level.Items[lara->Control.WeaponControl.WeaponItem];
+	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	item->TargetState = 3;
 
 	AnimateItem(item);
@@ -389,8 +389,8 @@ void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->TargetEntity = nullptr;
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
-		KillItem(lara->Control.WeaponControl.WeaponItem);
-		lara->Control.WeaponControl.WeaponItem = NO_ITEM;
+		KillItem(lara->Control.Weapon.WeaponItem);
+		lara->Control.Weapon.WeaponItem = NO_ITEM;
 		lara->RightArm.FrameNumber = 0;
 		lara->LeftArm.FrameNumber = 0;
 	}
@@ -409,16 +409,16 @@ void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlot::Empty;
-	lara->meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
+	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
+	lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
 void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->Control.WeaponControl.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
-	lara->meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
+	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void FireHarpoon(ITEM_INFO* laraItem)
@@ -429,7 +429,7 @@ void FireHarpoon(ITEM_INFO* laraItem)
 	if (!ammos)
 		return;
 
-	lara->Control.WeaponControl.HasFired = true;
+	lara->Control.Weapon.HasFired = true;
 
 	// Create a new item for harpoon
 	short itemNumber = CreateItem();
@@ -647,7 +647,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 	if (!ammo)
 		return;
 
-	lara->Control.WeaponControl.HasFired = true;
+	lara->Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1108,7 +1108,7 @@ void FireRocket(ITEM_INFO* laraItem)
 	if (!ammos)
 		return;
 
-	lara->Control.WeaponControl.HasFired = true;
+	lara->Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -1381,7 +1381,7 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 	if (!ammos)
 		return;
 
-	lara->Control.WeaponControl.HasFired = true;
+	lara->Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)

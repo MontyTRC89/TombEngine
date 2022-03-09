@@ -1167,11 +1167,11 @@ void TriggerLaraDrips(ITEM_INFO* item)
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
-				Lara.wet[i] = UCHAR_MAX;
+				Lara.Wet[i] = UCHAR_MAX;
 
-			if (Lara.wet[i] 
+			if (Lara.Wet[i] 
 				&& !LaraNodeUnderwater[i] 
-				&& (GetRandomControl() & 0x1FF) < Lara.wet[i])
+				&& (GetRandomControl() & 0x1FF) < Lara.Wet[i])
 			{
 
 				pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -1192,10 +1192,10 @@ void TriggerLaraDrips(ITEM_INFO* item)
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
 				dptr->roomNumber = LaraItem->RoomNumber;
 
-				if (Lara.wet[i] >= 4)
-					Lara.wet[i] -= 4;
+				if (Lara.Wet[i] >= 4)
+					Lara.Wet[i] -= 4;
 				else
-					Lara.wet[i] = 0;
+					Lara.Wet[i] = 0;
 
 			}
 		}

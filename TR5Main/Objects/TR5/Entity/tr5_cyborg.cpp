@@ -530,7 +530,7 @@ void CyborgControl(short itemNumber)
 				break;
 			}
 		}
-		else if (item->ActiveState == 43 && !Lara.burn)
+		else if (item->ActiveState == 43 && !Lara.Burn)
 		{
 			PHD_VECTOR pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_LFOOT);
@@ -556,7 +556,7 @@ void CyborgControl(short itemNumber)
 				{
 					LaraBurn(LaraItem);
 					Lara.BurnCount = 48;
-					Lara.burnBlue = 1;
+					Lara.BurnBlue = 1;
 					LaraItem->HitPoints = 0;
 				}
 			}

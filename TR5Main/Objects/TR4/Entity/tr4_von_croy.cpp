@@ -151,7 +151,7 @@ void VonCroyControl(short itemNumber)
 	// Try to find a possible enemy or target
 	ITEM_INFO* foundTarget = NULL;
 
-	if (Lara.location <= creature->LocationAI)
+	if (Lara.Location <= creature->LocationAI)
 	{
 		int minDistance = 0x7FFFFFFF;
 		int distance;
@@ -428,7 +428,7 @@ void VonCroyControl(short itemNumber)
 		}
 		else
 		{
-			if (Lara.location >= item->ItemFlags[3])
+			if (Lara.Location >= item->ItemFlags[3])
 			{
 				if (!foundTarget || info.distance >= 0x200000 && (item->SwapMeshFlags & 0x40000 || info.distance >= 9437184))
 				{
@@ -446,7 +446,7 @@ void VonCroyControl(short itemNumber)
 							item->TargetState = STATE_VON_CROY_STOP;
 						}
 					}
-					else if (Lara.location > item->ItemFlags[3] && laraInfo.distance > 0x400000)
+					else if (Lara.Location > item->ItemFlags[3] && laraInfo.distance > 0x400000)
 					{
 						item->TargetState = STATE_VON_CROY_RUN;
 					}
@@ -495,7 +495,7 @@ void VonCroyControl(short itemNumber)
 		creature->MaxTurn = ANGLE(11);
 		tilt = abs(angle) / 2;
 
-		if (info.distance < SQUARE(2048) || Lara.location < creature->LocationAI)
+		if (info.distance < SQUARE(2048) || Lara.Location < creature->LocationAI)
 		{
 			item->TargetState = STATE_VON_CROY_STOP;
 			break;

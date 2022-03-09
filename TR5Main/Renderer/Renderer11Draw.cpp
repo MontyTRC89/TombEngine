@@ -240,7 +240,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = GetMesh(Lara.meshPtrs[k]);
+			RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 			for (auto& bucket : mesh->buckets)
 			{
@@ -2112,8 +2112,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara.ActiveState: %d", LaraItem->ActiveState);
 				PrintDebugMessage("Lara.RequiredState: %d", LaraItem->RequiredState);
 				PrintDebugMessage("Lara.TargetState: %d", LaraItem->TargetState);
-				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.WeaponControl.WeaponItem);
-				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.WeaponControl.GunType);
+				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
+				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.Weapon.GunType);
 				PrintDebugMessage("Lara.Control.HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara.Velocity, VerticalVelocity: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
 				PrintDebugMessage("Lara.Airborne: %d", LaraItem->Airborne);

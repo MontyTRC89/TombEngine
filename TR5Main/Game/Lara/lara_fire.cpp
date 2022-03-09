@@ -349,7 +349,7 @@ void LaraGun(ITEM_INFO* laraItem)
 	if (laraInfo->RightArm.FlashGun > 0)
 		--laraInfo->RightArm.FlashGun;
 
-	if (laraInfo->Control.WeaponControl.GunType == WEAPON_TORCH)
+	if (laraInfo->Control.Weapon.GunType == WEAPON_TORCH)
 	{
 		DoFlameTorch();
 		return;
@@ -361,12 +361,12 @@ void LaraGun(ITEM_INFO* laraItem)
 	{
 		// Draw weapon.
 		if (TrInput & IN_DRAW)
-			laraInfo->Control.WeaponControl.RequestGunType = laraInfo->Control.WeaponControl.LastGunType;
+			laraInfo->Control.Weapon.RequestGunType = laraInfo->Control.Weapon.LastGunType;
 		// Draw flare.
 		else if (TrInput & IN_FLARE &&
 			(g_GameFlow->GetLevel(CurrentLevel)->LaraType != LaraType::Young))
 		{
-			if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+			if (laraInfo->Control.Weapon.GunType == WEAPON_FLARE)
 			{
 			//	if (!laraInfo->leftArm.frameNumber)	// NO
 				{
@@ -378,32 +378,32 @@ void LaraGun(ITEM_INFO* laraItem)
 				if (laraInfo->NumFlares != -1)
 					laraInfo->NumFlares--;
 
-				laraInfo->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
+				laraInfo->Control.Weapon.RequestGunType = WEAPON_FLARE;
 			}
 		}
 
 		if (TrInput & IN_DRAW ||
-			laraInfo->Control.WeaponControl.RequestGunType != laraInfo->Control.WeaponControl.GunType)
+			laraInfo->Control.Weapon.RequestGunType != laraInfo->Control.Weapon.GunType)
 		{
 			if ((laraItem->ActiveState == LS_CROUCH_IDLE ||
 				laraItem->ActiveState == LS_CROUCH_TURN_LEFT ||
 				laraItem->ActiveState == LS_CROUCH_TURN_RIGHT) &&
-				(laraInfo->Control.WeaponControl.RequestGunType == WEAPON_HK ||
-					laraInfo->Control.WeaponControl.RequestGunType == WEAPON_CROSSBOW ||
-					laraInfo->Control.WeaponControl.RequestGunType == WEAPON_SHOTGUN ||
-					laraInfo->Control.WeaponControl.RequestGunType == WEAPON_HARPOON_GUN))
+				(laraInfo->Control.Weapon.RequestGunType == WEAPON_HK ||
+					laraInfo->Control.Weapon.RequestGunType == WEAPON_CROSSBOW ||
+					laraInfo->Control.Weapon.RequestGunType == WEAPON_SHOTGUN ||
+					laraInfo->Control.Weapon.RequestGunType == WEAPON_HARPOON_GUN))
 			{
-				if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
-					laraInfo->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
+				if (laraInfo->Control.Weapon.GunType == WEAPON_FLARE)
+					laraInfo->Control.Weapon.RequestGunType = WEAPON_FLARE;
 			}
-			else if (laraInfo->Control.WeaponControl.RequestGunType == WEAPON_FLARE ||
+			else if (laraInfo->Control.Weapon.RequestGunType == WEAPON_FLARE ||
 				(laraInfo->Vehicle == NO_ITEM &&
-					(laraInfo->Control.WeaponControl.RequestGunType == WEAPON_HARPOON_GUN ||
+					(laraInfo->Control.Weapon.RequestGunType == WEAPON_HARPOON_GUN ||
 						laraInfo->Control.WaterStatus == WaterStatus::Dry ||
 						(laraInfo->Control.WaterStatus == WaterStatus::Wade &&
-							laraInfo->WaterSurfaceDist > -Weapons[laraInfo->Control.WeaponControl.GunType].GunHeight))))
+							laraInfo->WaterSurfaceDist > -Weapons[laraInfo->Control.Weapon.GunType].GunHeight))))
 			{
-				if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+				if (laraInfo->Control.Weapon.GunType == WEAPON_FLARE)
 				{
 					CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 					UndrawFlareMeshes(laraItem);
@@ -411,7 +411,7 @@ void LaraGun(ITEM_INFO* laraItem)
 					laraInfo->Flare.Life = 0;
 				}
 
-				laraInfo->Control.WeaponControl.GunType = laraInfo->Control.WeaponControl.RequestGunType;
+				laraInfo->Control.Weapon.GunType = laraInfo->Control.Weapon.RequestGunType;
 				InitialiseNewWeapon(laraItem);
 				laraInfo->RightArm.FrameNumber = 0;
 				laraInfo->LeftArm.FrameNumber = 0;
@@ -419,26 +419,26 @@ void LaraGun(ITEM_INFO* laraItem)
 			}
 			else
 			{
-				laraInfo->Control.WeaponControl.LastGunType = laraInfo->Control.WeaponControl.RequestGunType;
+				laraInfo->Control.Weapon.LastGunType = laraInfo->Control.Weapon.RequestGunType;
 
-				if (laraInfo->Control.WeaponControl.GunType != WEAPON_FLARE)
-					laraInfo->Control.WeaponControl.GunType = laraInfo->Control.WeaponControl.RequestGunType;
+				if (laraInfo->Control.Weapon.GunType != WEAPON_FLARE)
+					laraInfo->Control.Weapon.GunType = laraInfo->Control.Weapon.RequestGunType;
 				else
-					laraInfo->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
+					laraInfo->Control.Weapon.RequestGunType = WEAPON_FLARE;
 			}
 		}
 	}
 	else if (laraInfo->Control.HandStatus == HandStatus::WeaponReady)
 	{
 		if (TrInput & IN_DRAW ||
-			laraInfo->Control.WeaponControl.RequestGunType != laraInfo->Control.WeaponControl.GunType)
+			laraInfo->Control.Weapon.RequestGunType != laraInfo->Control.Weapon.GunType)
 		{
 			laraInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 		}
-		else if (laraInfo->Control.WeaponControl.GunType != WEAPON_HARPOON_GUN &&
+		else if (laraInfo->Control.Weapon.GunType != WEAPON_HARPOON_GUN &&
 			laraInfo->Control.WaterStatus != WaterStatus::Dry &&
 			(laraInfo->Control.WaterStatus != WaterStatus::Wade ||
-				laraInfo->WaterSurfaceDist < -Weapons[laraInfo->Control.WeaponControl.GunType].GunHeight))
+				laraInfo->WaterSurfaceDist < -Weapons[laraInfo->Control.Weapon.GunType].GunHeight))
 		{
 			laraInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 		}
@@ -448,19 +448,19 @@ void LaraGun(ITEM_INFO* laraItem)
 		laraItem->ActiveState == LS_CRAWL_IDLE &&
 		laraItem->AnimNumber == LA_CRAWL_IDLE)
 	{
-		laraInfo->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
+		laraInfo->Control.Weapon.RequestGunType = WEAPON_FLARE;
 	}
 
 	switch (laraInfo->Control.HandStatus)
 	{
 	case HandStatus::DrawWeapon:
-		if (laraInfo->Control.WeaponControl.GunType != WEAPON_FLARE &&
-			laraInfo->Control.WeaponControl.GunType != WEAPON_NONE)
+		if (laraInfo->Control.Weapon.GunType != WEAPON_FLARE &&
+			laraInfo->Control.Weapon.GunType != WEAPON_NONE)
 		{
-			laraInfo->Control.WeaponControl.LastGunType = laraInfo->Control.WeaponControl.GunType;
+			laraInfo->Control.Weapon.LastGunType = laraInfo->Control.Weapon.GunType;
 		}
 
-		switch (laraInfo->Control.WeaponControl.GunType)
+		switch (laraInfo->Control.Weapon.GunType)
 		{
 		case WEAPON_PISTOLS:
 		case WEAPON_REVOLVER:
@@ -468,7 +468,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			if (Camera.type != CameraType::Look && Camera.type != CameraType::Heavy)
 				Camera.type = CameraType::Combat;
 
-			DrawPistols(laraItem, laraInfo->Control.WeaponControl.GunType);
+			DrawPistols(laraItem, laraInfo->Control.Weapon.GunType);
 			break;
 
 		case WEAPON_SHOTGUN:
@@ -480,7 +480,7 @@ void LaraGun(ITEM_INFO* laraItem)
 			if (Camera.type != CameraType::Look && Camera.type != CameraType::Heavy)
 				Camera.type = CameraType::Combat;
 
-			DrawShotgun(laraItem, laraInfo->Control.WeaponControl.GunType);
+			DrawShotgun(laraItem, laraInfo->Control.Weapon.GunType);
 			break;
 
 		case WEAPON_FLARE:
@@ -499,14 +499,14 @@ void LaraGun(ITEM_INFO* laraItem)
 		break;
 
 	case HandStatus::UndrawWeapon:
-		laraInfo->meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+		laraInfo->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 
-		switch (laraInfo->Control.WeaponControl.GunType)
+		switch (laraInfo->Control.Weapon.GunType)
 		{
 		case WEAPON_PISTOLS:
 		case WEAPON_REVOLVER:
 		case WEAPON_UZI:
-			UndrawPistols(laraItem, laraInfo->Control.WeaponControl.GunType);
+			UndrawPistols(laraItem, laraInfo->Control.Weapon.GunType);
 			break;
 
 		case WEAPON_SHOTGUN:
@@ -515,7 +515,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		case WEAPON_GRENADE_LAUNCHER:
 		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
-			UndrawShotgun(laraItem, laraInfo->Control.WeaponControl.GunType);
+			UndrawShotgun(laraItem, laraInfo->Control.Weapon.GunType);
 			break;
 
 		case WEAPON_FLARE:
@@ -530,9 +530,9 @@ void LaraGun(ITEM_INFO* laraItem)
 
 	case HandStatus::WeaponReady:
 		if (!(TrInput & IN_ACTION))
-			laraInfo->meshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
+			laraInfo->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SKIN].meshIndex + LM_HEAD;
 		else
-			laraInfo->meshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
+			laraInfo->MeshPtrs[LM_HEAD] = Objects[ID_LARA_SCREAM].meshIndex + LM_HEAD;
 
 		if (Camera.type != CameraType::Look &&
 			Camera.type != CameraType::Heavy)
@@ -542,18 +542,18 @@ void LaraGun(ITEM_INFO* laraItem)
 
 		if (TrInput & IN_ACTION)
 		{
-			if (!GetAmmo(laraItem, laraInfo->Control.WeaponControl.GunType))
+			if (!GetAmmo(laraItem, laraInfo->Control.Weapon.GunType))
 			{
-				laraInfo->Control.WeaponControl.RequestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
+				laraInfo->Control.Weapon.RequestGunType = Objects[ID_PISTOLS_ITEM].loaded ? WEAPON_PISTOLS : WEAPON_NONE;
 				return;
 			}
 		}
 
-		switch (laraInfo->Control.WeaponControl.GunType)
+		switch (laraInfo->Control.Weapon.GunType)
 		{
 		case WEAPON_PISTOLS:
 		case WEAPON_UZI:
-			PistolHandler(laraItem, laraInfo->Control.WeaponControl.GunType);
+			PistolHandler(laraItem, laraInfo->Control.Weapon.GunType);
 
 			break;
 
@@ -564,7 +564,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		case WEAPON_ROCKET_LAUNCHER:
 		case WEAPON_HARPOON_GUN:
 		case WEAPON_REVOLVER:
-			RifleHandler(laraItem, laraInfo->Control.WeaponControl.GunType);
+			RifleHandler(laraItem, laraInfo->Control.Weapon.GunType);
 			break;
 
 		default:
@@ -574,7 +574,7 @@ void LaraGun(ITEM_INFO* laraItem)
 		break;
 
 	case HandStatus::Free:
-		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (laraInfo->Control.Weapon.GunType == WEAPON_FLARE)
 		{
 			if (laraInfo->Vehicle != NO_ITEM ||
 				CheckForHoldingState((LaraState)laraItem->ActiveState))
@@ -603,9 +603,9 @@ void LaraGun(ITEM_INFO* laraItem)
 		break;
 
 	case HandStatus::Busy:
-		if (laraInfo->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (laraInfo->Control.Weapon.GunType == WEAPON_FLARE)
 		{
-			if (laraInfo->meshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
+			if (laraInfo->MeshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				laraInfo->Flare.ControlLeft = (laraInfo->Vehicle != NO_ITEM || CheckForHoldingState((LaraState)laraItem->ActiveState));
 				DoFlareInHand(laraItem, laraInfo->Flare.Life);
@@ -638,7 +638,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 	laraInfo->LeftArm.FlashGun = 0;
 	laraInfo->RightArm.FlashGun = 0;
 
-	switch (laraInfo->Control.WeaponControl.GunType)
+	switch (laraInfo->Control.Weapon.GunType)
 	{
 	case WEAPON_PISTOLS:
 	case WEAPON_UZI:
@@ -646,7 +646,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 		laraInfo->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 
 		if (laraInfo->Control.HandStatus != HandStatus::Free)
-			DrawPistolMeshes(laraItem, laraInfo->Control.WeaponControl.GunType);
+			DrawPistolMeshes(laraItem, laraInfo->Control.Weapon.GunType);
 
 		break;
 
@@ -656,11 +656,11 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 	case WEAPON_GRENADE_LAUNCHER:
 	case WEAPON_HARPOON_GUN:
 	case WEAPON_ROCKET_LAUNCHER:
-		laraInfo->RightArm.FrameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
-		laraInfo->LeftArm.FrameBase = Objects[WeaponObject(laraInfo->Control.WeaponControl.GunType)].frameBase;
+		laraInfo->RightArm.FrameBase = Objects[WeaponObject(laraInfo->Control.Weapon.GunType)].frameBase;
+		laraInfo->LeftArm.FrameBase = Objects[WeaponObject(laraInfo->Control.Weapon.GunType)].frameBase;
 
 		if (laraInfo->Control.HandStatus != HandStatus::Free)
-			DrawShotgunMeshes(laraItem, laraInfo->Control.WeaponControl.GunType);
+			DrawShotgunMeshes(laraItem, laraInfo->Control.Weapon.GunType);
 
 		break;
 
@@ -735,9 +735,9 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int 
 			case HIT_BLOOD:
 				if (target->ObjectNumber == ID_BADDY2 &&
 					(target->ActiveState == 8 || GetRandomControl() & 1) &&
-					(laraInfo->Control.WeaponControl.GunType == WEAPON_PISTOLS ||
-						laraInfo->Control.WeaponControl.GunType == WEAPON_SHOTGUN ||
-						laraInfo->Control.WeaponControl.GunType == WEAPON_UZI))
+					(laraInfo->Control.Weapon.GunType == WEAPON_PISTOLS ||
+						laraInfo->Control.Weapon.GunType == WEAPON_SHOTGUN ||
+						laraInfo->Control.Weapon.GunType == WEAPON_UZI))
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Position, 0);
@@ -835,8 +835,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 		}
 	}
 
-	laraInfo->Control.WeaponControl.HasFired = true;
-	laraInfo->Control.WeaponControl.Fired = true;
+	laraInfo->Control.Weapon.HasFired = true;
+	laraInfo->Control.Weapon.Fired = true;
 	
 	GAME_VECTOR vSrc;
 	vSrc.x = pos.x;

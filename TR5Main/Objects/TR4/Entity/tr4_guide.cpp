@@ -241,7 +241,7 @@ void GuideControl(short itemNumber)
 
 		if (item->RequiredState)
 			item->TargetState = item->RequiredState;
-		else if (Lara.location >= item->ItemFlags[3] ||
+		else if (Lara.Location >= item->ItemFlags[3] ||
 			item->ItemFlags[1] != 2)
 		{
 			if (!creature->ReachedGoal || foundEnemy)
@@ -365,7 +365,7 @@ void GuideControl(short itemNumber)
 		}
 		else
 		{
-			if (Lara.location >= item->ItemFlags[3])
+			if (Lara.Location >= item->ItemFlags[3])
 			{
 				if (!foundEnemy ||
 					AI.distance >= 0x200000 &&
@@ -381,7 +381,7 @@ void GuideControl(short itemNumber)
 						else
 							item->TargetState = GUIDE_STATE_IDLE;
 					}
-					else if (Lara.location > item->ItemFlags[3] &&
+					else if (Lara.Location > item->ItemFlags[3] &&
 						laraAI.distance > pow(SECTOR(2), 2))
 					{
 						item->TargetState = GUIDE_STATE_RUN;
@@ -404,7 +404,7 @@ void GuideControl(short itemNumber)
 			joint2 = AI.angle;
 
 		if (AI.distance < pow(SECTOR(2), 2) ||
-			Lara.location < item->ItemFlags[3])
+			Lara.Location < item->ItemFlags[3])
 		{
 			item->TargetState = GUIDE_STATE_IDLE;
 			break;

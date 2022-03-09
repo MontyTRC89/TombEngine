@@ -99,14 +99,14 @@ void UndrawFlareMeshes(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void DrawFlareMeshes(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
+	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ITEM_INFO* laraItem)
@@ -134,8 +134,8 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			if (flareFrame >= g_Level.Anims[laraItem->AnimNumber].frameBase + 31) // Last frame.
 			{
-				lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.LastGunType;
-				lara->Control.WeaponControl.GunType = lara->Control.WeaponControl.LastGunType;
+				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.LastGunType;
+				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
 				lara->Control.HandStatus = HandStatus::Free;
 
 				InitialiseNewWeapon(laraItem);
@@ -188,8 +188,8 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		{
 			armFrame = 0;
 
-			lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.LastGunType;
-			lara->Control.WeaponControl.GunType = lara->Control.WeaponControl.LastGunType;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.LastGunType;
+			lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
 			lara->Control.HandStatus = HandStatus::Free;
 
 			InitialiseNewWeapon(laraItem);

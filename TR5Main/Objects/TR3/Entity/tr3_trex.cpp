@@ -46,7 +46,7 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	laraItem->HitPoints = -16384;
 	Lara.Air = -1;
 	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
+	Lara.Control.Weapon.GunType = WEAPON_NONE;
 
 	Camera.flags = 1;
 	Camera.targetAngle = ANGLE(170.0f);

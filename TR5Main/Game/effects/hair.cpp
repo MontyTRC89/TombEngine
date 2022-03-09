@@ -60,9 +60,9 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 
 	if (framePtr == NULL)
 	{
-		if (lara->hitDirection >= 0)
+		if (lara->HitDirection >= 0)
 		{
-			switch (lara->hitDirection)
+			switch (lara->HitDirection)
 			{
 			case NORTH:
 				if (lara->Control.IsLow)
@@ -93,7 +93,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 				break;
 			}
 
-			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + lara->hitFrame];
+			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + lara->HitFrame];
 		}
 		else
 			frame = GetBestFrame(item);
@@ -104,7 +104,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	}
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	MESH* mesh = &g_Level.Meshes[lara->meshPtrs[LM_HIPS]];
+	MESH* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
 	PHD_VECTOR pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_HIPS);
 	sphere[0].x = pos.x;
@@ -112,7 +112,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[lara->meshPtrs[LM_TORSO]];
+	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_TORSO]];
 	pos = { (int)mesh->sphere.Center.x - 10, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z + 25 }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_TORSO);
 	sphere[1].x = pos.x;
@@ -122,7 +122,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	if (youngLara)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
-	mesh = &g_Level.Meshes[lara->meshPtrs[LM_HEAD]];
+	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HEAD]];
 	pos = { (int)mesh->sphere.Center.x - 2, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z }; // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
@@ -130,7 +130,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[2].z = pos.z;
 	sphere[2].r = (int)mesh->sphere.Radius;
 
-	mesh = &g_Level.Meshes[lara->meshPtrs[LM_RINARM]];
+	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_RINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
@@ -138,7 +138,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[3].z = pos.z;
 	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
-	mesh = &g_Level.Meshes[lara->meshPtrs[LM_LINARM]];
+	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_LINARM]];
 	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;

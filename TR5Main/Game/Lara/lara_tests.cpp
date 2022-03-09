@@ -1006,7 +1006,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != WEAPON_FLARE))
 	{
 		return false;
 	}
@@ -1091,7 +1091,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != WEAPON_FLARE))
 	{
 		return false;
 	}
@@ -1298,7 +1298,7 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
 			lara->Flare.Life) &&
 		lara->Vehicle == NO_ITEM)								// Not in a vehicle.
 	{
@@ -1660,7 +1660,7 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
 		!probe.Position.FloorSlope &&							// Not a slope.
 		lara->WaterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;
@@ -1675,7 +1675,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;
@@ -2439,7 +2439,7 @@ bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)
 	auto probe = GetCollisionResult(item);
 
 	if (probe.Position.Floor == item->Position.yPos &&
-		lara->Control.TightropeControl.CanDismount)
+		lara->Control.Tightrope.CanDismount)
 	{
 		return true;
 	}

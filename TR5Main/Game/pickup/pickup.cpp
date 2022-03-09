@@ -175,8 +175,8 @@ void DoPickup(ITEM_INFO* character)
 	{
 		if (character->ActiveState == LA_UNDERWATER_PICKUP_FLARE)
 		{
-			lara->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
-			lara->Control.WeaponControl.GunType = WEAPON_FLARE;
+			lara->Control.Weapon.RequestGunType = WEAPON_FLARE;
+			lara->Control.Weapon.GunType = WEAPON_FLARE;
 			InitialiseNewWeapon(character);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = (int)(item->Data) & 0x7FFF;
@@ -191,8 +191,8 @@ void DoPickup(ITEM_INFO* character)
 		}
 		else if (character->ActiveState == LS_PICKUP_FLARE)
 		{
-			lara->Control.WeaponControl.RequestGunType = WEAPON_FLARE;
-			lara->Control.WeaponControl.GunType = WEAPON_FLARE;
+			lara->Control.Weapon.RequestGunType = WEAPON_FLARE;
+			lara->Control.Weapon.GunType = WEAPON_FLARE;
 			InitialiseNewWeapon(character);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = (short)(item->Data) & 0x7FFF;
@@ -276,7 +276,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	auto lara = (LaraInfo*&)l->Data;
 
-	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == WEAPON_FLARE)
 		return;
 
 	item->Position.yRot = l->Position.yRot;
@@ -1080,9 +1080,9 @@ bool UseSpecialItem(ITEM_INFO* item)
 			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Position.yPos > Lara.WaterSurfaceDist))
 			{
 				if (use < ID_WATERSKIN1_3)
-					Lara.smallWaterskin = 4;
+					Lara.SmallWaterskin = 4;
 				else
-					Lara.bigWaterskin = 6;
+					Lara.BigWaterskin = 6;
 
 				flag = 1;
 			}
@@ -1090,13 +1090,13 @@ bool UseSpecialItem(ITEM_INFO* item)
 			{
 				if (use <= ID_WATERSKIN1_3)
 				{
-					item->ItemFlags[3] = Lara.smallWaterskin - 1;
-					Lara.smallWaterskin = 1;
+					item->ItemFlags[3] = Lara.SmallWaterskin - 1;
+					Lara.SmallWaterskin = 1;
 				}
 				else
 				{
-					item->ItemFlags[3] = Lara.bigWaterskin - 1;
-					Lara.bigWaterskin = 1;
+					item->ItemFlags[3] = Lara.BigWaterskin - 1;
+					Lara.BigWaterskin = 1;
 				}
 
 				flag = 2;

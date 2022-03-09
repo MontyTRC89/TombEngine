@@ -149,7 +149,7 @@ namespace TEN::Entities::Effects
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 
-				if (!Lara.burn
+				if (!Lara.Burn
 					&& ItemNearLara(&item->Position, 600)
 					&& (SQUARE(LaraItem->Position.xPos - item->Position.xPos) +
 						SQUARE(LaraItem->Position.zPos - item->Position.zPos) < SQUARE(512))
@@ -283,7 +283,7 @@ namespace TEN::Entities::Effects
 
 		if (!Lara.BurnSmoke)
 		{
-			if (Lara.burnBlue == 0)
+			if (Lara.BurnBlue == 0)
 			{
 				TriggerDynamicLight(
 					pos.x,
@@ -294,7 +294,7 @@ namespace TEN::Entities::Effects
 					(GetRandomControl() & 0x1F) + 96,
 					0);
 			}
-			else if (Lara.burnBlue == 1)
+			else if (Lara.BurnBlue == 1)
 			{
 				TriggerDynamicLight(
 					pos.x, 
@@ -305,7 +305,7 @@ namespace TEN::Entities::Effects
 					(GetRandomControl() & 0x1F) + 96,
 					(GetRandomControl() & 0x3F) + 192);
 			}
-			else if (Lara.burnBlue == 2)
+			else if (Lara.BurnBlue == 2)
 			{
 				TriggerDynamicLight(
 					pos.x,
@@ -333,7 +333,7 @@ namespace TEN::Entities::Effects
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
 		int wh = GetWaterHeight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
-		if (wh == NO_HEIGHT || fx->pos.yPos <= wh || Lara.burnBlue)
+		if (wh == NO_HEIGHT || fx->pos.yPos <= wh || Lara.BurnBlue)
 		{
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos, 0);
 
@@ -343,13 +343,13 @@ namespace TEN::Entities::Effects
 		else
 		{
 			KillEffect(fxNumber);
-			Lara.burn = false;
+			Lara.Burn = false;
 		}
 
 		if (Lara.Control.WaterStatus == WaterStatus::FlyCheat)
 		{
 			KillEffect(fxNumber);
-			Lara.burn = false;
+			Lara.Burn = false;
 		}
 	}
 
@@ -620,7 +620,7 @@ namespace TEN::Entities::Effects
 
 				if (ItemNearLara(&pos, 600))
 				{
-					if ((!Lara.burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
+					if ((!Lara.Burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
 						LaraItem->HitPoints -= 5;
 						LaraItem->HitStatus = true;
@@ -640,7 +640,7 @@ namespace TEN::Entities::Effects
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (Lara.Control.WeaponControl.GunType != WEAPON_TORCH
+		if (Lara.Control.Weapon.GunType != WEAPON_TORCH
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
 			|| Lara.LeftArm.Locked
 			|| Lara.LitTorch == (item->Status & 1)
