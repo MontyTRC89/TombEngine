@@ -251,9 +251,9 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (BinocularRange == 0)
 			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.Weapon.GunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || 
-												   (Lara.Control.Weapon.GunType == WEAPON_HK) || 
-												   (Lara.Control.Weapon.GunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+												   (Lara.Control.Weapon.GunType == LaraWeaponType::HK) || 
+												   (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;

@@ -32,7 +32,7 @@ static void SwordGuardianFly(ITEM_INFO* item)
 	pos.y = (GetRandomControl() * 256 / 32768) + item->Position.yPos - 256;
 	pos.z = (GetRandomControl() * 256 / 32768) + item->Position.zPos - 128;
 
-	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, WEAPON_GRENADE_LAUNCHER, 32);
+	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
 	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Position, 0);
 }
 

@@ -319,22 +319,22 @@ int S_UpdateInput()
 	static int medipackTimeout = 0;
 
 	/***************************WEAPON HOTKEYS***************************/
-	if (KeyMap[DIK_1] && Lara.Weapons[WEAPON_PISTOLS].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_PISTOLS;
-	if (KeyMap[DIK_2] && Lara.Weapons[WEAPON_SHOTGUN].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_SHOTGUN;
-	if (KeyMap[DIK_3] && Lara.Weapons[WEAPON_REVOLVER].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_REVOLVER;
-	if (KeyMap[DIK_4] && Lara.Weapons[WEAPON_UZI].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_UZI;
-	if (KeyMap[DIK_5] && Lara.Weapons[WEAPON_HARPOON_GUN].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_HARPOON_GUN;
-	if (KeyMap[DIK_6] && Lara.Weapons[WEAPON_HK].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_HK;
-	if (KeyMap[DIK_7] && Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_ROCKET_LAUNCHER;
-	if (KeyMap[DIK_8] && Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present == true)
-		Lara.Control.Weapon.RequestGunType = WEAPON_GRENADE_LAUNCHER;
+	if (KeyMap[DIK_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+	if (KeyMap[DIK_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+	if (KeyMap[DIK_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+	if (KeyMap[DIK_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+	if (KeyMap[DIK_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+	if (KeyMap[DIK_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+	if (KeyMap[DIK_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+	if (KeyMap[DIK_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 		/*------------------------------------------------------------------*/
 
 	if (KeyMap[DIK_0])

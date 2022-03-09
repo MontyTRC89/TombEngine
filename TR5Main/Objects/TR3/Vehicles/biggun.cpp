@@ -130,10 +130,10 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 		AddActiveItem(itemNumber);
 
 		SmokeCountL = 32;
-		SmokeWeapon = WEAPON_ROCKET_LAUNCHER;
+		SmokeWeapon = LaraWeaponType::RocketLauncher;
 
 		for (int i = 0; i < 5; i++)
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, WEAPON_ROCKET_LAUNCHER, 32);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, 32);
 
 		SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
 	}
@@ -152,14 +152,14 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		lara->Vehicle = itemNum;
 
-		if (lara->Control.Weapon.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, false);
 			UndrawFlareMeshes(laraItem);
 
 			lara->Flare.ControlLeft = false;
-			lara->Control.Weapon.RequestGunType = WEAPON_NONE;
-			lara->Control.Weapon.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
 		laraItem->AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;

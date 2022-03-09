@@ -1006,7 +1006,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 	{
 		return false;
 	}
@@ -1091,7 +1091,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 	{
 		return false;
 	}
@@ -1193,14 +1193,14 @@ void GetTightropeFallOff(ITEM_INFO* item, int regularity)
 
 bool IsStandingWeapon(LaraWeaponType gunType)
 {
-	if (gunType == LaraWeaponType::WEAPON_SHOTGUN ||
-		gunType == LaraWeaponType::WEAPON_HK ||
-		gunType == LaraWeaponType::WEAPON_CROSSBOW ||
-		gunType == LaraWeaponType::WEAPON_TORCH ||
-		gunType == LaraWeaponType::WEAPON_GRENADE_LAUNCHER ||
-		gunType == LaraWeaponType::WEAPON_HARPOON_GUN ||
-		gunType == LaraWeaponType::WEAPON_ROCKET_LAUNCHER ||
-		gunType == LaraWeaponType::WEAPON_SNOWMOBILE)
+	if (gunType == LaraWeaponType::Shotgun ||
+		gunType == LaraWeaponType::HK ||
+		gunType == LaraWeaponType::Crossbow ||
+		gunType == LaraWeaponType::Torch ||
+		gunType == LaraWeaponType::GrenadeLauncher ||
+		gunType == LaraWeaponType::HarpoonGun ||
+		gunType == LaraWeaponType::RocketLauncher||
+		gunType == LaraWeaponType::Snowmobile)
 	{
 		return true;
 	}
@@ -1296,11 +1296,11 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
 			lara->Flare.Life) &&
-		lara->Vehicle == NO_ITEM)								// Not in a vehicle.
+		lara->Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1654,13 +1654,13 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	int distance = CLICK(3);
 	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
-		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
-		!probe.Position.FloorSlope &&							// Not a slope.
-		lara->WaterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
-		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Not handling flare.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Within lower floor bound.
+		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Within lowest ceiling bound.
+		!probe.Position.FloorSlope &&								// Not a slope.
+		lara->WaterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;
@@ -1673,9 +1673,9 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.Weapon.GunType != WEAPON_FLARE ||	// Not handling flare.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;

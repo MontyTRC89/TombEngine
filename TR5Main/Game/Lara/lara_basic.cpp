@@ -537,8 +537,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != WEAPON_TORCH) ||
-			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != WEAPON_FLARE))
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
 			item->TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -551,8 +551,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != WEAPON_TORCH) ||
-			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != WEAPON_FLARE))
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
 			item->TargetState = LS_TURN_RIGHT_FAST;
 		}

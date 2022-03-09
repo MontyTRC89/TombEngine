@@ -125,7 +125,7 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 	}
 	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
 		lara->Control.HandStatus == HandStatus::WeaponReady &&
-		lara->Control.Weapon.GunType != WEAPON_TORCH ||
+		lara->Control.Weapon.GunType != LaraWeaponType::Torch ||
 		lara->PoisonPotency)
 	{
 		if (!BinocularRange)

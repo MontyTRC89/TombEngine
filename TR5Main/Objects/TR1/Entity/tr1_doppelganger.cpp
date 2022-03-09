@@ -40,9 +40,9 @@ ITEM_INFO* FindReference(ITEM_INFO* item, short objectNumber)
 	return (itemNumber == NO_ITEM ? NULL : &g_Level.Items[itemNumber]);
 }
 
-static short GetWeaponDamage(int weaponType)
+static short GetWeaponDamage(LaraWeaponType weaponType)
 {
-	return short(Weapons[weaponType].Damage) * 25;
+	return short(Weapons[(int)weaponType].Damage) * 25;
 }
 
 void DoppelgangerControl(short itemNumber)

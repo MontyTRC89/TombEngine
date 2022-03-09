@@ -858,7 +858,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
 
-	//if (lara->gunType == WEAPON_CROSSBOW && !LaserSight)
+	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.

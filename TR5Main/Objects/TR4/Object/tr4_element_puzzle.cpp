@@ -229,7 +229,7 @@ namespace TEN::Entities::TR4
         }
         else
         {
-            if (laraInfo->Control.Weapon.GunType != WEAPON_TORCH ||
+            if (laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
                 laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
                 laraInfo->LeftArm.Locked ||
                 !(TrInput & IN_ACTION) ||

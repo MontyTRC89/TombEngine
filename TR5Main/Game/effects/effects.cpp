@@ -38,7 +38,7 @@ SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 SPARKS Sparks[MAX_SPARKS];
 SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
-int SmokeWeapon;
+LaraWeaponType SmokeWeapon;
 byte SmokeCountL;
 byte SmokeCountR;
 int SplashCount = 0;
@@ -74,6 +74,7 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 void DetatchSpark(int number, SpriteEnumFlag type)
 {
 	auto* sptr = &Sparks[0];
+
 	for (int lp = 0; lp < MAX_SPARKS; lp++, sptr++)
 	{
 		if (sptr->on && (sptr->flags & type) && sptr->fxObj == number)
@@ -1023,12 +1024,10 @@ void UpdateSplashes()
 
 void SetupRipple(int x, int y, int z, float size, char flags, unsigned int spriteID, float rotation)
 {
-	RIPPLE_STRUCT* ripple;
-	int i;
-
-	for (i = 0; i < MAX_RIPPLES; i++)
+	for (int i = 0; i < MAX_RIPPLES; i++)
 	{
-		ripple = &Ripples[i];
+		auto* ripple = &Ripples[i];
+
 		if (!(ripple->active)) 
 		{
 			ripple->active = true;
