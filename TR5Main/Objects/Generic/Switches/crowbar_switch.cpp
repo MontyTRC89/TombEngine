@@ -116,7 +116,7 @@ namespace TEN::Entities::Switches
 		{
 			if (doSwitch == -1)
 			{
-				if (laraInfo->Crowbar)
+				if (laraInfo->Inventory.HasCrowbar)
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{

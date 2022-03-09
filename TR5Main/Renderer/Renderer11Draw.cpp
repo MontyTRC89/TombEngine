@@ -1122,14 +1122,14 @@ namespace TEN::Renderer
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Diary.currentPage;
+		short currentPage = Lara.Inventory.Diary.currentPage;
 		drawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
 		                       obj->yrot, obj->zrot, obj->scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
 		{
-			if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].
-				Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
+			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].
+				Strings[i].y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].stringID)
 				break;
 
 			//drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);

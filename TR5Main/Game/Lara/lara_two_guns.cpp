@@ -50,7 +50,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			PHD_VECTOR pos;
 
-			switch ((LaraWeaponType)SmokeWeapon)
+			switch (SmokeWeapon)
 			{
 			case LaraWeaponType::Pistol:
 				pos = { 4, 128, 40 };
@@ -73,7 +73,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			PHD_VECTOR pos;
 
-			switch ((LaraWeaponType)SmokeWeapon)
+			switch (SmokeWeapon)
 			{
 			case LaraWeaponType::Pistol:
 				pos = { -16, 128, 40 };

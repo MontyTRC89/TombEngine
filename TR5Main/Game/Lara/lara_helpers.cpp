@@ -343,7 +343,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetAngle = coll->NearestLedgeAngle;
+		lara->TargetFacingAngle = coll->NearestLedgeAngle;
 	}
 
 	if (vaultResult.SetJumpVelocity)

@@ -373,10 +373,10 @@ void LaraGun(ITEM_INFO* laraItem)
 					laraInfo->Control.HandStatus = HandStatus::UndrawWeapon;
 				}
 			}
-			else if (laraInfo->NumFlares)
+			else if (laraInfo->Inventory.TotalFlares)
 			{
-				if (laraInfo->NumFlares != -1)
-					laraInfo->NumFlares--;
+				if (laraInfo->Inventory.TotalFlares != -1)
+					laraInfo->Inventory.TotalFlares--;
 
 				laraInfo->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
