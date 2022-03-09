@@ -1230,7 +1230,7 @@ void BinocularCamera(ITEM_INFO* item)
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(item, lara->Control.WeaponControl.GunType);
+		Ammo& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 		if (!(InputBusy & IN_ACTION) ||
 			WeaponDelay ||
@@ -1238,7 +1238,7 @@ void BinocularCamera(ITEM_INFO* item)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (lara->Control.WeaponControl.GunType != WEAPON_CROSSBOW)
+				if (lara->Control.Weapon.GunType != WEAPON_CROSSBOW)
 					WeaponDelay = 0;
 
 				LSHKShotsFired = 0;
@@ -1247,7 +1247,7 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 		else
 		{
-			if (lara->Control.WeaponControl.GunType == WEAPON_REVOLVER)
+			if (lara->Control.Weapon.GunType == WEAPON_REVOLVER)
 			{
 				firing = 1;
 				WeaponDelay = 16;
@@ -1258,7 +1258,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
-			else if (lara->Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+			else if (lara->Control.Weapon.GunType == WEAPON_CROSSBOW)
 			{
 				firing = 1;
 				WeaponDelay = 32;

@@ -180,7 +180,7 @@ void EnemyJeepControl(short itemNumber)
 			
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info.distance > SQUARE(1024) || Lara.location >= item->ItemFlags[3])
+			else if (info.distance > SQUARE(1024) || Lara.Location >= item->ItemFlags[3])
 				item->TargetState = 1;
 
 			break;
@@ -266,7 +266,7 @@ void EnemyJeepControl(short itemNumber)
 		{
 			TestTriggers(target->Position.xPos,target->Position.yPos,target->Position.zPos,target->RoomNumber, true);
 
-			if (Lara.location < item->ItemFlags[3] && item->ActiveState != 2 && item->TargetState != 2)
+			if (Lara.Location < item->ItemFlags[3] && item->ActiveState != 2 && item->TargetState != 2)
 			{
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -300,7 +300,7 @@ void EnemyJeepControl(short itemNumber)
 				DisableEntityAI(itemNumber);
 			}
 
-			if (Lara.location >= item->ItemFlags[3] || !(target->Flags & 4))
+			if (Lara.Location >= item->ItemFlags[3] || !(target->Flags & 4))
 			{
 				creature->ReachedGoal = false;
 				item->ItemFlags[3]++;

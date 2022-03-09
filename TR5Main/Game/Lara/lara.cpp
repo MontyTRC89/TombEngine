@@ -402,19 +402,19 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.WeaponControl.HasFired)
+	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);
-		lara->Control.WeaponControl.HasFired = false;
+		lara->Control.Weapon.HasFired = false;
 	}
 
-	if (lara->Poisoned)
+	if (lara->PoisonPotency)
 	{
-		if (lara->Poisoned > 4096)
-			lara->Poisoned = 4096;
+		if (lara->PoisonPotency > LARA_POISON_POTENCY_MAX)
+			lara->PoisonPotency = LARA_POISON_POTENCY_MAX;
 
-		if (lara->Poisoned >= 256 && !(Wibble & 0xFF))
-			item->HitPoints -= lara->Poisoned >> 8;
+		if (!(Wibble & 0xFF))
+			item->HitPoints -= lara->PoisonPotency;
 	}
 
 	if (lara->Control.IsMoving)
@@ -429,7 +429,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (!lara->Control.Locked)
-		lara->locationPad = 128;
+		lara->LocationPad = 128;
 
 	int oldX = item->Position.xPos;
 	int oldY = item->Position.yPos;
@@ -954,7 +954,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot = -ANGLE(22.0f);
 	}
 
-	if (lara->Control.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
@@ -1020,7 +1020,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot += item->Position.zRot / -8;
 	}
 
-	if (lara->Control.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);

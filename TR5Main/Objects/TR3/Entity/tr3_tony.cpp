@@ -422,7 +422,7 @@ void ControlTonyFireBall(short fxNumber)
 		return;
 	}
 
-	if (!Lara.burn)
+	if (!Lara.Burn)
 	{
 		if (ItemNearLara(&fx->pos, 200))
 		{

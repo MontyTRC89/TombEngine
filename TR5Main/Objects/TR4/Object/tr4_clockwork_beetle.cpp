@@ -317,7 +317,7 @@ void UseClockworkBeetle(short flag)
 		if (itemNum != NO_ITEM)
 		{
 			item = &g_Level.Items[itemNum];
-			Lara.hasBeetleThings &= 0xFE;
+			Lara.HasBeetleThings &= 0xFE;
 			item->Shade = -15856;
 			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
 			item->RoomNumber = LaraItem->RoomNumber;

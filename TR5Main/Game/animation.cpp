@@ -194,7 +194,7 @@ void AnimateLara(ITEM_INFO* item)
 	item->VerticalVelocity += lara->ExtraVelocity.y;
 	item->LateralVelocity += lara->ExtraVelocity.z;
 
-	if (lara->Control.RopeControl.Ptr != -1)
+	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)

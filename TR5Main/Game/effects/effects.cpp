@@ -291,7 +291,7 @@ void UpdateSparks()
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
 			spark->size = lerp(spark->sSize, spark->dSize, alpha);
 
-			if (spark->flags & SP_FIRE && !Lara.burn || spark->flags & SP_DAMAGE)
+			if (spark->flags & SP_FIRE && !Lara.Burn || spark->flags & SP_DAMAGE)
 			{
 				ds = spark->size * (spark->scalar / 2.0);
 

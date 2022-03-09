@@ -303,7 +303,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (lara->ExtraVelocity.x || lara->ExtraVelocity.z)
+	if (lara->WaterCurrentPull.x || lara->WaterCurrentPull.z)
 		return false;
 
 	short moveAngle = UPVItem->Position.yRot + ANGLE(180.0f);
@@ -360,9 +360,9 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	PHD_VECTOR target;
 
-	if (!lara->Control.WaterCurrentActive)
+	if (!lara->WaterCurrentActive)
 	{
-		int absVel = abs(lara->ExtraVelocity.x);
+		int absVel = abs(lara->WaterCurrentPull.x);
 		int shift;
 		if (absVel > 16)
 			shift = 4;
@@ -371,12 +371,12 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else
 			shift = 2;
 
-		lara->ExtraVelocity.x -= lara->ExtraVelocity.x >> shift;
+		lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
 
-		if (abs(lara->ExtraVelocity.x) < 4)
-			lara->ExtraVelocity.x = 0;
+		if (abs(lara->WaterCurrentPull.x) < 4)
+			lara->WaterCurrentPull.x = 0;
 
-		absVel = abs(lara->ExtraVelocity.z);
+		absVel = abs(lara->WaterCurrentPull.z);
 		if (absVel > 16)
 			shift = 4;
 		else if (absVel > 8)
@@ -384,16 +384,16 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else
 			shift = 2;
 
-		lara->ExtraVelocity.z -= lara->ExtraVelocity.z >> shift;
-		if (abs(lara->ExtraVelocity.z) < 4)
-			lara->ExtraVelocity.z = 0;
+		lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
+		if (abs(lara->WaterCurrentPull.z) < 4)
+			lara->WaterCurrentPull.z = 0;
 
-		if (lara->ExtraVelocity.x == 0 && lara->ExtraVelocity.z == 0)
+		if (lara->WaterCurrentPull.x == 0 && lara->WaterCurrentPull.z == 0)
 			return;
 	}
 	else
 	{
-		int sinkVal = lara->Control.WaterCurrentActive - 1;
+		int sinkVal = lara->WaterCurrentActive - 1;
 		target.x = g_Level.Sinks[sinkVal].x;
 		target.y = g_Level.Sinks[sinkVal].y;
 		target.z = g_Level.Sinks[sinkVal].z;
@@ -407,13 +407,13 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		dx = phd_sin(angle * 16) * velocity * 1024;
 		dz = phd_cos(angle * 16) * velocity * 1024;
 
-		lara->ExtraVelocity.x += ((dx - lara->ExtraVelocity.x) / 16);
-		lara->ExtraVelocity.z += ((dz - lara->ExtraVelocity.z) / 16);
+		lara->WaterCurrentPull.x += ((dx - lara->WaterCurrentPull.x) / 16);
+		lara->WaterCurrentPull.z += ((dz - lara->WaterCurrentPull.z) / 16);
 	}
 
-	lara->Control.WaterCurrentActive = 0;
-	UPVItem->Position.xPos += lara->ExtraVelocity.x / CLICK(1);
-	UPVItem->Position.zPos += lara->ExtraVelocity.z / CLICK(1);
+	lara->WaterCurrentActive = 0;
+	UPVItem->Position.xPos += lara->WaterCurrentPull.x / CLICK(1);
+	UPVItem->Position.zPos += lara->WaterCurrentPull.z / CLICK(1);
 }
 
 static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
@@ -872,13 +872,13 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		lara->Vehicle = itemNumber;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
 			lara->Flare.ControlLeft = false;
-			lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = WEAPON_NONE;
 		}
 
 		laraItem->Position.xPos = UPVItem->Position.xPos;

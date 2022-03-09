@@ -212,9 +212,9 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 				Lara.ExtraAnim = 1;
 				Lara.Control.HandStatus = HandStatus::Busy;
-				Lara.hitDirection = -1;
+				Lara.HitDirection = -1;
 
-				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+				Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 				
 				((CreatureInfo*)g_Level.Items[(short)item->Data].Data)->Flags = -1;
 

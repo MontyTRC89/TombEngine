@@ -243,7 +243,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.RopeControl.Ptr == -1)
+	if (lara->Control.Rope.Ptr == -1)
 		item->Airborne = true;
 
 	lara->Control.MoveAngle = item->Position.yRot;

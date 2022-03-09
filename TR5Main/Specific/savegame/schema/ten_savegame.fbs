@@ -85,6 +85,8 @@ table WeaponControlData {
 	weapon_item: int32;
 	has_fired: bool;
 	fired: bool;
+	uzi_left: bool;
+	uzi_right: bool;
 	gun_type: int32;
 	request_gun_type: int32;
 	last_gun_type: int32;
@@ -126,6 +128,11 @@ table SubsuitControlData {
 	hit_count: uint32;
 }
 
+table MinecartControlData {
+	left: bool;
+	right: bool;
+}
+
 table LaraCountData {
 	run_jump: uint32;
 	position_adjust: uint32;
@@ -142,10 +149,7 @@ table LaraControlData {
 	jump_direction: int32;
 	hand_status: int32;
 	water_status: int32;
-	weapon_control: WeaponControlData;
-	rope_control: RopeControlData;
-	tightrope_control: TightropeControlData;
-	subsuit_control: SubsuitControlData;
+	count: LaraCountData;
 	can_look: bool;
 	is_moving: bool;
 	keep_low: bool;
@@ -154,9 +158,12 @@ table LaraControlData {
 	is_climbing_ladder: bool;
 	can_monkey_swing: bool;
 	run_jump_queued: bool;
-	water_current_active: int32;
 	locked: bool;
-	count: LaraCountData;
+	weapon: WeaponControlData;
+	rope: RopeControlData;
+	tightrope: TightropeControlData;
+	subsuit: SubsuitControlData;
+	minecart: MinecartControlData;
 }
 
 table Lara {
@@ -171,25 +178,27 @@ table Lara {
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
+	water_current_active: int32;
+	water_current_pull: Vector3;
 	hit_frame: int32;
 	hit_direction: int32;
 	air: int32;
 	sprint_energy: int32;
-	spasm_effect_count: int32;
+	spasm_effect_count: uint32;
 	flare: FlareData;
 	burn_type: int32;
 	burn: bool;
 	burn_blue: int32;
 	burn_smoke: bool;
 	burn_count: uint32;
-	poisoned: int32;
+	poison_potency: int32;
 	wet: [bool];
 	lit_torch: bool;
 	water_surface_dist: int32;
 	next_corner_position: Vector3;
 	next_corner_rotation: Vector3;
 	mesh_ptrs: [int32];
-	target_angles: [int32];
+	target_arm_angles: [int32];
 	left_arm: ArmInfo;
 	right_arm: ArmInfo;
 	interacted_item: int32;
@@ -204,8 +213,6 @@ table Lara {
 	big_waterskin: int32;
 	vehicle: int32;
 	extra_anim: int32;
-	mine_l: bool;
-	mine_r: bool;
 	weapons: [CarriedWeaponInfo];
 	puzzles: [int32];
 	keys: [int32];

@@ -324,8 +324,8 @@ void TribemanDartsControl(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CreatureInfo* creature = (CreatureInfo *)item->Data;
+	auto* item = &g_Level.Items[itemNum];
+	auto* creature = (CreatureInfo *)item->Data;
 	
 	short headX = 0;
 	short headY = 0;
@@ -351,35 +351,35 @@ void TribemanDartsControl(short itemNum)
 		if (item->AIBits)
 			GetAITarget(creature);
 
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, (info.zoneNumber == info.enemyZone ? VIOLENT : TIMID));
+		GetCreatureMood(item, &AI, (AI.zoneNumber == AI.enemyZone ? VIOLENT : TIMID));
 
-		if (item->HitStatus && Lara.Poisoned >= 0x100 && creature->Mood == MoodType::Bored)
+		if (item->HitStatus && Lara.PoisonPotency && creature->Mood == MoodType::Bored)
 			creature->Mood = MoodType::Escape;
 
-		CreatureMood(item, &info, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
 		angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? ANGLE(2) : creature->MaxTurn);
-		if (info.ahead)
+		if (AI.ahead)
 		{
-			headY = info.angle / 2;
-			torsoY = info.angle / 2;
+			headY = AI.angle / 2;
+			torsoY = AI.angle / 2;
 		}
 
 		if (item->HitStatus || 
-			(creature->Enemy == LaraItem && (info.distance < 1024 || 
-				TargetVisible(item, &info)) && (abs(LaraItem->Position.yPos - item->Position.yPos) < 2048))) 
+			(creature->Enemy == LaraItem && (AI.distance < 1024 || 
+				TargetVisible(item, &AI)) && (abs(LaraItem->Position.yPos - item->Position.yPos) < 2048))) 
 			AlertAllGuards(itemNum);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle / 2;
+				torsoY = AI.angle;
+				torsoX = AI.xAngle / 2;
 			}
 			creature->Flags &= 0x0FFF;
 			creature->MaxTurn = ANGLE(2);
@@ -395,16 +395,16 @@ void TribemanDartsControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AI.bite && AI.distance < SQUARE(WALL_SIZE / 2))
 				item->TargetState = 11;
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
+			else if (AI.bite && AI.distance < SQUARE(WALL_SIZE * 2))
 				item->TargetState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+			else if (Targetable(item, &AI) && AI.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 4;
 			else if (creature->Mood == MoodType::Bored)
 			{
@@ -432,16 +432,16 @@ void TribemanDartsControl(short itemNum)
 			}
 			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
 					item->TargetState = 1;
 				else
 					item->TargetState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
+			else if (AI.bite && AI.distance < SQUARE(WALL_SIZE / 2))
 				item->TargetState = 6;
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
+			else if (AI.bite && AI.distance < SQUARE(WALL_SIZE * 2))
 				item->TargetState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+			else if (Targetable(item, &AI) && AI.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 1;
 			else if (creature->Mood == MoodType::Bored && GetRandomControl() < 0x200)
 				item->TargetState = 2;
@@ -452,11 +452,11 @@ void TribemanDartsControl(short itemNum)
 		case 2:
 			creature->MaxTurn = ANGLE(9);
 
-			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
+			if (AI.bite && AI.distance < SQUARE(WALL_SIZE / 2))
 				item->TargetState = 11;
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 2))
+			else if (AI.bite && AI.distance < SQUARE(WALL_SIZE * 2))
 				item->TargetState = 2;
-			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+			else if (Targetable(item, &AI) && AI.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 1;
 			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = 3;
@@ -469,7 +469,7 @@ void TribemanDartsControl(short itemNum)
 				else
 					item->TargetState = 1;
 			}
-			else if (info.distance > SQUARE(2048))
+			else if (AI.distance > SQUARE(2048))
 				item->TargetState = 3;
 			break;
 
@@ -478,35 +478,35 @@ void TribemanDartsControl(short itemNum)
 			creature->MaxTurn = ANGLE(6);
 			tilt = angle / 4;
 
-			if (info.bite && info.distance < SQUARE(WALL_SIZE / 2))
+			if (AI.bite && AI.distance < SQUARE(WALL_SIZE / 2))
 				item->TargetState = 11;
-			else if (Targetable(item, &info) && info.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+			else if (Targetable(item, &AI) && AI.distance < SQUARE(MAX_VISIBILITY_DISTANCE))
 				item->TargetState = 1;
 			if (item->AIBits & GUARD)
 				item->TargetState = 11;
-			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && info.ahead)
+			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
 				item->TargetState = 11;
 			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = 1;
 			break;
 
 		case 8:
-			if (!info.bite || info.distance > SQUARE(512))
+			if (!AI.bite || AI.distance > SQUARE(512))
 				item->TargetState = 11;
 			else
 				item->TargetState = 6;
 			break;
 
 		case 4:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoY = AI.angle;
+				torsoX = AI.xAngle;
 			}
 			creature->MaxTurn = 0;
-			if (abs(info.angle) < ANGLE(2))
-				item->Position.yRot += info.angle;
-			else if (info.angle < 0)
+			if (abs(AI.angle) < ANGLE(2))
+				item->Position.yRot += AI.angle;
+			else if (AI.angle < 0)
 				item->Position.yRot -= ANGLE(2);
 			else
 				item->Position.yRot += ANGLE(2);

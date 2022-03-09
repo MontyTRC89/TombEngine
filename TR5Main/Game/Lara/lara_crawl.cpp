@@ -375,7 +375,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(lara->Control.WeaponControl.GunType) &&
+			!IsStandingWeapon(lara->Control.Weapon.GunType) &&
 			item->AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
 			item->TargetState = LS_CROUCH_IDLE;

@@ -47,11 +47,11 @@ static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
 	{
 		if (add)
 		{
-			lara.hasBeetleThings |= 1 << bit;
+			lara.HasBeetleThings |= 1 << bit;
 		}
 		else
 		{
-			lara.hasBeetleThings &= ~(1 << bit);
+			lara.HasBeetleThings &= ~(1 << bit);
 		}
 	};
 	switch (obj) {
@@ -72,34 +72,34 @@ static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
 		lara.Diary.Present = add;
 		break;
 	case ID_WATERSKIN1_EMPTY:
-		modifyWaterSkinAmount(lara.smallWaterskin, 1);
+		modifyWaterSkinAmount(lara.SmallWaterskin, 1);
 		break;
 	case ID_WATERSKIN1_1:
-		modifyWaterSkinAmount(lara.smallWaterskin, 2);
+		modifyWaterSkinAmount(lara.SmallWaterskin, 2);
 		break;
 	case ID_WATERSKIN1_2:
-		modifyWaterSkinAmount(lara.smallWaterskin, 3);
+		modifyWaterSkinAmount(lara.SmallWaterskin, 3);
 		break;
 	case ID_WATERSKIN1_3:
-		modifyWaterSkinAmount(lara.smallWaterskin, 4);
+		modifyWaterSkinAmount(lara.SmallWaterskin, 4);
 		break;
 	case ID_WATERSKIN2_EMPTY:
-		modifyWaterSkinAmount(lara.bigWaterskin, 1);
+		modifyWaterSkinAmount(lara.BigWaterskin, 1);
 		break;
 	case ID_WATERSKIN2_1:
-		modifyWaterSkinAmount(lara.bigWaterskin, 2);
+		modifyWaterSkinAmount(lara.BigWaterskin, 2);
 		break;
 	case ID_WATERSKIN2_2:
-		modifyWaterSkinAmount(lara.bigWaterskin, 3);
+		modifyWaterSkinAmount(lara.BigWaterskin, 3);
 		break;
 	case ID_WATERSKIN2_3:
-		modifyWaterSkinAmount(lara.bigWaterskin, 4);
+		modifyWaterSkinAmount(lara.BigWaterskin, 4);
 		break;
 	case ID_WATERSKIN2_4:
-		modifyWaterSkinAmount(lara.bigWaterskin, 5);
+		modifyWaterSkinAmount(lara.BigWaterskin, 5);
 		break;
 	case ID_WATERSKIN2_5:
-		modifyWaterSkinAmount(lara.bigWaterskin, 6);
+		modifyWaterSkinAmount(lara.BigWaterskin, 6);
 		break;
 	case ID_CLOCKWORK_BEETLE:
 		modifyBeetleCount(0);
@@ -130,7 +130,7 @@ std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID obj)
 {	
 	auto HasBeetle = [&](int bit)
 	{
-		return lara.hasBeetleThings &= 1 << bit;
+		return lara.HasBeetleThings &= 1 << bit;
 	};
 
 	switch (obj) {
@@ -146,25 +146,25 @@ std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID obj)
 	case ID_DIARY_ITEM:
 		return lara.Diary.Present;
 	case ID_WATERSKIN1_EMPTY:
-		return lara.smallWaterskin == 1;
+		return lara.SmallWaterskin == 1;
 	case ID_WATERSKIN1_1:
-		return lara.smallWaterskin == 2;
+		return lara.SmallWaterskin == 2;
 	case ID_WATERSKIN1_2:
-		return lara.smallWaterskin == 3;
+		return lara.SmallWaterskin == 3;
 	case ID_WATERSKIN1_3:
-		return lara.smallWaterskin == 4;
+		return lara.SmallWaterskin == 4;
 	case ID_WATERSKIN2_EMPTY:
-		return lara.bigWaterskin == 1;
+		return lara.BigWaterskin == 1;
 	case ID_WATERSKIN2_1:
-		return lara.bigWaterskin == 2;
+		return lara.BigWaterskin == 2;
 	case ID_WATERSKIN2_2:
-		return lara.bigWaterskin == 3;
+		return lara.BigWaterskin == 3;
 	case ID_WATERSKIN2_3:
-		return lara.bigWaterskin == 4;
+		return lara.BigWaterskin == 4;
 	case ID_WATERSKIN2_4:
-		return lara.bigWaterskin == 5;
+		return lara.BigWaterskin == 5;
 	case ID_WATERSKIN2_5:
-		return lara.bigWaterskin == 6;
+		return lara.BigWaterskin == 6;
 	case ID_CLOCKWORK_BEETLE:
 		return HasBeetle(0);
 	case ID_CLOCKWORK_BEETLE_COMBO1:
