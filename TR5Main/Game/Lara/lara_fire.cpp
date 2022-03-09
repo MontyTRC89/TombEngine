@@ -29,7 +29,7 @@ bool MonksAttackLara;
 ITEM_INFO* LastTargets[MAX_TARGETS];
 ITEM_INFO* TargetList[MAX_TARGETS];
 
-WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
+WeaponInfo Weapons[(int)LaraWeaponType::Total] =
 {
 	// No weapons
 	{
@@ -47,6 +47,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		0,
 		0
 	},
+
 	// Pistols
 	{
 		{ -ANGLE(60.0f),  ANGLE(60.0f),  -ANGLE(60.0f), ANGLE(60.0f) },
@@ -63,6 +64,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_LARA_FIRE,
 		0
 	},
+
 	// Revolver
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
@@ -79,6 +81,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_DESSERT_EAGLE_FIRE,
 		0
 	},
+
 	// Uzis
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
@@ -95,6 +98,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_LARA_UZI_FIRE,
 		0
 	},
+
 	// Shotgun
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -111,6 +115,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_LARA_SHOTGUN,
 		0
 	},
+
 	// HK
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -127,6 +132,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		0,     // FIRE/SILENCER_FIRE
 		0
 	},
+
 	// Crossbow
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -143,6 +149,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_LARA_CROSSBOW,
 		20
 	},
+
 	// Flare
 	{
 		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
@@ -159,6 +166,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		0,
 		0
 	},
+
 	// Flare 2
 	{
 		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -175,6 +183,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		SFX_TR4_LARA_UZI_FIRE,
 		0
 	},
+
 	// Grenade launcher
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -191,6 +200,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		0,
 		30
 	},
+
 	// Harpoon gun
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(65.0f), ANGLE(65.0f) },
@@ -207,6 +217,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		0,
 		0
 	},
+
 	// Rocket launcher
 	{
 		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -223,6 +234,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons] =
 		77,
 		30
 	},
+
 	// Snowmobile
 	{
 		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
@@ -264,6 +276,25 @@ int HoldStates[] =
 	LS_CROUCH_TURN_RIGHT,
 	-1
 };
+
+bool CheckForHoldingState(LaraState state)
+{
+#if 0
+	if (laraInfo->ExtraAnim != NO_ITEM)
+		return false;
+#endif
+
+	int* holdState = HoldStates;
+	while (*holdState >= 0)
+	{
+		if (state == *holdState)
+			return true;
+
+		holdState++;
+	}
+
+	return false;
+}
 
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 {
@@ -621,7 +652,7 @@ Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
-	return laraInfo->Weapons[(int)weaponType].Ammo[laraInfo->Weapons[(int)weaponType].SelectedAmmo];
+	return laraInfo->Weapons[(int)weaponType].Ammo[(int)laraInfo->Weapons[(int)weaponType].SelectedAmmo];
 }
 
 void InitialiseNewWeapon(ITEM_INFO* laraItem)
@@ -1002,25 +1033,6 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 	laraInfo->TargetArmAngles[0] = angles[0];
 	laraInfo->TargetArmAngles[1] = angles[1];
-}
-
-bool CheckForHoldingState(LaraState state)
-{
-#if 0
-	if (laraInfo->ExtraAnim != NO_ITEM)
-		return false;
-#endif
-
-	int* holdState = HoldStates;
-	while (*holdState >= 0)
-	{
-		if (state == *holdState)
-			return true;
-
-		holdState++;
-	}
-	
-	return false;
 }
 
 void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)

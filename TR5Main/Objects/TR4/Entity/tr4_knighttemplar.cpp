@@ -33,6 +33,7 @@ void KnightTemplarControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
 	if (item->AnimNumber == object->animIndex ||
@@ -48,8 +49,6 @@ void KnightTemplarControl(short itemNumber)
 			TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
 		}
 	}
-
-	auto* creature = GetCreatureInfo(item);
 
 	short tilt = 0;
 	short angle = 0;
@@ -91,8 +90,8 @@ void KnightTemplarControl(short itemNumber)
 	switch (item->ActiveState)
 	{
 	case 1:
-		creature->MaxTurn = ANGLE(2.0f);
 		item->TargetState = 2;
+		creature->MaxTurn = ANGLE(2.0f);
 		creature->Flags = 0;
 
 		if (AI.distance > pow(682, 2))

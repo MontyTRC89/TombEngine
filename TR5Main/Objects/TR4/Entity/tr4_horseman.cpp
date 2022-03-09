@@ -44,14 +44,14 @@ namespace TEN::Entities::TR4
 		{
 			auto* spark = &Sparks[GetFreeSpark()];
 
-			int r = GetRandomControl();
+			int random = GetRandomControl();
 
 			spark->on = 1;
 			spark->sG = -128;
-			spark->sB = (r & 0xF) + 16;
+			spark->sB = (random & 0xF) + 16;
 			spark->sR = 0;
 			spark->dG = 96;
-			spark->dB = ((r / 16) & 0x1F) + 48;
+			spark->dB = ((random / 16) & 0x1F) + 48;
 			spark->dR = 0;
 			spark->colFadeSpeed = 2;
 			spark->fadeToBlack = 4;
@@ -62,52 +62,52 @@ namespace TEN::Entities::TR4
 			spark->y = pos->y;
 			spark->z = pos->z;
 			spark->friction = 34;
-			spark->yVel = (r & 0xFFF) - 2048;
+			spark->yVel = (random & 0xFFF) - 2048;
 			spark->flags = SP_NONE;
-			spark->gravity = (r / 128) & 0x1F;
+			spark->gravity = (random / 128) & 0x1F;
 			spark->maxYvel = 0;
-			spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) * 4096;
-			spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) * 4096;
+			spark->zVel = phd_cos((random & 0x7FF) + param1 - 1024) * 4096;
+			spark->xVel = -phd_sin((random & 0x7FF) + param1 - 1024) * 4096;
 		}
 
 		for (int i = 0; i < num; i++)
 		{
 			auto* spark = &Sparks[GetFreeSpark()];
 
-			int r = GetRandomControl();
+			int random = GetRandomControl();
 
 			spark->on = 1;
 			spark->sG = -128;
 			spark->sR = 0;
 			spark->dG = 96;
-			spark->sB = (r & 0xF) + 16;
+			spark->sB = (random & 0xF) + 16;
 			spark->dR = 0;
 			spark->colFadeSpeed = 2;
 			spark->fadeToBlack = 4;
-			spark->dB = ((r / 16) & 0x1F) + 48;
+			spark->dB = ((random / 16) & 0x1F) + 48;
 			spark->life = 9;
 			spark->sLife = 9;
 			spark->transType = TransTypeEnum::COLADD;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
-			spark->yVel = (r & 0xFFF) - 2048;
-			spark->gravity = (r / 128) & 0x1F;
-			spark->rotAng = r / 8;
+			spark->yVel = (random & 0xFFF) - 2048;
+			spark->gravity = (random / 128) & 0x1F;
+			spark->rotAng = random / 8;
 
-			if (r & 1)
-				spark->rotAdd = -16 - (r & 0xF);
+			if (random & 1)
+				spark->rotAdd = -16 - (random & 0xF);
 			else
 				spark->rotAdd = spark->sB;
 			
 			spark->scalar = 3;
 			spark->friction = 34;
-			spark->sSize = spark->size = ((r / 32) & 7) + 4;
+			spark->sSize = spark->size = ((random / 32) & 7) + 4;
 			spark->dSize = spark->sSize / 2;
 			spark->flags = SP_DEF | SP_ROTATE | SP_SCALE;
 			spark->maxYvel = 0;
-			spark->xVel = -phd_sin((r & 0x7FF) + param1 - 1024) * 4096;
-			spark->zVel = phd_cos((r & 0x7FF) + param1 - 1024) * 4096;
+			spark->xVel = -phd_sin((random & 0x7FF) + param1 - 1024) * 4096;
+			spark->zVel = phd_cos((random & 0x7FF) + param1 - 1024) * 4096;
 		}
 	}
 
