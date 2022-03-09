@@ -17,21 +17,21 @@ struct Item;
 struct ItemBuilder;
 struct ItemT;
 
-struct WeaponInfo;
-struct WeaponInfoBuilder;
-struct WeaponInfoT;
+struct AmmoInfo;
+struct AmmoInfoBuilder;
+struct AmmoInfoT;
 
 struct HolsterInfo;
 struct HolsterInfoBuilder;
 struct HolsterInfoT;
 
-struct AmmoInfo;
-struct AmmoInfoBuilder;
-struct AmmoInfoT;
-
 struct CarriedWeaponInfo;
 struct CarriedWeaponInfoBuilder;
 struct CarriedWeaponInfoT;
+
+struct WeaponInfo;
+struct WeaponInfoBuilder;
+struct WeaponInfoT;
 
 struct ArmInfo;
 struct ArmInfoBuilder;
@@ -40,6 +40,14 @@ struct ArmInfoT;
 struct FlareData;
 struct FlareDataBuilder;
 struct FlareDataT;
+
+struct LaraInventoryData;
+struct LaraInventoryDataBuilder;
+struct LaraInventoryDataT;
+
+struct LaraCountData;
+struct LaraCountDataBuilder;
+struct LaraCountDataT;
 
 struct WeaponControlData;
 struct WeaponControlDataBuilder;
@@ -60,10 +68,6 @@ struct SubsuitControlDataT;
 struct MinecartControlData;
 struct MinecartControlDataBuilder;
 struct MinecartControlDataT;
-
-struct LaraCountData;
-struct LaraCountDataBuilder;
-struct LaraCountDataT;
 
 struct LaraControlData;
 struct LaraControlDataBuilder;
@@ -779,107 +783,74 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct WeaponInfoT : public flatbuffers::NativeTable {
-  typedef WeaponInfo TableType;
-  uint32_t object_number = 0;
-  uint32_t anim_number = 0;
-  uint32_t frame_number = 0;
-  uint32_t active_state = 0;
-  uint32_t targetstate = 0;
+struct AmmoInfoT : public flatbuffers::NativeTable {
+  typedef AmmoInfo TableType;
+  int32_t count = 0;
+  bool is_infinite = false;
 };
 
-struct WeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef WeaponInfoT NativeTableType;
-  typedef WeaponInfoBuilder Builder;
+struct AmmoInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef AmmoInfoT NativeTableType;
+  typedef AmmoInfoBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_OBJECT_NUMBER = 4,
-    VT_ANIM_NUMBER = 6,
-    VT_FRAME_NUMBER = 8,
-    VT_ACTIVE_STATE = 10,
-    VT_TARGETSTATE = 12
+    VT_COUNT = 4,
+    VT_IS_INFINITE = 6
   };
-  uint32_t object_number() const {
-    return GetField<uint32_t>(VT_OBJECT_NUMBER, 0);
+  int32_t count() const {
+    return GetField<int32_t>(VT_COUNT, 0);
   }
-  uint32_t anim_number() const {
-    return GetField<uint32_t>(VT_ANIM_NUMBER, 0);
-  }
-  uint32_t frame_number() const {
-    return GetField<uint32_t>(VT_FRAME_NUMBER, 0);
-  }
-  uint32_t active_state() const {
-    return GetField<uint32_t>(VT_ACTIVE_STATE, 0);
-  }
-  uint32_t targetstate() const {
-    return GetField<uint32_t>(VT_TARGETSTATE, 0);
+  bool is_infinite() const {
+    return GetField<uint8_t>(VT_IS_INFINITE, 0) != 0;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_OBJECT_NUMBER) &&
-           VerifyField<uint32_t>(verifier, VT_ANIM_NUMBER) &&
-           VerifyField<uint32_t>(verifier, VT_FRAME_NUMBER) &&
-           VerifyField<uint32_t>(verifier, VT_ACTIVE_STATE) &&
-           VerifyField<uint32_t>(verifier, VT_TARGETSTATE) &&
+           VerifyField<int32_t>(verifier, VT_COUNT) &&
+           VerifyField<uint8_t>(verifier, VT_IS_INFINITE) &&
            verifier.EndTable();
   }
-  WeaponInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(WeaponInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<WeaponInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  AmmoInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(AmmoInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<AmmoInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-struct WeaponInfoBuilder {
-  typedef WeaponInfo Table;
+struct AmmoInfoBuilder {
+  typedef AmmoInfo Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_object_number(uint32_t object_number) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_OBJECT_NUMBER, object_number, 0);
+  void add_count(int32_t count) {
+    fbb_.AddElement<int32_t>(AmmoInfo::VT_COUNT, count, 0);
   }
-  void add_anim_number(uint32_t anim_number) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_ANIM_NUMBER, anim_number, 0);
+  void add_is_infinite(bool is_infinite) {
+    fbb_.AddElement<uint8_t>(AmmoInfo::VT_IS_INFINITE, static_cast<uint8_t>(is_infinite), 0);
   }
-  void add_frame_number(uint32_t frame_number) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_FRAME_NUMBER, frame_number, 0);
-  }
-  void add_active_state(uint32_t active_state) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_ACTIVE_STATE, active_state, 0);
-  }
-  void add_targetstate(uint32_t targetstate) {
-    fbb_.AddElement<uint32_t>(WeaponInfo::VT_TARGETSTATE, targetstate, 0);
-  }
-  explicit WeaponInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit AmmoInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  flatbuffers::Offset<WeaponInfo> Finish() {
+  flatbuffers::Offset<AmmoInfo> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<WeaponInfo>(end);
+    auto o = flatbuffers::Offset<AmmoInfo>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(
+inline flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t object_number = 0,
-    uint32_t anim_number = 0,
-    uint32_t frame_number = 0,
-    uint32_t active_state = 0,
-    uint32_t targetstate = 0) {
-  WeaponInfoBuilder builder_(_fbb);
-  builder_.add_targetstate(targetstate);
-  builder_.add_active_state(active_state);
-  builder_.add_frame_number(frame_number);
-  builder_.add_anim_number(anim_number);
-  builder_.add_object_number(object_number);
+    int32_t count = 0,
+    bool is_infinite = false) {
+  AmmoInfoBuilder builder_(_fbb);
+  builder_.add_count(count);
+  builder_.add_is_infinite(is_infinite);
   return builder_.Finish();
 }
 
-struct WeaponInfo::Traits {
-  using type = WeaponInfo;
-  static auto constexpr Create = CreateWeaponInfo;
+struct AmmoInfo::Traits {
+  using type = AmmoInfo;
+  static auto constexpr Create = CreateAmmoInfo;
 };
 
-flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct HolsterInfoT : public flatbuffers::NativeTable {
   typedef HolsterInfo TableType;
@@ -960,75 +931,6 @@ struct HolsterInfo::Traits {
 };
 
 flatbuffers::Offset<HolsterInfo> CreateHolsterInfo(flatbuffers::FlatBufferBuilder &_fbb, const HolsterInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct AmmoInfoT : public flatbuffers::NativeTable {
-  typedef AmmoInfo TableType;
-  int32_t count = 0;
-  bool is_infinite = false;
-};
-
-struct AmmoInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef AmmoInfoT NativeTableType;
-  typedef AmmoInfoBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_COUNT = 4,
-    VT_IS_INFINITE = 6
-  };
-  int32_t count() const {
-    return GetField<int32_t>(VT_COUNT, 0);
-  }
-  bool is_infinite() const {
-    return GetField<uint8_t>(VT_IS_INFINITE, 0) != 0;
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_COUNT) &&
-           VerifyField<uint8_t>(verifier, VT_IS_INFINITE) &&
-           verifier.EndTable();
-  }
-  AmmoInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(AmmoInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<AmmoInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct AmmoInfoBuilder {
-  typedef AmmoInfo Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_count(int32_t count) {
-    fbb_.AddElement<int32_t>(AmmoInfo::VT_COUNT, count, 0);
-  }
-  void add_is_infinite(bool is_infinite) {
-    fbb_.AddElement<uint8_t>(AmmoInfo::VT_IS_INFINITE, static_cast<uint8_t>(is_infinite), 0);
-  }
-  explicit AmmoInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<AmmoInfo> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<AmmoInfo>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t count = 0,
-    bool is_infinite = false) {
-  AmmoInfoBuilder builder_(_fbb);
-  builder_.add_count(count);
-  builder_.add_is_infinite(is_infinite);
-  return builder_.Finish();
-}
-
-struct AmmoInfo::Traits {
-  using type = AmmoInfo;
-  static auto constexpr Create = CreateAmmoInfo;
-};
-
-flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct CarriedWeaponInfoT : public flatbuffers::NativeTable {
   typedef CarriedWeaponInfo TableType;
@@ -1150,6 +1052,108 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfoDirect(
 }
 
 flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const CarriedWeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct WeaponInfoT : public flatbuffers::NativeTable {
+  typedef WeaponInfo TableType;
+  uint32_t object_number = 0;
+  uint32_t anim_number = 0;
+  uint32_t frame_number = 0;
+  uint32_t active_state = 0;
+  uint32_t target_state = 0;
+};
+
+struct WeaponInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef WeaponInfoT NativeTableType;
+  typedef WeaponInfoBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_OBJECT_NUMBER = 4,
+    VT_ANIM_NUMBER = 6,
+    VT_FRAME_NUMBER = 8,
+    VT_ACTIVE_STATE = 10,
+    VT_TARGET_STATE = 12
+  };
+  uint32_t object_number() const {
+    return GetField<uint32_t>(VT_OBJECT_NUMBER, 0);
+  }
+  uint32_t anim_number() const {
+    return GetField<uint32_t>(VT_ANIM_NUMBER, 0);
+  }
+  uint32_t frame_number() const {
+    return GetField<uint32_t>(VT_FRAME_NUMBER, 0);
+  }
+  uint32_t active_state() const {
+    return GetField<uint32_t>(VT_ACTIVE_STATE, 0);
+  }
+  uint32_t target_state() const {
+    return GetField<uint32_t>(VT_TARGET_STATE, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_OBJECT_NUMBER) &&
+           VerifyField<uint32_t>(verifier, VT_ANIM_NUMBER) &&
+           VerifyField<uint32_t>(verifier, VT_FRAME_NUMBER) &&
+           VerifyField<uint32_t>(verifier, VT_ACTIVE_STATE) &&
+           VerifyField<uint32_t>(verifier, VT_TARGET_STATE) &&
+           verifier.EndTable();
+  }
+  WeaponInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(WeaponInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<WeaponInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct WeaponInfoBuilder {
+  typedef WeaponInfo Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_object_number(uint32_t object_number) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_OBJECT_NUMBER, object_number, 0);
+  }
+  void add_anim_number(uint32_t anim_number) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_ANIM_NUMBER, anim_number, 0);
+  }
+  void add_frame_number(uint32_t frame_number) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_FRAME_NUMBER, frame_number, 0);
+  }
+  void add_active_state(uint32_t active_state) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_ACTIVE_STATE, active_state, 0);
+  }
+  void add_target_state(uint32_t target_state) {
+    fbb_.AddElement<uint32_t>(WeaponInfo::VT_TARGET_STATE, target_state, 0);
+  }
+  explicit WeaponInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<WeaponInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WeaponInfo>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t object_number = 0,
+    uint32_t anim_number = 0,
+    uint32_t frame_number = 0,
+    uint32_t active_state = 0,
+    uint32_t target_state = 0) {
+  WeaponInfoBuilder builder_(_fbb);
+  builder_.add_target_state(target_state);
+  builder_.add_active_state(active_state);
+  builder_.add_frame_number(frame_number);
+  builder_.add_anim_number(anim_number);
+  builder_.add_object_number(object_number);
+  return builder_.Finish();
+}
+
+struct WeaponInfo::Traits {
+  using type = WeaponInfo;
+  static auto constexpr Create = CreateWeaponInfo;
+};
+
+flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct ArmInfoT : public flatbuffers::NativeTable {
   typedef ArmInfo TableType;
@@ -1343,6 +1347,487 @@ struct FlareData::Traits {
 };
 
 flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LaraInventoryDataT : public flatbuffers::NativeTable {
+  typedef LaraInventoryData TableType;
+  bool is_busy = false;
+  bool old_busy = false;
+  int32_t beetle_life = 0;
+  int32_t beetle_components = 0;
+  int32_t small_waterskin = 0;
+  int32_t big_waterskin = 0;
+  bool has_binoculars = false;
+  bool has_crowbar = false;
+  bool has_torch = false;
+  bool has_lasersight = false;
+  bool has_silencer = false;
+  int32_t total_small_medipacks = 0;
+  int32_t total_large_medipacks = 0;
+  int32_t total_flares = 0;
+  uint32_t total_secrets = 0;
+  std::vector<int32_t> puzzles{};
+  std::vector<int32_t> keys{};
+  std::vector<int32_t> pickups{};
+  std::vector<int32_t> examines{};
+  std::vector<int32_t> puzzles_combo{};
+  std::vector<int32_t> keys_combo{};
+  std::vector<int32_t> pickups_combo{};
+  std::vector<int32_t> examines_combo{};
+};
+
+struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LaraInventoryDataT NativeTableType;
+  typedef LaraInventoryDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_IS_BUSY = 4,
+    VT_OLD_BUSY = 6,
+    VT_BEETLE_LIFE = 8,
+    VT_BEETLE_COMPONENTS = 10,
+    VT_SMALL_WATERSKIN = 12,
+    VT_BIG_WATERSKIN = 14,
+    VT_HAS_BINOCULARS = 16,
+    VT_HAS_CROWBAR = 18,
+    VT_HAS_TORCH = 20,
+    VT_HAS_LASERSIGHT = 22,
+    VT_HAS_SILENCER = 24,
+    VT_TOTAL_SMALL_MEDIPACKS = 26,
+    VT_TOTAL_LARGE_MEDIPACKS = 28,
+    VT_TOTAL_FLARES = 30,
+    VT_TOTAL_SECRETS = 32,
+    VT_PUZZLES = 34,
+    VT_KEYS = 36,
+    VT_PICKUPS = 38,
+    VT_EXAMINES = 40,
+    VT_PUZZLES_COMBO = 42,
+    VT_KEYS_COMBO = 44,
+    VT_PICKUPS_COMBO = 46,
+    VT_EXAMINES_COMBO = 48
+  };
+  bool is_busy() const {
+    return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
+  }
+  bool old_busy() const {
+    return GetField<uint8_t>(VT_OLD_BUSY, 0) != 0;
+  }
+  int32_t beetle_life() const {
+    return GetField<int32_t>(VT_BEETLE_LIFE, 0);
+  }
+  int32_t beetle_components() const {
+    return GetField<int32_t>(VT_BEETLE_COMPONENTS, 0);
+  }
+  int32_t small_waterskin() const {
+    return GetField<int32_t>(VT_SMALL_WATERSKIN, 0);
+  }
+  int32_t big_waterskin() const {
+    return GetField<int32_t>(VT_BIG_WATERSKIN, 0);
+  }
+  bool has_binoculars() const {
+    return GetField<uint8_t>(VT_HAS_BINOCULARS, 0) != 0;
+  }
+  bool has_crowbar() const {
+    return GetField<uint8_t>(VT_HAS_CROWBAR, 0) != 0;
+  }
+  bool has_torch() const {
+    return GetField<uint8_t>(VT_HAS_TORCH, 0) != 0;
+  }
+  bool has_lasersight() const {
+    return GetField<uint8_t>(VT_HAS_LASERSIGHT, 0) != 0;
+  }
+  bool has_silencer() const {
+    return GetField<uint8_t>(VT_HAS_SILENCER, 0) != 0;
+  }
+  int32_t total_small_medipacks() const {
+    return GetField<int32_t>(VT_TOTAL_SMALL_MEDIPACKS, 0);
+  }
+  int32_t total_large_medipacks() const {
+    return GetField<int32_t>(VT_TOTAL_LARGE_MEDIPACKS, 0);
+  }
+  int32_t total_flares() const {
+    return GetField<int32_t>(VT_TOTAL_FLARES, 0);
+  }
+  uint32_t total_secrets() const {
+    return GetField<uint32_t>(VT_TOTAL_SECRETS, 0);
+  }
+  const flatbuffers::Vector<int32_t> *puzzles() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PUZZLES);
+  }
+  const flatbuffers::Vector<int32_t> *keys() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_KEYS);
+  }
+  const flatbuffers::Vector<int32_t> *pickups() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PICKUPS);
+  }
+  const flatbuffers::Vector<int32_t> *examines() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_EXAMINES);
+  }
+  const flatbuffers::Vector<int32_t> *puzzles_combo() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PUZZLES_COMBO);
+  }
+  const flatbuffers::Vector<int32_t> *keys_combo() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_KEYS_COMBO);
+  }
+  const flatbuffers::Vector<int32_t> *pickups_combo() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PICKUPS_COMBO);
+  }
+  const flatbuffers::Vector<int32_t> *examines_combo() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_EXAMINES_COMBO);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_IS_BUSY) &&
+           VerifyField<uint8_t>(verifier, VT_OLD_BUSY) &&
+           VerifyField<int32_t>(verifier, VT_BEETLE_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_BEETLE_COMPONENTS) &&
+           VerifyField<int32_t>(verifier, VT_SMALL_WATERSKIN) &&
+           VerifyField<int32_t>(verifier, VT_BIG_WATERSKIN) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_BINOCULARS) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_CROWBAR) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_TORCH) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_LASERSIGHT) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_SILENCER) &&
+           VerifyField<int32_t>(verifier, VT_TOTAL_SMALL_MEDIPACKS) &&
+           VerifyField<int32_t>(verifier, VT_TOTAL_LARGE_MEDIPACKS) &&
+           VerifyField<int32_t>(verifier, VT_TOTAL_FLARES) &&
+           VerifyField<uint32_t>(verifier, VT_TOTAL_SECRETS) &&
+           VerifyOffset(verifier, VT_PUZZLES) &&
+           verifier.VerifyVector(puzzles()) &&
+           VerifyOffset(verifier, VT_KEYS) &&
+           verifier.VerifyVector(keys()) &&
+           VerifyOffset(verifier, VT_PICKUPS) &&
+           verifier.VerifyVector(pickups()) &&
+           VerifyOffset(verifier, VT_EXAMINES) &&
+           verifier.VerifyVector(examines()) &&
+           VerifyOffset(verifier, VT_PUZZLES_COMBO) &&
+           verifier.VerifyVector(puzzles_combo()) &&
+           VerifyOffset(verifier, VT_KEYS_COMBO) &&
+           verifier.VerifyVector(keys_combo()) &&
+           VerifyOffset(verifier, VT_PICKUPS_COMBO) &&
+           verifier.VerifyVector(pickups_combo()) &&
+           VerifyOffset(verifier, VT_EXAMINES_COMBO) &&
+           verifier.VerifyVector(examines_combo()) &&
+           verifier.EndTable();
+  }
+  LaraInventoryDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LaraInventoryDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LaraInventoryData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraInventoryDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LaraInventoryDataBuilder {
+  typedef LaraInventoryData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_is_busy(bool is_busy) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_IS_BUSY, static_cast<uint8_t>(is_busy), 0);
+  }
+  void add_old_busy(bool old_busy) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_OLD_BUSY, static_cast<uint8_t>(old_busy), 0);
+  }
+  void add_beetle_life(int32_t beetle_life) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_BEETLE_LIFE, beetle_life, 0);
+  }
+  void add_beetle_components(int32_t beetle_components) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_BEETLE_COMPONENTS, beetle_components, 0);
+  }
+  void add_small_waterskin(int32_t small_waterskin) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_SMALL_WATERSKIN, small_waterskin, 0);
+  }
+  void add_big_waterskin(int32_t big_waterskin) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_BIG_WATERSKIN, big_waterskin, 0);
+  }
+  void add_has_binoculars(bool has_binoculars) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_BINOCULARS, static_cast<uint8_t>(has_binoculars), 0);
+  }
+  void add_has_crowbar(bool has_crowbar) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_CROWBAR, static_cast<uint8_t>(has_crowbar), 0);
+  }
+  void add_has_torch(bool has_torch) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_TORCH, static_cast<uint8_t>(has_torch), 0);
+  }
+  void add_has_lasersight(bool has_lasersight) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_LASERSIGHT, static_cast<uint8_t>(has_lasersight), 0);
+  }
+  void add_has_silencer(bool has_silencer) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_SILENCER, static_cast<uint8_t>(has_silencer), 0);
+  }
+  void add_total_small_medipacks(int32_t total_small_medipacks) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_TOTAL_SMALL_MEDIPACKS, total_small_medipacks, 0);
+  }
+  void add_total_large_medipacks(int32_t total_large_medipacks) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_TOTAL_LARGE_MEDIPACKS, total_large_medipacks, 0);
+  }
+  void add_total_flares(int32_t total_flares) {
+    fbb_.AddElement<int32_t>(LaraInventoryData::VT_TOTAL_FLARES, total_flares, 0);
+  }
+  void add_total_secrets(uint32_t total_secrets) {
+    fbb_.AddElement<uint32_t>(LaraInventoryData::VT_TOTAL_SECRETS, total_secrets, 0);
+  }
+  void add_puzzles(flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles) {
+    fbb_.AddOffset(LaraInventoryData::VT_PUZZLES, puzzles);
+  }
+  void add_keys(flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys) {
+    fbb_.AddOffset(LaraInventoryData::VT_KEYS, keys);
+  }
+  void add_pickups(flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups) {
+    fbb_.AddOffset(LaraInventoryData::VT_PICKUPS, pickups);
+  }
+  void add_examines(flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines) {
+    fbb_.AddOffset(LaraInventoryData::VT_EXAMINES, examines);
+  }
+  void add_puzzles_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles_combo) {
+    fbb_.AddOffset(LaraInventoryData::VT_PUZZLES_COMBO, puzzles_combo);
+  }
+  void add_keys_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys_combo) {
+    fbb_.AddOffset(LaraInventoryData::VT_KEYS_COMBO, keys_combo);
+  }
+  void add_pickups_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups_combo) {
+    fbb_.AddOffset(LaraInventoryData::VT_PICKUPS_COMBO, pickups_combo);
+  }
+  void add_examines_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines_combo) {
+    fbb_.AddOffset(LaraInventoryData::VT_EXAMINES_COMBO, examines_combo);
+  }
+  explicit LaraInventoryDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<LaraInventoryData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LaraInventoryData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool is_busy = false,
+    bool old_busy = false,
+    int32_t beetle_life = 0,
+    int32_t beetle_components = 0,
+    int32_t small_waterskin = 0,
+    int32_t big_waterskin = 0,
+    bool has_binoculars = false,
+    bool has_crowbar = false,
+    bool has_torch = false,
+    bool has_lasersight = false,
+    bool has_silencer = false,
+    int32_t total_small_medipacks = 0,
+    int32_t total_large_medipacks = 0,
+    int32_t total_flares = 0,
+    uint32_t total_secrets = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles_combo = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys_combo = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups_combo = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines_combo = 0) {
+  LaraInventoryDataBuilder builder_(_fbb);
+  builder_.add_examines_combo(examines_combo);
+  builder_.add_pickups_combo(pickups_combo);
+  builder_.add_keys_combo(keys_combo);
+  builder_.add_puzzles_combo(puzzles_combo);
+  builder_.add_examines(examines);
+  builder_.add_pickups(pickups);
+  builder_.add_keys(keys);
+  builder_.add_puzzles(puzzles);
+  builder_.add_total_secrets(total_secrets);
+  builder_.add_total_flares(total_flares);
+  builder_.add_total_large_medipacks(total_large_medipacks);
+  builder_.add_total_small_medipacks(total_small_medipacks);
+  builder_.add_big_waterskin(big_waterskin);
+  builder_.add_small_waterskin(small_waterskin);
+  builder_.add_beetle_components(beetle_components);
+  builder_.add_beetle_life(beetle_life);
+  builder_.add_has_silencer(has_silencer);
+  builder_.add_has_lasersight(has_lasersight);
+  builder_.add_has_torch(has_torch);
+  builder_.add_has_crowbar(has_crowbar);
+  builder_.add_has_binoculars(has_binoculars);
+  builder_.add_old_busy(old_busy);
+  builder_.add_is_busy(is_busy);
+  return builder_.Finish();
+}
+
+struct LaraInventoryData::Traits {
+  using type = LaraInventoryData;
+  static auto constexpr Create = CreateLaraInventoryData;
+};
+
+inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryDataDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool is_busy = false,
+    bool old_busy = false,
+    int32_t beetle_life = 0,
+    int32_t beetle_components = 0,
+    int32_t small_waterskin = 0,
+    int32_t big_waterskin = 0,
+    bool has_binoculars = false,
+    bool has_crowbar = false,
+    bool has_torch = false,
+    bool has_lasersight = false,
+    bool has_silencer = false,
+    int32_t total_small_medipacks = 0,
+    int32_t total_large_medipacks = 0,
+    int32_t total_flares = 0,
+    uint32_t total_secrets = 0,
+    const std::vector<int32_t> *puzzles = nullptr,
+    const std::vector<int32_t> *keys = nullptr,
+    const std::vector<int32_t> *pickups = nullptr,
+    const std::vector<int32_t> *examines = nullptr,
+    const std::vector<int32_t> *puzzles_combo = nullptr,
+    const std::vector<int32_t> *keys_combo = nullptr,
+    const std::vector<int32_t> *pickups_combo = nullptr,
+    const std::vector<int32_t> *examines_combo = nullptr) {
+  auto puzzles__ = puzzles ? _fbb.CreateVector<int32_t>(*puzzles) : 0;
+  auto keys__ = keys ? _fbb.CreateVector<int32_t>(*keys) : 0;
+  auto pickups__ = pickups ? _fbb.CreateVector<int32_t>(*pickups) : 0;
+  auto examines__ = examines ? _fbb.CreateVector<int32_t>(*examines) : 0;
+  auto puzzles_combo__ = puzzles_combo ? _fbb.CreateVector<int32_t>(*puzzles_combo) : 0;
+  auto keys_combo__ = keys_combo ? _fbb.CreateVector<int32_t>(*keys_combo) : 0;
+  auto pickups_combo__ = pickups_combo ? _fbb.CreateVector<int32_t>(*pickups_combo) : 0;
+  auto examines_combo__ = examines_combo ? _fbb.CreateVector<int32_t>(*examines_combo) : 0;
+  return TEN::Save::CreateLaraInventoryData(
+      _fbb,
+      is_busy,
+      old_busy,
+      beetle_life,
+      beetle_components,
+      small_waterskin,
+      big_waterskin,
+      has_binoculars,
+      has_crowbar,
+      has_torch,
+      has_lasersight,
+      has_silencer,
+      total_small_medipacks,
+      total_large_medipacks,
+      total_flares,
+      total_secrets,
+      puzzles__,
+      keys__,
+      pickups__,
+      examines__,
+      puzzles_combo__,
+      keys_combo__,
+      pickups_combo__,
+      examines_combo__);
+}
+
+flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffers::FlatBufferBuilder &_fbb, const LaraInventoryDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct LaraCountDataT : public flatbuffers::NativeTable {
+  typedef LaraCountData TableType;
+  uint32_t run_jump = 0;
+  uint32_t position_adjust = 0;
+  uint32_t pose = 0;
+  uint32_t dive = 0;
+  uint32_t death = 0;
+  uint32_t no_cheat = 0;
+};
+
+struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LaraCountDataT NativeTableType;
+  typedef LaraCountDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_RUN_JUMP = 4,
+    VT_POSITION_ADJUST = 6,
+    VT_POSE = 8,
+    VT_DIVE = 10,
+    VT_DEATH = 12,
+    VT_NO_CHEAT = 14
+  };
+  uint32_t run_jump() const {
+    return GetField<uint32_t>(VT_RUN_JUMP, 0);
+  }
+  uint32_t position_adjust() const {
+    return GetField<uint32_t>(VT_POSITION_ADJUST, 0);
+  }
+  uint32_t pose() const {
+    return GetField<uint32_t>(VT_POSE, 0);
+  }
+  uint32_t dive() const {
+    return GetField<uint32_t>(VT_DIVE, 0);
+  }
+  uint32_t death() const {
+    return GetField<uint32_t>(VT_DEATH, 0);
+  }
+  uint32_t no_cheat() const {
+    return GetField<uint32_t>(VT_NO_CHEAT, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_RUN_JUMP) &&
+           VerifyField<uint32_t>(verifier, VT_POSITION_ADJUST) &&
+           VerifyField<uint32_t>(verifier, VT_POSE) &&
+           VerifyField<uint32_t>(verifier, VT_DIVE) &&
+           VerifyField<uint32_t>(verifier, VT_DEATH) &&
+           VerifyField<uint32_t>(verifier, VT_NO_CHEAT) &&
+           verifier.EndTable();
+  }
+  LaraCountDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LaraCountDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LaraCountData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct LaraCountDataBuilder {
+  typedef LaraCountData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_run_jump(uint32_t run_jump) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_RUN_JUMP, run_jump, 0);
+  }
+  void add_position_adjust(uint32_t position_adjust) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_POSITION_ADJUST, position_adjust, 0);
+  }
+  void add_pose(uint32_t pose) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_POSE, pose, 0);
+  }
+  void add_dive(uint32_t dive) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_DIVE, dive, 0);
+  }
+  void add_death(uint32_t death) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_DEATH, death, 0);
+  }
+  void add_no_cheat(uint32_t no_cheat) {
+    fbb_.AddElement<uint32_t>(LaraCountData::VT_NO_CHEAT, no_cheat, 0);
+  }
+  explicit LaraCountDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<LaraCountData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<LaraCountData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t run_jump = 0,
+    uint32_t position_adjust = 0,
+    uint32_t pose = 0,
+    uint32_t dive = 0,
+    uint32_t death = 0,
+    uint32_t no_cheat = 0) {
+  LaraCountDataBuilder builder_(_fbb);
+  builder_.add_no_cheat(no_cheat);
+  builder_.add_death(death);
+  builder_.add_dive(dive);
+  builder_.add_pose(pose);
+  builder_.add_position_adjust(position_adjust);
+  builder_.add_run_jump(run_jump);
+  return builder_.Finish();
+}
+
+struct LaraCountData::Traits {
+  using type = LaraCountData;
+  static auto constexpr Create = CreateLaraCountData;
+};
+
+flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct WeaponControlDataT : public flatbuffers::NativeTable {
   typedef WeaponControlData TableType;
@@ -2007,119 +2492,6 @@ struct MinecartControlData::Traits {
 
 flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct LaraCountDataT : public flatbuffers::NativeTable {
-  typedef LaraCountData TableType;
-  uint32_t run_jump = 0;
-  uint32_t position_adjust = 0;
-  uint32_t pose = 0;
-  uint32_t dive = 0;
-  uint32_t death = 0;
-  uint32_t no_cheat = 0;
-};
-
-struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef LaraCountDataT NativeTableType;
-  typedef LaraCountDataBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_RUN_JUMP = 4,
-    VT_POSITION_ADJUST = 6,
-    VT_POSE = 8,
-    VT_DIVE = 10,
-    VT_DEATH = 12,
-    VT_NO_CHEAT = 14
-  };
-  uint32_t run_jump() const {
-    return GetField<uint32_t>(VT_RUN_JUMP, 0);
-  }
-  uint32_t position_adjust() const {
-    return GetField<uint32_t>(VT_POSITION_ADJUST, 0);
-  }
-  uint32_t pose() const {
-    return GetField<uint32_t>(VT_POSE, 0);
-  }
-  uint32_t dive() const {
-    return GetField<uint32_t>(VT_DIVE, 0);
-  }
-  uint32_t death() const {
-    return GetField<uint32_t>(VT_DEATH, 0);
-  }
-  uint32_t no_cheat() const {
-    return GetField<uint32_t>(VT_NO_CHEAT, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_RUN_JUMP) &&
-           VerifyField<uint32_t>(verifier, VT_POSITION_ADJUST) &&
-           VerifyField<uint32_t>(verifier, VT_POSE) &&
-           VerifyField<uint32_t>(verifier, VT_DIVE) &&
-           VerifyField<uint32_t>(verifier, VT_DEATH) &&
-           VerifyField<uint32_t>(verifier, VT_NO_CHEAT) &&
-           verifier.EndTable();
-  }
-  LaraCountDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(LaraCountDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<LaraCountData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct LaraCountDataBuilder {
-  typedef LaraCountData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_run_jump(uint32_t run_jump) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_RUN_JUMP, run_jump, 0);
-  }
-  void add_position_adjust(uint32_t position_adjust) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_POSITION_ADJUST, position_adjust, 0);
-  }
-  void add_pose(uint32_t pose) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_POSE, pose, 0);
-  }
-  void add_dive(uint32_t dive) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_DIVE, dive, 0);
-  }
-  void add_death(uint32_t death) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_DEATH, death, 0);
-  }
-  void add_no_cheat(uint32_t no_cheat) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_NO_CHEAT, no_cheat, 0);
-  }
-  explicit LaraCountDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<LaraCountData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<LaraCountData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t run_jump = 0,
-    uint32_t position_adjust = 0,
-    uint32_t pose = 0,
-    uint32_t dive = 0,
-    uint32_t death = 0,
-    uint32_t no_cheat = 0) {
-  LaraCountDataBuilder builder_(_fbb);
-  builder_.add_no_cheat(no_cheat);
-  builder_.add_death(death);
-  builder_.add_dive(dive);
-  builder_.add_pose(pose);
-  builder_.add_position_adjust(position_adjust);
-  builder_.add_run_jump(run_jump);
-  return builder_.Finish();
-}
-
-struct LaraCountData::Traits {
-  using type = LaraCountData;
-  static auto constexpr Create = CreateLaraCountData;
-};
-
-flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct LaraControlDataT : public flatbuffers::NativeTable {
   typedef LaraControlData TableType;
   int32_t move_angle = 0;
@@ -2407,70 +2779,44 @@ flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::FlatBuff
 struct LaraT : public flatbuffers::NativeTable {
   typedef Lara TableType;
   int32_t item_number = 0;
-  int32_t hit_points = 0;
-  int32_t velocity = 0;
-  int32_t vertical_velocity = 0;
-  int32_t projected_floor_height = 0;
-  int32_t target_angle = 0;
-  int32_t water_status = 0;
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
+  std::unique_ptr<TEN::Save::LaraInventoryDataT> inventory{};
+  std::vector<std::unique_ptr<TEN::Save::CarriedWeaponInfoT>> weapons{};
+  std::unique_ptr<TEN::Save::FlareDataT> flare{};
+  bool lit_torch = false;
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
   int32_t water_current_active = 0;
   std::unique_ptr<TEN::Save::Vector3> water_current_pull{};
-  int32_t hit_frame = 0;
-  int32_t hit_direction = 0;
+  std::unique_ptr<TEN::Save::ArmInfoT> left_arm{};
+  std::unique_ptr<TEN::Save::ArmInfoT> right_arm{};
+  std::vector<int32_t> target_arm_angles{};
+  int32_t target_entity_number = 0;
   int32_t air = 0;
   int32_t sprint_energy = 0;
+  int32_t poison_potency = 0;
+  int32_t vehicle = 0;
+  int32_t extra_anim = 0;
+  int32_t hit_frame = 0;
+  int32_t hit_direction = 0;
   uint32_t spasm_effect_count = 0;
-  std::unique_ptr<TEN::Save::FlareDataT> flare{};
+  int32_t projected_floor_height = 0;
+  int32_t target_facing_angle = 0;
+  int32_t water_surface_dist = 0;
+  int32_t interacted_item = 0;
+  std::unique_ptr<TEN::Save::Vector3> next_corner_position{};
+  std::unique_ptr<TEN::Save::Vector3> next_corner_rotation{};
   int32_t burn_type = 0;
+  uint32_t burn_count = 0;
   bool burn = false;
   int32_t burn_blue = 0;
   bool burn_smoke = false;
-  uint32_t burn_count = 0;
-  int32_t poison_potency = 0;
   std::vector<bool> wet{};
-  bool lit_torch = false;
-  int32_t water_surface_dist = 0;
-  std::unique_ptr<TEN::Save::Vector3> next_corner_position{};
-  std::unique_ptr<TEN::Save::Vector3> next_corner_rotation{};
   std::vector<int32_t> mesh_ptrs{};
-  std::vector<int32_t> target_arm_angles{};
-  std::unique_ptr<TEN::Save::ArmInfoT> left_arm{};
-  std::unique_ptr<TEN::Save::ArmInfoT> right_arm{};
-  int32_t interacted_item = 0;
   int32_t location = 0;
   int32_t highest_location = 0;
   int32_t location_pad = 0;
-  bool is_busy = false;
-  bool old_busy = false;
-  int32_t beetle_life = 0;
-  int32_t has_beetle_things = 0;
-  int32_t small_waterskin = 0;
-  int32_t big_waterskin = 0;
-  int32_t vehicle = 0;
-  int32_t extra_anim = 0;
-  std::vector<std::unique_ptr<TEN::Save::CarriedWeaponInfoT>> weapons{};
-  std::vector<int32_t> puzzles{};
-  std::vector<int32_t> keys{};
-  std::vector<int32_t> pickups{};
-  std::vector<int32_t> examines{};
-  std::vector<int32_t> puzzles_combo{};
-  std::vector<int32_t> keys_combo{};
-  std::vector<int32_t> pickups_combo{};
-  std::vector<int32_t> examines_combo{};
-  int32_t secrets = 0;
-  bool lasersight = false;
-  bool crowbar = false;
-  bool torch = false;
-  bool silencer = false;
-  bool binoculars = false;
-  int32_t num_large_medipacks = 0;
-  int32_t num_small_medipacks = 0;
-  int32_t num_flares = 0;
-  int32_t target_item_number = 0;
 };
 
 struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -2479,94 +2825,62 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ITEM_NUMBER = 4,
-    VT_HIT_POINTS = 6,
-    VT_VELOCITY = 8,
-    VT_VERTICAL_VELOCITY = 10,
-    VT_PROJECTED_FLOOR_HEIGHT = 12,
-    VT_TARGET_ANGLE = 14,
-    VT_WATER_STATUS = 16,
-    VT_CONTROL = 18,
-    VT_EXTRA_HEAD_ROT = 20,
-    VT_EXTRA_TORSO_ROT = 22,
-    VT_EXTRA_VELOCITY = 24,
-    VT_WATER_CURRENT_ACTIVE = 26,
-    VT_WATER_CURRENT_PULL = 28,
-    VT_HIT_FRAME = 30,
-    VT_HIT_DIRECTION = 32,
+    VT_CONTROL = 6,
+    VT_INVENTORY = 8,
+    VT_WEAPONS = 10,
+    VT_FLARE = 12,
+    VT_LIT_TORCH = 14,
+    VT_EXTRA_HEAD_ROT = 16,
+    VT_EXTRA_TORSO_ROT = 18,
+    VT_EXTRA_VELOCITY = 20,
+    VT_WATER_CURRENT_ACTIVE = 22,
+    VT_WATER_CURRENT_PULL = 24,
+    VT_LEFT_ARM = 26,
+    VT_RIGHT_ARM = 28,
+    VT_TARGET_ARM_ANGLES = 30,
+    VT_TARGET_ENTITY_NUMBER = 32,
     VT_AIR = 34,
     VT_SPRINT_ENERGY = 36,
-    VT_SPASM_EFFECT_COUNT = 38,
-    VT_FLARE = 40,
-    VT_BURN_TYPE = 42,
-    VT_BURN = 44,
-    VT_BURN_BLUE = 46,
-    VT_BURN_SMOKE = 48,
-    VT_BURN_COUNT = 50,
-    VT_POISON_POTENCY = 52,
-    VT_WET = 54,
-    VT_LIT_TORCH = 56,
-    VT_WATER_SURFACE_DIST = 58,
-    VT_NEXT_CORNER_POSITION = 60,
-    VT_NEXT_CORNER_ROTATION = 62,
-    VT_MESH_PTRS = 64,
-    VT_TARGET_ARM_ANGLES = 66,
-    VT_LEFT_ARM = 68,
-    VT_RIGHT_ARM = 70,
-    VT_INTERACTED_ITEM = 72,
-    VT_LOCATION = 74,
-    VT_HIGHEST_LOCATION = 76,
-    VT_LOCATION_PAD = 78,
-    VT_IS_BUSY = 80,
-    VT_OLD_BUSY = 82,
-    VT_BEETLE_LIFE = 84,
-    VT_HAS_BEETLE_THINGS = 86,
-    VT_SMALL_WATERSKIN = 88,
-    VT_BIG_WATERSKIN = 90,
-    VT_VEHICLE = 92,
-    VT_EXTRA_ANIM = 94,
-    VT_WEAPONS = 96,
-    VT_PUZZLES = 98,
-    VT_KEYS = 100,
-    VT_PICKUPS = 102,
-    VT_EXAMINES = 104,
-    VT_PUZZLES_COMBO = 106,
-    VT_KEYS_COMBO = 108,
-    VT_PICKUPS_COMBO = 110,
-    VT_EXAMINES_COMBO = 112,
-    VT_SECRETS = 114,
-    VT_LASERSIGHT = 116,
-    VT_CROWBAR = 118,
-    VT_TORCH = 120,
-    VT_SILENCER = 122,
-    VT_BINOCULARS = 124,
-    VT_NUM_LARGE_MEDIPACKS = 126,
-    VT_NUM_SMALL_MEDIPACKS = 128,
-    VT_NUM_FLARES = 130,
-    VT_TARGET_ITEM_NUMBER = 132
+    VT_POISON_POTENCY = 38,
+    VT_VEHICLE = 40,
+    VT_EXTRA_ANIM = 42,
+    VT_HIT_FRAME = 44,
+    VT_HIT_DIRECTION = 46,
+    VT_SPASM_EFFECT_COUNT = 48,
+    VT_PROJECTED_FLOOR_HEIGHT = 50,
+    VT_TARGET_FACING_ANGLE = 52,
+    VT_WATER_SURFACE_DIST = 54,
+    VT_INTERACTED_ITEM = 56,
+    VT_NEXT_CORNER_POSITION = 58,
+    VT_NEXT_CORNER_ROTATION = 60,
+    VT_BURN_TYPE = 62,
+    VT_BURN_COUNT = 64,
+    VT_BURN = 66,
+    VT_BURN_BLUE = 68,
+    VT_BURN_SMOKE = 70,
+    VT_WET = 72,
+    VT_MESH_PTRS = 74,
+    VT_LOCATION = 76,
+    VT_HIGHEST_LOCATION = 78,
+    VT_LOCATION_PAD = 80
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
   }
-  int32_t hit_points() const {
-    return GetField<int32_t>(VT_HIT_POINTS, 0);
-  }
-  int32_t velocity() const {
-    return GetField<int32_t>(VT_VELOCITY, 0);
-  }
-  int32_t vertical_velocity() const {
-    return GetField<int32_t>(VT_VERTICAL_VELOCITY, 0);
-  }
-  int32_t projected_floor_height() const {
-    return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
-  }
-  int32_t target_angle() const {
-    return GetField<int32_t>(VT_TARGET_ANGLE, 0);
-  }
-  int32_t water_status() const {
-    return GetField<int32_t>(VT_WATER_STATUS, 0);
-  }
   const TEN::Save::LaraControlData *control() const {
     return GetPointer<const TEN::Save::LaraControlData *>(VT_CONTROL);
+  }
+  const TEN::Save::LaraInventoryData *inventory() const {
+    return GetPointer<const TEN::Save::LaraInventoryData *>(VT_INVENTORY);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *>(VT_WEAPONS);
+  }
+  const TEN::Save::FlareData *flare() const {
+    return GetPointer<const TEN::Save::FlareData *>(VT_FLARE);
+  }
+  bool lit_torch() const {
+    return GetField<uint8_t>(VT_LIT_TORCH, 0) != 0;
   }
   const TEN::Save::Vector3 *extra_head_rot() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_HEAD_ROT);
@@ -2583,11 +2897,17 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Vector3 *water_current_pull() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_WATER_CURRENT_PULL);
   }
-  int32_t hit_frame() const {
-    return GetField<int32_t>(VT_HIT_FRAME, 0);
+  const TEN::Save::ArmInfo *left_arm() const {
+    return GetPointer<const TEN::Save::ArmInfo *>(VT_LEFT_ARM);
   }
-  int32_t hit_direction() const {
-    return GetField<int32_t>(VT_HIT_DIRECTION, 0);
+  const TEN::Save::ArmInfo *right_arm() const {
+    return GetPointer<const TEN::Save::ArmInfo *>(VT_RIGHT_ARM);
+  }
+  const flatbuffers::Vector<int32_t> *target_arm_angles() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_TARGET_ARM_ANGLES);
+  }
+  int32_t target_entity_number() const {
+    return GetField<int32_t>(VT_TARGET_ENTITY_NUMBER, 0);
   }
   int32_t air() const {
     return GetField<int32_t>(VT_AIR, 0);
@@ -2595,14 +2915,47 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t sprint_energy() const {
     return GetField<int32_t>(VT_SPRINT_ENERGY, 0);
   }
+  int32_t poison_potency() const {
+    return GetField<int32_t>(VT_POISON_POTENCY, 0);
+  }
+  int32_t vehicle() const {
+    return GetField<int32_t>(VT_VEHICLE, 0);
+  }
+  int32_t extra_anim() const {
+    return GetField<int32_t>(VT_EXTRA_ANIM, 0);
+  }
+  int32_t hit_frame() const {
+    return GetField<int32_t>(VT_HIT_FRAME, 0);
+  }
+  int32_t hit_direction() const {
+    return GetField<int32_t>(VT_HIT_DIRECTION, 0);
+  }
   uint32_t spasm_effect_count() const {
     return GetField<uint32_t>(VT_SPASM_EFFECT_COUNT, 0);
   }
-  const TEN::Save::FlareData *flare() const {
-    return GetPointer<const TEN::Save::FlareData *>(VT_FLARE);
+  int32_t projected_floor_height() const {
+    return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
+  }
+  int32_t target_facing_angle() const {
+    return GetField<int32_t>(VT_TARGET_FACING_ANGLE, 0);
+  }
+  int32_t water_surface_dist() const {
+    return GetField<int32_t>(VT_WATER_SURFACE_DIST, 0);
+  }
+  int32_t interacted_item() const {
+    return GetField<int32_t>(VT_INTERACTED_ITEM, 0);
+  }
+  const TEN::Save::Vector3 *next_corner_position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_POSITION);
+  }
+  const TEN::Save::Vector3 *next_corner_rotation() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_ROTATION);
   }
   int32_t burn_type() const {
     return GetField<int32_t>(VT_BURN_TYPE, 0);
+  }
+  uint32_t burn_count() const {
+    return GetField<uint32_t>(VT_BURN_COUNT, 0);
   }
   bool burn() const {
     return GetField<uint8_t>(VT_BURN, 0) != 0;
@@ -2613,41 +2966,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool burn_smoke() const {
     return GetField<uint8_t>(VT_BURN_SMOKE, 0) != 0;
   }
-  uint32_t burn_count() const {
-    return GetField<uint32_t>(VT_BURN_COUNT, 0);
-  }
-  int32_t poison_potency() const {
-    return GetField<int32_t>(VT_POISON_POTENCY, 0);
-  }
   const flatbuffers::Vector<uint8_t> *wet() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_WET);
   }
-  bool lit_torch() const {
-    return GetField<uint8_t>(VT_LIT_TORCH, 0) != 0;
-  }
-  int32_t water_surface_dist() const {
-    return GetField<int32_t>(VT_WATER_SURFACE_DIST, 0);
-  }
-  const TEN::Save::Vector3 *next_corner_position() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_POSITION);
-  }
-  const TEN::Save::Vector3 *next_corner_rotation() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_NEXT_CORNER_ROTATION);
-  }
   const flatbuffers::Vector<int32_t> *mesh_ptrs() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_MESH_PTRS);
-  }
-  const flatbuffers::Vector<int32_t> *target_arm_angles() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_TARGET_ARM_ANGLES);
-  }
-  const TEN::Save::ArmInfo *left_arm() const {
-    return GetPointer<const TEN::Save::ArmInfo *>(VT_LEFT_ARM);
-  }
-  const TEN::Save::ArmInfo *right_arm() const {
-    return GetPointer<const TEN::Save::ArmInfo *>(VT_RIGHT_ARM);
-  }
-  int32_t interacted_item() const {
-    return GetField<int32_t>(VT_INTERACTED_ITEM, 0);
   }
   int32_t location() const {
     return GetField<int32_t>(VT_LOCATION, 0);
@@ -2658,171 +2981,57 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t location_pad() const {
     return GetField<int32_t>(VT_LOCATION_PAD, 0);
   }
-  bool is_busy() const {
-    return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
-  }
-  bool old_busy() const {
-    return GetField<uint8_t>(VT_OLD_BUSY, 0) != 0;
-  }
-  int32_t beetle_life() const {
-    return GetField<int32_t>(VT_BEETLE_LIFE, 0);
-  }
-  int32_t has_beetle_things() const {
-    return GetField<int32_t>(VT_HAS_BEETLE_THINGS, 0);
-  }
-  int32_t small_waterskin() const {
-    return GetField<int32_t>(VT_SMALL_WATERSKIN, 0);
-  }
-  int32_t big_waterskin() const {
-    return GetField<int32_t>(VT_BIG_WATERSKIN, 0);
-  }
-  int32_t vehicle() const {
-    return GetField<int32_t>(VT_VEHICLE, 0);
-  }
-  int32_t extra_anim() const {
-    return GetField<int32_t>(VT_EXTRA_ANIM, 0);
-  }
-  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *>(VT_WEAPONS);
-  }
-  const flatbuffers::Vector<int32_t> *puzzles() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PUZZLES);
-  }
-  const flatbuffers::Vector<int32_t> *keys() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_KEYS);
-  }
-  const flatbuffers::Vector<int32_t> *pickups() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PICKUPS);
-  }
-  const flatbuffers::Vector<int32_t> *examines() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_EXAMINES);
-  }
-  const flatbuffers::Vector<int32_t> *puzzles_combo() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PUZZLES_COMBO);
-  }
-  const flatbuffers::Vector<int32_t> *keys_combo() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_KEYS_COMBO);
-  }
-  const flatbuffers::Vector<int32_t> *pickups_combo() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_PICKUPS_COMBO);
-  }
-  const flatbuffers::Vector<int32_t> *examines_combo() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_EXAMINES_COMBO);
-  }
-  int32_t secrets() const {
-    return GetField<int32_t>(VT_SECRETS, 0);
-  }
-  bool lasersight() const {
-    return GetField<uint8_t>(VT_LASERSIGHT, 0) != 0;
-  }
-  bool crowbar() const {
-    return GetField<uint8_t>(VT_CROWBAR, 0) != 0;
-  }
-  bool torch() const {
-    return GetField<uint8_t>(VT_TORCH, 0) != 0;
-  }
-  bool silencer() const {
-    return GetField<uint8_t>(VT_SILENCER, 0) != 0;
-  }
-  bool binoculars() const {
-    return GetField<uint8_t>(VT_BINOCULARS, 0) != 0;
-  }
-  int32_t num_large_medipacks() const {
-    return GetField<int32_t>(VT_NUM_LARGE_MEDIPACKS, 0);
-  }
-  int32_t num_small_medipacks() const {
-    return GetField<int32_t>(VT_NUM_SMALL_MEDIPACKS, 0);
-  }
-  int32_t num_flares() const {
-    return GetField<int32_t>(VT_NUM_FLARES, 0);
-  }
-  int32_t target_item_number() const {
-    return GetField<int32_t>(VT_TARGET_ITEM_NUMBER, 0);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_ITEM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
-           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
-           VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
-           VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
-           VerifyField<int32_t>(verifier, VT_TARGET_ANGLE) &&
-           VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyOffset(verifier, VT_CONTROL) &&
            verifier.VerifyTable(control()) &&
+           VerifyOffset(verifier, VT_INVENTORY) &&
+           verifier.VerifyTable(inventory()) &&
+           VerifyOffset(verifier, VT_WEAPONS) &&
+           verifier.VerifyVector(weapons()) &&
+           verifier.VerifyVectorOfTables(weapons()) &&
+           VerifyOffset(verifier, VT_FLARE) &&
+           verifier.VerifyTable(flare()) &&
+           VerifyField<uint8_t>(verifier, VT_LIT_TORCH) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_WATER_CURRENT_ACTIVE) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_WATER_CURRENT_PULL) &&
-           VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
-           VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
-           VerifyField<int32_t>(verifier, VT_AIR) &&
-           VerifyField<int32_t>(verifier, VT_SPRINT_ENERGY) &&
-           VerifyField<uint32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
-           VerifyOffset(verifier, VT_FLARE) &&
-           verifier.VerifyTable(flare()) &&
-           VerifyField<int32_t>(verifier, VT_BURN_TYPE) &&
-           VerifyField<uint8_t>(verifier, VT_BURN) &&
-           VerifyField<int32_t>(verifier, VT_BURN_BLUE) &&
-           VerifyField<uint8_t>(verifier, VT_BURN_SMOKE) &&
-           VerifyField<uint32_t>(verifier, VT_BURN_COUNT) &&
-           VerifyField<int32_t>(verifier, VT_POISON_POTENCY) &&
-           VerifyOffset(verifier, VT_WET) &&
-           verifier.VerifyVector(wet()) &&
-           VerifyField<uint8_t>(verifier, VT_LIT_TORCH) &&
-           VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_POSITION) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_ROTATION) &&
-           VerifyOffset(verifier, VT_MESH_PTRS) &&
-           verifier.VerifyVector(mesh_ptrs()) &&
-           VerifyOffset(verifier, VT_TARGET_ARM_ANGLES) &&
-           verifier.VerifyVector(target_arm_angles()) &&
            VerifyOffset(verifier, VT_LEFT_ARM) &&
            verifier.VerifyTable(left_arm()) &&
            VerifyOffset(verifier, VT_RIGHT_ARM) &&
            verifier.VerifyTable(right_arm()) &&
+           VerifyOffset(verifier, VT_TARGET_ARM_ANGLES) &&
+           verifier.VerifyVector(target_arm_angles()) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_ENTITY_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_AIR) &&
+           VerifyField<int32_t>(verifier, VT_SPRINT_ENERGY) &&
+           VerifyField<int32_t>(verifier, VT_POISON_POTENCY) &&
+           VerifyField<int32_t>(verifier, VT_VEHICLE) &&
+           VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
+           VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
+           VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
+           VerifyField<uint32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_FACING_ANGLE) &&
+           VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
            VerifyField<int32_t>(verifier, VT_INTERACTED_ITEM) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_POSITION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_NEXT_CORNER_ROTATION) &&
+           VerifyField<int32_t>(verifier, VT_BURN_TYPE) &&
+           VerifyField<uint32_t>(verifier, VT_BURN_COUNT) &&
+           VerifyField<uint8_t>(verifier, VT_BURN) &&
+           VerifyField<int32_t>(verifier, VT_BURN_BLUE) &&
+           VerifyField<uint8_t>(verifier, VT_BURN_SMOKE) &&
+           VerifyOffset(verifier, VT_WET) &&
+           verifier.VerifyVector(wet()) &&
+           VerifyOffset(verifier, VT_MESH_PTRS) &&
+           verifier.VerifyVector(mesh_ptrs()) &&
            VerifyField<int32_t>(verifier, VT_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_HIGHEST_LOCATION) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_PAD) &&
-           VerifyField<uint8_t>(verifier, VT_IS_BUSY) &&
-           VerifyField<uint8_t>(verifier, VT_OLD_BUSY) &&
-           VerifyField<int32_t>(verifier, VT_BEETLE_LIFE) &&
-           VerifyField<int32_t>(verifier, VT_HAS_BEETLE_THINGS) &&
-           VerifyField<int32_t>(verifier, VT_SMALL_WATERSKIN) &&
-           VerifyField<int32_t>(verifier, VT_BIG_WATERSKIN) &&
-           VerifyField<int32_t>(verifier, VT_VEHICLE) &&
-           VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
-           VerifyOffset(verifier, VT_WEAPONS) &&
-           verifier.VerifyVector(weapons()) &&
-           verifier.VerifyVectorOfTables(weapons()) &&
-           VerifyOffset(verifier, VT_PUZZLES) &&
-           verifier.VerifyVector(puzzles()) &&
-           VerifyOffset(verifier, VT_KEYS) &&
-           verifier.VerifyVector(keys()) &&
-           VerifyOffset(verifier, VT_PICKUPS) &&
-           verifier.VerifyVector(pickups()) &&
-           VerifyOffset(verifier, VT_EXAMINES) &&
-           verifier.VerifyVector(examines()) &&
-           VerifyOffset(verifier, VT_PUZZLES_COMBO) &&
-           verifier.VerifyVector(puzzles_combo()) &&
-           VerifyOffset(verifier, VT_KEYS_COMBO) &&
-           verifier.VerifyVector(keys_combo()) &&
-           VerifyOffset(verifier, VT_PICKUPS_COMBO) &&
-           verifier.VerifyVector(pickups_combo()) &&
-           VerifyOffset(verifier, VT_EXAMINES_COMBO) &&
-           verifier.VerifyVector(examines_combo()) &&
-           VerifyField<int32_t>(verifier, VT_SECRETS) &&
-           VerifyField<uint8_t>(verifier, VT_LASERSIGHT) &&
-           VerifyField<uint8_t>(verifier, VT_CROWBAR) &&
-           VerifyField<uint8_t>(verifier, VT_TORCH) &&
-           VerifyField<uint8_t>(verifier, VT_SILENCER) &&
-           VerifyField<uint8_t>(verifier, VT_BINOCULARS) &&
-           VerifyField<int32_t>(verifier, VT_NUM_LARGE_MEDIPACKS) &&
-           VerifyField<int32_t>(verifier, VT_NUM_SMALL_MEDIPACKS) &&
-           VerifyField<int32_t>(verifier, VT_NUM_FLARES) &&
-           VerifyField<int32_t>(verifier, VT_TARGET_ITEM_NUMBER) &&
            verifier.EndTable();
   }
   LaraT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -2837,26 +3046,20 @@ struct LaraBuilder {
   void add_item_number(int32_t item_number) {
     fbb_.AddElement<int32_t>(Lara::VT_ITEM_NUMBER, item_number, 0);
   }
-  void add_hit_points(int32_t hit_points) {
-    fbb_.AddElement<int32_t>(Lara::VT_HIT_POINTS, hit_points, 0);
-  }
-  void add_velocity(int32_t velocity) {
-    fbb_.AddElement<int32_t>(Lara::VT_VELOCITY, velocity, 0);
-  }
-  void add_vertical_velocity(int32_t vertical_velocity) {
-    fbb_.AddElement<int32_t>(Lara::VT_VERTICAL_VELOCITY, vertical_velocity, 0);
-  }
-  void add_projected_floor_height(int32_t projected_floor_height) {
-    fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
-  }
-  void add_target_angle(int32_t target_angle) {
-    fbb_.AddElement<int32_t>(Lara::VT_TARGET_ANGLE, target_angle, 0);
-  }
-  void add_water_status(int32_t water_status) {
-    fbb_.AddElement<int32_t>(Lara::VT_WATER_STATUS, water_status, 0);
-  }
   void add_control(flatbuffers::Offset<TEN::Save::LaraControlData> control) {
     fbb_.AddOffset(Lara::VT_CONTROL, control);
+  }
+  void add_inventory(flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory) {
+    fbb_.AddOffset(Lara::VT_INVENTORY, inventory);
+  }
+  void add_weapons(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons) {
+    fbb_.AddOffset(Lara::VT_WEAPONS, weapons);
+  }
+  void add_flare(flatbuffers::Offset<TEN::Save::FlareData> flare) {
+    fbb_.AddOffset(Lara::VT_FLARE, flare);
+  }
+  void add_lit_torch(bool lit_torch) {
+    fbb_.AddElement<uint8_t>(Lara::VT_LIT_TORCH, static_cast<uint8_t>(lit_torch), 0);
   }
   void add_extra_head_rot(const TEN::Save::Vector3 *extra_head_rot) {
     fbb_.AddStruct(Lara::VT_EXTRA_HEAD_ROT, extra_head_rot);
@@ -2873,11 +3076,17 @@ struct LaraBuilder {
   void add_water_current_pull(const TEN::Save::Vector3 *water_current_pull) {
     fbb_.AddStruct(Lara::VT_WATER_CURRENT_PULL, water_current_pull);
   }
-  void add_hit_frame(int32_t hit_frame) {
-    fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
+  void add_left_arm(flatbuffers::Offset<TEN::Save::ArmInfo> left_arm) {
+    fbb_.AddOffset(Lara::VT_LEFT_ARM, left_arm);
   }
-  void add_hit_direction(int32_t hit_direction) {
-    fbb_.AddElement<int32_t>(Lara::VT_HIT_DIRECTION, hit_direction, 0);
+  void add_right_arm(flatbuffers::Offset<TEN::Save::ArmInfo> right_arm) {
+    fbb_.AddOffset(Lara::VT_RIGHT_ARM, right_arm);
+  }
+  void add_target_arm_angles(flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_arm_angles) {
+    fbb_.AddOffset(Lara::VT_TARGET_ARM_ANGLES, target_arm_angles);
+  }
+  void add_target_entity_number(int32_t target_entity_number) {
+    fbb_.AddElement<int32_t>(Lara::VT_TARGET_ENTITY_NUMBER, target_entity_number, 0);
   }
   void add_air(int32_t air) {
     fbb_.AddElement<int32_t>(Lara::VT_AIR, air, 0);
@@ -2885,14 +3094,47 @@ struct LaraBuilder {
   void add_sprint_energy(int32_t sprint_energy) {
     fbb_.AddElement<int32_t>(Lara::VT_SPRINT_ENERGY, sprint_energy, 0);
   }
+  void add_poison_potency(int32_t poison_potency) {
+    fbb_.AddElement<int32_t>(Lara::VT_POISON_POTENCY, poison_potency, 0);
+  }
+  void add_vehicle(int32_t vehicle) {
+    fbb_.AddElement<int32_t>(Lara::VT_VEHICLE, vehicle, 0);
+  }
+  void add_extra_anim(int32_t extra_anim) {
+    fbb_.AddElement<int32_t>(Lara::VT_EXTRA_ANIM, extra_anim, 0);
+  }
+  void add_hit_frame(int32_t hit_frame) {
+    fbb_.AddElement<int32_t>(Lara::VT_HIT_FRAME, hit_frame, 0);
+  }
+  void add_hit_direction(int32_t hit_direction) {
+    fbb_.AddElement<int32_t>(Lara::VT_HIT_DIRECTION, hit_direction, 0);
+  }
   void add_spasm_effect_count(uint32_t spasm_effect_count) {
     fbb_.AddElement<uint32_t>(Lara::VT_SPASM_EFFECT_COUNT, spasm_effect_count, 0);
   }
-  void add_flare(flatbuffers::Offset<TEN::Save::FlareData> flare) {
-    fbb_.AddOffset(Lara::VT_FLARE, flare);
+  void add_projected_floor_height(int32_t projected_floor_height) {
+    fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
+  }
+  void add_target_facing_angle(int32_t target_facing_angle) {
+    fbb_.AddElement<int32_t>(Lara::VT_TARGET_FACING_ANGLE, target_facing_angle, 0);
+  }
+  void add_water_surface_dist(int32_t water_surface_dist) {
+    fbb_.AddElement<int32_t>(Lara::VT_WATER_SURFACE_DIST, water_surface_dist, 0);
+  }
+  void add_interacted_item(int32_t interacted_item) {
+    fbb_.AddElement<int32_t>(Lara::VT_INTERACTED_ITEM, interacted_item, 0);
+  }
+  void add_next_corner_position(const TEN::Save::Vector3 *next_corner_position) {
+    fbb_.AddStruct(Lara::VT_NEXT_CORNER_POSITION, next_corner_position);
+  }
+  void add_next_corner_rotation(const TEN::Save::Vector3 *next_corner_rotation) {
+    fbb_.AddStruct(Lara::VT_NEXT_CORNER_ROTATION, next_corner_rotation);
   }
   void add_burn_type(int32_t burn_type) {
     fbb_.AddElement<int32_t>(Lara::VT_BURN_TYPE, burn_type, 0);
+  }
+  void add_burn_count(uint32_t burn_count) {
+    fbb_.AddElement<uint32_t>(Lara::VT_BURN_COUNT, burn_count, 0);
   }
   void add_burn(bool burn) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN, static_cast<uint8_t>(burn), 0);
@@ -2903,41 +3145,11 @@ struct LaraBuilder {
   void add_burn_smoke(bool burn_smoke) {
     fbb_.AddElement<uint8_t>(Lara::VT_BURN_SMOKE, static_cast<uint8_t>(burn_smoke), 0);
   }
-  void add_burn_count(uint32_t burn_count) {
-    fbb_.AddElement<uint32_t>(Lara::VT_BURN_COUNT, burn_count, 0);
-  }
-  void add_poison_potency(int32_t poison_potency) {
-    fbb_.AddElement<int32_t>(Lara::VT_POISON_POTENCY, poison_potency, 0);
-  }
   void add_wet(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> wet) {
     fbb_.AddOffset(Lara::VT_WET, wet);
   }
-  void add_lit_torch(bool lit_torch) {
-    fbb_.AddElement<uint8_t>(Lara::VT_LIT_TORCH, static_cast<uint8_t>(lit_torch), 0);
-  }
-  void add_water_surface_dist(int32_t water_surface_dist) {
-    fbb_.AddElement<int32_t>(Lara::VT_WATER_SURFACE_DIST, water_surface_dist, 0);
-  }
-  void add_next_corner_position(const TEN::Save::Vector3 *next_corner_position) {
-    fbb_.AddStruct(Lara::VT_NEXT_CORNER_POSITION, next_corner_position);
-  }
-  void add_next_corner_rotation(const TEN::Save::Vector3 *next_corner_rotation) {
-    fbb_.AddStruct(Lara::VT_NEXT_CORNER_ROTATION, next_corner_rotation);
-  }
   void add_mesh_ptrs(flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs) {
     fbb_.AddOffset(Lara::VT_MESH_PTRS, mesh_ptrs);
-  }
-  void add_target_arm_angles(flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_arm_angles) {
-    fbb_.AddOffset(Lara::VT_TARGET_ARM_ANGLES, target_arm_angles);
-  }
-  void add_left_arm(flatbuffers::Offset<TEN::Save::ArmInfo> left_arm) {
-    fbb_.AddOffset(Lara::VT_LEFT_ARM, left_arm);
-  }
-  void add_right_arm(flatbuffers::Offset<TEN::Save::ArmInfo> right_arm) {
-    fbb_.AddOffset(Lara::VT_RIGHT_ARM, right_arm);
-  }
-  void add_interacted_item(int32_t interacted_item) {
-    fbb_.AddElement<int32_t>(Lara::VT_INTERACTED_ITEM, interacted_item, 0);
   }
   void add_location(int32_t location) {
     fbb_.AddElement<int32_t>(Lara::VT_LOCATION, location, 0);
@@ -2947,87 +3159,6 @@ struct LaraBuilder {
   }
   void add_location_pad(int32_t location_pad) {
     fbb_.AddElement<int32_t>(Lara::VT_LOCATION_PAD, location_pad, 0);
-  }
-  void add_is_busy(bool is_busy) {
-    fbb_.AddElement<uint8_t>(Lara::VT_IS_BUSY, static_cast<uint8_t>(is_busy), 0);
-  }
-  void add_old_busy(bool old_busy) {
-    fbb_.AddElement<uint8_t>(Lara::VT_OLD_BUSY, static_cast<uint8_t>(old_busy), 0);
-  }
-  void add_beetle_life(int32_t beetle_life) {
-    fbb_.AddElement<int32_t>(Lara::VT_BEETLE_LIFE, beetle_life, 0);
-  }
-  void add_has_beetle_things(int32_t has_beetle_things) {
-    fbb_.AddElement<int32_t>(Lara::VT_HAS_BEETLE_THINGS, has_beetle_things, 0);
-  }
-  void add_small_waterskin(int32_t small_waterskin) {
-    fbb_.AddElement<int32_t>(Lara::VT_SMALL_WATERSKIN, small_waterskin, 0);
-  }
-  void add_big_waterskin(int32_t big_waterskin) {
-    fbb_.AddElement<int32_t>(Lara::VT_BIG_WATERSKIN, big_waterskin, 0);
-  }
-  void add_vehicle(int32_t vehicle) {
-    fbb_.AddElement<int32_t>(Lara::VT_VEHICLE, vehicle, 0);
-  }
-  void add_extra_anim(int32_t extra_anim) {
-    fbb_.AddElement<int32_t>(Lara::VT_EXTRA_ANIM, extra_anim, 0);
-  }
-  void add_weapons(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons) {
-    fbb_.AddOffset(Lara::VT_WEAPONS, weapons);
-  }
-  void add_puzzles(flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles) {
-    fbb_.AddOffset(Lara::VT_PUZZLES, puzzles);
-  }
-  void add_keys(flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys) {
-    fbb_.AddOffset(Lara::VT_KEYS, keys);
-  }
-  void add_pickups(flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups) {
-    fbb_.AddOffset(Lara::VT_PICKUPS, pickups);
-  }
-  void add_examines(flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines) {
-    fbb_.AddOffset(Lara::VT_EXAMINES, examines);
-  }
-  void add_puzzles_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles_combo) {
-    fbb_.AddOffset(Lara::VT_PUZZLES_COMBO, puzzles_combo);
-  }
-  void add_keys_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys_combo) {
-    fbb_.AddOffset(Lara::VT_KEYS_COMBO, keys_combo);
-  }
-  void add_pickups_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups_combo) {
-    fbb_.AddOffset(Lara::VT_PICKUPS_COMBO, pickups_combo);
-  }
-  void add_examines_combo(flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines_combo) {
-    fbb_.AddOffset(Lara::VT_EXAMINES_COMBO, examines_combo);
-  }
-  void add_secrets(int32_t secrets) {
-    fbb_.AddElement<int32_t>(Lara::VT_SECRETS, secrets, 0);
-  }
-  void add_lasersight(bool lasersight) {
-    fbb_.AddElement<uint8_t>(Lara::VT_LASERSIGHT, static_cast<uint8_t>(lasersight), 0);
-  }
-  void add_crowbar(bool crowbar) {
-    fbb_.AddElement<uint8_t>(Lara::VT_CROWBAR, static_cast<uint8_t>(crowbar), 0);
-  }
-  void add_torch(bool torch) {
-    fbb_.AddElement<uint8_t>(Lara::VT_TORCH, static_cast<uint8_t>(torch), 0);
-  }
-  void add_silencer(bool silencer) {
-    fbb_.AddElement<uint8_t>(Lara::VT_SILENCER, static_cast<uint8_t>(silencer), 0);
-  }
-  void add_binoculars(bool binoculars) {
-    fbb_.AddElement<uint8_t>(Lara::VT_BINOCULARS, static_cast<uint8_t>(binoculars), 0);
-  }
-  void add_num_large_medipacks(int32_t num_large_medipacks) {
-    fbb_.AddElement<int32_t>(Lara::VT_NUM_LARGE_MEDIPACKS, num_large_medipacks, 0);
-  }
-  void add_num_small_medipacks(int32_t num_small_medipacks) {
-    fbb_.AddElement<int32_t>(Lara::VT_NUM_SMALL_MEDIPACKS, num_small_medipacks, 0);
-  }
-  void add_num_flares(int32_t num_flares) {
-    fbb_.AddElement<int32_t>(Lara::VT_NUM_FLARES, num_flares, 0);
-  }
-  void add_target_item_number(int32_t target_item_number) {
-    fbb_.AddElement<int32_t>(Lara::VT_TARGET_ITEM_NUMBER, target_item_number, 0);
   }
   explicit LaraBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -3043,136 +3174,84 @@ struct LaraBuilder {
 inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t item_number = 0,
-    int32_t hit_points = 0,
-    int32_t velocity = 0,
-    int32_t vertical_velocity = 0,
-    int32_t projected_floor_height = 0,
-    int32_t target_angle = 0,
-    int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
+    flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons = 0,
+    flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    bool lit_torch = false,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
     const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
-    int32_t hit_frame = 0,
-    int32_t hit_direction = 0,
+    flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
+    flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_arm_angles = 0,
+    int32_t target_entity_number = 0,
     int32_t air = 0,
     int32_t sprint_energy = 0,
+    int32_t poison_potency = 0,
+    int32_t vehicle = 0,
+    int32_t extra_anim = 0,
+    int32_t hit_frame = 0,
+    int32_t hit_direction = 0,
     uint32_t spasm_effect_count = 0,
-    flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    int32_t projected_floor_height = 0,
+    int32_t target_facing_angle = 0,
+    int32_t water_surface_dist = 0,
+    int32_t interacted_item = 0,
+    const TEN::Save::Vector3 *next_corner_position = 0,
+    const TEN::Save::Vector3 *next_corner_rotation = 0,
     int32_t burn_type = 0,
+    uint32_t burn_count = 0,
     bool burn = false,
     int32_t burn_blue = 0,
     bool burn_smoke = false,
-    uint32_t burn_count = 0,
-    int32_t poison_potency = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> wet = 0,
-    bool lit_torch = false,
-    int32_t water_surface_dist = 0,
-    const TEN::Save::Vector3 *next_corner_position = 0,
-    const TEN::Save::Vector3 *next_corner_rotation = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> mesh_ptrs = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> target_arm_angles = 0,
-    flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
-    flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
-    int32_t interacted_item = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
-    int32_t location_pad = 0,
-    bool is_busy = false,
-    bool old_busy = false,
-    int32_t beetle_life = 0,
-    int32_t has_beetle_things = 0,
-    int32_t small_waterskin = 0,
-    int32_t big_waterskin = 0,
-    int32_t vehicle = 0,
-    int32_t extra_anim = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> puzzles_combo = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> keys_combo = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> pickups_combo = 0,
-    flatbuffers::Offset<flatbuffers::Vector<int32_t>> examines_combo = 0,
-    int32_t secrets = 0,
-    bool lasersight = false,
-    bool crowbar = false,
-    bool torch = false,
-    bool silencer = false,
-    bool binoculars = false,
-    int32_t num_large_medipacks = 0,
-    int32_t num_small_medipacks = 0,
-    int32_t num_flares = 0,
-    int32_t target_item_number = 0) {
+    int32_t location_pad = 0) {
   LaraBuilder builder_(_fbb);
-  builder_.add_target_item_number(target_item_number);
-  builder_.add_num_flares(num_flares);
-  builder_.add_num_small_medipacks(num_small_medipacks);
-  builder_.add_num_large_medipacks(num_large_medipacks);
-  builder_.add_secrets(secrets);
-  builder_.add_examines_combo(examines_combo);
-  builder_.add_pickups_combo(pickups_combo);
-  builder_.add_keys_combo(keys_combo);
-  builder_.add_puzzles_combo(puzzles_combo);
-  builder_.add_examines(examines);
-  builder_.add_pickups(pickups);
-  builder_.add_keys(keys);
-  builder_.add_puzzles(puzzles);
-  builder_.add_weapons(weapons);
-  builder_.add_extra_anim(extra_anim);
-  builder_.add_vehicle(vehicle);
-  builder_.add_big_waterskin(big_waterskin);
-  builder_.add_small_waterskin(small_waterskin);
-  builder_.add_has_beetle_things(has_beetle_things);
-  builder_.add_beetle_life(beetle_life);
   builder_.add_location_pad(location_pad);
   builder_.add_highest_location(highest_location);
   builder_.add_location(location);
-  builder_.add_interacted_item(interacted_item);
-  builder_.add_right_arm(right_arm);
-  builder_.add_left_arm(left_arm);
-  builder_.add_target_arm_angles(target_arm_angles);
   builder_.add_mesh_ptrs(mesh_ptrs);
+  builder_.add_wet(wet);
+  builder_.add_burn_blue(burn_blue);
+  builder_.add_burn_count(burn_count);
+  builder_.add_burn_type(burn_type);
   builder_.add_next_corner_rotation(next_corner_rotation);
   builder_.add_next_corner_position(next_corner_position);
+  builder_.add_interacted_item(interacted_item);
   builder_.add_water_surface_dist(water_surface_dist);
-  builder_.add_wet(wet);
-  builder_.add_poison_potency(poison_potency);
-  builder_.add_burn_count(burn_count);
-  builder_.add_burn_blue(burn_blue);
-  builder_.add_burn_type(burn_type);
-  builder_.add_flare(flare);
+  builder_.add_target_facing_angle(target_facing_angle);
+  builder_.add_projected_floor_height(projected_floor_height);
   builder_.add_spasm_effect_count(spasm_effect_count);
-  builder_.add_sprint_energy(sprint_energy);
-  builder_.add_air(air);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
+  builder_.add_extra_anim(extra_anim);
+  builder_.add_vehicle(vehicle);
+  builder_.add_poison_potency(poison_potency);
+  builder_.add_sprint_energy(sprint_energy);
+  builder_.add_air(air);
+  builder_.add_target_entity_number(target_entity_number);
+  builder_.add_target_arm_angles(target_arm_angles);
+  builder_.add_right_arm(right_arm);
+  builder_.add_left_arm(left_arm);
   builder_.add_water_current_pull(water_current_pull);
   builder_.add_water_current_active(water_current_active);
   builder_.add_extra_velocity(extra_velocity);
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
+  builder_.add_flare(flare);
+  builder_.add_weapons(weapons);
+  builder_.add_inventory(inventory);
   builder_.add_control(control);
-  builder_.add_water_status(water_status);
-  builder_.add_target_angle(target_angle);
-  builder_.add_projected_floor_height(projected_floor_height);
-  builder_.add_vertical_velocity(vertical_velocity);
-  builder_.add_velocity(velocity);
-  builder_.add_hit_points(hit_points);
   builder_.add_item_number(item_number);
-  builder_.add_binoculars(binoculars);
-  builder_.add_silencer(silencer);
-  builder_.add_torch(torch);
-  builder_.add_crowbar(crowbar);
-  builder_.add_lasersight(lasersight);
-  builder_.add_old_busy(old_busy);
-  builder_.add_is_busy(is_busy);
-  builder_.add_lit_torch(lit_torch);
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_burn(burn);
+  builder_.add_lit_torch(lit_torch);
   return builder_.Finish();
 }
 
@@ -3184,149 +3263,89 @@ struct Lara::Traits {
 inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t item_number = 0,
-    int32_t hit_points = 0,
-    int32_t velocity = 0,
-    int32_t vertical_velocity = 0,
-    int32_t projected_floor_height = 0,
-    int32_t target_angle = 0,
-    int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
+    flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons = nullptr,
+    flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    bool lit_torch = false,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
     const TEN::Save::Vector3 *extra_velocity = 0,
     int32_t water_current_active = 0,
     const TEN::Save::Vector3 *water_current_pull = 0,
-    int32_t hit_frame = 0,
-    int32_t hit_direction = 0,
+    flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
+    flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
+    const std::vector<int32_t> *target_arm_angles = nullptr,
+    int32_t target_entity_number = 0,
     int32_t air = 0,
     int32_t sprint_energy = 0,
+    int32_t poison_potency = 0,
+    int32_t vehicle = 0,
+    int32_t extra_anim = 0,
+    int32_t hit_frame = 0,
+    int32_t hit_direction = 0,
     uint32_t spasm_effect_count = 0,
-    flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    int32_t projected_floor_height = 0,
+    int32_t target_facing_angle = 0,
+    int32_t water_surface_dist = 0,
+    int32_t interacted_item = 0,
+    const TEN::Save::Vector3 *next_corner_position = 0,
+    const TEN::Save::Vector3 *next_corner_rotation = 0,
     int32_t burn_type = 0,
+    uint32_t burn_count = 0,
     bool burn = false,
     int32_t burn_blue = 0,
     bool burn_smoke = false,
-    uint32_t burn_count = 0,
-    int32_t poison_potency = 0,
     const std::vector<uint8_t> *wet = nullptr,
-    bool lit_torch = false,
-    int32_t water_surface_dist = 0,
-    const TEN::Save::Vector3 *next_corner_position = 0,
-    const TEN::Save::Vector3 *next_corner_rotation = 0,
     const std::vector<int32_t> *mesh_ptrs = nullptr,
-    const std::vector<int32_t> *target_arm_angles = nullptr,
-    flatbuffers::Offset<TEN::Save::ArmInfo> left_arm = 0,
-    flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
-    int32_t interacted_item = 0,
     int32_t location = 0,
     int32_t highest_location = 0,
-    int32_t location_pad = 0,
-    bool is_busy = false,
-    bool old_busy = false,
-    int32_t beetle_life = 0,
-    int32_t has_beetle_things = 0,
-    int32_t small_waterskin = 0,
-    int32_t big_waterskin = 0,
-    int32_t vehicle = 0,
-    int32_t extra_anim = 0,
-    const std::vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons = nullptr,
-    const std::vector<int32_t> *puzzles = nullptr,
-    const std::vector<int32_t> *keys = nullptr,
-    const std::vector<int32_t> *pickups = nullptr,
-    const std::vector<int32_t> *examines = nullptr,
-    const std::vector<int32_t> *puzzles_combo = nullptr,
-    const std::vector<int32_t> *keys_combo = nullptr,
-    const std::vector<int32_t> *pickups_combo = nullptr,
-    const std::vector<int32_t> *examines_combo = nullptr,
-    int32_t secrets = 0,
-    bool lasersight = false,
-    bool crowbar = false,
-    bool torch = false,
-    bool silencer = false,
-    bool binoculars = false,
-    int32_t num_large_medipacks = 0,
-    int32_t num_small_medipacks = 0,
-    int32_t num_flares = 0,
-    int32_t target_item_number = 0) {
+    int32_t location_pad = 0) {
+  auto weapons__ = weapons ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>(*weapons) : 0;
+  auto target_arm_angles__ = target_arm_angles ? _fbb.CreateVector<int32_t>(*target_arm_angles) : 0;
   auto wet__ = wet ? _fbb.CreateVector<uint8_t>(*wet) : 0;
   auto mesh_ptrs__ = mesh_ptrs ? _fbb.CreateVector<int32_t>(*mesh_ptrs) : 0;
-  auto target_arm_angles__ = target_arm_angles ? _fbb.CreateVector<int32_t>(*target_arm_angles) : 0;
-  auto weapons__ = weapons ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>(*weapons) : 0;
-  auto puzzles__ = puzzles ? _fbb.CreateVector<int32_t>(*puzzles) : 0;
-  auto keys__ = keys ? _fbb.CreateVector<int32_t>(*keys) : 0;
-  auto pickups__ = pickups ? _fbb.CreateVector<int32_t>(*pickups) : 0;
-  auto examines__ = examines ? _fbb.CreateVector<int32_t>(*examines) : 0;
-  auto puzzles_combo__ = puzzles_combo ? _fbb.CreateVector<int32_t>(*puzzles_combo) : 0;
-  auto keys_combo__ = keys_combo ? _fbb.CreateVector<int32_t>(*keys_combo) : 0;
-  auto pickups_combo__ = pickups_combo ? _fbb.CreateVector<int32_t>(*pickups_combo) : 0;
-  auto examines_combo__ = examines_combo ? _fbb.CreateVector<int32_t>(*examines_combo) : 0;
   return TEN::Save::CreateLara(
       _fbb,
       item_number,
-      hit_points,
-      velocity,
-      vertical_velocity,
-      projected_floor_height,
-      target_angle,
-      water_status,
       control,
+      inventory,
+      weapons__,
+      flare,
+      lit_torch,
       extra_head_rot,
       extra_torso_rot,
       extra_velocity,
       water_current_active,
       water_current_pull,
-      hit_frame,
-      hit_direction,
+      left_arm,
+      right_arm,
+      target_arm_angles__,
+      target_entity_number,
       air,
       sprint_energy,
+      poison_potency,
+      vehicle,
+      extra_anim,
+      hit_frame,
+      hit_direction,
       spasm_effect_count,
-      flare,
+      projected_floor_height,
+      target_facing_angle,
+      water_surface_dist,
+      interacted_item,
+      next_corner_position,
+      next_corner_rotation,
       burn_type,
+      burn_count,
       burn,
       burn_blue,
       burn_smoke,
-      burn_count,
-      poison_potency,
       wet__,
-      lit_torch,
-      water_surface_dist,
-      next_corner_position,
-      next_corner_rotation,
       mesh_ptrs__,
-      target_arm_angles__,
-      left_arm,
-      right_arm,
-      interacted_item,
       location,
       highest_location,
-      location_pad,
-      is_busy,
-      old_busy,
-      beetle_life,
-      has_beetle_things,
-      small_waterskin,
-      big_waterskin,
-      vehicle,
-      extra_anim,
-      weapons__,
-      puzzles__,
-      keys__,
-      pickups__,
-      examines__,
-      puzzles_combo__,
-      keys_combo__,
-      pickups_combo__,
-      examines_combo__,
-      secrets,
-      lasersight,
-      crowbar,
-      torch,
-      silencer,
-      binoculars,
-      num_large_medipacks,
-      num_small_medipacks,
-      num_flares,
-      target_item_number);
+      location_pad);
 }
 
 flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb, const LaraT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5269,42 +5288,33 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _data);
 }
 
-inline WeaponInfoT *WeaponInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<WeaponInfoT>();
+inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<AmmoInfoT>();
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void WeaponInfo::UnPackTo(WeaponInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+inline void AmmoInfo::UnPackTo(AmmoInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = object_number(); _o->object_number = _e; }
-  { auto _e = anim_number(); _o->anim_number = _e; }
-  { auto _e = frame_number(); _o->frame_number = _e; }
-  { auto _e = active_state(); _o->active_state = _e; }
-  { auto _e = targetstate(); _o->targetstate = _e; }
+  { auto _e = count(); _o->count = _e; }
+  { auto _e = is_infinite(); _o->is_infinite = _e; }
 }
 
-inline flatbuffers::Offset<WeaponInfo> WeaponInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateWeaponInfo(_fbb, _o, _rehasher);
+inline flatbuffers::Offset<AmmoInfo> AmmoInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateAmmoInfo(_fbb, _o, _rehasher);
 }
 
-inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+inline flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const WeaponInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _object_number = _o->object_number;
-  auto _anim_number = _o->anim_number;
-  auto _frame_number = _o->frame_number;
-  auto _active_state = _o->active_state;
-  auto _targetstate = _o->targetstate;
-  return TEN::Save::CreateWeaponInfo(
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const AmmoInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _count = _o->count;
+  auto _is_infinite = _o->is_infinite;
+  return TEN::Save::CreateAmmoInfo(
       _fbb,
-      _object_number,
-      _anim_number,
-      _frame_number,
-      _active_state,
-      _targetstate);
+      _count,
+      _is_infinite);
 }
 
 inline HolsterInfoT *HolsterInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5337,35 +5347,6 @@ inline flatbuffers::Offset<HolsterInfo> CreateHolsterInfo(flatbuffers::FlatBuffe
       _left_holster,
       _right_holster,
       _back_holster);
-}
-
-inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<AmmoInfoT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void AmmoInfo::UnPackTo(AmmoInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = count(); _o->count = _e; }
-  { auto _e = is_infinite(); _o->is_infinite = _e; }
-}
-
-inline flatbuffers::Offset<AmmoInfo> AmmoInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateAmmoInfo(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<AmmoInfo> CreateAmmoInfo(flatbuffers::FlatBufferBuilder &_fbb, const AmmoInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const AmmoInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _count = _o->count;
-  auto _is_infinite = _o->is_infinite;
-  return TEN::Save::CreateAmmoInfo(
-      _fbb,
-      _count,
-      _is_infinite);
 }
 
 inline CarriedWeaponInfoT *CarriedWeaponInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5404,6 +5385,44 @@ inline flatbuffers::Offset<CarriedWeaponInfo> CreateCarriedWeaponInfo(flatbuffer
       _selected_ammo,
       _has_lasersight,
       _has_silencer);
+}
+
+inline WeaponInfoT *WeaponInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<WeaponInfoT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void WeaponInfo::UnPackTo(WeaponInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = object_number(); _o->object_number = _e; }
+  { auto _e = anim_number(); _o->anim_number = _e; }
+  { auto _e = frame_number(); _o->frame_number = _e; }
+  { auto _e = active_state(); _o->active_state = _e; }
+  { auto _e = target_state(); _o->target_state = _e; }
+}
+
+inline flatbuffers::Offset<WeaponInfo> WeaponInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateWeaponInfo(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const WeaponInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _object_number = _o->object_number;
+  auto _anim_number = _o->anim_number;
+  auto _frame_number = _o->frame_number;
+  auto _active_state = _o->active_state;
+  auto _target_state = _o->target_state;
+  return TEN::Save::CreateWeaponInfo(
+      _fbb,
+      _object_number,
+      _anim_number,
+      _frame_number,
+      _active_state,
+      _target_state);
 }
 
 inline ArmInfoT *ArmInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5477,6 +5496,139 @@ inline flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBui
       _life,
       _frame,
       _control_left);
+}
+
+inline LaraInventoryDataT *LaraInventoryData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<LaraInventoryDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void LaraInventoryData::UnPackTo(LaraInventoryDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = is_busy(); _o->is_busy = _e; }
+  { auto _e = old_busy(); _o->old_busy = _e; }
+  { auto _e = beetle_life(); _o->beetle_life = _e; }
+  { auto _e = beetle_components(); _o->beetle_components = _e; }
+  { auto _e = small_waterskin(); _o->small_waterskin = _e; }
+  { auto _e = big_waterskin(); _o->big_waterskin = _e; }
+  { auto _e = has_binoculars(); _o->has_binoculars = _e; }
+  { auto _e = has_crowbar(); _o->has_crowbar = _e; }
+  { auto _e = has_torch(); _o->has_torch = _e; }
+  { auto _e = has_lasersight(); _o->has_lasersight = _e; }
+  { auto _e = has_silencer(); _o->has_silencer = _e; }
+  { auto _e = total_small_medipacks(); _o->total_small_medipacks = _e; }
+  { auto _e = total_large_medipacks(); _o->total_large_medipacks = _e; }
+  { auto _e = total_flares(); _o->total_flares = _e; }
+  { auto _e = total_secrets(); _o->total_secrets = _e; }
+  { auto _e = puzzles(); if (_e) { _o->puzzles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->puzzles[_i] = _e->Get(_i); } } }
+  { auto _e = keys(); if (_e) { _o->keys.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->keys[_i] = _e->Get(_i); } } }
+  { auto _e = pickups(); if (_e) { _o->pickups.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pickups[_i] = _e->Get(_i); } } }
+  { auto _e = examines(); if (_e) { _o->examines.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->examines[_i] = _e->Get(_i); } } }
+  { auto _e = puzzles_combo(); if (_e) { _o->puzzles_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->puzzles_combo[_i] = _e->Get(_i); } } }
+  { auto _e = keys_combo(); if (_e) { _o->keys_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->keys_combo[_i] = _e->Get(_i); } } }
+  { auto _e = pickups_combo(); if (_e) { _o->pickups_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pickups_combo[_i] = _e->Get(_i); } } }
+  { auto _e = examines_combo(); if (_e) { _o->examines_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->examines_combo[_i] = _e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<LaraInventoryData> LaraInventoryData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraInventoryDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLaraInventoryData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffers::FlatBufferBuilder &_fbb, const LaraInventoryDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraInventoryDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _is_busy = _o->is_busy;
+  auto _old_busy = _o->old_busy;
+  auto _beetle_life = _o->beetle_life;
+  auto _beetle_components = _o->beetle_components;
+  auto _small_waterskin = _o->small_waterskin;
+  auto _big_waterskin = _o->big_waterskin;
+  auto _has_binoculars = _o->has_binoculars;
+  auto _has_crowbar = _o->has_crowbar;
+  auto _has_torch = _o->has_torch;
+  auto _has_lasersight = _o->has_lasersight;
+  auto _has_silencer = _o->has_silencer;
+  auto _total_small_medipacks = _o->total_small_medipacks;
+  auto _total_large_medipacks = _o->total_large_medipacks;
+  auto _total_flares = _o->total_flares;
+  auto _total_secrets = _o->total_secrets;
+  auto _puzzles = _fbb.CreateVector(_o->puzzles);
+  auto _keys = _fbb.CreateVector(_o->keys);
+  auto _pickups = _fbb.CreateVector(_o->pickups);
+  auto _examines = _fbb.CreateVector(_o->examines);
+  auto _puzzles_combo = _fbb.CreateVector(_o->puzzles_combo);
+  auto _keys_combo = _fbb.CreateVector(_o->keys_combo);
+  auto _pickups_combo = _fbb.CreateVector(_o->pickups_combo);
+  auto _examines_combo = _fbb.CreateVector(_o->examines_combo);
+  return TEN::Save::CreateLaraInventoryData(
+      _fbb,
+      _is_busy,
+      _old_busy,
+      _beetle_life,
+      _beetle_components,
+      _small_waterskin,
+      _big_waterskin,
+      _has_binoculars,
+      _has_crowbar,
+      _has_torch,
+      _has_lasersight,
+      _has_silencer,
+      _total_small_medipacks,
+      _total_large_medipacks,
+      _total_flares,
+      _total_secrets,
+      _puzzles,
+      _keys,
+      _pickups,
+      _examines,
+      _puzzles_combo,
+      _keys_combo,
+      _pickups_combo,
+      _examines_combo);
+}
+
+inline LaraCountDataT *LaraCountData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<LaraCountDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void LaraCountData::UnPackTo(LaraCountDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = run_jump(); _o->run_jump = _e; }
+  { auto _e = position_adjust(); _o->position_adjust = _e; }
+  { auto _e = pose(); _o->pose = _e; }
+  { auto _e = dive(); _o->dive = _e; }
+  { auto _e = death(); _o->death = _e; }
+  { auto _e = no_cheat(); _o->no_cheat = _e; }
+}
+
+inline flatbuffers::Offset<LaraCountData> LaraCountData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLaraCountData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraCountDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _run_jump = _o->run_jump;
+  auto _position_adjust = _o->position_adjust;
+  auto _pose = _o->pose;
+  auto _dive = _o->dive;
+  auto _death = _o->death;
+  auto _no_cheat = _o->no_cheat;
+  return TEN::Save::CreateLaraCountData(
+      _fbb,
+      _run_jump,
+      _position_adjust,
+      _pose,
+      _dive,
+      _death,
+      _no_cheat);
 }
 
 inline WeaponControlDataT *WeaponControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -5705,47 +5857,6 @@ inline flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbu
       _right);
 }
 
-inline LaraCountDataT *LaraCountData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<LaraCountDataT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void LaraCountData::UnPackTo(LaraCountDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = run_jump(); _o->run_jump = _e; }
-  { auto _e = position_adjust(); _o->position_adjust = _e; }
-  { auto _e = pose(); _o->pose = _e; }
-  { auto _e = dive(); _o->dive = _e; }
-  { auto _e = death(); _o->death = _e; }
-  { auto _e = no_cheat(); _o->no_cheat = _e; }
-}
-
-inline flatbuffers::Offset<LaraCountData> LaraCountData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateLaraCountData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraCountDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _run_jump = _o->run_jump;
-  auto _position_adjust = _o->position_adjust;
-  auto _pose = _o->pose;
-  auto _dive = _o->dive;
-  auto _death = _o->death;
-  auto _no_cheat = _o->no_cheat;
-  return TEN::Save::CreateLaraCountData(
-      _fbb,
-      _run_jump,
-      _position_adjust,
-      _pose,
-      _dive,
-      _death,
-      _no_cheat);
-}
-
 inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraControlDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -5842,70 +5953,44 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   (void)_o;
   (void)_resolver;
   { auto _e = item_number(); _o->item_number = _e; }
-  { auto _e = hit_points(); _o->hit_points = _e; }
-  { auto _e = velocity(); _o->velocity = _e; }
-  { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
-  { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
-  { auto _e = target_angle(); _o->target_angle = _e; }
-  { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = inventory(); if (_e) _o->inventory = std::unique_ptr<TEN::Save::LaraInventoryDataT>(_e->UnPack(_resolver)); }
+  { auto _e = weapons(); if (_e) { _o->weapons.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->weapons[_i] = std::unique_ptr<TEN::Save::CarriedWeaponInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = flare(); if (_e) _o->flare = std::unique_ptr<TEN::Save::FlareDataT>(_e->UnPack(_resolver)); }
+  { auto _e = lit_torch(); _o->lit_torch = _e; }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = water_current_active(); _o->water_current_active = _e; }
   { auto _e = water_current_pull(); if (_e) _o->water_current_pull = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = hit_frame(); _o->hit_frame = _e; }
-  { auto _e = hit_direction(); _o->hit_direction = _e; }
+  { auto _e = left_arm(); if (_e) _o->left_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
+  { auto _e = right_arm(); if (_e) _o->right_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
+  { auto _e = target_arm_angles(); if (_e) { _o->target_arm_angles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->target_arm_angles[_i] = _e->Get(_i); } } }
+  { auto _e = target_entity_number(); _o->target_entity_number = _e; }
   { auto _e = air(); _o->air = _e; }
   { auto _e = sprint_energy(); _o->sprint_energy = _e; }
+  { auto _e = poison_potency(); _o->poison_potency = _e; }
+  { auto _e = vehicle(); _o->vehicle = _e; }
+  { auto _e = extra_anim(); _o->extra_anim = _e; }
+  { auto _e = hit_frame(); _o->hit_frame = _e; }
+  { auto _e = hit_direction(); _o->hit_direction = _e; }
   { auto _e = spasm_effect_count(); _o->spasm_effect_count = _e; }
-  { auto _e = flare(); if (_e) _o->flare = std::unique_ptr<TEN::Save::FlareDataT>(_e->UnPack(_resolver)); }
+  { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
+  { auto _e = target_facing_angle(); _o->target_facing_angle = _e; }
+  { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
+  { auto _e = interacted_item(); _o->interacted_item = _e; }
+  { auto _e = next_corner_position(); if (_e) _o->next_corner_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = next_corner_rotation(); if (_e) _o->next_corner_rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = burn_type(); _o->burn_type = _e; }
+  { auto _e = burn_count(); _o->burn_count = _e; }
   { auto _e = burn(); _o->burn = _e; }
   { auto _e = burn_blue(); _o->burn_blue = _e; }
   { auto _e = burn_smoke(); _o->burn_smoke = _e; }
-  { auto _e = burn_count(); _o->burn_count = _e; }
-  { auto _e = poison_potency(); _o->poison_potency = _e; }
   { auto _e = wet(); if (_e) { _o->wet.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->wet[_i] = _e->Get(_i) != 0; } } }
-  { auto _e = lit_torch(); _o->lit_torch = _e; }
-  { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
-  { auto _e = next_corner_position(); if (_e) _o->next_corner_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = next_corner_rotation(); if (_e) _o->next_corner_rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = mesh_ptrs(); if (_e) { _o->mesh_ptrs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_ptrs[_i] = _e->Get(_i); } } }
-  { auto _e = target_arm_angles(); if (_e) { _o->target_arm_angles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->target_arm_angles[_i] = _e->Get(_i); } } }
-  { auto _e = left_arm(); if (_e) _o->left_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
-  { auto _e = right_arm(); if (_e) _o->right_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
-  { auto _e = interacted_item(); _o->interacted_item = _e; }
   { auto _e = location(); _o->location = _e; }
   { auto _e = highest_location(); _o->highest_location = _e; }
   { auto _e = location_pad(); _o->location_pad = _e; }
-  { auto _e = is_busy(); _o->is_busy = _e; }
-  { auto _e = old_busy(); _o->old_busy = _e; }
-  { auto _e = beetle_life(); _o->beetle_life = _e; }
-  { auto _e = has_beetle_things(); _o->has_beetle_things = _e; }
-  { auto _e = small_waterskin(); _o->small_waterskin = _e; }
-  { auto _e = big_waterskin(); _o->big_waterskin = _e; }
-  { auto _e = vehicle(); _o->vehicle = _e; }
-  { auto _e = extra_anim(); _o->extra_anim = _e; }
-  { auto _e = weapons(); if (_e) { _o->weapons.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->weapons[_i] = std::unique_ptr<TEN::Save::CarriedWeaponInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = puzzles(); if (_e) { _o->puzzles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->puzzles[_i] = _e->Get(_i); } } }
-  { auto _e = keys(); if (_e) { _o->keys.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->keys[_i] = _e->Get(_i); } } }
-  { auto _e = pickups(); if (_e) { _o->pickups.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pickups[_i] = _e->Get(_i); } } }
-  { auto _e = examines(); if (_e) { _o->examines.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->examines[_i] = _e->Get(_i); } } }
-  { auto _e = puzzles_combo(); if (_e) { _o->puzzles_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->puzzles_combo[_i] = _e->Get(_i); } } }
-  { auto _e = keys_combo(); if (_e) { _o->keys_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->keys_combo[_i] = _e->Get(_i); } } }
-  { auto _e = pickups_combo(); if (_e) { _o->pickups_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->pickups_combo[_i] = _e->Get(_i); } } }
-  { auto _e = examines_combo(); if (_e) { _o->examines_combo.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->examines_combo[_i] = _e->Get(_i); } } }
-  { auto _e = secrets(); _o->secrets = _e; }
-  { auto _e = lasersight(); _o->lasersight = _e; }
-  { auto _e = crowbar(); _o->crowbar = _e; }
-  { auto _e = torch(); _o->torch = _e; }
-  { auto _e = silencer(); _o->silencer = _e; }
-  { auto _e = binoculars(); _o->binoculars = _e; }
-  { auto _e = num_large_medipacks(); _o->num_large_medipacks = _e; }
-  { auto _e = num_small_medipacks(); _o->num_small_medipacks = _e; }
-  { auto _e = num_flares(); _o->num_flares = _e; }
-  { auto _e = target_item_number(); _o->target_item_number = _e; }
 }
 
 inline flatbuffers::Offset<Lara> Lara::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5917,137 +6002,85 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _item_number = _o->item_number;
-  auto _hit_points = _o->hit_points;
-  auto _velocity = _o->velocity;
-  auto _vertical_velocity = _o->vertical_velocity;
-  auto _projected_floor_height = _o->projected_floor_height;
-  auto _target_angle = _o->target_angle;
-  auto _water_status = _o->water_status;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
+  auto _inventory = _o->inventory ? CreateLaraInventoryData(_fbb, _o->inventory.get(), _rehasher) : 0;
+  auto _weapons = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> (_o->weapons.size(), [](size_t i, _VectorArgs *__va) { return CreateCarriedWeaponInfo(*__va->__fbb, __va->__o->weapons[i].get(), __va->__rehasher); }, &_va );
+  auto _flare = _o->flare ? CreateFlareData(_fbb, _o->flare.get(), _rehasher) : 0;
+  auto _lit_torch = _o->lit_torch;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
   auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
   auto _water_current_active = _o->water_current_active;
   auto _water_current_pull = _o->water_current_pull ? _o->water_current_pull.get() : 0;
-  auto _hit_frame = _o->hit_frame;
-  auto _hit_direction = _o->hit_direction;
+  auto _left_arm = _o->left_arm ? CreateArmInfo(_fbb, _o->left_arm.get(), _rehasher) : 0;
+  auto _right_arm = _o->right_arm ? CreateArmInfo(_fbb, _o->right_arm.get(), _rehasher) : 0;
+  auto _target_arm_angles = _fbb.CreateVector(_o->target_arm_angles);
+  auto _target_entity_number = _o->target_entity_number;
   auto _air = _o->air;
   auto _sprint_energy = _o->sprint_energy;
+  auto _poison_potency = _o->poison_potency;
+  auto _vehicle = _o->vehicle;
+  auto _extra_anim = _o->extra_anim;
+  auto _hit_frame = _o->hit_frame;
+  auto _hit_direction = _o->hit_direction;
   auto _spasm_effect_count = _o->spasm_effect_count;
-  auto _flare = _o->flare ? CreateFlareData(_fbb, _o->flare.get(), _rehasher) : 0;
+  auto _projected_floor_height = _o->projected_floor_height;
+  auto _target_facing_angle = _o->target_facing_angle;
+  auto _water_surface_dist = _o->water_surface_dist;
+  auto _interacted_item = _o->interacted_item;
+  auto _next_corner_position = _o->next_corner_position ? _o->next_corner_position.get() : 0;
+  auto _next_corner_rotation = _o->next_corner_rotation ? _o->next_corner_rotation.get() : 0;
   auto _burn_type = _o->burn_type;
+  auto _burn_count = _o->burn_count;
   auto _burn = _o->burn;
   auto _burn_blue = _o->burn_blue;
   auto _burn_smoke = _o->burn_smoke;
-  auto _burn_count = _o->burn_count;
-  auto _poison_potency = _o->poison_potency;
   auto _wet = _fbb.CreateVector(_o->wet);
-  auto _lit_torch = _o->lit_torch;
-  auto _water_surface_dist = _o->water_surface_dist;
-  auto _next_corner_position = _o->next_corner_position ? _o->next_corner_position.get() : 0;
-  auto _next_corner_rotation = _o->next_corner_rotation ? _o->next_corner_rotation.get() : 0;
   auto _mesh_ptrs = _fbb.CreateVector(_o->mesh_ptrs);
-  auto _target_arm_angles = _fbb.CreateVector(_o->target_arm_angles);
-  auto _left_arm = _o->left_arm ? CreateArmInfo(_fbb, _o->left_arm.get(), _rehasher) : 0;
-  auto _right_arm = _o->right_arm ? CreateArmInfo(_fbb, _o->right_arm.get(), _rehasher) : 0;
-  auto _interacted_item = _o->interacted_item;
   auto _location = _o->location;
   auto _highest_location = _o->highest_location;
   auto _location_pad = _o->location_pad;
-  auto _is_busy = _o->is_busy;
-  auto _old_busy = _o->old_busy;
-  auto _beetle_life = _o->beetle_life;
-  auto _has_beetle_things = _o->has_beetle_things;
-  auto _small_waterskin = _o->small_waterskin;
-  auto _big_waterskin = _o->big_waterskin;
-  auto _vehicle = _o->vehicle;
-  auto _extra_anim = _o->extra_anim;
-  auto _weapons = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> (_o->weapons.size(), [](size_t i, _VectorArgs *__va) { return CreateCarriedWeaponInfo(*__va->__fbb, __va->__o->weapons[i].get(), __va->__rehasher); }, &_va );
-  auto _puzzles = _fbb.CreateVector(_o->puzzles);
-  auto _keys = _fbb.CreateVector(_o->keys);
-  auto _pickups = _fbb.CreateVector(_o->pickups);
-  auto _examines = _fbb.CreateVector(_o->examines);
-  auto _puzzles_combo = _fbb.CreateVector(_o->puzzles_combo);
-  auto _keys_combo = _fbb.CreateVector(_o->keys_combo);
-  auto _pickups_combo = _fbb.CreateVector(_o->pickups_combo);
-  auto _examines_combo = _fbb.CreateVector(_o->examines_combo);
-  auto _secrets = _o->secrets;
-  auto _lasersight = _o->lasersight;
-  auto _crowbar = _o->crowbar;
-  auto _torch = _o->torch;
-  auto _silencer = _o->silencer;
-  auto _binoculars = _o->binoculars;
-  auto _num_large_medipacks = _o->num_large_medipacks;
-  auto _num_small_medipacks = _o->num_small_medipacks;
-  auto _num_flares = _o->num_flares;
-  auto _target_item_number = _o->target_item_number;
   return TEN::Save::CreateLara(
       _fbb,
       _item_number,
-      _hit_points,
-      _velocity,
-      _vertical_velocity,
-      _projected_floor_height,
-      _target_angle,
-      _water_status,
       _control,
+      _inventory,
+      _weapons,
+      _flare,
+      _lit_torch,
       _extra_head_rot,
       _extra_torso_rot,
       _extra_velocity,
       _water_current_active,
       _water_current_pull,
-      _hit_frame,
-      _hit_direction,
+      _left_arm,
+      _right_arm,
+      _target_arm_angles,
+      _target_entity_number,
       _air,
       _sprint_energy,
+      _poison_potency,
+      _vehicle,
+      _extra_anim,
+      _hit_frame,
+      _hit_direction,
       _spasm_effect_count,
-      _flare,
+      _projected_floor_height,
+      _target_facing_angle,
+      _water_surface_dist,
+      _interacted_item,
+      _next_corner_position,
+      _next_corner_rotation,
       _burn_type,
+      _burn_count,
       _burn,
       _burn_blue,
       _burn_smoke,
-      _burn_count,
-      _poison_potency,
       _wet,
-      _lit_torch,
-      _water_surface_dist,
-      _next_corner_position,
-      _next_corner_rotation,
       _mesh_ptrs,
-      _target_arm_angles,
-      _left_arm,
-      _right_arm,
-      _interacted_item,
       _location,
       _highest_location,
-      _location_pad,
-      _is_busy,
-      _old_busy,
-      _beetle_life,
-      _has_beetle_things,
-      _small_waterskin,
-      _big_waterskin,
-      _vehicle,
-      _extra_anim,
-      _weapons,
-      _puzzles,
-      _keys,
-      _pickups,
-      _examines,
-      _puzzles_combo,
-      _keys_combo,
-      _pickups_combo,
-      _examines_combo,
-      _secrets,
-      _lasersight,
-      _crowbar,
-      _torch,
-      _silencer,
-      _binoculars,
-      _num_large_medipacks,
-      _num_small_medipacks,
-      _num_flares,
-      _target_item_number);
+      _location_pad);
 }
 
 inline FixedCameraT *FixedCamera::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

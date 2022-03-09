@@ -100,7 +100,7 @@ void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Position.yPos);
-	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
+	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
 }
 
 // State:		LS_AUTO_JUMP (62)
@@ -113,7 +113,7 @@ void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
+	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
 }
 
 // ---------------
@@ -1361,7 +1361,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		item->MeshBits = -1;
-		lara->IsBusy = false;
+		lara->Inventory.IsBusy = false;
 	}
 
 	CalculateItemRotationToSurface(item);

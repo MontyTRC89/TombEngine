@@ -101,24 +101,24 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->NumFlares = -1;
-	lara->NumSmallMedipacks = -1;
-	lara->NumLargeMedipacks = -1;
+	lara->Inventory.TotalFlares = -1;
+	lara->Inventory.TotalSmallMedipacks = -1;
+	lara->Inventory.TotalLargeMedipacks = -1;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		lara->Crowbar = true;
+		lara->Inventory.HasCrowbar = true;
 
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
-		lara->Lasersight = true;
+		lara->Inventory.HasLasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->HasBeetleThings |= 1;
+		lara->Inventory.BeetleComponents |= 1;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		lara->SmallWaterskin = 1;
+		lara->Inventory.SmallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		lara->BigWaterskin = 1;
+		lara->Inventory.BigWaterskin = 1;
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
@@ -219,28 +219,28 @@ void DelsGiveLaraItemsCheat(ITEM_INFO* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			lara->Puzzles[i] = 1;
+			lara->Inventory.Puzzles[i] = 1;
 
-		lara->PuzzlesCombo[2 * i] = false;
-		lara->PuzzlesCombo[2 * i + 1] = false;
+		lara->Inventory.PuzzlesCombo[2 * i] = false;
+		lara->Inventory.PuzzlesCombo[2 * i + 1] = false;
 	}
 
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			lara->Keys[i] = 1;
+			lara->Inventory.Keys[i] = 1;
 
-		lara->KeysCombo[2 * i] = false;
-		lara->KeysCombo[2 * i + 1] = false;
+		lara->Inventory.KeysCombo[2 * i] = false;
+		lara->Inventory.KeysCombo[2 * i + 1] = false;
 	}
 
 	for (int i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			lara->Pickups[i] = 1;
+			lara->Inventory.Pickups[i] = 1;
 
-		lara->PickupsCombo[2 * i] = false;
-		lara->PickupsCombo[2 * i + 1] = false;
+		lara->Inventory.PickupsCombo[2 * i] = false;
+		lara->Inventory.PickupsCombo[2 * i + 1] = false;
 	}
 	/* Hardcoded code */
 }

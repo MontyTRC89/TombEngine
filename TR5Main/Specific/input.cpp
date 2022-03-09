@@ -343,10 +343,10 @@ int S_UpdateInput()
 		{
 			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.PoisonPotency)
 			{
-				if (Lara.NumSmallMedipacks != 0)
+				if (Lara.Inventory.TotalSmallMedipacks != 0)
 				{
-					if (Lara.NumSmallMedipacks != -1)
-						Lara.NumSmallMedipacks--;
+					if (Lara.Inventory.TotalSmallMedipacks != -1)
+						Lara.Inventory.TotalSmallMedipacks--;
 
 					Lara.PoisonPotency = 0;
 					LaraItem->HitPoints += 500;
@@ -370,10 +370,10 @@ int S_UpdateInput()
 		{
 			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.PoisonPotency)
 			{
-				if (Lara.NumLargeMedipacks != 0)
+				if (Lara.Inventory.TotalLargeMedipacks != 0)
 				{
-					if (Lara.NumLargeMedipacks != -1)
-						Lara.NumLargeMedipacks--;
+					if (Lara.Inventory.TotalLargeMedipacks != -1)
+						Lara.Inventory.TotalLargeMedipacks--;
 
 					Lara.PoisonPotency = 0;
 					LaraItem->HitPoints += 1000;
@@ -461,7 +461,7 @@ int S_UpdateInput()
 	InputBusy = linput;
 	TrInput = linput;
 
-	if (Lara.IsBusy)
+	if (Lara.Inventory.IsBusy)
 	{
 		linput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
 

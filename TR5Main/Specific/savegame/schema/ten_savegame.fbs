@@ -39,12 +39,9 @@ table Item {
     data: TEN.Save.ItemData;
 }
 
-table WeaponInfo {
-	object_number: uint32;
-	anim_number: uint32;
-	frame_number: uint32;
-	active_state: uint32;
-	targetstate: uint32;
+table AmmoInfo {
+	count: int32;
+	is_infinite: bool;
 }
 
 table HolsterInfo {
@@ -53,17 +50,20 @@ table HolsterInfo {
 	back_holster: int32;
 }
 
-table AmmoInfo {
-	count: int32;
-	is_infinite: bool;
-}
-
 table CarriedWeaponInfo {
 	present: bool;
 	ammo: [AmmoInfo];
 	selected_ammo: int32;
 	has_lasersight: bool;
 	has_silencer: bool;
+}
+
+table WeaponInfo {
+	object_number: uint32;
+	anim_number: uint32;
+	frame_number: uint32;
+	active_state: uint32;
+	target_state: uint32;
 }
 
 table ArmInfo {
@@ -79,6 +79,41 @@ table FlareData {
 	life: uint32;
 	frame: int32;
 	control_left: bool;
+}
+
+table LaraInventoryData {
+	is_busy: bool;
+	old_busy: bool;
+	beetle_life: int32;
+	beetle_components: int32;
+	small_waterskin: int32;
+	big_waterskin: int32;
+	has_binoculars: bool;
+	has_crowbar: bool;
+	has_torch: bool;
+	has_lasersight: bool;
+	has_silencer: bool;
+	total_small_medipacks: int32;
+	total_large_medipacks: int32;
+	total_flares: int32;
+	total_secrets: uint32;
+	puzzles: [int32];
+	keys: [int32];
+	pickups: [int32];
+	examines: [int32];
+	puzzles_combo: [int32];
+	keys_combo: [int32];
+	pickups_combo: [int32];
+	examines_combo: [int32];
+}
+
+table LaraCountData {
+	run_jump: uint32;
+	position_adjust: uint32;
+	pose: uint32;
+	dive: uint32;
+	death: uint32;
+	no_cheat: uint32;
 }
 
 table WeaponControlData {
@@ -133,15 +168,6 @@ table MinecartControlData {
 	right: bool;
 }
 
-table LaraCountData {
-	run_jump: uint32;
-	position_adjust: uint32;
-	pose: uint32;
-	dive: uint32;
-	death: uint32;
-	no_cheat: uint32;
-}
-
 table LaraControlData {
 	move_angle: int32;
 	turn_rate: int32;
@@ -168,70 +194,44 @@ table LaraControlData {
 
 table Lara {
 	item_number: int32;
-	hit_points: int32;
-	velocity: int32;
-	vertical_velocity: int32;
-	projected_floor_height: int32;
-	target_angle: int32;
-	water_status: int32;
 	control: LaraControlData;
+	inventory: LaraInventoryData;
+	weapons: [CarriedWeaponInfo];
+	flare: FlareData;
+	lit_torch: bool;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
 	water_current_active: int32;
 	water_current_pull: Vector3;
-	hit_frame: int32;
-	hit_direction: int32;
+	left_arm: ArmInfo;
+	right_arm: ArmInfo;
+	target_arm_angles: [int32];
+	target_entity_number: int32;
 	air: int32;
 	sprint_energy: int32;
+	poison_potency: int32;
+	vehicle: int32;
+	extra_anim: int32;
+	hit_frame: int32;
+	hit_direction: int32;
 	spasm_effect_count: uint32;
-	flare: FlareData;
+	projected_floor_height: int32;
+	target_facing_angle: int32;
+	water_surface_dist: int32;
+	interacted_item: int32;
+	next_corner_position: Vector3;
+	next_corner_rotation: Vector3;
 	burn_type: int32;
+	burn_count: uint32;
 	burn: bool;
 	burn_blue: int32;
 	burn_smoke: bool;
-	burn_count: uint32;
-	poison_potency: int32;
 	wet: [bool];
-	lit_torch: bool;
-	water_surface_dist: int32;
-	next_corner_position: Vector3;
-	next_corner_rotation: Vector3;
 	mesh_ptrs: [int32];
-	target_arm_angles: [int32];
-	left_arm: ArmInfo;
-	right_arm: ArmInfo;
-	interacted_item: int32;
 	location: int32;
 	highest_location: int32;
 	location_pad: int32;
-	is_busy: bool;
-	old_busy: bool;
-	beetle_life: int32;
-	has_beetle_things: int32;
-	small_waterskin: int32;
-	big_waterskin: int32;
-	vehicle: int32;
-	extra_anim: int32;
-	weapons: [CarriedWeaponInfo];
-	puzzles: [int32];
-	keys: [int32];
-	pickups: [int32];
-	examines: [int32];
-	puzzles_combo: [int32];
-	keys_combo: [int32];
-	pickups_combo: [int32];
-	examines_combo: [int32];
-	secrets: int32;
-	lasersight: bool;
-	crowbar: bool;
-	torch: bool;
-	silencer: bool;
-	binoculars: bool;
-	num_large_medipacks: int32;
-	num_small_medipacks: int32;
-	num_flares: int32;
-	target_item_number: int32;
 }
 
 table FixedCamera {

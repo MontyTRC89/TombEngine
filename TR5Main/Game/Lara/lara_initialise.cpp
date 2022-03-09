@@ -89,19 +89,19 @@ void InitialiseLara(int restore)
 		Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1] = 100;
 	}
 
-	Lara.Binoculars = true;
+	Lara.Inventory.HasBinoculars = true;
 
 	if (!restore)
 	{
 		if (Objects[ID_FLARE_INV_ITEM].loaded)
-			Lara.NumFlares = 3;
+			Lara.Inventory.TotalFlares = 3;
 
-		Lara.NumSmallMedipacks = 3;
-		Lara.NumLargeMedipacks = 1;
+		Lara.Inventory.TotalSmallMedipacks = 3;
+		Lara.Inventory.TotalLargeMedipacks = 1;
 	}
 
 	InitialiseLaraAnims(LaraItem);
-	Lara.BeetleLife = 3;
+	Lara.Inventory.BeetleLife = 3;
 }
 
 void LaraInitialiseMeshes(ITEM_INFO* item)
