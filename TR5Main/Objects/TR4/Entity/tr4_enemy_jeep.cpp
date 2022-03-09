@@ -38,11 +38,11 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		grenadeItem->Position.zPos = item->Position.xPos + 1024 * phd_cos(grenadeItem->Position.yRot);
 
 		SmokeCountL = 32;
-		SmokeWeapon = 5;
+		SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did the TEN enum get shuffled around? @Sezz 2022.03.09
 
 		for (int i = 0; i < 5; i++)
 		{
-			TriggerGunSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 0, 0, 0, 1, 5, 32);
+			TriggerGunSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 0, 0, 0, 1, (LaraWeaponType)5, 32);
 		}
 
 		if (GetRandomControl() & 3)

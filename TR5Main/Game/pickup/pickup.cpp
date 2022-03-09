@@ -175,8 +175,8 @@ void DoPickup(ITEM_INFO* character)
 	{
 		if (character->ActiveState == LA_UNDERWATER_PICKUP_FLARE)
 		{
-			lara->Control.Weapon.RequestGunType = WEAPON_FLARE;
-			lara->Control.Weapon.GunType = WEAPON_FLARE;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
 			InitialiseNewWeapon(character);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = (int)(item->Data) & 0x7FFF;
@@ -191,8 +191,8 @@ void DoPickup(ITEM_INFO* character)
 		}
 		else if (character->ActiveState == LS_PICKUP_FLARE)
 		{
-			lara->Control.Weapon.RequestGunType = WEAPON_FLARE;
-			lara->Control.Weapon.GunType = WEAPON_FLARE;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
 			InitialiseNewWeapon(character);
 			lara->Control.HandStatus = HandStatus::Special;
 			lara->Flare.Life = (short)(item->Data) & 0x7FFF;
@@ -276,7 +276,7 @@ void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 
 	auto lara = (LaraInfo*&)l->Data;
 
-	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == WEAPON_FLARE)
+	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;
 
 	item->Position.yRot = l->Position.yRot;
@@ -671,37 +671,37 @@ void RegeneratePickups()
 {
 	for (int i = 0; i < NumRPickups; i++)
 	{
-		ITEM_INFO* item = &g_Level.Items[RPickups[i]];
+		auto* item = &g_Level.Items[RPickups[i]];
 
 		if (item->Status == ITEM_INVISIBLE)
 		{
 			short ammo = 0;
 			if (item->ObjectNumber == ID_CROSSBOW_AMMO1_ITEM)
-				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_CROSSBOW_AMMO2_ITEM)
-				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO2];
 			else if (item->ObjectNumber == ID_CROSSBOW_AMMO3_ITEM)
-				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO3];
 			else if(item->ObjectNumber == ID_GRENADE_AMMO1_ITEM)
-				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_GRENADE_AMMO2_ITEM)
-				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2];
+				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO2];
 			else if (item->ObjectNumber == ID_GRENADE_AMMO3_ITEM)
-				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3];
+				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO3];
 			else if (item->ObjectNumber == ID_HK_AMMO_ITEM)
-				ammo = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_UZI_AMMO_ITEM)
-				ammo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_HARPOON_AMMO_ITEM)
-				ammo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_ROCKET_LAUNCHER_AMMO_ITEM)
-				ammo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_REVOLVER_AMMO_ITEM)
-				ammo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
-				ammo = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[WEAPON_AMMO1];
 			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
-				ammo = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2];
+				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[WEAPON_AMMO2];
 
 			if (ammo == 0)
 			{

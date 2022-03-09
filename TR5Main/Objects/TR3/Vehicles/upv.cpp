@@ -171,10 +171,10 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &laraItem->Position, 2);
 
-		if (lara->Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
-			lara->Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
-		Statistics.Game.AmmoUsed++;
+		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1])
+			lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1]--;
 
+		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
 	}
 }
@@ -872,13 +872,13 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		lara->Vehicle = itemNumber;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		if (lara->Control.Weapon.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
 			lara->Flare.ControlLeft = false;
-			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
 		laraItem->Position.xPos = UPVItem->Position.xPos;

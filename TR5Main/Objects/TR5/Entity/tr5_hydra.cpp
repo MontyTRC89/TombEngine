@@ -270,7 +270,7 @@ void HydraControl(short itemNumber)
 					distance = sqrt(AI.distance);
 					damage = 5 - distance / SECTOR(1);
 
-					if (Lara.Control.Weapon.GunType == WEAPON_SHOTGUN)
+					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 						damage *= 3;
 
 					if (damage > 0)
@@ -295,7 +295,7 @@ void HydraControl(short itemNumber)
 
 				damage = 6 - sqrt(AI.distance) / 1024;
 
-				if (Lara.Control.Weapon.GunType == WEAPON_SHOTGUN)
+				if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					damage *= 3;
 
 				if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)

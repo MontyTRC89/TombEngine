@@ -242,7 +242,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 
 	Lara.ExtraAnim = 1;
 	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.Weapon.GunType = WEAPON_NONE;
+	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 	Lara.HitDirection = -1;
 	Lara.Air = -1;
 

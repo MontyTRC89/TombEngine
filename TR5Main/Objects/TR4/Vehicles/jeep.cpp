@@ -1497,13 +1497,13 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			Lara.Vehicle = itemNumber;
 
-			if (Lara.Control.Weapon.GunType == WEAPON_FLARE)
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
 				CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 				UndrawFlareMeshes(l);
 				Lara.Flare.ControlLeft = 0;
-				Lara.Control.Weapon.RequestGunType = WEAPON_NONE;
-				Lara.Control.Weapon.GunType = WEAPON_NONE;
+				Lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
+				Lara.Control.Weapon.GunType = LaraWeaponType::None;
 			}
 
 			Lara.Control.HandStatus = HandStatus::Busy;

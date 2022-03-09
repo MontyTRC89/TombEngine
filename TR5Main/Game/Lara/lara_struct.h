@@ -806,26 +806,26 @@ enum WeaponAmmoType
 	MAX_AMMOTYPE
 };
 
-enum LaraWeaponType
+enum class LaraWeaponType
 {
-	WEAPON_NONE,
-	WEAPON_PISTOLS,
-	WEAPON_REVOLVER,
-	WEAPON_UZI,
-	WEAPON_SHOTGUN,
-	WEAPON_HK = 5,
-	WEAPON_CROSSBOW,
-	WEAPON_FLARE,
-	WEAPON_TORCH,
-	WEAPON_GRENADE_LAUNCHER,
-	WEAPON_HARPOON_GUN,
-	WEAPON_ROCKET_LAUNCHER,
-	WEAPON_SNOWMOBILE,
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	Shotgun,
+	HK,
+	Crossbow,
+	Flare,
+	Torch,
+	GrenadeLauncher,
+	HarpoonGun,
+	RocketLauncher,
+	Snowmobile,
 
-	NUM_WEAPONS
+	TotalWeapons
 };
 
-enum LARA_WEAPON_TYPE_CARRIED
+enum LaraWeaponTypeCarried
 {
 	WTYPE_MISSING = 0x0,
 	WTYPE_PRESENT = 0x1,
@@ -879,7 +879,7 @@ enum class ClothType
 	Wet
 };
 
-enum class WaterStatus // TODO: Rename to something more encompassing of its actual function.
+enum class WaterStatus
 {
 	Dry,
 	Wade,
@@ -1185,7 +1185,6 @@ struct LaraControlData
 struct LaraInfo
 {
 	short ItemNumber;
-
 	LaraControlData Control;
 	FlareData Flare;
 	bool LitTorch;
@@ -1196,6 +1195,7 @@ struct LaraInfo
 	short WaterCurrentActive;
 	PHD_VECTOR WaterCurrentPull;
 
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons];
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
 	ITEM_INFO* TargetEntity;
@@ -1206,6 +1206,8 @@ struct LaraInfo
 	int SprintEnergy;
 	int PoisonPotency;
 
+	short Vehicle;
+	int ExtraAnim;
 	int HitFrame;
 	int HitDirection;
 	FX_INFO* SpasmEffect;
@@ -1223,26 +1225,21 @@ struct LaraInfo
 	bool Burn;
 	byte BurnBlue;
 	bool BurnSmoke;
-
 	byte Wet[NUM_LARA_MESHES];
 	int MeshPtrs[NUM_LARA_MESHES];
 	signed char Location;
 	signed char HighestLocation;
 	signed char LocationPad;
 
-	// Inventory-related?
+	// Inventory?
 	bool IsBusy;
 	bool OldBusy;
 
 	// NEW:
-
 	byte BeetleLife;
 	short HasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
 	byte SmallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
 	byte BigWaterskin;		// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	short Vehicle;
-	short ExtraAnim;
-	CarriedWeaponInfo Weapons[static_cast<int>(LaraWeaponType::NUM_WEAPONS)];
 
 	DiaryInfo Diary;
 	int Puzzles[NUM_PUZZLES];

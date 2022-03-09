@@ -132,7 +132,7 @@ void ExplosionControl(short itemNumber)
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{
 						if (Objects[CollidedItems[i]->ObjectNumber].intelligent)
-							DoExplosiveDamageOnBaddie(LaraItem, CollidedItems[i], item, WEAPON_GRENADE_LAUNCHER);
+							DoExplosiveDamageOnBaddie(LaraItem, CollidedItems[i], item, LaraWeaponType::GrenadeLauncher);
 					}
 					else
 					{

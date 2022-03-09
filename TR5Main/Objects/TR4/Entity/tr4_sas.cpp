@@ -608,12 +608,10 @@ namespace TEN::Entities::TR4
 			}
 
 			SmokeCountL = 32;
-			SmokeWeapon = 5;
+			SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did TEN's enum get shuffled around? @Sezz 2022.03.09
 
 			for (int i = 0; i < 5; i++)
-			{
-				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, 5, 32);
-			}
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, (LaraWeaponType)5, 32);
 
 			InitialiseItem(itemNumber);
 

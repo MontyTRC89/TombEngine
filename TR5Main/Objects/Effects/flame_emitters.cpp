@@ -640,7 +640,7 @@ namespace TEN::Entities::Effects
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (Lara.Control.Weapon.GunType != WEAPON_TORCH
+		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
 			|| Lara.LeftArm.Locked
 			|| Lara.LitTorch == (item->Status & 1)

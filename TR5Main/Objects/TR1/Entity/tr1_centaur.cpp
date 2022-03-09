@@ -131,7 +131,7 @@ void ControlCentaurBomb(short itemNumber)
 				currentObject->intelligent && !currentObject->undead &&
 				currentObject->collision)
 			{
-				DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, WEAPON_CROSSBOW);
+				DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
 			}
 
 			k++;

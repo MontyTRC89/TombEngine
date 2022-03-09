@@ -556,32 +556,32 @@ namespace TEN::Renderer
 		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-		if (Lara.Control.Weapon.GunType != WEAPON_FLARE &&
-			Lara.Control.Weapon.GunType != WEAPON_SHOTGUN &&
-			Lara.Control.Weapon.GunType != WEAPON_CROSSBOW)
+		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
+			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
+			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
 			switch (Lara.Control.Weapon.GunType)
 			{
-			case WEAPON_REVOLVER:
+			case LaraWeaponType::Revolver:
 				length = 192;
 				zOffset = 68;
 				rotationX = -14560;
 				break;
 
-			case WEAPON_UZI:
+			case LaraWeaponType::Uzi:
 				length = 190;
 				zOffset = 50;
 				rotationX = -14560;
 				break;
 
-			case WEAPON_HK:
+			case LaraWeaponType::HK:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
 				break;
 
 			default:
-			case WEAPON_PISTOLS:
+			case LaraWeaponType::Pistol:
 				length = 180;
 				zOffset = 40;
 				rotationX = -16830;
