@@ -209,7 +209,7 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;
 				Lara.Control.HandStatus = HandStatus::Busy;
-				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
+				Lara.Control.Weapon.GunType = WEAPON_NONE;
 			}
 
 			break;

@@ -435,7 +435,7 @@ namespace TEN::Entities::TR4
 					if (AI.bite ||
 						LaraItem->ActiveState >= LS_LADDER_IDLE &&
 						LaraItem->ActiveState <= LS_LADDER_DOWN &&
-						!Lara.location)
+						!Lara.Location)
 					{
 						item->TargetState = STATE_DEMIGOD_HAMMER_AIM;
 						break;
@@ -656,7 +656,7 @@ namespace TEN::Entities::TR4
 					!AI.bite &&
 					(LaraItem->ActiveState < LS_LADDER_IDLE ||
 						LaraItem->ActiveState > LS_LADDER_DOWN ||
-						Lara.location))
+						Lara.Location))
 				{
 					item->TargetState = STATE_DEMIGOD_IDLE;
 				}
@@ -684,7 +684,7 @@ namespace TEN::Entities::TR4
 
 					Camera.bounce = -128;
 
-					if (LaraItem->ActiveState >= 56 && LaraItem->ActiveState <= 61 && !Lara.location)
+					if (LaraItem->ActiveState >= 56 && LaraItem->ActiveState <= 61 && !Lara.Location)
 					{
 						ResetLaraFlex(LaraItem);
 						LaraItem->TargetState = 3;

@@ -151,7 +151,7 @@ void SmallScorpionControl(short itemNumber)
 					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 20 &&
 						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 32)
 					{
-						Lara.Poisoned += 512;
+						Lara.PoisonPotency += 2;
 						LaraItem->HitPoints -= 20;
 						LaraItem->HitStatus = true;
 

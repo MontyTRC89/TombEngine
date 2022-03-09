@@ -1186,12 +1186,12 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		lara->Vehicle = itemNumber;
 
-		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == WEAPON_FLARE)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 			lara->Flare.ControlLeft = false;
-			lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = WEAPON_NONE;
 		}
 
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -1216,7 +1216,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->Position.zPos = quadItem->Position.zPos;
 		laraItem->Position.yRot = quadItem->Position.yRot;
 		ResetLaraFlex(laraItem);
-		lara->hitDirection = -1;
+		lara->HitDirection = -1;
 		quadItem->HitPoints = 1;
 
 		AnimateItem(laraItem);

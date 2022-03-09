@@ -39,7 +39,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* weapon = &Weapons[(int)weaponType];
-	auto* p = &PistolsTable[(int)lara->Control.WeaponControl.GunType];
+	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int soundPlayed = false;
 	short angleLeft[2], angleRight[2];
@@ -128,7 +128,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 						soundPlayed = true;
 
 						if (weaponType == LaraWeaponType::WEAPON_UZI)
-							lara->Control.WeaponControl.UziRight = true;
+							lara->Control.Weapon.UziRight = true;
 
 						Statistics.Game.AmmoUsed++;
 					}
@@ -137,10 +137,10 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				// go to (3) SHOOT_CONTINUE start frame
 				frameRight = p->RecoilAnim;
 			}
-			else if (lara->Control.WeaponControl.UziRight)
+			else if (lara->Control.Weapon.UziRight)
 			{
 				SoundEffect(weapon->SampleNum + 1, &laraItem->Position, 0);
-				lara->Control.WeaponControl.UziRight = false;
+				lara->Control.Weapon.UziRight = false;
 			}
 		}
 		// at or beyond (3) SHOOT_CONTINUE start frame
@@ -149,7 +149,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			if (weaponType == LaraWeaponType::WEAPON_UZI)
 			{
 				SoundEffect(weapon->SampleNum, &laraItem->Position, 0);
-				lara->Control.WeaponControl.UziRight = true;
+				lara->Control.Weapon.UziRight = true;
 			}
 
 			// increment toward (3) SHOOT_CONTINUE end frame (finish recoil before allowing to shoot again)
@@ -180,10 +180,10 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		//else if ((frameRight > 0) && (frameRight <= p->draw1Anim2))
 		//	frameRight--;
 
-		if (lara->Control.WeaponControl.UziRight)
+		if (lara->Control.Weapon.UziRight)
 		{
 			SoundEffect(weapon->SampleNum + 1, &laraItem->Position, 0);
-			lara->Control.WeaponControl.UziRight = false;
+			lara->Control.Weapon.UziRight = false;
 		}
 	}
 
@@ -225,17 +225,17 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 					}
 
 					if (weaponType == LaraWeaponType::WEAPON_UZI)
-						lara->Control.WeaponControl.UziLeft = true;
+						lara->Control.Weapon.UziLeft = true;
 
 					Statistics.Game.AmmoUsed++;
 				}
 
 				frameLeft = p->RecoilAnim;
 			}
-			else if (lara->Control.WeaponControl.UziLeft)
+			else if (lara->Control.Weapon.UziLeft)
 			{
 				SoundEffect(weapon->SampleNum + 1, &laraItem->Position, 0);
-				lara->Control.WeaponControl.UziLeft = false;
+				lara->Control.Weapon.UziLeft = false;
 			}
 		}
 		else if (frameLeft >= p->RecoilAnim)
@@ -243,7 +243,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			if (weaponType == LaraWeaponType::WEAPON_UZI)
 			{
 				SoundEffect(weapon->SampleNum, &laraItem->Position, 0);
-				lara->Control.WeaponControl.UziLeft = true;
+				lara->Control.Weapon.UziLeft = true;
 			}
 
 			frameLeft++;
@@ -267,10 +267,10 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		//else if (frameLeft > 0 && frameLeft <= p->draw1Anim2)
 		//	frameLeft--;													// UnLock ARM
 
-		if (lara->Control.WeaponControl.UziLeft)
+		if (lara->Control.Weapon.UziLeft)
 		{
 			SoundEffect(weapon->SampleNum + 1, &laraItem->Position, 0);
-			lara->Control.WeaponControl.UziLeft = false;
+			lara->Control.Weapon.UziLeft = false;
 		}
 	}
 
@@ -347,7 +347,7 @@ void ReadyPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 void DrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	auto* p = &PistolsTable[(int)lara->Control.WeaponControl.GunType];
+	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int frame = lara->LeftArm.FrameNumber + 1;
 
@@ -372,7 +372,7 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* weapon = &Weapons[(int)weaponType];
-	auto* p = &PistolsTable[(int)lara->Control.WeaponControl.GunType];
+	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int frameLeft = lara->LeftArm.FrameNumber;
 
@@ -473,7 +473,7 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 void SetArmInfo(ITEM_INFO* laraItem, ArmInfo* arm, int frame)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	auto* p = &PistolsTable[(int)lara->Control.WeaponControl.GunType];
+	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int animBase = Objects[(int)p->ObjectNumber].animIndex;
 
@@ -495,21 +495,21 @@ void DrawPistolMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	if (weaponType != LaraWeaponType::WEAPON_REVOLVER)
-		lara->Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 
-	lara->Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlot::Empty;
+	lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 
-	lara->meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
+	lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
 	if (weaponType != LaraWeaponType::WEAPON_REVOLVER)
-		lara->meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_LHAND;
+		lara->MeshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_LHAND;
 }
 
 void UndrawPistolMeshRight(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-	lara->Control.WeaponControl.HolsterInfo.RightHolster = HolsterSlotForWeapon(weaponType);
+	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+	lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(weaponType);
 }
 
 void UndrawPistolMeshLeft(ITEM_INFO* laraItem, LaraWeaponType weaponType)
@@ -518,7 +518,7 @@ void UndrawPistolMeshLeft(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (weaponType != LaraWeaponType::WEAPON_REVOLVER)
 	{
-		lara->meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		lara->Control.WeaponControl.HolsterInfo.LeftHolster = HolsterSlotForWeapon(weaponType);
+		lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(weaponType);
 	}
 }

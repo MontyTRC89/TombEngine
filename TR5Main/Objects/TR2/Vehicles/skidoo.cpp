@@ -300,12 +300,12 @@ void SkidooCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	lara->Vehicle = itemNum;
 
-	if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+	if (lara->Control.Weapon.GunType == WEAPON_FLARE)
 	{
 		CreateFlare(laraItem, ID_FLARE_ITEM, false);
 		UndrawFlareMeshes(laraItem);
 		lara->Flare.ControlLeft = 0;
-		lara->Control.WeaponControl.RequestGunType = WEAPON_NONE;
+		lara->Control.Weapon.RequestGunType = WEAPON_NONE;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 

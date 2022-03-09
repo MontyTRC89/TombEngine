@@ -306,7 +306,7 @@ void LaserHeadControl(short itemNumber)
 				if (LOS(&src, &dest)
 					&& distance <= MAX_VISIBILITY_DISTANCE
 					&& LaraItem->HitPoints > 0
-					&& !Lara.burn
+					&& !Lara.Burn
 					&& (LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 				{
 					// Lock target for attacking
@@ -438,7 +438,7 @@ void LaserHeadControl(short itemNumber)
 						&& arc
 						&& !arc->life
 						|| LaraItem->HitPoints <= 0
-						|| Lara.burn)
+						|| Lara.Burn)
 					{
 						if (arc)
 						{
@@ -510,7 +510,7 @@ void LaserHeadControl(short itemNumber)
 								}
 
 								// Check if Lara was hit by energy arcs
-								if (!Lara.burn)
+								if (!Lara.Burn)
 								{
 									int someIndex = 0;
 
@@ -571,7 +571,7 @@ void LaserHeadControl(short itemNumber)
 											{
 												LaraBurn(LaraItem);
 												Lara.BurnCount = 48;
-												Lara.burnBlue = 2;
+												Lara.BurnBlue = 2;
 												LaraItem->HitPoints = 0;
 												break;
 											}

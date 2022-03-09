@@ -1497,13 +1497,13 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		{
 			Lara.Vehicle = itemNumber;
 
-			if (Lara.Control.WeaponControl.GunType == WEAPON_FLARE)
+			if (Lara.Control.Weapon.GunType == WEAPON_FLARE)
 			{
 				CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
 				UndrawFlareMeshes(l);
 				Lara.Flare.ControlLeft = 0;
-				Lara.Control.WeaponControl.RequestGunType = WEAPON_NONE;
-				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
+				Lara.Control.Weapon.RequestGunType = WEAPON_NONE;
+				Lara.Control.Weapon.GunType = WEAPON_NONE;
 			}
 
 			Lara.Control.HandStatus = HandStatus::Busy;
@@ -1549,7 +1549,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 			LaraItem->Position.yRot = item->Position.yRot;
 
 			ResetLaraFlex(LaraItem);
-			Lara.hitDirection = -1;
+			Lara.HitDirection = -1;
 
 			AnimateItem(l);
 

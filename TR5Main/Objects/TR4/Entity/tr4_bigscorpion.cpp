@@ -305,7 +305,7 @@ void ScorpionControl(short itemNumber)
 
 				if (item->ActiveState == 5)
 				{
-					Lara.Poisoned += 2048;
+					Lara.PoisonPotency += 8;
 
 					CreatureEffect2(
 						item,

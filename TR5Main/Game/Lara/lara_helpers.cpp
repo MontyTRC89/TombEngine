@@ -167,61 +167,61 @@ void DoLaraFallDamage(ITEM_INFO* item)
 void DoLaraTightropeBalance(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
-	const int factor = ((lara->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
+	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TightropeControl.Balance += ANGLE(1.4f);
+		lara->Control.Tightrope.Balance += ANGLE(1.4f);
 	if (TrInput & IN_RIGHT)
-		lara->Control.TightropeControl.Balance -= ANGLE(1.4f);
+		lara->Control.Tightrope.Balance -= ANGLE(1.4f);
 
-	if (lara->Control.TightropeControl.Balance < 0)
+	if (lara->Control.Tightrope.Balance < 0)
 	{
-		lara->Control.TightropeControl.Balance -= factor;
-		if (lara->Control.TightropeControl.Balance <= -ANGLE(45.0f))
-			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.Tightrope.Balance -= factor;
+		if (lara->Control.Tightrope.Balance <= -ANGLE(45.0f))
+			lara->Control.Tightrope.Balance = ANGLE(45.0f);
 
 	}
-	else if (lara->Control.TightropeControl.Balance > 0)
+	else if (lara->Control.Tightrope.Balance > 0)
 	{
-		lara->Control.TightropeControl.Balance += factor;
-		if (lara->Control.TightropeControl.Balance >= ANGLE(45.0f))
-			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.Tightrope.Balance += factor;
+		if (lara->Control.Tightrope.Balance >= ANGLE(45.0f))
+			lara->Control.Tightrope.Balance = ANGLE(45.0f);
 	}
 	else
-		lara->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
+		lara->Control.Tightrope.Balance = GetRandomControl() & 1 ? -1 : 1;
 }
 
 void DoLaraTightropeLean(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Position.zRot = lara->Control.TightropeControl.Balance / 4;
-	lara->ExtraTorsoRot.zRot = -lara->Control.TightropeControl.Balance;
+	item->Position.zRot = lara->Control.Tightrope.Balance / 4;
+	lara->ExtraTorsoRot.zRot = -lara->Control.Tightrope.Balance;
 }
 
 void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TightropeControl.TimeOnTightrope <= 32)
-		lara->Control.TightropeControl.TimeOnTightrope = 0;
+	if (lara->Control.Tightrope.TimeOnTightrope <= 32)
+		lara->Control.Tightrope.TimeOnTightrope = 0;
 	else
-		lara->Control.TightropeControl.TimeOnTightrope -= 32;
+		lara->Control.Tightrope.TimeOnTightrope -= 32;
 
-	if (lara->Control.TightropeControl.Balance > 0)
+	if (lara->Control.Tightrope.Balance > 0)
 	{
-		if (lara->Control.TightropeControl.Balance <= ANGLE(0.75f))
-			lara->Control.TightropeControl.Balance = 0;
+		if (lara->Control.Tightrope.Balance <= ANGLE(0.75f))
+			lara->Control.Tightrope.Balance = 0;
 		else
-			lara->Control.TightropeControl.Balance -= ANGLE(0.75f);
+			lara->Control.Tightrope.Balance -= ANGLE(0.75f);
 	}
 
-	if (lara->Control.TightropeControl.Balance < 0)
+	if (lara->Control.Tightrope.Balance < 0)
 	{
-		if (lara->Control.TightropeControl.Balance >= -ANGLE(0.75f))
-			lara->Control.TightropeControl.Balance = 0;
+		if (lara->Control.Tightrope.Balance >= -ANGLE(0.75f))
+			lara->Control.Tightrope.Balance = 0;
 		else
-			lara->Control.TightropeControl.Balance += ANGLE(0.75f);
+			lara->Control.Tightrope.Balance += ANGLE(0.75f);
 	}
 }
 
@@ -256,12 +256,10 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Make slope speed dynamic.
 	auto* lara = GetLaraInfo(item);
 
 	auto probe = GetCollisionResult(item);
 
-	// TODO
 	/*if (g_GameFlow->Animations.HasSlideExtended)
 	{
 
@@ -272,11 +270,15 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 		lara->ExtraVelocity.x += velocity;
 	}*/
 
-	constexpr int velocity = 50;
+	// TODO
+	constexpr int minVelocity = 50; // Apply only when landing?
+	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
+	constexpr int VelocityIncreasePerStep = 1;
+
 	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 	short direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
-	lara->ExtraVelocity.x += velocity;
+	lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)

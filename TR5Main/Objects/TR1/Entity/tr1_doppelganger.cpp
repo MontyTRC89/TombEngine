@@ -52,7 +52,7 @@ void DoppelgangerControl(short itemNumber)
 	if (item->HitPoints < 1000)
 	{
 		item->HitPoints = 1000;
-		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.WeaponControl.GunType);
+		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.Weapon.GunType);
 	}
 
 	auto* reference = FindReference(item, ID_BACON_REFERENCE);

@@ -80,7 +80,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 
 					ResetLaraFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
-					lara->Poisoned = 0;
+					lara->PoisonPotency = 0;
 					lara->Air = 1800;
 					lara->Control.Count.Death = 0;
 				}
@@ -112,13 +112,13 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		lara->Lasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->hasBeetleThings |= 1;
+		lara->HasBeetleThings |= 1;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		lara->smallWaterskin = 1;
+		lara->SmallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		lara->bigWaterskin = 1;
+		lara->BigWaterskin = 1;
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{

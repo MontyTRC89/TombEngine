@@ -1707,23 +1707,23 @@ void GuiController::ConstructObjectList()
 	if (Lara.Crowbar)
 		InsertObjectIntoList(INV_OBJECT_CROWBAR);
 
-	if (Lara.hasBeetleThings)
+	if (Lara.HasBeetleThings)
 	{
-		if (Lara.hasBeetleThings & 1)
+		if (Lara.HasBeetleThings & 1)
 			InsertObjectIntoList(INV_OBJECT_BEETLE);
 
-		if (Lara.hasBeetleThings & 2)
+		if (Lara.HasBeetleThings & 2)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART1);
 
-		if (Lara.hasBeetleThings & 4)
+		if (Lara.HasBeetleThings & 4)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.smallWaterskin)
-		InsertObjectIntoList((Lara.smallWaterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.SmallWaterskin)
+		InsertObjectIntoList((Lara.SmallWaterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.bigWaterskin)
-		InsertObjectIntoList((Lara.bigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.BigWaterskin)
+		InsertObjectIntoList((Lara.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLES; i++)
 		if (Lara.Puzzles[i])
@@ -1811,20 +1811,20 @@ void GuiController::ConstructCombineObjectList()
 			InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
 	}
 
-	if (Lara.hasBeetleThings)
+	if (Lara.HasBeetleThings)
 	{
-		if (Lara.hasBeetleThings & 2)
+		if (Lara.HasBeetleThings & 2)
 			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART1);
 
-		if (Lara.hasBeetleThings & 4)
+		if (Lara.HasBeetleThings & 4)
 			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.smallWaterskin)
-		InsertObjectIntoList_v2(Lara.smallWaterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.SmallWaterskin)
+		InsertObjectIntoList_v2(Lara.SmallWaterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.bigWaterskin)
-		InsertObjectIntoList_v2(Lara.bigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.BigWaterskin)
+		InsertObjectIntoList_v2(Lara.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		if (Lara.PuzzlesCombo[i])
@@ -2008,12 +2008,12 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_PISTOLS_ITEM)
 		{
-			Lara.Control.WeaponControl.RequestGunType = WEAPON_PISTOLS;
+			Lara.Control.Weapon.RequestGunType = WEAPON_PISTOLS;
 
 			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.Control.WeaponControl.GunType == WEAPON_PISTOLS)
+			if (Lara.Control.Weapon.GunType == WEAPON_PISTOLS)
 				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
@@ -2021,12 +2021,12 @@ void GuiController::UseCurrentItem()
 
 		if (gmeobject == ID_UZI_ITEM)
 		{
-			Lara.Control.WeaponControl.RequestGunType = WEAPON_UZI;
+			Lara.Control.Weapon.RequestGunType = WEAPON_UZI;
 
 			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.Control.WeaponControl.GunType == WEAPON_UZI)
+			if (Lara.Control.Weapon.GunType == WEAPON_UZI)
 				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
@@ -2047,7 +2047,7 @@ void GuiController::UseCurrentItem()
 					LaraItem->ActiveState != LS_CRAWL_BACK &&
 					LaraItem->ActiveState != LS_CRAWL_TO_HANG)
 				{
-					if (Lara.Control.WeaponControl.GunType != WEAPON_FLARE)
+					if (Lara.Control.Weapon.GunType != WEAPON_FLARE)
 					{
 						TrInput = IN_FLARE;
 						LaraGun(LaraItem);
@@ -2087,7 +2087,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.Poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2098,7 +2098,7 @@ void GuiController::UseCurrentItem()
 				if (Lara.NumSmallMedipacks != -1)
 					Lara.NumSmallMedipacks--;
 
-				Lara.Poisoned = 0;
+				Lara.PoisonPotency = 0;
 				LaraItem->HitPoints += 500;
 
 				if (LaraItem->HitPoints > 1000)
@@ -2114,7 +2114,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.Poisoned)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2125,7 +2125,7 @@ void GuiController::UseCurrentItem()
 				if (Lara.NumLargeMedipacks != -1)
 					Lara.NumLargeMedipacks--;
 
-				Lara.Poisoned = 0;
+				Lara.PoisonPotency = 0;
 				LaraItem->HitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
@@ -2166,12 +2166,12 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_SHOTGUN_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_SHOTGUN;
+		Lara.Control.Weapon.RequestGunType = WEAPON_SHOTGUN;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
+		if (Lara.Control.Weapon.GunType == WEAPON_SHOTGUN)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
@@ -2179,72 +2179,72 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_REVOLVER_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_REVOLVER;
+		Lara.Control.Weapon.RequestGunType = WEAPON_REVOLVER;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
+		if (Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HK_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_HK;
+		Lara.Control.Weapon.RequestGunType = WEAPON_HK;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_HK)
+		if (Lara.Control.Weapon.GunType == WEAPON_HK)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_CROSSBOW_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_CROSSBOW;
+		Lara.Control.Weapon.RequestGunType = WEAPON_CROSSBOW;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+		if (Lara.Control.Weapon.GunType == WEAPON_CROSSBOW)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_GRENADE_GUN_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_GRENADE_LAUNCHER;
+		Lara.Control.Weapon.RequestGunType = WEAPON_GRENADE_LAUNCHER;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_GRENADE_LAUNCHER)
+		if (Lara.Control.Weapon.GunType == WEAPON_GRENADE_LAUNCHER)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HARPOON_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_HARPOON_GUN;
+		Lara.Control.Weapon.RequestGunType = WEAPON_HARPOON_GUN;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_HARPOON_GUN)
+		if (Lara.Control.Weapon.GunType == WEAPON_HARPOON_GUN)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_ROCKET_LAUNCHER_ITEM)
 	{
-		Lara.Control.WeaponControl.RequestGunType = WEAPON_ROCKET_LAUNCHER;
+		Lara.Control.Weapon.RequestGunType = WEAPON_ROCKET_LAUNCHER;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_ROCKET_LAUNCHER)
+		if (Lara.Control.Weapon.GunType == WEAPON_ROCKET_LAUNCHER)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
@@ -3413,7 +3413,7 @@ void combine_revolver_lasersight(int flag)
 		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
 	{
 		UndrawPistolMeshRight(LaraItem, WEAPON_REVOLVER);
 		DrawPistolMeshes(LaraItem, WEAPON_REVOLVER);
@@ -3433,7 +3433,7 @@ void combine_crossbow_lasersight(int flag)
 		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == WEAPON_CROSSBOW)
 	{
 		UndrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
 		DrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
@@ -3849,9 +3849,9 @@ void combine_Examine8(int flag)
 
 void combine_ClockWorkBeetle(int flag)
 {
-	Lara.hasBeetleThings &= 2;//remove combo1
-	Lara.hasBeetleThings &= 4;//remove combo2
-	Lara.hasBeetleThings |= 1;//get beetle
+	Lara.HasBeetleThings &= 2;//remove combo1
+	Lara.HasBeetleThings &= 4;//remove combo2
+	Lara.HasBeetleThings |= 1;//get beetle
 }
 
 bool GuiController::PerformWaterskinCombine(int flag)
@@ -3859,14 +3859,14 @@ bool GuiController::PerformWaterskinCombine(int flag)
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
 
-	small_liters = Lara.smallWaterskin - 1;//how many liters in the small one?
-	big_liters = Lara.bigWaterskin - 1;//how many liters in the big one?
+	small_liters = Lara.SmallWaterskin - 1;//how many liters in the small one?
+	big_liters = Lara.BigWaterskin - 1;//how many liters in the big one?
 	small_capacity = 3 - small_liters;//how many more liters can we fit in the small one?
 	big_capacity = 5 - big_liters;//how many more liters can we fit in the big one?
 
 	if (flag)
 	{
-		if (Lara.bigWaterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
+		if (Lara.BigWaterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
 		{
 			i = big_liters;
 
@@ -3883,17 +3883,17 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.smallWaterskin = small_liters + 1;
-			Lara.bigWaterskin = big_liters + 1;
+			Lara.SmallWaterskin = small_liters + 1;
+			Lara.BigWaterskin = big_liters + 1;
 			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
 			return 1;
 		}
 	}
 	else 
 	{
-		if (Lara.smallWaterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
+		if (Lara.SmallWaterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
 		{
-			i = Lara.smallWaterskin - 1;
+			i = Lara.SmallWaterskin - 1;
 
 			do
 			{
@@ -3908,8 +3908,8 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.smallWaterskin = small_liters + 1;
-			Lara.bigWaterskin = big_liters + 1;
+			Lara.SmallWaterskin = small_liters + 1;
+			Lara.BigWaterskin = big_liters + 1;
 			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
 			return 1;
 		}
