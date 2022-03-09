@@ -189,6 +189,7 @@ void AnimateLara(ITEM_INFO* item)
 		item->Velocity = velocity >> 16;
 	}
 
+	// TEMP
 	item->Velocity += lara->ExtraVelocity.x;
 	item->VerticalVelocity += lara->ExtraVelocity.y;
 	item->LateralVelocity += lara->ExtraVelocity.z;
@@ -198,6 +199,9 @@ void AnimateLara(ITEM_INFO* item)
 
 	if (!lara->Control.IsMoving)
 		MoveItem(item, lara->Control.MoveAngle, item->Velocity, item->LateralVelocity);
+
+	// TEMP
+	lara->ExtraVelocity = PHD_VECTOR();
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);
@@ -243,6 +247,7 @@ void AnimateItem(ITEM_INFO* item)
 				case COMMAND_DEACTIVATE:
 					if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
 						item->AfterDeath = 1;
+
 					item->Status = ITEM_DEACTIVATED;
 					break;
 
