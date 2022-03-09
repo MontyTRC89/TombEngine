@@ -670,10 +670,10 @@ void GuideControl(short itemNumber)
 
 		if (someFlag)
 		{
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 		}
 
 		break;
@@ -692,10 +692,10 @@ void GuideControl(short itemNumber)
 				TestTriggers(item, true);
 
 				item->Position.yRot = enemy->Position.yRot;
-				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				break;
 			}
 			else if (item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 42)
@@ -721,10 +721,10 @@ void GuideControl(short itemNumber)
 
 				TestTriggers(item, true);
 
-				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 				break;
 			}
 
@@ -762,20 +762,20 @@ void GuideControl(short itemNumber)
 
 		if (!enemy->Flags)
 		{
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 			break;
 		}
 		if (enemy->Flags == 42)
 		{
 			TestTriggers(item, true);
-			
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
+
 			item->AIBits = FOLLOW;
 			item->ItemFlags[3]++;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 		}
 		else if (item->TriggerFlags <= 999)
 			item->TargetState = GUIDE_STATE_IDLE;

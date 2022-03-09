@@ -239,8 +239,8 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_LYING_DOWN:
-			creature->MaxTurn = 0;
 			item->HitPoints = 0;
+			creature->MaxTurn = 0;
 			joint0 = 0;
 			joint1 = 0;
 			joint2 = 0;

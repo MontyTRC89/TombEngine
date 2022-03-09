@@ -1265,7 +1265,7 @@ void BinocularCamera(ITEM_INFO* item)
 			}
 			else
 			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WEAPON_AMMO1)
+				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 				{
 					WeaponDelay = 12;
 					firing = 1;
@@ -1278,7 +1278,7 @@ void BinocularCamera(ITEM_INFO* item)
 						SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 					}
 				}
-				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WEAPON_AMMO2)
+				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 				{
 					if (!LSHKTimer)
 					{

@@ -17,20 +17,20 @@ struct AmmoPickupInfo
 static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 {
 	{
-		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WEAPON_AMMO1, 0 },
-		{ ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, WEAPON_AMMO1, 30 },
-		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WEAPON_AMMO1, 36 },
-		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WEAPON_AMMO2, 36 },
-		{ ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, WEAPON_AMMO1, 10 },
-		{ ID_CROSSBOW_AMMO2_ITEM, LaraWeaponType::Crossbow, WEAPON_AMMO2, 10 },
-		{ ID_CROSSBOW_AMMO3_ITEM, LaraWeaponType::Crossbow, WEAPON_AMMO3, 10 },
-		{ ID_REVOLVER_AMMO_ITEM, LaraWeaponType::Revolver, WEAPON_AMMO1, 6 },
-		{ ID_HK_AMMO_ITEM, LaraWeaponType::HK, WEAPON_AMMO1, 30 },
-		{ ID_GRENADE_AMMO1_ITEM, LaraWeaponType::GrenadeLauncher, WEAPON_AMMO1, 10 },
-		{ ID_GRENADE_AMMO2_ITEM, LaraWeaponType::GrenadeLauncher, WEAPON_AMMO2, 10 },
-		{ ID_GRENADE_AMMO3_ITEM, LaraWeaponType::GrenadeLauncher, WEAPON_AMMO3, 10 },
-		{ ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher, WEAPON_AMMO1, 10 },
-		{ ID_HARPOON_AMMO_ITEM, LaraWeaponType::HarpoonGun, WEAPON_AMMO1, 10 }
+		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 0 },
+		{ ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, WeaponAmmoType::Ammo1, 30 },
+		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 36 },
+		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 36 },
+		{ ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo1, 10 },
+		{ ID_CROSSBOW_AMMO2_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo2, 10 },
+		{ ID_CROSSBOW_AMMO3_ITEM, LaraWeaponType::Crossbow, WeaponAmmoType::Ammo3, 10 },
+		{ ID_REVOLVER_AMMO_ITEM, LaraWeaponType::Revolver, WeaponAmmoType::Ammo1, 6 },
+		{ ID_HK_AMMO_ITEM, LaraWeaponType::HK, WeaponAmmoType::Ammo1, 30 },
+		{ ID_GRENADE_AMMO1_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo1, 10 },
+		{ ID_GRENADE_AMMO2_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo2, 10 },
+		{ ID_GRENADE_AMMO3_ITEM, LaraWeaponType::GrenadeLauncher, WeaponAmmoType::Ammo3, 10 },
+		{ ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher, WeaponAmmoType::Ammo1, 10 },
+		{ ID_HARPOON_AMMO_ITEM, LaraWeaponType::HarpoonGun, WeaponAmmoType::Ammo1, 10 }
 	}
 };
 
@@ -42,12 +42,12 @@ static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount
 
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
-	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[info.AmmoType];
+	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType];
 	if (!currentAmmo.hasInfinite())
 	{
 		int defaultModify = add ? info.Amount : -info.Amount;
 		int newVal = int{ currentAmmo.getCount() } + (amount ? amount : defaultModify);
-		lara.Weapons[(int)info.LaraWeaponType].Ammo[info.AmmoType] = std::max(0, newVal);
+		lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType] = std::max(0, newVal);
 	}
 
 	return true;
@@ -72,8 +72,8 @@ std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
-	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[info.AmmoType].hasInfinite())
-		return lara.Weapons[(int)info.LaraWeaponType].Ammo[info.AmmoType].getCount();
+	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].hasInfinite())
+		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].getCount();
 
 	// -1 signifies infinite ammo.
 	return -1;

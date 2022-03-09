@@ -855,6 +855,8 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			if (lara->Vehicle == NO_ITEM)
 				lara_collision_routines[item->ActiveState](item, coll);
 		}
+
+		lara->ExtraVelocity = PHD_VECTOR();
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
 
@@ -968,6 +970,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->ActiveState](item, coll);
 
+	lara->ExtraVelocity = PHD_VECTOR();
+
 	UpdateItemRoom(item, 0);
 
 	LaraGun(item);
@@ -1032,6 +1036,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->ActiveState](item, coll);
+
+	lara->ExtraVelocity = PHD_VECTOR();
 
 	UpdateItemRoom(item, LARA_RAD);
 

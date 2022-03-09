@@ -81,12 +81,12 @@ void InitialiseLara(int restore)
 	if (weapon == LaraWeaponType::Pistol)
 	{
 		Lara.Weapons[(int)LaraWeaponType::Pistol].Present = true;
-		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[WEAPON_AMMO1].setInfinite(true);
+		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 	else if (weapon == LaraWeaponType::HK)
 	{
 		Lara.Weapons[(int)LaraWeaponType::HK].Present = true;
-		Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1] = 100;
+		Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1] = 100;
 	}
 
 	Lara.Inventory.HasBinoculars = true;
