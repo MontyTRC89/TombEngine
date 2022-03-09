@@ -10,9 +10,7 @@
 struct WeaponPickupInfo
 {
 	GAME_OBJECT_ID ObjectID;
-	// when the player picks up a weapon they
-	// get one clip's worth of the following ammo
-	GAME_OBJECT_ID AmmoID;
+	GAME_OBJECT_ID AmmoID;	// When the player picks up a weapon, they get one clip's worth of this ammo.
 	LaraWeaponType LaraWeaponType;
 };
 
@@ -49,26 +47,25 @@ static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmo
 		return false;
 
 	WeaponPickupInfo info = kWeapons[arrayPos];
-	// set the SelectedAmmo type to 0 if adding the weapon for the
-	// first time. Note that this refers to the index of the weapon's
-	// ammo array, and not the weapon's actual ammunition count
+
+	// Set the SelectedAmmo type to WeaponAmmoType::Ammo1 (0) if adding the weapon for the first time.
+	// Note that this refers to the index of the weapon's ammo array, and not the weapon's actual ammunition count.
 	if (!lara.Weapons[(int)info.LaraWeaponType].Present)
-		lara.Weapons[(int)info.LaraWeaponType].SelectedAmmo = 0;
+		lara.Weapons[(int)info.LaraWeaponType].SelectedAmmo = WeaponAmmoType::Ammo1;
 	
 	lara.Weapons[(int)info.LaraWeaponType].Present = add;
 	auto ammoID = info.AmmoID;
 	return add ? TryAddingAmmo(lara, ammoID, ammoAmount) : TryRemovingAmmo(lara, ammoID, ammoAmount);
 }
 
-// Adding a weapon will either give the player the weapon + amt ammo
-// or, if they already have the weapon, simply the ammo.
+// Adding a weapon will either give the player the weapon + an amount of ammo, or,
+// if they already have the weapon, simply the ammo.
 bool TryAddingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
 {
 	return TryModifyWeapon(lara, objectID, amount, true);
 }
 
-// Removing a weapon is the reverse of the above; it will remove the weapon
-// (if it's there) and amt ammo.
+// Removing a weapon is the reverse of the above; it will remove the weapon (if it's there) and the amount of ammo.
 bool TryRemovingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
 {
 	return TryModifyWeapon(lara, objectID, amount, false);

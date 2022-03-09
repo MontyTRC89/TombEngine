@@ -330,12 +330,12 @@ bool SaveGame::Save(int slot)
 	auto controlOffset = control.Finish();
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
-	for (int i = 0; i < (int)LaraWeaponType::TotalWeapons; i++)
+	for (int i = 0; i < (int)LaraWeaponType::Total; i++)
 	{
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < MAX_AMMOTYPE; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::Total; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].getCount());
@@ -350,7 +350,7 @@ bool SaveGame::Save(int slot)
 		serializedInfo.add_has_lasersight(info->HasLasersight);
 		serializedInfo.add_has_silencer(info->HasSilencer);
 		serializedInfo.add_present(info->Present);
-		serializedInfo.add_selected_ammo(info->SelectedAmmo);
+		serializedInfo.add_selected_ammo((int)info->SelectedAmmo);
 		auto serializedInfoOffset = serializedInfo.Finish();
 
 		carriedWeapons.push_back(serializedInfoOffset);
@@ -1362,7 +1362,7 @@ bool SaveGame::Load(int slot)
 		Lara.Weapons[i].HasLasersight = info->has_lasersight();
 		Lara.Weapons[i].HasSilencer = info->has_silencer();
 		Lara.Weapons[i].Present = info->present();
-		Lara.Weapons[i].SelectedAmmo = info->selected_ammo();
+		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
 	}
 
 	if (Lara.BurnType != BurnType::None)

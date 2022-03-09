@@ -287,7 +287,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 	short loopAngles[2];
 	bool fired = false;
-	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WEAPON_AMMO1 ? 1820 : 5460);
+	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -699,19 +699,19 @@ void FireGrenade(ITEM_INFO* laraItem)
 		}
 
 		item->Velocity = GRENADE_VELOCITY;
-		item->VerticalVelocity = -512 * phd_sin(item->Position.xRot);
+		item->VerticalVelocity = -CLICK(2) * phd_sin(item->Position.xRot);
 		item->ActiveState = item->Position.xRot;
 		item->TargetState = item->Position.yRot;
 		item->RequiredState = 0;
 		item->HitPoints = 120;	
-		item->ItemFlags[0] = WEAPON_AMMO2;
+		item->ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
 
 		AddActiveItem(itemNumber);
 
 		if (!ammo.hasInfinite())
 			(ammo)--;
 
-		item->ItemFlags[0] = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo;
+		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo;
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -1446,7 +1446,7 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 		AddActiveItem(itemNumber);
 
-		item->ItemFlags[0] = lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
+		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
 		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
 
@@ -1699,11 +1699,11 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	/*	if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WEAPON_AMMO1)
+	/*	if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 		{
 			HKTimer = 12;
 		}
-		else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WEAPON_AMMO2)
+		else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 		{
 			HKCounter++;
 			if (HKCounter == 5)

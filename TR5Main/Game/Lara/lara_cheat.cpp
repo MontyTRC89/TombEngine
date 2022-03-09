@@ -125,10 +125,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::Revolver];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_UZI_ITEM].loaded)
@@ -136,10 +136,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_SHOTGUN_ITEM].loaded)
@@ -147,10 +147,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::Shotgun];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
@@ -158,10 +158,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::HarpoonGun];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
@@ -169,11 +169,11 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
-		weapon.Ammo[WEAPON_AMMO2].setInfinite(true);
-		weapon.Ammo[WEAPON_AMMO3].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
 	}
 
 	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
@@ -181,10 +181,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::RocketLauncher];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_HK_ITEM].loaded)
@@ -192,10 +192,10 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::HK];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
@@ -203,12 +203,12 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 		auto& weapon = lara->Weapons[(int)LaraWeaponType::Crossbow];
 
 		weapon.Present = true;
-		weapon.SelectedAmmo = WEAPON_AMMO1;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
-		weapon.Ammo[WEAPON_AMMO1].setInfinite(true);
-		weapon.Ammo[WEAPON_AMMO2].setInfinite(true);
-		weapon.Ammo[WEAPON_AMMO3].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
 	}
 }
 

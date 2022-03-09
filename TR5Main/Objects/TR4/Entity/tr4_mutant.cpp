@@ -167,8 +167,8 @@ namespace TEN::Entities::TR4
 		target->xPos = end.x;
 		target->yPos = end.y;
 		target->zPos = end.z;
-		target->yRot = angles[0];
 		target->xRot = angles[1];
+		target->yRot = angles[0];
 		target->zRot = 0;
 	}
 

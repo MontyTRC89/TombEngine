@@ -819,12 +819,13 @@ enum LARA_MESHES
 	NUM_LARA_MESHES
 };
 
-enum WeaponAmmoType
+enum class WeaponAmmoType
 {
-	WEAPON_AMMO1,
-	WEAPON_AMMO2,
-	WEAPON_AMMO3,
-	MAX_AMMOTYPE
+	Ammo1,
+	Ammo2,
+	Ammo3,
+
+	Total
 };
 
 enum class LaraWeaponType
@@ -843,7 +844,7 @@ enum class LaraWeaponType
 	RocketLauncher,
 	Snowmobile,
 
-	TotalWeapons
+	Total
 };
 
 enum LaraWeaponTypeCarried
@@ -872,6 +873,7 @@ enum class HolsterSlot : int
 	RocketLauncher = ID_ROCKET_ANIM,
 };
 
+// TODO: Unused.
 enum class ClothType
 {
 	None,
@@ -920,9 +922,11 @@ enum class JumpDirection
 struct Ammo
 {
 	using CountType = uint16_t;
+
 private:
 	CountType count;
 	bool isInfinite;
+
 public:
 
 	Ammo& operator --()
@@ -1033,8 +1037,8 @@ struct HolsterInfo
 struct CarriedWeaponInfo
 {
 	bool Present;
-	Ammo Ammo[MAX_AMMOTYPE];
-	int SelectedAmmo; // WeaponAmmoType_enum
+	Ammo Ammo[(int)WeaponAmmoType::Total];
+	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
 };
@@ -1222,7 +1226,7 @@ struct LaraInfo
 	short ItemNumber;
 	LaraControlData Control;
 	LaraInventoryData Inventory;
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::TotalWeapons];
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::Total];
 	FlareData Flare;
 	bool LitTorch;
 
@@ -1261,6 +1265,7 @@ struct LaraInfo
 	bool Burn;
 	byte BurnBlue;
 	bool BurnSmoke;
+
 	byte Wet[NUM_LARA_MESHES];
 	int MeshPtrs[NUM_LARA_MESHES];
 	signed char Location;
