@@ -2404,6 +2404,21 @@ bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraJumpTolerance(item, coll, testSetup);
 }
 
+bool TestLaraSlideJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: Broken on diagonal slides?
+	if (g_GameFlow->Animations.HasSlideExtended)
+	{
+		auto probe = GetCollisionResult(item);
+
+		short direction = GetLaraSlideDirection(item, coll);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
+	}
+
+	return true;
+}
+
 bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
@@ -2415,15 +2430,6 @@ bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	return false;
-}
-
-bool TestLaraSlideJump(ITEM_INFO* item, COLL_INFO* coll)
-{
-	auto probe = GetCollisionResult(item);
-
-	short direction = GetLaraSlideDirection(item, coll);
-	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-	return (abs((short)(direction - item->Position.yRot)) <= abs(steepness));
 }
 
 bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)

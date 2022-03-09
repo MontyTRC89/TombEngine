@@ -238,7 +238,7 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	short direction = item->Position.yRot;
+	short direction = coll->Setup.ForwardAngle;
 	auto probe = GetCollisionResult(item);
 
 	// Ground is flat.
@@ -254,17 +254,29 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	return direction;
 }
 
-// TODO: Doesn't work. Make slope speed dynamic, rather than tied to the animation.
 void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 {
+	// TODO: Make slope speed dynamic.
 	auto* lara = GetLaraInfo(item);
 
-	int velocity = 50;
-	short steepness = GetSurfaceSteepnessAngle(coll->FloorTiltX, coll->FloorTiltZ);
-	short direction = GetSurfaceBearingAngle(coll->FloorTiltX, coll->FloorTiltZ);
+	auto probe = GetCollisionResult(item);
 
-	//lara->ExtraVelocity.x = velocity;// *steepness* phd_sin(direction);
-	MoveItem(item, coll->Setup.ForwardAngle, velocity);
+	// TODO
+	/*if (g_GameFlow->Animations.HasSlideExtended)
+	{
+
+	}
+	else
+	{
+		constexpr int velocity = 50;
+		lara->ExtraVelocity.x += velocity;
+	}*/
+
+	constexpr int velocity = 50;
+	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	short direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+
+	lara->ExtraVelocity.x += velocity;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -387,7 +399,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 	// TODO: Take inertia into consideration before switching animations if already sliding.
 
 	// Slide backward.
-	/*if (abs(deltaAngle) > ANGLE(90.0f))
+	if (abs(deltaAngle) > ANGLE(90.0f))
 	{
 		if (item->ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
@@ -395,7 +407,7 @@ void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
 	// Slide forward.
-	else [[likely]]*/
+	else [[likely]]
 	{
 		if (item->ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
 			return;
