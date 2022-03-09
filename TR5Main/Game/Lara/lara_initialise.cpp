@@ -44,7 +44,7 @@ void InitialiseLara(int restore)
 	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
-	if (Lara.Weapons[static_cast<int>(LaraWeaponType::WEAPON_PISTOLS)].Present)
+	if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 	{
 		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Pistols;
 		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
@@ -55,7 +55,7 @@ void InitialiseLara(int restore)
 		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 
-	if (Lara.Weapons[static_cast<int>(LaraWeaponType::WEAPON_SHOTGUN)].Present)
+	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
 	else
 		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
@@ -66,27 +66,27 @@ void InitialiseLara(int restore)
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
-	LaraWeaponType weapon = WEAPON_NONE;
+	LaraWeaponType weapon = LaraWeaponType::None;
 
 	if (Objects[ID_HK_ITEM].loaded)
-		weapon = WEAPON_HK;
+		weapon = LaraWeaponType::HK;
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
-		weapon = WEAPON_PISTOLS;
+		weapon = LaraWeaponType::Pistol;
 
 	Lara.Control.Weapon.LastGunType = Lara.Control.Weapon.GunType = Lara.Control.Weapon.RequestGunType = weapon;
 
 	LaraInitialiseMeshes(LaraItem);
 
-	if (weapon == WEAPON_PISTOLS)
+	if (weapon == LaraWeaponType::Pistol)
 	{
-		Lara.Weapons[WEAPON_PISTOLS].Present = true;
-		Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].setInfinite(true);
+		Lara.Weapons[(int)LaraWeaponType::Pistol].Present = true;
+		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[WEAPON_AMMO1].setInfinite(true);
 	}
-	else if (weapon == WEAPON_HK)
+	else if (weapon == LaraWeaponType::HK)
 	{
-		Lara.Weapons[WEAPON_HK].Present = true;
-		Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1] = 100;
+		Lara.Weapons[(int)LaraWeaponType::HK].Present = true;
+		Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1] = 100;
 	}
 
 	Lara.Binoculars = true;
@@ -117,11 +117,11 @@ void LaraInitialiseMeshes(ITEM_INFO* item)
 
 	/* Hardcoded code */
 
-	if (lara->Control.Weapon.GunType == WEAPON_HK)
+	if (lara->Control.Weapon.GunType == LaraWeaponType::HK)
 		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::HK;
-	else if (!lara->Weapons[WEAPON_SHOTGUN].Present)
+	else if (!lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
 	{
-		if (lara->Weapons[WEAPON_HK].Present)
+		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
 			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::HK;
 	}
 	else

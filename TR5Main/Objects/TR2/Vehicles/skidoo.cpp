@@ -300,12 +300,12 @@ void SkidooCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	lara->Vehicle = itemNum;
 
-	if (lara->Control.Weapon.GunType == WEAPON_FLARE)
+	if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 	{
 		CreateFlare(laraItem, ID_FLARE_ITEM, false);
 		UndrawFlareMeshes(laraItem);
 		lara->Flare.ControlLeft = 0;
-		lara->Control.Weapon.RequestGunType = WEAPON_NONE;
+		lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 
@@ -390,7 +390,7 @@ void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidoo = (SkidooInfo*)skidooItem->Data;
-	auto* weapon = &Weapons[WEAPON_SNOWMOBILE];
+	auto* weapon = &Weapons[(int)LaraWeaponType::Snowmobile];
 
 	LaraGetNewTarget(laraItem, weapon);
 	AimWeapon(laraItem, weapon, &lara->RightArm);
@@ -403,8 +403,8 @@ void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 			lara->RightArm.Rotation.xRot
 		};
 		
-		if ((int)FireWeapon(WEAPON_PISTOLS, lara->TargetEntity, laraItem, angles) +
-			(int)FireWeapon(WEAPON_PISTOLS, lara->TargetEntity, laraItem, angles))
+		if ((int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles) +
+			(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))
 		{
 			skidoo->FlashTimer = 2;
 			SoundEffect(weapon->SampleNum, &laraItem->Position, 0);

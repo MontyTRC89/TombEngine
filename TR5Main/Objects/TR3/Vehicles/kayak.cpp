@@ -1200,7 +1200,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 
 	lara->ExtraAnim = 1;
 	lara->Control.HandStatus = HandStatus::Busy;
-	lara->Control.Weapon.GunType = WEAPON_NONE;
+	lara->Control.Weapon.GunType = LaraWeaponType::None;
 	lara->HitDirection = -1;
 }
 
@@ -1218,12 +1218,12 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		lara->Vehicle = itemNumber;
 
-		if (lara->Control.Weapon.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 			lara->Flare.ControlLeft = 0;
-			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
 		if (mountType == KayakMountType::Right)

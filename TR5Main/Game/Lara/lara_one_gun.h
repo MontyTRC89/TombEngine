@@ -1,8 +1,8 @@
 #pragma once
 #include "Specific/trmath.h"
 
+enum class LaraWeaponType;
 struct ITEM_INFO;
-enum LaraWeaponType;
 
 #define PELLET_SCATTER ANGLE(20.0f)
 

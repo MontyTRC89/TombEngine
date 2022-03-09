@@ -1,6 +1,7 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+enum class LaraWeaponType;
 struct ITEM_INFO;
 struct COLL_INFO;
 
@@ -190,7 +191,7 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern SPARKS Sparks[MAX_SPARKS];
 extern SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
-extern int SmokeWeapon;
+extern LaraWeaponType SmokeWeapon;
 extern byte SmokeCountL;
 extern byte SmokeCountR;
 extern int SplashCount;

@@ -1580,19 +1580,19 @@ void GuiController::ConstructObjectList()
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
-		if (Lara.Weapons[WEAPON_PISTOLS].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
 		else if (AmountPistolsAmmo)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
 
-		if (Lara.Weapons[WEAPON_UZI].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
 			InsertObjectIntoList(INV_OBJECT_UZIS);
 		else if (AmountUziAmmo)
 			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
 
-		if (Lara.Weapons[WEAPON_REVOLVER].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
 		{
-			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
+			if (Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
 				InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObjectIntoList(INV_OBJECT_REVOLVER);
@@ -1600,11 +1600,11 @@ void GuiController::ConstructObjectList()
 		else if (AmountRevolverAmmo)
 			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
 
-		if (Lara.Weapons[WEAPON_SHOTGUN].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 		{
 			InsertObjectIntoList(INV_OBJECT_SHOTGUN);
 
-			if (Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO2)
+			if (Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WEAPON_AMMO2)
 				CurrentShotGunAmmoType = 1;
 		}
 		else
@@ -1616,9 +1616,9 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
-		if (Lara.Weapons[WEAPON_HK].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::HK].Present)
 		{
-			if (Lara.Weapons[WEAPON_HK].HasSilencer)
+			if (Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer)
 				InsertObjectIntoList(INV_OBJECT_HK_SILENCER);
 			else
 				InsertObjectIntoList(INV_OBJECT_HK);
@@ -1626,17 +1626,17 @@ void GuiController::ConstructObjectList()
 		else if (AmountHKAmmo1)
 			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
-		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
 		{
-				if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
+				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
 				else
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
 
-				if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO2)
+				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WEAPON_AMMO2)
 					CurrentCrossBowAmmoType = 1;
 
-				if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO3)
+				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WEAPON_AMMO3)
 					CurrentCrossBowAmmoType = 2;
 		}
 		else
@@ -1651,14 +1651,14 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
-		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 		{
 			InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
 
-			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO2)
+			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WEAPON_AMMO2)
 				CurrentGrenadeGunAmmoType = 1;
 
-			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO3)
+			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WEAPON_AMMO3)
 				CurrentGrenadeGunAmmoType = 2;
 		}
 		else
@@ -1673,12 +1673,12 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO3);
 		}
 
-		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
 		else if (AmountRocketsAmmo)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
 
-		if (Lara.Weapons[WEAPON_HARPOON_GUN].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
 		else if (AmountHarpoonAmmo)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
@@ -1785,20 +1785,20 @@ void GuiController::ConstructCombineObjectList()
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
-		if (Lara.Weapons[WEAPON_REVOLVER].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
 		{
-			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
+			if (Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
 				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
 		}
 
-		if (Lara.Weapons[WEAPON_HK].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::HK].Present)
 			InsertObjectIntoList_v2(INV_OBJECT_HK);
 
-		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
+		if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
 		{
-			if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
+			if (Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
 				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
 			else
 				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
@@ -1856,28 +1856,28 @@ void GuiController::InitializeInventory()
 	ClearInputVariables(0);
 	useItem = 0;
 
-	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].hasInfinite())
+	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].hasInfinite())
 		AmountShotGunAmmo1 = -1;
 	else
-		AmountShotGunAmmo1 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].getCount() / 6;
+		AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].getCount() / 6;
 
-	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].hasInfinite())
+	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].hasInfinite())
 		AmountShotGunAmmo2 = -1;
 	else
-		AmountShotGunAmmo2 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].getCount() / 6;
+		AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].getCount() / 6;
 
-	AmountHKAmmo1 = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
-	AmountCrossBowAmmo1 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
-	AmountCrossBowAmmo2 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
-	AmountCrossBowAmmo3 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
-	AmountUziAmmo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
-	AmountRevolverAmmo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
-	AmountPistolsAmmo = Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].getCount();
-	AmountRocketsAmmo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
-	AmountHarpoonAmmo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
-	AmountGrenadeAmmo1 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
-	AmountGrenadeAmmo2 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
-	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
+	AmountHKAmmo1 = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo1 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo2 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO2].getCount();
+	AmountCrossBowAmmo3 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO3].getCount();
+	AmountUziAmmo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[WEAPON_AMMO1].getCount();
+	AmountRevolverAmmo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[WEAPON_AMMO1].getCount();
+	AmountPistolsAmmo = Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[WEAPON_AMMO1].getCount();
+	AmountRocketsAmmo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[WEAPON_AMMO1].getCount();
+	AmountHarpoonAmmo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo1 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo2 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO2].getCount();
+	AmountGrenadeAmmo3 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO3].getCount();
 	ConstructObjectList();
 
 	if (enterInventory == NO_ITEM)
@@ -2008,12 +2008,12 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_PISTOLS_ITEM)
 		{
-			Lara.Control.Weapon.RequestGunType = WEAPON_PISTOLS;
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
 			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.Control.Weapon.GunType == WEAPON_PISTOLS)
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol)
 				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
@@ -2021,12 +2021,12 @@ void GuiController::UseCurrentItem()
 
 		if (gmeobject == ID_UZI_ITEM)
 		{
-			Lara.Control.Weapon.RequestGunType = WEAPON_UZI;
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
 			if (Lara.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (Lara.Control.Weapon.GunType == WEAPON_UZI)
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 				Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 			return;
@@ -2047,7 +2047,7 @@ void GuiController::UseCurrentItem()
 					LaraItem->ActiveState != LS_CRAWL_BACK &&
 					LaraItem->ActiveState != LS_CRAWL_TO_HANG)
 				{
-					if (Lara.Control.Weapon.GunType != WEAPON_FLARE)
+					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
 						TrInput = IN_FLARE;
 						LaraGun(LaraItem);
@@ -2166,12 +2166,12 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_SHOTGUN_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_SHOTGUN;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_SHOTGUN)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
@@ -2179,72 +2179,72 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_REVOLVER_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_REVOLVER;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HK_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_HK;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_HK)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::HK)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_CROSSBOW_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_CROSSBOW;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_CROSSBOW)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_GRENADE_GUN_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_GRENADE_LAUNCHER;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_GRENADE_LAUNCHER)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::GrenadeLauncher)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_HARPOON_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_HARPOON_GUN;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_HARPOON_GUN)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::HarpoonGun)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
 	}
 	else if (gmeobject == ID_ROCKET_LAUNCHER_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = WEAPON_ROCKET_LAUNCHER;
+		Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 		if (Lara.Control.HandStatus != HandStatus::Free)
 			return;
 
-		if (Lara.Control.Weapon.GunType == WEAPON_ROCKET_LAUNCHER)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::RocketLauncher)
 			Lara.Control.HandStatus = HandStatus::DrawWeapon;
 
 		return;
@@ -2593,32 +2593,32 @@ void GuiController::HandleInventoryMenu()
 //this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
 void GuiController::UpdateWeaponStatus()
 {
-	if (Lara.Weapons[WEAPON_SHOTGUN].Present)
+	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 	{
 		if (CurrentShotGunAmmoType)
-			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO2;
+			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WEAPON_AMMO2;
 		else
-			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
+			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WEAPON_AMMO1;
 	}
 
-	if (Lara.Weapons[WEAPON_CROSSBOW].Present)
+	if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
 	{
-		Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
+		Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WEAPON_AMMO1;
 
 		if (CurrentCrossBowAmmoType == 1)
-			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO2;
+			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WEAPON_AMMO2;
 		else if (CurrentCrossBowAmmoType == 2)
-			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO3;
+			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WEAPON_AMMO3;
 	}
 
-	if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
+	if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 	{
-		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
+		Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WEAPON_AMMO1;
 
 		if (CurrentGrenadeGunAmmoType == 1)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO2;
+			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WEAPON_AMMO2;
 		else if (CurrentGrenadeGunAmmoType == 2)
-			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO3;
+			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WEAPON_AMMO3;
 	}
 }
 
@@ -2937,63 +2937,63 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 						switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
-							count = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count == -1 ? count : count / 6;
 							break;
 
 						case ID_SHOTGUN_AMMO2_ITEM:
-							count = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count == -1 ? count : count / 6;
 							break;
 
 						case ID_HK_AMMO_ITEM:
-							nummeup = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
+							nummeup = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_CROSSBOW_AMMO1_ITEM:
-							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count;
 							break;
 
 						case ID_CROSSBOW_AMMO2_ITEM:
-							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count;
 							break;
 
 						case ID_CROSSBOW_AMMO3_ITEM:
-							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[WEAPON_AMMO3].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO1_ITEM:
-							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO2_ITEM:
-							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO3_ITEM:
-							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
+							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[WEAPON_AMMO3].getCount();
 							nummeup = count;
 							break;
 
 						case ID_ROCKET_LAUNCHER_ITEM:
-							nummeup = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_HARPOON_ITEM:
-							nummeup = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
+							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_REVOLVER_AMMO_ITEM:
-							nummeup = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
+							nummeup = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_UZI_AMMO_ITEM:
-							nummeup = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
+							nummeup = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[WEAPON_AMMO1].getCount();
 							break;
 						}
 					}
@@ -3405,18 +3405,18 @@ void combine_revolver_lasersight(int flag)
 	if (flag)
 	{
 		Lara.Lasersight = 1;
-		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 0;
+		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 0;
 	}
 	else
 	{
 		Lara.Lasersight = 0;
-		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 1;
+		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 	{
-		UndrawPistolMeshRight(LaraItem, WEAPON_REVOLVER);
-		DrawPistolMeshes(LaraItem, WEAPON_REVOLVER);
+		UndrawPistolMeshRight(LaraItem, LaraWeaponType::Revolver);
+		DrawPistolMeshes(LaraItem, LaraWeaponType::Revolver);
 	}
 }
 
@@ -3425,18 +3425,18 @@ void combine_crossbow_lasersight(int flag)
 	if (flag)
 	{
 		Lara.Lasersight = 1;
-		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 0;
+		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 0;
 	}
 	else
 	{
 		Lara.Lasersight = 0;
-		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 1;
+		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == WEAPON_CROSSBOW)
+	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 	{
-		UndrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
-		DrawShotgunMeshes(LaraItem, WEAPON_CROSSBOW);
+		UndrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
+		DrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
 	}
 }
 
@@ -3445,13 +3445,13 @@ void combine_HK_SILENCER(int flag)
 	if (flag)
 	{
 		Lara.Silencer = 1;
-		Lara.Weapons[WEAPON_HK].HasSilencer = 0;
+		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 0;
 
 	}
 	else
 	{
 		Lara.Silencer = 0;
-		Lara.Weapons[WEAPON_HK].HasSilencer = 1;
+		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 1;
 	}
 }
 

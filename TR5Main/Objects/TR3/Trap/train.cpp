@@ -121,7 +121,7 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	laraInfo->ExtraAnim = 1;
 	laraInfo->Control.HandStatus = HandStatus::Busy;
-	laraInfo->Control.Weapon.GunType = WEAPON_NONE;
+	laraInfo->Control.Weapon.GunType = LaraWeaponType::None;
 	laraInfo->HitDirection = -1;
 	laraInfo->Air = -1;
 

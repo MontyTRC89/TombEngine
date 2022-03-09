@@ -269,12 +269,12 @@ namespace TEN::Entities::TR4
 						{
 							if (laraAI.angle > 0 || !(item->MeshBits & 0x400))
 							{
-								if (Lara.Control.Weapon.GunType == WEAPON_SHOTGUN)
+								if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 								{
 									item->HitPoints -= 10;
 									item->HitStatus = true;
 								}
-								else if (Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
+								else if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 								{
 									item->HitPoints -= 20;
 									item->HitStatus = true;

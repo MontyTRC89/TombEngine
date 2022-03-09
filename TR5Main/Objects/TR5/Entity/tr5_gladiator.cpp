@@ -158,7 +158,7 @@ void ControlGladiator(short itemNumber)
 						unknown &&
 						distance < pow(SECTOR(1.5f), 2) &&
 						GetRandomControl() & 1 &&
-						(Lara.Control.Weapon.GunType == WEAPON_SHOTGUN ||
+						(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							!(GetRandomControl() & 0xF)) &&
 						item->MeshBits == -1)
 					{

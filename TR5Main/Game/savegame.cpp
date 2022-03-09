@@ -224,9 +224,9 @@ bool SaveGame::Save(int slot)
 	weaponControl.add_fired(Lara.Control.Weapon.Fired);
 	weaponControl.add_uzi_left(Lara.Control.Weapon.UziLeft);
 	weaponControl.add_uzi_right(Lara.Control.Weapon.UziRight);
-	weaponControl.add_gun_type(Lara.Control.Weapon.GunType);
-	weaponControl.add_request_gun_type(Lara.Control.Weapon.RequestGunType);
-	weaponControl.add_last_gun_type(Lara.Control.Weapon.LastGunType);
+	weaponControl.add_gun_type((int)Lara.Control.Weapon.GunType);
+	weaponControl.add_request_gun_type((int)Lara.Control.Weapon.RequestGunType);
+	weaponControl.add_last_gun_type((int)Lara.Control.Weapon.LastGunType);
 	weaponControl.add_holster_info(holsterInfoOffset);
 	auto weaponControlOffset = weaponControl.Finish();
 
@@ -304,7 +304,7 @@ bool SaveGame::Save(int slot)
 	auto controlOffset = control.Finish();
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
-	for (int i = 0; i < NUM_WEAPONS; i++)
+	for (int i = 0; i < (int)LaraWeaponType::TotalWeapons; i++)
 	{
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		

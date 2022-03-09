@@ -107,14 +107,14 @@ void MummyControl(short itemNumber)
 				item->ActiveState != MUMMY_ANIM_STAND_TO_WALK)
 			{
 				if (GetRandomControl() & 3 ||
-					Lara.Control.Weapon.GunType != WEAPON_SHOTGUN &&
-					Lara.Control.Weapon.GunType != WEAPON_HK &&
-					Lara.Control.Weapon.GunType != WEAPON_REVOLVER)
+					Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
+					Lara.Control.Weapon.GunType != LaraWeaponType::HK &&
+					Lara.Control.Weapon.GunType != LaraWeaponType::Revolver)
 				{
 					if (!(GetRandomControl() & 7) ||
-						Lara.Control.Weapon.GunType == WEAPON_SHOTGUN ||
-						Lara.Control.Weapon.GunType == WEAPON_HK ||
-						Lara.Control.Weapon.GunType == WEAPON_REVOLVER)
+						Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 					{
 						if (item->ActiveState == MUMMY_STATE_WALK_ARMS_UP ||
 							item->ActiveState == MUMMY_STATE_WALK_HIT)
