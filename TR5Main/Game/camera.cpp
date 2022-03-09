@@ -1093,7 +1093,7 @@ void BinocularCamera(ITEM_INFO* item)
 			BinocularRange = 0;
 			AlterFOV(14560);
 			item->MeshBits = -1;
-			lara->IsBusy = false;
+			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot.yRot = 0;
 			lara->ExtraHeadRot.xRot = 0;
 			lara->ExtraTorsoRot.yRot = 0;
