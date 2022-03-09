@@ -64,8 +64,8 @@ For use in @{Level-specific.ShowString|ShowString} and @{Level-specific.HideStri
 @tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
 @tparam Color color the color of the text
 @tparam table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
-	DisplayStringOption.CENTER -- see x and y parameters
-	DisplayStringOption.SHADOW -- will give the text a small shadow
+	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
+	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
 __Default: empty__
 @tparam bool translated if false or omitted, the str argument will be printed.
 If true, the str argument will be the key of a translated string specified in
@@ -108,9 +108,9 @@ DisplayString::~DisplayString()
 	s_removeItemCallback(m_id);
 }
 
-void DisplayString::Register(sol::state* state)
+void DisplayString::Register(sol::table & parent)
 {
-	state->new_usertype<DisplayString>(
+	parent.new_usertype<DisplayString>(
 		"DisplayString",
 		"new", &CreateString,
 
@@ -126,17 +126,17 @@ void DisplayString::Register(sol::state* state)
 
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
-		// @function DisplayString:SetPos
+		// @function DisplayString:SetPosition
 		// @tparam int x x-coordinate of the string
 		// @tparam int y y-coordinate of the string
-		"SetPos", &DisplayString::SetPos,
+		ScriptReserved_SetPosition, &DisplayString::SetPos,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
-		// @function DisplayString:GetPos
+		// @function DisplayString:GetPosition
 		// @treturn int x x-coordinate of the string
 		// @treturn int y y-coordinate of the string
-		"GetPos", &DisplayString::GetPos
+		ScriptReserved_GetPosition, &DisplayString::GetPos
 	);
 }
 
