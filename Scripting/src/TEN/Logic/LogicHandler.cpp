@@ -34,15 +34,9 @@ Functions and callbacks for level-specific logic scripts.
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
 #if TEN_OPTIONAL_LUA
-	sol::table table_logic{ m_lua->lua_state(), sol::create };
-	parent.set(ScriptReserved_Strings, table_logic);
-
-	MakeReadOnlyTable(table_logic, ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
-
 	ResetLevelTables();
 
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
-
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
