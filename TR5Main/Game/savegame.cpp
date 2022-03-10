@@ -26,6 +26,7 @@
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Scripting/ScriptInterfaceLevel.h"
+#include "Scripting/ScriptInterfaceGame.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -708,6 +709,71 @@ bool SaveGame::Save(int slot)
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
+	std::map<std::string, VarSaveType> levelVars;
+	std::map<std::string, VarSaveType> gameVars;
+	g_GameScript->GetVariables(levelVars, gameVars);
+
+	auto strFunc = [&](auto const & varVec, auto& saveVec)
+	{
+		for (auto const& s : varVec)
+		{
+			if (std::holds_alternative<std::string>(s.second))
+			{
+				auto keyOffset = fbb.CreateString(s.first);
+				auto valOffset = fbb.CreateString(std::get<std::string>(s.second));
+				Save::ScriptStringBuilder scriptStringInfo{ fbb };
+				scriptStringInfo.add_key(keyOffset);
+				scriptStringInfo.add_value(valOffset);
+				saveVec.push_back(scriptStringInfo.Finish());
+			}
+		}
+		return fbb.CreateVector(saveVec);
+	};
+	std::vector<flatbuffers::Offset<Save::ScriptString>> levelStringVec;
+	std::vector<flatbuffers::Offset<Save::ScriptString>> gameStringVec;
+	auto levelStringsOffset = strFunc(levelVars, levelStringVec);
+	auto gameStringsOffset = strFunc(levelVars, gameStringVec);
+
+	auto doubleFunc = [&](auto const & varVec, auto& saveVec)
+	{
+		for (auto const& s : varVec)
+		{
+			if (std::holds_alternative<double>(s.second))
+			{
+				auto keyOffset = fbb.CreateString(s.first);
+				Save::ScriptNumberBuilder scriptNumberInfo{ fbb };
+				scriptNumberInfo.add_key(keyOffset);
+				scriptNumberInfo.add_value(std::get<double>(s.second));
+				saveVec.push_back(scriptNumberInfo.Finish());
+			}
+		}
+		return fbb.CreateVector(saveVec);
+	};
+	std::vector<flatbuffers::Offset<Save::ScriptNumber>> levelNumberVec;
+	std::vector<flatbuffers::Offset<Save::ScriptNumber>> gameNumberVec;
+	auto levelNumbersOffset = doubleFunc(levelVars, levelNumberVec);
+	auto gameNumbersOffset = doubleFunc(levelVars, gameNumberVec);
+
+	auto boolFunc = [&](auto const & varVec, auto& saveVec)
+	{
+		for (auto const& s : varVec)
+		{
+			if (std::holds_alternative<bool>(s.second))
+			{
+				auto keyOffset = fbb.CreateString(s.first);
+				Save::ScriptBoolBuilder scriptBoolInfo{ fbb };
+				scriptBoolInfo.add_key(keyOffset);
+				scriptBoolInfo.add_value(std::get<bool>(s.second));
+				saveVec.push_back(scriptBoolInfo.Finish());
+			}
+		}
+		return fbb.CreateVector(saveVec);
+	};
+	std::vector<flatbuffers::Offset<Save::ScriptBool>> levelBoolVec;
+	std::vector<flatbuffers::Offset<Save::ScriptBool>> gameBoolVec;
+	auto levelBoolsOffset = boolFunc(levelVars, levelBoolVec);
+	auto gameBoolsOffset = boolFunc(levelVars, gameBoolVec);
+
 	Save::SaveGameBuilder sgb{ fbb };
 
 	sgb.add_header(headerOffset);
@@ -740,6 +806,13 @@ bool SaveGame::Save(int slot)
 		sgb.add_pendulum(pendulumOffset);
 		sgb.add_alternate_pendulum(alternatePendulumOffset);
 	}
+
+	sgb.add_script_string_game(gameStringsOffset);
+	sgb.add_script_string_level(levelStringsOffset);
+	sgb.add_script_number_game(gameNumbersOffset);
+	sgb.add_script_number_level(levelNumbersOffset);
+	sgb.add_script_bool_game(gameBoolsOffset);
+	sgb.add_script_bool_level(levelBoolsOffset);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1377,6 +1450,65 @@ bool SaveGame::Load(int slot)
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
 	}
+
+	std::map<std::string, VarSaveType> levelVars;
+	std::map<std::string, VarSaveType> gameVars;
+
+	auto stringLevelVec = s->script_string_level();
+	if (stringLevelVec)
+	{
+		for (auto const& str : *stringLevelVec)
+		{
+			levelVars.insert(std::pair(str->key()->str(), str->value()->str()));
+		}
+	}
+
+	auto stringGameVec = s->script_string_game();
+	if (stringGameVec)
+	{
+		for (auto const& str : *stringGameVec)
+		{
+			gameVars.insert(std::pair(str->key()->str(), str->value()->str()));
+		}
+	}
+
+	auto numberLevelVec = s->script_number_level();
+	if (numberLevelVec)
+	{
+		for (auto const& num : *numberLevelVec)
+		{
+			levelVars.insert(std::pair(num->key()->str(), num->value()));
+		}
+	}
+
+	auto numberGameVec = s->script_number_game();
+	if (numberGameVec)
+	{
+		for (auto const& num : *numberGameVec)
+		{
+			gameVars.insert(std::pair(num->key()->str(), num->value()));
+		}
+	}
+
+	auto boolLevelVec = s->script_bool_level();
+	if (boolLevelVec)
+	{
+		for (auto const& num : *boolLevelVec)
+		{
+			levelVars.insert(std::pair(num->key()->str(), num->value()));
+		}
+	}
+
+	auto boolGameVec = s->script_bool_game();
+	if (boolGameVec)
+	{
+		for (auto const& num : *boolGameVec)
+		{
+			gameVars.insert(std::pair(num->key()->str(), num->value()));
+		}
+	}
+
+	g_GameScript->SetVariables(levelVars, gameVars);
 
 	return true;
 }

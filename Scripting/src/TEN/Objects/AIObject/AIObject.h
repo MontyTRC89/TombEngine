@@ -11,6 +11,8 @@ class Position;
 class AIObject : public NamedBase<AIObject, AI_OBJECT&>
 {
 public:
+
+	using IdentifierType = std::reference_wrapper<AI_OBJECT>;
 	AIObject(AI_OBJECT& ref, bool temp);
 	~AIObject();
 
@@ -28,20 +30,11 @@ public:
 	std::string GetName() const;
 	void SetName(std::string const &);
 
-	GAME_OBJECT_ID GetObjID() const;
-	void SetObjID(GAME_OBJECT_ID);
-
-	short GetTriggerFlags() const;
-	void SetTriggerFlags(short);
-
-	short GetFlags() const;
-	void SetFlags(short);
+	GAME_OBJECT_ID GetObjectID() const;
+	void SetObjectID(GAME_OBJECT_ID);
 
 	short GetYRot() const;
 	void SetYRot(short);
-
-	short GetBoxNumber() const;
-	void SetBoxNumber(short);
 
 private:
 	AI_OBJECT & m_aiObject;

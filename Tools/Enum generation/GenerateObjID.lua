@@ -1,6 +1,6 @@
 local generateheader = require("generateheader")
 
-local enumName = "ObjID"
+local enumName = "Objects.ObjID"
 local enumIncludes = [==[
 #include "objectslist.h"
 #include <unordered_map>
