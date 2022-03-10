@@ -38,7 +38,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	// TODO: Dispatch pickups from within states.
 	if (item->TargetState == LS_PICKUP)
@@ -145,7 +145,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -231,7 +231,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -287,7 +287,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -349,7 +349,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	// TODO: Dispatch pickups from within states.
 	if (item->TargetState == LS_PICKUP)
@@ -488,7 +488,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -593,7 +593,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -689,7 +689,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -749,7 +749,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -807,7 +807,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
