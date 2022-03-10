@@ -32,68 +32,82 @@ enum ZoneType : char
 	ZONE_HUMAN_LONGJUMP_AND_MONKEY,
 };
 
-struct LOT_INFO 
+struct LOTInfo 
 {
-	std::vector<BOX_NODE> node;
-	int head;
-	int tail;
-	int searchNumber;
-	int blockMask;
-	short step;
-	short drop;
-	short zoneCount;
-	int targetBox;
-	int requiredBox;
-	short fly;
-	bool canJump;
-	bool canMonkey;
-	bool isAmphibious;
-	bool isJumping;
-	bool isMonkeying;
-	PHD_VECTOR target;
-	ZoneType zone;
-	bool initialised;
+	std::vector<BOX_NODE> Node;
+	int Head;
+	int Tail;
+
+	int SearchNumber;
+	int BlockMask;
+	short Step;
+	short Drop;
+	short ZoneCount;
+	int TargetBox;
+	int RequiredBox;
+	short Fly;
+
+	bool Initialised;
+	bool CanJump;
+	bool CanMonkey;
+	bool IsAmphibious;
+	bool IsJumping;
+	bool IsMonkeying;
+
+	PHD_VECTOR Target;
+	ZoneType Zone;
 };
 
-enum MOOD_TYPE 
+enum class MoodType 
 {
-	BORED_MOOD,
-	ATTACK_MOOD,
-	ESCAPE_MOOD,
-	STALK_MOOD
+	Bored,
+	Attack,
+	Escape,
+	Stalk
 };
 
-enum class CREATURE_AI_PRIORITY 
+enum class CreatureAIPriority
 {
-	HIGH,
-	MEDIUM,
-	LOW,
-	NONE
+	None,
+	High,
+	Medium,
+	Low
 };
 
-struct CREATURE_INFO 
+struct CreatureInfo 
 {
-	short jointRotation[4];
-	short maximumTurn;
-	short flags;
-	bool alerted;
-	bool headLeft;
-	bool headRight;
-	bool reachedGoal;
-	bool hurtByLara;
-	bool patrol2;
-	bool jumpAhead;
-	bool monkeyAhead;
-	MOOD_TYPE mood;
-	ITEM_INFO* enemy;
-	short aiTargetNum;
-	ITEM_INFO* aiTarget;
-	short pad;
-	short itemNum;
-	PHD_VECTOR target;
-	LOT_INFO LOT;
+	short ItemNumber;
+
+	short MaxTurn;
+	short JointRotation[4];
+	bool HeadLeft;
+	bool HeadRight;
+
+	bool Patrol;			// Unused?
+	bool Alerted;
+	bool ReachedGoal;
+	bool JumpAhead;
+	bool MonkeySwingAhead;
+	bool Friendly;
+	bool Poisoned;
+	bool HurtByLara;
+
+	short Tosspad;
+	short LocationAI;
+	short FiredWeapon;
+
+	MoodType Mood;
+	ITEM_INFO* Enemy;
+	short AITargetNumber;
+	ITEM_INFO* AITarget;
+	short Pad;				// Unused?
+	PHD_VECTOR Target;
+	LOTInfo LOT;
+
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
-	CREATURE_AI_PRIORITY priority;
-	size_t framesSinceLOTUpdate;
+	CreatureAIPriority Priority;
+	size_t FramesSinceLOTUpdate;
 #endif
+
+	short Flags;
 };

@@ -417,7 +417,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_knighttemplar.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_littlebeetle.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_beetle_swarm.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sas.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sentrygun.h" />
@@ -770,7 +770,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_bigscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_littlebeetle.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_beetle_swarm.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />

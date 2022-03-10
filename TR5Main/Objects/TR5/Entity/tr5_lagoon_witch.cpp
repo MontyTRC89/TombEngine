@@ -45,10 +45,10 @@ void LagoonWitchControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 	
+	short angle = 0;
 	short joint0 = 0;
 	short joint1 = 0;
 	short joint2 = 0;
-	short angle = 0;
 
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
@@ -69,13 +69,13 @@ void LagoonWitchControl(short itemNumber)
 		if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM2))
 		{
 			item->AIBits = 0;
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 		}
 
 		if (item->AIBits)
 			GetAITarget(creature);
-		else if (creature->hurtByLara)
-			creature->enemy = LaraItem;
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
@@ -86,7 +86,7 @@ void LagoonWitchControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (AI.ahead)
 		{
@@ -95,12 +95,12 @@ void LagoonWitchControl(short itemNumber)
 			joint2 = AI.angle / 2;
 		}
 
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		switch (item->ActiveState)
 		{
 		case WITCH_STATE_SWIM:
-			creature->maximumTurn = ANGLE(4.0f);
+			creature->MaxTurn = ANGLE(4.0f);
 
 			if (AI.distance < pow(SECTOR(1), 2))
 				item->TargetState = WITCH_STATE_IDLE;
@@ -108,8 +108,8 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_IDLE:
-			creature->maximumTurn = ANGLE(2.0f);
-			creature->flags = 0;
+			creature->MaxTurn = ANGLE(2.0f);
+			creature->Flags = 0;
 
 			if (AI.distance < pow(CLICK(3), 2))
 				item->TargetState = WITCH_STATE_ATTACK;
@@ -121,14 +121,14 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_ATTACK:
-			creature->maximumTurn = ANGLE(2.0f);
+			creature->MaxTurn = ANGLE(2.0f);
 
-			if (!creature->flags &&
+			if (!creature->Flags &&
 				item->TouchBits & 0x3C3C0 &&
 				item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 29)
 			{
 				CreatureEffect2(item, &LagoonWitchBite, 10, item->Position.yRot, DoBloodSplat);
-				creature->flags = WITCH_STATE_SWIM;
+				creature->Flags = WITCH_STATE_SWIM;
 
 
 				LaraItem->HitPoints -= 100;
@@ -138,18 +138,18 @@ void LagoonWitchControl(short itemNumber)
 			break;
 		}
 
-		if (creature->reachedGoal)
+		if (creature->ReachedGoal)
 		{
-			auto* enemy = creature->enemy;
+			auto* enemy = creature->Enemy;
 
 			if (enemy)
 			{
 				if (enemy->Flags & 2)
-					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
 				item->ItemFlags[3]++;
-				creature->reachedGoal = false;
-				creature->enemy = 0;
+				creature->ReachedGoal = false;
+				creature->Enemy = 0;
 			}
 		}
 	}

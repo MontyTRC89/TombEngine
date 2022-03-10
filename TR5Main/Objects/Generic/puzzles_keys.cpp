@@ -80,7 +80,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		GetKeyTrigger(&g_Level.Items[itemNumber])) ||
 		(laraInfo->Control.IsMoving &&
-			laraInfo->interactedItem == itemNumber))
+			laraInfo->InteractedItem == itemNumber))
 	{
 		short oldYrot = receptableItem->Position.yRot;
 
@@ -115,7 +115,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 				PHD_VECTOR pos = { 0, 0, bounds->Z1 - 100 };
 				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
 				{
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
 					receptableItem->Position.yRot = oldYrot;
 					return;
@@ -144,7 +144,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 			ResetLaraFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			receptableItem->Flags |= 0x20;
-			laraInfo->interactedItem = itemNumber;
+			laraInfo->InteractedItem = itemNumber;
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			receptableItem->Position.yRot = oldYrot;
 			return;
@@ -152,7 +152,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 		if (laraInfo->Control.IsMoving)
 		{
-			if (laraInfo->interactedItem == itemNumber)
+			if (laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;
@@ -163,9 +163,9 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 	else
 	{
-		if (!laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber || laraInfo->interactedItem != itemNumber)
+		if (!laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber || laraInfo->InteractedItem != itemNumber)
 		{
-			if (laraInfo->interactedItem == itemNumber)
+			if (laraInfo->InteractedItem == itemNumber)
 			{
 				if (laraItem->ActiveState != LS_MISC_CONTROL)
 				{
@@ -209,7 +209,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNumber)
 
 void DoPuzzle()
 {
-	puzzleItem = Lara.interactedItem;
+	puzzleItem = Lara.InteractedItem;
 	auto* item = &g_Level.Items[puzzleItem];
 
 	int flag = 0;
@@ -267,7 +267,7 @@ void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->ActiveState == LS_IDLE &&
 		laraItem->AnimNumber == LA_STAND_IDLE) &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
-		(!laraInfo->Control.IsMoving || laraInfo->interactedItem != itemNumber))
+		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 	{
 		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
 			ObjectCollision(itemNumber, laraItem, coll);
@@ -319,13 +319,13 @@ void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 				}
 			}
 			else
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			return;
 		}
 
-		if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+		if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Free;

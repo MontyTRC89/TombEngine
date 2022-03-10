@@ -183,25 +183,25 @@ void SubmarineControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = (CREATURE_INFO*)item->Data;
+	auto* creature = (CreatureInfo*)item->Data;
 
 	if (item->AIBits)
 		GetAITarget(creature);
 	else
-		creature->enemy = LaraItem;
+		creature->Enemy = LaraItem;
 
-	AI_INFO info, laraInfo;
-	CreatureAIInfo(item, &info);
+	AI_INFO AI, laraInfo;
+	CreatureAIInfo(item, &AI);
 
-	GetCreatureMood(item, &info, VIOLENT);
-	CreatureMood(item, &info, VIOLENT);
+	GetCreatureMood(item, &AI, VIOLENT);
+	CreatureMood(item, &AI, VIOLENT);
 
-	short angle = CreatureTurn(item, creature->maximumTurn);
+	short angle = CreatureTurn(item, creature->MaxTurn);
 
-	if (creature->enemy == LaraItem)
+	if (creature->Enemy == LaraItem)
 	{
-		laraInfo.angle = info.angle;
-		laraInfo.distance = info.distance;
+		laraInfo.angle = AI.angle;
+		laraInfo.distance = AI.distance;
 	}
 	else
 	{
@@ -232,24 +232,24 @@ void SubmarineControl(short itemNumber)
 	else
 		item->ItemFlags[0] = 0;
 
-	creature->maximumTurn = ANGLE(2.0f);
+	creature->MaxTurn = ANGLE(2.0f);
 
-	short joint = info.xAngle - ANGLE(45.0f);
+	short joint = AI.xAngle - ANGLE(45.0f);
 
-	if (creature->flags < item->TriggerFlags)
-		creature->flags++;
+	if (creature->Flags < item->TriggerFlags)
+		creature->Flags++;
 
-	auto* enemy = creature->enemy;
-	creature->enemy = LaraItem;
+	auto* enemy = creature->Enemy;
+	creature->Enemy = LaraItem;
 
 	if (Targetable(item, &laraInfo))
 	{
-		if (creature->flags >= item->TriggerFlags &&
+		if (creature->Flags >= item->TriggerFlags &&
 			laraInfo.angle > -ANGLE(90.0f) &&
 			laraInfo.angle < ANGLE(90.0f))
 		{
 			SubmarineAttack(item);
-			creature->flags = 0;
+			creature->Flags = 0;
 		}
 
 		if (laraInfo.distance >= pow(SECTOR(3), 2))
@@ -260,9 +260,9 @@ void SubmarineControl(short itemNumber)
 		else
 			item->TargetState = 0;
 
-		if (info.distance < pow(SECTOR(1), 2))
+		if (AI.distance < pow(SECTOR(1), 2))
 		{
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (abs(laraInfo.angle) >= ANGLE(2.0f))
 			{
 				if (laraInfo.angle >= 0)
@@ -277,7 +277,7 @@ void SubmarineControl(short itemNumber)
 	else
 		item->TargetState = 1;
 
-	creature->enemy = enemy;
+	creature->Enemy = enemy;
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, joint);
@@ -346,16 +346,16 @@ void SubmarineControl(short itemNumber)
 		}
 	}
 
-	if (creature->reachedGoal)
+	if (creature->ReachedGoal)
 	{
-		if (creature->enemy)
+		if (creature->Enemy)
 		{
-			if (creature->flags & 2)
-				item->ItemFlags[3] = LOBYTE(item->Tosspad) - 1;
+			if (creature->Flags & 2)
+				item->ItemFlags[3] = LOBYTE(creature->Tosspad) - 1;
 
 			item->ItemFlags[3]++;
-			creature->reachedGoal = false;
-			creature->enemy = NULL;
+			creature->ReachedGoal = false;
+			creature->Enemy = NULL;
 		}
 	}
 

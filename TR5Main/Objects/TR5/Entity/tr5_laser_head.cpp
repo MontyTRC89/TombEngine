@@ -86,13 +86,13 @@ static void LaserHeadCharge(ITEM_INFO* item)
 		size = 32;
 	}
 
-	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->Data;
+	LaserHeadInfo* creature = (LaserHeadInfo*)item->Data;
 
 	PHD_VECTOR src, dest;
 	dest.x = LaserHeadBasePosition.x;
 	dest.y = LaserHeadBasePosition.y;
 	dest.z = LaserHeadBasePosition.z;
-	GetJointAbsPosition(&g_Level.Items[creature->baseItem], &dest, 0);
+	GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &dest, 0);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -110,7 +110,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 			src.x = GuardianChargePositions[i].x;
 			src.y = GuardianChargePositions[i].y;
 			src.z = GuardianChargePositions[i].z;
-			GetJointAbsPosition(&g_Level.Items[creature->baseItem], &src, 0);
+			GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &src, 0);
 			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 		}
 	}
@@ -148,14 +148,14 @@ void InitialiseLaserHead(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->Data = LASER_HEAD_INFO();
-	LASER_HEAD_INFO* info = item->Data;
+	item->Data = LaserHeadInfo();
+	LaserHeadInfo* info = item->Data;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_BASE)
 		{
-			info->baseItem = i;
+			info->BaseItem = i;
 			break;
 		}
 	}
@@ -167,18 +167,19 @@ void InitialiseLaserHead(short itemNumber)
 		{
 			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Position.yRot == rotation)
 			{
-				info->tentacles[j] = i;
+				info->Tentacles[j] = i;
 				break;
 			}
 		}
-		rotation += ANGLE(45);
+
+		rotation += ANGLE(45.0f);
 	}
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		if (g_Level.Items[i].ObjectNumber == ID_PUZZLE_ITEM4)
 		{
-			info->puzzleItem = i;
+			info->PuzzleItem = i;
 			break;
 		}
 	}
@@ -195,7 +196,7 @@ void InitialiseLaserHead(short itemNumber)
 void LaserHeadControl(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	LASER_HEAD_INFO* creature = (LASER_HEAD_INFO*)item->Data;
+	LaserHeadInfo* creature = (LaserHeadInfo*)item->Data;
 
 	GAME_VECTOR src, dest;
 
@@ -211,7 +212,7 @@ void LaserHeadControl(short itemNumber)
 			{
 				if (item->ActiveState < 8)
 				{
-					short tentacleNumber = creature->tentacles[item->ActiveState];
+					short tentacleNumber = creature->Tentacles[item->ActiveState];
 					g_Level.Items[tentacleNumber].TargetState = 2;
 					item->ActiveState++;
 				}
@@ -222,7 +223,7 @@ void LaserHeadControl(short itemNumber)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					ITEM_INFO* tentacleItem = &g_Level.Items[creature->tentacles[i]];
+					ITEM_INFO* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
 
 					if (tentacleItem->AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1
 						&& tentacleItem->FrameNumber == g_Level.Anims[tentacleItem->AnimNumber].frameEnd
@@ -230,7 +231,7 @@ void LaserHeadControl(short itemNumber)
 					{
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
-						KillItem(creature->tentacles[i]);
+						KillItem(creature->Tentacles[i]);
 					}
 				}
 			}
@@ -251,8 +252,8 @@ void LaserHeadControl(short itemNumber)
 			item->Velocity++;
 			if (item->Velocity > 136)
 			{
-				ExplodeItemNode(&g_Level.Items[creature->baseItem], 0, 0, 128);
-				KillItem(creature->baseItem);
+				ExplodeItemNode(&g_Level.Items[creature->BaseItem], 0, 0, 128);
+				KillItem(creature->BaseItem);
 
 				ExplodeItemNode(item, 0, 0, 128);
 
@@ -264,7 +265,7 @@ void LaserHeadControl(short itemNumber)
 				TriggerShockwave(&item->Position, 32, 160, 64, 64, 128, 0, 36, 0x3000, 0);
 				TriggerShockwave(&item->Position, 32, 160, 64, 64, 128, 0, 36, 0x6000, 0);
 
-				g_Level.Items[creature->puzzleItem].Position.yPos = item->Position.yPos;
+				g_Level.Items[creature->PuzzleItem].Position.yPos = item->Position.yPos;
 				TestTriggers(item, true);
 
 				SoundEffect(SFX_TR5_GODHEADBLAST, &item->Position, 0x800004);
@@ -305,7 +306,7 @@ void LaserHeadControl(short itemNumber)
 				if (LOS(&src, &dest)
 					&& distance <= MAX_VISIBILITY_DISTANCE
 					&& LaraItem->HitPoints > 0
-					&& !Lara.burn
+					&& !Lara.Burn
 					&& (LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 				{
 					// Lock target for attacking
@@ -437,7 +438,7 @@ void LaserHeadControl(short itemNumber)
 						&& arc
 						&& !arc->life
 						|| LaraItem->HitPoints <= 0
-						|| Lara.burn)
+						|| Lara.Burn)
 					{
 						if (arc)
 						{
@@ -509,7 +510,7 @@ void LaserHeadControl(short itemNumber)
 								}
 
 								// Check if Lara was hit by energy arcs
-								if (!Lara.burn)
+								if (!Lara.Burn)
 								{
 									int someIndex = 0;
 
@@ -570,7 +571,7 @@ void LaserHeadControl(short itemNumber)
 											{
 												LaraBurn(LaraItem);
 												Lara.BurnCount = 48;
-												Lara.burnBlue = 2;
+												Lara.BurnBlue = 2;
 												LaraItem->HitPoints = 0;
 												break;
 											}
@@ -634,7 +635,7 @@ void LaserHeadControl(short itemNumber)
 		}
 		else if (!(GlobalCounter & 7))
 		{
-			short tentacleItemNumber = creature->tentacles[item->ItemFlags[2]];
+			short tentacleItemNumber = creature->Tentacles[item->ItemFlags[2]];
 			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
 			AddActiveItem(tentacleItemNumber);
 			tentacleItem->Status = ITEM_ACTIVE;
@@ -649,7 +650,7 @@ void LaserHeadControl(short itemNumber)
 
 		for (i = 0; i < 8; i++)
 		{
-			short tentacleItemNumber = creature->tentacles[i];
+			short tentacleItemNumber = creature->Tentacles[i];
 			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
 			if (tentacleItem->AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex
 				&& tentacleItem->FrameNumber != g_Level.Anims[tentacleItem->AnimNumber].frameEnd)

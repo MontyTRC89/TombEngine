@@ -46,7 +46,7 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	laraItem->HitPoints = -16384;
 	Lara.Air = -1;
 	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.WeaponControl.GunType = WEAPON_NONE;
+	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 
 	Camera.flags = 1;
 	Camera.targetAngle = ANGLE(170.0f);
@@ -82,18 +82,18 @@ void TRexControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (item->TouchBits)
 			LaraItem->HitPoints -= (item->ActiveState == 3) ? 10 : 1;
 
-		info->flags = (info->mood != ESCAPE_MOOD && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
+		info->Flags = (info->Mood != MoodType::Escape && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
 
 		if (aiInfo.distance > pow(1500, 2) &&
 			aiInfo.distance < pow(SECTOR(4), 2)
-			&& aiInfo.bite && !info->flags)
+			&& aiInfo.bite && !info->Flags)
 		{
-			info->flags = 1;
+			info->Flags = 1;
 		}
 
 		switch (item->ActiveState)
@@ -103,16 +103,16 @@ void TRexControl(short itemNumber)
 				item->TargetState = item->RequiredState;
 			else if (aiInfo.distance < pow(1500, 2) && aiInfo.bite)
 				item->TargetState = 7;
-			else if (info->mood == BORED_MOOD || info->flags)
+			else if (info->Mood == MoodType::Bored || info->Flags)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(2.0f);
+			info->MaxTurn = ANGLE(2.0f);
 
-			if (info->mood != BORED_MOOD || !info->flags)
+			if (info->Mood != MoodType::Bored || !info->Flags)
 				item->TargetState = 1;
 			else if (aiInfo.ahead && GetRandomControl() < 0x200)
 			{
@@ -123,18 +123,18 @@ void TRexControl(short itemNumber)
 			break;
 
 		case 3:
-			info->maximumTurn = ANGLE(4.0f);
+			info->MaxTurn = ANGLE(4.0f);
 
 			if (aiInfo.distance < pow(SECTOR(5), 2) && aiInfo.bite)
 				item->TargetState = 1;
-			else if (info->flags)
+			else if (info->Flags)
 				item->TargetState = 1;
-			else if (info->mood != ESCAPE_MOOD && aiInfo.ahead && GetRandomControl() < 0x200)
+			else if (info->Mood != MoodType::Escape && aiInfo.ahead && GetRandomControl() < 0x200)
 			{
 				item->RequiredState = 6;
 				item->TargetState = 1;
 			}
-			else if (info->mood == BORED_MOOD)
+			else if (info->Mood == MoodType::Bored)
 				item->TargetState = 1;
 
 			break;
@@ -155,7 +155,7 @@ void TRexControl(short itemNumber)
 	}
 
 	CreatureJoint(item, 0, (short)(head * 2));
-	info->jointRotation[1] = info->jointRotation[0];
+	info->JointRotation[1] = info->JointRotation[0];
 
 	CreatureAnimation(itemNumber, angle, 0);
 

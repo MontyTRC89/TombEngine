@@ -24,14 +24,12 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT)
 	{
 		lara->Control.TurnRate -= ANGLE(3.4f);
-
 		if (lara->Control.TurnRate < -ANGLE(6.0f))
 			lara->Control.TurnRate = -ANGLE(6.0f);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		lara->Control.TurnRate += ANGLE(3.4f);
-
 		if (lara->Control.TurnRate > ANGLE(6.0f))
 			lara->Control.TurnRate = ANGLE(6.0f);
 	}
@@ -45,7 +43,6 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_JUMP)
 	{
 		item->VerticalVelocity += 16;
-
 		if (item->VerticalVelocity > 400)
 			item->VerticalVelocity = 400;
 	}
@@ -83,7 +80,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 
 					ResetLaraFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
-					lara->Poisoned = 0;
+					lara->PoisonPotency = 0;
 					lara->Air = 1800;
 					lara->Control.Count.Death = 0;
 				}
@@ -104,98 +101,114 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->NumFlares = -1;
-	lara->NumSmallMedipacks = -1;
-	lara->NumLargeMedipacks = -1;
+	lara->Inventory.TotalFlares = -1;
+	lara->Inventory.TotalSmallMedipacks = -1;
+	lara->Inventory.TotalLargeMedipacks = -1;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		lara->Crowbar = true;
+		lara->Inventory.HasCrowbar = true;
 
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
-		lara->Lasersight = true;
+		lara->Inventory.HasLasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->hasBeetleThings |= 1;
+		lara->Inventory.BeetleComponents |= 1;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		lara->smallWaterskin = 1;
+		lara->Inventory.SmallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		lara->bigWaterskin = 1;
+		lara->Inventory.BigWaterskin = 1;
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_REVOLVER].Present = true;
-		lara->Weapons[WEAPON_REVOLVER].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_REVOLVER].HasLasersight = false;
-		lara->Weapons[WEAPON_REVOLVER].HasSilencer = false;
-		lara->Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Revolver];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_UZI_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_UZI].Present = true;
-		lara->Weapons[WEAPON_UZI].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_UZI].HasLasersight = false;
-		lara->Weapons[WEAPON_UZI].HasSilencer = false;
-		lara->Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_SHOTGUN_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_SHOTGUN].Present = true;
-		lara->Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_SHOTGUN].HasLasersight = false;
-		lara->Weapons[WEAPON_SHOTGUN].HasSilencer = false;
-		lara->Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Shotgun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
-	{			
-		lara->Weapons[WEAPON_HARPOON_GUN].Present = true;
-		lara->Weapons[WEAPON_HARPOON_GUN].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_HARPOON_GUN].HasLasersight = false;
-		lara->Weapons[WEAPON_HARPOON_GUN].HasSilencer = false;
-		lara->Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].setInfinite(true);
+	{
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::HarpoonGun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].Present = true;
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].HasSilencer = false;
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].setInfinite(true);
-		lara->Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
 	}
 
 	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_ROCKET_LAUNCHER].Present = true;
-		lara->Weapons[WEAPON_ROCKET_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_ROCKET_LAUNCHER].HasLasersight = false;
-		lara->Weapons[WEAPON_ROCKET_LAUNCHER].HasSilencer = false;
-		lara->Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::RocketLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_HK_ITEM].loaded)
 	{
-		lara->Weapons[WEAPON_HK].Present = true;
-		lara->Weapons[WEAPON_HK].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_HK].HasLasersight = false;
-		lara->Weapons[WEAPON_HK].HasSilencer = false;
-		lara->Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].setInfinite(true);
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::HK];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
 	}
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
-	{			
-		lara->Weapons[WEAPON_CROSSBOW].Present = true;
-		lara->Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
-		lara->Weapons[WEAPON_CROSSBOW].HasLasersight = false;
-		lara->Weapons[WEAPON_CROSSBOW].HasSilencer = false;
-		lara->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].setInfinite(true);
-		lara->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].setInfinite(true);
-		lara->Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].setInfinite(true);
+	{
+		auto& weapon = lara->Weapons[(int)LaraWeaponType::Crossbow];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].setInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].setInfinite(true);
 	}
 }
 
@@ -206,28 +219,28 @@ void DelsGiveLaraItemsCheat(ITEM_INFO* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			lara->Puzzles[i] = 1;
+			lara->Inventory.Puzzles[i] = 1;
 
-		lara->PuzzlesCombo[2 * i] = false;
-		lara->PuzzlesCombo[2 * i + 1] = false;
+		lara->Inventory.PuzzlesCombo[2 * i] = false;
+		lara->Inventory.PuzzlesCombo[2 * i + 1] = false;
 	}
 
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			lara->Keys[i] = 1;
+			lara->Inventory.Keys[i] = 1;
 
-		lara->KeysCombo[2 * i] = false;
-		lara->KeysCombo[2 * i + 1] = false;
+		lara->Inventory.KeysCombo[2 * i] = false;
+		lara->Inventory.KeysCombo[2 * i + 1] = false;
 	}
 
 	for (int i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			lara->Pickups[i] = 1;
+			lara->Inventory.Pickups[i] = 1;
 
-		lara->PickupsCombo[2 * i] = false;
-		lara->PickupsCombo[2 * i + 1] = false;
+		lara->Inventory.PickupsCombo[2 * i] = false;
+		lara->Inventory.PickupsCombo[2 * i + 1] = false;
 	}
 	/* Hardcoded code */
 }

@@ -721,9 +721,9 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 		dx -= c * rx + s * rz;
 		dz -= c * rz - s * rx;
 
-		lara->hitDirection = (item2->Position.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
+		lara->HitDirection = (item2->Position.yRot - phd_atan(dz, dz) - ANGLE(135)) / 16384;
 
-		if (!lara->hitFrame && !lara->SpasmEffectCount)
+		if (!lara->HitFrame && !lara->SpasmEffectCount)
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Position, 0);
 			lara->SpasmEffectCount = GenerateInt(15, 35);
@@ -732,9 +732,9 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 		if (lara->SpasmEffectCount)
 			lara->SpasmEffectCount--;
 
-		lara->hitFrame++;
-		if (lara->hitFrame > 34)
-			lara->hitFrame = 34;
+		lara->HitFrame++;
+		if (lara->HitFrame > 34)
+			lara->HitFrame = 34;
 	}
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1672,7 +1672,7 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	coll->HitStatic = false;
 
 	if (l == LaraItem)
-		Lara.hitDirection = -1;
+		Lara.HitDirection = -1;
 
 	if (l->HitPoints > 0)
 	{
@@ -1718,8 +1718,8 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 			}
 		}
 
-		if (l == LaraItem && Lara.hitDirection == -1)
-			Lara.hitFrame = 0;
+		if (l == LaraItem && Lara.HitDirection == -1)
+			Lara.HitFrame = 0;
 	}
 }
 
@@ -1776,11 +1776,11 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
 						int angle = (l->Position.yRot - phd_atan(z - c * rx - s * rz, x - c * rx + s * rz) - ANGLE(135)) / 16384;
-						Lara.hitDirection = (short)angle;
+						Lara.HitDirection = (short)angle;
 						// TODO: check if a second Lara.hitFrame++; is required there !
-						Lara.hitFrame++;
-						if (Lara.hitFrame > 30)
-							Lara.hitFrame = 30;
+						Lara.HitFrame++;
+						if (Lara.HitFrame > 30)
+							Lara.HitFrame = 30;
 					}
 				}
 			}

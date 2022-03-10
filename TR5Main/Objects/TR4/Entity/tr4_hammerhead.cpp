@@ -45,38 +45,39 @@ void HammerheadControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		if (item->HitPoints > 0)
 		{
 			if (item->AIBits)
-				GetAITarget(info);
-			else if (info->hurtByLara)
-				info->enemy = LaraItem;
+				GetAITarget(creature);
+			else if (creature->HurtByLara)
+				creature->Enemy = LaraItem;
 
-			AI_INFO aiInfo;
-			CreatureAIInfo(item, &aiInfo);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			if (info->enemy != LaraItem)
+			if (creature->Enemy != LaraItem)
 				phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
 
-			GetCreatureMood(item, &aiInfo, VIOLENT);
-			CreatureMood(item, &aiInfo, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-			short angle = CreatureTurn(item, info->maximumTurn);
+			short angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->ActiveState)
 			{
 			case HAMMERHEAD_STATE_IDLE:
 				item->TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
-				info->flags = 0;
+				creature->Flags = 0;
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_SLOW:
-				info->maximumTurn = ANGLE(7.0f);
-				if (aiInfo.distance <= pow(SECTOR(1), 2))
+				creature->MaxTurn = ANGLE(7.0f);
+
+				if (AI.distance <= pow(SECTOR(1), 2))
 				{
-					if (aiInfo.distance < pow(682, 2))
+					if (AI.distance < pow(682, 2))
 						item->TargetState = HAMMERHEAD_STATE_ATTACK;
 				}
 				else
@@ -85,18 +86,18 @@ void HammerheadControl(short itemNumber)
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_FAST:
-				if (aiInfo.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(SECTOR(1), 2))
 					item->TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
 				
 				break;
 
 			case HAMMERHEAD_STATE_ATTACK:
-				if (!info->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x3400)
 					{
 						CreatureEffect(item, &HammerheadBite, DoBloodSplat);
-						info->flags = 1;
+						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 120;
 						LaraItem->HitStatus = true;

@@ -51,9 +51,11 @@ constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_VELOCITY = 12;
 
-constexpr auto LARA_FREEFALL_SPEED = 131;
-constexpr auto LARA_FREEFALL_SCREAM_SPEED = 154;
-constexpr auto LARA_FREEFALL_DIVE_DEATH_SPEED = 133;
+constexpr auto LARA_FREEFALL_VELOCITY = 131;
+constexpr auto LARA_DAMAGE_VELOCITY = 141;
+constexpr auto LARA_DEATH_VELOCITY = 155;
+constexpr auto LARA_DIVE_DEATH_VELOCITY = 134;
+constexpr auto LARA_TERMINAL_VELOCITY = CLICK(10);
 
 constexpr auto LARA_RUN_JUMP_TIME = 22;		// Frames to count before a running jump is possible.
 constexpr auto LARA_POSE_TIME = 30 * 30;	// 30 frames * 30 = 30 seconds to AFK pose.
@@ -61,6 +63,7 @@ constexpr auto LARA_POSE_TIME = 30 * 30;	// 30 frames * 30 = 30 seconds to AFK p
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
 constexpr auto LARA_AIR_MAX = 1800.0f;
 constexpr auto LARA_SPRINT_MAX = 120.0f;
+constexpr auto LARA_POISON_POTENCY_MAX = 16;
 
 extern LaraInfo Lara;
 extern ITEM_INFO* LaraItem;

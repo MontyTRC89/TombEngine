@@ -838,7 +838,7 @@ void lara_as_sclimbend(ITEM_INFO* item, COLL_INFO* coll)
 // Extends state 10 (AS_HANG)
 void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	PHD_VECTOR offset = { 0, 0, 0 };
@@ -886,7 +886,7 @@ void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
 // Extends state 11 (AS_REACH)
 void SlopeReachExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
@@ -929,7 +929,7 @@ void SlopeReachExtra(ITEM_INFO* item, COLL_INFO* coll)
 // Extends state 56 (AS_CLIMBSTNC)
 void SlopeClimbExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
@@ -1003,7 +1003,7 @@ void SlopeClimbExtra(ITEM_INFO* item, COLL_INFO* coll)
 
 void LadderMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	auto result = GetCollisionResult(item);
@@ -1019,7 +1019,7 @@ void LadderMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 // Extends state 61 (AS_CLIMBDOWN)
 void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
@@ -1078,7 +1078,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!g_GameFlow->Animations.Overhang)
+	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
 	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };

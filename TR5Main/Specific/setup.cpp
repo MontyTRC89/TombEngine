@@ -23,7 +23,7 @@
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
@@ -381,7 +381,7 @@ void InitialiseSpecialEffects()
 	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
-	TEN::Entities::TR4::ClearScarabs();
+	TEN::Entities::TR4::ClearBeetleSwarm();
 }
 
 void CustomObjects()

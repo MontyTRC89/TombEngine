@@ -22,6 +22,7 @@
 #include "Renderer/RendererSprites.h"
 #include "Game/effects/lightning.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
@@ -555,32 +556,32 @@ namespace TEN::Renderer
 		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-		if (Lara.Control.WeaponControl.GunType != WEAPON_FLARE &&
-			Lara.Control.WeaponControl.GunType != WEAPON_SHOTGUN &&
-			Lara.Control.WeaponControl.GunType != WEAPON_CROSSBOW)
+		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
+			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
+			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
-			switch (Lara.Control.WeaponControl.GunType)
+			switch (Lara.Control.Weapon.GunType)
 			{
-			case WEAPON_REVOLVER:
+			case LaraWeaponType::Revolver:
 				length = 192;
 				zOffset = 68;
 				rotationX = -14560;
 				break;
 
-			case WEAPON_UZI:
+			case LaraWeaponType::Uzi:
 				length = 190;
 				zOffset = 50;
 				rotationX = -14560;
 				break;
 
-			case WEAPON_HK:
+			case LaraWeaponType::HK:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
 				break;
 
 			default:
-			case WEAPON_PISTOLS:
+			case LaraWeaponType::Pistol:
 				length = 180;
 				zOffset = 40;
 				rotationX = -16830;
@@ -646,8 +647,16 @@ namespace TEN::Renderer
 				// Does the item need gunflash?
 				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
-				if (obj->biteOffset == -1 || !nativeItem->FiredWeapon)
+
+				if (obj->biteOffset == -1)
 					continue;
+
+				if (nativeItem->Data.is<CreatureInfo>())
+				{
+					auto* creature = GetCreatureInfo(nativeItem);
+					if (!creature->FiredWeapon)
+						continue;
+				}
 
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];

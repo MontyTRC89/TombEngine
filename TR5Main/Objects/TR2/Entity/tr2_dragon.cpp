@@ -212,11 +212,11 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 				Lara.ExtraAnim = 1;
 				Lara.Control.HandStatus = HandStatus::Busy;
-				Lara.hitDirection = -1;
+				Lara.HitDirection = -1;
 
-				Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+				Lara.MeshPtrs[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 				
-				((CREATURE_INFO*)g_Level.Items[(short)item->Data].Data)->flags = -1;
+				((CreatureInfo*)g_Level.Items[(short)item->Data].Data)->Flags = -1;
 
 				return;
 			}
@@ -262,26 +262,26 @@ void DragonControl(short backItemNumber)
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = DRAGON_STATE_DEATH;
 			item->TargetState = DRAGON_STATE_DEATH;
-			creature->flags = 0;
+			creature->Flags = 0;
 		}
-		else if (creature->flags >= 0)
+		else if (creature->Flags >= 0)
 		{
 			CreateBartoliLight(itemNumber, 1);
-			creature->flags++;
+			creature->Flags++;
 
-			if (creature->flags == DRAGON_LIVE_TIME)
+			if (creature->Flags == DRAGON_LIVE_TIME)
 				item->TargetState = DRAGON_STATE_IDLE;
-			if (creature->flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
+			if (creature->Flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 				item->HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 		}
 		else
 		{
-			if (creature->flags > -20)
+			if (creature->Flags > -20)
 				CreateBartoliLight(itemNumber, 2);
 
-			if (creature->flags == -100)
+			if (creature->Flags == -100)
 				createDragonBone(itemNumber);
-			else if (creature->flags == -200)
+			else if (creature->Flags == -200)
 			{
 				DisableEntityAI(itemNumber);
 				KillItem(backItemNumber);
@@ -290,13 +290,13 @@ void DragonControl(short backItemNumber)
 				item->Status = ITEM_DEACTIVATED;
 				return;
 			}
-			else if (creature->flags < -100)
+			else if (creature->Flags < -100)
 			{
 				item->Position.yPos += 10;
 				back->Position.yPos += 10;
 			}
 
-			creature->flags--;
+			creature->Flags--;
 			return;
 		}
 	}
@@ -326,9 +326,9 @@ void DragonControl(short backItemNumber)
 			{
 				if (AI.distance > DRAGON_STATE_IDLE_RANGE || !AI.ahead)
 					item->TargetState = DRAGON_STATE_WALK;
-				else if (AI.ahead && AI.distance < DRAGON_CLOSE_RANGE && !creature->flags)
+				else if (AI.ahead && AI.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
 				{
-					creature->flags = 1;
+					creature->Flags = 1;
 					if (AI.angle < 0)
 						item->TargetState = DRAGON_STATE_SWIPE_LEFT;
 					else
@@ -347,7 +347,7 @@ void DragonControl(short backItemNumber)
 		case DRAGON_STATE_SWIPE_LEFT:
 			if (item->TouchBits & DRAGON_TOUCH_L)
 			{
-				creature->flags = 0;
+				creature->Flags = 0;
 
 				LaraItem->HitStatus = true;
 				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
@@ -358,7 +358,7 @@ void DragonControl(short backItemNumber)
 		case DRAGON_STATE_SWIPE_RIGHT:
 			if (item->TouchBits & DRAGON_TOUCH_R)
 			{
-				creature->flags = 0;
+				creature->Flags = 0;
 
 				LaraItem->HitStatus = true;
 				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
@@ -367,7 +367,7 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_WALK:
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (ahead)
 				item->TargetState = DRAGON_STATE_IDLE;
@@ -402,13 +402,13 @@ void DragonControl(short backItemNumber)
 
 		case DRAGON_STATE_TURN_LEFT:
 			item->Position.yRot += -(ANGLE(1.0f) - angle);
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
 			item->Position.yRot += (ANGLE(1.0f) - angle);
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			break;
 
@@ -420,12 +420,12 @@ void DragonControl(short backItemNumber)
 
 			if (ahead)
 			{
-				creature->flags = 30;
+				creature->Flags = 30;
 				item->TargetState = DRAGON_STATE_FIRE_1;
 			}
 			else
 			{
-				creature->flags = 0;
+				creature->Flags = 0;
 				item->TargetState = DRAGON_STATE_AIM_1;
 			}
 
@@ -439,11 +439,11 @@ void DragonControl(short backItemNumber)
 
 			SoundEffect(305, &item->Position, 0);
 
-			if (creature->flags)
+			if (creature->Flags)
 			{
 				if (AI.ahead)
 					CreatureEffect(item, &DragonMouthBite, DragonFire);
-				creature->flags--;
+				creature->Flags--;
 			}
 			else
 				item->TargetState = DRAGON_STATE_IDLE;

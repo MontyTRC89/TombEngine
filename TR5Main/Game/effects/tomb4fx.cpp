@@ -471,9 +471,9 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 {
 	switch (weaponType)
 	{
-	case WEAPON_HK:
-	case WEAPON_ROCKET_LAUNCHER:
-	case WEAPON_GRENADE_LAUNCHER:
+	case LaraWeaponType::HK:
+	case LaraWeaponType::RocketLauncher:
+	case LaraWeaponType::GrenadeLauncher:
 		return 24; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
 
 	// other weapon
@@ -482,7 +482,7 @@ byte TriggerGunSmoke_SubFunction(int weaponType)
 	}
 }
 
-void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
+void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
 {
 	/*
 	SMOKE_SPARKS* spark;
@@ -496,7 +496,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	spark->life = (GetRandomControl() & 3) + 40;
 	spark->sLife = spark->life;
 
-	if (weaponType == WEAPON_PISTOLS || weaponType == WEAPON_REVOLVER || weaponType == WEAPON_UZI)
+	if (weaponType == LaraWeaponType::Pistol || weaponType == LaraWeaponType::Revolver || weaponType == LaraWeaponType::Uzi)
 	{
 		if (spark->dShade > 64)
 			spark->dShade = 64;
@@ -800,22 +800,22 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	{
 		switch (weaponType)
 		{
-		case WEAPON_PISTOLS:
+		case LaraWeaponType::Pistol:
 			pos.x = 8;
 			pos.y = 48;
 			pos.z = 40;
 			break;
-		case WEAPON_UZI:
+		case LaraWeaponType::Uzi:
 			pos.x = 8;
 			pos.y = 35;
 			pos.z = 48;
 			break;
-		case WEAPON_SHOTGUN:
+		case LaraWeaponType::Shotgun:
 			pos.x = 16;
 			pos.y = 114;
 			pos.z = 32;
 			break;
-		case WEAPON_HK:
+		case LaraWeaponType::HK:
 			pos.x = 16;
 			pos.y = 114;
 			pos.z = 96;
@@ -828,7 +828,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	}
 	else
 	{
-		if (weaponType == WEAPON_PISTOLS)
+		if (weaponType == LaraWeaponType::Pistol)
 		{
 			pos.x = -12;
 			pos.y = 48;
@@ -836,7 +836,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 
 			GetLaraJointPosition(&pos, LM_LHAND);
 		}
-		else if (weaponType == WEAPON_UZI)
+		else if (weaponType == LaraWeaponType::Uzi)
 		{
 			pos.x = -16;
 			pos.y = 35;
@@ -861,7 +861,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->counter = (GetRandomControl() & 0x1F) + 60;
 	if (hand)
 	{
-		if (weaponType == WEAPON_SHOTGUN)
+		if (weaponType == LaraWeaponType::Shotgun)
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.yRot
 				+ Lara.ExtraTorsoRot.yRot
@@ -892,8 +892,8 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 
 	if (LaraItem->MeshBits)
 	{
-		if (weaponType == WEAPON_SHOTGUN)
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, WEAPON_SHOTGUN, 24);
+		if (weaponType == LaraWeaponType::Shotgun)
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, LaraWeaponType::Shotgun, 24);
 		else
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, 16);
 	}
@@ -1167,11 +1167,11 @@ void TriggerLaraDrips(ITEM_INFO* item)
 			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
-				Lara.wet[i] = UCHAR_MAX;
+				Lara.Wet[i] = UCHAR_MAX;
 
-			if (Lara.wet[i] 
+			if (Lara.Wet[i] 
 				&& !LaraNodeUnderwater[i] 
-				&& (GetRandomControl() & 0x1FF) < Lara.wet[i])
+				&& (GetRandomControl() & 0x1FF) < Lara.Wet[i])
 			{
 
 				pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -1192,10 +1192,10 @@ void TriggerLaraDrips(ITEM_INFO* item)
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
 				dptr->roomNumber = LaraItem->RoomNumber;
 
-				if (Lara.wet[i] >= 4)
-					Lara.wet[i] -= 4;
+				if (Lara.Wet[i] >= 4)
+					Lara.Wet[i] -= 4;
 				else
-					Lara.wet[i] = 0;
+					Lara.Wet[i] = 0;
 
 			}
 		}
@@ -1464,14 +1464,15 @@ void UpdateShockwaves()
 	}
 }
 
-void TriggerExplosionBubble(int x, int y, int z, short roomNum)
+void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
 	int dx = LaraItem->Position.xPos - x;
 	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = &Sparks[GetFreeSpark()];
+
 		spark->sR = 128;
 		spark->dR = 128;
 		spark->dG = 128;
@@ -1507,14 +1508,14 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNum, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
+			CreateBubble(&pos, roomNumber, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 		}
 	}
 }
 
 /*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
 	
 	spark->on = 1;
 	if (unk)
@@ -1539,16 +1540,19 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 	spark->colFadeSpeed = 8;
 	spark->fadeToBlack = 64;
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
+
 	if (unk)
 		spark->transType = TransTypeEnum::COLADD;
 	else
 		spark->transType = 3;
+
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + z - 16;
 	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
 	spark->yVel = (GetRandomControl() & 0xFF) - 128;
 	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+
 	if (unk)
 	{
 		spark->friction = 20;
@@ -1556,16 +1560,17 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 		spark->y += 32;
 	}
 	else
-	{
 		spark->friction = 6;
-	}
+	
 	spark->flags = 538;
 	spark->rotAng = GetRandomControl() & 0xFFF;
+
 	if (GetRandomControl() & 1)
 		spark->rotAdd = -((GetRandomControl() & 0xF) + 16);
 	else
 		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 	spark->scalar = 3;
+
 	if (unk)
 	{
 		spark->maxYvel = 0;
@@ -1576,6 +1581,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 		spark->gravity = -3 - (GetRandomControl() & 3);
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
 	}
+
 	int size = (GetRandomControl() & 0x1F) + 128;
 	spark->dSize = size;
 	spark->sSize = size >> 2;
@@ -1596,7 +1602,8 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = &Sparks[GetFreeSpark()];
+
 	spark->on = 1;
 	spark->sR = (GetRandomControl() & 0x3F) - 0x40;
 	spark->sG = (GetRandomControl() & 0x3F) - 0x40;
@@ -1622,27 +1629,20 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	spark->zVel = ((GetRandomControl() & 0xFF) - 128) << 2;
 
 	if (crane != 0)
-	{
 		spark->friction = 5;
-	}
 	else
-	{
 		spark->friction = 4;
-	}
 
 	spark->flags = SP_NONE;
 	spark->gravity = (GetRandomControl() & 0xF) + ((crane << 4) + 16);
 	spark->maxYvel = 0;
 }
 
-void TriggerSmallSplash(int x, int y, int z, int num) 
+void TriggerSmallSplash(int x, int y, int z, int number) 
 {
-	int i;
-	int angle;
-
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < number; i++)
 	{
-		SPARKS* sptr = &Sparks[GetFreeSpark()];
+		auto* sptr = &Sparks[GetFreeSpark()];
 
 		sptr->on = 1;
 
@@ -1662,7 +1662,7 @@ void TriggerSmallSplash(int x, int y, int z, int num)
 
 		sptr->transType = TransTypeEnum::COLADD;
 
-		angle = GetRandomControl() << 3;
+		int angle = GetRandomControl() << 3;
 
 		sptr->xVel = -phd_sin(angle) * 512;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);

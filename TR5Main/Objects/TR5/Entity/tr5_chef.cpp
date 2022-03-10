@@ -57,7 +57,7 @@ void ControlChef(short itemNumber)
 	short angle = 0;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -72,18 +72,18 @@ void ControlChef(short itemNumber)
 	else
 	{
 		if (item->AIBits)
-			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+			GetAITarget(creature);
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
-		AI_INFO aiInfo;
+		AI_INFO AI;
 		AI_INFO aiLaraInfo;
-		CreatureAIInfo(item, &aiInfo);
+		CreatureAIInfo(item, &AI);
 
-		if (info->enemy == LaraItem)
+		if (creature->Enemy == LaraItem)
 		{
-			aiLaraInfo.angle = aiInfo.angle;
-			aiLaraInfo.distance = aiInfo.distance;
+			aiLaraInfo.angle = AI.angle;
+			aiLaraInfo.distance = AI.distance;
 		}
 		else
 		{
@@ -99,41 +99,41 @@ void ControlChef(short itemNumber)
 			aiLaraInfo.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		short angle = CreatureTurn(item, info->maximumTurn);
+		short angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (aiInfo.ahead)
+		if (AI.ahead)
 		{
-			joint0 = aiInfo.angle / 2;
+			joint0 = AI.angle / 2;
 			//joint1 = info.xAngle;
-			joint2 = aiInfo.angle / 2;
+			joint2 = AI.angle / 2;
 		}
 
-		info->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
 		switch (item->ActiveState)
 		{
 		case CHEF_STATE_COOKING:
 			if (abs(LaraItem->Position.yPos - item->Position.yPos) < SECTOR(1) &&
-				aiInfo.distance < pow(SECTOR(1.5f), 2) &&
+				AI.distance < pow(SECTOR(1.5f), 2) &&
 				(item->TouchBits ||
 					item->HitStatus ||
 					LaraItem->Velocity > 15 ||
 					TargetVisible(item, &aiLaraInfo)))
 			{
 				item->TargetState = CHEF_STATE_TURN_180;
-				info->alerted = true;
+				creature->Alerted = true;
 				item->AIBits = 0;
 			}
 
 			break;
 
 		case CHEF_STATE_TURN_180:
-			info->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (aiInfo.angle > 0)
+			if (AI.angle > 0)
 				item->Position.yRot -= ANGLE(2.0f);
 			else
 				item->Position.yRot += ANGLE(2.0f);
@@ -143,19 +143,19 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_ATTACK:
-			info->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (abs(aiInfo.angle) >= ANGLE(2.0f))
+			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
-				if (aiInfo.angle > 0)
+				if (AI.angle > 0)
 					item->Position.yRot += ANGLE(2.0f);
 				else
 					item->Position.yRot -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += aiInfo.angle;
+				item->Position.yRot += AI.angle;
 
-			if (!info->flags)
+			if (!creature->Flags)
 			{
 				if (item->TouchBits & 0x2000)
 				{
@@ -163,7 +163,7 @@ void ControlChef(short itemNumber)
 					{
 						CreatureEffect2(item, &ChefBite, 20, item->Position.yRot, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
-						info->flags = 1;
+						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 80;
 						LaraItem->HitStatus = true;
@@ -174,28 +174,28 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_AIM:
-			info->maximumTurn = ANGLE(2.0f);
-			info->flags = 0;
+			creature->MaxTurn = ANGLE(2.0f);
+			creature->Flags = 0;
 
-			if (aiInfo.distance >= pow(682, 2))
+			if (AI.distance >= pow(682, 2))
 			{
-				if (aiInfo.angle > ANGLE(112.5f) || aiInfo.angle < -ANGLE(112.5f))
+				if (AI.angle > ANGLE(112.5f) || AI.angle < -ANGLE(112.5f))
 					item->TargetState = CHEF_STATE_TURN_180;
-				else if (info->mood == ATTACK_MOOD)
+				else if (creature->Mood == MoodType::Attack)
 					item->TargetState = CHEF_STATE_WALK;
 			}
-			else if (aiInfo.bite)
+			else if (AI.bite)
 				item->TargetState = CHEF_STATE_ATTACK;
 			
 			break;
 
 		case CHEF_STATE_WALK:
-			info->maximumTurn = ANGLE(7.0f);
+			creature->MaxTurn = ANGLE(7.0f);
 
-			if (aiInfo.distance < pow(682, 2) ||
-				aiInfo.angle > ANGLE(112.5f) ||
-				aiInfo.angle < -ANGLE(112.5f) ||
-				info->mood != ATTACK_MOOD)
+			if (AI.distance < pow(682, 2) ||
+				AI.angle > ANGLE(112.5f) ||
+				AI.angle < -ANGLE(112.5f) ||
+				creature->Mood != MoodType::Attack)
 			{
 				item->TargetState = CHEF_STATE_AIM;
 			}

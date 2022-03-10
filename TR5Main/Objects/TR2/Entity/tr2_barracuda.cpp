@@ -55,18 +55,18 @@ void BarracudaControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			creature->flags = 0;
+			creature->Flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Bored)
 				item->TargetState = 2;
 			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 4;
-			else if (creature->mood == STALK_MOOD)
+			else if (creature->Mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else
 				item->TargetState = 3;
@@ -74,28 +74,28 @@ void BarracudaControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(2.0f);
+			creature->MaxTurn = ANGLE(2.0f);
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Bored)
 				break;
 			else if (AI.ahead && (item->TouchBits & 0xE0))
 				item->TargetState = 1;
-			else if (creature->mood != STALK_MOOD)
+			else if (creature->Mood != MoodType::Stalk)
 				item->TargetState = 3;
 
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(4.0f);
-			creature->flags = 0;
+			creature->MaxTurn = ANGLE(4.0f);
+			creature->Flags = 0;
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Bored)
 				item->TargetState = 2;
 			else if (AI.ahead && AI.distance < 340)
 				item->TargetState = 5;
 			else if (AI.ahead && AI.distance < 680)
 				item->TargetState = 1;
-			else if (creature->mood == STALK_MOOD)
+			else if (creature->Mood == MoodType::Stalk)
 				item->TargetState = 2;
 
 			break;
@@ -105,10 +105,10 @@ void BarracudaControl(short itemNumber)
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (!creature->flags && (item->TouchBits & 0xE0))
+			if (!creature->Flags && (item->TouchBits & 0xE0))
 			{
 				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
-				creature->flags = 1;
+				creature->Flags = 1;
 
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;

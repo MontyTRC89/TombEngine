@@ -21,13 +21,13 @@ namespace TEN::Effects::Lara
 
 		auto lara = (LaraInfo*&)item->Data;
 
-		if (!lara->burn && !lara->BurnSmoke)
+		if (!lara->Burn && !lara->BurnSmoke)
 		{
 			short fxNum = CreateNewEffect(item->RoomNumber);
 			if (fxNum != NO_ITEM)
 			{
 				EffectList[fxNum].objectNumber = ID_FLAME;
-				lara->burn = true;
+				lara->Burn = true;
 			}
 		}
 	}

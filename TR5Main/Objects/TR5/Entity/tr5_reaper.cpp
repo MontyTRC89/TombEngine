@@ -26,18 +26,18 @@ void ReaperControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		if (item->AIBits)
-			GetAITarget(info);
+			GetAITarget(creature);
 		else
-			info->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, TIMID);
-		CreatureMood(item, &aiInfo, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
 		short angle = CreatureTurn(item, ANGLE(2.0f));
 
@@ -45,17 +45,17 @@ void ReaperControl(short itemNumber)
 			!(GetRandomControl() & 0x3F))
 			item->TargetState = 1;
 
-		if (info->reachedGoal)
+		if (creature->ReachedGoal)
 		{
-			if (info->enemy)
+			if (creature->Enemy)
 			{
-				if (info->enemy->Flags & 2)
-					item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
+				if (creature->Enemy->Flags & 2)
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
 
 				item->ItemFlags[3]++;
 
-				info->reachedGoal = false;
-				info->enemy = NULL;
+				creature->ReachedGoal = false;
+				creature->Enemy = NULL;
 			}
 		}
 

@@ -46,6 +46,9 @@ struct ITEM_INFO
 	GAME_OBJECT_ID ObjectNumber;
 	int BoxNumber;
 	ITEM_DATA Data;
+	bool Active;
+	short NextItem;
+	short NextActive;
 
 	PHD_3DPOS StartPosition;
 	PHD_3DPOS Position;
@@ -54,48 +57,41 @@ struct ITEM_INFO
 	int Floor;
 	std::vector<BONE_MUTATOR> Mutator;
 
-
 	int ActiveState;
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
 	int AnimNumber;
 	int FrameNumber;
 
-	uint32_t TouchBits;
-	uint32_t MeshBits;
-
-	short NextItem;
-	short NextActive;
-
-	short Velocity;
-	short VerticalVelocity;
+	int Velocity;
+	int LateralVelocity;
+	int VerticalVelocity;
 	bool Airborne;
 
 	short HitPoints;
 	short Timer;
 	short Shade;
-	short CarriedItem;
-	short AfterDeath;
-	short FiredWeapon;
+
+	uint32_t MeshBits;
 
 	short ItemFlags[8];
 	short TriggerFlags;
 	uint16_t Flags; // ItemFlags enum
-	uint8_t AIBits; // AIObjectType enum
 	uint32_t SwapMeshFlags;
 
-	bool Active;
 	short Status; // ItemStatus enum
 	bool HitStatus;
 	bool Collidable;
 	bool LookedAt;
-	bool Poisoned;
 	bool InDrawRoom;
-	bool Friendly;
 
-	short DrawRoom;
-	short Tosspad;
-	short LocationAI;
+	short DrawRoom;	// Unused?
+
+	// TODO: Move to CreatureInfo?
+	uint32_t TouchBits;
+	uint8_t AIBits; // AIObjectType enum.
+	short AfterDeath;
+	short CarriedItem;
 };
 
 // used by fx->shade !
@@ -110,20 +106,20 @@ constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
 void EffectNewRoom(short fxNumber, short roomNumber);
-void ItemNewRoom(short itemNum, short roomNumber);
+void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNum);
+void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNum);
-void RemoveDrawnItem(short itemNum);
-void InitialiseFXArray(int allocmem);
-short CreateNewEffect(short roomNum);
+void RemoveActiveItem(short itemNumber);
+void RemoveDrawnItem(short itemNumber);
+void InitialiseFXArray(int allocateMemory);
+short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
-void InitialiseItem(short itemNum);
-void InitialiseItemArray(int numItems);
-void KillItem(short itemNum);
+void InitialiseItem(short itemNumber);
+void InitialiseItemArray(int totalItems);
+void KillItem(short itemNumber);
 void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset = 0, int zOffset = 0);
 std::vector<int> FindAllItems(short objectNumber);
-ITEM_INFO* FindItem(int object_number);
+ITEM_INFO* FindItem(int objectNumber);
 int FindItem(ITEM_INFO* item);

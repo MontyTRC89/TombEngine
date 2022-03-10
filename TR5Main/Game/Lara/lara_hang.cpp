@@ -35,7 +35,6 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollProbeMode::FreeFlat;
-
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -199,7 +198,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
@@ -213,7 +212,7 @@ void lara_as_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 		item->TargetState = LS_HANG;
 }
 
-void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -226,7 +225,7 @@ void lara_col_hangleft(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 }
 
-void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 31*/
 	/*collision: lara_col_hangright*/
@@ -240,19 +239,19 @@ void lara_as_hangright(ITEM_INFO* item, COLL_INFO* coll)
 		item->TargetState = LS_HANG;
 }
 
-void lara_col_hangright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	/*state 31*/
 	/*state code: lara_as_hangright*/
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RAD;
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 }
 
-void lara_as_gymnast(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_handstand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	/*state 54*/
 	/*collision: lara_default_col*/

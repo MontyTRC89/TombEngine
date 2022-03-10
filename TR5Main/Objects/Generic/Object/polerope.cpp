@@ -39,7 +39,7 @@ namespace TEN::Entities::Generic
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			laraItem->ActiveState == LS_IDLE && 
 			laraItem->AnimNumber == LA_STAND_IDLE || laraInfo->Control.IsMoving &&
-			laraInfo->interactedItem == itemNumber)
+			laraInfo->InteractedItem == itemNumber)
 		{
 			short rot = poleItem->Position.yRot;
 			poleItem->Position.yRot = laraItem->Position.yRot;
@@ -55,13 +55,13 @@ namespace TEN::Entities::Generic
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 
 				poleItem->Position.yRot = rot;
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

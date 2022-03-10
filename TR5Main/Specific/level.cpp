@@ -12,6 +12,7 @@
 #include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
@@ -1280,9 +1281,11 @@ void GetAIPickups()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		auto item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 		if (Objects[item->ObjectNumber].intelligent)
 		{
+			auto* creature = GetCreatureInfo(item);
+
 			item->AIBits = 0;
 			for (int num = 0; num < g_Level.AIObjects.size(); ++num)
 			{
@@ -1299,7 +1302,7 @@ void GetAIPickups()
 				}
 			}
 
-			item->Tosspad |= item->AIBits << 8 | (char) item->ItemFlags[3];
+			creature->Tosspad |= item->AIBits << 8 | (char) item->ItemFlags[3];
 		}
 	}
 }

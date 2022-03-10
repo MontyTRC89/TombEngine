@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -33,10 +34,15 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 	{
-		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.SlideExtended)
+		short direction = GetLaraSlideDirection(item, coll);
+
+		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			if (TrInput & IN_LEFT)
+			ApproachLaraTargetAngle(item, direction, 12);
+			ModulateLaraSlideVelocity(item, coll);
+
+			// TODO: Prepped for another time.
+			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -51,10 +57,12 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-		}*/
+			}*/
+		}
+		else
+			ApproachLaraTargetAngle(item, direction);
 
-		if (TrInput & IN_JUMP)
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -94,7 +102,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor >= CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallState(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -106,6 +114,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraDeflectEdge(item, coll);
 
+	// TODO
 	if (TestLaraStep(item, coll))
 	{
 		LaraSnapToHeight(item, coll);
@@ -131,10 +140,15 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraSlide(item, coll))
 	{
-		// TODO: Prepped for another time.
-		/*if (g_GameFlow->Animations.SlideExtended)
+		short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+
+		if (g_GameFlow->Animations.HasSlideExtended)
 		{
-			if (TrInput & IN_LEFT)
+			ApproachLaraTargetAngle(item, direction, 12);
+			ModulateLaraSlideVelocity(item, coll);
+
+			// TODO: Prepped for another time.
+			/*if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -149,10 +163,12 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}
-		}*/
+			}*/
+		}
+		else
+			ApproachLaraTargetAngle(item, direction);
 
-		if (TrInput & IN_JUMP)
+		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -188,7 +204,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor >= CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackState(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);

@@ -22,7 +22,7 @@ void JeanYvesControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->TriggerFlags >= Lara.highestLocation)
+	if (item->TriggerFlags >= Lara.HighestLocation)
 	{
 		short state = 0;
 
@@ -36,17 +36,17 @@ void JeanYvesControl(short itemNumber)
 	}
 	else
 	{
-		if (Lara.highestLocation > 3)
-			Lara.highestLocation = 3;
+		if (Lara.HighestLocation > 3)
+			Lara.HighestLocation = 3;
 
-		short state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
-		short animNumber = Objects[item->ObjectNumber].animIndex + state;
+		int state = (GetRandomControl() & 3) + 4 * Lara.HighestLocation;
+		int animNumber = Objects[item->ObjectNumber].animIndex + state;
 		state++;
 
 		item->TargetState = item->ActiveState = state;
 		item->AnimNumber = animNumber;
 		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->TriggerFlags = Lara.highestLocation;
+		item->TriggerFlags = Lara.HighestLocation;
 
 		AnimateItem(item);
 	}
