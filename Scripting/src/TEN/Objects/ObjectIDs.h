@@ -8,7 +8,7 @@
 
 /***
 Constants for object IDs.
-@enum ObjID
+@enum Objects.ObjID
 @pragma nostrip
 */
 

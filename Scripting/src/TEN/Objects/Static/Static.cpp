@@ -123,18 +123,22 @@ std::string Static::GetName() const
 
 void Static::SetName(std::string const & id) 
 {
-	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
+	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
+	{
+		return;
+	}
 
-	// remove the old name if we have one
-	s_callbackRemoveName(m_mesh.luaName);
-
-	// un-register any other objects using this name.
-	// maybe we should throw an error if another object
-	// already uses the name...
-	s_callbackRemoveName(id);
-	m_mesh.luaName = id;
-	// todo add error checking
-	s_callbackSetName(id, m_mesh);
+	if (s_callbackSetName(id, m_mesh))
+	{
+		// remove the old name if we have one
+		s_callbackRemoveName(m_mesh.luaName);
+		m_mesh.luaName = id;
+	}
+	else
+	{
+		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
+		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+	}
 }
 
 int Static::GetSlot() const

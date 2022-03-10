@@ -94,6 +94,12 @@ You will not need to call them manually.
 */
 	table_flow.set_function(ScriptReserved_SetStrings, &FlowHandler::SetStrings, this);
 
+/*** Get translated string
+@function GetString
+@tparam key string key for translated string 
+*/
+	table_flow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
+
 /*** Set language names for translations.
 Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
