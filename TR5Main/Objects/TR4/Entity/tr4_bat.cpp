@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-	#define BAT_ANGLE ANGLE(20.0f)
+#define BAT_ANGLE ANGLE(20.0f)
 
 	constexpr auto BAT_ANIM_FALLING = 3;
 	constexpr auto BAT_ANIM_IDLE = 5;
@@ -33,6 +33,12 @@ namespace TEN::Entities::TR4
 		BAT_STATE_FALL,
 		BAT_STATE_DEATH,
 		BAT_STATE_IDLE
+	};
+
+	// TODO
+	enum BatAnim
+	{
+
 	};
 
 	static bool isBatCollideTarget(ITEM_INFO* item)
@@ -58,22 +64,22 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* target;
-		CREATURE_INFO* slots;
+		CreatureInfo* slots;
 		int distance, bestdistance;
 		short angle;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		angle = 0;
 
 		if (item->HitPoints > 0)
 		{
 			if (item->AIBits)
-				GetAITarget(info);
+				GetAITarget(creature);
 			else
 			{
-				info->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 
 				// NOTE: it seems weird, bat could target any enemy including dogs for example
 
@@ -114,8 +120,8 @@ namespace TEN::Entities::TR4
 
 			GetCreatureMood(item, &aiInfo, VIOLENT);
 
-			if (info->flags)
-				info->mood = ESCAPE_MOOD;
+			if (creature->Flags)
+				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &aiInfo, VIOLENT);
 
@@ -126,22 +132,22 @@ namespace TEN::Entities::TR4
 			case BAT_STATE_IDLE:
 				if (aiInfo.distance < BAT_TARGETING_RANGE
 					|| item->HitStatus
-					|| info->hurtByLara)
+					|| creature->HurtByLara)
 					item->TargetState = BAT_STATE_START;
 
 				break;
 
 			case BAT_STATE_FLY:
 				if (aiInfo.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
-					info->flags = 0;
+					creature->Flags = 0;
 
-				if (!info->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits
-						|| info->enemy != LaraItem
+						|| creature->Enemy != LaraItem
 						&& aiInfo.distance < BAT_ATTACK_RANGE
 						&& aiInfo.ahead
-						&& abs(item->Position.yPos - info->enemy->Position.yPos) < BAT_TARGET_YPOS)
+						&& abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 					{
 						item->TargetState = BAT_STATE_ATTACK;
 					}
@@ -150,25 +156,25 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_ATTACK:
-				if (!info->flags
+				if (!creature->Flags
 					&& (item->TouchBits
-						|| info->enemy != LaraItem)
+						|| creature->Enemy != LaraItem)
 					&& aiInfo.distance < BAT_ATTACK_RANGE
 					&& aiInfo.ahead &&
-					abs(item->Position.yPos - info->enemy->Position.yPos) < BAT_TARGET_YPOS)
+					abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
-					if (info->enemy == LaraItem)
+					if (creature->Enemy == LaraItem)
 					{
 						LaraItem->HitPoints -= BAT_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
-					info->flags = 1;
+					creature->Flags = 1;
 				}
 				else
 				{
 					item->TargetState = BAT_STATE_FLY;
-					info->mood = BORED_MOOD;
+					creature->Mood = MoodType::Bored;
 				}
 
 				break;

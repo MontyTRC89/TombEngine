@@ -9,80 +9,74 @@
 
 struct WeaponPickupInfo
 {
-	GAME_OBJECT_ID id;
-	// when the player picks up a weapon they
-	// get one clip's worth of the following ammo
-	GAME_OBJECT_ID ammoID;
-	LaraWeaponType laraWeaponType;
+	GAME_OBJECT_ID ObjectID;
+	GAME_OBJECT_ID AmmoID;	// When the player picks up a weapon, they get one clip's worth of this ammo.
+	LaraWeaponType LaraWeaponType;
 };
 
-static constexpr std::array<WeaponPickupInfo, 9> kWeapons{ {
-	{ID_PISTOLS_ITEM, ID_PISTOLS_AMMO_ITEM, WEAPON_PISTOLS},
-	{ID_UZI_ITEM, ID_UZI_AMMO_ITEM, WEAPON_UZI},
-	{ID_SHOTGUN_ITEM, ID_SHOTGUN_AMMO1_ITEM, WEAPON_SHOTGUN},
-	{ID_CROSSBOW_ITEM, ID_CROSSBOW_AMMO1_ITEM, WEAPON_CROSSBOW},
-	{ID_REVOLVER_ITEM, ID_REVOLVER_AMMO_ITEM, WEAPON_REVOLVER},
-	{ID_HK_ITEM, ID_HK_AMMO_ITEM, WEAPON_HK},
-	{ID_GRENADE_GUN_ITEM, ID_GRENADE_AMMO1_ITEM, WEAPON_GRENADE_LAUNCHER},
-	{ID_ROCKET_LAUNCHER_ITEM, ID_ROCKET_LAUNCHER_AMMO_ITEM, WEAPON_ROCKET_LAUNCHER},
-	{ID_HARPOON_ITEM, ID_HARPOON_AMMO_ITEM, WEAPON_HARPOON_GUN} }
+static constexpr std::array<WeaponPickupInfo, 9> kWeapons
+{
+	{
+		{ ID_PISTOLS_ITEM, ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol },
+		{ ID_UZI_ITEM, ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi },
+		{ ID_SHOTGUN_ITEM, ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun },
+		{ ID_CROSSBOW_ITEM, ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow },
+		{ ID_REVOLVER_ITEM, ID_REVOLVER_AMMO_ITEM, LaraWeaponType::Revolver },
+		{ ID_HK_ITEM, ID_HK_AMMO_ITEM, LaraWeaponType::HK },
+		{ ID_GRENADE_GUN_ITEM, ID_GRENADE_AMMO1_ITEM, LaraWeaponType::GrenadeLauncher },
+		{ ID_ROCKET_LAUNCHER_ITEM, ID_ROCKET_LAUNCHER_AMMO_ITEM, LaraWeaponType::RocketLauncher },
+		{ ID_HARPOON_ITEM, ID_HARPOON_AMMO_ITEM, LaraWeaponType::HarpoonGun }
+	}
 };
 
-static int GetWeapon(GAME_OBJECT_ID obj)
+static int GetWeapon(GAME_OBJECT_ID objectID)
 {
 	for (int i = 0; i < kWeapons.size(); ++i)
 	{
-		if (obj == kWeapons[i].id)
-		{
+		if (objectID == kWeapons[i].ObjectID)
 			return i;
-		}
 	}
+	
 	return -1;
 }
 
-static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID obj, int ammoAmt, bool add)
+static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmount, bool add)
 {
-	int arrPos = GetArrSlot(kWeapons, obj);
-	if (-1 == arrPos)
-	{
+	int arrayPos = GetArraySlot(kWeapons, objectID);
+	if (-1 == arrayPos)
 		return false;
-	}
 
-	WeaponPickupInfo info = kWeapons[arrPos];
-	// set the SelectedAmmo type to 0 if adding the weapon for the
-	// first time. Note that this refers to the index of the weapon's
-	// ammo array, and not the weapon's actual ammunition count
-	if (!lara.Weapons[info.laraWeaponType].Present) {
-		lara.Weapons[info.laraWeaponType].SelectedAmmo = 0;
-	}
-	lara.Weapons[info.laraWeaponType].Present = add;
-	auto ammoID = info.ammoID;
-	return add ? TryAddAmmo(lara, ammoID, ammoAmt) : TryRemoveAmmo(lara, ammoID, ammoAmt);
+	WeaponPickupInfo info = kWeapons[arrayPos];
+
+	// Set the SelectedAmmo type to WeaponAmmoType::Ammo1 (0) if adding the weapon for the first time.
+	// Note that this refers to the index of the weapon's ammo array, and not the weapon's actual ammunition count.
+	if (!lara.Weapons[(int)info.LaraWeaponType].Present)
+		lara.Weapons[(int)info.LaraWeaponType].SelectedAmmo = WeaponAmmoType::Ammo1;
+	
+	lara.Weapons[(int)info.LaraWeaponType].Present = add;
+	auto ammoID = info.AmmoID;
+	return add ? TryAddingAmmo(lara, ammoID, ammoAmount) : TryRemovingAmmo(lara, ammoID, ammoAmount);
 }
 
-
-// Adding a weapon will either give the player the weapon + amt ammo
-// or, if they already have the weapon, simply the ammo.
-bool TryAddWeapon(LaraInfo& lara, GAME_OBJECT_ID obj, int amt)
+// Adding a weapon will either give the player the weapon + an amount of ammo, or,
+// if they already have the weapon, simply the ammo.
+bool TryAddingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
 {
-	return TryModifyWeapon(lara, obj, amt, true);
+	return TryModifyWeapon(lara, objectID, amount, true);
 }
 
-// Removing a weapon is the reverse of the above; it will remove the weapon
-// (if it's there) and amt ammo.
-bool TryRemoveWeapon(LaraInfo& lara, GAME_OBJECT_ID obj, int amt)
+// Removing a weapon is the reverse of the above; it will remove the weapon (if it's there) and the amount of ammo.
+bool TryRemovingWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount)
 {
-	return TryModifyWeapon(lara, obj, amt, false);
+	return TryModifyWeapon(lara, objectID, amount, false);
 }
 
-std::optional<bool> HasWeapon(LaraInfo& lara, GAME_OBJECT_ID obj)
+std::optional<bool> HasWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	int arrPos = GetArrSlot(kWeapons, obj);
+	int arrPos = GetArraySlot(kWeapons, objectID);
 	if (-1 == arrPos)
-	{
 		return std::nullopt;
-	}
 
 	WeaponPickupInfo info = kWeapons[arrPos];
-	return lara.Weapons[info.laraWeaponType].Present;
+	return lara.Weapons[(int)info.LaraWeaponType].Present;
 }

@@ -11,7 +11,7 @@
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
 
-struct CREATURE_INFO;
+struct CreatureInfo;
 struct ITEM_INFO;
 struct FX_INFO;
 
@@ -798,34 +798,56 @@ enum LaraAnim
 };
 #pragma endregion
 
-enum WeaponAmmoType
+enum LARA_MESHES
 {
-	WEAPON_AMMO1,
-	WEAPON_AMMO2,
-	WEAPON_AMMO3,
-	MAX_AMMOTYPE
+	LM_HIPS,
+	LM_LTHIGH,
+	LM_LSHIN,
+	LM_LFOOT,
+	LM_RTHIGH,
+	LM_RSHIN,
+	LM_RFOOT,
+	LM_TORSO,
+	LM_RINARM,
+	LM_ROUTARM,
+	LM_RHAND,
+	LM_LINARM,
+	LM_LOUTARM,
+	LM_LHAND,
+	LM_HEAD,
+
+	NUM_LARA_MESHES
 };
 
-enum LaraWeaponType
+enum class WeaponAmmoType
 {
-	WEAPON_NONE,
-	WEAPON_PISTOLS,
-	WEAPON_REVOLVER,
-	WEAPON_UZI,
-	WEAPON_SHOTGUN,
-	WEAPON_HK = 5,
-	WEAPON_CROSSBOW,
-	WEAPON_FLARE,
-	WEAPON_TORCH,
-	WEAPON_GRENADE_LAUNCHER,
-	WEAPON_HARPOON_GUN,
-	WEAPON_ROCKET_LAUNCHER,
-	WEAPON_SNOWMOBILE,
+	Ammo1,
+	Ammo2,
+	Ammo3,
 
-	NUM_WEAPONS
+	Total
 };
 
-enum LARA_WEAPON_TYPE_CARRIED
+enum class LaraWeaponType
+{
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	Shotgun,
+	HK,
+	Crossbow,
+	Flare,
+	Torch,
+	GrenadeLauncher,
+	HarpoonGun,
+	RocketLauncher,
+	Snowmobile,
+
+	Total
+};
+
+enum LaraWeaponTypeCarried
 {
 	WTYPE_MISSING = 0x0,
 	WTYPE_PRESENT = 0x1,
@@ -851,32 +873,21 @@ enum class HolsterSlot : int
 	RocketLauncher = ID_ROCKET_ANIM,
 };
 
-enum LARA_MESHES
+// TODO: Unused.
+enum class ClothType
 {
-	LM_HIPS,
-	LM_LTHIGH,
-	LM_LSHIN,
-	LM_LFOOT,
-	LM_RTHIGH,
-	LM_RSHIN,
-	LM_RFOOT,
-	LM_TORSO,
-	LM_RINARM,
-	LM_ROUTARM,
-	LM_RHAND,
-	LM_LINARM,
-	LM_LOUTARM,
-	LM_LHAND,
-	LM_HEAD,
-
-	NUM_LARA_MESHES
+	None,
+	Dry,
+	Wet
 };
 
-enum LARA_CLOTH_TYPES
+enum class BurnType
 {
-	CLOTH_MISSING,
-	CLOTH_DRY,
-	CLOTH_WET
+	None,
+	Normal,
+	Smoke,
+	Blue,
+	Blue2
 };
 
 enum class WaterStatus
@@ -885,7 +896,6 @@ enum class WaterStatus
 	Wade,
 	TreadWater,
 	Underwater,
-	Swamp, // TODO
 	FlyCheat
 };
 
@@ -909,28 +919,14 @@ enum class JumpDirection
 	Right
 };
 
-enum class BurnType
-{
-	None,
-	Normal,
-	Smoke,
-	Blue,
-	Blue2
-};
-
-struct HolsterInfo
-{
-	HolsterSlot LeftHolster;
-	HolsterSlot RightHolster;
-	HolsterSlot BackHolster;
-};
-
 struct Ammo
 {
 	using CountType = uint16_t;
+
 private:
 	CountType count;
 	bool isInfinite;
+
 public:
 
 	Ammo& operator --()
@@ -1031,13 +1027,39 @@ public:
 	}
 };
 
+struct HolsterInfo
+{
+	HolsterSlot LeftHolster;
+	HolsterSlot RightHolster;
+	HolsterSlot BackHolster;
+};
+
 struct CarriedWeaponInfo
 {
 	bool Present;
-	Ammo Ammo[MAX_AMMOTYPE];
-	int SelectedAmmo; // WeaponAmmoType_enum
-	bool HasLasersight;
-	bool HasSilencer;
+	Ammo Ammo[(int)WeaponAmmoType::Total];
+	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
+	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
+	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
+};
+
+// TODO: There is an abandoned WeaponInfo struct in ten_savegame.fbs.
+
+struct ArmInfo
+{
+	int AnimNumber;
+	int FrameNumber;
+	int FrameBase;
+	bool Locked;
+	PHD_3DPOS Rotation;
+	short FlashGun;
+};
+
+struct FlareData
+{
+	unsigned int Life;
+	int Frame;
+	bool ControlLeft;
 };
 
 #define MaxDiaryPages	  64
@@ -1062,21 +1084,47 @@ struct DiaryInfo
 	DiaryPage Pages[MaxDiaryPages];
 };
 
-struct FlareData
+struct LaraInventoryData
 {
-	unsigned int Life;
-	int Frame;
-	bool ControlLeft;
+	bool IsBusy;
+	bool OldBusy;
+
+	DiaryInfo Diary;
+
+	byte BeetleLife;
+	int BeetleComponents;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
+	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
+
+	bool HasBinoculars;
+	bool HasCrowbar;
+	bool HasTorch;
+	bool HasLasersight;	// TODO: Duplicated in CarriedWeaponInfo.
+	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
+
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
+
+	int Puzzles[NUM_PUZZLES];
+	int Keys[NUM_KEYS];
+	int Pickups[NUM_PICKUPS];
+	int Examines[NUM_EXAMINES];
+	int PuzzlesCombo[NUM_PUZZLES * 2];
+	int KeysCombo[NUM_KEYS * 2];
+	int PickupsCombo[NUM_PICKUPS * 2];
+	int ExaminesCombo[NUM_EXAMINES * 2];
 };
 
-struct ArmInfo
+struct LaraCountData
 {
-	int AnimNumber;
-	int FrameNumber;
-	int FrameBase;
-	bool Locked;
-	PHD_3DPOS Rotation;
-	short FlashGun;
+	unsigned int RunJump;
+	unsigned int PositionAdjust;
+	unsigned int Pose;
+	unsigned int Dive;
+	unsigned int Death;
+	unsigned int NoCheat;
 };
 
 struct WeaponControlData
@@ -1085,10 +1133,13 @@ struct WeaponControlData
 	bool HasFired;
 	bool Fired;
 
+	bool UziLeft;
+	bool UziRight;
+
 	LaraWeaponType GunType;
 	LaraWeaponType RequestGunType;
 	LaraWeaponType LastGunType;
-	HolsterInfo HolsterInfo; // TODO
+	HolsterInfo HolsterInfo;
 };
 
 struct RopeControlData
@@ -1115,24 +1166,32 @@ struct TightropeControlData
 {
 #if NEW_TIGHTROPE
 	float Balance;
-	unsigned short TimeOnTightrope;
+	unsigned int TimeOnTightrope;
 	bool CanDismount;
-	short TightropeItem; // maybe give Tightrope Item a property for difficulty?
+	short TightropeItem; // TODO: Give tightrope a property for difficulty?
 #else // !NEW_TIGHTROPE
-	byte OnCount;
+	unsigned int OnCount;
 	byte Off;
 	byte Fall;
 #endif
 };
 
-struct LaraCountData
+struct SubsuitControlData
 {
-	unsigned int RunJump;
-	unsigned int PositionAdjust;
-	unsigned int Pose;
-	unsigned int Dive;
-	unsigned int Death;
-	unsigned int NoCheat; // TODO: Savegame
+	short XRot;
+	short DXRot;
+	int Velocity[2];
+	int VerticalVelocity;
+
+	// TODO: These appear to be unused.
+	short XRotVel;
+	unsigned short HitCount;
+};
+
+struct MinecartControlData
+{
+	bool Left;
+	bool Right;
 };
 
 struct LaraControlData
@@ -1143,10 +1202,7 @@ struct LaraControlData
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
 	WaterStatus WaterStatus;
-
-	WeaponControlData WeaponControl;
-	RopeControlData RopeControl;
-	TightropeControlData TightropeControl;
+	LaraCountData Count;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1158,87 +1214,61 @@ struct LaraControlData
 	bool RunJumpQueued;
 	bool Locked;
 
-	short WaterCurrentActive;
-
-	LaraCountData Count;
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+	MinecartControlData Minecart;
 };
 
 struct LaraInfo
 {
 	short ItemNumber;
-
 	LaraControlData Control;
+	LaraInventoryData Inventory;
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::Total];
 	FlareData Flare;
 	bool LitTorch;
 
 	PHD_3DPOS ExtraHeadRot;
 	PHD_3DPOS ExtraTorsoRot;
 	PHD_VECTOR ExtraVelocity;
+	short WaterCurrentActive;
+	PHD_VECTOR WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	ITEM_INFO* target;
-	CREATURE_INFO* creature;
-	short targetAngles[2];
+	short TargetArmAngles[2];
+	ITEM_INFO* TargetEntity;
+	CreatureInfo* Creature;	// Not saved. Unused?
 
 	int Air;
 	int SprintEnergy;
-	short Poisoned;
+	int PoisonPotency;
 
-	int hitFrame;
-	int hitDirection;
-	FX_INFO* SpasmEffect;
-	int SpasmEffectCount;
+	short Vehicle;
+	int ExtraAnim;
+	int HitFrame;
+	int HitDirection;
+	FX_INFO* SpasmEffect;	// Not saved.
+	unsigned int SpasmEffectCount;
 
 	int ProjectedFloorHeight;
-	short TargetAngle; // TODO: Savegame
+	short TargetFacingAngle;
 	int WaterSurfaceDist;
-	short interactedItem;
+	short InteractedItem;
 	PHD_3DPOS NextCornerPos;
 
-	// TODO: Use BurnType in place of burn, burnBlue, and burnSmoke. Core didn't make replacing them easy.
+	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;
 	unsigned int BurnCount;
-	bool burn;
-	byte burnBlue;
+	bool Burn;
+	byte BurnBlue;
 	bool BurnSmoke;
 
-	byte wet[NUM_LARA_MESHES];
-	int meshPtrs[NUM_LARA_MESHES];
-	signed char location;
-	signed char highestLocation;
-	signed char locationPad;
-
-	// Inventory-related?
-	bool IsBusy;
-	bool OldBusy;
-
-	// NEW:
-	byte BeetleLife;
-	short hasBeetleThings;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte smallWaterskin;	// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
-	byte bigWaterskin;		// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	short Vehicle;
-	short ExtraAnim;
-	bool mineL;
-	bool mineR;
-	CarriedWeaponInfo Weapons[static_cast<int>(LaraWeaponType::NUM_WEAPONS)];
-	DiaryInfo Diary;
-	int Puzzles[NUM_PUZZLES];
-	int Keys[NUM_KEYS];
-	int Pickups[NUM_PICKUPS];
-	int Examines[NUM_EXAMINES];
-	int PuzzlesCombo[NUM_PUZZLES * 2];
-	int KeysCombo[NUM_KEYS * 2];
-	int PickupsCombo[NUM_PICKUPS * 2];
-	int ExaminesCombo[NUM_EXAMINES * 2];
-	int Secrets;
-	bool Lasersight;
-	bool Crowbar;
-	bool Torch;
-	bool Silencer;
-	bool Binoculars;
-	int NumSmallMedipacks;
-	int NumLargeMedipacks;
-	int NumFlares;
+	byte Wet[NUM_LARA_MESHES];
+	int MeshPtrs[NUM_LARA_MESHES];
+	signed char Location;
+	signed char HighestLocation;
+	signed char LocationPad;
 };

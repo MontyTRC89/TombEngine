@@ -58,12 +58,12 @@ void SmallSpiderControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* spider;
+	CreatureInfo* spider;
 	AI_INFO info;
 	short angle;
 
 	item = &g_Level.Items[itemNum];
-	spider = (CREATURE_INFO*)item->Data;
+	spider = (CreatureInfo*)item->Data;
 	angle = 0;
 
 	if (item->HitPoints <= 0)
@@ -86,9 +86,9 @@ void SmallSpiderControl(short itemNum)
 		switch (item->ActiveState)
 		{
 		case 1:
-			spider->flags = 0;
+			spider->Flags = 0;
 
-			if (spider->mood == BORED_MOOD)
+			if (spider->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 2;
@@ -99,34 +99,34 @@ void SmallSpiderControl(short itemNum)
 			{
 				item->TargetState = 4;
 			}
-			else if (spider->mood == STALK_MOOD)
+			else if (spider->Mood == MoodType::Stalk)
 			{
 				item->TargetState = 2;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->Mood == MoodType::Escape || spider->Mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 2:
-			if (spider->mood == BORED_MOOD)
+			if (spider->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 					item->TargetState = 1;
 				else
 					break;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->Mood == MoodType::Escape || spider->Mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 3:
-			spider->flags = 0;
+			spider->Flags = 0;
 
-			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+			if (spider->Mood == MoodType::Bored || spider->Mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else if (info.ahead && item->TouchBits)
 				item->TargetState = 1;
@@ -139,12 +139,12 @@ void SmallSpiderControl(short itemNum)
 		case 4:
 		case 5:
 		case 6:
-			if (!spider->flags && item->TouchBits)
+			if (!spider->Flags && item->TouchBits)
 			{
 				S_SpiderBite(item);
 				LaraItem->HitPoints -= 25;
 				LaraItem->HitStatus = 1;
-				spider->flags = 1;
+				spider->Flags = 1;
 			}
 			break;
 		}
@@ -163,12 +163,12 @@ void BigSpiderControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* spider;
+	CreatureInfo* spider;
 	AI_INFO info;
 	short angle;
 
 	item = &g_Level.Items[itemNum];
-	spider = (CREATURE_INFO*)item->Data;
+	spider = (CreatureInfo*)item->Data;
 	angle = 0;
 
 	if (item->HitPoints <= 0)
@@ -190,9 +190,9 @@ void BigSpiderControl(short itemNum)
 		switch (item->ActiveState)
 		{
 		case 1:
-			spider->flags = 0;
+			spider->Flags = 0;
 
-			if (spider->mood == BORED_MOOD)
+			if (spider->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x200)
 					item->TargetState = 2;
@@ -203,34 +203,34 @@ void BigSpiderControl(short itemNum)
 			{
 				item->TargetState = 4;
 			}
-			else if (spider->mood == STALK_MOOD)
+			else if (spider->Mood == MoodType::Stalk)
 			{
 				item->TargetState = 2;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->Mood == MoodType::Escape || spider->Mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 2:
-			if (spider->mood == BORED_MOOD)
+			if (spider->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x200)
 					item->TargetState = 1;
 				else
 					break;
 			}
-			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			else if (spider->Mood == MoodType::Escape || spider->Mood == MoodType::Attack)
 			{
 				item->TargetState = 3;
 			}
 			break;
 
 		case 3:
-			spider->flags = 0;
+			spider->Flags = 0;
 
-			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+			if (spider->Mood == MoodType::Bored || spider->Mood == MoodType::Stalk)
 				item->TargetState = 2;
 			else if (info.ahead && item->TouchBits)
 				item->TargetState = 1;
@@ -239,12 +239,12 @@ void BigSpiderControl(short itemNum)
 		case 4:
 		case 5:
 		case 6:
-			if (!spider->flags && item->TouchBits)
+			if (!spider->Flags && item->TouchBits)
 			{
 				S_SpiderBite(item);
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = 1;
-				spider->flags = 1;
+				spider->Flags = 1;
 			}
 			break;
 		}

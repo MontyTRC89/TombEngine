@@ -31,9 +31,7 @@ int TriggerActive(ITEM_INFO* item)
 
 	flag = (~item->Flags & IFLAG_REVERSE) >> 14;
 	if ((item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
-	{
 		flag = !flag;
-	}
 	else
 	{
 		if (item->Timer)
@@ -50,6 +48,7 @@ int TriggerActive(ITEM_INFO* item)
 				if (item->Timer == -1)
 					item->Timer = 0;
 			}
+
 			if (item->Timer <= -1)
 				flag = !flag;
 		}
@@ -114,9 +113,10 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch)
 	return 0;
 }
 
-int SwitchTrigger(short itemNum, short timer)
+int SwitchTrigger(short itemNumber, short timer)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
+
 	if (item->Status == ITEM_DEACTIVATED)
 	{
 		if ((!item->ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
@@ -129,7 +129,7 @@ int SwitchTrigger(short itemNum, short timer)
 		}
 		if (item->TriggerFlags != 6 || item->ActiveState)
 		{
-			RemoveActiveItem(itemNum);
+			RemoveActiveItem(itemNumber);
 
 			item->Status = ITEM_NOT_ACTIVE;
 			if (!item->ItemFlags[0] == 0)
@@ -624,7 +624,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			break;
 
 		case TO_SINK:
-			Lara.Control.WaterCurrentActive = value + 1;
+			Lara.WaterCurrentActive = value + 1;
 			break;
 
 		case TO_FLIPMAP:

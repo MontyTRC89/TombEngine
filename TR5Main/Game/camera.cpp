@@ -461,10 +461,10 @@ void CombatCamera(ITEM_INFO* item)
 	Camera.target.x = item->Position.xPos;
 	Camera.target.z = item->Position.zPos;
 
-	if (lara->target)
+	if (lara->TargetEntity)
 	{
-		Camera.targetAngle = lara->targetAngles[0];
-		Camera.targetElevation = lara->targetAngles[1] + item->Position.xRot;
+		Camera.targetAngle = lara->TargetArmAngles[0];
+		Camera.targetElevation = lara->TargetArmAngles[1] + item->Position.xRot;
 	}
 	else
 	{
@@ -1093,7 +1093,7 @@ void BinocularCamera(ITEM_INFO* item)
 			BinocularRange = 0;
 			AlterFOV(14560);
 			item->MeshBits = -1;
-			lara->IsBusy = false;
+			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot.yRot = 0;
 			lara->ExtraHeadRot.xRot = 0;
 			lara->ExtraTorsoRot.yRot = 0;
@@ -1213,7 +1213,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange < 128)
 			BinocularRange = 128;
 		else
-			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
+			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
@@ -1221,7 +1221,7 @@ void BinocularCamera(ITEM_INFO* item)
 		if (BinocularRange > 1536)
 			BinocularRange = 1536;
 		else
-			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
+			SoundEffect(SFX_TR5_ZOOM_VIEW_WHIRR, 0, (flags << 8) | 6);
 	}
 
 	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
@@ -1230,7 +1230,7 @@ void BinocularCamera(ITEM_INFO* item)
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(item, lara->Control.WeaponControl.GunType);
+		Ammo& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 		if (!(InputBusy & IN_ACTION) ||
 			WeaponDelay ||
@@ -1238,7 +1238,7 @@ void BinocularCamera(ITEM_INFO* item)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (lara->Control.WeaponControl.GunType != WEAPON_CROSSBOW)
+				if (lara->Control.Weapon.GunType != LaraWeaponType::Crossbow)
 					WeaponDelay = 0;
 
 				LSHKShotsFired = 0;
@@ -1247,7 +1247,7 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 		else
 		{
-			if (lara->Control.WeaponControl.GunType == WEAPON_REVOLVER)
+			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 			{
 				firing = 1;
 				WeaponDelay = 16;
@@ -1258,27 +1258,27 @@ void BinocularCamera(ITEM_INFO* item)
 
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
-			else if (lara->Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+			else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 			{
 				firing = 1;
 				WeaponDelay = 32;
 			}
 			else
 			{
-				if (lara->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 				{
 					WeaponDelay = 12;
 					firing = 1;
 
-					if (lara->Weapons[WEAPON_HK].HasSilencer)
-						SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+						SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-						SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
+						SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 					}
 				}
-				else if (lara->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 				{
 					if (!LSHKTimer)
 					{
@@ -1291,24 +1291,24 @@ void BinocularCamera(ITEM_INFO* item)
 						LSHKTimer = 4;
 						firing = 1;
 
-						if (lara->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 					else
 					{
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
-						if (lara->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 				}
@@ -1316,12 +1316,12 @@ void BinocularCamera(ITEM_INFO* item)
 				{
 					if (LSHKTimer)
 					{
-						if (lara->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 					else
@@ -1329,12 +1329,12 @@ void BinocularCamera(ITEM_INFO* item)
 						LSHKTimer = 4;
 						firing = 1;
 
-						if (lara->Weapons[WEAPON_HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR5_HK_FIRE, 0, 0);
 						}
 					}
 

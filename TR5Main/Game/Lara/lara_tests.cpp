@@ -30,10 +30,10 @@ using namespace TEN::Floordata;
 bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool heightLimit)
 {
 	// Determine probe base left/right points
-	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90)) * coll->Setup.Radius;
-	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
-	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90)) * coll->Setup.Radius;
+	int xl = phd_sin(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int zl = phd_cos(coll->NearestLedgeAngle - ANGLE(90.0f)) * coll->Setup.Radius;
+	int xr = phd_sin(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
+	int zr = phd_cos(coll->NearestLedgeAngle + ANGLE(90.0f)) * coll->Setup.Radius;
 
 	// Determine probe top point
 	int y = item->Position.yPos - coll->Setup.Height;
@@ -67,7 +67,7 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 		return false;
 
 	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)WALL_SIZE) * (coll->Setup.Radius * 2);
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
@@ -98,7 +98,7 @@ bool TestValidLedgeAngle(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 {
-	// TODO: Temporary. coll->Setup.Radius is currently only set to
+	// HACK: coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
 	auto radius = (item->ActiveState == LS_CROUCH_IDLE ||
@@ -111,6 +111,7 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 	auto probeBack = GetCollisionResult(item, item->Position.yRot + ANGLE(180.0f), radius, -coll->Setup.Height);
 	auto probeMiddle = GetCollisionResult(item);
 
+	// TODO: Assess clamp instead?
 	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
 	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches. @Sezz 2021.10.15
 	if ((probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||	// Front is not a clamp.
@@ -125,7 +126,17 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 
 bool TestLaraSlide(ITEM_INFO* item, COLL_INFO* coll)
 {
-	return (GetCollisionResult(item).Position.FloorSlope && !TestEnvironment(ENV_FLAG_SWAMP, item));
+	int y = item->Position.yPos;
+	auto probe = GetCollisionResult(item);
+
+	if (abs(probe.Position.Floor - y) <= CLICK(1) &&
+		probe.Position.FloorSlope &&
+		!TestEnvironment(ENV_FLAG_SWAMP, item))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
@@ -546,7 +557,7 @@ CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngl
 		return CornerResult::None;
 
 	// Last chance for possible diagonal vs. non-diagonal cases: ray test
-	if (!	LaraPositionOnLOS(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
+	if (!LaraPositionOnLOS(item, item->Position.yRot + ANGLE(testAngle), coll->Setup.Radius + CLICK(1)))
 		return CornerResult::None;
 
 	cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, true);
@@ -995,7 +1006,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 	{
 		return false;
 	}
@@ -1020,7 +1031,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
@@ -1032,7 +1043,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
@@ -1045,7 +1056,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->Animations.CrawlExtended)
+			if (g_GameFlow->Animations.HasCrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
@@ -1080,7 +1091,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 	{
 		return false;
 	}
@@ -1182,14 +1193,14 @@ void GetTightropeFallOff(ITEM_INFO* item, int regularity)
 
 bool IsStandingWeapon(LaraWeaponType gunType)
 {
-	if (gunType == LaraWeaponType::WEAPON_SHOTGUN ||
-		gunType == LaraWeaponType::WEAPON_HK ||
-		gunType == LaraWeaponType::WEAPON_CROSSBOW ||
-		gunType == LaraWeaponType::WEAPON_TORCH ||
-		gunType == LaraWeaponType::WEAPON_GRENADE_LAUNCHER ||
-		gunType == LaraWeaponType::WEAPON_HARPOON_GUN ||
-		gunType == LaraWeaponType::WEAPON_ROCKET_LAUNCHER ||
-		gunType == LaraWeaponType::WEAPON_SNOWMOBILE)
+	if (gunType == LaraWeaponType::Shotgun ||
+		gunType == LaraWeaponType::HK ||
+		gunType == LaraWeaponType::Crossbow ||
+		gunType == LaraWeaponType::Torch ||
+		gunType == LaraWeaponType::GrenadeLauncher ||
+		gunType == LaraWeaponType::HarpoonGun ||
+		gunType == LaraWeaponType::RocketLauncher||
+		gunType == LaraWeaponType::Snowmobile)
 	{
 		return true;
 	}
@@ -1285,11 +1296,11 @@ bool TestLaraPose(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
 			lara->Flare.Life) &&
-		lara->Vehicle == NO_ITEM)								// Not in a vehicle.
+		lara->Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1643,13 +1654,13 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, COLL_INFO* coll)
 	int distance = CLICK(3);
 	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
-		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
-		!probe.Position.FloorSlope &&							// Not a slope.
-		lara->WaterSurfaceDist >= -CLICK(1) &&					// Water depth is optically permissive.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Within lower floor bound.
+		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Within lowest ceiling bound.
+		!probe.Position.FloorSlope &&								// Not a slope.
+		lara->WaterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;
@@ -1662,9 +1673,9 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		lara->Control.HandStatus == HandStatus::Free &&			// Hands are free.
-		(lara->Control.WeaponControl.GunType != WEAPON_FLARE ||	// Not handling flare.
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
 			lara->Flare.Life))
 	{
 		return true;
@@ -2040,7 +2051,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up two steps.
 		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
 		if (vaultResult.Success &&
-			g_GameFlow->Animations.CrawlExtended)
+			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
 			return vaultResult;
@@ -2057,7 +2068,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 		// Vault to crouch up three steps.
 		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
 		if (vaultResult.Success &&
-			g_GameFlow->Animations.CrawlExtended)
+			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
 			return vaultResult;
@@ -2078,7 +2089,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, COLL_INFO* coll)
 	// Auto jump to monkey swing.
 	vaultResult = TestLaraMonkeyAutoJump(item, coll);
 	if (vaultResult.Success &&
-		g_GameFlow->Animations.MonkeyAutoJump)
+		g_GameFlow->Animations.HasMonkeyAutoJump)
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
 		return vaultResult;
@@ -2113,6 +2124,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
+		lara->TargetFacingAngle = item->Position.yRot;
 		AnimateLara(item);
 
 		return true;
@@ -2392,12 +2404,42 @@ bool TestLaraJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	return TestLaraJumpTolerance(item, coll, testSetup);
 }
 
+bool TestLaraSlideJump(ITEM_INFO* item, COLL_INFO* coll)
+{
+	// TODO: Broken on diagonal slides?
+	if (g_GameFlow->Animations.HasSlideExtended)
+	{
+		auto probe = GetCollisionResult(item);
+
+		short direction = GetLaraSlideDirection(item, coll);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		return (abs((short)(coll->Setup.ForwardAngle - direction)) <= abs(steepness));
+	}
+
+	return true;
+}
+
 bool TestLaraCrawlspaceDive(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto probe = GetCollisionResult(item, coll->Setup.ForwardAngle, coll->Setup.Radius, -coll->Setup.Height);
 	
 	if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT ||
 		TestLaraKeepLow(item, coll))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool TestLaraTightropeDismount(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	auto probe = GetCollisionResult(item);
+
+	if (probe.Position.Floor == item->Position.yPos &&
+		lara->Control.Tightrope.CanDismount)
 	{
 		return true;
 	}

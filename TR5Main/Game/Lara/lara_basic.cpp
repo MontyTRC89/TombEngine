@@ -100,7 +100,8 @@ void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Position.yPos);
-	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
+	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
+	item->TargetState = LS_IDLE;
 }
 
 // State:		LS_AUTO_JUMP (62)
@@ -113,7 +114,7 @@ void lara_as_auto_jump(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	ApproachLaraTargetAngle(item, lara->TargetAngle, 2.5f);
+	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
 }
 
 // ---------------
@@ -303,7 +304,7 @@ void lara_as_run_forward(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
@@ -469,7 +470,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -537,8 +538,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.WeaponControl.GunType != WEAPON_TORCH) ||
-			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
 			item->TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -551,8 +552,8 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT ||
 			lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.WeaponControl.GunType != WEAPON_TORCH) ||
-			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.WeaponControl.GunType != WEAPON_FLARE))
+			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+			(lara->Control.HandStatus == HandStatus::DrawWeapon && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
 			item->TargetState = LS_TURN_RIGHT_FAST;
 		}
@@ -566,7 +567,7 @@ void lara_as_idle(ITEM_INFO* item, COLL_INFO* coll)
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
 	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		g_GameFlow->Animations.Pose)
+		g_GameFlow->Animations.HasPose)
 	{
 		item->TargetState = LS_POSE;
 		return;
@@ -900,7 +901,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1147,7 +1148,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1361,7 +1362,7 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
 		item->MeshBits = -1;
-		lara->IsBusy = false;
+		lara->Inventory.IsBusy = false;
 	}
 }
 
@@ -1593,7 +1594,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
@@ -1719,7 +1720,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)) &&
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->TargetState = LS_CROUCH_IDLE;
@@ -2321,7 +2322,7 @@ void lara_as_sprint(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.WeaponControl.GunType)))
+		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
 	{
 		item->TargetState = LS_CROUCH_IDLE;
 		return;

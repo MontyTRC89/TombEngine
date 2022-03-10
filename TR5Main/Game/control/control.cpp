@@ -34,7 +34,7 @@
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
@@ -232,7 +232,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 						LaserSight = false;
 						AlterFOV(ANGLE(80));
 						LaraItem->MeshBits = 0xFFFFFFFF;
-						Lara.IsBusy = false;
+						Lara.Inventory.IsBusy = false;
 						Camera.type = BinocularOldCamera;
 
 						ResetLaraFlex(LaraItem);
@@ -251,14 +251,14 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			}
 			else if (BinocularRange == 0)
 			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER && Lara.Weapons[WEAPON_REVOLVER].HasLasersight) || 
-												   (Lara.Control.WeaponControl.GunType == WEAPON_HK) || 
-												   (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW && Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)))
+				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+												   (Lara.Control.Weapon.GunType == LaraWeaponType::HK) || 
+												   (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
 
-					Lara.IsBusy = true;
+					Lara.Inventory.IsBusy = true;
 					LaserSight = true;
 				}
 			}
@@ -390,7 +390,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		UpdateDripParticles();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
-		UpdateScarabs();
+		UpdateBeetleSwarm();
 		UpdateLocusts();
 		AnimateWaterfalls();
 
@@ -612,7 +612,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		Camera.target.y = LaraItem->Position.yPos;
 		Camera.target.z = LaraItem->Position.zPos;
 
-		int x = Lara.Control.WeaponControl.WeaponItem;
+		int x = Lara.Control.Weapon.WeaponItem;
 
 		RequiredStartPos = false;
 		InitialiseGame = false;

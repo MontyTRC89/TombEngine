@@ -8,9 +8,9 @@ struct MinecartInfo
 	short TurnLen;
 
 	int Velocity;
-	short VerticalVelocity;
-	short Gradient;
-	char StopDelay;
+	int VerticalVelocity;
+	int Gradient;
+	unsigned int StopDelay;
 
 	int FloorHeightMiddle;
 	int FloorHeightFront;

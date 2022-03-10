@@ -428,7 +428,7 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		laraItem->ActiveState == LS_IDLE &&
 		laraItem->AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&
-		!item->Active || Lara.Control.IsMoving && Lara.interactedItem == itemNumber)
+		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
 		laraItem->Position.yRot ^= 0x8000;
 
@@ -448,7 +448,7 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 				return;
 			}
 
-			Lara.interactedItem = itemNumber;
+			Lara.InteractedItem = itemNumber;
 		}
 
 		laraItem->Position.yRot ^= 0x8000;

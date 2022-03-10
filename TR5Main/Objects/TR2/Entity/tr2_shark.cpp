@@ -44,13 +44,13 @@ void SharkControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 0:
-			info->flags = 0;
-			info->maximumTurn = 0;
+			info->Flags = 0;
+			info->MaxTurn = 0;
 
 			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
 				item->TargetState = 3;
@@ -59,24 +59,24 @@ void SharkControl(short itemNumber)
 			break;
 
 		case 1:
-			info->maximumTurn = ANGLE(0.5f);
+			info->MaxTurn = ANGLE(0.5f);
 
-			if (info->mood == BORED_MOOD)
+			if (info->Mood == MoodType::Bored)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2))
 				item->TargetState = 0;
-			else if (info->mood == ESCAPE_MOOD || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
+			else if (info->Mood == MoodType::Escape || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
 				item->TargetState = 2;
 
 			break;
 
 		case 2:
-			info->maximumTurn = ANGLE(2.0f);
-			info->flags = 0;
+			info->MaxTurn = ANGLE(2.0f);
+			info->Flags = 0;
 
-			if (info->mood == BORED_MOOD)
+			if (info->Mood == MoodType::Bored)
 				item->TargetState = 1;
-			else if (info->mood == ESCAPE_MOOD)
+			else if (info->Mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(1365, 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
 			{
@@ -93,10 +93,10 @@ void SharkControl(short itemNumber)
 			if (aiInfo.ahead)
 				head = aiInfo.angle;
 
-			if (!info->flags && item->TouchBits & 0x3400)
+			if (!info->Flags && item->TouchBits & 0x3400)
 			{
 				CreatureEffect(item, &SharkBite, DoBloodSplat);
-				info->flags = 1;
+				info->Flags = 1;
 
 				LaraItem->HitPoints -= 400;
 				LaraItem->HitStatus = true;

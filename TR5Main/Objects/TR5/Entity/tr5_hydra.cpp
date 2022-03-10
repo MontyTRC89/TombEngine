@@ -11,7 +11,6 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-
 BITE_INFO HydraBite = { 0, 0, 0, 11 };
 
 // TODO
@@ -168,7 +167,7 @@ void HydraControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short tilt = 0;
 	short joint0 = 0;
@@ -179,29 +178,29 @@ void HydraControl(short itemNumber)
 	if (item->HitPoints > 0)
 	{
 		if (item->AIBits)
-			GetAITarget(info);
-		else if (info->hurtByLara)
-			info->enemy = LaraItem;
+			GetAITarget(creature);
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		if (item->ActiveState != 5 &&
 			item->ActiveState != 10 &&
 			item->ActiveState != HYDRA_STATE_DEATH)
 		{
-			if (abs(aiInfo.angle) >= ANGLE(1.0f))
+			if (abs(AI.angle) >= ANGLE(1.0f))
 			{
-				if (aiInfo.angle > 0)
+				if (AI.angle > 0)
 					item->Position.yRot += ANGLE(1.0f);
 				else
 					item->Position.yRot -= ANGLE(1.0f);
 			}
 			else
-				item->Position.yRot += aiInfo.angle;
+				item->Position.yRot += AI.angle;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
@@ -211,9 +210,9 @@ void HydraControl(short itemNumber)
 
 		if (item->ActiveState != 12)
 		{
-			joint1 = aiInfo.angle / 2;
-			joint3 = aiInfo.angle / 2;
-			joint2 = -aiInfo.xAngle;
+			joint1 = AI.angle / 2;
+			joint3 = AI.angle / 2;
+			joint2 = -AI.xAngle;
 		}
 
 		joint0 = -joint1;
@@ -226,17 +225,17 @@ void HydraControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case HYDRA_STATE_STOP:
-			info->maximumTurn = ANGLE(1.0f);
-			info->flags = 0;
+			creature->MaxTurn = ANGLE(1.0f);
+			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
 				tilt = ANGLE(2.8f);
 
-			if (aiInfo.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
+			if (AI.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
 			{
-				if (aiInfo.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
+				if (AI.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
 				{
 					if (!(GetRandomControl() & 0xF))
 						item->TargetState = HYDRA_STATE_AIM;
@@ -253,25 +252,25 @@ void HydraControl(short itemNumber)
 		case HYDRA_STATE_BITE_ATTACK2:
 		case HYDRA_STATE_BITE_ATTACK3:
 		case HYDRA_STATE_BITE_ATTACK4:
-			info->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (info->flags == 0)
+			if (creature->Flags == 0)
 			{
 				if (item->TouchBits & 0x400)
 				{
 					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
-					info->flags = 1;
+					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
 					LaraItem->HitStatus = true;
 				}
 
-				if (item->HitStatus && aiInfo.distance <  pow(CLICK(7), 2))
+				if (item->HitStatus && AI.distance <  pow(CLICK(7), 2))
 				{
-					distance = sqrt(aiInfo.distance);
+					distance = sqrt(AI.distance);
 					damage = 5 - distance / SECTOR(1);
 
-					if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
+					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 						damage *= 3;
 
 					if (damage > 0)
@@ -286,7 +285,7 @@ void HydraControl(short itemNumber)
 			break;
 
 		case HYDRA_STATE_AIM:
-			info->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (item->HitStatus)
 			{
@@ -294,12 +293,12 @@ void HydraControl(short itemNumber)
 				/*item->HitPoints = 0;
 				break;*/
 
-				damage = 6 - sqrt(aiInfo.distance) / 1024;
+				damage = 6 - sqrt(AI.distance) / 1024;
 
-				if (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
+				if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					damage *= 3;
 
-				if ((GetRandomControl() & 0xF) < damage && aiInfo.distance < SQUARE(10240) && damage > 0)
+				if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
 				{
 					item->HitPoints -= damage;
 					item->TargetState = 4;
@@ -352,19 +351,19 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 6:
-			info->maximumTurn = ANGLE(1.0f);
-			info->flags = 0;
+			creature->MaxTurn = ANGLE(1.0f);
+			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
 			else if (item->TriggerFlags == 2)
 				tilt = ANGLE(2.8f);
 
-			if (aiInfo.distance >= pow(CLICK(3), 2))
+			if (AI.distance >= pow(CLICK(3), 2))
 			{
-				if (aiInfo.distance >= pow(CLICK(5), 2))
+				if (AI.distance >= pow(CLICK(5), 2))
 				{
-					if (aiInfo.distance >= pow(CLICK(7), 2))
+					if (AI.distance >= pow(CLICK(7), 2))
 						item->TargetState = 0;
 					else
 						item->TargetState = 9;

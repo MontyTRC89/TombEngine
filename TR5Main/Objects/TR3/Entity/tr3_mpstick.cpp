@@ -51,7 +51,7 @@ void MPStickControl(short itemNumber)
 		return;
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	short torsoY = 0;
 	short torsoX = 0;
 	short head = 0;
@@ -81,7 +81,7 @@ void MPStickControl(short itemNumber)
 			item->AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = BATON_DEATH;
-			creature->LOT.step = 256;
+			creature->LOT.Step = 256;
 		}
 	}
 	else
@@ -90,7 +90,7 @@ void MPStickControl(short itemNumber)
 			GetAITarget(creature);
 		else
 		{
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 			dx = LaraItem->Position.xPos - item->Position.xPos;
 			dz = LaraItem->Position.zPos - item->Position.zPos;
@@ -100,11 +100,11 @@ void MPStickControl(short itemNumber)
 			int bestDistance = 0x7fffffff;
 			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
-				CREATURE_INFO* currentCreature = ActiveCreatures[slot];
-				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
+				CreatureInfo* currentCreature = ActiveCreatures[slot];
+				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					continue;
 
-				target = &g_Level.Items[currentCreature->itemNum];
+				target = &g_Level.Items[currentCreature->ItemNumber];
 				if (target->ObjectNumber != ID_LARA)
 					continue;
 
@@ -118,14 +118,14 @@ void MPStickControl(short itemNumber)
 				if (distance < bestDistance && distance < laraInfo.distance)
 				{
 					bestDistance = distance;
-					creature->enemy = target;
+					creature->Enemy = target;
 				}
 			}
 		}
 
 		CreatureAIInfo(item, &info);
 
-		if (creature->enemy == LaraItem)
+		if (creature->Enemy == LaraItem)
 		{
 			laraInfo.angle = info.angle;
 			laraInfo.distance = info.distance;
@@ -141,30 +141,30 @@ void MPStickControl(short itemNumber)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		enemy = creature->enemy;
-		creature->enemy = LaraItem;
+		enemy = creature->Enemy;
+		creature->Enemy = LaraItem;
 		if (item->HitStatus || ((laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) && (abs(LaraItem->Position.yPos - item->Position.yPos) < 1024)))
 		{
-			if (!creature->alerted)
+			if (!creature->Alerted)
 				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Position, 0);
 			AlertAllGuards(itemNumber);
 		}
-		creature->enemy = enemy;
+		creature->Enemy = enemy;
 
 		switch (item->ActiveState)
 		{
 		case BATON_WAIT:
-			if (creature->alerted || item->TargetState == BATON_RUN)
+			if (creature->Alerted || item->TargetState == BATON_RUN)
 			{
 				item->TargetState = BATON_STOP;
 				break;
 			}
 
 		case BATON_STOP:
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 			head = laraInfo.angle;
 
 			if (item->AIBits & GUARD)
@@ -183,14 +183,14 @@ void MPStickControl(short itemNumber)
 			else if (item->AIBits & PATROL1)
 				item->TargetState = BATON_WALK;
 
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead && !item->HitStatus)
+				if (Lara.TargetEntity != item && info.ahead && !item->HitStatus)
 					item->TargetState = BATON_STOP;
 				else
 					item->TargetState = BATON_RUN;
 			}
-			else if (creature->mood == BORED_MOOD || ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (creature->Mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048))))
 			{
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
@@ -210,18 +210,18 @@ void MPStickControl(short itemNumber)
 			break;
 		case BATON_WALK:
 			head = laraInfo.angle;
-			creature->flags = 0;
+			creature->Flags = 0;
 
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (item->AIBits & PATROL1)
 			{
 				item->TargetState = BATON_WALK;
 				head = 0;
 			}
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->Mood == MoodType::Escape)
 				item->TargetState = BATON_RUN;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x100)
 				{
@@ -243,20 +243,20 @@ void MPStickControl(short itemNumber)
 			if (info.ahead)
 				head = info.angle;
 
-			creature->maximumTurn = ANGLE(7);
+			creature->MaxTurn = ANGLE(7);
 			tilt = angle / 2;
 
 			if (item->AIBits & GUARD)
 				item->TargetState = BATON_WAIT;
-			else if (creature->mood == ESCAPE_MOOD)
+			else if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead)
+				if (Lara.TargetEntity != item && info.ahead)
 					item->TargetState = BATON_STOP;
 				break;
 			}
-			else if ((item->AIBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
+			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048)))
 				item->TargetState = BATON_STOP;
-			else if (creature->mood == BORED_MOOD)
+			else if (creature->Mood == MoodType::Bored)
 				item->TargetState = BATON_WALK;
 			else if (info.ahead && info.distance < SQUARE(1024))
 				item->TargetState = BATON_WALK;
@@ -268,9 +268,9 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
-			creature->flags = 0;
+			creature->Flags = 0;
 			if (info.bite && info.distance < SQUARE(512))
 				item->TargetState = BATON_PUNCH0;
 			else
@@ -283,9 +283,9 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
-			creature->flags = 0;
+			creature->Flags = 0;
 			if (info.ahead && info.distance < SQUARE(1024))
 				item->TargetState = BATON_PUNCH1;
 			else
@@ -298,9 +298,9 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
-			creature->flags = 0;
+			creature->Flags = 0;
 			if (info.bite && info.distance < SQUARE(1280))
 				item->TargetState = BATON_PUNCH2;
 			else
@@ -313,23 +313,23 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (enemy == LaraItem)
 			{
-				if (!creature->flags && (item->TouchBits & 0x2400))
+				if (!creature->Flags && (item->TouchBits & 0x2400))
 				{
 					LaraItem->HitPoints -= 80;
 					LaraItem->HitStatus = 1;
 					CreatureEffect(item, &mpstickBite1, DoBloodSplat);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
-					creature->flags = 1;
+					creature->Flags = 1;
 				}
 			}
 			else
 			{
-				if (!creature->flags && enemy)
+				if (!creature->Flags && enemy)
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < 256 &&
 						abs(enemy->Position.yPos - item->Position.yPos) <= 256 &&
@@ -337,7 +337,7 @@ void MPStickControl(short itemNumber)
 					{
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
-						creature->flags = 1;
+						creature->Flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 					}
@@ -352,23 +352,23 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (enemy == LaraItem)
 			{
-				if (!creature->flags && (item->TouchBits & 0x2400))
+				if (!creature->Flags && (item->TouchBits & 0x2400))
 				{
 					LaraItem->HitPoints -= 80;
 					LaraItem->HitStatus = 1;
 					CreatureEffect(item, &mpstickBite1, DoBloodSplat);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
-					creature->flags = 1;
+					creature->Flags = 1;
 				}
 			}
 			else
 			{
-				if (!creature->flags && enemy)
+				if (!creature->Flags && enemy)
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < 256 &&
 						abs(enemy->Position.yPos - item->Position.yPos) <= 256 &&
@@ -376,7 +376,7 @@ void MPStickControl(short itemNumber)
 					{
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
-						creature->flags = 1;
+						creature->Flags = 1;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
@@ -395,23 +395,23 @@ void MPStickControl(short itemNumber)
 				torsoY = info.angle;
 				torsoX = info.xAngle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (enemy == LaraItem)
 			{
-				if (creature->flags != 2 && (item->TouchBits & 0x2400))
+				if (creature->Flags != 2 && (item->TouchBits & 0x2400))
 				{
 					LaraItem->HitPoints -= 100;
 					LaraItem->HitStatus = 1;
 					CreatureEffect(item, &mpstickBite1, DoBloodSplat);
-					creature->flags = 2;
+					creature->Flags = 2;
 					SoundEffect(70, &item->Position, 0);
 
 				}
 			}
 			else
 			{
-				if (creature->flags != 2 && enemy)
+				if (creature->Flags != 2 && enemy)
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < 256 &&
 						abs(enemy->Position.yPos - item->Position.yPos) <= 256 &&
@@ -419,7 +419,7 @@ void MPStickControl(short itemNumber)
 					{
 						enemy->HitPoints -= 6;
 						enemy->HitStatus = 1;
-						creature->flags = 2;
+						creature->Flags = 2;
 						CreatureEffect(item, &mpstickBite1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 					}
@@ -431,23 +431,23 @@ void MPStickControl(short itemNumber)
 			{
 				torsoY = info.angle;
 			}
-			creature->maximumTurn = ANGLE(6);
+			creature->MaxTurn = ANGLE(6);
 
 			if (enemy == LaraItem)
 			{
-				if (creature->flags != 1 && (item->TouchBits & 0x60) && (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 8))
+				if (creature->Flags != 1 && (item->TouchBits & 0x60) && (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 8))
 				{
 					LaraItem->HitPoints -= 150;
 					LaraItem->HitStatus = 1;
 					CreatureEffect(item, &mpstickBite2, DoBloodSplat);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
-					creature->flags = 1;
+					creature->Flags = 1;
 				}
 			}
 			else
 			{
-				if (!creature->flags != 1 && enemy && (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 8))
+				if (!creature->Flags != 1 && enemy && (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 8))
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < 256 &&
 						abs(enemy->Position.yPos - item->Position.yPos) <= 256 &&
@@ -455,7 +455,7 @@ void MPStickControl(short itemNumber)
 					{
 						enemy->HitPoints -= 9;
 						enemy->HitStatus = 1;
-						creature->flags = 1;
+						creature->Flags = 1;
 						CreatureEffect(item, &mpstickBite2, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 					}
@@ -476,27 +476,27 @@ void MPStickControl(short itemNumber)
 		switch (CreatureVault(itemNumber, angle, 2, 260))
 		{
 		case 2:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = BATON_CLIMB1;
 			break;
 
 		case 3:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = BATON_CLIMB2;
 			break;
 
 		case 4:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = BATON_CLIMB3;
 			break;
 		case -4:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			item->ActiveState = BATON_FALL3;
@@ -505,7 +505,7 @@ void MPStickControl(short itemNumber)
 	}
 	else
 	{
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

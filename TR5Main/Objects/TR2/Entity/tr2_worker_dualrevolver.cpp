@@ -18,12 +18,12 @@ void WorkerDualGunControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* dual;
+	CreatureInfo* dual;
 	AI_INFO info;
 	short angle, head_x, head_y, torso_x, torso_y, tilt;
 
 	item = &g_Level.Items[itemNum];
-	dual = (CREATURE_INFO*)item->Data;
+	dual = (CreatureInfo*)item->Data;
 	angle = head_x = head_y = torso_x = torso_y = tilt = 0;
 
 	if (item->HitPoints <= 0)
@@ -46,13 +46,13 @@ void WorkerDualGunControl(short itemNum)
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, dual->maximumTurn);
+		angle = CreatureTurn(item, dual->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
 		case 2:
-			dual->maximumTurn = 0;
+			dual->MaxTurn = 0;
 
 			if (info.ahead)
 			{
@@ -60,7 +60,7 @@ void WorkerDualGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (dual->mood == ATTACK_MOOD || LaraItem->HitPoints > 0)
+			if (dual->Mood == MoodType::Attack || LaraItem->HitPoints > 0)
 			{
 				if (Targetable(item, &info))
 				{
@@ -71,18 +71,18 @@ void WorkerDualGunControl(short itemNum)
 				}
 				else
 				{
-					switch (dual->mood)
+					switch (dual->Mood)
 					{
-					case ATTACK_MOOD:
+					case MoodType::Attack:
 						if (info.distance > 0x19000000 || !info.ahead)
 							item->TargetState = 4;
 						else
 							item->TargetState = 3;
 						break;
-					case ESCAPE_MOOD:
+					case MoodType::Escape:
 						item->TargetState = 4;
 						break;
-					case STALK_MOOD:
+					case MoodType::Stalk:
 						item->TargetState = 3;
 						break;
 
@@ -99,7 +99,7 @@ void WorkerDualGunControl(short itemNum)
 			}
 			break;
 		case 3:
-			dual->maximumTurn = ANGLE(3);
+			dual->MaxTurn = ANGLE(3);
 
 			if (info.ahead)
 			{
@@ -122,11 +122,11 @@ void WorkerDualGunControl(short itemNum)
 				}
 			}
 
-			if (dual->mood == ESCAPE_MOOD)
+			if (dual->Mood == MoodType::Escape)
 			{
 				item->TargetState = 4;
 			}
-			else if (dual->mood == ATTACK_MOOD || dual->mood == STALK_MOOD)
+			else if (dual->Mood == MoodType::Attack || dual->Mood == MoodType::Stalk)
 			{
 				if (info.distance > 0x19000000 || !info.ahead)
 					item->TargetState = 4;
@@ -142,7 +142,7 @@ void WorkerDualGunControl(short itemNum)
 			}
 			break;
 		case 4:
-			dual->maximumTurn = ANGLE(6);
+			dual->MaxTurn = ANGLE(6);
 
 			if (info.ahead)
 			{
@@ -166,7 +166,7 @@ void WorkerDualGunControl(short itemNum)
 					item->TargetState = 3;
 				}
 			}
-			else if (dual->mood == ATTACK_MOOD)
+			else if (dual->Mood == MoodType::Attack)
 			{
 				if (info.ahead && info.distance < 0x19000000)
 					item->TargetState = 3;
@@ -181,7 +181,7 @@ void WorkerDualGunControl(short itemNum)
 			}
 			break;
 		case 5:
-			dual->flags = 0;
+			dual->Flags = 0;
 
 			if (info.ahead)
 			{
@@ -195,7 +195,7 @@ void WorkerDualGunControl(short itemNum)
 				item->TargetState = 3;
 			break;
 		case 6:
-			dual->flags = 0;
+			dual->Flags = 0;
 
 			if (info.ahead)
 			{
@@ -215,10 +215,10 @@ void WorkerDualGunControl(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (!dual->flags)
+			if (!dual->Flags)
 			{
 				ShotLara(item, &info, &workerDualGunL, torso_y, 50);
-				dual->flags = 1;
+				dual->Flags = 1;
 			}
 			break;
 		case 8:
@@ -228,14 +228,14 @@ void WorkerDualGunControl(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (!dual->flags)
+			if (!dual->Flags)
 			{
 				ShotLara(item, &info, &workerDualGunR, torso_y, 50);
-				dual->flags = 1;
+				dual->Flags = 1;
 			}
 			break;
 		case 9:
-			dual->flags = 0;
+			dual->Flags = 0;
 
 			if (info.ahead)
 			{
@@ -255,11 +255,11 @@ void WorkerDualGunControl(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (!dual->flags)
+			if (!dual->Flags)
 			{
 				ShotLara(item, &info, &workerDualGunL, torso_y, 50);
 				ShotLara(item, &info, &workerDualGunR, torso_y, 50);
-				dual->flags = 1;
+				dual->Flags = 1;
 			}
 			break;
 		}

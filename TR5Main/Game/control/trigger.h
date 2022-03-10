@@ -62,7 +62,7 @@ extern int KeyTriggerActive;
 
 bool GetKeyTrigger(ITEM_INFO* item);
 int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch);
-int SwitchTrigger(short itemNum, short timer);
+int SwitchTrigger(short itemNumber, short timer);
 int KeyTrigger(short itemNum);
 int PickupTrigger(short itemNum);
 void RefreshCamera(short type, short* data);

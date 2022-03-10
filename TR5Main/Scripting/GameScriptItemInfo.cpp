@@ -456,7 +456,6 @@ int GameScriptItemInfo::GetFrameNumber() const
 	return m_item->FrameNumber - g_Level.Anims[m_item->AnimNumber].frameBase;
 }
 
-
 void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 {
 	auto const fBase = g_Level.Anims[m_item->AnimNumber].frameBase;
@@ -464,16 +463,12 @@ void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 	auto frameCount = fEnd - fBase;
 	bool cond = (frameNumber < frameCount);
 	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";
-	if (ScriptAssertF(cond, err, frameNumber, m_item->AnimNumber, frameCount))
-	{
-		m_item->FrameNumber = frameNumber + fBase;
-	}
-	else
-	{
-		ScriptWarn("Not setting frame number.");
-	}
-}
 
+	if (ScriptAssertF(cond, err, frameNumber, m_item->AnimNumber, frameCount))
+		m_item->FrameNumber = frameNumber + fBase;
+	else
+		ScriptWarn("Not setting frame number.");
+}
 
 short GameScriptItemInfo::GetStatus() const
 {

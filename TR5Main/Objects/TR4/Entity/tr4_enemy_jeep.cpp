@@ -38,11 +38,11 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		grenadeItem->Position.zPos = item->Position.xPos + 1024 * phd_cos(grenadeItem->Position.yRot);
 
 		SmokeCountL = 32;
-		SmokeWeapon = 5;
+		SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did the TEN enum get shuffled around? @Sezz 2022.03.09
 
 		for (int i = 0; i < 5; i++)
 		{
-			TriggerGunSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 0, 0, 0, 1, 5, 32);
+			TriggerGunSmoke(item->Position.xPos, item->Position.yPos, item->Position.zPos, 0, 0, 0, 1, (LaraWeaponType)5, 32);
 		}
 
 		if (GetRandomControl() & 3)
@@ -92,7 +92,7 @@ void EnemyJeepControl(short itemNumber)
 	if (CreatureActive(itemNumber))
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
 
 		int x = item->Position.xPos;
 		int y = item->Position.yPos;
@@ -146,8 +146,8 @@ void EnemyJeepControl(short itemNumber)
 		AI_INFO info;
 		CreatureAIInfo(item, &info);
 
-		creature->enemy = creature->aiTarget;
-		ITEM_INFO* target = creature->aiTarget;
+		creature->Enemy = creature->AITarget;
+		ITEM_INFO* target = creature->AITarget;
 		short angle;
 		int distance;
 		{
@@ -180,13 +180,13 @@ void EnemyJeepControl(short itemNumber)
 			
 			if (item->RequiredState)
 				item->TargetState = item->RequiredState;
-			else if (info.distance > SQUARE(1024) || Lara.location >= item->ItemFlags[3])
+			else if (info.distance > SQUARE(1024) || Lara.Location >= item->ItemFlags[3])
 				item->TargetState = 1;
 
 			break;
 
 		case 1:
-			creature->maximumTurn = item->ItemFlags[0] / 16;
+			creature->MaxTurn = item->ItemFlags[0] / 16;
 			item->ItemFlags[0] += 37;
 			if (item->ItemFlags[0] > 8704)
 				item->ItemFlags[0] = 8704;
@@ -239,34 +239,34 @@ void EnemyJeepControl(short itemNumber)
 		}
 		else
 		{
-			creature->LOT.requiredBox |= 8;
+			creature->LOT.RequiredBox |= 8;
 			if (item->ItemFlags[1] > 0)
 			{
 				item->ItemFlags[1] -= 8;
 				if (item->ItemFlags[1]<0)
-					creature->LOT.requiredBox &= ~8;
+					creature->LOT.RequiredBox &= ~8;
 				item->Position.yPos += item->ItemFlags[1] / 64;
 			}
 			else
 			{
 				item->ItemFlags[1] = 2 * xRot;
-				creature->LOT.requiredBox |= 8u;
+				creature->LOT.RequiredBox |= 8u;
 			}
-			if (creature->LOT.requiredBox & 8)
+			if (creature->LOT.RequiredBox & 8)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->TargetState = 1;
 			}
 		}
 
 		if (info.distance < SQUARE(1536) || item->ItemFlags[3] == -2)
-			creature->reachedGoal = true;
+			creature->ReachedGoal = true;
 
-		if (creature->reachedGoal)
+		if (creature->ReachedGoal)
 		{
 			TestTriggers(target->Position.xPos,target->Position.yPos,target->Position.zPos,target->RoomNumber, true);
 
-			if (Lara.location < item->ItemFlags[3] && item->ActiveState != 2 && item->TargetState != 2)
+			if (Lara.Location < item->ItemFlags[3] && item->ActiveState != 2 && item->TargetState != 2)
 			{
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -300,12 +300,12 @@ void EnemyJeepControl(short itemNumber)
 				DisableEntityAI(itemNumber);
 			}
 
-			if (Lara.location >= item->ItemFlags[3] || !(target->Flags & 4))
+			if (Lara.Location >= item->ItemFlags[3] || !(target->Flags & 4))
 			{
-				creature->reachedGoal = false;
+				creature->ReachedGoal = false;
 				item->ItemFlags[3]++;
 
-				creature->enemy = nullptr;
+				creature->Enemy = nullptr;
 				AI_OBJECT* aiObject = nullptr;
 
 				for (int i = 0; i < g_Level.AIObjects.size(); i++)
@@ -321,7 +321,7 @@ void EnemyJeepControl(short itemNumber)
 
 				if (aiObject != nullptr)
 				{
-					creature->enemy = nullptr;
+					creature->Enemy = nullptr;
 					target->ObjectNumber = aiObject->objectNumber;
 					target->RoomNumber = aiObject->roomNumber;
 					target->Position.xPos = aiObject->x;
@@ -370,13 +370,13 @@ void EnemyJeepControl(short itemNumber)
 
 		for (int i = 0; i < 4; i++)
 		{
-			creature->jointRotation[i] -= item->ItemFlags[0];
+			creature->JointRotation[i] -= item->ItemFlags[0];
 		}
 
-		if (!creature->reachedGoal)
+		if (!creature->ReachedGoal)
 			ClampRotation(&item->Position, info.angle, item->ItemFlags[0] / 16);
 
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 		AnimateItem(item);
 
 		floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);

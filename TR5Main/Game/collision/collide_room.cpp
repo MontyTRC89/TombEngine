@@ -25,9 +25,9 @@ void ShiftItem(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Shift.z = 0;
 }
 
-void MoveItem(ITEM_INFO* item, short angle, int x, int y)
+void MoveItem(ITEM_INFO* item, short angle, int x, int z)
 {
-	if (!x && !y)
+	if (!x && !z)
 		return;
 
 	if (x != 0)
@@ -39,13 +39,13 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int y)
 		item->Position.zPos += round(x * c);
 	}
 
-	if (y != 0)
+	if (z != 0)
 	{
 		float s = phd_sin(angle + ANGLE(90.0f));
 		float c = phd_cos(angle + ANGLE(90.0f));
 
-		item->Position.xPos += round(y * s);
-		item->Position.zPos += round(y * c);
+		item->Position.xPos += round(z * s);
+		item->Position.zPos += round(z * c);
 	}
 }
 
@@ -815,13 +815,15 @@ void GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool 
 
 // New function for rotating item along XZ slopes.
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
-// Dont need to set a value in radiusDivide if you dont need it (radiusDivide is set to 1 by default).
+// Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
 // Warning: dont set it to 0 !!!!
-
-void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short xOffset, short zOffset)
 {
-	if (!radiusDivide)
+	if (!radiusDivisor)
+	{
+		TENLog(std::string("CalculateItemRotationToSurface() attempted division by zero!"), LogLevel::Warning);
 		return;
+	}
 
 	GAME_VECTOR pos = {};
 	pos.x = item->Position.xPos;
@@ -829,9 +831,9 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 	pos.z = item->Position.zPos;
 	pos.roomNumber = item->RoomNumber;
 
-	auto bounds = GetBoundsAccurate(item);
+	auto* bounds = GetBoundsAccurate(item);
 	auto radiusX = bounds->X2;
-	auto radiusZ = bounds->Z2 / radiusDivide; // Need divide in any case else it's too much !
+	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
 	auto frontX = phd_sin(item->Position.yRot) * radiusZ;
@@ -854,13 +856,13 @@ void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide)
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Position.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN);
-	item->Position.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN);
+	item->Position.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	item->Position.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
 int GetQuadrant(short angle)
 {
-	return (unsigned short) (angle + ANGLE(45)) / ANGLE(90);
+	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
@@ -1131,22 +1133,33 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance)
 	return finalResult[usedProbe];
 }
 
-bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room)
+short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 {
-	return (room->flags & envType);
+	short stepAngleIncrement = ANGLE(45.0f) / 4;
+	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int roomNumber)
+short GetSurfaceBearingAngle(float xTilt, float zTilt)
 {
-	return TestEnvironment(envType, &g_Level.Rooms[roomNumber]);
+	return (short)phd_atan(-zTilt, -xTilt);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item)
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
 {
-	return TestEnvironment(envType, item->RoomNumber);
+	return (room->flags & environmentType);
 }
 
-bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 {
-	return TestEnvironment(envType, GetCollisionResult(x, y, z, roomNumber).RoomNumber);
+	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+}
+
+bool TestEnvironment(RoomEnvFlags environmentType, ITEM_INFO* item)
+{
+	return TestEnvironment(environmentType, item->RoomNumber);
+}
+
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
+{
+	return TestEnvironment(environmentType, GetCollisionResult(x, y, z, roomNumber).RoomNumber);
 }

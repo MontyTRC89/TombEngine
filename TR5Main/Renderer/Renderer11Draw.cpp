@@ -15,7 +15,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "RenderView/RenderView.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/weather.h"
@@ -240,7 +240,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = GetMesh(Lara.meshPtrs[k]);
+			RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 			for (auto& bucket : mesh->buckets)
 			{
@@ -1122,14 +1122,14 @@ namespace TEN::Renderer
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Diary.currentPage;
+		short currentPage = Lara.Inventory.Diary.currentPage;
 		drawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
 		                       obj->yrot, obj->zrot, obj->scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
 		{
-			if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].
-				Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
+			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].
+				Strings[i].y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].stringID)
 				break;
 
 			//drawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
@@ -1625,22 +1625,22 @@ namespace TEN::Renderer
 			for (int m = 0; m < 32; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int i = 0; i < TEN::Entities::TR4::NUM_SCARABS; i++)
+			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				SCARAB_STRUCT* beetle = &TEN::Entities::TR4::Scarabs[i];
+				BeetleInfo* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
 
-				if (beetle->on)
+				if (beetle->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
-						Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->pos.yRot), TO_RAD(beetle->pos.xRot),
-					                                                 TO_RAD(beetle->pos.zRot));
+						Matrix::CreateTranslation(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Position.yRot), TO_RAD(beetle->Position.xRot),
+					                                                 TO_RAD(beetle->Position.zRot));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+					m_stItem.Position = Vector4(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, 1.0f);
+					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)
@@ -2112,8 +2112,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara.ActiveState: %d", LaraItem->ActiveState);
 				PrintDebugMessage("Lara.RequiredState: %d", LaraItem->RequiredState);
 				PrintDebugMessage("Lara.TargetState: %d", LaraItem->TargetState);
-				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.WeaponControl.WeaponItem);
-				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.WeaponControl.GunType);
+				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
+				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.Weapon.GunType);
 				PrintDebugMessage("Lara.Control.HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara.Velocity, VerticalVelocity: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
 				PrintDebugMessage("Lara.Airborne: %d", LaraItem->Airborne);
@@ -2122,7 +2122,7 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target HitPoints: %d", Lara.target ? Lara.target->HitPoints : NULL);
+				PrintDebugMessage("target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : NULL);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
@@ -2986,7 +2986,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->Data;
+		WraithInfo* info = (WraithInfo*)nativeItem->Data;
 
 		for (int j = 0; j <= 4; j++)
 		{
@@ -3015,8 +3015,8 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < 7; i++)
 			{
-				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
-				Vector3 p2 = Vector3(info[i + 1].xPos, info[i + 1].yPos, info[i + 1].zPos);
+				Vector3 p1 = Vector3(info[i].Position.xPos, info[i].Position.yPos, info[i].Position.zPos);
+				Vector3 p2 = Vector3(info[i + 1].Position.xPos, info[i + 1].Position.yPos, info[i + 1].Position.zPos);
 
 				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}

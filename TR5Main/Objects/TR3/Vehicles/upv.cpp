@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/bubble.h"
@@ -43,24 +44,24 @@ BITE_INFO UPVBites[6] =
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
-#define UPDOWN_ACCEL		(ANGLE(2.0f) * 65536)
-#define UPDOWN_SLOWACCEL	(ANGLE(1.0f) * 65536)
-#define UPDOWN_FRICTION		(ANGLE(1.0f) * 65536)
-#define MAX_UPDOWN			(ANGLE(2.0f) * 65536)
+#define UPDOWN_ACCEL		(ANGLE(2.0f) * (USHRT_MAX + 1))
+#define UPDOWN_SLOWACCEL	(ANGLE(1.0f) * (USHRT_MAX + 1))
+#define UPDOWN_FRICTION		(ANGLE(1.0f) * (USHRT_MAX + 1))
+#define MAX_UPDOWN			(ANGLE(2.0f) * (USHRT_MAX + 1))
 #define UPDOWN_LIMIT		ANGLE(80.0f)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
 #define SURFACE_ANGLE		ANGLE(30.0f)
 #define DIVE_ANGLE			ANGLE(15.0f)
 #define DIVE_SPEED			ANGLE(5.0f)
-#define SUB_DRAW_SHIFT		128
-#define SUB_RADIUS			300
-#define SUB_HEIGHT			400
-#define SUB_LENGTH			SECTOR(1)
-#define FRONT_TOLERANCE		(ANGLE(45.0f) * 65536)
-#define TOP_TOLERANCE		(ANGLE(45.0f) * 65536)
-#define WALLDEFLECT			(ANGLE(2.0f) * 65536)
-#define GETOFF_DIST 		SECTOR(1)
+#define UPV_DRAW_SHIFT		128
+#define UPV_RADIUS			300
+#define UPV_HEIGHT			400
+#define UPV_LENGTH			SECTOR(1)
+#define FRONT_TOLERANCE		(ANGLE(45.0f) * (USHRT_MAX + 1))
+#define TOP_TOLERANCE		(ANGLE(45.0f) * (USHRT_MAX + 1))
+#define WALL_DEFLECT		(ANGLE(2.0f) * (USHRT_MAX + 1))
+#define DISMOUNT_DISTANCE 	SECTOR(1)
 #define HARPOON_VELOCITY	CLICK(1)
 #define HARPOON_RELOAD		15
 
@@ -75,26 +76,26 @@ BITE_INFO UPVBites[6] =
 #define MOUNT_UNDERWATER_SOUND_FRAME	30
 #define MOUNT_UNDERWATER_CONTROL_FRAME	42
 
-#define UPV_IN_PROPEL		IN_JUMP
-#define UPV_IN_UP			IN_FORWARD
-#define UPV_IN_DOWN			IN_BACK
-#define UPV_IN_LEFT			IN_LEFT
-#define UPV_IN_RIGHT		IN_RIGHT
-#define UPV_IN_FIRE			IN_ACTION
-#define UPV_IN_DISMOUNT		IN_ROLL
+#define UPV_IN_PROPEL	IN_JUMP
+#define UPV_IN_UP		IN_FORWARD
+#define UPV_IN_DOWN		IN_BACK
+#define UPV_IN_LEFT		IN_LEFT
+#define UPV_IN_RIGHT	IN_RIGHT
+#define UPV_IN_FIRE		IN_ACTION
+#define UPV_IN_DISMOUNT	IN_ROLL
 
 enum UPVState
 {
-	UPV_STATE_DEATH,
-	UPV_STATE_HIT,
-	UPV_STATE_DISMOUNT_SURFACE,
-	UPV_STATE_UNK1,
-	UPV_STATE_MOVE,
-	UPV_STATE_IDLE,
-	UPV_STATE_UNK2,
-	UPV_STATE_UNK3,
-	UPV_STATE_MOUNT,
-	UPV_STATE_DISMOUNT_UNDERWATER
+	UPV_STATE_DEATH = 0,
+	UPV_STATE_HIT = 1,
+	UPV_STATE_DISMOUNT_WATER_SURFACE = 2,
+	UPV_STATE_UNK1 = 3,
+	UPV_STATE_MOVE = 4,
+	UPV_STATE_IDLE = 5,
+	UPV_STATE_UNK2 = 6, // TODO
+	UPV_STATE_UNK3 = 7, // TODO
+	UPV_STATE_MOUNT = 8,
+	UPV_STATE_DISMOUNT_UNDERWATER = 9
 };
 
 // TODO
@@ -111,75 +112,76 @@ enum UPVAnim
 	UPV_ANIM_MOUNT_UNDERWATER = 13,
 };
 
-enum SUB_BITE_FLAG
+enum UPVBiteFlags
 {
-	SUB_FAN = 0,
-	SUB_FRONT_LIGHT,
-	SUB_LEFT_FIN_LEFT,
-	SUB_LEFT_FIN_RIGHT,
-	SUB_RIGHT_FIN_RIGHT,
-	SUB_RIGHT_FIN_LEFT
+	UPV_FAN = 0,
+	UPV_FRONT_LIGHT = 1,
+	UPV_LEFT_FIN_LEFT = 2,
+	UPV_LEFT_FIN_RIGHT = 3,
+	UPV_RIGHT_FIN_RIGHT = 4,
+	UPV_RIGHT_FIN_LEFT = 5
 };
 
 void UPVInitialise(short itemNumber)
 {
-	ITEM_INFO* UPVItem = &g_Level.Items[itemNumber];
+	auto* UPVItem = &g_Level.Items[itemNumber];
 	UPVItem->Data = UPVInfo();
-	UPVInfo* UPV = UPVItem->Data;
+	auto* UPV = (UPVInfo*)UPVItem->Data;
 
-	UPV->Vel = UPV->Rot = 0;
+	UPV->Velocity = 0;
+	UPV->Rot = 0;
 	UPV->Flags = UPV_SURFACE;
-	UPV->WeaponTimer = 0;
+	UPV->HarpoonTimer = 0;
+	UPV->HarpoonLeft = false;
 }
 
-static void FireSubHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
-	short itemNum = CreateItem();
+	auto* lara = GetLaraInfo(laraItem);
+	auto UPV = (UPVInfo*)UPVItem->Data;
 
-	if (itemNum != NO_ITEM)
+	short itemNumber = CreateItem();
+
+	if (itemNumber != NO_ITEM)
 	{
-		static char lr = 0;
-		PHD_VECTOR pos { (lr ? 22 : -22), 24, 230 };
-		ITEM_INFO* harpoonItem = &g_Level.Items[itemNum];
-
+		auto* harpoonItem = &g_Level.Items[itemNumber];
 		harpoonItem->ObjectNumber = ID_HARPOON;
 		harpoonItem->Shade = 0xC210;
 		harpoonItem->RoomNumber = UPVItem->RoomNumber;
 
+		PHD_VECTOR pos{ (UPV->HarpoonLeft ? 22 : -22), 24, 230 };
 		GetJointAbsPosition(UPVItem, &pos, UPV_TURBINE_BONE);
 
 		harpoonItem->Position.xPos = pos.x;
 		harpoonItem->Position.yPos = pos.y;
 		harpoonItem->Position.zPos = pos.z;
-		InitialiseItem(itemNum);
+		InitialiseItem(itemNumber);
 
 		harpoonItem->Position.xRot = UPVItem->Position.xRot;
 		harpoonItem->Position.yRot = UPVItem->Position.yRot;
 		harpoonItem->Position.zRot = 0;
 
+		// TODO: Huh?
 		harpoonItem->VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Position.xRot);
 		harpoonItem->VerticalVelocity = HARPOON_VELOCITY * phd_cos(harpoonItem->Position.xRot);
 		harpoonItem->HitPoints = HARPOON_TIME;
 		harpoonItem->ItemFlags[0] = 1;
 
-		AddActiveItem(itemNum);
+		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &LaraItem->Position, 2);
+		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &laraItem->Position, 2);
 
-		if (Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1])
-			Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1]--;
+		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1])
+			lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1]--;
+
 		Statistics.Game.AmmoUsed++;
-
-		lr ^= 1;
+		UPV->HarpoonLeft = !UPV->HarpoonLeft;
 	}
 }
 
-static void TriggerSubMist(long x, long y, long z, long speed, short angle)
+static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 {
-	long size, xv, zv;
-	SPARKS* sptr;
-
-	sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = &Sparks[GetFreeSpark()];
 
 	sptr->on = 1;
 	sptr->sR = 0;
@@ -200,8 +202,8 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 	sptr->x = x + ((GetRandomControl() & 15) - 8);
 	sptr->y = y + ((GetRandomControl() & 15) - 8);
 	sptr->z = z + ((GetRandomControl() & 15) - 8);
-	zv = speed * phd_cos(angle) / 4;
-	xv = speed * phd_sin(angle) / 4;
+	long zv = velocity * phd_cos(angle) / 4;
+	long xv = velocity * phd_sin(angle) / 4;
 	sptr->xVel = xv + ((GetRandomControl() & 127) - 64);
 	sptr->yVel = 0;
 	sptr->zVel = zv + ((GetRandomControl() & 127) - 64);
@@ -222,61 +224,57 @@ static void TriggerSubMist(long x, long y, long z, long speed, short angle)
 
 	sptr->scalar = 3;
 	sptr->gravity = sptr->maxYvel = 0;
-	size = (GetRandomControl() & 7) + (speed / 2) + 16;
+	long size = (GetRandomControl() & 7) + (velocity / 2) + 16;
 	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 }
 
-void SubEffects(short itemNum)
+void UPVEffects(short itemNumber)
 {
-	if (itemNum == NO_ITEM)
+	if (itemNumber == NO_ITEM)
 		return;
 
-	ITEM_INFO* laraItem = LaraItem;
+	auto* laraItem = LaraItem;
 	auto* lara = GetLaraInfo(laraItem);
-	ITEM_INFO* UPVItem = &g_Level.Items[itemNum];
-	UPVInfo* UPV = UPVItem->Data;
+	auto* UPVItem = &g_Level.Items[itemNumber];
+	auto* UPV = (UPVInfo*)UPVItem->Data;
 
 	PHD_VECTOR pos;
-	long lp;
 
-	if (lara->Vehicle == itemNum)
+	if (lara->Vehicle == itemNumber)
 	{
-		if (!UPV->Vel)
+		if (!UPV->Velocity)
 			UPV->FanRot += ANGLE(2.0f);
 		else
-			UPV->FanRot += (UPV->Vel / 4069);
+			UPV->FanRot += UPV->Velocity / 4069;
 
-		if (UPV->Vel)
+		if (UPV->Velocity)
 		{
-			pos = { UPVBites[SUB_FAN].x, UPVBites[SUB_FAN].y, UPVBites[SUB_FAN].z };
-			GetJointAbsPosition(UPVItem, &pos, UPVBites[SUB_FAN].meshNum);
-			TriggerSubMist(pos.x, pos.y + SUB_DRAW_SHIFT, pos.z, abs(UPV->Vel) / 65536, UPVItem->Position.yRot + ANGLE(180.0f));
+			pos = { UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z };
+			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FAN].meshNum);
+
+			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Position.yRot + ANGLE(180.0f));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
-				PHD_3DPOS pos3d;
-				short roomNum;
-
-				pos3d.xPos = pos.x + (GetRandomControl() & 63) - 32;
-				pos3d.yPos = pos.y + SUB_DRAW_SHIFT;
-				pos3d.zPos = pos.z + (GetRandomControl() & 63) - 32;
-				roomNum = UPVItem->RoomNumber;
-				GetFloor(pos3d.xPos, pos3d.yPos, pos3d.zPos, &roomNum);
-				CreateBubble((PHD_VECTOR*)&pos3d, roomNum, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
+				PHD_3DPOS pos2;
+				pos2.xPos = pos.x + (GetRandomControl() & 63) - 32;
+				pos2.yPos = pos.y + UPV_DRAW_SHIFT;
+				pos2.zPos = pos.z + (GetRandomControl() & 63) - 32;
+				short probedRoomNumber = GetCollisionResult(pos2.xPos, pos2.yPos, pos2.zPos, UPVItem->RoomNumber).RoomNumber;
+				
+				CreateBubble((PHD_VECTOR*)&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
 			}
 		}
 	}
 	
-	for (lp = 0; lp < 2; lp++)
+	for (int lp = 0; lp < 2; lp++)
 	{
+		int random = 31 - (GetRandomControl() & 3);
+		pos = { UPVBites[UPV_FRONT_LIGHT].x, UPVBites[UPV_FRONT_LIGHT].y, UPVBites[UPV_FRONT_LIGHT].z << (lp * 6) };
+		GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FRONT_LIGHT].meshNum);
+
 		GAME_VECTOR	source, target;
-		long r;
-
-		r = 31 - (GetRandomControl() & 3);
-		pos = { UPVBites[SUB_FRONT_LIGHT].x, UPVBites[SUB_FRONT_LIGHT].y, UPVBites[SUB_FRONT_LIGHT].z << (lp * 6) };
-		GetJointAbsPosition(UPVItem, &pos, UPVBites[SUB_FRONT_LIGHT].meshNum);
-
 		if (lp == 1)
 		{
 			target.x = pos.x;
@@ -294,29 +292,29 @@ void SubEffects(short itemNum)
 			source.roomNumber = UPVItem->RoomNumber;
 		}
 
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), r, r, r);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), random, random, random);
 	}
 
-	if (UPV->WeaponTimer)
-		UPV->WeaponTimer--;
+	if (UPV->HarpoonTimer)
+		UPV->HarpoonTimer--;
 }
 
 static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (lara->ExtraVelocity.x || lara->ExtraVelocity.z)
+	if (lara->WaterCurrentPull.x || lara->WaterCurrentPull.z)
 		return false;
 
 	short moveAngle = UPVItem->Position.yRot + ANGLE(180.0f);
-	int speed = GETOFF_DIST * phd_cos(UPVItem->Position.xRot);
-	int x = UPVItem->Position.xPos + speed * phd_sin(moveAngle);
-	int z = UPVItem->Position.zPos + speed * phd_cos(moveAngle);
-	int y = UPVItem->Position.yPos - GETOFF_DIST * phd_sin(-UPVItem->Position.xRot);
-	auto probe = GetCollisionResult(x, y, z, UPVItem->RoomNumber);
+	int velocity = DISMOUNT_DISTANCE * phd_cos(UPVItem->Position.xRot);
+	int x = UPVItem->Position.xPos + velocity * phd_sin(moveAngle);
+	int z = UPVItem->Position.zPos + velocity * phd_cos(moveAngle);
+	int y = UPVItem->Position.yPos - DISMOUNT_DISTANCE * phd_sin(-UPVItem->Position.xRot);
 
-	if (probe.Position.Floor < y ||
-		(probe.Position.Floor - probe.Position.Ceiling) < STEP_SIZE ||
+	auto probe = GetCollisionResult(x, y, z, UPVItem->RoomNumber);
+	if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
+		probe.Position.Floor < y ||
 		probe.Position.Ceiling > y ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT)
@@ -338,97 +336,99 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		return false;
 	}
 
-	int y = abs(laraItem->Position.yPos - (UPVItem->Position.yPos - STEP_SIZE / 2));
-	int dist = pow(laraItem->Position.xPos - UPVItem->Position.xPos, 2) + pow(laraItem->Position.zPos - UPVItem->Position.zPos, 2);
-	short rotDelta = abs(laraItem->Position.yRot - UPVItem->Position.yRot);
-
-	if (y > STEP_SIZE ||
-		dist > pow(STEP_SIZE * 2, 2) ||
-		rotDelta > ANGLE(35.0f) || rotDelta < -ANGLE(35.0f) ||
-		GetCollisionResult(UPVItem).Position.Floor < -32000)
-	{
+	int y = abs(laraItem->Position.yPos - (UPVItem->Position.yPos - CLICK(0.5f)));
+	if (y > CLICK(1))
 		return false;
-	}
+
+	int distance = pow(laraItem->Position.xPos - UPVItem->Position.xPos, 2) + pow(laraItem->Position.zPos - UPVItem->Position.zPos, 2);
+	if (distance > pow(CLICK(2), 2))
+		return false;
+
+	short deltaAngle = abs(laraItem->Position.yRot - UPVItem->Position.yRot);
+	if (deltaAngle > ANGLE(35.0f) || deltaAngle < -ANGLE(35.0f))
+		return false;
+
+	if (GetCollisionResult(UPVItem).Position.Floor < -32000)
+		return false;
 
 	return true;
 }
 
-static void DoCurrent(ITEM_INFO* item)
+static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
+	auto* lara = GetLaraInfo(laraItem);
+
 	PHD_VECTOR target;
 
-	if (!Lara.Control.WaterCurrentActive)
+	if (!lara->WaterCurrentActive)
 	{
-		long shifter, absvel;
-
-		absvel = abs(Lara.ExtraVelocity.x);
-
-		if (absvel > 16)
-			shifter = 4;
-		else if (absvel > 8)
-			shifter = 3;
+		int absVel = abs(lara->WaterCurrentPull.x);
+		int shift;
+		if (absVel > 16)
+			shift = 4;
+		else if (absVel > 8)
+			shift = 3;
 		else
-			shifter = 2;
+			shift = 2;
 
-		Lara.ExtraVelocity.x -= Lara.ExtraVelocity.x >> shifter;
+		lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
 
-		if (abs(Lara.ExtraVelocity.x) < 4)
-			Lara.ExtraVelocity.x = 0;
+		if (abs(lara->WaterCurrentPull.x) < 4)
+			lara->WaterCurrentPull.x = 0;
 
-		absvel = abs(Lara.ExtraVelocity.z);
-		if (absvel > 16)
-			shifter = 4;
-		else if (absvel > 8)
-			shifter = 3;
+		absVel = abs(lara->WaterCurrentPull.z);
+		if (absVel > 16)
+			shift = 4;
+		else if (absVel > 8)
+			shift = 3;
 		else
-			shifter = 2;
+			shift = 2;
 
-		Lara.ExtraVelocity.z -= Lara.ExtraVelocity.z >> shifter;
-		if (abs(Lara.ExtraVelocity.z) < 4)
-			Lara.ExtraVelocity.z = 0;
+		lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
+		if (abs(lara->WaterCurrentPull.z) < 4)
+			lara->WaterCurrentPull.z = 0;
 
-		if (Lara.ExtraVelocity.x == 0 && Lara.ExtraVelocity.z == 0)
+		if (lara->WaterCurrentPull.x == 0 && lara->WaterCurrentPull.z == 0)
 			return;
 	}
 	else
 	{
-		long angle, dx, dz, speed, sinkval;
+		int sinkVal = lara->WaterCurrentActive - 1;
+		target.x = g_Level.Sinks[sinkVal].x;
+		target.y = g_Level.Sinks[sinkVal].y;
+		target.z = g_Level.Sinks[sinkVal].z;
+		
+		int angle = ((mGetAngle(target.x, target.z, laraItem->Position.xPos, laraItem->Position.zPos) - ANGLE(90.0f)) / 16) & 4095;
 
-		sinkval = Lara.Control.WaterCurrentActive - 1;
-		target.x = g_Level.Sinks[sinkval].x;
-		target.y = g_Level.Sinks[sinkval].y;
-		target.z = g_Level.Sinks[sinkval].z;
-		angle = ((mGetAngle(target.x, target.z, LaraItem->Position.xPos, LaraItem->Position.zPos) - ANGLE(90)) / 16) & 4095;
+		int dx = target.x - laraItem->Position.xPos;
+		int dz = target.z - laraItem->Position.zPos;
 
-		dx = target.x - LaraItem->Position.xPos;
-		dz = target.z - LaraItem->Position.zPos;
+		int velocity = g_Level.Sinks[sinkVal].strength;
+		dx = phd_sin(angle * 16) * velocity * 1024;
+		dz = phd_cos(angle * 16) * velocity * 1024;
 
-		speed = g_Level.Sinks[sinkval].strength;
-		dx = phd_sin(angle * 16) * speed * 1024;
-		dz = phd_cos(angle * 16) * speed * 1024;
-
-		Lara.ExtraVelocity.x += ((dx - Lara.ExtraVelocity.x) / 16);
-		Lara.ExtraVelocity.z += ((dz - Lara.ExtraVelocity.z) / 16);
+		lara->WaterCurrentPull.x += ((dx - lara->WaterCurrentPull.x) / 16);
+		lara->WaterCurrentPull.z += ((dz - lara->WaterCurrentPull.z) / 16);
 	}
 
-	item->Position.xPos += (Lara.ExtraVelocity.x / 256);
-	item->Position.zPos += (Lara.ExtraVelocity.z / 256);
-	Lara.Control.WaterCurrentActive = 0;
+	lara->WaterCurrentActive = 0;
+	UPVItem->Position.xPos += lara->WaterCurrentPull.x / CLICK(1);
+	UPVItem->Position.zPos += lara->WaterCurrentPull.z / CLICK(1);
 }
 
 static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	UPVInfo* UPV = UPVItem->Data;
+	auto* UPV = (UPVInfo*)UPVItem->Data;
 	COLL_INFO cinfo, * coll = &cinfo; // ??
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -SUB_HEIGHT;
-	coll->Setup.LowerCeilingBound = SUB_HEIGHT;
+	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
+	coll->Setup.LowerCeilingBound = UPV_HEIGHT;
 	coll->Setup.OldPosition.x = UPVItem->Position.xPos;
 	coll->Setup.OldPosition.y = UPVItem->Position.yPos;
 	coll->Setup.OldPosition.z = UPVItem->Position.zPos;
-	coll->Setup.Radius = SUB_RADIUS;
+	coll->Setup.Radius = UPV_RADIUS;
 	coll->Setup.FloorSlopeIsWall = false;
 	coll->Setup.FloorSlopeIsPit = false;
 	coll->Setup.DeathFlagIsPit = false;
@@ -436,12 +436,18 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.Mode = CollProbeMode::Quadrants;
 
-	if ((UPVItem->Position.xRot >= -16384) && (UPVItem->Position.xRot <= 16384))
-		coll->Setup.ForwardAngle = lara->Control.MoveAngle = UPVItem->Position.yRot;
+	if ((UPVItem->Position.xRot >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Position.xRot <= (SHRT_MAX / 2 + 1)))
+	{
+		lara->Control.MoveAngle = UPVItem->Position.yRot;
+		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	}
 	else
-		coll->Setup.ForwardAngle = lara->Control.MoveAngle = UPVItem->Position.yRot - ANGLE(180.0f);
+	{
+		lara->Control.MoveAngle = UPVItem->Position.yRot - ANGLE(180.0f);
+		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	}
 
-	int height = phd_sin(UPVItem->Position.xRot) * SUB_LENGTH;
+	int height = phd_sin(UPVItem->Position.xRot) * UPV_LENGTH;
 	if (height < 0)
 		height = -height;
 	if (height < 200)
@@ -455,28 +461,28 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	if (coll->CollisionType == CT_FRONT)
 	{
-		if (UPV->RotX > FRONT_TOLERANCE)
-			UPV->RotX += WALLDEFLECT;
-		else if (UPV->RotX < -FRONT_TOLERANCE)
-			UPV->RotX -= WALLDEFLECT;
+		if (UPV->XRot > FRONT_TOLERANCE)
+			UPV->XRot += WALL_DEFLECT;
+		else if (UPV->XRot < -FRONT_TOLERANCE)
+			UPV->XRot -= WALL_DEFLECT;
 		else
 		{
-			if (abs(UPV->Vel) >= MAX_VELOCITY)
+			if (abs(UPV->Velocity) >= MAX_VELOCITY)
 			{
 				laraItem->TargetState = UPV_STATE_HIT;
-				UPV->Vel = -UPV->Vel / 2;
+				UPV->Velocity = -UPV->Velocity / 2;
 			}
 			else
-				UPV->Vel = 0;
+				UPV->Velocity = 0;
 		}
 	}
 	else if (coll->CollisionType == CT_TOP)
 	{
-		if (UPV->RotX >= -TOP_TOLERANCE)
-			UPV->RotX -= WALLDEFLECT;
+		if (UPV->XRot >= -TOP_TOLERANCE)
+			UPV->XRot -= WALL_DEFLECT;
 	}
 	else if (coll->CollisionType == CT_TOP_FRONT)
-		UPV->Vel = 0;
+		UPV->Velocity = 0;
 	else if (coll->CollisionType == CT_LEFT)
 		UPVItem->Position.yRot += ANGLE(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)
@@ -486,21 +492,21 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		UPVItem->Position.xPos = coll->Setup.OldPosition.x;
 		UPVItem->Position.yPos = coll->Setup.OldPosition.y;
 		UPVItem->Position.zPos = coll->Setup.OldPosition.z;
-		UPV->Vel = 0;
+		UPV->Velocity = 0;
 		return;
 	}
 
 	if (coll->Middle.Floor < 0)
 	{
 		UPVItem->Position.yPos += coll->Middle.Floor;
-		UPV->RotX += WALLDEFLECT;
+		UPV->XRot += WALL_DEFLECT;
 	}
 }
 
-static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	UPVInfo* UPV = UPVItem->Data;
+	auto* UPV = (UPVInfo*)UPVItem->Data;
 
 	TestUPVDismount(laraItem, UPVItem);
 
@@ -547,9 +553,9 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else
 		{
 			if (TrInput & UPV_IN_UP)
-				UPV->RotX -= UPDOWN_ACCEL;
+				UPV->XRot -= UPDOWN_ACCEL;
 			else if (TrInput & UPV_IN_DOWN)
-				UPV->RotX += UPDOWN_ACCEL;
+				UPV->XRot += UPDOWN_ACCEL;
 		}
 
 		if (TrInput & UPV_IN_PROPEL)
@@ -561,7 +567,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 				UPV->Flags |= UPV_DIVE;
 			}
 
-			UPV->Vel += ACCELERATION;
+			UPV->Velocity += ACCELERATION;
 		}
 
 		else
@@ -605,34 +611,34 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else
 		{
 			if (TrInput & UPV_IN_UP)
-				UPV->RotX -= UPDOWN_ACCEL;
+				UPV->XRot -= UPDOWN_ACCEL;
 			else if (TrInput & UPV_IN_DOWN)
-				UPV->RotX += UPDOWN_ACCEL;
+				UPV->XRot += UPDOWN_ACCEL;
 		}
 
 		if (TrInput & UPV_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
 		{
-			if (UPV->Vel > 0)
-				UPV->Vel -= ACCELERATION;
+			if (UPV->Velocity > 0)
+				UPV->Velocity -= ACCELERATION;
 			else
 			{
 				if (UPV->Flags & UPV_SURFACE)
-					laraItem->TargetState = UPV_STATE_DISMOUNT_SURFACE;
+					laraItem->TargetState = UPV_STATE_DISMOUNT_WATER_SURFACE;
 				else
 					laraItem->TargetState = UPV_STATE_DISMOUNT_UNDERWATER;
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
-				StopSoundEffect(SFX_TR3_UPV_LOOP);
-				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				StopSoundEffect(SFX_TR3_LITTLE_SUB_LOOP);
+				SoundEffect(SFX_TR3_LITTLE_SUB_STOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 			}
 		}
 
 		else if (TrInput & UPV_IN_PROPEL)
 		{
 			if (TrInput & UPV_IN_UP &&
-				UPV->Flags & UPV_SURFACE &&
-				UPVItem->Position.xRot > -DIVE_ANGLE)
+				UPVItem->Position.xRot > -DIVE_ANGLE &&
+				UPV->Flags & UPV_SURFACE)
 			{
 				UPV->Flags |= UPV_DIVE;
 			}
@@ -649,7 +655,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVItem->Position.xRot += ANGLE(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -658,7 +664,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -670,15 +676,17 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		if (anim == UPV_ANIM_DISMOUNT_UNDERWATER && frame == DISMOUNT_UNDERWATER_FRAME)
 		{
 			UPV->Flags &= ~UPV_CONTROL;
-			PHD_VECTOR vec = { 0, 0, 0 };
-			GAME_VECTOR VPos, LPos;
 
+			PHD_VECTOR vec = { 0, 0, 0 };
 			GetLaraJointPosition(&vec, LM_HIPS);
 
+			GAME_VECTOR LPos;
 			LPos.x = vec.x;
 			LPos.y = vec.y;
 			LPos.z = vec.z;
 			LPos.roomNumber = UPVItem->RoomNumber;
+
+			GAME_VECTOR VPos;
 			VPos.x = UPVItem->Position.xPos;
 			VPos.y = UPVItem->Position.yPos;
 			VPos.z = UPVItem->Position.zPos;
@@ -705,12 +713,11 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		break;
 
-	case UPV_STATE_DISMOUNT_SURFACE:
+	case UPV_STATE_DISMOUNT_WATER_SURFACE:
 		if (anim == UPV_ANIM_DISMOUNT_SURFACE && frame == DISMOUNT_SURFACE_FRAME)
 		{
 			UPV->Flags &= ~UPV_CONTROL;
 			int waterDepth, waterHeight, heightFromWater;
-			PHD_VECTOR vec = { 0, 0, 0 };
 
 			waterDepth = GetWaterSurface(laraItem);
 			waterHeight = GetWaterHeight(laraItem);
@@ -720,6 +727,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			else
 				heightFromWater = NO_HEIGHT;
 
+			PHD_VECTOR vec = { 0, 0, 0 };
 			GetLaraJointPosition(&vec, LM_HIPS);
 
 			laraItem->Position.xPos = vec.x;
@@ -730,14 +738,15 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			SetAnimation(laraItem, LA_ONWATER_IDLE);
 			laraItem->VerticalVelocity = 0;
 			laraItem->Airborne = false;
-			laraItem->Position.xRot = laraItem->Position.zRot = 0;
+			laraItem->Position.xRot = 0;
+			laraItem->Position.zRot = 0;
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
+			ResetLaraFlex(laraItem);
 			lara->Control.WaterStatus = WaterStatus::TreadWater;
 			lara->WaterSurfaceDist = -heightFromWater;
 			lara->Control.Count.Dive = 11;
-			ResetLaraFlex(laraItem);
 			lara->Control.HandStatus = HandStatus::Free;
 			lara->Vehicle = NO_ITEM;
 
@@ -745,7 +754,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		}
 		else
 		{
-			UPV->RotX -= UPDOWN_ACCEL;
+			UPV->XRot -= UPDOWN_ACCEL;
 			if (UPVItem->Position.xRot < 0)
 				UPVItem->Position.xRot = 0;
 		}
@@ -756,7 +765,6 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		if (anim == UPV_ANIM_DEATH && (frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
 		{
 			PHD_VECTOR vec = { 0, 0, 0 };
-
 			GetLaraJointPosition(&vec, LM_HIPS);
 
 			laraItem->Position.xPos = vec.x;
@@ -767,7 +775,7 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
 			laraItem->VerticalVelocity = 0;
-			laraItem->Airborne = 0;
+			laraItem->Airborne = false;
 			
 			UPV->Flags |= UPV_DEAD;
 		}
@@ -784,23 +792,23 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPV->Flags &= ~UPV_DIVE;
 	}
 
-	if (UPV->Vel > 0)
+	if (UPV->Velocity > 0)
 	{
-		UPV->Vel -= FRICTION;
-		if (UPV->Vel < 0)
-			UPV->Vel = 0;
+		UPV->Velocity -= FRICTION;
+		if (UPV->Velocity < 0)
+			UPV->Velocity = 0;
 	}
-	else if (UPV->Vel < 0)
+	else if (UPV->Velocity < 0)
 	{
-		UPV->Vel += FRICTION;
-		if (UPV->Vel > 0)
-			UPV->Vel = 0;
+		UPV->Velocity += FRICTION;
+		if (UPV->Velocity > 0)
+			UPV->Velocity = 0;
 	}
 
-	if (UPV->Vel > MAX_VELOCITY)
-		UPV->Vel = MAX_VELOCITY;
-	else if (UPV->Vel < -MAX_VELOCITY)
-		UPV->Vel = -MAX_VELOCITY;
+	if (UPV->Velocity > MAX_VELOCITY)
+		UPV->Velocity = MAX_VELOCITY;
+	else if (UPV->Velocity < -MAX_VELOCITY)
+		UPV->Velocity = -MAX_VELOCITY;
 
 	if (UPV->Rot > 0)
 	{
@@ -815,17 +823,17 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPV->Rot = 0;
 	}
 
-	if (UPV->RotX > 0)
+	if (UPV->XRot > 0)
 	{
-		UPV->RotX -= UPDOWN_FRICTION;
-		if (UPV->RotX < 0)
-			UPV->RotX = 0;
+		UPV->XRot -= UPDOWN_FRICTION;
+		if (UPV->XRot < 0)
+			UPV->XRot = 0;
 	}
-	else if (UPV->RotX < 0)
+	else if (UPV->XRot < 0)
 	{
-		UPV->RotX += UPDOWN_FRICTION;
-		if (UPV->RotX > 0)
-			UPV->RotX = 0;
+		UPV->XRot += UPDOWN_FRICTION;
+		if (UPV->XRot > 0)
+			UPV->XRot = 0;
 	}
 
 	if (UPV->Rot > MAX_ROTATION)
@@ -833,54 +841,53 @@ static void UserInput(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	else if (UPV->Rot < -MAX_ROTATION)
 		UPV->Rot = -MAX_ROTATION;
 
-	if (UPV->RotX > MAX_UPDOWN)
-		UPV->RotX = MAX_UPDOWN;
-	else if (UPV->RotX < -MAX_UPDOWN)
-		UPV->RotX = -MAX_UPDOWN;
+	if (UPV->XRot > MAX_UPDOWN)
+		UPV->XRot = MAX_UPDOWN;
+	else if (UPV->XRot < -MAX_UPDOWN)
+		UPV->XRot = -MAX_UPDOWN;
 }
 
-void NoGetOnCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (!TestBoundsCollide(item, laraitem, coll->Setup.Radius))
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
-	if (!TestCollision(item, laraitem))
+	if (!TestCollision(item, laraItem))
 		return;
 
-	ItemPushItem(item, laraitem, coll, 0, 0);
+	ItemPushItem(item, laraItem, coll, 0, 0);
 }
 
-void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
+void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
+	auto* UPVItem = &g_Level.Items[itemNumber];
 
 	if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
 		return;
 
-	ITEM_INFO* UPVItem = &g_Level.Items[itemNum];
-
 	if (TestUPVMount(laraItem, UPVItem))
 	{
-		lara->Vehicle = itemNum;
+		lara->Vehicle = itemNumber;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			CreateFlare(LaraItem, ID_FLARE_ITEM, 0);
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
 			UndrawFlareMeshes(laraItem);
 
 			lara->Flare.ControlLeft = false;
-			lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
-		lara->Control.HandStatus = HandStatus::Busy;
 		laraItem->Position.xPos = UPVItem->Position.xPos;
 		laraItem->Position.yPos = UPVItem->Position.yPos;
 		laraItem->Position.zPos = UPVItem->Position.zPos;
 		laraItem->Position.xRot = UPVItem->Position.xRot;
 		laraItem->Position.yRot = UPVItem->Position.yRot;
 		laraItem->Position.zRot = UPVItem->Position.zRot;
+		lara->Control.HandStatus = HandStatus::Busy;
 		UPVItem->HitPoints = 1;
 
 		if (laraItem->ActiveState == LS_ONWATER_STOP || laraItem->ActiveState == LS_ONWATER_FORWARD)
@@ -893,36 +900,36 @@ void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 			laraItem->AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
 			laraItem->ActiveState = laraItem->TargetState = UPV_STATE_MOUNT;
 		}
-		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 
+		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 		AnimateItem(laraItem);
 	}
 	else
 	{
-		UPVItem->Position.yPos += SUB_DRAW_SHIFT;
-		NoGetOnCollision(itemNum, laraItem, coll);
-		UPVItem->Position.yPos -= SUB_DRAW_SHIFT;
+		UPVItem->Position.yPos += UPV_DRAW_SHIFT;
+		NoGetOnCollision(itemNumber, laraItem, coll);
+		UPVItem->Position.yPos -= UPV_DRAW_SHIFT;
 	}
 }
 
-bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	ITEM_INFO* UPVItem = &g_Level.Items[lara->Vehicle];
-	UPVInfo* UPV = UPVItem->Data;
+	auto* UPVItem = &g_Level.Items[lara->Vehicle];
+	auto* UPV = (UPVInfo*)UPVItem->Data;
 	
 	auto oldPos = UPVItem->Position;
 	auto probe = GetCollisionResult(UPVItem);
 
 	if (!(UPV->Flags & UPV_DEAD))
 	{
-		UserInput(laraItem, UPVItem);
+		UPVControl(laraItem, UPVItem);
 
-		UPVItem->VerticalVelocity = UPV->Vel / 65536;
+		UPVItem->VerticalVelocity = UPV->Velocity / (USHRT_MAX + 1);
 
-		UPVItem->Position.xRot += UPV->RotX / 65536;
-		UPVItem->Position.yRot += UPV->Rot / 65536;
-		UPVItem->Position.zRot = UPV->Rot / 65536;
+		UPVItem->Position.xRot += UPV->XRot / (USHRT_MAX + 1);
+		UPVItem->Position.yRot += UPV->Rot / (USHRT_MAX + 1);
+		UPVItem->Position.zRot = UPV->Rot / (USHRT_MAX + 1);
 
 		if (UPVItem->Position.xRot > UPDOWN_LIMIT)
 			UPVItem->Position.xRot = UPDOWN_LIMIT;
@@ -937,7 +944,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
 	int waterHeight = GetWaterHeight(UPVItem);
 
-	if ((newHeight - waterHeight) < SUB_HEIGHT || (newHeight < UPVItem->Position.yPos - SUB_HEIGHT / 2))
+	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Position.yPos - UPV_HEIGHT / 2))
 	{
 		UPVItem->Position.xPos = oldPos.xPos;
 		UPVItem->Position.yPos = oldPos.yPos;
@@ -949,7 +956,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	if (UPV->Flags & UPV_CONTROL && !(UPV->Flags & UPV_DEAD))
 	{
-		if (!(g_Level.Rooms[UPVItem->RoomNumber].flags & ENV_FLAG_WATER) &&
+		if (!TestEnvironment(ENV_FLAG_WATER, UPVItem->RoomNumber) &&
 			waterHeight != NO_HEIGHT)
 		{
 			if ((waterHeight - UPVItem->Position.yPos) >= -SURFACE_DIST)
@@ -957,7 +964,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->Position, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Position, 2);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 
@@ -970,7 +977,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &LaraItem->Position, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Position, 2);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 
@@ -985,7 +992,6 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			if (laraItem->HitPoints > 0)
 			{
 				lara->Air--;
-
 				if (lara->Air < 0)
 				{
 					lara->Air = -1;
@@ -998,31 +1004,30 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			if (laraItem->HitPoints >= 0)
 			{
 				lara->Air += 10;
-
-				if (lara->Air > 1800)
-					lara->Air = 1800;
+				if (lara->Air > LARA_AIR_MAX)
+					lara->Air = LARA_AIR_MAX;
 			}
 		}
 	}
 
 	TestTriggers(UPVItem, false);
-	SubEffects(lara->Vehicle);
+	UPVEffects(lara->Vehicle);
 
 	if (!(UPV->Flags & UPV_DEAD) &&
 		lara->Vehicle != NO_ITEM)
 	{
-		DoCurrent(UPVItem);
+		DoCurrent(laraItem, UPVItem);
 
 		if (TrInput & UPV_IN_FIRE &&
 			UPV->Flags & UPV_CONTROL &&
-			!UPV->WeaponTimer)
+			!UPV->HarpoonTimer)
 		{
 			if (laraItem->ActiveState != UPV_STATE_DISMOUNT_UNDERWATER &&
-				laraItem->ActiveState != UPV_STATE_DISMOUNT_SURFACE &&
+				laraItem->ActiveState != UPV_STATE_DISMOUNT_WATER_SURFACE &&
 				laraItem->ActiveState != UPV_STATE_MOUNT)
 			{
-				FireSubHarpoon(laraItem, UPVItem);
-				UPV->WeaponTimer = HARPOON_RELOAD;
+				FireUPVHarpoon(laraItem, UPVItem);
+				UPV->HarpoonTimer = HARPOON_RELOAD;
 			}
 		}
 
@@ -1043,7 +1048,7 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * 65536));
+			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * (USHRT_MAX + 1)));
 
 		UPVItem->AnimNumber = Objects[ID_UPV].animIndex + (laraItem->AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->FrameNumber = g_Level.Anims[UPVItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
@@ -1064,10 +1069,9 @@ bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 		BackgroundCollision(laraItem, UPVItem);
 
-		UPV->RotX = 0;
+		UPV->XRot = 0;
 
 		SetAnimation(UPVItem, UPV_ANIM_IDLE);
-		UPVItem->VerticalVelocity = 0;
 		UPVItem->VerticalVelocity = 0;
 		UPVItem->Airborne = true;
 		AnimateItem(UPVItem);

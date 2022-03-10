@@ -9,35 +9,35 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 
-int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
+bool ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-	ITEM_INFO* enemy = creature->enemy;
+	auto* creature = GetCreatureInfo(item);
+	auto* enemy = creature->Enemy;
 
-	int hit = 0;
-	int targetable = 0;
+	bool hit = false;
+	bool targetable = false;
 
-	if (info->distance <= SQUARE(MAX_VISIBILITY_DISTANCE) && Targetable(item, info))
+	if (info->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->Velocity * SQUARE(MAX_VISIBILITY_DISTANCE) / 300;
-		distance = info->distance + SQUARE(distance);
-		if (distance <= SQUARE(MAX_VISIBILITY_DISTANCE))
+		int distance = phd_sin(info->enemyFacing) * enemy->Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
+		distance = pow(distance, 2) + info->distance;
+		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
-			int random = (SQUARE(MAX_VISIBILITY_DISTANCE) - info->distance) / (SQUARE(MAX_VISIBILITY_DISTANCE) / 0x5000) + 8192;
-			hit = (GetRandomControl() < random);
+			int random = (pow(MAX_VISIBILITY_DISTANCE, 2) - info->distance) / (pow(MAX_VISIBILITY_DISTANCE, 2) / 0x5000) + 8192;
+			hit = GetRandomControl() < random;
 		}
 		else
-		{
-			hit = 0;
-		}
-		targetable = 1;
+			hit = false;
+		
+		targetable = true;
 	}
 	else
 	{
-		hit = 0;
-		targetable = 0;
+		hit = false;
+		targetable = false;
 	}
 
 	if (damage)
@@ -51,9 +51,7 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 				LaraItem->HitStatus = true; 
 			}
 			else if (targetable)
-			{
 				CreatureEffect(item, gun, &GunMiss);
-			}
 		}
 		else
 		{
@@ -67,11 +65,7 @@ int ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotatio
 				if (random > 14)
 					random = 0;
 
-				PHD_VECTOR pos;
-				pos.x = 0;
-				pos.y = 0;
-				pos.z = 0;
-
+				PHD_VECTOR pos = { 0, 0, 0 };
 				GetJointAbsPosition(enemy, &pos, random);
 				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Position.yRot, enemy->RoomNumber);
 			}
@@ -99,12 +93,7 @@ short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 
 short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 {
-	PHD_VECTOR pos;
-
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-
+	PHD_VECTOR pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Position.yRot, LaraItem->RoomNumber);
@@ -118,31 +107,28 @@ short GunShot(int x, int y, int z, short speed, short yrot, short roomNumber)
 	return -1;
 }
 
-int Targetable(ITEM_INFO* item, AI_INFO* info) 
+bool Targetable(ITEM_INFO* item, AI_INFO* info) 
 {
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-	ITEM_INFO* enemy = creature->enemy;
+	auto* creature = GetCreatureInfo(item);
+	auto* enemy = creature->Enemy;
 
-	if (enemy == NULL || enemy->HitPoints <= 0 || !info->ahead || info->distance >= SQUARE(MAX_VISIBILITY_DISTANCE))
-		return 0;
+	if (enemy == NULL || enemy->HitPoints <= 0 || !info->ahead || info->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
+		return false;
 
-	if (!enemy->Data.is<CREATURE_INFO>() && !enemy->Data.is<LaraInfo*>())
-		return 0;
-
-	GAME_VECTOR start, target;
+	if (!enemy->Data.is<CreatureInfo>() && !enemy->Data.is<LaraInfo*>())
+		return false;
 
 	BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
+	GAME_VECTOR start;
 	start.x = item->Position.xPos;
-	if (item->ObjectNumber == ID_SNIPER)
-		start.y = item->Position.yPos - 768;
-	else
-		start.y = item->Position.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
+	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Position.yPos - CLICK(3)) : (item->Position.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4));
 	start.z = item->Position.zPos;
 	start.roomNumber = item->RoomNumber;
 
 	bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 
+	GAME_VECTOR target;
 	target.x = enemy->Position.xPos;
 	target.y = enemy->Position.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
 	target.z = enemy->Position.zPos;
@@ -150,19 +136,19 @@ int Targetable(ITEM_INFO* item, AI_INFO* info)
 	return LOS(&start, &target);
 }
 
-int TargetVisible(ITEM_INFO* item, AI_INFO* info) 
+bool TargetVisible(ITEM_INFO* item, AI_INFO* info) 
 {
-	CREATURE_INFO*  creature = (CREATURE_INFO*)item->Data;
-	ITEM_INFO* enemy = creature->enemy;
+	auto* creature = GetCreatureInfo(item);
+	auto* enemy = creature->Enemy;
 
 	if (enemy != NULL)
 	{
-		short angle = info->angle - creature->jointRotation[2];
-		if (enemy->HitPoints != 0 && angle > -ANGLE(45) && angle < ANGLE(45) && info->distance < SQUARE(MAX_VISIBILITY_DISTANCE))
+		short angle = info->angle - creature->JointRotation[2];
+		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && info->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
 			GAME_VECTOR start;
 			start.x = item->Position.xPos;
-			start.y = item->Position.yPos - 768;
+			start.y = item->Position.yPos - CLICK(3);
 			start.z = item->Position.zPos;
 			start.roomNumber = item->RoomNumber;
 
@@ -176,5 +162,5 @@ int TargetVisible(ITEM_INFO* item, AI_INFO* info)
 		}
 	}
 
-	return 0;
+	return false;
 }

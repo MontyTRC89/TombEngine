@@ -32,12 +32,12 @@ void WorkerMachineGunControl(short itemNum)
 		return;
 
 	ITEM_INFO* item;
-	CREATURE_INFO* machinegun;
+	CreatureInfo* machinegun;
 	AI_INFO info;
 	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
 	item = &g_Level.Items[itemNum];
-	machinegun = (CREATURE_INFO*)item->Data;
+	machinegun = (CreatureInfo*)item->Data;
 	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
 	if (item->HitPoints <= 0)
@@ -54,13 +54,13 @@ void WorkerMachineGunControl(short itemNum)
 		CreatureAIInfo(item, &info);
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, machinegun->maximumTurn);
+		angle = CreatureTurn(item, machinegun->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 1:
-			machinegun->flags = 0;
-			machinegun->maximumTurn = 0;
+			machinegun->Flags = 0;
+			machinegun->MaxTurn = 0;
 
 			if (info.ahead)
 			{
@@ -68,7 +68,7 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood == ESCAPE_MOOD)
+			if (machinegun->Mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -79,7 +79,7 @@ void WorkerMachineGunControl(short itemNum)
 				else
 					item->TargetState = 2;
 			}
-			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
+			else if (machinegun->Mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance <= 0x400000)
 					item->TargetState = 2;
@@ -93,7 +93,7 @@ void WorkerMachineGunControl(short itemNum)
 			break;
 
 		case 2:
-			machinegun->maximumTurn = 546;
+			machinegun->MaxTurn = 546;
 
 			if (info.ahead)
 			{
@@ -101,7 +101,7 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood == ESCAPE_MOOD)
+			if (machinegun->Mood == MoodType::Escape)
 			{
 				item->TargetState = 3;
 			}
@@ -112,7 +112,7 @@ void WorkerMachineGunControl(short itemNum)
 				else
 					item->TargetState = 6;
 			}
-			else if (machinegun->mood == ATTACK_MOOD || !info.ahead)
+			else if (machinegun->Mood == MoodType::Attack || !info.ahead)
 			{
 				if (info.distance > 0x400000)
 					item->TargetState = 3;
@@ -124,7 +124,7 @@ void WorkerMachineGunControl(short itemNum)
 			break;
 
 		case 3:
-			machinegun->maximumTurn = 910;
+			machinegun->MaxTurn = 910;
 
 			if (info.ahead)
 			{
@@ -132,13 +132,13 @@ void WorkerMachineGunControl(short itemNum)
 				head_x = info.xAngle;
 			}
 
-			if (machinegun->mood != ESCAPE_MOOD)
+			if (machinegun->Mood != MoodType::Escape)
 			{
 				if (Targetable(item, &info))
 				{
 					item->TargetState = 2;
 				}
-				else if (machinegun->mood == BORED_MOOD || machinegun->mood == STALK_MOOD)
+				else if (machinegun->Mood == MoodType::Bored || machinegun->Mood == MoodType::Stalk)
 				{
 					item->TargetState = 2;
 				}
@@ -158,7 +158,7 @@ void WorkerMachineGunControl(short itemNum)
 			}
 			else
 			{
-				if (machinegun->mood == ATTACK_MOOD)
+				if (machinegun->Mood == MoodType::Attack)
 				{
 					item->TargetState = 1;
 				}
@@ -171,7 +171,7 @@ void WorkerMachineGunControl(short itemNum)
 
 		case 8:
 		case 10:
-			machinegun->flags = 0;
+			machinegun->Flags = 0;
 
 			if (info.ahead)
 			{
@@ -190,7 +190,7 @@ void WorkerMachineGunControl(short itemNum)
 			break;
 
 		case 9:
-			machinegun->flags = 0;
+			machinegun->Flags = 0;
 
 			if (info.ahead)
 			{
@@ -216,18 +216,18 @@ void WorkerMachineGunControl(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (machinegun->flags)
+			if (machinegun->Flags)
 			{
-				machinegun->flags--;
+				machinegun->Flags--;
 			}
 			else
 			{
 				ShotLara(item, &info, &workerMachineGun, torso_y, 30);
-				item->FiredWeapon = 1;
-				machinegun->flags = 5;
+				machinegun->FiredWeapon = 1;
+				machinegun->Flags = 5;
 			}
 
-			if (item->TargetState != 1 && (machinegun->mood == ESCAPE_MOOD || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->TargetState != 1 && (machinegun->Mood == MoodType::Escape || info.distance > 0x900000 || !Targetable(item, &info)))
 			{
 				item->TargetState = 1;
 			}
@@ -240,15 +240,15 @@ void WorkerMachineGunControl(short itemNum)
 				torso_x = info.xAngle;
 			}
 
-			if (machinegun->flags)
+			if (machinegun->Flags)
 			{
-				machinegun->flags--;
+				machinegun->Flags--;
 			}
 			else
 			{
 				ShotLara(item, &info, &workerMachineGun, torso_y, 30);
-				item->FiredWeapon = 1;
-				machinegun->flags = 5;
+				machinegun->FiredWeapon = 1;
+				machinegun->Flags = 5;
 			}
 			break;
 		}

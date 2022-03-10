@@ -120,7 +120,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 		laraItem->AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		trapDoorItem->Status != ITEM_ACTIVE ||
-		laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
@@ -147,7 +147,7 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 			}
 			else
-				laraInfo->interactedItem =itemNumber;
+				laraInfo->InteractedItem =itemNumber;
 		}
 	}
 	else
