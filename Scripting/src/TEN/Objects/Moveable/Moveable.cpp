@@ -50,24 +50,6 @@ Moveable::~Moveable()
 }
 
 
-/*** If you create items with this you NEED to give a position, room, 
-and object number, and then call InitialiseItem before it will work.
-	@function Moveable.New
-*/
-
-/*** Like above, but the returned variable controls the 
-lifetime of the object (it will be destroyed when the variable goes
-out of scope).
-	@function Moveable.NewTemporary
-*/
-template <bool temp> std::unique_ptr<Moveable> CreateEmpty()
-{
-	short num = CreateItem();	
-	ITEM_INFO * item = &g_Level.Items[num];
-	auto ptr = std::make_unique<Moveable>(num, temp, false);
-	return ptr;
-}
-
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
 most can just be set to zero (see usage). See also the overload which
@@ -76,13 +58,13 @@ takes no arguments.
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Position position position in level
-	@tparam Rotation rotation rotation about x, y, and z axes
+	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation.new(0, 0, 0))
 	@tparam int room room ID item is in
-	@tparam int animNumber anim number
-	@tparam int frameNumber frame number
-	@tparam int hp HP of item
-	@tparam int OCB ocb of item
-	@tparam table AIBits table with AI bits
+	@tparam int animNumber anim number (default 0)
+	@tparam int frameNumber frame number (default 0)
+	@tparam int hp HP of item (default 10)
+	@tparam int OCB ocb of item (default 0)
+	@tparam table AIBits table with AI bits (default {0,0,0,0,0,0})
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable.New(
@@ -93,7 +75,7 @@ takes no arguments.
 		0, -- room
 		0, -- animNumber
 		0, -- frameNumber
-		0, -- HP
+		10, -- HP
 		0, -- OCB
 		{0,0,0,0,0,0} -- aiBits
 		)
@@ -106,17 +88,20 @@ out of scope).
 	@param see_above same as above function
 */
 
+#define USE_IF_HAVE(Type, ifthere, ifnotthere) \
+std::holds_alternative<Type>(ifthere) ? std::get<Type>(ifthere) : ifnotthere
+
 template <bool temp> static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,
 	Position const & pos,
-	Rotation const & rot,
+	TypeOrNil<Rotation> const & rot,
 	short room,
-	int animNumber,
-	int frameNumber,
-	short hp,
-	short ocb,
-	aiBitsType const & aiBits
+	TypeOrNil<int> animNumber,
+	TypeOrNil<int> frameNumber,
+	TypeOrNil<short> hp,
+	TypeOrNil<short> ocb,
+	TypeOrNil<aiBitsType> const & aiBits
 )
 {
 	short num = CreateItem();
@@ -124,17 +109,17 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 
 	ITEM_INFO* item = &g_Level.Items[num];
 	ptr->SetPos(pos);
-	ptr->SetRot(rot);
+	ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 	ptr->SetRoom(room);
 	ptr->SetObjectID(objID);
 	ptr->Init();
 
 	ptr->SetName(name);
-	ptr->SetAnimNumber(animNumber);
-	ptr->SetFrameNumber(frameNumber);
-	ptr->SetHP(hp);
-	ptr->SetOCB(ocb);
-	ptr->SetAIBits(aiBits);
+	ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
+	ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+	ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+	ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
+	ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 
 	return ptr;
 }
@@ -142,8 +127,8 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_new, sol::overload(Create<false>, CreateEmpty<false>),
-		ScriptReserved_newTemporary, sol::overload(Create<true>, CreateEmpty<true>),
+		ScriptReserved_new, Create<false>,
+		ScriptReserved_newTemporary, Create<true>,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
