@@ -101,6 +101,7 @@ void lara_as_vault(ITEM_INFO* item, COLL_INFO* coll)
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Position.yPos);
 	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
+	item->TargetState = LS_IDLE;
 }
 
 // State:		LS_AUTO_JUMP (62)
@@ -1363,8 +1364,6 @@ void lara_as_death(ITEM_INFO* item, COLL_INFO* coll)
 		item->MeshBits = -1;
 		lara->Inventory.IsBusy = false;
 	}
-
-	CalculateItemRotationToSurface(item);
 }
 
 // State:		LS_DEATH (8)
