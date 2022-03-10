@@ -58,6 +58,9 @@ static constexpr char const ScriptReserved_GetRoom[]			= "GetRoom";
 static constexpr char const ScriptReserved_SetRoom[]			= "SetRoom";
 static constexpr char const ScriptReserved_GetStrength[]		= "GetStrength";
 static constexpr char const ScriptReserved_SetStrength[]		= "SetStrength";
+static constexpr char const ScriptReserved_Destroy[]			= "Destroy";
+static constexpr char const ScriptReserved_GetKey[]				= "GetKey";
+static constexpr char const ScriptReserved_SetKey[]				= "SetKey";
 
 
 // Flow Functions
