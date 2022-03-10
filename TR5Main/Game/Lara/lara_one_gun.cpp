@@ -136,11 +136,11 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 						//						HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR5_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Position, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, &laraItem->Position, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, &laraItem->Position, 0);
 						}
 					}
 					else
@@ -156,8 +156,8 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				//				HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR5_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &laraItem->Position, 0);
+				StopSoundEffect(SFX_LARA_HK_FIRE);
+				SoundEffect(SFX_LARA_HK_STOP, &laraItem->Position, 0);
 				//				HKFlag = 0;
 			}
 		}
@@ -211,7 +211,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Position, 83888140);
-							SoundEffect(SFX_TR5_HK_FIRE, &laraItem->Position, 0);
+							SoundEffect(SFX_LARA_HK_FIRE, &laraItem->Position, 0);
 						}
 					}
 					else
@@ -226,8 +226,8 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 				//				HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR5_HK_FIRE);
-				SoundEffect(SFX_TR5_HK_STOP, &laraItem->Position, 0);
+				StopSoundEffect(SFX_LARA_HK_FIRE);
+				SoundEffect(SFX_LARA_HK_STOP, &laraItem->Position, 0);
 				//				HKFlag = 0;
 			}
 			/*			else if (HKFlag)
