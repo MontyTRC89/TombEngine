@@ -33,38 +33,66 @@ void AIObject::Register(sol::table & parent)
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
-		/// (@{Position}) position in level
-		// @mem pos
-		"pos", sol::property(&AIObject::GetPos, &AIObject::SetPos),
+		/// Get the object's position
+		// @function GetPosition
+		// @treturn Position a copy of the object's position
+		ScriptReserved_GetPosition, &AIObject::GetPos,
 
-		/// (int) y-axis rotation
-		// @mem yRot
-		"yRot", sol::property(&AIObject::GetYRot, &AIObject::SetYRot),
+		/// Set the object's position
+		// @function SetPosition
+		// @tparam Position position the new position of the object 
+		ScriptReserved_SetPosition, &AIObject::SetPos,
 
-		/// (string) unique string identifier.
-		// e.g. "door_back_room" or "cracked_greek_statue"
-		// @mem name
-		"name", sol::property(&AIObject::GetName, &AIObject::SetName),
+		/// Get the object's Y-axis rotation
+		// To the best of my knowledge, the rotation of an AIObject has no effect.
+		// @function GetRotationY
+		// @treturn number the object's Y-axis rotation 
+		ScriptReserved_GetRotationY, &AIObject::GetYRot,
 
-		/// (int) room number
-		// @mem room
-		"room", sol::property(&AIObject::GetRoom, &AIObject::SetRoom),
+		/// Set the object's Y-axis rotation
+		// To the best of my knowledge, the rotation of an AIObject has no effect.
+		// @function SetRotationY
+		// @tparam number The object's new Y-axis rotation
+		ScriptReserved_SetRotationY, &AIObject::SetYRot,
 
-		/// (@{ObjID}) object ID
-		// @mem objID
-		"objID", sol::property(&AIObject::GetObjID, &AIObject::SetObjID),
+		/// Get the object's unique string identifier
+		// @function GetName
+		// @treturn string the object's name
+		ScriptReserved_GetName, &AIObject::GetName,
 
-		/// (short) flags
-		// @mem flags
-		"flags", sol::property(&AIObject::GetFlags, &AIObject::SetFlags),
+		/// Set the object's name (its unique string identifier)
+		// @function SetName
+		// @tparam string name The object's new name
+		ScriptReserved_SetName, &AIObject::SetName,
 
-		/// (short) trigger flags
-		// @mem triggerFlags
-		"triggerFlags", sol::property(&AIObject::GetTriggerFlags, &AIObject::SetTriggerFlags),
+		/// Get the current room of the object
+		// @function AIObject:GetRoom
+		// @treturn int number representing the current room of the object
+		ScriptReserved_GetRoom, &AIObject::GetRoom,
 
-		/// (short) box number
-		// @mem boxNumber
-		"boxNumber", sol::property(&AIObject::GetBoxNumber, &AIObject::SetBoxNumber)
+		/// Set room of object 
+		// This is used in conjunction with SetPosition to teleport the object to a new room.
+		// @function AIObject:SetRoom
+		// @tparam int ID the ID of the new room 
+		ScriptReserved_SetRoom, &AIObject::SetRoom,
+
+		/// Retrieve the object ID
+		// @function AIObject:GetObjectID
+		// @treturn int a number representing the ID of the object
+		ScriptReserved_GetObjectID, &AIObject::GetObjectID,
+
+		/// Change the object's ID. This will change the type of AI object it is.
+		// Note that a baddy will gain the behaviour of the tile it's on _before_ said baddy is triggered.
+		// This means that changing the type of an AI object beneath a moveable will have no effect.
+		// Instead, this function can be used to change an object that the baddy isn't standing on.
+		// For example, you could have a pair of AI_GUARD objects, and change one or the other two
+		// AI_PATROL_1 based on whether the player has a certain item or not.
+		// @function AIObject:SetObjectID
+		// @tparam ObjectID ID the new ID 
+		// @usage
+		// aiObj = TEN.Objects.GetMoveableByName("ai_guard_sphinx_room")
+		// aiObj:SetObjectID(TEN.Objects.ObjID.AI_PATROL1)
+		ScriptReserved_SetObjectID, &AIObject::SetObjectID
 		);
 }
 
@@ -80,12 +108,12 @@ void AIObject::SetPos(Position const& pos)
 	m_aiObject.z = pos.z;
 }
 
-GAME_OBJECT_ID AIObject::GetObjID() const
+GAME_OBJECT_ID AIObject::GetObjectID() const
 {
 	return m_aiObject.objectNumber;
 }
 
-void AIObject::SetObjID(GAME_OBJECT_ID objNum)
+void AIObject::SetObjectID(GAME_OBJECT_ID objNum)
 {
 	m_aiObject.objectNumber = objNum;
 }
@@ -107,18 +135,22 @@ std::string AIObject::GetName() const
 
 void AIObject::SetName(std::string const & id) 
 {
-	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
+	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
+	{
+		return;
+	}
 
-	// remove the old name if we have one
-	s_callbackRemoveName(m_aiObject.luaName);
-
-	// un-register any other objects using this name.
-	// maybe we should throw an error if another object
-	// already uses the name...
-	s_callbackRemoveName(id);
-	m_aiObject.luaName = id;
-	// todo add error checking
-	s_callbackSetName(id, m_aiObject);
+	if (s_callbackSetName(id, m_aiObject))
+	{
+		// remove the old name if we have one
+		s_callbackRemoveName(m_aiObject.luaName);
+		m_aiObject.luaName = id;
+	}
+	else
+	{
+		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
+		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+	}
 }
 
 short AIObject::GetRoom() const
@@ -128,36 +160,14 @@ short AIObject::GetRoom() const
 
 void AIObject::SetRoom(short room)
 {
+	const size_t nRooms = g_Level.Rooms.size();
+	if (room < 0 || static_cast<size_t>(room) >= nRooms)
+	{
+		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", room, nRooms);
+		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
+		return;
+	}
+
 	m_aiObject.roomNumber = room;
-}
-
-short AIObject::GetTriggerFlags() const
-{
-	return m_aiObject.triggerFlags;
-}
-
-void AIObject::SetTriggerFlags(short tf)
-{
-	m_aiObject.triggerFlags = tf;
-}
-
-short AIObject::GetFlags() const
-{
-	return m_aiObject.flags;
-}
-
-void AIObject::SetFlags(short tf)
-{
-	m_aiObject.flags = tf;
-}
-
-short AIObject::GetBoxNumber() const
-{
-	return m_aiObject.boxNumber;
-}
-
-void AIObject::SetBoxNumber(short bn)
-{
-	m_aiObject.boxNumber = bn;
 }
 #endif

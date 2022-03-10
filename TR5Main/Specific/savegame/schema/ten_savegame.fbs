@@ -285,6 +285,21 @@ table Pendulum {
 	node: int32;
 }
 
+table ScriptNumber {
+	key: string;
+	value: double;
+}
+
+table ScriptBool {
+	key: string;
+	value: bool;
+}
+
+table ScriptString {
+	key: string;
+	value: string;
+}
+
 table SaveGameHeader {
 	level_name: string;
 	days: int32;
@@ -312,7 +327,7 @@ table SaveGame {
 	level: SaveGameStatistics;
 	lara: Lara;
 	active_weapon: WeaponInfo;
-    items: [Item];
+	items: [Item];
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
@@ -334,6 +349,12 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
+	script_bool_level: [ScriptBool];
+	script_number_level: [ScriptNumber];
+	script_string_level: [ScriptString];
+	script_bool_game: [ScriptBool];
+	script_number_game: [ScriptNumber];
+	script_string_game: [ScriptString];
 }
 
 root_type TEN.Save.SaveGame;

@@ -56,7 +56,7 @@ public:
 	DisplayString();
 	~DisplayString();
 	DisplayStringIDType GetID() const;
-	static void Register(sol::state* state);
+	static void Register(sol::table & parent);
 
 	void SetPos(int x, int y);
 	std::tuple<int, int> GetPos() const;

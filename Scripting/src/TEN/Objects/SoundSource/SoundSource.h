@@ -25,9 +25,6 @@ public:
 	int GetSoundID() const;
 	void SetSoundID(int soundID);
 
-	int GetFlags() const;
-	void SetFlags(int flags);
-
 	std::string GetName() const;
 	void SetName(std::string const &);
 
