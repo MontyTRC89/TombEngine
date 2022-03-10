@@ -169,7 +169,7 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_TR3_LARA_HARPOON_FIRE_WATER, &laraItem->Position, 2);
+		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &laraItem->Position, 2);
 
 		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1])
 			lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1]--;
@@ -629,8 +629,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
-				StopSoundEffect(SFX_TR3_LITTLE_SUB_LOOP);
-				SoundEffect(SFX_TR3_LITTLE_SUB_STOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				StopSoundEffect(SFX_TR3_UPV_LOOP);
+				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 			}
 		}
 
@@ -655,7 +655,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPVItem->Position.xRot += ANGLE(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -664,7 +664,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -1048,7 +1048,7 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_LITTLE_SUB_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * (USHRT_MAX + 1)));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * (USHRT_MAX + 1)));
 
 		UPVItem->AnimNumber = Objects[ID_UPV].animIndex + (laraItem->AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->FrameNumber = g_Level.Anims[UPVItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
