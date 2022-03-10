@@ -1,5 +1,5 @@
 #pragma once
-struct MOTORBIKE_INFO {
+struct MotorbikeInfo {
 	int wheelRight;  // (two wheel: front and back)
 	int wheelLeft;   // (one wheel: left)
 	int velocity;

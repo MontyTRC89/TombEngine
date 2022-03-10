@@ -40,9 +40,9 @@ ITEM_INFO* FindReference(ITEM_INFO* item, short objectNumber)
 	return (itemNumber == NO_ITEM ? NULL : &g_Level.Items[itemNumber]);
 }
 
-static short GetWeaponDamage(int weaponType)
+static short GetWeaponDamage(LaraWeaponType weaponType)
 {
-	return short(Weapons[weaponType].Damage) * 25;
+	return short(Weapons[(int)weaponType].Damage) * 25;
 }
 
 void DoppelgangerControl(short itemNumber)
@@ -52,7 +52,7 @@ void DoppelgangerControl(short itemNumber)
 	if (item->HitPoints < 1000)
 	{
 		item->HitPoints = 1000;
-		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.WeaponControl.GunType);
+		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.Weapon.GunType);
 	}
 
 	auto* reference = FindReference(item, ID_BACON_REFERENCE);

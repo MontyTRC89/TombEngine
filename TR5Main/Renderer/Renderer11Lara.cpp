@@ -21,14 +21,14 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon) {
 	ITEM_INFO& laraItem = *LaraItem;
 	LaraInfo& laraInfo = Lara;
 	switch(weapon){
-		case WEAPON_ROCKET_LAUNCHER:
-		case WEAPON_HARPOON_GUN:
-		case WEAPON_GRENADE_LAUNCHER:
-		case WEAPON_CROSSBOW:
-		case WEAPON_SHOTGUN:
+		case LaraWeaponType::RocketLauncher:
+		case LaraWeaponType::HarpoonGun:
+		case LaraWeaponType::GrenadeLauncher:
+		case LaraWeaponType::Crossbow:
+		case LaraWeaponType::Shotgun:
 			return (LaraItem->ActiveState == LS_IDLE || LaraItem->ActiveState == LS_TURN_LEFT_FAST || LaraItem->ActiveState == LS_TURN_RIGHT_FAST || LaraItem->ActiveState == LS_TURN_LEFT_SLOW || LaraItem->ActiveState == LS_TURN_RIGHT_SLOW);
 			break;
-		case WEAPON_HK:
+		case LaraWeaponType::HK:
 		{
 			//Animate upper body if Lara is shooting from shoulder OR if Lara is standing still/turning
 			int baseAnim = Objects[WeaponObject(weapon)].animIndex;
@@ -85,7 +85,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 	// Then the arms, based on current weapon status
-	if (Lara.Control.WeaponControl.GunType != WEAPON_FLARE && (Lara.Control.HandStatus == HandStatus::Free || Lara.Control.HandStatus == HandStatus::Busy) || Lara.Control.WeaponControl.GunType == WEAPON_FLARE && !Lara.Flare.ControlLeft)
+	if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare && (Lara.Control.HandStatus == HandStatus::Free || Lara.Control.HandStatus == HandStatus::Busy) || Lara.Control.Weapon.GunType == LaraWeaponType::Flare && !Lara.Flare.ControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -95,7 +95,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon some extra rotation could be applied to arms
-		if (Lara.Control.WeaponControl.GunType == WEAPON_PISTOLS || Lara.Control.WeaponControl.GunType == WEAPON_UZI)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol || Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.LeftArm.Rotation.xRot), TO_RAD(Lara.LeftArm.Rotation.yRot), TO_RAD(Lara.LeftArm.Rotation.zRot));
 			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.RightArm.Rotation.xRot), TO_RAD(Lara.RightArm.Rotation.yRot), TO_RAD(Lara.RightArm.Rotation.zRot));
@@ -110,21 +110,21 @@ void Renderer11::updateLaraAnimations(bool force)
 		ArmInfo *rightArm = &Lara.RightArm;
 
 		// HACK: backguns handles differently // TokyoSU: not really a hack since it's the original way to do that.
-		switch (Lara.Control.WeaponControl.GunType)
+		switch (Lara.Control.Weapon.GunType)
 		{
-		case WEAPON_SHOTGUN:
-		case WEAPON_HK:
-		case WEAPON_CROSSBOW:
-		case WEAPON_GRENADE_LAUNCHER:
-		case WEAPON_ROCKET_LAUNCHER:
-		case WEAPON_HARPOON_GUN:
+		case LaraWeaponType::Shotgun:
+		case LaraWeaponType::HK:
+		case LaraWeaponType::Crossbow:
+		case LaraWeaponType::GrenadeLauncher:
+		case LaraWeaponType::RocketLauncher:
+		case LaraWeaponType::HarpoonGun:
 		{
 			ANIM_FRAME* shotgunFramePtr;
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
-			if(shouldAnimateUpperBody(Lara.Control.WeaponControl.GunType)){
+			if(shouldAnimateUpperBody(Lara.Control.Weapon.GunType)){
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 			shotgunFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
@@ -132,14 +132,14 @@ void Renderer11::updateLaraAnimations(bool force)
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			if(shouldAnimateUpperBody(Lara.Control.WeaponControl.GunType)){
+			if(shouldAnimateUpperBody(Lara.Control.Weapon.GunType)){
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 			shotgunFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
 			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 		}
 			break;
-		case WEAPON_REVOLVER:
+		case LaraWeaponType::Revolver:
 		{
 			ANIM_FRAME* revolverFramePtr;
 
@@ -155,8 +155,8 @@ void Renderer11::updateLaraAnimations(bool force)
 		}
 			break;
 
-		case WEAPON_PISTOLS:
-		case WEAPON_UZI:
+		case LaraWeaponType::Pistol:
+		case LaraWeaponType::Uzi:
 		default:
 		{
 			ANIM_FRAME* pistolFramePtr;
@@ -178,8 +178,8 @@ void Renderer11::updateLaraAnimations(bool force)
 
 		break;
 
-		case WEAPON_FLARE:
-		case WEAPON_TORCH:
+		case LaraWeaponType::Flare:
+		case LaraWeaponType::Torch:
 			// Left arm
 			LaraItem->AnimNumber = Lara.LeftArm.AnimNumber;
 			LaraItem->FrameNumber = Lara.LeftArm.FrameNumber;
@@ -262,7 +262,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		RendererMesh *mesh = GetMesh(Lara.meshPtrs[k]);
+		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		drawMoveableMesh(item, mesh, room, k);
 	}
 
@@ -312,9 +312,9 @@ void Renderer11::DrawLaraHolsters()
 	RendererItem* item = &m_items[Lara.ItemNumber];
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
 
-	HolsterSlot leftHolsterID = Lara.Control.WeaponControl.HolsterInfo.LeftHolster;
-	HolsterSlot rightHolsterID = Lara.Control.WeaponControl.HolsterInfo.RightHolster;
-	HolsterSlot backHolsterID = Lara.Control.WeaponControl.HolsterInfo.BackHolster;
+	HolsterSlot leftHolsterID = Lara.Control.Weapon.HolsterInfo.LeftHolster;
+	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;
+	HolsterSlot backHolsterID = Lara.Control.Weapon.HolsterInfo.BackHolster;
 
 	if(m_moveableObjects[static_cast<int>(leftHolsterID)])
 	{

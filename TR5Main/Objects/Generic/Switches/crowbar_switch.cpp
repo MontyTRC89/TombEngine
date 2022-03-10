@@ -50,7 +50,7 @@ namespace TEN::Entities::Switches
 			laraitem->AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ItemFlags[0] == 0) ||
-			(laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber))
+			(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			if (switchItem->ActiveState == SWITCH_ON)
 			{
@@ -68,14 +68,14 @@ namespace TEN::Entities::Switches
 							switchItem->TargetState = SWITCH_OFF;
 						}
 						else
-							laraInfo->interactedItem = itemNumber;
+							laraInfo->InteractedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
 						doSwitch = -1;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -97,14 +97,14 @@ namespace TEN::Entities::Switches
 							switchItem->TargetState = SWITCH_ON;
 						}
 						else
-							laraInfo->interactedItem = itemNumber;
+							laraInfo->InteractedItem = itemNumber;
 
 						g_Gui.SetInventoryItemChosen(NO_ITEM);
 					}
 					else
 						doSwitch = -1;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -116,7 +116,7 @@ namespace TEN::Entities::Switches
 		{
 			if (doSwitch == -1)
 			{
-				if (laraInfo->Crowbar)
+				if (laraInfo->Inventory.HasCrowbar)
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{

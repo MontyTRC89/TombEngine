@@ -212,7 +212,7 @@ namespace TEN::Entities::TR4
                     if (puzzleItem->TriggerFlags == 1)
                     {
                         puzzleItem->MeshBits = 3;
-                        laraInfo->Pickups[1]--;
+                        laraInfo->Inventory.Pickups[1]--;
                         puzzleItem->ItemFlags[0] = 1;
                         puzzleItem->Position.yRot = oldRot;
                         return;
@@ -220,7 +220,7 @@ namespace TEN::Entities::TR4
 
                     puzzleItem->MeshBits = 12;
                     TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
-                    laraInfo->Pickups[0]--;
+                    laraInfo->Inventory.Pickups[0]--;
                     puzzleItem->ItemFlags[0] = 1;
                 }
             }
@@ -229,7 +229,7 @@ namespace TEN::Entities::TR4
         }
         else
         {
-            if (laraInfo->Control.WeaponControl.GunType != WEAPON_TORCH ||
+            if (laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
                 laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
                 laraInfo->LeftArm.Locked ||
                 !(TrInput & IN_ACTION) ||

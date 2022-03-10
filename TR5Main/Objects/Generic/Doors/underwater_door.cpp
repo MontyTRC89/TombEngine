@@ -43,7 +43,7 @@ namespace TEN::Entities::Doors
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
 			!(doorItem->Status && doorItem->Airborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			laraItem->Position.yRot ^= ANGLE(180.0f);
 
@@ -65,13 +65,13 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 
 				laraItem->Position.yRot ^= ANGLE(180.0f);
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

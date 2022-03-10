@@ -79,13 +79,13 @@ void WorkerShotgunControl(short itemNumber)
 		GetCreatureMood(item, &aiInfo, VIOLENT);
 		CreatureMood(item, &aiInfo, VIOLENT);
 
-		angle = CreatureTurn(item, info->maximumTurn);
+		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->ActiveState)
 		{
 		case 2:
-			info->flags = 0;
-			info->maximumTurn = 0;
+			info->Flags = 0;
+			info->MaxTurn = 0;
 
 			if (aiInfo.ahead)
 			{
@@ -93,7 +93,7 @@ void WorkerShotgunControl(short itemNumber)
 				headX = aiInfo.xAngle;
 			}
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->Mood == MoodType::Escape)
 			{
 				item->TargetState = 5;
 			}
@@ -104,7 +104,7 @@ void WorkerShotgunControl(short itemNumber)
 				else
 					item->TargetState = 1;
 			}
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->Mood == MoodType::Attack || !aiInfo.ahead)
 				item->TargetState = (aiInfo.distance <= 0x400000) ? 1 : 5;
 			else
 				item->TargetState = 3;
@@ -120,13 +120,13 @@ void WorkerShotgunControl(short itemNumber)
 
 			if (Targetable(item, &aiInfo))
 				item->TargetState = 4;
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->Mood == MoodType::Attack || !aiInfo.ahead)
 				item->TargetState = 2;
 			
 			break;
 
 		case 1:
-			info->maximumTurn = 546;
+			info->MaxTurn = 546;
 
 			if (aiInfo.ahead)
 			{
@@ -134,7 +134,7 @@ void WorkerShotgunControl(short itemNumber)
 				headX = aiInfo.xAngle;
 			}
 
-			if (info->mood == ESCAPE_MOOD)
+			if (info->Mood == MoodType::Escape)
 				item->TargetState = 5;
 			else if (Targetable(item, &aiInfo))
 			{
@@ -143,7 +143,7 @@ void WorkerShotgunControl(short itemNumber)
 				else
 					item->TargetState = 6;
 			}
-			else if (info->mood == ATTACK_MOOD || !aiInfo.ahead)
+			else if (info->Mood == MoodType::Attack || !aiInfo.ahead)
 			{
 				if (aiInfo.distance > 0x400000)
 					item->TargetState = 5;
@@ -154,7 +154,7 @@ void WorkerShotgunControl(short itemNumber)
 			break;
 
 		case 5:
-			info->maximumTurn = 910;
+			info->MaxTurn = 910;
 			tilt = angle / 2;
 
 			if (aiInfo.ahead)
@@ -163,11 +163,11 @@ void WorkerShotgunControl(short itemNumber)
 				headY = aiInfo.angle;
 			}
 
-			if (info->mood != ESCAPE_MOOD)
+			if (info->Mood != MoodType::Escape)
 			{
 				if (Targetable(item, &aiInfo))
 					item->TargetState = 1;
-				else if (info->mood == BORED_MOOD || info->mood == STALK_MOOD)
+				else if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
 					item->TargetState = 1;
 			}
 			
@@ -175,7 +175,7 @@ void WorkerShotgunControl(short itemNumber)
 
 		case 8:
 		case 9:
-			info->flags = 0;
+			info->Flags = 0;
 
 			if (aiInfo.ahead)
 			{
@@ -196,15 +196,15 @@ void WorkerShotgunControl(short itemNumber)
 				torsoY = aiInfo.angle;
 			}
 
-			if (!info->flags)
+			if (!info->Flags)
 			{
 				ShotLaraWithShotgun(item, &aiInfo, &WorkerShotgunBite, torsoY, 25);
-				item->FiredWeapon = 2;
-				info->flags = 1;
+				info->FiredWeapon = 2;
+				info->Flags = 1;
 			}
 
 			if (item->ActiveState == 4 && item->TargetState != 2 &&
-				(info->mood == ESCAPE_MOOD || aiInfo.distance > 0x900000 || !Targetable(item, &aiInfo)))
+				(info->Mood == MoodType::Escape || aiInfo.distance > 0x900000 || !Targetable(item, &aiInfo)))
 			{
 				item->TargetState = 2;
 			}
@@ -218,11 +218,11 @@ void WorkerShotgunControl(short itemNumber)
 				torsoY = aiInfo.angle;
 			}
 
-			if (!info->flags)
+			if (!info->Flags)
 			{
 				ShotLaraWithShotgun(item, &aiInfo, &WorkerShotgunBite, torsoY, 25);
-				item->FiredWeapon = 2;
-				info->flags = 1;
+				info->FiredWeapon = 2;
+				info->Flags = 1;
 			}
 
 			break;

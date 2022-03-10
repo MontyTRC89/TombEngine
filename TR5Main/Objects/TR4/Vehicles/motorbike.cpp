@@ -123,18 +123,18 @@ enum MOTORBIKE_FLAGS
 static char ExhaustStart = 0;
 static bool NoGetOff = false;
 
-static MOTORBIKE_INFO* GetMotorbikeInfo(ITEM_INFO* item)
+static MotorbikeInfo* GetMotorbikeInfo(ITEM_INFO* item)
 {
-    return (MOTORBIKE_INFO*)item->Data;
+    return (MotorbikeInfo*)item->Data;
 }
 
 void InitialiseMotorbike(short itemNumber)
 {
     ITEM_INFO* item;
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
 
     item = &g_Level.Items[itemNumber];
-    item->Data = ITEM_DATA(MOTORBIKE_INFO());
+    item->Data = ITEM_DATA(MotorbikeInfo());
     motorbike = item->Data;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
@@ -268,7 +268,7 @@ static int DoMotorbikeShift(ITEM_INFO* motorbike, PHD_VECTOR* pos, PHD_VECTOR* o
 
 static void DrawMotorbikeLight(ITEM_INFO* item)
 {
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     PHD_VECTOR start, target;
     int rnd;
 
@@ -337,7 +337,7 @@ static BOOL GetOnMotorBike(short itemNumber)
 void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
 {
     ITEM_INFO* item;
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
 
     if (laraitem->HitPoints >= 0 && Lara.Vehicle == NO_ITEM)
     {
@@ -355,13 +355,13 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
         {
             Lara.Vehicle = itemNumber;
 
-            if (Lara.Control.WeaponControl.GunType == WEAPON_FLARE)
+            if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
             {
                 CreateFlare(LaraItem, ID_FLARE_ITEM, FALSE);
                 UndrawFlareMeshes(laraitem);
                 Lara.Flare.ControlLeft = false;
-                Lara.Control.WeaponControl.GunType = WEAPON_NONE;
-                Lara.Control.WeaponControl.RequestGunType = WEAPON_NONE;
+                Lara.Control.Weapon.GunType = LaraWeaponType::None;
+                Lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
                 Lara.Flare.Life = 0;
             }
 
@@ -390,7 +390,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
             laraitem->Position.zPos = item->Position.zPos;
             laraitem->Position.yRot = item->Position.yRot;
             ResetLaraFlex(laraitem);
-            Lara.hitDirection = -1;
+            Lara.HitDirection = -1;
             AnimateItem(laraitem);
             motorbike->revs = 0;
             item->Collidable = true;
@@ -705,7 +705,7 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
 
 static int MotorBikeDynamics(ITEM_INFO* item)
 {
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     PHD_VECTOR bl_old, mtb_old, br_old, mtf_old, fl_old;
     PHD_VECTOR fl, bl, mtf, mtb, br;
     PHD_VECTOR oldpos, moved;
@@ -965,7 +965,7 @@ static BOOL MotorbikeCanGetOff(void)
 
 static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
 {
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     motorbike = GetMotorbikeInfo(item);
 
     if (item->Position.yPos == item->Floor
@@ -1175,7 +1175,7 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
 
 static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
 {
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     PHD_VECTOR pos;
     int drive = 0;
     int rotation_speed, vel, newvel;
@@ -1356,11 +1356,11 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
 
 void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even used
 {
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     motorbike = GetMotorbikeInfo(item);
 
     Lara.Control.HandStatus = HandStatus::Busy;
-    Lara.hitDirection = -1;
+    Lara.HitDirection = -1;
     lara->ActiveState = BIKE_IDLE;
     lara->TargetState = BIKE_IDLE;
     lara->AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + BA_IDLE;
@@ -1376,7 +1376,7 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even
 int MotorbikeControl(void)
 {
     ITEM_INFO* item;
-    MOTORBIKE_INFO* motorbike;
+    MotorbikeInfo* motorbike;
     FLOOR_INFO* floor;
     PHD_VECTOR oldpos, fl, fr, fm;
     int drive, collide, pitch = 0, dead, ceiling;

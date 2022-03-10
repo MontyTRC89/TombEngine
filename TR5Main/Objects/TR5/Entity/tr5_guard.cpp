@@ -199,7 +199,7 @@ void GuardControl(short itemNum)
 		animIndex = Objects[ID_GUARD1].animIndex;
 
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	short angle = 0;
 	short joint2 = 0;
 	short joint1 = 0;
@@ -240,24 +240,24 @@ void GuardControl(short itemNum)
 		canJump2blocks = false;
 	else
 		canJump2blocks = true;
-	if (item->FiredWeapon)
+	if (creature->FiredWeapon)
 	{
 		PHD_VECTOR pos;
 		pos.x = SwatGun.x;
 		pos.y = SwatGun.y;
 		pos.z = SwatGun.z;
 		GetJointAbsPosition(item, &pos, SwatGun.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
-		item->FiredWeapon--;
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
+		creature->FiredWeapon--;
 	}
 	if (item->AIBits)
 		GetAITarget(creature);
 	else
-		creature->enemy = LaraItem;
+		creature->Enemy = LaraItem;
 	AI_INFO info;
 	AI_INFO laraInfo;
 	CreatureAIInfo(item, &info);
-	if (creature->enemy == LaraItem)
+	if (creature->Enemy == LaraItem)
 	{
 		laraInfo.angle = info.angle;
 		laraInfo.distance = info.distance;
@@ -291,17 +291,17 @@ void GuardControl(short itemNum)
 	}
 	else
 	{
-		GetCreatureMood(item, &info, creature->enemy != LaraItem);
+		GetCreatureMood(item, &info, creature->Enemy != LaraItem);
 		if (item->ObjectNumber == ID_SCIENTIST)
 		{
 			if (item->HitPoints >= Objects[ID_SCIENTIST].HitPoints)
 			{
-				if (creature->enemy == LaraItem)
-					creature->mood = BORED_MOOD;
+				if (creature->Enemy == LaraItem)
+					creature->Mood = MoodType::Bored;
 			}
 			else
 			{
-				creature->mood = ESCAPE_MOOD;
+				creature->Mood = MoodType::Escape;
 			}
 		}
 		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_NO_LENSFLARE) // CHECK
@@ -319,7 +319,7 @@ void GuardControl(short itemNum)
 			{
 				if (!(GlobalCounter & 7))
 					item->HitPoints--;
-				creature->mood = ESCAPE_MOOD;
+				creature->Mood = MoodType::Escape;
 				if (item->HitPoints <= 0)
 				{
 					item->ActiveState = STATE_GUARD_DEATH2;
@@ -328,21 +328,21 @@ void GuardControl(short itemNum)
 				}
 			}
 		}
-		CreatureMood(item, &info, creature->enemy != LaraItem);
-		ITEM_INFO * enemy = creature->enemy;
-		angle = CreatureTurn(item, creature->maximumTurn);
-		creature->enemy = LaraItem;
+		CreatureMood(item, &info, creature->Enemy != LaraItem);
+		ITEM_INFO * enemy = creature->Enemy;
+		angle = CreatureTurn(item, creature->MaxTurn);
+		creature->Enemy = LaraItem;
 		if (laraInfo.distance < 0x400000 && LaraItem->Velocity > 20
 			|| item->HitStatus
 			|| TargetVisible(item, &laraInfo))
 		{
 			if (!(item->AIBits & FOLLOW) && item->ObjectNumber != ID_SCIENTIST && abs(item->Position.yPos - LaraItem->Position.yPos) < 1280)
 			{
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 				AlertAllGuards(itemNum);
 			}
 		}
-		creature->enemy = enemy;
+		creature->Enemy = enemy;
 		GAME_VECTOR src;
 		src.x = item->Position.xPos;
 		src.y = item->Position.yPos - 384;
@@ -354,7 +354,7 @@ void GuardControl(short itemNum)
 		dest.y = LaraItem->Position.yPos + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
 		dest.z = LaraItem->Position.zPos;
 		bool los = !LOS(&src, &dest) && item->TriggerFlags != 10;
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 		ITEM_INFO* currentItem;
 		short currentItemNumber;
 		PHD_VECTOR pos1, pos2;
@@ -362,9 +362,9 @@ void GuardControl(short itemNum)
 		switch (item->ActiveState)
 		{
 		case STATE_GUARD_STOP:
-			creature->LOT.isJumping = false;
+			creature->LOT.IsJumping = false;
 			joint2 = laraInfo.angle;
-			creature->flags = 0;
+			creature->Flags = 0;
 			if (info.ahead)
 			{
 				if (!(item->AIBits & FOLLOW))
@@ -373,7 +373,7 @@ void GuardControl(short itemNum)
 					joint1 = info.xAngle;
 				}
 			}
-			if (item->ObjectNumber == ID_SCIENTIST && item == Lara.target)
+			if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 			{
 				item->TargetState = STATE_GUARD_SURREND;
 			}
@@ -394,7 +394,7 @@ void GuardControl(short itemNum)
 						item->AIBits &= ~GUARD;
 				}
 			}
-			else if (creature->enemy == LaraItem && (laraInfo.angle > 20480 || laraInfo.angle < -20480) && item->ObjectNumber != ID_SCIENTIST)
+			else if (creature->Enemy == LaraItem && (laraInfo.angle > 20480 || laraInfo.angle < -20480) && item->ObjectNumber != ID_SCIENTIST)
 			{
 				item->TargetState = STATE_GUARD_TURN180;
 			}
@@ -418,7 +418,7 @@ void GuardControl(short itemNum)
 			}
 			else if (canJump1block || canJump2blocks)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = animIndex + 41;
 				item->ActiveState = STATE_GUARD_STOP_START_JUMP;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -426,13 +426,13 @@ void GuardControl(short itemNum)
 					item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 				else
 					item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
-				creature->LOT.isJumping = true;
+				creature->LOT.IsJumping = true;
 			}
 			else if (los)
 			{
 				item->TargetState = STATE_GUARD_HUNTING_IDLE;
 			}
-			else if (creature->mood)
+			else if (creature->Mood != MoodType::Bored)
 			{
 				if (info.distance < 0x900000 || item->AIBits & FOLLOW)
 				{
@@ -449,7 +449,7 @@ void GuardControl(short itemNum)
 				item->TriggerFlags = 0;
 			break;
 		case STATE_GUARD_TURN180:
-			creature->flags = 0;
+			creature->Flags = 0;
 			if (info.angle >= 0)
 				item->Position.yRot -= ANGLE(2);
 			else
@@ -476,17 +476,17 @@ void GuardControl(short itemNum)
 			}
 			if (item->ActiveState == STATE_GUARD_FIRE_FAST)
 			{
-				if (creature->flags)
+				if (creature->Flags)
 				{
 					if (item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 10
 						&& (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) & 1)
-						creature->flags = 0;
+						creature->Flags = 0;
 				}
 			}
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
-				creature->flags = 1;
-				item->FiredWeapon = 2;
+				creature->Flags = 1;
+				creature->FiredWeapon = 2;
 				if (item->ActiveState == STATE_GUARD_FIRE_SINGLE)
 					ShotLara(item, &info, &SwatGun, joint0, 30);
 				else
@@ -502,7 +502,7 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_AIM:
-			creature->flags = 0;
+			creature->Flags = 0;
 			joint0 = laraInfo.angle / 2;
 			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
@@ -526,8 +526,8 @@ void GuardControl(short itemNum)
 				item->TargetState = STATE_GUARD_FIRE_FAST;
 			break;
 		case STATE_GUARD_WALK:
-			creature->LOT.isJumping = false;
-			creature->maximumTurn = ANGLE(5);
+			creature->LOT.IsJumping = false;
+			creature->MaxTurn = ANGLE(5);
 			if (!Targetable(item, &info)
 				|| info.distance >= 0x1000000 && info.zoneNumber == info.enemyZone
 				|| item->ObjectNumber == ID_SCIENTIST
@@ -535,7 +535,7 @@ void GuardControl(short itemNum)
 			{
 				if (canJump1block || canJump2blocks)
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					item->AnimNumber = animIndex + 41;
 					item->ActiveState = STATE_GUARD_STOP_START_JUMP;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -543,7 +543,7 @@ void GuardControl(short itemNum)
 						item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 					else
 						item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
-					creature->LOT.isJumping = true;
+					creature->LOT.IsJumping = true;
 				}
 				else if (info.distance >= 0x100000)
 				{
@@ -571,15 +571,15 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_RUN:
-			creature->LOT.isJumping = false;
-			creature->maximumTurn = ANGLE(10);
+			creature->LOT.IsJumping = false;
+			creature->MaxTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < 0x1000000 || info.enemyZone == info.zoneNumber) && item->ObjectNumber != ID_SCIENTIST)
 			{
 				item->TargetState = STATE_GUARD_AIM;
 			}
 			else if (canJump1block || canJump2blocks)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = animIndex + 50;
 				item->ActiveState = STATE_GUARD_STOP_START_JUMP;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -587,7 +587,7 @@ void GuardControl(short itemNum)
 					item->TargetState = STATE_GUARD_JUMPING_1BLOCK;
 				else
 					item->TargetState = STATE_GUARD_JUMPING_2BLOCKS;
-				creature->LOT.isJumping = true;
+				creature->LOT.IsJumping = true;
 			}
 			else if (los)
 			{
@@ -599,8 +599,8 @@ void GuardControl(short itemNum)
 			}
 			if (item->TriggerFlags == 11)
 			{
-				creature->LOT.isJumping = true;
-				creature->maximumTurn = 0;
+				creature->LOT.IsJumping = true;
+				creature->MaxTurn = 0;
 			}
 			break;
 		case STATE_GUARD_ROPE_DOWN:
@@ -630,7 +630,7 @@ void GuardControl(short itemNum)
 			break;
 		case STATE_GUARD_SITTING:
 			joint2 = AIGuard(creature);
-			if (creature->alerted)
+			if (creature->Alerted)
 				item->TargetState = STATE_GUARD_STAND_UP;
 			break;
 		case STATE_GUARD_STAND_UP:
@@ -672,14 +672,14 @@ void GuardControl(short itemNum)
 			break;
 		case 17:
 			joint2 = 0;
-			if (!item->HitStatus && LaraItem->Velocity < 40 && !Lara.Control.WeaponControl.HasFired)
-				creature->alerted = false;
-			if (creature->alerted)
+			if (!item->HitStatus && LaraItem->Velocity < 40 && !Lara.Control.Weapon.HasFired)
+				creature->Alerted = false;
+			if (creature->Alerted)
 				item->TargetState = 18;
 			break;
 		case STATE_GUARD_WAITING_ON_WALL:
 			joint2 = AIGuard(creature);
-			if (creature->alerted)
+			if (creature->Alerted)
 				item->TargetState = STATE_GUARD_STOP;
 			break;
 		case STATE_GUARD_HUNTING:
@@ -689,8 +689,8 @@ void GuardControl(short itemNum)
 				if (item->TriggerFlags != 8 || !los || item->HitStatus)
 					item->TargetState = STATE_GUARD_HUNTING;
 			}
-			creature->LOT.isJumping = false;
-			creature->maximumTurn = ANGLE(5);
+			creature->LOT.IsJumping = false;
+			creature->MaxTurn = ANGLE(5);
 			if (canJump1block || canJump2blocks || info.distance < 0x100000 || !los || item->HitStatus)
 				item->TargetState = STATE_GUARD_STOP;
 			break;
@@ -748,7 +748,7 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_USE_COMPUTER:
-			if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.target)
+			if ((item->ObjectNumber != ID_SCIENTIST || item != Lara.TargetEntity)
 				&& (GetRandomControl() & 0x7F || item->TriggerFlags >= 10 || item->TriggerFlags == 9))
 			{
 				if (item->AIBits & GUARD)
@@ -770,7 +770,7 @@ void GuardControl(short itemNum)
 			}
 			break;
 		case STATE_GUARD_SURREND:
-			if (item != Lara.target && !(GetRandomControl() & 0x3F))
+			if (item != Lara.TargetEntity && !(GetRandomControl() & 0x3F))
 			{
 				if (item->TriggerFlags == 7 || item->TriggerFlags == 9)
 					item->RequiredState = STATE_GUARD_USE_COMPUTER;
@@ -788,9 +788,9 @@ void GuardControl(short itemNum)
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
-	if (creature->reachedGoal && creature->enemy)
+	if (creature->ReachedGoal && creature->Enemy)
 	{
-		ITEM_INFO* enemy = creature->enemy;
+		ITEM_INFO* enemy = creature->Enemy;
 		
 		if (enemy->Flags != 4)
 		{
@@ -811,12 +811,12 @@ void GuardControl(short itemNum)
 				}
 				else
 				{
-					TestTriggers(creature->enemy->Position.xPos, creature->enemy->Position.yPos, creature->enemy->Position.zPos, enemy->RoomNumber, true);
+					TestTriggers(creature->Enemy->Position.xPos, creature->Enemy->Position.yPos, creature->Enemy->Position.zPos, enemy->RoomNumber, true);
 
 					item->RequiredState = STATE_GUARD_WALK;
-					if (creature->enemy->Flags & 2)
-						item->ItemFlags[3] = (item->Tosspad & 0xFF) - 1;
-					if (creature->enemy->Flags & 8)
+					if (creature->Enemy->Flags & 2)
+						item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
+					if (creature->Enemy->Flags & 8)
 					{
 						item->RequiredState = STATE_GUARD_STOP;
 						item->TriggerFlags = 300;
@@ -843,37 +843,37 @@ void GuardControl(short itemNum)
 		switch (CreatureVault(itemNum, angle, 2, 256) + 4)
 		{
 		case 0:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = animIndex + 38;
 			item->ActiveState = 23;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 1:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = animIndex + 39;
 			item->ActiveState = 24;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 2:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = animIndex + 40;
 			item->ActiveState = 25;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 6:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = animIndex + 35;
 			item->ActiveState = 20;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 7:
-			creature->maximumTurn = 0; 
+			creature->MaxTurn = 0; 
 			item->AnimNumber = animIndex + 36;
 			item->ActiveState = 21;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 8:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = animIndex + 37;
 			item->ActiveState = 22;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -891,16 +891,16 @@ void SniperControl(short itemNumber)
 		short joint2 = 0;
 		short joint1 = 0;
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-		if (item->FiredWeapon)
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
+		if (creature->FiredWeapon)
 		{
 			PHD_VECTOR pos;
 			pos.x = SniperGun.x;
 			pos.y = SniperGun.y;
 			pos.z = SniperGun.z;
 			GetJointAbsPosition(item, &pos, SniperGun.meshNum);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->FiredWeapon + 10, 192, 128, 32);
-			item->FiredWeapon--;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
+			creature->FiredWeapon--;
 		}
 		if (item->HitPoints > 0)
 		{
@@ -908,22 +908,22 @@ void SniperControl(short itemNumber)
 			{
 				GetAITarget(creature);
 			}
-			else if (creature->hurtByLara)
+			else if (creature->HurtByLara)
 			{
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 			}
 			AI_INFO info;
 			CreatureAIInfo(item, &info);
 			GetCreatureMood(item, &info, VIOLENT);
 			CreatureMood(item, &info, VIOLENT);
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 			if (info.ahead)
 			{
 				joint0 = info.angle / 2;
 				joint2 = info.angle / 2;
 				joint1 = info.xAngle;
 			}
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			switch (item->ActiveState)
 			{
 			case STATE_SNIPER_STOP:
@@ -935,7 +935,7 @@ void SniperControl(short itemNumber)
 				item->MeshBits = -1;
 				break;
 			case 3:
-				creature->flags = 0;
+				creature->Flags = 0;
 				if (!TargetVisible(item, &info)
 					|| item->HitStatus
 					&& GetRandomControl() & 1)
@@ -948,11 +948,11 @@ void SniperControl(short itemNumber)
 				}
 				break;
 			case STATE_SNIPER_FIRE:
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					ShotLara(item, &info, &SniperGun, joint0, 100);
-					creature->flags = 1;
-					item->FiredWeapon = 2;
+					creature->Flags = 1;
+					creature->FiredWeapon = 2;
 				}
 				break;
 			default:
@@ -993,7 +993,7 @@ void Mafia2Control(short itemNum)
 	if (!CreatureActive(itemNum))
 		return;
 	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	short angle = 0;
 	short joint2 = 0;
 	short joint1 = 0;
@@ -1038,15 +1038,15 @@ void Mafia2Control(short itemNum)
 	{
 		canJump2sectors = false;
 	}
-	if (item->FiredWeapon)
+	if (creature->FiredWeapon)
 	{
 		PHD_VECTOR pos;
 		pos.x = ArmedBaddy2Gun.x;
 		pos.y = ArmedBaddy2Gun.y;
 		pos.z = ArmedBaddy2Gun.z;
 		GetJointAbsPosition(item, &pos, ArmedBaddy2Gun.meshNum);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->FiredWeapon + 8, 24, 16, 4);
-		item->FiredWeapon--;
+		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
+		creature->FiredWeapon--;
 	}
 	AI_INFO info;
 	AI_INFO laraInfo;
@@ -1056,9 +1056,9 @@ void Mafia2Control(short itemNum)
 		if (item->AIBits)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 		CreatureAIInfo(item, &info);
-		if (creature->enemy == LaraItem)
+		if (creature->Enemy == LaraItem)
 		{
 			laraInfo.angle = info.angle;
 			laraInfo.distance = info.distance;
@@ -1070,25 +1070,25 @@ void Mafia2Control(short itemNum)
 			laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
-		GetCreatureMood(item, &info, creature->enemy != LaraItem);
-		CreatureMood(item, &info, creature->enemy != LaraItem);
-		angle = CreatureTurn(item, creature->maximumTurn);
-		creature->enemy = LaraItem;
+		GetCreatureMood(item, &info, creature->Enemy != LaraItem);
+		CreatureMood(item, &info, creature->Enemy != LaraItem);
+		angle = CreatureTurn(item, creature->MaxTurn);
+		creature->Enemy = LaraItem;
 		if (laraInfo.distance < SQUARE(2048) && LaraItem->Velocity > 20 || item->HitStatus || TargetVisible(item, &laraInfo))
 		{
 			if (!(item->AIBits & FOLLOW))
 			{
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 				AlertAllGuards(itemNum);
 			}
 		}
 		switch (item->ActiveState)
 		{
 		case STATE_MAFIA2_STOP:
-			creature->LOT.isJumping = false;
+			creature->LOT.IsJumping = false;
 			joint2 = laraInfo.angle;
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 			if (info.ahead && !(item->AIBits & GUARD))
 			{
 				joint0 = info.angle / 2;
@@ -1133,7 +1133,7 @@ void Mafia2Control(short itemNum)
 				{
 					if (canJump1sector || canJump2sectors)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
 						item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -1141,10 +1141,10 @@ void Mafia2Control(short itemNum)
 							item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 						else
 							item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
-						creature->LOT.isJumping = true;
+						creature->LOT.IsJumping = true;
 						break;
 					}
-					if (creature->mood)
+					if (creature->Mood != MoodType::Bored)
 					{
 						if (info.distance >= SQUARE(3072))
 							item->TargetState = STATE_MAFIA2_WALK;
@@ -1158,7 +1158,7 @@ void Mafia2Control(short itemNum)
 			break;
 		case STATE_MAFIA2_TURN180_UNDRAW_GUNS:
 		case STATE_MAFIA2_TURN180:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (info.angle >= 0)
 				item->Position.yRot -= ANGLE(2);
 			else
@@ -1179,7 +1179,7 @@ void Mafia2Control(short itemNum)
 			joint2 = laraInfo.angle / 2;
 			if (info.ahead)
 				joint1 = info.xAngle;
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle >= 0)
@@ -1191,18 +1191,18 @@ void Mafia2Control(short itemNum)
 			{
 				item->Position.yRot += info.angle;
 			}
-			if (!creature->flags)
+			if (!creature->Flags)
 			{
 				ShotLara(item, &info, &ArmedBaddy2Gun, laraInfo.angle / 2, 35);
-				creature->flags = 1;
-				item->FiredWeapon = 2;
+				creature->Flags = 1;
+				creature->FiredWeapon = 2;
 			}
 			break;
 		case STATE_MAFIA2_AIM:
 			joint0 = laraInfo.angle / 2;
 			joint2 = laraInfo.angle / 2;
-			creature->flags = 0;
-			creature->maximumTurn = 0;
+			creature->Flags = 0;
+			creature->MaxTurn = 0;
 			if (info.ahead)
 				joint1 = info.xAngle;
 			if (abs(info.angle) >= ANGLE(2))
@@ -1230,8 +1230,8 @@ void Mafia2Control(short itemNum)
 			}
 			break;
 		case STATE_MAFIA2_WALK:
-			creature->LOT.isJumping = false;
-			creature->maximumTurn = ANGLE(5);
+			creature->LOT.IsJumping = false;
+			creature->MaxTurn = ANGLE(5);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
 				item->TargetState = STATE_MAFIA2_AIM;
@@ -1240,8 +1240,8 @@ void Mafia2Control(short itemNum)
 			{
 				if (canJump1sector || canJump2sectors)
 				{
-					creature->maximumTurn = 0;
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
+					creature->MaxTurn = 0;
 					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
 					item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -1249,7 +1249,7 @@ void Mafia2Control(short itemNum)
 						item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 					else
 						item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
-					creature->LOT.isJumping = true;
+					creature->LOT.IsJumping = true;
 					break;
 				}
 				if (info.distance >= SQUARE(1024))
@@ -1264,15 +1264,15 @@ void Mafia2Control(short itemNum)
 			}
 			break;
 		case STATE_MAFIA2_RUN:
-			creature->LOT.isJumping = false;
-			creature->maximumTurn = ANGLE(10);
+			creature->LOT.IsJumping = false;
+			creature->MaxTurn = ANGLE(10);
 			if (Targetable(item, &info) && (info.distance < SQUARE(1024) || info.zoneNumber != info.enemyZone))
 			{
 				item->TargetState = STATE_MAFIA2_AIM;
 			}
 			else if (canJump1sector || canJump2sectors)
 			{
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 50;
 				item->ActiveState = STATE_MAFIA2_STOP_START_JUMP;
 				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
@@ -1280,7 +1280,7 @@ void Mafia2Control(short itemNum)
 					item->TargetState = STATE_MAFIA2_JUMPING_2BLOCKS;
 				else
 					item->TargetState = STATE_MAFIA2_JUMPING_1BLOCK;
-				creature->LOT.isJumping = true;
+				creature->LOT.IsJumping = true;
 			}
 			else if (info.distance < SQUARE(3072))
 			{
@@ -1288,7 +1288,7 @@ void Mafia2Control(short itemNum)
 			}
 			break;
 		case STATE_MAFIA2_UNDRAW_GUNS:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			if (info.angle >= 0)
 				item->Position.yRot += ANGLE(2);
 			else
@@ -1332,37 +1332,37 @@ void Mafia2Control(short itemNum)
 		switch (CreatureVault(itemNum, angle, 2, 256) + 4)
 		{
 		case 0:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 38;
 			item->ActiveState = 23;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 1:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 39;
 			item->ActiveState = 24;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 2:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 40;
 			item->ActiveState = 25;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 6:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
 			item->ActiveState = 20;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 7:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
 			item->ActiveState = 21;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 			break;
 		case 8:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
 			item->ActiveState = 22;
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;

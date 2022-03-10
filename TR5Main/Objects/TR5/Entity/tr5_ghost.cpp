@@ -31,46 +31,46 @@ void InvisibleGhostControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
+	short angle = 0;
 	short joint0 = 0;
 	short joint2 = 0;
 	short joint1 = 0;
-	short angle = 0;
 		
 	if (item->AIBits)
-		GetAITarget(info);
-	else if (info->hurtByLara)
-		info->enemy = LaraItem;
+		GetAITarget(creature);
+	else if (creature->HurtByLara)
+		creature->Enemy = LaraItem;
 
-	AI_INFO aiInfo;
-	CreatureAIInfo(item, &aiInfo);
+	AI_INFO AI;
+	CreatureAIInfo(item, &AI);
 
-	angle = CreatureTurn(item, info->maximumTurn);
-	if (abs(aiInfo.angle) >= ANGLE(3.0f))
+	angle = CreatureTurn(item, creature->MaxTurn);
+	if (abs(AI.angle) >= ANGLE(3.0f))
 	{
-		if (aiInfo.angle > 0)
+		if (AI.angle > 0)
 			item->Position.yRot += ANGLE(3.0f);
 		else
 			item->Position.yRot -= ANGLE(3.0f);
 	}
 	else
-		item->Position.yRot += aiInfo.angle;
+		item->Position.yRot += AI.angle;
 
-	if (aiInfo.ahead)
+	if (AI.ahead)
 	{
-		joint0 = aiInfo.angle / 2;
-		joint2 = aiInfo.angle / 2;
-		joint1 = aiInfo.xAngle;
+		joint0 = AI.angle / 2;
+		joint2 = AI.angle / 2;
+		joint1 = AI.xAngle;
 	}
 
-	info->maximumTurn = 0;
+	creature->MaxTurn = 0;
 		
 	if (item->ActiveState == 1)
 	{
-		info->flags = 0;
+		creature->Flags = 0;
 
-		if (aiInfo.distance < pow(614, 2))
+		if (AI.distance < pow(614, 2))
 		{
 			if (GetRandomControl() & 1)
 				item->TargetState = 2;
@@ -80,12 +80,12 @@ void InvisibleGhostControl(short itemNumber)
 	}
 	else if (item->ActiveState > 1 &&
 		item->ActiveState <= 3 &&
-		!info->flags &&
+		!creature->Flags &&
 		item->TouchBits & 0x9470 &&
 		item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 18)
 	{
 		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Position.yRot, DoBloodSplat);
-		info->flags = 1;
+		creature->Flags = 1;
 
 		LaraItem->HitPoints -= 400;
 		LaraItem->HitStatus = true;
@@ -95,14 +95,14 @@ void InvisibleGhostControl(short itemNumber)
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 
-	if (aiInfo.distance >= pow(SECTOR(1.5f), 2))
+	if (AI.distance >= pow(SECTOR(1.5f), 2))
 	{
 		item->AfterDeath = 125;
 		item->ItemFlags[0] = 0;
 	}
 	else
 	{
-		item->AfterDeath = sqrt(aiInfo.distance) / 16;
+		item->AfterDeath = sqrt(AI.distance) / 16;
 		if (item->ItemFlags[0] == 0)
 		{
 			item->ItemFlags[0] = 1;

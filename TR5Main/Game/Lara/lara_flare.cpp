@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-constexpr DirectX::SimpleMath::Vector3 FlareMainColor = Vector3(1, 0.52947, 0.3921);
+constexpr auto FlareMainColor = Vector3(1, 0.52947, 0.3921);
 
 void FlareControl(short itemNumber)
 {
@@ -61,9 +61,9 @@ void FlareControl(short itemNumber)
 
 	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->VerticalVelocity, zVel);
 
-	int& age = flareItem->Data;
-	age &= 0x7FFF;
-	if (age >= FLARE_LIFE_MAX)
+	int& life = flareItem->Data;
+	life &= 0x7FFF;
+	if (life >= FLARE_LIFE_MAX)
 	{
 		if (!flareItem->VerticalVelocity && !flareItem->Velocity)
 		{
@@ -72,14 +72,14 @@ void FlareControl(short itemNumber)
 		}
 	}
 	else
-		age++;
+		life++;
 
-	if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, age))
+	if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, life))
 	{
-		TriggerChaffEffects(flareItem, age);
+		TriggerChaffEffects(flareItem, life);
 		/* Hardcoded code */
 
-		age |= 0x8000;
+		life |= 0x8000;
 	}
 }
 
@@ -92,21 +92,21 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	lara->RightArm.Rotation = PHD_3DPOS();
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->target = NULL;
+	lara->TargetEntity = NULL;
 }
 
 void UndrawFlareMeshes(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void DrawFlareMeshes(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	lara->meshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
+	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ITEM_INFO* laraItem)
@@ -124,8 +124,8 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		{
 			laraItem->AnimNumber = LA_DISCARD_FLARE;
 			flareFrame = armFrame + g_Level.Anims[laraItem->AnimNumber].frameBase;
-			lara->Flare.Frame = flareFrame;
 			laraItem->FrameNumber = flareFrame;
+			lara->Flare.Frame = flareFrame;
 		}
 
 		if (laraItem->AnimNumber == LA_DISCARD_FLARE)
@@ -134,13 +134,13 @@ void UndrawFlare(ITEM_INFO* laraItem)
 
 			if (flareFrame >= g_Level.Anims[laraItem->AnimNumber].frameBase + 31) // Last frame.
 			{
-				lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.LastGunType;
-				lara->Control.WeaponControl.GunType = lara->Control.WeaponControl.LastGunType;
+				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.LastGunType;
+				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
 				lara->Control.HandStatus = HandStatus::Free;
 
 				InitialiseNewWeapon(laraItem);
 
-				lara->target = NULL;
+				lara->TargetEntity = NULL;
 				lara->RightArm.Locked = false;
 				lara->LeftArm.Locked = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
@@ -187,13 +187,14 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		else if (armFrame == 33)
 		{
 			armFrame = 0;
-			lara->Control.WeaponControl.RequestGunType = lara->Control.WeaponControl.LastGunType;
-			lara->Control.WeaponControl.GunType = lara->Control.WeaponControl.LastGunType;
+
+			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.LastGunType;
+			lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
 			lara->Control.HandStatus = HandStatus::Free;
 
 			InitialiseNewWeapon(laraItem);
 
-			lara->target = NULL;
+			lara->TargetEntity = NULL;
 			lara->LeftArm.Locked = false;
 			lara->RightArm.Locked = false;
 			lara->Flare.ControlLeft = false;
@@ -344,11 +345,11 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		if (objectNumber == ID_FLARE_ITEM)
 		{
 			flareItem->Data = (int)0;
-			int& age = flareItem->Data;
+			int& life = flareItem->Data;
 			if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, lara->Flare.Life))
-				age = lara->Flare.Life | 0x8000;
+				life = lara->Flare.Life | 0x8000;
 			else
-				age = lara->Flare.Life & 0x7FFF;
+				life = lara->Flare.Life & 0x7FFF;
 		}
 		else
 			flareItem->ItemFlags[3] = lara->LitTorch;
@@ -386,25 +387,22 @@ void DoFlareInHand(ITEM_INFO* laraItem, int flareLife)
 
 int DoFlareLight(PHD_VECTOR* pos, int flareLife)
 {
-	int r, g, b;
-	int falloff;
-
 	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
 		return 0;
 
-	auto random = GenerateFloat();
+	float random = GenerateFloat();
 
 	int x = pos->x + (random * 120);
-	int y = pos->y + (random * 120) - 256;
+	int y = pos->y + (random * 120) - CLICK(1);
 	int z = pos->z + (random * 120);
 
 	if (flareLife < 4)
 	{
-		falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
+		int falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
 
-		r = FlareMainColor.x * 255;
-		g = FlareMainColor.y * 255;
-		b = FlareMainColor.z * 255;
+		int r = FlareMainColor.x * 255;
+		int g = FlareMainColor.y * 255;
+		int b = FlareMainColor.z * 255;
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
@@ -412,24 +410,24 @@ int DoFlareLight(PHD_VECTOR* pos, int flareLife)
 	}
 	else if (flareLife < (FLARE_LIFE_MAX - 90))
 	{
-		auto multiplier = GenerateFloat(0.75f, 1.0f);
-		falloff = 12 * multiplier;
+		float multiplier = GenerateFloat(0.75f, 1.0f);
+		int falloff = 12 * multiplier;
 
-		r = FlareMainColor.x * 255 * multiplier;
-		g = FlareMainColor.y * 255 * multiplier;
-		b = FlareMainColor.z * 255 * multiplier;
+		int r = FlareMainColor.x * 255 * multiplier;
+		int g = FlareMainColor.y * 255 * multiplier;
+		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		return (random < 0.4f);
 	}
 	else
 	{
-		auto multiplier = GenerateFloat(0.05f, 0.8f);
-		falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
+		float multiplier = GenerateFloat(0.05f, 0.8f);
+		int falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
 
-		r = FlareMainColor.x * 255 * multiplier;
-		g = FlareMainColor.y * 255 * multiplier;
-		b = FlareMainColor.z * 255 * multiplier;
+		int r = FlareMainColor.x * 255 * multiplier;
+		int g = FlareMainColor.y * 255 * multiplier;
+		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		return (random < 0.3f);

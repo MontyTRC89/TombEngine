@@ -132,14 +132,17 @@ short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
-void MoveItem(ITEM_INFO* item, short angle, int x, int y = 0);
+void MoveItem(ITEM_INFO* item, short angle, int x, int z = 0);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
 void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
-void CalcItemToFloorRotation(ITEM_INFO* item, int radiusDivide = 1);
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
 
-bool TestEnvironment(RoomEnvFlags envType, ROOM_INFO* room);
-bool TestEnvironment(RoomEnvFlags envType, int roomNumber);
-bool TestEnvironment(RoomEnvFlags envType, ITEM_INFO* item);
-bool TestEnvironment(RoomEnvFlags envType, int x, int y, int z, int roomNumber);
+short GetSurfaceBearingAngle(float xTilt, float zTilt);
+short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
+
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ITEM_INFO* item);
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);

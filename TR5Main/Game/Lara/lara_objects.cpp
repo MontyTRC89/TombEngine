@@ -209,7 +209,7 @@ void lara_as_pushable_grab(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_pulley(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* pulleyItem = &g_Level.Items[lara->interactedItem];
+	auto* pulleyItem = &g_Level.Items[lara->InteractedItem];
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableSpasm = false;
@@ -274,7 +274,7 @@ void lara_as_horizontal_bar_swing(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_horizontal_bar_leap(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto* barItem = &g_Level.Items[lara->interactedItem];
+	auto* barItem = &g_Level.Items[lara->InteractedItem];
 
 	item->Airborne = true;
 
@@ -282,11 +282,11 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int distance;
 		if (item->Position.yRot == barItem->Position.yRot)
-			distance = barItem->TriggerFlags / 100 - 2;
+			distance = (barItem->TriggerFlags / 100) - 2;
 		else
-			distance = barItem->TriggerFlags % 100 - 2;
+			distance = (barItem->TriggerFlags % 100) - 2;
 
-		item->Velocity = 20 * distance + 58;
+		item->Velocity = (20 * distance) + 58;
 		item->VerticalVelocity = -(20 * distance + 64);
 	}
 
@@ -308,23 +308,25 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
-
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
 
+	if (TrInput & IN_LOOK)
+		LookUpDown(item);
+
 	if (TrInput & IN_FORWARD)
-		item->TargetState = LS_TIGHTROPE_WALK;
-	else if (TrInput & (IN_ROLL | IN_BACK))
 	{
-		if (item->AnimNumber == LA_TIGHTROPE_IDLE)
-		{
-			item->ActiveState = LS_TIGHTROPE_TURN_180;
-			item->AnimNumber = LA_TIGHTROPE_TURN_180;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		}
+		item->TargetState = LS_TIGHTROPE_WALK;
+		return;
 	}
+
+	if (TrInput & (IN_ROLL | IN_BACK))
+	{
+		item->TargetState = LS_TIGHTROPE_TURN_180;
+		return;
+	}
+
+	item->TargetState = LS_TIGHTROPE_IDLE;
 }
 
 // State:		LS_TIGHTROPE_DISMOUNT (125)
@@ -353,28 +355,35 @@ void lara_as_tightrope_walk(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto probe = GetCollisionResult(item);
-	if (probe.Position.Floor == item->Position.yPos &&
-		lara->Control.TightropeControl.CanDismount)
+	if (TestLaraTightropeDismount(item, coll))
 	{
 		item->TargetState = LS_TIGHTROPE_DISMOUNT;
 		DoLaraTightropeBalanceRegen(item);
-	}
-	
-	if ((TrInput & (IN_BACK | IN_ROLL) || !(TrInput & IN_FORWARD)) &&
-		item->TargetState != LS_TIGHTROPE_DISMOUNT)
-	{
-		item->TargetState = LS_TIGHTROPE_IDLE;
+		return;
 	}
 
-	lara->Control.TightropeControl.TimeOnTightrope++;
+	lara->Control.Tightrope.TimeOnTightrope++;
 	DoLaraTightropeBalance(item);
 	DoLaraTightropeLean(item);
 
-	if (lara->Control.TightropeControl.Balance >= 8000)
-		SetAnimation(item, LA_TIGHTROPE_FALL_RIGHT);
-	else if (lara->Control.TightropeControl.Balance <= -8000)
-		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
+	if (lara->Control.Tightrope.Balance >= 8000)
+	{
+		item->TargetState = LS_TIGHTROPE_UNBALANCE_RIGHT;
+		return;
+	}
+	else if (lara->Control.Tightrope.Balance <= -8000)
+	{
+		item->TargetState = LS_TIGHTROPE_UNBALANCE_LEFT;
+		return;
+	}
+
+	if (TrInput & IN_FORWARD)
+	{
+		item->TargetState = LS_TIGHTROPE_WALK;
+		return;
+	}
+
+	item->TargetState = LS_TIGHTROPE_IDLE;
 }
 
 // State:		TIGHTROPE_UNBALANCE_LEFT (122), TIGHTROPE_UNBALANCE_RIGHT (123)
@@ -386,20 +395,13 @@ void lara_as_tightrope_fall(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLastFrame(item))
 	{
-		PHD_VECTOR pos = { 0, 75, 0 };
-		GetLaraJointPosition(&pos, LM_RFOOT);
+		// HACK: Set position command can't move Lara laterally?
+		if (item->AnimNumber == LA_TIGHTROPE_FALL_LEFT)
+			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
+		else if (item->AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
+			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
 
-		item->Position.xPos = pos.x;
-		item->Position.yPos = pos.y;
-		item->Position.zPos = pos.z;
-
-		item->TargetState = LS_FREEFALL;
-		item->ActiveState = LS_FREEFALL;
-		item->AnimNumber = LA_FREEFALL;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-
-		item->VerticalVelocity = 81;
-		Camera.targetspeed = 16;
+		item->VerticalVelocity = 10;
 	}
 }
 
@@ -408,10 +410,10 @@ void lara_as_tightrope_fall(ITEM_INFO* item, COLL_INFO* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
+	GetTightropeFallOff(item, 127);
+
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
-
-	GetTightropeFallOff(item, 127);
 
 	if (item->ActiveState != LS_TIGHTROPE_UNBALANCE_LEFT)
 	{
@@ -428,13 +430,8 @@ void lara_as_tightrope_idle(ITEM_INFO* item, COLL_INFO* coll)
 				item->TargetState = LS_TIGHTROPE_WALK;
 			else if (TrInput & (IN_ROLL | IN_BACK))
 			{
-				if (item->AnimNumber == LA_TIGHTROPE_IDLE)
-				{
-					item->ActiveState = LS_TIGHTROPE_TURN_180;
-					item->AnimNumber = LA_TIGHTROPE_TURN_180;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-					GetTightropeFallOff(item, 1);
-				}
+				item->TargetState = LS_TIGHTROPE_TURN_180;
+				GetTightropeFallOff(item, 1);
 			}
 		}
 	}
@@ -453,8 +450,8 @@ void lara_as_tightrope_walk(ITEM_INFO* item, COLL_INFO* coll)
 		if (GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber),
 			item->Position.xPos, item->Position.yPos, item->Position.zPos) == item->Position.yPos)
 		{
-			lara->Control.TightropeControl.Off = 0;
 			item->TargetState = LS_TIGHTROPE_DISMOUNT;
+			lara->Control.TightropeControl.Off = 0;
 		}
 	}
 	else
@@ -530,7 +527,6 @@ void lara_as_tightrope_fall(ITEM_INFO* item, COLL_INFO* coll)
 			item->TargetState = LS_TIGHTROPE_IDLE;
 			item->AnimNumber = undoAnim;
 			item->FrameNumber = undoFrame;
-
 			lara->Control.TightropeControl.Fall--;
 		}
 		else
@@ -558,7 +554,7 @@ void lara_as_rope_turn_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_LEFT)
-			lara->Control.RopeControl.Y += ANGLE(1.4f);
+			lara->Control.Rope.Y += ANGLE(1.4f);
 		else
 			item->TargetState = LS_ROPE_IDLE;
 	}
@@ -575,7 +571,7 @@ void lara_as_rope_turn_counter_clockwise(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_RIGHT)
-			lara->Control.RopeControl.Y -= ANGLE(1.4f);
+			lara->Control.Rope.Y -= ANGLE(1.4f);
 		else
 			item->TargetState = LS_ROPE_IDLE;
 	}
@@ -607,16 +603,16 @@ void lara_col_rope_idle(ITEM_INFO* item, COLL_INFO* coll)
 		if (TrInput & IN_SPRINT)
 		{
 			item->TargetState = LS_ROPE_SWING;
-			lara->Control.RopeControl.DFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
-			lara->Control.RopeControl.Frame = lara->Control.RopeControl.DFrame;
+			lara->Control.Rope.DFrame = (g_Level.Anims[LA_ROPE_SWING].frameBase + 32) << 8;
+			lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
-		else if (TrInput & IN_FORWARD && lara->Control.RopeControl.Segment > 4)
+		else if (TrInput & IN_FORWARD && lara->Control.Rope.Segment > 4)
 			item->TargetState = LS_ROPE_UP;
-		else if (TrInput & IN_BACK && lara->Control.RopeControl.Segment < 21)
+		else if (TrInput & IN_BACK && lara->Control.Rope.Segment < 21)
 		{
 			item->TargetState = LS_ROPE_DOWN;
-			lara->Control.RopeControl.Flag = 0;
-			lara->Control.RopeControl.Count = 0;
+			lara->Control.Rope.Flag = 0;
+			lara->Control.Rope.Count = 0;
 		}
 		else if (TrInput & IN_LEFT)
 			item->TargetState = LS_ROPE_TURN_CLOCKWISE;
@@ -643,36 +639,36 @@ void lara_col_rope_swing(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			int velocity;
 
-			if (abs(lara->Control.RopeControl.LastX) < 9000)
-				velocity = 192 * (9000 - abs(lara->Control.RopeControl.LastX)) / 9000;
+			if (abs(lara->Control.Rope.LastX) < 9000)
+				velocity = 192 * (9000 - abs(lara->Control.Rope.LastX)) / 9000;
 			else
 				velocity = 0;
 
 			ApplyVelocityToRope(
-				lara->Control.RopeControl.Segment - 2,
-				item->Position.yRot + (lara->Control.RopeControl.Direction ? 0 : ANGLE(180.0f)),
+				lara->Control.Rope.Segment - 2,
+				item->Position.yRot + (lara->Control.Rope.Direction ? 0 : ANGLE(180.0f)),
 				velocity >> 5);
 		}
 
-		if (lara->Control.RopeControl.Frame > lara->Control.RopeControl.DFrame)
+		if (lara->Control.Rope.Frame > lara->Control.Rope.DFrame)
 		{
-			lara->Control.RopeControl.Frame -= (unsigned short)lara->Control.RopeControl.FrameRate;
-			if (lara->Control.RopeControl.Frame < lara->Control.RopeControl.DFrame)
-				lara->Control.RopeControl.Frame = lara->Control.RopeControl.DFrame;
+			lara->Control.Rope.Frame -= (unsigned short)lara->Control.Rope.FrameRate;
+			if (lara->Control.Rope.Frame < lara->Control.Rope.DFrame)
+				lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
-		else if (lara->Control.RopeControl.Frame < lara->Control.RopeControl.DFrame)
+		else if (lara->Control.Rope.Frame < lara->Control.Rope.DFrame)
 		{
-			lara->Control.RopeControl.Frame += (unsigned short)lara->Control.RopeControl.FrameRate;
-			if (lara->Control.RopeControl.Frame > lara->Control.RopeControl.DFrame)
-				lara->Control.RopeControl.Frame = lara->Control.RopeControl.DFrame;
+			lara->Control.Rope.Frame += (unsigned short)lara->Control.Rope.FrameRate;
+			if (lara->Control.Rope.Frame > lara->Control.Rope.DFrame)
+				lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
 
-		item->FrameNumber = lara->Control.RopeControl.Frame >> 8;
+		item->FrameNumber = lara->Control.Rope.Frame >> 8;
 
 		if (!(TrInput & IN_SPRINT) &&
 			item->FrameNumber == g_Level.Anims[LA_ROPE_SWING].frameBase + 32 &&
-			lara->Control.RopeControl.MaxXBackward < 6750 &&
-			lara->Control.RopeControl.MaxXForward < 6750)
+			lara->Control.Rope.MaxXBackward < 6750 &&
+			lara->Control.Rope.MaxXForward < 6750)
 		{
 			item->TargetState = LS_ROPE_IDLE;
 			item->ActiveState = LS_ROPE_IDLE;
@@ -684,7 +680,7 @@ void lara_col_rope_swing(ITEM_INFO* item, COLL_INFO* coll)
 			JumpOffRope(item);
 	}
 	else if (item->FrameNumber == g_Level.Anims[LA_ROPE_IDLE_TO_SWING].frameBase + 15)
-		ApplyVelocityToRope(lara->Control.RopeControl.Segment, item->Position.yRot, 128);
+		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Position.yRot, 128);
 }
 
 // State:	LS_ROPE_UP (112)
@@ -702,10 +698,10 @@ void lara_as_rope_up(ITEM_INFO* item, COLL_INFO* coll)
 		if (g_Level.Anims[item->AnimNumber].frameEnd == item->FrameNumber)
 		{
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			lara->Control.RopeControl.Segment -= 2;
+			lara->Control.Rope.Segment -= 2;
 		}
 
-		if (!(TrInput & IN_FORWARD) || lara->Control.RopeControl.Segment <= 4)
+		if (!(TrInput & IN_FORWARD) || lara->Control.Rope.Segment <= 4)
 			item->TargetState = LS_ROPE_IDLE;
 	}
 }
@@ -964,7 +960,7 @@ void lara_col_pole_down(ITEM_INFO* item, COLL_INFO* coll)
 		item->VerticalVelocity = 64;
 	
 	// TODO: Do something about that ugly snap at the bottom.
-	if (coll->Middle.Floor + item->VerticalVelocity < 0)
+	if ((coll->Middle.Floor + item->VerticalVelocity) < 0)
 		item->Position.yPos += coll->Middle.Floor;
 	else if (TestLaraPoleCollision(item, coll, false))
 		item->Position.yPos += item->VerticalVelocity;
@@ -1097,9 +1093,9 @@ void lara_as_zip_line(ITEM_INFO* item, COLL_INFO* coll)
 		item->TargetState = LS_JUMP_FORWARD;
 		AnimateLara(item);
 
-		item->Airborne = true;
 		item->Velocity = 100;
 		item->VerticalVelocity = 40;
+		item->Airborne = true;
 		lara->Control.MoveAngle = item->Position.yRot;
 	}
 }

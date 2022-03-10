@@ -44,7 +44,7 @@ namespace TEN::Entities::TR5
 				laraItem->AnimNumber != LA_STAND_IDLE ||
 				laraItem->Airborne ||
 				laraInfo->Control.HandStatus != HandStatus::Free) &&
-			(!laraInfo->Control.IsMoving || laraInfo->interactedItem != itemNumber))
+			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 		{
 			if (laraItem->ActiveState != LS_DOVE_SWITCH)
 				ObjectCollision(itemNumber, laraItem, coll);
@@ -72,16 +72,16 @@ namespace TEN::Entities::TR5
 					laraInfo->Control.IsMoving = false;
 					ResetLaraFlex(laraItem);
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 				}
 				else
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 				
 				switchItem->Position.yRot = oldYrot;
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

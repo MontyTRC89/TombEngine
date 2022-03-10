@@ -126,8 +126,8 @@ namespace TEN::Entities::TR4
 			return;
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
-		ITEM_INFO* enemyItem = creature->enemy;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
+		ITEM_INFO* enemyItem = creature->Enemy;
 		bool jumpLeft = false;
 		bool jumpRight = false;
 		short tilt = 0;
@@ -191,14 +191,14 @@ namespace TEN::Entities::TR4
 		if (item->AIBits)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 		AI_INFO info;
 		AI_INFO laraInfo;
 		CreatureAIInfo(item, &info);
 
 		if (item->HitStatus
-			&& Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN
+			&& Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun
 			&& info.distance < SQUARE(3584)
 			&& item->ActiveState != 7
 			&& item->ActiveState != 17
@@ -220,12 +220,12 @@ namespace TEN::Entities::TR4
 			}
 
 			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			creature->LOT.isJumping = true;
+			creature->LOT.IsJumping = true;
 			item->HitPoints = 25;
 		}
 		else
 		{
-			if (creature->enemy == LaraItem)
+			if (creature->Enemy == LaraItem)
 			{
 				laraInfo.distance = info.distance;
 				laraInfo.angle = info.angle;
@@ -241,21 +241,21 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &info, VIOLENT);
 
 			if (!(item->MeshBits & 0x200))
-				creature->mood = ESCAPE_MOOD;
+				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &info, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
-			ITEM_INFO* tempEnemy = creature->enemy;
-			creature->enemy = LaraItem;
+			ITEM_INFO* tempEnemy = creature->Enemy;
+			creature->Enemy = LaraItem;
 			if (item->HitStatus
 				|| distance < SQUARE(1024)
 				|| TargetVisible(item, &laraInfo))
-				creature->alerted = true;
-			creature->enemy = tempEnemy;
+				creature->Alerted = true;
+			creature->Enemy = tempEnemy;
 
-			if (item != Lara.target || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
+			if (item != Lara.TargetEntity || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
 			{
 				jumpLeft = false;
 				jumpRight = false;
@@ -332,13 +332,13 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 2:
-				creature->flags = 0;
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != ESCAPE_MOOD ? ANGLE(2) : 0;
+				creature->Flags = 0;
+				creature->LOT.IsJumping = false;
+				creature->MaxTurn = creature->Mood != MoodType::Escape ? ANGLE(2) : 0;
 				if (item->AIBits & GUARD
 					|| !(GetRandomControl() & 0x1F) 
 					&& (info.distance > SQUARE(1024) 
-						|| creature->mood != ATTACK_MOOD))
+						|| creature->Mood != MoodType::Attack))
 				{
 					if (!(GetRandomControl() & 0x3F))
 					{
@@ -360,19 +360,19 @@ namespace TEN::Entities::TR4
 					}
 					else if (canJump1sector || canJump2sectors)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->AnimNumber = Objects[ID_SKELETON].animIndex + 40;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						item->ActiveState = STATE_SKELETON_JUMP_LEFT;
 						if (!canJump2sectors)
 						{
 							item->TargetState = STATE_SKELETON_JUMP_1SECTOR;
-							creature->LOT.isJumping = true;
+							creature->LOT.IsJumping = true;
 						}
 						else
 						{
 							item->TargetState = STATE_SKELETON_JUMP_2SECTORS;
-							creature->LOT.isJumping = true;
+							creature->LOT.IsJumping = true;
 						}
 					}
 					else if (jumpLeft)
@@ -391,9 +391,9 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						if (creature->mood == ESCAPE_MOOD)
+						if (creature->Mood == MoodType::Escape)
 						{
-							if (Lara.target == item 
+							if (Lara.TargetEntity == item 
 								|| !info.ahead 
 								|| item->HitStatus 
 								|| !(item->MeshBits & 0x200))
@@ -403,9 +403,9 @@ namespace TEN::Entities::TR4
 							}
 							item->TargetState = 2;
 						}
-						else if (creature->mood == BORED_MOOD ||
+						else if (creature->Mood == MoodType::Bored ||
 							item->AIBits & FOLLOW &&
-							(creature->reachedGoal ||
+							(creature->ReachedGoal ||
 								laraInfo.distance > SQUARE(2048)))
 						{
 							if (item->RequiredState)
@@ -417,11 +417,11 @@ namespace TEN::Entities::TR4
 								item->TargetState = 15;
 							}
 						}
-						else if (Lara.target == item
+						else if (Lara.TargetEntity == item
 							&& laraInfo.angle
 							&& laraInfo.distance < SQUARE(2048)
 							&& GetRandomControl() & 1
-							&& (Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN || !(GetRandomControl() & 0xF))
+							&& (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF))
 							&& item->MeshBits == -1)
 						{
 							item->TargetState = STATE_SKELETON_USE_SHIELD;
@@ -466,9 +466,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 15:
-				creature->flags = 0;
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != BORED_MOOD ? 1092 : 364;
+				creature->Flags = 0;
+				creature->LOT.IsJumping = false;
+				creature->MaxTurn = creature->Mood != MoodType::Bored ? 1092 : 364;
 				if (item->AIBits & PATROL1)
 				{
 					item->TargetState = 15;
@@ -492,11 +492,11 @@ namespace TEN::Entities::TR4
 						item->TargetState = 2;
 						break;
 					}
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
 					{
 						item->TargetState = 16;
 					}
-					else if (creature->mood != BORED_MOOD)
+					else if (creature->Mood != MoodType::Bored)
 					{
 						if (info.distance >= SQUARE(682))
 						{
@@ -506,7 +506,7 @@ namespace TEN::Entities::TR4
 							}
 							else if (canJump1sector || canJump2sectors)
 							{
-								creature->maximumTurn = 0;
+								creature->MaxTurn = 0;
 								item->TargetState = 2;
 							}
 							else if (!info.ahead || info.distance > SQUARE(2048))
@@ -527,42 +527,42 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 16:
-				creature->maximumTurn = 1274;
-				creature->LOT.isJumping = false;
+				creature->MaxTurn = 1274;
+				creature->LOT.IsJumping = false;
 
 				if (item->AIBits & GUARD || canJump1sector || canJump2sectors)
 				{
 					if (item->MeshBits & 0x200)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->TargetState = 2;
 						break;
 					}
 
-					creature->LOT.isJumping = true;
+					creature->LOT.IsJumping = true;
 					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 					if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos + 1024)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->AnimNumber = Objects[ID_SKELETON].animIndex + 44;
 						item->ActiveState = 23;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-						creature->LOT.isJumping = false;
+						creature->LOT.IsJumping = false;
 						item->Airborne = true;
 					}
 				}
 				else
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.target != item && info.ahead && (item->MeshBits & 0x200))
+						if (Lara.TargetEntity != item && info.ahead && (item->MeshBits & 0x200))
 							item->TargetState = 2;
 					}
-					else if (item->AIBits & FOLLOW && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
+					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048)))
 					{
 						item->TargetState = 2;
 					}
-					else if (creature->mood != BORED_MOOD)
+					else if (creature->Mood != MoodType::Bored)
 					{
 						if (info.ahead && info.distance < SQUARE(2048))
 						{
@@ -577,7 +577,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 10:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (abs(info.angle) >= 1092)
 				{
 					if (info.angle >= 0)
@@ -594,7 +594,7 @@ namespace TEN::Entities::TR4
 					item->Position.yRot += info.angle;
 				}
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x18000)
 					{
@@ -602,7 +602,7 @@ namespace TEN::Entities::TR4
 						LaraItem->HitStatus = true;
 						CreatureEffect2(item, &skeletonBite, 15, -1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
-						creature->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 				if (!(GetRandomControl() & 0x3F) || LaraItem->HitPoints <= 0)
@@ -614,7 +614,7 @@ namespace TEN::Entities::TR4
 			case STATE_SKELETON_ATTACK1:
 			case STATE_SKELETON_ATTACK2:
 			case 18:
-				creature->maximumTurn = 0;
+				creature->MaxTurn = 0;
 				if (abs(info.angle) >= 1092)
 				{
 					if (info.angle >= 0)
@@ -656,7 +656,7 @@ namespace TEN::Entities::TR4
 							}
 						}
 					}
-					if (!creature->flags)
+					if (!creature->Flags)
 					{
 						if (item->TouchBits & 0x18000)
 						{
@@ -666,7 +666,7 @@ namespace TEN::Entities::TR4
 
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
-							creature->flags = 1;
+							creature->Flags = 1;
 						}
 					}
 				}
@@ -675,7 +675,7 @@ namespace TEN::Entities::TR4
 			case STATE_SKELETON_USE_SHIELD:
 				if (item->HitStatus)
 				{
-					if (item->MeshBits == -1 && laraInfo.angle && Lara.Control.WeaponControl.GunType == WEAPON_SHOTGUN)
+					if (item->MeshBits == -1 && laraInfo.angle && Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					{
 						if (GetRandomControl() & 3)
 						{
@@ -691,7 +691,7 @@ namespace TEN::Entities::TR4
 						item->TargetState = 2;
 					}
 				}
-				else if (Lara.target != item || item->MeshBits != -1 || Lara.Control.WeaponControl.GunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || !(GetRandomControl() & 0x7F))
 				{
 					item->TargetState = 2;
 				}
@@ -704,11 +704,11 @@ namespace TEN::Entities::TR4
 					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 					if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos + 1280)
 					{
-						creature->maximumTurn = 0;
+						creature->MaxTurn = 0;
 						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
 						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 						item->ActiveState = 23;
-						creature->LOT.isJumping = false;
+						creature->LOT.IsJumping = false;
 						item->Airborne = true;
 					}
 				}
@@ -739,17 +739,17 @@ namespace TEN::Entities::TR4
 					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 20)
 				{
 					item->HitPoints = 25;
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					break;
 				}
 				if (item->ActiveState == 11)
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					break;
 				}
 
 				item->HitPoints = 25;
-				creature->LOT.isJumping = false;
+				creature->LOT.IsJumping = false;
 
 				roomNumber = item->RoomNumber;
 				floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
@@ -762,7 +762,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					creature->maximumTurn = 0;
+					creature->MaxTurn = 0;
 					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 47;
 					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
 					item->ActiveState = 24;
@@ -772,8 +772,8 @@ namespace TEN::Entities::TR4
 
 			case STATE_SKELETON_JUMP_LEFT:
 			case STATE_SKELETON_JUMP_RIGHT:
-				creature->alerted = false;
-				creature->maximumTurn = 0;
+				creature->Alerted = false;
+				creature->MaxTurn = 0;
 				item->Status = ITEM_ACTIVE;
 				break;
 

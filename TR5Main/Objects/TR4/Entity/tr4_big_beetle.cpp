@@ -45,7 +45,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 
@@ -83,35 +83,35 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			AI_INFO aiInfo;
-			CreatureAIInfo(item, &aiInfo);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &aiInfo, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
 
-			if (info->flags)
-				info->mood = ESCAPE_MOOD;
+			if (creature->Flags)
+				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &aiInfo, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, info->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->HitStatus ||
-				aiInfo.distance > pow(SECTOR(3), 2) ||
+				AI.distance > pow(SECTOR(3), 2) ||
 				!(GetRandomControl() & 0x7F))
 			{
-				info->flags = 0;
+				creature->Flags = 0;
 			}
 
 			switch (item->ActiveState)
 			{
 			case 1:
 				item->Position.yPos = item->Floor;
-				info->maximumTurn = ANGLE(1.0f);
+				creature->MaxTurn = ANGLE(1.0f);
 
 				if (item->HitStatus ||
 					item->AIBits == MODIFY ||
-					info->hurtByLara ||
-					aiInfo.distance < pow(SECTOR(3), 2))
+					creature->HurtByLara ||
+					AI.distance < pow(SECTOR(3), 2))
 				{
 					item->TargetState = 2;
 				}
@@ -119,27 +119,27 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 3:
-				info->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
-				else if (aiInfo.ahead)
+				else if (AI.ahead)
 				{
-					if (aiInfo.distance < pow(CLICK(1), 2))
+					if (AI.distance < pow(CLICK(1), 2))
 						item->TargetState = 9;
 				}
 
 				break;
 
 			case 4u:
-				info->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
-				if (aiInfo.ahead)
+				if (AI.ahead)
 				{
-					if (aiInfo.distance < pow(CLICK(1), 2))
+					if (AI.distance < pow(CLICK(1), 2))
 						item->TargetState = 4;
 				}
-				else if (aiInfo.distance < pow(CLICK(1), 2))
+				else if (AI.distance < pow(CLICK(1), 2))
 					item->TargetState = 9;
 				else
 				{
@@ -147,7 +147,7 @@ namespace TEN::Entities::TR4
 					item->TargetState = 9;
 				}
 
-				if (!info->flags)
+				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x60)
 					{
@@ -161,14 +161,14 @@ namespace TEN::Entities::TR4
 							-1,
 							DoBloodSplat);
 
-						info->flags = 1;
+						creature->Flags = 1;
 					}
 				}
 
 				break;
 
 			case 5:
-				info->flags = 0;
+				creature->Flags = 0;
 
 				item->Position.yPos += 51;
 				if (item->Position.yPos > item->Floor)
@@ -177,20 +177,20 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 9u:
-				info->maximumTurn = ANGLE(7.0f);
+				creature->MaxTurn = ANGLE(7.0f);
 
 				if (item->RequiredState)
 					item->TargetState = item->RequiredState;
 				else if (!item->HitStatus &&
 					item->AIBits != MODIFY &&
 					GetRandomControl() >= 384 &&
-					(info->mood && GetRandomControl() >= 128 ||
-						info->hurtByLara ||
+					(creature->Mood != MoodType::Bored && GetRandomControl() >= 128 ||
+						creature->HurtByLara ||
 						item->AIBits == MODIFY))
 				{
-					if (aiInfo.ahead)
+					if (AI.ahead)
 					{
-						if (aiInfo.distance < pow(CLICK(1), 2) && !info->flags)
+						if (AI.distance < pow(CLICK(1), 2) && !creature->Flags)
 							item->TargetState = 4;
 					}
 				}

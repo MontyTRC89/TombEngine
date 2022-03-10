@@ -104,7 +104,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -138,7 +138,7 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = item->Velocity * 0.95f;
 
-	if (item->VerticalVelocity == LARA_FREEFALL_SCREAM_SPEED &&
+	if (item->VerticalVelocity == LARA_DEATH_VELOCITY &&
 		item->HitPoints > 0)
 	{
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Position, 0);
@@ -226,7 +226,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -243,7 +243,7 @@ void lara_col_reach(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.RopeControl.Ptr == -1)
+	if (lara->Control.Rope.Ptr == -1)
 		item->Airborne = true;
 
 	lara->Control.MoveAngle = item->Position.yRot;
@@ -465,7 +465,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -522,7 +522,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}*/
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -579,7 +579,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}*/
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -649,7 +649,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		lara->ExtraHeadRot.yRot += (ANGLE(10.0f) - item->Position.zRot) / 3;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -739,7 +739,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL;
 		return;
@@ -785,12 +785,14 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
+		DoLaraFallDamage(item);
+
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
-			g_GameFlow->Animations.CrawlspaceSwandive)
+			g_GameFlow->Animations.HasCrawlspaceDive)
 		{
 			item->TargetState = LS_CROUCH_IDLE;
 
@@ -805,7 +807,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->VerticalVelocity >= LARA_FREEFALL_SPEED)
+	if (item->VerticalVelocity >= LARA_FREEFALL_VELOCITY)
 	{
 		item->TargetState = LS_FREEFALL_DIVE;
 		return;
@@ -851,10 +853,11 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);	// Should never occur before fall speed reaches death speed, but here for consistency.
-
-		if (item->HitPoints <= 0 || item->VerticalVelocity >= LARA_FREEFALL_DIVE_DEATH_SPEED)
-			item->TargetState = LS_DEATH; // TODO: Something about this is bugged.
+		if (item->VerticalVelocity >= LARA_DIVE_DEATH_VELOCITY ||
+			item->HitPoints <= 0)
+		{
+			item->TargetState = LS_DEATH;
+		}
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideState(item, coll);
 		else [[likely]]
@@ -866,7 +869,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_ROLL)
 	{
-		item->TargetState = LS_JUMP_ROLL_180; // TODO: New state?
+		item->TargetState = LS_JUMP_ROLL_180;
 		return;
 	}
 

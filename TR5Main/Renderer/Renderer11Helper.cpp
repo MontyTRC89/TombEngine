@@ -212,7 +212,7 @@ namespace TEN::Renderer
 					else if (j == 6 || j == 7)
 						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
 				},
-				[&j, &currentBone](JEEP_INFO& jeep)
+				[&j, &currentBone](JeepInfo& jeep)
 				{
 					switch(j)
 					{
@@ -233,7 +233,7 @@ namespace TEN::Renderer
 						break;
 					}
 				},
-				[&j, &currentBone](MOTORBIKE_INFO& bike)
+				[&j, &currentBone](MotorbikeInfo& bike)
 				{
 				switch (j)
 				{
@@ -260,23 +260,23 @@ namespace TEN::Renderer
 				if (j == 2)
 					currentBone->ExtraRotation.z = biggun.BarrelZRotation;
 				},
-				[&j, &currentBone, &lastJoint](CREATURE_INFO& creature)
+				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{
 				if (currentBone->ExtraRotationFlags & ROT_Y)
 				{
-					currentBone->ExtraRotation.y = TO_RAD(creature.jointRotation[lastJoint]);
+					currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_X)
 				{
-					currentBone->ExtraRotation.x = TO_RAD(creature.jointRotation[lastJoint]);
+					currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_Z)
 				{
-					currentBone->ExtraRotation.z = TO_RAD(creature.jointRotation[lastJoint]);
+					currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
 					lastJoint++;
 				}
 				}

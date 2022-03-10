@@ -297,7 +297,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 	if (minecart->StopDelay)
 		minecart->StopDelay--;
 
-	if ((lara->mineL && lara->mineR && !minecart->StopDelay) &&
+	if ((lara->Control.Minecart.Left && lara->Control.Minecart.Right && !minecart->StopDelay) &&
 		(minecartItem->Position.xPos & 0x380 == 512 ||
 			minecartItem->Position.zRot & 0x380 == 512))
 	{
@@ -312,13 +312,13 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			minecart->StopDelay = 16;
 	}
 
-	if ((lara->mineL || lara->mineR) &&
-		!(lara->mineL && lara->mineR) &&
+	if ((lara->Control.Minecart.Left || lara->Control.Minecart.Right) &&
+		!(lara->Control.Minecart.Left && lara->Control.Minecart.Right) &&
 		!minecart->StopDelay &&
 		!(minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
 	{
 		short angle;
-		unsigned short rotation = (((unsigned short)minecartItem->Position.yRot) / ANGLE(90.0f)) | (lara->mineL * 4);
+		unsigned short rotation = (((unsigned short)minecartItem->Position.yRot) / ANGLE(90.0f)) | (lara->Control.Minecart.Left * 4);
 
 		switch (rotation)
 		{
@@ -380,7 +380,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			minecart->TurnLen = angle;
 		}
 
-		minecart->Flags |= (lara->mineL) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
+		minecart->Flags |= (lara->Control.Minecart.Left) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
 	}
 
 	if (minecart->Velocity < CART_MIN_SPEED)
@@ -446,8 +446,8 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 				x = phd_sin(degree);
 				z = phd_cos(degree);
 				break;
-			case 2:
 
+			case 2:
 				x = phd_cos(degree);
 				z = -phd_sin(degree);
 				break;
@@ -666,7 +666,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			if (laraItem->FrameNumber == GetFrameNumber(minecartItem, 20) &&
 				minecart->Flags & CART_FLAG_MESH)
 			{
-				lara->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+				lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 				minecart->Flags &= ~CART_FLAG_MESH;
 			}
 
@@ -727,10 +727,10 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			laraItem->FrameNumber == GetFrameNumber(minecartItem, 20) &&
 			!minecart->Flags & CART_FLAG_MESH)
 		{
-			MESH tmp = g_Level.Meshes[lara->meshPtrs[LM_RHAND]];
+			auto temp = g_Level.Meshes[lara->MeshPtrs[LM_RHAND]];
 
-			lara->meshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
-			g_Level.Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = tmp;
+			lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+			g_Level.Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = temp;
 
 			minecart->Flags |= CART_FLAG_MESH;
 		}
@@ -827,14 +827,12 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 
 			if (coll.HitStatic)
 			{
-				int hits;
-
 				laraItem->AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 				laraItem->ActiveState = laraItem->TargetState = CART_STATE_HIT;
 				DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - CLICK(3), laraItem->Position.zPos, minecartItem->Velocity, minecartItem->Position.yRot, laraItem->RoomNumber, 3);
 
-				hits = CART_NHITS * short(minecart->Velocity / 2048);
+				int hits = CART_NHITS * short(minecart->Velocity / 2048);
 				if (hits < 20)
 					hits = 20;
 
@@ -864,13 +862,13 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	{
 		lara->Vehicle = itemNumber;
 
-		if (lara->Control.WeaponControl.GunType == WEAPON_FLARE)
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			CreateFlare(laraItem, ID_FLARE_ITEM, FALSE);
 			UndrawFlareMeshes(laraItem);
 			lara->Flare.ControlLeft = false;
-			lara->Control.WeaponControl.RequestGunType = WEAPON_NONE;
-			lara->Control.WeaponControl.GunType = WEAPON_NONE;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
 		lara->Control.HandStatus = HandStatus::Busy;

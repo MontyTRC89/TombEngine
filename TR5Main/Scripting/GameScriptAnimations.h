@@ -3,20 +3,20 @@
 #include "ScriptAssert.h"
 #include <string>
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
 
 struct GameScriptAnimations
 {
-	bool CrawlExtended;				// Extended crawl moveset
-	bool CrouchRoll;				// Crouch roll
-	bool CrawlspaceSwandive;		// Swandive into crawlspaces
-	bool MonkeyTurn180;				// 180 degree turn on monkey swing
-	bool MonkeyAutoJump;			// Auto jump to monkey swing when pressing UP + ACTION beneath
-	bool OscillateHang;				// Grab thin ledge animation from TR1 and 2
-	bool Pose;						// Crossed arms AFK posing
-	bool Overhang;				    // Overhang functionality by Krys
+	bool HasSlideExtended;		// Extended slope sliding functionality.
+	bool HasCrawlExtended;		// Extended crawl moveset.
+	bool HasCrouchRoll;			// Crouch roll.
+	bool HasCrawlspaceDive;		// Dive into crawlspaces.
+	bool HasOverhangClimb;		// Overhang functionality.
+	bool HasPose;				// Crossed arms AFK posing.
+	bool HasMonkeyAutoJump;		// Auto jump to monkey swing when pressing UP + ACTION.
 
 	static void Register(sol::state* lua);
 };

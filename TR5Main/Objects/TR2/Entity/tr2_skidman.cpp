@@ -94,7 +94,7 @@ void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
 void SkidManControl(short riderNum)
 {
 	ITEM_INFO* item, * rider;
-	CREATURE_INFO* skidman;
+	CreatureInfo* skidman;
 	AI_INFO info;
 	short angle, item_number;
 	int damage;
@@ -115,7 +115,7 @@ void SkidManControl(short riderNum)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	skidman = (CREATURE_INFO*)item->Data;
+	skidman = (CreatureInfo*)item->Data;
 	angle = 0;
 
 	if (item->HitPoints <= 0)
@@ -132,8 +132,8 @@ void SkidManControl(short riderNum)
 			rider->FrameNumber = g_Level.Anims[rider->AnimNumber].frameBase;
 			rider->ActiveState = SMAN_DEATH;
 
-			if (Lara.target == item)
-				Lara.target = NULL;
+			if (Lara.TargetEntity == item)
+				Lara.TargetEntity = NULL;
 		}
 		else
 			AnimateItem(rider);
@@ -155,7 +155,7 @@ void SkidManControl(short riderNum)
 		switch (item->ActiveState)
 		{
 		case SMAN_WAIT:
-			if (skidman->mood == BORED_MOOD)
+			if (skidman->Mood == MoodType::Bored)
 				break;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				break;
@@ -163,7 +163,7 @@ void SkidManControl(short riderNum)
 			break;
 
 		case SMAN_MOVING:
-			if (skidman->mood == BORED_MOOD)
+			if (skidman->Mood == MoodType::Bored)
 				item->TargetState = SMAN_WAIT;
 			else if (abs(info.angle) < SMAN_TARGET_ANGLE && info.distance < SMAN_WAIT_RANGE)
 				item->TargetState = SMAN_WAIT;
@@ -193,29 +193,29 @@ void SkidManControl(short riderNum)
 
 	if (rider->ActiveState != SMAN_DEATH)
 	{
-		if (!skidman->flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->HitPoints > 0)
+		if (!skidman->Flags && abs(info.angle) < SMAN_TARGET_ANGLE && LaraItem->HitPoints > 0)
 		{
 			damage = (Lara.Vehicle != NO_ITEM) ? 10 : 50;
 
 			if (ShotLara(item, &info, &skidooLeft, 0, damage) + ShotLara(item, &info, &skidooRight, 0, damage))
-				skidman->flags = 5;
+				skidman->Flags = 5;
 		}
 
-		if (skidman->flags)
+		if (skidman->Flags)
 		{
 			SoundEffect(43, &item->Position, 0);
-			skidman->flags--;
+			skidman->Flags--;
 		}
 	}
 
 	if (item->ActiveState == SMAN_WAIT)
 	{
 		SoundEffect(153, &item->Position, 0);
-		skidman->jointRotation[0] = 0;
+		skidman->JointRotation[0] = 0;
 	}
 	else
 	{
-		skidman->jointRotation[0] = (skidman->jointRotation[0] == 1) ? 2 : 1;
+		skidman->JointRotation[0] = (skidman->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
 		SoundEffect(155, &item->Position, 4 + ((0x10000 - (100 - item->Velocity) * 100) << 8));
 	}

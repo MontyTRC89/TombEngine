@@ -39,7 +39,7 @@ void DobermanControl(short itemNumber)
 		short joint = 0;
 		
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->Data;
+		CreatureInfo* creature = (CreatureInfo*)item->Data;
 		
 		if (item->HitPoints > 0)
 		{
@@ -52,15 +52,15 @@ void DobermanControl(short itemNumber)
 			GetCreatureMood(item, &info, TIMID);
 			CreatureMood(item, &info, TIMID);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 		
 			int random;
 
 			switch (item->ActiveState)
 			{
 			case 1:
-				creature->maximumTurn = ANGLE(3);
-				if (creature->mood)
+				creature->MaxTurn = ANGLE(3);
+				if (creature->Mood != MoodType::Bored)
 				{
 					item->TargetState = 2;
 				}
@@ -89,8 +89,8 @@ void DobermanControl(short itemNumber)
 
 			case 2:
 				tilt = angle;
-				creature->maximumTurn = ANGLE(6);
-				if (!creature->mood)
+				creature->MaxTurn = ANGLE(6);
+				if (creature->Mood == MoodType::Bored)
 				{
 					item->TargetState = 3;
 					break;
@@ -100,11 +100,11 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 3:
-				creature->maximumTurn = 0;
-				creature->flags = 0;
-				if (creature->mood)
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
+				if (creature->Mood != MoodType::Bored)
 				{
-					if (creature->mood != ESCAPE_MOOD 
+					if (creature->Mood != MoodType::Escape 
 						&& info.distance < SQUARE(341)
 						&& info.ahead)
 						item->TargetState = 7;
@@ -141,36 +141,36 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 4:
-				if (creature->mood || GetRandomControl() < 1280)
+				if (creature->Mood != MoodType::Bored || GetRandomControl() < 1280)
 				{
 					item->TargetState = 3;
 				}
 				break;
 
 			case 5:
-				if (creature->mood || GetRandomControl() < 256)
+				if (creature->Mood != MoodType::Bored || GetRandomControl() < 256)
 				{
 					item->TargetState = 3;
 				}
 				break;
 
 			case 6:
-				if (creature->mood || GetRandomControl() < 512)
+				if (creature->Mood != MoodType::Bored || GetRandomControl() < 512)
 				{
 					item->TargetState = 3;
 				}
 				break;
 
 			case 7:
-				creature->maximumTurn = ANGLE(1) / 2;
-				if (creature->flags != 1 
+				creature->MaxTurn = ANGLE(1) / 2;
+				if (creature->Flags != 1 
 					&& info.ahead 
 					&& item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
 					LaraItem->HitPoints -= 30;
 					LaraItem->HitStatus = true;
-					creature->flags = 1;
+					creature->Flags = 1;
 				}
 
 				if (info.distance <= SQUARE(341) || info.distance >= SQUARE(682))
@@ -180,12 +180,12 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 8:
-				if (creature->flags != 2 && item->TouchBits & 0x122000)
+				if (creature->Flags != 2 && item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
 					LaraItem->HitPoints -= 80;
 					LaraItem->HitStatus = true;
-					creature->flags = 2;
+					creature->Flags = 2;
 				}
 				if (info.distance >= SQUARE(341))
 				{
@@ -198,13 +198,13 @@ void DobermanControl(short itemNumber)
 				}
 				break;
 			case 9:
-				creature->maximumTurn = ANGLE(6);
-				if (creature->flags != 3 && item->TouchBits & 0x122000)
+				creature->MaxTurn = ANGLE(6);
+				if (creature->Flags != 3 && item->TouchBits & 0x122000)
 				{
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
 					LaraItem->HitPoints -= 50;
 					LaraItem->HitStatus = true;
-					creature->flags = 3;
+					creature->Flags = 3;
 				}
 				if (info.distance < SQUARE(341))
 					item->TargetState = 7;

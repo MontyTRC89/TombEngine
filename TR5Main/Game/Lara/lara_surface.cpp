@@ -25,7 +25,7 @@ void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -33,7 +33,7 @@ void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -41,7 +41,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -77,19 +77,16 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-	{
-		item->Position.yRot -= ANGLE(4);
-	}
+		item->Position.yRot -= ANGLE(4.0f);
 	else if (TrInput & IN_RIGHT)
-	{
-		item->Position.yRot += ANGLE(4);
-	}
+		item->Position.yRot += ANGLE(4.0f);
 
 	if (TrInput & IN_JUMP)
 	{
 		lara->Control.Count.Dive++;
 		if (lara->Control.Count.Dive == 10)
 			SwimDive(item);
+
 		return;
 	}
 	else if (TrInput & IN_FORWARD)
@@ -118,8 +115,8 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	lara->Control.Count.Dive = 0;
 	item->TargetState = LS_ONWATER_STOP;
+	lara->Control.Count.Dive = 0;
 }
 
 void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
@@ -135,18 +132,12 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
-	{
-		item->Position.yRot -= ANGLE(2);
-	}
+		item->Position.yRot -= ANGLE(2.0f);
 	else if (TrInput & IN_RIGHT)
-	{
-		item->Position.yRot += ANGLE(2);
-	}
+		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_RSTEP))
-	{
 		item->TargetState = LS_ONWATER_STOP;
-	}
 
 	item->VerticalVelocity += 8;
 	if (item->VerticalVelocity > 60)
@@ -166,18 +157,12 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
-	{
-		item->Position.yRot -= ANGLE(2);
-	}
+		item->Position.yRot -= ANGLE(2.0f);
 	else if (TrInput & IN_RIGHT)
-	{
-		item->Position.yRot += ANGLE(2);
-	}
+		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_LSTEP))
-	{
 		item->TargetState = LS_ONWATER_STOP;
-	}
 
 	item->VerticalVelocity += 8;
 	if (item->VerticalVelocity > 60)
@@ -197,18 +182,12 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
-	{
-		item->Position.yRot -= ANGLE(2);
-	}
+		item->Position.yRot -= ANGLE(2.0f);
 	else if (TrInput & IN_RIGHT)
-	{
-		item->Position.yRot += ANGLE(2);
-	}
+		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_BACK))
-	{
 		item->TargetState = LS_ONWATER_STOP;
-	}
 
 	item->VerticalVelocity += 8;
 	if (item->VerticalVelocity > 60)
@@ -228,13 +207,9 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.Count.Dive = 0;
 
 	if (TrInput & IN_LEFT)
-	{
-		item->Position.yRot -= ANGLE(4);
-	}
+		item->Position.yRot -= ANGLE(4.0f);
 	else if (TrInput & IN_RIGHT)
-	{
-		item->Position.yRot += ANGLE(4);
-	}
+		item->Position.yRot += ANGLE(4.0f);
 
 	if (!(TrInput & IN_FORWARD))
 		item->TargetState = LS_ONWATER_STOP;

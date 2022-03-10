@@ -121,7 +121,7 @@ void InitialiseSpotCam(short Sequence)
 
 	Camera.bounce = 0;
 
-	Lara.IsBusy = 0;
+	Lara.Inventory.IsBusy = 0;
 
 	CameraFade = -1;
 	LastSpotCamSequence = Sequence;

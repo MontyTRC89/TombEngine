@@ -10,26 +10,26 @@ namespace TEN::Entities::Traps
 {
 	void DartControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TouchBits)
 		{
 			LaraItem->HitPoints -= 25;
 			LaraItem->HitStatus = true;
-			Lara.Poisoned += 160;
+			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
 			DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else
 		{
 			int oldX = item->Position.xPos;
-			int oldZ = item->Position.zPos-1000;
+			int oldZ = item->Position.zPos - 1000;
 
-			int speed = item->Velocity * phd_cos(item->Position.xRot);
+			int velocity = item->Velocity * phd_cos(item->Position.xRot);
 
-			item->Position.xPos += speed * phd_sin(item->Position.yRot);
+			item->Position.xPos += velocity * phd_sin(item->Position.yRot);
 			item->Position.yPos -= item->Velocity * phd_sin(item->Position.xRot);
-			item->Position.zPos += speed * phd_cos(item->Position.yRot);
+			item->Position.zPos += velocity * phd_cos(item->Position.yRot);
 
 			short roomNumber = item->RoomNumber;
 			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
@@ -43,9 +43,7 @@ namespace TEN::Entities::Traps
 			if (item->Position.yPos >= height)
 			{
 				for (int i = 0; i < 4; i++)
-				{
 					TriggerDartSmoke(oldX, item->Position.yPos, oldZ, 0, 0, true);
-				}
 
 				KillItem(itemNumber);
 			}
@@ -64,9 +62,7 @@ namespace TEN::Entities::Traps
 				return;
 			}
 			else
-			{
 				item->Timer = 24;
-			}
 		}
 
 		short dartItemNumber = CreateItem();

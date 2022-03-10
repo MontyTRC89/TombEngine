@@ -76,8 +76,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_jump_left,//27
 	lara_as_jump_up,//28
 	lara_as_fall_back,//29
-	lara_as_hangleft,//30
-	lara_as_hangright,//31
+	lara_as_shimmy_left,//30
+	lara_as_shimmy_right,//31
 	lara_as_slide_back,//32
 	lara_as_surftread,
 	lara_as_surfswim,
@@ -100,14 +100,14 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//51
 	lara_as_swan_dive,//52
 	lara_as_freefall_dive,//53
-	lara_as_gymnast,//54
+	lara_as_handstand,//54
 	lara_as_waterout,//55
-	lara_as_climbstnc,//56
-	lara_as_climbing,//57
-	lara_as_climbleft,//58
-	lara_as_climbend,//59
-	lara_as_climbright,//60
-	lara_as_climbdown,//61
+	lara_as_climb_idle,//56
+	lara_as_climb_up,//57
+	lara_as_climb_left,//58
+	lara_as_climb_end,//59
+	lara_as_climb_right,//60
+	lara_as_climb_down,//61
 	lara_as_auto_jump,//62
 	lara_void_func,//63
 	lara_void_func,//64
@@ -200,8 +200,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//147
 	lara_as_null,//148
 	lara_as_slopefall,//149
-	lara_as_stepoff_left,
-	lara_as_stepoff_right,
+	lara_as_climb_stepoff_left,
+	lara_as_climb_stepoff_right,
 	lara_as_turn_left_fast,
 	lara_as_controlled,
 	lara_as_controlled,
@@ -255,8 +255,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_left,//27
 	lara_col_jump_up,//28
 	lara_col_fall_back,//29
-	lara_col_hangleft,
-	lara_col_hangright,
+	lara_col_shimmy_left,
+	lara_col_shimmy_right,
 	lara_col_slide_back,//32
 	lara_col_surftread,
 	lara_col_surfswim,
@@ -281,12 +281,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_freefall_dive,//53
 	lara_default_col,
 	lara_default_col,
-	lara_col_climbstnc,
-	lara_col_climbing,
-	lara_col_climbleft,
-	lara_col_climbend,
-	lara_col_climbright,
-	lara_col_climbdown,
+	lara_col_climb_idle,
+	lara_col_climb_up,
+	lara_col_climb_left,
+	lara_col_climb_end,
+	lara_col_climb_right,
+	lara_col_climb_down,
 	lara_void_func,//62
 	lara_void_func,
 	lara_void_func,
@@ -402,19 +402,19 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.WeaponControl.HasFired)
+	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);
-		lara->Control.WeaponControl.HasFired = false;
+		lara->Control.Weapon.HasFired = false;
 	}
 
-	if (lara->Poisoned)
+	if (lara->PoisonPotency)
 	{
-		if (lara->Poisoned > 4096)
-			lara->Poisoned = 4096;
+		if (lara->PoisonPotency > LARA_POISON_POTENCY_MAX)
+			lara->PoisonPotency = LARA_POISON_POTENCY_MAX;
 
-		if (lara->Poisoned >= 256 && !(Wibble & 0xFF))
-			item->HitPoints -= lara->Poisoned >> 8;
+		if (!(Wibble & 0xFF))
+			item->HitPoints -= lara->PoisonPotency;
 	}
 
 	if (lara->Control.IsMoving)
@@ -429,7 +429,7 @@ void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (!lara->Control.Locked)
-		lara->locationPad = 128;
+		lara->LocationPad = 128;
 
 	int oldX = item->Position.xPos;
 	int oldY = item->Position.yPos;
@@ -791,10 +791,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Say no.
 	static bool dbNo = false;
 	if (KeyMap[DIK_N] && !dbNo)
-	{
-		item->Airborne = !item->Airborne;
 		SayNo();
-	}
 	dbNo = KeyMap[DIK_N] ? true : false;
 
 	static PHD_3DPOS posO = item->Position;
@@ -819,28 +816,16 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	
 	// Forward 1 unit.
 	if (KeyMap[DIK_I])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot));
-	}
+		MoveItem(item, item->Position.yRot, 1);
 	// Back 1 unit.
 	else if (KeyMap[DIK_K])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot + ANGLE(180.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot + ANGLE(180.0f)));
-	}
+		MoveItem(item, item->Position.yRot + ANGLE(180.0f), 1);
 	// Left 1 unit.
 	else if (KeyMap[DIK_J])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot - ANGLE(90.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot - ANGLE(90.0f)));
-	}
+		MoveItem(item, item->Position.yRot - ANGLE(90.0f), 1);
 	// Right 1 unit.
 	else if (KeyMap[DIK_L])
-	{
-		item->Position.xPos += roundf(phd_sin(item->Position.yRot + ANGLE(90.0f)));
-		item->Position.zPos += roundf(phd_cos(item->Position.yRot + ANGLE(90.0f)));
-	}
+		MoveItem(item, item->Position.yRot + ANGLE(90.0f), 1);
 
 	//---
 
@@ -870,10 +855,12 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 			if (lara->Vehicle == NO_ITEM)
 				lara_collision_routines[item->ActiveState](item, coll);
 		}
+
+		lara->ExtraVelocity = PHD_VECTOR();
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
 
-	//if (lara->gunType == WEAPON_CROSSBOW && !LaserSight)
+	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.
@@ -969,7 +956,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot = -ANGLE(22.0f);
 	}
 
-	if (lara->Control.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
@@ -982,6 +969,8 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->ActiveState](item, coll);
+
+	lara->ExtraVelocity = PHD_VECTOR();
 
 	UpdateItemRoom(item, 0);
 
@@ -1035,7 +1024,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.zRot += item->Position.zRot / -8;
 	}
 
-	if (lara->Control.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
@@ -1047,6 +1036,8 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (lara->Vehicle == NO_ITEM)
 		lara_collision_routines[item->ActiveState](item, coll);
+
+	lara->ExtraVelocity = PHD_VECTOR();
 
 	UpdateItemRoom(item, LARA_RAD);
 

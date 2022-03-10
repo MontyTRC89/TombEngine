@@ -13,17 +13,6 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
-struct SUBSUIT_INFO
-{
-	short XRot;
-	short dXRot;
-	short XRotVel;
-	short Vel[2];
-	short YVel;
-};
-SUBSUIT_INFO Subsuit;
-byte SubHitCount = 0;
-
 void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraSwimCollision(item, coll);
@@ -37,8 +26,8 @@ void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Air = -1;
 	lara->Control.HandStatus = HandStatus::Busy;
 
-	auto waterHeight = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
-	if (waterHeight < (item->Position.yPos - (STEP_SIZE / 5 * 2) - 2) &&
+	int waterHeight = GetWaterHeight(item);
+	if (waterHeight < (item->Position.yPos - (CLICK(0.4f) - 2)) &&
 		waterHeight != NO_HEIGHT)
 	{
 		item->Position.yPos -= 5;
@@ -104,25 +93,24 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && laraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
-
 		return;
 	}
 
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (laraType == LaraType::Divesuit)
 		SwimTurnSubsuit(item);
 	else
 		SwimTurn(item, coll);
@@ -131,7 +119,6 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		item->TargetState = LS_UNDERWATER_FORWARD;
 
 	item->VerticalVelocity -= 6;
-
 	if (item->VerticalVelocity < 0)
 		item->VerticalVelocity = 0;
 
@@ -141,22 +128,21 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && laraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
-
 		return;
 	}
 	
-	if (level->LaraType != LaraType::Divesuit)
+	if (laraType != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
@@ -174,28 +160,26 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
 {
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+
 	if (item->HitPoints <= 0)
 	{
 		item->TargetState = LS_WATER_DEATH;
 		return;
 	}
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-
-	if (TrInput & IN_ROLL && level->LaraType != LaraType::Divesuit)
+	if (TrInput & IN_ROLL && laraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
-
 		return;
 	}
 	
-	if (level->LaraType != LaraType::Divesuit)
+	if (laraType != LaraType::Divesuit)
 		SwimTurn(item, coll);
 	else
 		SwimTurnSubsuit(item);
 
 	item->VerticalVelocity += 8;
-
 	if (item->VerticalVelocity > 200)
 		item->VerticalVelocity = 200;
 
@@ -207,71 +191,64 @@ void UpdateSubsuitAngles(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (Subsuit.YVel != 0)
+	if (lara->Control.Subsuit.VerticalVelocity != 0)
 	{
-		item->Position.yPos += Subsuit.YVel / 4;
-		Subsuit.YVel = ceil(0.9375 * Subsuit.YVel - 1); // YVel * (15/16)
+		item->Position.yPos += lara->Control.Subsuit.VerticalVelocity / 4;
+		lara->Control.Subsuit.VerticalVelocity = ceil((15 / 16) * lara->Control.Subsuit.VerticalVelocity - 1);
 	}
 
-	Subsuit.Vel[0] = Subsuit.Vel[1] = -4 * item->VerticalVelocity;
+	lara->Control.Subsuit.Velocity[0] = -4 * item->VerticalVelocity;
+	lara->Control.Subsuit.Velocity[1] = -4 * item->VerticalVelocity;
 
-	if (Subsuit.XRot >= Subsuit.dXRot)
+	if (lara->Control.Subsuit.XRot >= lara->Control.Subsuit.DXRot)
 	{
-		if (Subsuit.XRot > Subsuit.dXRot)
+		if (lara->Control.Subsuit.XRot > lara->Control.Subsuit.DXRot)
 		{
-			if (Subsuit.XRot > 0 && Subsuit.dXRot < 0)
-				Subsuit.XRot = ceil(0.75 * Subsuit.XRot);
+			if (lara->Control.Subsuit.XRot > 0 && lara->Control.Subsuit.DXRot < 0)
+				lara->Control.Subsuit.XRot = ceil(0.75 * lara->Control.Subsuit.XRot);
 
-			Subsuit.XRot -= ANGLE(2.0f);
-
-			if (Subsuit.XRot < Subsuit.dXRot)
-				Subsuit.XRot = Subsuit.dXRot;
+			lara->Control.Subsuit.XRot -= ANGLE(2.0f);
+			if (lara->Control.Subsuit.XRot < lara->Control.Subsuit.DXRot)
+				lara->Control.Subsuit.XRot = lara->Control.Subsuit.DXRot;
 		}
 	}
 	else
 	{
-		if (Subsuit.XRot < 0 && Subsuit.dXRot > 0)
-			Subsuit.XRot = ceil(0.75 * Subsuit.XRot);
+		if (lara->Control.Subsuit.XRot < 0 && lara->Control.Subsuit.DXRot > 0)
+			lara->Control.Subsuit.XRot = ceil(0.75 * lara->Control.Subsuit.XRot);
 
-		Subsuit.XRot += ANGLE(2.0f);
-
-		if (Subsuit.XRot > Subsuit.dXRot)
-			Subsuit.XRot = Subsuit.dXRot;
+		lara->Control.Subsuit.XRot += ANGLE(2.0f);
+		if (lara->Control.Subsuit.XRot > lara->Control.Subsuit.DXRot)
+			lara->Control.Subsuit.XRot = lara->Control.Subsuit.DXRot;
 	}
 
-	if (Subsuit.dXRot != 0)
+	if (lara->Control.Subsuit.DXRot != 0)
 	{
-		short rot = Subsuit.dXRot >> 3;
-		if (rot < -ANGLE(2.0f))
-			rot = -ANGLE(2.0f);
-		else if (rot > ANGLE(2.0f))
-			rot = ANGLE(2.0f);
+		short rotation = lara->Control.Subsuit.DXRot >> 3;
+		if (rotation < -ANGLE(2.0f))
+			rotation = -ANGLE(2.0f);
+		else if (rotation > ANGLE(2.0f))
+			rotation = ANGLE(2.0f);
 
-		item->Position.xRot += rot;
+		item->Position.xRot += rotation;
 	}
 
-	Subsuit.Vel[0] += abs(Subsuit.XRot >> 3);
-	Subsuit.Vel[1] += abs(Subsuit.XRot >> 3);
+	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot >> 3);
+	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot >> 3);
 
 	if (lara->Control.TurnRate > 0)
-	{
-		Subsuit.Vel[0] += 2 * abs(lara->Control.TurnRate);
-	}
+		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate);
 	else if (lara->Control.TurnRate < 0)
-	{
-		Subsuit.Vel[1] += 2 * abs(lara->Control.TurnRate);
-	}
+		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
 
-	if (Subsuit.Vel[0] > 1536)
-		Subsuit.Vel[0] = 1536;
+	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
+		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
 
-	if (Subsuit.Vel[1] > 1536)
-		Subsuit.Vel[1] = 1536;
+	if (lara->Control.Subsuit.Velocity[1] > SECTOR(1.5f))
+		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
 
-	if (Subsuit.Vel[0] != 0 || Subsuit.Vel[1] != 0)
-	{
-		SoundEffect(SFX_TR5_DIVESUITLOOP, &item->Position, (((Subsuit.Vel[0] + Subsuit.Vel[1]) * 4) & 0x1F00) + 10);
-	}
+	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
+		SoundEffect(SFX_TR5_LARA_UNDERWATER_ENGINE, &item->Position, (((lara->Control.Subsuit.Velocity[0] + lara->Control.Subsuit.Velocity[1]) * 4) & 0x1F00) + 10);
 }
 
 void SwimTurnSubsuit(ITEM_INFO* item)
@@ -279,14 +256,14 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 	auto* lara = GetLaraInfo(item);
 
 	if (item->Position.yPos < 14080)
-		Subsuit.YVel += (14080 - item->Position.yPos) >> 4;
+		lara->Control.Subsuit.VerticalVelocity += (14080 - item->Position.yPos) >> 4;
 
 	if (TrInput & IN_FORWARD && item->Position.xRot > -ANGLE(85.0f))
-		Subsuit.dXRot = -ANGLE(45.0f);
+		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
 	else if (TrInput & IN_BACK && item->Position.xRot < ANGLE(85.0f))
-		Subsuit.dXRot = ANGLE(45.0f);
+		lara->Control.Subsuit.DXRot = ANGLE(45.0f);
 	else
-		Subsuit.dXRot = 0;
+		lara->Control.Subsuit.DXRot = 0;
 
 	if (TrInput & IN_LEFT)
 	{
@@ -348,13 +325,13 @@ void LaraWaterCurrent(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.WaterCurrentActive)
+	if (lara->WaterCurrentActive)
 	{
-		auto* sink = &g_Level.Sinks[lara->Control.WaterCurrentActive - 1];
+		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
 
 		short angle = mGetAngle(sink->x, sink->z, item->Position.xPos, item->Position.zPos);
-		lara->ExtraVelocity.x += (sink->strength * 1024 * phd_sin(angle - ANGLE(90.0f)) - lara->ExtraVelocity.x) / 16;
-		lara->ExtraVelocity.z += (sink->strength * 1024 * phd_cos(angle - ANGLE(90.0f)) - lara->ExtraVelocity.z) / 16;
+		lara->WaterCurrentPull.x += (sink->strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
+		lara->WaterCurrentPull.z += (sink->strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
 
 		item->Position.yPos += (sink->y - item->Position.yPos) >> 4;
 	}
@@ -362,35 +339,34 @@ void LaraWaterCurrent(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		int shift = 0;
 
-		if (abs(lara->ExtraVelocity.x) <= 16)
-			shift = (abs(lara->ExtraVelocity.x) > 8) + 2;
+		if (abs(lara->WaterCurrentPull.x) <= 16)
+			shift = (abs(lara->WaterCurrentPull.x) > 8) + 2;
 		else
 			shift = 4;
-		lara->ExtraVelocity.x -= lara->ExtraVelocity.x >> shift;
+		lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
 
-		if (abs(lara->ExtraVelocity.x) < 4)
-			lara->ExtraVelocity.x = 0;
+		if (abs(lara->WaterCurrentPull.x) < 4)
+			lara->WaterCurrentPull.x = 0;
 
-		if (abs(lara->ExtraVelocity.z) <= 16)
-			shift = (abs(lara->ExtraVelocity.z) > 8) + 2;
+		if (abs(lara->WaterCurrentPull.z) <= 16)
+			shift = (abs(lara->WaterCurrentPull.z) > 8) + 2;
 		else
 			shift = 4;
-		lara->ExtraVelocity.z -= lara->ExtraVelocity.z >> shift;
+		lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
 
-		if (abs(lara->ExtraVelocity.z) < 4)
-			lara->ExtraVelocity.z = 0;
+		if (abs(lara->WaterCurrentPull.z) < 4)
+			lara->WaterCurrentPull.z = 0;
 
-		if (!lara->ExtraVelocity.x && !lara->ExtraVelocity.z)
+		if (!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
 			return;
 	}
 
-	item->Position.xPos += lara->ExtraVelocity.x >> 8;
-	item->Position.zPos += lara->ExtraVelocity.z >> 8;
-	lara->Control.WaterCurrentActive = 0;
+	item->Position.xPos += lara->WaterCurrentPull.x >> 8;
+	item->Position.zPos += lara->WaterCurrentPull.z >> 8;
+	lara->WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = phd_atan(item->Position.zPos - coll->Setup.OldPosition.z, item->Position.xPos - coll->Setup.OldPosition.x);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-
 	GetCollisionInfo(coll, item, PHD_VECTOR(0, 200, 0));
 
 	if (coll->CollisionType == CT_FRONT)

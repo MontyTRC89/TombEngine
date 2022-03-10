@@ -80,7 +80,7 @@ void GiantMutantControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)phd_atan(creature->target.z - item->Position.zPos, creature->target.x - item->Position.xPos) - item->Position.yRot;
+		angle = (short)phd_atan(creature->Target.z - item->Position.zPos, creature->Target.x - item->Position.xPos) - item->Position.yRot;
 
 		if (item->TouchBits)
 		{
@@ -99,7 +99,7 @@ void GiantMutantControl(short itemNumber)
 			if (LaraItem->HitPoints <= 0)
 				break;
 
-			creature->flags = 0;
+			creature->Flags = 0;
 
 			if (angle > MUTANT_NEED_TURN)
 				item->TargetState = MUTANT_STATE_TURN_RIGHT;
@@ -140,10 +140,10 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_TURN_RIGHT:
-			if (!creature->flags)
-				creature->flags = item->FrameNumber;
-			else if (item->FrameNumber - creature->flags > 16 &&
-				item->FrameNumber - creature->flags < 23)
+			if (!creature->Flags)
+				creature->Flags = item->FrameNumber;
+			else if (item->FrameNumber - creature->Flags > 16 &&
+				item->FrameNumber - creature->Flags < 23)
 			{
 				item->Position.yRot += ANGLE(14.0f);
 			}
@@ -154,10 +154,10 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_TURN_LEFT:
-			if (!creature->flags)
-				creature->flags = item->FrameNumber;
-			else if (item->FrameNumber - creature->flags > 13 &&
-				item->FrameNumber - creature->flags < 23)
+			if (!creature->Flags)
+				creature->Flags = item->FrameNumber;
+			else if (item->FrameNumber - creature->Flags > 13 &&
+				item->FrameNumber - creature->Flags < 23)
 			{
 				item->Position.yRot -= ANGLE(9.0f);
 			}
@@ -168,9 +168,9 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_ATTACK_1:
-			if (!creature->flags && item->TouchBits & MUTANT_TRIGHT)
+			if (!creature->Flags && item->TouchBits & MUTANT_TRIGHT)
 			{
-				creature->flags = 1;
+				creature->Flags = 1;
 
 				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;
@@ -179,9 +179,9 @@ void GiantMutantControl(short itemNumber)
 			break;
 
 		case MUTANT_STATE_ATTACK_2:
-			if (!creature->flags && item->TouchBits & MUTANT_TOUCH)
+			if (!creature->Flags && item->TouchBits & MUTANT_TOUCH)
 			{
-				creature->flags = 1;
+				creature->Flags = 1;
 
 				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;
@@ -209,7 +209,7 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;
 				Lara.Control.HandStatus = HandStatus::Busy;
-				Lara.Control.WeaponControl.GunType = WEAPON_NONE;
+				Lara.Control.Weapon.GunType = LaraWeaponType::None;
 			}
 
 			break;

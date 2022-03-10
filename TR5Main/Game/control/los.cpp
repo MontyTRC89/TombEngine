@@ -86,10 +86,10 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 
 	if (firing && LaserSight)
 	{
-		Lara.Control.WeaponControl.HasFired = true;
-		Lara.Control.WeaponControl.Fired = true;
+		Lara.Control.Weapon.HasFired = true;
+		Lara.Control.Weapon.Fired = true;
 
-		if (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
 	}
 
@@ -113,7 +113,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 
 		if (firing)
 		{
-			if (Lara.Control.WeaponControl.GunType != WEAPON_CROSSBOW)
+			if (Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 			{
 				if (itemNumber < 0)
 				{
@@ -170,11 +170,11 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 						}
 						else
 						{
-							if (drawTarget && (Lara.Control.WeaponControl.GunType == WEAPON_REVOLVER ||
-								Lara.Control.WeaponControl.GunType == WEAPON_HK))
+							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
+								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
 								if (Objects[item->ObjectNumber].intelligent)
-									HitTarget(LaraItem, item, &target, Weapons[Lara.Control.WeaponControl.GunType].Damage, 0);
+									HitTarget(LaraItem, item, &target, Weapons[(int)Lara.Control.Weapon.GunType].Damage, 0);
 								else
 								{
 									// TR5
@@ -197,7 +197,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 									
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
-										item->HitPoints -= Weapons[Lara.Control.WeaponControl.GunType].Damage;
+										item->HitPoints -= Weapons[(int)Lara.Control.Weapon.GunType].Damage;
 								}
 							}
 						}
@@ -265,7 +265,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int fir
 	}
 	else
 	{
-		if (Lara.Control.WeaponControl.GunType == WEAPON_CROSSBOW)
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
 			if (firing && LaserSight)
 				FireCrossBowFromLaserSight(LaraItem, src, &target);

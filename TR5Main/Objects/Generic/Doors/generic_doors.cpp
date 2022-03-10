@@ -174,7 +174,7 @@ namespace TEN::Entities::Doors
 				laraItem->AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
 				laraInfo->Control.HandStatus == HandStatus::Free ||
-				laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber))
+				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			doorItem->Position.yRot ^= ANGLE(180.0f);
 			if (TestLaraPosition(&CrowbarDoorBounds, doorItem, laraItem))
@@ -228,9 +228,9 @@ namespace TEN::Entities::Doors
 					return;
 				}
 
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = 0;
 				laraInfo->Control.HandStatus = HandStatus::Free;
@@ -399,7 +399,7 @@ namespace TEN::Entities::Doors
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					ActiveCreatures[i]->LOT.targetBox = NO_BOX;
+					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
 				}
 			}
 		}
@@ -433,7 +433,7 @@ namespace TEN::Entities::Doors
 				g_Level.Boxes[boxIndex].flags |= BLOCKED;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
-					ActiveCreatures[i]->LOT.targetBox = NO_BOX;
+					ActiveCreatures[i]->LOT.TargetBox = NO_BOX;
 			}
 		}
 	}

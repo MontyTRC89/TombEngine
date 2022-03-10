@@ -44,12 +44,12 @@ class ITEM_DATA
 		long double,
 		std::array<short, 4>,
 		ITEM_INFO*,
-		CREATURE_INFO,
-		LASER_HEAD_INFO,
+		CreatureInfo,
+		LaserHeadInfo,
 		QuadInfo,
 		BigGunInfo,
-		MOTORBIKE_INFO,
-		JEEP_INFO,
+		MotorbikeInfo,
+		JeepInfo,
 		LaraInfo*,
 		KayakInfo,
 		DOOR_DATA,
@@ -57,9 +57,9 @@ class ITEM_DATA
 		UPVInfo,
 		SpeedBoatInfo,
 		GAME_VECTOR,
-		WRAITH_INFO,
+		WraithInfo,
 		RubberBoatInfo,
-		PUSHABLE_INFO,
+		PushableInfo,
 		MinecartInfo
 	> data;
 	public:

@@ -422,7 +422,7 @@ void ControlTonyFireBall(short fxNumber)
 		return;
 	}
 
-	if (!Lara.burn)
+	if (!Lara.Burn)
 	{
 		if (ItemNearLara(&fx->pos, 200))
 		{
@@ -506,7 +506,7 @@ static void ExplodeTonyBoss(ITEM_INFO* item)
 void TonyControl(short itemNum)
 {
 	ITEM_INFO* item;
-	CREATURE_INFO* tonyboss;
+	CreatureInfo* tonyboss;
 	AI_INFO info;
 	PHD_VECTOR pos1;
 	short angle, head, torso_x, torso_y, tilt, lp;
@@ -516,7 +516,7 @@ void TonyControl(short itemNum)
 		return;
 
 	item = &g_Level.Items[itemNum];
-	tonyboss = (CREATURE_INFO*)item->Data;
+	tonyboss = (CreatureInfo*)item->Data;
 	head = torso_y = torso_x = angle = tilt = 0;
 
 	if (item->HitPoints <= 0)
@@ -566,9 +566,9 @@ void TonyControl(short itemNum)
 		}
 		else
 		{
-			tonyboss->target.x = LaraItem->Position.xPos;
-			tonyboss->target.z = LaraItem->Position.zPos;
-			angle = CreatureTurn(item, tonyboss->maximumTurn);
+			tonyboss->Target.x = LaraItem->Position.xPos;
+			tonyboss->Target.z = LaraItem->Position.zPos;
+			angle = CreatureTurn(item, tonyboss->MaxTurn);
 		}
 
 		if (info.ahead)
@@ -577,29 +577,29 @@ void TonyControl(short itemNum)
 		switch (item->ActiveState)
 		{
 			case TONYBOSS_WAIT:
-				tonyboss->maximumTurn = 0;
+				tonyboss->MaxTurn = 0;
 				if (item->TargetState != TONYBOSS_RISE && item->ItemFlags[3])
 					item->TargetState = TONYBOSS_RISE;
 				break;
 
 			case TONYBOSS_RISE:
 				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) > 16)
-					tonyboss->maximumTurn = TONYBOSS_TURN;
+					tonyboss->MaxTurn = TONYBOSS_TURN;
 				else
-					tonyboss->maximumTurn = 0;
+					tonyboss->MaxTurn = 0;
 				break;
 
 			case TONYBOSS_FLOAT:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
-				tonyboss->maximumTurn = TONYBOSS_TURN;
+				tonyboss->MaxTurn = TONYBOSS_TURN;
 
 				if (!BossData.ExplodeCount)
 				{
 					if (item->TargetState != TONYBOSS_BIGBOOM && item->ItemFlags[3] != 2)
 					{
 						item->TargetState = TONYBOSS_BIGBOOM;
-						tonyboss->maximumTurn = 0;
+						tonyboss->MaxTurn = 0;
 					}
 
 					if (item->TargetState != TONYBOSS_ROCKZAPP && item->ItemFlags[3] == 2)
@@ -625,7 +625,7 @@ void TonyControl(short itemNum)
 			case TONYBOSS_ROCKZAPP:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
-				tonyboss->maximumTurn = 0;
+				tonyboss->MaxTurn = 0;
 
 				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 40)
 				{
@@ -637,14 +637,14 @@ void TonyControl(short itemNum)
 			case TONYBOSS_ZAPP:
 				torso_y = info.angle;
 				torso_x = info.xAngle;
-				tonyboss->maximumTurn = TONYBOSS_TURN / 2;
+				tonyboss->MaxTurn = TONYBOSS_TURN / 2;
 
 				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) == 28)
 					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Position.yRot, 0);
 				break;
 
 			case TONYBOSS_BIGBOOM:
-				tonyboss->maximumTurn = 0;
+				tonyboss->MaxTurn = 0;
 				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) == 56)
 				{
 					item->ItemFlags[3] = 2;

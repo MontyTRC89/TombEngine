@@ -113,23 +113,23 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->dSize = size;
 }
 
-static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* creature, int damage)
+static void ShivaDamage(ITEM_INFO* item, CreatureInfo* creature, int damage)
 {
-	if (!(creature->flags) && item->TouchBits & 0x2400000)
+	if (!(creature->Flags) && item->TouchBits & 0x2400000)
 	{
 		CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
-		creature->flags = 1;
+		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;
 		LaraItem->HitStatus = true;
 	}
 
-	if (!(creature->flags) && item->TouchBits & 0x2400)
+	if (!(creature->Flags) && item->TouchBits & 0x2400)
 	{
 		CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
-		creature->flags = 1;
+		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;
 		LaraItem->HitStatus = true;
@@ -183,13 +183,13 @@ void ShivaControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		if (shiva->mood == ESCAPE_MOOD)
+		if (shiva->Mood == MoodType::Escape)
 		{
-			shiva->target.x = LaraItem->Position.xPos;
-			shiva->target.z = LaraItem->Position.zPos;
+			shiva->Target.x = LaraItem->Position.xPos;
+			shiva->Target.z = LaraItem->Position.zPos;
 		}
 
-		angle = CreatureTurn(item, shiva->maximumTurn);
+		angle = CreatureTurn(item, shiva->MaxTurn);
 
 		if (item->ActiveState != 4)
 			item->MeshBits = 0xFFFFFFFF;
@@ -199,14 +199,14 @@ void ShivaControl(short itemNumber)
 		switch (item->ActiveState)
 		{
 		case 4:
-			shiva->maximumTurn = 0;
+			shiva->MaxTurn = 0;
 
-			if (!shiva->flags)
+			if (!shiva->Flags)
 			{
 				if (item->MeshBits == 0)
 					effectMesh = 0;
 				item->MeshBits = (item->MeshBits * 2) + 1;
-				shiva->flags = 1;
+				shiva->Flags = 1;
 
 				GetJointAbsPosition(item, &pos, effectMesh++);
 				TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
@@ -214,12 +214,12 @@ void ShivaControl(short itemNumber)
 
 			}
 			else
-				shiva->flags--;
+				shiva->Flags--;
 
 			if (item->MeshBits == 0x7FFFFFFF)
 			{
 				item->TargetState = 0;
-				shiva->flags = -45;
+				shiva->Flags = -45;
 				effectMesh = 0;
 			}
 
@@ -229,33 +229,33 @@ void ShivaControl(short itemNumber)
 			if (AI.ahead)
 				headY = AI.angle;
 
-			if (shiva->flags < 0)
+			if (shiva->Flags < 0)
 			{
-				shiva->flags++;
+				shiva->Flags++;
 				TriggerShivaSmoke(item->Position.xPos + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Position.zPos + (GetRandomControl() & 0x5FF) - 0x300, 1);
 				break;
 			}
 
-			if (shiva->flags == 1)
-				shiva->flags = 0;
+			if (shiva->Flags == 1)
+				shiva->Flags = 0;
 
-			shiva->maximumTurn = 0;
+			shiva->MaxTurn = 0;
 
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->Mood == MoodType::Escape)
 			{
 				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
 				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
 				auto box = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) &&
-					!shiva->flags)
+					!shiva->Flags)
 				{
 					item->TargetState = 8;
 				}
 				else
 					item->TargetState = 2;
 			}
-			else if (shiva->mood == BORED_MOOD)
+			else if (shiva->Mood == MoodType::Bored)
 			{
 				int random = GetRandomControl();
 				if (random < 0x400)
@@ -264,16 +264,16 @@ void ShivaControl(short itemNumber)
 			else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 			{
 				item->TargetState = 5;
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
 				item->TargetState = 7;
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			}
 			else if (item->HitStatus && AI.ahead)
 			{
-				shiva->flags = 4;
+				shiva->Flags = 4;
 				item->TargetState = 2;
 			}
 			else
@@ -284,100 +284,100 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 2:
-			shiva->maximumTurn = 0;
+			shiva->MaxTurn = 0;
 
 			if (AI.ahead)
 				headY = AI.angle;
 
-			if (item->HitStatus || shiva->mood == ESCAPE_MOOD)
-				shiva->flags = 4;
+			if (item->HitStatus || shiva->Mood == MoodType::Escape)
+				shiva->Flags = 4;
 
 			if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
 				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
-					!shiva->flags) ||
+					!shiva->Flags) ||
 				!AI.ahead)
 			{
 				item->TargetState = 0;
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			}
-			else if (shiva->flags)
+			else if (shiva->Flags)
 				item->TargetState = 2;
 
 
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase && shiva->flags > 1)
-				shiva->flags -= 2;
+			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase && shiva->Flags > 1)
+				shiva->Flags -= 2;
 
 			break;
 
 		case 1:
-			shiva->maximumTurn = ANGLE(4.0f);
+			shiva->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
 
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->Mood == MoodType::Escape)
 				item->TargetState = 0;
-			else if (shiva->mood == BORED_MOOD)
+			else if (shiva->Mood == MoodType::Bored)
 				item->TargetState = 0;
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
 				item->TargetState = 0;
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			}
 			else if (item->HitStatus)
 			{
-				shiva->flags = 4;
+				shiva->Flags = 4;
 				item->TargetState = 3;
 			}
 
 			break;
 
 		case 3:
-			shiva->maximumTurn = ANGLE(4.0f);
+			shiva->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
 
 			if (item->HitStatus)
-				shiva->flags = 4;
+				shiva->Flags = 4;
 
 			if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2) ||
 				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
-					!shiva->flags))
+					!shiva->Flags))
 			{
 				item->TargetState = 1;
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			}
-			else if (shiva->flags)
+			else if (shiva->Flags)
 				item->TargetState = 3;
 
 			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
-				shiva->flags = 0;
+				shiva->Flags = 0;
 			
 			break;
 
 		case 8:
-			shiva->maximumTurn = ANGLE(4.0f);
+			shiva->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(4) / 3, 2) ||
 				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
-					!shiva->flags))
+					!shiva->Flags))
 			{
 				item->TargetState = 0;
 			}
 			else if (item->HitStatus)
 			{
-				shiva->flags = 4;
+				shiva->Flags = 4;
 				item->TargetState = 0;
 			}
 			
 			break;
 
 		case 5:
-			shiva->maximumTurn = ANGLE(4.0f);
+			shiva->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead)
 			{
@@ -390,7 +390,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 7:
-			shiva->maximumTurn = ANGLE(4.0f);
+			shiva->MaxTurn = ANGLE(4.0f);
 			headY = AI.angle;
 			torsoY = AI.angle;
 
@@ -401,7 +401,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 6:
-			shiva->maximumTurn = 0;
+			shiva->MaxTurn = 0;
 			headX = 0;
 			headY = 0;
 			torsoX = 0;

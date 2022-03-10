@@ -38,7 +38,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	// TODO: Dispatch pickups from within states.
 	if (item->TargetState == LS_PICKUP)
@@ -63,7 +63,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			lara->Control.HandStatus == HandStatus::Free &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->Animations.HasCrouchRoll)
 		{
 			item->TargetState = LS_CROUCH_ROLL;
 			return;
@@ -99,12 +99,12 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot = PHD_3DPOS();
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -145,7 +145,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -173,11 +173,11 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
-	item->Airborne = 0;
-	item->VerticalVelocity = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
@@ -231,7 +231,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -248,7 +248,7 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->Animations.HasCrouchRoll)
 		{
 			item->TargetState = LS_CROUCH_ROLL;
 			return;
@@ -287,7 +287,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -304,7 +304,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.CrouchRoll)
+			g_GameFlow->Animations.HasCrouchRoll)
 		{
 			item->TargetState = LS_CROUCH_ROLL;
 			return;
@@ -349,7 +349,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	// TODO: Dispatch pickups from within states.
 	if (item->TargetState == LS_PICKUP)
@@ -375,7 +375,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(lara->Control.WeaponControl.GunType) &&
+			!IsStandingWeapon(lara->Control.Weapon.GunType) &&
 			item->AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
 			item->TargetState = LS_CROUCH_IDLE;
@@ -389,7 +389,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (TrInput & (IN_ACTION | IN_JUMP) &&
 				crawlVaultResult.Success &&
-				g_GameFlow->Animations.CrawlExtended)
+				g_GameFlow->Animations.HasCrawlExtended)
 			{
 				item->TargetState = crawlVaultResult.TargetState;
 				ResetLaraFlex(item);
@@ -441,13 +441,13 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
-	item->VerticalVelocity = 0;
-	item->Airborne = false;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
@@ -488,7 +488,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -541,13 +541,13 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
@@ -593,7 +593,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -640,11 +640,11 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->VerticalVelocity = 0;
+	item->Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
-	item->Airborne = false;
-	item->VerticalVelocity = 0;
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
@@ -689,7 +689,7 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -749,7 +749,7 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(24.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->HitPoints <= 0)
 	{
@@ -807,7 +807,7 @@ void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetDistance = SECTOR(1);
 
 	if (item->AnimNumber == LA_CRAWL_TO_HANG_END)
 	{

@@ -233,7 +233,7 @@ void ElectricityWiresControl(short itemNumber)
 				if (collItem->Data.is<LaraInfo*>())
 				{
 					auto lara = (LaraInfo*&)collItem->Data;
-					lara->burnBlue = 1;
+					lara->BurnBlue = 1;
 					lara->BurnCount = 48;
 
 					if (!isWaterNearby)

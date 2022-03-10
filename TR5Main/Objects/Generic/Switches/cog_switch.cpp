@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus == HandStatus::Free &&
 					!switchItem->Airborne ||
 					laraInfo->Control.IsMoving &&
-					laraInfo->interactedItem == itemNum))
+					laraInfo->InteractedItem == itemNum))
 			{
 				if (TestLaraPosition(&CogSwitchBounds, switchItem, laraItem))
 				{
@@ -86,7 +86,7 @@ namespace TEN::Entities::Switches
 						laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
 						laraInfo->Control.IsMoving = false;
 						laraInfo->Control.HandStatus = HandStatus::Busy;
-						laraInfo->interactedItem = targetItemNum;
+						laraInfo->InteractedItem = targetItemNum;
 
 						AddActiveItem(itemNum);
 						switchItem->TargetState = SWITCH_ON;
@@ -102,11 +102,11 @@ namespace TEN::Entities::Switches
 						}
 					}
 					else
-						laraInfo->interactedItem = itemNum;
+						laraInfo->InteractedItem = itemNum;
 
 					return;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNum)
+				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNum)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;
@@ -135,7 +135,7 @@ namespace TEN::Entities::Switches
 			{
 				if (LaraItem->FrameNumber == g_Level.Anims[LaraItem->AnimNumber].frameBase + 10)
 				{
-					auto* doorItem = &g_Level.Items[Lara.interactedItem];
+					auto* doorItem = &g_Level.Items[Lara.InteractedItem];
 					doorItem->ItemFlags[0] = COG_DOOR_TURN;
 				}
 			}

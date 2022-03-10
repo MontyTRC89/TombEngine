@@ -75,8 +75,8 @@ void InitialisePushableBlock(short itemNumber)
 	item->ItemFlags[1] = NO_ITEM; // need to use itemFlags[1] to hold linked index for now
 	
 	// allocate new pushable info
-	item->Data = PUSHABLE_INFO();
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	item->Data = PushableInfo();
+	auto* info = (PushableInfo*)item->Data;
 	
 	info->stackLimit = 3; // LUA
 	info->gravity = 8; // LUA
@@ -124,9 +124,9 @@ void InitialisePushableBlock(short itemNumber)
 void PushableBlockControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
-	Lara.interactedItem = itemNumber;
+	Lara.InteractedItem = itemNumber;
 
 	PHD_VECTOR pos = { 0, 0, 0 };
 
@@ -382,7 +382,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* pushableItem = &g_Level.Items[itemNumber];
-	auto* pushableInfo = (PUSHABLE_INFO*)pushableItem->Data;
+	auto* pushableInfo = (PushableInfo*)pushableItem->Data;
 
 	int blockHeight = GetStackHeight(pushableItem);
 	
@@ -393,7 +393,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 		laraInfo->Control.HandStatus != HandStatus::Free ||
 		pushableItem->Status == ITEM_INVISIBLE ||
 		pushableItem->TriggerFlags < 0) &&
-		(!laraInfo->Control.IsMoving || laraInfo->interactedItem != itemNumber))
+		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 	{
 		if ((laraItem->ActiveState != LS_PUSHABLE_GRAB ||
 			(laraItem->FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19) ||
@@ -514,14 +514,14 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 				}
 				else
 				{
-					laraInfo->interactedItem = itemNumber;
+					laraInfo->InteractedItem = itemNumber;
 					pushableItem->Position.yRot = rot;
 				}
 			}
 		}
 		else
 		{
-			if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 			{
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Free;
@@ -559,7 +559,7 @@ bool TestBlockMovable(ITEM_INFO* item, int blokhite)
 
 bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
 {
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
 	int x = item->Position.xPos;
 	int y = item->Position.yPos;
@@ -834,7 +834,7 @@ void MoveStackY(short itemNumber, int y)
 void AddBridgeStack(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
 	if (info->hasFloorCeiling)
 		TEN::Floordata::AddBridge(itemNumber);
@@ -854,7 +854,7 @@ void AddBridgeStack(short itemNumber)
 void RemoveBridgeStack(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
 	if (info->hasFloorCeiling)
 		TEN::Floordata::RemoveBridge(itemNumber);
@@ -931,7 +931,7 @@ int FindStack(short itemNumber)
 
 int GetStackHeight(ITEM_INFO* item)
 {
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
 	int height = info->height;
 
@@ -947,7 +947,7 @@ int GetStackHeight(ITEM_INFO* item)
 
 bool CheckStackLimit(ITEM_INFO* item)
 {
-	auto* info = (PUSHABLE_INFO*)item->Data;
+	auto* info = (PushableInfo*)item->Data;
 
 	int limit = info->stackLimit;
 	
@@ -968,7 +968,7 @@ bool CheckStackLimit(ITEM_INFO* item)
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	const auto& pushable = (PUSHABLE_INFO&)item.Data;
+	const auto& pushable = (PushableInfo&)item.Data;
 	
 	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
 	{
@@ -981,7 +981,7 @@ std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z)
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
-	const auto& pushable = (PUSHABLE_INFO&)item.Data;
+	const auto& pushable = (PushableInfo&)item.Data;
 
 	if (item.Status != ITEM_INVISIBLE && pushable.hasFloorCeiling)
 		return std::optional{item.Position.yPos};

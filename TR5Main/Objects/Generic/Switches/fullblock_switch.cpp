@@ -41,7 +41,7 @@ namespace TEN::Entities::Switches
 			switchItem->Status ||
 			switchItem->Flags & 0x100 ||
 			CurrentSequence >= 3) &&
-			(!laraInfo->Control.IsMoving || laraInfo->interactedItem !=itemNumber))
+			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem !=itemNumber))
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 			return;
@@ -70,9 +70,9 @@ namespace TEN::Entities::Switches
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-				laraInfo->interactedItem = itemNumber;
+				laraInfo->InteractedItem = itemNumber;
 		}
-		else if (laraInfo->Control.IsMoving && laraInfo->interactedItem == itemNumber)
+		else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Free;

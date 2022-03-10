@@ -43,7 +43,6 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 		item->Position.zRot += std::min<short>(rate, abs(maxAngle - item->Position.zRot) / 3) * sign;
 }
 
-// Works, but disabled for the time being. @Sezz 2022.02.13
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 {
 	auto* lara = GetLaraInfo(item);
@@ -153,115 +152,133 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 
 void DoLaraFallDamage(ITEM_INFO* item)
 {
-	// TODO: Demagic more of these numbers.
-	int landingVelocity = item->VerticalVelocity - 140;
-
-	if (landingVelocity > 0)
+	if (item->VerticalVelocity >= LARA_DAMAGE_VELOCITY)
 	{
-		if (landingVelocity <= 14)
-			item->HitPoints -= LARA_HEALTH_MAX * pow(landingVelocity, 2) / 196;
-		else
+		if (item->VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
+		else [[likely]]
+		{
+			int base = item->VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
+			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
+		}
 	}
 }
 
 void DoLaraTightropeBalance(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
-	const int factor = ((lara->Control.TightropeControl.TimeOnTightrope >> 7) & 0xFF) * 128;
+	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TightropeControl.Balance += ANGLE(1.4f);
+		lara->Control.Tightrope.Balance += ANGLE(1.4f);
 	if (TrInput & IN_RIGHT)
-		lara->Control.TightropeControl.Balance -= ANGLE(1.4f);
+		lara->Control.Tightrope.Balance -= ANGLE(1.4f);
 
-	if (lara->Control.TightropeControl.Balance < 0)
+	if (lara->Control.Tightrope.Balance < 0)
 	{
-		lara->Control.TightropeControl.Balance -= factor;
-		if (lara->Control.TightropeControl.Balance <= -ANGLE(45.0f))
-			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.Tightrope.Balance -= factor;
+		if (lara->Control.Tightrope.Balance <= -ANGLE(45.0f))
+			lara->Control.Tightrope.Balance = ANGLE(45.0f);
 
 	}
-	else if (lara->Control.TightropeControl.Balance > 0)
+	else if (lara->Control.Tightrope.Balance > 0)
 	{
-		lara->Control.TightropeControl.Balance += factor;
-		if (lara->Control.TightropeControl.Balance >= ANGLE(45.0f))
-			lara->Control.TightropeControl.Balance = ANGLE(45.0f);
+		lara->Control.Tightrope.Balance += factor;
+		if (lara->Control.Tightrope.Balance >= ANGLE(45.0f))
+			lara->Control.Tightrope.Balance = ANGLE(45.0f);
 	}
 	else
-		lara->Control.TightropeControl.Balance = GetRandomControl() & 1 ? -1 : 1;
+		lara->Control.Tightrope.Balance = GetRandomControl() & 1 ? -1 : 1;
 }
 
 void DoLaraTightropeLean(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Position.zRot = lara->Control.TightropeControl.Balance / 4;
-	lara->ExtraTorsoRot.zRot = -lara->Control.TightropeControl.Balance;
+	item->Position.zRot = lara->Control.Tightrope.Balance / 4;
+	lara->ExtraTorsoRot.zRot = -lara->Control.Tightrope.Balance;
 }
 
 void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TightropeControl.TimeOnTightrope <= 32)
-		lara->Control.TightropeControl.TimeOnTightrope = 0;
+	if (lara->Control.Tightrope.TimeOnTightrope <= 32)
+		lara->Control.Tightrope.TimeOnTightrope = 0;
 	else
-		lara->Control.TightropeControl.TimeOnTightrope -= 32;
+		lara->Control.Tightrope.TimeOnTightrope -= 32;
 
-	if (lara->Control.TightropeControl.Balance > 0)
+	if (lara->Control.Tightrope.Balance > 0)
 	{
-		if (lara->Control.TightropeControl.Balance <= ANGLE(0.75f))
-			lara->Control.TightropeControl.Balance = 0;
+		if (lara->Control.Tightrope.Balance <= ANGLE(0.75f))
+			lara->Control.Tightrope.Balance = 0;
 		else
-			lara->Control.TightropeControl.Balance -= ANGLE(0.75f);
+			lara->Control.Tightrope.Balance -= ANGLE(0.75f);
 	}
 
-	if (lara->Control.TightropeControl.Balance < 0)
+	if (lara->Control.Tightrope.Balance < 0)
 	{
-		if (lara->Control.TightropeControl.Balance >= -ANGLE(0.75f))
-			lara->Control.TightropeControl.Balance = 0;
+		if (lara->Control.Tightrope.Balance >= -ANGLE(0.75f))
+			lara->Control.Tightrope.Balance = 0;
 		else
-			lara->Control.TightropeControl.Balance += ANGLE(0.75f);
+			lara->Control.Tightrope.Balance += ANGLE(0.75f);
 	}
 }
 
-
 LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 {
-	if (item->ObjectNumber != ID_LARA)
-	{
-		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-		
-		auto* firstLaraItem = FindItem(ID_LARA);
-		return (LaraInfo*&)firstLaraItem->Data;
-	}
+	if (item->ObjectNumber == ID_LARA)
+		return (LaraInfo*&)item->Data;
 
-	return (LaraInfo*&)item->Data;
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+
+	auto* firstLaraItem = FindItem(ID_LARA);
+	return (LaraInfo*&)firstLaraItem->Data;
 }
 
 short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 {
-	short direction = item->Position.yRot;
+	short direction = coll->Setup.ForwardAngle;
+	auto probe = GetCollisionResult(item);
 
-	//if (g_GameFlow->Animations.SlideExtended)
-	//{
-	//	// TODO: Get true slope direction.
-	//}
-	//else
-	{
-		if (coll->FloorTiltX > 2)
-			direction = -ANGLE(90.0f);
-		else if (coll->FloorTiltX < -2)
-			direction = ANGLE(90.0f);
+	// Ground is flat.
+	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
+		return direction;
 
-		if (coll->FloorTiltZ > 2 && coll->FloorTiltZ > abs(coll->FloorTiltX))
-			direction = ANGLE(180.0f);
-		else if (coll->FloorTiltZ < -2 && -coll->FloorTiltZ > abs(coll->FloorTiltX))
-			direction = 0;
-	}
+	direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+
+	// Determine nearest cardinal direction of surface bearing.
+	if (!g_GameFlow->Animations.HasSlideExtended)
+		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
 	return direction;
+}
+
+void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	auto probe = GetCollisionResult(item);
+
+	/*if (g_GameFlow->Animations.HasSlideExtended)
+	{
+
+	}
+	else
+	{
+		constexpr int velocity = 50;
+		lara->ExtraVelocity.x += velocity;
+	}*/
+
+	// TODO
+	constexpr int minVelocity = 50; // Apply only when landing?
+	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
+	constexpr int VelocityIncreasePerStep = 1;
+
+	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	short direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+
+	lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
@@ -301,8 +318,8 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
-	int dist = SECTOR(1);
-	auto probe = GetCollisionResult(item, item->Position.yRot, dist, -coll->Setup.Height);
+	int distance = SECTOR(1);
+	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
@@ -325,9 +342,8 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 
 	if (vaultResult.SnapToLedge)
 	{
-		// Disable smooth angle adjustment for now.
-		SnapItemToLedge(item, coll, 0.2f/*, false*/);
-		lara->TargetAngle = /*coll->NearestLedgeAngle*/ item->Position.yRot;
+		SnapItemToLedge(item, coll, 0.2f, false);
+		lara->TargetFacingAngle = coll->NearestLedgeAngle;
 	}
 
 	if (vaultResult.SetJumpVelocity)
@@ -338,7 +354,7 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	//item->Airborne = false; // TODO: Removing this addresses an unusual landing bug Core had worked around in an obscure way. I'd like to find a proper solution someday. @Sezz 2022.02.18
+	//item->Airborne = false; // TODO: Removing this works around an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
 }
@@ -379,34 +395,27 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	short direction = GetLaraSlideDirection(item, coll);
-	short delta = direction - item->Position.yRot;
-	static short oldAngle = 1; // TODO: Remove this.
+	short deltaAngle = direction - item->Position.yRot;
 
-	ShiftItem(item, coll);
+	// TODO: Take inertia into consideration before switching animations if already sliding.
 
-	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	// Slide backward.
+	if (abs(deltaAngle) > ANGLE(90.0f))
 	{
-		if (item->ActiveState == LS_SLIDE_BACK && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
-		item->Position.yRot = direction + ANGLE(180.0f);
 	}
-	else
+	// Slide forward.
+	else [[likely]]
 	{
-		if (item->ActiveState == LS_SLIDE_FORWARD && oldAngle == direction)
+		if (item->ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
-		item->Position.yRot = direction;
 	}
-
-	LaraSnapToHeight(item, coll);
-	lara->Control.MoveAngle = direction;
-	oldAngle = direction;
 }
 
 void SetCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
@@ -527,7 +536,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	if (lara->Control.Count.Pose < LARA_POSE_TIME &&
 		TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
-		g_GameFlow->Animations.Pose)
+		g_GameFlow->Animations.HasPose)
 	{
 		lara->Control.Count.Pose++;
 	}
@@ -586,7 +595,7 @@ bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
 			break;
 
 		case ID_UPV:
-			SubControl(item, coll);
+			UPVControl(item, coll);
 			break;
 
 		case ID_MINECART:
