@@ -104,13 +104,13 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		SetLaraFallState(item);
+		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-		SetLaraSlideState(item, coll);
+		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 
@@ -206,13 +206,13 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		SetLaraFallBackState(item);
+		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-		SetLaraSlideState(item, coll);
+		SetLaraSlideAnimation(item, coll);
 
 	LaraDeflectEdge(item, coll);
 

@@ -130,14 +130,14 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
-	// HACK: This prevents ShiftItem() from causing an instantaneous snap and interfering with DoLaraMonkeyStep() when going down a step. @Sezz 2022.01.28
+	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
 	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
 		coll->Shift.y = 0;
 	ShiftItem(item, coll);
 
 	if (TestLaraMonkeyFall(item, coll))
 	{
-		SetLaraMonkeyFallState(item);
+		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
@@ -225,7 +225,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyFall(item, coll))
 	{
-		SetLaraMonkeyFallState(item);
+		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
@@ -306,7 +306,7 @@ void lara_col_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyFall(item, coll))
 	{
-		SetLaraMonkeyFallState(item);
+		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
@@ -387,7 +387,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyFall(item, coll))
 	{
-		SetLaraMonkeyFallState(item);
+		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
@@ -468,7 +468,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraMonkeyFall(item, coll))
 	{
-		SetLaraMonkeyFallState(item);
+		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
