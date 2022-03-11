@@ -245,9 +245,9 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
 		return direction;
 
-	direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
-	// Determine nearest cardinal direction of surface bearing.
+	// Determine nearest cardinal direction of surface aspect.
 	if (!g_GameFlow->Animations.HasSlideExtended)
 		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
@@ -276,7 +276,7 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 	constexpr int VelocityIncreasePerStep = 1;
 
 	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-	short direction = GetSurfaceBearingAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
 	lara->ExtraVelocity.x += minVelocity;
 }
@@ -354,7 +354,7 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 {
 	item->Velocity = 0;
 	item->VerticalVelocity = 0;
-	//item->Airborne = false; // TODO: Removing this works around an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
+	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
 }
