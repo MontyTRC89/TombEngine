@@ -139,7 +139,7 @@ void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
 
 void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
 
-short GetSurfaceBearingAngle(float xTilt, float zTilt);
+short GetSurfaceAspectAngle(float xTilt, float zTilt);
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
