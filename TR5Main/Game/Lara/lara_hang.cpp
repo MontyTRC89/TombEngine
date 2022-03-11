@@ -268,5 +268,5 @@ void lara_as_corner(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
-	SetCornerAnimation(item, coll, TestLastFrame(item));
+	SetLaraCornerAnimation(item, coll, TestLastFrame(item));
 }

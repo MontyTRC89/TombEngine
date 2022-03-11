@@ -71,7 +71,7 @@ void lara_as_jump_forward(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0) [[unlikely]]
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
 			lara->Control.WaterStatus != WaterStatus::Wade)
 		{
@@ -151,7 +151,7 @@ void lara_as_freefall(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -218,7 +218,7 @@ void lara_as_reach(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -391,13 +391,13 @@ void lara_col_jump_prepare(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallState(item);
+		SetLaraFallAnimation(item);
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
 	{
-		SetLaraSlideState(item, coll);
+		SetLaraSlideAnimation(item, coll);
 		SetLaraLand(item, coll);
 		return;
 	}
@@ -451,7 +451,7 @@ void lara_as_jump_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -507,7 +507,7 @@ void lara_as_jump_right(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -564,7 +564,7 @@ void lara_as_jump_left(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -619,7 +619,7 @@ void lara_as_jump_up(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -724,7 +724,7 @@ void lara_as_fall_back(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
@@ -790,7 +790,7 @@ void lara_as_swan_dive(ITEM_INFO* item, COLL_INFO* coll)
 		if (item->HitPoints <= 0)
 			item->TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->Animations.HasCrawlspaceDive)
 		{
@@ -859,7 +859,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, COLL_INFO* coll)
 			item->TargetState = LS_DEATH;
 		}
 		else if (TestLaraSlide(item, coll))
-			SetLaraSlideState(item, coll);
+			SetLaraSlideAnimation(item, coll);
 		else [[likely]]
 			item->TargetState = LS_IDLE;
 
