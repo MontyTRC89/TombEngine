@@ -1139,7 +1139,7 @@ short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
 }
 
-short GetSurfaceBearingAngle(float xTilt, float zTilt)
+short GetSurfaceAspectAngle(float xTilt, float zTilt)
 {
 	return (short)phd_atan(-zTilt, -xTilt);
 }
