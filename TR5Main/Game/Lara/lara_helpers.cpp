@@ -396,25 +396,25 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 void SetLaraSlideState(ITEM_INFO* item, COLL_INFO* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
-	short deltaAngle = direction - item->Position.yRot;
+	short deltaAngle = abs((short)(direction - item->Position.yRot));
 
-	// TODO: Take inertia into consideration before switching animations if already sliding.
+	// TODO: Take inertia into consideration before switching slide animations.
 
-	// Slide backward.
-	if (abs(deltaAngle) > ANGLE(90.0f))
-	{
-		if (item->ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
-			return;
-
-		SetAnimation(item, LA_SLIDE_BACK_START);
-	}
 	// Slide forward.
-	else [[likely]]
+	if (deltaAngle <= ANGLE(90.0f))
 	{
-		if (item->ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
+		if (item->ActiveState == LS_SLIDE_FORWARD && deltaAngle <= ANGLE(90.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
+	}
+	// Slide back.
+	else
+	{
+		if (item->ActiveState == LS_SLIDE_BACK && deltaAngle > ANGLE(90.0f))
+			return;
+
+		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
 }
 
