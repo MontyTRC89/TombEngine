@@ -233,9 +233,6 @@ void lara_col_walk_forward(ITEM_INFO* item, COLL_INFO* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (LaraDeflectEdge(item, coll))
-		LaraCollideStop(item, coll);
-
 	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
@@ -1224,7 +1221,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, COLL_INFO* coll)
 		else if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
 			item->TargetState = LS_TURN_LEFT_FAST;
 		else [[likely]]
-			item->TargetState = LS_TURN_RIGHT_SLOW;
+			item->TargetState = LS_TURN_LEFT_SLOW;
 
 		return;
 	}
