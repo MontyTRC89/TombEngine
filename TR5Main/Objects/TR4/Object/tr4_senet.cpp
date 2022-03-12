@@ -425,8 +425,8 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
-		laraItem->ActiveState == LS_IDLE &&
-		laraItem->AnimNumber == LA_STAND_IDLE &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
@@ -436,9 +436,9 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&GameStixPosition, item, laraItem))
 			{
-				laraItem->AnimNumber = LA_SENET_ROLL;
-				laraItem->FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
-				laraItem->ActiveState = LS_MISC_CONTROL;
+				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
+				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
+				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.ExtraTorsoRot = { 0, 0, 0 };
 				Lara.Control.HandStatus = HandStatus::Busy;

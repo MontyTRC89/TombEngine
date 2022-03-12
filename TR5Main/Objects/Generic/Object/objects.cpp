@@ -122,15 +122,15 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
 	if ((!(TrInput & IN_ACTION) ||
-		laraItem->ActiveState != LS_IDLE ||
-		laraItem->AnimNumber != LA_STAND_IDLE ||
+		laraItem->Animation.ActiveState != LS_IDLE ||
+		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Status == ITEM_INVISIBLE ||
 		laraInfo->Control.HandStatus != HandStatus::Free) &&
 		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem !=itemNumber))
 	{
 #ifdef NEW_TIGHTROPE
-		if (laraItem->ActiveState == LS_TIGHTROPE_WALK &&
-		   laraItem->TargetState != LS_TIGHTROPE_DISMOUNT &&
+		if (laraItem->Animation.ActiveState == LS_TIGHTROPE_WALK &&
+		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
 		{
 			if (tightropeItem->Position.yRot == laraItem->Position.yRot)
@@ -141,8 +141,8 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		}
 
 #else // !NEW_TIGHTROPE
-		if (laraItem->ActiveState == LS_TIGHTROPE_WALK &&
-		   laraItem->TargetState != LS_TIGHTROPE_DISMOUNT &&
+		if (laraItem->Animation.ActiveState == LS_TIGHTROPE_WALK &&
+		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.Off)
 		{
 			if (item->Position.yRot == laraItem->Position.yRot)
@@ -161,9 +161,9 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		{
 			if (MoveLaraPosition(&TightRopePos, tightropeItem, laraItem))
 			{
-				laraItem->ActiveState = LS_TIGHTROPE_ENTER;
-				laraItem->AnimNumber = LA_TIGHTROPE_START;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
+				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
 				ResetLaraFlex(laraItem);
 #ifdef NEW_TIGHTROPE
@@ -198,8 +198,8 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 	auto* barItem = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
-		laraItem->ActiveState == LS_REACH &&
-		laraItem->AnimNumber == LA_REACH)
+		laraItem->Animation.ActiveState == LS_REACH &&
+		laraItem->Animation.AnimNumber == LA_REACH)
 	{
 		int test1 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
 		int test2 = 0;
@@ -212,11 +212,11 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 
 		if (test1 || test2)
 		{
-			laraItem->ActiveState = LS_MISC_CONTROL;
-			laraItem->AnimNumber = LA_SWINGBAR_GRAB;
-			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-			laraItem->VerticalVelocity = false;
-			laraItem->Airborne = false;
+			laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.VerticalVelocity = false;
+			laraItem->Animation.Airborne = false;
 
 			ResetLaraFlex(barItem);
 
@@ -242,7 +242,7 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* co
 		else
 			ObjectCollision(itemNumber, laraItem, coll);
 	}
-	else if (laraItem->ActiveState != LS_HORIZONTAL_BAR_SWING)
+	else if (laraItem->Animation.ActiveState != LS_HORIZONTAL_BAR_SWING)
 		ObjectCollision(itemNumber, laraItem, coll);
 }
 

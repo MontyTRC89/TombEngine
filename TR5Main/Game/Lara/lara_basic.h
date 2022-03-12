@@ -2,7 +2,7 @@
 
 struct ITEM_INFO;
 struct COLL_INFO;
-struct COLL_RESULT;
+struct CollisionResult;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS

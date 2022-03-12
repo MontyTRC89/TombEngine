@@ -2014,7 +2014,7 @@ void GuiController::UseCurrentItem()
 				return;
 
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol)
-				Lara.Control.HandStatus = HandStatus::DrawWeapon;
+				Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 			return;
 		}
@@ -2027,7 +2027,7 @@ void GuiController::UseCurrentItem()
 				return;
 
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
-				Lara.Control.HandStatus = HandStatus::DrawWeapon;
+				Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 			return;
 		}
@@ -2040,12 +2040,12 @@ void GuiController::UseCurrentItem()
 		{
 			if (Lara.Control.HandStatus == HandStatus::Free)
 			{
-				if (LaraItem->ActiveState != LS_CRAWL_IDLE &&
-					LaraItem->ActiveState != LS_CRAWL_FORWARD &&
-					LaraItem->ActiveState != LS_CRAWL_TURN_LEFT &&
-					LaraItem->ActiveState != LS_CRAWL_TURN_RIGHT &&
-					LaraItem->ActiveState != LS_CRAWL_BACK &&
-					LaraItem->ActiveState != LS_CRAWL_TO_HANG)
+				if (LaraItem->Animation.ActiveState != LS_CRAWL_IDLE &&
+					LaraItem->Animation.ActiveState != LS_CRAWL_FORWARD &&
+					LaraItem->Animation.ActiveState != LS_CRAWL_TURN_LEFT &&
+					LaraItem->Animation.ActiveState != LS_CRAWL_TURN_RIGHT &&
+					LaraItem->Animation.ActiveState != LS_CRAWL_BACK &&
+					LaraItem->Animation.ActiveState != LS_CRAWL_TO_HANG)
 				{
 					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
@@ -2066,7 +2066,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->ActiveState == LS_IDLE && LaraItem->AnimNumber == LA_STAND_IDLE)
+			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
 				|| (Lara.Control.IsLow && !(TrInput & IN_CROUCH)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
@@ -2075,7 +2075,7 @@ void GuiController::UseCurrentItem()
 				BinocularRange = 128;
 
 				if (Lara.Control.HandStatus != HandStatus::Free)
-					Lara.Control.HandStatus = HandStatus::UndrawWeapon;
+					Lara.Control.HandStatus = HandStatus::WeaponUndraw;
 			}
 
 			if (OldBinocular)
@@ -2150,15 +2150,15 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (LaraItem->ActiveState == LS_CRAWL_IDLE ||
-		LaraItem->ActiveState == LS_CRAWL_FORWARD ||
-		LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
-		LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||
-		LaraItem->ActiveState == LS_CRAWL_BACK ||
-		LaraItem->ActiveState == LS_CRAWL_TO_HANG ||
-		LaraItem->ActiveState == LS_CROUCH_IDLE ||
-		LaraItem->ActiveState == LS_CROUCH_TURN_LEFT ||
-		LaraItem->ActiveState == LS_CROUCH_TURN_RIGHT)
+	if (LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
+		LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
+		LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+		LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+		LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
+		LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG ||
+		LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
+		LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
+		LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 	{
 		SayNo();
 		return;
@@ -2172,7 +2172,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2185,7 +2185,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2197,7 +2197,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::HK)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2209,7 +2209,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2221,7 +2221,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::GrenadeLauncher)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2233,7 +2233,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::HarpoonGun)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}
@@ -2245,7 +2245,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::RocketLauncher)
-			Lara.Control.HandStatus = HandStatus::DrawWeapon;
+			Lara.Control.HandStatus = HandStatus::WeaponDraw;
 
 		return;
 	}

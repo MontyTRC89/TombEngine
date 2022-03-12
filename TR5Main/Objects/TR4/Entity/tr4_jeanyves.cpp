@@ -12,10 +12,10 @@ void InitialiseJeanYves(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* objectInfo = &Objects[item->ObjectNumber];
 	
-	item->TargetState = 1;
-	item->ActiveState = 1;
-	item->AnimNumber = objectInfo->animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
+	item->Animation.AnimNumber = objectInfo->animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void JeanYvesControl(short itemNumber)
@@ -31,7 +31,7 @@ void JeanYvesControl(short itemNumber)
 		else
 			state = 3 * (GetRandomControl() & 1);
 
-		item->TargetState = (((byte)(item->ActiveState) - 1) & 0xC) + state + 1;
+		item->Animation.TargetState = (((byte)(item->Animation.ActiveState) - 1) & 0xC) + state + 1;
 		AnimateItem(item);
 	}
 	else
@@ -43,9 +43,9 @@ void JeanYvesControl(short itemNumber)
 		int animNumber = Objects[item->ObjectNumber].animIndex + state;
 		state++;
 
-		item->TargetState = item->ActiveState = state;
-		item->AnimNumber = animNumber;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->Animation.TargetState = item->Animation.ActiveState = state;
+		item->Animation.AnimNumber = animNumber;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->TriggerFlags = Lara.HighestLocation;
 
 		AnimateItem(item);

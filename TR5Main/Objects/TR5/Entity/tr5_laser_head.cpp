@@ -187,7 +187,7 @@ void InitialiseLaserHead(short itemNumber)
 	int y = item->Position.yPos - 640;
 	item->Position.yPos = y;
 	item->ItemFlags[1] = y - 640;
-	item->ActiveState = 0;
+	item->Animation.ActiveState = 0;
 	item->ItemFlags[3] = 90;
 
 	ZeroMemory(&LaserHeadData, sizeof(LASER_HEAD_STRUCT));
@@ -210,23 +210,23 @@ void LaserHeadControl(short itemNumber)
 		{
 			if (!(GlobalCounter & 7))
 			{
-				if (item->ActiveState < 8)
+				if (item->Animation.ActiveState < 8)
 				{
-					short tentacleNumber = creature->Tentacles[item->ActiveState];
-					g_Level.Items[tentacleNumber].TargetState = 2;
-					item->ActiveState++;
+					short tentacleNumber = creature->Tentacles[item->Animation.ActiveState];
+					g_Level.Items[tentacleNumber].Animation.TargetState = 2;
+					item->Animation.ActiveState++;
 				}
 			}
 
 			// Destroy tentacle items
-			if (item->ActiveState > 0)
+			if (item->Animation.ActiveState > 0)
 			{
 				for (int i = 0; i < 8; i++)
 				{
 					ITEM_INFO* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
 
-					if (tentacleItem->AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1
-						&& tentacleItem->FrameNumber == g_Level.Anims[tentacleItem->AnimNumber].frameEnd
+					if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1
+						&& tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd
 						&& tentacleItem->MeshBits & 1)
 					{
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
@@ -236,8 +236,8 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			item->Position.yPos = item->ItemFlags[1] - (192 - item->Velocity) * phd_sin(item->ItemFlags[2]);
-			item->ItemFlags[2] += ONE_DEGREE * item->Velocity;
+			item->Position.yPos = item->ItemFlags[1] - (192 - item->Animation.Velocity) * phd_sin(item->ItemFlags[2]);
+			item->ItemFlags[2] += ONE_DEGREE * item->Animation.Velocity;
 
 			if (!(GlobalCounter & 7))
 			{
@@ -249,8 +249,8 @@ void LaserHeadControl(short itemNumber)
 			InterpolateAngle(item->TriggerFlags, &item->Position.xRot, 0, 2);
 
 			// Final death
-			item->Velocity++;
-			if (item->Velocity > 136)
+			item->Animation.Velocity++;
+			if (item->Animation.Velocity > 136)
 			{
 				ExplodeItemNode(&g_Level.Items[creature->BaseItem], 0, 0, 128);
 				KillItem(creature->BaseItem);
@@ -399,7 +399,7 @@ void LaserHeadControl(short itemNumber)
 					if (!(GetRandomControl() & 0x1F)
 						&& abs(LaserHeadData.xRot) < 1024
 						&& abs(LaserHeadData.yRot) < 1024
-						&& !LaraItem->VerticalVelocity
+						&& !LaraItem->Animation.VerticalVelocity
 						|| !(GetRandomControl() & 0x1FF))
 					{
 						item->ItemFlags[0]++;
@@ -627,10 +627,10 @@ void LaserHeadControl(short itemNumber)
 			}
 			else
 			{
-				item->VerticalVelocity += 3;
-				if (item->VerticalVelocity > 32)
-					item->VerticalVelocity = 32;
-				item->Position.yPos -= item->VerticalVelocity;
+				item->Animation.VerticalVelocity += 3;
+				if (item->Animation.VerticalVelocity > 32)
+					item->Animation.VerticalVelocity = 32;
+				item->Position.yPos -= item->Animation.VerticalVelocity;
 			}
 		}
 		else if (!(GlobalCounter & 7))
@@ -652,8 +652,8 @@ void LaserHeadControl(short itemNumber)
 		{
 			short tentacleItemNumber = creature->Tentacles[i];
 			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
-			if (tentacleItem->AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex
-				&& tentacleItem->FrameNumber != g_Level.Anims[tentacleItem->AnimNumber].frameEnd)
+			if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex
+				&& tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd)
 			{
 				break;
 			}
@@ -672,7 +672,7 @@ void LaserHeadControl(short itemNumber)
 
 			item->ItemFlags[0] = 3;
 			item->ItemFlags[3] = item->Position.yRot + (GetRandomControl() & 0x1000) - 2048;
-			item->Velocity = 3;
+			item->Animation.Velocity = 3;
 			item->TriggerFlags = item->Position.xRot + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}

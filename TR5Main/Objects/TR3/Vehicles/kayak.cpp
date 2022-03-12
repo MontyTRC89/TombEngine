@@ -188,7 +188,7 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 	if (waterHeight != NO_HEIGHT)
 	{
 		short angle1, angle2;
-		if (kayakItem->Velocity < 0)
+		if (kayakItem->Animation.Velocity < 0)
 		{
 			if (!rotate)
 			{
@@ -280,7 +280,7 @@ KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
 
 	if (!(TrInput & IN_ACTION) ||
 		lara->Control.HandStatus != HandStatus::Free ||
-		laraItem->Airborne)
+		laraItem->Animation.Airborne)
 	{
 		return KayakMountType::None;
 	}
@@ -614,8 +614,8 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	int rightHeight = KayakTestHeight(kayakItem, KAYAK_X, KAYAK_Z, &rightPos);
 
 	kayakItem->Position.yRot += kayak->TurnRate / (USHRT_MAX + 1);
-	kayakItem->Position.xPos += kayakItem->Velocity * phd_sin(kayakItem->Position.yRot);
-	kayakItem->Position.zPos += kayakItem->Velocity * phd_cos(kayakItem->Position.yRot);
+	kayakItem->Position.xPos += kayakItem->Animation.Velocity * phd_sin(kayakItem->Position.yRot);
+	kayakItem->Position.zPos += kayakItem->Animation.Velocity * phd_cos(kayakItem->Position.yRot);
 
 	KayakDoCurrent(laraItem,kayakItem);
 
@@ -623,7 +623,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	kayak->RightVerticalVelocity = KayakDoDynamics(rightHeight, kayak->RightVerticalVelocity, &rightPos.y);
 	kayak->FrontVerticalVelocity = KayakDoDynamics(frontHeight, kayak->FrontVerticalVelocity, &frontPos.y);
 
-	kayakItem->VerticalVelocity = KayakDoDynamics(kayak->WaterHeight, kayakItem->VerticalVelocity, &kayakItem->Position.yPos);
+	kayakItem->Animation.VerticalVelocity = KayakDoDynamics(kayak->WaterHeight, kayakItem->Animation.VerticalVelocity, &kayakItem->Position.yPos);
 
 	int height2 = (leftPos.y + rightPos.y) / 2;
 	int x = phd_atan(1024, kayakItem->Position.yPos - frontPos.y);
@@ -733,16 +733,16 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 
 	if (laraItem->HitPoints <= 0 &&
-		laraItem->ActiveState != KAYAK_STATE_IDLE_DEATH)
+		laraItem->Animation.ActiveState != KAYAK_STATE_IDLE_DEATH)
 	{
-		laraItem->AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_IDLE_DEATH;
-		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-		laraItem->ActiveState = laraItem->TargetState = KAYAK_STATE_IDLE_DEATH;
+		laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_IDLE_DEATH;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_IDLE_DEATH;
 	}
 
-	int frame = laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase;
+	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-	switch (laraItem->ActiveState)
+	switch (laraItem->Animation.ActiveState)
 	{
 	case KAYAK_STATE_IDLE:
 		if (TrInput & KAYAK_IN_DISMOUNT &&
@@ -751,26 +751,26 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		{
 			if (TrInput & KAYAK_IN_LEFT && KayakCanGetOut(kayakItem, -1))
 			{
-				laraItem->TargetState = KAYAK_STATE_DISMOUNT;
-				laraItem->RequiredState = KAYAK_STATE_DISMOUNT_LEFT;
+				laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
+				laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_LEFT;
 			}
 			else if (TrInput & KAYAK_IN_RIGHT && KayakCanGetOut(kayakItem, 1))
 			{
-				laraItem->TargetState = KAYAK_STATE_DISMOUNT;
-				laraItem->RequiredState = KAYAK_STATE_DISMOUNT_RIGHT;
+				laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
+				laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_RIGHT;
 			}
 		}
 		else if (TrInput & KAYAK_IN_FORWARD)
 		{
-			laraItem->TargetState = KAYAK_STATE_TURN_RIGHT;
+			laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 			kayak->Turn = false;
 			kayak->Forward = true;
 		}
 		else if (TrInput & KAYAK_IN_BACK)
-			laraItem->TargetState = KAYAK_STATE_BACK;
+			laraItem->Animation.TargetState = KAYAK_STATE_BACK;
 		else if (TrInput & KAYAK_IN_LEFT)
 		{
-			laraItem->TargetState = KAYAK_STATE_TURN_LEFT;
+			laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 
 			if (kayak->Velocity)
 				kayak->Turn = false;
@@ -782,7 +782,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 		else if (TrInput & KAYAK_IN_RIGHT)
 		{
-			laraItem->TargetState = KAYAK_STATE_TURN_RIGHT;
+			laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 
 			if (kayak->Velocity)
 				kayak->Turn = false;
@@ -796,14 +796,14 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				lara->WaterCurrentPull.x ||
 				lara->WaterCurrentPull.z))
 		{
-			laraItem->TargetState = KAYAK_STATE_HOLD_LEFT;
+			laraItem->Animation.TargetState = KAYAK_STATE_HOLD_LEFT;
 		}
 		else if (TrInput & KAYAK_IN_HOLD_RIGHT &&
 			(kayak->Velocity ||
 				lara->WaterCurrentPull.x ||
 				lara->WaterCurrentPull.z))
 		{
-			laraItem->TargetState = KAYAK_STATE_HOLD_RIGHT;
+			laraItem->Animation.TargetState = KAYAK_STATE_HOLD_RIGHT;
 		}
 
 		break;
@@ -826,16 +826,16 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				if (TrInput & KAYAK_IN_LEFT)
 				{
 					if ((kayak->LeftRightCount & ~0x80) >= 2)
-						laraItem->TargetState = KAYAK_STATE_TURN_RIGHT;
+						laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 				}
 				else
-					laraItem->TargetState = KAYAK_STATE_TURN_RIGHT;
+					laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 			}
 			else
-				laraItem->TargetState = KAYAK_STATE_IDLE;
+				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 		}
 		else if (!(TrInput & KAYAK_IN_LEFT))
-			laraItem->TargetState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
 		if (frame == 7)
 		{
@@ -885,17 +885,17 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				if (TrInput & KAYAK_IN_RIGHT)
 				{
 					if ((kayak->LeftRightCount & ~0x80) >= 2)
-						laraItem->TargetState = KAYAK_STATE_TURN_LEFT;
+						laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 				}
 				else
-					laraItem->TargetState = KAYAK_STATE_TURN_LEFT;
+					laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 			}
 			else
-				laraItem->TargetState = KAYAK_STATE_IDLE;
+				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 		}
 
 		else if (!(TrInput & KAYAK_IN_RIGHT))
-			laraItem->TargetState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
 		if (frame == 7)
 		{
@@ -930,9 +930,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		
 	case KAYAK_STATE_BACK:
 		if (!(TrInput & KAYAK_IN_BACK))
-			laraItem->TargetState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
-		if ((laraItem->AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_PADDLE_BACK)
+		if ((laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_PADDLE_BACK)
 		{
 			if (frame == 8)
 			{
@@ -961,9 +961,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				!lara->WaterCurrentPull.x &&
 				!lara->WaterCurrentPull.z))
 		{
-			laraItem->TargetState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 		}
-		else if ((laraItem->AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_HOLD_PADDLE_LEFT)
+		else if ((laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_HOLD_PADDLE_LEFT)
 		{
 			if (kayak->Velocity >= 0)
 			{
@@ -997,9 +997,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				!lara->WaterCurrentPull.x &&
 				!lara->WaterCurrentPull.z))
 		{
-			laraItem->TargetState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 		}
-		else if ((laraItem->AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_HOLD_PADDLE_RIGHT)
+		else if ((laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex) == KAYAK_ANIM_HOLD_PADDLE_RIGHT)
 		{
 			if (kayak->Velocity >= 0)
 			{
@@ -1028,7 +1028,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		break;
 		
 	case KAYAK_STATE_MOUNT_LEFT:
-		if (laraItem->AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_GET_PADDLE &&
+		if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_GET_PADDLE &&
 			frame == 24 &&
 			!(kayak->Flags & 0x80))
 		{
@@ -1040,7 +1040,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		break;
 		
 	case KAYAK_STATE_DISMOUNT:
-		if (laraItem->AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_START &&
+		if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_START &&
 			frame == 27 &&
 			kayak->Flags & 0x80)
 		{
@@ -1049,11 +1049,11 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			laraItem->MeshBits |= LARA_LEG_BITS;
 		}
 
-		laraItem->TargetState = laraItem->RequiredState;
+		laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
 		break;
 		
 	case KAYAK_STATE_DISMOUNT_LEFT:
-		if (laraItem->AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
+		if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
 			frame == 83)
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
@@ -1066,9 +1066,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			laraItem->Position.xRot = 0;
 			laraItem->Position.yRot = kayakItem->Position.yRot - ANGLE(90.0f);
 			laraItem->Position.zRot = 0;
-			laraItem->Velocity = 40;
-			laraItem->VerticalVelocity = -50;
-			laraItem->Airborne = true;
+			laraItem->Animation.Velocity = 40;
+			laraItem->Animation.VerticalVelocity = -50;
+			laraItem->Animation.Airborne = true;
 			lara->Control.HandStatus = HandStatus::Free;
 			lara->Vehicle = NO_ITEM;
 			kayak->LeftRightCount = 0;
@@ -1077,7 +1077,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		break;
 		
 	case KAYAK_STATE_DISMOUNT_RIGHT:
-		if (laraItem->AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
+		if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
 			frame == 83)
 		{
 			PHD_VECTOR vec = { 0, 350, 500 };
@@ -1090,9 +1090,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			laraItem->Position.xRot = 0;
 			laraItem->Position.yRot = kayakItem->Position.yRot + ANGLE(90.0f);
 			laraItem->Position.zRot = 0;
-			laraItem->Velocity = 40;
-			laraItem->VerticalVelocity = -50;
-			laraItem->Airborne = true;
+			laraItem->Animation.Velocity = 40;
+			laraItem->Animation.VerticalVelocity = -50;
+			laraItem->Animation.Airborne = true;
 			lara->Control.HandStatus = HandStatus::Free;
 			lara->Vehicle = NO_ITEM;
 			kayak->LeftRightCount = 0;
@@ -1117,7 +1117,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	else if (kayak->Velocity < -MAX_VELOCITY)
 		kayak->Velocity = -MAX_VELOCITY;
 
-	kayakItem->Velocity = (kayak->Velocity / (USHRT_MAX + 1));
+	kayakItem->Animation.Velocity = (kayak->Velocity / (USHRT_MAX + 1));
 	;
 	if (kayak->TurnRate >= 0)
 	{
@@ -1159,7 +1159,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 				if (object->collision &&
 					(item->ObjectNumber == ID_TEETH_SPIKES ||
 						item->ObjectNumber == ID_DARTS &&
-						item->ActiveState != 1))
+						item->Animation.ActiveState != 1))
 				{
 					int x = kayakItem->Position.xPos - item->Position.xPos;
 					int y = kayakItem->Position.yPos - item->Position.yPos;
@@ -1171,7 +1171,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 					{
 						if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 						{
-							DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - STEP_SIZE, laraItem->Position.zPos, kayakItem->Velocity, kayakItem->Position.yRot, laraItem->RoomNumber, 3);
+							DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - STEP_SIZE, laraItem->Position.zPos, kayakItem->Animation.Velocity, kayakItem->Position.yRot, laraItem->RoomNumber, 3);
 							laraItem->HitPoints -= 5;
 						}
 					}
@@ -1187,14 +1187,14 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	laraItem->AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
-	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-	laraItem->ActiveState = 12; // TODO
-	laraItem->TargetState = 12;
+	laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	laraItem->Animation.ActiveState = 12; // TODO
+	laraItem->Animation.TargetState = 12;
 	laraItem->HitPoints = 0;
-	laraItem->Velocity = 0;
-	laraItem->VerticalVelocity = 0;
-	laraItem->Airborne = false;
+	laraItem->Animation.Velocity = 0;
+	laraItem->Animation.VerticalVelocity = 0;
+	laraItem->Animation.Airborne = false;
 
 	AnimateItem(laraItem);
 
@@ -1227,21 +1227,21 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		}
 
 		if (mountType == KayakMountType::Right)
-			laraItem->AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_RIGHT;
 		else if (mountType == KayakMountType::Left)
-			laraItem->AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_LEFT;
+			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_LEFT;
 
-		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-		laraItem->ActiveState = laraItem->TargetState = KAYAK_STATE_MOUNT_LEFT;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
 		laraItem->Position.xPos = kayakItem->Position.xPos;
 		laraItem->Position.yPos = kayakItem->Position.yPos;
 		laraItem->Position.zPos = kayakItem->Position.zPos;
 		laraItem->Position.xRot = 0;
 		laraItem->Position.yRot = kayakItem->Position.yRot;
 		laraItem->Position.zRot = 0;
-		laraItem->Velocity = 0;
-		laraItem->VerticalVelocity = 0;
-		laraItem->Airborne = false;
+		laraItem->Animation.Velocity = 0;
+		laraItem->Animation.VerticalVelocity = 0;
+		laraItem->Animation.Airborne = false;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
@@ -1268,7 +1268,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 	if (TrInput & IN_LOOK)
 		LookUpDown(laraItem);
 
-	int ofs = kayakItem->VerticalVelocity;
+	int ofs = kayakItem->Animation.VerticalVelocity;
 
 	KayakUserInput(laraItem, kayakItem);
 	KayakToBackground(laraItem, kayakItem);
@@ -1290,11 +1290,11 @@ bool KayakControl(ITEM_INFO* laraItem)
 		kayak->TrueWater = true;
 	}
 
-	if ((ofs - kayakItem->VerticalVelocity) > 128 &&
-		kayakItem->VerticalVelocity == 0 &&
+	if ((ofs - kayakItem->Animation.VerticalVelocity) > 128 &&
+		kayakItem->Animation.VerticalVelocity == 0 &&
 		water != NO_HEIGHT)
 	{
-		int damage = ofs - kayakItem->VerticalVelocity;
+		int damage = ofs - kayakItem->Animation.VerticalVelocity;
 		if (damage > 160)
 			laraItem->HitPoints -= (damage - 160) * 8;
 	}
@@ -1316,8 +1316,8 @@ bool KayakControl(ITEM_INFO* laraItem)
 
 		AnimateItem(laraItem);
 
-		kayakItem->AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
-		kayakItem->FrameNumber = g_Level.Anims[kayakItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		kayakItem->Animation.AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
+		kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 		Camera.targetDistance = CLICK(8);
@@ -1331,7 +1331,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 
 	if (Wibble & 7)
 	{
-		if (!kayak->TrueWater && kayakItem->VerticalVelocity < 20)
+		if (!kayak->TrueWater && kayakItem->Animation.VerticalVelocity < 20)
 		{
 			PHD_VECTOR dest;
 			char cnt = 0;
@@ -1352,7 +1352,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 		}
 	}
 
-	if (!kayakItem->Velocity &&
+	if (!kayakItem->Animation.Velocity &&
 		!lara->WaterCurrentPull.x &&
 		!lara->WaterCurrentPull.z)
 	{

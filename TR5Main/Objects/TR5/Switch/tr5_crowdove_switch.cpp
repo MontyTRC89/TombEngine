@@ -40,13 +40,13 @@ namespace TEN::Entities::TR5
 		if (switchItem->Flags & ONESHOT ||
 			!(switchItem->MeshBits & 4) ||
 			(!(TrInput & IN_ACTION) ||
-				laraItem->ActiveState != LS_IDLE ||
-				laraItem->AnimNumber != LA_STAND_IDLE ||
-				laraItem->Airborne ||
+				laraItem->Animation.ActiveState != LS_IDLE ||
+				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
+				laraItem->Animation.Airborne ||
 				laraInfo->Control.HandStatus != HandStatus::Free) &&
 			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 		{
-			if (laraItem->ActiveState != LS_DOVE_SWITCH)
+			if (laraItem->Animation.ActiveState != LS_DOVE_SWITCH)
 				ObjectCollision(itemNumber, laraItem, coll);
 		}
 		else
@@ -57,9 +57,9 @@ namespace TEN::Entities::TR5
 			{
 				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
 				{
-					laraItem->AnimNumber = LA_DOVESWITCH_TURN;
-					laraItem->ActiveState = LS_DOVE_SWITCH;
-					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
+					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 					AddActiveItem(itemNumber);
 
@@ -109,12 +109,12 @@ namespace TEN::Entities::TR5
 		}
 		else if (item->ItemFlags[0] == 0)
 		{
-			if (item->ActiveState == SWITCH_OFF)
-				item->TargetState = SWITCH_ON;
+			if (item->Animation.ActiveState == SWITCH_OFF)
+				item->Animation.TargetState = SWITCH_ON;
 
 			AnimateItem(item);
 
-			if (item->ActiveState == SWITCH_OFF)
+			if (item->Animation.ActiveState == SWITCH_OFF)
 				item->Position.yRot += ANGLE(90.0f);
 		}
 	}

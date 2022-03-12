@@ -34,7 +34,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -66,48 +66,48 @@ void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_ROLL)
 		{
-			item->TargetState = LS_MONKEY_TURN_180;
+			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->TargetState = LS_MONKEY_FORWARD;
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->TargetState = LS_MONKEY_BACK;
+			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->TargetState = LS_MONKEY_TURN_LEFT;
+			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->TargetState = LS_MONKEY_TURN_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_LEFT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -118,7 +118,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Position.yRot;
-	item->Airborne = false;
+	item->Animation.Airborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -161,7 +161,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -190,15 +190,15 @@ void lara_as_monkey_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->TargetState = LS_MONKEY_FORWARD;
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -249,7 +249,7 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -271,15 +271,15 @@ void lara_as_monkey_back(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_BACK)
 		{
-			item->TargetState = LS_MONKEY_BACK;
+			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -330,7 +330,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -352,15 +352,15 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_LSTEP)
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_LEFT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -411,7 +411,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -433,15 +433,15 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_RSTEP)
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -487,7 +487,7 @@ void lara_as_monkey_turn_180(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
 
-	item->TargetState = LS_MONKEY_IDLE;
+	item->Animation.TargetState = LS_MONKEY_IDLE;
 }
 
 // State:		LS_MONKEY_TURN_180 (79)
@@ -510,7 +510,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -519,29 +519,29 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->TargetState = LS_MONKEY_FORWARD;
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->TargetState = LS_MONKEY_BACK;
+			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_LEFT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->TargetState = LS_MONKEY_TURN_LEFT;
+			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
 
 			lara->Control.TurnRate -= LARA_TURN_RATE;
 			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
@@ -550,11 +550,11 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 
@@ -578,7 +578,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		SetLaraMonkeyRelease(item);
 		return;
 	}
@@ -587,29 +587,29 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->TargetState = LS_MONKEY_FORWARD;
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
 		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->TargetState = LS_MONKEY_BACK;
+			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_LEFT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
 		{
-			item->TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->TargetState = LS_MONKEY_TURN_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 
 			lara->Control.TurnRate += LARA_TURN_RATE;
 			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
@@ -618,11 +618,11 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 			return;
 		}
 
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	item->TargetState = LS_JUMP_UP;
+	item->Animation.TargetState = LS_JUMP_UP;
 	SetLaraMonkeyRelease(item);
 }
 

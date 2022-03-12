@@ -101,9 +101,9 @@ bool TestLaraKeepLow(ITEM_INFO* item, COLL_INFO* coll)
 	// HACK: coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
-	auto radius = (item->ActiveState == LS_CROUCH_IDLE ||
-		item->ActiveState == LS_CROUCH_TURN_LEFT ||
-		item->ActiveState == LS_CROUCH_TURN_RIGHT)
+	auto radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
+		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
+		item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 		? LARA_RAD : LARA_RAD_CRAWL;
 
 	auto y = item->Position.yPos;
@@ -149,9 +149,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	if (TestLaraMonkeyGrab(item, coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
-		item->Velocity = 0;
-		item->VerticalVelocity = 0;
-		item->Airborne = false;
+		item->Animation.Velocity = 0;
+		item->Animation.VerticalVelocity = 0;
+		item->Animation.Airborne = false;
 		item->Position.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
@@ -185,9 +185,9 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll);
 
-	item->Velocity = 0;
-	item->VerticalVelocity = 0;
-	item->Airborne = false;
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = false;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->ExtraTorsoRot = PHD_3DPOS();
 	return true;
@@ -204,9 +204,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		SetAnimation(item, LA_REACH_TO_MONKEY);
 		ResetLaraFlex(item);
-		item->Velocity = 0;
-		item->VerticalVelocity = 0;
-		item->Airborne = false;
+		item->Animation.Velocity = 0;
+		item->Animation.VerticalVelocity = 0;
+		item->Animation.Airborne = false;
 		item->Position.yPos += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
@@ -253,9 +253,9 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		SnapItemToLedge(item, coll, 0.2f);
 
-	item->Velocity = 2;
-	item->VerticalVelocity = 1;
-	item->Airborne = true;
+	item->Animation.Velocity = 2;
+	item->Animation.VerticalVelocity = 1;
+	item->Animation.Airborne = true;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
@@ -317,8 +317,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 
 			if (!TestLaraHangOnClimbWall(item, coll))
 			{
-				if (item->AnimNumber != LA_LADDER_TO_HANG_RIGHT &&
-					item->AnimNumber != LA_LADDER_TO_HANG_LEFT)
+				if (item->Animation.AnimNumber != LA_LADDER_TO_HANG_RIGHT &&
+					item->Animation.AnimNumber != LA_LADDER_TO_HANG_LEFT)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Position.yRot));
 					item->Position.yPos = coll->Setup.OldPosition.y;
@@ -329,10 +329,10 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			}
 			else
 			{
-				if (item->AnimNumber == LA_REACH_TO_HANG && item->FrameNumber == GetFrameNumber(item, 21) &&
+				if (item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21) &&
 					TestLaraClimbStance(item, coll))
 				{
-					item->TargetState = LS_LADDER_IDLE;
+					item->Animation.TargetState = LS_LADDER_IDLE;
 				}
 			}
 		}
@@ -340,9 +340,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->Position.yPos += 256;
-			item->Airborne = true;
-			item->Velocity = 2;
-			item->VerticalVelocity = 1;
+			item->Animation.Airborne = true;
+			item->Animation.Velocity = 2;
+			item->Animation.VerticalVelocity = 1;
 			lara->Control.HandStatus = HandStatus::Free;
 		}
 	}
@@ -387,7 +387,7 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic && 
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
-				if (item->Velocity != 0)
+				if (item->Animation.Velocity != 0)
 					SnapItemToLedge(item, coll);
 
 				item->Position.yPos += verticalShift;
@@ -398,8 +398,8 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 				item->Position.yPos = coll->Setup.OldPosition.y;
 				item->Position.zPos = coll->Setup.OldPosition.z;
 
-				if (item->ActiveState == LS_SHIMMY_LEFT || 
-					item->ActiveState == LS_SHIMMY_RIGHT)
+				if (item->Animation.ActiveState == LS_SHIMMY_LEFT || 
+					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
 					SetAnimation(item, LA_REACH_TO_HANG, 21);
 				}
@@ -413,9 +413,9 @@ bool TestLaraHang(ITEM_INFO* item, COLL_INFO* coll)
 			item->Position.xPos += coll->Shift.x;
 			item->Position.yPos += GetBoundsAccurate(item)->Y2 * 1.8f;
 			item->Position.zPos += coll->Shift.z;
-			item->Airborne = true;
-			item->Velocity = 2;
-			item->VerticalVelocity = 1;
+			item->Animation.Airborne = true;
+			item->Animation.Velocity = 2;
+			item->Animation.VerticalVelocity = 1;
 			lara->Control.HandStatus = HandStatus::Free;
 		}
 	}
@@ -495,7 +495,7 @@ CornerResult TestLaraHangCorner(ITEM_INFO* item, COLL_INFO* coll, float testAngl
 	auto* lara = GetLaraInfo(item);
 
 	// Lara isn't in stop state yet, bypass test
-	if (item->AnimNumber != LA_REACH_TO_HANG)
+	if (item->Animation.AnimNumber != LA_REACH_TO_HANG)
 		return CornerResult::None;
 
 	// Static is in the way, bypass test
@@ -632,7 +632,7 @@ bool TestLaraValidHangPos(ITEM_INFO* item, COLL_INFO* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(2);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.Mode = CollProbeMode::FreeFlat;
+	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
 	GetCollisionInfo(coll, item);
@@ -686,14 +686,14 @@ bool TestLaraHangOnClimbWall(ITEM_INFO* item, COLL_INFO* coll)
 	if (!lara->Control.CanClimbLadder)
 		return false;
 
-	if (item->VerticalVelocity < 0)
+	if (item->Animation.VerticalVelocity < 0)
 		return false;
 	   
 	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
 	// Until climb wall tests are fully refactored, we need to recalculate COLL_INFO.
 
 	auto coll2 = *coll;
-	coll2.Setup.Mode = CollProbeMode::Quadrants;
+	coll2.Setup.Mode = CollisionProbeMode::Quadrants;
 	GetCollisionInfo(&coll2, item);
 
 	switch (GetQuadrant(item->Position.yRot))
@@ -744,14 +744,14 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 	int hdif = coll->Front.Floor - bounds->Y1;
 
-	if (hdif < 0 == hdif + item->VerticalVelocity < 0)
+	if (hdif < 0 == hdif + item->Animation.VerticalVelocity < 0)
 	{
 		hdif = item->Position.yPos + bounds->Y1;
 
-		if ((hdif + item->VerticalVelocity & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
+		if ((hdif + item->Animation.VerticalVelocity & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
 		{
-			if (item->VerticalVelocity > 0)
-				*edge = (hdif + item->VerticalVelocity) & 0xFFFFFF00;
+			if (item->Animation.VerticalVelocity > 0)
+				*edge = (hdif + item->Animation.VerticalVelocity) & 0xFFFFFF00;
 			else
 				*edge = hdif & 0xFFFFFF00;
 
@@ -870,7 +870,7 @@ int LaraFloorFront(ITEM_INFO* item, short angle, int distance)
 	return LaraCollisionFront(item, angle, distance).Position.Floor;
 }
 
-COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short angle, int distance)
+CollisionResult LaraCollisionFront(ITEM_INFO* item, short angle, int distance)
 {
 	auto probe = GetCollisionResult(item, angle, distance, -LARA_HEIGHT);
 
@@ -880,7 +880,7 @@ COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short angle, int distance)
 	return probe;
 }
 
-COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height)
+CollisionResult LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height)
 {
 	int x = item->Position.xPos + distance * phd_sin(angle);
 	int y = item->Position.yPos - height;
@@ -894,7 +894,7 @@ int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height)
 	return LaraCeilingCollisionFront(item, angle, distance, height).Position.Ceiling;
 }
 
-COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height)
+CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height)
 {
 	auto probe = GetCollisionResult(item, angle, distance, -height);
 
@@ -956,8 +956,8 @@ bool TestLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 	//int heightFromFloor = GetCollisionResult(item).Position.Floor - item->Position.yPos;
 	
 	//if (item->VerticalVelocity >= 0 &&
-	if (item->Airborne && item->VerticalVelocity > 0 &&
-		(coll->Middle.Floor <= item->VerticalVelocity ||
+	if (item->Animation.Airborne && item->Animation.VerticalVelocity > 0 &&
+		(coll->Middle.Floor <= item->Animation.VerticalVelocity ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
@@ -982,7 +982,7 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 	else
 	{
 		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
-		item->TargetState = LS_IDLE;
+		item->Animation.TargetState = LS_IDLE;
 	}
 
 	item->Position.yPos += coll->Middle.Floor + CLICK(2.75f) - 9;
@@ -990,9 +990,9 @@ bool TestLaraWaterStepOut(ITEM_INFO* item, COLL_INFO* coll)
 
 	item->Position.xRot = 0;
 	item->Position.zRot = 0;
-	item->Velocity = 0;
-	item->VerticalVelocity = 0;
-	item->Airborne = false;
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = false;
 	lara->Control.WaterStatus = WaterStatus::Wade;
 
 	return true;
@@ -1069,10 +1069,10 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, COLL_INFO* coll)
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->Position.yPos += frontFloor - 5;
-	item->ActiveState = LS_ONWATER_EXIT;
-	item->Airborne = false;
-	item->Velocity = 0;
-	item->VerticalVelocity = 0;
+	item->Animation.ActiveState = LS_ONWATER_EXIT;
+	item->Animation.Airborne = false;
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 
@@ -1133,16 +1133,16 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, COLL_INFO* coll) // NEW function fo
 	}
 
 	SetAnimation(item, LA_ONWATER_IDLE);
-	item->TargetState = LS_LADDER_IDLE;
+	item->Animation.TargetState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
 	item->Position.yRot = rot;
 	item->Position.yPos -= 10;//otherwise she falls back into the water
 	item->Position.xRot = 0;
 	item->Position.zRot = 0;
-	item->Velocity = 0;
-	item->VerticalVelocity = 0;
-	item->Airborne = false;
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = false;
 	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
@@ -1159,7 +1159,7 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (waterDepth == NO_HEIGHT)
 	{
-		item->VerticalVelocity = 0;
+		item->Animation.VerticalVelocity = 0;
 		item->Position.xPos = coll->Setup.OldPosition.x;
 		item->Position.yPos = coll->Setup.OldPosition.y;
 		item->Position.zPos = coll->Setup.OldPosition.z;
@@ -1169,12 +1169,12 @@ void TestLaraWaterDepth(ITEM_INFO* item, COLL_INFO* coll)
 	else if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
-		item->TargetState = LS_IDLE;
+		item->Animation.TargetState = LS_IDLE;
 		item->Position.zRot = 0;
 		item->Position.xRot = 0;
-		item->Velocity = 0;
-		item->VerticalVelocity = 0;
-		item->Airborne = false;
+		item->Animation.Velocity = 0;
+		item->Animation.VerticalVelocity = 0;
+		item->Animation.Airborne = false;
 		item->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
@@ -2115,10 +2115,10 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 	{
 		// TODO: Somehow harmonise CalculatedJumpVelocity to work for both ledge and ladder auto jumps, because otherwise there will be a need for an odd workaround in the future.
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult.Height - item->Position.yPos + CLICK(0.2f)), -CLICK(7.1f)));
-		item->AnimNumber = LA_STAND_SOLID;
-		item->FrameNumber = GetFrameNumber(item, 0);
-		item->TargetState = LS_JUMP_UP;
-		item->ActiveState = LS_IDLE;
+		item->Animation.AnimNumber = LA_STAND_SOLID;
+		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		item->Animation.TargetState = LS_JUMP_UP;
+		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.TurnRate = 0;
 
@@ -2135,10 +2135,10 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, COLL_INFO* coll)
 	if (vaultResult.Success &&
 		TestLaraClimbStance(item, coll))
 	{
-		item->AnimNumber = LA_STAND_SOLID;
-		item->FrameNumber = GetFrameNumber(item, 0);
-		item->TargetState = LS_LADDER_IDLE;
-		item->ActiveState = LS_IDLE;
+		item->Animation.AnimNumber = LA_STAND_SOLID;
+		item->Animation.FrameNumber = GetFrameNumber(item, 0);
+		item->Animation.TargetState = LS_LADDER_IDLE;
+		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.TurnRate = 0;
 

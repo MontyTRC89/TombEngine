@@ -41,15 +41,15 @@ void RaptorControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 5)
+		if (item->Animation.ActiveState != 5)
 		{
 			if (GetRandomControl() > 0x4000)
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
 			else
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
 
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 5;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 5;
 		}
 	}
 	else
@@ -114,29 +114,29 @@ void RaptorControl(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		neck = -angle * 6;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->MaxTurn = 0;
 			creature->Flags &= ~1;
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (creature->Flags & 2)
 			{
 				creature->Flags &= ~2;
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			}
 			else if (item->TouchBits & 0xFF7C00 || (AI.distance < pow(585, 2) && AI.bite))
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
@@ -145,11 +145,11 @@ void RaptorControl(short itemNumber)
 			creature->Flags &= ~1;
 
 			if (creature->Mood != MoodType::Bored)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (AI.ahead && GetRandomControl() < 0x80)
 			{
-				item->RequiredState = 6;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 6;
+				item->Animation.TargetState = 1;
 				creature->Flags &= ~2;
 			}
 
@@ -161,30 +161,30 @@ void RaptorControl(short itemNumber)
 			creature->Flags &= ~1;
 
 			if (item->TouchBits & 0xFF7C00)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (creature->Flags & 2)
 			{
-				item->RequiredState = 6;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 6;
+				item->Animation.TargetState = 1;
 				creature->Flags &= ~2;
 			}
 			else if (AI.bite && AI.distance < SQUARE(1536))
 			{
-				if (item->TargetState == 3)
+				if (item->Animation.TargetState == 3)
 				{
 					if (GetRandomControl() < 0x2000)
-						item->TargetState = 1;
+						item->Animation.TargetState = 1;
 					else
-						item->TargetState = 7;
+						item->Animation.TargetState = 7;
 				}
 			}
 			else if (AI.ahead && creature->Mood != MoodType::Escape && GetRandomControl() < 0x80)
 			{
-				item->RequiredState = 6;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 6;
+				item->Animation.TargetState = 1;
 			}
 			else if (creature->Mood == MoodType::Bored || (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -205,7 +205,7 @@ void RaptorControl(short itemNumber)
 					LaraItem->HitPoints -= 100;
 					LaraItem->HitStatus = 1;
 
-					item->RequiredState = 1;
+					item->Animation.RequiredState = 1;
 				}
 			}
 			else
@@ -248,7 +248,7 @@ void RaptorControl(short itemNumber)
 					LaraItem->HitPoints -= 100;
 					LaraItem->HitStatus = 1;
 
-					item->RequiredState = 1;
+					item->Animation.RequiredState = 1;
 				}
 			}
 			else
@@ -290,7 +290,7 @@ void RaptorControl(short itemNumber)
 					if (LaraItem->HitPoints <= 0)
 						creature->Flags |= 2;
 
-					item->RequiredState = 3;
+					item->Animation.RequiredState = 3;
 				}
 			}
 			else

@@ -149,19 +149,19 @@ void VentilatorControl(short itemNumber)
 	{
 		xChange = 1;
 		TestTriggers(item, true);
-		if (item->ActiveState == 1)
+		if (item->Animation.ActiveState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				return;
 		}
 		else
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 	}
 
 	int speed = 0;
-	if (item->ActiveState == 1)
-		speed = g_Level.Anims[item->AnimNumber].frameEnd - item->FrameNumber;
+	if (item->Animation.ActiveState == 1)
+		speed = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
 	else
 		speed = 128;
 
@@ -235,7 +235,7 @@ void VentilatorControl(short itemNumber)
 					{
 						int dz = 96 * zChange * (item->ItemFlags[0] - z1) / item->ItemFlags[0];
 
-						if (item->ActiveState == 1)
+						if (item->Animation.ActiveState == 1)
 							dz = speed * dz / 120;
 
 						LaraItem->Position.zPos += dz;
@@ -258,7 +258,7 @@ void VentilatorControl(short itemNumber)
 					{
 						int dx = 96 * xChange * (item->ItemFlags[0] - x1) / item->ItemFlags[0];
 
-						if (item->ActiveState == 1)
+						if (item->Animation.ActiveState == 1)
 							dx = speed * dx / 120;
 
 						LaraItem->Position.xPos += dx;
@@ -303,7 +303,7 @@ void VentilatorControl(short itemNumber)
 					y = 96 * (item->ItemFlags[0] - (LaraItem->Position.yPos - effectBounds.Y2)) / item->ItemFlags[0];
 				}
 
-				if (item->ActiveState == 1)
+				if (item->Animation.ActiveState == 1)
 					y = speed * y / 120;
 
 				LaraItem->Position.yPos += y;

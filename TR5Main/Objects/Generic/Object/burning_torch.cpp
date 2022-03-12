@@ -77,14 +77,14 @@ namespace TEN::Entities::Generic
 			}
 
 			if (TrInput & IN_DRAW &&
-				!LaraItem->VerticalVelocity &&
-				!LaraItem->Airborne &&
-				LaraItem->ActiveState != LS_JUMP_PREPARE &&
-				LaraItem->ActiveState != LS_JUMP_UP &&
-				LaraItem->ActiveState != LS_JUMP_FORWARD &&
-				LaraItem->ActiveState != LS_JUMP_BACK &&
-				LaraItem->ActiveState != LS_JUMP_LEFT &&
-				LaraItem->ActiveState != LS_JUMP_RIGHT ||
+				!LaraItem->Animation.VerticalVelocity &&
+				!LaraItem->Animation.Airborne &&
+				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
+				LaraItem->Animation.ActiveState != LS_JUMP_UP &&
+				LaraItem->Animation.ActiveState != LS_JUMP_FORWARD &&
+				LaraItem->Animation.ActiveState != LS_JUMP_BACK &&
+				LaraItem->Animation.ActiveState != LS_JUMP_LEFT &&
+				LaraItem->Animation.ActiveState != LS_JUMP_RIGHT ||
 				Lara.Control.WaterStatus == WaterStatus::Underwater)
 			{
 				Lara.LeftArm.Locked = true;
@@ -98,7 +98,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case 1:
-			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Airborne)
+			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.Airborne)
 			{
 				Lara.LeftArm.Locked = false;
 				Lara.LeftArm.FrameNumber = 0;
@@ -145,7 +145,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case 3:
-			if (LaraItem->ActiveState != LS_MISC_CONTROL)
+			if (LaraItem->Animation.ActiveState != LS_MISC_CONTROL)
 			{
 				Lara.LeftArm.Locked = false;
 				Lara.LeftArm.FrameNumber = 0;
@@ -204,35 +204,35 @@ namespace TEN::Entities::Generic
 		int oldY = item->Position.yPos;
 		int oldZ = item->Position.zPos;
 
-		if (item->VerticalVelocity)
+		if (item->Animation.VerticalVelocity)
 			item->Position.zRot += ANGLE(5);
-		else if (!item->Velocity)
+		else if (!item->Animation.Velocity)
 		{
 			item->Position.xRot = 0;
 			item->Position.zRot = 0;
 		}
 
-		int xv = item->Velocity * phd_sin(item->Position.yRot);
-		int zv = item->Velocity * phd_cos(item->Position.yRot);
+		int xv = item->Animation.Velocity * phd_sin(item->Position.yRot);
+		int zv = item->Animation.Velocity * phd_cos(item->Position.yRot);
 
 		item->Position.xPos += xv;
 		item->Position.zPos += zv;
 
 		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 		{
-			item->VerticalVelocity += (5 - item->VerticalVelocity) / 2;
-			item->Velocity += (5 - item->Velocity) / 2;
+			item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
+			item->Animation.Velocity += (5 - item->Animation.Velocity) / 2;
 			if (item->ItemFlags[3] != 0)
 				item->ItemFlags[3] = 0;
 		}
 		else
 		{
-			item->VerticalVelocity += 6;
+			item->Animation.VerticalVelocity += 6;
 		}
 
-		item->Position.yPos += item->VerticalVelocity;
+		item->Position.yPos += item->Animation.VerticalVelocity;
 
-		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->VerticalVelocity, zv);
+		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->Animation.VerticalVelocity, zv);
 
 		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, 0))
 		{
@@ -247,7 +247,7 @@ namespace TEN::Entities::Generic
 			{
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
 			}
-			item->Velocity >>= 1;
+			item->Animation.Velocity >>= 1;
 		}
 		if (item->ItemFlags[3])
 		{
@@ -292,9 +292,9 @@ namespace TEN::Entities::Generic
 
 		if (
 			!(TrInput & IN_ACTION) ||
-			laraItem->ActiveState != LS_IDLE ||
-			laraItem->AnimNumber != LA_STAND_IDLE ||
-			laraItem->Airborne ||
+			laraItem->Animation.ActiveState != LS_IDLE ||
+			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
+			laraItem->Animation.Airborne ||
 			laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
 			laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
 			laraInfo->LeftArm.Locked ||
@@ -343,16 +343,16 @@ namespace TEN::Entities::Generic
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
 				if (torchItem->ObjectNumber == ID_BURNING_ROOTS)
-					laraItem->AnimNumber = LA_TORCH_LIGHT_5;
+					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;
 				else
 				{
 					int dy = abs(laraItem->Position.yPos - torchItem->Position.yPos);
 					laraItem->ItemFlags[3] = 1;
-					laraItem->AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
+					laraItem->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
 
-				laraItem->ActiveState = LS_MISC_CONTROL;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Flare.ControlLeft = false;
 				laraInfo->LeftArm.Locked = true;
 				laraInfo->InteractedItem = itemNumber;
@@ -360,14 +360,14 @@ namespace TEN::Entities::Generic
 
 			torchItem->Position.yRot = rot;
 		}
-		if (laraItem->ActiveState == LS_MISC_CONTROL &&
+		if (laraItem->Animation.ActiveState == LS_MISC_CONTROL &&
 			laraInfo->InteractedItem == itemNumber &&
 			torchItem->Status != ITEM_ACTIVE)
 		{
-			if (laraItem->AnimNumber >= LA_TORCH_LIGHT_1 &&
-				laraItem->AnimNumber <= LA_TORCH_LIGHT_5)
+			if (laraItem->Animation.AnimNumber >= LA_TORCH_LIGHT_1 &&
+				laraItem->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase == 40)
+				if (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase == 40)
 				{
 					TestTriggers(torchItem, true, torchItem->Flags & IFLAG_ACTIVATION_MASK);
 					torchItem->Flags |= 0x3E00;

@@ -39,9 +39,9 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_UNDERWATER_STOP &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_STOP &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
-			!(doorItem->Status && doorItem->Airborne) &&
+			!(doorItem->Status && doorItem->Animation.Airborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
@@ -52,12 +52,12 @@ namespace TEN::Entities::Doors
 				if (MoveLaraPosition(&UnderwaterDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
-					laraItem->VerticalVelocity = 0;
+					laraItem->Animation.VerticalVelocity = 0;
 					doorItem->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNumber);
 
-					doorItem->TargetState = LS_RUN_FORWARD;
+					doorItem->Animation.TargetState = LS_RUN_FORWARD;
 
 					AnimateItem(doorItem);
 

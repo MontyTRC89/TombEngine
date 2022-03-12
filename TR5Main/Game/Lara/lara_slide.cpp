@@ -28,7 +28,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
 
@@ -64,19 +64,19 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
-			item->TargetState = LS_JUMP_FORWARD;
+			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->TargetState = LS_SLIDE_FORWARD;
+		item->Animation.TargetState = LS_SLIDE_FORWARD;
 		return;
 	}
 
 	if (TrInput & IN_FORWARD)
-		item->TargetState = LS_RUN_FORWARD;
+		item->Animation.TargetState = LS_RUN_FORWARD;
 	else
-		item->TargetState = LS_IDLE;
+		item->Animation.TargetState = LS_IDLE;
 
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
@@ -88,7 +88,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Airborne = false;
+	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -132,7 +132,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_DEATH;
+		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
 
@@ -168,16 +168,16 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
-			item->TargetState = LS_JUMP_BACK;
+			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 			return;
 		}
 
-		item->TargetState = LS_SLIDE_BACK;
+		item->Animation.TargetState = LS_SLIDE_BACK;
 		return;
 	}
 
-	item->TargetState = LS_IDLE;
+	item->Animation.TargetState = LS_IDLE;
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
 }
@@ -188,7 +188,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Airborne = false;
+	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;

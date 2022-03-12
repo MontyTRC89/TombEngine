@@ -46,13 +46,13 @@ namespace TEN::Entities::Switches
 		int doSwitch = 0;
 
 		if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
-			laraitem->ActiveState == LS_IDLE &&
-			laraitem->AnimNumber == LA_STAND_IDLE &&
+			laraitem->Animation.ActiveState == LS_IDLE &&
+			laraitem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ItemFlags[0] == 0) ||
 			(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
-			if (switchItem->ActiveState == SWITCH_ON)
+			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
 				laraitem->Position.yRot ^= (short)ANGLE(180.0f);
 
@@ -63,9 +63,9 @@ namespace TEN::Entities::Switches
 						if (MoveLaraPosition(&CrowbarPos2, switchItem, laraitem))
 						{
 							doSwitch = 1;
-							laraitem->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->FrameNumber = g_Level.Anims[laraitem->AnimNumber].frameBase;
-							switchItem->TargetState = SWITCH_OFF;
+							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
 							laraInfo->InteractedItem = itemNumber;
@@ -92,9 +92,9 @@ namespace TEN::Entities::Switches
 						if (MoveLaraPosition(&CrowbarPos, switchItem, laraitem))
 						{
 							doSwitch = 1;
-							laraitem->AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->FrameNumber = g_Level.Anims[laraitem->AnimNumber].frameBase;
-							switchItem->TargetState = SWITCH_ON;
+							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else
 							laraInfo->InteractedItem = itemNumber;
@@ -132,8 +132,8 @@ namespace TEN::Entities::Switches
 			else
 			{
 				ResetLaraFlex(laraitem);
-				laraitem->TargetState = LS_SWITCH_DOWN;
-				laraitem->ActiveState = LS_SWITCH_DOWN;
+				laraitem->Animation.TargetState = LS_SWITCH_DOWN;
+				laraitem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				switchItem->Status = ITEM_ACTIVE;

@@ -521,14 +521,14 @@ void TonyControl(short itemNum)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 6)
+		if (item->Animation.ActiveState != 6)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 6;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 6;
 		}
 
-		if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) > 110)
+		if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) > 110)
 		{
 			item->MeshBits = 0;
 			if (!BossData.DroppedIcon)
@@ -574,16 +574,16 @@ void TonyControl(short itemNum)
 		if (info.ahead)
 			head = info.angle;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 			case TONYBOSS_WAIT:
 				tonyboss->MaxTurn = 0;
-				if (item->TargetState != TONYBOSS_RISE && item->ItemFlags[3])
-					item->TargetState = TONYBOSS_RISE;
+				if (item->Animation.TargetState != TONYBOSS_RISE && item->ItemFlags[3])
+					item->Animation.TargetState = TONYBOSS_RISE;
 				break;
 
 			case TONYBOSS_RISE:
-				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) > 16)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) > 16)
 					tonyboss->MaxTurn = TONYBOSS_TURN;
 				else
 					tonyboss->MaxTurn = 0;
@@ -596,26 +596,26 @@ void TonyControl(short itemNum)
 
 				if (!BossData.ExplodeCount)
 				{
-					if (item->TargetState != TONYBOSS_BIGBOOM && item->ItemFlags[3] != 2)
+					if (item->Animation.TargetState != TONYBOSS_BIGBOOM && item->ItemFlags[3] != 2)
 					{
-						item->TargetState = TONYBOSS_BIGBOOM;
+						item->Animation.TargetState = TONYBOSS_BIGBOOM;
 						tonyboss->MaxTurn = 0;
 					}
 
-					if (item->TargetState != TONYBOSS_ROCKZAPP && item->ItemFlags[3] == 2)
+					if (item->Animation.TargetState != TONYBOSS_ROCKZAPP && item->ItemFlags[3] == 2)
 					{
 						if (!(Wibble & 255) && item->ItemFlags[0] == 0)
 						{
-							item->TargetState = TONYBOSS_ROCKZAPP;
+							item->Animation.TargetState = TONYBOSS_ROCKZAPP;
 							item->ItemFlags[0] = 1;
 						}
 					}
 
-					if (item->TargetState != TONYBOSS_ZAPP && item->TargetState != TONYBOSS_ROCKZAPP && item->ItemFlags[3] == 2)
+					if (item->Animation.TargetState != TONYBOSS_ZAPP && item->Animation.TargetState != TONYBOSS_ROCKZAPP && item->ItemFlags[3] == 2)
 					{
 						if (!(Wibble & 255) && item->ItemFlags[0] == 1)
 						{
-							item->TargetState = TONYBOSS_ZAPP;
+							item->Animation.TargetState = TONYBOSS_ZAPP;
 							item->ItemFlags[0] = 0;
 						}
 					}
@@ -627,7 +627,7 @@ void TonyControl(short itemNum)
 				torso_x = info.xAngle;
 				tonyboss->MaxTurn = 0;
 
-				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 40)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 40)
 				{
 					TriggerFireBall(item, T_ROCKZAPPL, NULL, item->RoomNumber, 0, 0);
 					TriggerFireBall(item, T_ROCKZAPPR, NULL, item->RoomNumber, 0, 0);
@@ -639,13 +639,13 @@ void TonyControl(short itemNum)
 				torso_x = info.xAngle;
 				tonyboss->MaxTurn = TONYBOSS_TURN / 2;
 
-				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) == 28)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
 					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Position.yRot, 0);
 				break;
 
 			case TONYBOSS_BIGBOOM:
 				tonyboss->MaxTurn = 0;
-				if ((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) == 56)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 56)
 				{
 					item->ItemFlags[3] = 2;
 					BossData.DrawExplode = true;
@@ -657,15 +657,15 @@ void TonyControl(short itemNum)
 		}
 	}
 
-	if (item->ActiveState == TONYBOSS_ROCKZAPP || item->ActiveState == TONYBOSS_ZAPP || item->ActiveState == TONYBOSS_BIGBOOM)
+	if (item->Animation.ActiveState == TONYBOSS_ROCKZAPP || item->Animation.ActiveState == TONYBOSS_ZAPP || item->Animation.ActiveState == TONYBOSS_BIGBOOM)
 	{
 		byte r, g, b;
 		int bright;
 
-		bright = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+		bright = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		if (bright > 16)
 		{
-			bright = g_Level.Anims[item->AnimNumber].frameEnd - item->FrameNumber;
+			bright = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
 			if (bright > 16)
 				bright = 16;
 		}
@@ -683,7 +683,7 @@ void TonyControl(short itemNum)
 		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, r, g, b);
 		TriggerTonyFlame(itemNum, 14);
 
-		if (item->ActiveState == TONYBOSS_ROCKZAPP || item->ActiveState == TONYBOSS_BIGBOOM)
+		if (item->Animation.ActiveState == TONYBOSS_ROCKZAPP || item->Animation.ActiveState == TONYBOSS_BIGBOOM)
 		{
 			pos1.x = pos1.y = pos1.z = 0;
 			GetJointAbsPosition(item, &pos1, 13);

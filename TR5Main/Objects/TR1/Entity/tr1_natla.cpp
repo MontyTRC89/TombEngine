@@ -58,7 +58,7 @@ void NatlaControl(short itemNumber)
 	AI_INFO AI;
 
 	if (item->HitPoints <= 0 && item->HitPoints > -16384)
-		item->TargetState = NATLA_STATE_DEATH;
+		item->Animation.TargetState = NATLA_STATE_DEATH;
 	else if (item->HitPoints <= NATLA_NEAR_DEATH)
 	{
 		creature->LOT.Step = CLICK(1);
@@ -81,18 +81,18 @@ void NatlaControl(short itemNumber)
 			facing = 0;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case NATLA_STATE_FALL:
 			if (item->Position.yPos < item->Floor)
 			{
-				item->Velocity = 0;
-				item->Airborne = true;
+				item->Animation.Velocity = 0;
+				item->Animation.Airborne = true;
 			}
 			else
 			{
-				item->Airborne = 0;
-				item->TargetState = NATLA_STATE_SEMI_DEATH;
+				item->Animation.Airborne = 0;
+				item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
 				item->Position.yPos = item->Floor;
 				timer = 0;
 			}
@@ -101,7 +101,7 @@ void NatlaControl(short itemNumber)
 
 		case NATLA_STATE_STAND:
 			if (!shoot)
-				item->TargetState = NATLA_STATE_RUN;
+				item->Animation.TargetState = NATLA_STATE_RUN;
 
 			if (timer >= 20)
 			{
@@ -135,14 +135,14 @@ void NatlaControl(short itemNumber)
 			}
 
 			if (shoot)
-				item->TargetState = NATLA_STATE_STAND;
+				item->Animation.TargetState = NATLA_STATE_STAND;
 
 			break;
 
 		case NATLA_STATE_SEMI_DEATH:
 			if (timer == NATLA_DEATH_TIME)
 			{
-				item->TargetState = NATLA_STATE_STAND;
+				item->Animation.TargetState = NATLA_STATE_STAND;
 				creature->Flags = 0;
 				timer = 0;
 				item->HitPoints = NATLA_NEAR_DEATH;
@@ -153,14 +153,14 @@ void NatlaControl(short itemNumber)
 			break;
 
 		case NATLA_STATE_FLY:
-			item->TargetState = NATLA_STATE_FALL;
+			item->Animation.TargetState = NATLA_STATE_FALL;
 			timer = 0;
 			break;
 
 		case NATLA_STATE_IDLE:
 		case NATLA_STATE_SHOOT:
 		case NATLA_STATE_AIM:
-			item->TargetState = NATLA_STATE_SEMI_DEATH;
+			item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
 			item->Flags = 0;
 			timer = 0;
 			break;
@@ -175,7 +175,7 @@ void NatlaControl(short itemNumber)
 
 		shoot = (AI.angle > -NATLA_FIRE_ARC && AI.angle < NATLA_FIRE_ARC && Targetable(item, &AI));
 
-		if (item->ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
+		if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
 		{
 			if (creature->Flags & NATLA_FLYMODE && shoot && GetRandomControl() < NATLA_LAND_CHANCE)
 				creature->Flags -= NATLA_FLYMODE;
@@ -195,13 +195,13 @@ void NatlaControl(short itemNumber)
 		if (AI.ahead)
 			head = AI.angle;
 
-		if (item->ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
+		if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
 			CreatureMood(item, &AI, TIMID);
 
 		item->Position.yRot -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
-		if (item->ActiveState == NATLA_STATE_FLY)
+		if (item->Animation.ActiveState == NATLA_STATE_FLY)
 		{
 			if (AI.angle > NATLA_FLY_TURN)
 				facing += NATLA_FLY_TURN;
@@ -218,21 +218,21 @@ void NatlaControl(short itemNumber)
 			facing = 0;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case NATLA_STATE_IDLE:
 			timer = 0;
 
 			if (creature->Flags & NATLA_FLYMODE)
-				item->TargetState = NATLA_STATE_FLY;
+				item->Animation.TargetState = NATLA_STATE_FLY;
 			else
-				item->TargetState = NATLA_STATE_AIM;
+				item->Animation.TargetState = NATLA_STATE_AIM;
 
 			break;
 
 		case NATLA_STATE_FLY:
 			if (!(creature->Flags & NATLA_FLYMODE) && item->Position.yPos == item->Floor)
-				item->TargetState = NATLA_STATE_IDLE;
+				item->Animation.TargetState = NATLA_STATE_IDLE;
 
 			if (timer >= 30)
 			{
@@ -250,17 +250,17 @@ void NatlaControl(short itemNumber)
 			break;
 
 		case NATLA_STATE_AIM:
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (shoot)
-				item->TargetState = NATLA_STATE_SHOOT;
+				item->Animation.TargetState = NATLA_STATE_SHOOT;
 			else
-				item->TargetState = NATLA_STATE_IDLE;
+				item->Animation.TargetState = NATLA_STATE_IDLE;
 
 			break;
 
 		case NATLA_STATE_SHOOT:
-			if (!item->RequiredState)
+			if (!item->Animation.RequiredState)
 			{
 				short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
@@ -274,7 +274,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 					EffectList[FXNumber].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
 
-				item->RequiredState = NATLA_STATE_IDLE;
+				item->Animation.RequiredState = NATLA_STATE_IDLE;
 			}
 
 			break;

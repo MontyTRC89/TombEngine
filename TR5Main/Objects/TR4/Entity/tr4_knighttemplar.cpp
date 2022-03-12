@@ -20,10 +20,10 @@ void InitialiseKnightTemplar(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
-	item->TargetState = 1;
-	item->ActiveState = 1;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->MeshBits &= 0xF7FF;
 }
 
@@ -36,10 +36,10 @@ void KnightTemplarControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
-	if (item->AnimNumber == object->animIndex ||
-		item->AnimNumber - object->animIndex == 1 ||
-		item->AnimNumber - object->animIndex == 11 ||
-		item->AnimNumber - object->animIndex == 12)
+	if (item->Animation.AnimNumber == object->animIndex ||
+		item->Animation.AnimNumber - object->animIndex == 1 ||
+		item->Animation.AnimNumber - object->animIndex == 11 ||
+		item->Animation.AnimNumber - object->animIndex == 12)
 	{
 		if (GetRandomControl() & 1)
 		{
@@ -87,24 +87,24 @@ void KnightTemplarControl(short itemNumber)
 	int frameBase = 0;
 	int frameNumber = 0;
 
-	switch (item->ActiveState)
+	switch (item->Animation.ActiveState)
 	{
 	case 1:
-		item->TargetState = 2;
+		item->Animation.TargetState = 2;
 		creature->MaxTurn = ANGLE(2.0f);
 		creature->Flags = 0;
 
 		if (AI.distance > pow(682, 2))
 		{
 			if (Lara.TargetEntity == item)
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 		}
 		else if (GetRandomControl() & 1)
-			item->TargetState = 4;
+			item->Animation.TargetState = 4;
 		else if (GetRandomControl() & 1)
-			item->TargetState = 3;
+			item->Animation.TargetState = 3;
 		else
-			item->TargetState = 5;
+			item->Animation.TargetState = 5;
 
 		break;
 
@@ -112,7 +112,7 @@ void KnightTemplarControl(short itemNumber)
 		creature->MaxTurn = ANGLE(7.0f);
 
 		if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 
 		break;
 
@@ -131,8 +131,8 @@ void KnightTemplarControl(short itemNumber)
 		else
 			item->Position.yRot += AI.angle;
 
-		frameNumber = item->FrameNumber;
-		frameBase = g_Level.Anims[item->AnimNumber].frameBase;
+		frameNumber = item->Animation.FrameNumber;
+		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
@@ -200,14 +200,14 @@ void KnightTemplarControl(short itemNumber)
 		if (item->HitStatus)
 		{
 			if (GetRandomControl() & 1)
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			else
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 		}
 		else if (AI.distance <= pow(682, 2) || Lara.TargetEntity != item)
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 		else
-			item->TargetState = 6;
+			item->Animation.TargetState = 6;
 		
 		break;
 

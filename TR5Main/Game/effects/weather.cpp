@@ -243,7 +243,7 @@ namespace Environment
 			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
 			p.Position.z += p.Velocity.z;
 
-			COLL_RESULT coll;
+			CollisionResult coll;
 			bool collisionCalculated = false;
 
 			if (p.CollisionCheckDelay <= 0)

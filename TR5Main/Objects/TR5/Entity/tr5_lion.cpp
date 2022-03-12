@@ -21,10 +21,10 @@ void InitialiseLion(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 1;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }
 
 void LionControl(short itemNumber)
@@ -44,11 +44,11 @@ void LionControl(short itemNumber)
 		{
 			item->HitPoints = 0;
 
-			if (item->ActiveState != 5)
+			if (item->Animation.ActiveState != 5)
 			{
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
-				item->ActiveState = 5;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
+				item->Animation.ActiveState = 5;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else
@@ -65,21 +65,21 @@ void LionControl(short itemNumber)
 			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = -16 * angle;
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case 1:
 				creature->MaxTurn = 0;
 
-				if (item->RequiredState)
+				if (item->Animation.RequiredState)
 				{
-					item->TargetState = item->RequiredState;
+					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
 				}
 
 				if (creature->Mood == MoodType::Bored)
 				{
 					if (!(GetRandomControl() & 0x3F))
-						item->TargetState = 2;
+						item->Animation.TargetState = 2;
 					break;
 				}
 
@@ -87,18 +87,18 @@ void LionControl(short itemNumber)
 				{
 					if (item->TouchBits & 0x200048)
 					{
-						item->TargetState = 7;
+						item->Animation.TargetState = 7;
 						break;
 					}
 
 					if (AI.distance < pow(SECTOR(1), 2))
 					{
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 						break;
 					}
 				}
 
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 				break;
 
 			case 2:
@@ -108,12 +108,12 @@ void LionControl(short itemNumber)
 				{
 					if (GetRandomControl() < 128)
 					{
-						item->RequiredState = 6;
-						item->TargetState = 1;
+						item->Animation.RequiredState = 6;
+						item->Animation.TargetState = 1;
 					}
 				}
 				else
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 
 				break;
 
@@ -124,28 +124,28 @@ void LionControl(short itemNumber)
 				if (creature->Mood != MoodType::Bored)
 				{
 					if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-						item->TargetState = 1;
+						item->Animation.TargetState = 1;
 					else if (item->TouchBits & 0x200048 && AI.ahead)
-						item->TargetState = 1;
+						item->Animation.TargetState = 1;
 					else if (creature->Mood != MoodType::Escape)
 					{
 						if (GetRandomControl() < 128)
 						{
-							item->RequiredState = 6;
-							item->TargetState = 1;
+							item->Animation.RequiredState = 6;
+							item->Animation.TargetState = 1;
 						}
 					}
 				}
 				else
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				
 				break;
 
 			case 4:
-				if (!item->RequiredState && item->TouchBits & 0x200048)
+				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
 					CreatureEffect2(item, &LionBite1, 10, item->Position.yRot, DoBloodSplat);
-					item->RequiredState = 1;
+					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 200;
 					LaraItem->HitStatus = true;
@@ -156,10 +156,10 @@ void LionControl(short itemNumber)
 			case 7:
 				creature->MaxTurn = ANGLE(1.0f);
 
-				if (!item->RequiredState && item->TouchBits & 0x200048)
+				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
 					CreatureEffect2(item, &LionBite2, 10, item->Position.yRot, DoBloodSplat);
-					item->RequiredState = 1;
+					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 60;
 					LaraItem->HitStatus = true;

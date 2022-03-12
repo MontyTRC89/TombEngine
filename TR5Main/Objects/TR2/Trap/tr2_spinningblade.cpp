@@ -15,9 +15,9 @@ void InitialiseSpinningBlade(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = 1;
 }
 
 void SpinningBladeControl(short itemNumber)
@@ -26,16 +26,16 @@ void SpinningBladeControl(short itemNumber)
 
 	bool spinning = false;
 
-	if (item->ActiveState == 2)
+	if (item->Animation.ActiveState == 2)
 	{
-		if (item->TargetState != 1)
+		if (item->Animation.TargetState != 1)
 		{
 			int x = item->Position.xPos + SECTOR(3) * phd_sin(item->Position.yRot) / 2;
 			int z = item->Position.zPos + SECTOR(3) * phd_cos(item->Position.yRot) / 2;
 
 			int height = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
 			if (height == NO_HEIGHT)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 		}
 
 		spinning = true;
@@ -45,7 +45,7 @@ void SpinningBladeControl(short itemNumber)
 			LaraItem->HitStatus = true;
 			LaraItem->HitPoints -= 100;
 
-			DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - CLICK(2), LaraItem->Position.zPos, (short)(item->Velocity * 2), LaraItem->Position.yRot, LaraItem->RoomNumber, 2);
+			DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - CLICK(2), LaraItem->Position.zPos, (short)(item->Animation.Velocity * 2), LaraItem->Position.yRot, LaraItem->RoomNumber, 2);
 		}
 
 		SoundEffect(231, &item->Position, 0);
@@ -53,7 +53,7 @@ void SpinningBladeControl(short itemNumber)
 	else
 	{
 		if (TriggerActive(item))
-			item->TargetState = 2;
+			item->Animation.TargetState = 2;
 
 		spinning = false;
 	}
@@ -68,6 +68,6 @@ void SpinningBladeControl(short itemNumber)
 	if (probe.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
-	if (spinning && item->ActiveState == 1)
+	if (spinning && item->Animation.ActiveState == 1)
 		item->Position.yRot += -ANGLE(180.0f);
 }

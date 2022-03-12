@@ -29,23 +29,23 @@ namespace TEN::Entities::Switches
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			(laraItem->ActiveState == LS_REACH || laraItem->ActiveState == LS_JUMP_UP) &&
-			(laraItem->Status || laraItem->Airborne) &&
-			laraItem->VerticalVelocity > 0 &&
+			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
+			(laraItem->Status || laraItem->Animation.Airborne) &&
+			laraItem->Animation.VerticalVelocity > 0 &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
-			!switchItem->ActiveState)
+			!switchItem->Animation.ActiveState)
 		{
 			if (TestLaraPosition(&JumpSwitchBounds, switchItem, laraItem))
 			{
 				AlignLaraPosition(&JumpSwitchPos, switchItem, laraItem);
 
-				laraItem->ActiveState = LS_SWITCH_DOWN;
-				laraItem->AnimNumber = LA_JUMPSWITCH_PULL;
-				laraItem->VerticalVelocity = 0;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-				laraItem->Airborne = false;
+				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
+				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;
+				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.Airborne = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
-				switchItem->TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_ON;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);

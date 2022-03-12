@@ -223,12 +223,12 @@ int S_UpdateInput()
 	{
 		if (!flareNo)
 		{
-			if (LaraItem->ActiveState == LS_CRAWL_IDLE ||
-				LaraItem->ActiveState == LS_CRAWL_FORWARD ||
-				LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->ActiveState == LS_CRAWL_BACK ||
-				LaraItem->ActiveState == LS_CRAWL_TO_HANG)
+			if (LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG)
 			{
 				SoundEffect(SFX_TR4_LARA_NO, nullptr, 2);
 				flareNo = true;

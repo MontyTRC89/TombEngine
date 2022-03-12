@@ -216,14 +216,14 @@ void AlertAllGuards(short itemNumber)
 
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState)
 {
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->ActiveState = killState;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = killState;
 
-	LaraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-	LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
-	LaraItem->ActiveState = 0;
-	LaraItem->TargetState = laraKillState;
+	LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+	LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+	LaraItem->Animation.ActiveState = 0;
+	LaraItem->Animation.TargetState = laraKillState;
 
 	LaraItem->Position.xPos = item->Position.xPos;
 	LaraItem->Position.yPos = item->Position.yPos;
@@ -231,9 +231,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	LaraItem->Position.yRot = item->Position.yRot;
 	LaraItem->Position.xRot = item->Position.xRot;
 	LaraItem->Position.zRot = item->Position.zRot;
-	LaraItem->VerticalVelocity = 0;
-	LaraItem->Airborne = false;
-	LaraItem->VerticalVelocity = 0;
+	LaraItem->Animation.VerticalVelocity = 0;
+	LaraItem->Animation.Airborne = false;
+	LaraItem->Animation.VerticalVelocity = 0;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -275,7 +275,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	PHD_VECTOR pos = { bite->x, bite->y, bite->z };
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, item->VerticalVelocity, item->Position.yRot, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
@@ -335,7 +335,7 @@ void CreatureFloat(short itemNumber)
 
 	if (item->Position.yPos <= waterLevel)
 	{
-		if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 		{
 			item->Position.yPos = waterLevel;
 			item->Collidable = false;
@@ -397,7 +397,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 	int x = creature->Target.x - item->Position.xPos;
 	int z = creature->Target.z - item->Position.zPos;
 	angle = phd_atan(z, x) - item->Position.yRot;
-	int range = item->VerticalVelocity * (16384 / maxTurn);
+	int range = item->Animation.VerticalVelocity * (16384 / maxTurn);
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
@@ -604,7 +604,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	short biffAngle;
-	if (item->ObjectNumber != ID_TYRANNOSAUR && item->VerticalVelocity && item->HitPoints > 0)
+	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.VerticalVelocity && item->HitPoints > 0)
 		biffAngle = CreatureCreature(itemNumber);
 	else
 		biffAngle = 0;
@@ -679,7 +679,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Position.xPos, y, item->Position.zPos, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Position.xPos, y, item->Position.zPos);
  
-		angle = (item->VerticalVelocity) ? phd_atan(item->VerticalVelocity, -dy) : 0;
+		angle = (item->Animation.VerticalVelocity) ? phd_atan(item->Animation.VerticalVelocity, -dy) : 0;
 		if (angle < -ANGLE(20.0f))
 			angle = -ANGLE(20.0f);
 		else if (angle > ANGLE(20.0f))
@@ -1437,13 +1437,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->Position.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
-		z = enemy->Position.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
+		x = enemy->Position.xPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
+		z = enemy->Position.zPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
 	}
 	else
 	{
-		x = enemy->Position.xPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Position.yRot) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
-		z = enemy->Position.zPos + enemy->VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Position.yRot) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
+		x = enemy->Position.xPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Position.yRot) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
+		z = enemy->Position.zPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Position.yRot) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
 	}
 
 	y = item->Position.yPos - enemy->Position.yPos;
