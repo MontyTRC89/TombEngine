@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
                 GetJointAbsPosition(item, &pos, 0);
                 SoundEffect(65, (PHD_3DPOS*)&pos, 0);
 
-                if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+                if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
                     item->Flags &= 0xC1;
             }
         }

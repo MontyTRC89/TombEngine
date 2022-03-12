@@ -30,9 +30,9 @@ void InitialiseCobra(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase + 45;
-	item->ActiveState = item->TargetState = 3;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
+	item->Animation.ActiveState = item->Animation.TargetState = 3;
 	item->ItemFlags[2] = item->HitStatus;
 }
 
@@ -50,11 +50,11 @@ void CobraControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 4)
+		if (item->Animation.ActiveState != 4)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 4;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 4;
 		}
 	}
 	else
@@ -81,17 +81,17 @@ void CobraControl(short itemNumber)
 		else
 			item->Position.yRot += ANGLE(10.0f);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			info->Flags = 0;
 
 			if (AI.distance > pow(SECTOR(2.5f), 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (LaraItem->HitPoints > 0 &&
-				((AI.ahead && AI.distance < pow(SECTOR(1), 2)) || item->HitStatus || LaraItem->Velocity > 15))
+				((AI.ahead && AI.distance < pow(SECTOR(1), 2)) || item->HitStatus || LaraItem->Animation.Velocity > 15))
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 
 			break;
@@ -106,7 +106,7 @@ void CobraControl(short itemNumber)
 			}
 			if (AI.distance < pow(SECTOR(1.5f), 2) && LaraItem->HitPoints > 0)
 			{
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 				item->HitPoints = item->ItemFlags[2];
 			}
 

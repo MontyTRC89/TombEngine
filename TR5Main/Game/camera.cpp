@@ -156,8 +156,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos != LaraItem->Position.xPos ||
 		OldCam.pos.yPos != LaraItem->Position.yPos ||
 		OldCam.pos.zPos != LaraItem->Position.zPos ||
-		OldCam.ActiveState != LaraItem->ActiveState ||
-		OldCam.TargetState != LaraItem->TargetState ||
+		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
+		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
@@ -178,8 +178,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos = LaraItem->Position.xPos;
 		OldCam.pos.yPos = LaraItem->Position.yPos;
 		OldCam.pos.zPos = LaraItem->Position.zPos;
-		OldCam.ActiveState = LaraItem->ActiveState;
-		OldCam.TargetState = LaraItem->TargetState;
+		OldCam.ActiveState = LaraItem->Animation.ActiveState;
+		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
@@ -618,7 +618,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 	int y = ideal->y;
 	int z = ideal->z;
 
-	COLL_RESULT probe;
+	CollisionResult probe;
 
 	if (yFirst)
 	{
@@ -904,8 +904,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos == item->Position.xPos &&
 		OldCam.pos.yPos == item->Position.yPos &&
 		OldCam.pos.zPos == item->Position.zPos &&
-		OldCam.ActiveState == item->ActiveState &&
-		OldCam.TargetState == item->TargetState &&
+		OldCam.ActiveState == item->Animation.ActiveState &&
+		OldCam.TargetState == item->Animation.TargetState &&
 		Camera.oldType == CameraType::Look)
 	{
 		ideal.x = LookCamPosition.x;
@@ -923,8 +923,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos = item->Position.xPos;
 		OldCam.pos.yPos = item->Position.yPos;
 		OldCam.pos.zPos = item->Position.zPos;
-		OldCam.ActiveState = item->ActiveState;
-		OldCam.TargetState = item->TargetState;
+		OldCam.ActiveState = item->Animation.ActiveState;
+		OldCam.TargetState = item->Animation.TargetState;
 		LookCamPosition.x = ideal.x;
 		LookCamPosition.y = ideal.y;
 		LookCamPosition.z = ideal.z;

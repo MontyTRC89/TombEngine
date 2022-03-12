@@ -45,9 +45,9 @@ namespace TEN::Entities::Switches
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_IDLE &&
-			laraItem->AnimNumber == LA_STAND_IDLE &&
-			laraItem->Airborne == false &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.Airborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
@@ -67,9 +67,9 @@ namespace TEN::Entities::Switches
 				}
 				else if (MoveLaraPosition(&PulleyPos, switchItem, laraItem))
 				{
-					laraItem->AnimNumber = LA_PULLEY_GRAB;
-					laraItem->ActiveState = LS_PULLEY;
-					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
+					laraItem->Animation.ActiveState = LS_PULLEY;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 					AddActiveItem(itemNumber);
 
@@ -97,7 +97,7 @@ namespace TEN::Entities::Switches
 				switchItem->Position.yRot = oldYrot;
 			}
 		}
-		else if (laraItem->ActiveState != LS_PULLEY)
+		else if (laraItem->Animation.ActiveState != LS_PULLEY)
 			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }

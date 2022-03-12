@@ -9,8 +9,8 @@ void InitialiseLightingGuide(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 1;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }

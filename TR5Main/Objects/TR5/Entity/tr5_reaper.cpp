@@ -15,10 +15,10 @@ void InitialiseReaper(short itemNumber)
 
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 2;
-	item->ActiveState = 2;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 2;
+	item->Animation.ActiveState = 2;
 }
 
 void ReaperControl(short itemNumber)
@@ -41,9 +41,9 @@ void ReaperControl(short itemNumber)
 
 		short angle = CreatureTurn(item, ANGLE(2.0f));
 
-		if (item->ActiveState == 2 &&
+		if (item->Animation.ActiveState == 2 &&
 			!(GetRandomControl() & 0x3F))
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 
 		if (creature->ReachedGoal)
 		{

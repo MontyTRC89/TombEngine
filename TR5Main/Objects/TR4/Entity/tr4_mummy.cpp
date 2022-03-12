@@ -61,18 +61,18 @@ void InitialiseMummy(short itemNumber)
 
 	if (item->TriggerFlags == 2)
 	{
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_LYING_DOWN;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->TargetState = MUMMY_STATE_LYING_DOWN;
-		item->ActiveState = MUMMY_STATE_LYING_DOWN;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_LYING_DOWN;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.TargetState = MUMMY_STATE_LYING_DOWN;
+		item->Animation.ActiveState = MUMMY_STATE_LYING_DOWN;
 		item->Status = ITEM_INVISIBLE;
 	}
 	else
 	{
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_CROSSED;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->TargetState = MUMMY_STATE_ARMS_CROSSED;
-		item->ActiveState = MUMMY_STATE_ARMS_CROSSED;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_CROSSED;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.TargetState = MUMMY_STATE_ARMS_CROSSED;
+		item->Animation.ActiveState = MUMMY_STATE_ARMS_CROSSED;
 	}
 }
 
@@ -102,9 +102,9 @@ void MummyControl(short itemNumber)
 	{
 		if (AI.distance < pow(SECTOR(3), 2))
 		{
-			if (item->ActiveState != MUMMY_ANIM_STAND_TO_WALK_ARMS_UP &&
-				item->ActiveState != MUMMY_ANIM_WALK_ARMS_UP_TO_WALK_LEFT &&
-				item->ActiveState != MUMMY_ANIM_STAND_TO_WALK)
+			if (item->Animation.ActiveState != MUMMY_ANIM_STAND_TO_WALK_ARMS_UP &&
+				item->Animation.ActiveState != MUMMY_ANIM_WALK_ARMS_UP_TO_WALK_LEFT &&
+				item->Animation.ActiveState != MUMMY_ANIM_STAND_TO_WALK)
 			{
 				if (GetRandomControl() & 3 ||
 					Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
@@ -116,27 +116,27 @@ void MummyControl(short itemNumber)
 						Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 						Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 					{
-						if (item->ActiveState == MUMMY_STATE_WALK_ARMS_UP ||
-							item->ActiveState == MUMMY_STATE_WALK_HIT)
+						if (item->Animation.ActiveState == MUMMY_STATE_WALK_ARMS_UP ||
+							item->Animation.ActiveState == MUMMY_STATE_WALK_HIT)
 						{
-							item->ActiveState = MUMMY_STATE_ARMS_UP_PUSHED_BACK;
-							item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_UP_PUSHED_BACK;
+							item->Animation.ActiveState = MUMMY_STATE_ARMS_UP_PUSHED_BACK;
+							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_UP_PUSHED_BACK;
 						}
 						else
 						{
-							item->ActiveState = MUMMY_STATE_PUSHED_BACK;
-							item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_PUSHED_BACK;
+							item->Animation.ActiveState = MUMMY_STATE_PUSHED_BACK;
+							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_PUSHED_BACK;
 						}
 
-						item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Position.yRot += AI.angle;
 					}
 				}
 				else
 				{
-					item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-					item->ActiveState = MUMMY_STATE_COLLAPSE;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
 					item->Position.yRot += AI.angle;
 					creature->MaxTurn = 0;
 				}
@@ -157,7 +157,7 @@ void MummyControl(short itemNumber)
 			joint2 = AI.xAngle;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case MUMMY_STATE_IDLE:
 			creature->Flags = 0;
@@ -167,10 +167,10 @@ void MummyControl(short itemNumber)
 				AI.distance >= pow(SECTOR(7), 2))
 			{
 				if (AI.distance - pow(SECTOR(0.5f), 2) <= 0)
-					item->TargetState = MUMMY_STATE_HIT;
+					item->Animation.TargetState = MUMMY_STATE_HIT;
 				else
 				{
-					item->TargetState = MUMMY_STATE_IDLE;
+					item->Animation.TargetState = MUMMY_STATE_IDLE;
 					joint0 = 0;
 					joint1 = 0;
 					joint2 = 0;
@@ -180,7 +180,7 @@ void MummyControl(short itemNumber)
 				}
 			}
 			else
-				item->TargetState = MUMMY_STATE_WALK;
+				item->Animation.TargetState = MUMMY_STATE_WALK;
 
 			break;
 
@@ -189,7 +189,7 @@ void MummyControl(short itemNumber)
 			{
 				creature->MaxTurn = 0;
 
-				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->TriggerFlags = 0;
 			}
 			else
@@ -199,10 +199,10 @@ void MummyControl(short itemNumber)
 				if (AI.distance >= pow(SECTOR(3), 2))
 				{
 					if (AI.distance > pow(SECTOR(7), 2))
-						item->TargetState = MUMMY_STATE_IDLE;
+						item->Animation.TargetState = MUMMY_STATE_IDLE;
 				}
 				else
-					item->TargetState = MUMMY_STATE_WALK_ARMS_UP;
+					item->Animation.TargetState = MUMMY_STATE_WALK_ARMS_UP;
 			}
 
 			break;
@@ -213,20 +213,20 @@ void MummyControl(short itemNumber)
 
 			if (AI.distance < pow(SECTOR(0.5f), 2))
 			{
-				item->TargetState = MUMMY_STATE_IDLE;
+				item->Animation.TargetState = MUMMY_STATE_IDLE;
 				break;
 			}
 
 			if (AI.distance > pow(SECTOR(3), 2) && AI.distance < pow(SECTOR(7), 2))
 			{
-				item->TargetState = MUMMY_STATE_WALK;
+				item->Animation.TargetState = MUMMY_STATE_WALK;
 				break;
 			}
 
 			if (AI.distance <= pow(682, 2))
-				item->TargetState = MUMMY_STATE_WALK_HIT;
+				item->Animation.TargetState = MUMMY_STATE_WALK_HIT;
 			else if (AI.distance > pow(SECTOR(7), 2))
-				item->TargetState = MUMMY_STATE_IDLE;
+				item->Animation.TargetState = MUMMY_STATE_IDLE;
 
 			break;
 
@@ -234,7 +234,7 @@ void MummyControl(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags > -1)
-				item->TargetState = MUMMY_STATE_WALK;
+				item->Animation.TargetState = MUMMY_STATE_WALK;
 
 			break;
 
@@ -247,7 +247,7 @@ void MummyControl(short itemNumber)
 
 			if (AI.distance < pow(SECTOR(1), 2) || !(GetRandomControl() & 0x7F))
 			{
-				item->TargetState = MUMMY_STATE_GET_UP;
+				item->Animation.TargetState = MUMMY_STATE_GET_UP;
 				item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 			}
 
@@ -271,13 +271,13 @@ void MummyControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x4800)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase &&
-						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameEnd)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					{
 						LaraItem->HitPoints -= 100;
 						LaraItem->HitStatus = true;
 
-						if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_HIT_LEFT)
+						if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_HIT_LEFT)
 						{
 							CreatureEffect2(
 								item,

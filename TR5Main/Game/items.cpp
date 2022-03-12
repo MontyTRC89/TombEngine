@@ -319,18 +319,18 @@ void InitialiseItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-	item->RequiredState = 0;
-	item->TargetState = g_Level.Anims[item->AnimNumber].ActiveState;
-	item->ActiveState = g_Level.Anims[item->AnimNumber].ActiveState;
+	item->Animation.RequiredState = 0;
+	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 
 	item->Position.zRot = 0;
 	item->Position.xRot = 0;
 
-	item->VerticalVelocity = 0;
-	item->Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Velocity = 0;
 
 	item->ItemFlags[3] = 0;
 	item->ItemFlags[2] = 0;
@@ -339,7 +339,7 @@ void InitialiseItem(short itemNumber)
 
 	item->Active = false;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Airborne = false;
+	item->Animation.Airborne = false;
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
@@ -389,12 +389,12 @@ void InitialiseItem(short itemNumber)
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
 	{
-		item->Mutator.resize(Objects[item->ObjectNumber].nmeshes);
-		for (int i = 0; i < item->Mutator.size(); i++)
-			item->Mutator[i] = {};
+		item->Animation.Mutator.resize(Objects[item->ObjectNumber].nmeshes);
+		for (int i = 0; i < item->Animation.Mutator.size(); i++)
+			item->Animation.Mutator[i] = {};
 	}
 	else
-		item->Mutator.clear();
+		item->Animation.Mutator.clear();
 
 	if (Objects[item->ObjectNumber].initialise != NULL)
 		Objects[item->ObjectNumber].initialise(itemNumber);

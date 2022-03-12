@@ -20,10 +20,10 @@ void InitialiseMonkey(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[ID_MONKEY].animIndex + 2;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->ActiveState = 6;
-	item->TargetState = 6;
+	item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 2;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = 6;
+	item->Animation.TargetState = 6;
 }
 
 void MonkeyControl(short itemNumber)
@@ -42,12 +42,12 @@ void MonkeyControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 11)
+		if (item->Animation.ActiveState != 11)
 		{
 			item->MeshBits = -1;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 14;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 11;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 14;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 11;
 		}
 	}
 	else
@@ -139,7 +139,7 @@ void MonkeyControl(short itemNumber)
 
 		creature->Enemy = enemy;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 6:
 			creature->Flags = 0;
@@ -152,47 +152,47 @@ void MonkeyControl(short itemNumber)
 				if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 0x1)
-						item->TargetState = 8;
+						item->Animation.TargetState = 8;
 					else
-						item->TargetState = 7;
+						item->Animation.TargetState = 7;
 				}
 
 				break;
 			}
 
 			else if (item->AIBits & PATROL1)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (creature->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (creature->Mood == MoodType::Bored)
 			{
-				if (item->RequiredState)
-					item->TargetState = item->RequiredState;
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!(GetRandomControl() & 0xF))
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 				else if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 0x1)
-						item->TargetState = 8;
+						item->Animation.TargetState = 8;
 					else
-						item->TargetState = 7;
+						item->Animation.TargetState = 7;
 				}
 			}
 			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 			{
-				if (item->RequiredState)
-					item->TargetState = item->RequiredState;
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.ahead)
-					item->TargetState = 6;
+					item->Animation.TargetState = 6;
 				else
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else if (AI.bite && AI.distance < pow(682, 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (AI.bite && AI.distance < pow(682, 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
@@ -208,66 +208,66 @@ void MonkeyControl(short itemNumber)
 				if (!(GetRandomControl() & 15))
 				{
 					if (GetRandomControl() & 1)
-						item->TargetState = 10;
+						item->Animation.TargetState = 10;
 					else
-						item->TargetState = 6;
+						item->Animation.TargetState = 6;
 				}
 
 				break;
 			}
 			else if (item->AIBits & PATROL1)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.TargetEntity != item && AI.ahead)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				else
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 			}
 			else if (creature->Mood == MoodType::Bored)
 			{
-				if (item->RequiredState)
-					item->TargetState = item->RequiredState;
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (!(GetRandomControl() & 15))
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 				else if (!(GetRandomControl() & 15))
 				{
 					if (GetRandomControl() & 1)
-						item->TargetState = 10;
+						item->Animation.TargetState = 10;
 					else
-						item->TargetState = 6;
+						item->Animation.TargetState = 6;
 				}
 			}
 			else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
 			{
-				if (item->RequiredState)
-					item->TargetState = item->RequiredState;
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.ahead)
-					item->TargetState = 6;
+					item->Animation.TargetState = 6;
 				else
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 			}
 			else if (AI.bite && AI.distance < pow(341, 2))
 			{
 				if (LaraItem->Position.yPos < item->Position.yPos)
-					item->TargetState = 13;
+					item->Animation.TargetState = 13;
 				else
-					item->TargetState = 12;
+					item->Animation.TargetState = 12;
 			}
 			else if (AI.bite && AI.distance < pow(682, 2))
-				item->TargetState = 14;
+				item->Animation.TargetState = 14;
 			else if (AI.bite && AI.distance < pow(682, 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != NULL &&
 				creature->Enemy->ObjectNumber != ID_AI_PATROL1 && creature->Enemy->ObjectNumber != ID_AI_PATROL2 &&
 				abs(item->Position.yPos - creature->Enemy->Position.yPos) < 256)
 			{
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-				item->TargetState = 9;
+				item->Animation.TargetState = 9;
 			else
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 
 			break;
 
@@ -278,7 +278,7 @@ void MonkeyControl(short itemNumber)
 				break;
 			else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 				creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
-				item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 12)
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 12)
 			{
 				if (creature->Enemy->RoomNumber == NO_ROOM ||
 					creature->Enemy->Status == ITEM_INVISIBLE ||
@@ -311,7 +311,7 @@ void MonkeyControl(short itemNumber)
 					}
 				}
 			}
-			else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH && item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 12)
+			else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 12)
 			{
 				item->AIBits = 0;
 
@@ -347,18 +347,18 @@ void MonkeyControl(short itemNumber)
 
 			if (item->AIBits & PATROL1)
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 				torsoY = 0;
 			}
 			else if (creature->Mood == MoodType::Escape)
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 256)
-					item->TargetState = 6;
+					item->Animation.TargetState = 6;
 			}
 			else if (AI.bite && AI.distance < pow(682, 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
@@ -370,21 +370,21 @@ void MonkeyControl(short itemNumber)
 				torsoY = AI.angle;
 
 			if (item->AIBits & GUARD)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.TargetEntity != item && AI.ahead)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				break;
 			}
 			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = 9;
+				item->Animation.TargetState = 9;
 			else if (AI.distance < pow(682, 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-				item->TargetState = 9;
+				item->Animation.TargetState = 9;
 
 			break;
 
@@ -533,50 +533,50 @@ void MonkeyControl(short itemNumber)
 	CreatureJoint(item, 1, headX);
 	CreatureJoint(item, 2, torsoY);
 
-	if (item->ActiveState < 15)
+	if (item->Animation.ActiveState < 15)
 	{
 		switch (CreatureVault(itemNumber, angle, 2, 128))
 		{
 		case 2:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 19;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 17;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 19;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 17;
 			break;
 
 		case 3:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 18;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 16;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 18;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 16;
 			break;
 
 		case 4:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 17;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 15;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 17;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 15;
 			break;
 
 		case -2:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 22;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 20;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 22;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 20;
 			break;
 
 		case -3:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 21;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 19;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 21;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 19;
 			break;
 
 		case -4:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[ID_MONKEY].animIndex + 20;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 18;
+			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 20;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 18;
 			break;
 		}
 	}

@@ -95,8 +95,8 @@ namespace TEN::Entities::TR4
 
 		if (mineItem->TriggerFlags && !mineItem->ItemFlags[3])
 		{
-			if (laraItem->AnimNumber != LA_DETONATOR_USE ||
-				laraItem->FrameNumber < g_Level.Anims[laraItem->AnimNumber].frameBase + 57)
+			if (laraItem->Animation.AnimNumber != LA_DETONATOR_USE ||
+				laraItem->Animation.FrameNumber < g_Level.Anims[laraItem->Animation.AnimNumber].frameBase + 57)
 			{
 				if (TestBoundsCollide(mineItem, laraItem, 512))
 				{
@@ -109,10 +109,10 @@ namespace TEN::Entities::TR4
 					ExplodeItemNode(mineItem, 0, 0, 128);
 					KillItem(itemNumber);
 
-					laraItem->AnimNumber = LA_MINE_DEATH;
-					laraItem->FrameNumber = g_Level.Anims[mineItem->AnimNumber].frameBase;
-					laraItem->ActiveState = LS_DEATH;
-					laraItem->Velocity = 0;
+					laraItem->Animation.AnimNumber = LA_MINE_DEATH;
+					laraItem->Animation.FrameNumber = g_Level.Anims[mineItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.ActiveState = LS_DEATH;
+					laraItem->Animation.Velocity = 0;
 
 					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &mineItem->Position, 0);
 				}

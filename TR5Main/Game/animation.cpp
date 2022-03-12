@@ -24,16 +24,16 @@ void AnimateLara(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->FrameNumber++;
+	item->Animation.FrameNumber++;
 
-	auto* anim = &g_Level.Anims[item->AnimNumber];
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
-		anim = &g_Level.Anims[item->AnimNumber];
-		item->ActiveState = anim->ActiveState;
+		anim = &g_Level.Anims[item->Animation.AnimNumber];
+		item->Animation.ActiveState = anim->ActiveState;
 	}
 
-	if (item->FrameNumber > anim->frameEnd)
+	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
 		if (anim->numberCommands > 0)
 		{
@@ -49,12 +49,12 @@ void AnimateLara(ITEM_INFO* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->VerticalVelocity = *(cmd++);
-					item->Velocity = *(cmd++);
-					item->Airborne = true;
+					item->Animation.VerticalVelocity = *(cmd++);
+					item->Animation.Velocity = *(cmd++);
+					item->Animation.Airborne = true;
 					if (lara->Control.CalculatedJumpVelocity)
 					{
-						item->VerticalVelocity = lara->Control.CalculatedJumpVelocity;
+						item->Animation.VerticalVelocity = lara->Control.CalculatedJumpVelocity;
 						lara->Control.CalculatedJumpVelocity = 0;
 					}
 					break;
@@ -75,11 +75,11 @@ void AnimateLara(ITEM_INFO* item)
 			}
 		}
 
-		item->AnimNumber = anim->jumpAnimNum;
-		item->FrameNumber = anim->jumpFrameNum;
+		item->Animation.AnimNumber = anim->jumpAnimNum;
+		item->Animation.FrameNumber = anim->jumpFrameNum;
 
-		anim = &g_Level.Anims[item->AnimNumber];
-		item->ActiveState = anim->ActiveState;
+		anim = &g_Level.Anims[item->Animation.AnimNumber];
+		item->Animation.ActiveState = anim->ActiveState;
 	}
 
 	if (anim->numberCommands > 0)
@@ -101,7 +101,7 @@ void AnimateLara(ITEM_INFO* item)
 				break;
 
 			case COMMAND_SOUND_FX:
-				if (item->FrameNumber != *cmd)
+				if (item->Animation.FrameNumber != *cmd)
 				{
 					cmd += 2;
 					break;
@@ -119,7 +119,7 @@ void AnimateLara(ITEM_INFO* item)
 				break;
 
 			case COMMAND_EFFECT:
-				if (item->FrameNumber != *cmd)
+				if (item->Animation.FrameNumber != *cmd)
 				{
 					cmd += 2;
 					break;
@@ -140,33 +140,33 @@ void AnimateLara(ITEM_INFO* item)
 
 	int lateral = anim->Xvelocity;
 	if (anim->Xacceleration)
-		lateral += anim->Xacceleration * (item->FrameNumber - anim->frameBase);
-	item->LateralVelocity = lateral >>= 16;
+		lateral += anim->Xacceleration * (item->Animation.FrameNumber - anim->frameBase);
+	item->Animation.LateralVelocity = lateral >>= 16;
 
-	if (item->Airborne)
+	if (item->Animation.Airborne)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
-			item->Velocity -= item->Velocity >> 3;
-			if (abs(item->Velocity) < 8)
+			item->Animation.Velocity -= item->Animation.Velocity >> 3;
+			if (abs(item->Animation.Velocity) < 8)
 			{
-				item->Velocity = 0;
-				item->Airborne = false;
+				item->Animation.Velocity = 0;
+				item->Animation.Airborne = false;
 			}
-			if (item->VerticalVelocity > 128)
-				item->VerticalVelocity /= 2;
-			item->VerticalVelocity -= item->VerticalVelocity / 4;
-			if (item->VerticalVelocity < 4)
-				item->VerticalVelocity = 4;
-			item->Position.yPos += item->VerticalVelocity;
+			if (item->Animation.VerticalVelocity > 128)
+				item->Animation.VerticalVelocity /= 2;
+			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 4;
+			if (item->Animation.VerticalVelocity < 4)
+				item->Animation.VerticalVelocity = 4;
+			item->Position.yPos += item->Animation.VerticalVelocity;
 		}
 		else
 		{
-			int velocity = (anim->velocity + anim->acceleration * (item->FrameNumber - anim->frameBase - 1));
-			item->Velocity -= velocity >> 16;
-			item->Velocity += (velocity + anim->acceleration) >> 16;
-			item->VerticalVelocity += (item->VerticalVelocity >= 128 ? 1 : GRAVITY);
-			item->Position.yPos += item->VerticalVelocity;
+			int velocity = (anim->velocity + anim->acceleration * (item->Animation.FrameNumber - anim->frameBase - 1));
+			item->Animation.Velocity -= velocity >> 16;
+			item->Animation.Velocity += (velocity + anim->acceleration) >> 16;
+			item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : GRAVITY);
+			item->Position.yPos += item->Animation.VerticalVelocity;
 		}
 	}
 	else
@@ -177,28 +177,28 @@ void AnimateLara(ITEM_INFO* item)
 		{
 			velocity = (anim->velocity >> 1);
 			if (anim->acceleration)
-				velocity += (anim->acceleration * (item->FrameNumber - anim->frameBase)) >> 2;
+				velocity += (anim->acceleration * (item->Animation.FrameNumber - anim->frameBase)) >> 2;
 		}
 		else
 		{
 			velocity = anim->velocity;
 			if (anim->acceleration)
-				velocity += anim->acceleration * (item->FrameNumber - anim->frameBase);
+				velocity += anim->acceleration * (item->Animation.FrameNumber - anim->frameBase);
 		}
 
-		item->Velocity = velocity >> 16;
+		item->Animation.Velocity = velocity >> 16;
 	}
 
 	// Apply extra velocity.
-	item->Velocity += lara->ExtraVelocity.x;
-	item->VerticalVelocity += lara->ExtraVelocity.y;
-	item->LateralVelocity += lara->ExtraVelocity.z; // TODO
+	item->Animation.Velocity += lara->ExtraVelocity.x;
+	item->Animation.VerticalVelocity += lara->ExtraVelocity.y;
+	item->Animation.LateralVelocity += lara->ExtraVelocity.z; // TODO
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		MoveItem(item, lara->Control.MoveAngle, item->Velocity, item->LateralVelocity);
+		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity, item->Animation.LateralVelocity);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);
@@ -209,19 +209,19 @@ void AnimateItem(ITEM_INFO* item)
 	item->TouchBits = 0;
 	item->HitStatus = false;
 
-	item->FrameNumber++;
+	item->Animation.FrameNumber++;
 
-	auto* anim = &g_Level.Anims[item->AnimNumber];
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	if (anim->numberChanges > 0 && GetChange(item, anim))
 	{
-		anim = &g_Level.Anims[item->AnimNumber];
+		anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-		item->ActiveState = anim->ActiveState;
-		if (item->RequiredState == item->ActiveState)
-			item->RequiredState = 0;
+		item->Animation.ActiveState = anim->ActiveState;
+		if (item->Animation.RequiredState == item->Animation.ActiveState)
+			item->Animation.RequiredState = 0;
 	}
 
-	if (item->FrameNumber > anim->frameEnd)
+	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
 		if (anim->numberCommands > 0)
 		{
@@ -236,9 +236,9 @@ void AnimateItem(ITEM_INFO* item)
 					break;
 
 				case COMMAND_JUMP_VELOCITY:
-					item->VerticalVelocity = *(cmd++);
-					item->Velocity = *(cmd++);
-					item->Airborne = true;
+					item->Animation.VerticalVelocity = *(cmd++);
+					item->Animation.Velocity = *(cmd++);
+					item->Animation.Airborne = true;
 					break;
 
 				case COMMAND_DEACTIVATE:
@@ -259,18 +259,18 @@ void AnimateItem(ITEM_INFO* item)
 			}
 		}
 
-		item->AnimNumber = anim->jumpAnimNum;
-		item->FrameNumber = anim->jumpFrameNum;
+		item->Animation.AnimNumber = anim->jumpAnimNum;
+		item->Animation.FrameNumber = anim->jumpFrameNum;
 
-		anim = &g_Level.Anims[item->AnimNumber];
-		if (item->ActiveState != anim->ActiveState)
+		anim = &g_Level.Anims[item->Animation.AnimNumber];
+		if (item->Animation.ActiveState != anim->ActiveState)
 		{
-			item->ActiveState = anim->ActiveState;
-			item->TargetState = anim->ActiveState;
+			item->Animation.ActiveState = anim->ActiveState;
+			item->Animation.TargetState = anim->ActiveState;
 		}
 
-		if (item->RequiredState == item->ActiveState)
-			item->RequiredState = 0;
+		if (item->Animation.RequiredState == item->Animation.ActiveState)
+			item->Animation.RequiredState = 0;
 	}
 
 	if (anim->numberCommands > 0)
@@ -292,7 +292,7 @@ void AnimateItem(ITEM_INFO* item)
 				break;
 
 			case COMMAND_SOUND_FX:
-				if (item->FrameNumber != *cmd)
+				if (item->Animation.FrameNumber != *cmd)
 				{
 					cmd += 2;
 					break;
@@ -329,7 +329,7 @@ void AnimateItem(ITEM_INFO* item)
 				break;
 
 			case COMMAND_EFFECT:
-				if (item->FrameNumber != *cmd)
+				if (item->Animation.FrameNumber != *cmd)
 				{
 					cmd += 2;
 					break;
@@ -349,27 +349,27 @@ void AnimateItem(ITEM_INFO* item)
 
 	int lateral = 0;
 
-	if (item->Airborne)
+	if (item->Animation.Airborne)
 	{
-		item->VerticalVelocity += (item->VerticalVelocity >= 128 ? 1 : 6);
-		item->Position.yPos += item->VerticalVelocity;
+		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : 6);
+		item->Position.yPos += item->Animation.VerticalVelocity;
 	}
 	else
 	{
 		int velocity = anim->velocity;
 		if (anim->acceleration)
-			velocity += anim->acceleration * (item->FrameNumber - anim->frameBase);
+			velocity += anim->acceleration * (item->Animation.FrameNumber - anim->frameBase);
 
-		item->Velocity = velocity >> 16;
+		item->Animation.Velocity = velocity >> 16;
 
 		lateral = anim->Xvelocity;
 		if (anim->Xacceleration)
-			lateral += anim->Xacceleration * (item->FrameNumber - anim->frameBase);
+			lateral += anim->Xacceleration * (item->Animation.FrameNumber - anim->frameBase);
 
 		lateral >>= 16;
 	}
 
-	MoveItem(item, item->Position.yRot, item->Velocity, lateral);
+	MoveItem(item, item->Position.yRot, item->Animation.Velocity, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -388,7 +388,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 
 bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 {
-	if (item->ActiveState == item->TargetState)
+	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
 	if (anim->numberChanges <= 0)
@@ -397,15 +397,15 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
 		auto* change = &g_Level.Changes[anim->changeIndex + i];
-		if (change->TargetState == item->TargetState)
+		if (change->TargetState == item->Animation.TargetState)
 		{
 			for (int j = 0; j < change->numberRanges; j++)
 			{
 				auto* range = &g_Level.Ranges[change->rangeIndex + j];
-				if (item->FrameNumber >= range->startFrame && item->FrameNumber <= range->endFrame)
+				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
 				{
-					item->AnimNumber = range->linkAnimNum;
-					item->FrameNumber = range->linkFrameNum;
+					item->Animation.AnimNumber = range->linkAnimNum;
+					item->Animation.FrameNumber = range->linkFrameNum;
 					return true;
 				}
 			}
@@ -451,8 +451,8 @@ ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
 
 int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 {
-	int frame = item->FrameNumber;
-	auto* anim = &g_Level.Anims[item->AnimNumber];
+	int frame = item->Animation.FrameNumber;
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
 	int rate2 = *rate = anim->interpolation & 0x00ff;
 	frame -= anim->frameBase; 
@@ -475,12 +475,12 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 
 int GetCurrentRelativeFrameNumber(ITEM_INFO* item)
 {
-	return item->FrameNumber - GetFrameNumber(item, 0);
+	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
 }
 
 int GetFrameNumber(ITEM_INFO* item, int frameToStart)
 {
-	return GetFrameNumber(item->ObjectNumber, item->AnimNumber, frameToStart);
+	return GetFrameNumber(item->ObjectNumber, item->Animation.AnimNumber, frameToStart);
 }
 
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)
@@ -500,7 +500,7 @@ int GetFrameCount(int animNumber)
 
 int GetNextAnimState(ITEM_INFO* item)
 {
-	return GetNextAnimState(item->ObjectNumber, item->AnimNumber);
+	return GetNextAnimState(item->ObjectNumber, item->Animation.AnimNumber);
 }
 
 int GetNextAnimState(int objectID, int animNumber)
@@ -519,25 +519,25 @@ void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
 		return;
 	}
 
-	if (item->AnimNumber == animIndex)
+	if (item->Animation.AnimNumber == animIndex)
 		return;
 
-	item->AnimNumber = index;
-	item->FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->ActiveState = g_Level.Anims[index].ActiveState;
-	item->TargetState = item->ActiveState;
+	item->Animation.AnimNumber = index;
+	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
+	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
+	item->Animation.TargetState = item->Animation.ActiveState;
 }
 
 bool TestLastFrame(ITEM_INFO* item, int animNumber)
 {
 	if (animNumber < 0)
-		animNumber = item->AnimNumber;
+		animNumber = item->Animation.AnimNumber;
 
-	if (item->AnimNumber != animNumber)
+	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
 	auto* anim = &g_Level.Anims[animNumber];
-	return (item->FrameNumber >= anim->frameEnd);
+	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
 void DrawAnimatingItem(ITEM_INFO* item)

@@ -26,11 +26,11 @@ void SharkControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 5)
+		if (item->Animation.ActiveState != 5)
 		{
-			item->AnimNumber = Objects[ID_SHARK].animIndex + 4;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 5;
+			item->Animation.AnimNumber = Objects[ID_SHARK].animIndex + 4;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 5;
 		}
 
 		CreatureFloat(itemNumber);
@@ -46,16 +46,16 @@ void SharkControl(short itemNumber)
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 0:
 			info->Flags = 0;
 			info->MaxTurn = 0;
 
 			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			break;
 
 		case 1:
@@ -64,9 +64,9 @@ void SharkControl(short itemNumber)
 			if (info->Mood == MoodType::Bored)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2))
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 			else if (info->Mood == MoodType::Escape || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 
@@ -75,15 +75,15 @@ void SharkControl(short itemNumber)
 			info->Flags = 0;
 
 			if (info->Mood == MoodType::Bored)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (info->Mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(1365, 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
 			{
 				if (GetRandomControl() < 0x800)
-					item->TargetState = 0;
+					item->Animation.TargetState = 0;
 				else if (aiInfo.distance < pow(SECTOR(0.75f), 2))
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 			}
 
 			break;
@@ -106,7 +106,7 @@ void SharkControl(short itemNumber)
 		}
 	}
 
-	if (item->ActiveState != 6)
+	if (item->Animation.ActiveState != 6)
 	{
 		CreatureJoint(item, 0, head);
 		CreatureAnimation(itemNumber, angle, 0);

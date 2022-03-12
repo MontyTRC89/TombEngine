@@ -310,7 +310,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 
 	short tempRoom = 0;
 
-	if (item->AnimNumber == LA_OVERHANG_LADDER_SLOPE_CONCAVE)
+	if (item->Animation.AnimNumber == LA_OVERHANG_LADDER_SLOPE_CONCAVE)
 		return;
 
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
@@ -320,7 +320,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	// Drop down if action not pressed
 	if (!(TrInput & IN_ACTION))
 	{
-		SetAnimation(item, item->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
+		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		return;
 	}
 
@@ -328,8 +328,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
 		auto* lara = GetLaraInfo(item);
-		lara->NextCornerPos.zRot = (item->AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
-		SetAnimation(item, item->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
+		lara->NextCornerPos.zRot = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
+		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
 
@@ -385,7 +385,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 				if (!testWall->IsWall((up.x - offset.x), (up.z - offset.z)) && (ceiling - testCeiling) > CLICK(0.5f)) // No wall or downwards ceiling step
 				{
 					TranslateItem(item, 0, -CLICK(1), -CLICK(1));
-					SetAnimation(item, item->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
+					SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
 					//item->TargetState = 62;
 				}
 			}
@@ -433,7 +433,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 			bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(5) / 2, -CLICK(3) / 2);
 			if (yDiff >= CLICK(3) / 4 && yDiff <= CLICK(5) / 4 && (SlopeCheck(slope, goal) || bridge1 >= 0))
 			{
-				SetAnimation(item, item->AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
+				SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
 				return;
 			}
 		}
@@ -459,7 +459,7 @@ void lara_as_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_slopefall(ITEM_INFO* item, COLL_INFO* coll)
 {
-	item->Airborne = true;
+	item->Animation.Airborne = true;
 
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -502,7 +502,7 @@ void lara_col_slopehang(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 	}
 
-	if (item->AnimNumber != LA_OVERHANG_HANG_SWING)
+	if (item->Animation.AnimNumber != LA_OVERHANG_HANG_SWING)
 	{
 		// Return to climbing mode
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
@@ -583,7 +583,7 @@ void lara_col_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yPos = ceiling + HEIGHT_ADJUST;
 
 	PHD_VECTOR shimmy = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	if (item->AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
+	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
 		shimmy.x -= offset.z / 2;
 		shimmy.z += offset.x / 2;
@@ -611,7 +611,7 @@ void lara_col_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 	}
 
 	if (cancelShimmy)
-		SetAnimation(item, (item->AnimNumber == LA_OVERHANG_SHIMMY_LEFT) ? LA_OVERHANG_SHIMMY_LEFT_STOP : LA_OVERHANG_SHIMMY_RIGHT_STOP);
+		SetAnimation(item, (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT) ? LA_OVERHANG_SHIMMY_LEFT_STOP : LA_OVERHANG_SHIMMY_RIGHT_STOP);
 }
 
 void lara_as_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
@@ -630,7 +630,7 @@ void lara_as_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto* lara = GetLaraInfo(item);
 
-	if (item->AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
+	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
 		lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 		Camera.targetAngle = -ANGLE(22.5f);
@@ -662,11 +662,11 @@ void lara_as_slopeclimbup(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION))
 	{
 		int frame = GetCurrentRelativeFrameNumber(item);
-		int length = GetFrameCount(item->AnimNumber);
+		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
 		TranslateItem(item, 0, dPos, dPos);
-		if (item->AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
+		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
 			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
 			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);
@@ -692,11 +692,11 @@ void lara_as_slopeclimbdown(ITEM_INFO* item, COLL_INFO* coll)
 	if (!(TrInput & IN_ACTION))
 	{
 		int frame = GetCurrentRelativeFrameNumber(item);
-		int length = GetFrameCount(item->AnimNumber);
+		int length = GetFrameCount(item->Animation.AnimNumber);
 		int dPos = frame * CLICK(1) / length;
 
 		TranslateItem(item, 0, dPos, dPos);
-		if (item->AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
+		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
 			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
 			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);
@@ -706,10 +706,10 @@ void lara_as_slopeclimbdown(ITEM_INFO* item, COLL_INFO* coll)
 void lara_as_sclimbstart(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// Rotating camera effect during monkey to overhead slope transition
-	if (item->AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
+	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
 	{
 		int frame = GetCurrentRelativeFrameNumber(item);
-		int numFrames = GetFrameCount(item->AnimNumber);
+		int numFrames = GetFrameCount(item->Animation.AnimNumber);
 
 		float frac = (frame * 1.5f) / (float)(numFrames);
 		if (frac > 1.0f)
@@ -723,7 +723,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, COLL_INFO* coll)
 			distance = 1024;
 		}
 
-		if (item->FrameNumber < g_Level.Anims[item->AnimNumber].frameEnd)
+		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			Camera.targetDistance = distance;
 			Camera.targetElevation = int(3072 * frac);
@@ -758,7 +758,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
 	// Rotating camera effect during monkey to overhead slope transition
 
 	// Following camera effect during the slope to underlying monkey transition
-	if (item->AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONVEX)
+	if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONVEX)
 	{
 		Camera.flags = 1;
 		Camera.targetDistance = 1664;
@@ -766,10 +766,10 @@ void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
 		Camera.targetspeed = 15;
 	}
 	// Rotating camera effect during concave slope to monkey transition
-	else if (item->AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
+	else if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
 	{
 		int frame = GetCurrentRelativeFrameNumber(item);
-		int numFrames = GetFrameCount(item->AnimNumber);
+		int numFrames = GetFrameCount(item->Animation.AnimNumber);
 
 		float frac = (frame * 1.25f) / (float)(numFrames);
 		if (frac > 1.0f)
@@ -777,7 +777,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
 
 		Camera.flags = 1;
 
-		if (item->FrameNumber < g_Level.Anims[item->AnimNumber].frameEnd)
+		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			
 			Camera.targetAngle = (short)(-16384 * frac);
@@ -807,7 +807,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
 
 void lara_as_sclimbend(ITEM_INFO* item, COLL_INFO* coll)
 {
-	switch (item->AnimNumber)
+	switch (item->Animation.AnimNumber)
 	{
 	case LA_OVERHANG_EXIT_MONKEY_FORWARD:
 		SetAnimation(item, LA_MONKEY_FORWARD);
@@ -853,7 +853,7 @@ void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
 	auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 	int ceilDist = item->Position.yPos - GetCeiling(floorNext, down.x, down.y, down.z);
 
-	if (item->TargetState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
+	if (item->Animation.TargetState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
 	{
 		if (ceilDist >= CLICK(1) && ceilDist < CLICK(2))
 		{
@@ -861,7 +861,7 @@ void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
 
 			if ((slope.x / 3) == (goal.x / 3) || (slope.y / 3) == (goal.y / 3))
 			{
-				item->TargetState = LS_HANG;
+				item->Animation.TargetState = LS_HANG;
 				if (TrInput & IN_FORWARD)
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
 				/*else if (TrInput & IN_BACK)
@@ -948,7 +948,7 @@ void SlopeClimbExtra(ITEM_INFO* item, COLL_INFO* coll)
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
 	// Block for ladder to overhead slope transition
-	if (item->AnimNumber == LA_LADDER_IDLE)
+	if (item->Animation.AnimNumber == LA_LADDER_IDLE)
 	{
 		if (TrInput & IN_FORWARD)
 		{
@@ -1013,7 +1013,7 @@ void LadderMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 		return;
 
 	if (result.BottomBlock->Flags.Monkeyswing && (item->Position.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
-		item->TargetState = LS_MONKEY_IDLE;
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 }
 
 // Extends state 61 (AS_CLIMBDOWN)
@@ -1037,7 +1037,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
-	if (item->AnimNumber == LA_LADDER_DOWN) // Make Lara stop before underlying slope ceiling at correct height
+	if (item->Animation.AnimNumber == LA_LADDER_DOWN) // Make Lara stop before underlying slope ceiling at correct height
 	{
 		if (TrInput & IN_BACK)
 		{
@@ -1057,7 +1057,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 				{
 					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(3), CLICK(4)); 
 					if (ceilDist < CLICK(1) && (bridge1 >= 0 || SlopeCheck(slope, goal)))
-						item->TargetState = LS_LADDER_IDLE;
+						item->Animation.TargetState = LS_LADDER_IDLE;
 				}
 				else if (GetFrameNumber(item, 0) == midpoint)
 				{
@@ -1065,7 +1065,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
 						item->Position.yPos += CLICK(1); // Do midpoint Y translation
-						item->TargetState = LS_LADDER_IDLE;
+						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}
 			}
@@ -1096,7 +1096,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
-	if (item->AnimNumber == LA_REACH_TO_MONKEY && !GetFrameNumber(item, 0)) // Manage proper grabbing of monkey slope on forward jump
+	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameNumber(item, 0)) // Manage proper grabbing of monkey slope on forward jump
 	{
 		int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 		int ceilDist = item->Position.yPos - ceiling;
@@ -1126,7 +1126,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_FORWARD) // Monkey to slope transitions
 	{
-		if (TestMonkey(floorNow, now.x, now.y, now.z) && ((item->AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->AnimNumber == LA_MONKEY_IDLE))
+		if (TestMonkey(floorNow, now.x, now.y, now.z) && ((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
 			if (abs(DirOrientDiff(goalOrient, item->Position.yRot)) <= ANGLE(30) &&
 				InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, 0, CLICK(1) / 2))
@@ -1182,10 +1182,10 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 
 				if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
 				{
-					if (item->TargetState != LS_LADDER_IDLE)
+					if (item->Animation.TargetState != LS_LADDER_IDLE)
 					{
 						SnapItemToLedge(item, coll);
-						item->TargetState = LS_LADDER_IDLE;
+						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}
 			}

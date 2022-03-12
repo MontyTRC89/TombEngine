@@ -38,11 +38,11 @@ void BirdMonsterControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 9)
+		if (item->Animation.ActiveState != 9)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 9;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 9;
 		}
 	}
 	else
@@ -57,7 +57,7 @@ void BirdMonsterControl(short itemNumber)
 		CreatureMood(item, &AI, VIOLENT);
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->MaxTurn = 0;
@@ -65,22 +65,22 @@ void BirdMonsterControl(short itemNumber)
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				else
-					item->TargetState = 10;
+					item->Animation.TargetState = 10;
 			}
 			else if (AI.ahead && (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk))
 			{
 				if (AI.zoneNumber != AI.enemyZone)
 				{
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 					creature->Mood = MoodType::Escape;
 				}
 				else
-					item->TargetState = 8;
+					item->Animation.TargetState = 8;
 			}
 			else
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			
 			break;
 
@@ -88,7 +88,7 @@ void BirdMonsterControl(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (creature->Mood != MoodType::Bored || !AI.ahead)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			
 			break;
 
@@ -96,9 +96,9 @@ void BirdMonsterControl(short itemNumber)
 			creature->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 			else if ((creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk) && AI.ahead)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			
 			break;
 
@@ -106,9 +106,9 @@ void BirdMonsterControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -116,9 +116,9 @@ void BirdMonsterControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -126,9 +126,9 @@ void BirdMonsterControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-				item->TargetState = 11;
+				item->Animation.TargetState = 11;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 

@@ -32,10 +32,10 @@ void InitialiseBrownBeast(short itemNumber)
 
 	ClearItem(itemNumber);
 	
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 1;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }
 
 void ControlBrowsBeast(short itemNumber)
@@ -51,11 +51,11 @@ void ControlBrowsBeast(short itemNumber)
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
-		if (item->ActiveState != 7)
+		if (item->Animation.ActiveState != 7)
 		{
-			item->AnimNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
-			item->ActiveState = 7;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
+			item->Animation.ActiveState = 7;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -87,7 +87,7 @@ void ControlBrowsBeast(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		creature->MaxTurn = ANGLE(7.0f);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->Flags = 0;
@@ -96,24 +96,24 @@ void ControlBrowsBeast(short itemNumber)
 				if (distance <= pow(SECTOR(1), 2))
 				{
 					if (GetRandomControl() & 1)
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 					else
-						item->TargetState = 6;
+						item->Animation.TargetState = 6;
 				}
 				else if (GetRandomControl() & 1)
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 				else
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			
 			break;
 
 		case 2:
 		case 3:
 			if (distance < pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Position, 0);
 			break;
@@ -137,10 +137,10 @@ void ControlBrowsBeast(short itemNumber)
 
 			if (item->TouchBits & 0x3C000)
 			{
-				if (item->AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 19 &&
-						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 25)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
 					{
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Position.yRot, DoBloodSplat);
 						creature->Flags |= 1;
@@ -151,10 +151,10 @@ void ControlBrowsBeast(short itemNumber)
 					}
 				}
 
-				if (item->AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 6 &&
-						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 16)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 					{
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Position.yRot, DoBloodSplat);
 						creature->Flags |= 1;
@@ -169,10 +169,10 @@ void ControlBrowsBeast(short itemNumber)
 			if (!(item->TouchBits & 0xF00000))
 				break;
 
-			if (item->AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+			if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
 			{
-				if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 13 &&
-					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 20)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Position.yRot, DoBloodSplat);
 					creature->Flags |= 2;
@@ -183,10 +183,10 @@ void ControlBrowsBeast(short itemNumber)
 				}
 			}
 
-			if (item->AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+			if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
 			{
-				if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 33 &&
-					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 43)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
 				{
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Position.yRot, DoBloodSplat);
 					creature->Flags |= 2;

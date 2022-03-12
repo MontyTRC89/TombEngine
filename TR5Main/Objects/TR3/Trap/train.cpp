@@ -107,15 +107,15 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	SoundEffect(SFX_TR3_LARA_FALLDETH, &laraItem->Position, SFX_ALWAYS);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
-	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
 	laraItem->HitPoints = 0;
 	laraItem->Position.yRot = trainItem->Position.yRot;
-	laraItem->Velocity = 0;
-	laraItem->VerticalVelocity = 0;
-	laraItem->Airborne = false;
+	laraItem->Animation.Velocity = 0;
+	laraItem->Animation.VerticalVelocity = 0;
+	laraItem->Animation.Airborne = false;
 
 	AnimateItem(laraItem);
 

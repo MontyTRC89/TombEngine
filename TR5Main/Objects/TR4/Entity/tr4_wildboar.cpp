@@ -19,10 +19,10 @@ void InitialiseWildBoar(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 1;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }
 
 void WildBoarControl(short itemNumber)
@@ -98,20 +98,20 @@ void WildBoarControl(short itemNumber)
 			joint3 = AI.angle / 2;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->MaxTurn = 0;
 
 			if (AI.ahead && AI.distance || item->Flags)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (GetRandomControl() & 0x7F)
 			{
 				joint1 = AIGuard(creature) / 2;
 				joint3 = joint1;
 			}
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -119,9 +119,9 @@ void WildBoarControl(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.ahead && AI.distance)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (!(GetRandomControl() & 0x7F))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			
 			break;
 
@@ -140,7 +140,7 @@ void WildBoarControl(short itemNumber)
 
 			if (!item->Flags && (AI.distance < 0x10000 && AI.bite))
 			{
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 
 				if (creature->Enemy == LaraItem)
 				{
@@ -163,11 +163,11 @@ void WildBoarControl(short itemNumber)
 	{
 		item->HitPoints = 0;
 
-		if (item->ActiveState != 5)
+		if (item->Animation.ActiveState != 5)
 		{
-			item->AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
-			item->ActiveState = 5;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
+			item->Animation.ActiveState = 5;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 

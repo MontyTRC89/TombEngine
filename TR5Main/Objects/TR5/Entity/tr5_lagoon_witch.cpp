@@ -33,10 +33,10 @@ void InitialiseLagoonWitch(short itemNumber)
 	
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->TargetState = WITCH_STATE_IDLE;
-	item->ActiveState = WITCH_STATE_IDLE;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->Animation.TargetState = WITCH_STATE_IDLE;
+	item->Animation.ActiveState = WITCH_STATE_IDLE;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Position.yPos += 512;
 }
 
@@ -56,12 +56,12 @@ void LagoonWitchControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != WITCH_STATE_DEATH)
+		if (item->Animation.ActiveState != WITCH_STATE_DEATH)
 		{
 			item->HitPoints = 0;
-			item->ActiveState = WITCH_STATE_DEATH;
-			item->AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.ActiveState = WITCH_STATE_DEATH;
+			item->Animation.AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -97,13 +97,13 @@ void LagoonWitchControl(short itemNumber)
 
 		creature->MaxTurn = 0;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case WITCH_STATE_SWIM:
 			creature->MaxTurn = ANGLE(4.0f);
 
 			if (AI.distance < pow(SECTOR(1), 2))
-				item->TargetState = WITCH_STATE_IDLE;
+				item->Animation.TargetState = WITCH_STATE_IDLE;
 
 			break;
 
@@ -112,11 +112,11 @@ void LagoonWitchControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.distance < pow(CLICK(3), 2))
-				item->TargetState = WITCH_STATE_ATTACK;
+				item->Animation.TargetState = WITCH_STATE_ATTACK;
 			else if (AI.distance > pow(SECTOR(1), 2))
-				item->TargetState = WITCH_STATE_SWIM;
+				item->Animation.TargetState = WITCH_STATE_SWIM;
 			else
-				item->TargetState = WITCH_STATE_IDLE;
+				item->Animation.TargetState = WITCH_STATE_IDLE;
 
 			break;
 
@@ -125,7 +125,7 @@ void LagoonWitchControl(short itemNumber)
 
 			if (!creature->Flags &&
 				item->TouchBits & 0x3C3C0 &&
-				item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 29)
+				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 			{
 				CreatureEffect2(item, &LagoonWitchBite, 10, item->Position.yRot, DoBloodSplat);
 				creature->Flags = WITCH_STATE_SWIM;

@@ -229,10 +229,10 @@ namespace TEN::Entities::TR4
 	
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_IDLE;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_STOP;
-			item->ActiveState = STATE_BADDY_STOP;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_IDLE;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_STOP;
+			item->Animation.ActiveState = STATE_BADDY_STOP;
 
 			return;
 		}
@@ -240,10 +240,10 @@ namespace TEN::Entities::TR4
 		// OCB: jump right
 		if (ocb == 1)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_RIGHT;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_JUMP_RIGHT;
-			item->ActiveState = STATE_BADDY_JUMP_RIGHT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_RIGHT;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_JUMP_RIGHT;
+			item->Animation.ActiveState = STATE_BADDY_JUMP_RIGHT;
 
 			return;
 		}
@@ -251,10 +251,10 @@ namespace TEN::Entities::TR4
 		// OCB: jump left
 		if (ocb == 2)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_ROLL_LEFT;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_ROLL_LEFT;
-			item->ActiveState = STATE_BADDY_ROLL_LEFT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_ROLL_LEFT;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_ROLL_LEFT;
+			item->Animation.ActiveState = STATE_BADDY_ROLL_LEFT;
 
 			return;
 		}
@@ -262,10 +262,10 @@ namespace TEN::Entities::TR4
 		// OCB: crouch
 		if (ocb == 3)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_CROUCH;
-			item->ActiveState = STATE_BADDY_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_CROUCH;
+			item->Animation.ActiveState = STATE_BADDY_CROUCH;
 
 			return;
 		}
@@ -273,10 +273,10 @@ namespace TEN::Entities::TR4
 		// OCB: climb up 4 or 6 clicks 
 		if (ocb == 4)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_CLIMB_4_CLICKS;
-			item->ActiveState = STATE_BADDY_CLIMB_4_CLICKS;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_CLIMB_4_CLICKS;
+			item->Animation.ActiveState = STATE_BADDY_CLIMB_4_CLICKS;
 			item->Position.xPos += phd_sin(item->Position.yRot) * (STEP_SIZE * 4);
 			item->Position.zPos += phd_cos(item->Position.yRot) * (STEP_SIZE * 4);
 
@@ -286,10 +286,10 @@ namespace TEN::Entities::TR4
 		// OCB: crouch and jump in train levels?
 		if (ocb > 100)
 		{
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = STATE_BADDY_CROUCH;
-			item->ActiveState = STATE_BADDY_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CROUCH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = STATE_BADDY_CROUCH;
+			item->Animation.ActiveState = STATE_BADDY_CROUCH;
 			item->Position.xPos += phd_sin(item->Position.yRot) * (STEP_SIZE * 4);
 			item->Position.zPos += phd_cos(item->Position.yRot) * (STEP_SIZE * 4);
 			item->ItemFlags[3] = ocb;
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 			return;
 		}
 	
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void BaddyControl(short itemNum)
@@ -439,32 +439,32 @@ namespace TEN::Entities::TR4
 			height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 			item->Floor = height;
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case STATE_BADDY_DEATH:
-				item->Airborne = true;
+				item->Animation.Airborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 				if (item->Position.yPos >= item->Floor)
 				{
 					item->Position.yPos = item->Floor;
-					item->VerticalVelocity = 0;
-					item->Airborne = false;
+					item->Animation.VerticalVelocity = 0;
+					item->Animation.Airborne = false;
 				}
 				break;
 
 			case STATE_BADDY_MONKEY_TO_FREEFALL:
-				item->TargetState = STATE_BADDY_FREEFALL;
-				item->Airborne = false;
+				item->Animation.TargetState = STATE_BADDY_FREEFALL;
+				item->Animation.Airborne = false;
 				break;
 
 			case STATE_BADDY_FREEFALL:
-				item->Airborne = true;
+				item->Animation.Airborne = true;
 				if (item->Position.yPos >= item->Floor)
 				{
 					item->Position.yPos = item->Floor;
-					item->VerticalVelocity = 0;
-					item->Airborne = false;
-					item->TargetState = STATE_BADDY_FREEFALL_LAND_DEATH;
+					item->Animation.VerticalVelocity = 0;
+					item->Animation.Airborne = false;
+					item->Animation.TargetState = STATE_BADDY_FREEFALL_LAND_DEATH;
 				}
 				break;
 
@@ -475,17 +475,17 @@ namespace TEN::Entities::TR4
 			case STATE_BADDY_MONKEY_GRAB:
 			case STATE_BADDY_MONKEY_IDLE:
 			case STATE_BADDY_MONKEY_FORWARD:
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_MONKEY_TO_FREEFALL;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->ActiveState = STATE_BADDY_MONKEY_TO_FREEFALL;
-				item->Velocity = 0;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_MONKEY_TO_FREEFALL;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = STATE_BADDY_MONKEY_TO_FREEFALL;
+				item->Animation.Velocity = 0;
 				break;
 
 			default:
 				currentCreature->LOT.IsJumping = true;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->ActiveState = STATE_BADDY_DEATH;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = STATE_BADDY_DEATH;
 
 				// OCB: respawn code for BADDY_1
 				if (item->TriggerFlags > 999)
@@ -643,7 +643,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case STATE_BADDY_STOP:
 				currentCreature->LOT.IsMonkeying = false;
@@ -660,7 +660,7 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & GUARD)
 				{
 					joint3 = AIGuard(currentCreature);
-					item->TargetState = 0;
+					item->Animation.TargetState = 0;
 					break;
 				}
 
@@ -669,7 +669,7 @@ namespace TEN::Entities::TR4
 					&& laraInfo.ahead
 					&& laraInfo.distance > SQUARE(682))
 				{
-					item->TargetState = STATE_BADDY_DODGE_START;
+					item->Animation.TargetState = STATE_BADDY_DODGE_START;
 					break;
 				}
 
@@ -677,23 +677,23 @@ namespace TEN::Entities::TR4
 				{
 					if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 					{
-						item->TargetState = STATE_BADDY_AIM;
+						item->Animation.TargetState = STATE_BADDY_AIM;
 						break;
 					}
 
 					if (item->SwapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_SIMPLE && item->SwapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_NINJA)
 					{
-						item->TargetState = STATE_BADDY_DRAW_GUN;
+						item->Animation.TargetState = STATE_BADDY_DRAW_GUN;
 						break;
 					}
 
-					item->TargetState = STATE_BADDY_HOLSTER_SWORD;
+					item->Animation.TargetState = STATE_BADDY_HOLSTER_SWORD;
 					break;
 				}
 
 				if (item->AIBits & MODIFY)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					if (item->Floor > item->Position.yPos + (STEP_SIZE * 3))
 						item->AIBits &= ~MODIFY;
 					break;
@@ -702,15 +702,15 @@ namespace TEN::Entities::TR4
 				if (canJump1sector || canJump2sectors)
 				{
 					currentCreature->MaxTurn = 0;
-					item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-					item->ActiveState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
+					item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.ActiveState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
 					currentCreature->LOT.IsJumping = true;
 
 					if (!canJump2sectors)
-						item->TargetState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
+						item->Animation.TargetState = STATE_BADDY_JUMP_FORWARD_1_BLOCK;
 					else
-						item->TargetState = STATE_BADDY_JUMP_FORWARD_2_BLOCKS;
+						item->Animation.TargetState = STATE_BADDY_JUMP_FORWARD_2_BLOCKS;
 					break;
 				}
 
@@ -720,15 +720,15 @@ namespace TEN::Entities::TR4
 					if ((objNum == ID_SMALLMEDI_ITEM || objNum == ID_UZI_AMMO_ITEM || objNum == ID_BIGMEDI_ITEM) 
 						&& info.distance < SQUARE(512))
 					{
-						item->TargetState = STATE_BADDY_STAND_TO_CROUCH;
-						item->RequiredState = STATE_BADDY_CROUCH_PICKUP;
+						item->Animation.TargetState = STATE_BADDY_STAND_TO_CROUCH;
+						item->Animation.RequiredState = STATE_BADDY_CROUCH_PICKUP;
 						break;
 					}
 				}
 
 				if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_GUN && item->ItemFlags[2] < 1)
 				{
-					item->TargetState = STATE_BADDY_HOLSTER_GUN;
+					item->Animation.TargetState = STATE_BADDY_HOLSTER_GUN;
 					break;
 				}
 
@@ -740,16 +740,16 @@ namespace TEN::Entities::TR4
 					{
 						if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_EMPTY)
 						{
-							item->TargetState = STATE_BADDY_MONKEY_GRAB;
+							item->Animation.TargetState = STATE_BADDY_MONKEY_GRAB;
 							break;
 						}
 						if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 						{
-							item->TargetState = STATE_BADDY_HOLSTER_GUN;
+							item->Animation.TargetState = STATE_BADDY_HOLSTER_GUN;
 							break;
 						}
 
-						item->TargetState = STATE_BADDY_HOLSTER_SWORD;
+						item->Animation.TargetState = STATE_BADDY_HOLSTER_SWORD;
 						break;
 					}
 				}
@@ -758,43 +758,43 @@ namespace TEN::Entities::TR4
 					if (roll)
 					{
 						currentCreature->MaxTurn = 0;
-						item->TargetState = STATE_BADDY_ROLL_LEFT;
+						item->Animation.TargetState = STATE_BADDY_ROLL_LEFT;
 						break;
 					}
 					if (jump)
 					{
 						currentCreature->MaxTurn = 0;
-						item->TargetState = STATE_BADDY_JUMP_RIGHT;
+						item->Animation.TargetState = STATE_BADDY_JUMP_RIGHT;
 						break;
 					}
 					if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_EMPTY)
 					{
-						item->TargetState = STATE_BADDY_DRAW_SWORD;
+						item->Animation.TargetState = STATE_BADDY_DRAW_SWORD;
 						break;
 					}
 					if (currentCreature->Enemy && currentCreature->Enemy->HitPoints > 0 && info.distance < SQUARE(682))
 					{
 						if (item->SwapMeshFlags == SWAPMESHFLAGS_BADDY_GUN)
 						{
-							item->TargetState = STATE_BADDY_HOLSTER_GUN;
+							item->Animation.TargetState = STATE_BADDY_HOLSTER_GUN;
 						}
 						else if (info.distance >= SQUARE(512))
 						{
-							item->TargetState = STATE_BADDY_SWORD_HIT_FRONT;
+							item->Animation.TargetState = STATE_BADDY_SWORD_HIT_FRONT;
 						}
 						else if (GetRandomControl() & 1)
 						{
-							item->TargetState = STATE_BADDY_SWORD_HIT_LEFT;
+							item->Animation.TargetState = STATE_BADDY_SWORD_HIT_LEFT;
 						}
 						else
 						{
-							item->TargetState = STATE_BADDY_SWORD_HIT_RIGHT;
+							item->Animation.TargetState = STATE_BADDY_SWORD_HIT_RIGHT;
 						}
 						break;
 					}
 				}
 
-				item->TargetState = STATE_BADDY_WALK;
+				item->Animation.TargetState = STATE_BADDY_WALK;
 				break;
 
 			case STATE_BADDY_WALK:
@@ -813,18 +813,18 @@ namespace TEN::Entities::TR4
 				}
 				if (Targetable(item, &info) && item->ItemFlags[2] > 0)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
 				if (canJump1sector || canJump2sectors)
 				{
 					currentCreature->MaxTurn = 0;
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
 				if (currentCreature->ReachedGoal && currentCreature->MonkeySwingAhead)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
 
@@ -832,38 +832,38 @@ namespace TEN::Entities::TR4
 				{
 					if (item->SwapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_SIMPLE && item->SwapMeshFlags != SWAPMESHFLAGS_BADDY_SWORD_NINJA)
 					{
-						item->TargetState = STATE_BADDY_STOP;
+						item->Animation.TargetState = STATE_BADDY_STOP;
 						break;
 					}
 				}
 				if (info.ahead && info.distance < 0x40000)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
 				if (info.bite)
 				{
 					if (info.distance < SQUARE(482))
 					{
-						item->TargetState = STATE_BADDY_STOP;
+						item->Animation.TargetState = STATE_BADDY_STOP;
 						break;
 					}
 					if (info.distance < SQUARE(1024))
 					{
-						item->TargetState = STATE_BADDY_WALK_SWORD_HIT_RIGHT;
+						item->Animation.TargetState = STATE_BADDY_WALK_SWORD_HIT_RIGHT;
 						break;
 					}
 				}
 				if (roll || jump)
 				{
-					item->ActiveState = STATE_BADDY_STOP;
+					item->Animation.ActiveState = STATE_BADDY_STOP;
 					break;
 				}
 				if (currentCreature->Mood == MoodType::Attack &&
 					!(currentCreature->JumpAhead) &&
 					info.distance > SQUARE(1024))
 				{
-					item->TargetState = STATE_BADDY_RUN;
+					item->Animation.TargetState = STATE_BADDY_RUN;
 				}
 				break;
 
@@ -875,14 +875,14 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = ANGLE(11);
 				tilt = abs(angle) / 2;
 				if (objectNumber == ID_BADDY2
-					&& item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT
+					&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT
 					&& height3 == height1
 					&& abs(height1 - item->Position.yPos) < STEP_SIZE * 1.5f
 					&& (info.angle > -ANGLE(22.5f) && info.angle < ANGLE(22.5f) &&
 						info.distance < SQUARE(3072)
 						|| height2 >= height1 + 512))
 				{
-					item->TargetState = STATE_BADDY_SOMERSAULT;
+					item->Animation.TargetState = STATE_BADDY_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
 					break;
 				}
@@ -895,12 +895,12 @@ namespace TEN::Entities::TR4
 					|| info.distance < SQUARE(614)
 					|| currentCreature->JumpAhead)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
 				if (info.distance < SQUARE(1024))
 				{
-					item->TargetState = STATE_BADDY_WALK;
+					item->Animation.TargetState = STATE_BADDY_WALK;
 					break;
 				}
 				break;
@@ -909,10 +909,10 @@ namespace TEN::Entities::TR4
 			case STATE_BADDY_SWORD_HIT_FRONT:
 			case STATE_BADDY_SWORD_HIT_LEFT:
 			case STATE_BADDY_WALK_SWORD_HIT_RIGHT:
-				if (item->ActiveState == STATE_BADDY_SWORD_HIT_RIGHT &&
+				if (item->Animation.ActiveState == STATE_BADDY_SWORD_HIT_RIGHT &&
 					info.distance < 0x40000)
 				{
-					item->TargetState = STATE_BADDY_SWORD_HIT_LEFT;
+					item->Animation.TargetState = STATE_BADDY_SWORD_HIT_LEFT;
 				}
 				if (info.ahead)
 				{
@@ -920,8 +920,8 @@ namespace TEN::Entities::TR4
 					joint2 = info.xAngle;
 				}
 				currentCreature->MaxTurn = 0;
-				if (item->ActiveState != STATE_BADDY_SWORD_HIT_FRONT ||
-					item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
+				if (item->Animation.ActiveState != STATE_BADDY_SWORD_HIT_FRONT ||
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(info.angle) >= ANGLE(7))
 					{
@@ -943,8 +943,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x1C000)
 					{
-						if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
-							item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 						{
 							LaraItem->HitPoints -= 120;
 							LaraItem->HitStatus = true;
@@ -958,7 +958,7 @@ namespace TEN::Entities::TR4
 						}
 					}
 				}
-				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd - 1)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 				{
 					currentCreature->Flags = 0;
 				}
@@ -975,25 +975,25 @@ namespace TEN::Entities::TR4
 
 				if (laraInfo.ahead
 					&& laraInfo.distance < SQUARE(682)
-					&& (LaraItem->ActiveState == LS_MONKEY_IDLE
-						|| LaraItem->ActiveState == LS_MONKEY_FORWARD
-						|| LaraItem->ActiveState == LS_MONKEY_SHIMMY_LEFT
-						|| LaraItem->ActiveState == LS_MONKEY_SHIMMY_RIGHT
-						|| LaraItem->ActiveState == LS_MONKEY_TURN_180
-						|| LaraItem->ActiveState == LS_MONKEY_TURN_LEFT
-						|| LaraItem->ActiveState == LS_MONKEY_TURN_RIGHT))
+					&& (LaraItem->Animation.ActiveState == LS_MONKEY_IDLE
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_FORWARD
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_SHIMMY_LEFT
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_SHIMMY_RIGHT
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_180
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT
+						|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				{
-					item->TargetState = STATE_BADDY_MONKEY_PUSH_OFF;
+					item->Animation.TargetState = STATE_BADDY_MONKEY_PUSH_OFF;
 				}
 				else if (item->BoxNumber != currentCreature->LOT.TargetBox
 					&& currentCreature->MonkeySwingAhead
 					|| GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) != height - (STEP_SIZE * 6))
 				{
-					item->TargetState = STATE_BADDY_MONKEY_FORWARD;
+					item->Animation.TargetState = STATE_BADDY_MONKEY_FORWARD;
 				}
 				else
 				{
-					item->TargetState = STATE_BADDY_MONKEY_FALL_LAND;
+					item->Animation.TargetState = STATE_BADDY_MONKEY_FALL_LAND;
 					currentCreature->LOT.IsMonkeying = false;
 					currentCreature->LOT.IsJumping = false;
 				}
@@ -1013,7 +1013,7 @@ namespace TEN::Entities::TR4
 					height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 					if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - (STEP_SIZE * 6))
 					{
-						item->TargetState = STATE_BADDY_MONKEY_IDLE;
+						item->Animation.TargetState = STATE_BADDY_MONKEY_IDLE;
 					}
 				}
 				if (laraInfo.ahead)
@@ -1021,15 +1021,15 @@ namespace TEN::Entities::TR4
 					if (laraInfo.distance < SQUARE(682))
 					{
 
-						if (LaraItem->ActiveState == LS_MONKEY_IDLE
-							|| LaraItem->ActiveState == LS_MONKEY_FORWARD
-							|| LaraItem->ActiveState == LS_MONKEY_SHIMMY_LEFT
-							|| LaraItem->ActiveState == LS_MONKEY_SHIMMY_RIGHT
-							|| LaraItem->ActiveState == LS_MONKEY_TURN_180
-							|| LaraItem->ActiveState == LS_MONKEY_TURN_LEFT
-							|| LaraItem->ActiveState == LS_MONKEY_TURN_RIGHT)
+						if (LaraItem->Animation.ActiveState == LS_MONKEY_IDLE
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_FORWARD
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_SHIMMY_LEFT
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_SHIMMY_RIGHT
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_180
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT
+							|| LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT)
 						{
-							item->TargetState = STATE_BADDY_MONKEY_IDLE;
+							item->Animation.TargetState = STATE_BADDY_MONKEY_IDLE;
 						}
 					}
 				}
@@ -1041,13 +1041,13 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits)
 					{
-						LaraItem->ActiveState = LS_JUMP_UP;
-						LaraItem->TargetState = LS_JUMP_UP;
-						LaraItem->AnimNumber = LA_JUMP_UP;
-						LaraItem->FrameNumber = g_Level.Anims[LaraItem->FrameNumber].frameBase + 9;
-						LaraItem->Airborne = true;
-						LaraItem->VerticalVelocity = 2;
-						LaraItem->VerticalVelocity = 1;
+						LaraItem->Animation.ActiveState = LS_JUMP_UP;
+						LaraItem->Animation.TargetState = LS_JUMP_UP;
+						LaraItem->Animation.AnimNumber = LA_JUMP_UP;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.FrameNumber].frameBase + 9;
+						LaraItem->Animation.Airborne = true;
+						LaraItem->Animation.VerticalVelocity = 2;
+						LaraItem->Animation.VerticalVelocity = 1;
 						LaraItem->Position.yPos += (STEP_SIZE * 0.75f);
 						Lara.Control.HandStatus = HandStatus::Free;
 						currentCreature->Flags = 1;
@@ -1072,13 +1072,13 @@ namespace TEN::Entities::TR4
 							|| currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM) 
 							&& info.distance < SQUARE(512))
 						{
-							item->TargetState = STATE_BADDY_CROUCH_PICKUP;
+							item->Animation.TargetState = STATE_BADDY_CROUCH_PICKUP;
 							break;
 						}
 					}
 					if (currentCreature->Alerted)
 					{
-						item->TargetState = STATE_BADDY_CROUCH_TO_STAND;
+						item->Animation.TargetState = STATE_BADDY_CROUCH_TO_STAND;
 					}
 				}
 				else
@@ -1087,14 +1087,14 @@ namespace TEN::Entities::TR4
 					{
 						break;
 					}
-					item->TargetState = STATE_BADDY_CROUCH_TO_STAND;
+					item->Animation.TargetState = STATE_BADDY_CROUCH_TO_STAND;
 					currentCreature->Enemy = NULL;
 				}
 				break;
 
 			case STATE_BADDY_CROUCH_PICKUP:
 				ClampRotation(&item->Position, info.angle, ANGLE(11));
-				if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 				{
 					break;
 				}
@@ -1158,10 +1158,10 @@ namespace TEN::Entities::TR4
 				if (!Targetable(item, &info)
 					|| item->ItemFlags[2] < 1)
 				{
-					item->TargetState = STATE_BADDY_STOP;
+					item->Animation.TargetState = STATE_BADDY_STOP;
 					break;
 				}
-				item->TargetState = STATE_BADDY_FIRE;
+				item->Animation.TargetState = STATE_BADDY_FIRE;
 				break;
 
 			case STATE_BADDY_FIRE:
@@ -1171,8 +1171,8 @@ namespace TEN::Entities::TR4
 					joint2 = info.xAngle;
 				}
 				ClampRotation(&item->Position, info.angle, ANGLE(7));
-				if (item->FrameNumber >= g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
-					item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
+				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
 				{
 					break;
 				}
@@ -1182,35 +1182,35 @@ namespace TEN::Entities::TR4
 					item->ItemFlags[2]--;
 				}
 				if (!ShotLara(item, &info, &baddyGun, joint1, 15));
-				item->TargetState = STATE_BADDY_STOP;
+				item->Animation.TargetState = STATE_BADDY_STOP;
 				break;
 
 			default:
 				break;
 
 			case STATE_BADDY_HOLSTER_GUN:
-				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
 				{
 					item->SwapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 				}
 				break;
 
 			case STATE_BADDY_DRAW_GUN:
-				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_DRAW_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_GUN)
 				{
 					item->SwapMeshFlags = SWAPMESHFLAGS_BADDY_GUN;
 				}
 				break;
 
 			case STATE_BADDY_HOLSTER_SWORD:
-				if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
 				{
 					item->SwapMeshFlags = SWAPMESHFLAGS_BADDY_EMPTY;
 				}
 				break;
 
 			case STATE_BADDY_DRAW_SWORD:
-				if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
 				{
 					break;
 				}
@@ -1230,7 +1230,7 @@ namespace TEN::Entities::TR4
 				if (laraInfo.distance < SQUARE(682) ||
 					item != Lara.TargetEntity)
 				{
-					item->TargetState = STATE_BADDY_UNKNOWN_9;
+					item->Animation.TargetState = STATE_BADDY_UNKNOWN_9;
 				}
 				break;
 
@@ -1239,18 +1239,18 @@ namespace TEN::Entities::TR4
 				{
 					if ((GetRandomControl() & 0x7F) == 0)
 					{
-						item->TargetState = STATE_BADDY_STOP;
+						item->Animation.TargetState = STATE_BADDY_STOP;
 					}
 				}
 				break;
 
 			case STATE_BADDY_SOMERSAULT:
-				if (item->AnimNumber == Objects[objectNumber].animIndex + ANIMATION_BADDY_SOMERSAULT_END)
+				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + ANIMATION_BADDY_SOMERSAULT_END)
 				{
 					ClampRotation(&item->Position, info.angle, ANGLE(7));
 					break;
 				}
-				if (item->FrameNumber != g_Level.Anims[item->AnimNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
 				{
 					break;
 				}
@@ -1263,7 +1263,7 @@ namespace TEN::Entities::TR4
 				{
 					break;
 				}
-				if (item->AnimNumber != Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD)
+				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + ANIMATION_BADDY_STAND_TO_JUMP_FORWARD)
 				{
 					item->ItemFlags[0] += 2;
 				}
@@ -1276,12 +1276,12 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 1, joint2);
 		CreatureJoint(item, 2, joint3);
 
-		if (item->ActiveState >= STATE_BADDY_JUMP_FORWARD_2_BLOCKS ||
-			item->ActiveState == STATE_BADDY_JUMP_FORWARD_1_BLOCK ||
-			item->ActiveState == STATE_BADDY_MONKEY_FORWARD ||
-			item->ActiveState == STATE_BADDY_DEATH ||
-			item->ActiveState == STATE_BADDY_SOMERSAULT ||
-			item->ActiveState == STATE_BADDY_BLIND)
+		if (item->Animation.ActiveState >= STATE_BADDY_JUMP_FORWARD_2_BLOCKS ||
+			item->Animation.ActiveState == STATE_BADDY_JUMP_FORWARD_1_BLOCK ||
+			item->Animation.ActiveState == STATE_BADDY_MONKEY_FORWARD ||
+			item->Animation.ActiveState == STATE_BADDY_DEATH ||
+			item->Animation.ActiveState == STATE_BADDY_SOMERSAULT ||
+			item->Animation.ActiveState == STATE_BADDY_BLIND)
 		{
 			CreatureAnimation(itemNum, angle, 0);
 		}
@@ -1293,37 +1293,37 @@ namespace TEN::Entities::TR4
 			{
 			case 2:
 				creature->MaxTurn = 0;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_2_CLICKS;
-				item->ActiveState = STATE_BADDY_CLIMB_2_CLICKS;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_2_CLICKS;
+				item->Animation.ActiveState = STATE_BADDY_CLIMB_2_CLICKS;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				break;
 
 			case 3:
 				creature->MaxTurn = 0;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_3_CLICKS;
-				item->ActiveState = STATE_BADDY_CLIMB_3_CLICKS;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_3_CLICKS;
+				item->Animation.ActiveState = STATE_BADDY_CLIMB_3_CLICKS;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				break;
 
 			case 4:
 				creature->MaxTurn = 0;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
-				item->ActiveState = STATE_BADDY_CLIMB_4_CLICKS;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_CLIMB_4_CLICKS;
+				item->Animation.ActiveState = STATE_BADDY_CLIMB_4_CLICKS;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				break;
 
 			case -3:
 				creature->MaxTurn = 0;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_3_CLICKS;
-				item->ActiveState = STATE_BADDY_JUMP_OFF_3_CLICKS;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_3_CLICKS;
+				item->Animation.ActiveState = STATE_BADDY_JUMP_OFF_3_CLICKS;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				break;
 
 			case -4:
 				creature->MaxTurn = 0;
-				item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_4_CLICKS;
-				item->ActiveState = STATE_BADDY_JUMP_OFF_4_CLICKS;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_JUMP_OFF_4_CLICKS;
+				item->Animation.ActiveState = STATE_BADDY_JUMP_OFF_4_CLICKS;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				break;
 
 			default:
@@ -1333,9 +1333,9 @@ namespace TEN::Entities::TR4
 		else
 		{
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_BLIND;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase + (GetRandomControl() & 7);
-			item->ActiveState = STATE_BADDY_BLIND;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + ANIMATION_BADDY_BLIND;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
+			item->Animation.ActiveState = STATE_BADDY_BLIND;
 		}
 
 		return;

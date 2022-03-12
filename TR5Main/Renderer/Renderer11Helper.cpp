@@ -157,11 +157,11 @@ namespace TEN::Renderer
 		{
 			ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
-			if (nativeItem->Mutator.size() == boneIndexList.size())
+			if (nativeItem->Animation.Mutator.size() == boneIndexList.size())
 			{
 				for (int i : boneIndexList)
 				{
-					auto mutator = nativeItem->Mutator[i];
+					auto mutator = nativeItem->Animation.Mutator[i];
 					if (mutator.IsEmpty())
 						continue;
 

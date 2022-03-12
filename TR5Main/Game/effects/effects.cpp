@@ -1254,13 +1254,13 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	if (item->Position.yPos + frame->boundingBox.Y2 < wh)
 		return;
 
-	if (item->VerticalVelocity <= 0 || wd >= 474 || SplashCount != 0)
+	if (item->Animation.VerticalVelocity <= 0 || wd >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
-			if (!(GetRandomControl() & 0xF) || item->ActiveState != LS_IDLE)
+			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
-				if (item->ActiveState == LS_IDLE)
+				if (item->Animation.ActiveState == LS_IDLE)
 					SetupRipple(item->Position.xPos, wh - 1, item->Position.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				else
 					SetupRipple(item->Position.xPos, wh - 1, item->Position.zPos, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
@@ -1273,7 +1273,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 		SplashSetup.x = item->Position.xPos;
 		SplashSetup.z = item->Position.zPos;
 		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item->Velocity;
+		SplashSetup.splashPower = item->Animation.Velocity;
 		SetupSplash(&SplashSetup, roomNumber);
 		SplashCount = 16;
 	}
@@ -1291,7 +1291,7 @@ void Splash(ITEM_INFO* item)
 		SplashSetup.y = waterHeight - 1;
 		SplashSetup.x = item->Position.xPos;
 		SplashSetup.z = item->Position.zPos;
-		SplashSetup.splashPower = item->VerticalVelocity;
+		SplashSetup.splashPower = item->Animation.VerticalVelocity;
 		SplashSetup.innerRadius = 64;
 		SetupSplash(&SplashSetup, roomNumber);
 	}
