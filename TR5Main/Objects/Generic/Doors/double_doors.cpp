@@ -39,10 +39,10 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_IDLE &&
-			laraItem->AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!laraItem->HitStatus &&
-			!(doorItem->Status && doorItem->Airborne) &&
+			!(doorItem->Status && doorItem->Animation.Airborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{

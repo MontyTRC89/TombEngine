@@ -62,11 +62,11 @@ void GiantMutantControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != MUTANT_STATE_DEATH)
+		if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = MUTANT_STATE_DEATH;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = MUTANT_STATE_DEATH;
 		}
 	}
 	else
@@ -88,11 +88,11 @@ void GiantMutantControl(short itemNumber)
 			LaraItem->HitStatus = true;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case MUTANT_STATE_SET:
-			item->TargetState = MUTANT_STATE_FALL;
-			item->Airborne = true;
+			item->Animation.TargetState = MUTANT_STATE_FALL;
+			item->Animation.Airborne = true;
 			break;
 
 		case MUTANT_STATE_IDLE:
@@ -102,68 +102,68 @@ void GiantMutantControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (angle > MUTANT_NEED_TURN)
-				item->TargetState = MUTANT_STATE_TURN_RIGHT;
+				item->Animation.TargetState = MUTANT_STATE_TURN_RIGHT;
 			else if (angle < -MUTANT_NEED_TURN)
-				item->TargetState = MUTANT_STATE_TURN_LEFT;
+				item->Animation.TargetState = MUTANT_STATE_TURN_LEFT;
 			else if (AI.distance < MUTANT_ATTACK_RANGE)
 			{
 				if (LaraItem->HitPoints <= MUTANT_ATTACK_DAMAGE)
 				{
 					if (AI.distance < MUTANT_CLOSE_RANGE)
-						item->TargetState = MUTANT_STATE_ATTACK_3;
+						item->Animation.TargetState = MUTANT_STATE_ATTACK_3;
 					else
-						item->TargetState = MUTANT_STATE_FORWARD;
+						item->Animation.TargetState = MUTANT_STATE_FORWARD;
 				}
 				else if (GetRandomControl() < 0x4000)
-					item->TargetState = MUTANT_STATE_ATTACK_1;
+					item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 				else
-					item->TargetState = MUTANT_STATE_ATTACK_2;
+					item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
 			}
 			else
-				item->TargetState = MUTANT_STATE_FORWARD;
+				item->Animation.TargetState = MUTANT_STATE_FORWARD;
 
 			break;
 
 		case MUTANT_STATE_FORWARD:
 			if (angle < -MUTANT_TURN)
-				item->TargetState -= MUTANT_TURN;
+				item->Animation.TargetState -= MUTANT_TURN;
 			else if (angle > MUTANT_TURN)
-				item->TargetState += MUTANT_TURN;
+				item->Animation.TargetState += MUTANT_TURN;
 			else
-				item->TargetState += angle;
+				item->Animation.TargetState += angle;
 
 			if (angle > MUTANT_NEED_TURN || angle < -MUTANT_NEED_TURN)
-				item->TargetState = MUTANT_STATE_IDLE;
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
 			else if (AI.distance < MUTANT_ATTACK_RANGE)
-				item->TargetState = MUTANT_STATE_IDLE;
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
 
 			break;
 
 		case MUTANT_STATE_TURN_RIGHT:
 			if (!creature->Flags)
-				creature->Flags = item->FrameNumber;
-			else if (item->FrameNumber - creature->Flags > 16 &&
-				item->FrameNumber - creature->Flags < 23)
+				creature->Flags = item->Animation.FrameNumber;
+			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
+				item->Animation.FrameNumber - creature->Flags < 23)
 			{
 				item->Position.yRot += ANGLE(14.0f);
 			}
 
 			if (angle < MUTANT_NEED_TURN)
-				item->TargetState = MUTANT_STATE_IDLE;
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
 
 			break;
 
 		case MUTANT_STATE_TURN_LEFT:
 			if (!creature->Flags)
-				creature->Flags = item->FrameNumber;
-			else if (item->FrameNumber - creature->Flags > 13 &&
-				item->FrameNumber - creature->Flags < 23)
+				creature->Flags = item->Animation.FrameNumber;
+			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
+				item->Animation.FrameNumber - creature->Flags < 23)
 			{
 				item->Position.yRot -= ANGLE(9.0f);
 			}
 
 			if (angle > -MUTANT_NEED_TURN)
-				item->TargetState = MUTANT_STATE_IDLE;
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
 
 			break;
 
@@ -192,20 +192,20 @@ void GiantMutantControl(short itemNumber)
 		case MUTANT_STATE_ATTACK_3:
 			if (item->TouchBits & MUTANT_TRIGHT || LaraItem->HitPoints <= 0)
 			{
-				item->TargetState = MUTANT_STATE_KILL;
+				item->Animation.TargetState = MUTANT_STATE_KILL;
 				Camera.targetDistance = SECTOR(2);
 				Camera.flags = CF_FOLLOW_CENTER;
 
-				LaraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
-				LaraItem->ActiveState = LaraItem->TargetState = 46;
+				LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 				LaraItem->RoomNumber = item->RoomNumber;
 				LaraItem->Position.xPos = item->Position.xPos;
 				LaraItem->Position.yPos = item->Position.yPos;
 				LaraItem->Position.zPos = item->Position.zPos;
 				LaraItem->Position.yRot = item->Position.yRot;
 				LaraItem->Position.xRot = LaraItem->Position.zRot = 0;
-				LaraItem->Airborne = false;
+				LaraItem->Animation.Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;
 				Lara.Control.HandStatus = HandStatus::Busy;
@@ -223,14 +223,14 @@ void GiantMutantControl(short itemNumber)
 
 	CreatureJoint(item, 0, head);
 
-	if (item->ActiveState == MUTANT_STATE_FALL)
+	if (item->Animation.ActiveState == MUTANT_STATE_FALL)
 	{
 		AnimateItem(item);
 
 		if (item->Position.yPos > item->Floor)
 		{
-			item->TargetState = MUTANT_STATE_IDLE;
-			item->Airborne = false;
+			item->Animation.TargetState = MUTANT_STATE_IDLE;
+			item->Animation.Airborne = false;
 			item->Position.yPos = item->Floor;
 			Camera.bounce = 500;
 		}

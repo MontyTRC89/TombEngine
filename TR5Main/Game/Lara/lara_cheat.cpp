@@ -42,16 +42,16 @@ void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->VerticalVelocity += 16;
-		if (item->VerticalVelocity > 400)
-			item->VerticalVelocity = 400;
+		item->Animation.VerticalVelocity += 16;
+		if (item->Animation.VerticalVelocity > 400)
+			item->Animation.VerticalVelocity = 400;
 	}
 	else
 	{
-		if (item->VerticalVelocity >= 8)
-			item->VerticalVelocity -= item->VerticalVelocity >> 3;
+		if (item->Animation.VerticalVelocity >= 8)
+			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity >> 3;
 		else
-			item->VerticalVelocity = 0;
+			item->Animation.VerticalVelocity = 0;
 	}
 }
 
@@ -74,8 +74,8 @@ void LaraCheatyBits(ITEM_INFO* item)
 				{
 					SetAnimation(item, LA_DOZY);
 					item->Position.xRot = ANGLE(30.0f);
-					item->VerticalVelocity = 30;
-					item->Airborne = false;
+					item->Animation.VerticalVelocity = 30;
+					item->Animation.Airborne = false;
 					item->HitPoints = 1000;
 
 					ResetLaraFlex(item);

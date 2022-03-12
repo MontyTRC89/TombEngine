@@ -54,11 +54,11 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 			grenadeItem->ItemFlags[0] = 2;
 		}
 
-		grenadeItem->Velocity = 32;
-		grenadeItem->ActiveState = grenadeItem->Position.xRot;
-		grenadeItem->VerticalVelocity = -32 * phd_sin(grenadeItem->Position.xRot);
-		grenadeItem->TargetState = grenadeItem->Position.yRot;
-		grenadeItem->RequiredState = 0;
+		grenadeItem->Animation.Velocity = 32;
+		grenadeItem->Animation.ActiveState = grenadeItem->Position.xRot;
+		grenadeItem->Animation.VerticalVelocity = -32 * phd_sin(grenadeItem->Position.xRot);
+		grenadeItem->Animation.TargetState = grenadeItem->Position.yRot;
+		grenadeItem->Animation.RequiredState = 0;
 		grenadeItem->HitPoints = 120;
 
 		AddActiveItem(grenadeItemNumber);
@@ -162,7 +162,7 @@ void EnemyJeepControl(short itemNumber)
 
 		PHD_VECTOR pos;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 0:
 		case 2:
@@ -178,10 +178,10 @@ void EnemyJeepControl(short itemNumber)
 			GetJointAbsPosition(item, &pos, 11);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 			
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (info.distance > SQUARE(1024) || Lara.Location >= item->ItemFlags[3])
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -197,12 +197,12 @@ void EnemyJeepControl(short itemNumber)
 			{
 				if (info.angle < -256)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				}
 			}
 			else
 			{
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			}
 
 			break;
@@ -212,7 +212,7 @@ void EnemyJeepControl(short itemNumber)
 			item->ItemFlags[0] += 18;
 			if (item->ItemFlags[0] > 8704)
 				item->ItemFlags[0] = 8704;
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 
 			break;
 
@@ -228,13 +228,13 @@ void EnemyJeepControl(short itemNumber)
 
 		if (height3 <= item->Floor + 512)
 		{
-			if (height4 > item->Floor + 512 && item->ActiveState != 5)
+			if (height4 > item->Floor + 512 && item->Animation.ActiveState != 5)
 			{
 				item->ItemFlags[1] = 0;
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->ActiveState = 5;
-				item->TargetState = 1;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = 5;
+				item->Animation.TargetState = 1;
 			}
 		}
 		else
@@ -255,7 +255,7 @@ void EnemyJeepControl(short itemNumber)
 			if (creature->LOT.RequiredBox & 8)
 			{
 				creature->MaxTurn = 0;
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 		}
 
@@ -266,12 +266,12 @@ void EnemyJeepControl(short itemNumber)
 		{
 			TestTriggers(target->Position.xPos,target->Position.yPos,target->Position.zPos,target->RoomNumber, true);
 
-			if (Lara.Location < item->ItemFlags[3] && item->ActiveState != 2 && item->TargetState != 2)
+			if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
 			{
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->TargetState = 2;
-				item->ActiveState = 2;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.TargetState = 2;
+				item->Animation.ActiveState = 2;
 
 				if (target->Flags & 4)
 				{
@@ -385,12 +385,12 @@ void EnemyJeepControl(short itemNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (item->Position.yPos < item->Floor)
-			item->Airborne = true;
+			item->Animation.Airborne = true;
 		else
 		{
-			item->VerticalVelocity = 0;
+			item->Animation.VerticalVelocity = 0;
 			item->Position.yPos = item->Floor;
-			item->Airborne = false;
+			item->Animation.Airborne = false;
 		}
 
 		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Position, (item->ItemFlags[0] * 1024) + 16777220);

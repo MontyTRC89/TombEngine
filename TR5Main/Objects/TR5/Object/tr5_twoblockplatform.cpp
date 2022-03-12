@@ -57,7 +57,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 				}
 			}
 
-			if (onObject && LaraItem->AnimNumber != LA_HOP_BACK_CONTINUE)
+			if (onObject && LaraItem->Animation.AnimNumber != LA_HOP_BACK_CONTINUE)
 				item->ItemFlags[1] = 1;
 			else
 				item->ItemFlags[1] = -1;

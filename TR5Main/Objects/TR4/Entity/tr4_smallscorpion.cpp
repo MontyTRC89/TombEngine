@@ -36,10 +36,10 @@ void InitialiseSmallScorpion(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = SSCORPION_STATE_IDLE;
-	item->ActiveState = SSCORPION_STATE_IDLE;
+	item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = SSCORPION_STATE_IDLE;
+	item->Animation.ActiveState = SSCORPION_STATE_IDLE;
 }
 
 void SmallScorpionControl(short itemNumber)
@@ -62,12 +62,12 @@ void SmallScorpionControl(short itemNumber)
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
-		if (item->ActiveState != SSCORPION_STATE_DEATH_1 &&
-			item->ActiveState != SSCORPION_STATE_DEATH_2)
+		if (item->Animation.ActiveState != SSCORPION_STATE_DEATH_1 &&
+			item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 		{
-			item->AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = SSCORPION_STATE_DEATH_1;
+			item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
 		}
 	}
 	else
@@ -89,24 +89,24 @@ void SmallScorpionControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case SSCORPION_STATE_IDLE:
 			creature->MaxTurn = 0;
 			creature->Flags = 0;
 
 			if (AI.distance > pow(341, 2))
-				item->TargetState = SSCORPION_STATE_WALK;
+				item->Animation.TargetState = SSCORPION_STATE_WALK;
 			else if (AI.bite)
 			{
 				creature->MaxTurn = ANGLE(6.0f);
 				if (GetRandomControl() & 1)
-					item->TargetState = SSCORPION_STATE_ATTACK_1;
+					item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 				else
-					item->TargetState = SSCORPION_STATE_ATTACK_2;
+					item->Animation.TargetState = SSCORPION_STATE_ATTACK_2;
 			}
 			else if (!AI.ahead)
-				item->TargetState = SSCORPION_STATE_RUN;
+				item->Animation.TargetState = SSCORPION_STATE_RUN;
 			
 			break;
 
@@ -115,10 +115,10 @@ void SmallScorpionControl(short itemNumber)
 			if (AI.distance >= pow(341, 2))
 			{
 				if (AI.distance > pow(213, 2))
-					item->TargetState = SSCORPION_STATE_RUN;
+					item->Animation.TargetState = SSCORPION_STATE_RUN;
 			}
 			else
-				item->TargetState = SSCORPION_STATE_IDLE;
+				item->Animation.TargetState = SSCORPION_STATE_IDLE;
 			
 			break;
 
@@ -126,7 +126,7 @@ void SmallScorpionControl(short itemNumber)
 			creature->MaxTurn = ANGLE(8.0f);
 
 			if (AI.distance < pow(341, 2))
-				item->TargetState = SSCORPION_STATE_IDLE;
+				item->Animation.TargetState = SSCORPION_STATE_IDLE;
 			
 			break;
 
@@ -148,8 +148,8 @@ void SmallScorpionControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x1B00100)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 20 &&
-						item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 32)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 					{
 						Lara.PoisonPotency += 2;
 						LaraItem->HitPoints -= 20;
@@ -157,7 +157,7 @@ void SmallScorpionControl(short itemNumber)
 
 						short rotation;
 						BITE_INFO* biteInfo;
-						if (item->ActiveState == SSCORPION_STATE_ATTACK_1)
+						if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 						{
 							rotation = item->Position.yRot + -ANGLE(180.0f);
 							biteInfo = &SmallScorpionBiteInfo1;

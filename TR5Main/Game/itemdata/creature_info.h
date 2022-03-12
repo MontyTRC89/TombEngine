@@ -34,6 +34,8 @@ enum ZoneType : char
 
 struct LOTInfo 
 {
+	bool Initialised;
+
 	std::vector<BOX_NODE> Node;
 	int Head;
 	int Tail;
@@ -47,12 +49,11 @@ struct LOTInfo
 	int RequiredBox;
 	short Fly;
 
-	bool Initialised;
 	bool CanJump;
 	bool CanMonkey;
-	bool IsAmphibious;
 	bool IsJumping;
 	bool IsMonkeying;
+	bool IsAmphibious;
 
 	PHD_VECTOR Target;
 	ZoneType Zone;
@@ -85,24 +86,24 @@ struct CreatureInfo
 
 	bool Patrol;			// Unused?
 	bool Alerted;
-	bool ReachedGoal;
+	bool Friendly;
+	bool HurtByLara;
+	bool Poisoned;
 	bool JumpAhead;
 	bool MonkeySwingAhead;
-	bool Friendly;
-	bool Poisoned;
-	bool HurtByLara;
+	bool ReachedGoal;
 
 	short Tosspad;
 	short LocationAI;
 	short FiredWeapon;
 
+	LOTInfo LOT;
 	MoodType Mood;
 	ITEM_INFO* Enemy;
 	short AITargetNumber;
 	ITEM_INFO* AITarget;
 	short Pad;				// Unused?
 	PHD_VECTOR Target;
-	LOTInfo LOT;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority;

@@ -12,10 +12,10 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->TargetState = 2;
-		item->ActiveState = 2;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+		item->Animation.TargetState = 2;
+		item->Animation.ActiveState = 2;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->ItemFlags[2] = abs(item->TriggerFlags);
 	}
 
@@ -27,13 +27,13 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			if (item->ActiveState == 2)
+			if (item->Animation.ActiveState == 2)
 			{
 				if (item->ItemFlags[2] > 1)
 					item->ItemFlags[2]--;
 				else if (item->ItemFlags[2] == 1)
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 					item->ItemFlags[2] = 0;
 				}
 				else if (item->ItemFlags[2] == 0)
@@ -44,7 +44,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+				int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 				if (frameNumber >= 0 && frameNumber <= 6)
 				{

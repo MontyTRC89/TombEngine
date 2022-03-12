@@ -34,8 +34,8 @@ namespace TEN::Entities::TR4
 		item->Status = ITEM_INVISIBLE;
 
 		// Set mutators to 0 by default
-		for (int i = 0; i < item->Mutator.size(); i++)
-			item->Mutator[i].Scale.y = 0.0f;
+		for (int i = 0; i < item->Animation.Mutator.size(); i++)
+			item->Animation.Mutator[i].Scale.y = 0.0f;
 
 		short rotations[8] =
 		{
@@ -128,17 +128,17 @@ namespace TEN::Entities::TR4
 
 				int bloodCount = 0;
 
-				if ((item->ItemFlags[0] > 1024 || LaraItem->Airborne) 
+				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.Airborne) 
 					&& (item->TriggerFlags & 7) > 2 
 					&& (item->TriggerFlags & 7) < 6)
 				{
-					if (LaraItem->VerticalVelocity > 6 || item->ItemFlags[0] > 1024)
+					if (LaraItem->Animation.VerticalVelocity > 6 || item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
 						bloodCount = 20;
 					}
 				}
-				else if (LaraItem->Velocity >= 30)
+				else if (LaraItem->Animation.Velocity >= 30)
 				{
 					LaraItem->HitPoints -= 8;
 					bloodCount = (GetRandomControl() & 3) + 2;
@@ -187,11 +187,11 @@ namespace TEN::Entities::TR4
 					height -= LaraItem->Position.yPos;
 					if (item->Position.yPos >= LaraItem->Position.yPos && height < 50)
 					{
-						LaraItem->AnimNumber = LA_SPIKE_DEATH;
-						LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
-						LaraItem->ActiveState = LS_DEATH;
-						LaraItem->TargetState = LS_DEATH;
-						LaraItem->Airborne = false;
+						LaraItem->Animation.AnimNumber = LA_SPIKE_DEATH;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+						LaraItem->Animation.ActiveState = LS_DEATH;
+						LaraItem->Animation.TargetState = LS_DEATH;
+						LaraItem->Animation.Airborne = false;
 					}
 				}
 			}
@@ -247,8 +247,8 @@ namespace TEN::Entities::TR4
 		// Update bone mutators
 		if (item->ItemFlags[1])
 		{
-			for (int i = 0; i < item->Mutator.size(); i++)
-				item->Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+			for (int i = 0; i < item->Animation.Mutator.size(); i++)
+				item->Animation.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 		}
 	}
 }

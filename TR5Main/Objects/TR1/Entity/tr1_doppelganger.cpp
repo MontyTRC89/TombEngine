@@ -78,8 +78,8 @@ void DoppelgangerControl(short itemNumber)
 		int laraFloorHeight = GetCollisionResult(LaraItem).Position.Floor;
 
 		// Animate bacon Lara, mirroring Lara's position.
-		item->FrameNumber = LaraItem->FrameNumber;
-		item->AnimNumber = LaraItem->AnimNumber;
+		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
+		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
 		item->Position.xPos = pos.x;
 		item->Position.yPos = pos.y;
 		item->Position.zPos = pos.z;
@@ -90,12 +90,12 @@ void DoppelgangerControl(short itemNumber)
 
 		// Compare floor heights.
 		if (item->Floor >= laraFloorHeight + SECTOR(1) + 1 &&	// Add 1 to avoid bacon Lara dying when exiting water.
-			!LaraItem->Airborne)
+			!LaraItem->Animation.Airborne)
 		{
 			SetAnimation(item, LA_JUMP_WALL_SMASH_START);
-			item->Velocity = 0;
-			item->VerticalVelocity = 0;
-			item->Airborne = true;
+			item->Animation.Velocity = 0;
+			item->Animation.VerticalVelocity = 0;
+			item->Animation.Airborne = true;
 			item->Data = -1;
 			item->Position.yPos += 50;
 		}
@@ -112,10 +112,10 @@ void DoppelgangerControl(short itemNumber)
 			item->Position.yPos = item->Floor;
 			TestTriggers(item, true);
 
-			item->VerticalVelocity = 0;
-			item->Airborne = false;
-			item->TargetState = LS_DEATH;
-			item->RequiredState = LS_DEATH;
+			item->Animation.VerticalVelocity = 0;
+			item->Animation.Airborne = false;
+			item->Animation.TargetState = LS_DEATH;
+			item->Animation.RequiredState = LS_DEATH;
 		}
 	}
 }

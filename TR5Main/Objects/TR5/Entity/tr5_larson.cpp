@@ -34,10 +34,10 @@ void InitialiseLarson(short itemNum)
 
 	ClearItem(itemNum);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = STATE_TR5_LARSON_STOP;
-	item->ActiveState = STATE_TR5_LARSON_STOP;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = STATE_TR5_LARSON_STOP;
+	item->Animation.ActiveState = STATE_TR5_LARSON_STOP;
 
 	if (!item->TriggerFlags)
 		return;
@@ -104,14 +104,14 @@ void LarsonControl(short itemNumber)
 		if (CurrentLevel == 2)
 		{
 			item->ItemFlags[3] = 1;
-			item->Airborne = false;
+			item->Animation.Airborne = false;
 			item->HitStatus = false;
 			item->Collidable = false;
 			item->Status = ITEM_DEACTIVATED;
 		}
 		else
 		{
-			item->Airborne = false;
+			item->Animation.Airborne = false;
 			item->HitStatus = false;
 			item->Collidable = false;
 			item->Status = ITEM_ACTIVE;
@@ -147,7 +147,7 @@ void LarsonControl(short itemNumber)
 		CreatureMood(item, &info, VIOLENT);
 
 		if (info.distance < SQUARE(2048) 
-			&& LaraItem->Velocity > 20
+			&& LaraItem->Animation.Velocity > 20
 			|| item->HitStatus
 			|| TargetVisible(item, &info) != 0)
 		{
@@ -157,7 +157,7 @@ void LarsonControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 		
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case STATE_TR5_LARSON_STOP:
 			joint0 = info.angle / 2;
@@ -165,24 +165,24 @@ void LarsonControl(short itemNumber)
 			if (info.ahead)
 				joint1 = info.xAngle;
 
-			if (item->RequiredState)
+			if (item->Animation.RequiredState)
 			{
-				item->TargetState = item->RequiredState;
+				item->Animation.TargetState = item->Animation.RequiredState;
 			}
 			else if (item->AIBits & AMBUSH)
 			{
-				item->TargetState = STATE_TR5_LARSON_RUN;
+				item->Animation.TargetState = STATE_TR5_LARSON_RUN;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->TargetState = STATE_TR5_LARSON_AIM;
+				item->Animation.TargetState = STATE_TR5_LARSON_AIM;
 			}
 			else
 			{
 				if (item->AIBits & GUARD || CurrentLevel == 2 || item->ItemFlags[3])
 				{
 					creature->MaxTurn = 0;
-					item->TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					if (abs(info.angle) >= ANGLE(2))
 					{
 						if (info.angle > 0)
@@ -200,13 +200,13 @@ void LarsonControl(short itemNumber)
 					if (creature->Mood != MoodType::Bored)
 					{
 						if (creature->Mood == MoodType::Escape)
-							item->TargetState = STATE_TR5_LARSON_RUN;
+							item->Animation.TargetState = STATE_TR5_LARSON_RUN;
 						else
-							item->TargetState = STATE_TR5_LARSON_WALK;
+							item->Animation.TargetState = STATE_TR5_LARSON_WALK;
 					}
 					else
 					{
-						item->TargetState = GetRandomControl() >= 96 ? 2 : 6;
+						item->Animation.TargetState = GetRandomControl() >= 96 ? 2 : 6;
 					}
 				}
 			}
@@ -219,25 +219,25 @@ void LarsonControl(short itemNumber)
 			creature->MaxTurn = ANGLE(7);
 			if (creature->Mood == MoodType::Bored && GetRandomControl() < 96)
 			{
-				item->RequiredState = STATE_TR5_LARSON_IDLE;
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				break;
 			}
 
 			if (creature->Mood == MoodType::Escape || item->AIBits & AMBUSH)
 			{
-				item->RequiredState = STATE_TR5_LARSON_RUN;
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			else if (Targetable(item, &info))
 			{
-				item->RequiredState = STATE_TR5_LARSON_AIM;
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			else if (!info.ahead || info.distance > SQUARE(3072))
 			{
-				item->RequiredState = STATE_TR5_LARSON_RUN;
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			break;
 
@@ -249,32 +249,32 @@ void LarsonControl(short itemNumber)
 
 			if (creature->ReachedGoal)
 			{
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			else if (item->AIBits & AMBUSH)
 			{
-				item->TargetState = STATE_TR5_LARSON_RUN;
+				item->Animation.TargetState = STATE_TR5_LARSON_RUN;
 			}
 			else if (creature->Mood != MoodType::Bored || GetRandomControl() >= 96)
 			{
 				if (Targetable(item, &info))
 				{
-					item->RequiredState = STATE_TR5_LARSON_AIM;
-					item->TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
+					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				}
 				else if (info.ahead)
 				{
 					if (info.distance <= SQUARE(3072))
 					{
-						item->RequiredState = STATE_TR5_LARSON_WALK;
-						item->TargetState = STATE_TR5_LARSON_STOP;
+						item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
+						item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					}
 				}
 			}
 			else
 			{
-				item->RequiredState = STATE_TR5_LARSON_IDLE;
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			break;
 
@@ -297,9 +297,9 @@ void LarsonControl(short itemNumber)
 			}
 
 			if (Targetable(item, &info))
-				item->TargetState = STATE_TR5_LARSON_ATTACK;
+				item->Animation.TargetState = STATE_TR5_LARSON_ATTACK;
 			else
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			break;
 
 		case STATE_TR5_LARSON_IDLE:
@@ -310,14 +310,14 @@ void LarsonControl(short itemNumber)
 
 			if (creature->Mood != MoodType::Bored)
 			{
-				item->TargetState = STATE_TR5_LARSON_STOP;
+				item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 			}
 			else
 			{
 				if (GetRandomControl() <= 96)
 				{
-					item->RequiredState = STATE_TR5_LARSON_WALK;
-					item->TargetState = STATE_TR5_LARSON_STOP;
+					item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
+					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 				}
 			}
 			break;
@@ -339,7 +339,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->Position.yRot += info.angle;
 			}
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				if (item->ObjectNumber == ID_PIERRE)
 				{
@@ -353,7 +353,7 @@ void LarsonControl(short itemNumber)
 				creature->FiredWeapon = 2;
 			}
 			if (creature->Mood == MoodType::Escape && GetRandomControl() > 0x2000)
-				item->RequiredState = STATE_TR5_LARSON_STOP;
+				item->Animation.RequiredState = STATE_TR5_LARSON_STOP;
 			break;
 
 		default:
@@ -361,11 +361,11 @@ void LarsonControl(short itemNumber)
 
 		}
 	}
-	else if (item->ActiveState == STATE_TR5_LARSON_DIE)
+	else if (item->Animation.ActiveState == STATE_TR5_LARSON_DIE)
 	{
 		// When Larson dies, it activates trigger at start position
 		if (item->ObjectNumber == ID_LARSON 
-			&& item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			short roomNumber = item->ItemFlags[2] & 0xFF;
 			short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -384,11 +384,11 @@ void LarsonControl(short itemNumber)
 	{
 		// Die
 		if (item->ObjectNumber == ID_PIERRE)
-			item->AnimNumber = Objects[ID_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
+			item->Animation.AnimNumber = Objects[ID_PIERRE].animIndex + ANIMATION_TR5_PIERRE_DIE;
 		else
-			item->AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
-		item->ActiveState = STATE_TR5_LARSON_DIE;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
+		item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	CreatureTilt(item, tilt);

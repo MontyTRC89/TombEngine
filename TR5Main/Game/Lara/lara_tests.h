@@ -30,9 +30,9 @@ bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int distance);
 
 int LaraFloorFront(ITEM_INFO* item, short angle, int distance);
 int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height);
-COLL_RESULT LaraCollisionFront(ITEM_INFO* item, short angle, int distance);
-COLL_RESULT LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height);
-COLL_RESULT LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height);
+CollisionResult LaraCollisionFront(ITEM_INFO* item, short angle, int distance);
+CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height);
+CollisionResult LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height);
 
 bool TestLaraFall(ITEM_INFO* item, COLL_INFO* coll);
 bool TestLaraMonkeyGrab(ITEM_INFO* item, COLL_INFO* coll);

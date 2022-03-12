@@ -32,10 +32,10 @@ namespace TEN::Entities::Doors
 		{
 			if (SequenceResults[Sequences[0]][Sequences[1]][Sequences[2]] == doorItem->TriggerFlags)
 			{
-				if (doorItem->ActiveState == 1)
-					doorItem->TargetState = 1;
+				if (doorItem->Animation.ActiveState == 1)
+					doorItem->Animation.TargetState = 1;
 				else
-					doorItem->TargetState = 0;
+					doorItem->Animation.TargetState = 0;
 
 				TestTriggers(doorItem, true);
 			}
@@ -43,9 +43,9 @@ namespace TEN::Entities::Doors
 			CurrentSequence = 4;
 		}
 
-		if (doorItem->ActiveState == doorItem->TargetState)
+		if (doorItem->Animation.ActiveState == doorItem->Animation.TargetState)
 		{
-			if (doorItem->ActiveState == 1)
+			if (doorItem->Animation.ActiveState == 1)
 			{
 				if (!doorData->opened)
 				{

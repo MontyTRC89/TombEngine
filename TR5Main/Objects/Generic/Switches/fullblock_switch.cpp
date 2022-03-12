@@ -35,8 +35,8 @@ namespace TEN::Entities::Switches
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION) ||
-			laraItem->ActiveState != LS_IDLE ||
-			laraItem->AnimNumber != LA_STAND_IDLE ||
+			laraItem->Animation.ActiveState != LS_IDLE ||
+			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||
 			switchItem->Status ||
 			switchItem->Flags & 0x100 ||
@@ -51,15 +51,15 @@ namespace TEN::Entities::Switches
 		{
 			if (MoveLaraPosition(&FullBlockSwitchPos, switchItem, laraItem))
 			{
-				if (switchItem->ActiveState == 1)
+				if (switchItem->Animation.ActiveState == 1)
 				{
-					laraItem->ActiveState = LS_SWITCH_DOWN;
-					laraItem->AnimNumber = LA_BUTTON_GIANT_PUSH;
-					switchItem->TargetState = 0;
+					laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
+					laraItem->Animation.AnimNumber = LA_BUTTON_GIANT_PUSH;
+					switchItem->Animation.TargetState = 0;
 				}
 
-				laraItem->TargetState = LS_IDLE;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->Animation.TargetState = LS_IDLE;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				switchItem->Status = ITEM_ACTIVE;
 
 				AddActiveItem(itemNumber);
@@ -83,14 +83,14 @@ namespace TEN::Entities::Switches
 	{
 		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
 
-		if (switchItem->AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
+		if (switchItem->Animation.AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
 			CurrentSequence >= 3 ||
 			switchItem->ItemFlags[0])
 		{
 			if (CurrentSequence >= 4)
 			{
 				switchItem->ItemFlags[0] = 0;
-				switchItem->TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_ON;
 				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				if (++CurrentSequence >= 7)

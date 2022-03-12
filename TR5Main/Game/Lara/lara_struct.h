@@ -903,8 +903,8 @@ enum class HandStatus
 {
 	Free,
 	Busy,
-	DrawWeapon,
-	UndrawWeapon,
+	WeaponDraw,
+	WeaponUndraw,
 	WeaponReady,
 	Special
 };

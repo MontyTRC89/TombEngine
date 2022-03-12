@@ -50,8 +50,8 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_IDLE &&
-			laraItem->AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!laraItem->HitStatus &&
 			doorItem->Status != ITEM_ACTIVE &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
@@ -74,7 +74,7 @@ namespace TEN::Entities::Doors
 					if (MoveLaraPosition(&PullDoorPos, doorItem, laraItem))
 					{
 						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
-						doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
+						doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
 						openTheDoor = true;
 					}
 					else
@@ -87,7 +87,7 @@ namespace TEN::Entities::Doors
 						if (MoveLaraPosition(&KickDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
-							doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
@@ -98,7 +98,7 @@ namespace TEN::Entities::Doors
 						if (MoveLaraPosition(&PushDoorPos, doorItem, laraItem))
 						{
 							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
-							doorItem->TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
+							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
 						else
@@ -110,8 +110,8 @@ namespace TEN::Entities::Doors
 				{
 					AddActiveItem(itemNumber);
 
-					laraItem->ActiveState = LS_MISC_CONTROL;
-					laraItem->TargetState = LS_IDLE;
+					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+					laraItem->Animation.TargetState = LS_IDLE;
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					doorItem->Status = ITEM_ACTIVE;
@@ -127,7 +127,7 @@ namespace TEN::Entities::Doors
 			if (pull)
 				doorItem->Position.yRot ^= ANGLE(180.0f);
 		}
-		else if (doorItem->ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
+		else if (doorItem->Animation.ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNumber, laraItem, coll);
 	}
 

@@ -237,10 +237,10 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	if (lara->Vehicle == NO_ITEM)
 		return true;
 
-	if ((laraItem->ActiveState == QUAD_STATE_DISMOUNT_RIGHT || laraItem->ActiveState == QUAD_STATE_DISMOUNT_LEFT) &&
+	if ((laraItem->Animation.ActiveState == QUAD_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QUAD_STATE_DISMOUNT_LEFT) &&
 		TestLastFrame(laraItem))
 	{
-		if (laraItem->ActiveState == QUAD_STATE_DISMOUNT_LEFT)
+		if (laraItem->Animation.ActiveState == QUAD_STATE_DISMOUNT_LEFT)
 			laraItem->Position.yRot += ANGLE(90.0f);
 		else
 			laraItem->Position.yRot -= ANGLE(90.0f);
@@ -253,7 +253,7 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		lara->Vehicle = NO_ITEM;
 		lara->Control.HandStatus = HandStatus::Free;
 
-		if (laraItem->ActiveState == QUAD_STATE_FALL_OFF)
+		if (laraItem->Animation.ActiveState == QUAD_STATE_FALL_OFF)
 		{
 			PHD_VECTOR pos = { 0, 0, 0 };
 
@@ -263,8 +263,8 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			laraItem->Position.xPos = pos.x;
 			laraItem->Position.yPos = pos.y;
 			laraItem->Position.zPos = pos.z;
-			laraItem->VerticalVelocity = quadItem->VerticalVelocity;
-			laraItem->Airborne = true;
+			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
+			laraItem->Animation.Airborne = true;
 			laraItem->Position.xRot = 0;
 			laraItem->Position.zRot = 0;
 			laraItem->HitPoints = 0;
@@ -273,11 +273,11 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 
 			return false;
 		}
-		else if (laraItem->ActiveState == QUAD_STATE_FALL_DEATH)
+		else if (laraItem->Animation.ActiveState == QUAD_STATE_FALL_DEATH)
 		{
-			laraItem->TargetState = LS_DEATH;
-			laraItem->VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
-			laraItem->VerticalVelocity = 0;
+			laraItem->Animation.TargetState = LS_DEATH;
+			laraItem->Animation.VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
+			laraItem->Animation.VerticalVelocity = 0;
 			quad->Flags |= QUAD_FLAG_DEAD;
 
 			return false;
@@ -294,7 +294,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, COLL_INFO* co
 	auto* lara = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) ||
-		laraItem->Airborne ||
+		laraItem->Animation.Airborne ||
 		lara->Control.HandStatus != HandStatus::Free ||
 		quadItem->Flags & ONESHOT ||
 		abs(quadItem->Position.yPos - laraItem->Position.yPos) > CLICK(1))
@@ -368,7 +368,7 @@ static void QuadBaddieCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 					{
 						if (TestBoundsCollide(item, quadItem, QUAD_RADIUS))
 						{
-							DoLotsOfBlood(item->Position.xPos, quadItem->Position.yPos - CLICK(1), item->Position.zPos, quadItem->VerticalVelocity, quadItem->Position.yRot, item->RoomNumber, 3);
+							DoLotsOfBlood(item->Position.xPos, quadItem->Position.yPos - CLICK(1), item->Position.zPos, quadItem->Animation.VerticalVelocity, quadItem->Position.yRot, item->RoomNumber, 3);
 							item->HitPoints = 0;
 						}
 					}
@@ -433,7 +433,7 @@ static int TestQuadHeight(ITEM_INFO* quadItem, int dz, int dx, PHD_VECTOR* pos)
 
 static int DoQuadShift(ITEM_INFO* quadItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 {
-	COLL_RESULT probe;
+	CollisionResult probe;
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
 	int oldX = old->x / SECTOR(1);
@@ -662,9 +662,9 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	auto probe = GetCollisionResult(quadItem);
 	int speed = 0;
 	if (quadItem->Position.yPos >= probe.Position.Floor)
-		speed = quadItem->VerticalVelocity * phd_cos(quadItem->Position.xRot);
+		speed = quadItem->Animation.VerticalVelocity * phd_cos(quadItem->Position.xRot);
 	else
-		speed = quadItem->VerticalVelocity;
+		speed = quadItem->Animation.VerticalVelocity;
 
 	quadItem->Position.zPos += speed * phd_cos(quad->MomentumAngle);
 	quadItem->Position.xPos += speed * phd_sin(quad->MomentumAngle);
@@ -799,75 +799,75 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 	auto* quad = (QuadInfo*)quadItem->Data;
 
 	if (quadItem->Position.yPos != quadItem->Floor &&
-		laraItem->ActiveState != QUAD_STATE_FALL &&
-		laraItem->ActiveState != QUAD_STATE_LAND &&
-		laraItem->ActiveState != QUAD_STATE_FALL_OFF &&
+		laraItem->Animation.ActiveState != QUAD_STATE_FALL &&
+		laraItem->Animation.ActiveState != QUAD_STATE_LAND &&
+		laraItem->Animation.ActiveState != QUAD_STATE_FALL_OFF &&
 		!dead)
 	{
 		if (quad->Velocity < 0)
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_LEAP_START;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_LEAP_START;
 		else
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_LEAP_START2;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_LEAP_START2;
 
-		laraItem->FrameNumber = GetFrameNumber(laraItem, laraItem->AnimNumber);
-		laraItem->ActiveState = QUAD_STATE_FALL;
-		laraItem->TargetState = QUAD_STATE_FALL;
+		laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
+		laraItem->Animation.ActiveState = QUAD_STATE_FALL;
+		laraItem->Animation.TargetState = QUAD_STATE_FALL;
 	}
 	else if (collide &&
-		laraItem->ActiveState != QUAD_STATE_HIT_FRONT &&
-		laraItem->ActiveState != QUAD_STATE_HIT_BACK &&
-		laraItem->ActiveState != QUAD_STATE_HIT_LEFT &&
-		laraItem->ActiveState != QUAD_STATE_HIT_RIGHT &&
-		laraItem->ActiveState != QUAD_STATE_FALL_OFF &&
+		laraItem->Animation.ActiveState != QUAD_STATE_HIT_FRONT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_HIT_BACK &&
+		laraItem->Animation.ActiveState != QUAD_STATE_HIT_LEFT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_HIT_RIGHT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_FALL_OFF &&
 		quad->Velocity > (MAX_VELOCITY / 3) &&
 		!dead)
 	{
 		if (collide == QUAD_HIT_FRONT)
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_BACK;
-			laraItem->ActiveState = QUAD_STATE_HIT_FRONT;
-			laraItem->TargetState = QUAD_STATE_HIT_FRONT;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_BACK;
+			laraItem->Animation.ActiveState = QUAD_STATE_HIT_FRONT;
+			laraItem->Animation.TargetState = QUAD_STATE_HIT_FRONT;
 		}
 		else if (collide == QUAD_HIT_BACK)
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_FRONT;
-			laraItem->ActiveState = QUAD_STATE_HIT_BACK;
-			laraItem->TargetState = QUAD_STATE_HIT_BACK;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_FRONT;
+			laraItem->Animation.ActiveState = QUAD_STATE_HIT_BACK;
+			laraItem->Animation.TargetState = QUAD_STATE_HIT_BACK;
 		}
 		else if (collide == QUAD_HIT_LEFT)
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_RIGHT;
-			laraItem->ActiveState = QUAD_STATE_HIT_LEFT;
-			laraItem->TargetState = QUAD_STATE_HIT_LEFT;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_RIGHT;
+			laraItem->Animation.ActiveState = QUAD_STATE_HIT_LEFT;
+			laraItem->Animation.TargetState = QUAD_STATE_HIT_LEFT;
 		}
 		else
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_LEFT;
-			laraItem->ActiveState = QUAD_STATE_HIT_RIGHT;
-			laraItem->TargetState = QUAD_STATE_HIT_RIGHT;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_HIT_LEFT;
+			laraItem->Animation.ActiveState = QUAD_STATE_HIT_RIGHT;
+			laraItem->Animation.TargetState = QUAD_STATE_HIT_RIGHT;
 		}
 
-		laraItem->FrameNumber = GetFrameNumber(laraItem, laraItem->AnimNumber);
+		laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
 		SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &quadItem->Position, 0);
 	}
 	else
 	{
-		switch (laraItem->ActiveState)
+		switch (laraItem->Animation.ActiveState)
 		{
 		case QUAD_STATE_IDLE:
 			if (dead)
-				laraItem->TargetState = QUAD_STATE_BIKE_DEATH;
+				laraItem->Animation.TargetState = QUAD_STATE_BIKE_DEATH;
 			else if (TrInput & QUAD_IN_DISMOUNT &&
 				quad->Velocity == 0 &&
 				!quad->NoDismount)
 			{
 				if (TrInput & QUAD_IN_LEFT && CanQuadbikeGetOff(-1))
-					laraItem->TargetState = QUAD_STATE_DISMOUNT_LEFT;
+					laraItem->Animation.TargetState = QUAD_STATE_DISMOUNT_LEFT;
 				else if (TrInput & QUAD_IN_RIGHT && CanQuadbikeGetOff(1))
-					laraItem->TargetState = QUAD_STATE_DISMOUNT_RIGHT;
+					laraItem->Animation.TargetState = QUAD_STATE_DISMOUNT_RIGHT;
 			}
 			else if (TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE))
-				laraItem->TargetState = QUAD_STATE_DRIVE;
+				laraItem->Animation.TargetState = QUAD_STATE_DRIVE;
 
 			break;
 
@@ -875,31 +875,31 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 			if (dead)
 			{
 				if (quad->Velocity > (MAX_VELOCITY / 2))
-					laraItem->TargetState = QUAD_STATE_FALL_DEATH;
+					laraItem->Animation.TargetState = QUAD_STATE_FALL_DEATH;
 				else
-					laraItem->TargetState = QUAD_STATE_BIKE_DEATH;
+					laraItem->Animation.TargetState = QUAD_STATE_BIKE_DEATH;
 			}
 			else if (!(TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE)) &&
 				(quad->Velocity / 256) == 0)
 			{
-				laraItem->TargetState = QUAD_STATE_IDLE;
+				laraItem->Animation.TargetState = QUAD_STATE_IDLE;
 			}
 			else if (TrInput & QUAD_IN_LEFT &&
 				!quad->DriftStarting)
 			{
-				laraItem->TargetState = QUAD_STATE_TURN_LEFT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_LEFT;
 			}
 			else if (TrInput & QUAD_IN_RIGHT &&
 				!quad->DriftStarting)
 			{
-				laraItem->TargetState = QUAD_STATE_TURN_RIGHT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_RIGHT;
 			}
 			else if (TrInput & QUAD_IN_BRAKE)
 			{
 				if (quad->Velocity > (MAX_VELOCITY / 3 * 2))
-					laraItem->TargetState = QUAD_STATE_BRAKE;
+					laraItem->Animation.TargetState = QUAD_STATE_BRAKE;
 				else
-					laraItem->TargetState = QUAD_STATE_SLOW;
+					laraItem->Animation.TargetState = QUAD_STATE_SLOW;
 			}
 
 			break;
@@ -908,48 +908,48 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 		case QUAD_STATE_SLOW:
 		case QUAD_STATE_STOP_SLOWLY:
 			if ((quad->Velocity / 256) == 0)
-				laraItem->TargetState = QUAD_STATE_IDLE;
+				laraItem->Animation.TargetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_LEFT)
-				laraItem->TargetState = QUAD_STATE_TURN_LEFT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_LEFT;
 			else if (TrInput & QUAD_IN_RIGHT)
-				laraItem->TargetState = QUAD_STATE_TURN_RIGHT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_RIGHT;
 
 			break;
 
 		case QUAD_STATE_TURN_LEFT:
 			if ((quad->Velocity / 256) == 0)
-				laraItem->TargetState = QUAD_STATE_IDLE;
+				laraItem->Animation.TargetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_RIGHT)
 			{
-				laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_RIGHT_START;
-				laraItem->FrameNumber = GetFrameNumber(laraItem, laraItem->AnimNumber);
-				laraItem->ActiveState = QUAD_STATE_TURN_RIGHT;
-				laraItem->TargetState = QUAD_STATE_TURN_RIGHT;
+				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_RIGHT_START;
+				laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
+				laraItem->Animation.ActiveState = QUAD_STATE_TURN_RIGHT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_RIGHT;
 			}
 			else if (!(TrInput & QUAD_IN_LEFT))
-				laraItem->TargetState = QUAD_STATE_DRIVE;
+				laraItem->Animation.TargetState = QUAD_STATE_DRIVE;
 
 			break;
 
 		case QUAD_STATE_TURN_RIGHT:
 			if ((quad->Velocity / 256) == 0)
-				laraItem->TargetState = QUAD_STATE_IDLE;
+				laraItem->Animation.TargetState = QUAD_STATE_IDLE;
 			else if (TrInput & QUAD_IN_LEFT)
 			{
-				laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_LEFT_START;
-				laraItem->FrameNumber = GetFrameNumber(laraItem, laraItem->AnimNumber);
-				laraItem->ActiveState = QUAD_STATE_TURN_LEFT;
-				laraItem->TargetState = QUAD_STATE_TURN_LEFT;
+				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_TURN_LEFT_START;
+				laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
+				laraItem->Animation.ActiveState = QUAD_STATE_TURN_LEFT;
+				laraItem->Animation.TargetState = QUAD_STATE_TURN_LEFT;
 			}
 			else if (!(TrInput & QUAD_IN_RIGHT))
-				laraItem->TargetState = QUAD_STATE_DRIVE;
+				laraItem->Animation.TargetState = QUAD_STATE_DRIVE;
 
 			break;
 
 		case QUAD_STATE_FALL:
 			if (quadItem->Position.yPos == quadItem->Floor)
-				laraItem->TargetState = QUAD_STATE_LAND;
-			else if (quadItem->VerticalVelocity > TERMINAL_VERTICAL_VELOCITY)
+				laraItem->Animation.TargetState = QUAD_STATE_LAND;
+			else if (quadItem->Animation.VerticalVelocity > TERMINAL_VERTICAL_VELOCITY)
 				quad->Flags |= QUAD_FLAG_IS_FALLING;
 
 			break;
@@ -962,7 +962,7 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 		case QUAD_STATE_HIT_LEFT:
 		case QUAD_STATE_HIT_RIGHT:
 			if (TrInput & (QUAD_IN_ACCELERATE | QUAD_IN_BRAKE))
-				laraItem->TargetState = QUAD_STATE_DRIVE;
+				laraItem->Animation.TargetState = QUAD_STATE_DRIVE;
 
 			break;
 		}
@@ -970,7 +970,7 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 		if (TestEnvironment(ENV_FLAG_WATER, quadItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
 		{
-			laraItem->TargetState = QUAD_STATE_FALL_OFF;
+			laraItem->Animation.TargetState = QUAD_STATE_FALL_OFF;
 			laraItem->Position.yPos = quadItem->Position.yPos + 700;
 			laraItem->RoomNumber = quadItem->RoomNumber;
 			laraItem->HitPoints = 0;
@@ -1146,7 +1146,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 				quad->Revs = 0;
 		}
 
-		quadItem->VerticalVelocity = quad->Velocity / 256;
+		quadItem->Animation.VerticalVelocity = quad->Velocity / 256;
 
 		if (quad->EngineRevs > 0x7000)
 			quad->EngineRevs = -0x2000;
@@ -1201,16 +1201,16 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 		if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_LEFT;
-			laraItem->ActiveState = laraItem->TargetState = QUAD_STATE_MOUNT_LEFT;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QUAD_STATE_MOUNT_LEFT;
 		}
 		else
 		{
-			laraItem->AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_RIGHT;
-			laraItem->ActiveState = laraItem->TargetState = QUAD_STATE_MOUNT_RIGHT;
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QUAD_STATE_MOUNT_RIGHT;
 		}
 
-		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Position.xPos = quadItem->Position.xPos;
 		laraItem->Position.yPos = quadItem->Position.yPos;
 		laraItem->Position.zPos = quadItem->Position.zPos;
@@ -1321,7 +1321,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		collide = false;
 	else
 	{
-		switch (laraItem->ActiveState)
+		switch (laraItem->Animation.ActiveState)
 		{
 		case QUAD_STATE_MOUNT_LEFT:
 		case QUAD_STATE_MOUNT_RIGHT:
@@ -1364,7 +1364,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	quad->LeftVerticalVelocity = DoQuadDynamics(floorHeightLeft, quad->LeftVerticalVelocity, (int*)&frontLeft.y);
 	quad->RightVerticalVelocity = DoQuadDynamics(floorHeightRight, quad->RightVerticalVelocity, (int*)&frontRight.y);
-	quadItem->VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quadItem->VerticalVelocity, (int*)&quadItem->Position.yPos);
+	quadItem->Animation.VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quadItem->Animation.VerticalVelocity, (int*)&quadItem->Position.yPos);
 
 	probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
 	short xRot = phd_atan(QUAD_FRONT, quadItem->Position.yPos - probe.Position.Floor);
@@ -1386,8 +1386,8 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		AnimateQuadBike(laraItem, quadItem, collide, dead);
 		AnimateItem(laraItem);
 
-		quadItem->AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
-		quadItem->FrameNumber = g_Level.Anims[quadItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		quadItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
+		quadItem->Animation.FrameNumber = g_Level.Anims[quadItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 
@@ -1405,10 +1405,10 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		}
 	}
 
-	if (laraItem->ActiveState != QUAD_STATE_MOUNT_RIGHT &&
-		laraItem->ActiveState != QUAD_STATE_MOUNT_LEFT &&
-		laraItem->ActiveState != QUAD_STATE_DISMOUNT_RIGHT &&
-		laraItem->ActiveState != QUAD_STATE_DISMOUNT_LEFT)
+	if (laraItem->Animation.ActiveState != QUAD_STATE_MOUNT_RIGHT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_MOUNT_LEFT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_DISMOUNT_RIGHT &&
+		laraItem->Animation.ActiveState != QUAD_STATE_DISMOUNT_LEFT)
 	{
 		PHD_VECTOR pos;
 		int speed = 0;
@@ -1421,11 +1421,11 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			pos.z = quadEffectsPositions[i].z;
 			GetJointAbsPosition(quadItem, &pos, quadEffectsPositions[i].meshNum);
 			angle = quadItem->Position.yRot + ((i == 0) ? 0x9000 : 0x7000);
-			if (quadItem->VerticalVelocity > 32)
+			if (quadItem->Animation.VerticalVelocity > 32)
 			{
-				if (quadItem->VerticalVelocity < 64)
+				if (quadItem->Animation.VerticalVelocity < 64)
 				{
-					speed = 64 - quadItem->VerticalVelocity;
+					speed = 64 - quadItem->Animation.VerticalVelocity;
 					TriggerQuadExhaustSmoke(pos.x, pos.y, pos.z, angle, speed, 1);
 				}
 			}

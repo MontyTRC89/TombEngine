@@ -43,12 +43,12 @@ void InitialiseSpearGuardian(short itemNum)
 	ClearItem(itemNum);
 
 	item = &g_Level.Items[itemNum];
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
 
-	anim = &g_Level.Anims[item->AnimNumber];
+	anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	item->FrameNumber = anim->frameBase;
-	item->ActiveState = anim->ActiveState;
+	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.ActiveState = anim->ActiveState;
 }
 
 void SpearGuardianControl(short itemNum)
@@ -69,7 +69,7 @@ void SpearGuardianControl(short itemNum)
 
 	if (item->HitPoints <= 0)
 	{
-		item->ActiveState = 17;
+		item->Animation.ActiveState = 17;
 		item->MeshBits /= 2;
 
 		if (!item->MeshBits)
@@ -88,10 +88,10 @@ void SpearGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, xian->MaxTurn);
 
-		if (item->ActiveState != 18)
+		if (item->Animation.ActiveState != 18)
 			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 18:
 			if (!xian->Flags)
@@ -113,14 +113,14 @@ void SpearGuardianControl(short itemNum)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 				else if (random < 0x400)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 
 		case 2:
@@ -130,19 +130,19 @@ void SpearGuardianControl(short itemNum)
 			xian->MaxTurn = 0;
 
 			if (xian->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (xian->Mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else if (random < 0x400)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->TargetState = 13;
+				item->Animation.TargetState = 13;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 
 		case 3:
@@ -152,26 +152,26 @@ void SpearGuardianControl(short itemNum)
 			xian->MaxTurn = ANGLE(3);
 
 			if (xian->Mood == MoodType::Escape)
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else if (xian->Mood == MoodType::Bored)
 			{
 				random = GetRandomControl();
 				if (random < 0x200)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else if (random < 0x400)
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
 			{
 				if (info.distance < SQUARE(WALL_SIZE * 3 / 2))
-					item->TargetState = 7;
+					item->Animation.TargetState = 7;
 				else if (GetRandomControl() < 0x4000)
-					item->TargetState = 9;
+					item->Animation.TargetState = 9;
 				else
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 			}
 			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3))
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			break;
 
 		case 4:
@@ -185,12 +185,12 @@ void SpearGuardianControl(short itemNum)
 			else if (xian->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->TargetState = 15;
+				item->Animation.TargetState = 15;
 			break;
 
 		case 5:
@@ -199,9 +199,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			break;
 
 		case 7:
@@ -210,9 +210,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3 / 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			break;
 
 		case 9:
@@ -221,9 +221,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			break;
 
 		case 11:
@@ -232,9 +232,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			break;
 
 		case 13:
@@ -243,9 +243,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 14;
+				item->Animation.TargetState = 14;
 			break;
 
 		case 15:
@@ -254,9 +254,9 @@ void SpearGuardianControl(short itemNum)
 
 			xian->Flags = 0;
 			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else
-				item->TargetState = 16;
+				item->Animation.TargetState = 16;
 			break;
 
 		case 6:
@@ -274,12 +274,12 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 
 		case 14:
@@ -289,9 +289,9 @@ void SpearGuardianControl(short itemNum)
 			XianDamage(item, xian, 75);
 
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			break;
 
 		case 16:
@@ -303,14 +303,14 @@ void SpearGuardianControl(short itemNum)
 			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			break;
 		}
 	}

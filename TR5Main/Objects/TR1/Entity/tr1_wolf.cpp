@@ -59,7 +59,7 @@ void InitialiseWolf(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
-	item->FrameNumber = SLEEP_FRAME;
+	item->Animation.FrameNumber = SLEEP_FRAME;
 }
 
 void WolfControl(short itemNumber)
@@ -76,11 +76,11 @@ void WolfControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != WOLF_STATE_DEATH)
+		if (item->Animation.ActiveState != WOLF_STATE_DEATH)
 		{
-			item->AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = WOLF_STATE_DEATH;
+			item->Animation.AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = WOLF_STATE_DEATH;
 		}
 	}
 	else
@@ -96,29 +96,29 @@ void WolfControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case WOLF_STATE_SLEEP:
 			head = 0;
 
 			if (creature->Mood == MoodType::Escape || AI.zoneNumber == AI.enemyZone)
 			{
-				item->RequiredState = WOLF_STATE_CROUCH;
-				item->TargetState = WOLF_STATE_IDLE;
+				item->Animation.RequiredState = WOLF_STATE_CROUCH;
+				item->Animation.TargetState = WOLF_STATE_IDLE;
 			}
 			else if (GetRandomControl() < WAKE_CHANCE)
 			{
-				item->RequiredState = WOLF_STATE_WALK;
-				item->TargetState = WOLF_STATE_IDLE;
+				item->Animation.RequiredState = WOLF_STATE_WALK;
+				item->Animation.TargetState = WOLF_STATE_IDLE;
 			}
 
 			break;
 
 		case WOLF_STATE_IDLE:
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else
-				item->TargetState = WOLF_STATE_WALK;
+				item->Animation.TargetState = WOLF_STATE_WALK;
 			break;
 
 		case WOLF_STATE_WALK:
@@ -126,30 +126,30 @@ void WolfControl(short itemNumber)
 
 			if (creature->Mood != MoodType::Bored)
 			{
-				item->TargetState = WOLF_STATE_STALK;
-				item->RequiredState = WOLF_STATE_NONE;
+				item->Animation.TargetState = WOLF_STATE_STALK;
+				item->Animation.RequiredState = WOLF_STATE_NONE;
 			}
 			else if (GetRandomControl() < SLEEP_CHANCE)
 			{
-				item->RequiredState = WOLF_STATE_SLEEP;
-				item->TargetState = WOLF_STATE_IDLE;
+				item->Animation.RequiredState = WOLF_STATE_SLEEP;
+				item->Animation.TargetState = WOLF_STATE_IDLE;
 			}
 
 			break;
 
 		case WOLF_STATE_CROUCH:
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (creature->Mood == MoodType::Escape)
-				item->TargetState = WOLF_STATE_RUN;
+				item->Animation.TargetState = WOLF_STATE_RUN;
 			else if (AI.distance < pow(345, 2) && AI.bite)
-				item->TargetState = WOLF_STATE_BITE;
+				item->Animation.TargetState = WOLF_STATE_BITE;
 			else if (creature->Mood == MoodType::Stalk)
-				item->TargetState = WOLF_STATE_STALK;
+				item->Animation.TargetState = WOLF_STATE_STALK;
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = WOLF_STATE_IDLE;
+				item->Animation.TargetState = WOLF_STATE_IDLE;
 			else
-				item->TargetState = WOLF_STATE_RUN;
+				item->Animation.TargetState = WOLF_STATE_RUN;
 
 			break;
 
@@ -157,26 +157,26 @@ void WolfControl(short itemNumber)
 			creature->MaxTurn = STALK_TURN;
 
 			if (creature->Mood == MoodType::Escape)
-				item->TargetState = WOLF_STATE_RUN;
+				item->Animation.TargetState = WOLF_STATE_RUN;
 			else if (AI.distance < pow(345, 2) && AI.bite)
-				item->TargetState = WOLF_STATE_BITE;
+				item->Animation.TargetState = WOLF_STATE_BITE;
 			else if (AI.distance > pow(SECTOR(3), 2))
-				item->TargetState = WOLF_STATE_RUN;
+				item->Animation.TargetState = WOLF_STATE_RUN;
 			else if (creature->Mood == MoodType::Attack)
 			{
 				if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
 					(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
 				{
-					item->TargetState = WOLF_STATE_RUN;
+					item->Animation.TargetState = WOLF_STATE_RUN;
 				}
 			}
 			else if (GetRandomControl() < HOWL_CHANCE)
 			{
-				item->RequiredState = WOLF_STATE_HOWL;
-				item->TargetState = WOLF_STATE_CROUCH;
+				item->Animation.RequiredState = WOLF_STATE_HOWL;
+				item->Animation.TargetState = WOLF_STATE_CROUCH;
 			}
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = WOLF_STATE_CROUCH;
+				item->Animation.TargetState = WOLF_STATE_CROUCH;
 
 			break;
 
@@ -189,47 +189,47 @@ void WolfControl(short itemNumber)
 				if (AI.distance > (ATTACK_RANGE / 2) &&
 					(AI.enemyFacing > FRONT_ARC || AI.enemyFacing < -FRONT_ARC))
 				{
-					item->RequiredState = WOLF_STATE_STALK;
-					item->TargetState = WOLF_STATE_CROUCH;
+					item->Animation.RequiredState = WOLF_STATE_STALK;
+					item->Animation.TargetState = WOLF_STATE_CROUCH;
 				}
 				else
 				{
-					item->TargetState = WOLF_STATE_ATTACK;
-					item->RequiredState = WOLF_STATE_NONE;
+					item->Animation.TargetState = WOLF_STATE_ATTACK;
+					item->Animation.RequiredState = WOLF_STATE_NONE;
 				}
 			}
 			else if (creature->Mood == MoodType::Stalk && AI.distance < STALK_RANGE)
 			{
-				item->RequiredState = WOLF_STATE_STALK;
-				item->TargetState = WOLF_STATE_CROUCH;
+				item->Animation.RequiredState = WOLF_STATE_STALK;
+				item->Animation.TargetState = WOLF_STATE_CROUCH;
 			}
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = WOLF_STATE_CROUCH;
+				item->Animation.TargetState = WOLF_STATE_CROUCH;
 
 			break;
 
 		case WOLF_STATE_ATTACK:
 			tilt = angle;
 
-			if (!item->RequiredState && item->TouchBits & TOUCH)
+			if (!item->Animation.RequiredState && item->TouchBits & TOUCH)
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
 				LaraItem->HitPoints -= LUNGE_DAMAGE;
 				LaraItem->HitStatus = true;
-				item->RequiredState = WOLF_STATE_RUN;
+				item->Animation.RequiredState = WOLF_STATE_RUN;
 			}
 
-			item->TargetState = WOLF_STATE_RUN;
+			item->Animation.TargetState = WOLF_STATE_RUN;
 			break;
 
 		case WOLF_STATE_BITE:
-			if (!item->RequiredState &&
+			if (!item->Animation.RequiredState &&
 				item->TouchBits & TOUCH && AI.ahead)
 			{
 				CreatureEffect(item, &WolfBite, DoBloodSplat);
 				LaraItem->HitPoints -= BITE_DAMAGE;
 				LaraItem->HitStatus = true;
-				item->RequiredState = WOLF_STATE_CROUCH;
+				item->Animation.RequiredState = WOLF_STATE_CROUCH;
 			}
 
 			break;

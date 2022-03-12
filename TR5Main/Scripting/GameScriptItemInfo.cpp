@@ -412,60 +412,60 @@ void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> cons
 
 int GameScriptItemInfo::GetCurrentAnimState() const
 {
-	return m_item->ActiveState;
+	return m_item->Animation.ActiveState;
 }
 
 void GameScriptItemInfo::SetCurrentAnimState(int animState)
 {
-	m_item->ActiveState = animState;
+	m_item->Animation.ActiveState = animState;
 }
 
 int GameScriptItemInfo::GetRequiredAnimState() const
 {
-	return m_item->RequiredState;
+	return m_item->Animation.RequiredState;
 }
 
 void GameScriptItemInfo::SetRequiredAnimState(short animState)
 {
-	m_item->RequiredState = animState;
+	m_item->Animation.RequiredState = animState;
 }
 
 int GameScriptItemInfo::GetGoalAnimState() const
 {
-	return m_item->TargetState;
+	return m_item->Animation.TargetState;
 }
 
 void GameScriptItemInfo::SetGoalAnimState(int state)
 {
-	m_item->TargetState = state;
+	m_item->Animation.TargetState = state;
 }
 
 int GameScriptItemInfo::GetAnimNumber() const
 {
-	return m_item->AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
 }
 
 void GameScriptItemInfo::SetAnimNumber(int animNumber)
 {
 	//TODO fixme: we need bounds checking with an error message once it's in the level file format
-	m_item->AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
+	m_item->Animation.AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
 }
 
 int GameScriptItemInfo::GetFrameNumber() const
 {
-	return m_item->FrameNumber - g_Level.Anims[m_item->AnimNumber].frameBase;
+	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
 void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->AnimNumber].frameEnd;
+	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = (frameNumber < frameCount);
 	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";
 
-	if (ScriptAssertF(cond, err, frameNumber, m_item->AnimNumber, frameCount))
-		m_item->FrameNumber = frameNumber + fBase;
+	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount))
+		m_item->Animation.FrameNumber = frameNumber + fBase;
 	else
 		ScriptWarn("Not setting frame number.");
 }

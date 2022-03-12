@@ -41,10 +41,10 @@ void InitialiseHydra(short itemNumber)
 
 	ClearItem(itemNumber);
 	
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = HYDRA_STATE_STOP;
-	item->ActiveState = HYDRA_STATE_STOP;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = HYDRA_STATE_STOP;
+	item->Animation.ActiveState = HYDRA_STATE_STOP;
 
 	if (item->TriggerFlags == 1)
 		item->Position.zPos += CLICK(1.5f);
@@ -188,9 +188,9 @@ void HydraControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		if (item->ActiveState != 5 &&
-			item->ActiveState != 10 &&
-			item->ActiveState != HYDRA_STATE_DEATH)
+		if (item->Animation.ActiveState != 5 &&
+			item->Animation.ActiveState != 10 &&
+			item->Animation.ActiveState != HYDRA_STATE_DEATH)
 		{
 			if (abs(AI.angle) >= ANGLE(1.0f))
 			{
@@ -208,7 +208,7 @@ void HydraControl(short itemNumber)
 				tilt = ANGLE(2.8f);
 		}
 
-		if (item->ActiveState != 12)
+		if (item->Animation.ActiveState != 12)
 		{
 			joint1 = AI.angle / 2;
 			joint3 = AI.angle / 2;
@@ -222,7 +222,7 @@ void HydraControl(short itemNumber)
 		short angles[2];
 		short roomNumber;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case HYDRA_STATE_STOP:
 			creature->MaxTurn = ANGLE(1.0f);
@@ -238,13 +238,13 @@ void HydraControl(short itemNumber)
 				if (AI.distance >= pow(SECTOR(2), 2) && GetRandomControl() & 0x1F)
 				{
 					if (!(GetRandomControl() & 0xF))
-						item->TargetState = HYDRA_STATE_AIM;
+						item->Animation.TargetState = HYDRA_STATE_AIM;
 				}
 				else
-					item->TargetState = HYDRA_STATE_BITE_ATTACK1;
+					item->Animation.TargetState = HYDRA_STATE_BITE_ATTACK1;
 			}
 			else
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			
 			break;
 
@@ -276,7 +276,7 @@ void HydraControl(short itemNumber)
 					if (damage > 0)
 					{
 						item->HitPoints -= damage;
-						item->TargetState = HYDRA_STATE_HURT;
+						item->Animation.TargetState = HYDRA_STATE_HURT;
 						CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
 					}
 				}
@@ -301,7 +301,7 @@ void HydraControl(short itemNumber)
 				if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
 				{
 					item->HitPoints -= damage;
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 					CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
 				}
 			}
@@ -313,7 +313,7 @@ void HydraControl(short itemNumber)
 
 			if (!(GlobalCounter & 3))
 			{
-				frame = ((g_Level.Anims[item->AnimNumber].frameBase - item->FrameNumber) / 8) + 1;
+				frame = ((g_Level.Anims[item->Animation.AnimNumber].frameBase - item->Animation.FrameNumber) / 8) + 1;
 				if (frame > 16)
 					frame = 16;
 
@@ -323,7 +323,7 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 3:
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				pos1 = { 0, 1024, 40 };
 				GetJointAbsPosition(item, &pos1, 10);
@@ -364,15 +364,15 @@ void HydraControl(short itemNumber)
 				if (AI.distance >= pow(CLICK(5), 2))
 				{
 					if (AI.distance >= pow(CLICK(7), 2))
-						item->TargetState = 0;
+						item->Animation.TargetState = 0;
 					else
-						item->TargetState = 9;
+						item->Animation.TargetState = 9;
 				}
 				else
-					item->TargetState = 8;
+					item->Animation.TargetState = 8;
 			}
 			else
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			
 			break;
 
@@ -384,14 +384,14 @@ void HydraControl(short itemNumber)
 	{
 		item->HitPoints = 0;
 
-		if (item->ActiveState != HYDRA_STATE_DEATH)
+		if (item->Animation.ActiveState != HYDRA_STATE_DEATH)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
-			item->ActiveState = HYDRA_STATE_DEATH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
+			item->Animation.ActiveState = HYDRA_STATE_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
-		if (!((item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase) & 7))
+		if (!((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) & 7))
 		{
 			if (item->ItemFlags[3] < 12)
 			{

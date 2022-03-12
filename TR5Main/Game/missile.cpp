@@ -109,7 +109,7 @@ void ControlMissile(short fxNumber)
 		LaraItem->HitStatus = 1;
 
 		fx->pos.yRot = LaraItem->Position.yRot;
-		fx->speed = LaraItem->Velocity;
+		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
 
