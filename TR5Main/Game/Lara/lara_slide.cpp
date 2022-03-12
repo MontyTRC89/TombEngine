@@ -114,11 +114,9 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 	LaraDeflectEdge(item, coll);
 
-	// TODO
 	if (TestLaraStep(item, coll))
 	{
-		LaraSnapToHeight(item, coll);
-		//DoLaraStep(item, coll);
+		DoLaraStep(item, coll);
 		return;
 	}
 }
@@ -218,8 +216,7 @@ void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 	if (TestLaraStep(item, coll))
 	{
-		LaraSnapToHeight(item, coll);
-		//DoLaraStep(item, coll);
+		DoLaraStep(item, coll);
 		return;
 	}
 }
