@@ -31,17 +31,8 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
-		lara->Control.Count.RunJump = 0;
-
-	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
-		lara->Control.RunJumpQueued = false;
-
-	// Increment/reset AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME &&
-		TestLaraPose(item, coll) &&
+	// Update AFK pose timer.
+	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->Animations.HasPose)
 	{
@@ -50,19 +41,27 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		lara->Control.Count.Pose = 0;
 
+	// Reset running jump timer.
+	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
+		lara->Control.Count.RunJump = 0;
+
+	// Reset running jump action queue.
+	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
+		lara->Control.RunJumpQueued = false;
+
 	// Reset lean.
 	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 		ResetLaraLean(item, 6);
 
 	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) &&
-		coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&
+	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
 		(!item->Velocity || (item->Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
 		ResetLaraFlex(item, 12);
 	}
 
 	// Reset turn rate.
+	// TODO: Make it less stupid in the future. Do it according to a curve?
 	int sign = copysign(1, lara->Control.TurnRate);
 	if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
 		lara->Control.TurnRate -= ANGLE(2.0f) * sign;
@@ -150,7 +149,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	static constexpr int rate = 50;
-	int threshold = std::max(abs(item->Velocity) / 3 * 2, CLICK(1) / 16);
+	int threshold = std::max(abs(item->Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
 	
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
@@ -374,7 +373,10 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 	short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
+	//short deltaAngle = abs((short)(direction - item->Position.yRot));
+	
 	lara->ExtraVelocity.x += minVelocity;
+	lara->ExtraVelocity.y += minVelocity * phd_sin(steepness); // TODO: Keeps incrementing to ridiculous values.
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
