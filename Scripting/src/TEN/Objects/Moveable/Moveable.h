@@ -19,7 +19,7 @@ class Moveable : public NamedBase<Moveable, short>
 public:
 	using IdentifierType = short;
 
-	Moveable(short num, bool temporary, bool init = true);
+	Moveable(short num, bool init = true);
 	~Moveable();
 	Moveable& operator=(Moveable const& other) = delete;
 	Moveable(Moveable const& other) = delete;
@@ -31,9 +31,12 @@ public:
 	void SetObjectID(GAME_OBJECT_ID id);
 
 	std::string GetName() const;
-	void SetName(std::string const &);
+	bool SetName(std::string const &);
+
 	bool GetValid() const;
 	void Invalidate();
+
+	void Destroy();
 
 	Position GetPos() const;
 	void SetPos(Position const& pos);
@@ -75,5 +78,4 @@ private:
 	ITEM_INFO* m_item;
 	short m_num;
 	bool m_initialised;
-	bool m_temporary;
 };
