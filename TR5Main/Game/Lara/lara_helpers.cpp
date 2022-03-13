@@ -27,7 +27,7 @@
 // For State Control & Collision
 // -----------------------------
 
-void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
+void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -72,7 +72,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yRot += lara->Control.TurnRate;
 }
 
-bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
+bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -166,7 +166,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 }
 
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
+void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate)
 {
 	if (!item->Animation.Velocity)
 		return;
@@ -182,7 +182,7 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
@@ -209,13 +209,13 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	EaseOutLaraHeight(item, coll->Middle.Floor);
 }
 
-void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	EaseOutLaraHeight(item, coll->Middle.Ceiling);
 }
 
 // TODO: Doesn't always work on bridges.
-void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.ForwardAngle = item->Position.yRot + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
@@ -225,7 +225,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
-void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
+void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -331,10 +331,10 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 	return (LaraInfo*&)firstLaraItem->Data;
 }
 
-short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
+short GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = coll->Setup.ForwardAngle;
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	// Ground is flat.
 	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
@@ -349,11 +349,11 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	return direction;
 }
 
-void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
+void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	/*if (g_GameFlow->Animations.HasSlideExtended)
 	{
@@ -379,7 +379,7 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
 	lara->ExtraVelocity.y += minVelocity * phd_sin(steepness); // TODO: Keeps incrementing to ridiculous values.
 }
 
-void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -411,13 +411,13 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
-void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraRunJumpQueue(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int distance = SECTOR(1);
-	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -coll->Setup.Height);
+	auto probe = GetCollision(item, item->Position.yRot, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
@@ -430,7 +430,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
 		lara->Control.RunJumpQueued = false;
 }
 
-void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
+void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultResult)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -448,7 +448,7 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(lara->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 }
 
-void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraLand(ITEM_INFO* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
@@ -491,7 +491,7 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
-void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
 	short deltaAngle = abs((short)(direction - item->Position.yRot));
@@ -514,9 +514,11 @@ void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll)
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
+
+	LaraSnapToHeight(item, coll);
 }
 
-void SetLaraCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
+void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)
 {
 	auto* lara = GetLaraInfo(item);
 

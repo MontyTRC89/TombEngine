@@ -311,7 +311,7 @@ void DoPickup(ITEM_INFO* laraItem)
 	getThisItemPlease = NO_ITEM;
 }
 
-void PickupCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -948,7 +948,7 @@ void InitialiseSearchObject(short itemNumber)
 	}
 }
 
-void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
+void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;

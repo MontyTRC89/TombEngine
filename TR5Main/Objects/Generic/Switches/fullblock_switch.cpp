@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 	byte Sequences[3];
 	byte CurrentSequence;
 
-	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

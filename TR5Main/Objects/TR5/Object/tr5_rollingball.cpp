@@ -14,7 +14,7 @@
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
-void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
@@ -48,7 +48,7 @@ void RollingBallControl(short itemNumber)
 	item->Position.yPos += item->Animation.VerticalVelocity;
 	item->Position.zPos += item->ItemFlags[1] / 32;
 
-	int dh = GetCollisionResult(item).Position.Floor - CLICK(2);
+	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
 	if (item->Position.yPos > dh)
 	{
@@ -86,10 +86,10 @@ void RollingBallControl(short itemNumber)
 	int leftX  = item->Position.xPos - CLICK(0.5f);
 	int leftZ  = item->Position.zPos;
 
-	auto frontFloor = GetCollisionResult(frontX, item->Position.yPos, frontZ, item->RoomNumber);
-	auto backFloor  = GetCollisionResult(backX,  item->Position.yPos, backZ,  item->RoomNumber);
-	auto rightFloor = GetCollisionResult(rightX, item->Position.yPos, rightZ, item->RoomNumber);
-	auto leftFloor  = GetCollisionResult(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
+	auto frontFloor = GetCollision(frontX, item->Position.yPos, frontZ, item->RoomNumber);
+	auto backFloor  = GetCollision(backX,  item->Position.yPos, backZ,  item->RoomNumber);
+	auto rightFloor = GetCollision(rightX, item->Position.yPos, rightZ, item->RoomNumber);
+	auto leftFloor  = GetCollision(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
 
 	int frontHeight = frontFloor.Position.Floor - CLICK(2);
 	int backHeight  = backFloor.Position.Floor  - CLICK(2);
@@ -110,10 +110,10 @@ void RollingBallControl(short itemNumber)
 	leftX  = item->Position.xPos - CLICK(2);
 	leftZ  = item->Position.zPos;
 
-	auto fronFarFloor  = GetCollisionResult(frontX, item->Position.yPos, frontZ, item->RoomNumber);
-	auto backFarFloor  = GetCollisionResult(backX,  item->Position.yPos, backZ,  item->RoomNumber);
-	auto rightFarFloor = GetCollisionResult(rightX, item->Position.yPos, rightZ, item->RoomNumber);
-	auto leftFarFloor  = GetCollisionResult(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
+	auto fronFarFloor  = GetCollision(frontX, item->Position.yPos, frontZ, item->RoomNumber);
+	auto backFarFloor  = GetCollision(backX,  item->Position.yPos, backZ,  item->RoomNumber);
+	auto rightFarFloor = GetCollision(rightX, item->Position.yPos, rightZ, item->RoomNumber);
+	auto leftFarFloor  = GetCollision(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
 
 	int frontFarHeight = fronFarFloor.Position.Floor  - CLICK(2);
 	int backFarHeight  = backFarFloor.Position.Floor  - CLICK(2);
@@ -236,7 +236,7 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	auto roomNumber = GetCollisionResult(item).RoomNumber;
+	auto roomNumber = GetCollision(item).RoomNumber;
 
 	if (item->RoomNumber != roomNumber)
 		ItemNewRoom(itemNumber, roomNumber);
@@ -276,7 +276,7 @@ void RollingBallControl(short itemNumber)
 	TestTriggers(item, true);
 }
 
-void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, COLL_INFO* coll)
+void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNum];
 

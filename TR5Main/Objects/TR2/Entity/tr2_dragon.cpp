@@ -151,7 +151,7 @@ static void createDragonBone(short frontNumber)
 	}
 }
 
-void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

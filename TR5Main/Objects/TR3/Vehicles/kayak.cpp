@@ -182,7 +182,7 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 	int x = kayakItem->Position.xPos + zOffset * s + xOffset * c;
 	int z = kayakItem->Position.zPos + zOffset * c - xOffset * s;
 
-	int probedRoomNum = GetCollisionResult(x, kayakItem->Position.yPos, z, kayakItem->RoomNumber).RoomNumber;
+	int probedRoomNum = GetCollision(x, kayakItem->Position.yPos, z, kayakItem->RoomNumber).RoomNumber;
 	int waterHeight = GetWaterHeight(x, kayakItem->Position.yPos, z, probedRoomNum);
 
 	if (waterHeight != NO_HEIGHT)
@@ -248,7 +248,7 @@ void KayakDoRipple(ITEM_INFO* kayakItem, int xOffset, int zOffset)
 	int x = kayakItem->Position.xPos + zOffset * s + xOffset * c;
 	int z = kayakItem->Position.zPos + zOffset * c - xOffset * s;
 
-	int probedRoomNum = GetCollisionResult(x, kayakItem->Position.yPos, z, kayakItem->RoomNumber).RoomNumber;
+	int probedRoomNum = GetCollision(x, kayakItem->Position.yPos, z, kayakItem->RoomNumber).RoomNumber;
 	int waterHeight = GetWaterHeight(x, kayakItem->Position.yPos, z, probedRoomNum);
 
 	if (waterHeight != NO_HEIGHT)
@@ -289,7 +289,7 @@ KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
 	if (distance > pow(360, 2))
 		return KayakMountType::None;
 
-	auto probe = GetCollisionResult(kayakItem);
+	auto probe = GetCollision(kayakItem);
 	if (probe.Position.Floor > -32000)
 	{
 		short angle = phd_atan(kayakItem->Position.zPos - laraItem->Position.zPos, kayakItem->Position.xPos - laraItem->Position.xPos);
@@ -453,7 +453,7 @@ int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, PHD_VECTOR* pos)
 	pos->y = vec.y;
 	pos->z = vec.z;
 
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, kayakItem->RoomNumber);
+	auto probe = GetCollision(pos->x, pos->y, pos->z, kayakItem->RoomNumber);
 	int probedRoomNum = probe.RoomNumber;
 
 	int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNum);
@@ -530,7 +530,7 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		auto probe = GetCollisionResult(old->x, pos->y, pos->z, kayakItem->RoomNumber);
+		auto probe = GetCollision(old->x, pos->y, pos->z, kayakItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
@@ -539,7 +539,7 @@ int KayakDoShift(ITEM_INFO* kayakItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = SECTOR(1) - zShift;
 		}
 
-		probe = GetCollisionResult(pos->x, pos->y, old->z, kayakItem->RoomNumber);
+		probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
@@ -664,7 +664,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 	kayakItem->Position.yRot += rot;
 
-	auto probe = GetCollisionResult(kayakItem);
+	auto probe = GetCollision(kayakItem);
 	int probedRoomNum = probe.RoomNumber;
 
 	height2 = GetWaterHeight(kayakItem->Position.xPos, kayakItem->Position.yPos, kayakItem->Position.zPos, probedRoomNum);
@@ -674,7 +674,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	if (height2 < (kayakItem->Position.yPos - KAYAK_COLLIDE))
 		KayakDoShift(kayakItem, (PHD_VECTOR*)&kayakItem->Position, &oldPos[8]);
 
-	probe = GetCollisionResult(kayakItem);
+	probe = GetCollision(kayakItem);
 	probedRoomNum = probe.RoomNumber;
 
 	height2 = GetWaterHeight(kayakItem->Position.xPos, kayakItem->Position.yPos, kayakItem->Position.zPos, probedRoomNum);
@@ -1204,7 +1204,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 	lara->HitDirection = -1;
 }
 
-void KayakCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[itemNumber];
@@ -1274,7 +1274,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 	KayakToBackground(laraItem, kayakItem);
 	TestTriggers(kayakItem, false);
 
-	auto probe = GetCollisionResult(kayakItem);
+	auto probe = GetCollision(kayakItem);
 	int water = GetWaterHeight(kayakItem->Position.xPos, kayakItem->Position.yPos, kayakItem->Position.zPos, probe.RoomNumber);
 	kayak->WaterHeight = water;
 

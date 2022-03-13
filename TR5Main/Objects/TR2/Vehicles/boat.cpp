@@ -176,7 +176,7 @@ void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
 	}*/
 }
 
-BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, COLL_INFO* coll)
+BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -246,7 +246,7 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 	int x = sBoatItem->Position.xPos + DISMOUNT_DISTANCE * phd_sin(angle);
 	int y = sBoatItem->Position.yPos;
 	int z = sBoatItem->Position.zPos + DISMOUNT_DISTANCE * phd_cos(angle);
-	auto probe = GetCollisionResult(x, y, z, sBoatItem->RoomNumber);
+	auto probe = GetCollision(x, y, z, sBoatItem->RoomNumber);
 
 	if ((probe.Position.Floor - sBoatItem->Position.yPos) < -CLICK(2))
 		return false;
@@ -290,7 +290,7 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 		int x = laraItem->Position.xPos + 360 * phd_sin(laraItem->Position.yRot);
 		int y = laraItem->Position.yPos - 90;
 		int z = laraItem->Position.zPos + 360 * phd_cos(laraItem->Position.yRot);
-		auto probe = GetCollisionResult(x, y, z, laraItem->RoomNumber);
+		auto probe = GetCollision(x, y, z, laraItem->RoomNumber);
 
 		if (probe.Position.Floor >= (y - CLICK(1)))
 		{
@@ -316,7 +316,7 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, PHD
 	pos->y = sBoatItem->Position.yPos - zOffset * phd_sin(sBoatItem->Position.xRot) + xOffset * phd_sin(sBoatItem->Position.zRot);
 	pos->z = sBoatItem->Position.zPos + zOffset * c - xOffset * s;
 
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, sBoatItem->RoomNumber);
+	auto probe = GetCollision(pos->x, pos->y, pos->z, sBoatItem->RoomNumber);
 	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
@@ -405,7 +405,7 @@ short SpeedBoatDoShift(ITEM_INFO* sBoatItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		auto probe = GetCollisionResult(old->x, pos->y, pos->z, sBoatItem->RoomNumber);
+		auto probe = GetCollision(old->x, pos->y, pos->z, sBoatItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
@@ -414,7 +414,7 @@ short SpeedBoatDoShift(ITEM_INFO* sBoatItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = SECTOR(1) - shiftZ;
 		}
 
-		probe = GetCollisionResult(pos->x, pos->y, old->z, sBoatItem->RoomNumber);
+		probe = GetCollision(pos->x, pos->y, old->z, sBoatItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
@@ -590,7 +590,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 			SpeedBoatDoShift(sBoatItem, &f, &frontOld);
 	}
 
-	auto probe = GetCollisionResult(sBoatItem);
+	auto probe = GetCollision(sBoatItem);
 	auto height = GetWaterHeight(sBoatItem->Position.xPos, sBoatItem->Position.yPos - 5, sBoatItem->Position.zPos, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
@@ -611,7 +611,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 		if (lara->Vehicle == itemNumber && sBoatItem->Animation.Velocity > BOAT_MAX_VELOCITY + BOAT_ACCELERATION && newVelocity < sBoatItem->Animation.Velocity - 10)
 		{
 			laraItem->HitPoints -= sBoatItem->Animation.Velocity;
-			laraItem->HitStatus = 1;
+			laraItem->HitStatus = true;
 			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Position, 0);
 			newVelocity /= 2;
 			sBoatItem->Animation.Velocity /= 2;
@@ -850,7 +850,7 @@ void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water)
 	*/
 }
 
-void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -924,7 +924,7 @@ void SpeedBoatControl(short itemNumber)
 	int heightFrontLeft = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, -BOAT_SIDE, &frontLeft);
 	int heightFrontRight = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, BOAT_SIDE, &frontRight);
 
-	auto probe = GetCollisionResult(sBoatItem);
+	auto probe = GetCollision(sBoatItem);
 
 	if (lara->Vehicle == itemNumber)
 	{

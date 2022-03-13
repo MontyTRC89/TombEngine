@@ -209,7 +209,7 @@ static int CanQuadbikeGetOff(int direction)
 	int y = item->Position.yPos;
 	int z = item->Position.zPos + CLICK(2) * phd_cos(angle);
 
-	auto collResult = GetCollisionResult(x, y, z, item->RoomNumber);
+	auto collResult = GetCollision(x, y, z, item->RoomNumber);
 
 	if (collResult.Position.FloorSlope ||
 		collResult.Position.Floor == NO_HEIGHT)
@@ -289,7 +289,7 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		return true;
 }
 
-static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, COLL_INFO* coll)
+static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -306,7 +306,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, COLL_INFO* co
 	if (dist > 170000)
 		return false;
 
-	auto probe = GetCollisionResult(quadItem);
+	auto probe = GetCollision(quadItem);
 	if (probe.Position.Floor < -32000)
 		return false;
 	else
@@ -421,7 +421,7 @@ static int TestQuadHeight(ITEM_INFO* quadItem, int dz, int dx, PHD_VECTOR* pos)
 	pos->z = quadItem->Position.zPos + dz * c - dx * s;
 	pos->x = quadItem->Position.xPos + dz * s + dx * c;
 
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, quadItem->RoomNumber);
+	auto probe = GetCollision(pos->x, pos->y, pos->z, quadItem->RoomNumber);
 	if (probe.Position.Ceiling > pos->y ||
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
@@ -477,7 +477,7 @@ static int DoQuadShift(ITEM_INFO* quadItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		probe = GetCollisionResult(old->x, pos->y, pos->z, quadItem->RoomNumber);
+		probe = GetCollision(old->x, pos->y, pos->z, quadItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
@@ -486,7 +486,7 @@ static int DoQuadShift(ITEM_INFO* quadItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = WALL_SIZE - shiftZ;
 		}
 
-		probe = GetCollisionResult(pos->x, pos->y, old->z, quadItem->RoomNumber);
+		probe = GetCollision(pos->x, pos->y, old->z, quadItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
@@ -659,7 +659,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	else
 		quadItem->Position.yRot += quad->TurnRate + quad->ExtraRotation;
 
-	auto probe = GetCollisionResult(quadItem);
+	auto probe = GetCollision(quadItem);
 	int speed = 0;
 	if (quadItem->Position.yPos >= probe.Position.Floor)
 		speed = quadItem->Animation.VerticalVelocity * phd_cos(quadItem->Position.xRot);
@@ -759,7 +759,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			rot += rotAdd;
 	}
 
-	probe = GetCollisionResult(quadItem);
+	probe = GetCollision(quadItem);
 	if (probe.Position.Floor < quadItem->Position.yPos - CLICK(1))
 		DoQuadShift(quadItem, (PHD_VECTOR*)&quadItem->Position, &old);
 
@@ -1173,7 +1173,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 	return drive;
 }
 
-void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quadItem = &g_Level.Items[itemNumber];
@@ -1286,7 +1286,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->size = spark->sSize = size / 2;
 }
 
-bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quadItem = &g_Level.Items[lara->Vehicle];
@@ -1300,7 +1300,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 
 	bool collide = QuadDynamics(laraItem, quadItem);
 
-	auto probe = GetCollisionResult(quadItem);
+	auto probe = GetCollision(quadItem);
 
 	PHD_VECTOR frontLeft, frontRight;
 	auto floorHeightLeft = TestQuadHeight(quadItem, QUAD_FRONT, -QUAD_SIDE, &frontLeft);

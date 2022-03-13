@@ -83,7 +83,7 @@ void ControlCentaurBomb(short itemNumber)
 	item->Position.yPos += item->Animation.Velocity * phd_sin(-item->Position.xRot);
 	item->Position.zPos += item->Animation.Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	if (probe.Position.Floor < item->Position.yPos ||
 		probe.Position.Ceiling > item->Position.yPos)

@@ -117,7 +117,7 @@ void GameSticksControl(short itemNumber)
 		else
 			item2->Position.zPos -= 128;
 
-		probedRoomNumber = GetCollisionResult(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+		probedRoomNumber = GetCollision(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
 		if (item2->RoomNumber != probedRoomNumber)
 			ItemNewRoom(SenetPiecesNumber[ActivePiece], probedRoomNumber);
 		
@@ -173,7 +173,7 @@ void GameSticksControl(short itemNumber)
 							item2->Position.xPos = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
 							item2->Position.zPos = SenetTargetZ + SECTOR(i % 3);
 							
-							probedRoomNumber = GetCollisionResult(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+							probedRoomNumber = GetCollision(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
 							if (item2->RoomNumber != probedRoomNumber)
 								ItemNewRoom(SenetPiecesNumber[i], probedRoomNumber);
 							
@@ -420,7 +420,7 @@ void MakeMove(int piece, int displacement)
 	}
 }
 
-void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 

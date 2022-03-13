@@ -54,7 +54,7 @@ void ControlMissile(short fxNumber)
 	fx->pos.zPos += velocity * phd_cos(fx->pos.yRot);
 	fx->pos.xPos += velocity * phd_sin(fx->pos.yRot);
 
-	auto probe = GetCollisionResult(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 
 	// Check for hitting something.
 	if (fx->pos.yPos >= probe.Position.Floor ||
@@ -142,7 +142,7 @@ void ControlNatlaGun(short fxNumber)
 		int x = fx->pos.xPos + fx->speed * phd_sin(fx->pos.yRot);
 		int y = fx->pos.yPos;
 
-		auto probe = GetCollisionResult(x, y, z, fx->roomNumber);
+		auto probe = GetCollision(x, y, z, fx->roomNumber);
 
 		// Don't create one if hit a wall.
 		if (y >= probe.Position.Floor ||

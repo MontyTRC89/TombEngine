@@ -47,7 +47,7 @@ void KnifeControl(short fxNumber)
 	fx->pos.xPos += speed * phd_sin(fx->pos.yRot);
 	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
 
-	auto probe = GetCollisionResult(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 
 	if (fx->pos.yPos >= probe.Position.Floor ||
 		fx->pos.yPos <= probe.Position.Ceiling)

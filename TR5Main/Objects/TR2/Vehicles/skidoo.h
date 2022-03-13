@@ -4,19 +4,19 @@
 
 void InitialiseSkidoo(short itemNumber);
 
-int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, COLL_INFO* coll);
+int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo* coll);
 bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction);
 bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 
 int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, PHD_VECTOR* moved);
-void SkidooCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void SkidooCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 
 void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 void DoSnowEffect(ITEM_INFO* skidooItem);
 
-bool SkidooControl(ITEM_INFO* laraItem, COLL_INFO* coll);
+bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll);
 bool SkidooUserControl(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int height, int* pitch);
 void SkidooAnimation(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int collide, bool dead);
 

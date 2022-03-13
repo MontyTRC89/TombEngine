@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 struct PHD_VECTOR;
 
 void InitialiseKayak(short itemNumber);
@@ -22,5 +22,5 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem);
 void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem);
 void KayakLaraRapidsDrown(ITEM_INFO* laraItem);
 
-void KayakCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
+void KayakCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll);
 bool KayakControl(ITEM_INFO* laraItem);

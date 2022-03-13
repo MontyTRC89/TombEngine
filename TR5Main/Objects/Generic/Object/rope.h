@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 struct PHD_VECTOR;
 
 namespace TEN::Entities::Generic
@@ -44,7 +44,7 @@ namespace TEN::Entities::Generic
 	void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* dest);
 	void phd_GetMatrixAngles(int* array, short* angle);
 	void RopeControl(short itemNumber);
-	void RopeCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+	void RopeCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
 	void RopeDynamics(ROPE_STRUCT* rope);
 	int RopeNodeCollision(ROPE_STRUCT* rope, int x, int y, int z, int value);
 	void ApplyVelocityToRope(int node, short angle, short n);
@@ -56,5 +56,5 @@ namespace TEN::Entities::Generic
 	void UpdateRopeSwing(ITEM_INFO* item);
 	void JumpOffRope(ITEM_INFO* item);
 	void FallFromRope(ITEM_INFO* item);
-	void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll);
+	void LaraClimbRope(ITEM_INFO* item, CollisionInfo* coll);
 }

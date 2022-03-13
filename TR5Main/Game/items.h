@@ -68,41 +68,40 @@ struct EntityAnimationData
 
 struct ITEM_INFO
 {
-	std::string LuaName;
 	GAME_OBJECT_ID ObjectNumber;
+	std::string LuaName;
 	short NextItem;
 	short NextActive;
-	int BoxNumber;
-	int Status; // ItemStatus enum
 
 	bool Active;
+	int Status;	// ItemStatus enum.
+	short RoomNumber;
+	ROOM_VECTOR Location;
+	int BoxNumber;
+	int Timer;
+	int Floor;
+	short Shade;
+	int HitPoints;
+
 	bool HitStatus;
-	bool Collidable;
 	bool LookedAt;
+	bool Collidable;
 	bool InDrawRoom;
-	short DrawRoom;	// Unused?
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
 	PHD_3DPOS Position;
 	PHD_3DPOS StartPosition;
-	ROOM_VECTOR Location;
-	short RoomNumber;
-	int Floor;
 
-	int HitPoints;
-	int Timer;
-	short Shade;
-
+	uint32_t TouchBits;
 	uint32_t MeshBits;
 
+	uint16_t Flags; // ItemFlags enum
 	short ItemFlags[8];
 	short TriggerFlags;
-	uint16_t Flags; // ItemFlags enum
 	uint32_t SwapMeshFlags;
 
 	// TODO: Move to CreatureInfo?
-	uint32_t TouchBits;
 	uint8_t AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;

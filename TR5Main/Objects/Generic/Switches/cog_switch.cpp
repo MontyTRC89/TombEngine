@@ -27,7 +27,7 @@ namespace TEN::Entities::Switches
 	};
 	PHD_VECTOR CogSwitchPos(0, 0, -856);
 
-	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNum];

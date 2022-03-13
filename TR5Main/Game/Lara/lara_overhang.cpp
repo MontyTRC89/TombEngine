@@ -41,7 +41,7 @@ inline bool SlopeInvCheck(Vector2 slope, Vector2 goal)
 
 bool TestMonkey(FLOOR_INFO* floor, int x, int y, int z)
 {
-	return GetCollisionResult(floor, x, y, z).BottomBlock->Flags.Monkeyswing;
+	return GetCollision(floor, x, y, z).BottomBlock->Flags.Monkeyswing;
 }
 
 short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight, int minCeilY = 0, int maxCeilY = 0)
@@ -290,7 +290,7 @@ void FillSlopeData(short orient, Vector2& goal, short& climbOrient, short& goalO
 
 // ************  Climbing logic (control & collision routines) ************* //
 
-void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
@@ -305,8 +305,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	PHD_VECTOR up = { item->Position.xPos - offset.x, item->Position.yPos - CLICK(1), item->Position.zPos - offset.z };
 	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
 
-	auto collResultUp = GetCollisionResult(up.x, up.y, up.z, item->RoomNumber);
-	auto collResultDown = GetCollisionResult(down.x, down.y, down.z, item->RoomNumber);
+	auto collResultUp = GetCollision(up.x, up.y, up.z, item->RoomNumber);
+	auto collResultDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
 	short tempRoom = 0;
 
@@ -406,7 +406,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 		// Get floor_lara 256 downstream of Lara
 		auto floorNext = (FLOOR_INFO*)GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
-		if ((GetClimbFlags(GetCollisionResult(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos).BottomBlock) & climbOrient) &&
+		if ((GetClimbFlags(GetCollision(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos).BottomBlock) & climbOrient) &&
 			InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, 0, CLICK(1)))
 		{
 			AlignToEdge(item, BACKWARD_ALIGNMENT);
@@ -440,7 +440,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -457,7 +457,7 @@ void lara_as_slopeclimb(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.speed = 15;
 }
 
-void lara_as_slopefall(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 {
 	item->Animation.Airborne = true;
 
@@ -476,7 +476,7 @@ void lara_as_slopefall(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.speed = 15;
 }
 
-void lara_col_slopehang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
@@ -548,7 +548,7 @@ void lara_col_slopehang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_slopehang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -563,7 +563,7 @@ void lara_as_slopehang(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.speed = 15;
 }
 
-void lara_col_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
@@ -614,7 +614,7 @@ void lara_col_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 		SetAnimation(item, (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT) ? LA_OVERHANG_SHIMMY_LEFT_STOP : LA_OVERHANG_SHIMMY_RIGHT_STOP);
 }
 
-void lara_as_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -642,7 +642,7 @@ void lara_as_slopeshimmy(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_slopeclimbup(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -673,7 +673,7 @@ void lara_as_slopeclimbup(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_slopeclimbdown(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
 		item->Position.xRot--;
@@ -703,7 +703,7 @@ void lara_as_slopeclimbdown(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_sclimbstart(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Rotating camera effect during monkey to overhead slope transition
 	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
@@ -753,7 +753,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.xRot--;
 }
 
-void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Rotating camera effect during monkey to overhead slope transition
 
@@ -805,7 +805,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.xRot--;
 }
 
-void lara_as_sclimbend(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
 {
 	switch (item->Animation.AnimNumber)
 	{
@@ -836,7 +836,7 @@ void lara_as_sclimbend(ITEM_INFO* item, COLL_INFO* coll)
 // ********  Extending existing state routines  ********
 
 // Extends state 10 (AS_HANG)
-void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
+void SlopeHangExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
@@ -884,7 +884,7 @@ void SlopeHangExtra(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Extends state 11 (AS_REACH)
-void SlopeReachExtra(ITEM_INFO* item, COLL_INFO* coll)
+void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
@@ -927,7 +927,7 @@ void SlopeReachExtra(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Extends state 56 (AS_CLIMBSTNC)
-void SlopeClimbExtra(ITEM_INFO* item, COLL_INFO* coll)
+void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
@@ -1001,12 +1001,12 @@ void SlopeClimbExtra(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void LadderMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
+void LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	auto result = GetCollisionResult(item);
+	auto result = GetCollision(item);
 	auto ceilingTilt = result.Block->TiltXZ(item->Position.xPos, item->Position.yPos, false);
 
 	if (abs(ceilingTilt.x) > 2 || abs(ceilingTilt.y) > 2)
@@ -1017,7 +1017,7 @@ void LadderMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Extends state 61 (AS_CLIMBDOWN)
-void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
+void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
@@ -1074,7 +1074,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, COLL_INFO* coll)
 }
 
 // Extends state 75 (AS_HANG2)
-void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
+void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1168,7 +1168,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 		{
 			// Additional overhang ladder tests
 
-			auto collResult = GetCollisionResult(down.x, item->Position.yPos - coll->Setup.Height, down.z, item->RoomNumber);
+			auto collResult = GetCollision(down.x, item->Position.yPos - coll->Setup.Height, down.z, item->RoomNumber);
 			auto topSide = item->Position.yPos - coll->Setup.Height;
 
 			if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Position.yRot + ANGLE(180.0f))) &&
@@ -1176,9 +1176,9 @@ void SlopeMonkeyExtra(ITEM_INFO* item, COLL_INFO* coll)
 				collResult.Position.Ceiling <= topSide - CLICK(1))
 			{
 				// Primary checks succeeded, now do C-shaped secondary probing
-				collResult = GetCollisionResult(down.x, topSide, down.z, collResult.RoomNumber);
-				collResult = GetCollisionResult(down.x, topSide - CLICK(2), down.z, collResult.RoomNumber);
-				collResult = GetCollisionResult(now.x, topSide - CLICK(2), now.z, collResult.RoomNumber);
+				collResult = GetCollision(down.x, topSide, down.z, collResult.RoomNumber);
+				collResult = GetCollision(down.x, topSide - CLICK(2), down.z, collResult.RoomNumber);
+				collResult = GetCollision(now.x, topSide - CLICK(2), now.z, collResult.RoomNumber);
 
 				if ((collResult.Position.Floor <= topSide - CLICK(1)) || (collResult.Position.Ceiling >= topSide - CLICK(1)))
 				{

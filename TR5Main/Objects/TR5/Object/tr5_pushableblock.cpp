@@ -147,7 +147,7 @@ void PushableBlockControl(short itemNumber)
 	// control block falling
 	if (item->Animation.Airborne)
 	{
-		int floorHeight = GetCollisionResult(item->Position.xPos, item->Position.yPos + 10, item->Position.zPos, item->RoomNumber).Position.Floor;
+		int floorHeight = GetCollision(item->Position.xPos, item->Position.yPos + 10, item->Position.zPos, item->RoomNumber).Position.Floor;
 
 		if (item->Position.yPos < (floorHeight - item->Animation.VerticalVelocity))
 		{
@@ -247,7 +247,7 @@ void PushableBlockControl(short itemNumber)
 		{
 			if (info->canFall) // check if pushable is about to fall
 			{
-				int floorHeight = GetCollisionResult(item->Position.xPos, item->Position.yPos + 10, item->Position.zPos, item->RoomNumber).Position.Floor;
+				int floorHeight = GetCollision(item->Position.xPos, item->Position.yPos + 10, item->Position.zPos, item->RoomNumber).Position.Floor;
 				if (floorHeight > item->Position.yPos)
 				{
 					item->Position.xPos = item->Position.xPos & 0xFFFFFE00 | 0x200;
@@ -378,7 +378,7 @@ void PushableBlockControl(short itemNumber)
 	}
 }
 
-void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* pushableItem = &g_Level.Items[itemNumber];
@@ -584,7 +584,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
 		break;
 	}
 
-	auto probe = GetCollisionResult(x, y - blockHeight, z, item->RoomNumber);
+	auto probe = GetCollision(x, y - blockHeight, z, item->RoomNumber);
 
 	auto* room = &g_Level.Rooms[probe.RoomNumber];
 	if (GetSector(room, x - room->x, z - room->z)->Stopper)
@@ -607,7 +607,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
 
 	int ceiling = y - blockHeight + 100;
 
-	if (GetCollisionResult(x, ceiling, z, item->RoomNumber).Position.Ceiling > ceiling)
+	if (GetCollision(x, ceiling, z, item->RoomNumber).Position.Ceiling > ceiling)
 		return false;
 
 	int oldX = item->Position.xPos;
@@ -676,7 +676,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant)
 	if (GetSector(room, x - room->x, z - room->z)->Stopper)
 		return false;
 
-	auto probe = GetCollisionResult(x, y - blockHeight, z, item->RoomNumber);
+	auto probe = GetCollision(x, y - blockHeight, z, item->RoomNumber);
 
 	if (probe.Position.Floor != y)
 		return false;
@@ -687,7 +687,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant)
 
 	int ceiling = y - blockHeight + 100;
 
-	if (GetCollisionResult(x, ceiling, z, item->RoomNumber).Position.Ceiling > ceiling)
+	if (GetCollision(x, ceiling, z, item->RoomNumber).Position.Ceiling > ceiling)
 		return false;
 
 	int oldX = item->Position.xPos;
@@ -741,7 +741,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant)
 
 	roomNumber = LaraItem->RoomNumber;
 
-	probe = GetCollisionResult(x, y - LARA_HEIGHT, z, LaraItem->RoomNumber);
+	probe = GetCollision(x, y - LARA_HEIGHT, z, LaraItem->RoomNumber);
 
 	room = &g_Level.Rooms[roomNumber];
 	if (GetSector(room, x - room->x, z - room->z)->Stopper)
@@ -791,7 +791,7 @@ void MoveStackXZ(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
+	short probedRoomNumber = GetCollision(item).RoomNumber;
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 
@@ -804,7 +804,7 @@ void MoveStackXZ(short itemNumber)
 		stackItem->Position.xPos = item->Position.xPos;
 		stackItem->Position.zPos = item->Position.zPos;
 
-		probedRoomNumber = GetCollisionResult(item).RoomNumber;
+		probedRoomNumber = GetCollision(item).RoomNumber;
 		if (probedRoomNumber != stackItem->RoomNumber)
 			ItemNewRoom(stackIndex, probedRoomNumber);
 	}
@@ -814,7 +814,7 @@ void MoveStackY(short itemNumber, int y)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
+	short probedRoomNumber = GetCollision(item).RoomNumber;
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 
@@ -825,7 +825,7 @@ void MoveStackY(short itemNumber, int y)
 
 		item->Position.yPos += y;
 
-		probedRoomNumber = GetCollisionResult(item).RoomNumber;
+		probedRoomNumber = GetCollision(item).RoomNumber;
 		if (probedRoomNumber != item->RoomNumber)
 			ItemNewRoom(stackIndex, probedRoomNumber);
 	}

@@ -176,14 +176,14 @@ namespace TEN::Entities::TR4
 			int y = horseItem->Position.yPos;
 			int z = horseItem->Position.zPos + 341 * phd_cos(horseItem->Position.yRot);
 
-			auto probe = GetCollisionResult(x, y, z, item->RoomNumber);
+			auto probe = GetCollision(x, y, z, item->RoomNumber);
 			int height1 = probe.Position.Floor;
 
 			x = horseItem->Position.xPos - 341 * phd_sin(horseItem->Position.yRot);
 			y = horseItem->Position.yPos;
 			z = horseItem->Position.zPos - 341 * phd_cos(horseItem->Position.yRot);
 
-			int height2 = GetCollisionResult(x, y, z, probe.RoomNumber).Position.Floor;
+			int height2 = GetCollision(x, y, z, probe.RoomNumber).Position.Floor;
 
 			xRot = phd_atan(682, height2 - height1);
 		}

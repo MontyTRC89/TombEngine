@@ -17,7 +17,7 @@ void ControlSpikyWall(short itemNumber)
 	{
 		int x = item->Position.xPos + phd_sin(item->Position.yRot);
 		int z = item->Position.zPos + phd_cos(item->Position.yRot);
-		auto probe = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber);
+		auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
 
 		if (probe.Position.Floor != item->Position.yPos)
 		{

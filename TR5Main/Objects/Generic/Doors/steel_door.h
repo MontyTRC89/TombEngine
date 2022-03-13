@@ -1,10 +1,10 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 namespace TEN::Entities::Doors
 {
 	void InitialiseSteelDoor(short itemNumber);
-	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }

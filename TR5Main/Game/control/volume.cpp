@@ -27,63 +27,63 @@ namespace TEN::Control::Volumes
 
 		for (size_t i = 0; i < room->triggerVolumes.size(); i++)
 		{
-			auto volume = &room->triggerVolumes[i];
+			auto* volume = &room->triggerVolumes[i];
 
-			if ((volume->activators & activatorType) != activatorType)
+			if ((volume->Activators & activatorType) != activatorType)
 				continue;
 
 			bool contains = false;
 
-			switch (volume->type)
+			switch (volume->Type)
 			{
-			case VOLUME_BOX:
+			case TriggerVolumeType::Box:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.addDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				
-				contains = volume->box.Intersects(bbox);
+				contains = volume->Box.Intersects(bbox);
 				break;
 
-			case VOLUME_SPHERE:
+			case TriggerVolumeType::Sphere:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.addDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				
-				contains = volume->sphere.Intersects(bbox);
+				contains = volume->Sphere.Intersects(bbox);
 				break;
 			}
 
 			// TODO: Implement checks on which item is entering/inside/leaving volume
-			// and pass item name or ID as argument for lua function, so it knows its caller.
+			// and pass item name or ID as argument for Lua function, so it knows its caller.
 
 			if (contains)
 			{
 				CurrentCollidedVolume = i + 1;
 
-				if (volume->status == TriggerStatus::TS_OUTSIDE)
+				if (volume->Status == TriggerStatus::Outside)
 				{
-					volume->status = TriggerStatus::TS_ENTERING;
+					volume->Status = TriggerStatus::Entering;
 					
-					if (!volume->onEnter.empty())
-						g_GameScript->ExecuteFunction(volume->onEnter);
+					if (!volume->OnEnter.empty())
+						g_GameScript->ExecuteFunction(volume->OnEnter);
 				}
 				else
 				{
-					volume->status = TriggerStatus::TS_INSIDE;
+					volume->Status = TriggerStatus::Inside;
 					
-					if (!volume->onInside.empty())
-						g_GameScript->ExecuteFunction(volume->onInside);
+					if (!volume->OnInside.empty())
+						g_GameScript->ExecuteFunction(volume->OnInside);
 				}
 			}
 			else
 			{
-				if (volume->status == TriggerStatus::TS_INSIDE)
+				if (volume->Status == TriggerStatus::Inside)
 				{
-					volume->status = TriggerStatus::TS_LEAVING;
+					volume->Status = TriggerStatus::Leaving;
 					
-					if (!volume->onLeave.empty())
-						g_GameScript->ExecuteFunction(volume->onLeave);
+					if (!volume->OnLeave.empty())
+						g_GameScript->ExecuteFunction(volume->OnLeave);
 				}
 				else
-					volume->status = TriggerStatus::TS_OUTSIDE;
+					volume->Status = TriggerStatus::Outside;
 			}
 		}
 	}
@@ -96,7 +96,7 @@ namespace TEN::Control::Volumes
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
 		auto bbox = TO_DX_BBOX(pos, &box);
-		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS);
+		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::Flyby);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
@@ -104,7 +104,7 @@ namespace TEN::Control::Volumes
 		auto* staticInfo = &StaticObjects[mesh->staticNumber];
 		auto bbox = TO_DX_BBOX(mesh->pos, &staticInfo->collisionBox);
 
-		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS);
+		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static);
 	}
 
 	void TestVolumes(ITEM_INFO* item)
@@ -116,10 +116,10 @@ namespace TEN::Control::Volumes
 #endif
 
 		if (item->ObjectNumber == ID_LARA)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::PLAYER);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player);
 		else if (Objects[item->ObjectNumber].intelligent)
 			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC);
 		else
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::MOVEABLES);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable);
 	}
 }

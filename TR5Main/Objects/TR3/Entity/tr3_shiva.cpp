@@ -245,7 +245,7 @@ void ShivaControl(short itemNumber)
 			{
 				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
 				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
-				auto box = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
+				auto box = GetCollision(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) &&
 					!shiva->Flags)

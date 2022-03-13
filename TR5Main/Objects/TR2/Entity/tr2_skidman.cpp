@@ -66,7 +66,7 @@ void InitialiseSkidman(short itemNum)
 		TENLog("Can't create skidoo for rider!", LogLevel::Error);
 }
 
-void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll)
+void SkidManCollision(short itemNum, ITEM_INFO* laraitem, CollisionInfo* coll)
 {
 	ITEM_INFO* item;
 

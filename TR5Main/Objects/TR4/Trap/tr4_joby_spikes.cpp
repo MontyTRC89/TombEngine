@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
         item->Position.yRot = GetRandomControl() * 1024;
         item->ItemFlags[2] = GetRandomControl() & 1;
 
-        auto probe = GetCollisionResult(item);
+        auto probe = GetCollision(item);
 
         // TODO: check this optimized division
         //v6 = 1321528399i64 * ((probe.Position.Floor - probe.Position.Ceiling) << 12);

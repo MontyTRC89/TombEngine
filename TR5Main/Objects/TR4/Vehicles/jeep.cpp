@@ -287,7 +287,7 @@ static int JeepCanGetOff()
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 
-	auto collResult = GetCollisionResult(x, y, z, item->RoomNumber);
+	auto collResult = GetCollision(x, y, z, item->RoomNumber);
 
 	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT)
 		return 0;
@@ -1487,7 +1487,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 	}
 }
 
-void JeepCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	if (l->HitPoints > 0 && Lara.Vehicle == NO_ITEM)
 	{

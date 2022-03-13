@@ -77,7 +77,7 @@ void ScorpionControl(short itemNumber)
 	int x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
 	int z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber);
+	auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
 	int height1 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height1) > CLICK(2))
 		probe.Position.Floor = item->Position.yPos;
@@ -85,7 +85,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height2 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height2) > CLICK(2))
 		height2 = item->Position.yPos;
@@ -95,7 +95,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height3 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height3) > CLICK(2))
 		height3 = item->Position.yPos;
@@ -103,7 +103,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height4 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height4) > CLICK(2))
 		height4 = item->Position.yPos;

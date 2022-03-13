@@ -1078,7 +1078,7 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 
 short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
 {
-	short probedRoomNumber = GetCollisionResult(x, y, z, roomNumber).RoomNumber;
+	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		TriggerUnderwaterBlood(x, y, z, a4);
 	else
