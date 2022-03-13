@@ -20,7 +20,7 @@
 
 // State:		LS_SLIDE_FORWARD (24)
 // Collision:	lara_col_slide_forward()
-void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -84,7 +84,7 @@ void lara_as_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_SLIDE_FORWARD (24)
 // Control:		lara_as_slide_forward()
-void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -123,7 +123,7 @@ void lara_col_slide_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_SLIDE_BACK (32)
 // Collision:	lara_col_slide_back()
-void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -184,7 +184,7 @@ void lara_as_slide_back(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_SLIDE_BACK (32)
 // Control:		lara_as_slide_back()
-void lara_col_slide_back(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

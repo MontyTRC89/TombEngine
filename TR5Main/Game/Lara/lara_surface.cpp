@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
-void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
+void lara_col_surftread(ITEM_INFO* item, CollisionInfo* coll) 
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -21,7 +21,7 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfright(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -29,7 +29,7 @@ void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfleft(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -37,7 +37,7 @@ void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfback(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -45,7 +45,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfswim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -56,7 +56,7 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 	TestLaraLadderClimbOut(item, coll);
 }
 
-void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surftread(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -119,7 +119,7 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.Count.Dive = 0;
 }
 
-void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfright(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -144,7 +144,7 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfleft(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -169,7 +169,7 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfback(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -194,7 +194,7 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfswim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -221,7 +221,7 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_waterout(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

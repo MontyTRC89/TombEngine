@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
         }
     }
 
-    void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+    void ElementPuzzleDoCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
     {
         auto* item = &g_Level.Items[itemNumber];
 
@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
         }
     }
 
-    void ElementPuzzleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+    void ElementPuzzleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
     {
         auto* laraInfo = GetLaraInfo(laraItem);
         auto* puzzleItem = &g_Level.Items[itemNumber];

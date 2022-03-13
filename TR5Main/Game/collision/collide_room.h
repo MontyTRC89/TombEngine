@@ -3,7 +3,7 @@
 #include "Specific/trmath.h"
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 struct FLOOR_INFO;
 struct ROOM_INFO;
 struct MESH_INFO;
@@ -67,7 +67,7 @@ struct CollisionResult
 
 struct CollisionSetup
 {
-	CollisionProbeMode Mode;			// Probe rotation mode
+	CollisionProbeMode Mode;	// Probe rotation mode
 
 	bool CeilingSlopeIsWall;	// Treat steep slopes on ceilings as walls
 	bool FloorSlopeIsWall;		// Treat steep slopes as walls
@@ -91,7 +91,7 @@ struct CollisionSetup
 	int OldFrameNumber;
 };
 
-struct COLL_INFO
+struct CollisionInfo
 {
 	CollisionSetup    Setup;    // In parameters
 
@@ -118,22 +118,22 @@ struct COLL_INFO
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f)); }
 };
 
-CollisionResult GetCollisionResult(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
-CollisionResult GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
-CollisionResult GetCollisionResult(int x, int y, int z, short roomNumber);
-CollisionResult GetCollisionResult(ITEM_INFO* item);
+CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
+CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
+CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(ITEM_INFO* item);
 
-void  GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
-void  GetCollisionInfo(COLL_INFO* coll, ITEM_INFO* item, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
-short GetNearestLedgeAngle(ITEM_INFO* item, COLL_INFO* coll, float& distance);
+short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
 
 int  FindGridShift(int x, int z);
-void ShiftItem(ITEM_INFO* item, COLL_INFO* coll);
+void ShiftItem(ITEM_INFO* item, CollisionInfo* coll);
 void MoveItem(ITEM_INFO* item, short angle, int x, int z = 0);
-void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
-void SnapItemToLedge(ITEM_INFO* item, COLL_INFO* coll, short angle, float offsetMultiplier = 0.0f);
-void SnapItemToGrid(ITEM_INFO* item, COLL_INFO* coll);
+void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
+void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll);
 
 void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
 

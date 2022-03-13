@@ -1,9 +1,9 @@
 #pragma once
 
-struct COLL_INFO;
+struct CollisionInfo;
 struct ITEM_INFO;
 
 void InitialiseFallingBlock(short itemNumber);
 void InitialiseWreckingBall(short itemNumber);
-void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
 void WreckingBallControl(short itemNumber);

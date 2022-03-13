@@ -7,7 +7,7 @@
 
 struct BOUNDING_BOX;
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 class FLOOR_INFO;
 struct ANIM_STRUCT;
 struct MESH_INFO;

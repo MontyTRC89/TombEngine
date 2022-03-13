@@ -74,8 +74,8 @@ void DoppelgangerControl(short itemNumber)
 		}
 
 		// Get floor heights for comparison.
-		item->Floor = GetCollisionResult(item).Position.Floor;
-		int laraFloorHeight = GetCollisionResult(LaraItem).Position.Floor;
+		item->Floor = GetCollision(item).Position.Floor;
+		int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
 
 		// Animate bacon Lara, mirroring Lara's position.
 		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
@@ -106,7 +106,7 @@ void DoppelgangerControl(short itemNumber)
 		AnimateItem(item);
 		TestTriggers(item, true);
 
-		item->Floor = GetCollisionResult(item).Position.Floor;
+		item->Floor = GetCollision(item).Position.Floor;
 		if (item->Position.yPos >= item->Floor)
 		{
 			item->Position.yPos = item->Floor;

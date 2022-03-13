@@ -169,7 +169,7 @@ namespace TEN::Entities::Generic
 			rope->active = 0;
 	}
 
-	void RopeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void RopeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* ropeItem = &g_Level.Items[itemNumber];
@@ -655,7 +655,7 @@ namespace TEN::Entities::Generic
 		Lara.Control.Rope.Ptr = -1;
 	}
 
-	void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
+	void LaraClimbRope(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if (!(TrInput & IN_ACTION))
 			FallFromRope(item);

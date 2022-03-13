@@ -152,12 +152,12 @@ static int TestMinecartHeight(ITEM_INFO* minecartItem, int xOffset, int zOffset)
 	pos.y = minecartItem->Position.yPos - zOffset * phd_sin(minecartItem->Position.xRot) + xOffset * phd_sin(minecartItem->Position.zRot);
 	pos.z = minecartItem->Position.zPos + zOffset * c - xOffset * s;
 
-	return GetCollisionResult(pos.x, pos.y, pos.z, minecartItem->RoomNumber).Position.Floor;
+	return GetCollision(pos.x, pos.y, pos.z, minecartItem->RoomNumber).Position.Floor;
 }
 
 static short GetMinecartCollision(ITEM_INFO* minecartItem, short angle, int distance)
 {
-	auto probe = GetCollisionResult(minecartItem, angle, distance, -LARA_HEIGHT);
+	auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
 
 	if (probe.Position.Floor != NO_HEIGHT)
 		probe.Position.Floor -= minecartItem->Position.yPos;
@@ -165,7 +165,7 @@ static short GetMinecartCollision(ITEM_INFO* minecartItem, short angle, int dist
 	return (short)probe.Position.Floor;
 }
 
-static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, COLL_INFO* coll)
+static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -188,7 +188,7 @@ static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, COLL_INF
 	if (distance > pow(CLICK(2), 2))
 		return false;
 
-	if (GetCollisionResult(minecartItem).Position.Floor < -32000)
+	if (GetCollision(minecartItem).Position.Floor < -32000)
 		return false;
 
 	return true;
@@ -205,7 +205,7 @@ static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 	else
 		angle = minecartItem->Position.yRot - ANGLE(90.0f);
 
-	auto probe = GetCollisionResult(minecartItem, angle, -DISMOUNT_DISTANCE);
+	auto probe = GetCollision(minecartItem, angle, -DISMOUNT_DISTANCE);
 
 	if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
 		return false;
@@ -821,7 +821,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		if (laraItem->Animation.ActiveState != CART_STATE_DUCK &&
 			laraItem->Animation.ActiveState != CART_STATE_HIT)
 		{
-			COLL_INFO coll;
+			CollisionInfo coll;
 			coll.Setup.Radius = CART_RADIUS;
 			DoObjectCollision(minecartItem, &coll);
 
@@ -848,7 +848,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 	}
 }
 
-void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -921,7 +921,7 @@ bool MineCartControl(ITEM_INFO* laraItem)
 		laraItem->Position.zRot = minecartItem->Position.zRot;
 	}
 
-	short probedRoomNumber = GetCollisionResult(minecartItem).RoomNumber;
+	short probedRoomNumber = GetCollision(minecartItem).RoomNumber;
 	if (probedRoomNumber != minecartItem->RoomNumber)
 	{
 		ItemNewRoom(lara->Vehicle, probedRoomNumber);

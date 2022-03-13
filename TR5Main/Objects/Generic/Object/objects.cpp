@@ -116,7 +116,7 @@ void ControlWaterfall(short itemNumber)
 	}
 }
 
-void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* tightropeItem = &g_Level.Items[itemNumber];
@@ -192,7 +192,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* barItem = &g_Level.Items[itemNumber];
@@ -268,7 +268,7 @@ void CutsceneRopeControl(short itemNumber)
 	ropeItem->Position.xRot = -4869;
 }
 
-void HybridCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll) 
+void HybridCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 

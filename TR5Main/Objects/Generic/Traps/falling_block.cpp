@@ -33,7 +33,7 @@ void InitialiseFallingBlock(short itemNumber)
 		item->Animation.Mutator[i].Rotation = Vector3::Zero;
 }
 
-void FallingBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void FallingBlockCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	if (!item->ItemFlags[0] && !item->TriggerFlags && item->Position.yPos == l->Position.yPos)

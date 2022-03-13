@@ -3,7 +3,7 @@
 
 enum class LaraWeaponType;
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 enum RIPPLE_TYPE
 {

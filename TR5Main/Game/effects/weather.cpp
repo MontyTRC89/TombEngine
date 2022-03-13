@@ -248,7 +248,7 @@ namespace Environment
 
 			if (p.CollisionCheckDelay <= 0)
 			{
-				coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				coll = GetCollision(p.Position.x, p.Position.y, p.Position.z, p.Room);
 
 				// Determine collision checking frequency based on nearest floor/ceiling surface position.
 				// If floor and ceiling is too far, don't do precise collision checks, instead doing it 
@@ -272,7 +272,7 @@ namespace Environment
 			{
 				if (!collisionCalculated)
 				{
-					coll = GetCollisionResult(p.Position.x, p.Position.y, p.Position.z, p.Room);
+					coll = GetCollision(p.Position.x, p.Position.y, p.Position.z, p.Room);
 					collisionCalculated = true;
 				}
 
@@ -412,7 +412,7 @@ namespace Environment
 				if (g_Level.Rooms[outsideRoom].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 					continue;
 
-				auto coll = GetCollisionResult(xPos, yPos, zPos, outsideRoom);
+				auto coll = GetCollision(xPos, yPos, zPos, outsideRoom);
 
 				if (!(coll.Position.Ceiling < yPos || coll.Block->RoomAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
 					continue;

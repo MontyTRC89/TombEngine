@@ -636,7 +636,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 

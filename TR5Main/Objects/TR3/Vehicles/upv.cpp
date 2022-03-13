@@ -261,7 +261,7 @@ void UPVEffects(short itemNumber)
 				pos2.xPos = pos.x + (GetRandomControl() & 63) - 32;
 				pos2.yPos = pos.y + UPV_DRAW_SHIFT;
 				pos2.zPos = pos.z + (GetRandomControl() & 63) - 32;
-				short probedRoomNumber = GetCollisionResult(pos2.xPos, pos2.yPos, pos2.zPos, UPVItem->RoomNumber).RoomNumber;
+				short probedRoomNumber = GetCollision(pos2.xPos, pos2.yPos, pos2.zPos, UPVItem->RoomNumber).RoomNumber;
 				
 				CreateBubble((PHD_VECTOR*)&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
 			}
@@ -312,7 +312,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	int z = UPVItem->Position.zPos + velocity * phd_cos(moveAngle);
 	int y = UPVItem->Position.yPos - DISMOUNT_DISTANCE * phd_sin(-UPVItem->Position.xRot);
 
-	auto probe = GetCollisionResult(x, y, z, UPVItem->RoomNumber);
+	auto probe = GetCollision(x, y, z, UPVItem->RoomNumber);
 	if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
 		probe.Position.Floor < y ||
 		probe.Position.Ceiling > y ||
@@ -348,7 +348,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (deltaAngle > ANGLE(35.0f) || deltaAngle < -ANGLE(35.0f))
 		return false;
 
-	if (GetCollisionResult(UPVItem).Position.Floor < -32000)
+	if (GetCollision(UPVItem).Position.Floor < -32000)
 		return false;
 
 	return true;
@@ -420,7 +420,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPV = (UPVInfo*)UPVItem->Data;
-	COLL_INFO cinfo, * coll = &cinfo; // ??
+	CollisionInfo cinfo, * coll = &cinfo; // ??
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
@@ -847,7 +847,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		UPV->XRot = -MAX_UPDOWN;
 }
 
-void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -859,7 +859,7 @@ void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	ItemPushItem(item, laraItem, coll, 0, 0);
 }
 
-void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[itemNumber];
@@ -912,14 +912,14 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[lara->Vehicle];
 	auto* UPV = (UPVInfo*)UPVItem->Data;
 	
 	auto oldPos = UPVItem->Position;
-	auto probe = GetCollisionResult(UPVItem);
+	auto probe = GetCollision(UPVItem);
 
 	if (!(UPV->Flags & UPV_DEAD))
 	{
@@ -941,7 +941,7 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.VerticalVelocity * phd_cos(UPVItem->Position.xRot);
 	}
 
-	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
+	int newHeight = GetCollision(UPVItem).Position.Floor;
 	int waterHeight = GetWaterHeight(UPVItem);
 
 	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Position.yPos - UPV_HEIGHT / 2))

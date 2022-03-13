@@ -34,7 +34,7 @@ void InitialiseWreckingBall(short itemNumber)
 		ItemNewRoom(itemNumber, room);
 }
 
-void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item;
 	int x, y, z, test;

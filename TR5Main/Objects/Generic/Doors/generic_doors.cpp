@@ -162,7 +162,7 @@ namespace TEN::Entities::Doors
 		}
 	}
 
-	void DoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void DoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];

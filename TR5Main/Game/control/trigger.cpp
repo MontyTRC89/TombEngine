@@ -244,7 +244,7 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
+	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
 
 	if (bottomBlock->TriggerIndex == -1)
 		return nullptr;
@@ -378,7 +378,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
+			if (GetCollision(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -714,12 +714,12 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ITEM_INFO* item)
 {
-	ProcessSectorFlags(GetCollisionResult(item).BottomBlock);
+	ProcessSectorFlags(GetCollision(item).BottomBlock);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 {
-	ProcessSectorFlags(GetCollisionResult(x, y, z, roomNumber).BottomBlock);
+	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(FLOOR_INFO* floor)

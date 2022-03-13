@@ -1,12 +1,12 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
 void InitialisePushableBlock(short itemNumber);
 void PushableBlockControl(short itemNumber);
-void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 bool TestBlockMovable(ITEM_INFO* item, int blockHeight);
 bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant);
 bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant);

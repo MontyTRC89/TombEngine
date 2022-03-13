@@ -49,7 +49,7 @@ OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 };
 
 // Puzzles
-void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* receptableItem = &g_Level.Items[itemNumber];
@@ -186,7 +186,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-void PuzzleDoneCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void PuzzleDoneCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	if (g_Level.Items[itemNumber].TriggerFlags - 998 > 1)
 		ObjectCollision(itemNumber, laraItem, coll);
@@ -246,7 +246,7 @@ void DoPuzzle()
 }
 
 // Keys
-void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* keyHoleItem = &g_Level.Items[itemNumber];

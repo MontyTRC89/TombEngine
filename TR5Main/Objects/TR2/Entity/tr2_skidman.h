@@ -3,5 +3,5 @@
 #include "Game/items.h"
 
 void InitialiseSkidman(short itemNum);
-void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
+void SkidManCollision(short itemNum, ITEM_INFO* laraitem, CollisionInfo* coll);
 void SkidManControl(short riderNum);

@@ -15,7 +15,7 @@
 /*this file has all the lara_as/lara_col functions related to hanging*/
 
 /*normal hanging and shimmying*/
-void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -41,7 +41,7 @@ void lara_as_hang(ITEM_INFO* item, COLL_INFO* coll)
 	SlopeHangExtra(item, coll);
 }
 
-void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -198,7 +198,7 @@ void lara_col_hang(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	/*state 30*/
 	/*collision: lara_col_hangleft*/
@@ -212,7 +212,7 @@ void lara_as_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.TargetState = LS_HANG;
 }
 
-void lara_col_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -225,7 +225,7 @@ void lara_col_shimmy_left(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 }
 
-void lara_as_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	/*state 31*/
 	/*collision: lara_col_hangright*/
@@ -239,7 +239,7 @@ void lara_as_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.TargetState = LS_HANG;
 }
 
-void lara_col_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -251,7 +251,7 @@ void lara_col_shimmy_right(ITEM_INFO* item, COLL_INFO* coll)
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 }
 
-void lara_as_handstand(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_handstand(ITEM_INFO* item, CollisionInfo* coll)
 {
 	/*state 54*/
 	/*collision: lara_default_col*/
@@ -261,7 +261,7 @@ void lara_as_handstand(ITEM_INFO* item, COLL_INFO* coll)
 
 /*go around corners*/
 
-void lara_as_corner(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_corner(ITEM_INFO* item, CollisionInfo* coll)
 {
 	/*state 107*/
 	/*collision: lara_default_col*/

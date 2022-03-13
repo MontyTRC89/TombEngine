@@ -141,7 +141,7 @@ namespace TEN::Entities::TR4
 		else
 			item->Position.xRot += angleV;
 
-		auto probe = GetCollisionResult(item);
+		auto probe = GetCollision(item);
 
 		bool hitWall = false;
 		if (probe.Position.Floor < item->Position.yPos || probe.Position.Ceiling > item->Position.yPos)
@@ -286,7 +286,7 @@ namespace TEN::Entities::TR4
 		}
 
 		// Check if WRAITH is going below floor or above ceiling and trigger sparks
-		probe = GetCollisionResult(item);
+		probe = GetCollision(item);
 
 		if (probe.Position.Floor < item->Position.yPos ||
 			probe.Position.Ceiling > item->Position.yPos)

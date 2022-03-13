@@ -12,12 +12,12 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
-void lara_col_climb_end(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_end(ITEM_INFO* item, CollisionInfo* coll)
 {
 	return;
 }
 
-void lara_as_climb_end(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_end(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -25,7 +25,7 @@ void lara_as_climb_end(ITEM_INFO* item, COLL_INFO* coll)
 	Camera.targetAngle = -ANGLE(45.0f);
 }
 
-void lara_col_climb_down(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_down(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_LADDER_DOWN)
 		return;
@@ -104,7 +104,7 @@ void lara_col_climb_down(ITEM_INFO* item, COLL_INFO* coll)
 		AnimateLara(item);
 }
 
-void lara_as_climb_down(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_down(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -113,7 +113,7 @@ void lara_as_climb_down(ITEM_INFO* item, COLL_INFO* coll)
 	SlopeClimbDownExtra(item, coll);
 }
 
-void lara_col_climb_up(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_up(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!LaraCheckForLetGo(item, coll) && item->Animation.AnimNumber == LA_LADDER_UP)
 	{
@@ -178,14 +178,14 @@ void lara_col_climb_up(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_climb_up(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_up(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = ANGLE(30.0f);
 }
 
-void lara_col_climb_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -197,7 +197,7 @@ void lara_col_climb_right(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_climb_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -208,7 +208,7 @@ void lara_as_climb_right(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
-void lara_col_climb_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -220,7 +220,7 @@ void lara_col_climb_left(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_climb_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -231,7 +231,7 @@ void lara_as_climb_left(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
-void lara_col_climb_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	int yShift;
 	int resultRight, resultLeft;
@@ -327,7 +327,7 @@ void lara_col_climb_idle(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-void lara_as_climb_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -367,7 +367,7 @@ void lara_as_climb_idle(ITEM_INFO* item, COLL_INFO* coll)
 	SlopeClimbExtra(item, coll);
 }
 
-void lara_as_climb_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -377,7 +377,7 @@ void lara_as_climb_stepoff_left(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yRot -= ANGLE(90.0f);
 }
 
-void lara_as_climb_stepoff_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_climb_stepoff_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -472,7 +472,7 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	return LaraTestClimb(item, x, item->Position.yPos + origin, z, xFront, zFront, height, item->RoomNumber, shift);
 }
 
-void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shift)
+void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int shift)
 {
 	if (result == 1)
 	{
@@ -577,7 +577,7 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, COLL_INFO* coll, int result, int shif
 	AnimateLara(item);
 }
 
-int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
+int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -666,7 +666,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, COLL_INFO* coll)
 	return result;
 }
 
-int LaraClimbLeftCornerTest(ITEM_INFO* item, COLL_INFO* coll)
+int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -960,7 +960,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 	return -2;
 }
 
-bool LaraCheckForLetGo(ITEM_INFO* item, COLL_INFO* coll)
+bool LaraCheckForLetGo(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

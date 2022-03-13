@@ -31,7 +31,7 @@ void FallingCeilingControl(short itemNumber)
 		RemoveActiveItem(itemNumber);
 	else
 	{
-		auto probe = GetCollisionResult(item);
+		auto probe = GetCollision(item);
 
 		item->Floor = probe.Position.Floor;
 
