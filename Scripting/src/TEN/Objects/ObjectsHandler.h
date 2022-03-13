@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include "LuaHandler.h"
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/Moveable.h"
@@ -13,9 +14,17 @@ class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler
 {
 
 public:
-	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent);
+	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
+
+	bool NotifyKilled(ITEM_INFO* key) override;
+	bool AddMoveableToMap(ITEM_INFO* key, Moveable* mov);
+	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
 
 private:
+	// A map between moveables and the engine entities they represent. This is needed
+	// so that something that is killed by the engine can notify all corresponding
+	// Lua variables which can then become invalid.
+	std::unordered_map<ITEM_INFO *, std::unordered_set<Moveable*>>		m_moveables{};
 	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
 	std::unordered_map<std::string, short>	 					m_itemsMapName{};
 	sol::table m_table_objects;
