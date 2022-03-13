@@ -307,6 +307,10 @@ void Moveable::Register(sol::table & parent)
 // @function SetName
 // @tparam name string the new moveable's name
 	ScriptReserved_SetName, &Moveable::SetName);
+/// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
+// @function GetValid
+// @treturn valid bool true if the object is still not destroyed
+	ScriptReserved_GetValid, &Moveable::GetValid,
 }
 
 
@@ -592,5 +596,17 @@ void Moveable::MakeInvisible()
 			DisableBaddieAI(m_num);
 		}
 	}
+}
+
+void Moveable::Invalidate()
+{
+	m_item = nullptr;
+	m_num = NO_ITEM;
+	m_initialised = false;
+}
+
+bool Moveable::GetValid() const
+{
+	return m_item != nullptr;
 }
 #endif
