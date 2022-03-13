@@ -12,6 +12,7 @@
 #include "Position/Position.h"
 #include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
+#include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -28,24 +29,32 @@ constexpr auto LUA_CLASS_NAME{ "Moveable" };
 static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
-Moveable::Moveable(short num, bool temp, bool init) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ init }, m_temporary{ temp }
-{};
+
+Moveable::Moveable(short num, bool alreadyInitialised) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ alreadyInitialised }
+{
+	if (alreadyInitialised)
+	{
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
+	}
+};
 
 Moveable::Moveable(Moveable&& other) noexcept : 
-	m_item { std::exchange(other.m_item, nullptr) },
+	m_item{ std::exchange(other.m_item, nullptr) },
 	m_num{ std::exchange(other.m_num, NO_ITEM) },
-	m_initialised{ std::exchange(other.m_initialised, false) },
-	m_temporary{ std::exchange(other.m_temporary, false) }
-{};
+	m_initialised{ std::exchange(other.m_initialised, false) }
+{
+	if (GetValid())
+	{
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, &other);
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
+	}
+};
 
-// todo.. how to check if item is killed outside of script?
+
 Moveable::~Moveable()
 {
-	// todo.. see if there's a better default state than -1
-	if (m_temporary && (m_num > NO_ITEM))
-	{
-		s_callbackRemoveName(m_item->luaName);
-		KillItem(m_num);
+	if (m_num > NO_ITEM) {
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 	}
 }
 
@@ -81,17 +90,10 @@ takes no arguments.
 		)
 	*/
 
-/*** Like the above, but the returned variable controls the 
-lifetime of the object (it will be destroyed when the variable goes
-out of scope).
-	@function Moveable.NewTemporary
-	@param see_above same as above function
-*/
-
 #define USE_IF_HAVE(Type, ifthere, ifnotthere) \
 std::holds_alternative<Type>(ifthere) ? std::get<Type>(ifthere) : ifnotthere
 
-template <bool temp> static std::unique_ptr<Moveable> Create(
+static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,
 	Position const & pos,
@@ -105,30 +107,36 @@ template <bool temp> static std::unique_ptr<Moveable> Create(
 )
 {
 	short num = CreateItem();
-	auto ptr = std::make_unique<Moveable>(num, temp, false);
+	auto ptr = std::make_unique<Moveable>(num, false);
 
-	ITEM_INFO* item = &g_Level.Items[num];
-	ptr->SetPos(pos);
-	ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
-	ptr->SetRoom(room);
-	ptr->SetObjectID(objID);
-	ptr->Init();
+	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
+	{
 
-	ptr->SetName(name);
-	ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
-	ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
-	ptr->SetHP(USE_IF_HAVE(short, hp, 10));
-	ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
-	ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		ITEM_INFO* item = &g_Level.Items[num];
+		ptr->SetPos(pos);
+		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
+		ptr->SetRoom(room);
+		ptr->SetObjectID(objID);
+		ptr->Init();
 
+		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
+		ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
+		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+
+		// call this when resetting name too?
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
+		// add to name map too?
+	}
 	return ptr;
 }
 
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_new, Create<false>,
-		ScriptReserved_newTemporary, Create<true>,
+		ScriptReserved_new, Create,
+		ScriptReserved_newTemporary, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
@@ -298,7 +306,7 @@ void Moveable::Register(sol::table & parent)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
 // @function GetName
-// @treturn name the moveable's name
+// @treturn string the moveable's name
 	ScriptReserved_GetName, &Moveable::GetName,
 
 /// Set the moveable's name (its unique string identifier)
@@ -306,11 +314,17 @@ void Moveable::Register(sol::table & parent)
 // It cannot be blank and cannot share a name with any existing object.
 // @function SetName
 // @tparam name string the new moveable's name
-	ScriptReserved_SetName, &Moveable::SetName);
+// @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
+	ScriptReserved_SetName, &Moveable::SetName, 
+
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
 // @function GetValid
 // @treturn valid bool true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
+
+/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
+// @function Destroy
+	ScriptReserved_Destroy, &Moveable::Destroy);
 }
 
 
@@ -347,29 +361,35 @@ std::string Moveable::GetName() const
 	return m_item->luaName;
 }
 
-void Moveable::SetName(std::string const & id) 
+bool Moveable::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
 	{
-		return;
+		return false;
 	}
 
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_item->luaName);
-		m_item->luaName = id;
+		if (id != m_item->luaName)
+		{
+			s_callbackRemoveName(m_item->luaName);
+			m_item->luaName = id;
+		}
 	}
 	else
 	{
 		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
 		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+
+		return false;
 	}
+	return true;
 }
 
 Position Moveable::GetPos() const
 {
-	return Position(	m_item->pos	);
+	return Position(m_item->pos	);
 }
 
 void Moveable::SetPos(Position const& pos)
@@ -609,4 +629,16 @@ bool Moveable::GetValid() const
 {
 	return m_item != nullptr;
 }
+
+void Moveable::Destroy()
+{
+	if (m_num > NO_ITEM) {
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
+		s_callbackRemoveName(m_item->luaName);
+		KillItem(m_num);
+	}
+
+	Invalidate();
+}
+
 #endif
