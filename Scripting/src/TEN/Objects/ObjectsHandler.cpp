@@ -115,3 +115,58 @@ void ObjectsHandler::AssignLara()
 	m_table_objects.set("Lara", Moveable(Lara.itemNumber, false));
 #endif
 }
+
+bool ObjectsHandler::NotifyKilled(ITEM_INFO* key)
+{
+#if TEN_OPTIONAL_LUA
+	auto it = m_moveables.find(key);
+	if (std::end(m_moveables) != it)
+	{
+		for (auto& m : m_moveables[key])
+		{
+			m->Invalidate();
+		}
+		return true;
+	}
+	return false;
+#endif
+}
+
+bool ObjectsHandler::AddMoveableToMap(ITEM_INFO* key, Moveable* mov)
+{
+#if TEN_OPTIONAL_LUA
+	std::unordered_set<Moveable*> movVec;
+	movVec.insert(mov);
+	auto it = m_moveables.find(key);
+	if (std::end(m_moveables) == it)
+	{
+		return m_moveables.insert(std::pair{ key, movVec }).second;
+	}
+	else
+	{
+		m_moveables[key].insert(mov);
+		return true;
+	}
+#endif
+}
+
+bool ObjectsHandler::RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov)
+{
+#if TEN_OPTIONAL_LUA
+	//todo why is "lara" destroyed here???
+	auto it = m_moveables.find(key);
+	if (std::end(m_moveables) != it)
+	{
+		auto& set = m_moveables[key];
+		bool erased = static_cast<bool>(set.erase(mov));
+		if (erased && set.empty())
+		{
+			erased = erased && static_cast<bool>(m_moveables.erase(key));
+		}
+		return erased;
+	}
+	return false;
+#endif
+}
+
+
