@@ -32,6 +32,8 @@ public:
 
 	std::string GetName() const;
 	void SetName(std::string const &);
+	bool GetValid() const;
+	void Invalidate();
 
 	Position GetPos() const;
 	void SetPos(Position const& pos);
