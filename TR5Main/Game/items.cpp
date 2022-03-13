@@ -7,6 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Floordata;
 
@@ -77,6 +78,8 @@ void KillItem(short itemNum)
 
 		if (Objects[item->objectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNum, true);
+
+		g_GameScriptEntities->NotifyKilled(item);
 
 		if (itemNum >= g_Level.NumItems)
 		{
