@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void lara_as_swimcheat(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

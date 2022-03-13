@@ -566,7 +566,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->Position.yPos = pos.y;
 			grenadeItem->Position.zPos = pos.z;
 
-			auto probe = GetCollisionResult(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
+			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
 			grenadeItem->RoomNumber = probe.RoomNumber;
 
 			if (probe.Position.Floor < grenadeItem->Position.yPos)
@@ -647,7 +647,7 @@ namespace TEN::Entities::TR4
 			AnimateItem(item);
 	}
 
-	void SasDragBlokeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void SasDragBlokeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 

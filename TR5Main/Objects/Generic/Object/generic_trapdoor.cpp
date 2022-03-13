@@ -45,7 +45,7 @@ void InitialiseTrapDoor(short itemNumber)
 	CloseTrapDoor(itemNumber);
 }
 
-void TrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void TrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
@@ -56,7 +56,7 @@ void TrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
@@ -110,7 +110,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* 
 	}
 }
 
-void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];

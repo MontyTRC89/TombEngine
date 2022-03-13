@@ -13,12 +13,12 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
-void lara_col_waterroll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_waterroll(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_uwdeath(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -36,32 +36,32 @@ void lara_col_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_dive(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_dive(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_tread(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_tread(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_glide(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_glide(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_col_swim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_swim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
-void lara_as_waterroll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_waterroll(ITEM_INFO* item, CollisionInfo* coll)
 {
 	item->Animation.VerticalVelocity = 0;
 }
 
-void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_uwdeath(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -83,13 +83,13 @@ void lara_as_uwdeath(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.xRot = 0;
 }
 
-void lara_as_dive(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_dive(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
 		item->Position.xRot -= ANGLE(1.0f);
 }
 
-void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_tread(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -126,7 +126,7 @@ void lara_as_tread(ITEM_INFO* item, COLL_INFO* coll)
 		lara->Control.HandStatus = HandStatus::Free;
 }
 
-void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_glide(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
 
@@ -158,7 +158,7 @@ void lara_as_glide(ITEM_INFO* item, COLL_INFO* coll)
 		item->Animation.TargetState = LS_UNDERWATER_STOP;
 }
 
-void lara_as_swim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_swim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
 
@@ -283,7 +283,7 @@ void SwimTurnSubsuit(ITEM_INFO* item)
 	}
 }
 
-void SwimTurn(ITEM_INFO* item, COLL_INFO* coll)
+void SwimTurn(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -321,7 +321,7 @@ void SwimDive(ITEM_INFO* item)
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 
-void LaraWaterCurrent(ITEM_INFO* item, COLL_INFO* coll)
+void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

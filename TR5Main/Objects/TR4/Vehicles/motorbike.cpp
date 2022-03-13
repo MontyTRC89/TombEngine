@@ -334,7 +334,7 @@ static BOOL GetOnMotorBike(short itemNumber)
     return true;
 }
 
-void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* coll)
+void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
 {
     ITEM_INFO* item;
     MotorbikeInfo* motorbike;
@@ -949,7 +949,7 @@ static BOOL MotorbikeCanGetOff(void)
     auto y = item->Position.yPos;
     auto z = item->Position.zPos + BIKE_RADIUS * phd_cos(angle);
 
-	auto collResult = GetCollisionResult(x, y, z, item->RoomNumber);
+	auto collResult = GetCollision(x, y, z, item->RoomNumber);
 
     if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
         return false;

@@ -121,7 +121,7 @@ void DrawRubberBoat(ITEM_INFO* rBoatItem)
 	*/
 }
 
-RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber, COLL_INFO* coll)
+RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* rBoat = &g_Level.Items[itemNumber];
@@ -195,7 +195,7 @@ int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, PHD_VECTOR* 
 	pos->y = rBoatItem->Position.yPos - zOffset * phd_sin(rBoatItem->Position.xRot) + xOffset * phd_sin(rBoatItem->Position.zRot);
 	pos->z = rBoatItem->Position.zPos + zOffset * c - xOffset * s;
 
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, rBoatItem->RoomNumber);
+	auto probe = GetCollision(pos->x, pos->y, pos->z, rBoatItem->RoomNumber);
 	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
@@ -284,7 +284,7 @@ static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, PHD_VECTOR* pos, PHD_VECTOR*
 		x = 0;
 		z = 0;
 
-		int height = GetCollisionResult(old->x, pos->y, pos->z, rBoatItem->RoomNumber).Position.Floor;
+		int height = GetCollision(old->x, pos->y, pos->z, rBoatItem->RoomNumber).Position.Floor;
 		if (height < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
@@ -293,7 +293,7 @@ static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, PHD_VECTOR* pos, PHD_VECTOR*
 				z = SECTOR(1) - zShift;
 		}
 
-		height = GetCollisionResult(pos->x, pos->y, old->z, rBoatItem->RoomNumber).Position.Floor;
+		height = GetCollision(pos->x, pos->y, old->z, rBoatItem->RoomNumber).Position.Floor;
 		if (height < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
@@ -619,7 +619,7 @@ bool RubberBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 	return noTurn;
 }
 
-void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
+void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -687,7 +687,7 @@ static bool TestRubberBoatDismount(ITEM_INFO* laraItem, int direction)
 	int y = sBoatItem->Position.yPos;
 	int z = sBoatItem->Position.zPos + SECTOR(1) * phd_cos(angle);
 
-	auto collResult = GetCollisionResult(x, y, z, sBoatItem->RoomNumber);
+	auto collResult = GetCollision(x, y, z, sBoatItem->RoomNumber);
 
 	if ((collResult.Position.Floor - sBoatItem->Position.yPos) < -512)
 		return false;
@@ -884,7 +884,7 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		int y = laraItem->Position.yPos - 90;
 		int z = laraItem->Position.zPos + 360 * phd_cos(laraItem->Position.yRot);
 
-		auto probe = GetCollisionResult(x, y, z, laraItem->RoomNumber);
+		auto probe = GetCollision(x, y, z, laraItem->RoomNumber);
 		if (probe.Position.Floor >= (y - CLICK(1)))
 		{
 			laraItem->Position.xPos = x;
@@ -924,7 +924,7 @@ void RubberBoatControl(short itemNumber)
 		TestTriggers(rBoatItem, true);
 	}
 
-	auto probe = GetCollisionResult(rBoatItem);
+	auto probe = GetCollision(rBoatItem);
 	int water = GetWaterHeight(rBoatItem->Position.xPos, rBoatItem->Position.yPos, rBoatItem->Position.zPos, probe.RoomNumber);
 	rBoat->Water = water;
 
@@ -1041,7 +1041,7 @@ void RubberBoatControl(short itemNumber)
 
 	DoRubberBoatDismount(laraItem, rBoatItem);
 
-	short probedRoomNumber = GetCollisionResult(rBoatItem->Position.xPos, rBoatItem->Position.yPos + 128, rBoatItem->Position.zPos, rBoatItem->RoomNumber).RoomNumber;
+	short probedRoomNumber = GetCollision(rBoatItem->Position.xPos, rBoatItem->Position.yPos + 128, rBoatItem->Position.zPos, rBoatItem->RoomNumber).RoomNumber;
 	height = GetWaterHeight(rBoatItem->Position.xPos, rBoatItem->Position.yPos + 128, rBoatItem->Position.zPos, probedRoomNumber);
 	if (height > rBoatItem->Position.yPos + 32 || height == NO_HEIGHT)
 		height = 0;
@@ -1051,7 +1051,7 @@ void RubberBoatControl(short itemNumber)
 	PHD_VECTOR prop = { 0, 0, -80 };
 	GetJointAbsPosition(rBoatItem, &prop, 2);
 
-	probedRoomNumber = GetCollisionResult(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
+	probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
 
 	if (rBoatItem->Animation.Velocity &&
 		height < prop.y &&
@@ -1072,7 +1072,7 @@ void RubberBoatControl(short itemNumber)
 	}
 	else
 	{
-		height = GetCollisionResult(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).Position.Floor;
+		height = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).Position.Floor;
 		if (prop.y > height &&
 			!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		{

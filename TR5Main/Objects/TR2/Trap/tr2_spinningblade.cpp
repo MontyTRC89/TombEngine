@@ -33,7 +33,7 @@ void SpinningBladeControl(short itemNumber)
 			int x = item->Position.xPos + SECTOR(3) * phd_sin(item->Position.yRot) / 2;
 			int z = item->Position.zPos + SECTOR(3) * phd_cos(item->Position.yRot) / 2;
 
-			int height = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+			int height = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
 			if (height == NO_HEIGHT)
 				item->Animation.TargetState = 1;
 		}
@@ -60,7 +60,7 @@ void SpinningBladeControl(short itemNumber)
 
 	AnimateItem(item);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	item->Floor = probe.Position.Floor;
 	item->Position.yPos = probe.Position.Floor;

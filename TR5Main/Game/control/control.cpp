@@ -1007,7 +1007,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
-				return GetCollisionResult(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
+				return GetCollision(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 			}
 
@@ -1028,7 +1028,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
 			{
-				return GetCollisionResult(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
+				return GetCollision(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
 				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
 			}
 
@@ -1050,7 +1050,7 @@ int GetWaterHeight(ITEM_INFO* item)
 int GetDistanceToFloor(int itemNumber, bool precise)
 {
 	auto item = &g_Level.Items[itemNumber];
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	// HACK: Remove item from bridge objects temporarily.
 	probe.Block->RemoveItem(itemNumber);

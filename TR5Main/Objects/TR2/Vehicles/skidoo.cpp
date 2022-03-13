@@ -135,7 +135,7 @@ void InitialiseSkidoo(short itemNumber)
 	}
 }
 
-int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, COLL_INFO* coll)
+int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 
@@ -156,7 +156,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, COLL_INFO* co
 	else
 		mountType = 0;
 
-	auto probe = GetCollisionResult(skidooItem);
+	auto probe = GetCollision(skidooItem);
 	if (probe.Position.Floor < -32000 ||
 		!TestBoundsCollide(skidooItem, laraItem, coll->Setup.Radius) ||
 		!TestCollision(skidooItem, laraItem))
@@ -178,7 +178,7 @@ bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
 	int x = skidooItem->Position.xPos - SKIDOO_DISMOUNT_DISTANCE * phd_sin(angle);
 	int y = skidooItem->Position.yPos;
 	int z = skidooItem->Position.zPos - SKIDOO_DISMOUNT_DISTANCE * phd_cos(angle);
-	auto probe = GetCollisionResult(x, y, z, skidooItem->RoomNumber);
+	auto probe = GetCollision(x, y, z, skidooItem->RoomNumber);
 
 	if ((probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT) ||
 		abs(probe.Position.Floor - skidooItem->Position.yPos) > CLICK(2) ||
@@ -283,7 +283,7 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, PHD_VECTOR* moved)
 	return 0;
 }
 
-void SkidooCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
+void SkidooCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidooItem = &g_Level.Items[itemNum];
@@ -452,14 +452,14 @@ void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 
 void DoSnowEffect(ITEM_INFO* skidooItem)
 {
-	auto material = GetCollisionResult(skidooItem).BottomBlock->Material;
+	auto material = GetCollision(skidooItem).BottomBlock->Material;
 	if (material != FLOOR_MATERIAL::Ice && material != FLOOR_MATERIAL::Snow)
 		return;
 
 	TEN::Effects::TriggerSnowmobileSnow(skidooItem);
 }
 
-bool SkidooControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidooItem = &g_Level.Items[lara->Vehicle];
@@ -470,7 +470,7 @@ bool SkidooControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 	auto heightFrontLeft = TestSkidooHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, &frontLeft);
 	auto heightFrontRight = TestSkidooHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, &frontRight);
 
-	auto probe = GetCollisionResult(skidooItem);
+	auto probe = GetCollision(skidooItem);
 
 	TestTriggers(skidooItem, true);
 	TestTriggers(skidooItem, false);
@@ -851,7 +851,7 @@ int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, PHD_VECTOR
 	pos->x = skidooItem->Position.xPos + zOffset * s + xOffset * c;
 	pos->z = skidooItem->Position.zPos + zOffset * c - xOffset * s;
 	
-	auto probe = GetCollisionResult(pos->x, pos->y, pos->z, skidooItem->RoomNumber);
+	auto probe = GetCollision(pos->x, pos->y, pos->z, skidooItem->RoomNumber);
 	if (probe.Position.Ceiling > pos->y ||
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
@@ -906,7 +906,7 @@ short DoSkidooShift(ITEM_INFO* skidooItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 		x = 0;
 		z = 0;
 
-		auto probe = GetCollisionResult(old->x, pos->y, pos->z, skidooItem->RoomNumber);
+		auto probe = GetCollision(old->x, pos->y, pos->z, skidooItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->z > old->z)
@@ -915,7 +915,7 @@ short DoSkidooShift(ITEM_INFO* skidooItem, PHD_VECTOR* pos, PHD_VECTOR* old)
 				z = SECTOR(1) - shiftZ;
 		}
 
-		probe = GetCollisionResult(pos->x, pos->y, old->z, skidooItem->RoomNumber);
+		probe = GetCollision(pos->x, pos->y, old->z, skidooItem->RoomNumber);
 		if (probe.Position.Floor < (old->y - CLICK(1)))
 		{
 			if (pos->x > old->x)
@@ -1066,7 +1066,7 @@ int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	if (heightFrontRight < (frontRightOld.y - CLICK(1)))
 		rotation += DoSkidooShift(skidooItem, &frontRight, &frontRightOld);
 
-	auto probe = GetCollisionResult(skidooItem);
+	auto probe = GetCollision(skidooItem);
 	if (probe.Position.Floor < (skidooItem->Position.yPos - CLICK(1)))
 		DoSkidooShift(skidooItem, (PHD_VECTOR*)&skidooItem->Position, &old);
 

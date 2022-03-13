@@ -22,7 +22,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -230,7 +230,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	return (numItems || numMeshes);
 }
 
-bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, CollisionInfo* coll)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(lara);
 
@@ -258,7 +258,7 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* 
 	return true;
 }
 
-void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
+void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto bounds = GetBoundsAccurate(item);
 	auto height = abs(bounds->Y2 + bounds->Y1);
@@ -652,7 +652,7 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 	}
 }
 
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spazon, char bigpush) // previously ItemPushLara
 {
 	// Get item's rotation
 	auto c = phd_cos(item->Position.yRot);
@@ -773,7 +773,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 	return true;
 }
 
-bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
+bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
@@ -848,7 +848,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	return true;
 }
 
-void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
+void CollideSolidStatics(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
@@ -872,7 +872,7 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll)
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -1180,8 +1180,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	auto oldCollResult = GetCollisionResult(x, y, z, item->RoomNumber);
-	auto collResult = GetCollisionResult(item);
+	auto oldCollResult = GetCollision(x, y, z, item->RoomNumber);
+	auto collResult = GetCollision(item);
 
 	if (item->Position.yPos >= collResult.Position.Floor)
 	{
@@ -1569,8 +1569,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			oldCollResult = GetCollisionResult(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
-			collResult = GetCollisionResult(item);
+			oldCollResult = GetCollision(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
+			collResult = GetCollision(item);
 
 			// Bounce off floor.
 
@@ -1617,7 +1617,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		//		else
 		{
 			/* Bounce off ceiling */
-			collResult = GetCollisionResult(item);
+			collResult = GetCollision(item);
 
 			if (item->Position.yPos < collResult.Position.Ceiling)
 			{
@@ -1658,12 +1658,12 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		}
 	}
 
-	collResult = GetCollisionResult(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	collResult = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 	if (collResult.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCollision
+void DoObjectCollision(ITEM_INFO* l, CollisionInfo* coll) // previously LaraBaddieCollision
 {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
@@ -1723,14 +1723,14 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	}
 }
 
-void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void AIPickupCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* c)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SHOOT_SWITCH1 && !(item->MeshBits & 1))
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void ObjectCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1744,7 +1744,7 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void CreatureCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	float c, s;
@@ -1788,7 +1788,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void TrapCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 

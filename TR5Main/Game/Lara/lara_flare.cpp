@@ -302,7 +302,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->Position.yPos = pos.y;
 		flareItem->Position.zPos = pos.z;
 
-		auto probe = GetCollisionResult(pos.x, pos.y, pos.z, laraItem->RoomNumber);
+		auto probe = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber);
 		auto collided = GetCollidedObjects(flareItem, 0, true, CollidedItems, CollidedMeshes, true);
 		if (probe.Position.Floor < pos.y || collided)
 		{

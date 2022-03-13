@@ -32,7 +32,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			if (item->Position.yPos > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
 				item->Position.yPos -= item->TriggerFlags & 0xF;
 
-			auto probe = GetCollisionResult(item);
+			auto probe = GetCollision(item);
 
 			item->Floor = probe.Position.Floor;
 

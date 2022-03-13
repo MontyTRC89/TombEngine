@@ -116,15 +116,15 @@ void CyborgControl(short itemNumber)
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+		int height1 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+		int height2 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
-		auto probe = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber);
+		auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
 		short roomNumber = probe.RoomNumber;
 		int height3 = probe.Position.Floor;
 
@@ -341,7 +341,7 @@ void CyborgControl(short itemNumber)
 							}
 							else
 							{
-								probe = GetCollisionResult(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+								probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
 								roomNumber = probe.RoomNumber;
 								height = probe.Position.Floor;
 
@@ -439,7 +439,7 @@ void CyborgControl(short itemNumber)
 				if (item->BoxNumber == creature->LOT.TargetBox ||
 					!creature->MonkeySwingAhead)
 				{
-					probe = GetCollisionResult(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+					probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
 					roomNumber = probe.RoomNumber;
 					height = probe.Position.Floor;
 
@@ -459,7 +459,7 @@ void CyborgControl(short itemNumber)
 				if (item->BoxNumber == creature->LOT.TargetBox ||
 					!creature->MonkeySwingAhead)
 				{
-					probe = GetCollisionResult(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+					probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
 					roomNumber = probe.RoomNumber;
 					height = probe.Position.Floor;
 

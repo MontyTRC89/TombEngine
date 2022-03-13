@@ -447,7 +447,7 @@ void FireHarpoon(ITEM_INFO* laraItem)
 		PHD_VECTOR jointPos = { -2, 373, 77 };
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight >= jointPos.y)
 		{
 			item->Position.xPos = jointPos.x;
@@ -539,7 +539,7 @@ void HarpoonBoltControl(short itemNumber)
 		return;
 	}
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	// Check if bolt has hit a solid wall
 	if (probe.Position.Floor < item->Position.yPos ||
@@ -665,7 +665,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 		item->Position.yPos = y = jointPos.y;
 		item->Position.zPos = z = jointPos.z;
 
-		int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight < jointPos.y)
 		{
 			item->Position.xPos = laraItem->Position.xPos;
@@ -871,7 +871,7 @@ void GrenadeControl(short itemNumber)
 	// Grenades that originate from first grenade when special ammo is selected
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
 	{
-		auto probe = GetCollisionResult(item);
+		auto probe = GetCollision(item);
 		if (probe.Position.Floor < item->Position.yPos ||
 			probe.Position.Ceiling > item->Position.yPos)
 		{
@@ -890,7 +890,7 @@ void GrenadeControl(short itemNumber)
 		item->Position.yRot = sYrot;
 	}
 
-	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
+	short probedRoomNumber = GetCollision(item).RoomNumber;
 
 	// TODO: splash effect
 	/*
@@ -1237,7 +1237,7 @@ void RocketControl(short itemNumber)
 	bool explode = false;
 	
 	// Check if solid wall and then decide if explode or not
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 	if (probe.Position.Floor < item->Position.yPos ||
 		probe.Position.Ceiling > item->Position.yPos)
 	{
@@ -1414,7 +1414,7 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 			item->RoomNumber = laraItem->RoomNumber;
 
-			int floorHeight = GetCollisionResult(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
+			int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 			if (floorHeight >= jointPos.y)
 			{
 				item->Position.xPos = jointPos.x;
@@ -1511,7 +1511,7 @@ void CrossbowBoltControl(short itemNumber)
 	item->Position.yPos += item->Animation.Velocity * phd_sin(-item->Position.xRot);
 	item->Position.zPos += item->Animation.Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	// Check if bolt has hit a solid wall
 	if (probe.Position.Floor < item->Position.yPos ||

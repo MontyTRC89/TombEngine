@@ -637,7 +637,7 @@ namespace TEN::Entities::TR4
 
 					GetJointAbsPosition(item, &pos, 16);
 
-					auto floor = GetCollisionResult(x, y, z, item->RoomNumber).Block;
+					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)

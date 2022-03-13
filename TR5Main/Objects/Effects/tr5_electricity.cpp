@@ -220,7 +220,7 @@ void ElectricityWiresControl(short itemNumber)
 				PHD_VECTOR collPos = {};
 				GetJointAbsPosition(collItem, &collPos, j);
 
-				auto collJointRoom = GetCollisionResult(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
+				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
 
 				if (!isWaterNearby && waterTouch && roomNumber == collJointRoom)
 					isWaterNearby = true;

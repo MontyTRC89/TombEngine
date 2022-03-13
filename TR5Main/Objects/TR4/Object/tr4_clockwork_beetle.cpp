@@ -329,7 +329,7 @@ void UseClockworkBeetle(short flag)
 			item->Position.zRot = 0;
 
 			if (Lara.Inventory.BeetleLife)
-				item->ItemFlags[0] = GetCollisionResult(item).Block->Flags.MarkBeetle;
+				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;
 			else
 				item->ItemFlags[0] = 0;
 

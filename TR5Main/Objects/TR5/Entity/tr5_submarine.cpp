@@ -531,7 +531,7 @@ void TorpedoControl(short itemNumber)
 	item->Position.yPos += item->Animation.Velocity * phd_sin(-item->Position.xRot);
 	item->Position.zPos += c * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	if (item->Position.yPos < probe.Position.Floor &&
 		item->Position.yPos > probe.Position.Ceiling &&

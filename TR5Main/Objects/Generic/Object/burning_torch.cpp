@@ -285,7 +285,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FireCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void FireCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* torchItem = &g_Level.Items[itemNumber];

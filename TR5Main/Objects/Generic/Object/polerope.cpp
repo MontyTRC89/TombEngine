@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	void PoleCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void PoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* poleItem = &g_Level.Items[itemNumber];

@@ -139,7 +139,7 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 	}
 }
 
-void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
+void BigGunCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* bigGunItem = &g_Level.Items[itemNum];
@@ -178,7 +178,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll)
 		ObjectCollision(itemNum, laraItem, coll);
 }
 
-bool BigGunControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool BigGunControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* bigGunItem = &g_Level.Items[lara->Vehicle];

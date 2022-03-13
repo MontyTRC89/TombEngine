@@ -27,7 +27,7 @@
 
 // State:		LS_CROUCH_IDLE (71)
 // Collision:	lara_col_crouch_idle()
-void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
 	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
@@ -95,7 +95,7 @@ void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CROUCH_IDLE (71)
 // Control:		lara_as_crouch_idle()
-void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -138,7 +138,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CROUCH_ROLL (72)
 // Collision:	lara_as_crouch_roll()
-void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -169,7 +169,7 @@ void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CROUCH_ROLL (72)
 // Control:		lara_as_crouch_roll()
-void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -226,7 +226,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CROUCH_TURN_LEFT (105)
 // Collision:	lara_col_crouch_turn_left()
-void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crouch_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -275,14 +275,14 @@ void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_TURN_LEFT (105)
 // Control:		lara_as_crouch_turn_left()
-void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crouch_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
 
 // State:		LS_CROUCH_TURN_RIGHT (106)
 // Collision:	lara_col_crouch_turn_right()
-void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crouch_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -331,7 +331,7 @@ void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
 // Control:		lara_as_crouch_turn_right()
-void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crouch_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
@@ -342,7 +342,7 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_IDLE (80)
 // Collision:	lara_col_crawl_idle()
-void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -437,7 +437,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_IDLE (80)
 // Control:		lara_as_crawl_idle()
-void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -481,7 +481,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_FORWARD (81)
 // Collision:	lara_col_crawl_forward()
-void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -537,7 +537,7 @@ void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_FORWARD (81)
 // Control:		lara_as_crawl_forward()
-void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -585,7 +585,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_BACK (86)
 // Collision:	lara_col_crawl_back()
-void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -636,7 +636,7 @@ void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_BACK (86)
 // Control:		lara_as_crawl_back()
-void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -682,7 +682,7 @@ void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_TURN_LEFT (84)
 // Collision:	lara_col_crawl_turn_left()
-void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crawl_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -735,14 +735,14 @@ void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_TURN_LEFT (84)
 // Control:		lara_as_crawl_turn_left()
-void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
 // Collision:	lara_col_crawl_turn_right()
-void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_crawl_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -795,12 +795,12 @@ void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
 // Control:		lara_as_crawl_turn_right()
-void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
-void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_crawl_to_hang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

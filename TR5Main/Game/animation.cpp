@@ -187,18 +187,14 @@ void AnimateLara(ITEM_INFO* item)
 		}
 
 		item->Animation.Velocity = velocity >> 16;
+		item->Position.yPos += lara->ExtraVelocity.y;
 	}
-
-	// Apply extra velocity.
-	item->Animation.Velocity += lara->ExtraVelocity.x;
-	item->Animation.VerticalVelocity += lara->ExtraVelocity.y;
-	item->Animation.LateralVelocity += lara->ExtraVelocity.z; // TODO
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity, item->Animation.LateralVelocity);
+		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
 
 	// Update matrices
 	g_Renderer.updateLaraAnimations(true);

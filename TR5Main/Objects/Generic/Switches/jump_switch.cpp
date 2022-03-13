@@ -23,7 +23,7 @@ namespace TEN::Entities::Switches
 
 	PHD_VECTOR JumpSwitchPos = { 0, -208, 256 };  
 
-	void JumpSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void JumpSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

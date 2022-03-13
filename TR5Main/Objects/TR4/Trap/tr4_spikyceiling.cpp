@@ -16,7 +16,7 @@ void ControlSpikyCeiling(short itemNumber)
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
 		int y = item->Position.yPos + ((item->ItemFlags[0] == 1) ? 10 : 5);
-		auto probe = GetCollisionResult(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
+		auto probe = GetCollision(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
 
 		if (probe.Position.Floor < (y + SECTOR(1)))
 		{

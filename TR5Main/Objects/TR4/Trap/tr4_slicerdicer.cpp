@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 
 		item->TriggerFlags += 170;
 
-		auto probedRoomNumber = GetCollisionResult(item).RoomNumber;
+		auto probedRoomNumber = GetCollision(item).RoomNumber;
 		if (item->RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 
