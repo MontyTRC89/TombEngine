@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr5_guard.h"
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/people.h"
 #include "Game/effects/effects.h"

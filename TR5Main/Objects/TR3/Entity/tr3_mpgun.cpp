@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_mpgun.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/collision/sphere.h"
@@ -157,9 +158,9 @@ void MPGunControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		int x = item->Position.xPos + WALL_SIZE * phd_sin(item->Position.yRot + laraInfo.angle);
+		int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + laraInfo.angle);
 		int y = item->Position.yPos;
-		int z = item->Position.zPos + WALL_SIZE * phd_cos(item->Position.yRot + laraInfo.angle);
+		int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + laraInfo.angle);
 		
 		short roomNumber = item->RoomNumber;
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

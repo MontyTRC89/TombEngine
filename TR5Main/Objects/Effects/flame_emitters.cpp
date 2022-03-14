@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"

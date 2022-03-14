@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
 #include "Specific/setup.h"
 #include "Game/effects/effects.h"

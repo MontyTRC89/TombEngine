@@ -2,6 +2,7 @@
 #include "Game/effects/tomb4fx.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/bubble.h"
@@ -467,7 +468,7 @@ void UpdateSmoke()
 	}
 }
 
-byte TriggerGunSmoke_SubFunction(int weaponType)
+byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
 {
 	switch (weaponType)
 	{

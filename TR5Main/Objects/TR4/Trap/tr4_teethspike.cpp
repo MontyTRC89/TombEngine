@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "tr4_teethspike.h"
-#include "control.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"

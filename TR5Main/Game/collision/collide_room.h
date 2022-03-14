@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	PHD_VECTOR Coordinates;
+	VectorInt3 Coordinates;
 	int RoomNumber;
 
 	FLOOR_INFO* Block;
@@ -127,6 +127,19 @@ void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, 
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
 short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
+
+FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
+int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
+int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
+int GetDistanceToFloor(int itemNumber, bool precise = true);
+void AlterFloorHeight(ITEM_INFO* item, int height);
+
+int GetWaterSurface(int x, int y, int z, short roomNumber);
+int GetWaterSurface(ITEM_INFO* item);
+int GetWaterDepth(int x, int y, int z, short roomNumber);
+int GetWaterDepth(ITEM_INFO* item);
+int GetWaterHeight(int x, int y, int z, short roomNumber);
+int GetWaterHeight(ITEM_INFO* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ITEM_INFO* item, CollisionInfo* coll);

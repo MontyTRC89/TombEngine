@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/debris.h"
 
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"

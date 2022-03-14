@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
