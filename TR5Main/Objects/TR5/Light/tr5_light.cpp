@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr5_light.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Sound/sound.h"

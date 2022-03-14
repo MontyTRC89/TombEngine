@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
+#include "Game/collision/collide_room.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/control/box.h"

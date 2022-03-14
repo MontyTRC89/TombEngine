@@ -2,6 +2,7 @@
 #include "Game/savegame.h"
 
 #include <filesystem>
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"

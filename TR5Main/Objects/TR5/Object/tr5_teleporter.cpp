@@ -2,7 +2,7 @@
 #include "tr5_teleporter.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Sound/sound.h"
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"

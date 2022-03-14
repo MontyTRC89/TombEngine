@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"

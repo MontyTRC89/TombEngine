@@ -88,16 +88,4 @@ bool ExplodeItemNode(ITEM_INFO* item, int node, int noXZVel, int bits);
 
 void CleanUp();
 
-void AlterFloorHeight(ITEM_INFO* item, int height);
-int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);	
-int GetWaterSurface(int x, int y, int z, short roomNumber);
-int GetWaterSurface(ITEM_INFO* item);
-int GetWaterDepth(int x, int y, int z, short roomNumber);
-int GetWaterDepth(ITEM_INFO* item);
-int GetWaterHeight(int x, int y, int z, short roomNumber);
-int GetWaterHeight(ITEM_INFO* item);
-int GetDistanceToFloor(int itemNumber, bool precise = true);
-
 unsigned CALLBACK GameMain(void*);
