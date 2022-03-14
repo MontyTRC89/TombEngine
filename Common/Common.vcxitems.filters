@@ -19,5 +19,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\input.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\configuration.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\setup.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\control\volumetriggerer.h" />
   </ItemGroup>
 </Project>

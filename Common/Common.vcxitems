@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\animation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Game\control\volumetriggerer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\items.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Game\room.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Specific\configuration.h" />
