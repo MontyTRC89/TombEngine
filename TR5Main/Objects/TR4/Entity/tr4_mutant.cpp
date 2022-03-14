@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 
 	static bool ShootFrame(ITEM_INFO* item)
 	{
-		int frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
+		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
 			/*frameNumber == 50 ||
 			frameNumber == 55 ||*/
@@ -232,10 +232,10 @@ namespace TEN::Entities::TR4
 		InitialiseCreature(itemNumber);
 
 		auto* item = &g_Level.Items[itemNumber];
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = MUTANT_STATE_APPEAR;
-		item->TargetState = MUTANT_STATE_APPEAR;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = MUTANT_STATE_APPEAR;
+		item->Animation.TargetState = MUTANT_STATE_APPEAR;
 	}
 
 	void CrocgodControl(short itemNumber)
@@ -268,24 +268,24 @@ namespace TEN::Entities::TR4
 		creature->MaxTurn = 0;
 		angle = CreatureTurn(item, 0);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case MUTANT_STATE_IDLE:
 			if (AI.ahead)
 			{
 				int random = GetRandomControl() & 31;
 				if ((random > 0 && random < 10) && AI.distance <= MUTANT_SHOOT_RANGE)
-					item->TargetState = MUTANT_STATE_SHOOT;
+					item->Animation.TargetState = MUTANT_STATE_SHOOT;
 				else if ((random > 10 && random < 20) && AI.distance <= MUTANT_LOCUST_1_RANGE)
-					item->TargetState = MUTANT_STATE_LOCUST_1;
+					item->Animation.TargetState = MUTANT_STATE_LOCUST_1;
 				else if ((random > 20 && random < 30) && AI.distance <= MUTANT_LOCUST_2_RANGE)
-					item->TargetState = MUTANT_STATE_LOCUST_2;
+					item->Animation.TargetState = MUTANT_STATE_LOCUST_2;
 			}
 
 			break;
 
 		case MUTANT_STATE_SHOOT:
-			frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
+			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
 				PHD_3DPOS src;
@@ -308,7 +308,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case MUTANT_STATE_LOCUST_1:
-			frameNumber = (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
+			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 			if (frameNumber >= 60 && frameNumber <= 120)
 				TEN::Entities::TR4::SpawnLocust(item);
 
@@ -325,7 +325,7 @@ namespace TEN::Entities::TR4
 			break;
 		}
 
-		if (item->ActiveState != MUTANT_STATE_LOCUST_1)
+		if (item->Animation.ActiveState != MUTANT_STATE_LOCUST_1)
 			mutantJoint = OBJECT_BONES(headY, AI.xAngle, true);
 		else
 			mutantJoint = OBJECT_BONES(0);

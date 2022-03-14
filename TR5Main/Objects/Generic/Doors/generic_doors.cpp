@@ -162,16 +162,16 @@ namespace TEN::Entities::Doors
 		}
 	}
 
-	void DoorCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void DoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (doorItem->TriggerFlags == 2 &&
-			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Airborne && // CHECK
+			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.Airborne && // CHECK
 			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
-				laraItem->ActiveState == LS_IDLE &&
-				laraItem->AnimNumber == LA_STAND_IDLE &&
+				laraItem->Animation.ActiveState == LS_IDLE &&
+				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
 				laraInfo->Control.HandStatus == HandStatus::Free ||
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
@@ -224,7 +224,7 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					doorItem->Flags |= IFLAG_ACTIVATION_MASK;
 					doorItem->Status = ITEM_ACTIVE;
-					doorItem->TargetState = LS_RUN_FORWARD;
+					doorItem->Animation.TargetState = LS_RUN_FORWARD;
 					return;
 				}
 
@@ -310,8 +310,8 @@ namespace TEN::Entities::Doors
 		{
 			if (TriggerActive(doorItem))
 			{
-				if (doorItem->ActiveState == 0)
-					doorItem->TargetState = 1;
+				if (doorItem->Animation.ActiveState == 0)
+					doorItem->Animation.TargetState = 1;
 				else if (!doorData->opened)
 				{
 					OpenThatDoor(&doorData->d1, doorData);
@@ -325,8 +325,8 @@ namespace TEN::Entities::Doors
 			{
 				doorItem->Status = ITEM_ACTIVE;
 
-				if (doorItem->ActiveState == 1)
-					doorItem->TargetState = 0;
+				if (doorItem->Animation.ActiveState == 1)
+					doorItem->Animation.TargetState = 0;
 				else if (doorData->opened)
 				{
 					ShutThatDoor(&doorData->d1, doorData);

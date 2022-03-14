@@ -156,8 +156,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos != LaraItem->Position.xPos ||
 		OldCam.pos.yPos != LaraItem->Position.yPos ||
 		OldCam.pos.zPos != LaraItem->Position.zPos ||
-		OldCam.ActiveState != LaraItem->ActiveState ||
-		OldCam.TargetState != LaraItem->TargetState ||
+		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
+		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
@@ -178,8 +178,8 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		OldCam.pos.xPos = LaraItem->Position.xPos;
 		OldCam.pos.yPos = LaraItem->Position.yPos;
 		OldCam.pos.zPos = LaraItem->Position.zPos;
-		OldCam.ActiveState = LaraItem->ActiveState;
-		OldCam.TargetState = LaraItem->TargetState;
+		OldCam.ActiveState = LaraItem->Animation.ActiveState;
+		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
@@ -228,7 +228,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber))
 		y = g_Level.Rooms[Camera.pos.roomNumber].y - CLICK(1);
 
-	auto probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	auto probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		y > probe.Position.Floor)
 	{
@@ -260,7 +260,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		}
 	}
 
-	probe = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
 
 	int buffer = CLICK(1) - 1;
 	if ((Camera.pos.y - buffer) < probe.Position.Ceiling &&
@@ -297,7 +297,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 
 	ItemsCollideCamera();
 
-	Camera.pos.roomNumber = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber).RoomNumber;
+	Camera.pos.roomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber).RoomNumber;
 	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
@@ -333,13 +333,13 @@ void ChaseCamera(ITEM_INFO* item)
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
+	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 
 	int y = Camera.target.y;
-	probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	if (((y < probe.Position.Ceiling || probe.Position.Floor < y) || probe.Position.Floor <= probe.Position.Ceiling) ||
 		(probe.Position.Floor == NO_HEIGHT || probe.Position.Ceiling == NO_HEIGHT))
 	{
@@ -472,11 +472,11 @@ void CombatCamera(ITEM_INFO* item)
 		Camera.targetElevation = lara->ExtraHeadRot.xRot + lara->ExtraTorsoRot.xRot + item->Position.xRot - ANGLE(15.0f);
 	}
 
-	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
+	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 
-	probe = GetCollisionResult(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.roomNumber);
 	Camera.target.roomNumber = probe.RoomNumber;
 
 	int buffer = CLICK(0.25f);
@@ -501,7 +501,7 @@ void CombatCamera(ITEM_INFO* item)
 	}
 
 	int y = Camera.target.y;
-	probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	Camera.target.roomNumber = probe.RoomNumber;
 
 	if (y < probe.Position.Ceiling ||
@@ -618,11 +618,11 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 	int y = ideal->y;
 	int z = ideal->z;
 
-	COLL_RESULT probe;
+	CollisionResult probe;
 
 	if (yFirst)
 	{
-		probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+		probe = GetCollision(x, y, z, ideal->roomNumber);
 
 		int buffer = CLICK(1) - 1;
 		if ((y - buffer) < probe.Position.Ceiling &&
@@ -649,7 +649,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		}
 	}
 
-	probe = GetCollisionResult(x - push, y, z, ideal->roomNumber);
+	probe = GetCollision(x - push, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -659,7 +659,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		x = (x & (~1023)) + push;
 	}
 
-	probe = GetCollisionResult(x, y, z - push, ideal->roomNumber);
+	probe = GetCollision(x, y, z - push, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -669,7 +669,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		z = (z & (~1023)) + push;
 	}
 
-	probe = GetCollisionResult(x + push, y, z, ideal->roomNumber);
+	probe = GetCollision(x + push, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -679,7 +679,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		x = (x | 1023) - push;
 	}
 
-	probe = GetCollisionResult(x, y, z + push, ideal->roomNumber);
+	probe = GetCollision(x, y, z + push, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -691,7 +691,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 
 	if (!yFirst)
 	{
-		probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+		probe = GetCollision(x, y, z, ideal->roomNumber);
 
 		int buffer = CLICK(1) - 1;
 		if ((y - buffer) < probe.Position.Ceiling &&
@@ -718,7 +718,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		}
 	}
 
-	probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+	probe = GetCollision(x, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		y < probe.Position.Ceiling ||
 		probe.Position.Floor == NO_HEIGHT ||
@@ -815,7 +815,7 @@ void LookCamera(ITEM_INFO* item)
 	PHD_VECTOR pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
 	GetLaraJointPosition(&pos, LM_HEAD);
 
-	auto probe = GetCollisionResult(pos.x, pos.y, pos.z, item->RoomNumber);
+	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 	if (probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
 		probe.Position.Ceiling >= probe.Position.Floor ||
@@ -825,14 +825,14 @@ void LookCamera(ITEM_INFO* item)
 		pos = { 0, (int)CLICK(0.25f) / 4 , 0 };
 		GetLaraJointPosition(&pos, LM_HEAD);
 
-		probe = GetCollisionResult(pos.x, pos.y + CLICK(1), pos.z, item->RoomNumber);
+		probe = GetCollision(pos.x, pos.y + CLICK(1), pos.z, item->RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
 			pos.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
-			probe = GetCollisionResult(pos.x, pos.y, pos.z, probe.RoomNumber);
+			probe = GetCollision(pos.x, pos.y, pos.z, probe.RoomNumber);
 		}
 		else
-			probe = GetCollisionResult(pos.x, pos.y, pos.z, probe.RoomNumber);
+			probe = GetCollision(pos.x, pos.y, pos.z, probe.RoomNumber);
 
 		if (probe.Position.Floor == NO_HEIGHT ||
 			probe.Position.Ceiling == NO_HEIGHT ||
@@ -866,14 +866,14 @@ void LookCamera(ITEM_INFO* item)
 	for (i = 0; i < 8; i++)
 	{
 		roomNum = probe.RoomNumber;
-		probe = GetCollisionResult(x, y + CLICK(1), z, probe.RoomNumber);
+		probe = GetCollision(x, y + CLICK(1), z, probe.RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
 			y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 			break;
 		}
 		else
-			probe = GetCollisionResult(x, y, z, probe.RoomNumber);
+			probe = GetCollision(x, y, z, probe.RoomNumber);
 
 		if (probe.Position.Floor == NO_HEIGHT ||
 			probe.Position.Ceiling == NO_HEIGHT ||
@@ -904,8 +904,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos == item->Position.xPos &&
 		OldCam.pos.yPos == item->Position.yPos &&
 		OldCam.pos.zPos == item->Position.zPos &&
-		OldCam.ActiveState == item->ActiveState &&
-		OldCam.TargetState == item->TargetState &&
+		OldCam.ActiveState == item->Animation.ActiveState &&
+		OldCam.TargetState == item->Animation.TargetState &&
 		Camera.oldType == CameraType::Look)
 	{
 		ideal.x = LookCamPosition.x;
@@ -923,8 +923,8 @@ void LookCamera(ITEM_INFO* item)
 		OldCam.pos.xPos = item->Position.xPos;
 		OldCam.pos.yPos = item->Position.yPos;
 		OldCam.pos.zPos = item->Position.zPos;
-		OldCam.ActiveState = item->ActiveState;
-		OldCam.TargetState = item->TargetState;
+		OldCam.ActiveState = item->Animation.ActiveState;
+		OldCam.TargetState = item->Animation.TargetState;
 		LookCamPosition.x = ideal.x;
 		LookCamPosition.y = ideal.y;
 		LookCamPosition.z = ideal.z;
@@ -975,7 +975,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 
 	int buffer = CLICK(1) - 1;
 	if ((y - buffer) < probe.Position.Ceiling &&
@@ -1001,7 +1001,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		Camera.pos.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 	else if (y < probe.Position.Ceiling ||
@@ -1014,7 +1014,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		y > probe.Position.Floor ||
 		probe.Position.Ceiling >= probe.Position.Floor ||
@@ -1124,7 +1124,7 @@ void BinocularCamera(ITEM_INFO* item)
 	int y = item->Position.yPos - CLICK(2);
 	int z = item->Position.zPos;
 
-	auto probe = GetCollisionResult(x, y, z, item->RoomNumber);
+	auto probe = GetCollision(x, y, z, item->RoomNumber);
 	if (probe.Position.Ceiling <= (y - CLICK(1)))
 		y -= CLICK(1);
 	else
@@ -1173,7 +1173,7 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 	}
 
-	Camera.target.roomNumber = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.roomNumber).RoomNumber;
+	Camera.target.roomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.roomNumber).RoomNumber;
 	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
@@ -1380,7 +1380,7 @@ void ConfirmCameraTargetPos()
 	}
 
 	int y = Camera.target.y;
-	auto probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	auto probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		probe.Position.Floor < y ||
 		probe.Position.Floor <= probe.Position.Ceiling ||
@@ -1589,7 +1589,7 @@ void CalculateCamera()
 			Camera.speed = 1;
 		}
 
-		Camera.target.roomNumber = GetCollisionResult(x, y, z, Camera.target.roomNumber).RoomNumber;
+		Camera.target.roomNumber = GetCollision(x, y, z, Camera.target.roomNumber).RoomNumber;
 
 		if (abs(LastTarget.x - Camera.target.x) < 4 &&
 			abs(LastTarget.y - Camera.target.y) < 4 &&
@@ -1780,7 +1780,7 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	Camera.pos.x = pos->xPos + (cos * x + sin * z);
 	Camera.pos.z = pos->zPos + (cos * z - sin * x);
 
-	auto coll = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	auto coll = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
 	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
 	{
 		Camera.pos.x = CamOldPos.x;

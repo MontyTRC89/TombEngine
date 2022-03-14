@@ -38,10 +38,10 @@ void InitialiseChef(short itemNumber)
 	
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->TargetState = CHEF_STATE_COOKING;
-	item->ActiveState = CHEF_STATE_COOKING;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.TargetState = CHEF_STATE_COOKING;
+	item->Animation.ActiveState = CHEF_STATE_COOKING;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Position.xPos += 192 * phd_sin(item->Position.yRot);
 	item->Position.zPos += 192 * phd_cos(item->Position.yRot);
 }
@@ -61,12 +61,12 @@ void ControlChef(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != CHEF_STATE_DEATH)
+		if (item->Animation.ActiveState != CHEF_STATE_DEATH)
 		{
 			item->HitPoints = 0;
-			item->ActiveState = CHEF_STATE_DEATH;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CHEF_ANIM_DEATH;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.ActiveState = CHEF_STATE_DEATH;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CHEF_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -113,17 +113,17 @@ void ControlChef(short itemNumber)
 
 		creature->MaxTurn = 0;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case CHEF_STATE_COOKING:
 			if (abs(LaraItem->Position.yPos - item->Position.yPos) < SECTOR(1) &&
 				AI.distance < pow(SECTOR(1.5f), 2) &&
 				(item->TouchBits ||
 					item->HitStatus ||
-					LaraItem->Velocity > 15 ||
+					LaraItem->Animation.Velocity > 15 ||
 					TargetVisible(item, &aiLaraInfo)))
 			{
-				item->TargetState = CHEF_STATE_TURN_180;
+				item->Animation.TargetState = CHEF_STATE_TURN_180;
 				creature->Alerted = true;
 				item->AIBits = 0;
 			}
@@ -137,7 +137,7 @@ void ControlChef(short itemNumber)
 				item->Position.yRot -= ANGLE(2.0f);
 			else
 				item->Position.yRot += ANGLE(2.0f);
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				item->Position.yRot += -ANGLE(180.0f);
 
 			break;
@@ -159,7 +159,7 @@ void ControlChef(short itemNumber)
 			{
 				if (item->TouchBits & 0x2000)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 10)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
 						CreatureEffect2(item, &ChefBite, 20, item->Position.yRot, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
@@ -180,12 +180,12 @@ void ControlChef(short itemNumber)
 			if (AI.distance >= pow(682, 2))
 			{
 				if (AI.angle > ANGLE(112.5f) || AI.angle < -ANGLE(112.5f))
-					item->TargetState = CHEF_STATE_TURN_180;
+					item->Animation.TargetState = CHEF_STATE_TURN_180;
 				else if (creature->Mood == MoodType::Attack)
-					item->TargetState = CHEF_STATE_WALK;
+					item->Animation.TargetState = CHEF_STATE_WALK;
 			}
 			else if (AI.bite)
-				item->TargetState = CHEF_STATE_ATTACK;
+				item->Animation.TargetState = CHEF_STATE_ATTACK;
 			
 			break;
 
@@ -197,7 +197,7 @@ void ControlChef(short itemNumber)
 				AI.angle < -ANGLE(112.5f) ||
 				creature->Mood != MoodType::Attack)
 			{
-				item->TargetState = CHEF_STATE_AIM;
+				item->Animation.TargetState = CHEF_STATE_AIM;
 			}
 
 			break;

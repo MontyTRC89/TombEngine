@@ -4,8 +4,9 @@
 #include "Specific/trmath.h"
 #include "Sound/sound.h"
 #include "tr5_missile.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
+
 void ControlBodyPart(short fxNumber)
 {
 	FX_INFO* fx = &EffectList[fxNumber];

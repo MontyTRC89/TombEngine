@@ -903,8 +903,8 @@ enum class HandStatus
 {
 	Free,
 	Busy,
-	DrawWeapon,
-	UndrawWeapon,
+	WeaponDraw,
+	WeaponUndraw,
 	WeaponReady,
 	Special
 };
@@ -1119,9 +1119,9 @@ struct LaraInventoryData
 
 struct LaraCountData
 {
-	unsigned int RunJump;
-	unsigned int PositionAdjust;
 	unsigned int Pose;
+	unsigned int PositionAdjust;
+	unsigned int RunJump;
 	unsigned int Dive;
 	unsigned int Death;
 	unsigned int NoCheat;

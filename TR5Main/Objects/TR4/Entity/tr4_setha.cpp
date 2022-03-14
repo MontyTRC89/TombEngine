@@ -4,6 +4,7 @@
 #include "Game/effects/effects.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Specific/trmath.h"
 #include "Game/Lara/lara.h"
@@ -22,10 +23,10 @@ void InitialiseSetha(short itemNumber)
 	
 	ClearItem(itemNumber);
 	
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 12;
-	item->ActiveState = 12;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 12;
+	item->Animation.ActiveState = 12;
 }
 
 void SethaControl(short itemNumber)
@@ -95,20 +96,20 @@ void SethaControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->LOT.IsJumping = false;
 			creature->Flags = 0;
 
-			if (item->RequiredState)
+			if (item->Animation.RequiredState)
 			{
-				item->TargetState = item->RequiredState;
+				item->Animation.TargetState = item->Animation.RequiredState;
 				break;
 			}
 			else if (info.distance < SQUARE(1024) && info.bite)
 			{
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 				break;
 			}
 			else if (LaraItem->Position.yPos >= item->Position.yPos - 1024)
@@ -119,7 +120,7 @@ void SethaControl(short itemNumber)
 					&& Targetable(item, &info))
 				{
 					item->ItemFlags[0] = 0;
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 					break;
 				}
 				else if (ceiling != NO_HEIGHT
@@ -133,11 +134,11 @@ void SethaControl(short itemNumber)
 					{
 						item->ItemFlags[0] = 0;
 						item->Position.yPos += 1536;
-						item->TargetState = 12;
+						item->Animation.TargetState = 12;
 					}
 					else
 					{
-						item->TargetState = 2;
+						item->Animation.TargetState = 2;
 						item->Position.yPos += 1536;
 					}
 					break;
@@ -148,7 +149,7 @@ void SethaControl(short itemNumber)
 					{
 						if (Targetable(item, &info))
 						{
-							item->TargetState = 4;
+							item->Animation.TargetState = 4;
 							break;
 						}
 					}
@@ -160,12 +161,12 @@ void SethaControl(short itemNumber)
 						&& Targetable(item, &info))
 					{
 						item->ItemFlags[0] = 0;
-						item->TargetState = 13;
+						item->Animation.TargetState = 13;
 						break;
 					}
 					else if (canJump)
 					{
-						item->TargetState = 5;
+						item->Animation.TargetState = 5;
 						break;
 					}
 				}
@@ -174,7 +175,7 @@ void SethaControl(short itemNumber)
 			{
 				if (creature->ReachedGoal)
 				{
-					item->TargetState = 14;
+					item->Animation.TargetState = 14;
 					break;
 				}
 				else
@@ -184,7 +185,7 @@ void SethaControl(short itemNumber)
 				}
 			}
 
-			item->TargetState = 2;
+			item->Animation.TargetState = 2;
 
 			break;
 
@@ -195,11 +196,11 @@ void SethaControl(short itemNumber)
 				|| canJump 
 				|| creature->ReachedGoal)
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 			else if (info.distance > SQUARE(3072))
 			{
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			}
 			break;
 
@@ -210,19 +211,19 @@ void SethaControl(short itemNumber)
 				|| canJump 
 				|| creature->ReachedGoal)
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 			else if (info.distance < SQUARE(3072))
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 			break;
 
 		case 4:
 			if (canJump)
 			{
-				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 15
-					&& item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 15
+					&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
 					creature->ReachedGoal = true;
 					creature->MaxTurn = 0;
@@ -233,7 +234,7 @@ void SethaControl(short itemNumber)
 			{
 				if (item->TouchBits)
 				{
-					if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 16)
+					if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 16)
 					{
 						if (item->TouchBits & 0xE000)
 						{
@@ -272,12 +273,12 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 7:
-			if (item->AnimNumber == Objects[item->AnimNumber].animIndex + 17 
-				&& item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 
+				&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				if (GetRandomControl() & 1)
 				{
-					item->RequiredState = 10;
+					item->Animation.RequiredState = 10;
 				}
 			}
 		
@@ -306,8 +307,8 @@ void SethaControl(short itemNumber)
 			{
 				if (item->TouchBits)
 				{
-					if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 15 
-						&& item->FrameNumber < g_Level.Anims[item->AnimNumber].frameBase + 26)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 
+						&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 					{
 						LaraItem->HitPoints -= 250;
 						LaraItem->HitStatus = true;
@@ -335,7 +336,7 @@ void SethaControl(short itemNumber)
 		case 12:
 		case 13:
 		case 15:
-			if (item->ActiveState==15)
+			if (item->Animation.ActiveState==15)
 				creature->Target.y = LaraItem->Position.yPos;
 		
 			creature->MaxTurn = 0;
@@ -361,10 +362,10 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 14:
-			if (item->AnimNumber != Objects[item->AnimNumber].animIndex + 26)
+			if (item->Animation.AnimNumber != Objects[item->Animation.AnimNumber].animIndex + 26)
 			{
 				creature->LOT.Fly = 16;
-				item->Airborne = false;
+				item->Animation.Airborne = false;
 				creature->MaxTurn = 0;
 				creature->Target.y = LaraItem->Position.yPos;
 
@@ -390,16 +391,16 @@ void SethaControl(short itemNumber)
 				if (Targetable(item, &info))
 				{
 					item->ItemFlags[0] = 0;
-					item->TargetState = 15;
+					item->Animation.TargetState = 15;
 				}
 			}
 			else
 			{
 				creature->LOT.Fly = 0;
-				item->Airborne = true;
+				item->Animation.Airborne = true;
 				if (item->Position.yPos - item->Floor > 0)
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				}
 			}
 
@@ -417,30 +418,30 @@ void SethaControl(short itemNumber)
 			&& info.distance < SQUARE(2048)
 			&& !(creature->LOT.IsJumping))
 		{
-			if (item->ActiveState != 12)
+			if (item->Animation.ActiveState != 12)
 			{
-				if (item->ActiveState <= 13)
+				if (item->Animation.ActiveState <= 13)
 				{
 					if (abs(height4 - item->Position.yPos) >= 512)
 					{
-						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-						item->TargetState = 6;
-						item->ActiveState = 6;
+						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
+						item->Animation.TargetState = 6;
+						item->Animation.ActiveState = 6;
 					}
 					else
 					{
-						item->AnimNumber = Objects[item->ObjectNumber].animIndex + 17;
-						item->TargetState = 7;
-						item->ActiveState = 7;
+						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 17;
+						item->Animation.TargetState = 7;
+						item->Animation.ActiveState = 7;
 					}
 				}
 				else
 				{
-					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 25;
-					item->TargetState = 16;
-					item->ActiveState = 16;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 25;
+					item->Animation.TargetState = 16;
+					item->Animation.ActiveState = 16;
 				}
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 	}
@@ -576,7 +577,7 @@ void SethaAttack(int itemNumber)
 	short angles[2];
 	PHD_3DPOS attackPos;
 
-	switch (item->ActiveState)
+	switch (item->Animation.ActiveState)
 	{
 	case 11:
 	case 15:

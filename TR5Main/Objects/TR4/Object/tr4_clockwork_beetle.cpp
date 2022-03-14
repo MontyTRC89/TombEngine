@@ -13,17 +13,17 @@ void ClockworkBeetleControl(short itemNumber)
 
 	int flag = 0;
 
-	if (LaraItem->AnimNumber == LA_MECHANICAL_BEETLE_USE)
+	if (LaraItem->Animation.AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
 		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].frameBase;
 
-		if (LaraItem->FrameNumber < fb + 14)
+		if (LaraItem->Animation.FrameNumber < fb + 14)
 		{
 			beetle->Status = ITEM_INVISIBLE;
 			return;
 		}
 
-		if (LaraItem->FrameNumber < fb + 104)
+		if (LaraItem->Animation.FrameNumber < fb + 104)
 		{
 			PHD_VECTOR pos = { 0, 0, -32 };
 			GetLaraJointPosition(&pos, LM_RHAND);
@@ -37,7 +37,7 @@ void ClockworkBeetleControl(short itemNumber)
 			return;
 		}
 
-		if (LaraItem->FrameNumber == fb + 104)
+		if (LaraItem->Animation.FrameNumber == fb + 104)
 		{
 			short roomNumber = beetle->RoomNumber;
 			FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, &roomNumber);
@@ -56,8 +56,8 @@ void ClockworkBeetleControl(short itemNumber)
 
 	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Position, 0);
 
-	beetle->VerticalVelocity += 12;
-	beetle->Position.yPos += beetle->VerticalVelocity;
+	beetle->Animation.VerticalVelocity += 12;
+	beetle->Position.yPos += beetle->Animation.VerticalVelocity;
 
 	short roomNumber = beetle->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos - 20, beetle->Position.zPos, &roomNumber);
@@ -67,10 +67,10 @@ void ClockworkBeetleControl(short itemNumber)
 	{
 		beetle->Position.yPos = height;
 
-		if (beetle->VerticalVelocity <= 32)
-			beetle->VerticalVelocity = 0;
+		if (beetle->Animation.VerticalVelocity <= 32)
+			beetle->Animation.VerticalVelocity = 0;
 		else
-			beetle->VerticalVelocity = -beetle->VerticalVelocity >> 1;
+			beetle->Animation.VerticalVelocity = -beetle->Animation.VerticalVelocity >> 1;
 
 		flag = 1;
 	}
@@ -140,22 +140,22 @@ void ClockworkBeetleControl(short itemNumber)
 
 				if (pow(x, 2) + pow(z, 2) >= 0x19000)
 				{
-					if (beetle->Velocity < 32)
-						beetle->Velocity++;
+					if (beetle->Animation.Velocity < 32)
+						beetle->Animation.Velocity++;
 				}
 				else
 				{
-					if (beetle->Velocity <= 4)
+					if (beetle->Animation.Velocity <= 4)
 					{
-						if (beetle->Velocity < 4)
-							beetle->Velocity++;
+						if (beetle->Animation.Velocity < 4)
+							beetle->Animation.Velocity++;
 					}
 					else
-						beetle->Velocity = beetle->Velocity - (beetle->ItemFlags[2] == 4) - 1;
+						beetle->Animation.Velocity = beetle->Animation.Velocity - (beetle->ItemFlags[2] == 4) - 1;
 				}
 
-				beetle->Position.xPos += beetle->Velocity * phd_sin(beetle->Position.yRot);
-				beetle->Position.zPos += beetle->Velocity * phd_cos(beetle->Position.yRot);
+				beetle->Position.xPos += beetle->Animation.Velocity * phd_sin(beetle->Position.yRot);
+				beetle->Position.zPos += beetle->Animation.Velocity * phd_cos(beetle->Position.yRot);
 			}
 			else
 			{
@@ -233,11 +233,11 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 3:
 		{
-			if (beetle->Velocity < 32)
-				beetle->Velocity++;
+			if (beetle->Animation.Velocity < 32)
+				beetle->Animation.Velocity++;
 
-			beetle->Position.xPos += beetle->Velocity * phd_sin(beetle->Position.yRot);
-			beetle->Position.zPos += beetle->Velocity * phd_cos(beetle->Position.yRot);
+			beetle->Position.xPos += beetle->Animation.Velocity * phd_sin(beetle->Position.yRot);
+			beetle->Position.zPos += beetle->Animation.Velocity * phd_cos(beetle->Position.yRot);
 
 			if (!floor->Flags.MarkBeetle)
 				beetle->ItemFlags[3] = 1;
@@ -275,7 +275,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (flag && beetle->ItemFlags[3] > 30 && val)
 			{
-				beetle->VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
+				beetle->Animation.VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 		}
@@ -287,7 +287,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (flag && val)
 			{
-				beetle->VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
+				beetle->Animation.VerticalVelocity = -((val >> 1) + GetRandomControl() % val);
 				return;
 			}
 
@@ -304,8 +304,8 @@ void ClockworkBeetleControl(short itemNumber)
 void UseClockworkBeetle(short flag)
 {
 	if (flag ||
-		LaraItem->ActiveState == LS_IDLE &&
-		LaraItem->AnimNumber == LA_STAND_IDLE &&
+		LaraItem->Animation.ActiveState == LS_IDLE &&
+		LaraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		!LaraItem->HitStatus &&
 		Lara.Control.HandStatus == HandStatus::Free)
 	{
@@ -329,11 +329,11 @@ void UseClockworkBeetle(short flag)
 			item->Position.zRot = 0;
 
 			if (Lara.Inventory.BeetleLife)
-				item->ItemFlags[0] = GetCollisionResult(item).Block->Flags.MarkBeetle;
+				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;
 			else
 				item->ItemFlags[0] = 0;
 
-			item->Velocity = 0;
+			item->Animation.Velocity = 0;
 			AddActiveItem(itemNumber);
 
 			if (item->ItemFlags[0])

@@ -4,7 +4,7 @@
 #include "Specific/newtypes.h"
 #include "Specific/phd_global.h"
 
-struct TRIGGER_VOLUME;
+struct TriggerVolume;
 
 constexpr auto MAX_FLIPMAP = 256;
 
@@ -117,7 +117,7 @@ struct ROOM_INFO
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
-	std::vector<TRIGGER_VOLUME> triggerVolumes;
+	std::vector<TriggerVolume> triggerVolumes;
 };
 
 constexpr auto NUM_ROOMS = 1024;
@@ -130,12 +130,12 @@ extern int FlipStats[MAX_FLIPMAP];
 extern int FlipMap[MAX_FLIPMAP];
 
 void DoFlipMap(short group);
-void AddRoomFlipItems(ROOM_INFO* r);
-void RemoveRoomFlipItems(ROOM_INFO* r);
-int IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(PHD_3DPOS const & pos, int roomNumber);
+void AddRoomFlipItems(ROOM_INFO* room);
+void RemoveRoomFlipItems(ROOM_INFO* room);
+bool IsObjectInRoom(short roomNumber, short objectNumber);
+bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber);
 PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 
-FLOOR_INFO* GetSector(ROOM_INFO* r, int x, int z);
+FLOOR_INFO* GetSector(ROOM_INFO* room, int x, int z);

@@ -35,13 +35,13 @@ void InitialiseDeathSlide(short itemNumber)
 	pos->roomNumber = item->RoomNumber;
 }
 
-void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) ||
-		laraItem->ActiveState != LS_IDLE ||
-		laraItem->Airborne ||
+		laraItem->Animation.ActiveState != LS_IDLE ||
+		laraItem->Animation.Airborne ||
 		laraInfo->Control.HandStatus != HandStatus::Free)
 	{
 		return;
@@ -56,10 +56,10 @@ void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		AlignLaraPosition(&DeathSlidePosition, zipLineItem, laraItem);
 		laraInfo->Control.HandStatus = HandStatus::Busy;
 
-		laraItem->TargetState = LS_ZIP_LINE;
+		laraItem->Animation.TargetState = LS_ZIP_LINE;
 		do
 			AnimateItem(laraItem);
-		while (laraItem->ActiveState != LS_GRABBING);
+		while (laraItem->Animation.ActiveState != LS_GRABBING);
 
 		if (!zipLineItem->Active)
 			AddActiveItem(itemNumber);
@@ -87,15 +87,15 @@ void ControlDeathSlide(short itemNumber)
 				ItemNewRoom(itemNumber, old->roomNumber);
 
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
-			zipLineItem->ActiveState = zipLineItem->TargetState = 1;
-			zipLineItem->AnimNumber = Objects[zipLineItem->ObjectNumber].animIndex;
-			zipLineItem->FrameNumber = g_Level.Anims[zipLineItem->AnimNumber].frameBase;
+			zipLineItem->Animation.ActiveState = zipLineItem->Animation.TargetState = 1;
+			zipLineItem->Animation.AnimNumber = Objects[zipLineItem->ObjectNumber].animIndex;
+			zipLineItem->Animation.FrameNumber = g_Level.Anims[zipLineItem->Animation.AnimNumber].frameBase;
 
 			RemoveActiveItem(itemNumber);
 			return;
 		}
 
-		if (zipLineItem->ActiveState == 1)
+		if (zipLineItem->Animation.ActiveState == 1)
 		{
 			AnimateItem(zipLineItem);
 			return;
@@ -103,22 +103,22 @@ void ControlDeathSlide(short itemNumber)
 
 		AnimateItem(zipLineItem);
 
-		if (zipLineItem->VerticalVelocity < 100)
-			zipLineItem->VerticalVelocity += 5;
+		if (zipLineItem->Animation.VerticalVelocity < 100)
+			zipLineItem->Animation.VerticalVelocity += 5;
 
 		float c = phd_cos(zipLineItem->Position.yRot);
 		float s = phd_sin(zipLineItem->Position.yRot);
 
-		zipLineItem->Position.zPos += zipLineItem->VerticalVelocity * c;
-		zipLineItem->Position.xPos += zipLineItem->VerticalVelocity * s;
-		zipLineItem->Position.yPos += zipLineItem->VerticalVelocity / 4;
+		zipLineItem->Position.zPos += zipLineItem->Animation.VerticalVelocity * c;
+		zipLineItem->Position.xPos += zipLineItem->Animation.VerticalVelocity * s;
+		zipLineItem->Position.yPos += zipLineItem->Animation.VerticalVelocity / 4;
 
 		short roomNumber = zipLineItem->RoomNumber;
 		GetFloor(zipLineItem->Position.xPos, zipLineItem->Position.yPos, zipLineItem->Position.zPos, &roomNumber);
 		if (roomNumber != zipLineItem->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
-		if (LaraItem->ActiveState == LS_ZIP_LINE)
+		if (LaraItem->Animation.ActiveState == LS_ZIP_LINE)
 		{
 			LaraItem->Position.xPos = zipLineItem->Position.xPos;
 			LaraItem->Position.yPos = zipLineItem->Position.yPos;
@@ -133,13 +133,13 @@ void ControlDeathSlide(short itemNumber)
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
-			if (LaraItem->ActiveState == LS_ZIP_LINE)
+			if (LaraItem->Animation.ActiveState == LS_ZIP_LINE)
 			{
-				LaraItem->TargetState = LS_JUMP_FORWARD;
+				LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
-				LaraItem->Airborne = true;
-				LaraItem->Velocity = zipLineItem->VerticalVelocity;
-				LaraItem->VerticalVelocity = zipLineItem->VerticalVelocity / 4;
+				LaraItem->Animation.Airborne = true;
+				LaraItem->Animation.Velocity = zipLineItem->Animation.VerticalVelocity;
+				LaraItem->Animation.VerticalVelocity = zipLineItem->Animation.VerticalVelocity / 4;
 			}
 
 			// Stop

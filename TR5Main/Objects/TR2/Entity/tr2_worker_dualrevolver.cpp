@@ -28,16 +28,16 @@ void WorkerDualGunControl(short itemNum)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 11)
+		if (item->Animation.ActiveState != 11)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 11;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 11;
 		}
 	}
 	else if (LaraItem->HitPoints <= 0)
 	{
-		item->TargetState = 2;
+		item->Animation.TargetState = 2;
 	}
 	else
 	{
@@ -48,7 +48,7 @@ void WorkerDualGunControl(short itemNum)
 
 		angle = CreatureTurn(item, dual->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 		case 2:
@@ -65,9 +65,9 @@ void WorkerDualGunControl(short itemNum)
 				if (Targetable(item, &info))
 				{
 					if (info.distance <= 0x900000)
-						item->TargetState = 9;
+						item->Animation.TargetState = 9;
 					else
-						item->TargetState = 3;
+						item->Animation.TargetState = 3;
 				}
 				else
 				{
@@ -75,27 +75,27 @@ void WorkerDualGunControl(short itemNum)
 					{
 					case MoodType::Attack:
 						if (info.distance > 0x19000000 || !info.ahead)
-							item->TargetState = 4;
+							item->Animation.TargetState = 4;
 						else
-							item->TargetState = 3;
+							item->Animation.TargetState = 3;
 						break;
 					case MoodType::Escape:
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 						break;
 					case MoodType::Stalk:
-						item->TargetState = 3;
+						item->Animation.TargetState = 3;
 						break;
 
 					default:
 						if (!info.ahead)
-							item->TargetState = 3;
+							item->Animation.TargetState = 3;
 						break;
 					}
 				}
 			}
 			else
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 			break;
 		case 3:
@@ -111,34 +111,34 @@ void WorkerDualGunControl(short itemNum)
 			{
 				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				}
 				else
 				{
 					if (info.angle >= 0)
-						item->TargetState = 6;
+						item->Animation.TargetState = 6;
 					else
-						item->TargetState = 5;
+						item->Animation.TargetState = 5;
 				}
 			}
 
 			if (dual->Mood == MoodType::Escape)
 			{
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			}
 			else if (dual->Mood == MoodType::Attack || dual->Mood == MoodType::Stalk)
 			{
 				if (info.distance > 0x19000000 || !info.ahead)
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 			}
 			else if (LaraItem->HitPoints > 0)
 			{
 				if (info.ahead)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 			}
 			else
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 			break;
 		case 4:
@@ -157,27 +157,27 @@ void WorkerDualGunControl(short itemNum)
 				if (info.zoneNumber == info.enemyZone)
 				{
 					if (info.angle >= 0)
-						item->TargetState = 6;
+						item->Animation.TargetState = 6;
 					else
-						item->TargetState = 5;
+						item->Animation.TargetState = 5;
 				}
 				else
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				}
 			}
 			else if (dual->Mood == MoodType::Attack)
 			{
 				if (info.ahead && info.distance < 0x19000000)
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else if (LaraItem->HitPoints > 0)
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 			else
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 			break;
 		case 5:
@@ -190,9 +190,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 		case 6:
 			dual->Flags = 0;
@@ -204,9 +204,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 		case 7:
 			if (info.ahead)
@@ -244,9 +244,9 @@ void WorkerDualGunControl(short itemNum)
 			}
 
 			if (Targetable(item, &info))
-				item->TargetState = 10;
+				item->Animation.TargetState = 10;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			break;
 		case 10:
 			if (info.ahead)

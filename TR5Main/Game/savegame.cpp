@@ -2,6 +2,7 @@
 #include "Game/savegame.h"
 
 #include <filesystem>
+#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
@@ -459,31 +460,31 @@ bool SaveGame::Save(int slot)
 
 		Save::ItemBuilder serializedItem{ fbb };
 
-		serializedItem.add_anim_number(itemToSerialize.AnimNumber - obj->animIndex);
+		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
-		serializedItem.add_active_state(itemToSerialize.ActiveState);
-		serializedItem.add_vertical_velocity(itemToSerialize.VerticalVelocity);
+		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
+		serializedItem.add_vertical_velocity(itemToSerialize.Animation.VerticalVelocity);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
-		serializedItem.add_frame_number(itemToSerialize.FrameNumber);
-		serializedItem.add_target_state(itemToSerialize.TargetState);
+		serializedItem.add_frame_number(itemToSerialize.Animation.FrameNumber);
+		serializedItem.add_target_state(itemToSerialize.Animation.TargetState);
 		serializedItem.add_hit_points(itemToSerialize.HitPoints);
 		serializedItem.add_item_flags(itemFlagsOffset);
 		serializedItem.add_mesh_bits(itemToSerialize.MeshBits);
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
 		serializedItem.add_position(&position);
-		serializedItem.add_required_state(itemToSerialize.RequiredState);
+		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
-		serializedItem.add_velocity(itemToSerialize.Velocity);
+		serializedItem.add_velocity(itemToSerialize.Animation.Velocity);
 		serializedItem.add_timer(itemToSerialize.Timer);
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
-		serializedItem.add_airborne(itemToSerialize.Airborne);
+		serializedItem.add_airborne(itemToSerialize.Animation.Airborne);
 		serializedItem.add_hit_stauts(itemToSerialize.HitStatus);
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
@@ -957,8 +958,8 @@ bool SaveGame::Load(int slot)
 			item->Position.zRot = savedItem->position()->z_rot();
 		}
 
-		item->Velocity = savedItem->velocity();
-		item->VerticalVelocity = savedItem->vertical_velocity();
+		item->Animation.Velocity = savedItem->velocity();
+		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
 
 		// Do the correct way for assigning new room number
 		if (item->ObjectNumber == ID_LARA)
@@ -983,11 +984,11 @@ bool SaveGame::Load(int slot)
 		}
 
 		// Animations
-		item->ActiveState = savedItem->active_state();
-		item->RequiredState = savedItem->required_state();
-		item->TargetState = savedItem->target_state();
-		item->AnimNumber = obj->animIndex + savedItem->anim_number();
-		item->FrameNumber = savedItem->frame_number();
+		item->Animation.ActiveState = savedItem->active_state();
+		item->Animation.RequiredState = savedItem->required_state();
+		item->Animation.TargetState = savedItem->target_state();
+		item->Animation.AnimNumber = obj->animIndex + savedItem->anim_number();
+		item->Animation.FrameNumber = savedItem->frame_number();
 
 		// Hit points
 		item->HitPoints = savedItem->hit_points();
@@ -1010,7 +1011,7 @@ bool SaveGame::Load(int slot)
 		item->HitStatus = savedItem->hit_stauts();
 		item->Status = savedItem->status();
 		item->AIBits = savedItem->ai_bits();
-		item->Airborne = savedItem->airborne();
+		item->Animation.Airborne = savedItem->airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
 
@@ -1070,7 +1071,7 @@ bool SaveGame::Load(int slot)
 				|| item->Status == ITEM_DEACTIVATED))
 		{
 			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
 		if ((item->ObjectNumber >= ID_SMASH_OBJECT1)

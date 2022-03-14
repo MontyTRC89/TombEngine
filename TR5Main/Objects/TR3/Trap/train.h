@@ -4,4 +4,4 @@
 #include "Game/collision/collide_room.h"
 
 void TrainControl(short itemNumber);
-void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);

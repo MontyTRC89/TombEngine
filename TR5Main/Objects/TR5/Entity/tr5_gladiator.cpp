@@ -33,10 +33,10 @@ void InitialiseGladiator(short itemNumber)
 
     ClearItem(itemNumber);
 
-    item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-    item->TargetState = 1;
-    item->ActiveState = 1;
+    item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+    item->Animation.TargetState = 1;
+    item->Animation.ActiveState = 1;
 
     if (item->TriggerFlags == 1)
         item->SwapMeshFlags = -1;
@@ -59,11 +59,11 @@ void ControlGladiator(short itemNumber)
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
-		if (item->ActiveState != 6)
+		if (item->Animation.ActiveState != 6)
 		{
-			item->AnimNumber = Objects[ID_GLADIATOR].animIndex + 16;
-			item->ActiveState = 6;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + 16;
+			item->Animation.ActiveState = 6;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -109,7 +109,7 @@ void ControlGladiator(short itemNumber)
 			joint1 = AI.xAngle;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->Flags = 0;
@@ -126,7 +126,7 @@ void ControlGladiator(short itemNumber)
 			}
 
 			if (item->AIBits & PATROL1)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
 			{
 				if (creature->Mood == MoodType::Escape)
@@ -135,7 +135,7 @@ void ControlGladiator(short itemNumber)
 						AI.ahead &&
 						!item->HitStatus)
 					{
-						item->TargetState = 1;
+						item->Animation.TargetState = 1;
 						break;
 					}
 				}
@@ -146,10 +146,10 @@ void ControlGladiator(short itemNumber)
 						(creature->ReachedGoal ||
 							distance > pow(SECTOR(2), 2)))
 					{
-						if (item->RequiredState)
-							item->TargetState = item->RequiredState;
+						if (item->Animation.RequiredState)
+							item->Animation.TargetState = item->Animation.RequiredState;
 						else if (!(GetRandomControl() & 0x3F))
-							item->TargetState = 2;
+							item->Animation.TargetState = 2;
 						
 						break;
 					}
@@ -162,22 +162,22 @@ void ControlGladiator(short itemNumber)
 							!(GetRandomControl() & 0xF)) &&
 						item->MeshBits == -1)
 					{
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 						break;
 					}
 						
 					if (AI.bite && AI.distance < pow(819, 2))
 					{
 						if (GetRandomControl() & 1)
-							item->TargetState = 8;
+							item->Animation.TargetState = 8;
 						else
-							item->TargetState = 9;
+							item->Animation.TargetState = 9;
 
 						break;
 					}
 				}
 
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 
 			break;
@@ -189,27 +189,27 @@ void ControlGladiator(short itemNumber)
 
 			if (item->AIBits & PATROL1)
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 				joint2 = 0;
 			}
 			else if (creature->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (creature->Mood != MoodType::Bored)
 			{
 				if (AI.distance < pow(SECTOR(1), 2))
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 					break;
 				}
 
 				if (AI.bite && AI.distance < pow(SECTOR(2), 2))
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 				else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 			}
 			else if (!(GetRandomControl() & 0x3F))
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 				break;
 			}
 				
@@ -226,7 +226,7 @@ void ControlGladiator(short itemNumber)
 			if (item->AIBits & GUARD)
 			{
 				creature->MaxTurn = 0;
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 				break;
 			}
 
@@ -234,7 +234,7 @@ void ControlGladiator(short itemNumber)
 			{
 				if (Lara.TargetEntity != item && AI.ahead)
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 					break;
 				}
 
@@ -245,22 +245,22 @@ void ControlGladiator(short itemNumber)
 				(creature->ReachedGoal ||
 					distance > pow(SECTOR(2), 2)))
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 				break;
 			}
 
 			if (creature->Mood == MoodType::Bored)
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 				break;
 			}
 
 			if (AI.distance < pow(SECTOR(1.5f), 2))
 			{
 				if (AI.bite)
-					item->TargetState = 10;
+					item->Animation.TargetState = 10;
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 
 			break;
@@ -270,14 +270,14 @@ void ControlGladiator(short itemNumber)
 			{
 				if (!unknown)
 				{
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 					break;
 				}
 			}
 			else if (Lara.TargetEntity != item ||
 				!(GetRandomControl() & 0x7F))
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 				break;
 			}
 
@@ -285,7 +285,7 @@ void ControlGladiator(short itemNumber)
 
 		case 5:
 			if (Lara.TargetEntity != item)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -305,7 +305,7 @@ void ControlGladiator(short itemNumber)
 			else
 				item->Position.yRot += AI.angle;
 
-			if (item->FrameNumber > g_Level.Anims[item->AnimNumber].frameBase + 10)
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 

@@ -22,7 +22,7 @@ BOUNDING_BOX GlobalCollisionBounds;
 ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -230,7 +230,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	return (numItems || numMeshes);
 }
 
-bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll)
+bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, CollisionInfo* coll)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(lara);
 
@@ -258,7 +258,7 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* 
 	return true;
 }
 
-void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
+void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto bounds = GetBoundsAccurate(item);
 	auto height = abs(bounds->Y2 + bounds->Y1);
@@ -652,7 +652,7 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 	}
 }
 
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazon, char bigpush) // previously ItemPushLara
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spazon, char bigpush) // previously ItemPushLara
 {
 	// Get item's rotation
 	auto c = phd_cos(item->Position.yRot);
@@ -773,7 +773,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, COLL_INFO* coll, bool spazo
 	return true;
 }
 
-bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previously ItemPushLaraStatic
+bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
@@ -848,7 +848,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, COLL_INFO* coll) // previo
 	return true;
 }
 
-void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
+void CollideSolidStatics(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
@@ -872,7 +872,7 @@ void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll)
 	}
 }
 
-bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll)
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -1180,8 +1180,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	auto oldCollResult = GetCollisionResult(x, y, z, item->RoomNumber);
-	auto collResult = GetCollisionResult(item);
+	auto oldCollResult = GetCollision(x, y, z, item->RoomNumber);
+	auto collResult = GetCollision(item);
 
 	if (item->Position.yPos >= collResult.Position.Floor)
 	{
@@ -1244,7 +1244,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			else		// Z crossed boundary.
 				item->Position.yRot = 0x8000 - item->Position.yRot;
 
-			item->Velocity /= 2;
+			item->Animation.Velocity /= 2;
 
 			/* Put item back in its last position */
 			item->Position.xPos = x;
@@ -1255,21 +1255,21 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		{
 			// Need to know which direction the slope is.
 
-			item->Velocity -= (item->Velocity / 4);
+			item->Animation.Velocity -= (item->Animation.Velocity / 4);
 
 			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0x4000
 			{
 				if (((unsigned short)item->Position.yRot) > 0x8000)
 				{
 					item->Position.yRot = 0x4000 + (0xc000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity -= collResult.FloorTilt.x * 2;
+						item->Animation.Velocity -= collResult.FloorTilt.x * 2;
 						if ((unsigned short)item->Position.yRot > 0x4000 && (unsigned short)item->Position.yRot < 0xc000)
 						{
 							item->Position.yRot -= 4096;
@@ -1284,10 +1284,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x > 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0xc000
@@ -1295,14 +1295,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) < 0x8000)
 				{
 					item->Position.yRot = 0xc000 + (0x4000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += collResult.FloorTilt.x * 2;
+						item->Animation.Velocity += collResult.FloorTilt.x * 2;
 						if ((unsigned short)item->Position.yRot > 0xc000 || (unsigned short)item->Position.yRot < 0x4000)
 						{
 							item->Position.yRot -= 4096;
@@ -1317,10 +1317,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.y < 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0
@@ -1328,14 +1328,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0x4000 && ((unsigned short)item->Position.yRot) < 0xc000)
 				{
 					item->Position.yRot = (0x8000 - item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity -= collResult.FloorTilt.y * 2;
+						item->Animation.Velocity -= collResult.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Position.yRot < 0x8000)
 						{
@@ -1351,10 +1351,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.y > 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0x8000
@@ -1362,14 +1362,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0xc000 || ((unsigned short)item->Position.yRot) < 0x4000)
 				{
 					item->Position.yRot = (0x8000 - item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += collResult.FloorTilt.y * 2;
+						item->Animation.Velocity += collResult.FloorTilt.y * 2;
 
 						if ((unsigned short)item->Position.yRot > 0x8000)
 						{
@@ -1385,10 +1385,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0x2000
@@ -1396,14 +1396,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0x6000 && ((unsigned short)item->Position.yRot) < 0xe000)
 				{
 					item->Position.yRot = 0x2000 + (0xa000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += (-collResult.FloorTilt.x) + (-collResult.FloorTilt.y);
+						item->Animation.Velocity += (-collResult.FloorTilt.x) + (-collResult.FloorTilt.y);
 						if ((unsigned short)item->Position.yRot > 0x2000 && (unsigned short)item->Position.yRot < 0xa000)
 						{
 							item->Position.yRot -= 4096;
@@ -1418,10 +1418,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0x6000
@@ -1429,14 +1429,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0xa000 || ((unsigned short)item->Position.yRot) < 0x2000)
 				{
 					item->Position.yRot = 0x6000 + (0xe000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
+						item->Animation.Velocity += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
 						if ((unsigned short)item->Position.yRot < 0xe000 && (unsigned short)item->Position.yRot > 0x6000)
 						{
 							item->Position.yRot -= 4096;
@@ -1451,10 +1451,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0xa000
@@ -1462,14 +1462,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0xe000 || ((unsigned short)item->Position.yRot) < 0x6000)
 				{
 					item->Position.yRot = 0xa000 + (0x2000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += collResult.FloorTilt.x + collResult.FloorTilt.y;
+						item->Animation.Velocity += collResult.FloorTilt.x + collResult.FloorTilt.y;
 						if ((unsigned short)item->Position.yRot < 0x2000 || (unsigned short)item->Position.yRot > 0xa000)
 						{
 							item->Position.yRot -= 4096;
@@ -1484,10 +1484,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0xe000
@@ -1495,14 +1495,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				if (((unsigned short)item->Position.yRot) > 0x2000 && ((unsigned short)item->Position.yRot) < 0xa000)
 				{
 					item->Position.yRot = 0xe000 + (0x6000 - (unsigned short)item->Position.yRot - 1);
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
 				else
 				{
-					if (item->Velocity < 32)
+					if (item->Animation.Velocity < 32)
 					{
-						item->Velocity += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
+						item->Animation.Velocity += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
 						if ((unsigned short)item->Position.yRot < 0x6000 || (unsigned short)item->Position.yRot > 0xe000)
 						{
 							item->Position.yRot -= 4096;
@@ -1517,10 +1517,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						}
 					}
 
-					if (item->VerticalVelocity > 0)
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
+					if (item->Animation.VerticalVelocity > 0)
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 					else
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 				}
 			}
 
@@ -1532,34 +1532,34 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		else
 		{
 			/* Hit the floor; bounce and slow down */
-			if (item->VerticalVelocity > 0)
+			if (item->Animation.VerticalVelocity > 0)
 			{
-				if (item->VerticalVelocity > 16)
+				if (item->Animation.VerticalVelocity > 16)
 				{
 					if (item->ObjectNumber == ID_GRENADE)
-						item->VerticalVelocity = -(item->VerticalVelocity - (item->VerticalVelocity / 2));
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity - (item->Animation.VerticalVelocity / 2));
 					else
 					{
-						item->VerticalVelocity = -(item->VerticalVelocity / 2);
-						if (item->VerticalVelocity < -100)
-							item->VerticalVelocity = -100;
+						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						if (item->Animation.VerticalVelocity < -100)
+							item->Animation.VerticalVelocity = -100;
 					}
 				}
 				else
 				{
 					/* Roll on floor */
-					item->VerticalVelocity = 0;
+					item->Animation.VerticalVelocity = 0;
 					if (item->ObjectNumber == ID_GRENADE)
 					{
-						item->RequiredState = 1;
+						item->Animation.RequiredState = 1;
 						item->Position.xRot = 0;
-						item->Velocity--;
+						item->Animation.Velocity--;
 					}
 					else
-						item->Velocity -= 3;
+						item->Animation.Velocity -= 3;
 
-					if (item->Velocity < 0)
-						item->Velocity = 0;
+					if (item->Animation.Velocity < 0)
+						item->Animation.Velocity = 0;
 				}
 			}
 			item->Position.yPos = collResult.Position.Floor;
@@ -1569,8 +1569,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			oldCollResult = GetCollisionResult(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
-			collResult = GetCollisionResult(item);
+			oldCollResult = GetCollision(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
+			collResult = GetCollision(item);
 
 			// Bounce off floor.
 
@@ -1581,34 +1581,34 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			if (item->Position.yPos >= oldCollResult.Position.Floor)
 			{
 				/* Hit the floor; bounce and slow down */
-				if (item->VerticalVelocity > 0)
+				if (item->Animation.VerticalVelocity > 0)
 				{
-					if (item->VerticalVelocity > 16)
+					if (item->Animation.VerticalVelocity > 16)
 					{
 						if (item->ObjectNumber == ID_GRENADE)
-							item->VerticalVelocity = -(item->VerticalVelocity - (item->VerticalVelocity / 2));
+							item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity - (item->Animation.VerticalVelocity / 2));
 						else
 						{
-							item->VerticalVelocity = -(item->VerticalVelocity / 4);
-							if (item->VerticalVelocity < -100)
-								item->VerticalVelocity = -100;
+							item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 4);
+							if (item->Animation.VerticalVelocity < -100)
+								item->Animation.VerticalVelocity = -100;
 						}
 					}
 					else
 					{
 						/* Roll on floor */
-						item->VerticalVelocity = 0;
+						item->Animation.VerticalVelocity = 0;
 						if (item->ObjectNumber == ID_GRENADE)
 						{
-							item->RequiredState = 1;
+							item->Animation.RequiredState = 1;
 							item->Position.xRot = 0;
-							item->Velocity--;
+							item->Animation.Velocity--;
 						}
 						else
-							item->Velocity -= 3;
+							item->Animation.Velocity -= 3;
 
-						if (item->Velocity < 0)
-							item->Velocity = 0;
+						if (item->Animation.Velocity < 0)
+							item->Animation.Velocity = 0;
 					}
 				}
 				item->Position.yPos = oldCollResult.Position.Floor;
@@ -1617,7 +1617,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		//		else
 		{
 			/* Bounce off ceiling */
-			collResult = GetCollisionResult(item);
+			collResult = GetCollision(item);
 
 			if (item->Position.yPos < collResult.Position.Ceiling)
 			{
@@ -1640,9 +1640,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 
 					if (item->ObjectNumber == ID_GRENADE)
-						item->Velocity -= item->Velocity / 8;
+						item->Animation.Velocity -= item->Animation.Velocity / 8;
 					else
-						item->Velocity /= 2;
+						item->Animation.Velocity /= 2;
 
 					/* Put item back in its last position */
 					item->Position.xPos = x;
@@ -1652,18 +1652,18 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				else
 					item->Position.yPos = collResult.Position.Ceiling;
 
-				if (item->VerticalVelocity < 0)
-					item->VerticalVelocity = -item->VerticalVelocity;
+				if (item->Animation.VerticalVelocity < 0)
+					item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity;
 			}
 		}
 	}
 
-	collResult = GetCollisionResult(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	collResult = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
 	if (collResult.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCollision
+void DoObjectCollision(ITEM_INFO* l, CollisionInfo* coll) // previously LaraBaddieCollision
 {
 	ITEM_INFO* item;
 	OBJECT_INFO* obj;
@@ -1723,14 +1723,14 @@ void DoObjectCollision(ITEM_INFO* l, COLL_INFO* coll) // previously LaraBaddieCo
 	}
 }
 
-void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
+void AIPickupCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* c)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SHOOT_SWITCH1 && !(item->MeshBits & 1))
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void ObjectCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1744,14 +1744,14 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+void CreatureCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	float c, s;
 	int x, z, rx, rz;
 	ANIM_FRAME* frame;
 
-	if (item->ObjectNumber != ID_HITMAN || item->ActiveState != LS_INSERT_PUZZLE)
+	if (item->ObjectNumber != ID_HITMAN || item->Animation.ActiveState != LS_INSERT_PUZZLE)
 	{
 		if (TestBoundsCollide(item, l, coll->Setup.Radius))
 		{
@@ -1788,7 +1788,7 @@ void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void TrapCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 

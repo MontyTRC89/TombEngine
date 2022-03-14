@@ -54,7 +54,7 @@ void SwordGuardianControl(short itemNum)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 12)
+		if (item->Animation.ActiveState != 12)
 		{
 			//item->meshBits >>= 1;
 			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 0);
@@ -67,7 +67,7 @@ void SwordGuardianControl(short itemNum)
 			KillItem(itemNum);
 			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;
-			item->ActiveState = 12;
+			item->Animation.ActiveState = 12;
 		}
 		return;
 	}
@@ -79,7 +79,7 @@ void SwordGuardianControl(short itemNum)
 		sword->LOT.Zone = ZONE_BASIC;
 		CreatureAIInfo(item, &info);
 
-		if (item->ActiveState == 8)
+		if (item->Animation.ActiveState == 8)
 		{
 			if (info.zoneNumber != info.enemyZone)
 			{
@@ -96,10 +96,10 @@ void SwordGuardianControl(short itemNum)
 
 		angle = CreatureTurn(item, sword->MaxTurn);
 
-		if (item->ActiveState != 9)
+		if (item->Animation.ActiveState != 9)
 			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 9:
 			sword->MaxTurn = 0;
@@ -126,21 +126,21 @@ void SwordGuardianControl(short itemNum)
 				if (info.bite && info.distance < 0x100000)
 				{
 					if (GetRandomControl() >= 0x4000)
-						item->TargetState = 5;
+						item->Animation.TargetState = 5;
 					else
-						item->TargetState = 3;
+						item->Animation.TargetState = 3;
 				}
 				else
 				{
 					if (info.zoneNumber == info.enemyZone)
-						item->TargetState = 2;
+						item->Animation.TargetState = 2;
 					else
-						item->TargetState = 8;
+						item->Animation.TargetState = 8;
 				}
 			}
 			else
 			{
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			}
 			break;
 
@@ -153,13 +153,13 @@ void SwordGuardianControl(short itemNum)
 			if (lara_alive)
 			{
 				if (info.bite && info.distance < 0x400000)
-					item->TargetState = 10;
+					item->Animation.TargetState = 10;
 				else if (info.zoneNumber != info.enemyZone)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 			}
 			else
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 			break;
 
@@ -170,9 +170,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x100000)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			break;
 
 		case 5:
@@ -182,9 +182,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x100000)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			break;
 
 		case 10:
@@ -194,9 +194,9 @@ void SwordGuardianControl(short itemNum)
 				torso = info.angle;
 
 			if (!info.bite || info.distance > 0x400000)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 11;
+				item->Animation.TargetState = 11;
 			break;
 
 		case 8:
@@ -208,7 +208,7 @@ void SwordGuardianControl(short itemNum)
 			SwordGuardianFly(item);
 
 			if (!sword->LOT.Fly)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			break;
 
 		case 4:

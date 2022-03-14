@@ -47,22 +47,22 @@ void InitialiseImp(short itemNumber)
 	if (item->TriggerFlags == 2 || item->TriggerFlags == 12)
 	{
 		state = IMP_STATE_START_ROLL;
-		item->AnimNumber = Objects[ID_IMP].animIndex + 8;
+		item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 8;
 	}
 	else if (item->TriggerFlags == 1 || item->TriggerFlags == 11)
 	{
 		state = IMP_STATE_START_CLIMB;
-		item->AnimNumber = Objects[ID_IMP].animIndex + 7;
+		item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 7;
 	}
 	else
 	{
 		state = IMP_STATE_IDLE;
-		item->AnimNumber = Objects[ID_IMP].animIndex + 1;
+		item->Animation.AnimNumber = Objects[ID_IMP].animIndex + 1;
 	}
 
-	item->TargetState = state;
-	item->ActiveState = state;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.TargetState = state;
+	item->Animation.ActiveState = state;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 static void ImpThrowStones(ITEM_INFO* item)
@@ -146,12 +146,12 @@ void ImpControl(short itemNumber)
 
 			int d1 = item->Position.yPos - LaraItem->Position.yPos + CLICK(1.5f);
 
-			if (LaraItem->ActiveState == LS_CROUCH_IDLE ||
-				LaraItem->ActiveState == LS_CROUCH_ROLL ||
-				LaraItem->ActiveState > LS_MONKEY_TURN_180 &&
-				LaraItem->ActiveState < LS_HANG_TO_CRAWL ||
-				LaraItem->ActiveState == LS_CROUCH_TURN_LEFT ||
-				LaraItem->ActiveState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
+				LaraItem->Animation.ActiveState > LS_MONKEY_TURN_180 &&
+				LaraItem->Animation.ActiveState < LS_HANG_TO_CRAWL ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 			{
 				d1 = item->Position.yPos - LaraItem->Position.yPos;
 			}
@@ -162,7 +162,7 @@ void ImpControl(short itemNumber)
 
 			GetCreatureMood(item, &AI, VIOLENT);
 
-			if (item->ActiveState == IMP_STATE_SCARED)
+			if (item->Animation.ActiveState == IMP_STATE_SCARED)
 				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, VIOLENT);
@@ -178,17 +178,17 @@ void ImpControl(short itemNumber)
 			else
 				item->SwapMeshFlags = 0;
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case IMP_STATE_WALK:
 				creature->MaxTurn = ANGLE(7.0f);
 				if (AI.distance <= pow(SECTOR(2), 2))
 				{
 					if (AI.distance < pow(SECTOR(2), 2))
-						item->TargetState = IMP_STATE_IDLE;
+						item->Animation.TargetState = IMP_STATE_IDLE;
 				}
 				else
-					item->TargetState = IMP_STATE_RUN;
+					item->Animation.TargetState = IMP_STATE_RUN;
 				
 				break;
 
@@ -199,23 +199,23 @@ void ImpControl(short itemNumber)
 				if (AI.bite && AI.distance < pow(170, 2) && item->TriggerFlags < 10)
 				{
 					if (GetRandomControl() & 1)
-						item->TargetState = IMP_STATE_ATTACK_1;
+						item->Animation.TargetState = IMP_STATE_ATTACK_1;
 					else
-						item->TargetState = IMP_STATE_ATTACK_2;
+						item->Animation.TargetState = IMP_STATE_ATTACK_2;
 				}
 				else if (item->AIBits & FOLLOW)
-					item->TargetState = IMP_STATE_WALK;
+					item->Animation.TargetState = IMP_STATE_WALK;
 				else
 				{
 					if (item->TriggerFlags == 3)
-						item->TargetState = IMP_STATE_THROW_STONES;
+						item->Animation.TargetState = IMP_STATE_THROW_STONES;
 					else if (AI.distance <= pow(SECTOR(2), 2))
 					{
 						if (AI.distance > pow(SECTOR(0.5f), 2) || item->TriggerFlags < 10)
-							item->TargetState = IMP_STATE_WALK;
+							item->Animation.TargetState = IMP_STATE_WALK;
 					}
 					else
-						item->TargetState = IMP_STATE_RUN;
+						item->Animation.TargetState = IMP_STATE_RUN;
 				}
 
 				break;
@@ -226,10 +226,10 @@ void ImpControl(short itemNumber)
 				if (AI.distance >= pow(SECTOR(0.5f), 2))
 				{
 					if (AI.distance < pow(SECTOR(2), 2))
-						item->TargetState = IMP_STATE_WALK;
+						item->Animation.TargetState = IMP_STATE_WALK;
 				}
 				else
-					item->TargetState = IMP_STATE_IDLE;
+					item->Animation.TargetState = IMP_STATE_IDLE;
 				
 				break;
 
@@ -260,7 +260,7 @@ void ImpControl(short itemNumber)
 			case IMP_STATE_THROW_STONES:
 				creature->MaxTurn = -1;
 
-				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 40)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 40)
 					ImpThrowStones(item);
 
 				break;
@@ -273,11 +273,11 @@ void ImpControl(short itemNumber)
 		{
 			item->HitPoints = 0;
 
-			if (item->ActiveState != IMP_STATE_DEATH)
+			if (item->Animation.ActiveState != IMP_STATE_DEATH)
 			{
-				item->AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_DEATH;
-				item->ActiveState = IMP_STATE_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_DEATH;
+				item->Animation.ActiveState = IMP_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 

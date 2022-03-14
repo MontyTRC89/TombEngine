@@ -11,9 +11,9 @@ void FallingCeilingControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->ActiveState)
+	if (item->Animation.ActiveState)
 	{
-		if (item->ActiveState == 1 && item->TouchBits)
+		if (item->Animation.ActiveState == 1 && item->TouchBits)
 		{
 			LaraItem->HitPoints -= 300;
 			LaraItem->HitStatus = true;
@@ -21,8 +21,8 @@ void FallingCeilingControl(short itemNumber)
 	}
 	else
 	{
-		item->TargetState = 1;
-		item->Airborne = true;;
+		item->Animation.TargetState = 1;
+		item->Animation.Airborne = true;;
 	}
 
 	AnimateItem(item);
@@ -31,21 +31,21 @@ void FallingCeilingControl(short itemNumber)
 		RemoveActiveItem(itemNumber);
 	else
 	{
-		auto probe = GetCollisionResult(item);
+		auto probe = GetCollision(item);
 
 		item->Floor = probe.Position.Floor;
 
 		if (probe.RoomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, probe.RoomNumber);
 
-		if (item->ActiveState == 1)
+		if (item->Animation.ActiveState == 1)
 		{
 			if (item->Position.yPos >= item->Floor)
 			{
 				item->Position.yPos = item->Floor;
-				item->Airborne = false;
-				item->TargetState = 2;
-				item->VerticalVelocity = 0;
+				item->Animation.Airborne = false;
+				item->Animation.TargetState = 2;
+				item->Animation.VerticalVelocity = 0;
 			}
 		}
 	}

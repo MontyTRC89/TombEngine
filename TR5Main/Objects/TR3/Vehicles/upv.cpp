@@ -162,8 +162,8 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		harpoonItem->Position.zRot = 0;
 
 		// TODO: Huh?
-		harpoonItem->VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Position.xRot);
-		harpoonItem->VerticalVelocity = HARPOON_VELOCITY * phd_cos(harpoonItem->Position.xRot);
+		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Position.xRot);
+		harpoonItem->Animation.VerticalVelocity = HARPOON_VELOCITY * phd_cos(harpoonItem->Position.xRot);
 		harpoonItem->HitPoints = HARPOON_TIME;
 		harpoonItem->ItemFlags[0] = 1;
 
@@ -261,7 +261,7 @@ void UPVEffects(short itemNumber)
 				pos2.xPos = pos.x + (GetRandomControl() & 63) - 32;
 				pos2.yPos = pos.y + UPV_DRAW_SHIFT;
 				pos2.zPos = pos.z + (GetRandomControl() & 63) - 32;
-				short probedRoomNumber = GetCollisionResult(pos2.xPos, pos2.yPos, pos2.zPos, UPVItem->RoomNumber).RoomNumber;
+				short probedRoomNumber = GetCollision(pos2.xPos, pos2.yPos, pos2.zPos, UPVItem->RoomNumber).RoomNumber;
 				
 				CreateBubble((PHD_VECTOR*)&pos2, probedRoomNumber, 4, 8, BUBBLE_FLAG_CLUMP, 0, 0, 0);
 			}
@@ -312,7 +312,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	int z = UPVItem->Position.zPos + velocity * phd_cos(moveAngle);
 	int y = UPVItem->Position.yPos - DISMOUNT_DISTANCE * phd_sin(-UPVItem->Position.xRot);
 
-	auto probe = GetCollisionResult(x, y, z, UPVItem->RoomNumber);
+	auto probe = GetCollision(x, y, z, UPVItem->RoomNumber);
 	if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
 		probe.Position.Floor < y ||
 		probe.Position.Ceiling > y ||
@@ -331,7 +331,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	if (!(TrInput & IN_ACTION) ||
 		lara->Control.HandStatus != HandStatus::Free ||
-		laraItem->Airborne)
+		laraItem->Animation.Airborne)
 	{
 		return false;
 	}
@@ -348,7 +348,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (deltaAngle > ANGLE(35.0f) || deltaAngle < -ANGLE(35.0f))
 		return false;
 
-	if (GetCollisionResult(UPVItem).Position.Floor < -32000)
+	if (GetCollision(UPVItem).Position.Floor < -32000)
 		return false;
 
 	return true;
@@ -420,7 +420,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPV = (UPVInfo*)UPVItem->Data;
-	COLL_INFO cinfo, * coll = &cinfo; // ??
+	CollisionInfo cinfo, * coll = &cinfo; // ??
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
@@ -434,7 +434,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.DeathFlagIsPit = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.Mode = CollProbeMode::Quadrants;
+	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 
 	if ((UPVItem->Position.xRot >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Position.xRot <= (SHRT_MAX / 2 + 1)))
 	{
@@ -469,7 +469,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		{
 			if (abs(UPV->Velocity) >= MAX_VELOCITY)
 			{
-				laraItem->TargetState = UPV_STATE_HIT;
+				laraItem->Animation.TargetState = UPV_STATE_HIT;
 				UPV->Velocity = -UPV->Velocity / 2;
 			}
 			else
@@ -510,15 +510,15 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	TestUPVDismount(laraItem, UPVItem);
 
-	int anim = laraItem->AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
-	int frame = laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase;
+	int anim = laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
+	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-	switch (laraItem->ActiveState)
+	switch (laraItem->Animation.ActiveState)
 	{
 	case UPV_STATE_MOVE:
 		if (laraItem->HitPoints <= 0)
 		{
-			laraItem->TargetState = UPV_STATE_DEATH;
+			laraItem->Animation.TargetState = UPV_STATE_DEATH;
 			break;
 		}
 
@@ -571,14 +571,14 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		}
 
 		else
-			laraItem->TargetState = UPV_STATE_IDLE;
+			laraItem->Animation.TargetState = UPV_STATE_IDLE;
 
 		break;
 
 	case UPV_STATE_IDLE:
 		if (laraItem->HitPoints <= 0)
 		{
-			laraItem->TargetState = UPV_STATE_DEATH;
+			laraItem->Animation.TargetState = UPV_STATE_DEATH;
 			break;
 		}
 
@@ -623,9 +623,9 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			else
 			{
 				if (UPV->Flags & UPV_SURFACE)
-					laraItem->TargetState = UPV_STATE_DISMOUNT_WATER_SURFACE;
+					laraItem->Animation.TargetState = UPV_STATE_DISMOUNT_WATER_SURFACE;
 				else
-					laraItem->TargetState = UPV_STATE_DISMOUNT_UNDERWATER;
+					laraItem->Animation.TargetState = UPV_STATE_DISMOUNT_UNDERWATER;
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
@@ -643,7 +643,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 				UPV->Flags |= UPV_DIVE;
 			}
 
-			laraItem->TargetState = UPV_STATE_MOVE;
+			laraItem->Animation.TargetState = UPV_STATE_MOVE;
 		}
 
 		break;
@@ -698,8 +698,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->Position.zPos = LPos.z;
 
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
-			laraItem->VerticalVelocity = 0;
-			laraItem->Airborne = false;
+			laraItem->Animation.VerticalVelocity = 0;
+			laraItem->Animation.Airborne = false;
 			laraItem->Position.xRot = laraItem->Position.zRot = 0;
 
 			UpdateItemRoom(laraItem, 0);
@@ -736,8 +736,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->Position.zPos = vec.z;
 
 			SetAnimation(laraItem, LA_ONWATER_IDLE);
-			laraItem->VerticalVelocity = 0;
-			laraItem->Airborne = false;
+			laraItem->Animation.VerticalVelocity = 0;
+			laraItem->Animation.Airborne = false;
 			laraItem->Position.xRot = 0;
 			laraItem->Position.zRot = 0;
 
@@ -774,13 +774,13 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->Position.zRot = 0;
 
 			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
-			laraItem->VerticalVelocity = 0;
-			laraItem->Airborne = false;
+			laraItem->Animation.VerticalVelocity = 0;
+			laraItem->Animation.Airborne = false;
 			
 			UPV->Flags |= UPV_DEAD;
 		}
 
-		UPVItem->VerticalVelocity = 0;
+		UPVItem->Animation.VerticalVelocity = 0;
 		break;
 	}
 
@@ -847,7 +847,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		UPV->XRot = -MAX_UPDOWN;
 }
 
-void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -859,7 +859,7 @@ void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	ItemPushItem(item, laraItem, coll, 0, 0);
 }
 
-void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[itemNumber];
@@ -890,18 +890,18 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 		UPVItem->HitPoints = 1;
 
-		if (laraItem->ActiveState == LS_ONWATER_STOP || laraItem->ActiveState == LS_ONWATER_FORWARD)
+		if (laraItem->Animation.ActiveState == LS_ONWATER_STOP || laraItem->Animation.ActiveState == LS_ONWATER_FORWARD)
 		{
-			laraItem->AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
-			laraItem->ActiveState = laraItem->TargetState = UPV_STATE_MOUNT;
+			laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
+			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = UPV_STATE_MOUNT;
 		}
 		else
 		{
-			laraItem->AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
-			laraItem->ActiveState = laraItem->TargetState = UPV_STATE_MOUNT;
+			laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
+			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = UPV_STATE_MOUNT;
 		}
 
-		laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		AnimateItem(laraItem);
 	}
 	else
@@ -912,20 +912,20 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	}
 }
 
-bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
+bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[lara->Vehicle];
 	auto* UPV = (UPVInfo*)UPVItem->Data;
 	
 	auto oldPos = UPVItem->Position;
-	auto probe = GetCollisionResult(UPVItem);
+	auto probe = GetCollision(UPVItem);
 
 	if (!(UPV->Flags & UPV_DEAD))
 	{
 		UPVControl(laraItem, UPVItem);
 
-		UPVItem->VerticalVelocity = UPV->Velocity / (USHRT_MAX + 1);
+		UPVItem->Animation.VerticalVelocity = UPV->Velocity / (USHRT_MAX + 1);
 
 		UPVItem->Position.xRot += UPV->XRot / (USHRT_MAX + 1);
 		UPVItem->Position.yRot += UPV->Rot / (USHRT_MAX + 1);
@@ -936,12 +936,12 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		else if (UPVItem->Position.xRot < -UPDOWN_LIMIT)
 			UPVItem->Position.xRot = -UPDOWN_LIMIT;
 
-		UPVItem->Position.xPos += phd_sin(UPVItem->Position.yRot) * UPVItem->VerticalVelocity * phd_cos(UPVItem->Position.xRot);
-		UPVItem->Position.yPos -= phd_sin(UPVItem->Position.xRot) * UPVItem->VerticalVelocity;
-		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->VerticalVelocity * phd_cos(UPVItem->Position.xRot);
+		UPVItem->Position.xPos += phd_sin(UPVItem->Position.yRot) * UPVItem->Animation.VerticalVelocity * phd_cos(UPVItem->Position.xRot);
+		UPVItem->Position.yPos -= phd_sin(UPVItem->Position.xRot) * UPVItem->Animation.VerticalVelocity;
+		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.VerticalVelocity * phd_cos(UPVItem->Position.xRot);
 	}
 
-	int newHeight = GetCollisionResult(UPVItem).Position.Floor;
+	int newHeight = GetCollision(UPVItem).Position.Floor;
 	int waterHeight = GetWaterHeight(UPVItem);
 
 	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Position.yPos - UPV_HEIGHT / 2))
@@ -949,7 +949,7 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPVItem->Position.xPos = oldPos.xPos;
 		UPVItem->Position.yPos = oldPos.yPos;
 		UPVItem->Position.zPos = oldPos.zPos;
-		UPVItem->VerticalVelocity = 0;
+		UPVItem->Animation.VerticalVelocity = 0;
 	}
 
 	UPVItem->Floor = probe.Position.Floor;
@@ -1022,9 +1022,9 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 			UPV->Flags & UPV_CONTROL &&
 			!UPV->HarpoonTimer)
 		{
-			if (laraItem->ActiveState != UPV_STATE_DISMOUNT_UNDERWATER &&
-				laraItem->ActiveState != UPV_STATE_DISMOUNT_WATER_SURFACE &&
-				laraItem->ActiveState != UPV_STATE_MOUNT)
+			if (laraItem->Animation.ActiveState != UPV_STATE_DISMOUNT_UNDERWATER &&
+				laraItem->Animation.ActiveState != UPV_STATE_DISMOUNT_WATER_SURFACE &&
+				laraItem->Animation.ActiveState != UPV_STATE_MOUNT)
 			{
 				FireUPVHarpoon(laraItem, UPVItem);
 				UPV->HarpoonTimer = HARPOON_RELOAD;
@@ -1048,10 +1048,10 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->VerticalVelocity * (USHRT_MAX + 1)));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->Animation.VerticalVelocity * (USHRT_MAX + 1)));
 
-		UPVItem->AnimNumber = Objects[ID_UPV].animIndex + (laraItem->AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
-		UPVItem->FrameNumber = g_Level.Anims[UPVItem->AnimNumber].frameBase + (laraItem->FrameNumber - g_Level.Anims[laraItem->AnimNumber].frameBase);
+		UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
+		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
 		if (UPV->Flags & UPV_SURFACE)
 			Camera.targetElevation = -ANGLE(60.0f);
@@ -1072,8 +1072,8 @@ bool UPVControl(ITEM_INFO* laraItem, COLL_INFO* coll)
 		UPV->XRot = 0;
 
 		SetAnimation(UPVItem, UPV_ANIM_IDLE);
-		UPVItem->VerticalVelocity = 0;
-		UPVItem->Airborne = true;
+		UPVItem->Animation.VerticalVelocity = 0;
+		UPVItem->Animation.Airborne = true;
 		AnimateItem(UPVItem);
 
 		return true;

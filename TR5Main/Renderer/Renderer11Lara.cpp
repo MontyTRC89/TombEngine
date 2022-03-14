@@ -26,7 +26,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon) {
 		case LaraWeaponType::GrenadeLauncher:
 		case LaraWeaponType::Crossbow:
 		case LaraWeaponType::Shotgun:
-			return (LaraItem->ActiveState == LS_IDLE || LaraItem->ActiveState == LS_TURN_LEFT_FAST || LaraItem->ActiveState == LS_TURN_RIGHT_FAST || LaraItem->ActiveState == LS_TURN_LEFT_SLOW || LaraItem->ActiveState == LS_TURN_RIGHT_SLOW);
+			return (LaraItem->Animation.ActiveState == LS_IDLE || LaraItem->Animation.ActiveState == LS_TURN_LEFT_FAST || LaraItem->Animation.ActiveState == LS_TURN_RIGHT_FAST || LaraItem->Animation.ActiveState == LS_TURN_LEFT_SLOW || LaraItem->Animation.ActiveState == LS_TURN_RIGHT_SLOW);
 			break;
 		case LaraWeaponType::HK:
 		{
@@ -35,7 +35,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon) {
 			if(laraInfo.RightArm.AnimNumber - baseAnim == 0 || laraInfo.RightArm.AnimNumber - baseAnim == 2 || laraInfo.RightArm.AnimNumber - baseAnim == 4){
 				return true;
 			} else
-				return (LaraItem->ActiveState == LS_IDLE || LaraItem->ActiveState == LS_TURN_LEFT_FAST || LaraItem->ActiveState == LS_TURN_RIGHT_FAST || LaraItem->ActiveState == LS_TURN_LEFT_SLOW || LaraItem->ActiveState == LS_TURN_RIGHT_SLOW);
+				return (LaraItem->Animation.ActiveState == LS_IDLE || LaraItem->Animation.ActiveState == LS_TURN_LEFT_FAST || LaraItem->Animation.ActiveState == LS_TURN_RIGHT_FAST || LaraItem->Animation.ActiveState == LS_TURN_LEFT_SLOW || LaraItem->Animation.ActiveState == LS_TURN_RIGHT_SLOW);
 		}
 			break;
 		default:
@@ -181,8 +181,8 @@ void Renderer11::updateLaraAnimations(bool force)
 		case LaraWeaponType::Flare:
 		case LaraWeaponType::Torch:
 			// Left arm
-			LaraItem->AnimNumber = Lara.LeftArm.AnimNumber;
-			LaraItem->FrameNumber = Lara.LeftArm.FrameNumber;
+			LaraItem->Animation.AnimNumber = Lara.LeftArm.AnimNumber;
+			LaraItem->Animation.FrameNumber = Lara.LeftArm.FrameNumber;
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 			frac = GetFrame(LaraItem, framePtr, &rate);

@@ -32,7 +32,7 @@ void InitialiseShootSwitch(short itemNumber)
 		switchItem->MeshBits &= ~(1 << (Objects[switchItem->ObjectNumber].nmeshes - 2));
 }
 
-void ShootSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void ShootSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* switchItem = &g_Level.Items[itemNumber];
 

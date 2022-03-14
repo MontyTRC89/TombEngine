@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase >= 200)
+        if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
         {
             SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Position, 0);
 
@@ -36,7 +36,7 @@ namespace TEN::Entities::TR4
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            int height = GetCollisionResult(item).Position.Floor;
+            int height = GetCollision(item).Position.Floor;
 
             for (int i = 0; i < 2; i++)
             {
