@@ -3,6 +3,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Specific/phd_global.h"
 
+enum class LaraWeaponType;
 struct ITEM_INFO;
 
 struct SMOKE_SPARKS
@@ -209,7 +210,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();
-byte TriggerGunSmoke_SubFunction(int weaponType);
+byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType);
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count);
 void TriggerShatterSmoke(int x, int y, int z);
 int GetFreeBlood();

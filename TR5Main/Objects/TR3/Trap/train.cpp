@@ -29,7 +29,7 @@ long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 	pos.y = item->Position.yPos - z * phd_sin(item->Position.xRot) + x * phd_sin(item->Position.zRot);
 	pos.z = item->Position.zPos + z * c - x * s;
 
-	auto probe = GetCollisionResult(pos.x, pos.y, pos.z, item->RoomNumber);
+	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 
 	*roomNumber = probe.RoomNumber;
 	return probe.Position.Floor;
@@ -64,7 +64,7 @@ void TrainControl(short itemNumber)
 
 	item->Position.yPos -= 32;// ?
 
-	short probedRoomNumber = GetCollisionResult(item).RoomNumber;
+	short probedRoomNumber = GetCollision(item).RoomNumber;
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 
@@ -83,7 +83,7 @@ void TrainControl(short itemNumber)
 			ForcedFixedCamera.x = item->Position.xPos + SECTOR(8) * s;
 			ForcedFixedCamera.z = item->Position.zPos + SECTOR(8) * c;
 
-			ForcedFixedCamera.y = GetCollisionResult(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
+			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
 			ForcedFixedCamera.roomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
@@ -93,7 +93,7 @@ void TrainControl(short itemNumber)
 		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Position, SFX_ALWAYS);
 }
 
-void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trainItem = &g_Level.Items[itemNumber];
@@ -107,15 +107,15 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	SoundEffect(SFX_LARA_HIGH_FALL_DEATH, &laraItem->Position, SFX_ALWAYS);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
-	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
 	laraItem->HitPoints = 0;
 	laraItem->Position.yRot = trainItem->Position.yRot;
-	laraItem->Velocity = 0;
-	laraItem->VerticalVelocity = 0;
-	laraItem->Airborne = false;
+	laraItem->Animation.Velocity = 0;
+	laraItem->Animation.VerticalVelocity = 0;
+	laraItem->Animation.Airborne = false;
 
 	AnimateItem(laraItem);
 

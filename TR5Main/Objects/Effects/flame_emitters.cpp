@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/lightning.h"
@@ -636,7 +637,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -646,9 +647,9 @@ namespace TEN::Entities::Effects
 			|| Lara.LitTorch == (item->Status & 1)
 			|| item->Timer == -1
 			|| !(TrInput & IN_ACTION)
-			|| l->ActiveState != LS_IDLE
-			|| l->AnimNumber != LA_STAND_IDLE
-			|| l->Airborne)
+			|| l->Animation.ActiveState != LS_IDLE
+			|| l->Animation.AnimNumber != LA_STAND_IDLE
+			|| l->Animation.Airborne)
 		{
 			if (item->ObjectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, l, coll);
@@ -693,17 +694,17 @@ namespace TEN::Entities::Effects
 			{
 				if (item->ObjectNumber == ID_BURNING_ROOTS)
 				{
-					l->AnimNumber = LA_TORCH_LIGHT_5;
+					l->Animation.AnimNumber = LA_TORCH_LIGHT_5;
 				}
 				else
 				{
 					int dy = abs(l->Position.yPos - item->Position.yPos);
 					l->ItemFlags[3] = 1;
-					l->AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
+					l->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
 
-				l->ActiveState = LS_MISC_CONTROL;
-				l->FrameNumber = g_Level.Anims[l->AnimNumber].frameBase;
+				l->Animation.ActiveState = LS_MISC_CONTROL;
+				l->Animation.FrameNumber = g_Level.Anims[l->Animation.AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
 				Lara.InteractedItem = itemNumber;
@@ -714,11 +715,11 @@ namespace TEN::Entities::Effects
 
 		if (Lara.InteractedItem == itemNumber
 			&& item->Status != ITEM_ACTIVE
-			&& l->ActiveState == LS_MISC_CONTROL)
+			&& l->Animation.ActiveState == LS_MISC_CONTROL)
 		{
-			if (l->AnimNumber >= LA_TORCH_LIGHT_1 && l->AnimNumber <= LA_TORCH_LIGHT_5)
+			if (l->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && l->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (l->FrameNumber - g_Level.Anims[l->AnimNumber].frameBase == 40)
+				if (l->Animation.FrameNumber - g_Level.Anims[l->Animation.AnimNumber].frameBase == 40)
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 

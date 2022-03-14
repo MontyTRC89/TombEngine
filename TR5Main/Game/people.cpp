@@ -22,7 +22,7 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotati
 
 	if (info->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, info))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
+		int distance = phd_sin(info->enemyFacing) * enemy->Animation.Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
 		distance = pow(distance, 2) + info->distance;
 		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
 		{

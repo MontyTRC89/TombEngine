@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 void InitialiseQuadBike(short itemNumber);
 //static void QuadbikeExplode(ITEM_INFO* laraItem, ITEM_INFO* quadItem);
@@ -16,6 +16,6 @@ void InitialiseQuadBike(short itemNumber);
 //static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem);
 //static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collide, bool dead);
 //static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch);
-void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 //static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
-bool QuadBikeControl(ITEM_INFO* laraItem, COLL_INFO* coll);
+bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll);

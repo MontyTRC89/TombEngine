@@ -252,10 +252,10 @@ void InitialiseHarpy(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = STATE_HARPY_STOP;
-	item->ActiveState = STATE_HARPY_STOP;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = STATE_HARPY_STOP;
+	item->Animation.ActiveState = STATE_HARPY_STOP;
 }
 
 void HarpyControl(short itemNumber)
@@ -275,7 +275,7 @@ void HarpyControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		short state = item->ActiveState - 9;
+		short state = item->Animation.ActiveState - 9;
 		item->HitPoints = 0;
 
 		if (state)
@@ -290,11 +290,11 @@ void HarpyControl(short itemNumber)
 				}
 				else
 				{
-					item->AnimNumber = object->animIndex + 5;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-					item->ActiveState = 9;
-					item->Velocity = 0;
-					item->Airborne = true;
+					item->Animation.AnimNumber = object->animIndex + 5;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.ActiveState = 9;
+					item->Animation.Velocity = 0;
+					item->Animation.Airborne = true;
 					item->Position.xRot = 0;
 				}
 
@@ -309,14 +309,14 @@ void HarpyControl(short itemNumber)
 			}
 		}
 		else
-			item->TargetState = STATE_HARPY_FALLING;
+			item->Animation.TargetState = STATE_HARPY_FALLING;
 
 		if (item->Position.yPos >= item->Floor)
 		{
 			item->Position.yPos = item->Floor;
-			item->VerticalVelocity = 0;
-			item->TargetState = STATE_HARPY_DEATH;
-			item->Airborne = false;
+			item->Animation.VerticalVelocity = 0;
+			item->Animation.TargetState = STATE_HARPY_DEATH;
+			item->Animation.Airborne = false;
 		}
 
 		item->Position.xRot = 0;
@@ -375,7 +375,7 @@ void HarpyControl(short itemNumber)
 		int height = 0;
 		int dy = 0;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case STATE_HARPY_STOP:
 			creature->Flags = 0;
@@ -386,7 +386,7 @@ void HarpyControl(short itemNumber)
 				height = (item->Position.yPos + SECTOR(2));
 				if (creature->Enemy->Position.yPos > height && item->Floor > height)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 					break;
 				}
 			}
@@ -397,12 +397,12 @@ void HarpyControl(short itemNumber)
 				{
 					if (info.distance < pow(341, 2))
 					{
-						item->TargetState = STATE_HARPY_POISON_ATTACK;
+						item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
 						break;
 					}
 					if (dy <= SECTOR(1) && info.distance < pow(SECTOR(2), 2))
 					{
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 						break;
 					}
 				}
@@ -413,11 +413,11 @@ void HarpyControl(short itemNumber)
 				info.distance <= pow(SECTOR(3.5f), 2) ||
 				!(GetRandomControl() & 1))
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 				break;
 			}
 
-			item->TargetState = STATE_HARPY_FLAME_ATTACK;
+			item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
 			item->ItemFlags[0] = 0;
 			break;
 
@@ -425,17 +425,17 @@ void HarpyControl(short itemNumber)
 			creature->MaxTurn = ANGLE(7.0f);
 			creature->Flags = 0;
 
-			if (item->RequiredState)
+			if (item->Animation.RequiredState)
 			{
-				item->TargetState = item->RequiredState;
-				if (item->RequiredState == 8)
+				item->Animation.TargetState = item->Animation.RequiredState;
+				if (item->Animation.RequiredState == 8)
 					item->ItemFlags[0] = 0;
 
 				break;
 			}
 			if (item->HitStatus)
 			{
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 				break;
 			}
 			if (info.ahead)
@@ -447,25 +447,25 @@ void HarpyControl(short itemNumber)
 						info.distance > pow(SECTOR(3.5f), 2) &&
 						GetRandomControl() & 1)
 					{
-						item->TargetState = STATE_HARPY_FLAME_ATTACK;
+						item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
 					}
 					else
-						item->TargetState = 4;
+						item->Animation.TargetState = 4;
 				}
 				else
-					item->TargetState = STATE_HARPY_POISON_ATTACK;
+					item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
 
 				break;
 			}
 			if (GetRandomControl() & 1)
 			{
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 				break;
 			}
 			if (!info.ahead)
 			{
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 				break;
 			}
 			if (info.distance >= pow(341, 2))
@@ -473,14 +473,14 @@ void HarpyControl(short itemNumber)
 				if (info.ahead && info.distance >= pow(SECTOR(2), 2) &&
 					info.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
 				{
-					item->TargetState = STATE_HARPY_FLAME_ATTACK;
+					item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
 					item->ItemFlags[0] = 0;
 				}
 				else
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 			}
 			else
-				item->TargetState = STATE_HARPY_POISON_ATTACK;
+				item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
 
 			break;
 
@@ -488,7 +488,7 @@ void HarpyControl(short itemNumber)
 			if (!creature->Enemy ||
 				creature->Enemy->Position.yPos < (item->Position.yPos + SECTOR(2)))
 			{
-				item->TargetState = STATE_HARPY_STOP;
+				item->Animation.TargetState = STATE_HARPY_STOP;
 			}
 
 			break;
@@ -497,15 +497,15 @@ void HarpyControl(short itemNumber)
 			creature->MaxTurn = ANGLE(2.0f);
 
 			if (info.ahead && info.distance < pow(SECTOR(2), 2))
-				item->TargetState = STATE_HARPY_ATTACK;
+				item->Animation.TargetState = STATE_HARPY_ATTACK;
 			else
-				item->TargetState = 13;
+				item->Animation.TargetState = 13;
 
 			break;
 
 		case STATE_HARPY_ATTACK:
 			creature->MaxTurn = ANGLE(2.0f);
-			item->TargetState = 2;
+			item->Animation.TargetState = 2;
 
 			if (item->TouchBits & 0x14 ||
 				creature->Enemy && creature->Enemy != LaraItem &&
@@ -571,16 +571,16 @@ void HarpyControl(short itemNumber)
 		case 12:
 			if (info.ahead && info.distance > pow(SECTOR(3.5f), 2))
 			{
-				item->TargetState = 2;
-				item->RequiredState = STATE_HARPY_FLAME_ATTACK;
+				item->Animation.TargetState = 2;
+				item->Animation.RequiredState = STATE_HARPY_FLAME_ATTACK;
 			}
 			else if (GetRandomControl() & 1)
-				item->TargetState = STATE_HARPY_STOP;
+				item->Animation.TargetState = STATE_HARPY_STOP;
 
 			break;
 
 		case 13:
-			item->TargetState = 2;
+			item->Animation.TargetState = 2;
 			break;
 
 		default:

@@ -42,17 +42,17 @@ namespace TEN::Entities::TR4
 	void InitialiseTr4Dog(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		item->ActiveState = DOG_STATE_STOP;
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+		item->Animation.ActiveState = DOG_STATE_STOP;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
 
 		// OCB 1 makes the dog sitting down until fired
 		if (item->TriggerFlags)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 			item->Status -= ITEM_INVISIBLE;
 		}
 
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void Tr4DogControl(short itemNumber)
@@ -71,13 +71,13 @@ namespace TEN::Entities::TR4
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->AnimNumber == object->animIndex + 1)
+			if (item->Animation.AnimNumber == object->animIndex + 1)
 				item->HitPoints = object->HitPoints;
-			else if (item->ActiveState != DOG_STATE_DEATH)
+			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
 			{
-				item->AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
-				item->ActiveState = DOG_STATE_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
+				item->Animation.ActiveState = DOG_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else
@@ -123,9 +123,9 @@ namespace TEN::Entities::TR4
 			}
 
 			short random = GetRandomControl();
-			int frame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case DOG_STATE_NONE:
 			case DOG_STATE_SLEEP:
@@ -133,14 +133,14 @@ namespace TEN::Entities::TR4
 				joint2 = 0;
 
 				if (creature->Mood != MoodType::Bored && item->AIBits != MODIFY)
-					item->TargetState = DOG_STATE_STOP;
+					item->Animation.TargetState = DOG_STATE_STOP;
 				else
 				{
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
 					if (creature->Flags > 300 && random < 128)
-						item->TargetState = DOG_STATE_STOP;
+						item->Animation.TargetState = DOG_STATE_STOP;
 				}
 
 				break;
@@ -149,9 +149,9 @@ namespace TEN::Entities::TR4
 			case DOG_STATE_CROUCH:
 				creature->MaxTurn = 0;
 
-				if (item->ActiveState == DOG_STATE_CROUCH && item->RequiredState)
+				if (item->Animation.ActiveState == DOG_STATE_CROUCH && item->Animation.RequiredState)
 				{
-					item->TargetState = item->RequiredState;
+					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
 				}
 
@@ -162,26 +162,26 @@ namespace TEN::Entities::TR4
 					if (GetRandomControl())
 						break;
 
-					if (item->ActiveState == DOG_STATE_STOP)
+					if (item->Animation.ActiveState == DOG_STATE_STOP)
 					{
-						item->TargetState = DOG_STATE_CROUCH;
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 						break;
 					}
 				}
 				else
 				{
-					if (item->ActiveState == DOG_STATE_CROUCH && random < 128)
+					if (item->Animation.ActiveState == DOG_STATE_CROUCH && random < 128)
 					{
-						item->TargetState = DOG_STATE_STOP;
+						item->Animation.TargetState = DOG_STATE_STOP;
 						break;
 					}
 
 					if (item->AIBits & PATROL1)
 					{
-						if (item->ActiveState == DOG_STATE_STOP)
-							item->TargetState = DOG_STATE_WALK;
+						if (item->Animation.ActiveState == DOG_STATE_STOP)
+							item->Animation.TargetState = DOG_STATE_WALK;
 						else
-							item->TargetState = DOG_STATE_STOP;
+							item->Animation.TargetState = DOG_STATE_STOP;
 
 						break;
 					}
@@ -190,21 +190,21 @@ namespace TEN::Entities::TR4
 					{
 						if (Lara.TargetEntity == item || !AI.ahead || item->HitStatus)
 						{
-							item->RequiredState = DOG_STATE_RUN;
-							item->TargetState = DOG_STATE_CROUCH;
+							item->Animation.RequiredState = DOG_STATE_RUN;
+							item->Animation.TargetState = DOG_STATE_CROUCH;
 						}
 						else
-							item->TargetState = DOG_STATE_STOP;
+							item->Animation.TargetState = DOG_STATE_STOP;
 
 						break;
 					}
 
 					if (creature->Mood != MoodType::Bored)
 					{
-						item->RequiredState = DOG_STATE_RUN;
+						item->Animation.RequiredState = DOG_STATE_RUN;
 
-						if (item->ActiveState == DOG_STATE_STOP)
-							item->TargetState = DOG_STATE_CROUCH;
+						if (item->Animation.ActiveState == DOG_STATE_STOP)
+							item->Animation.TargetState = DOG_STATE_CROUCH;
 
 						break;
 					}
@@ -216,9 +216,9 @@ namespace TEN::Entities::TR4
 					{
 						if (item->AIBits & MODIFY)
 						{
-							if (item->ActiveState == DOG_STATE_STOP)
+							if (item->Animation.ActiveState == DOG_STATE_STOP)
 							{
-								item->TargetState = DOG_STATE_SLEEP;
+								item->Animation.TargetState = DOG_STATE_SLEEP;
 								creature->Flags = 0;
 								break;
 							}
@@ -228,19 +228,19 @@ namespace TEN::Entities::TR4
 					if (random >= 4096)
 					{
 						if (!(random & 0x1F))
-							item->TargetState = DOG_STATE_HOWL;
+							item->Animation.TargetState = DOG_STATE_HOWL;
 
 						break;
 					}
 
-					if (item->ActiveState == DOG_STATE_STOP)
+					if (item->Animation.ActiveState == DOG_STATE_STOP)
 					{
-						item->TargetState = DOG_STATE_WALK;
+						item->Animation.TargetState = DOG_STATE_WALK;
 						break;
 					}
 				}
 
-				item->TargetState = DOG_STATE_STOP;
+				item->Animation.TargetState = DOG_STATE_STOP;
 				break;
 
 			case DOG_STATE_WALK:
@@ -248,17 +248,17 @@ namespace TEN::Entities::TR4
 
 				if (item->AIBits & PATROL1)
 				{
-					item->TargetState = DOG_STATE_WALK;
+					item->Animation.TargetState = DOG_STATE_WALK;
 					break;
 				}
 
 				if (creature->Mood == MoodType::Bored && random < 256)
 				{
-					item->TargetState = DOG_STATE_STOP;
+					item->Animation.TargetState = DOG_STATE_STOP;
 					break;
 				}
 
-				item->TargetState = DOG_STATE_STALK;
+				item->Animation.TargetState = DOG_STATE_STALK;
 				break;
 
 			case DOG_STATE_RUN:
@@ -267,20 +267,20 @@ namespace TEN::Entities::TR4
 				if (creature->Mood == MoodType::Escape)
 				{
 					if (Lara.TargetEntity != item && AI.ahead)
-						item->TargetState = DOG_STATE_CROUCH;
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
 					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-						item->TargetState = DOG_STATE_JUMP_ATTACK;
+						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
-						item->RequiredState = DOG_STATE_STALK;
-						item->TargetState = DOG_STATE_CROUCH;
+						item->Animation.RequiredState = DOG_STATE_STALK;
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 					}
 				}
 				else
-					item->TargetState = DOG_STATE_CROUCH;
+					item->Animation.TargetState = DOG_STATE_CROUCH;
 
 				break;
 
@@ -290,17 +290,17 @@ namespace TEN::Entities::TR4
 				if (creature->Mood != MoodType::Bored)
 				{
 					if (creature->Mood == MoodType::Escape)
-						item->TargetState = DOG_STATE_RUN;
+						item->Animation.TargetState = DOG_STATE_RUN;
 					else if (AI.bite && AI.distance < pow(341, 2))
 					{
-						item->TargetState = DOG_STATE_CROUCH_ATTACK;
-						item->RequiredState = DOG_STATE_STALK;
+						item->Animation.TargetState = DOG_STATE_CROUCH_ATTACK;
+						item->Animation.RequiredState = DOG_STATE_STALK;
 					}
 					else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
-						item->TargetState = DOG_STATE_RUN;
+						item->Animation.TargetState = DOG_STATE_RUN;
 				}
 				else
-					item->TargetState = DOG_STATE_CROUCH;
+					item->Animation.TargetState = DOG_STATE_CROUCH;
 
 				break;
 
@@ -316,7 +316,7 @@ namespace TEN::Entities::TR4
 					LaraItem->HitStatus = true;
 				}
 
-				item->TargetState = DOG_STATE_RUN;
+				item->Animation.TargetState = DOG_STATE_RUN;
 				break;
 
 			case DOG_STATE_HOWL:

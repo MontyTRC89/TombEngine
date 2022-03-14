@@ -26,14 +26,14 @@ void InitialiseSarcophagus(short itemNumber)
 
 }
 
-void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* sarcItem = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
-		laraItem->ActiveState == LS_IDLE &&
-		laraItem->AnimNumber == LA_STAND_IDLE &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		sarcItem->Status != ITEM_ACTIVE ||
 		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
@@ -42,9 +42,9 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 		{
 			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
 			{
-				laraItem->AnimNumber = LA_PICKUP_SARCOPHAGUS;
-				laraItem->ActiveState = LS_MISC_CONTROL;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
+				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				sarcItem->Flags |= IFLAG_ACTIVATION_MASK;
 
 				AddActiveItem(itemNumber);
@@ -66,8 +66,8 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll
 			}
 		}
 	}
-	else if (laraItem->AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-		laraItem->FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
+		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNumber, laraItem, coll);
 	}

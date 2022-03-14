@@ -2,7 +2,7 @@
 #include "Game/collision/collide_room.h"
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 struct LaraInfo;
 struct VaultTestResult;
 
@@ -11,34 +11,34 @@ struct VaultTestResult;
 // For State Control & Collision
 // -----------------------------
 
-void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll);
-bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll);
+void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll);
+bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll);
 void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate = 1.0f);
 void EaseOutLaraHeight(ITEM_INFO* item, int height);
-void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll);
-void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll);
-void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll);
-void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate);
+void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate);
+void DoLaraStep(ITEM_INFO* item, CollisionInfo* coll);
+void DoLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll);
+void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll);
+void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate);
 void DoLaraTightropeBalance(ITEM_INFO* item);
 void DoLaraTightropeLean(ITEM_INFO* item);
 void DoLaraTightropeBalanceRegen(ITEM_INFO* item);
 void DoLaraFallDamage(ITEM_INFO* item);
 
 LaraInfo*& GetLaraInfo(ITEM_INFO* item);
-short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll);
+short GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll);
 
-void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll);
-void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll);
-void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll);
-void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult);
-void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll);
+void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll);
+void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll);
+void SetLaraRunJumpQueue(ITEM_INFO* item, CollisionInfo* coll);
+void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultResult);
+void SetLaraLand(ITEM_INFO* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ITEM_INFO* item);
 void SetLaraFallBackAnimation(ITEM_INFO* item);
 void SetLaraMonkeyFallAnimation(ITEM_INFO* item);
 void SetLaraMonkeyRelease(ITEM_INFO* item);
-void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll);
-void SetLaraCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip);
+void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll);
+void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip);
 
 void ResetLaraLean(ITEM_INFO* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ITEM_INFO* item, float rate = 1.0f);

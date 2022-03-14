@@ -2,7 +2,7 @@
 #include "Game/Lara/lara.h"
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 constexpr auto MAX_TARGETS = 8;
 

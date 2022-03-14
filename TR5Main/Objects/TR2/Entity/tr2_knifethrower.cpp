@@ -47,7 +47,7 @@ void KnifeControl(short fxNumber)
 	fx->pos.xPos += speed * phd_sin(fx->pos.yRot);
 	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
 
-	auto probe = GetCollisionResult(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
 
 	if (fx->pos.yPos >= probe.Position.Floor ||
 		fx->pos.yPos <= probe.Position.Ceiling)
@@ -67,7 +67,7 @@ void KnifeControl(short fxNumber)
 		LaraItem->HitStatus = true;
 
 		fx->pos.yRot = LaraItem->Position.yRot;
-		fx->speed = LaraItem->Velocity;
+		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
@@ -95,11 +95,11 @@ void KnifeThrowerControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 10)
+		if (item->Animation.ActiveState != 10)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 10;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 10;
 		}
 	}
 	else
@@ -112,7 +112,7 @@ void KnifeThrowerControl(short itemNumber)
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			info->MaxTurn = 0;
@@ -121,18 +121,18 @@ void KnifeThrowerControl(short itemNumber)
 				head = aiInfo.angle;
 
 			if (info->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (Targetable(item, &aiInfo))
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 			else if (info->Mood == MoodType::Bored)
 			{
 				if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(6), 2))
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(4), 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -143,23 +143,23 @@ void KnifeThrowerControl(short itemNumber)
 				head = aiInfo.angle;
 
 			if (info->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (Targetable(item, &aiInfo))
 			{
 				if (aiInfo.distance < pow(SECTOR(2.5f), 2) || aiInfo.zoneNumber != aiInfo.enemyZone)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else if (GetRandomControl() < 0x4000)
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 				else
-					item->TargetState = 6;
+					item->Animation.TargetState = 6;
 			}
 			else if (info->Mood == MoodType::Bored)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 			}
 			else if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(4), 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -172,17 +172,17 @@ void KnifeThrowerControl(short itemNumber)
 
 			if (Targetable(item, &aiInfo))
 			{
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 			else if (info->Mood == MoodType::Bored)
 			{
 				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(4), 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 
@@ -193,9 +193,9 @@ void KnifeThrowerControl(short itemNumber)
 				torso = aiInfo.angle;
 
 			if (Targetable(item, &aiInfo))
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 			else
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 
@@ -206,9 +206,9 @@ void KnifeThrowerControl(short itemNumber)
 				torso = aiInfo.angle;
 
 			if (Targetable(item, &aiInfo))
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			else
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 
@@ -219,9 +219,9 @@ void KnifeThrowerControl(short itemNumber)
 				torso = aiInfo.angle;
 
 			if (Targetable(item, &aiInfo))
-				item->TargetState = 9;
+				item->Animation.TargetState = 9;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 

@@ -33,7 +33,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-static void StartBaddy(OBJECT_INFO* obj)
+static void StartEntity(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];
 	if (obj->loaded)
@@ -208,7 +208,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_FLAMETHROWER_BADDY];
+	obj = &Objects[ID_FLAMETHROWER_GOON];
 	if (obj->loaded)
 	{
 		obj->control = FlameThrowerControl;
@@ -465,7 +465,7 @@ static void StartProjectiles(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR3Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartVehicles(objToInit);

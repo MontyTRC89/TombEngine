@@ -3,7 +3,7 @@
 #include "Game/pickup/pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
-#include "tr4_baddy.h" // OK
+#include "tr4_goon.h" // OK
 #include "tr4_bat.h" // OK
 #include "tr4_bigscorpion.h" // OK
 #include "tr4_crocodile.h" // OK
@@ -78,7 +78,7 @@
 
 using namespace TEN::Entities::TR4;
 
-static void StartBaddy(OBJECT_INFO* obj)
+static void StartEntity(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -222,11 +222,11 @@ static void StartBaddy(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_BADDY1];
+	obj = &Objects[ID_GOON1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseBaddy;
-		obj->control = BaddyControl;
+		obj->initialise = InitialiseGoon;
+		obj->control = GoonControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->HitPoints = 25;
@@ -238,7 +238,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
+		obj->meshSwapSlot = ID_MESHSWAP_GOON1;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -247,11 +247,11 @@ static void StartBaddy(OBJECT_INFO* obj)
 		//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_BADDY2];
+	obj = &Objects[ID_GOON2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseBaddy;
-		obj->control = BaddyControl;
+		obj->initialise = InitialiseGoon;
+		obj->control = GoonControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->HitPoints = 25;
@@ -263,7 +263,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
+		obj->meshSwapSlot = ID_MESHSWAP_GOON2;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -1214,7 +1214,7 @@ static void StartSwitch(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR4Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartSwitch(objToInit);
 	StartTrap(objToInit);

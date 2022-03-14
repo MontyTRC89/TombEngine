@@ -64,17 +64,17 @@ void InitialiseCrocodile(short itemNumber)
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_SWIM;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = CROC_STATE_UNDERWATER_SWIM;
-		item->TargetState = CROC_STATE_UNDERWATER_SWIM;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_SWIM;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = CROC_STATE_UNDERWATER_SWIM;
+		item->Animation.TargetState = CROC_STATE_UNDERWATER_SWIM;
 	}
 	else
 	{
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_IDLE;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = CROC_STATE_IDLE;
-		item->TargetState = CROC_STATE_IDLE;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_IDLE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = CROC_STATE_IDLE;
+		item->Animation.TargetState = CROC_STATE_IDLE;
 	}
 }
 
@@ -123,21 +123,21 @@ void CrocodileControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != CROC_STATE_DEATH && item->ActiveState != CROC_STATE_UNDERWATER_DEATH)
+		if (item->Animation.ActiveState != CROC_STATE_DEATH && item->Animation.ActiveState != CROC_STATE_UNDERWATER_DEATH)
 		{
 			if (TestEnvironment(ENV_FLAG_WATER, item))
 			{
-				item->AnimNumber = object->animIndex + CROC_ANIM_UNDERWATER_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->ActiveState = CROC_STATE_UNDERWATER_DEATH;
-				item->TargetState = CROC_STATE_UNDERWATER_DEATH;
+				item->Animation.AnimNumber = object->animIndex + CROC_ANIM_UNDERWATER_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = CROC_STATE_UNDERWATER_DEATH;
+				item->Animation.TargetState = CROC_STATE_UNDERWATER_DEATH;
 			}
 			else
 			{
-				item->AnimNumber = object->animIndex + CROC_ANIM_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->ActiveState = CROC_STATE_DEATH;
-				item->TargetState = CROC_STATE_DEATH;
+				item->Animation.AnimNumber = object->animIndex + CROC_ANIM_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = CROC_STATE_DEATH;
+				item->Animation.TargetState = CROC_STATE_DEATH;
 			}
 		}
 
@@ -169,7 +169,7 @@ void CrocodileControl(short itemNumber)
 
 		boneAngle = angle * 4;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case CROC_STATE_IDLE:
 			creature->MaxTurn = 0;
@@ -177,7 +177,7 @@ void CrocodileControl(short itemNumber)
 			if (item->AIBits & GUARD)
 			{
 				boneAngle = item->ItemFlags[0];
-				item->TargetState = CROC_STATE_IDLE;
+				item->Animation.TargetState = CROC_STATE_IDLE;
 				item->ItemFlags[0] = item->ItemFlags[1] + boneAngle;
 
 				if (!(GetRandomControl() & 0x1F))
@@ -194,13 +194,13 @@ void CrocodileControl(short itemNumber)
 					item->ItemFlags[0] = 1024;
 			}
 			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
-				item->TargetState = CROC_STATE_ATTACK;
+				item->Animation.TargetState = CROC_STATE_ATTACK;
 			else
 			{
 				if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
-					item->TargetState = CROC_STATE_WALK;
+					item->Animation.TargetState = CROC_STATE_WALK;
 				else
-					item->TargetState = CROC_STATE_RUN;
+					item->Animation.TargetState = CROC_STATE_RUN;
 			}
 
 			break;
@@ -211,17 +211,17 @@ void CrocodileControl(short itemNumber)
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
 			{
-				item->RequiredState = CROC_STATE_UNDERWATER_SWIM;
-				item->TargetState = CROC_STATE_UNDERWATER_SWIM;
+				item->Animation.RequiredState = CROC_STATE_UNDERWATER_SWIM;
+				item->Animation.TargetState = CROC_STATE_UNDERWATER_SWIM;
 				break;
 			}
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
-				item->TargetState = CROC_STATE_IDLE;
+				item->Animation.TargetState = CROC_STATE_IDLE;
 			else if (!AI.ahead || AI.distance > CROC_MAXRUN_RANGE)
-				item->TargetState = CROC_STATE_RUN;
+				item->Animation.TargetState = CROC_STATE_RUN;
 
 			break;
 
@@ -231,37 +231,37 @@ void CrocodileControl(short itemNumber)
 			// Land to water transition.
 			if (CrocodileIsInWater(item))
 			{
-				item->RequiredState = CROC_STATE_WALK;
-				item->TargetState = CROC_STATE_WALK;
+				item->Animation.RequiredState = CROC_STATE_WALK;
+				item->Animation.TargetState = CROC_STATE_WALK;
 				break;
 			}
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
-				item->TargetState = CROC_STATE_IDLE;
+				item->Animation.TargetState = CROC_STATE_IDLE;
 			else if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
-				item->TargetState = CROC_STATE_WALK;
+				item->Animation.TargetState = CROC_STATE_WALK;
 
 			break;
 
 		case CROC_STATE_ATTACK:
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
-				item->RequiredState = 0;
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				item->Animation.RequiredState = 0;
 
 			if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
 			{
-				if (!item->RequiredState)
+				if (!item->Animation.RequiredState)
 				{
 					CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
-					item->RequiredState = CROC_STATE_IDLE;
+					item->Animation.RequiredState = CROC_STATE_IDLE;
 
 					LaraItem->HitPoints -= CROC_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 			}
 			else
-				item->TargetState = CROC_STATE_IDLE;
+				item->Animation.TargetState = CROC_STATE_IDLE;
 			
 			break;
 
@@ -271,50 +271,50 @@ void CrocodileControl(short itemNumber)
 			// Water to land transition.
 			if (!CrocodileIsInWater(item))
 			{
-				item->AnimNumber = object->animIndex + CROC_ANIM_LAND_MODE;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->RequiredState = CROC_STATE_WALK;
-				item->ActiveState = CROC_STATE_WALK;
-				item->TargetState = CROC_STATE_WALK;
+				item->Animation.AnimNumber = object->animIndex + CROC_ANIM_LAND_MODE;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.RequiredState = CROC_STATE_WALK;
+				item->Animation.ActiveState = CROC_STATE_WALK;
+				item->Animation.TargetState = CROC_STATE_WALK;
 				break;
 			}
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (AI.bite)
 			{
 				if (item->TouchBits & 768)
-					item->TargetState = CROC_STATE_UNDERWATER_ATTACK;
+					item->Animation.TargetState = CROC_STATE_UNDERWATER_ATTACK;
 			}
 
 			break;
 
 		case CROC_STATE_UNDERWATER_ATTACK:
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
-				item->RequiredState = CROC_STATE_NONE_1;
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				item->Animation.RequiredState = CROC_STATE_NONE_1;
 
 			if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
 			{
-				if (!item->RequiredState)
+				if (!item->Animation.RequiredState)
 				{
 					CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
-					item->RequiredState = CROC_STATE_UNDERWATER_SWIM;
+					item->Animation.RequiredState = CROC_STATE_UNDERWATER_SWIM;
 
 					LaraItem->HitPoints -= CROC_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 			}
 			else
-				item->TargetState = CROC_STATE_UNDERWATER_SWIM;
+				item->Animation.TargetState = CROC_STATE_UNDERWATER_SWIM;
 			
 			break;
 		}
 	}
 
 	OBJECT_BONES boneRot;
-	if (item->ActiveState == CROC_STATE_IDLE ||
-		item->ActiveState == CROC_STATE_ATTACK ||
-		item->ActiveState == CROC_STATE_UNDERWATER_ATTACK)
+	if (item->Animation.ActiveState == CROC_STATE_IDLE ||
+		item->Animation.ActiveState == CROC_STATE_ATTACK ||
+		item->Animation.ActiveState == CROC_STATE_UNDERWATER_ATTACK)
 	{
 		boneRot.bone0 = AI.angle;
 		boneRot.bone1 = AI.angle;
@@ -335,13 +335,13 @@ void CrocodileControl(short itemNumber)
 	CreatureJoint(item, 2, boneRot.bone2);
 	CreatureJoint(item, 3, boneRot.bone3);
 
-	if (item->ActiveState < CROC_STATE_UNDERWATER_SWIM)
+	if (item->Animation.ActiveState < CROC_STATE_UNDERWATER_SWIM)
 		CalculateItemRotationToSurface(item, 2.0f);
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	if (item->ActiveState >= CROC_STATE_UNDERWATER_SWIM &&
-		item->ActiveState <= CROC_STATE_UNDERWATER_DEATH)
+	if (item->Animation.ActiveState >= CROC_STATE_UNDERWATER_SWIM &&
+		item->Animation.ActiveState <= CROC_STATE_UNDERWATER_DEATH)
 	{
 		CreatureUnderwater(item, CLICK(1));
 	}

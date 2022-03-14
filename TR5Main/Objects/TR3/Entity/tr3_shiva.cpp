@@ -141,11 +141,11 @@ void InitialiseShiva(short itemNumber)
 	ClearItem(itemNumber);
 
 	auto* item = &g_Level.Items[itemNumber];
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
-	auto* anim = &g_Level.Anims[item->AnimNumber];
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	item->FrameNumber = anim->frameBase;
-	item->ActiveState = anim->ActiveState;
+	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.ActiveState = anim->ActiveState;
 }
 
 void ShivaControl(short itemNumber)
@@ -168,11 +168,11 @@ void ShivaControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 9)
+		if (item->Animation.ActiveState != 9)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 9;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 9;
 		}
 	}
 	else
@@ -191,12 +191,12 @@ void ShivaControl(short itemNumber)
 
 		angle = CreatureTurn(item, shiva->MaxTurn);
 
-		if (item->ActiveState != 4)
+		if (item->Animation.ActiveState != 4)
 			item->MeshBits = 0xFFFFFFFF;
 
 		int effectMesh = 0;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 4:
 			shiva->MaxTurn = 0;
@@ -218,7 +218,7 @@ void ShivaControl(short itemNumber)
 
 			if (item->MeshBits == 0x7FFFFFFF)
 			{
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 				shiva->Flags = -45;
 				effectMesh = 0;
 			}
@@ -245,40 +245,40 @@ void ShivaControl(short itemNumber)
 			{
 				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
 				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
-				auto box = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
+				auto box = GetCollision(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) &&
 					!shiva->Flags)
 				{
-					item->TargetState = 8;
+					item->Animation.TargetState = 8;
 				}
 				else
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (shiva->Mood == MoodType::Bored)
 			{
 				int random = GetRandomControl();
 				if (random < 0x400)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 			{
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 				shiva->Flags = 0;
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 				shiva->Flags = 0;
 			}
 			else if (item->HitStatus && AI.ahead)
 			{
 				shiva->Flags = 4;
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			}
 			else
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			}
 
 			break;
@@ -293,18 +293,18 @@ void ShivaControl(short itemNumber)
 				shiva->Flags = 4;
 
 			if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
-				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 					!shiva->Flags) ||
 				!AI.ahead)
 			{
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 				shiva->Flags = 0;
 			}
 			else if (shiva->Flags)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase && shiva->Flags > 1)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase && shiva->Flags > 1)
 				shiva->Flags -= 2;
 
 			break;
@@ -316,18 +316,18 @@ void ShivaControl(short itemNumber)
 				headY = AI.angle;
 
 			if (shiva->Mood == MoodType::Escape)
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 			else if (shiva->Mood == MoodType::Bored)
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 				shiva->Flags = 0;
 			}
 			else if (item->HitStatus)
 			{
 				shiva->Flags = 4;
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			}
 
 			break;
@@ -342,16 +342,16 @@ void ShivaControl(short itemNumber)
 				shiva->Flags = 4;
 
 			if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2) ||
-				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 					!shiva->Flags))
 			{
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 				shiva->Flags = 0;
 			}
 			else if (shiva->Flags)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				shiva->Flags = 0;
 			
 			break;
@@ -363,15 +363,15 @@ void ShivaControl(short itemNumber)
 				headY = AI.angle;
 
 			if (AI.ahead && AI.distance < pow(SECTOR(4) / 3, 2) ||
-				(item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase &&
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 					!shiva->Flags))
 			{
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 			}
 			else if (item->HitStatus)
 			{
 				shiva->Flags = 4;
-				item->TargetState = 0;
+				item->Animation.TargetState = 0;
 			}
 			
 			break;
@@ -407,9 +407,9 @@ void ShivaControl(short itemNumber)
 			torsoX = 0;
 			torsoY = 0;
 
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 10 ||
-				item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 21 ||
-				item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase + 33)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10 ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 21 ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 33)
 			{
 				CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
 				CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);

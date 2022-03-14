@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_scuba.h"
 
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -31,7 +32,7 @@ static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, s
 
 		harpoon->Position.xRot = 0;
 		harpoon->Position.yRot = yRot;
-		harpoon->VerticalVelocity = 150;
+		harpoon->Animation.VerticalVelocity = 150;
 
 		AddActiveItem(harpoonItemNum);
 		harpoon->Status = ITEM_ACTIVE;
@@ -54,10 +55,10 @@ void ScubaHarpoonControl(short itemNum)
 		int ox = item->Position.xPos;
 		int oz = item->Position.zPos;
 
-		short speed = item->VerticalVelocity * phd_cos(item->Position.xRot);
+		short speed = item->Animation.VerticalVelocity * phd_cos(item->Position.xRot);
 		item->Position.zPos += speed * phd_cos(item->Position.yRot);
 		item->Position.xPos += speed * phd_sin(item->Position.yRot);
-		item->Position.yPos += -item->VerticalVelocity * phd_sin(item->Position.xRot);
+		item->Position.yPos += -item->Animation.VerticalVelocity * phd_sin(item->Position.xRot);
 
 		short roomNumber = item->RoomNumber;
 		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
@@ -83,11 +84,11 @@ void ScubaControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 9)
+		if (item->Animation.ActiveState != 9)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 9;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 9;
 		}
 
 		CreatureFloat(itemNumber);
@@ -146,7 +147,7 @@ void ScubaControl(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		waterHeight = GetWaterSurface(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber) + WALL_SIZE / 2;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->MaxTurn = ANGLE(3);
@@ -154,11 +155,11 @@ void ScubaControl(short itemNumber)
 				neck = -info.angle;
 
 			if (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (creature->Mood == MoodType::Escape)
 				break;
 			else if (shoot)
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			break;
 
 		case 4:
@@ -168,9 +169,9 @@ void ScubaControl(short itemNumber)
 				neck = -info.angle;
 
 			if (!shoot || creature->Mood == MoodType::Escape || (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 
 		case 3:
@@ -179,7 +180,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->VerticalVelocity, item->Position.yRot, item->RoomNumber);
+				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
 			break;
@@ -192,11 +193,11 @@ void ScubaControl(short itemNumber)
 				head = info.angle;
 
 			if (creature->Target.y > waterHeight)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (creature->Mood == MoodType::Escape)
 				break;
 			else if (shoot)
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			break;
 
 		case 6:
@@ -206,9 +207,9 @@ void ScubaControl(short itemNumber)
 				head = info.angle;
 
 			if (!shoot || creature->Mood == MoodType::Escape || creature->Target.y > waterHeight)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			break;
 
 		case 7:
@@ -217,7 +218,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->VerticalVelocity, item->Position.yRot, item->RoomNumber);
+				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
 			break;
@@ -229,7 +230,7 @@ void ScubaControl(short itemNumber)
 	CreatureJoint(item, 1, neck);
 	CreatureAnimation(itemNumber, angle, 0);
 
-	switch (item->ActiveState)
+	switch (item->Animation.ActiveState)
 	{
 	case 1:
 	case 4:

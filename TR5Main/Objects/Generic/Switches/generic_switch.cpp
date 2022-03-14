@@ -33,13 +33,13 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->ObjectNumber == ID_JUMP_SWITCH)
 			{
-				switchItem->TargetState = SWITCH_OFF;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 				switchItem->Timer = 0;
 				AnimateItem(switchItem);
 			}
 			else
 			{
-				switchItem->TargetState = SWITCH_ON;
+				switchItem->Animation.TargetState = SWITCH_ON;
 				switchItem->Timer = 0;
 			}
 		}
@@ -47,14 +47,14 @@ namespace TEN::Entities::Switches
 		AnimateItem(switchItem);
 	}
 
-	void SwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void SwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_IDLE &&
-			laraItem->AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->Status == ITEM_NOT_ACTIVE &&
 			!(switchItem->Flags & 0x100) &&
@@ -63,9 +63,9 @@ namespace TEN::Entities::Switches
 		{
 			auto* bounds = GetBoundsAccurate(switchItem);
 
-			if (switchItem->TriggerFlags == 3 && switchItem->ActiveState == SWITCH_ON ||
+			if (switchItem->TriggerFlags == 3 && switchItem->Animation.ActiveState == SWITCH_ON ||
 				switchItem->TriggerFlags >= 5 && switchItem->TriggerFlags <= 7 &&
-				switchItem->ActiveState == SWITCH_OFF)
+				switchItem->Animation.ActiveState == SWITCH_OFF)
 			{
 				return;
 			}
@@ -94,44 +94,44 @@ namespace TEN::Entities::Switches
 			{
 				if (MoveLaraPosition(&SwitchPos, switchItem, laraItem))
 				{
-					if (switchItem->ActiveState == SWITCH_ON) /* Switch down */
+					if (switchItem->Animation.ActiveState == SWITCH_ON) /* Switch down */
 					{
 						if (switchItem->TriggerFlags)
 						{
-							laraItem->AnimNumber = LA_HOLESWITCH_ACTIVATE;
-							laraItem->ActiveState = LS_HOLE;
+							laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
+							laraItem->Animation.ActiveState = LS_HOLE;
 						}
 						else
 						{
-							laraItem->ActiveState = LS_SWITCH_UP;
-							laraItem->AnimNumber = LA_WALLSWITCH_DOWN;
+							laraItem->Animation.ActiveState = LS_SWITCH_UP;
+							laraItem->Animation.AnimNumber = LA_WALLSWITCH_DOWN;
 						}
 						
-						switchItem->TargetState = SWITCH_OFF;
+						switchItem->Animation.TargetState = SWITCH_OFF;
 					}
 					else /* Switch up */
 					{
 						if (switchItem->TriggerFlags)
 						{
 							if (switchItem->TriggerFlags == 3)
-								laraItem->AnimNumber = LA_BUTTON_LARGE_PUSH;
+								laraItem->Animation.AnimNumber = LA_BUTTON_LARGE_PUSH;
 							else
 							{
-								laraItem->AnimNumber = LA_HOLESWITCH_ACTIVATE;
-								laraItem->ActiveState = LS_HOLE;
+								laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
+								laraItem->Animation.ActiveState = LS_HOLE;
 							}
 						}
 						else
 						{
-							laraItem->ActiveState = LS_SWITCH_DOWN;
-							laraItem->AnimNumber = LA_WALLSWITCH_UP;
+							laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
+							laraItem->Animation.AnimNumber = LA_WALLSWITCH_UP;
 						}
 
-						switchItem->TargetState = SWITCH_ON;
+						switchItem->Animation.TargetState = SWITCH_ON;
 					}
 
 					ResetLaraFlex(laraItem);
-					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 
@@ -151,7 +151,7 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		if (laraItem->ActiveState != LS_SWITCH_DOWN && laraItem->ActiveState != LS_SWITCH_UP)
+		if (laraItem->Animation.ActiveState != LS_SWITCH_DOWN && laraItem->Animation.ActiveState != LS_SWITCH_UP)
 			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }

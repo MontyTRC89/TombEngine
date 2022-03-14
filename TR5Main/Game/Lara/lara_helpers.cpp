@@ -22,26 +22,20 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Renderer;
+#include "Renderer/Renderer11.h"
+
 // -----------------------------
 // HELPER FUNCTIONS
 // For State Control & Collision
 // -----------------------------
 
-void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
+void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->ActiveState))
-		lara->Control.Count.RunJump = 0;
-
-	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->ActiveState))
-		lara->Control.RunJumpQueued = false;
-
-	// Increment/reset AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME &&
-		TestLaraPose(item, coll) &&
+	// Update AFK pose timer.
+	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
 		!(TrInput & (IN_WAKE | IN_LOOK)) &&
 		g_GameFlow->Animations.HasPose)
 	{
@@ -50,19 +44,27 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	else
 		lara->Control.Count.Pose = 0;
 
+	// Reset running jump timer.
+	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
+		lara->Control.Count.RunJump = 0;
+
+	// Reset running jump action queue.
+	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
+		lara->Control.RunJumpQueued = false;
+
 	// Reset lean.
 	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
 		ResetLaraLean(item, 6);
 
 	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) &&
-		coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&
-		(!item->Velocity || (item->Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
+		(!item->Animation.Velocity || (item->Animation.Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
 		ResetLaraFlex(item, 12);
 	}
 
 	// Reset turn rate.
+	// TODO: Make it less stupid in the future. Do it according to a curve?
 	int sign = copysign(1, lara->Control.TurnRate);
 	if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
 		lara->Control.TurnRate -= ANGLE(2.0f) * sign;
@@ -73,7 +75,7 @@ void HandleLaraMovementParameters(ITEM_INFO* item, COLL_INFO* coll)
 	item->Position.yRot += lara->Control.TurnRate;
 }
 
-bool HandleLaraVehicle(ITEM_INFO* item, COLL_INFO* coll)
+bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -150,7 +152,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
 	static constexpr int rate = 50;
-	int threshold = std::max(abs(item->Velocity) / 3 * 2, CLICK(1) / 16);
+	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
 	
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
@@ -167,9 +169,9 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 }
 
 // TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
+void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate)
 {
-	if (!item->Velocity)
+	if (!item->Animation.Velocity)
 		return;
 
 	rate = abs(rate);
@@ -183,14 +185,14 @@ void DoLaraLean(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		if (TestLaraStepUp(item, coll))
 		{
-			item->TargetState = LS_STEP_UP;
-			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			item->Animation.TargetState = LS_STEP_UP;
+			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Position.yPos += coll->Middle.Floor;
 				return;
@@ -198,8 +200,8 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 		}
 		else if (TestLaraStepDown(item, coll))
 		{
-			item->TargetState = LS_STEP_DOWN;
-			if (GetChange(item, &g_Level.Anims[item->AnimNumber]))
+			item->Animation.TargetState = LS_STEP_DOWN;
+			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Position.yPos += coll->Middle.Floor;
 				return;
@@ -210,13 +212,13 @@ void DoLaraStep(ITEM_INFO* item, COLL_INFO* coll)
 	EaseOutLaraHeight(item, coll->Middle.Floor);
 }
 
-void DoLaraMonkeyStep(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	EaseOutLaraHeight(item, coll->Middle.Ceiling);
 }
 
 // TODO: Doesn't always work on bridges.
-void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
+void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.ForwardAngle = item->Position.yRot + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
@@ -226,11 +228,11 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, COLL_INFO* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
-void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rate)
+void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!item->Velocity)
+	if (!item->Animation.Velocity)
 		return;
 
 	int sign = copysign(1, maxAngle);
@@ -239,7 +241,7 @@ void DoLaraCrawlFlex(ITEM_INFO* item, COLL_INFO* coll, short maxAngle, short rat
 	lara->ExtraTorsoRot.zRot += std::min(abs(rate), abs(maxAngle - lara->ExtraTorsoRot.zRot) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
-		item->ActiveState != LS_CRAWL_BACK)
+		item->Animation.ActiveState != LS_CRAWL_BACK)
 	{
 		lara->ExtraHeadRot.zRot = lara->ExtraTorsoRot.zRot / 2;
 		lara->ExtraHeadRot.yRot = lara->ExtraHeadRot.zRot;
@@ -309,13 +311,13 @@ void DoLaraTightropeBalanceRegen(ITEM_INFO* item)
 
 void DoLaraFallDamage(ITEM_INFO* item)
 {
-	if (item->VerticalVelocity >= LARA_DAMAGE_VELOCITY)
+	if (item->Animation.VerticalVelocity >= LARA_DAMAGE_VELOCITY)
 	{
-		if (item->VerticalVelocity >= LARA_DEATH_VELOCITY)
+		if (item->Animation.VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
 		else [[likely]]
 		{
-			int base = item->VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
+			int base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 	}
@@ -332,10 +334,10 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item)
 	return (LaraInfo*&)firstLaraItem->Data;
 }
 
-short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
+short GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = coll->Setup.ForwardAngle;
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	// Ground is flat.
 	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
@@ -350,34 +352,34 @@ short GetLaraSlideDirection(ITEM_INFO* item, COLL_INFO* coll)
 	return direction;
 }
 
-void ModulateLaraSlideVelocity(ITEM_INFO* item, COLL_INFO* coll)
+void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto probe = GetCollisionResult(item);
+	constexpr int minVelocity = 50;
+	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	/*if (g_GameFlow->Animations.HasSlideExtended)
+	if (g_GameFlow->Animations.HasSlideExtended)
 	{
+		auto probe = GetCollision(item);
+		short minSlideAngle = ANGLE(33.75f);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
+		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
+		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		//short deltaAngle = abs((short)(direction - item->Position.yRot));
+
+		g_Renderer.PrintDebugMessage("%d", slideVelocity);
+
+		lara->ExtraVelocity.x += slideVelocity;
+		lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
 	else
-	{
-		constexpr int velocity = 50;
-		lara->ExtraVelocity.x += velocity;
-	}*/
-
-	// TODO
-	constexpr int minVelocity = 50; // Apply only when landing?
-	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
-	constexpr int VelocityIncreasePerStep = 1;
-
-	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-	short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-
-	lara->ExtraVelocity.x += minVelocity;
+		lara->ExtraVelocity.x += minVelocity;
 }
 
-void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -409,26 +411,26 @@ void SetLaraJumpDirection(ITEM_INFO* item, COLL_INFO* coll)
 
 // TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
-void SetLaraRunJumpQueue(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraRunJumpQueue(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Position.yPos;
 	int distance = SECTOR(1);
-	auto probe = GetCollisionResult(item, item->Position.yRot, distance, -coll->Setup.Height);
+	auto probe = GetCollision(item, item->Position.yRot, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
 			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
-		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->TargetState);
+		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
 	}
 	else
 		lara->Control.RunJumpQueued = false;
 }
 
-void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
+void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultResult)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -446,10 +448,10 @@ void SetLaraVault(ITEM_INFO* item, COLL_INFO* coll, VaultTestResult vaultResult)
 		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(lara->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
 }
 
-void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraLand(ITEM_INFO* item, CollisionInfo* coll)
 {
-	item->Velocity = 0;
-	item->VerticalVelocity = 0;
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
 	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
@@ -458,21 +460,21 @@ void SetLaraLand(ITEM_INFO* item, COLL_INFO* coll)
 void SetLaraFallAnimation(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->VerticalVelocity = 0;
-	item->Airborne = true;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = true;
 }
 
 void SetLaraFallBackAnimation(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->VerticalVelocity = 0;
-	item->Airborne = true;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = true;
 }
 
 void SetLaraMonkeyFallAnimation(ITEM_INFO* item)
 {
 	// HACK: Disallow release during 180 turn action.
-	if (item->ActiveState == LS_MONKEY_TURN_180)
+	if (item->Animation.ActiveState == LS_MONKEY_TURN_180)
 		return;
 
 	SetAnimation(item, LA_MONKEY_TO_FREEFALL);
@@ -483,13 +485,13 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Velocity = 2;
-	item->VerticalVelocity = 1;
-	item->Airborne = true;
+	item->Animation.Velocity = 2;
+	item->Animation.VerticalVelocity = 1;
+	item->Animation.Airborne = true;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
-void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll)
+void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
 	short deltaAngle = abs((short)(direction - item->Position.yRot));
@@ -499,7 +501,7 @@ void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll)
 	// Slide forward.
 	if (deltaAngle <= ANGLE(90.0f))
 	{
-		if (item->ActiveState == LS_SLIDE_FORWARD && deltaAngle <= ANGLE(90.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_FORWARD && deltaAngle <= ANGLE(90.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
@@ -507,14 +509,16 @@ void SetLaraSlideAnimation(ITEM_INFO* item, COLL_INFO* coll)
 	// Slide back.
 	else
 	{
-		if (item->ActiveState == LS_SLIDE_BACK && deltaAngle > ANGLE(90.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && deltaAngle > ANGLE(90.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
+
+	LaraSnapToHeight(item, coll);
 }
 
-void SetLaraCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
+void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -523,9 +527,9 @@ void SetLaraCornerAnimation(ITEM_INFO* item, COLL_INFO* coll, bool flip)
 		SetAnimation(item, LA_FALL_START);
 		item->Position.yPos += CLICK(1);
 		item->Position.yRot += lara->NextCornerPos.yRot / 2;
-		item->Velocity = 2;
-		item->VerticalVelocity = 1;
-		item->Airborne = true;
+		item->Animation.Velocity = 2;
+		item->Animation.VerticalVelocity = 1;
+		item->Animation.Airborne = true;
 		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}

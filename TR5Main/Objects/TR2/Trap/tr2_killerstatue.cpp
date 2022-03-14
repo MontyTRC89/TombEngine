@@ -13,21 +13,21 @@ void InitialiseKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->ActiveState = 1;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = 1;
 }
 
 void KillerStatueControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->ActiveState == 1)
-		item->TargetState = 2;
+	if (TriggerActive(item) && item->Animation.ActiveState == 1)
+		item->Animation.TargetState = 2;
 	else
-		item->TargetState = 1;
+		item->Animation.TargetState = 1;
 
-	if (item->TouchBits & 0x80 && item->ActiveState == 2)
+	if (item->TouchBits & 0x80 && item->Animation.ActiveState == 2)
 	{
 		LaraItem->HitStatus = 1;
 		LaraItem->HitPoints -= 20;
@@ -37,7 +37,7 @@ void KillerStatueControl(short itemNumber)
 		int y = LaraItem->Position.yPos - GetRandomControl() / 44;
 		int d = (GetRandomControl() - 16384) / 8 + LaraItem->Position.yRot;
 
-		DoBloodSplat(x, y, z, LaraItem->Velocity, d, LaraItem->RoomNumber);
+		DoBloodSplat(x, y, z, LaraItem->Animation.Velocity, d, LaraItem->RoomNumber);
 	}
 
 	AnimateItem(item);

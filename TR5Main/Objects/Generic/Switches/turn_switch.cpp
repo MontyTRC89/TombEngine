@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 
 	PHD_VECTOR TurnSwitchPosA = { 650, 0, -138 };
 
-	void TurnSwitchCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void TurnSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -54,21 +54,21 @@ namespace TEN::Entities::Switches
 		int doSwitch = 0;
 
 		if (TrInput & IN_ACTION &&
-			laraItem->ActiveState == LS_IDLE &&
-			laraItem->AnimNumber == LA_STAND_IDLE &&
-			laraItem->Airborne == false &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.Airborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
-			switchItem->ActiveState == TURN_SWITCH_STOP ||
+			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
 			if (TestLaraPosition(&TurnSwitchBoundsA, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(&TurnSwitchPosA, switchItem, laraItem))
 				{
-					laraItem->AnimNumber = LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE;
-					laraItem->FrameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
-					switchItem->AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 4;
-					switchItem->FrameNumber = g_Level.Anims[switchItem->AnimNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE;
+					laraItem->Animation.FrameNumber = g_Level.Anims[LA_TURNSWITCH_GRAB_COUNTER_CLOCKWISE].frameBase;
+					switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 4;
+					switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 					switchItem->ItemFlags[0] = TURN_SWITCH_ANTICLOCKWISE;
 					ForcedFixedCamera.x = switchItem->Position.xPos - 1024 * phd_sin(switchItem->Position.yRot);
 					ForcedFixedCamera.z = switchItem->Position.zPos - 1024 * phd_cos(switchItem->Position.yRot);
@@ -85,8 +85,8 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
 					{
-						laraItem->AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
-						laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						switchItem->ItemFlags[0] = TURN_SWITCH_CLOCKWISE;
 						ForcedFixedCamera.x = switchItem->Position.xPos + 1024 * phd_sin(switchItem->Position.yRot);
 						ForcedFixedCamera.z = switchItem->Position.zPos + 1024 * phd_cos(switchItem->Position.yRot);
@@ -112,7 +112,7 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.IsMoving = false;
 			ResetLaraFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Busy;
-			laraItem->ActiveState = LA_REACH;
+			laraItem->Animation.ActiveState = LA_REACH;
 
 			UseForcedFixedCamera = true;
 			ForcedFixedCamera.y = switchItem->Position.yPos - 2048;
@@ -127,8 +127,8 @@ namespace TEN::Entities::Switches
 			{
 				if (!TriggerActive(&g_Level.Items[ItemNos[0]]))
 				{
-					g_Level.Items[ItemNos[0]].AnimNumber = Objects[g_Level.Items[ItemNos[0]].ObjectNumber].animIndex;
-					g_Level.Items[ItemNos[0]].FrameNumber = g_Level.Anims[g_Level.Items[ItemNos[0]].AnimNumber].frameBase;
+					g_Level.Items[ItemNos[0]].Animation.AnimNumber = Objects[g_Level.Items[ItemNos[0]].ObjectNumber].animIndex;
+					g_Level.Items[ItemNos[0]].Animation.FrameNumber = g_Level.Anims[g_Level.Items[ItemNos[0]].Animation.AnimNumber].frameBase;
 				}
 			}
 		}
@@ -162,54 +162,54 @@ namespace TEN::Entities::Switches
 
 		if (g_Level.Items[itemNumber].ItemFlags[0] == TURN_SWITCH_CLOCKWISE)
 		{
-			if (switchItem->AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
+			if (switchItem->Animation.AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
 			{
 				switchItem->Position.yRot += ANGLE(90.0f);
 				if (TrInput & IN_ACTION)
 				{
-					laraItem->AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
-					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-					switchItem->AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 1;
-					switchItem->FrameNumber = g_Level.Anims[switchItem->AnimNumber].frameBase;
+					switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 1;
+					switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 				}
 			}
 
-			if (laraItem->AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_END &&
-				laraItem->FrameNumber == g_Level.Anims[laraItem->AnimNumber].frameEnd && 
+			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_END &&
+				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd && 
 				!switchItem->ItemFlags[1])
 				switchItem->ItemFlags[1] = 1;
 
-			if (laraItem->FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase &&
-				laraItem->FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 43 ||
-				laraItem->FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 58 &&
-				laraItem->FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 115)
+			if (laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase &&
+				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 43 ||
+				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 58 &&
+				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 115)
 			{
 				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Position, 2);
 			}
 		}
 		else
 		{
-			if (switchItem->AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
+			if (switchItem->Animation.AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
 			{
 				switchItem->Position.yRot -= ANGLE(90.0f);
 				if (TrInput & IN_ACTION)
 				{
-					laraItem->AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START;
-					laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-					switchItem->AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 5;
-					switchItem->FrameNumber = g_Level.Anims[switchItem->AnimNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 5;
+					switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 				}
 			}
 
-			if (laraItem->AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END && laraItem->FrameNumber == g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END].frameEnd &&
+			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END && laraItem->Animation.FrameNumber == g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END].frameEnd &&
 				!switchItem->ItemFlags[1])
 				switchItem->ItemFlags[1] = 1;
 
-			if (laraItem->FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase &&
-				laraItem->FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 43 ||
-				laraItem->FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 58 &&
-				laraItem->FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 115)
+			if (laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase &&
+				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 43 ||
+				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 58 &&
+				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 115)
 			{
 				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Position, 2);
 			}
@@ -219,11 +219,11 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->ItemFlags[1] == 1)
 		{
-			laraItem->AnimNumber = LA_STAND_IDLE;
-			laraItem->ActiveState = LS_IDLE;
-			laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-			switchItem->AnimNumber = Objects[switchItem->ObjectNumber].animIndex;
-			switchItem->FrameNumber = g_Level.Anims[switchItem->AnimNumber].frameBase;
+			laraItem->Animation.AnimNumber = LA_STAND_IDLE;
+			laraItem->Animation.ActiveState = LS_IDLE;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex;
+			switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 			switchItem->Status = ITEM_NOT_ACTIVE;
 
 			RemoveActiveItem(itemNumber);

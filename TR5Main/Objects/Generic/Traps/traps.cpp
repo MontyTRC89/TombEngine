@@ -34,7 +34,7 @@ void InitialiseWreckingBall(short itemNumber)
 		ItemNewRoom(itemNumber, room);
 }
 
-void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 {
 	ITEM_INFO* item;
 	int x, y, z, test;
@@ -47,7 +47,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 		y = l->Position.yPos;
 		z = l->Position.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
-		damage = item->VerticalVelocity > 0 ? 96 : 0;
+		damage = item->Animation.VerticalVelocity > 0 ? 96 : 0;
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
@@ -216,62 +216,62 @@ void WreckingBallControl(short itemNumber)
 		{
 			--item->TriggerFlags;
 		}
-		else if (!item->ActiveState)
+		else if (!item->Animation.ActiveState)
 		{
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 		}
-		else if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			SoundEffect(SFX_TR5_BASECLAWDROP, &item->Position, 0);
 			++item->ItemFlags[1];
-			item->VerticalVelocity = 6;
-			item->Position.yPos += item->VerticalVelocity;
+			item->Animation.VerticalVelocity = 6;
+			item->Position.yPos += item->Animation.VerticalVelocity;
 		}
 	}
 	else if (item->ItemFlags[1] == 2)
 	{
-		item->VerticalVelocity += 24;
-		item->Position.yPos += item->VerticalVelocity;
+		item->Animation.VerticalVelocity += 24;
+		item->Position.yPos += item->Animation.VerticalVelocity;
 		room = item->RoomNumber;
 		height = GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room), item->Position.xPos, item->Position.yPos, item->Position.zPos);
 		if (height < item->Position.yPos)
 		{
 			item->Position.yPos = height;
-			if (item->VerticalVelocity > 48)
+			if (item->Animation.VerticalVelocity > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->VerticalVelocity = -item->VerticalVelocity >> 3;
+				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
 			}
 			else
 			{
 				++item->ItemFlags[1];
-				item->VerticalVelocity = 0;
+				item->Animation.VerticalVelocity = 0;
 			}
 		}
-		else if (height - item->Position.yPos < 1536 && item->ActiveState)
+		else if (height - item->Position.yPos < 1536 && item->Animation.ActiveState)
 		{
-			item->TargetState = 0;
+			item->Animation.TargetState = 0;
 		}
 	}
 	else if (item->ItemFlags[1] == 3)
 	{
-		item->VerticalVelocity -= 3;
-		item->Position.yPos += item->VerticalVelocity;
+		item->Animation.VerticalVelocity -= 3;
+		item->Position.yPos += item->Animation.VerticalVelocity;
 		if (item->Position.yPos < item2->Position.yPos + 1644)
 		{
 			StopSoundEffect(SFX_TR5_BASECLAWWINCHLOOP);
 			item->ItemFlags[0] = 1;
 			item->Position.yPos = item2->Position.yPos + 1644;
-			if (item->VerticalVelocity < -32)
+			if (item->Animation.VerticalVelocity < -32)
 			{
 				SoundEffect(SFX_TR5_BASECLAWTOPIMPACT, &item->Position, 4104);
-				item->VerticalVelocity = -item->VerticalVelocity >> 3;
+				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
 				BounceCamera(item, 16, 8192);
 			}
 			else
 			{
 				item->ItemFlags[1] = -1;
-				item->VerticalVelocity = 0;
+				item->Animation.VerticalVelocity = 0;
 				item->ItemFlags[0] = 0;
 			}
 		}

@@ -2085,7 +2085,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
-				PrintDebugMessage("    For moveables: %d", m_numMoveablesTransparentDrawCalls);
+				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
 				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
@@ -2093,36 +2093,37 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara.Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
-				PrintDebugMessage("Lara.RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem.BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
+				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				                  LaraItem->BoxNumber);
-				PrintDebugMessage("Lara.Pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
-				PrintDebugMessage("Lara.Rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE,
-				                  r->z + r->zSize * WALL_SIZE);
+				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
+				                  r->z + r->zSize * SECTOR(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara.AnimNumber: %d", LaraItem->AnimNumber);
-				PrintDebugMessage("Lara.FrameNumber: %d", LaraItem->FrameNumber);
-				PrintDebugMessage("Lara.ActiveState: %d", LaraItem->ActiveState);
-				PrintDebugMessage("Lara.RequiredState: %d", LaraItem->RequiredState);
-				PrintDebugMessage("Lara.TargetState: %d", LaraItem->TargetState);
-				PrintDebugMessage("Lara.Control.WeaponControl.WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
-				PrintDebugMessage("Lara.Control.WeaponControl.GunType: %d", Lara.Control.Weapon.GunType);
-				PrintDebugMessage("Lara.Control.HandStatus: %d", Lara.Control.HandStatus);
-				PrintDebugMessage("Lara.Velocity, VerticalVelocity: %d %d", LaraItem->Velocity, LaraItem->VerticalVelocity);
-				PrintDebugMessage("Lara.Airborne: %d", LaraItem->Airborne);
-				PrintDebugMessage("Lara.Control.CanClimbLadder: %d", Lara.Control.CanClimbLadder);
-				PrintDebugMessage("Lara.WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
+				PrintDebugMessage("Lara AnimNumber: %d", LaraItem->Animation.AnimNumber);
+				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
+				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
+				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
+				PrintDebugMessage("Lara RequiredState: %d", LaraItem->Animation.RequiredState);
+				PrintDebugMessage("Lara WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
+				PrintDebugMessage("Lara GunType: %d", Lara.Control.Weapon.GunType);
+				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
+				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
+				PrintDebugMessage("Lara Airborne: %d", LaraItem->Animation.Airborne);
+				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
+				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : NULL);
+				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : NULL);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}

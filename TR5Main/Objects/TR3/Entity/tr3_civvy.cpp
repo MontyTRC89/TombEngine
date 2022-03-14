@@ -67,9 +67,9 @@ void InitialiseCivvy(short itemNumber)
 
 	InitialiseCreature(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_STOP_ANIM;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->ActiveState = item->TargetState = CIVVY_STOP;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_STOP_ANIM;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.ActiveState = item->Animation.TargetState = CIVVY_STOP;
 }
 
 void CivvyControl(short itemNumber)
@@ -94,11 +94,11 @@ void CivvyControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != CIVVY_DEATH)
+		if (item->Animation.ActiveState != CIVVY_DEATH)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_DIE_ANIM;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CIVVY_DEATH;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_DIE_ANIM;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = CIVVY_DEATH;
 			creature->LOT.Step = CLICK(1);
 		}
 	}
@@ -152,12 +152,12 @@ void CivvyControl(short itemNumber)
 		}
 		creature->Enemy = realEnemy;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case CIVVY_WAIT:
-			if (creature->Alerted || item->TargetState == CIVVY_RUN)
+			if (creature->Alerted || item->Animation.TargetState == CIVVY_RUN)
 			{
-				item->TargetState = CIVVY_STOP;
+				item->Animation.TargetState = CIVVY_STOP;
 				break;
 			}
 
@@ -171,43 +171,43 @@ void CivvyControl(short itemNumber)
 				head = AIGuard(creature);
 				if (!(GetRandomControl() & 0xFF))
 				{
-					if (item->ActiveState == CIVVY_STOP)
-						item->TargetState = CIVVY_WAIT;
+					if (item->Animation.ActiveState == CIVVY_STOP)
+						item->Animation.TargetState = CIVVY_WAIT;
 					else
-						item->TargetState = CIVVY_STOP;
+						item->Animation.TargetState = CIVVY_STOP;
 				}
 
 				break;
 			}
 
 			else if (item->AIBits & PATROL1)
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 
 			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.TargetEntity != item && AI.ahead)
-					item->TargetState = CIVVY_STOP;
+					item->Animation.TargetState = CIVVY_STOP;
 				else
-					item->TargetState = CIVVY_RUN;
+					item->Animation.TargetState = CIVVY_RUN;
 			}
 			else if (creature->Mood == MoodType::Bored ||
 				(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2))))
 			{
-				if (item->RequiredState)
-					item->TargetState = item->RequiredState;
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.ahead)
-					item->TargetState = CIVVY_STOP;
+					item->Animation.TargetState = CIVVY_STOP;
 				else
-					item->TargetState = CIVVY_RUN;
+					item->Animation.TargetState = CIVVY_RUN;
 			}
 			else if (AI.bite && AI.distance < CIVVY_ATTACK0_RANGE)
-				item->TargetState = CIVVY_AIM0;
+				item->Animation.TargetState = CIVVY_AIM0;
 			else if (AI.bite && AI.distance < CIVVY_ATTACK1_RANGE)
-				item->TargetState = CIVVY_AIM1;
+				item->Animation.TargetState = CIVVY_AIM1;
 			else if (AI.bite && AI.distance < CIVVY_WALK_RANGE)
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 			else
-				item->TargetState = CIVVY_RUN;
+				item->Animation.TargetState = CIVVY_RUN;
 
 			break;
 
@@ -217,25 +217,25 @@ void CivvyControl(short itemNumber)
 
 			if (item->AIBits & PATROL1)
 			{
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 				head = 0;
 			}
 			else if (creature->Mood == MoodType::Escape)
-				item->TargetState = CIVVY_RUN;
+				item->Animation.TargetState = CIVVY_RUN;
 			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < CIVVY_WAIT_CHANCE)
 				{
-					item->RequiredState = CIVVY_WAIT;
-					item->TargetState = CIVVY_STOP;
+					item->Animation.RequiredState = CIVVY_WAIT;
+					item->Animation.TargetState = CIVVY_STOP;
 				}
 			}
 			else if (AI.bite && AI.distance < CIVVY_ATTACK0_RANGE)
-				item->TargetState = CIVVY_STOP;
+				item->Animation.TargetState = CIVVY_STOP;
 			else if (AI.bite && AI.distance < CIVVY_ATTACK2_RANGE)
-				item->TargetState = CIVVY_AIM2;
+				item->Animation.TargetState = CIVVY_AIM2;
 			else
-				item->TargetState = CIVVY_RUN;
+				item->Animation.TargetState = CIVVY_RUN;
 
 			break;
 
@@ -247,19 +247,19 @@ void CivvyControl(short itemNumber)
 				head = AI.angle;
 
 			if (item->AIBits & GUARD)
-				item->TargetState = CIVVY_WAIT;
+				item->Animation.TargetState = CIVVY_WAIT;
 			else if (creature->Mood == MoodType::Escape)
 			{
 				if (Lara.TargetEntity != item && AI.ahead)
-					item->TargetState = CIVVY_STOP;
+					item->Animation.TargetState = CIVVY_STOP;
 				break;
 			}
 			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAiInfo.distance > pow(SECTOR(2), 2)))
-				item->TargetState = CIVVY_STOP;
+				item->Animation.TargetState = CIVVY_STOP;
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 			else if (AI.ahead && AI.distance < CIVVY_WALK_RANGE)
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 
 			break;
 
@@ -273,9 +273,9 @@ void CivvyControl(short itemNumber)
 			}
 
 			if (AI.bite && AI.distance < CIVVY_ATTACK0_RANGE)
-				item->TargetState = CIVVY_PUNCH0;
+				item->Animation.TargetState = CIVVY_PUNCH0;
 			else
-				item->TargetState = CIVVY_STOP;
+				item->Animation.TargetState = CIVVY_STOP;
 
 			creature->Flags = 0;
 			break;
@@ -290,9 +290,9 @@ void CivvyControl(short itemNumber)
 			}
 
 			if (AI.ahead && AI.distance < CIVVY_ATTACK1_RANGE)
-				item->TargetState = CIVVY_PUNCH1;
+				item->Animation.TargetState = CIVVY_PUNCH1;
 			else
-				item->TargetState = CIVVY_STOP;
+				item->Animation.TargetState = CIVVY_STOP;
 
 			creature->Flags = 0;
 			break;
@@ -308,9 +308,9 @@ void CivvyControl(short itemNumber)
 			}
 
 			if (AI.bite && AI.distance < CIVVY_ATTACK2_RANGE)
-				item->TargetState = CIVVY_PUNCH2;
+				item->Animation.TargetState = CIVVY_PUNCH2;
 			else
-				item->TargetState = CIVVY_WALK;
+				item->Animation.TargetState = CIVVY_WALK;
 
 			break;
 
@@ -355,7 +355,7 @@ void CivvyControl(short itemNumber)
 			}
 
 			if (AI.ahead && AI.distance > CIVVY_ATTACK1_RANGE&& AI.distance < CIVVY_ATTACK2_RANGE)
-				item->TargetState = CIVVY_PUNCH2;
+				item->Animation.TargetState = CIVVY_PUNCH2;
 
 			break;
 
@@ -387,36 +387,36 @@ void CivvyControl(short itemNumber)
 	CreatureJoint(item, 1, torsoX);
 	CreatureJoint(item, 2, head);
 
-	if (item->ActiveState < CIVVY_DEATH)
+	if (item->Animation.ActiveState < CIVVY_DEATH)
 	{
 		switch (CreatureVault(itemNumber, angle, 2, CIVVY_VAULT_SHIFT))
 		{
 		case 2:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB1_ANIM;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CIVVY_CLIMB1;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB1_ANIM;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = CIVVY_CLIMB1;
 			break;
 
 		case 3:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB2_ANIM;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CIVVY_CLIMB2;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB2_ANIM;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = CIVVY_CLIMB2;
 			break;
 
 		case 4:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB3_ANIM;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CIVVY_CLIMB3;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB3_ANIM;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = CIVVY_CLIMB3;
 			break;
 
 		case -4:
 			creature->MaxTurn = 0;
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_FALL3_ANIM;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = CIVVY_FALL3;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_FALL3_ANIM;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = CIVVY_FALL3;
 			break;
 		}
 	}

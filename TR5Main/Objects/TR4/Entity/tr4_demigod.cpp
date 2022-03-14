@@ -136,11 +136,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		short animIndex = item->AnimNumber - Objects[item->ObjectNumber].animIndex;
+		short animIndex = item->Animation.AnimNumber - Objects[item->ObjectNumber].animIndex;
 
 		if (animIndex == 8)
 		{
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
@@ -168,7 +168,7 @@ namespace TEN::Entities::TR4
 		else if (animIndex == 19)
 		{
 
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
@@ -196,7 +196,7 @@ namespace TEN::Entities::TR4
 		else if (animIndex == 16)
 		{
 			// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-			int frameNumber = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
@@ -288,10 +288,10 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->TargetState = STATE_DEMIGOD_IDLE;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = STATE_DEMIGOD_IDLE;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+		item->Animation.TargetState = STATE_DEMIGOD_IDLE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = STATE_DEMIGOD_IDLE;
 
 		/*if (g_Level.NumItems > 0)
 		{
@@ -339,21 +339,21 @@ namespace TEN::Entities::TR4
 		{
 			item->HitPoints = 0;
 
-			if (item->ActiveState != STATE_DEMIGOD_DEATH_1 &&
-				item->ActiveState != STATE_DEMIGOD_DEATH_2)
+			if (item->Animation.ActiveState != STATE_DEMIGOD_DEATH_1 &&
+				item->Animation.ActiveState != STATE_DEMIGOD_DEATH_2)
 			{
-				if (item->ActiveState == STATE_DEMIGOD_WALK ||
-					item->ActiveState == STATE_DEMIGOD_RUN)
+				if (item->Animation.ActiveState == STATE_DEMIGOD_WALK ||
+					item->Animation.ActiveState == STATE_DEMIGOD_RUN)
 				{
-					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
-					item->ActiveState = STATE_DEMIGOD_DEATH_2;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
+					item->Animation.ActiveState = STATE_DEMIGOD_DEATH_2;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 				else
 				{
-					item->AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-					item->ActiveState = STATE_DEMIGOD_DEATH_1;
-					item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
+					item->Animation.ActiveState = STATE_DEMIGOD_DEATH_1;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
 		}
@@ -417,7 +417,7 @@ namespace TEN::Entities::TR4
 				joint3 = AI.angle >> 1;
 			}
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case STATE_DEMIGOD_IDLE:
 				creature->MaxTurn = 0;
@@ -429,15 +429,15 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance >= pow(SECTOR(3), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_WALK;
+						item->Animation.TargetState = STATE_DEMIGOD_WALK;
 						break;
 					}
 					if (AI.bite ||
-						LaraItem->ActiveState >= LS_LADDER_IDLE &&
-						LaraItem->ActiveState <= LS_LADDER_DOWN &&
+						LaraItem->Animation.ActiveState >= LS_LADDER_IDLE &&
+						LaraItem->Animation.ActiveState <= LS_LADDER_DOWN &&
 						!Lara.Location)
 					{
-						item->TargetState = STATE_DEMIGOD_HAMMER_AIM;
+						item->Animation.TargetState = STATE_DEMIGOD_HAMMER_AIM;
 						break;
 					}
 				}
@@ -448,9 +448,9 @@ namespace TEN::Entities::TR4
 						creature->Flags = 1;
 
 						if (item->ObjectNumber == ID_DEMIGOD2)
-							item->TargetState = STATE_DEMIGOD_AIM;
+							item->Animation.TargetState = STATE_DEMIGOD_AIM;
 						else
-							item->TargetState = STATE_DEMIGOD_GROUND_AIM;
+							item->Animation.TargetState = STATE_DEMIGOD_GROUND_AIM;
 
 						break;
 					}
@@ -459,13 +459,13 @@ namespace TEN::Entities::TR4
 					{
 						if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
 						{
-							item->TargetState = STATE_DEMIGOD_WALK;
+							item->Animation.TargetState = STATE_DEMIGOD_WALK;
 							break;
 						}
 
 						if (!(GetRandomControl() & 3))
 						{
-							item->TargetState = STATE_DEMIGOD_CIRCLE_AIM;
+							item->Animation.TargetState = STATE_DEMIGOD_CIRCLE_AIM;
 							break;
 						}
 					}
@@ -473,11 +473,11 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance <= pow(SECTOR(3), 2) || item->ObjectNumber != ID_DEMIGOD2)
 				{
-					item->TargetState = STATE_DEMIGOD_WALK;
+					item->Animation.TargetState = STATE_DEMIGOD_WALK;
 					break;
 				}
 
-				item->TargetState = STATE_DEMIGOD_FLY;
+				item->Animation.TargetState = STATE_DEMIGOD_FLY;
 				break;
 
 			case STATE_DEMIGOD_WALK:
@@ -485,7 +485,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 
@@ -493,7 +493,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(SECTOR(3), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_IDLE;
+						item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 				}
@@ -501,7 +501,7 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &AI))
 					{
-						item->TargetState = STATE_DEMIGOD_IDLE;
+						item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 
@@ -510,9 +510,9 @@ namespace TEN::Entities::TR4
 				if (AI.distance > pow(SECTOR(3), 2))
 				{
 					if (item->ObjectNumber == ID_DEMIGOD2)
-						item->TargetState = STATE_DEMIGOD_FLY;
+						item->Animation.TargetState = STATE_DEMIGOD_FLY;
 					else
-						item->TargetState = STATE_DEMIGOD_RUN;
+						item->Animation.TargetState = STATE_DEMIGOD_RUN;
 				}
 
 				break;
@@ -522,14 +522,14 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 				if (item->ObjectNumber == ID_DEMIGOD1)
 				{
 					if (AI.distance < pow(SECTOR(3), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_IDLE;
+						item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 				}
@@ -537,12 +537,12 @@ namespace TEN::Entities::TR4
 				{
 					if (Targetable(item, &AI) || item->ObjectNumber == ID_DEMIGOD3 && AI.distance > pow(SECTOR(2), 2))
 					{
-						item->TargetState = STATE_DEMIGOD_IDLE;
+						item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 						break;
 					}
 
 					if (AI.distance < pow(SECTOR(3), 2))
-						item->TargetState = STATE_DEMIGOD_WALK;
+						item->Animation.TargetState = STATE_DEMIGOD_WALK;
 				}
 
 				break;
@@ -553,7 +553,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
 
-				if (item->AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
+				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
 						item->Position.yRot += ANGLE(7.0f);
@@ -565,12 +565,12 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI) || creature->Flags)
 				{
-					item->TargetState = STATE_DEMIGOD_ATTACK;
+					item->Animation.TargetState = STATE_DEMIGOD_ATTACK;
 					creature->Flags = 0;
 				}
 				else
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 					creature->Flags = 0;
 				}
 
@@ -585,14 +585,14 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 
 				if (Targetable(item, &AI))
-					item->TargetState = STATE_DEMIGOD_IDLE_FLY;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE_FLY;
 
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_AIM:
 				creature->MaxTurn = ANGLE(7.0f);
 				if (!Targetable(item, &AI) && AI.distance < pow(SECTOR(5), 2))
-					item->TargetState = STATE_DEMIGOD_CIRCLE_ATTACK;
+					item->Animation.TargetState = STATE_DEMIGOD_CIRCLE_ATTACK;
 
 				break;
 
@@ -603,7 +603,7 @@ namespace TEN::Entities::TR4
 
 				if (!Targetable(item, &AI) || AI.distance < pow(SECTOR(5), 2) || !GetRandomControl())
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 					break;
 				}
 
@@ -617,7 +617,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint1 = -AI.xAngle;
 
-				if (item->AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
+				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
 						item->Position.yRot += ANGLE(7.0f);
@@ -629,12 +629,12 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI) || creature->Flags)
 				{
-					item->TargetState = STATE_DEMIGOD_GROUND_ATTACK;
+					item->Animation.TargetState = STATE_DEMIGOD_GROUND_ATTACK;
 					creature->Flags = 0;
 				}
 				else
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 					creature->Flags = 0;
 				}
 
@@ -654,19 +654,19 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&
-					(LaraItem->ActiveState < LS_LADDER_IDLE ||
-						LaraItem->ActiveState > LS_LADDER_DOWN ||
+					(LaraItem->Animation.ActiveState < LS_LADDER_IDLE ||
+						LaraItem->Animation.ActiveState > LS_LADDER_DOWN ||
 						Lara.Location))
 				{
-					item->TargetState = STATE_DEMIGOD_IDLE;
+					item->Animation.TargetState = STATE_DEMIGOD_IDLE;
 				}
 				else
-					item->TargetState = STATE_DEMIGOD_HAMMER_ATTACK;
+					item->Animation.TargetState = STATE_DEMIGOD_HAMMER_ATTACK;
 
 				break;
 
 			case STATE_DEMIGOD_HAMMER_ATTACK:
-				if (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase == 26)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 26)
 				{
 					PHD_VECTOR pos = { 80, -8, -40 };
 					GetJointAbsPosition(item, &pos, 17);
@@ -684,16 +684,16 @@ namespace TEN::Entities::TR4
 
 					Camera.bounce = -128;
 
-					if (LaraItem->ActiveState >= 56 && LaraItem->ActiveState <= 61 && !Lara.Location)
+					if (LaraItem->Animation.ActiveState >= 56 && LaraItem->Animation.ActiveState <= 61 && !Lara.Location)
 					{
 						ResetLaraFlex(LaraItem);
-						LaraItem->TargetState = 3;
-						LaraItem->ActiveState = 3;
-						LaraItem->AnimNumber = 34;
-						LaraItem->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+						LaraItem->Animation.TargetState = 3;
+						LaraItem->Animation.ActiveState = 3;
+						LaraItem->Animation.AnimNumber = 34;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						LaraItem->HitStatus = true;
-						LaraItem->Velocity = 2;
-						LaraItem->VerticalVelocity = 1;
+						LaraItem->Animation.Velocity = 2;
+						LaraItem->Animation.VerticalVelocity = 1;
 						Lara.Control.HandStatus = HandStatus::Free;
 					}
 				}
