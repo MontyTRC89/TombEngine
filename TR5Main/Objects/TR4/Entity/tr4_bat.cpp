@@ -15,10 +15,8 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-#define BAT_ANGLE ANGLE(20.0f)
+	#define BAT_ANGLE ANGLE(20.0f)
 
-	constexpr auto BAT_ANIM_FALLING = 3;
-	constexpr auto BAT_ANIM_IDLE = 5;
 	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
 	constexpr auto BAT_TARGET_YPOS = 896;
@@ -26,19 +24,21 @@ namespace TEN::Entities::TR4
 
 	enum BatState
 	{
-		BAT_STATE_NONE,
-		BAT_STATE_START,
-		BAT_STATE_FLY,
-		BAT_STATE_ATTACK,
-		BAT_STATE_FALL,
-		BAT_STATE_DEATH,
-		BAT_STATE_IDLE
+		BAT_STATE_NONE = 0,
+		BAT_STATE_START = 1,
+		BAT_STATE_FLY = 2,
+		BAT_STATE_ATTACK = 3,
+		BAT_STATE_FALL = 4,
+		BAT_STATE_DEATH = 5,
+		BAT_STATE_IDLE = 6
 	};
 
 	// TODO
 	enum BatAnim
 	{
+		BAT_ANIM_FALL = 3,
 
+		BAT_ANIM_IDLE = 5
 	};
 
 	static bool isBatCollideTarget(ITEM_INFO* item)
@@ -198,7 +198,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->Animation.Airborne = true;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALLING;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALL;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.TargetState = BAT_STATE_FALL;
 				item->Animation.ActiveState = BAT_STATE_FALL;

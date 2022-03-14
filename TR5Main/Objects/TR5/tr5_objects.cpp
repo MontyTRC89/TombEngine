@@ -67,7 +67,7 @@
 #include "Game/control/box.h"
 using namespace TEN::Entities::TR5;
 
-static void StartBaddy(OBJECT_INFO *obj)
+static void StartEntity(OBJECT_INFO *obj)
 {
 	obj = &Objects[ID_LARA];
 	if (obj->loaded)
@@ -1263,7 +1263,7 @@ static void StartPickup(OBJECT_INFO *obj)
 static OBJECT_INFO *objToInit;
 void InitialiseTR5Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartPickup(objToInit);

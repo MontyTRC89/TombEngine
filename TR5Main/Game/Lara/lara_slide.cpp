@@ -106,6 +106,13 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+
+		if (g_GameFlow->Animations.HasSlideExtended)
+		{
+			item->Animation.Velocity = lara->ExtraVelocity.x;
+			item->Animation.VerticalVelocity = lara->ExtraVelocity.y / 2;
+		}
+
 		return;
 	}
 
@@ -206,6 +213,13 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+
+		if (g_GameFlow->Animations.HasSlideExtended)
+		{
+			item->Animation.Velocity = lara->ExtraVelocity.x;
+			item->Animation.VerticalVelocity = lara->ExtraVelocity.y / 2;
+		}
+
 		return;
 	}
 

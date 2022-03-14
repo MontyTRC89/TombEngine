@@ -22,6 +22,9 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Renderer;
+#include "Renderer/Renderer11.h"
+
 // -----------------------------
 // HELPER FUNCTIONS
 // For State Control & Collision
@@ -353,30 +356,27 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto probe = GetCollision(item);
+	constexpr int minVelocity = 50;
+	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	/*if (g_GameFlow->Animations.HasSlideExtended)
+	if (g_GameFlow->Animations.HasSlideExtended)
 	{
+		auto probe = GetCollision(item);
+		short minSlideAngle = ANGLE(33.75f);
+		short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
+		float velocityMultiplier = 1 / (float)ANGLE(33.75f);
+		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		//short deltaAngle = abs((short)(direction - item->Position.yRot));
+
+		g_Renderer.PrintDebugMessage("%d", slideVelocity);
+
+		lara->ExtraVelocity.x += slideVelocity;
+		lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
 	else
-	{
-		constexpr int velocity = 50;
-		lara->ExtraVelocity.x += velocity;
-	}*/
-
-	// TODO
-	constexpr int minVelocity = 50; // Apply only when landing?
-	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
-	constexpr int VelocityIncreasePerStep = 1;
-
-	short steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-	short direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-
-	//short deltaAngle = abs((short)(direction - item->Position.yRot));
-	
-	lara->ExtraVelocity.x += minVelocity;
-	lara->ExtraVelocity.y += minVelocity * phd_sin(steepness); // TODO: Keeps incrementing to ridiculous values.
+		lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll)

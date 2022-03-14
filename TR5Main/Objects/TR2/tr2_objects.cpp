@@ -35,7 +35,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-static void StartBaddy(OBJECT_INFO* obj)
+static void StartEntity(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
@@ -687,7 +687,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR2Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartVehicles(objToInit);

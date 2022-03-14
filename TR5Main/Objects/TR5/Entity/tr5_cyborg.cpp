@@ -19,12 +19,25 @@
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
-BITE_INFO HitmanGun = { 0, 300, 64, 7 };
+BITE_INFO CyborgGunBite = { 0, 300, 64, 7 };
 byte HitmanJoints[12] = { 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 enum CyborgState
 {
+	CYBORG_STATE_IDLE = 1,
+	CYBORG_STATE_WALK = 2,
+	CYBORG_STATE_RUN = 3,
+	CYBORG_STATE_START_END_MONKEY = 4,
+	CYBORG_STATE_MONKEY = 5,
 
+	CYBORG_STATE_JUMP = 15,
+	CYBORG_STATE_JUMP_2_BLOCKS = 16,
+
+	CYBORG_STATE_AIM = 38,
+	CYBORG_STATE_FIRE = 39,
+
+	CYBORG_STATE_GASSED = 42,
+	CYBORG_STATE_DEATH = 43
 };
 
 // TODO
@@ -32,18 +45,6 @@ enum CyborgAnim
 {
 
 };
-
-#define CYBORG_STATE_STOP					1
-#define CYBORG_STATE_WALK					2
-#define CYBORG_STATE_RUN					3
-#define CYBORG_STATE_START_END_MONKEY		4
-#define CYBORG_STATE_MONKEY					5
-#define CYBORG_STATE_JUMP					15
-#define CYBORG_STATE_JUMP_2BLOCKS			16
-#define CYBORG_STATE_AIM					38
-#define CYBORG_STATE_FIRE					39
-#define CYBORG_STATE_GASSED					42
-#define CYBORG_STATE_DEATH					43
 
 void InitialiseCyborg(short itemNumber)
 {
@@ -53,8 +54,8 @@ void InitialiseCyborg(short itemNumber)
 
     item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
     item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-    item->Animation.TargetState = CYBORG_STATE_STOP;
-    item->Animation.ActiveState = CYBORG_STATE_STOP;
+    item->Animation.TargetState = CYBORG_STATE_IDLE;
+    item->Animation.ActiveState = CYBORG_STATE_IDLE;
 }
 
 static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
@@ -149,8 +150,8 @@ void CyborgControl(short itemNumber)
 
 		if (creature->FiredWeapon)
 		{
-			PHD_VECTOR pos = { HitmanGun.x, HitmanGun.y, HitmanGun.z };
-			GetJointAbsPosition(item, &pos, HitmanGun.meshNum);
+			PHD_VECTOR pos = { CyborgGunBite.x, CyborgGunBite.y, CyborgGunBite.z };
+			GetJointAbsPosition(item, &pos, CyborgGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
 			creature->FiredWeapon--;
@@ -276,7 +277,7 @@ void CyborgControl(short itemNumber)
 
 			switch (item->Animation.ActiveState)
 			{
-			case CYBORG_STATE_STOP:
+			case CYBORG_STATE_IDLE:
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 				creature->LOT.IsJumping = false;
@@ -324,7 +325,7 @@ void CyborgControl(short itemNumber)
 								item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 								if (canJump2blocks)
-									item->Animation.TargetState = CYBORG_STATE_JUMP_2BLOCKS;
+									item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
 								creature->LOT.IsJumping = true;
 							}
 							else if (!creature->MonkeySwingAhead)
@@ -337,7 +338,7 @@ void CyborgControl(short itemNumber)
 										item->Animation.TargetState = CYBORG_STATE_RUN;
 								}
 								else
-									item->Animation.TargetState = CYBORG_STATE_STOP;
+									item->Animation.TargetState = CYBORG_STATE_IDLE;
 							}
 							else
 							{
@@ -364,7 +365,7 @@ void CyborgControl(short itemNumber)
 					(AI.distance < pow(SECTOR(4), 2) ||
 						AI.zoneNumber != AI.enemyZone))
 				{
-					item->Animation.TargetState = CYBORG_STATE_STOP;
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
 					item->Animation.RequiredState = CYBORG_STATE_AIM;
 				}
 				else
@@ -377,7 +378,7 @@ void CyborgControl(short itemNumber)
 						creature->MaxTurn = 0;
 
 						if (canJump2blocks)
-							item->Animation.TargetState = CYBORG_STATE_JUMP_2BLOCKS;
+							item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
 
 						creature->LOT.IsJumping = true;
 					}
@@ -392,10 +393,10 @@ void CyborgControl(short itemNumber)
 							}
 						}
 						else
-							item->Animation.TargetState = CYBORG_STATE_STOP;
+							item->Animation.TargetState = CYBORG_STATE_IDLE;
 					}
 					else
-						item->Animation.TargetState = CYBORG_STATE_STOP;
+						item->Animation.TargetState = CYBORG_STATE_IDLE;
 				}
 
 				break;
@@ -408,7 +409,7 @@ void CyborgControl(short itemNumber)
 					(AI.distance < pow(SECTOR(4), 2) ||
 						AI.zoneNumber != AI.enemyZone))
 				{
-					item->Animation.TargetState = CYBORG_STATE_STOP;
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
 					item->Animation.RequiredState = CYBORG_STATE_AIM;
 				}
 				else if (canJump1block || canJump2blocks)
@@ -419,14 +420,14 @@ void CyborgControl(short itemNumber)
 					creature->MaxTurn = 0;
 
 					if (canJump2blocks)
-						item->Animation.TargetState = CYBORG_STATE_JUMP_2BLOCKS;
+						item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
 
 					creature->LOT.IsJumping = true;
 				}
 				else
 				{
 					if (creature->MonkeySwingAhead)
-						item->Animation.TargetState = CYBORG_STATE_STOP;
+						item->Animation.TargetState = CYBORG_STATE_IDLE;
 					else if (AI.distance < pow(SECTOR(3), 2))
 						item->Animation.TargetState = CYBORG_STATE_WALK;
 				}
@@ -444,7 +445,7 @@ void CyborgControl(short itemNumber)
 					height = probe.Position.Floor;
 
 					if (probe.Position.Ceiling == height - SECTOR(1.5f), 2)
-						item->Animation.TargetState = CYBORG_STATE_STOP;
+						item->Animation.TargetState = CYBORG_STATE_IDLE;
 				}
 				else
 					item->Animation.TargetState = CYBORG_STATE_MONKEY;
@@ -493,7 +494,7 @@ void CyborgControl(short itemNumber)
 						AI.zoneNumber != AI.enemyZone))
 					item->Animation.TargetState = CYBORG_STATE_FIRE;
 				else
-					item->Animation.TargetState = CYBORG_STATE_STOP;
+					item->Animation.TargetState = CYBORG_STATE_IDLE;
 
 				break;
 
@@ -521,7 +522,7 @@ void CyborgControl(short itemNumber)
 					((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
 				{
 					creature->FiredWeapon = 1;
-					ShotLara(item, &AI, &HitmanGun, joint0, 12);
+					ShotLara(item, &AI, &CyborgGunBite, joint0, 12);
 				}
 
 				break;
@@ -582,7 +583,7 @@ void CyborgControl(short itemNumber)
 
 				if (creature->Enemy->Flags & 8)
 				{
-					item->Animation.RequiredState = CYBORG_STATE_STOP;
+					item->Animation.RequiredState = CYBORG_STATE_IDLE;
 					item->TriggerFlags = 300;
 					item->AIBits = GUARD | PATROL1;
 				}

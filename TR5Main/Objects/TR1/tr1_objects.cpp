@@ -19,7 +19,7 @@
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
 
-static void StartBaddy(OBJECT_INFO* obj)
+static void StartEntity(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
@@ -197,7 +197,7 @@ static void StartProjectiles(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR1Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartProjectiles(objToInit);

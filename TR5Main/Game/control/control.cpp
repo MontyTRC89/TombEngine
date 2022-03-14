@@ -95,7 +95,7 @@ int DrawPhase()
 	return Camera.numberFrames;
 }
 
-GAME_STATUS ControlPhase(int numFrames, int demoMode)
+GameStatus ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
@@ -126,7 +126,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (S_UpdateInput() == -1)
-				return GAME_STATUS::GAME_STATUS_NONE;
+				return GameStatus::None;
 		}
 
 		// Has Lara control been disabled?
@@ -149,7 +149,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
@@ -158,7 +158,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
 				if (g_Gui.CallInventory(false))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
@@ -174,7 +174,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				StopAllSounds();
 
 				if (g_Gui.CallInventory(true))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 		}
 
@@ -184,19 +184,19 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			g_Renderer.SyncRenderer();
 
 			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
-				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+				return GameStatus::ExitToTitle;
 		}
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
-			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
+			return GameStatus::LevelComplete;
 
 		int oldInput = TrInput;
 
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
 		{
-			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
+			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
 		if (demoMode && TrInput == -1)
@@ -414,7 +414,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NONE;
+	return GameStatus::None;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -450,7 +450,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GAME_STATUS DoTitle(int index)
+GameStatus DoTitle(int index)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
@@ -551,19 +551,19 @@ GAME_STATUS DoTitle(int index)
 	switch (inventoryResult)
 	{
 	case InventoryResult::NewGame:
-		return GAME_STATUS::GAME_STATUS_NEW_GAME;
+		return GameStatus::NewGame;
 
 	case InventoryResult::LoadGame:
-		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+		return GameStatus::LoadGame;
 
 	case InventoryResult::ExitGame:
-		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
+		return GameStatus::ExitGame;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NEW_GAME;
+	return GameStatus::NewGame;
 }
 
-GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
+GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
@@ -666,9 +666,9 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		nFrames = DrawPhase();
 		Sound_UpdateScene();
 
-		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GameStatus::ExitToTitle ||
+			result == GameStatus::LoadGame ||
+			result == GameStatus::LevelComplete)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
