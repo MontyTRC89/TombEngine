@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_scuba.h"
 
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
