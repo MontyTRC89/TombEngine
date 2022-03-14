@@ -11,16 +11,16 @@
 #include "Renderer/Renderer11.h"
 #include "Scripting/ScriptInterfaceGame.h"
 
-
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
+
 	constexpr auto CAM_SIZE = 32;
 
 	int CurrentCollidedVolume;
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType)
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer)
 	{
 		CurrentCollidedVolume = 0;
 
@@ -50,9 +50,6 @@ namespace TEN::Control::Volumes
 				break;
 			}
 
-			// TODO: Implement checks on which item is entering/inside/leaving volume
-			// and pass item name or ID as argument for lua function, so it knows its caller.
-
 			if (contains)
 			{
 				CurrentCollidedVolume = i + 1;
@@ -61,13 +58,13 @@ namespace TEN::Control::Volumes
 				{
 					volume->status = TriggerStatus::TS_ENTERING;
 					if (!volume->onEnter.empty())
-						g_GameScript->ExecuteFunction(volume->onEnter);
+						g_GameScript->ExecuteFunction(volume->onEnter, triggerer);
 				}
 				else
 				{
 					volume->status = TriggerStatus::TS_INSIDE;
 					if (!volume->onInside.empty())
-						g_GameScript->ExecuteFunction(volume->onInside);
+						g_GameScript->ExecuteFunction(volume->onInside, triggerer);
 				}
 			}
 			else
@@ -76,7 +73,7 @@ namespace TEN::Control::Volumes
 				{
 					volume->status = TriggerStatus::TS_LEAVING;
 					if (!volume->onLeave.empty())
-						g_GameScript->ExecuteFunction(volume->onLeave);
+						g_GameScript->ExecuteFunction(volume->onLeave, triggerer);
 				}
 				else
 				{
@@ -93,7 +90,7 @@ namespace TEN::Control::Volumes
 		box.X1 = box.Y1 = box.Z1 =  CAM_SIZE;
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 		auto bbox = TO_DX_BBOX(pos, &box);
-		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS);
+		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::FLYBYS, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
@@ -101,11 +98,12 @@ namespace TEN::Control::Volumes
 		STATIC_INFO* sinfo = &StaticObjects[mesh->staticNumber];
 		auto bbox = TO_DX_BBOX(mesh->pos, &sinfo->collisionBox);
 
-		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS);
+		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::STATICS, mesh);
 	}
 
-	void TestVolumes(ITEM_INFO* item)
+	void TestVolumes(short itemNum)
 	{
+		auto item = &g_Level.Items[itemNum];
 		auto bbox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
@@ -113,10 +111,11 @@ namespace TEN::Control::Volumes
 #endif
 
 		if (item->objectNumber == ID_LARA)
-			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::PLAYER);
+			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::PLAYER, itemNum);
 		else if (Objects[item->objectNumber].intelligent)
-			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::NPC);
+			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::NPC, itemNum);
 		else
-			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::MOVEABLES);
+			TestVolumes(item->roomNumber, bbox, TriggerVolumeActivators::MOVEABLES, itemNum);
 	}
+
 }
