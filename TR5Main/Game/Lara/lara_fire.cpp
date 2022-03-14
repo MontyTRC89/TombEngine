@@ -764,7 +764,7 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int 
 			switch (obj->hitEffect)
 			{
 			case HIT_BLOOD:
-				if (target->ObjectNumber == ID_BADDY2 &&
+				if (target->ObjectNumber == ID_GOON2 &&
 					(target->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(laraInfo->Control.Weapon.GunType == LaraWeaponType::Pistol ||
 						laraInfo->Control.Weapon.GunType == LaraWeaponType::Shotgun ||
