@@ -20,6 +20,7 @@
 #include <Renderer/Renderer11Enums.h>
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
+#include "Objects/Moveable/Moveable.h"
 
 using namespace TEN::Effects::Lightning;
 
@@ -187,7 +188,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 @section specialobjects
 */
 
-/*** An @{ItemInfo} representing Lara herself.
+/*** A @{Moveable} representing Lara herself.
 @table Lara
 */
 void LogicHandler::ResetVariables()
@@ -238,11 +239,20 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 #endif
 }
 
-void LogicHandler::ExecuteFunction(std::string const & name)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer)
 {
 #if TEN_OPTIONAL_LUA
+	sol::protected_function_result r;
 	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];
-	auto r = func();
+	if (std::holds_alternative<short>(triggerer))
+	{
+		r = func(std::make_unique<Moveable>( std::get<short>(triggerer), true));
+	}
+	else
+	{
+		r = func();
+	}
+
 	if (!r.valid())
 	{
 		sol::error err = r;
