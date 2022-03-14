@@ -41,7 +41,7 @@ void UpdateBubbles()
 		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
 		short roomNumber = bubble->roomNumber;
 
-		auto probe = GetCollisionResult(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, bubble->roomNumber);
+		auto probe = GetCollision(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, bubble->roomNumber);
 		FLOOR_INFO* floor = GetFloor(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, &roomNumber);
 
 		if (bubble->worldPosition.y > probe.Position.Floor || !floor)

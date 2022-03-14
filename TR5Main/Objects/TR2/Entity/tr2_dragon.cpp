@@ -105,8 +105,8 @@ static void createExplosion(ITEM_INFO* item)
 		explosionItem->Position.yRot = 0;
 		explosionItem->Position.xRot = 0;
 		explosionItem->Position.zRot = 0;
-		explosionItem->Velocity = 0;
-		explosionItem->VerticalVelocity = 0;
+		explosionItem->Animation.Velocity = 0;
+		explosionItem->Animation.VerticalVelocity = 0;
 
 		InitialiseItem(ExplosionIndex);
 		AddActiveItem(ExplosionIndex);
@@ -151,7 +151,7 @@ static void createDragonBone(short frontNumber)
 	}
 }
 
-void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -160,7 +160,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 	if (!TestCollision(item, laraItem))
 		return;
 
-	if (item->ActiveState == DRAGON_STATE_DEATH)
+	if (item->Animation.ActiveState == DRAGON_STATE_DEATH)
 	{
 		int rx = laraItem->Position.xPos - item->Position.xPos;
 		int rz = laraItem->Position.zPos - item->Position.zPos;
@@ -176,13 +176,13 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 
 			int angle = laraItem->Position.yRot - item->Position.yRot;
 
-			int anim = item->AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-			int frame = item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase;
+			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				TrInput & IN_ACTION &&
 				item->ObjectNumber == ID_DRAGON_BACK &&
-				!laraItem->Airborne &&
+				!laraItem->Animation.Airborne &&
 				shift <= DRAGON_MID && 
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
@@ -190,10 +190,10 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 				angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
 				angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 			{
-				laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-				laraItem->ActiveState = 0;
-				laraItem->TargetState = 7;
+				laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = 0;
+				laraItem->Animation.TargetState = 7;
 
 				laraItem->Position.xPos = item->Position.xPos;
 				laraItem->Position.yPos = item->Position.yPos;
@@ -201,9 +201,9 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
 				laraItem->Position.yRot = item->Position.yRot;
 				laraItem->Position.xRot = item->Position.xRot;
 				laraItem->Position.zRot = item->Position.zRot;
-				laraItem->VerticalVelocity = 0;
-				laraItem->Airborne = false;
-				laraItem->Velocity = 0;
+				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Animation.Airborne = false;
+				laraItem->Animation.Velocity = 0;
 
 				if (item->RoomNumber != laraItem->RoomNumber)
 					ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -256,12 +256,12 @@ void DragonControl(short backItemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != DRAGON_STATE_DEATH)
+		if (item->Animation.ActiveState != DRAGON_STATE_DEATH)
 		{
-			item->AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = DRAGON_STATE_DEATH;
-			item->TargetState = DRAGON_STATE_DEATH;
+			item->Animation.AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = DRAGON_STATE_DEATH;
+			item->Animation.TargetState = DRAGON_STATE_DEATH;
 			creature->Flags = 0;
 		}
 		else if (creature->Flags >= 0)
@@ -270,7 +270,7 @@ void DragonControl(short backItemNumber)
 			creature->Flags++;
 
 			if (creature->Flags == DRAGON_LIVE_TIME)
-				item->TargetState = DRAGON_STATE_IDLE;
+				item->Animation.TargetState = DRAGON_STATE_IDLE;
 			if (creature->Flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 				item->HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 		}
@@ -317,7 +317,7 @@ void DragonControl(short backItemNumber)
 			LaraItem->HitPoints -= DRAGON_TOUCH_DAMAGE;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case DRAGON_STATE_IDLE:
 			item->Position.yRot -= angle;
@@ -325,22 +325,22 @@ void DragonControl(short backItemNumber)
 			if (!ahead)
 			{
 				if (AI.distance > DRAGON_STATE_IDLE_RANGE || !AI.ahead)
-					item->TargetState = DRAGON_STATE_WALK;
+					item->Animation.TargetState = DRAGON_STATE_WALK;
 				else if (AI.ahead && AI.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
 				{
 					creature->Flags = 1;
 					if (AI.angle < 0)
-						item->TargetState = DRAGON_STATE_SWIPE_LEFT;
+						item->Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
 					else
-						item->TargetState = DRAGON_STATE_SWIPE_RIGHT;
+						item->Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
 				}
 				else if (AI.angle < 0)
-					item->TargetState = DRAGON_STATE_TURN_LEFT;
+					item->Animation.TargetState = DRAGON_STATE_TURN_LEFT;
 				else
-					item->TargetState = DRAGON_STATE_TURN_RIGHT;
+					item->Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
 			}
 			else
-				item->TargetState = DRAGON_STATE_AIM_1;
+				item->Animation.TargetState = DRAGON_STATE_AIM_1;
 
 			break;
 
@@ -370,33 +370,33 @@ void DragonControl(short backItemNumber)
 			creature->Flags = 0;
 
 			if (ahead)
-				item->TargetState = DRAGON_STATE_IDLE;
+				item->Animation.TargetState = DRAGON_STATE_IDLE;
 			else if (angle < -DRAGON_NEED_TURN)
 			{
 				if (AI.distance < DRAGON_STATE_IDLE_RANGE && AI.ahead)
-					item->TargetState = DRAGON_STATE_IDLE;
+					item->Animation.TargetState = DRAGON_STATE_IDLE;
 				else
-					item->TargetState = DRAGON_STATE_LEFT;
+					item->Animation.TargetState = DRAGON_STATE_LEFT;
 			}
 			else if (angle > DRAGON_NEED_TURN)
 			{
 				if (AI.distance < DRAGON_STATE_IDLE_RANGE && AI.ahead)
-					item->TargetState = DRAGON_STATE_IDLE;
+					item->Animation.TargetState = DRAGON_STATE_IDLE;
 				else
-					item->TargetState = DRAGON_STATE_RIGHT;
+					item->Animation.TargetState = DRAGON_STATE_RIGHT;
 			}
 
 			break;
 
 		case DRAGON_STATE_LEFT:
 			if (angle > -DRAGON_NEED_TURN || ahead)
-				item->TargetState = DRAGON_STATE_WALK;
+				item->Animation.TargetState = DRAGON_STATE_WALK;
 
 			break;
 
 		case DRAGON_STATE_RIGHT:
 			if (angle < DRAGON_NEED_TURN || ahead)
-				item->TargetState = DRAGON_STATE_WALK;
+				item->Animation.TargetState = DRAGON_STATE_WALK;
 
 			break;
 
@@ -421,12 +421,12 @@ void DragonControl(short backItemNumber)
 			if (ahead)
 			{
 				creature->Flags = 30;
-				item->TargetState = DRAGON_STATE_FIRE_1;
+				item->Animation.TargetState = DRAGON_STATE_FIRE_1;
 			}
 			else
 			{
 				creature->Flags = 0;
-				item->TargetState = DRAGON_STATE_AIM_1;
+				item->Animation.TargetState = DRAGON_STATE_AIM_1;
 			}
 
 			break;
@@ -446,7 +446,7 @@ void DragonControl(short backItemNumber)
 				creature->Flags--;
 			}
 			else
-				item->TargetState = DRAGON_STATE_IDLE;
+				item->Animation.TargetState = DRAGON_STATE_IDLE;
 
 			break;
 		}
@@ -455,9 +455,9 @@ void DragonControl(short backItemNumber)
 	CreatureJoint(item, 0, head);
 	CreatureAnimation(itemNumber, angle, 0);
 
-	back->ActiveState = item->ActiveState;
-	back->AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-	back->FrameNumber = g_Level.Anims[back->AnimNumber].frameBase + (item->FrameNumber - g_Level.Anims[item->AnimNumber].frameBase);
+	back->Animation.ActiveState = item->Animation.ActiveState;
+	back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
+	back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 	back->Position.xPos = item->Position.xPos;
 	back->Position.yPos = item->Position.yPos;
 	back->Position.zPos = item->Position.zPos;

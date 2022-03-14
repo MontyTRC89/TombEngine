@@ -25,7 +25,6 @@
 #include "Game/effects/weather.h"
 #include "Game/effects/lightning.h"
 #include "Game/spotcam.h"
-#include "Game/control/box.h"
 #include "Game/particle/SimpleParticle.h"
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -96,10 +95,10 @@ int DrawPhase()
 	return Camera.numberFrames;
 }
 
-GAME_STATUS ControlPhase(int numFrames, int demoMode)
+GameStatus ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
-	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -127,7 +126,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (S_UpdateInput() == -1)
-				return GAME_STATUS::GAME_STATUS_NONE;
+				return GameStatus::None;
 		}
 
 		// Has Lara control been disabled?
@@ -150,7 +149,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
@@ -159,7 +158,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
 				if (g_Gui.CallInventory(false))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
@@ -175,7 +174,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 				StopAllSounds();
 
 				if (g_Gui.CallInventory(true))
-					return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+					return GameStatus::LoadGame;
 			}
 		}
 
@@ -185,19 +184,19 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			g_Renderer.SyncRenderer();
 
 			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
-				return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE;
+				return GameStatus::ExitToTitle;
 		}
 
 		// Has level been completed?
 		if (CurrentLevel != 0 && LevelComplete)
-			return GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED;
+			return GameStatus::LevelComplete;
 
 		int oldInput = TrInput;
 
 		// Is Lara dead?
 		if (CurrentLevel != 0 && (Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
 		{
-			return GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE; // Maybe do game over menu like some PSX versions have??
+			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
 		if (demoMode && TrInput == -1)
@@ -213,7 +212,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->ActiveState != LS_IDLE || LaraItem->AnimNumber != LA_STAND_IDLE) && (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->AnimNumber != LA_CROUCH_IDLE || LaraItem->TargetState != LS_CROUCH_IDLE)))
+				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) && (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -267,28 +266,27 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Update all items
 		InItemControlLoop = true;
 
-		short itemNum = NextItemActive;
-		while (itemNum != NO_ITEM)
+		short itemNumber = NextItemActive;
+		while (itemNumber != NO_ITEM)
 		{
-			ITEM_INFO *item = &g_Level.Items[itemNum];
+			auto* item = &g_Level.Items[itemNumber];
 			short nextItem = item->NextActive;
 
 			if (item->AfterDeath <= 128)
 			{
 				if (Objects[item->ObjectNumber].control)
-					Objects[item->ObjectNumber].control(itemNum);
+					Objects[item->ObjectNumber].control(itemNumber);
 
 				if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
 					item->AfterDeath++;
+
 				if (item->AfterDeath == 128)
-					KillItem(itemNum);
+					KillItem(itemNumber);
 			}
 			else
-			{
-				KillItem(itemNum);
-			}
+				KillItem(itemNumber);
 
-			itemNum = nextItem;
+			itemNumber = nextItem;
 		}
 
 		InItemControlLoop = false;
@@ -297,14 +295,15 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Update all effects
 		InItemControlLoop = true;
 
-		short fxNum = NextFxActive;
-		while (fxNum != NO_ITEM)
+		short fxNumber = NextFxActive;
+		while (fxNumber != NO_ITEM)
 		{
-			short nextFx = EffectList[fxNum].nextActive;
-			FX_INFO *fx = &EffectList[fxNum];
+			short nextFx = EffectList[fxNumber].nextActive;
+			auto* fx = &EffectList[fxNumber];
 			if (Objects[fx->objectNumber].control)
-				Objects[fx->objectNumber].control(fxNum);
-			fxNum = nextFx;
+				Objects[fx->objectNumber].control(fxNumber);
+
+			fxNumber = nextFx;
 		}
 
 		InItemControlLoop = false;
@@ -313,12 +312,16 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Update some effect timers
 		if (SmokeCountL)
 			SmokeCountL--;
+
 		if (SmokeCountR)
 			SmokeCountR--;
+
 		if (SplashCount)
 			SplashCount--;
+
 		if (WeaponDelay)
 			WeaponDelay--;
+
 		if (WeaponEnemyTimer)
 			WeaponEnemyTimer--;
 
@@ -411,7 +414,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		GameTimer++;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NONE;
+	return GameStatus::None;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -423,14 +426,12 @@ unsigned CALLBACK GameMain(void *)
 		TimeInit();
 
 		if (g_GameFlow->IntroImagePath.empty())
-		{
 			throw TENScriptException("Intro image path is not set.");
-		}
 
 		// Do a fixed time title image
 		g_Renderer.renderTitleImage();
 
-		// Execute the LUA gameflow and play the game
+		// Execute the Lua gameflow and play the game
 		g_GameFlow->DoGameflow();
 
 		DoTheGame = false;
@@ -449,7 +450,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GAME_STATUS DoTitle(int index)
+GameStatus DoTitle(int index)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
@@ -470,7 +471,8 @@ GAME_STATUS DoTitle(int index)
 		StopAllSounds();
 
 		// Run the level script
-		GameScriptLevel* level = g_GameFlow->Levels[index];
+		auto* level = g_GameFlow->Levels[index];
+
 		std::string err;
 		if (!level->ScriptFileName.empty())
 		{
@@ -549,17 +551,19 @@ GAME_STATUS DoTitle(int index)
 	switch (inventoryResult)
 	{
 	case InventoryResult::NewGame:
-		return GAME_STATUS::GAME_STATUS_NEW_GAME;
+		return GameStatus::NewGame;
+
 	case InventoryResult::LoadGame:
-		return GAME_STATUS::GAME_STATUS_LOAD_GAME;
+		return GameStatus::LoadGame;
+
 	case InventoryResult::ExitGame:
-		return GAME_STATUS::GAME_STATUS_EXIT_GAME;
+		return GameStatus::ExitGame;
 	}
 
-	return GAME_STATUS::GAME_STATUS_NEW_GAME;
+	return GameStatus::NewGame;
 }
 
-GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
+GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
@@ -584,7 +588,7 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	StopAllSounds();
 
 	// Run the level script
-	GameScriptLevel* level = g_GameFlow->Levels[index];
+	auto* level = g_GameFlow->Levels[index];
   
 	if (!level->ScriptFileName.empty())
 	{
@@ -644,15 +648,13 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 
 	g_GameScript->OnStart();
 	if (loadFromSavegame)
-	{
 		g_GameScript->OnLoad();
-	}
 
-	int nframes = 2;
+	int nFrames = 2;
 
 	// First control phase
 	g_Renderer.resetAnimations();
-	GAME_STATUS result = ControlPhase(nframes, 0);
+	auto result = ControlPhase(nFrames, 0);
 
 	// Fade in screen
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
@@ -660,13 +662,13 @@ GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	// The game loop, finally!
 	while (true)
 	{
-		result = ControlPhase(nframes, 0);
-		nframes = DrawPhase();
+		result = ControlPhase(nFrames, 0);
+		nFrames = DrawPhase();
 		Sound_UpdateScene();
 
-		if (result == GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE ||
-			result == GAME_STATUS::GAME_STATUS_LOAD_GAME ||
-			result == GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED)
+		if (result == GameStatus::ExitToTitle ||
+			result == GameStatus::LoadGame ||
+			result == GameStatus::LevelComplete)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
@@ -738,52 +740,6 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
-void AlterFloorHeight(ITEM_INFO *item, int height)
-{
-	FLOOR_INFO *floor;
-	FLOOR_INFO *ceiling;
-	BOX_INFO *box;
-	short roomNumber;
-	int flag = 0;
-
-	if (abs(height))
-	{
-		flag = 1;
-		if (height >= 0)
-			height++;
-		else
-			height--;
-	}
-
-	roomNumber = item->RoomNumber;
-	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-	ceiling = GetFloor(item->Position.xPos, height + item->Position.yPos - WALL_SIZE, item->Position.zPos, &roomNumber);
-
-	floor->FloorCollision.Planes[0].z += height;
-	floor->FloorCollision.Planes[1].z += height;
-
-	box = &g_Level.Boxes[floor->Box];
-	if (box->flags & BLOCKABLE)
-	{
-		if (height >= 0)
-			box->flags &= ~BLOCKED;
-		else
-			box->flags |= BLOCKED;
-	}
-}
-
-FLOOR_INFO *GetFloor(int x, int y, int z, short *roomNumber)
-{
-	const auto location = GetRoom(ROOM_VECTOR{*roomNumber, y}, x, y, z);
-	*roomNumber = location.roomNumber;
-	return &GetFloor(*roomNumber, x, z);
-}
-
-int GetFloorHeight(FLOOR_INFO *floor, int x, int y, int z)
-{
-	return GetFloorHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
-}
-
 int GetRandomControl()
 {
 	return GenerateInt();
@@ -794,20 +750,15 @@ int GetRandomDraw()
 	return GenerateInt();
 }
 
-int GetCeiling(FLOOR_INFO *floor, int x, int y, int z)
-{
-	return GetCeilingHeight(ROOM_VECTOR{floor->Room, y}, x, z).value_or(NO_HEIGHT);
-}
-
 bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 {
 	if (1 << node & item->MeshBits)
 	{
-		int num = bits;
+		int number = bits;
 		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 			SoundEffect(SFX_TR5_SMASHMETAL, &item->Position, 0);
-		else if (num == 256)
-			num = -64;
+		else if (number == 256)
+			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 		ShatterItem.yRot = item->Position.yRot;
@@ -819,248 +770,13 @@ bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, num, item->RoomNumber, noXZVel);
+		ShatterObject(&ShatterItem, NULL, number, item->RoomNumber, noXZVel);
 		item->MeshBits &= ~ShatterItem.bit;
 
 		return true;
 	}
 
 	return false;
-}
-
-int GetWaterSurface(int x, int y, int z, short roomNumber)
-{
-	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
-
-	if (TestEnvironment(ENV_FLAG_WATER, room))
-	{
-		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			if (!TestEnvironment(ENV_FLAG_WATER, room))
-				return (floor->CeilingHeight(x, z));
-
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return NO_HEIGHT;
-	}
-	else
-	{
-		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			if (TestEnvironment(ENV_FLAG_WATER, room))
-				return (floor->FloorHeight(x, z));
-
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-	}
-
-	return NO_HEIGHT;
-}
-
-int GetWaterSurface(ITEM_INFO* item)
-{
-	return GetWaterSurface(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
-}
-
-int GetWaterDepth(int x, int y, int z, short roomNumber)
-{
-	FLOOR_INFO* floor;
-	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-
-	short roomIndex = NO_ROOM;
-	do
-	{
-		int zFloor = (z - room->z) / SECTOR(1);
-		int xFloor = (x - room->x) / SECTOR(1);
-
-		if (zFloor <= 0)
-		{
-			zFloor = 0;
-			if (xFloor < 1)
-				xFloor = 1;
-			else if (xFloor > room->xSize - 2)
-				xFloor = room->xSize - 2;
-		}
-		else if (zFloor >= room->zSize - 1)
-		{
-			zFloor = room->zSize - 1;
-			if (xFloor < 1)
-				xFloor = 1;
-			else if (xFloor > room->xSize - 2)
-				xFloor = room->xSize - 2;
-		}
-		else if (xFloor < 0)
-			xFloor = 0;
-		else if (xFloor >= room->xSize)
-			xFloor = room->xSize - 1;
-
-		floor = &room->floor[zFloor + xFloor * room->zSize];
-		roomIndex = floor->WallPortal;
-		if (roomIndex != NO_ROOM)
-		{
-			roomNumber = roomIndex;
-			room = &g_Level.Rooms[roomIndex];
-		}
-	} while (roomIndex != NO_ROOM);
-
-	if (TestEnvironment(ENV_FLAG_WATER, room) ||
-		TestEnvironment(ENV_FLAG_SWAMP, room))
-	{
-		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
-				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				int waterHeight = floor->CeilingHeight(x, z);
-				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - waterHeight);
-			}
-
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return DEEP_WATER;
-	}
-	else
-	{
-		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			if (TestEnvironment(ENV_FLAG_WATER, room) ||
-				TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				int waterHeight = floor->FloorHeight(x, z);
-				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - waterHeight);
-			}
-
-			floor = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return NO_HEIGHT;
-	}
-}
-
-
-int GetWaterDepth(ITEM_INFO* item)
-{
-	return GetWaterDepth(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
-}
-
-int GetWaterHeight(int x, int y, int z, short roomNumber)
-{
-	ROOM_INFO* room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO* floor;
-
-	short adjoiningRoom = NO_ROOM;
-	do
-	{
-		int xBlock = (x - room->x) / SECTOR(1);
-		int zBlock = (z - room->z) / SECTOR(1);
-
-		if (zBlock <= 0)
-		{
-			zBlock = 0;
-			if (xBlock < 1)
-				xBlock = 1;
-			else if (xBlock > room->xSize - 2)
-				xBlock = room->xSize - 2;
-		}
-		else if (zBlock >= room->zSize - 1)
-		{
-			zBlock = room->zSize - 1;
-			if (xBlock < 1)
-				xBlock = 1;
-			else if (xBlock > room->xSize - 2)
-				xBlock = room->xSize - 2;
-		}
-		else if (xBlock < 0)
-			xBlock = 0;
-		else if (xBlock >= room->xSize)
-			xBlock = room->xSize - 1;
-
-		floor = &room->floor[zBlock + xBlock * room->zSize];
-		adjoiningRoom = floor->WallPortal;
-
-		if (adjoiningRoom != NO_ROOM)
-		{
-			roomNumber = adjoiningRoom;
-			room = &g_Level.Rooms[adjoiningRoom];
-		}
-	} while (adjoiningRoom != NO_ROOM);
-
-	if (floor->IsWall(x, z))
-		return NO_HEIGHT;
-
-	if (TestEnvironment(ENV_FLAG_WATER, room) ||
-		TestEnvironment(ENV_FLAG_SWAMP, room))
-	{
-		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-
-			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
-				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				return GetCollisionResult(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
-				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
-			}
-
-			floor = GetSector(r, x - r->x, z - r->z);
-
-			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
-				break;
-		}
-
-		return room->maxceiling;
-	}
-	else
-	{
-		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
-		{
-			auto room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-
-			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
-				TestEnvironment(ENV_FLAG_SWAMP, room2))
-			{
-				return GetCollisionResult(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
-				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
-			}
-
-			floor = GetSector(room2, x - room2->x, z - room2->z);
-
-			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
-				break;
-		}
-	}
-
-	return NO_HEIGHT;
-}
-
-int GetWaterHeight(ITEM_INFO* item)
-{
-	return GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
-}
-
-int GetDistanceToFloor(int itemNumber, bool precise)
-{
-	auto item = &g_Level.Items[itemNumber];
-	auto probe = GetCollisionResult(item);
-
-	// HACK: Remove item from bridge objects temporarily.
-	probe.Block->RemoveItem(itemNumber);
-	auto height = GetFloorHeight(probe.Block, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-	probe.Block->AddItem(itemNumber);
-
-	auto bounds = GetBoundsAccurate(item);
-	int minHeight = precise ? bounds->Y2 : 0;
-
-	return (minHeight + item->Position.yPos - height);
 }
 
 void CleanUp()

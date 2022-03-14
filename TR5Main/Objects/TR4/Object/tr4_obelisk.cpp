@@ -17,8 +17,8 @@ void InitialiseObelisk(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 	AddActiveItem(itemNumber);
 	item->Status = ITEM_ACTIVE;
@@ -166,40 +166,40 @@ void ObeliskControl(short itemNumber)
 		auto* obj = &Objects[item->ObjectNumber];
 		bool flag = false;
 
-		if (item->AnimNumber == obj->animIndex + 2)
+		if (item->Animation.AnimNumber == obj->animIndex + 2)
 		{
 			item->Position.yRot -= ANGLE(90.0f);
 
 			if (TrInput & IN_ACTION)
 			{
-				item->AnimNumber = obj->animIndex + 1;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = obj->animIndex + 1;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 			else
 				flag = true;
 		}
 
-		if (item->AnimNumber == obj->animIndex + 6)
+		if (item->Animation.AnimNumber == obj->animIndex + 6)
 		{
 			item->Position.yRot += ANGLE(90.0f);
 
 			if (!(TrInput & IN_ACTION))
 			{
-				item->AnimNumber = obj->animIndex + 3;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = obj->animIndex + 3;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				flag = false;
 			}
 			else
 			{
-				item->AnimNumber = obj->animIndex + 5;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = obj->animIndex + 5;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 
 		if (flag)
 		{
-			item->AnimNumber = obj->animIndex + 3;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = obj->animIndex + 3;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
 		if (item->TriggerFlags == 2)

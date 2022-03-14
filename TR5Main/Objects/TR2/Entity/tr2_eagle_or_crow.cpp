@@ -33,15 +33,15 @@ void InitialiseEagle(short itemNumber)
 
 	if (item->ObjectNumber == ID_CROW)
 	{
-		item->AnimNumber = Objects[ID_CROW].animIndex + 14;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = item->TargetState = 7;
+		item->Animation.AnimNumber = Objects[ID_CROW].animIndex + 14;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = item->Animation.TargetState = 7;
 	}
 	else
 	{
-		item->AnimNumber = Objects[ID_EAGLE].animIndex + 5;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->ActiveState = item->TargetState = 2;
+		item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 5;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = item->Animation.TargetState = 2;
 	}
 }
 
@@ -57,15 +57,15 @@ void EagleControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 4:
 			if (item->Position.yPos > item->Floor)
 			{
 				item->Position.yPos = item->Floor;
-				item->VerticalVelocity = 0;
-				item->Airborne = false;
-				item->TargetState = 5;
+				item->Animation.VerticalVelocity = 0;
+				item->Animation.Airborne = false;
+				item->Animation.TargetState = 5;
 			}
 
 			break;
@@ -76,14 +76,14 @@ void EagleControl(short itemNumber)
 
 		default:
 			if (item->ObjectNumber == ID_CROW)
-				item->AnimNumber = Objects[ID_CROW].animIndex + 1;
+				item->Animation.AnimNumber = Objects[ID_CROW].animIndex + 1;
 			else
-				item->AnimNumber = Objects[ID_EAGLE].animIndex + 8;
+				item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 8;
 
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 4;
-			item->Velocity = 0;
-			item->Airborne = true;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 4;
+			item->Animation.Velocity = 0;
+			item->Animation.Airborne = true;
 			break;
 		}
 		item->Position.xRot = 0;
@@ -98,13 +98,13 @@ void EagleControl(short itemNumber)
 
 		angle = CreatureTurn(item, ANGLE(3.0f));
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 7:
 			item->Position.yPos = item->Floor;
 
 			if (creature->Mood != MoodType::Bored)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
@@ -114,32 +114,32 @@ void EagleControl(short itemNumber)
 			if (creature->Mood == MoodType::Bored)
 				break;
 			else
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
 		case 1:
 			creature->Flags = 0;
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			if (creature->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
 		case 3:
 			if (creature->Mood == MoodType::Bored)
 			{
-				item->RequiredState = 2;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 2;
+				item->Animation.TargetState = 1;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 
 			break;
 

@@ -10,7 +10,7 @@
 
 namespace TEN::Entities::TR4
 {
-	void BladeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void BladeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* bladeItem = &g_Level.Items[itemNumber];
 

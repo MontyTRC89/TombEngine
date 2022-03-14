@@ -39,11 +39,11 @@ void RatControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 6)
+		if (item->Animation.ActiveState != 6)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 6;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 6;
 		}
 	}
 	else
@@ -59,32 +59,32 @@ void RatControl(short itemNumber)
 
 		angle = CreatureTurn(item, ANGLE(6.0f));
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 4:
 			if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
-					item->RequiredState = 3;
+					item->Animation.RequiredState = 3;
 				else if (random > 0xA00)
-					item->RequiredState = 1;
+					item->Animation.RequiredState = 1;
 			}
 			else if (aiInfo.distance < pow(340, 2))
-				item->RequiredState = 5;
+				item->Animation.RequiredState = 5;
 			else
-				item->RequiredState = 1;
+				item->Animation.RequiredState = 1;
 
-			if (item->RequiredState)
-				item->TargetState = 2;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = 2;
 
 			break;
 
 		case 2:
 			info->MaxTurn = 0;
 
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 
 			break;
 
@@ -96,22 +96,22 @@ void RatControl(short itemNumber)
 				random = (short)GetRandomControl();
 				if (random < 0x500)
 				{
-					item->RequiredState = 3;
-					item->TargetState = 2;
+					item->Animation.RequiredState = 3;
+					item->Animation.TargetState = 2;
 				}
 				else if (random < 0xA00)
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(340, 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 
 		case 5:
-			if (!item->RequiredState && item->TouchBits & 0x7F)
+			if (!item->Animation.RequiredState && item->TouchBits & 0x7F)
 			{
 				CreatureEffect(item, &RatBite, DoBloodSplat);
-				item->RequiredState = 2;
+				item->Animation.RequiredState = 2;
 
 				LaraItem->HitPoints -= 20;
 				LaraItem->HitStatus = true;
@@ -121,7 +121,7 @@ void RatControl(short itemNumber)
 
 		case 3:
 			if (GetRandomControl() < 0x500)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 		}

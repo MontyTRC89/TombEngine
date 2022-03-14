@@ -2,7 +2,7 @@
 #include "tr5_teleporter.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Sound/sound.h"
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
@@ -183,10 +183,10 @@ void ControlTeleporter(short itemNumber)
 			SoundEffect(SFX_TR5_LIFTHITFLOOR2, 0, 0);
 		}
 
-		LaraItem->AnimNumber = LA_ELEVATOR_RECOVER;
-		LaraItem->FrameNumber = g_Level.Anims[LaraItem->AnimNumber].frameBase;
-		LaraItem->TargetState = LS_MISC_CONTROL;
-		LaraItem->ActiveState = LS_MISC_CONTROL;
+		LaraItem->Animation.AnimNumber = LA_ELEVATOR_RECOVER;
+		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+		LaraItem->Animation.TargetState = LS_MISC_CONTROL;
+		LaraItem->Animation.ActiveState = LS_MISC_CONTROL;
 
 		item->ItemFlags[0]++;
 		if (item->ItemFlags[0] >= 150)

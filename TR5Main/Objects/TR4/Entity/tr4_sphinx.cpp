@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
+#include "Game/collision/collide_room.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/control/box.h"
@@ -31,10 +32,10 @@ void InitialiseSphinx(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = SPHINX_SLEEPING;
-	item->ActiveState = SPHINX_SLEEPING;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = SPHINX_SLEEPING;
+	item->Animation.ActiveState = SPHINX_SLEEPING;
 }
 
 void SphinxControl(short itemNumber)
@@ -54,7 +55,7 @@ void SphinxControl(short itemNumber)
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 	int height1 = GetFloorHeight(floor, x, y, z);
 
-	if (item->ActiveState == 5 && floor->Stopper)
+	if (item->Animation.ActiveState == 5 && floor->Stopper)
 	{
 		ROOM_INFO* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -107,19 +108,19 @@ void SphinxControl(short itemNumber)
 	int dx = abs(item->ItemFlags[2] - (short)item->Position.xPos);
 	int dz = abs(item->ItemFlags[3] - (short)item->Position.zPos);
 
-	switch (item->ActiveState)
+	switch (item->Animation.ActiveState)
 	{
 	case SPHINX_SLEEPING:
 		creature->MaxTurn = 0;
 
 		if (info.distance < SQUARE(1024) || item->TriggerFlags)
 		{
-			item->TargetState = SPHINX_WAKING_UP;
+			item->Animation.TargetState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->TargetState = SPHINX_ALERTED;
+			item->Animation.TargetState = SPHINX_ALERTED;
 		}
 
 		break;
@@ -129,12 +130,12 @@ void SphinxControl(short itemNumber)
 
 		if (info.distance < SQUARE(1024) || item->TriggerFlags)
 		{
-			item->TargetState = SPHINX_WAKING_UP;
+			item->Animation.TargetState = SPHINX_WAKING_UP;
 		}
 
 		if (GetRandomControl() == 0)
 		{
-			item->TargetState = SPHINX_SLEEPING;
+			item->Animation.TargetState = SPHINX_SLEEPING;
 		}
 
 		break;
@@ -142,16 +143,16 @@ void SphinxControl(short itemNumber)
 	case SPHINX_WALK:
 		creature->MaxTurn = ANGLE(3);
 
-		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->RequiredState == SPHINX_RUN)
+		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->Animation.RequiredState == SPHINX_RUN)
 		{
-			item->TargetState = SPHINX_RUN;
+			item->Animation.TargetState = SPHINX_RUN;
 		}
-		else if (info.distance < SQUARE(2048) && item->TargetState != SPHINX_RUN)
+		else if (info.distance < SQUARE(2048) && item->Animation.TargetState != SPHINX_RUN)
 		{
 			if (height2 <= item->Position.yPos + 256 && height2 >= item->Position.yPos - 256)
 			{
-				item->TargetState = SPHINX_STOP;
-				item->RequiredState = SPHINX_WALK_BACK;
+				item->Animation.TargetState = SPHINX_STOP;
+				item->Animation.RequiredState = SPHINX_WALK_BACK;
 			}
 		}
 
@@ -176,17 +177,17 @@ void SphinxControl(short itemNumber)
 			}
 		}
 
-		if (dx >= 50 || dz >= 50 || item->AnimNumber != Objects[item->ObjectNumber].animIndex)
+		if (dx >= 50 || dz >= 50 || item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
 		{
 			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
 			{
-				item->TargetState = SPHINX_STOP;
+				item->Animation.TargetState = SPHINX_STOP;
 			}
 		}
 		else
 		{
-			item->TargetState = SPHINX_HIT;
-			item->RequiredState = SPHINX_WALK_BACK;
+			item->Animation.TargetState = SPHINX_HIT;
+			item->Animation.RequiredState = SPHINX_WALK_BACK;
 			creature->MaxTurn = 0;
 		}
 
@@ -196,14 +197,14 @@ void SphinxControl(short itemNumber)
 		creature->MaxTurn = ANGLE(3);
 		if (info.distance > SQUARE(2048) || height2 > item->Position.yPos + 256 || height2 < item->Position.yPos - 256)
 		{
-			item->TargetState = SPHINX_STOP;
-			item->RequiredState = SPHINX_RUN;
+			item->Animation.TargetState = SPHINX_STOP;
+			item->Animation.RequiredState = SPHINX_RUN;
 		}
 
 		break;
 
 	case SPHINX_HIT:
-		if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 		{
 			TestTriggers(item, true);
 
@@ -225,13 +226,13 @@ void SphinxControl(short itemNumber)
 	case SPHINX_STOP:
 		creature->Flags = 0;
 
-		if (item->RequiredState == SPHINX_WALK_BACK)
+		if (item->Animation.RequiredState == SPHINX_WALK_BACK)
 		{
-			item->TargetState = SPHINX_WALK_BACK;
+			item->Animation.TargetState = SPHINX_WALK_BACK;
 		}
 		else
 		{
-			item->TargetState = SPHINX_WALK;
+			item->Animation.TargetState = SPHINX_WALK;
 		}
 
 		break;

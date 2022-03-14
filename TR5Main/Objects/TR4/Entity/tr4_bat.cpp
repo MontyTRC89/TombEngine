@@ -15,10 +15,8 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-#define BAT_ANGLE ANGLE(20.0f)
+	#define BAT_ANGLE ANGLE(20.0f)
 
-	constexpr auto BAT_ANIM_FALLING = 3;
-	constexpr auto BAT_ANIM_IDLE = 5;
 	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
 	constexpr auto BAT_TARGET_YPOS = 896;
@@ -26,19 +24,21 @@ namespace TEN::Entities::TR4
 
 	enum BatState
 	{
-		BAT_STATE_NONE,
-		BAT_STATE_START,
-		BAT_STATE_FLY,
-		BAT_STATE_ATTACK,
-		BAT_STATE_FALL,
-		BAT_STATE_DEATH,
-		BAT_STATE_IDLE
+		BAT_STATE_NONE = 0,
+		BAT_STATE_START = 1,
+		BAT_STATE_FLY = 2,
+		BAT_STATE_ATTACK = 3,
+		BAT_STATE_FALL = 4,
+		BAT_STATE_DEATH = 5,
+		BAT_STATE_IDLE = 6
 	};
 
 	// TODO
 	enum BatAnim
 	{
+		BAT_ANIM_FALL = 3,
 
+		BAT_ANIM_IDLE = 5
 	};
 
 	static bool isBatCollideTarget(ITEM_INFO* item)
@@ -52,10 +52,10 @@ namespace TEN::Entities::TR4
 
 		InitialiseCreature(itemNumber);
 
-		item->AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
-		item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-		item->TargetState = BAT_STATE_IDLE;
-		item->ActiveState = BAT_STATE_IDLE;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.TargetState = BAT_STATE_IDLE;
+		item->Animation.ActiveState = BAT_STATE_IDLE;
 	}
 
 	void BatControl(short itemNumber)
@@ -127,13 +127,13 @@ namespace TEN::Entities::TR4
 
 			angle = CreatureTurn(item, BAT_ANGLE);
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
 				if (aiInfo.distance < BAT_TARGETING_RANGE
 					|| item->HitStatus
 					|| creature->HurtByLara)
-					item->TargetState = BAT_STATE_START;
+					item->Animation.TargetState = BAT_STATE_START;
 
 				break;
 
@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 						&& aiInfo.ahead
 						&& abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
 					{
-						item->TargetState = BAT_STATE_ATTACK;
+						item->Animation.TargetState = BAT_STATE_ATTACK;
 					}
 				}
 
@@ -173,36 +173,36 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					item->TargetState = BAT_STATE_FLY;
+					item->Animation.TargetState = BAT_STATE_FLY;
 					creature->Mood = MoodType::Bored;
 				}
 
 				break;
 			}
 		}
-		else if (item->ActiveState == BAT_STATE_ATTACK)
+		else if (item->Animation.ActiveState == BAT_STATE_ATTACK)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->TargetState = BAT_STATE_FLY;
-			item->ActiveState = BAT_STATE_FLY;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = BAT_STATE_FLY;
+			item->Animation.ActiveState = BAT_STATE_FLY;
 		}
 		else
 		{
 			if (item->Position.yPos >= item->Floor)
 			{
-				item->TargetState = BAT_STATE_DEATH;
+				item->Animation.TargetState = BAT_STATE_DEATH;
 				item->Position.yPos = item->Floor;
-				item->Airborne = false;
+				item->Animation.Airborne = false;
 			}
 			else
 			{
-				item->Airborne = true;
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALLING;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-				item->TargetState = BAT_STATE_FALL;
-				item->ActiveState = BAT_STATE_FALL;
-				item->Velocity = 0;
+				item->Animation.Airborne = true;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALL;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.TargetState = BAT_STATE_FALL;
+				item->Animation.ActiveState = BAT_STATE_FALL;
+				item->Animation.Velocity = 0;
 			}
 		}
 

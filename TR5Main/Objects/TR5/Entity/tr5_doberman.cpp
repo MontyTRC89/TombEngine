@@ -18,16 +18,16 @@ void InitialiseDoberman(short itemNum)
     item = &g_Level.Items[itemNum];
     if (item->TriggerFlags)
     {
-        item->ActiveState = 5;
-        item->AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
+        item->Animation.ActiveState = 5;
+        item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
     }
     else
     {
-        item->ActiveState = 6;
-        item->AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
+        item->Animation.ActiveState = 6;
+        item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
     }
-    item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void DobermanControl(short itemNumber)
@@ -56,32 +56,32 @@ void DobermanControl(short itemNumber)
 		
 			int random;
 
-			switch (item->ActiveState)
+			switch (item->Animation.ActiveState)
 			{
 			case 1:
 				creature->MaxTurn = ANGLE(3);
 				if (creature->Mood != MoodType::Bored)
 				{
-					item->TargetState = 2;
+					item->Animation.TargetState = 2;
 				}
 				else
 				{
 					random = GetRandomControl();
 					if (random < 768)
 					{
-						item->RequiredState = 4;
-						item->TargetState = 3;
+						item->Animation.RequiredState = 4;
+						item->Animation.TargetState = 3;
 						break;
 					}
 					if (random < 1536)
 					{
-						item->RequiredState = 5;
-						item->TargetState = 3;
+						item->Animation.RequiredState = 5;
+						item->Animation.TargetState = 3;
 						break;
 					}
 					if (random < 2816)
 					{
-						item->TargetState = 3;
+						item->Animation.TargetState = 3;
 						break;
 					}
 				}
@@ -92,11 +92,11 @@ void DobermanControl(short itemNumber)
 				creature->MaxTurn = ANGLE(6);
 				if (creature->Mood == MoodType::Bored)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 					break;
 				}
 				if (info.distance < SQUARE(768))
-					item->TargetState = 8;
+					item->Animation.TargetState = 8;
 				break;
 
 			case 3:
@@ -107,15 +107,15 @@ void DobermanControl(short itemNumber)
 					if (creature->Mood != MoodType::Escape 
 						&& info.distance < SQUARE(341)
 						&& info.ahead)
-						item->TargetState = 7;
+						item->Animation.TargetState = 7;
 					else
-						item->TargetState = 2;
+						item->Animation.TargetState = 2;
 				}
 				else
 				{
-					if (item->RequiredState)
+					if (item->Animation.RequiredState)
 					{
-						item->TargetState = item->RequiredState;
+						item->Animation.TargetState = item->Animation.RequiredState;
 					}
 					else
 					{
@@ -125,16 +125,16 @@ void DobermanControl(short itemNumber)
 							if (random >= 1536)
 							{
 								if (random < 9728)
-									item->TargetState = 1;
+									item->Animation.TargetState = 1;
 							}
 							else
 							{
-								item->TargetState = 5;
+								item->Animation.TargetState = 5;
 							}
 						}
 						else
 						{
-							item->TargetState = 4;
+							item->Animation.TargetState = 4;
 						}
 					}
 				}
@@ -143,21 +143,21 @@ void DobermanControl(short itemNumber)
 			case 4:
 				if (creature->Mood != MoodType::Bored || GetRandomControl() < 1280)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				}
 				break;
 
 			case 5:
 				if (creature->Mood != MoodType::Bored || GetRandomControl() < 256)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				}
 				break;
 
 			case 6:
 				if (creature->Mood != MoodType::Bored || GetRandomControl() < 512)
 				{
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				}
 				break;
 
@@ -174,9 +174,9 @@ void DobermanControl(short itemNumber)
 				}
 
 				if (info.distance <= SQUARE(341) || info.distance >= SQUARE(682))
-					item->TargetState = 3;
+					item->Animation.TargetState = 3;
 				else
-					item->TargetState = 9;
+					item->Animation.TargetState = 9;
 				break;
 
 			case 8:
@@ -190,11 +190,11 @@ void DobermanControl(short itemNumber)
 				if (info.distance >= SQUARE(341))
 				{
 					if (info.distance < SQUARE(682))
-						item->TargetState = 9;
+						item->Animation.TargetState = 9;
 				}
 				else
 				{
-					item->TargetState = 7;
+					item->Animation.TargetState = 7;
 				}
 				break;
 			case 9:
@@ -207,17 +207,17 @@ void DobermanControl(short itemNumber)
 					creature->Flags = 3;
 				}
 				if (info.distance < SQUARE(341))
-					item->TargetState = 7;
+					item->Animation.TargetState = 7;
 				break;
 			default:
 				break;
 			}
 		}
-		else if (item->ActiveState != 10)
+		else if (item->Animation.ActiveState != 10)
 		{
-			item->AnimNumber = Objects[ID_DOG].animIndex + 13;
-			item->ActiveState = 10;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_DOG].animIndex + 13;
+			item->Animation.ActiveState = 10;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
 		CreatureTilt(item, tilt);

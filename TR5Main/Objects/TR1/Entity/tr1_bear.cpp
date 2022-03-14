@@ -63,28 +63,28 @@ void BearControl(short itemNumber)
 	{
 		angle = CreatureTurn(item, ANGLE(1.0f));
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 			case BEAR_STATE_WALK:
 			{
-				item->TargetState = BEAR_STATE_REAR;
+				item->Animation.TargetState = BEAR_STATE_REAR;
 				break;
 			}
 			case BEAR_STATE_RUN:
 			case BEAR_STATE_STROLL:
 			{
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 				break;
 			}
 			case BEAR_STATE_REAR:
 			{
-				item->TargetState = BEAR_STATE_DEATH;
+				item->Animation.TargetState = BEAR_STATE_DEATH;
 				creature->Flags = 1;
 				break;
 			}
 			case BEAR_STATE_IDLE:
 			{
-				item->TargetState = BEAR_STATE_DEATH;
+				item->Animation.TargetState = BEAR_STATE_DEATH;
 				creature->Flags = 0;
 				break;
 			}
@@ -120,22 +120,22 @@ void BearControl(short itemNumber)
 
 		const bool laraDead = LaraItem->HitPoints <= 0;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case BEAR_STATE_IDLE:
 			if (laraDead)
 			{
 				if (AI.bite && AI.distance < EAT_RANGE)
-					item->TargetState = BEAR_STATE_CHOMP;
+					item->Animation.TargetState = BEAR_STATE_CHOMP;
 				else
-					item->TargetState = BEAR_STATE_STROLL;
+					item->Animation.TargetState = BEAR_STATE_STROLL;
 			}
-			else if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			else if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (creature->Mood == MoodType::Bored)
-				item->TargetState = BEAR_STATE_STROLL;
+				item->Animation.TargetState = BEAR_STATE_STROLL;
 			else
-				item->TargetState = BEAR_STATE_RUN;
+				item->Animation.TargetState = BEAR_STATE_RUN;
 			
 			break;
 
@@ -143,18 +143,18 @@ void BearControl(short itemNumber)
 			creature->MaxTurn = WALK_TURN;
 
 			if (laraDead && item->TouchBits & TOUCH && AI.ahead)
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 			else if (creature->Mood != MoodType::Bored)
 			{
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 
 				if (creature->Mood == MoodType::Escape)
-					item->RequiredState = BEAR_STATE_STROLL;
+					item->Animation.RequiredState = BEAR_STATE_STROLL;
 			}
 			else if (GetRandomControl() < ROAR_CHANCE)
 			{
-				item->RequiredState = BEAR_STATE_ROAR;
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.RequiredState = BEAR_STATE_ROAR;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 			}
 
 			break;
@@ -169,16 +169,16 @@ void BearControl(short itemNumber)
 			}
 
 			if (creature->Mood == MoodType::Bored || laraDead)
-				item->TargetState = BEAR_STATE_IDLE;
-			else if (AI.ahead && !item->RequiredState)
+				item->Animation.TargetState = BEAR_STATE_IDLE;
+			else if (AI.ahead && !item->Animation.RequiredState)
 			{
 				if (!creature->Flags && AI.distance < REAR_RANGE && GetRandomControl() < REAR_CHANCE)
 				{
-					item->RequiredState = BEAR_STATE_REAR;
-					item->TargetState = BEAR_STATE_IDLE;
+					item->Animation.RequiredState = BEAR_STATE_REAR;
+					item->Animation.TargetState = BEAR_STATE_IDLE;
 				}
 				else if (AI.distance < ATTACK_RANGE)
-					item->TargetState = BEAR_STATE_ATTACK_1;
+					item->Animation.TargetState = BEAR_STATE_ATTACK_1;
 			}
 
 			break;
@@ -186,50 +186,50 @@ void BearControl(short itemNumber)
 		case BEAR_STATE_REAR:
 			if (creature->Flags)
 			{
-				item->RequiredState = BEAR_STATE_STROLL;
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.RequiredState = BEAR_STATE_STROLL;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 			}
-			else if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			else if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
-				item->TargetState = BEAR_STATE_IDLE;
+				item->Animation.TargetState = BEAR_STATE_IDLE;
 			else if (AI.bite && AI.distance < PAT_RANGE)
-				item->TargetState = BEAR_STATE_ATTACK_2;
+				item->Animation.TargetState = BEAR_STATE_ATTACK_2;
 			else
-				item->TargetState = BEAR_STATE_WALK;
+				item->Animation.TargetState = BEAR_STATE_WALK;
 			
 			break;
 
 		case BEAR_STATE_WALK:
 			if (creature->Flags)
 			{
-				item->RequiredState = BEAR_STATE_STROLL;
-				item->TargetState = BEAR_STATE_REAR;
+				item->Animation.RequiredState = BEAR_STATE_STROLL;
+				item->Animation.TargetState = BEAR_STATE_REAR;
 			}
 			else if (AI.ahead && (item->TouchBits & TOUCH))
-				item->TargetState = BEAR_STATE_REAR;
+				item->Animation.TargetState = BEAR_STATE_REAR;
 			else if (creature->Mood == MoodType::Escape)
 			{
-				item->TargetState = BEAR_STATE_REAR;
-				item->RequiredState = BEAR_STATE_STROLL;
+				item->Animation.TargetState = BEAR_STATE_REAR;
+				item->Animation.RequiredState = BEAR_STATE_STROLL;
 			}
 			else if (creature->Mood == MoodType::Bored || GetRandomControl() < ROAR_CHANCE)
 			{
-				item->RequiredState = BEAR_STATE_ROAR;
-				item->TargetState = BEAR_STATE_REAR;
+				item->Animation.RequiredState = BEAR_STATE_ROAR;
+				item->Animation.TargetState = BEAR_STATE_REAR;
 			}
 			else if (AI.distance > REAR_RANGE || GetRandomControl() < DROP_CHANCE)
 			{
-				item->RequiredState = BEAR_STATE_IDLE;
-				item->TargetState = BEAR_STATE_REAR;
+				item->Animation.RequiredState = BEAR_STATE_IDLE;
+				item->Animation.TargetState = BEAR_STATE_REAR;
 			}
 
 			break;
 
 		case BEAR_STATE_ATTACK_2:
-			if (!item->RequiredState && item->TouchBits & TOUCH)
+			if (!item->Animation.RequiredState && item->TouchBits & TOUCH)
 			{
-				item->RequiredState = BEAR_STATE_REAR;
+				item->Animation.RequiredState = BEAR_STATE_REAR;
 
 				LaraItem->HitPoints -= PAT_DAMAGE;
 				LaraItem->HitStatus = true;
@@ -238,10 +238,10 @@ void BearControl(short itemNumber)
 			break;
 
 		case BEAR_STATE_ATTACK_1:
-			if (!item->RequiredState && (item->TouchBits & TOUCH))
+			if (!item->Animation.RequiredState && (item->TouchBits & TOUCH))
 			{
 				CreatureEffect(item, &BearBite, DoBloodSplat);
-				item->RequiredState = BEAR_STATE_IDLE;
+				item->Animation.RequiredState = BEAR_STATE_IDLE;
 
 				LaraItem->HitPoints -= ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;

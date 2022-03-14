@@ -13,7 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
-void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll) 
+void lara_col_surftread(ITEM_INFO* item, CollisionInfo* coll) 
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -21,7 +21,7 @@ void lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfright(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -29,7 +29,7 @@ void lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfleft(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -37,7 +37,7 @@ void lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfback(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -45,7 +45,7 @@ void lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll)
 	LaraSurfaceCollision(item, coll);
 }
 
-void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_col_surfswim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -56,17 +56,17 @@ void lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 	TestLaraLadderClimbOut(item, coll);
 }
 
-void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surftread(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->VerticalVelocity -= 4;
-	if (item->VerticalVelocity < 0)
-		item->VerticalVelocity = 0;
+	item->Animation.VerticalVelocity -= 4;
+	if (item->Animation.VerticalVelocity < 0)
+		item->Animation.VerticalVelocity = 0;
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_WATER_DEATH;
+		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -91,41 +91,41 @@ void lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll)
 	}
 	else if (TrInput & IN_FORWARD)
 	{
-		item->TargetState = LS_ONWATER_FORWARD;
+		item->Animation.TargetState = LS_ONWATER_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_BACK)
 	{
-		item->TargetState = LS_ONWATER_BACK;
+		item->Animation.TargetState = LS_ONWATER_BACK;
 		return;
 	}
 	else if (TrInput & IN_ROLL)
 	{
-		item->TargetState = LS_ROLL_FORWARD;
+		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 	else if (TrInput & IN_LSTEP)
 	{
-		item->TargetState = LS_ONWATER_LEFT;
+		item->Animation.TargetState = LS_ONWATER_LEFT;
 		return;
 	}
 	else if (TrInput & IN_RSTEP)
 	{
-		item->TargetState = LS_ONWATER_RIGHT;
+		item->Animation.TargetState = LS_ONWATER_RIGHT;
 		return;
 	}
 
-	item->TargetState = LS_ONWATER_STOP;
+	item->Animation.TargetState = LS_ONWATER_STOP;
 	lara->Control.Count.Dive = 0;
 }
 
-void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfright(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_WATER_DEATH;
+		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -137,20 +137,20 @@ void lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_RSTEP))
-		item->TargetState = LS_ONWATER_STOP;
+		item->Animation.TargetState = LS_ONWATER_STOP;
 
-	item->VerticalVelocity += 8;
-	if (item->VerticalVelocity > 60)
-		item->VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += 8;
+	if (item->Animation.VerticalVelocity > 60)
+		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfleft(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_WATER_DEATH;
+		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -162,20 +162,20 @@ void lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_LSTEP))
-		item->TargetState = LS_ONWATER_STOP;
+		item->Animation.TargetState = LS_ONWATER_STOP;
 
-	item->VerticalVelocity += 8;
-	if (item->VerticalVelocity > 60)
-		item->VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += 8;
+	if (item->Animation.VerticalVelocity > 60)
+		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfback(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_WATER_DEATH;
+		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -187,20 +187,20 @@ void lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.yRot += ANGLE(2.0f);
 
 	if (!(TrInput & IN_BACK))
-		item->TargetState = LS_ONWATER_STOP;
+		item->Animation.TargetState = LS_ONWATER_STOP;
 
-	item->VerticalVelocity += 8;
-	if (item->VerticalVelocity > 60)
-		item->VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += 8;
+	if (item->Animation.VerticalVelocity > 60)
+		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_surfswim(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
-		item->TargetState = LS_WATER_DEATH;
+		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
 
@@ -212,16 +212,16 @@ void lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll)
 		item->Position.yRot += ANGLE(4.0f);
 
 	if (!(TrInput & IN_FORWARD))
-		item->TargetState = LS_ONWATER_STOP;
+		item->Animation.TargetState = LS_ONWATER_STOP;
 	if (TrInput & IN_JUMP)
-		item->TargetState = LS_ONWATER_STOP;
+		item->Animation.TargetState = LS_ONWATER_STOP;
 
-	item->VerticalVelocity += 8;
-	if (item->VerticalVelocity > 60)
-		item->VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += 8;
+	if (item->Animation.VerticalVelocity > 60)
+		item->Animation.VerticalVelocity = 60;
 }
 
-void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll)
+void lara_as_waterout(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

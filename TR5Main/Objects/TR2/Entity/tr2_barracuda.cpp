@@ -37,11 +37,11 @@ void BarracudaControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 6)
+		if (item->Animation.ActiveState != 6)
 		{
-			item->AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 6;
+			item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 6;
 		}
 
 		CreatureFloat(itemNumber);
@@ -57,19 +57,19 @@ void BarracudaControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			creature->Flags = 0;
 
 			if (creature->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (AI.ahead && AI.distance < 680)
-				item->TargetState = 4;
+				item->Animation.TargetState = 4;
 			else if (creature->Mood == MoodType::Stalk)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
@@ -79,9 +79,9 @@ void BarracudaControl(short itemNumber)
 			if (creature->Mood == MoodType::Bored)
 				break;
 			else if (AI.ahead && (item->TouchBits & 0xE0))
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (creature->Mood != MoodType::Stalk)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 
 			break;
 
@@ -90,13 +90,13 @@ void BarracudaControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (creature->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (AI.ahead && AI.distance < 340)
-				item->TargetState = 5;
+				item->Animation.TargetState = 5;
 			else if (AI.ahead && AI.distance < 680)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (creature->Mood == MoodType::Stalk)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 
 			break;
 

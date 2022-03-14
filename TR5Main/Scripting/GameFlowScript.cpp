@@ -126,9 +126,7 @@ Specify which translations in the strings table correspond to which languages.
 GameFlow::~GameFlow()
 {
 	for (auto& lev : Levels)
-	{
 		delete lev;
-	}
 }
 
 void GameFlow::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
@@ -176,9 +174,7 @@ void GameFlow::SetGameFarView(byte val)
 		GameFarView = 32;
 	}
 	else
-	{
 		GameFarView = val;
-	}
 }
 
 void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>&& src)
@@ -186,7 +182,8 @@ void GameFlow::SetAudioTracks(sol::as_table_t<std::vector<GameScriptAudioTrack>>
 	std::vector<GameScriptAudioTrack> tracks = std::move(src);
 	SoundTracks.clear();
 
-	for (auto t : tracks) {
+	for (auto t : tracks)
+	{
 		SoundTrackInfo track;
 		track.Name = t.trackName;
 		track.Mask = 0;
@@ -209,9 +206,7 @@ void GameFlow::LoadGameFlowScript()
 char const * GameFlow::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
-	{
 		return "String not found";
-	}
 	else
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
@@ -247,7 +242,7 @@ bool GameFlow::DoGameflow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		GameScriptLevel* level = Levels[CurrentLevel];
 
-		GAME_STATUS status;
+		GameStatus status;
 
 		if (CurrentLevel == 0)
 		{
@@ -281,17 +276,17 @@ bool GameFlow::DoGameflow()
 
 		switch (status)
 		{
-		case GAME_STATUS::GAME_STATUS_EXIT_GAME:
+		case GameStatus::ExitGame:
 			return true;
-		case GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE:
+		case GameStatus::ExitToTitle:
 			CurrentLevel = 0;
 			break;
-		case GAME_STATUS::GAME_STATUS_NEW_GAME:
+		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
 			InitialiseGame = true;
 			break;
-		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
+		case GameStatus::LoadGame:
 			// Load the header of the savegame for getting the level to load
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
@@ -300,7 +295,7 @@ bool GameFlow::DoGameflow()
 			loadFromSavegame = true;
 
 			break;
-		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
+		case GameStatus::LevelComplete:
 			if (LevelComplete == Levels.size())
 			{
 				// TODO: final credits

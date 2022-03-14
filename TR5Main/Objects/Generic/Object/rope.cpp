@@ -169,7 +169,7 @@ namespace TEN::Entities::Generic
 			rope->active = 0;
 	}
 
-	void RopeCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll)
+	void RopeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* ropeItem = &g_Level.Items[itemNumber];
@@ -177,9 +177,9 @@ namespace TEN::Entities::Generic
 		
 		if (TrInput & IN_ACTION &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
-			(laraItem->ActiveState == LS_REACH || laraItem->ActiveState == LS_JUMP_UP) &&
-			laraItem->Airborne &&
-			laraItem->VerticalVelocity > 0&&
+			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
+			laraItem->Animation.Airborne &&
+			laraItem->Animation.VerticalVelocity > 0&&
 			rope->active)
 		{
 			auto* frame = GetBoundsAccurate(laraItem);
@@ -189,26 +189,26 @@ namespace TEN::Entities::Generic
 				laraItem->Position.xPos,
 				laraItem->Position.yPos + frame->Y1 + 512,
 				laraItem->Position.zPos + frame->Z2 * phd_cos(laraItem->Position.yRot),
-				laraItem->ActiveState == LS_REACH ? 128 : 320);
+				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
 			{
-				if (laraItem->ActiveState == LS_REACH)
+				if (laraItem->Animation.ActiveState == LS_REACH)
 				{
-					laraItem->AnimNumber = LA_REACH_TO_ROPE_SWING;
-					laraItem->ActiveState = LS_ROPE_SWING;
+					laraItem->Animation.AnimNumber = LA_REACH_TO_ROPE_SWING;
+					laraItem->Animation.ActiveState = LS_ROPE_SWING;
 					laraInfo->Control.Rope.Frame = g_Level.Anims[LA_ROPE_SWING].frameBase + 32 << 8;
 					laraInfo->Control.Rope.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase + 60 << 8;
 				}
 				else
 				{
-					laraItem->AnimNumber = LA_JUMP_UP_TO_ROPE_START;
-					laraItem->ActiveState = LS_ROPE_IDLE;
+					laraItem->Animation.AnimNumber = LA_JUMP_UP_TO_ROPE_START;
+					laraItem->Animation.ActiveState = LS_ROPE_IDLE;
 				}
 
-				laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-				laraItem->VerticalVelocity = 0;
-				laraItem->Airborne = false;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Animation.Airborne = false;
 
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
@@ -221,7 +221,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, laraItem->Position.yRot, 16 * laraItem->Velocity);
+				ApplyVelocityToRope(segment, laraItem->Position.yRot, 16 * laraItem->Animation.Velocity);
 			}
 		}
 	}
@@ -609,53 +609,53 @@ namespace TEN::Entities::Generic
 		{
 			if (item->Position.xRot >= 0)
 			{
-				item->VerticalVelocity = -112;
-				item->Velocity = item->Position.xRot / 128;
+				item->Animation.VerticalVelocity = -112;
+				item->Animation.Velocity = item->Position.xRot / 128;
 			}
 			else
 			{
-				item->Velocity = 0;
-				item->VerticalVelocity = -20;
+				item->Animation.Velocity = 0;
+				item->Animation.VerticalVelocity = -20;
 			}
 
 			item->Position.xRot = 0;
-			item->Airborne = true;
+			item->Animation.Airborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
 
-			if (item->FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
-				item->AnimNumber = LA_ROPE_SWING_TO_REACH_1;
-			else if (item->FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
-				item->AnimNumber = LA_ROPE_SWING_TO_REACH_2;
+			if (item->Animation.FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 42)
+				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_1;
+			else if (item->Animation.FrameNumber - g_Level.Anims[LA_ROPE_SWING].frameBase > 21)
+				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_2;
 			else
-				item->AnimNumber = LA_ROPE_SWING_TO_REACH_3;
+				item->Animation.AnimNumber = LA_ROPE_SWING_TO_REACH_3;
 
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = LS_REACH;
-			item->TargetState = LS_REACH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = LS_REACH;
+			item->Animation.TargetState = LS_REACH;
 			Lara.Control.Rope.Ptr = -1;
 		}
 	}
 
 	void FallFromRope(ITEM_INFO* item)
 	{
-		item->Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
+		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->Position.xRot = 0;
 		item->Position.yPos += 320;
 
-		item->AnimNumber = LA_FALL_START;
-		item->FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-		item->ActiveState = LS_JUMP_FORWARD;
-		item->TargetState = LS_JUMP_FORWARD;
+		item->Animation.AnimNumber = LA_FALL_START;
+		item->Animation.FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
+		item->Animation.ActiveState = LS_JUMP_FORWARD;
+		item->Animation.TargetState = LS_JUMP_FORWARD;
 
-		item->VerticalVelocity = 0;
-		item->Airborne = true;
+		item->Animation.VerticalVelocity = 0;
+		item->Animation.Airborne = true;
 
 		Lara.Control.HandStatus = HandStatus::Free;
 		Lara.Control.Rope.Ptr = -1;
 	}
 
-	void LaraClimbRope(ITEM_INFO* item, COLL_INFO* coll)
+	void LaraClimbRope(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if (!(TrInput & IN_ACTION))
 			FallFromRope(item);
@@ -690,17 +690,17 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			if (item->AnimNumber == LA_ROPE_DOWN && item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Position, 0);
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				Lara.Control.Rope.Flag = 0;
 				++Lara.Control.Rope.Segment;
 				Lara.Control.Rope.Offset = 0;
 			}
 
 			if (!(TrInput & IN_BACK) || Lara.Control.Rope.Segment >= 21)
-				item->TargetState = LS_ROPE_IDLE;
+				item->Animation.TargetState = LS_ROPE_IDLE;
 		}
 	}
 

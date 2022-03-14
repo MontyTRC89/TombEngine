@@ -745,43 +745,43 @@ void ReadRooms()
 		int numTriggerVolumes = ReadInt32();
 		for (int j = 0; j < numTriggerVolumes; j++)
 		{
-			TRIGGER_VOLUME volume;
+			TriggerVolume volume;
 
-			volume.type = (TriggerVolumeType)ReadInt32();
+			volume.Type = (TriggerVolumeType)ReadInt32();
 
-			volume.position.x = ReadFloat();
-			volume.position.y = ReadFloat();
-			volume.position.z = ReadFloat();
+			volume.Position.x = ReadFloat();
+			volume.Position.y = ReadFloat();
+			volume.Position.z = ReadFloat();
 
-			volume.rotation.x = ReadFloat();
-			volume.rotation.y = ReadFloat();
-			volume.rotation.z = ReadFloat();
-			volume.rotation.w = ReadFloat();
+			volume.Rotation.x = ReadFloat();
+			volume.Rotation.y = ReadFloat();
+			volume.Rotation.z = ReadFloat();
+			volume.Rotation.w = ReadFloat();
 
-			volume.scale.x = ReadFloat();
-			volume.scale.y = ReadFloat();
-			volume.scale.z = ReadFloat();
+			volume.Scale.x = ReadFloat();
+			volume.Scale.y = ReadFloat();
+			volume.Scale.z = ReadFloat();
 
-			volume.activators = ReadInt32();
+			volume.Activators = ReadInt32();
 
 			byte numBytes = ReadInt8();
 			char buffer[255];
 			ReadBytes(buffer, numBytes);
-			volume.onEnter = std::string(buffer, buffer+numBytes);
+			volume.OnEnter = std::string(buffer, buffer+numBytes);
 
 			numBytes = ReadInt8();
 			ReadBytes(buffer, numBytes);
-			volume.onInside = std::string(buffer, buffer+numBytes);
+			volume.OnInside = std::string(buffer, buffer+numBytes);
 
 			numBytes = ReadInt8();
 			ReadBytes(buffer, numBytes);
-			volume.onLeave = std::string(buffer, buffer+numBytes);
+			volume.OnLeave = std::string(buffer, buffer+numBytes);
 
-			volume.oneShot = ReadInt8();
-			volume.status = TS_OUTSIDE;
+			volume.OneShot = ReadInt8();
+			volume.Status = TriggerStatus::Outside;
 
-			volume.box    = BoundingOrientedBox(volume.position, volume.scale, volume.rotation);
-			volume.sphere = BoundingSphere(volume.position, volume.scale.x);
+			volume.Box    = BoundingOrientedBox(volume.Position, volume.Scale, volume.Rotation);
+			volume.Sphere = BoundingSphere(volume.Position, volume.Scale.x);
 
 			room.triggerVolumes.push_back(volume);
 		}

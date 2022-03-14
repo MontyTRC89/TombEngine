@@ -43,18 +43,18 @@ void InitialiseScorpion(short itemNumber)
 
 	if (item->TriggerFlags == 1)
 	{
-		item->TargetState = BSCORPION_STATE_TROOPS_ATTACK;
-		item->ActiveState = BSCORPION_STATE_TROOPS_ATTACK;
-		item->AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
+		item->Animation.TargetState = BSCORPION_STATE_TROOPS_ATTACK;
+		item->Animation.ActiveState = BSCORPION_STATE_TROOPS_ATTACK;
+		item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 7;
 	}
 	else
 	{
-		item->TargetState = BSCORPION_STATE_IDLE;
-		item->ActiveState = BSCORPION_STATE_IDLE;
-		item->AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
+		item->Animation.TargetState = BSCORPION_STATE_IDLE;
+		item->Animation.ActiveState = BSCORPION_STATE_IDLE;
+		item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void ScorpionControl(short itemNumber)
@@ -77,7 +77,7 @@ void ScorpionControl(short itemNumber)
 	int x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
 	int z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(x, item->Position.yPos, z, item->RoomNumber);
+	auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
 	int height1 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height1) > CLICK(2))
 		probe.Position.Floor = item->Position.yPos;
@@ -85,7 +85,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height2 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height2) > CLICK(2))
 		height2 = item->Position.yPos;
@@ -95,7 +95,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos - 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos + 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height3 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height3) > CLICK(2))
 		height3 = item->Position.yPos;
@@ -103,7 +103,7 @@ void ScorpionControl(short itemNumber)
 	x = item->Position.xPos + 682 * phd_sin(item->Position.yRot);
 	z = item->Position.zPos - 682 * phd_cos(item->Position.yRot);
 
-	probe = GetCollisionResult(x, item->Position.yPos, z, probe.RoomNumber);
+	probe = GetCollision(x, item->Position.yPos, z, probe.RoomNumber);
 	int height4 = probe.Position.Floor;
 	if (abs(item->Position.yPos - height4) > CLICK(2))
 		height4 = item->Position.yPos;
@@ -113,15 +113,15 @@ void ScorpionControl(short itemNumber)
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
-		if (item->ActiveState != BSCORPION_STATE_DEATH)
+		if (item->Animation.ActiveState != BSCORPION_STATE_DEATH)
 		{
 			if (item->TriggerFlags > 0 && item->TriggerFlags < 7)
 			{
 				CutSeqNum = 4;
 
-				item->AnimNumber = Objects[item->AnimNumber].animIndex + 5;
-				item->ActiveState = BSCORPION_STATE_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[item->Animation.AnimNumber].animIndex + 5;
+				item->Animation.ActiveState = BSCORPION_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Status = ITEM_INVISIBLE;
 				creature->MaxTurn = 0;
 				
@@ -142,19 +142,19 @@ void ScorpionControl(short itemNumber)
 					}
 				}
 			}
-			else if (item->ActiveState != BSCORPION_STATE_DEATH && item->ActiveState != BSCORPION_STATE_SPECIAL_DEATH)
+			else if (item->Animation.ActiveState != BSCORPION_STATE_DEATH && item->Animation.ActiveState != BSCORPION_STATE_SPECIAL_DEATH)
 			{
-				item->AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
-				item->ActiveState = BSCORPION_STATE_DEATH;
-				item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
+				item->Animation.ActiveState = BSCORPION_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else if (CutSeqNum == 4)
 		{
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameEnd - 1;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1;
 			item->Status = ITEM_INVISIBLE;
 		}
-		else if (item->ActiveState == BSCORPION_STATE_DEATH)
+		else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH)
 		{
 			if (item->Status == ITEM_INVISIBLE)
 				item->Status = ITEM_ACTIVE;
@@ -166,7 +166,7 @@ void ScorpionControl(short itemNumber)
 			GetAITarget(creature);
 		else
 		{
-			if (creature->HurtByLara && item->ActiveState != BSCORPION_STATE_TROOPS_ATTACK)
+			if (creature->HurtByLara && item->Animation.ActiveState != BSCORPION_STATE_TROOPS_ATTACK)
 				creature->Enemy = LaraItem;
 			else
 			{
@@ -212,7 +212,7 @@ void ScorpionControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case BSCORPION_STATE_IDLE:
 			creature->MaxTurn = 0;
@@ -220,7 +220,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.distance > pow(1365, 2))
 			{
-				item->TargetState = BSCORPION_STATE_WALK;
+				item->Animation.TargetState = BSCORPION_STATE_WALK;
 				break;
 			}
 
@@ -232,13 +232,13 @@ void ScorpionControl(short itemNumber)
 					creature->Enemy->HitPoints <= 15 &&
 					creature->Enemy->ObjectNumber == ID_TROOPS)
 				{
-					item->TargetState = BSCORPION_STATE_ATTACK_1;
+					item->Animation.TargetState = BSCORPION_STATE_ATTACK_1;
 				}
 				else
-					item->TargetState = BSCORPION_STATE_ATTACK_2;
+					item->Animation.TargetState = BSCORPION_STATE_ATTACK_2;
 			}
 			else if (!info.ahead)
-				item->TargetState = BSCORPION_STATE_WALK;
+				item->Animation.TargetState = BSCORPION_STATE_WALK;
 
 			break;
 
@@ -246,9 +246,9 @@ void ScorpionControl(short itemNumber)
 			creature->MaxTurn = ANGLE(2.0f);
 
 			if (info.distance < pow(1365, 2))
-				item->TargetState = BSCORPION_STATE_IDLE;
+				item->Animation.TargetState = BSCORPION_STATE_IDLE;
 			else if (info.distance > pow(853, 2))
-				item->TargetState = BSCORPION_STATE_RUN;
+				item->Animation.TargetState = BSCORPION_STATE_RUN;
 
 			break;
 
@@ -256,7 +256,7 @@ void ScorpionControl(short itemNumber)
 			creature->MaxTurn = ANGLE(3.0f);
 
 			if (info.distance < pow(1365, 2))
-				item->TargetState = BSCORPION_STATE_IDLE;
+				item->Animation.TargetState = BSCORPION_STATE_IDLE;
 
 			break;
 
@@ -284,7 +284,7 @@ void ScorpionControl(short itemNumber)
 				creature->Enemy->HitPoints -= 15;
 				if (creature->Enemy->HitPoints <= 0)
 				{
-					item->TargetState = BSCORPION_STATE_SPECIAL_DEATH;
+					item->Animation.TargetState = BSCORPION_STATE_SPECIAL_DEATH;
 					creature->MaxTurn = 0;
 				}
 
@@ -303,7 +303,7 @@ void ScorpionControl(short itemNumber)
 				LaraItem->HitPoints -= 120;
 				LaraItem->HitStatus = true;
 
-				if (item->ActiveState == 5)
+				if (item->Animation.ActiveState == 5)
 				{
 					Lara.PoisonPotency += 8;
 
@@ -337,7 +337,7 @@ void ScorpionControl(short itemNumber)
 
 		case BSCORPION_STATE_TROOPS_ATTACK:
 			creature->MaxTurn = 0;
-			if (item->FrameNumber == g_Level.Anims[item->AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				item->TriggerFlags++;
 			}
@@ -345,7 +345,7 @@ void ScorpionControl(short itemNumber)
 				creature->Enemy->HitPoints <= 0 ||
 				item->TriggerFlags > 6)
 			{
-				item->TargetState = BSCORPION_STATE_SPECIAL_DEATH;
+				item->Animation.TargetState = BSCORPION_STATE_SPECIAL_DEATH;
 				creature->Enemy->HitPoints = 0;
 			}
 

@@ -13,7 +13,7 @@ enum class BoatMountType
 
 void InitialiseSpeedBoat(short itemNumber);
 void DoBoatWakeEffect(ITEM_INFO* sBoatItem);
-BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, COLL_INFO* coll);
+BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, CollisionInfo* coll);
 bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction);
 void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
 int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, PHD_VECTOR* pos);
@@ -27,5 +27,5 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber);
 bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
 void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide);
 void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water);
-void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, COLL_INFO* coll);
+void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 void SpeedBoatControl(short itemNumber);

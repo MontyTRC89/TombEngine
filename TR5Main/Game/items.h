@@ -9,7 +9,18 @@
 
 enum GAME_OBJECT_ID : short;
 
+// used by fx->shade !
+#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
+#define WHITE555 RGB555(255, 255, 255)
+#define GRAY555  RGB555(128, 128, 128)
+#define BLACK555 RGB555(  0,   0,   0)
+
 constexpr unsigned int NO_MESH_BITS = UINT_MAX;
+
+constexpr auto NO_ITEM = -1;
+constexpr auto ALL_MESHBITS = -1;
+constexpr auto NOT_TARGETABLE = -16384;
+constexpr auto NUM_ITEMS = 1024;
 
 enum AIObjectType
 {
@@ -40,70 +51,61 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-struct ITEM_INFO
+struct EntityAnimationData
 {
-	std::string LuaName;
-	GAME_OBJECT_ID ObjectNumber;
-	int BoxNumber;
-	ITEM_DATA Data;
-	bool Active;
-	short NextItem;
-	short NextActive;
-
-	PHD_3DPOS StartPosition;
-	PHD_3DPOS Position;
-	ROOM_VECTOR Location;
-	short RoomNumber;
-	int Floor;
-	std::vector<BONE_MUTATOR> Mutator;
-
+	int AnimNumber;
+	int FrameNumber;
 	int ActiveState;
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
-	int AnimNumber;
-	int FrameNumber;
 
-	int Velocity;
-	int LateralVelocity;
-	int VerticalVelocity;
 	bool Airborne;
+	int Velocity;
+	int VerticalVelocity;
+	int LateralVelocity;
+	std::vector<BONE_MUTATOR> Mutator;
+};
 
-	short HitPoints;
-	short Timer;
+struct ITEM_INFO
+{
+	GAME_OBJECT_ID ObjectNumber;
+	std::string LuaName;
+	short NextItem;
+	short NextActive;
+
+	bool Active;
+	int Status;	// ItemStatus enum.
+	short RoomNumber;
+	ROOM_VECTOR Location;
+	int BoxNumber;
+	int Timer;
+	int Floor;
 	short Shade;
+	int HitPoints;
 
-	uint32_t MeshBits;
-
-	short ItemFlags[8];
-	short TriggerFlags;
-	uint16_t Flags; // ItemFlags enum
-	uint32_t SwapMeshFlags;
-
-	short Status; // ItemStatus enum
 	bool HitStatus;
-	bool Collidable;
 	bool LookedAt;
+	bool Collidable;
 	bool InDrawRoom;
 
-	short DrawRoom;	// Unused?
+	ITEM_DATA Data;
+	EntityAnimationData Animation;
+	PHD_3DPOS Position;
+	PHD_3DPOS StartPosition;
+
+	uint32_t TouchBits;
+	uint32_t MeshBits;
+
+	uint16_t Flags; // ItemFlags enum
+	short ItemFlags[8];
+	short TriggerFlags;
+	uint32_t SwapMeshFlags;
 
 	// TODO: Move to CreatureInfo?
-	uint32_t TouchBits;
 	uint8_t AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
 };
-
-// used by fx->shade !
-#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
-#define WHITE555 RGB555(255, 255, 255)
-#define GRAY555  RGB555(128, 128, 128)
-#define BLACK555 RGB555(  0,   0,   0)
-
-constexpr auto NO_ITEM = -1;
-constexpr auto ALL_MESHBITS = -1;
-constexpr auto NOT_TARGETABLE = -16384;
-constexpr auto NUM_ITEMS = 1024;
 
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);

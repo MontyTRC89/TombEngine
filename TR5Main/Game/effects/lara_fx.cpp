@@ -70,20 +70,20 @@ namespace TEN::Effects::Lara
 		if (!TestEnvironment(ENV_FLAG_COLD, item))
 			return;
 
-		switch (item->AnimNumber)
+		switch (item->Animation.AnimNumber)
 		{
 		case LA_STAND_IDLE:
-			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
 		case LA_CROUCH_IDLE:
-			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
 		case LA_CRAWL_IDLE:
-			if (item->FrameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
+			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
 

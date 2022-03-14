@@ -155,8 +155,8 @@ static void SubmarineAttack(ITEM_INFO* item)
 		torpedoItem->Position.xRot = 0;
 		torpedoItem->Position.yRot = item->Position.yRot;
 		torpedoItem->Position.zRot = 0;
-		torpedoItem->Velocity = 0;
-		torpedoItem->VerticalVelocity = 0;
+		torpedoItem->Animation.Velocity = 0;
+		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;
 
 		AddActiveItem(itemNumber);
@@ -168,10 +168,10 @@ void InitialiseSubmarine(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
-	item->AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-	item->TargetState = 0;
-	item->ActiveState = 0;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 0;
+	item->Animation.ActiveState = 0;
 
 	if (!item->TriggerFlags)
 		item->TriggerFlags = 120;
@@ -254,11 +254,11 @@ void SubmarineControl(short itemNumber)
 
 		if (laraInfo.distance >= pow(SECTOR(3), 2))
 		{
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 			SoundEffect(SFX_TR5_DIVESUITLOOP, &item->Position, 2);
 		}
 		else
-			item->TargetState = 0;
+			item->Animation.TargetState = 0;
 
 		if (AI.distance < pow(SECTOR(1), 2))
 		{
@@ -275,7 +275,7 @@ void SubmarineControl(short itemNumber)
 		}
 	}
 	else
-		item->TargetState = 1;
+		item->Animation.TargetState = 1;
 
 	creature->Enemy = enemy;
 
@@ -367,29 +367,29 @@ void ChaffFlareControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	
-	if (item->VerticalVelocity)
+	if (item->Animation.VerticalVelocity)
 	{
 		item->Position.xRot += ANGLE(3.0f);
 		item->Position.zRot += ANGLE(5.0f);
 	}
 
-	int dx = item->Velocity * phd_sin(item->Position.yRot);
-	int dz = item->Velocity * phd_cos(item->Position.yRot);
+	int dx = item->Animation.Velocity * phd_sin(item->Position.yRot);
+	int dz = item->Animation.Velocity * phd_cos(item->Position.yRot);
 
 	item->Position.xPos += dx;
 	item->Position.zPos += dz;
 	
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		item->Velocity += (5 - item->Velocity) / 2;
-		item->VerticalVelocity += (5 - item->VerticalVelocity) / 2;
+		item->Animation.Velocity += (5 - item->Animation.Velocity) / 2;
+		item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
 	}
 	else
-		item->VerticalVelocity += GRAVITY;
+		item->Animation.VerticalVelocity += GRAVITY;
 
-	item->Position.yPos += item->VerticalVelocity;
+	item->Position.yPos += item->Animation.VerticalVelocity;
 
-	DoProjectileDynamics(itemNumber, item->Position.xPos, item->Position.yPos, item->Position.zPos, dx, item->VerticalVelocity, dz);
+	DoProjectileDynamics(itemNumber, item->Position.xPos, item->Position.yPos, item->Position.zPos, dx, item->Animation.VerticalVelocity, dz);
 
 	PHD_VECTOR pos1;
 	pos1.x = 0;
@@ -407,7 +407,7 @@ void ChaffFlareControl(short itemNumber)
 
 	if (item->ItemFlags[0] >= 300)
 	{
-		if (!item->VerticalVelocity && !item->Velocity)
+		if (!item->Animation.VerticalVelocity && !item->Animation.Velocity)
 		{
 			if (item->ItemFlags[1] <= 90)
 				item->ItemFlags[1]++;
@@ -461,28 +461,28 @@ void TorpedoControl(short itemNumber)
 			pos.x = chaffItem->Position.xPos;
 			pos.y = chaffItem->Position.yPos;
 			pos.z = chaffItem->Position.zPos;
-			item->ActiveState = pos.x / 4;
-			item->TargetState = pos.y / 4;
-			item->RequiredState = pos.z / 4;
+			item->Animation.ActiveState = pos.x / 4;
+			item->Animation.TargetState = pos.y / 4;
+			item->Animation.RequiredState = pos.z / 4;
 		}
 		else
 		{
-			pos.x = 4 * item->ActiveState;
-			pos.y = 4 * item->TargetState;
-			pos.z = 4 * item->RequiredState;
+			pos.x = 4 * item->Animation.ActiveState;
+			pos.y = 4 * item->Animation.TargetState;
+			pos.z = 4 * item->Animation.RequiredState;
 		}
 	}
 
 	short angles[2];
 	phd_GetVectorAngles(pos.x - item->Position.xPos, pos.y - item->Position.yPos, pos.z - item->Position.zPos, angles);
 
-	if (item->Velocity >= 48)
+	if (item->Animation.Velocity >= 48)
 	{
-		if (item->Velocity < 192)
-			item->Velocity++;
+		if (item->Animation.Velocity < 192)
+			item->Animation.Velocity++;
 	}
 	else
-		item->Velocity += 4;
+		item->Animation.Velocity += 4;
 
 	item->ItemFlags[1]++;
 
@@ -523,15 +523,15 @@ void TorpedoControl(short itemNumber)
 	int y = item->Position.yPos;
 	int z = item->Position.zPos;
 
-	item->Position.zRot += 16 * item->Velocity;
+	item->Position.zRot += 16 * item->Animation.Velocity;
 
-	int c = item->Velocity * phd_cos(item->Position.xRot);
+	int c = item->Animation.Velocity * phd_cos(item->Position.xRot);
 
 	item->Position.xPos += c * phd_sin(item->Position.yRot);
-	item->Position.yPos += item->Velocity * phd_sin(-item->Position.xRot);
+	item->Position.yPos += item->Animation.Velocity * phd_sin(-item->Position.xRot);
 	item->Position.zPos += c * phd_cos(item->Position.yRot);
 
-	auto probe = GetCollisionResult(item);
+	auto probe = GetCollision(item);
 
 	if (item->Position.yPos < probe.Position.Floor &&
 		item->Position.yPos > probe.Position.Ceiling &&

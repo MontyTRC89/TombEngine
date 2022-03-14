@@ -25,7 +25,7 @@ enum TRexAnim
 
 void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 {
-	tRexItem->TargetState = 8;
+	tRexItem->Animation.TargetState = 8;
 
 	if (laraItem->RoomNumber != tRexItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
@@ -36,12 +36,12 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	laraItem->Position.xRot = 0;
 	laraItem->Position.yRot = tRexItem->Position.yRot;
 	laraItem->Position.zRot = 0;
-	laraItem->Airborne = false;
+	laraItem->Animation.Airborne = false;
 
-	laraItem->AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
-	laraItem->FrameNumber = g_Level.Anims[laraItem->AnimNumber].frameBase;
-	laraItem->ActiveState = LS_DEATH;
-	laraItem->TargetState = LS_DEATH;
+	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	laraItem->Animation.ActiveState = LS_DEATH;
+	laraItem->Animation.TargetState = LS_DEATH;
 
 	laraItem->HitPoints = -16384;
 	Lara.Air = -1;
@@ -66,10 +66,10 @@ void TRexControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState == 1)
-			item->TargetState = 5;
+		if (item->Animation.ActiveState == 1)
+			item->Animation.TargetState = 5;
 		else
-			item->TargetState = 1;
+			item->Animation.TargetState = 1;
 	}
 	else
 	{
@@ -85,7 +85,7 @@ void TRexControl(short itemNumber)
 		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (item->TouchBits)
-			LaraItem->HitPoints -= (item->ActiveState == 3) ? 10 : 1;
+			LaraItem->HitPoints -= (item->Animation.ActiveState == 3) ? 10 : 1;
 
 		info->Flags = (info->Mood != MoodType::Escape && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
 
@@ -96,28 +96,28 @@ void TRexControl(short itemNumber)
 			info->Flags = 1;
 		}
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			if (item->RequiredState)
-				item->TargetState = item->RequiredState;
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (aiInfo.distance < pow(1500, 2) && aiInfo.bite)
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			else if (info->Mood == MoodType::Bored || info->Flags)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			break;
 
 		case 2:
 			info->MaxTurn = ANGLE(2.0f);
 
 			if (info->Mood != MoodType::Bored || !info->Flags)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (aiInfo.ahead && GetRandomControl() < 0x200)
 			{
-				item->RequiredState = 6;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 6;
+				item->Animation.TargetState = 1;
 			}
 
 			break;
@@ -126,30 +126,30 @@ void TRexControl(short itemNumber)
 			info->MaxTurn = ANGLE(4.0f);
 
 			if (aiInfo.distance < pow(SECTOR(5), 2) && aiInfo.bite)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (info->Flags)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (info->Mood != MoodType::Escape && aiInfo.ahead && GetRandomControl() < 0x200)
 			{
-				item->RequiredState = 6;
-				item->TargetState = 1;
+				item->Animation.RequiredState = 6;
+				item->Animation.TargetState = 1;
 			}
 			else if (info->Mood == MoodType::Bored)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 
 			break;
 
 		case 7:
 			if (item->TouchBits & 0x3000)
 			{
-				item->TargetState = 8;
+				item->Animation.TargetState = 8;
 
 				LaraItem->HitPoints -= 1500;
 				LaraItem->HitStatus = true;
 				LaraTRexDeath(item, LaraItem);
 			}
 
-			item->RequiredState = 2;
+			item->Animation.RequiredState = 2;
 			break;
 		}
 	}

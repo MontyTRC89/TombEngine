@@ -2,6 +2,7 @@
 #include "Game/control/los.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
@@ -74,7 +75,7 @@ bool ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return true;
 }
 
-bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, int firing)
+bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool firing)
 {
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();

@@ -41,11 +41,11 @@ void MonkControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->ActiveState != 9)
+		if (item->Animation.ActiveState != 9)
 		{
-			item->AnimNumber = Objects[item->ObjectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
-			item->FrameNumber = g_Level.Anims[item->AnimNumber].frameBase;
-			item->ActiveState = 9;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20 + (GetRandomControl() / 0x4000);
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 9;
 		}
 	}
 	else
@@ -66,7 +66,7 @@ void MonkControl(short itemNumber)
 		if (aiInfo.ahead)
 			torso = aiInfo.angle;
 
-		switch (item->ActiveState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
 			info->Flags &= 0x0FFF;
@@ -74,22 +74,22 @@ void MonkControl(short itemNumber)
 			if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				break;
 			else if (info->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (info->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x7000)
-					item->TargetState = 4;
+					item->Animation.TargetState = 4;
 				else
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(1), 2))
-				item->TargetState = 7;
+				item->Animation.TargetState = 7;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -99,23 +99,23 @@ void MonkControl(short itemNumber)
 			if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				break;
 			else if (info->Mood == MoodType::Bored)
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else if (info->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				auto random = GetRandomControl();
 				if (random < 0x3000)
-					item->TargetState = 5;
+					item->Animation.TargetState = 5;
 				else if (random < 0x6000)
-					item->TargetState = 8;
+					item->Animation.TargetState = 8;
 				else
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
-				item->TargetState = 2;
+				item->Animation.TargetState = 2;
 			else
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -127,22 +127,22 @@ void MonkControl(short itemNumber)
 				if (!MonksAttackLara && aiInfo.ahead && Lara.TargetEntity == item)
 				{
 					if (GetRandomControl() < 0x4000)
-						item->TargetState = 1;
+						item->Animation.TargetState = 1;
 					else
-						item->TargetState = 11;
+						item->Animation.TargetState = 11;
 				}
 			}
 			else if (info->Mood == MoodType::Escape)
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 			}
 			else if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(2), 2))
-				item->TargetState = 3;
+				item->Animation.TargetState = 3;
 			
 			break;
 
@@ -156,33 +156,33 @@ void MonkControl(short itemNumber)
 			tilt = angle / 4;
 
 			if (info->Mood == MoodType::Bored)
-				item->TargetState = 1;
+				item->Animation.TargetState = 1;
 			else if (info->Mood == MoodType::Escape)
 				break;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 			}
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(3), 2))
-				item->TargetState = 10;
+				item->Animation.TargetState = 10;
 			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->TargetState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->TargetState = 11;
+					item->Animation.TargetState = 11;
 			}
 
 			break;
 
 		case 8:
 			if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(0.5f), 2))
-				item->TargetState = 11;
+				item->Animation.TargetState = 11;
 			else
-				item->TargetState = 6;
+				item->Animation.TargetState = 6;
 
 			break;
 

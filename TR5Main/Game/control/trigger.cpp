@@ -119,7 +119,7 @@ int SwitchTrigger(short itemNumber, short timer)
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		if ((!item->ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item->Animation.ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->Animation.ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
 		{
 			item->Timer = timer;
 			item->Status = ITEM_ACTIVE;
@@ -127,14 +127,14 @@ int SwitchTrigger(short itemNumber, short timer)
 				item->Timer = 30 * timer;
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->ActiveState)
+		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
 		{
 			RemoveActiveItem(itemNumber);
 
 			item->Status = ITEM_NOT_ACTIVE;
 			if (!item->ItemFlags[0] == 0)
 				item->Flags |= ONESHOT;
-			if (item->ActiveState != 1)
+			if (item->Animation.ActiveState != 1)
 				return 1;
 			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
 				return 1;
@@ -244,7 +244,7 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
+	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
 
 	if (bottomBlock->TriggerIndex == -1)
 		return nullptr;
@@ -333,52 +333,52 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
 				switchFlag = 1;
 
-			switchOff = (g_Level.Items[value].ActiveState == 1);
+			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
 
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->ActiveState >= LS_MONKEY_IDLE &&
-				(LaraItem->ActiveState <= LS_MONKEY_TURN_180 ||
-					LaraItem->ActiveState == LS_MONKEY_TURN_LEFT ||
-					LaraItem->ActiveState == LS_MONKEY_TURN_RIGHT))
+			if (LaraItem->Animation.ActiveState >= LS_MONKEY_IDLE &&
+				(LaraItem->Animation.ActiveState <= LS_MONKEY_TURN_180 ||
+					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
+					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				break;
 			return;
 
 		case TRIGGER_TYPES::TIGHTROPE_T:
-			if (LaraItem->ActiveState >= LS_TIGHTROPE_IDLE &&
-				LaraItem->ActiveState <= LS_TIGHTROPE_RECOVER_BALANCE &&
-				LaraItem->ActiveState != LS_DOVE_SWITCH)
+			if (LaraItem->Animation.ActiveState >= LS_TIGHTROPE_IDLE &&
+				LaraItem->Animation.ActiveState <= LS_TIGHTROPE_RECOVER_BALANCE &&
+				LaraItem->Animation.ActiveState != LS_DOVE_SWITCH)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->ActiveState == LS_DOVE_SWITCH ||
-				LaraItem->ActiveState == LS_CRAWL_IDLE ||
-				LaraItem->ActiveState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->ActiveState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->ActiveState == LS_CRAWL_BACK ||
-				LaraItem->ActiveState == LS_CROUCH_IDLE ||
-				LaraItem->ActiveState == LS_CROUCH_ROLL ||
-				LaraItem->ActiveState == LS_CROUCH_TURN_LEFT ||
-				LaraItem->ActiveState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->Animation.ActiveState == LS_DOVE_SWITCH ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->ActiveState == LS_HANG ||
-				LaraItem->ActiveState == LS_LADDER_IDLE ||
-				LaraItem->ActiveState == LS_LADDER_UP ||
-				LaraItem->ActiveState == LS_LADDER_LEFT ||
-				LaraItem->ActiveState == LS_LADDER_STOP ||
-				LaraItem->ActiveState == LS_LADDER_RIGHT ||
-				LaraItem->ActiveState == LS_LADDER_DOWN)
+			if (LaraItem->Animation.ActiveState == LS_HANG ||
+				LaraItem->Animation.ActiveState == LS_LADDER_IDLE ||
+				LaraItem->Animation.ActiveState == LS_LADDER_UP ||
+				LaraItem->Animation.ActiveState == LS_LADDER_LEFT ||
+				LaraItem->Animation.ActiveState == LS_LADDER_STOP ||
+				LaraItem->Animation.ActiveState == LS_LADDER_RIGHT ||
+				LaraItem->Animation.ActiveState == LS_LADDER_DOWN)
 				break;
 			return;
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
+			if (GetCollision(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -714,12 +714,12 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ITEM_INFO* item)
 {
-	ProcessSectorFlags(GetCollisionResult(item).BottomBlock);
+	ProcessSectorFlags(GetCollision(item).BottomBlock);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 {
-	ProcessSectorFlags(GetCollisionResult(x, y, z, roomNumber).BottomBlock);
+	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(FLOOR_INFO* floor)
@@ -729,7 +729,7 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 
 	// Burn Lara
 	if (floor->Flags.Death &&
-		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->ActiveState) ||
+		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
 			Lara.Control.WaterStatus != WaterStatus::Dry))
 	{
 		LavaBurn(LaraItem);
