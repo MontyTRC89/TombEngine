@@ -99,13 +99,13 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll);
 bool TestAndDoLaraLadderClimb(ITEM_INFO* item, CollisionInfo* coll);
 
-bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup);
-bool TestLaraCrawlUpStep(ITEM_INFO* item, CollisionInfo* coll);
-bool TestLaraCrawlDownStep(ITEM_INFO* item, CollisionInfo* coll);
-bool TestLaraCrawlExitDownStep(ITEM_INFO* item, CollisionInfo* coll);
-bool TestLaraCrawlExitJump(ITEM_INFO* item, CollisionInfo* coll);
-bool TestLaraCrawlToHang(ITEM_INFO* item, CollisionInfo* coll);
+CrawlVaultTestResult TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup);
+CrawlVaultTestResult TestLaraCrawlUpStep(ITEM_INFO* item, CollisionInfo* coll);
+CrawlVaultTestResult TestLaraCrawlDownStep(ITEM_INFO* item, CollisionInfo* coll);
+CrawlVaultTestResult TestLaraCrawlExitDownStep(ITEM_INFO* item, CollisionInfo* coll);
+CrawlVaultTestResult TestLaraCrawlExitJump(ITEM_INFO* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll);
+bool TestLaraCrawlToHang(ITEM_INFO* item, CollisionInfo* coll);
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, CollisionInfo* coll, JumpTestSetup testSetup);
 bool TestLaraRunJumpForward(ITEM_INFO* item, CollisionInfo* coll);

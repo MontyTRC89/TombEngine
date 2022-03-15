@@ -2156,7 +2156,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup)
+CrawlVaultTestResult TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup)
 {
 	int y = item->Position.yPos;
 	auto probeA = GetCollision(item, item->Position.yRot, testSetup.CrossDist, -LARA_HEIGHT_CRAWL);	// Crossing.
@@ -2168,11 +2168,11 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaul
 
 	// Discard walls.
 	if (probeA.Position.Floor == NO_HEIGHT || probeB.Position.Floor == NO_HEIGHT)
-		return false;
+		return CrawlVaultTestResult{ false };
 
 	// Check for slope or death sector (if applicable).
 	if (isSlope || isDeath)
-		return false;
+		return CrawlVaultTestResult{ false };
 
 	// Assess crawl vault feasibility to location ahead.
 	if ((probeA.Position.Floor - y) <= testSetup.LowerFloorBound &&								// Within lower floor bound.
@@ -2184,13 +2184,13 @@ bool TestLaraCrawlVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, CrawlVaul
 		abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.MaxProbeHeightDif &&	// Crossing/destination floor height difference suggests continuous crawl surface.
 		(probeA.Position.Ceiling - y) < -testSetup.GapMin)										// Ceiling height is permissive.
 	{
-		return true;
+		return CrawlVaultTestResult{ true };
 	}
 
-	return false;
+	return CrawlVaultTestResult{ false };
 }
 
-bool TestLaraCrawlUpStep(ITEM_INFO* item, CollisionInfo* coll)
+CrawlVaultTestResult TestLaraCrawlUpStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Floor range: [-CLICK(1), -STEPUP_HEIGHT]
 
@@ -2207,7 +2207,7 @@ bool TestLaraCrawlUpStep(ITEM_INFO* item, CollisionInfo* coll)
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
 }
 
-bool TestLaraCrawlDownStep(ITEM_INFO* item, CollisionInfo* coll)
+CrawlVaultTestResult TestLaraCrawlDownStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 
@@ -2224,7 +2224,7 @@ bool TestLaraCrawlDownStep(ITEM_INFO* item, CollisionInfo* coll)
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
 }
 
-bool TestLaraCrawlExitDownStep(ITEM_INFO* item, CollisionInfo* coll)
+CrawlVaultTestResult TestLaraCrawlExitDownStep(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Floor range: [STEPUP_HEIGHT, CLICK(1)]
 
@@ -2242,7 +2242,7 @@ bool TestLaraCrawlExitDownStep(ITEM_INFO* item, CollisionInfo* coll)
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
 }
 
-bool TestLaraCrawlExitJump(ITEM_INFO* item, CollisionInfo* coll)
+CrawlVaultTestResult TestLaraCrawlExitJump(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Floor range: [NO_LOWER_BOUND, STEPUP_HEIGHT)
 
@@ -2258,6 +2258,54 @@ bool TestLaraCrawlExitJump(ITEM_INFO* item, CollisionInfo* coll)
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
+}
+
+CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
+{
+	if (!(TrInput & (IN_ACTION | IN_JUMP)))
+		return CrawlVaultTestResult{ false };
+
+	// Crawl vault exit down 1 step.
+	auto crawlVaultResult = TestLaraCrawlExitDownStep(item, coll);
+	if (crawlVaultResult.Success)
+	{
+		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll).Success)
+			crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
+		else [[likely]]
+			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
+
+		return crawlVaultResult;
+	}
+
+	// Crawl vault exit jump.
+	crawlVaultResult = TestLaraCrawlExitJump(item, coll);
+	if (crawlVaultResult.Success)
+	{
+		if (TrInput & IN_WALK)
+			crawlVaultResult.TargetState = LS_CRAWL_EXIT_FLIP;
+		else [[likely]]
+			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
+
+		return crawlVaultResult;
+	}
+
+	// Crawl vault up 1 step.
+	crawlVaultResult = TestLaraCrawlUpStep(item, coll);
+	if (crawlVaultResult.Success)
+	{
+		crawlVaultResult.TargetState = LS_CRAWL_STEP_UP;
+		return crawlVaultResult;
+	}
+
+	// Crawl vault down 1 step.
+	crawlVaultResult = TestLaraCrawlDownStep(item, coll);
+	if (crawlVaultResult.Success)
+	{
+		crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
+		return crawlVaultResult;
+	}
+
+	return CrawlVaultTestResult{ false };
 }
 
 bool TestLaraCrawlToHang(ITEM_INFO* item, CollisionInfo* coll)
@@ -2277,41 +2325,6 @@ bool TestLaraCrawlToHang(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	return false;
-}
-
-CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
-{
-	if (!(TrInput & (IN_ACTION | IN_JUMP)))
-		return CrawlVaultTestResult{ false };
-
-	if (TestLaraCrawlExitDownStep(item, coll))
-	{
-		if (TrInput & IN_CROUCH)
-		{
-			if (TestLaraCrawlDownStep(item, coll))
-				return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
-			else
-				return CrawlVaultTestResult{ false };
-		}
-		else [[likely]]
-			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_STEP_DOWN };
-	}
-
-	if (TestLaraCrawlExitJump(item, coll))
-	{
-		if (TrInput & IN_WALK)
-			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_FLIP };
-		else [[likely]]
-			return CrawlVaultTestResult{ true, LS_CRAWL_EXIT_JUMP };
-	}
-
-	if (TestLaraCrawlUpStep(item, coll))
-		return CrawlVaultTestResult{ true, LS_CRAWL_STEP_UP };
-
-	if (TestLaraCrawlDownStep(item, coll))
-		return CrawlVaultTestResult{ true, LS_CRAWL_STEP_DOWN };
-
-	return CrawlVaultTestResult{ false };
 }
 
 bool TestLaraJumpTolerance(ITEM_INFO* item, CollisionInfo* coll, JumpTestSetup testSetup)
