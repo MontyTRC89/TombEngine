@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseSpearGuardian(short itemNum);
-void SpearGuardianControl(short itemNum);
+void InitialiseSpearGuardian(short itemNumber);
+void SpearGuardianControl(short itemNumber);

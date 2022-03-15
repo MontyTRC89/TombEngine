@@ -63,11 +63,11 @@ void YetiControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
@@ -77,8 +77,8 @@ void YetiControl(short itemNumber)
 			info->MaxTurn = 0;
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 1;
@@ -93,9 +93,9 @@ void YetiControl(short itemNumber)
 				else if (GetRandomControl() < 0x300)
 					item->Animation.TargetState = 3;
 			}
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2) && GetRandomControl() < 0x4000)
+			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && GetRandomControl() < 0x4000)
 				item->Animation.TargetState = 4;
-			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
+			else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 				item->Animation.TargetState = 5;
 			else if (info->Mood == MoodType::Stalk)
 				item->Animation.TargetState = 3;
@@ -105,8 +105,8 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 7:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape || item->HitStatus)
 				item->Animation.TargetState = 2;
@@ -131,8 +131,8 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 9:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape || item->HitStatus)
 				item->Animation.TargetState = 2;
@@ -156,8 +156,8 @@ void YetiControl(short itemNumber)
 		case 3:
 			info->MaxTurn = ANGLE(4.0f);
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 1;
@@ -178,9 +178,9 @@ void YetiControl(short itemNumber)
 			}
 			else if (info->Mood == MoodType::Attack)
 			{
-				if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
+				if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 2;
-				else if (aiInfo.distance < pow(SECTOR(2), 2))
+				else if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 1;
 			}
 
@@ -191,16 +191,16 @@ void YetiControl(short itemNumber)
 			tilt = angle / 4;
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				break;
 			else if (info->Mood == MoodType::Bored)
 				item->Animation.TargetState = 3;
-			else if (aiInfo.ahead && aiInfo.distance < pow(CLICK(1), 2))
+			else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 				item->Animation.TargetState = 2;
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(2), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = 6;
 			else if (info->Mood == MoodType::Stalk)
 				item->Animation.TargetState = 3;
@@ -208,8 +208,8 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 4:
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags && item->TouchBits & 0x1400)
 			{
@@ -225,8 +225,8 @@ void YetiControl(short itemNumber)
 		case 5:
 			info->MaxTurn = ANGLE(4.0f);
 
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
 			{
@@ -244,8 +244,8 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 6:
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags && item->TouchBits & (0x0700 | 0x1400))
 			{
