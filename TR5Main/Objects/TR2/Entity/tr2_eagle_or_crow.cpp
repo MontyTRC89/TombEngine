@@ -90,11 +90,11 @@ void EagleControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, TIMID);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, TIMID);
 
 		angle = CreatureTurn(item, ANGLE(3.0f));
 
@@ -125,7 +125,7 @@ void EagleControl(short itemNumber)
 				item->Animation.TargetState = item->Animation.RequiredState;
 			if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 2;
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 				item->Animation.TargetState = 6;
 			else
 				item->Animation.TargetState = 3;
@@ -138,7 +138,7 @@ void EagleControl(short itemNumber)
 				item->Animation.RequiredState = 2;
 				item->Animation.TargetState = 1;
 			}
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.5f), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 				item->Animation.TargetState = 6;
 
 			break;
