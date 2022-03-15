@@ -38,11 +38,11 @@ void SharkControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
@@ -52,7 +52,7 @@ void SharkControl(short itemNumber)
 			info->Flags = 0;
 			info->MaxTurn = 0;
 
-			if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
+			if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2) && AI.zoneNumber == AI.enemyZone)
 				item->Animation.TargetState = 3;
 			else
 				item->Animation.TargetState = 1;
@@ -63,9 +63,9 @@ void SharkControl(short itemNumber)
 
 			if (info->Mood == MoodType::Bored)
 				break;
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(0.75f), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2))
 				item->Animation.TargetState = 0;
-			else if (info->Mood == MoodType::Escape || aiInfo.distance > pow(SECTOR(3), 2) || !aiInfo.ahead)
+			else if (info->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !AI.ahead)
 				item->Animation.TargetState = 2;
 
 			break;
@@ -78,11 +78,11 @@ void SharkControl(short itemNumber)
 				item->Animation.TargetState = 1;
 			else if (info->Mood == MoodType::Escape)
 				break;
-			else if (aiInfo.ahead && aiInfo.distance < pow(1365, 2) && aiInfo.zoneNumber == aiInfo.enemyZone)
+			else if (AI.ahead && AI.distance < pow(1365, 2) && AI.zoneNumber == AI.enemyZone)
 			{
 				if (GetRandomControl() < 0x800)
 					item->Animation.TargetState = 0;
-				else if (aiInfo.distance < pow(SECTOR(0.75f), 2))
+				else if (AI.distance < pow(SECTOR(0.75f), 2))
 					item->Animation.TargetState = 4;
 			}
 
@@ -90,8 +90,8 @@ void SharkControl(short itemNumber)
 
 		case 3:
 		case 4:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (!info->Flags && item->TouchBits & 0x3400)
 			{
