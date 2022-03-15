@@ -34,9 +34,6 @@ DisplayString::DisplayString()
 	// We don't ever dereference this pointer; it's just
 	// a handy way to get a unique key for a hash map.
 
-	//TODO Make sure to reset this when loading a save,
-	//TODO because this key will have a chance to no longer
-	//TODO be unique. -- squidshire, 28/08/2021
 	m_id = reinterpret_cast<DisplayStringIDType>(this);
 }
 
