@@ -164,7 +164,7 @@ namespace Misc {
 
 
 		///Translate a pair of percentages to screen-space pixel coordinates.
-		//To be used with @{DisplayString:SetPos} and @{DisplayString.new}.
+		//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString.new}.
 		//@function PercentToScreen
 		//@tparam float x percent value to translate to x-coordinate
 		//@tparam float y percent value to translate to y-coordinate
@@ -174,7 +174,7 @@ namespace Misc {
 
 
 		///Translate a pair of coordinates to percentages of window dimensions.
-		//To be used with @{DisplayString:GetPos}.
+		//To be used with @{Strings.DisplayString:GetPosition}.
 		//@function ScreenToPercent
 		//@tparam int x pixel value to translate to a percentage of the window width
 		//@tparam int y pixel value to translate to a percentage of the window height
