@@ -6,39 +6,40 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO workerMachineGun = { 0, 308, 32, 9 };
+BITE_INFO WorkerMachineGunBite = { 0, 308, 32, 9 };
 
-void InitialiseWorkerMachineGun(short itemNum)
+void InitialiseWorkerMachineGun(short itemNumber)
 {
-	ANIM_STRUCT* anim;
-	ITEM_INFO* item;
-	item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
+
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
-	anim = &g_Level.Anims[item->Animation.AnimNumber];
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	item->Animation.FrameNumber = anim->frameBase;
 	item->Animation.ActiveState = anim->ActiveState;
 }
 
-void WorkerMachineGunControl(short itemNum)
+void WorkerMachineGunControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CreatureInfo* machinegun;
-	AI_INFO info;
-	short angle, head_y, head_x, torso_y, torso_x, tilt;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	machinegun = (CreatureInfo*)item->Data;
-	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
+	short tilt = 0;
+	short angle = 0;
+	short headX = 0;
+	short headY = 0;
+	short torsoX = 0;
+	short torsoY = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -51,213 +52,195 @@ void WorkerMachineGunControl(short itemNum)
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, machinegun->MaxTurn);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
+
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
+
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			machinegun->Flags = 0;
-			machinegun->MaxTurn = 0;
+			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (machinegun->Mood == MoodType::Escape)
-			{
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
-			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item, &AI))
 			{
-				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
+				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = (GetRandomControl() < 0x4000) ? 8 : 10;
 				else
 					item->Animation.TargetState = 2;
 			}
-			else if (machinegun->Mood == MoodType::Attack || !info.ahead)
+			else if (creature->Mood == MoodType::Attack || !AI.ahead)
 			{
-				if (info.distance <= 0x400000)
+				if (AI.distance <= SECTOR(4096))
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 3;
 			}
 			else
-			{
 				item->Animation.TargetState = 4;
-			}
+			
 			break;
 
 		case 2:
-			machinegun->MaxTurn = 546;
+			creature->MaxTurn = ANGLE(3.0f);
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (machinegun->Mood == MoodType::Escape)
-			{
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
-			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item, &AI))
 			{
-				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
+				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 6;
 			}
-			else if (machinegun->Mood == MoodType::Attack || !info.ahead)
+			else if (creature->Mood == MoodType::Attack || !AI.ahead)
 			{
-				if (info.distance > 0x400000)
+				if (AI.distance > SECTOR(4096))
 					item->Animation.TargetState = 3;
 			}
 			else
-			{
 				item->Animation.TargetState = 4;
-			}
+			
 			break;
 
 		case 3:
-			machinegun->MaxTurn = 910;
+			creature->MaxTurn = ANGLE(5.0f);
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (machinegun->Mood != MoodType::Escape)
+			if (creature->Mood != MoodType::Escape)
 			{
-				if (Targetable(item, &info))
-				{
+				if (Targetable(item, &AI))
 					item->Animation.TargetState = 2;
-				}
-				else if (machinegun->Mood == MoodType::Bored || machinegun->Mood == MoodType::Stalk)
-				{
+				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 2;
-				}
 			}
+
 			break;
 
 		case 4:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (Targetable(item, &info))
-			{
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 5;
-			}
 			else
 			{
-				if (machinegun->Mood == MoodType::Attack)
-				{
+				if (creature->Mood == MoodType::Attack)
 					item->Animation.TargetState = 1;
-				}
-				else if (!info.ahead)
-				{
+				else if (!AI.ahead)
 					item->Animation.TargetState = 1;
-				}
 			}
+			
 			break;
 
 		case 8:
 		case 10:
-			machinegun->Flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (Targetable(item, &info))
-			{
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = (item->Animation.ActiveState == 8) ? 5 : 11;
-			}
 			else
-			{
 				item->Animation.TargetState = 1;
-			}
+			
 			break;
 
 		case 9:
-			machinegun->Flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (Targetable(item, &info))
-			{
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 6;
-			}
 			else
-			{
 				item->Animation.TargetState = 2;
-			}
+			
 			break;
 
 		case 5:
 		case 11:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (machinegun->Flags)
-			{
-				machinegun->Flags--;
-			}
+			if (creature->Flags)
+				creature->Flags--;
 			else
 			{
-				ShotLara(item, &info, &workerMachineGun, torso_y, 30);
-				machinegun->FiredWeapon = 1;
-				machinegun->Flags = 5;
+				ShotLara(item, &AI, &WorkerMachineGunBite, torsoY, 30);
+				creature->FiredWeapon = 1;
+				creature->Flags = 5;
 			}
 
-			if (item->Animation.TargetState != 1 && (machinegun->Mood == MoodType::Escape || info.distance > 0x900000 || !Targetable(item, &info)))
+			if (item->Animation.TargetState != 1 &&
+				(creature->Mood == MoodType::Escape || AI.distance > SECTOR(9246) || !Targetable(item, &AI)))
 			{
 				item->Animation.TargetState = 1;
 			}
+
 			break;
 
 		case 6:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (machinegun->Flags)
-			{
-				machinegun->Flags--;
-			}
+			if (creature->Flags)
+				creature->Flags--;
 			else
 			{
-				ShotLara(item, &info, &workerMachineGun, torso_y, 30);
-				machinegun->FiredWeapon = 1;
-				machinegun->Flags = 5;
+				ShotLara(item, &AI, &WorkerMachineGunBite, torsoY, 30);
+				creature->FiredWeapon = 1;
+				creature->Flags = 5;
 			}
+
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torso_y);
-	CreatureJoint(item, 1, torso_x);
-	CreatureJoint(item, 2, head_y);
-	CreatureJoint(item, 3, head_x);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureJoint(item, 0, torsoY);
+	CreatureJoint(item, 1, torsoX);
+	CreatureJoint(item, 2, headY);
+	CreatureJoint(item, 3, headX);
+	CreatureAnimation(itemNumber, angle, tilt);
 }
