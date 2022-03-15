@@ -11,15 +11,15 @@ Represents the properties of an object as it appears in the inventory.
 @pragma nostrip
 */
 
-/*** Create an inventoryObject item. Use this if you want to specify property values later later.
+/*** Create an InventoryItem item. Use this if you want to specify property values later later.
 The default property values are not disclosed here, since at the time of writing, they are subject to change.
-	@function InventoryObject.new
-	@return an InventoryObject
+	@function InventoryItem.new
+	@return an InventoryItem
 */
 
 /*** For more information on each parameter, see the
 associated getters and setters.
-	@function InventoryObject.new
+	@function InventoryItem.new
 	@tparam string nameKey name key
 	@tparam InvItem slot slot of inventory object to change
 	@tparam int yOffset y-axis offset (positive values move the item down)
@@ -28,7 +28,7 @@ associated getters and setters.
 	@tparam RotationAxis rotAxisWhenCurrent axis to rotate around in inventory
 	@tparam int meshBits not currently implemented
 	@tparam ItemAction action is this usable, equippable, or examinable?
-	@return an InventoryObject
+	@return an InventoryItem
 */
 InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
 	name{ a_name },

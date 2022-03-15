@@ -12,7 +12,7 @@ Uses screen-space coordinates, with x values specifying the number of pixels fro
 and y values specifying the number of pixels from the top of the window.
 
 Since different players will have different resolutions, you should work in terms of percentages where possible,
-and use @{Level-specific.ScreenToPercent|ScreenToPercent} and @{Level-specific.PercentToScreen|PercentToScreen}
+and use @{Misc.ScreenToPercent|ScreenToPercent} and @{Misc.PercentToScreen|PercentToScreen}
 when you need to use screen-space coordinates.
 
 @tenclass Strings.DisplayString
@@ -41,7 +41,7 @@ DisplayString::DisplayString()
 }
 
 /*** Create a DisplayString.
-For use in @{Level-specific.ShowString|ShowString} and @{Level-specific.HideString|HideString}.
+For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.
 @function DisplayString.new
 @tparam string str string to print or key of translated string
 @tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
