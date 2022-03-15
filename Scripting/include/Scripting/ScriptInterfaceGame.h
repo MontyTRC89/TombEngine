@@ -3,6 +3,7 @@
 #include <functional>
 #include "room.h"
 #include "Specific/level.h"
+#include "Game/control/volumetriggerer.h"
 
 typedef DWORD D3DCOLOR;
 using VarMapVal = std::variant< short,
@@ -30,7 +31,7 @@ public:
 
 	virtual void FreeLevelScripts() = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
-	virtual void ExecuteFunction(std::string const& luaFileName) = 0;
+	virtual void ExecuteFunction(std::string const& luaFileName, TEN::Control::Volumes::VolumeTriggerer) = 0;
 
 	virtual void SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) = 0;
 	virtual void GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const = 0;
