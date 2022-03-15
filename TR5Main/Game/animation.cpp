@@ -372,6 +372,48 @@ void AnimateItem(ITEM_INFO* item)
 	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
+// Check if targetState can be dispatched from the current frame.
+bool HasChange(ITEM_INFO* item, int targetState)
+{
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
+
+	if (anim->numberChanges <= 0)
+		return false;
+
+	if (targetState < -1)
+		targetState = item->Animation.TargetState;
+
+	// Iterate over possible state dispatches.
+	for (int i = 0; i < anim->numberChanges; i++)
+	{
+		auto* change = &g_Level.Changes[anim->changeIndex + i];
+		if (change->TargetState == targetState)
+		{
+			// Iterate over frame range of state dispatch.
+			for (int j = 0; j < change->numberRanges; j++)
+			{
+				auto* range = &g_Level.Ranges[change->rangeIndex + j];
+				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool TestLastFrame(ITEM_INFO* item, int animNumber)
+{
+	if (animNumber < 0)
+		animNumber = item->Animation.AnimNumber;
+
+	if (item->Animation.AnimNumber != animNumber)
+		return false;
+
+	auto* anim = &g_Level.Anims[animNumber];
+	return (item->Animation.FrameNumber >= anim->frameEnd);
+}
+
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
 	float c = phd_cos(item->Position.yRot);
@@ -380,6 +422,25 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->Position.xPos += roundf(c * x + s * z);
 	item->Position.yPos += y;
 	item->Position.zPos += roundf(-s * x + c * z);
+}
+
+void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
+{
+	auto index = Objects[item->ObjectNumber].animIndex + animIndex;
+
+	if (index < 0 || index >= g_Level.Anims.size())
+	{
+		TENLog(std::string("Attempt to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		return;
+	}
+
+	if (item->Animation.AnimNumber == animIndex)
+		return;
+
+	item->Animation.AnimNumber = index;
+	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
+	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
+	item->Animation.TargetState = item->Animation.ActiveState;
 }
 
 bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
@@ -505,37 +566,6 @@ int GetNextAnimState(int objectID, int animNumber)
 	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].ActiveState;
 }
 
-void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
-{
-	auto index = Objects[item->ObjectNumber].animIndex + animIndex;
-
-	if (index < 0 || index >= g_Level.Anims.size())
-	{
-		TENLog(std::string("Attempt to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-		return;
-	}
-
-	if (item->Animation.AnimNumber == animIndex)
-		return;
-
-	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
-	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
-	item->Animation.TargetState = item->Animation.ActiveState;
-}
-
-bool TestLastFrame(ITEM_INFO* item, int animNumber)
-{
-	if (animNumber < 0)
-		animNumber = item->Animation.AnimNumber;
-
-	if (item->Animation.AnimNumber != animNumber)
-		return false;
-
-	auto* anim = &g_Level.Anims[animNumber];
-	return (item->Animation.FrameNumber >= anim->frameEnd);
-}
-
 void DrawAnimatingItem(ITEM_INFO* item)
 {
 	// TODO: to refactor
@@ -555,15 +585,15 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int laraMeshIndex)
 	pos->z = pos2.z;
 }
 
-void ClampRotation(PHD_3DPOS* pos, short angle, short rot)
+void ClampRotation(PHD_3DPOS* pos, short angle, short rotation)
 {
-	if (angle <= rot)
+	if (angle <= rotation)
 	{
-		if (angle >= -rot)
+		if (angle >= -rotation)
 			pos->yRot += angle;
 		else
-			pos->yRot -= rot;
+			pos->yRot -= rotation;
 	}
 	else
-		pos->yRot += rot;
+		pos->yRot += rotation;
 }

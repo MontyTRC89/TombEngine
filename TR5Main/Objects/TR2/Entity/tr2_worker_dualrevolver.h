@@ -1,3 +1,3 @@
 #pragma once
 
-void WorkerDualGunControl(short itemNum);
+void WorkerDualGunControl(short itemNumber);
