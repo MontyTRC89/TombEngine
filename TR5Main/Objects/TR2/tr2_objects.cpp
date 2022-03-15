@@ -601,7 +601,7 @@ static void StartEntity(OBJECT_INFO* obj)
 	obj = &Objects[ID_SNOWMOBILE_GUN];
 	if (obj->loaded)
 	{
-		obj->collision = SkidManCollision;
+		obj->collision = SkidooManCollision;
 		//obj->drawRoutine = DrawSkidoo; // TODO: recreate renderer for skidoo
 		obj->shadowSize = UNIT_SHADOW / 2;
 		obj->HitPoints = 100;
@@ -618,8 +618,8 @@ static void StartEntity(OBJECT_INFO* obj)
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSkidman;
-		obj->control = SkidManControl;
+		obj->initialise = InitialiseSkidooMan;
+		obj->control = SkidooManControl;
 		obj->HitPoints = 1;
 		obj->hitEffect = HIT_BLOOD;
 		obj->saveAnim = true;

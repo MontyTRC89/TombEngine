@@ -33,8 +33,8 @@ void SilencerControl(short itemNumber)
 	auto* info = GetCreatureInfo(item);
 
 	short angle = 0;
-	short torsoY = 0;
 	short torsoX = 0;
+	short torsoY = 0;
 	short head = 0;
 	short tilt = 0;
 
@@ -49,19 +49,19 @@ void SilencerControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
 		switch (item->Animation.ActiveState)
 		{
 		case 3:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 			info->MaxTurn = 0;
 
 			if (item->Animation.RequiredState)
@@ -70,8 +70,8 @@ void SilencerControl(short itemNumber)
 			break;
 
 		case 4:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 			info->MaxTurn = 0;
 
 			if (info->Mood == MoodType::Escape)
@@ -81,15 +81,15 @@ void SilencerControl(short itemNumber)
 			}
 			else
 			{
-				if (Targetable(item, &aiInfo))
+				if (Targetable(item, &AI))
 				{
 					item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 					item->Animation.TargetState = 3;
 				}
 
-				if (info->Mood == MoodType::Attack || !aiInfo.ahead)
+				if (info->Mood == MoodType::Attack || !AI.ahead)
 				{
-					if (aiInfo.distance >= 0x400000)
+					if (AI.distance >= SECTOR(4096))
 					{
 						item->Animation.RequiredState = 2;
 						item->Animation.TargetState = 3;
@@ -121,21 +121,21 @@ void SilencerControl(short itemNumber)
 			break;
 
 		case 1:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			info->MaxTurn = 910;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 2;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 			{
 				item->Animation.RequiredState = (GetRandomControl() >= 0x4000 ? 10 : 6);
 				item->Animation.TargetState = 3;
 			}
 			else
 			{
-				if (aiInfo.distance > 0x400000 || !aiInfo.ahead)
+				if (AI.distance > SECTOR(4096) || !AI.ahead)
 					item->Animation.TargetState = 2;
 				if (info->Mood == MoodType::Bored && GetRandomControl() < 0x300)
 					item->Animation.TargetState = 3;
@@ -144,8 +144,8 @@ void SilencerControl(short itemNumber)
 			break;
 
 		case 2:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			info->MaxTurn = ANGLE(5.0f);
 			info->Flags = 0;
@@ -153,16 +153,16 @@ void SilencerControl(short itemNumber)
 
 			if (info->Mood == MoodType::Escape)
 			{
-				if (Targetable(item, &aiInfo))
+				if (Targetable(item, &AI))
 					item->Animation.TargetState = 9;
 
 				break;
 
 			}
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 			{
-				if (aiInfo.distance >= 0x400000 && aiInfo.zoneNumber == aiInfo.enemyZone)
+				if (AI.distance >= SECTOR(4096) && AI.zoneNumber == AI.enemyZone)
 					item->Animation.TargetState = 9;
 
 				break;
@@ -175,12 +175,12 @@ void SilencerControl(short itemNumber)
 			break;
 
 		case 5:
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			info->MaxTurn = 0;
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 			{
 				item->Animation.RequiredState = 6;
 				item->Animation.TargetState = 3;
@@ -189,7 +189,7 @@ void SilencerControl(short itemNumber)
 			{
 				if (info->Mood == MoodType::Attack || GetRandomControl() < 0x100)
 					item->Animation.TargetState = 3;
-				if (!aiInfo.ahead)
+				if (!AI.ahead)
 					item->Animation.TargetState = 3;
 			}
 
@@ -200,17 +200,17 @@ void SilencerControl(short itemNumber)
 			info->MaxTurn = 0;
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoY = aiInfo.angle;
-				torsoX = aiInfo.xAngle;
+				torsoY = AI.angle;
+				torsoX = AI.xAngle;
 			}
 			else
-				head = aiInfo.angle;
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 				item->Animation.TargetState = item->Animation.ActiveState != 6 ? 11 : 7;
 			else
 				item->Animation.TargetState = 3;
@@ -221,17 +221,17 @@ void SilencerControl(short itemNumber)
 		case 11:
 			info->MaxTurn = 0;
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoY = aiInfo.angle;
-				torsoX = aiInfo.xAngle;
+				torsoY = AI.angle;
+				torsoX = AI.xAngle;
 			}
 			else
-				head = aiInfo.angle;
+				head = AI.angle;
 
 			if (!info->Flags)
 			{
-				ShotLara(item, &aiInfo, &SilencerGunBite, torsoY, 50);
+				ShotLara(item, &AI, &SilencerGunBite, torsoY, 50);
 				info->Flags = 1;
 			}
 
@@ -240,17 +240,17 @@ void SilencerControl(short itemNumber)
 		case 9:
 			info->MaxTurn = ANGLE(5.0f);
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoY = aiInfo.angle;
-				torsoX = aiInfo.xAngle;
+				torsoY = AI.angle;
+				torsoX = AI.xAngle;
 			}
 			else
-				head = aiInfo.angle;
+				head = AI.angle;
 
 			if (!item->Animation.RequiredState)
 			{
-				if (!ShotLara(item, &aiInfo, &SilencerGunBite, torsoY, 50))
+				if (!ShotLara(item, &AI, &SilencerGunBite, torsoY, 50))
 					item->Animation.TargetState = 2;
 
 				item->Animation.RequiredState = 9;

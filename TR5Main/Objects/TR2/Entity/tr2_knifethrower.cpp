@@ -104,11 +104,11 @@ void KnifeThrowerControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
@@ -117,19 +117,19 @@ void KnifeThrowerControl(short itemNumber)
 		case 1:
 			info->MaxTurn = 0;
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 				item->Animation.TargetState = 8;
 			else if (info->Mood == MoodType::Bored)
 			{
-				if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(6), 2))
+				if (!AI.ahead || AI.distance > pow(SECTOR(6), 2))
 					item->Animation.TargetState = 2;
 			}
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(4), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
 				item->Animation.TargetState = 2;
 			else
 				item->Animation.TargetState = 3;
@@ -139,14 +139,14 @@ void KnifeThrowerControl(short itemNumber)
 		case 2:
 			info->MaxTurn = ANGLE(3.0f);
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
 			if (info->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 			{
-				if (aiInfo.distance < pow(SECTOR(2.5f), 2) || aiInfo.zoneNumber != aiInfo.enemyZone)
+				if (AI.distance < pow(SECTOR(2.5f), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else if (GetRandomControl() < 0x4000)
 					item->Animation.TargetState = 4;
@@ -155,10 +155,10 @@ void KnifeThrowerControl(short itemNumber)
 			}
 			else if (info->Mood == MoodType::Bored)
 			{
-				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
+				if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
 					item->Animation.TargetState = 1;
 			}
-			else if (!aiInfo.ahead || aiInfo.distance > pow(SECTOR(4), 2))
+			else if (!AI.ahead || AI.distance > pow(SECTOR(4), 2))
 				item->Animation.TargetState = 3;
 			
 			break;
@@ -167,21 +167,21 @@ void KnifeThrowerControl(short itemNumber)
 			info->MaxTurn = ANGLE(6.0f);
 			tilt = angle / 3;
 
-			if (aiInfo.ahead)
-				head = aiInfo.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 			{
 				item->Animation.TargetState = 2;
 			}
 			else if (info->Mood == MoodType::Bored)
 			{
-				if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(6), 2))
+				if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 2;
 			}
-			else if (aiInfo.ahead && aiInfo.distance < pow(SECTOR(4), 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(4), 2))
 				item->Animation.TargetState = 2;
 
 			break;
@@ -189,10 +189,10 @@ void KnifeThrowerControl(short itemNumber)
 		case 4:
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 5;
 			else
 				item->Animation.TargetState = 2;
@@ -202,10 +202,10 @@ void KnifeThrowerControl(short itemNumber)
 		case 6:
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 7;
 			else
 				item->Animation.TargetState = 2;
@@ -215,10 +215,10 @@ void KnifeThrowerControl(short itemNumber)
 		case 8:
 			info->Flags = 0;
 
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 9;
 			else
 				item->Animation.TargetState = 1;
@@ -226,8 +226,8 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 5:
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags)
 			{
@@ -238,8 +238,8 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 7:
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags)
 			{
@@ -250,8 +250,8 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 9:
-			if (aiInfo.ahead)
-				torso = aiInfo.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
 			if (!info->Flags)
 			{

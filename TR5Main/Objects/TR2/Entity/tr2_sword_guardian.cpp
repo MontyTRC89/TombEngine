@@ -9,25 +9,22 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-BITE_INFO swordBite = { 0, 37, 550, 15 };
+BITE_INFO SwordBite = { 0, 37, 550, 15 };
 
-void InitialiseSwordGuardian(short itemNum)
+void InitialiseSwordGuardian(short itemNumber)
 {
-	ANIM_STRUCT* anim;
-	ITEM_INFO* item;
+	auto* item = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNum];
-
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 }
 
 static void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
-
 	pos.x = (GetRandomControl() * 256 / 32768) + item->Position.xPos - 128;
 	pos.y = (GetRandomControl() * 256 / 32768) + item->Position.yPos - 256;
 	pos.z = (GetRandomControl() * 256 / 32768) + item->Position.zPos - 128;
@@ -36,21 +33,19 @@ static void SwordGuardianFly(ITEM_INFO* item)
 	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Position, 0);
 }
 
-void SwordGuardianControl(short itemNum)
+void SwordGuardianControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CreatureInfo* sword;
-	AI_INFO info;
-	short angle, head, torso;
-	bool lara_alive;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	sword = (CreatureInfo*)item->Data;
-	angle = head = torso = 0;
-	lara_alive = (LaraItem->HitPoints > 0);
+	short angle = 0;
+	short head = 0;
+	short torso = 0;
+
+	bool laraAlive = LaraItem->HitPoints > 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -61,40 +56,43 @@ void SwordGuardianControl(short itemNum)
 			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Position, 0);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
-			ExplodingDeath(itemNum, -1, 256);
+			ExplodingDeath(itemNumber, -1, 256);
 			//item->objectNumber = ID_SWAT;
-			DisableEntityAI(itemNum);
-			KillItem(itemNum);
+			DisableEntityAI(itemNumber);
+			KillItem(itemNumber);
 			//item->status = ITEM_DESACTIVATED;
 			//item->flags |= ONESHOT;
 			item->Animation.ActiveState = 12;
 		}
+
 		return;
 	}
 	else
 	{
-		sword->LOT.Step = STEP_SIZE;
-		sword->LOT.Drop = -STEP_SIZE;
-		sword->LOT.Fly = NO_FLYING;
-		sword->LOT.Zone = ZONE_BASIC;
-		CreatureAIInfo(item, &info);
+		creature->LOT.Step = STEP_SIZE;
+		creature->LOT.Drop = -STEP_SIZE;
+		creature->LOT.Fly = NO_FLYING;
+		creature->LOT.Zone = ZONE_BASIC;
+
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
 		if (item->Animation.ActiveState == 8)
 		{
-			if (info.zoneNumber != info.enemyZone)
+			if (AI.zoneNumber != AI.enemyZone)
 			{
-				sword->LOT.Step = WALL_SIZE * 20;
-				sword->LOT.Drop = -WALL_SIZE * 20;
-				sword->LOT.Fly = STEP_SIZE / 4;
-				sword->LOT.Zone = ZONE_FLYER;
-				CreatureAIInfo(item, &info);
+				creature->LOT.Step = WALL_SIZE * 20;
+				creature->LOT.Drop = -WALL_SIZE * 20;
+				creature->LOT.Fly = STEP_SIZE / 4;
+				creature->LOT.Zone = ZONE_FLYER;
+				CreatureAIInfo(item, &AI);
 			}
 		}
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, sword->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (item->Animation.ActiveState != 9)
 			item->MeshBits = 0xFFFFFFFF;
@@ -102,28 +100,27 @@ void SwordGuardianControl(short itemNum)
 		switch (item->Animation.ActiveState)
 		{
 		case 9:
-			sword->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (!sword->Flags)
+			if (!creature->Flags)
 			{
 				item->MeshBits = (item->MeshBits << 1) + 1;
-				sword->Flags = 3;
+				creature->Flags = 3;
 			}
 			else
-			{
-				sword->Flags--;
-			}
+				creature->Flags--;
+			
 			break;
 
 		case 1:
-			sword->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (info.ahead)
-				head = info.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (lara_alive)
+			if (laraAlive)
 			{
-				if (info.bite && info.distance < 0x100000)
+				if (AI.bite && AI.distance < SECTOR(1024))
 				{
 					if (GetRandomControl() >= 0x4000)
 						item->Animation.TargetState = 5;
@@ -132,98 +129,100 @@ void SwordGuardianControl(short itemNum)
 				}
 				else
 				{
-					if (info.zoneNumber == info.enemyZone)
+					if (AI.zoneNumber == AI.enemyZone)
 						item->Animation.TargetState = 2;
 					else
 						item->Animation.TargetState = 8;
 				}
 			}
 			else
-			{
 				item->Animation.TargetState = 7;
-			}
+			
 			break;
 
 		case 2:
-			sword->MaxTurn = ANGLE(9);
+			creature->MaxTurn = ANGLE(9.0f);
 
-			if (info.ahead)
-				head = info.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (lara_alive)
+			if (laraAlive)
 			{
-				if (info.bite && info.distance < 0x400000)
+				if (AI.bite && AI.distance < SECTOR(4096))
 					item->Animation.TargetState = 10;
-				else if (info.zoneNumber != info.enemyZone)
+				else if (AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 			}
 			else
-			{
 				item->Animation.TargetState = 1;
-			}
+			
 			break;
 
 		case 3:
-			sword->Flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
-				torso = info.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (!info.bite || info.distance > 0x100000)
+			if (!AI.bite || AI.distance > SECTOR(1024))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 4;
 			break;
 
 		case 5:
-			sword->Flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
-				torso = info.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (!info.bite || info.distance > 0x100000)
+			if (!AI.bite || AI.distance > SECTOR(1024))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 6;
+
 			break;
 
 		case 10:
-			sword->Flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
-				torso = info.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (!info.bite || info.distance > 0x400000)
+			if (!AI.bite || AI.distance > SECTOR(4096))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 11;
+
 			break;
 
 		case 8:
-			sword->MaxTurn = ANGLE(7);
-
-			if (info.ahead)
-				head = info.angle;
-
+			creature->MaxTurn = ANGLE(7.0f);
 			SwordGuardianFly(item);
 
-			if (!sword->LOT.Fly)
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (!creature->LOT.Fly)
 				item->Animation.TargetState = 1;
+
 			break;
 
 		case 4:
 		case 6:
 		case 11:
-			if (info.ahead)
-				torso = info.angle;
+			if (AI.ahead)
+				torso = AI.angle;
 
-			if (!sword->Flags && (item->TouchBits & 0xC000))
+			if (!creature->Flags && (item->TouchBits & 0xC000))
 			{
+				CreatureEffect(item, &SwordBite, DoBloodSplat);
+				creature->Flags = 1;
+
 				LaraItem->HitPoints -= 300;
 				LaraItem->HitStatus = true;
-				CreatureEffect(item, &swordBite, DoBloodSplat);
-				sword->Flags = 1;
 			}
+
 			break;
 		}
 	}
@@ -232,6 +231,6 @@ void SwordGuardianControl(short itemNum)
 	{
 		CreatureJoint(item, 0, torso);
 		CreatureJoint(item, 1, head);
-		CreatureAnimation(itemNum, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 	}
 }
