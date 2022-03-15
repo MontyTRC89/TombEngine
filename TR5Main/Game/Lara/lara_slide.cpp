@@ -110,7 +110,7 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			item->Animation.Velocity = lara->ExtraVelocity.x;
-			item->Animation.VerticalVelocity = lara->ExtraVelocity.y / 2;
+			item->Animation.VerticalVelocity = lara->ExtraVelocity.y;
 		}
 
 		return;
@@ -217,7 +217,7 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
 			item->Animation.Velocity = lara->ExtraVelocity.x;
-			item->Animation.VerticalVelocity = lara->ExtraVelocity.y / 2;
+			item->Animation.VerticalVelocity = lara->ExtraVelocity.y;
 		}
 
 		return;

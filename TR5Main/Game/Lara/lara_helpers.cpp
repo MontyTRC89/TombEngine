@@ -498,6 +498,13 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 
 	// TODO: Take inertia into consideration before switching slide animations.
 
+	// Snap to height upon slide entrance.
+	if (item->Animation.ActiveState != LS_SLIDE_FORWARD &&
+		item->Animation.ActiveState != LS_SLIDE_BACK)
+	{
+		LaraSnapToHeight(item, coll);
+	}
+
 	// Slide forward.
 	if (deltaAngle <= ANGLE(90.0f))
 	{
@@ -514,8 +521,6 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
 	}
-
-	LaraSnapToHeight(item, coll);
 }
 
 void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)

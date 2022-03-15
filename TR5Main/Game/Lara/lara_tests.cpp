@@ -129,7 +129,7 @@ bool TestLaraSlide(ITEM_INFO* item, CollisionInfo* coll)
 	int y = item->Position.yPos;
 	auto probe = GetCollision(item);
 
-	if (abs(probe.Position.Floor - y) <= CLICK(1) &&
+	if (abs(probe.Position.Floor - y) <= STEPUP_HEIGHT &&
 		probe.Position.FloorSlope &&
 		!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
@@ -950,15 +950,12 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-// WIP
 bool TestLaraLand(ITEM_INFO* item, CollisionInfo* coll)
 {
-	//int heightFromFloor = GetCollisionResult(item).Position.Floor - item->Position.yPos;
+	int heightFromFloor = GetCollision(item).Position.Floor - item->Position.yPos;
 	
-	//if (item->VerticalVelocity >= 0 &&
-	if (item->Animation.Airborne && item->Animation.VerticalVelocity > 0 &&
-		(coll->Middle.Floor <= item->Animation.VerticalVelocity ||
-			TestEnvironment(ENV_FLAG_SWAMP, item)))
+	if (item->Animation.Airborne && item->Animation.VerticalVelocity >= 0 &&
+		(heightFromFloor <= item->Animation.VerticalVelocity || TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
 	}
