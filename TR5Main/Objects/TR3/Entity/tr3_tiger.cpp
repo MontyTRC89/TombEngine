@@ -48,18 +48,18 @@ void TigerControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, 1);
+		GetCreatureMood(item, &AI, 1);
 
-		if (info->Alerted && aiInfo.zoneNumber != aiInfo.enemyZone)
+		if (info->Alerted && AI.zoneNumber != AI.enemyZone)
 			info->Mood = MoodType::Escape;
 
-		CreatureMood(item, &aiInfo, 1);
+		CreatureMood(item, &AI, 1);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
@@ -71,7 +71,7 @@ void TigerControl(short itemNumber)
 
 			if (info->Mood == MoodType::Escape)
 			{
-				if (Lara.TargetEntity != item && aiInfo.ahead)
+				if (Lara.TargetEntity != item && AI.ahead)
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 3;
@@ -85,9 +85,9 @@ void TigerControl(short itemNumber)
 
 				item->Animation.TargetState = 2;
 			}
-			else if (aiInfo.bite && aiInfo.distance < pow(340, 2))
+			else if (AI.bite && AI.distance < pow(340, 2))
 				item->Animation.TargetState = 6;
-			else if (aiInfo.bite && aiInfo.distance < pow(SECTOR(1), 2))
+			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 			{
 				info->MaxTurn = ANGLE(3.0f);
 				item->Animation.TargetState = 8;
@@ -119,9 +119,9 @@ void TigerControl(short itemNumber)
 
 			if (info->Mood == MoodType::Bored)
 				item->Animation.TargetState = 1;
-			else if (info->Flags && aiInfo.ahead)
+			else if (info->Flags && AI.ahead)
 				item->Animation.TargetState = 1;
-			else if (aiInfo.bite && aiInfo.distance < pow(SECTOR(1.5f), 2))
+			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
 			{
 				if (LaraItem->Animation.Velocity == 0)
 					item->Animation.TargetState = 1;
@@ -133,7 +133,7 @@ void TigerControl(short itemNumber)
 				item->Animation.RequiredState = 5;
 				item->Animation.TargetState = 1;
 			}
-			else if (info->Mood == MoodType::Escape && Lara.TargetEntity != item && aiInfo.ahead)
+			else if (info->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
 				item->Animation.TargetState = 1;
 
 			info->Flags = 0;

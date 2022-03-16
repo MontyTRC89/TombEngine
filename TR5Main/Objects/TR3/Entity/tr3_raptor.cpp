@@ -74,7 +74,7 @@ void RaptorControl(short itemNumber)
 				int y = (targetItem->Position.yPos - item->Position.yPos) / 64;
 				int z = (targetItem->Position.zPos - item->Position.zPos) / 64;
 
-				int distance = x * x + y * y + z * z;
+				int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 				if (distance < minDistance && item->HitPoints > 0)
 				{
 					nearestItem = targetItem;
@@ -156,9 +156,9 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 3:
-			tilt = angle;
 			creature->MaxTurn = ANGLE(4.0f);
 			creature->Flags &= ~1;
+			tilt = angle;
 
 			if (item->TouchBits & 0xFF7C00)
 				item->Animation.TargetState = 1;
@@ -168,7 +168,7 @@ void RaptorControl(short itemNumber)
 				item->Animation.TargetState = 1;
 				creature->Flags &= ~2;
 			}
-			else if (AI.bite && AI.distance < SQUARE(1536))
+			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
 			{
 				if (item->Animation.TargetState == 3)
 				{
@@ -189,8 +189,8 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 4:
-			tilt = angle;
 			creature->MaxTurn = ANGLE(2.0f);
+			tilt = angle;
 
 			if (creature->Enemy == LaraItem)
 			{
@@ -232,8 +232,8 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 8:
-			tilt = angle;
 			creature->MaxTurn = ANGLE(2.0f);
+			tilt = angle;
 
 			if (creature->Enemy == LaraItem)
 			{
@@ -275,8 +275,9 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 7:
-			tilt = angle;
 			creature->MaxTurn = ANGLE(2.0f);
+			tilt = angle;
+
 			if (creature->Enemy == LaraItem)
 			{
 				if (!(creature->Flags & 1) && item->TouchBits & 0xFF7C00)
