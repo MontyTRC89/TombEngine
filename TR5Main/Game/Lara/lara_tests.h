@@ -62,7 +62,7 @@ bool TestLaraStepUp(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraStepDown(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll);
 
-bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup);
+bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup = false);
 bool TestLaraRunForward(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraWalkForward(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraWalkBack(ITEM_INFO* item, CollisionInfo* coll);
@@ -73,8 +73,6 @@ bool TestLaraWadeForwardSwamp(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraWalkBackSwamp(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraStepLeftSwamp(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraStepRightSwamp(ITEM_INFO* item, CollisionInfo* coll);
-
-bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup);
 bool TestLaraCrawlForward(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraCrawlBack(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll);
