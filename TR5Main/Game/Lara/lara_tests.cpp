@@ -101,22 +101,18 @@ bool TestLaraKeepLow(ITEM_INFO* item, CollisionInfo* coll)
 	// HACK: coll->Setup.Radius is currently only set to
 	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
-	auto radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
+	int radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 		? LARA_RAD : LARA_RAD_CRAWL;
 
-	auto y = item->Position.yPos;
 	auto probeFront = GetCollision(item, item->Position.yRot, radius, -coll->Setup.Height);
 	auto probeBack = GetCollision(item, item->Position.yRot + ANGLE(180.0f), radius, -coll->Setup.Height);
 	auto probeMiddle = GetCollision(item);
 
-	// TODO: Assess clamp instead?
-	// TODO: Cannot use as a failsafe in standing states; bugged with slanted ceilings reaching the ground.
-	// In common setups, Lara may embed on such ceilings, resulting in inappropriate crouch state dispatches. @Sezz 2021.10.15
-	if ((probeFront.Position.Ceiling - y) >= -LARA_HEIGHT ||	// Front is not a clamp.
-		(probeBack.Position.Ceiling - y) >= -LARA_HEIGHT ||		// Back is not a clamp.
-		(probeMiddle.Position.Ceiling - y) >= -LARA_HEIGHT)		// Middle is not a clamp.
+	if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) < LARA_HEIGHT ||	// Front is not a clamp.
+		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT ||		// Back is not a clamp.
+		abs(probeMiddle.Position.Ceiling - probeMiddle.Position.Floor) < LARA_HEIGHT)	// Middle is not a clamp.
 	{
 		return true;
 	}
