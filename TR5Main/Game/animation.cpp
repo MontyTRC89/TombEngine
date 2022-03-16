@@ -380,7 +380,7 @@ bool HasChange(ITEM_INFO* item, int targetState)
 	if (anim->numberChanges <= 0)
 		return false;
 
-	if (targetState < -1)
+	if (targetState < 0)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over possible state dispatches.

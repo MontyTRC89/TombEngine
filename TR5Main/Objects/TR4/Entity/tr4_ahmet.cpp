@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 
 	enum AhmetState
 	{
-		AHMET_STATE_EMPTY,
+		AHMET_STATE_NONE,
 		AHMET_STATE_IDLE,
 		AHMET_STATE_WALK,
 		AHMET_STATE_RUN,

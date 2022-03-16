@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
-bool ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotation, int damage) 
+bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, int damage) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
@@ -20,13 +20,13 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotati
 	bool hit = false;
 	bool targetable = false;
 
-	if (info->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, info))
+	if (AI->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, AI))
 	{
-		int distance = phd_sin(info->enemyFacing) * enemy->Animation.Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
-		distance = pow(distance, 2) + info->distance;
+		int distance = phd_sin(AI->enemyFacing) * enemy->Animation.Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
+		distance = pow(distance, 2) + AI->distance;
 		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
-			int random = (pow(MAX_VISIBILITY_DISTANCE, 2) - info->distance) / (pow(MAX_VISIBILITY_DISTANCE, 2) / 0x5000) + 8192;
+			int random = (pow(MAX_VISIBILITY_DISTANCE, 2) - AI->distance) / (pow(MAX_VISIBILITY_DISTANCE, 2) / 0x5000) + 8192;
 			hit = GetRandomControl() < random;
 		}
 		else
@@ -77,10 +77,9 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* info, BITE_INFO* gun, short extra_rotati
 	return targetable;
 }
 
-short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	GAME_VECTOR pos;
-
 	pos.x = LaraItem->Position.xPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.y = LaraItem->Floor;
 	pos.z = LaraItem->Position.zPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
@@ -88,10 +87,10 @@ short GunMiss(int x, int y, int z, short speed, short yrot, short roomNumber)
 
 	Richochet((PHD_3DPOS*)&pos);
 
-	return GunShot(x, y, z, speed, yrot, roomNumber);
+	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
-short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	PHD_VECTOR pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
@@ -99,26 +98,26 @@ short GunHit(int x, int y, int z, short speed, short yrot, short roomNumber)
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Position.yRot, LaraItem->RoomNumber);
 	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Position, 0);
 
-	return GunShot(x, y, z, speed, yrot, roomNumber);
+	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
-short GunShot(int x, int y, int z, short speed, short yrot, short roomNumber)
+short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	return -1;
 }
 
-bool Targetable(ITEM_INFO* item, AI_INFO* info) 
+bool Targetable(ITEM_INFO* item, AI_INFO* AI) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
 
-	if (enemy == NULL || enemy->HitPoints <= 0 || !info->ahead || info->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
+	if (enemy == NULL || enemy->HitPoints <= 0 || !AI->ahead || AI->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
 		return false;
 
 	if (!enemy->Data.is<CreatureInfo>() && !enemy->Data.is<LaraInfo*>())
 		return false;
 
-	BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
 	GAME_VECTOR start;
 	start.x = item->Position.xPos;
@@ -136,15 +135,15 @@ bool Targetable(ITEM_INFO* item, AI_INFO* info)
 	return LOS(&start, &target);
 }
 
-bool TargetVisible(ITEM_INFO* item, AI_INFO* info) 
+bool TargetVisible(ITEM_INFO* item, AI_INFO* AI) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
 
 	if (enemy != NULL)
 	{
-		short angle = info->angle - creature->JointRotation[2];
-		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && info->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+		short angle = AI->angle - creature->JointRotation[2];
+		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
 			GAME_VECTOR start;
 			start.x = item->Position.xPos;
@@ -154,7 +153,7 @@ bool TargetVisible(ITEM_INFO* item, AI_INFO* info)
 
 			GAME_VECTOR target;
 			target.x = enemy->Position.xPos;
-			BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
+			auto* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 			target.y = enemy->Position.yPos + ((((bounds->Y1 * 2) + bounds->Y1) + bounds->Y2) / 4);
 			target.z = enemy->Position.zPos;
 
