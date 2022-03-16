@@ -1356,11 +1356,19 @@ bool TestLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll)
 
 // TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
-bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup)
+bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
 {
+	// HACK: coll->Setup.Radius and coll->Setup.Height are set in
+	// lara_col functions, then reset by LaraAboveWater() to defaults.
+	// This means they store the wrong values for move tests called in crawl lara_as functions.
+	// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
+	// for the useCrawlSetup argument. @Sezz 2022.03.16
+	int laraRadius = useCrawlSetup ? LARA_RAD_CRAWL : coll->Setup.Radius;
+	int laraHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
+
 	int y = item->Position.yPos;
-	int distance = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probe = GetCollision(item, testSetup.Angle, distance, -coll->Setup.Height);
+	int distance = OFFSET_RADIUS(laraRadius);
+	auto probe = GetCollision(item, testSetup.Angle, distance, -laraHeight);
 
 	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
 	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
@@ -1380,9 +1388,9 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup t
 
 	auto start2 = GAME_VECTOR(
 		item->Position.xPos,
-		y - coll->Setup.Height + 1,
+		y - laraHeight + 1,
 		item->Position.zPos,
-		 item->RoomNumber);
+		item->RoomNumber);
 
 	auto end2 = GAME_VECTOR(
 		probe.Coordinates.x,
@@ -1403,10 +1411,10 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup t
 		return false;
 
 	// Assess move feasibility to location ahead.
-	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&					// Within lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&					// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -coll->Setup.Height &&						// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > coll->Setup.Height)	// Space is not a clamp.
+	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&			// Within lower floor bound.
+		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&			// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -laraHeight &&						// Within lowest ceiling bound.
+		abs(probe.Position.Ceiling - probe.Position.Floor) > laraHeight)	// Space is not a clamp.
 	{
 		return true;
 	}
@@ -1550,69 +1558,6 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, CollisionInfo* coll)
 	return TestLaraMoveTolerance(item, coll, testSetup);
 }
 
-// HACK: coll->Setup.Radius and coll->Setup.Height are only set
-// in COLLISION functions, then reset by LaraAboveWater() to defaults.
-// This means they will store the wrong values for tests called in crawl CONTROL functions.
-// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
-// for this clone function. @Sezz 2021.12.05
-bool TestLaraCrawlMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup testSetup)
-{
-	int y = item->Position.yPos;
-	int distance = OFFSET_RADIUS(LARA_RAD_CRAWL);
-	auto probe = GetCollision(item, testSetup.Angle, distance, -LARA_HEIGHT_CRAWL);
-
-	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
-	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
-	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
-
-	auto start1 = GAME_VECTOR(
-		item->Position.xPos,
-		y + testSetup.UpperFloorBound - 1,
-		item->Position.zPos,
-		item->RoomNumber);
-
-	auto end1 = GAME_VECTOR(
-		probe.Coordinates.x,
-		y + testSetup.UpperFloorBound - 1,
-		probe.Coordinates.z,
-		item->RoomNumber);
-
-	auto start2 = GAME_VECTOR(
-		item->Position.xPos,
-		y - LARA_HEIGHT_CRAWL + 1,
-		item->Position.zPos,
-		item->RoomNumber);
-
-	auto end2 = GAME_VECTOR(
-		probe.Coordinates.x,
-		probe.Coordinates.y + 1,
-		probe.Coordinates.z,
-		item->RoomNumber);
-
-	// Discard walls.
-	if (probe.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for slope or death sector (if applicable).
-	if (isSlopeDown || isSlopeUp || isDeath)
-		return false;
-
-	// Conduct ray test at upper floor bound and lowest ceiling bound.
-	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
-		return false;
-
-	// Assess move feasibility to location ahead.
-	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&				// Within lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&				// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&					// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_CRAWL)	// Space is not a clamp.
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool TestLaraCrawlForward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	// Using Lower/UpperFloorBound defined in crawl state collision functions.
@@ -1623,7 +1568,7 @@ bool TestLaraCrawlForward(ITEM_INFO* item, CollisionInfo* coll)
 		CLICK(1) - 1, -(CLICK(1) - 1)
 	};
 
-	return TestLaraCrawlMoveTolerance(item, coll, testSetup);
+	return TestLaraMoveTolerance(item, coll, testSetup, true);
 }
 
 bool TestLaraCrawlBack(ITEM_INFO* item, CollisionInfo* coll)
@@ -1636,7 +1581,7 @@ bool TestLaraCrawlBack(ITEM_INFO* item, CollisionInfo* coll)
 		CLICK(1) - 1, -(CLICK(1) - 1)
 	};
 
-	return TestLaraCrawlMoveTolerance(item, coll, testSetup);
+	return TestLaraMoveTolerance(item, coll, testSetup, true);
 }
 
 bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll)
