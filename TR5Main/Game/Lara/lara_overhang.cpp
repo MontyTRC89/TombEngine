@@ -356,7 +356,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 		if (GetClimbFlags(collResultUp.BottomBlock) & climbOrient &&
 			InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, CLICK(3), CLICK(4)))
 		{
-			if (TestLaraSplat(item, 0, 0, -CLICK(4)) &&
+			if (TestLaraWall(item, 0, 0, -CLICK(4)) &&
 				GetCeiling(collResultUp.Block, up.x, up.y, up.z) - item->Position.yPos <= 1456)  // Check if a wall is actually there...
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
@@ -718,7 +718,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 		Camera.flags = 1;
 
 		int distance = 1664;
-		if (TestLaraSplat(item, 0, 1536, 0))
+		if (TestLaraWall(item, 0, 1536, 0))
 		{
 			distance = 1024;
 		}

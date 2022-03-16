@@ -10,60 +10,64 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-enum MPGUN_STATES
+enum MPGunState
 {
-	MPGUN_EMPTY, 
-	MPGUN_WAIT,
-	MPGUN_WALK, 
-	MPGUN_RUN,
-	MPGUN_AIM1,
-	MPGUN_SHOOT1, 
-	MPGUN_AIM2,
-	MPGUN_SHOOT2, 
-	MPGUN_SHOOT3A, 
-	MPGUN_SHOOT3B, 
-	MPGUN_SHOOT4A, 
-	MPGUN_AIM3,
-	MPGUN_AIM4, 
-	MPGUN_DEATH, 
-	MPGUN_SHOOT4B,
-	MPGUN_DUCK,
-	MPGUN_DUCKED,
-	MPGUN_DUCKAIM, 
-	MPGUN_DUCKSHOT, 
-	MPGUN_DUCKWALK,
-	MPGUN_STAND
+	MPGUN_STATE_NONE = 0, 
+	MPGUN_STATE_WAIT = 1,
+	MPGUN_STATE_WALK = 2,
+	MPGUN_STATE_RUN = 3,
+	MPGUN_STATE_AIM_1 = 4,
+	MPGUN_STATE_SHOOT_1 = 5,
+	MPGUN_STATE_AIM_2 = 6,
+	MPGUN_STATE_SHOOT_2 = 7,
+	MPGUN_STATE_SHOOT_3A = 8,
+	MPGUN_STATE_SHOOT_3B = 9,
+	MPGUN_STATE_SHOOT_4A = 10,
+	MPGUN_STATE_AIM_3 = 11,
+	MPGUN_STATE_AIM_4 = 12,
+	MPGUN_STATE_DEATH = 13,
+	MPGUN_STATE_SHOOT_4B = 14,
+	MPGUN_STATE_CROUCH = 15,
+	MPGUN_STATE_CROUCHED = 16,
+	MPGUN_STATE_CROUCH_AIM = 17,
+	MPGUN_STATE_CROUCH_SHOT = 18,
+	MPGUN_STATE_CROUCH_WALK = 19,
+	MPGUN_STATE_STAND = 20
 };
 
-BITE_INFO mpgunBite = { 0, 160, 40, 13 };
+// TODO
+enum MPGunAnim
+{
+
+};
+
+BITE_INFO MPGunBite = { 0, 160, 40, 13 };
 
 void MPGunControl(short itemNumber)
 {
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CreatureInfo* creature = (CreatureInfo*)item->Data;
-	short torsoY = 0;
-	short torsoX = 0;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
+	short torsoX = 0;
+	short torsoY = 0;
 
 	if (creature->FiredWeapon)
 	{
-		PHD_VECTOR pos;
+		PHD_VECTOR pos = { MPGunBite.x, MPGunBite.y, MPGunBite.z };
+		GetJointAbsPosition(item, &pos, MPGunBite.meshNum);
 
-		pos.x = mpgunBite.x;
-		pos.y = mpgunBite.y;
-		pos.z = mpgunBite.z;
-
-		GetJointAbsPosition(item, &pos, mpgunBite.meshNum);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
 		creature->FiredWeapon--;
 	}
@@ -74,13 +78,8 @@ void MPGunControl(short itemNumber)
 		item->HitPoints -= 20;
 	}
 
-	AI_INFO info;
-	AI_INFO laraInfo;
-	ITEM_INFO* target;
-	int dx;
-	int dz;
-	int random;
-
+	AI_INFO AI;
+	AI_INFO laraAI;
 	if (item->HitPoints <= 0)
 	{
 		item->HitPoints = 0;
@@ -92,15 +91,16 @@ void MPGunControl(short itemNumber)
 		}
 		else if (!(GetRandomControl() & 3) && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)  
 		{
-			CreatureAIInfo(item, &info);
+			CreatureAIInfo(item, &AI);
 
-			if (Targetable(item, &info))
+			if (Targetable(item, &AI))
 			{
-				if (info.angle > -ANGLE(45) && info.angle < ANGLE(45))
+				if (AI.angle > -ANGLE(45.0f) &&
+					AI.angle < ANGLE(45.0f))
 				{
-					torsoY = info.angle;
-					head = info.angle;
-					ShotLara(item, &info, &mpgunBite, torsoY, 32);
+					head = AI.angle;
+					torsoY = AI.angle;
+					ShotLara(item, &AI, &MPGunBite, torsoY, 32);
 					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Position, 24576);
 				}
 			}
@@ -115,335 +115,362 @@ void MPGunControl(short itemNumber)
 		{
 			creature->Enemy = LaraItem;
 
-			dx = LaraItem->Position.xPos - item->Position.xPos;
-			dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Position.xPos - item->Position.xPos;
+			int dz = LaraItem->Position.zPos - item->Position.zPos;
 
-			laraInfo.distance = SQUARE(dx) + SQUARE(dx);
+			laraAI.distance = pow(dx, 2) + pow(dx, 2);
 			
 			for (int slot = 0; slot < ActiveCreatures.size(); slot++)
 			{
-				CreatureInfo* currentCreature = ActiveCreatures[slot];
+				auto* currentCreature = ActiveCreatures[slot];
 				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 					continue;
 
-				target = &g_Level.Items[currentCreature->ItemNumber];
+				auto* target = &g_Level.Items[currentCreature->ItemNumber];
 				if (target->ObjectNumber != ID_LARA)
 					continue;
 
 				dx = target->Position.xPos - item->Position.xPos;
 				dz = target->Position.zPos - item->Position.zPos;
-				int distance = SQUARE(dx) + SQUARE(dz);
-				if (distance < laraInfo.distance)
+
+				int distance = pow(dx, 2) + pow(dz, 2);
+				if (distance < laraAI.distance)
 					creature->Enemy = target;
 			}
 		}
 
-		CreatureAIInfo(item, &info);
+		CreatureAIInfo(item, &AI);
 
 		if (creature->Enemy == LaraItem)
 		{
-			laraInfo.angle = info.angle;
-			laraInfo.distance = info.distance;
+			laraAI.angle = AI.angle;
+			laraAI.distance = AI.distance;
 		}
 		else
 		{
-			dx = LaraItem->Position.xPos - item->Position.xPos;
-			dz = LaraItem->Position.zPos - item->Position.zPos;
-			laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot; 
-			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
+			int dx = LaraItem->Position.xPos - item->Position.xPos;
+			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			laraAI.angle = phd_atan(dz, dx) - item->Position.yRot; 
+			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
-		GetCreatureMood(item, &info, creature->Enemy != LaraItem ? VIOLENT : TIMID);
-		CreatureMood(item, &info, creature->Enemy != LaraItem ? VIOLENT : TIMID);
+		GetCreatureMood(item, &AI, creature->Enemy != LaraItem ? VIOLENT : TIMID);
+		CreatureMood(item, &AI, creature->Enemy != LaraItem ? VIOLENT : TIMID);
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + laraInfo.angle);
+		int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + laraAI.angle);
 		int y = item->Position.yPos;
-		int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + laraInfo.angle);
+		int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + laraAI.angle);
 		
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		int height = GetFloorHeight(floor, x, y, z);
+		int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		bool cover = (item->Position.yPos > (height + CLICK(3)) && item->Position.yPos < (height + CLICK(4.5f)) && laraAI.distance > pow(SECTOR(1), 2));
 
-		bool cover = (item->Position.yPos > (height + 768) && item->Position.yPos < (height + 1152) && laraInfo.distance > SQUARE(1024));
-
-		ITEM_INFO* enemy = creature->Enemy; 
+		auto* enemy = creature->Enemy; 
 		creature->Enemy = LaraItem;
-		if (laraInfo.distance < SQUARE(1024) || item->HitStatus || TargetVisible(item, &laraInfo)) 
+
+		if (laraAI.distance < pow(SECTOR(1), 2) || item->HitStatus || TargetVisible(item, &laraAI)) 
 		{
 			if (!creature->Alerted)
 				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Position, 0);
+
 			AlertAllGuards(itemNumber);
 		}
+
 		creature->Enemy = enemy;
 
 		switch (item->Animation.ActiveState)
 		{
-		case MPGUN_WAIT:
-			head = laraInfo.angle;
+		case MPGUN_STATE_WAIT:
 			creature->MaxTurn = 0;
+			head = laraAI.angle;
 
 			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 17 ||
 				item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 27 ||
 				item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 28)
 			{
-				if (abs(info.angle) < ANGLE(10))
-					item->Position.yRot += info.angle;
-				else if (info.angle < 0)
-					item->Position.yRot -= ANGLE(10);
+				if (abs(AI.angle) < ANGLE(10.0f))
+					item->Position.yRot += AI.angle;
+				else if (AI.angle < 0)
+					item->Position.yRot -= ANGLE(10.0f);
 				else
-					item->Position.yRot += ANGLE(10);
+					item->Position.yRot += ANGLE(10.0f);
 			}
 
 			if (item->AIBits & GUARD)
 			{
 				head = AIGuard(creature);
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 				break;
 			}
 
 			else if (item->AIBits & PATROL1)
 			{
-				item->Animation.TargetState = MPGUN_WALK;
+				item->Animation.TargetState = MPGUN_STATE_WALK;
 				head = 0;
 			}
 
 			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
-				item->Animation.TargetState = MPGUN_DUCK;
-			else if (item->Animation.RequiredState == MPGUN_DUCK)
-				item->Animation.TargetState = MPGUN_DUCK;
+				item->Animation.TargetState = MPGUN_STATE_CROUCH;
+			else if (item->Animation.RequiredState == MPGUN_STATE_CROUCH)
+				item->Animation.TargetState = MPGUN_STATE_CROUCH;
 			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = MPGUN_RUN;
-			else if (Targetable(item, &info))
+				item->Animation.TargetState = MPGUN_STATE_RUN;
+			else if (Targetable(item, &AI))
 			{
-				random = GetRandomControl();
+				int random = GetRandomControl();
 				if (random < 0x2000)
-					item->Animation.TargetState = MPGUN_SHOOT1;
+					item->Animation.TargetState = MPGUN_STATE_SHOOT_1;
 				else if (random < 0x4000)
-					item->Animation.TargetState = MPGUN_SHOOT2;
+					item->Animation.TargetState = MPGUN_STATE_SHOOT_2;
 				else
-					item->Animation.TargetState = MPGUN_AIM3;
+					item->Animation.TargetState = MPGUN_STATE_AIM_3;
 			}
-			else if (creature->Mood == MoodType::Bored || ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048))))
+			else if (creature->Mood == MoodType::Bored ||
+				(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
 			{
-				if (info.ahead)
-					item->Animation.TargetState = MPGUN_WAIT;
+				if (AI.ahead)
+					item->Animation.TargetState = MPGUN_STATE_WAIT;
 				else
-					item->Animation.TargetState = MPGUN_WALK;
+					item->Animation.TargetState = MPGUN_STATE_WALK;
 			}
 			else
-				item->Animation.TargetState = MPGUN_RUN;
+				item->Animation.TargetState = MPGUN_STATE_RUN;
+
 			break;
 
-		case MPGUN_WALK:
-			head = laraInfo.angle;	
-			creature->MaxTurn = ANGLE(6);
+		case MPGUN_STATE_WALK:
+			creature->MaxTurn = ANGLE(6.0f);
+			head = laraAI.angle;
+
 			if (item->AIBits & PATROL1)
 			{
-				item->Animation.TargetState = MPGUN_WALK;
+				item->Animation.TargetState = MPGUN_STATE_WALK;
 				head = 0;
 			}
 			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = MPGUN_RUN;
-			else if (Targetable(item, &info))
+				item->Animation.TargetState = MPGUN_STATE_RUN;
+			else if (Targetable(item, &AI))
 			{
-				if (info.distance > SQUARE(1536) && info.zoneNumber == info.enemyZone)
-					item->Animation.TargetState = MPGUN_AIM4;
+				if (AI.distance > pow(CLICK(1.5f), 2) && AI.zoneNumber == AI.enemyZone)
+					item->Animation.TargetState = MPGUN_STATE_AIM_4;
 				else
-					item->Animation.TargetState = MPGUN_WAIT;
+					item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else if (creature->Mood == MoodType::Bored)
 			{
-				if (info.ahead)
-					item->Animation.TargetState = MPGUN_WALK;
+				if (AI.ahead)
+					item->Animation.TargetState = MPGUN_STATE_WALK;
 				else
-					item->Animation.TargetState = MPGUN_WAIT;
+					item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else
-				item->Animation.TargetState = MPGUN_RUN;
+				item->Animation.TargetState = MPGUN_STATE_RUN;
+
 			break;
 
-		case MPGUN_RUN:
-			if (info.ahead)
-				head = info.angle;
-
-			creature->MaxTurn = ANGLE(10);
+		case MPGUN_STATE_RUN:
+			creature->MaxTurn = ANGLE(10.0f);
 			tilt = angle / 2;
+
+			if (AI.ahead)
+				head = AI.angle;
+
 			if (item->AIBits & GUARD)
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			else if (cover && (Lara.TargetEntity == item || item->HitStatus))
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else if (creature->Mood == MoodType::Escape)
 				break;
-			else if (Targetable(item, &info) || ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraInfo.distance > SQUARE(2048))))
-				item->Animation.TargetState = MPGUN_WAIT;
+			else if (Targetable(item, &AI) ||
+				(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
+			{
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
+			}
 			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = MPGUN_WALK;
+				item->Animation.TargetState = MPGUN_STATE_WALK;
+
 			break;
 
-		case MPGUN_AIM1:
-			if (info.ahead)
+		case MPGUN_STATE_AIM_1:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 12) || (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))  
+			if (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 12 ||
+				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))  
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32))
-					item->Animation.RequiredState = MPGUN_WAIT;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					item->Animation.RequiredState = MPGUN_STATE_WAIT;
 			}
 			else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
+
 			break;
 
-		case MPGUN_SHOOT1:
-			if (info.ahead)
+		case MPGUN_STATE_SHOOT_1:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
-			if (item->Animation.RequiredState == MPGUN_WAIT)
-				item->Animation.TargetState = MPGUN_WAIT;
+
+			if (item->Animation.RequiredState == MPGUN_STATE_WAIT)
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
+
 			break;
 
-		case MPGUN_SHOOT2:
-			if (info.ahead)
+		case MPGUN_STATE_SHOOT_2:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
+
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32))
-					item->Animation.TargetState = MPGUN_WAIT;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
+
 			break;
 
-		case MPGUN_SHOOT3A:
-		case MPGUN_SHOOT3B:
-			if (info.ahead)
+		case MPGUN_STATE_SHOOT_3A:
+		case MPGUN_STATE_SHOOT_3B:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase || (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 11))
+
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 11)
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32))
-					item->Animation.TargetState = MPGUN_WAIT;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
 			else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
+
 			break;
 
-		case MPGUN_AIM4:
-			if (info.ahead)
+		case MPGUN_STATE_AIM_4:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
-			if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) || (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))  
+
+			if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) ||
+				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))  
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32))
-					item->Animation.RequiredState = MPGUN_WALK;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					item->Animation.RequiredState = MPGUN_STATE_WALK;
 			}
 			else if (item->HitStatus && !(GetRandomControl() & 0x3) && cover)
 			{
-				item->Animation.RequiredState = MPGUN_DUCK;
-				item->Animation.TargetState = MPGUN_WAIT;
+				item->Animation.RequiredState = MPGUN_STATE_CROUCH;
+				item->Animation.TargetState = MPGUN_STATE_WAIT;
 			}
-			if (info.distance < SQUARE(1536))
-				item->Animation.RequiredState = MPGUN_WALK;
+
+			if (AI.distance < pow(SECTOR(1.5f), 2))
+				item->Animation.RequiredState = MPGUN_STATE_WALK;
+
 			break;
 
-		case MPGUN_SHOOT4A:
-		case MPGUN_SHOOT4B:
-			if (info.ahead)
+		case MPGUN_STATE_SHOOT_4A:
+		case MPGUN_STATE_SHOOT_4B:
+			if (AI.ahead)
 			{
-				torsoY = info.angle;
-				torsoX = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
-			if (item->Animation.RequiredState == MPGUN_WALK)
-			{
-				item->Animation.TargetState = MPGUN_WALK;
-			}
+
+			if (item->Animation.RequiredState == MPGUN_STATE_WALK)
+				item->Animation.TargetState = MPGUN_STATE_WALK;
+
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32))
-					item->Animation.TargetState = MPGUN_WALK;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
+					item->Animation.TargetState = MPGUN_STATE_WALK;
 			}
-			if (info.distance < SQUARE(1536))
-				item->Animation.TargetState = MPGUN_WALK;
+
+			if (AI.distance < pow(SECTOR(1.5f), 2))
+				item->Animation.TargetState = MPGUN_STATE_WALK;
+
 			break;
 
-		case MPGUN_DUCKED:
-			if (info.ahead)
-				head = info.angle;
-
+		case MPGUN_STATE_CROUCHED:
 			creature->MaxTurn = 0;
 
-			if (Targetable(item, &info))
-				item->Animation.TargetState = MPGUN_DUCKAIM;
-			else if (item->HitStatus || !cover || (info.ahead && !(GetRandomControl() & 0x1F)))
-				item->Animation.TargetState = MPGUN_STAND;
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (Targetable(item, &AI))
+				item->Animation.TargetState = MPGUN_STATE_CROUCH_AIM;
+			else if (item->HitStatus || !cover || (AI.ahead && !(GetRandomControl() & 0x1F)))
+				item->Animation.TargetState = MPGUN_STATE_STAND;
 			else
-				item->Animation.TargetState = MPGUN_DUCKWALK;
+				item->Animation.TargetState = MPGUN_STATE_CROUCH_WALK;
+
 			break;
 
-		case MPGUN_DUCKAIM:
-			creature->MaxTurn = ONE_DEGREE;
+		case MPGUN_STATE_CROUCH_AIM:
+			creature->MaxTurn = ANGLE(1.0f);
 
-			if (info.ahead)
-				torsoY = info.angle;
+			if (AI.ahead)
+				torsoY = AI.angle;
 
-			if (Targetable(item, &info))
-				item->Animation.TargetState = MPGUN_DUCKSHOT;
+			if (Targetable(item, &AI))
+				item->Animation.TargetState = MPGUN_STATE_CROUCH_SHOT;
 			else
-				item->Animation.TargetState = MPGUN_DUCKED;
+				item->Animation.TargetState = MPGUN_STATE_CROUCHED;
+
 			break;
 
-		case MPGUN_DUCKSHOT:
-			if (info.ahead)
-				torsoY = info.angle;
+		case MPGUN_STATE_CROUCH_SHOT:
+			if (AI.ahead)
+				torsoY = AI.angle;
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!ShotLara(item, &info, &mpgunBite, torsoY, 32) || !(GetRandomControl() & 0x7))
-					item->Animation.TargetState = MPGUN_DUCKED;
+				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32) || !(GetRandomControl() & 0x7))
+					item->Animation.TargetState = MPGUN_STATE_CROUCHED;
 			}
 
 			break;
 
-		case MPGUN_DUCKWALK:
-			if (info.ahead)
-				head = info.angle;
+		case MPGUN_STATE_CROUCH_WALK:
+			creature->MaxTurn = ANGLE(6.0f);
 
-			creature->MaxTurn = ANGLE(6);
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (Targetable(item, &info) || item->HitStatus || !cover || (info.ahead && !(GetRandomControl() & 0x1F)))
-				item->Animation.TargetState = MPGUN_DUCKED;
+			if (Targetable(item, &AI) || item->HitStatus || !cover || (AI.ahead && !(GetRandomControl() & 0x1F)))
+				item->Animation.TargetState = MPGUN_STATE_CROUCHED;
+
 			break;
-
 		}
 	}
 

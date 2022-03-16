@@ -9,64 +9,80 @@
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO scubaGun = { 17, 164, 44, 18 };
+BITE_INFO ScubaGunBite = { 17, 164, 44, 18 };
 
-static void ShootHarpoon(ITEM_INFO* frogman, int x, int y, int z, short speed, short yRot, short roomNumber)
+
+// TODO
+enum ScubaDiverState
 {
-	short harpoonItemNum = CreateItem();
-	if (harpoonItemNum != NO_ITEM)
+
+};
+
+// TODO
+enum ScubaDiverAnim
+{
+
+};
+
+static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, short velocity, short yRot, short roomNumber)
+{
+	short harpoonItemNumber = CreateItem();
+	if (harpoonItemNumber != NO_ITEM)
 	{
-		ITEM_INFO* harpoon = &g_Level.Items[harpoonItemNum];
+		auto* harpoonItem = &g_Level.Items[harpoonItemNumber];
 
-		harpoon->ObjectNumber = ID_SCUBA_HARPOON;
-		harpoon->RoomNumber = frogman->RoomNumber;
+		harpoonItem->ObjectNumber = ID_SCUBA_HARPOON;
+		harpoonItem->RoomNumber = item->RoomNumber;
 
-		harpoon->Position.xPos = x;
-		harpoon->Position.yPos = y;
-		harpoon->Position.zPos = z;
+		harpoonItem->Position.xPos = x;
+		harpoonItem->Position.yPos = y;
+		harpoonItem->Position.zPos = z;
 
-		InitialiseItem(harpoonItemNum);
+		InitialiseItem(harpoonItemNumber);
 
-		harpoon->Position.xRot = 0;
-		harpoon->Position.yRot = yRot;
-		harpoon->Animation.VerticalVelocity = 150;
+		harpoonItem->Position.xRot = 0;
+		harpoonItem->Position.yRot = yRot;
+		harpoonItem->Animation.VerticalVelocity = 150;
 
-		AddActiveItem(harpoonItemNum);
-		harpoon->Status = ITEM_ACTIVE;
+		AddActiveItem(harpoonItemNumber);
+		harpoonItem->Status = ITEM_ACTIVE;
 	}
 }
 
-void ScubaHarpoonControl(short itemNum)
+void ScubaHarpoonControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TouchBits)
 	{
+		DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
+		KillItem(itemNumber);
+
 		LaraItem->HitPoints -= 50;
 		LaraItem->HitStatus = true;
-		DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
-		KillItem(itemNum);
 	}
 	else
 	{
 		int ox = item->Position.xPos;
 		int oz = item->Position.zPos;
 
-		short speed = item->Animation.VerticalVelocity * phd_cos(item->Position.xRot);
-		item->Position.zPos += speed * phd_cos(item->Position.yRot);
-		item->Position.xPos += speed * phd_sin(item->Position.yRot);
+		int velocity = item->Animation.VerticalVelocity * phd_cos(item->Position.xRot);
+		item->Position.zPos += velocity * phd_cos(item->Position.yRot);
+		item->Position.xPos += velocity * phd_sin(item->Position.yRot);
 		item->Position.yPos += -item->Animation.VerticalVelocity * phd_sin(item->Position.xRot);
 
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		if (item->RoomNumber != roomNumber)
-			ItemNewRoom(itemNum, roomNumber);
-		item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		auto probe = GetCollision(item);
+
+		if (item->RoomNumber != probe.RoomNumber)
+			ItemNewRoom(itemNumber, probe.RoomNumber);
+
+		item->Floor = GetCollision(item).Position.Floor;
 		if (item->Position.yPos >= item->Floor)
-			KillItem(itemNum);
+			KillItem(itemNumber);
 	}
 }
 
@@ -75,13 +91,14 @@ void ScubaControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CreatureInfo* creature = (CreatureInfo *)item->Data;
-	int waterHeight;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
 	short angle = 0;
 	short head = 0;
 	short neck = 0;
 
+	int waterHeight;
 	if (item->HitPoints <= 0)
 	{
 		if (item->Animation.ActiveState != 9)
@@ -96,11 +113,11 @@ void ScubaControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
 		GAME_VECTOR start;
 		GAME_VECTOR target;
@@ -109,7 +126,7 @@ void ScubaControl(short itemNumber)
 		if (Lara.Control.WaterStatus == WaterStatus::Dry)
 		{
 			start.x = item->Position.xPos;
-			start.y = item->Position.yPos - STEP_SIZE;
+			start.y = item->Position.yPos - CLICK(1);
 			start.z = item->Position.zPos;
 			start.roomNumber = item->RoomNumber;
 
@@ -125,10 +142,10 @@ void ScubaControl(short itemNumber)
 				creature->Target.z = LaraItem->Position.zPos;
 			}
 
-			if (info.angle < -ANGLE(45) || info.angle > ANGLE(45))
+			if (AI.angle < -ANGLE(45.0f) || AI.angle > ANGLE(45.0f))
 				shoot = false;
 		}
-		else if (info.angle > -ANGLE(45) && info.angle < ANGLE(45))
+		else if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
 		{
 			start.x = item->Position.xPos;
 			start.y = item->Position.yPos;
@@ -150,9 +167,9 @@ void ScubaControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->MaxTurn = ANGLE(3);
+			creature->MaxTurn = ANGLE(3.0f);
 			if (shoot)
-				neck = -info.angle;
+				neck = -AI.angle;
 
 			if (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly)
 				item->Animation.TargetState = 2;
@@ -160,37 +177,43 @@ void ScubaControl(short itemNumber)
 				break;
 			else if (shoot)
 				item->Animation.TargetState = 4;
+
 			break;
 
 		case 4:
 			creature->Flags = 0;
 
 			if (shoot)
-				neck = -info.angle;
+				neck = -AI.angle;
 
-			if (!shoot || creature->Mood == MoodType::Escape || (creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly))
+			if (!shoot || creature->Mood == MoodType::Escape ||
+				(creature->Target.y < waterHeight && item->Position.yPos < waterHeight + creature->LOT.Fly))
+			{
 				item->Animation.TargetState = 1;
+			}
 			else
 				item->Animation.TargetState = 3;
+
 			break;
 
 		case 3:
 			if (shoot)
-				neck = -info.angle;
+				neck = -AI.angle;
 
 			if (!creature->Flags)
 			{
 				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
+
 			break;
 
 
 		case 2:
-			creature->MaxTurn = ANGLE(3);
+			creature->MaxTurn = ANGLE(3.0f);
 
 			if (shoot)
-				head = info.angle;
+				head = AI.angle;
 
 			if (creature->Target.y > waterHeight)
 				item->Animation.TargetState = 1;
@@ -198,29 +221,32 @@ void ScubaControl(short itemNumber)
 				break;
 			else if (shoot)
 				item->Animation.TargetState = 6;
+
 			break;
 
 		case 6:
 			creature->Flags = 0;
 
 			if (shoot)
-				head = info.angle;
+				head = AI.angle;
 
 			if (!shoot || creature->Mood == MoodType::Escape || creature->Target.y > waterHeight)
 				item->Animation.TargetState = 2;
 			else
 				item->Animation.TargetState = 7;
+
 			break;
 
 		case 7:
 			if (shoot)
-				head = info.angle;
+				head = AI.angle;
 
 			if (!creature->Flags)
 			{
 				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
+
 			break;
 			
 		}
@@ -235,9 +261,10 @@ void ScubaControl(short itemNumber)
 	case 1:
 	case 4:
 	case 3:
-		CreatureUnderwater(item, 512);
+		CreatureUnderwater(item, CLICK(2));
 		break;
+
 	default:
-		item->Position.yPos = waterHeight - 512;
+		item->Position.yPos = waterHeight - CLICK(2);
 	}
 }
