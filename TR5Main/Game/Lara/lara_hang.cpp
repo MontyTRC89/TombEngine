@@ -63,11 +63,11 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 			switch (TestLaraHangCorner(item, coll, -90.0f))
 			{
-			case CornerResult::Inner:
+			case CornerType::Inner:
 				item->Animation.TargetState = LS_SHIMMY_INNER_LEFT;
 				return;
 			
-			case CornerResult::Outer:
+			case CornerType::Outer:
 				item->Animation.TargetState = LS_SHIMMY_OUTER_LEFT;
 				return;
 			
@@ -77,11 +77,11 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 			switch (TestLaraHangCorner(item, coll, -45.0f))
 			{
-			case CornerResult::Inner:
+			case CornerType::Inner:
 				item->Animation.TargetState = LS_SHIMMY_45_INNER_LEFT;
 				return;
 
-			case CornerResult::Outer:
+			case CornerType::Outer:
 				item->Animation.TargetState = LS_SHIMMY_45_OUTER_LEFT;
 				return;
 
@@ -100,11 +100,11 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 			switch (TestLaraHangCorner(item, coll, 90.0f))
 			{
-			case CornerResult::Inner:
+			case CornerType::Inner:
 				item->Animation.TargetState = LS_SHIMMY_INNER_RIGHT;
 				return;
 
-			case CornerResult::Outer:
+			case CornerType::Outer:
 				item->Animation.TargetState = LS_SHIMMY_OUTER_RIGHT;
 				return;
 
@@ -114,11 +114,11 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 			switch (TestLaraHangCorner(item, coll, 45.0f))
 			{
-			case CornerResult::Inner:
+			case CornerType::Inner:
 				item->Animation.TargetState = LS_SHIMMY_45_INNER_RIGHT;
 				return;
 
-			case CornerResult::Outer:
+			case CornerType::Outer:
 				item->Animation.TargetState = LS_SHIMMY_45_OUTER_RIGHT;
 				return;
 
@@ -175,7 +175,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 				coll->Middle.Ceiling <= -CLICK(1) &&
 				abs(coll->FrontLeft.Ceiling - coll->FrontRight.Ceiling) < SLOPE_DIFFERENCE)
 			{
-				if (TestLaraClimbStance(item, coll))
+				if (TestLaraClimbIdle(item, coll))
 					item->Animation.TargetState = LS_LADDER_IDLE;
 				else if (TestLastFrame(item))
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
@@ -190,7 +190,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 			(item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 				item->Animation.AnimNumber == LA_HANG_IDLE))
 		{
-			if (TestLaraClimbStance(item, coll))
+			if (TestLaraClimbIdle(item, coll))
 				item->Animation.TargetState = LS_LADDER_IDLE;
 			else if (TestLastFrame(item))
 				SetAnimation(item, LA_LADDER_SHIMMY_DOWN);
