@@ -1,6 +1,6 @@
 local generateheader = require("generateheader")
 
-local enumName = "InvItem"
+local enumName = "Flow.InvItem"
 local enumIncludes = [==[
 #include "ItemEnumPair.h"
 #include <unordered_map>

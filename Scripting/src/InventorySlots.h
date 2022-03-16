@@ -8,7 +8,7 @@
 
 /***
 Constants for items that can be used with GetItem and SetItem.
-@enum InvID
+@enum Flow.InvID
 @pragma nostrip
 */
 
