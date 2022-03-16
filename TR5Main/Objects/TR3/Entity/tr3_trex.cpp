@@ -73,25 +73,25 @@ void TRexControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (aiInfo.ahead)
-			head = aiInfo.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (item->TouchBits)
 			LaraItem->HitPoints -= (item->Animation.ActiveState == 3) ? 10 : 1;
 
-		info->Flags = (info->Mood != MoodType::Escape && !aiInfo.ahead && aiInfo.enemyFacing > -FRONT_ARC && aiInfo.enemyFacing < FRONT_ARC);
+		info->Flags = (info->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
 
-		if (aiInfo.distance > pow(1500, 2) &&
-			aiInfo.distance < pow(SECTOR(4), 2)
-			&& aiInfo.bite && !info->Flags)
+		if (AI.distance > pow(1500, 2) &&
+			AI.distance < pow(SECTOR(4), 2) &&
+			AI.bite && !info->Flags)
 		{
 			info->Flags = 1;
 		}
@@ -101,7 +101,7 @@ void TRexControl(short itemNumber)
 		case 1:
 			if (item->Animation.RequiredState)
 				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (aiInfo.distance < pow(1500, 2) && aiInfo.bite)
+			else if (AI.distance < pow(1500, 2) && AI.bite)
 				item->Animation.TargetState = 7;
 			else if (info->Mood == MoodType::Bored || info->Flags)
 				item->Animation.TargetState = 2;
@@ -114,7 +114,7 @@ void TRexControl(short itemNumber)
 
 			if (info->Mood != MoodType::Bored || !info->Flags)
 				item->Animation.TargetState = 1;
-			else if (aiInfo.ahead && GetRandomControl() < 0x200)
+			else if (AI.ahead && GetRandomControl() < 0x200)
 			{
 				item->Animation.RequiredState = 6;
 				item->Animation.TargetState = 1;
@@ -125,11 +125,11 @@ void TRexControl(short itemNumber)
 		case 3:
 			info->MaxTurn = ANGLE(4.0f);
 
-			if (aiInfo.distance < pow(SECTOR(5), 2) && aiInfo.bite)
+			if (AI.distance < pow(SECTOR(5), 2) && AI.bite)
 				item->Animation.TargetState = 1;
 			else if (info->Flags)
 				item->Animation.TargetState = 1;
-			else if (info->Mood != MoodType::Escape && aiInfo.ahead && GetRandomControl() < 0x200)
+			else if (info->Mood != MoodType::Escape && AI.ahead && GetRandomControl() < 0x200)
 			{
 				item->Animation.RequiredState = 6;
 				item->Animation.TargetState = 1;
