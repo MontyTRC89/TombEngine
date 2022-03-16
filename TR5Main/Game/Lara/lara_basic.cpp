@@ -374,7 +374,7 @@ void lara_col_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
+		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;
@@ -2332,7 +2332,7 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 		auto vaultResult = TestLaraVault(item, coll);
 
 		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			!TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Allow immediate vault only in the case of a soft splat.
+			!TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Allow immediate vault only in the case of a soft splat.
 			vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
@@ -2390,7 +2390,7 @@ void lara_col_sprint(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		item->Position.zRot = 0;
 
-		if (TestLaraSplat(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
+		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
 			item->Animation.TargetState = LS_SPLAT;

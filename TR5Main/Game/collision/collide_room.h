@@ -31,7 +31,7 @@ enum class CollisionProbeMode
 	FreeFlat
 };
 
-enum class CornerResult
+enum class CornerType
 {
 	None,
 	Inner,
