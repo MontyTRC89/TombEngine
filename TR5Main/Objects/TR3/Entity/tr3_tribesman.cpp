@@ -200,8 +200,8 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->Flags = 0;
 			creature->MaxTurn = ANGLE(6.0f);
+			creature->Flags = 0;
 			tilt = angle / 4;
 
 			if (creature->Mood == MoodType::Bored)
@@ -348,13 +348,13 @@ void TribemanDartsControl(short itemNumber)
 
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
-	
+
+	short angle = 0;
+	short tilt = 0;
 	short headX = 0;
 	short headY = 0;
 	short torsoX = 0;
 	short torsoY = 0;
-	short angle = 0;
-	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -411,12 +411,14 @@ void TribemanDartsControl(short itemNumber)
 
 			if (item->AIBits & GUARD)
 			{
-				headY = AIGuard(creature);
-				torsoY = 0;
-				torsoX = 0;
 				creature->MaxTurn = 0;
+				headY = AIGuard(creature);
+				torsoX = 0;
+				torsoY = 0;
+
 				if (!(GetRandomControl() & 0xFF))
 					item->Animation.TargetState = 11;
+
 				break;
 			}
 			else if (creature->Mood == MoodType::Escape)
@@ -452,8 +454,8 @@ void TribemanDartsControl(short itemNumber)
 			{
 				creature->MaxTurn = 0;
 				headY = AIGuard(creature);
-				torsoY = 0;
 				torsoX = 0;
+				torsoY = 0;
 
 				if (!(GetRandomControl() & 0xFF))
 					item->Animation.TargetState = 1;

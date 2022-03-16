@@ -33,8 +33,11 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	long dx = LaraItem->Position.xPos - x;
 	long dz = LaraItem->Position.zPos - z;
 
-	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+	if (dx < -SECTOR(16) || dx > SECTOR(16) ||
+		dz < -SECTOR(16) || dz > SECTOR(16))
+	{
 		return;
+	}
 
 	auto* sptr = &Sparks[GetFreeSpark()];
 
@@ -205,6 +208,7 @@ void ShivaControl(short itemNumber)
 			{
 				if (item->MeshBits == 0)
 					effectMesh = 0;
+
 				item->MeshBits = (item->MeshBits * 2) + 1;
 				shiva->Flags = 1;
 
@@ -226,6 +230,8 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 0:
+			shiva->MaxTurn = 0;
+
 			if (AI.ahead)
 				headY = AI.angle;
 
@@ -239,19 +245,14 @@ void ShivaControl(short itemNumber)
 			if (shiva->Flags == 1)
 				shiva->Flags = 0;
 
-			shiva->MaxTurn = 0;
-
 			if (shiva->Mood == MoodType::Escape)
 			{
 				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
 				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
 				auto box = GetCollision(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
 
-				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) &&
-					!shiva->Flags)
-				{
+				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)
 					item->Animation.TargetState = 8;
-				}
 				else
 					item->Animation.TargetState = 2;
 			}
@@ -277,9 +278,7 @@ void ShivaControl(short itemNumber)
 				item->Animation.TargetState = 2;
 			}
 			else
-			{
 				item->Animation.TargetState = 1;
-			}
 
 			break;
 
