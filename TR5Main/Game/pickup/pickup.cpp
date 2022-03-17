@@ -343,7 +343,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 			if (TrInput & IN_ACTION && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
-				laraItem->Animation.ActiveState == LS_UNDERWATER_STOP && 
+				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
 				TestLaraPosition(&PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 			{
@@ -365,7 +365,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 							laraItem->Animation.ActiveState = LS_PICKUP;
 						}
 
-						laraItem->Animation.TargetState = LS_UNDERWATER_STOP;
+						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;

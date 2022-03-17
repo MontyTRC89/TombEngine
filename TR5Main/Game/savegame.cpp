@@ -247,7 +247,6 @@ bool SaveGame::Save(int slot)
 
 	Save::LaraCountDataBuilder count{ fbb };
 	count.add_death(Lara.Control.Count.Death);
-	count.add_dive(Lara.Control.Count.Dive);
 	count.add_no_cheat(Lara.Control.Count.NoCheat);
 	count.add_pose(Lara.Control.Count.Pose);
 	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
@@ -1218,7 +1217,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.Count.Dive = s->lara()->control()->count()->dive();
 	Lara.Control.Count.NoCheat = s->lara()->control()->count()->no_cheat();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();

@@ -372,7 +372,7 @@ void AnimateItem(ITEM_INFO* item)
 	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
-// Check if targetState can be dispatched from the current frame.
+// Checks whether targetState can be dispatched from the current frame.
 bool HasChange(ITEM_INFO* item, int targetState)
 {
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
@@ -451,11 +451,13 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	if (anim->numberChanges <= 0)
 		return false;
 
+	// Iterate over possible state dispatches.
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
 		auto* change = &g_Level.Changes[anim->changeIndex + i];
 		if (change->TargetState == item->Animation.TargetState)
 		{
+			// Iterate over frame range of state dispatch.
 			for (int j = 0; j < change->numberRanges; j++)
 			{
 				auto* range = &g_Level.Ranges[change->rangeIndex + j];

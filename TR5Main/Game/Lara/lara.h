@@ -4,7 +4,7 @@
 struct ITEM_INFO;
 struct CollisionInfo;
 
-#define LARA_GRAB_THRESHOLD ANGLE(35.0f)
+#define LARA_GRAB_THRESHOLD ANGLE(40.0f)
 #define FRONT_ARC ANGLE(90.0f)	// TODO: Check use.
 
 // Lean rates
@@ -37,7 +37,7 @@ struct CollisionInfo;
 #define LARA_CRAWL_FLEX_RATE ANGLE(2.25f)
 #define LARA_CRAWL_FLEX_MAX ANGLE(45.0f) / 2	// 2 = hardcoded number of bones to flex (head and torso).
 
-constexpr auto LARA_HEIGHT = CLICK(3) - 1;	// Lara height in standard states.
+constexpr auto LARA_HEIGHT = CLICK(3) - 1;	// Lara height in basic states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;		// Lara height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY = 850;	// Lara height in monkey swing states.
 constexpr auto LARA_HEIGHT_SURFSWIM = 700;	// Lara height in water treading states.
@@ -57,8 +57,9 @@ constexpr auto LARA_DEATH_VELOCITY = 155;
 constexpr auto LARA_DIVE_DEATH_VELOCITY = 134;
 constexpr auto LARA_TERMINAL_VELOCITY = CLICK(10);
 
-constexpr auto LARA_RUN_JUMP_TIME = 22;		// Frames to count before a running jump is possible.
-constexpr auto LARA_POSE_TIME = 30 * 30;	// 30 frames * 30 = 30 seconds to AFK pose.
+constexpr auto LARA_POSITION_ADJUST_MAX_TIME = 30 * 3;	// 30 frames * 3 = 3 seconds allowed for position adjustment.
+constexpr auto LARA_POSE_TIME = 30 * 30;				// 30 frames * 30 = 30 seconds to AFK pose.
+constexpr auto LARA_RUN_JUMP_TIME = 22;					// Frames to count before a running jump is possible.
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
 constexpr auto LARA_AIR_MAX = 1800.0f;
