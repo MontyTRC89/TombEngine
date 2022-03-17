@@ -175,7 +175,7 @@ bool TestLaraHang(ITEM_INFO* item, CollisionInfo* coll)
 		else // Death or action release
 		{
 			SetAnimation(item, LA_FALL_START);
-			item->Position.yPos += 256;
+			item->Position.yPos += CLICK(1);
 			item->Animation.Airborne = true;
 			item->Animation.Velocity = 2;
 			item->Animation.VerticalVelocity = 1;
@@ -509,7 +509,7 @@ bool TestLaraValidHangPosition(ITEM_INFO* item, CollisionInfo* coll)
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
 	// Difference between two indicates difference in height between ledges.
-	auto frontFloor = LaraCollisionAboveFront(item, lara->Control.MoveAngle, coll->Setup.Radius + CLICK(0.5f), LARA_HEIGHT).Position.Floor;
+	auto frontFloor = GetCollision(item, lara->Control.MoveAngle, coll->Setup.Radius + CLICK(0.5f), -LARA_HEIGHT).Position.Floor;
 	auto laraUpperBound = item->Position.yPos - coll->Setup.Height;
 
 	// If difference is above 1/2 click, return false (ledge is out of reach).
@@ -543,7 +543,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 	auto* lara = GetLaraInfo(item);
 
 	// Lara isn't in stop state yet, bypass test
-	if (item->Animation.AnimNumber != LA_REACH_TO_HANG)
+	if (item->Animation.AnimNumber != LA_REACH_TO_HANG && item->Animation.AnimNumber != LA_HANG_IDLE)
 		return CornerType::None;
 
 	// Static is in the way, bypass test
@@ -567,7 +567,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 		// Store next position
 		item->Position = cornerResult.RealPositionResult;
 		lara->NextCornerPos.xPos = item->Position.xPos;
-		lara->NextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
+		lara->NextCornerPos.yPos = GetCollision(item, item->Position.yRot, coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
 		lara->NextCornerPos.zPos = item->Position.zPos;
 		lara->NextCornerPos.yRot = item->Position.yRot;
 		lara->Control.MoveAngle = item->Position.yRot;
@@ -624,7 +624,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 		// Store next position
 		item->Position = cornerResult.RealPositionResult;
 		lara->NextCornerPos.xPos = item->Position.xPos;
-		lara->NextCornerPos.yPos = LaraCollisionAboveFront(item, item->Position.yRot, coll->Setup.Radius * 2, abs(bounds->Y1) + LARA_HEADROOM).Position.Floor + abs(bounds->Y1);
+		lara->NextCornerPos.yPos = GetCollision(item, item->Position.yRot, coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
 		lara->NextCornerPos.zPos = item->Position.zPos;
 		lara->NextCornerPos.yRot = item->Position.yRot;
 		lara->Control.MoveAngle = item->Position.yRot;
@@ -862,15 +862,6 @@ CollisionResult LaraCollisionFront(ITEM_INFO* item, short angle, int distance)
 	return probe;
 }
 
-CollisionResult LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height)
-{
-	int x = item->Position.xPos + distance * phd_sin(angle);
-	int y = item->Position.yPos - height;
-	int z = item->Position.zPos + distance * phd_cos(angle);
-
-	return GetCollision(x, y, z, GetCollision(item->Position.xPos, y, item->Position.zPos, item->RoomNumber).RoomNumber);
-}
-
 CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height)
 {
 	auto probe = GetCollision(item, angle, distance, -height);
@@ -939,8 +930,8 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, CollisionInfo* coll)
 	if (!TestValidLedge(item, coll))
 		return false;
 
-	auto surface = LaraCollisionAboveFront(item, coll->Setup.ForwardAngle, CLICK(2), CLICK(1));
-	auto headroom = surface.Position.Floor - surface.Position.Ceiling;
+	auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
+	int headroom = probe.Position.Floor - probe.Position.Ceiling;
 
 	if (frontFloor <= -CLICK(1))
 	{
@@ -2045,7 +2036,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 	return VaultTestResult{ false };
 }
 
-// Temporary solution to ladder mounts until ladders stop breaking whenever you try to do anything with them. @Sezz 2022.02.05
+// Temporary solution to ladder mounts until ladders stop breaking whenever anyone tries to do anything with them. @Sezz 2022.02.05
 bool TestAndDoLaraLadderClimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -2217,6 +2208,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 		else [[likely]]
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
+		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2229,6 +2221,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 		else [[likely]]
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
+		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2237,6 +2230,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_UP;
+		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2245,6 +2239,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
+		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 

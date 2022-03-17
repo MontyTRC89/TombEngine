@@ -37,7 +37,7 @@ enum LaraState
 	LS_HANG = 10,
 	LS_REACH = 11,
 	LS_SPLAT = 12,
-	LS_UNDERWATER_STOP = 13,
+	LS_UNDERWATER_IDLE = 13,
 	LS_GRAB_TO_FALL = 14,
 	LS_JUMP_PREPARE = 15,
 	LS_WALK_BACK = 16,
@@ -1122,7 +1122,6 @@ struct LaraCountData
 	unsigned int Pose;
 	unsigned int PositionAdjust;
 	unsigned int RunJump;
-	unsigned int Dive;
 	unsigned int Death;
 	unsigned int NoCheat;
 };

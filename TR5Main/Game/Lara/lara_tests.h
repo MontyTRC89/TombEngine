@@ -34,7 +34,6 @@ bool LaraPositionOnLOS(ITEM_INFO* item, short angle, int distance);
 int LaraFloorFront(ITEM_INFO* item, short angle, int distance);
 int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height);
 CollisionResult LaraCollisionFront(ITEM_INFO* item, short angle, int distance);
-CollisionResult LaraCollisionAboveFront(ITEM_INFO* item, short angle, int distance, int height);
 CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height);
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, CollisionInfo* coll);
