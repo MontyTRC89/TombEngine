@@ -746,7 +746,6 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			ResetLaraFlex(laraItem);
 			lara->Control.WaterStatus = WaterStatus::TreadWater;
 			lara->WaterSurfaceDist = -heightFromWater;
-			lara->Control.Count.Dive = 11;
 			lara->Control.HandStatus = HandStatus::Free;
 			lara->Vehicle = NO_ITEM;
 

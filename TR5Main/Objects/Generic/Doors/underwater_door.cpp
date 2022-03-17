@@ -39,7 +39,7 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
-			laraItem->Animation.ActiveState == LS_UNDERWATER_STOP &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
 			!(doorItem->Status && doorItem->Animation.Airborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||

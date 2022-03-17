@@ -1,18 +1,19 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
-void lara_col_waterroll(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_uwdeath(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_dive(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_tread(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_glide(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_swim(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_waterroll(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_uwdeath(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_dive(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_tread(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_glide(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_swim(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_dive(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_dive(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_idle(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_idle(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_glide(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_glide(ITEM_INFO* item, CollisionInfo* coll);
+void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll);
+
 void UpdateSubsuitAngles(ITEM_INFO* item);
 void SwimTurnSubsuit(ITEM_INFO* item);
 void SwimTurn(ITEM_INFO* item, CollisionInfo* coll);

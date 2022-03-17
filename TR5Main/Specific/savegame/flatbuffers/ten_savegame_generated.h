@@ -1721,7 +1721,6 @@ struct LaraCountDataT : public flatbuffers::NativeTable {
   uint32_t run_jump = 0;
   uint32_t position_adjust = 0;
   uint32_t pose = 0;
-  uint32_t dive = 0;
   uint32_t death = 0;
   uint32_t no_cheat = 0;
 };
@@ -1734,9 +1733,8 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_RUN_JUMP = 4,
     VT_POSITION_ADJUST = 6,
     VT_POSE = 8,
-    VT_DIVE = 10,
-    VT_DEATH = 12,
-    VT_NO_CHEAT = 14
+    VT_DEATH = 10,
+    VT_NO_CHEAT = 12
   };
   uint32_t run_jump() const {
     return GetField<uint32_t>(VT_RUN_JUMP, 0);
@@ -1746,9 +1744,6 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   uint32_t pose() const {
     return GetField<uint32_t>(VT_POSE, 0);
-  }
-  uint32_t dive() const {
-    return GetField<uint32_t>(VT_DIVE, 0);
   }
   uint32_t death() const {
     return GetField<uint32_t>(VT_DEATH, 0);
@@ -1761,7 +1756,6 @@ struct LaraCountData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint32_t>(verifier, VT_RUN_JUMP) &&
            VerifyField<uint32_t>(verifier, VT_POSITION_ADJUST) &&
            VerifyField<uint32_t>(verifier, VT_POSE) &&
-           VerifyField<uint32_t>(verifier, VT_DIVE) &&
            VerifyField<uint32_t>(verifier, VT_DEATH) &&
            VerifyField<uint32_t>(verifier, VT_NO_CHEAT) &&
            verifier.EndTable();
@@ -1783,9 +1777,6 @@ struct LaraCountDataBuilder {
   }
   void add_pose(uint32_t pose) {
     fbb_.AddElement<uint32_t>(LaraCountData::VT_POSE, pose, 0);
-  }
-  void add_dive(uint32_t dive) {
-    fbb_.AddElement<uint32_t>(LaraCountData::VT_DIVE, dive, 0);
   }
   void add_death(uint32_t death) {
     fbb_.AddElement<uint32_t>(LaraCountData::VT_DEATH, death, 0);
@@ -1809,13 +1800,11 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(
     uint32_t run_jump = 0,
     uint32_t position_adjust = 0,
     uint32_t pose = 0,
-    uint32_t dive = 0,
     uint32_t death = 0,
     uint32_t no_cheat = 0) {
   LaraCountDataBuilder builder_(_fbb);
   builder_.add_no_cheat(no_cheat);
   builder_.add_death(death);
-  builder_.add_dive(dive);
   builder_.add_pose(pose);
   builder_.add_position_adjust(position_adjust);
   builder_.add_run_jump(run_jump);
@@ -5602,7 +5591,6 @@ inline void LaraCountData::UnPackTo(LaraCountDataT *_o, const flatbuffers::resol
   { auto _e = run_jump(); _o->run_jump = _e; }
   { auto _e = position_adjust(); _o->position_adjust = _e; }
   { auto _e = pose(); _o->pose = _e; }
-  { auto _e = dive(); _o->dive = _e; }
   { auto _e = death(); _o->death = _e; }
   { auto _e = no_cheat(); _o->no_cheat = _e; }
 }
@@ -5618,7 +5606,6 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatB
   auto _run_jump = _o->run_jump;
   auto _position_adjust = _o->position_adjust;
   auto _pose = _o->pose;
-  auto _dive = _o->dive;
   auto _death = _o->death;
   auto _no_cheat = _o->no_cheat;
   return TEN::Save::CreateLaraCountData(
@@ -5626,7 +5613,6 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatB
       _run_jump,
       _position_adjust,
       _pose,
-      _dive,
       _death,
       _no_cheat);
 }

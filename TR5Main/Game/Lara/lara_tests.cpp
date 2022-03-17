@@ -175,7 +175,7 @@ bool TestLaraHang(ITEM_INFO* item, CollisionInfo* coll)
 		else // Death or action release
 		{
 			SetAnimation(item, LA_FALL_START);
-			item->Position.yPos += 256;
+			item->Position.yPos += CLICK(1);
 			item->Animation.Airborne = true;
 			item->Animation.Velocity = 2;
 			item->Animation.VerticalVelocity = 1;
@@ -543,7 +543,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 	auto* lara = GetLaraInfo(item);
 
 	// Lara isn't in stop state yet, bypass test
-	if (item->Animation.AnimNumber != LA_REACH_TO_HANG)
+	if (item->Animation.AnimNumber != LA_REACH_TO_HANG && item->Animation.AnimNumber != LA_HANG_IDLE)
 		return CornerType::None;
 
 	// Static is in the way, bypass test
