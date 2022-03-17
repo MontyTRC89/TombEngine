@@ -452,7 +452,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll)
 	if (GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber) - item->Position.yPos > -100)
 		TestLaraWaterStepOut(item, coll);
 	else
-		SwimDive(item);
+		SetLaraSwimDiveAnimation(item);
 }
 
 void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)

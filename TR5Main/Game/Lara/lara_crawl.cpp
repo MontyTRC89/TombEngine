@@ -17,7 +17,7 @@
 #include "Scripting/GameFlowScript.h"
 
 // -----------------------------
-// CRAWL & CROUCH
+// CROUCH & CRAWL
 // Control & Collision Functions
 // -----------------------------
 
