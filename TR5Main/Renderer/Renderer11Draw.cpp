@@ -2111,15 +2111,14 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara RequiredState: %d", LaraItem->Animation.RequiredState);
-				PrintDebugMessage("Lara WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
-				PrintDebugMessage("Lara GunType: %d", Lara.Control.Weapon.GunType);
-				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
 				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
+				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara Airborne: %d", LaraItem->Animation.Airborne);
-				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
+				PrintDebugMessage("Lara WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
+				PrintDebugMessage("Lara GunType: %d", Lara.Control.Weapon.GunType);
+				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
