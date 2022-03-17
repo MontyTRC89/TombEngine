@@ -5,7 +5,7 @@ struct ITEM_INFO;
 struct CollisionInfo;
 
 // -----------------------------
-// CRAWL & CROUCH
+// CROUCH & CRAWL
 // Control & Collision Functions
 // -----------------------------
 

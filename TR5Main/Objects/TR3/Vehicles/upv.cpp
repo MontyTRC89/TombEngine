@@ -889,7 +889,7 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 		UPVItem->HitPoints = 1;
 
-		if (laraItem->Animation.ActiveState == LS_ONWATER_STOP || laraItem->Animation.ActiveState == LS_ONWATER_FORWARD)
+		if (laraItem->Animation.ActiveState == LS_ONWATER_IDLE || laraItem->Animation.ActiveState == LS_ONWATER_FORWARD)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = UPV_STATE_MOUNT;
