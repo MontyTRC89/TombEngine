@@ -118,7 +118,7 @@ static void SubmarineAttack(ITEM_INFO* item)
 	{
 		ITEM_INFO* torpedoItem = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->pos, 2);
+		SoundEffect(1110,&torpedoItem->pos, 2);
 
 		torpedoItem->objectNumber = ID_TORPEDO;
 		torpedoItem->shade = -15856;
@@ -131,18 +131,18 @@ static void SubmarineAttack(ITEM_INFO* item)
 			pos1.x = (GetRandomControl() & 0x7F) - 414;
 			pos1.y = -320;
 			pos1.z = 352;
-			GetJointAbsPosition(item, &pos1, 4);
+			GetJointAbsPosition(item,&pos1, 4);
 
 			pos2.x = (GetRandomControl() & 0x3FF) - 862;
 			pos2.y = -320 - (GetRandomControl() & 0x3FF);
 			pos2.z = (GetRandomControl() & 0x3FF) - 160;
-			GetJointAbsPosition(item, &pos2, 4);
+			GetJointAbsPosition(item,&pos2, 4);
 
-			TriggerTorpedoSparks2(&pos1, &pos2, 0);
+			TriggerTorpedoSparks2(&pos1,&pos2, 0);
 		}
 
 		torpedoItem->roomNumber = item->roomNumber;
-		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->roomNumber);
+		GetFloor(pos1.x, pos1.y, pos1.z,&torpedoItem->roomNumber);
 
 		torpedoItem->pos.xPos = pos1.x;
 		torpedoItem->pos.yPos = pos1.y;
@@ -189,10 +189,10 @@ void SubmarineControl(short itemNumber)
 		creature->enemy = LaraItem;
 
 	AI_INFO info, laraInfo;
-	CreatureAIInfo(item, &info);
+	CreatureAIInfo(item,&info);
 
-	GetCreatureMood(item, &info, VIOLENT);
-	CreatureMood(item, &info, VIOLENT);
+	GetCreatureMood(item,&info, VIOLENT);
+	CreatureMood(item,&info, VIOLENT);
 
 	short angle = CreatureTurn(item, creature->maximumTurn);
 
@@ -246,7 +246,7 @@ void SubmarineControl(short itemNumber)
 	ITEM_INFO* enemy = creature->enemy;
 	creature->enemy = LaraItem;
 
-	if (Targetable(item, &laraInfo))
+	if (Targetable(item,&laraInfo))
 	{
 		if (creature->flags >= item->triggerFlags 
 			&& laraInfo.angle > -ANGLE(90) 
@@ -259,7 +259,7 @@ void SubmarineControl(short itemNumber)
 		if (laraInfo.distance >= SQUARE(3072))
 		{
 			item->goalAnimState = 1;
-			SoundEffect(SFX_TR5_MINI_SUB_LOOP, &item->pos, 2);
+			SoundEffect(948,&item->pos, 2);
 		}
 		else
 		{
@@ -299,27 +299,27 @@ void SubmarineControl(short itemNumber)
 		pos1.x = 200;
 		pos1.y = 320;
 		pos1.z = 90;
-		GetJointAbsPosition(item, &pos1, 1);
+		GetJointAbsPosition(item,&pos1, 1);
 
 		PHD_VECTOR pos2;
 		pos2.x = 200;
 		pos2.y = 1280;
 		pos2.z = 90;
-		GetJointAbsPosition(item, &pos2, 1);
+		GetJointAbsPosition(item,&pos2, 1);
 
-		TriggerTorpedoBubbles(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1,&pos2, 0);
 
 		pos1.x = 200;
 		pos1.y = 320;
 		pos1.z = -100;
-		GetJointAbsPosition(item, &pos1, 1);
+		GetJointAbsPosition(item,&pos1, 1);
 
 		pos2.x = 200;
 		pos2.y = 1280;
 		pos2.z = -100;
-		GetJointAbsPosition(item, &pos2, 1);
+		GetJointAbsPosition(item,&pos2, 1);
 
-		TriggerTorpedoBubbles(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1,&pos2, 0);
 	}
 	else
 	{
@@ -327,27 +327,27 @@ void SubmarineControl(short itemNumber)
 		pos1.x = -200;
 		pos1.y = 320;
 		pos1.z = 90;
-		GetJointAbsPosition(item, &pos1, 2);
+		GetJointAbsPosition(item,&pos1, 2);
 		
 		PHD_VECTOR pos2;
 		pos2.x = -200;
 		pos2.y = 1280;
 		pos2.z = 90;
-		GetJointAbsPosition(item, &pos2, 2);
+		GetJointAbsPosition(item,&pos2, 2);
 
-		TriggerTorpedoBubbles(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1,&pos2, 0);
 		
 		pos1.x = -200;
 		pos1.y = 320;
 		pos1.z = -100;
-		GetJointAbsPosition(item, &pos1, 2);
+		GetJointAbsPosition(item,&pos1, 2);
 		
 		pos2.x = -200;
 		pos2.y = 1280;
 		pos2.z = -100;
-		GetJointAbsPosition(item, &pos2, 2);
+		GetJointAbsPosition(item,&pos2, 2);
 
-		TriggerTorpedoBubbles(&pos1, &pos2, 0);
+		TriggerTorpedoBubbles(&pos1,&pos2, 0);
 	}
 
 	TriggerSubmarineSparks(itemNumber);
@@ -365,7 +365,7 @@ void SubmarineControl(short itemNumber)
 	pos2.z = -40;
 	GetJointAbsPosition(item, (PHD_VECTOR*)&pos2, 0);
 
-	if (!LOS((GAME_VECTOR*)&pos1, &pos2))
+	if (!LOS((GAME_VECTOR*)&pos1,&pos2))
 	{
 		int distance = sqrt(SQUARE(pos2.x - pos1.x) + SQUARE(pos2.y - pos1.y) + SQUARE(pos2.z - pos1.z));
 		if (distance < 16384)
@@ -426,15 +426,15 @@ void ChaffFlareControl(short itemNumber)
 	pos1.x = 0;
 	pos1.y = 0;
 	pos1.z = (GlobalCounter & 1) != 0 ? 48 : -48;
-	GetJointAbsPosition(item, &pos1, 0);
+	GetJointAbsPosition(item,&pos1, 0);
 
 	PHD_VECTOR pos2;
 	pos2.x = 0;
 	pos2.y = 0;
 	pos2.z = 8 * ((GlobalCounter & 1) != 0 ? 48 : -48);
-	GetJointAbsPosition(item, &pos2, 0);
+	GetJointAbsPosition(item,&pos2, 0);
 
-	TriggerTorpedoBubbles(&pos1, &pos2, 1);
+	TriggerTorpedoBubbles(&pos1,&pos2, 1);
 
 	if (item->itemFlags[0] >= 300)
 	{
@@ -460,7 +460,7 @@ void TorpedoControl(short itemNumber)
 {
 	ITEM_INFO*  item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &item->pos, 2);
+	SoundEffect(946,&item->pos, 2);
 
 	PHD_VECTOR pos;
 
@@ -575,7 +575,7 @@ void TorpedoControl(short itemNumber)
 	item->pos.zPos += c * phd_cos(item->pos.yRot);
 
 	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
 	int floorHeight = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 	int ceilingHeight = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
@@ -586,8 +586,8 @@ void TorpedoControl(short itemNumber)
 			LaraItem->hitStatus = true;
 			KillItem(itemNumber);
 			TriggerUnderwaterExplosion(item, 1);
-			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->pos, 2);
-			SoundEffect(SFX_TR5_LARA_UNDERWATER_HIT, &LaraItem->pos, 2);
+			SoundEffect(1108,&item->pos, 2);
+			SoundEffect(SFX_TR5_DIVESUITHIT,&LaraItem->pos, 2);
 			LaraItem->hitPoints -= 200;
 		//	if (Lara.anxiety >= 0x7F)
 		//		Lara.anxiety--;
@@ -606,15 +606,15 @@ void TorpedoControl(short itemNumber)
 			pos1.x = 0;
 			pos1.y = 0;
 			pos1.z = -64;
-			GetJointAbsPosition(item, &pos1, 0);
+			GetJointAbsPosition(item,&pos1, 0);
 
 			PHD_VECTOR pos2;
 			pos2.x = 0;
 			pos2.y = 0;
 			pos2.z = -64 << ((GlobalCounter & 1) + 2);
-			GetJointAbsPosition(item, &pos2, 0);
+			GetJointAbsPosition(item,&pos2, 0);
 
-			TriggerTorpedoBubbles(&pos1, &pos2, 1);
+			TriggerTorpedoBubbles(&pos1,&pos2, 1);
 		}
 	}
 	else
@@ -623,7 +623,7 @@ void TorpedoControl(short itemNumber)
 		item->pos.yPos = y;
 		item->pos.zPos = z;
 		TriggerUnderwaterExplosion(item, 1);
-		SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->pos, 2);
+		SoundEffect(1108,&item->pos, 2);
 		KillItem(itemNumber);
 	}
 }

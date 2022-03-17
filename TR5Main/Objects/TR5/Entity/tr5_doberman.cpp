@@ -44,13 +44,13 @@ void DobermanControl(short itemNumber)
 		if (item->hitPoints > 0)
 		{
 			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			CreatureAIInfo(item,&info);
 
 			if (info.ahead)
 				joint = info.angle;
 
-			GetCreatureMood(item, &info, TIMID);
-			CreatureMood(item, &info, TIMID);
+			GetCreatureMood(item,&info, TIMID);
+			CreatureMood(item,&info, TIMID);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 		
@@ -167,7 +167,7 @@ void DobermanControl(short itemNumber)
 					&& info.ahead 
 					&& item->touchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
 					LaraItem->hitPoints -= 30;
 					LaraItem->hitStatus = true;
 					creature->flags = 1;
@@ -182,7 +182,7 @@ void DobermanControl(short itemNumber)
 			case 8:
 				if (creature->flags != 2 && item->touchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
 					LaraItem->hitPoints -= 80;
 					LaraItem->hitStatus = true;
 					creature->flags = 2;
@@ -201,7 +201,7 @@ void DobermanControl(short itemNumber)
 				creature->maximumTurn = ANGLE(6);
 				if (creature->flags != 3 && item->touchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
 					LaraItem->hitPoints -= 50;
 					LaraItem->hitStatus = true;
 					creature->flags = 3;
