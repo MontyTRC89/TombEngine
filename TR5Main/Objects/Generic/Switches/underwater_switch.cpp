@@ -66,7 +66,7 @@ namespace TEN::Entities::Switches
 			if (switchItem->Status == ITEM_NOT_ACTIVE &&
 				laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
 				laraInfo->Control.HandStatus == HandStatus::Free &&
-				laraItem->Animation.ActiveState == LS_UNDERWATER_STOP)
+				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE)
 			{
 				if (TestLaraPosition(&UnderwaterSwitchBounds, switchItem, laraItem))
 				{
@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 								AnimateLara(laraItem);
 							} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
-							laraItem->Animation.TargetState = LS_UNDERWATER_STOP;
+							laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 							laraInfo->Control.HandStatus = HandStatus::Busy;
 							switchItem->Animation.TargetState = switchItem->Animation.ActiveState != SWITCH_ON;
 							switchItem->Status = ITEM_ACTIVE;
@@ -104,7 +104,7 @@ namespace TEN::Entities::Switches
 		int flag = 0;
 
 		if (TrInput & IN_ACTION &&
-			laraItem->Animation.ActiveState == LS_UNDERWATER_STOP &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
