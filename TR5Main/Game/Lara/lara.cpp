@@ -59,12 +59,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_hang,
 	lara_as_reach,
 	lara_as_splat,
-	lara_as_underwater_idle,
-	lara_void_func,
+	lara_as_underwater_idle,//13
+	lara_void_func,//14
 	lara_as_jump_prepare,//15
 	lara_as_walk_back,//16
 	lara_as_underwater_swim_forward,//17
-	lara_as_underwater_glide,//18
+	lara_as_underwater_inertia,//18
 	lara_as_controlled_no_look,//19
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
@@ -80,8 +80,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_shimmy_right,//31
 	lara_as_slide_back,//32
 	lara_as_surface_idle,//33
-	lara_as_surface_forward,//34
-	lara_as_underwater_dive,//35
+	lara_as_surface_swim_forward,//34
+	lara_as_surface_dive,//35
 	lara_as_pushable_push,//36
 	lara_as_pushable_pull,//37
 	lara_as_pushable_grab,//38
@@ -93,9 +93,9 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_underwater_death,//44
 	lara_as_roll_forward,//45
 	lara_as_special,//46
-	lara_as_surface_back,//47
-	lara_as_surface_left,//48
-	lara_as_surface_right,//49
+	lara_as_surface_swim_back,//47
+	lara_as_surface_swim_left,//48
+	lara_as_surface_swim_right,//49
 	lara_void_func,//50
 	lara_void_func,//51
 	lara_as_swan_dive,//52
@@ -243,7 +243,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_prepare,//15
 	lara_col_walk_back,
 	lara_col_underwater_swim_forward,
-	lara_col_underwater_glide,
+	lara_col_underwater_inertia,
 	lara_default_col,//19
 	lara_col_turn_right_fast,
 	lara_col_step_right,
@@ -259,8 +259,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_shimmy_right,
 	lara_col_slide_back,//32
 	lara_col_surface_idle,//33
-	lara_col_surface_forward,//34
-	lara_col_underwater_dive,//35
+	lara_col_surface_swim_forward,//34
+	lara_col_surface_dive,//35
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -269,18 +269,18 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-	lara_col_underwater_death,
-	lara_col_roll_forward,
-	lara_void_func,
-	lara_col_surface_back,//47
-	lara_col_surface_left,//48
-	lara_col_surface_right,//49
+	lara_col_underwater_death,//44
+	lara_col_roll_forward,//45
+	lara_void_func,//46
+	lara_col_surface_swim_back,//47
+	lara_col_surface_swim_left,//48
+	lara_col_surface_swim_right,//49
 	lara_void_func,
 	lara_void_func,
 	lara_col_swan_dive,//52
 	lara_col_freefall_dive,//53
 	lara_default_col,
-	lara_default_col,
+	lara_default_col,//55
 	lara_col_climb_idle,
 	lara_col_climb_up,
 	lara_col_climb_left,

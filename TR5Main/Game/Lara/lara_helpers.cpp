@@ -553,6 +553,17 @@ void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)
 	}
 }
 
+void SetLaraSwimDiveAnimation(ITEM_INFO* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	SetAnimation(item, LA_ONWATER_DIVE);
+	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+	item->Position.xRot = -ANGLE(45.0f);
+	item->Animation.VerticalVelocity = 80;
+	lara->Control.WaterStatus = WaterStatus::Underwater;
+}
+
 void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 {
 	if (!rate)
