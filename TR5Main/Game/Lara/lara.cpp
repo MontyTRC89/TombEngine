@@ -59,12 +59,12 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_hang,
 	lara_as_reach,
 	lara_as_splat,
-	lara_as_tread,
+	lara_as_underwater_idle,
 	lara_void_func,
 	lara_as_jump_prepare,//15
 	lara_as_walk_back,//16
-	lara_as_swim,//17
-	lara_as_glide,//18
+	lara_as_underwater_swim_forward,//17
+	lara_as_underwater_glide,//18
 	lara_as_controlled_no_look,//19
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
@@ -79,9 +79,9 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_shimmy_left,//30
 	lara_as_shimmy_right,//31
 	lara_as_slide_back,//32
-	lara_as_surftread,
-	lara_as_surfswim,
-	lara_as_dive,
+	lara_as_surface_idle,//33
+	lara_as_surface_forward,//34
+	lara_as_underwater_dive,//35
 	lara_as_pushable_push,//36
 	lara_as_pushable_pull,//37
 	lara_as_pushable_grab,//38
@@ -90,18 +90,18 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_switch_off,//41
 	lara_as_use_key,//42
 	lara_as_use_puzzle,//43
-	lara_as_uwdeath,//44
+	lara_as_underwater_death,//44
 	lara_as_roll_forward,//45
 	lara_as_special,//46
-	lara_as_surfback,//47
-	lara_as_surfleft,//48
-	lara_as_surfright,//49
+	lara_as_surface_back,//47
+	lara_as_surface_left,//48
+	lara_as_surface_right,//49
 	lara_void_func,//50
 	lara_void_func,//51
 	lara_as_swan_dive,//52
 	lara_as_freefall_dive,//53
 	lara_as_handstand,//54
-	lara_as_waterout,//55
+	lara_as_surface_climb_out,//55
 	lara_as_climb_idle,//56
 	lara_as_climb_up,//57
 	lara_as_climb_left,//58
@@ -112,7 +112,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//63
 	lara_void_func,//64
 	lara_as_wade_forward,//65
-	lara_as_waterroll,//66
+	lara_as_underwater_roll_180,//66
 	lara_as_pickup_flare,//67
 	lara_void_func,//68
 	lara_void_func,//69
@@ -238,12 +238,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_hang,
 	lara_col_reach,
 	lara_col_splat,
-	lara_col_tread,
+	lara_col_underwater_idle,
 	lara_col_land,
 	lara_col_jump_prepare,//15
 	lara_col_walk_back,
-	lara_col_swim,
-	lara_col_glide,
+	lara_col_underwater_swim_forward,
+	lara_col_underwater_glide,
 	lara_default_col,//19
 	lara_col_turn_right_fast,
 	lara_col_step_right,
@@ -258,9 +258,9 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_shimmy_left,
 	lara_col_shimmy_right,
 	lara_col_slide_back,//32
-	lara_col_surftread,
-	lara_col_surfswim,
-	lara_col_dive,
+	lara_col_surface_idle,//33
+	lara_col_surface_forward,//34
+	lara_col_underwater_dive,//35
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -269,12 +269,12 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-	lara_col_uwdeath,
+	lara_col_underwater_death,
 	lara_col_roll_forward,
 	lara_void_func,
-	lara_col_surfback,
-	lara_col_surfleft,
-	lara_col_surfright,
+	lara_col_surface_back,//47
+	lara_col_surface_left,//48
+	lara_col_surface_right,//49
 	lara_void_func,
 	lara_void_func,
 	lara_col_swan_dive,//52
@@ -291,7 +291,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,
 	lara_void_func,
 	lara_col_wade_forward,
-	lara_col_waterroll,
+	lara_col_underwater_roll_180,
 	lara_default_col,
 	lara_void_func,
 	lara_void_func,
@@ -343,7 +343,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_rope_swing,
 	lara_void_func,
 	lara_void_func,
-	lara_col_swim,
+	lara_col_underwater_swim_forward,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -419,7 +419,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (lara->Control.IsMoving)
 	{
-		if (lara->Control.Count.PositionAdjust > 90)
+		if (lara->Control.Count.PositionAdjust > LARA_POSITION_ADJUST_MAX_TIME)
 		{
 			lara->Control.IsMoving = false;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -572,7 +572,6 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 						item->Position.yPos = waterHeight;
 						item->Animation.VerticalVelocity = 0;
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
-						lara->Control.Count.Dive = 11;
 						ResetLaraLean(item);
 						ResetLaraFlex(item);
 
@@ -587,7 +586,6 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 				item->Position.yPos = waterHeight + 1;
 				item->Animation.VerticalVelocity = 0;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
-				lara->Control.Count.Dive = 11;
 				ResetLaraLean(item);
 				ResetLaraFlex(item);
 
@@ -636,7 +634,6 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
-					lara->Control.Count.Dive = 0;
 					ResetLaraLean(item);
 					ResetLaraFlex(item);
 

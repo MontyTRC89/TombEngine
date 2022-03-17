@@ -111,7 +111,6 @@ table LaraCountData {
 	run_jump: uint32;
 	position_adjust: uint32;
 	pose: uint32;
-	dive: uint32;
 	death: uint32;
 	no_cheat: uint32;
 }
