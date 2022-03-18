@@ -97,7 +97,7 @@ void AutoGunsControl(short itemNumber)
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_TR5_HK_FIRE, &item->Position, 0xC00004);
+				SoundEffect(SFX_LARA_HK_FIRE, &item->Position, 0xC00004);
 
 				if (GlobalCounter & 1)
 				{

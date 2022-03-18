@@ -262,7 +262,7 @@ void UpdateSubsuitAngles(ITEM_INFO* item)
 		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
 
 	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
-		SoundEffect(SFX_TR5_LARA_UNDERWATER_ENGINE, &item->Position, (((lara->Control.Subsuit.Velocity[0] + lara->Control.Subsuit.Velocity[1]) * 4) & 0x1F00) + 10);
+		SoundEffect(SFX_TR5_DIVESUITENGINE, &item->Position, (((lara->Control.Subsuit.Velocity[0] + lara->Control.Subsuit.Velocity[1]) * 4) & 0x1F00) + 10);
 }
 
 void SwimTurnSubsuit(ITEM_INFO* item)
