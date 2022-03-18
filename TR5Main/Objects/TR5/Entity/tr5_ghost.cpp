@@ -106,7 +106,7 @@ void InvisibleGhostControl(short itemNumber)
 		if (item->ItemFlags[0] == 0)
 		{
 			item->ItemFlags[0] = 1;
-			SoundEffect(SFX_TR5_SKELETON_APPEAR, &item->Position, 0);
+			SoundEffect(SFX_TR5_SKELETONGHOSTAPPEAR, &item->Position, 0);
 		}
 	}
 

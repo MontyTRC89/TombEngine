@@ -74,7 +74,7 @@ void ControlGunShip(short itemNumber)
 			item->MeshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_TR5_HK_FIRE, &item->Position, 0xC00004);
+			SoundEffect(SFX_LARA_HK_FIRE, &item->Position, 0xC00004);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);

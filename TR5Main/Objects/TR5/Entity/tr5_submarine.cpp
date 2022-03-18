@@ -120,7 +120,7 @@ static void SubmarineAttack(ITEM_INFO* item)
 	{
 		auto* torpedoItem = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Position, 2);
+		SoundEffect(SFX_TR5_UNDERWATERTORPEDO, &torpedoItem->Position, 2);
 
 		torpedoItem->ObjectNumber = ID_TORPEDO;
 		torpedoItem->Shade = -15856;
@@ -255,7 +255,7 @@ void SubmarineControl(short itemNumber)
 		if (laraInfo.distance >= pow(SECTOR(3), 2))
 		{
 			item->Animation.TargetState = 1;
-			SoundEffect(SFX_TR5_MINI_SUB_LOOP, &item->Position, 2);
+			SoundEffect(SFX_TR5_DIVESUITLOOP, &item->Position, 2);
 		}
 		else
 			item->Animation.TargetState = 0;
@@ -423,7 +423,7 @@ void TorpedoControl(short itemNumber)
 {
 	auto*  item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR5_SWIMSUIT_METAL_CLASH, &item->Position, 2);
+	SoundEffect(SFX_TR5_DIVESUITHIT, &item->Position, 2);
 
 	PHD_VECTOR pos;
 
@@ -542,8 +542,8 @@ void TorpedoControl(short itemNumber)
 			LaraItem->HitStatus = true;
 			KillItem(itemNumber);
 			TriggerUnderwaterExplosion(item, 1);
-			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Position, 2);
-			SoundEffect(SFX_TR5_LARA_UNDERWATER_HIT, &LaraItem->Position, 2);
+			SoundEffect(SFX_TR5_UNDERWATEREXPLOSION, &item->Position, 2);
+			SoundEffect(SFX_TR5_DIVESUITHIT, &LaraItem->Position, 2); 
 			LaraItem->HitPoints -= 200;
 		//	if (Lara.anxiety >= 0x7F)
 		//		Lara.anxiety--;
@@ -576,7 +576,7 @@ void TorpedoControl(short itemNumber)
 		item->Position.yPos = y;
 		item->Position.zPos = z;
 		TriggerUnderwaterExplosion(item, 1);
-		SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Position, 2);
+		SoundEffect(SFX_TR5_UNDERWATEREXPLOSION, &item->Position, 2);
 		KillItem(itemNumber);
 	}
 }
