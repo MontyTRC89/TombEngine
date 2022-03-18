@@ -62,7 +62,6 @@ void lara_as_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			lara->Control.HandStatus == HandStatus::Free &&
 			g_GameFlow->Animations.HasCrouchRoll)
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
@@ -372,11 +371,10 @@ void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(lara->Control.Weapon.GunType) &&
-			item->Animation.AnimNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
+			item->Animation.AnimNumber != LA_CROUCH_TO_CRAWL_START)) // TODO: This is a hack.
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			lara->Control.HandStatus = HandStatus::Free;
