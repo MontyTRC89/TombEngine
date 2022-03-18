@@ -52,13 +52,13 @@ void LionControl(short itemNum)
 		else
 		{
 			AI_INFO info;
-			CreatureAIInfo(item,&info);
+			CreatureAIInfo(item, &info);
 
 			if (info.ahead)
 				joint1 = info.angle;
 
-			GetCreatureMood(item,&info, VIOLENT);
-			CreatureMood(item,&info, VIOLENT);
+			GetCreatureMood(item, &info, VIOLENT);
+			CreatureMood(item, &info, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 			joint0 = -16 * angle;
@@ -141,7 +141,7 @@ void LionControl(short itemNum)
 				{
 					LaraItem->hitPoints -= 200;
 					LaraItem->hitStatus = true;
-					CreatureEffect2(item,&LionBite1, 10, item->pos.yRot, DoBloodSplat);
+					CreatureEffect2(item, &LionBite1, 10, item->pos.yRot, DoBloodSplat);
 					item->requiredAnimState = 1;
 				}
 				break;
@@ -149,7 +149,7 @@ void LionControl(short itemNum)
 				creature->maximumTurn = ANGLE(1);
 				if (!item->requiredAnimState && item->touchBits & 0x200048)
 				{
-					CreatureEffect2(item,&LionBite2, 10, item->pos.yRot, DoBloodSplat);
+					CreatureEffect2(item, &LionBite2, 10, item->pos.yRot, DoBloodSplat);
 					LaraItem->hitPoints -= 60;
 					LaraItem->hitStatus = true;
 					item->requiredAnimState = 1;

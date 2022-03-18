@@ -97,7 +97,7 @@ void ControlDeathSlide(short itemNumber)
 		item->pos.yPos += item->fallspeed / 4;
 
 		short roomNumber = item->roomNumber;
-		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		if (roomNumber != item->roomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
 
@@ -112,7 +112,7 @@ void ControlDeathSlide(short itemNumber)
 		int y = item->pos.yPos + 64;
 		int z = item->pos.zPos + 1024 * c;
 
-		FLOOR_INFO* floor = GetFloor(x, y, z,&roomNumber);
+		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{
@@ -126,7 +126,7 @@ void ControlDeathSlide(short itemNumber)
 			}
 
 			// Stop
-			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH,&item->pos, 0);
+			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &item->pos, 0);
 			RemoveActiveItem(itemNumber);
 			item->status = ITEM_NOT_ACTIVE;
 			item->flags -= ONESHOT;
@@ -134,7 +134,7 @@ void ControlDeathSlide(short itemNumber)
 		else
 		{
 			// Whizz
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE,&item->pos, 0);
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &item->pos, 0);
 		}
 	}
 }
