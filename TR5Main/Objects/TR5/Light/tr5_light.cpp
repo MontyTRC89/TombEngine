@@ -39,12 +39,12 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	source.x = x;
 	source.y = y;
 	source.z = z;
-	GetFloor(x, y, z,&room);
+	GetFloor(x, y, z, &room);
 	source.roomNumber = room;
 	target.x = x + 16384 * phd_sin(16 * angle);
 	target.y = y;
 	target.z = z + 16384 * phd_cos(16 * angle);
-	if (!LOS(&source,&target))
+	if (!LOS(&source, &target))
 		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
 
@@ -164,7 +164,7 @@ void ElectricalLightControl(short itemNumber)
 
 			intensity = item->itemFlags[1] - (GetRandomControl() & 0x7F);
 			if (intensity > 64)
-				SoundEffect(1001,&item->pos, 32 * (intensity & 0xFFFFFFF8) | 8);
+				SoundEffect(SFX_TR5_ELEC_LIGHT_CRACKLES, &item->pos, 32 * (intensity & 0xFFFFFFF8) | 8);
 		}
 		else
 		{
@@ -200,7 +200,7 @@ void BlinkingLightControl(short itemNumber)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 0;
-			GetJointAbsPosition(item,&pos, 0);
+			GetJointAbsPosition(item, &pos, 0);
 
 			TriggerDynamicLight(
 				pos.x,

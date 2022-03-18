@@ -46,7 +46,7 @@ void InvisibleGhostControl(short itemNumber)
 		}
 
 		AI_INFO info;
-		CreatureAIInfo(item,&info);
+		CreatureAIInfo(item, &info);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 		if (abs(info.angle) >= ANGLE(3))
@@ -89,7 +89,7 @@ void InvisibleGhostControl(short itemNumber)
 		{
 			LaraItem->hitPoints -= 400;
 			LaraItem->hitStatus = true;
-			CreatureEffect2(item,&InvisibleGhostBite, 10, item->pos.yRot, DoBloodSplat);
+			CreatureEffect2(item, &InvisibleGhostBite, 10, item->pos.yRot, DoBloodSplat);
 			creature->flags = 1;
 		}
 
@@ -108,7 +108,7 @@ void InvisibleGhostControl(short itemNumber)
 			if (item->itemFlags[0] == 0)
 			{
 				item->itemFlags[0] = 1;
-				SoundEffect(963,&item->pos, 0);
+				SoundEffect(SFX_TR5_SKELETON_APPEAR, &item->pos, 0);
 			}
 		}
 
