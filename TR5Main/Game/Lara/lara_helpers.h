@@ -29,6 +29,10 @@ LaraInfo*& GetLaraInfo(ITEM_INFO* item);
 short GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll);
 
 void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll);
+void UpdateLaraSubsuitAngles(ITEM_INFO* item);
+void ModulateLaraSubsuitSwimTurn(ITEM_INFO* item);
+void ModulateLaraSwimTurn(ITEM_INFO* item, CollisionInfo* coll);
+
 void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ITEM_INFO* item, CollisionInfo* coll);
 void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultResult);

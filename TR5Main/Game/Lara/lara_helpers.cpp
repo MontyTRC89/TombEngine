@@ -9,6 +9,7 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Scripting/GameFlowScript.h"
+#include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -22,6 +23,7 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+// TODO: Temp. debug
 using namespace TEN::Renderer;
 #include "Renderer/Renderer11.h"
 
@@ -377,6 +379,129 @@ void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll)
 	}
 	else
 		lara->ExtraVelocity.x += minVelocity;
+}
+
+void UpdateLaraSubsuitAngles(ITEM_INFO* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->Control.Subsuit.VerticalVelocity != 0)
+	{
+		item->Position.yPos += lara->Control.Subsuit.VerticalVelocity / 4;
+		lara->Control.Subsuit.VerticalVelocity = ceil((15 / 16) * lara->Control.Subsuit.VerticalVelocity - 1);
+	}
+
+	lara->Control.Subsuit.Velocity[0] = -4 * item->Animation.VerticalVelocity;
+	lara->Control.Subsuit.Velocity[1] = -4 * item->Animation.VerticalVelocity;
+
+	if (lara->Control.Subsuit.XRot >= lara->Control.Subsuit.DXRot)
+	{
+		if (lara->Control.Subsuit.XRot > lara->Control.Subsuit.DXRot)
+		{
+			if (lara->Control.Subsuit.XRot > 0 && lara->Control.Subsuit.DXRot < 0)
+				lara->Control.Subsuit.XRot = ceil(0.75 * lara->Control.Subsuit.XRot);
+
+			lara->Control.Subsuit.XRot -= ANGLE(2.0f);
+			if (lara->Control.Subsuit.XRot < lara->Control.Subsuit.DXRot)
+				lara->Control.Subsuit.XRot = lara->Control.Subsuit.DXRot;
+		}
+	}
+	else
+	{
+		if (lara->Control.Subsuit.XRot < 0 && lara->Control.Subsuit.DXRot > 0)
+			lara->Control.Subsuit.XRot = ceil(0.75 * lara->Control.Subsuit.XRot);
+
+		lara->Control.Subsuit.XRot += ANGLE(2.0f);
+		if (lara->Control.Subsuit.XRot > lara->Control.Subsuit.DXRot)
+			lara->Control.Subsuit.XRot = lara->Control.Subsuit.DXRot;
+	}
+
+	if (lara->Control.Subsuit.DXRot != 0)
+	{
+		short rotation = lara->Control.Subsuit.DXRot >> 3;
+		if (rotation < -ANGLE(2.0f))
+			rotation = -ANGLE(2.0f);
+		else if (rotation > ANGLE(2.0f))
+			rotation = ANGLE(2.0f);
+
+		item->Position.xRot += rotation;
+	}
+
+	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot >> 3);
+	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot >> 3);
+
+	if (lara->Control.TurnRate > 0)
+		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate);
+	else if (lara->Control.TurnRate < 0)
+		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
+
+	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
+		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
+
+	if (lara->Control.Subsuit.Velocity[1] > SECTOR(1.5f))
+		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
+
+	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
+		SoundEffect(SFX_TR5_DIVESUITENGINE, &item->Position, (((lara->Control.Subsuit.Velocity[0] + lara->Control.Subsuit.Velocity[1]) * 4) & 0x1F00) + 10);
+}
+
+void ModulateLaraSubsuitSwimTurn(ITEM_INFO* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (item->Position.yPos < 14080)
+		lara->Control.Subsuit.VerticalVelocity += (14080 - item->Position.yPos) >> 4;
+
+	if (TrInput & IN_FORWARD && item->Position.xRot > -ANGLE(85.0f))
+		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
+	else if (TrInput & IN_BACK && item->Position.xRot < ANGLE(85.0f))
+		lara->Control.Subsuit.DXRot = ANGLE(45.0f);
+	else
+		lara->Control.Subsuit.DXRot = 0;
+
+	if (TrInput & IN_LEFT)
+	{
+		lara->Control.TurnRate -= LARA_SUBSUIT_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
+
+		item->Position.zRot -= LARA_LEAN_RATE;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		lara->Control.TurnRate += LARA_SUBSUIT_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
+
+		item->Position.zRot += LARA_LEAN_RATE;
+	}
+}
+
+void ModulateLaraSwimTurn(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (TrInput & IN_FORWARD)
+		item->Position.xRot -= ANGLE(2.0f);
+	else if (TrInput & IN_BACK)
+		item->Position.xRot += ANGLE(2.0f);
+
+	if (TrInput & IN_LEFT)
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
+
+		item->Position.zRot -= LARA_LEAN_RATE;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
+
+		item->Position.zRot += LARA_LEAN_RATE;
+	}
 }
 
 void SetLaraJumpDirection(ITEM_INFO* item, CollisionInfo* coll)
