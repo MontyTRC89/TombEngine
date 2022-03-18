@@ -156,7 +156,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->itemFlags[0] == 1)
 		{
-			SoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP, &item->pos, 0);
+			SoundEffect(1045, &item->pos, 0);
 			adx = abs(dx);
 			if (adx >= 32)
 				adx = 32;
@@ -175,7 +175,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->itemFlags[0] == 2)
 		{
-			SoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP, &item->pos, 0);
+			SoundEffect(1045, &item->pos, 0);
 			adz = abs(dz);
 			if (adz >= 32)
 				adz = 32;
@@ -195,7 +195,7 @@ void WreckingBallControl(short itemNumber)
 		if (item->itemFlags[1] == -1 && (oldX != item->pos.xPos || oldZ != item->pos.zPos))
 		{
 			item->itemFlags[1] = 0;
-			SoundEffect(SFX_TR5_J_GRAB_MOTOR_A, &item->pos, 0);
+			SoundEffect(1044, &item->pos, 0);
 		}
 		if ((item->pos.xPos & 0x3FF) == 512 && (item->pos.zPos & 0x3FF) == 512)
 			item->itemFlags[0] = 0;
@@ -203,8 +203,8 @@ void WreckingBallControl(short itemNumber)
 		{
 			if (item->itemFlags[1] != -1)
 			{
-				StopSoundEffect(SFX_TR5_J_GRAB_MOTOR_B_LP);
-				SoundEffect(SFX_TR5_J_GRAB_MOTOR_C, &item->pos, 0);
+				StopSoundEffect(1045);
+				SoundEffect(1046, &item->pos, 0);
 			}
 			item->itemFlags[1] = 1;
 			item->triggerFlags = 30;
@@ -222,7 +222,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
-			SoundEffect(SFX_TR5_J_GRAB_DROP, &item->pos, 0);
+			SoundEffect(1042, &item->pos, 0);
 			++item->itemFlags[1];
 			item->fallspeed = 6;
 			item->pos.yPos += item->fallspeed;
@@ -259,12 +259,12 @@ void WreckingBallControl(short itemNumber)
 		item->pos.yPos += item->fallspeed;
 		if (item->pos.yPos < item2->pos.yPos + 1644)
 		{
-			StopSoundEffect(SFX_TR5_J_GRAB_WINCH_UP_LP);
+			StopSoundEffect(1048);
 			item->itemFlags[0] = 1;
 			item->pos.yPos = item2->pos.yPos + 1644;
 			if (item->fallspeed < -32)
 			{
-				SoundEffect(SFX_TR5_J_GRAB_IMPACT, &item->pos, 4104);
+				SoundEffect(1047, &item->pos, 4104);
 				item->fallspeed = -item->fallspeed >> 3;
 				BounceCamera(item, 16, 8192);
 			}
@@ -277,7 +277,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->itemFlags[0])
 		{
-			SoundEffect(SFX_TR5_J_GRAB_WINCH_UP_LP, &item->pos, 0);
+			SoundEffect(1048, &item->pos, 0);
 		}
 	}
 	item2->pos.xPos = item->pos.xPos;
