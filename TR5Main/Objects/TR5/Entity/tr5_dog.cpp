@@ -63,7 +63,7 @@ void Tr5DogControl(short itemNumber)
 			creature->enemy = LaraItem;
 
 		AI_INFO info;
-		CreatureAIInfo(item,&info);
+		CreatureAIInfo(item, &info);
 
 		int distance;
 		if (creature->enemy == LaraItem)
@@ -84,8 +84,8 @@ void Tr5DogControl(short itemNumber)
 			joint1 = info.angle;
 		}
 
-		GetCreatureMood(item,&info, VIOLENT);
-		CreatureMood(item,&info, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
 		if (!creature->mood)
 			creature->maximumTurn /= 2;
@@ -283,7 +283,7 @@ void Tr5DogControl(short itemNumber)
 				&& frame >= 4
 				&& frame <= 14)
 			{
-				CreatureEffect2(item,&DogBite, 2, -1, DoBloodSplat);
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
 				LaraItem->hitPoints -= 20;
 				LaraItem->hitStatus = true;
 			}
@@ -303,7 +303,7 @@ void Tr5DogControl(short itemNumber)
 					|| frame >= 22
 					&& frame <= 25))
 			{
-				CreatureEffect2(item,&DogBite, 2, -1, DoBloodSplat);
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
 				LaraItem->hitPoints -= 10;
 				LaraItem->hitStatus = true;
 			}

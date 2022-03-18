@@ -75,7 +75,7 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Ice:
-			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_ICE;
+			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_ICE;
 			break;
 
 		case FLOOR_MATERIAL::Marble:
@@ -103,7 +103,7 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Snow:
-			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_SNOW;
+			fx = SOUND_EFFECTS::SFX_TR3_FOOTSTEPS_SNOW;
 			break;
 
 		case FLOOR_MATERIAL::Stone:

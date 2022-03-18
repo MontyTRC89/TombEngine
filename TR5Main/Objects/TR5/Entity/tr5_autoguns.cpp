@@ -79,7 +79,7 @@ void AutoGunsControl(short itemNumber)
 
 			short angles[2];
 
-			int los = LOS(&pos1,&pos2);
+			int los = LOS(&pos1, &pos2);
 
 			// FIXME:
 			if (los)
@@ -95,8 +95,8 @@ void AutoGunsControl(short itemNumber)
 
 			short angle1, angle2;
 
-			InterpolateAngle(angles[0], item->itemFlags,&angle1, 4);
-			InterpolateAngle(angles[1],&item->itemFlags[1],&angle2, 4);
+			InterpolateAngle(angles[0], item->itemFlags, &angle1, 4);
+			InterpolateAngle(angles[1], &item->itemFlags[1], &angle2, 4);
 
 			data[0] = item->itemFlags[0];
 			data[1] = item->itemFlags[1];
@@ -104,7 +104,7 @@ void AutoGunsControl(short itemNumber)
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_LARA_HK_FIRE,&item->pos, 0xC00004);
+				SoundEffect(SFX_TR5_HK_FIRE, &item->pos, 0xC00004);
 
 				if (GlobalCounter & 1)
 				{
@@ -150,7 +150,7 @@ void AutoGunsControl(short itemNumber)
 						pos.y += dy + GetRandomControl() - 128;
 						pos.z += dz + GetRandomControl() - 128;
 
-						if (!LOS(&pos1,&pos))
+						if (!LOS(&pos1, &pos))
 							TriggerRicochetSpark(&pos, 2 * GetRandomControl(), 3, 0);
 					}
 				}

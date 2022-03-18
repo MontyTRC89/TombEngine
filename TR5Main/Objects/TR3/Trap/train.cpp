@@ -115,8 +115,8 @@ void TrainCollision(short trainNum, ITEM_INFO *larA, COLL_INFO *coll)
 	if (!TestCollision(train, larA))
 		return;
 
-	SoundEffect(SFX_LARA_GENERAL_DEATH , &larA->pos, SFX_ALWAYS);
-	SoundEffect(SFX_LARA_HIGH_FALL_DEATH, &larA->pos, SFX_ALWAYS);
+	SoundEffect(SFX_TR3_LARA_GENERAL_DEATH, &larA->pos, SFX_ALWAYS);
+	SoundEffect(SFX_TR3_LARA_FALLDETH, &larA->pos, SFX_ALWAYS);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
 	larA->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
