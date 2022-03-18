@@ -79,8 +79,8 @@ void ExplosionControl(short itemNumber)
 			{
 				flag = item->itemFlags[1] == 1 ? 2 : 0;
 			}
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1,&item->pos, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2,&item->pos, 0);
 			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos, item->pos.zPos, 3, -2, flag, item->roomNumber);
 			for (i = 0; i < item->itemFlags[2]; ++i)
 				TriggerExplosionSparks(item->pos.xPos + (GetRandomControl() % 128 - 64) * item->itemFlags[2], item->pos.yPos + (GetRandomControl() % 128 - 64) * item->itemFlags[2], item->pos.zPos + (GetRandomControl() % 128 - 64) * item->itemFlags[2], 2, 0, i, item->roomNumber);
@@ -150,7 +150,7 @@ void ExplosionControl(short itemNumber)
 						CollidedMeshes[i]->pos.yPos -= 128;
 						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						CollidedMeshes[i]->pos.yPos += 128;
-						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos, 0);
+						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber),&CollidedMeshes[i]->pos, 0);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->roomNumber;
 						SmashedMesh[SmashedMeshCount] = CollidedMeshes[i];

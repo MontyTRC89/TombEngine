@@ -108,7 +108,7 @@ void ControlHighObject1(short itemNumber)
 					flags = item->itemFlags[1] / 8;
 				}
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, (flags * 256) | 8);
+				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW,&item->pos, (flags * 256) | 8);
 
 				item->pos.yPos += 8;
 
@@ -200,7 +200,7 @@ void ControlHighObject1(short itemNumber)
 			flags = item->itemFlags[1];
 		}
 
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->pos, (flags * 256) | 8);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW,&item->pos, (flags * 256) | 8);
 
 		item->itemFlags[1] += 16;
 		item->pos.yPos -= 16;
