@@ -187,28 +187,6 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-bool TestLaraHitCeiling(CollisionInfo* coll)
-{
-	if (coll->CollisionType == CT_TOP ||
-		coll->CollisionType == CT_CLAMP)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
-{
-	item->Position.xPos = coll->Setup.OldPosition.x;
-	item->Position.yPos = coll->Setup.OldPosition.y;
-	item->Position.zPos = coll->Setup.OldPosition.z;
-
-	item->Animation.Velocity = 0;
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-}
-
 void LaraCollideStop(ITEM_INFO* item, CollisionInfo* coll)
 {
 	switch (coll->Setup.OldState)
@@ -599,6 +577,104 @@ void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (lara->Control.WaterStatus != WaterStatus::FlyCheat && lara->ExtraAnim == NO_ITEM)
 		TestLaraWaterDepth(item, coll);
+}
+
+void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->WaterCurrentActive)
+	{
+		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
+
+		short angle = mGetAngle(sink->x, sink->z, item->Position.xPos, item->Position.zPos);
+		lara->WaterCurrentPull.x += (sink->strength * SECTOR(1) * phd_sin(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.x) / 16;
+		lara->WaterCurrentPull.z += (sink->strength * SECTOR(1) * phd_cos(angle - ANGLE(90.0f)) - lara->WaterCurrentPull.z) / 16;
+
+		item->Position.yPos += (sink->y - item->Position.yPos) >> 4;
+	}
+	else
+	{
+		int shift = 0;
+
+		if (abs(lara->WaterCurrentPull.x) <= 16)
+			shift = (abs(lara->WaterCurrentPull.x) > 8) + 2;
+		else
+			shift = 4;
+		lara->WaterCurrentPull.x -= lara->WaterCurrentPull.x >> shift;
+
+		if (abs(lara->WaterCurrentPull.x) < 4)
+			lara->WaterCurrentPull.x = 0;
+
+		if (abs(lara->WaterCurrentPull.z) <= 16)
+			shift = (abs(lara->WaterCurrentPull.z) > 8) + 2;
+		else
+			shift = 4;
+		lara->WaterCurrentPull.z -= lara->WaterCurrentPull.z >> shift;
+
+		if (abs(lara->WaterCurrentPull.z) < 4)
+			lara->WaterCurrentPull.z = 0;
+
+		if (!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
+			return;
+	}
+
+	item->Position.xPos += lara->WaterCurrentPull.x >> 8;
+	item->Position.zPos += lara->WaterCurrentPull.z >> 8;
+	lara->WaterCurrentActive = 0;
+
+	coll->Setup.ForwardAngle = phd_atan(item->Position.zPos - coll->Setup.OldPosition.z, item->Position.xPos - coll->Setup.OldPosition.x);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, 200, 0));
+
+	if (coll->CollisionType == CT_FRONT)
+	{
+		if (item->Position.xRot > ANGLE(35.0f))
+			item->Position.xRot += ANGLE(1.0f);
+		else if (item->Position.xRot < -ANGLE(35.0f))
+			item->Position.xRot -= ANGLE(1.0f);
+		else
+			item->Animation.VerticalVelocity = 0;
+	}
+	else if (coll->CollisionType == CT_TOP)
+		item->Position.xRot -= ANGLE(1.0f);
+	else if (coll->CollisionType == CT_TOP_FRONT)
+		item->Animation.VerticalVelocity = 0;
+	else if (coll->CollisionType == CT_LEFT)
+		item->Position.yRot += ANGLE(5.0f);
+	else if (coll->CollisionType == CT_RIGHT)
+		item->Position.yRot -= ANGLE(5.0f);
+
+	if (coll->Middle.Floor < 0 && coll->Middle.Floor != NO_HEIGHT)
+		item->Position.yPos += coll->Middle.Floor;
+
+	ShiftItem(item, coll);
+
+	coll->Setup.OldPosition.x = item->Position.xPos;
+	coll->Setup.OldPosition.y = item->Position.yPos;
+	coll->Setup.OldPosition.z = item->Position.zPos;
+}
+
+bool TestLaraHitCeiling(CollisionInfo* coll)
+{
+	if (coll->CollisionType == CT_TOP ||
+		coll->CollisionType == CT_CLAMP)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
+{
+	item->Position.xPos = coll->Setup.OldPosition.x;
+	item->Position.yPos = coll->Setup.OldPosition.y;
+	item->Position.zPos = coll->Setup.OldPosition.z;
+
+	item->Animation.Velocity = 0;
+	item->Animation.VerticalVelocity = 0;
+	item->Animation.Airborne = false;
 }
 
 bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height, int side)

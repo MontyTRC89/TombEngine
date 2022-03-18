@@ -9,6 +9,7 @@
 #include "Game/Lara/lara_crawl.h"
 #include "Game/Lara/lara_objects.h"
 #include "Game/Lara/lara_hang.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_slide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_surface.h"
@@ -16,6 +17,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_initialise.h"
 
@@ -492,24 +494,22 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
 					{
-						lara->Control.HandStatus = HandStatus::Free;
+						SetAnimation(item, LA_SWANDIVE_DIVE);
 						item->Position.xRot = -ANGLE(45.0f);
-						item->Animation.TargetState = LS_FREEFALL_DIVE;
-						AnimateLara(item);
 						item->Animation.VerticalVelocity *= 2;
+						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						lara->Control.HandStatus = HandStatus::Free;
+						SetAnimation(item, LA_SWANDIVE_DIVE);
 						item->Position.xRot = -ANGLE(85.0f);
-						item->Animation.TargetState = LS_FREEFALL_DIVE;
-						AnimateLara(item);
 						item->Animation.VerticalVelocity *= 2;
+						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else
 					{
-						item->Position.xRot = -ANGLE(45.0f);
 						SetAnimation(item, LA_FREEFALL_DIVE);
+						item->Position.xRot = -ANGLE(45.0f);
 						item->Animation.VerticalVelocity = 3 * item->Animation.VerticalVelocity / 2;
 					}
 
@@ -524,11 +524,10 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
-					!isSwamp &&
-					item->Animation.Airborne)
+					item->Animation.Airborne && !isSwamp)
 				{
-					Splash(item);
 					item->Animation.TargetState = LS_IDLE;
+					Splash(item);
 				}
 				// Lara is grounded; don't splash again.
 				else if (!item->Animation.Airborne)
@@ -559,21 +558,21 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1))
 					{
 						SetAnimation(item, LA_FALL_START);
+						ResetLaraLean(item);
+						ResetLaraFlex(item);
 						item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
 						item->Animation.VerticalVelocity = 0;
 						item->Animation.Airborne = true;
 						lara->Control.WaterStatus = WaterStatus::Dry;
-						ResetLaraLean(item);
-						ResetLaraFlex(item);
 					}
 					else
 					{
 						SetAnimation(item, LA_UNDERWATER_RESURFACE);
+						ResetLaraLean(item);
+						ResetLaraFlex(item);
 						item->Position.yPos = waterHeight;
 						item->Animation.VerticalVelocity = 0;
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
-						ResetLaraLean(item);
-						ResetLaraFlex(item);
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 						SoundEffect(SFX_TR4_LARA_BREATH, &item->Position, 2);
@@ -608,15 +607,12 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 				else
 				{
 					SetAnimation(item, LA_STAND_IDLE);
-					item->Animation.TargetState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
 					lara->Control.WaterStatus = WaterStatus::Wade;
-
-					AnimateItem(item);
 				}
 
-				item->Animation.VerticalVelocity = 0;
 				ResetLaraLean(item);
 				ResetLaraFlex(item);
+				item->Animation.VerticalVelocity = 0;
 			}
 
 			break;
@@ -629,13 +625,12 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 				if (heightFromWater > SWIM_DEPTH && !isSwamp)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
-
+					ResetLaraLean(item);
+					ResetLaraFlex(item);
 					item->Position.yPos += 1 - heightFromWater;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
-					ResetLaraLean(item);
-					ResetLaraFlex(item);
 
 					UpdateItemRoom(item, 0);
 				}
@@ -984,7 +979,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
+	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	if (level->LaraType == LaraType::Divesuit)
 	{
@@ -1005,7 +1000,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	item->Position.yRot += lara->Control.TurnRate;
 
 	if (level->LaraType == LaraType::Divesuit)
-		UpdateSubsuitAngles(item);
+		UpdateLaraSubsuitAngles(item);
 
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetLaraLean(item, 1, true, false);
