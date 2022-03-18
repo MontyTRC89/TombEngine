@@ -49,7 +49,7 @@ namespace TEN::Renderer
 	}
 
 	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
-{
+	{
 		return &m_adapters;
 	}
 
@@ -118,7 +118,6 @@ namespace TEN::Renderer
 
 				Matrix extraRotation;
 				extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
-					
 
 				if (useObjectWorldRotation)
 				{
@@ -129,9 +128,7 @@ namespace TEN::Renderer
 					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
 				}
 				else
-				{
 					rotation = extraRotation * rotation;
-				}
 
 				if (bone != obj.Skeleton)
 					transforms[bone->Index] = rotation * bone->Transform;
@@ -359,32 +356,32 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode) {
+	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
+	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
 		for (int j = 0; j < node->Children.size(); j++)
-		{
 			BuildHierarchyRecursive(obj, node->Children[j], node);
-		}
 	}
 
-	void Renderer11::BuildHierarchy(RendererObject *obj) {
+	void Renderer11::BuildHierarchy(RendererObject *obj)
+	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
 		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
 
 		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-		{
 			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
-		}
 	}
 
-	bool Renderer11::isFullsScreen() {
+	bool Renderer11::isFullsScreen()
+	{
 		return (!Windowed);
 	}
+
 	bool Renderer11::isFading()
 	{
 		return false;
@@ -462,6 +459,7 @@ namespace TEN::Renderer
 						break;
 					}
 				}
+
 				if (found)
 					continue;
 
@@ -619,6 +617,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
+
 		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 		clipPort.x = std::max(clipPort.x, vp.x);
 		clipPort.y = std::max(clipPort.y, vp.y);
