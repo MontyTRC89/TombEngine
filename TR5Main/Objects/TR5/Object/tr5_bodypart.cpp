@@ -42,7 +42,7 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
 
 	short roomNumber = fx->roomNumber;
-	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos,&roomNumber);
+	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 
 	if (!fx->counter)
 	{
@@ -70,7 +70,7 @@ void ControlBodyPart(short fxNumber)
 
 				KillEffect(fxNumber);
 				if (fx->flag2 & 0x800)
-					SoundEffect(SFX_TR4_ROCK_FALL_LAND,&fx->pos, 0);
+					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos, 0);
 				return;
 			}
 

@@ -327,21 +327,21 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	{
 		v->speed = CART_MIN_VEL;
 
-		StopSoundEffect(736);
+		StopSoundEffect(209);
 
 		if (cart->YVel)
-			StopSoundEffect(734);
+			StopSoundEffect(210);
 		else
-			SoundEffect(734, &v->pos, 2);
+			SoundEffect(210, &v->pos, 2);
 	}
 	else
 	{
-		StopSoundEffect(734);
+		StopSoundEffect(210);
 
 		if (cart->YVel)
-			StopSoundEffect(736);
+			StopSoundEffect(209);
 		else
-			SoundEffect(736, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
+			SoundEffect(209, &v->pos, (2 | 4) + 0x1000000 + (v->speed * 32768));
 	}
 
 	if (cart->Flags & (CF_TURNINGL | CF_TURNINGR))
@@ -420,7 +420,7 @@ static void MoveCart(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (v->pos.yPos > cart->MidPos)
 		{
 			if (cart->YVel > 0)
-				SoundEffect(716, &v->pos, 2);
+				SoundEffect(202, &v->pos, 2);
 
 			v->pos.yPos = cart->MidPos;
 			cart->YVel = 0;
@@ -527,7 +527,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 	case CART_STILL:
 		if (!(cart->Flags & CF_CONTROL))
 		{
-			SoundEffect(733, &v->pos, 2);
+			SoundEffect(211, &v->pos, 2);
 			cart->Flags |= CF_CONTROL;
 			cart->StopDelay = 64;
 		}
@@ -569,17 +569,17 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if (TrInput & IN_DUCK)
 		{
 			l->goalAnimState = CART_DUCK;
-			StopSoundEffect(735);
+			StopSoundEffect(219);
 		}
 		else if ((!(TrInput & IN_JUMP)) || (cart->Flags & CF_STOPPED))
 		{
 			l->goalAnimState = CART_MOVE;
-			StopSoundEffect(735);
+			StopSoundEffect(219);
 		}
 		else
 		{
 			cart->Speed += CART_DEC;
-			SoundEffect(735, &l->pos, 2);
+			SoundEffect(219, &l->pos, 2);
 		}
 		break;
 
@@ -668,7 +668,7 @@ static void DoUserInput(ITEM_INFO* v, ITEM_INFO* l, CART_INFO* cart)
 		if ((fh > -STEP_SIZE) && (fh < STEP_SIZE))
 		{
 			if ((Wibble & 7) == 0)
-				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &v->pos, 2);
+				SoundEffect(SFX_TR3_QUAD_FRONT_IMPACT, &v->pos, 2);
 
 			v->pos.xPos += TURN_DEATH_VEL * phd_sin(v->pos.yRot);
 			v->pos.zPos += TURN_DEATH_VEL * phd_cos(v->pos.yRot);

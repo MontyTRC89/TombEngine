@@ -102,7 +102,7 @@ void NatlaControl(short itemNum)
 				{
 					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
-					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
+					SoundEffect(123, &fx->pos, NULL);
 				}
 				timer = 0;
 			}
@@ -118,7 +118,7 @@ void NatlaControl(short itemNum)
 				{
 					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
-					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
+					SoundEffect(123, &fx->pos, NULL);
 				}
 				timer = 0;
 			}
@@ -224,7 +224,7 @@ void NatlaControl(short itemNum)
 				{
 					fx = &EffectList[fx_number];
 					gun = fx->pos.xRot;
-					SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos, NULL);
+					SoundEffect(123, &fx->pos, NULL);
 				}
 				timer = 0;
 			}

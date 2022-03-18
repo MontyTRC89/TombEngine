@@ -104,21 +104,21 @@ void HitmanControl(short itemNumber)
 		z += dz;
 
 		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z,&roomNumber);
+		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 		int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 		x += dx;
 		z += dz;
 
 		roomNumber = item->roomNumber;
-		floor = GetFloor(x, item->pos.yPos, z,&roomNumber);
+		floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 		int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 		x += dx;
 		z += dz;
 
 		roomNumber = item->roomNumber;
-		floor = GetFloor(x, item->pos.yPos, z,&roomNumber);
+		floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
 		int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 		bool canJump1block;
@@ -146,7 +146,7 @@ void HitmanControl(short itemNumber)
 			pos.x = HitmanGun.x;
 			pos.y = HitmanGun.y;
 			pos.z = HitmanGun.z;
-			GetJointAbsPosition(item,&pos, HitmanGun.meshNum);
+			GetJointAbsPosition(item, &pos, HitmanGun.meshNum);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
 			item->firedWeapon--;
 		}
@@ -157,7 +157,7 @@ void HitmanControl(short itemNumber)
 			creature->enemy = LaraItem;
 
 		AI_INFO info, laraInfo;
-		CreatureAIInfo(item,&info);
+		CreatureAIInfo(item, &info);
 
 		if (item->hitStatus)
 		{
@@ -180,13 +180,13 @@ void HitmanControl(short itemNumber)
 			pos.x = 0;
 			pos.y = 0;
 			pos.z = 50;
-			GetJointAbsPosition(item,&pos, HitmanJoints[random]);
+			GetJointAbsPosition(item, &pos, HitmanJoints[random]);
 
 			TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
-			SoundEffect(933,&item->pos, 0);
+			SoundEffect(SFX_TR5_HITMAN_ELEC_SHORT, &item->pos, 0);
 
 			if (random == 5 || random == 7 || random == 10)
 			{
@@ -198,10 +198,10 @@ void HitmanControl(short itemNumber)
 				switch (random)
 				{
 				case 5:
-					GetJointAbsPosition(item,&pos2, 15);
+					GetJointAbsPosition(item, &pos2, 15);
 					break;
 				case 7:
-					GetJointAbsPosition(item,&pos2, 6);
+					GetJointAbsPosition(item, &pos2, 6);
 					if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER && item->hitPoints > 0)
 					{
 						item->currentAnimState = STATE_HITMAN_DEATH;
@@ -212,7 +212,7 @@ void HitmanControl(short itemNumber)
 					}
 					break;
 				case 10:
-					GetJointAbsPosition(item,&pos2, 12);
+					GetJointAbsPosition(item, &pos2, 12);
 					break;
 				}
 				
@@ -235,7 +235,7 @@ void HitmanControl(short itemNumber)
 				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
-			GetCreatureMood(item,&info, creature->enemy != LaraItem);
+			GetCreatureMood(item, &info, creature->enemy != LaraItem);
 
 			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_NO_LENSFLARE) // Gassed room?
 			{
@@ -252,14 +252,14 @@ void HitmanControl(short itemNumber)
 				}
 			}
 
-			CreatureMood(item,&info, creature->enemy != LaraItem);
+			CreatureMood(item, &info, creature->enemy != LaraItem);
 			
 			angle = CreatureTurn(item, creature->maximumTurn);
 			
 			if (laraInfo.distance < SQUARE(2048) 
 				&& LaraItem->speed > 20
 				|| item->hitStatus
-				|| TargetVisible(item,&laraInfo))
+				|| TargetVisible(item, &laraInfo))
 			{
 				if (!(item->aiBits & FOLLOW))
 				{
@@ -305,7 +305,7 @@ void HitmanControl(short itemNumber)
 							}
 						}
 					}
-					else if (Targetable(item,&info))
+					else if (Targetable(item, &info))
 					{
 						if (info.distance < SQUARE(4096) || info.zoneNumber != info.enemyZone)
 						{
@@ -350,7 +350,7 @@ void HitmanControl(short itemNumber)
 							}
 							else
 							{
-								floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+								floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 								height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 								if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 									item->goalAnimState = STATE_HITMAN_START_END_MONKEY;
@@ -365,7 +365,7 @@ void HitmanControl(short itemNumber)
 			case STATE_HITMAN_WALK:
 				creature->LOT.isJumping = false;
 				creature->maximumTurn = ANGLE(5);
-				if (Targetable(item,&info)
+				if (Targetable(item, &info)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
@@ -410,7 +410,7 @@ void HitmanControl(short itemNumber)
 				creature->LOT.isJumping = false;
 				creature->maximumTurn = ANGLE(10);
 
-				if (Targetable(item,&info)
+				if (Targetable(item, &info)
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 				{
@@ -444,7 +444,7 @@ void HitmanControl(short itemNumber)
 				if (item->boxNumber == creature->LOT.targetBox 
 					|| !creature->monkeyAhead)
 				{
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 						item->goalAnimState = STATE_HITMAN_STOP;
@@ -463,7 +463,7 @@ void HitmanControl(short itemNumber)
 				if (item->boxNumber == creature->LOT.targetBox
 					|| !creature->monkeyAhead)
 				{
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 					height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 					if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 						item->goalAnimState = STATE_HITMAN_START_END_MONKEY;
@@ -491,7 +491,7 @@ void HitmanControl(short itemNumber)
 					item->pos.yRot += info.angle;
 				}
 
-				if (Targetable(item,&info) 
+				if (Targetable(item, &info) 
 					&& (info.distance < SQUARE(4096) 
 						|| info.zoneNumber != info.enemyZone))
 					item->goalAnimState = STATE_HITMAN_FIRE;
@@ -525,7 +525,7 @@ void HitmanControl(short itemNumber)
 					&& ((byte)item->frameNumber - (byte)g_Level.Anims[item->animNumber].frameBase) & 1)
 				{
 					item->firedWeapon = 1;
-					ShotLara(item,&info,&HitmanGun, joint0, 12);
+					ShotLara(item, &info, &HitmanGun, joint0, 12);
 				}
 				break;
 
@@ -543,7 +543,7 @@ void HitmanControl(short itemNumber)
 			GetLaraJointPosition(&pos, LM_LFOOT);
 			
 			short roomNumberLeft = LaraItem->roomNumber;
-			GetFloor(pos.x, pos.y, pos.z,&roomNumberLeft);
+			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
 			
 			pos.x = 0;
 			pos.y = 0;
@@ -551,7 +551,7 @@ void HitmanControl(short itemNumber)
 			GetLaraJointPosition(&pos, LM_RFOOT);
 
 			short roomNumberRight = LaraItem->roomNumber;
-			GetFloor(pos.x, pos.y, pos.z,&roomNumberRight);
+			GetFloor(pos.x, pos.y, pos.z, &roomNumberRight);
 
 			ROOM_INFO* roomRight = &g_Level.Rooms[roomNumberRight];
 			ROOM_INFO* roomLeft = &g_Level.Rooms[roomNumberLeft];

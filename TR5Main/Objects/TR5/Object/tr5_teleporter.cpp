@@ -56,7 +56,7 @@ void ControlTeleporter(short itemNumber)
 				}
 
 				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
-				SoundEffect(SFX_RICH_TELEPORT,&targetItem->pos, (flags << 8) | 8);
+				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
 				if (GlobalCounter & 1)
 				{
@@ -75,7 +75,7 @@ void ControlTeleporter(short itemNumber)
 					int color = (item->itemFlags[0] >> 2) | (((item->itemFlags[0] - (GetRandomControl() % (item->itemFlags[0] >> 1))) | (item->itemFlags[0] << 8)) << 8);
 					color |= 0x18; // BYTE1
 
-					//TriggerEnergyArc(&src,&dest, (GetRandomControl() & 0x1F) + 16, color, 15, 40, 5);
+					//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 16, color, 15, 40, 5);
 
 					v20 = v16;
 					v21 = v12 & 0xFFFFFFFE;
@@ -179,8 +179,8 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->itemFlags[0] == 70)
 		{
-			SoundEffect(1060, 0, 0);
-			SoundEffect(1061, 0, 0);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);
 		}
 
 		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
@@ -200,7 +200,7 @@ void ControlTeleporter(short itemNumber)
 		LaraItem->pos.yRot = item->pos.yRot - ANGLE(180.0f);
 
 		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 		LaraItem->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 		if (LaraItem->roomNumber != roomNumber)

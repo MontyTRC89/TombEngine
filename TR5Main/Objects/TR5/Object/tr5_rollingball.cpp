@@ -403,7 +403,7 @@ void ClassicRollingBallControl(short itemNum)
 		oldz = item->pos.zPos;
 		AnimateItem(item);
 		roomNum = item->roomNumber;
-		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNum);
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNum);
 		if (item->roomNumber != roomNum)
 			ItemNewRoom(itemNum, item->roomNumber);
 
@@ -416,7 +416,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->gravityStatus = false;
 			item->fallspeed = 0;
 			item->pos.yPos = item->floor;
-			SoundEffect(147,&item->pos, 0);
+			SoundEffect(SFX_TR3_ROLLING_BALL, &item->pos, 0);
 			dist = sqrt((SQUARE(Camera.mikePos.x - item->pos.xPos)) + (SQUARE(Camera.mikePos.z - item->pos.zPos)));
 			if (dist < 10240)
 				Camera.bounce = -40 * (10240 - dist) / 10240;
@@ -442,11 +442,11 @@ void ClassicRollingBallControl(short itemNum)
 		x = item->pos.xPos + dist * phd_sin(item->pos.yRot);
 		z = item->pos.zPos + dist * phd_cos(item->pos.yRot);
 
-		floor = GetFloor(x, item->pos.yPos, z,&roomNum);
+		floor = GetFloor(x, item->pos.yPos, z, &roomNum);
 		y1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 		roomNum = item->roomNumber;
-		floor = GetFloor(x, item->pos.yPos - ydist, z,&roomNum);
+		floor = GetFloor(x, item->pos.yPos - ydist, z, &roomNum);
 		y2 = GetCeiling(floor, x, item->pos.yPos - ydist, z);
 
 		if (y1 < item->pos.yPos || y2 > (item->pos.yPos-ydist)) //there's something wrong here, this if statement returns true, executing this block, deactivating the boulders.
