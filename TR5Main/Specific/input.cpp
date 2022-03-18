@@ -249,8 +249,7 @@ int S_UpdateInput()
 	{
 		if (!flareNo)
 		{
-			if (LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
+			if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
 				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
 				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
 				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
