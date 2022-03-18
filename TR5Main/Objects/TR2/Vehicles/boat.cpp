@@ -1047,7 +1047,7 @@ void SpeedBoatControl(short itemNum)
 	auto pitch = sBoatItem->speed;
 	sBoatInfo->pitch += ((pitch - sBoatInfo->pitch) / 4);
 
-	int fx = (sBoatItem->speed > 8) ? SFX_TR2_SPEEDBOAT_MOVING : (drive ? SFX_TR2_SPEEDBOAT_IDLE : SFX_TR2_SPEEDBOAT_ACCELERATE);
+	int fx = (sBoatItem->speed > 8) ? SFX_TR2_BOAT_MOVING : (drive ? SFX_TR2_BOAT_IDLE : SFX_TR2_BOAT_ACCELERATE);
 	SoundEffect(fx, &sBoatItem->pos, 0, sBoatInfo->pitch / (float)BOAT_MAX_SPEED);
 
 	if (sBoatItem->speed && water - 5 == sBoatItem->pos.yPos)

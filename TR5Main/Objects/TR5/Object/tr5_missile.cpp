@@ -111,7 +111,7 @@ void MissileControl(short itemNumber)
 	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
 
 	short roomNumber = fx->roomNumber;
-	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos,&roomNumber);
+	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
 	int fh = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 	int ch = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 	
@@ -134,7 +134,7 @@ void MissileControl(short itemNumber)
 			else if (fx->flag1 == 2)
 			{
 				ExplodeFX(fx, 0, 32);
-				SoundEffect(251,&fx->pos, 0);
+				SoundEffect(251, &fx->pos, 0);
 			}
 		}
 		else
@@ -170,8 +170,8 @@ void MissileControl(short itemNumber)
 					ExplodeFX(fx, 0, 32);
 					LaraItem->hitPoints -= 50;
 					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->pos.yRot, LaraItem->roomNumber);
-					SoundEffect(944,&fx->pos, 0);
-					SoundEffect(SFX_TR4_LARA_INJURY,&LaraItem->pos, 0);
+					SoundEffect(SFX_TR5_IMP_STONE_HIT, &fx->pos, 0);
+					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->pos, 0);
 				}
 				
 				KillEffect(itemNumber);

@@ -72,7 +72,7 @@ void ControlChef(short itemNumber)
 
 		AI_INFO info;
 		AI_INFO laraInfo;
-		CreatureAIInfo(item,&info);
+		CreatureAIInfo(item, &info);
 
 		if (creature->enemy == LaraItem)
 		{
@@ -91,8 +91,8 @@ void ControlChef(short itemNumber)
 			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
-		GetCreatureMood(item,&info, VIOLENT);
-		CreatureMood(item,&info, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
 		short angle = CreatureTurn(item, creature->maximumTurn);
 
@@ -113,7 +113,7 @@ void ControlChef(short itemNumber)
 				&& (item->touchBits
 					|| LaraItem->speed > 15
 					|| item->hitStatus
-					|| TargetVisible(item,&laraInfo)))
+					|| TargetVisible(item, &laraInfo)))
 			{
 				item->goalAnimState = STATE_CHEF_TURN_180;
 				creature->alerted = true;
@@ -153,8 +153,8 @@ void ControlChef(short itemNumber)
 					{
 						LaraItem->hitPoints -= 80;
 						LaraItem->hitStatus = true;
-						CreatureEffect2(item,&ChefBite, 20, item->pos.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD,&item->pos, 0);
+						CreatureEffect2(item, &ChefBite, 20, item->pos.yRot, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 						creature->flags = 1;
 					}
 				}

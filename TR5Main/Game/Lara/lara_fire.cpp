@@ -768,7 +768,7 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 				if (target->objectNumber == ID_ROMAN_GOD1 ||
 					target->objectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(958, &target->pos, 0);
+					SoundEffect(SFX_TR5_SWORD_GOD_HITMET, &target->pos, 0);
 				}
 
 				break;
