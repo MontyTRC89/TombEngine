@@ -198,7 +198,7 @@ void UpdateSpiders()
 					}
 				}
 
-				FLOOR_INFO* floor = GetFloor(spider->pos.xPos, spider->pos.yPos, spider->pos.zPos,&spider->roomNumber);
+				FLOOR_INFO* floor = GetFloor(spider->pos.xPos, spider->pos.yPos, spider->pos.zPos, &spider->roomNumber);
 				int height = GetFloorHeight(floor, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
 
 				if (height >= spider->pos.yPos - 1280 || height == -32512)
@@ -255,7 +255,7 @@ void UpdateSpiders()
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(982,&spider->pos, 0);
+					SoundEffect(SFX_TR5_BEETLES, &spider->pos, 0);
 			}
 		}
 	}

@@ -71,7 +71,7 @@ void ControlGladiator(short itemNumber)
 			AI_INFO info;
 			AI_INFO laraInfo;
 
-			CreatureAIInfo(item,&info);
+			CreatureAIInfo(item, &info);
 
 			int unknown = true;
 			short rot;
@@ -94,8 +94,8 @@ void ControlGladiator(short itemNumber)
 				distance = SQUARE(dx) + SQUARE(dz);
 			}
 
-			GetCreatureMood(item,&info, VIOLENT);
-			CreatureMood(item,&info, VIOLENT);
+			GetCreatureMood(item, &info, VIOLENT);
+			CreatureMood(item, &info, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 			
@@ -312,7 +312,7 @@ void ControlGladiator(short itemNumber)
 					pos.x = 0;
 					pos.y = 0;
 					pos.z = 0;
-					GetJointAbsPosition(item,&pos, 16);
+					GetJointAbsPosition(item, &pos, 16);
 
 					floor = GetSector(r, pos.x - r->x, pos.z - r->z);
 					if (floor->Stopper)
@@ -344,8 +344,8 @@ void ControlGladiator(short itemNumber)
 						{
 							LaraItem->hitPoints -= 120;
 							LaraItem->hitStatus = true;
-							CreatureEffect2(item,&GladiatorBite, 10, item->pos.yRot, DoBloodSplat);
-							SoundEffect(SFX_TR4_LARA_THUD,&item->pos, 0);
+							CreatureEffect2(item, &GladiatorBite, 10, item->pos.yRot, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
 							creature->flags = 1;
 						}
 					}

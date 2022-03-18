@@ -168,10 +168,10 @@ void HydraControl(short itemNumber)
 		}
 
 		AI_INFO info;
-		CreatureAIInfo(item,&info);
+		CreatureAIInfo(item, &info);
 
-		GetCreatureMood(item,&info, VIOLENT);
-		CreatureMood(item,&info, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
 		if (item->currentAnimState != 5
 			&& item->currentAnimState != 10
@@ -259,7 +259,7 @@ void HydraControl(short itemNumber)
 				{
 					LaraItem->hitPoints -= 120;
 					LaraItem->hitStatus = true;
-					CreatureEffect2(item,&HydraBite, 10, item->pos.yRot, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10, item->pos.yRot, DoBloodSplat);
 					creature->flags = 1;
 				}
 
@@ -275,7 +275,7 @@ void HydraControl(short itemNumber)
 					{
 						item->hitPoints -= damage;
 						item->goalAnimState = STATE_HYDRA_HURT;
-						CreatureEffect2(item,&HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
+						CreatureEffect2(item, &HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
 					}
 				}
 			}
@@ -299,7 +299,7 @@ void HydraControl(short itemNumber)
 				{
 					item->hitPoints -= damage;
 					item->goalAnimState = 4;
-					CreatureEffect2(item,&HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10 * damage, item->pos.yRot, DoBloodSplat);
 				}
 			}
 
@@ -327,12 +327,12 @@ void HydraControl(short itemNumber)
 				pos1.x = 0;
 				pos1.y = 1024;
 				pos1.z = 40;
-				GetJointAbsPosition(item,&pos1, 10);
+				GetJointAbsPosition(item, &pos1, 10);
 
 				pos2.x = 0;
 				pos2.y = 144;
 				pos2.z = 40;
-				GetJointAbsPosition(item,&pos2, 10);
+				GetJointAbsPosition(item, &pos2, 10);
 
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
@@ -344,7 +344,7 @@ void HydraControl(short itemNumber)
 				pos.zRot = 0;
 
 				roomNumber = item->roomNumber;
-				GetFloor(pos2.x, pos2.y, pos2.z,&roomNumber);
+				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
 				// TEST: uncomment this for making HYDRA not firing bubbles
 				HydraBubblesAttack(&pos, roomNumber, 1);
@@ -405,7 +405,7 @@ void HydraControl(short itemNumber)
 			if (item->itemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->itemFlags[3], 0, 64);
-				SoundEffect(SFX_TR4_HIT_ROCK,&item->pos, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 				item->itemFlags[3]++;
 			}
 		}
