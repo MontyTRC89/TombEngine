@@ -56,9 +56,17 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		item->Position.yRot -= ANGLE(4.0f);
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
+	}
 	else if (TrInput & IN_RIGHT)
-		item->Position.yRot += ANGLE(4.0f);
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
+	}
 
 	if (DbInput & IN_JUMP)
 	{
@@ -118,11 +126,19 @@ void lara_as_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
-
+	
 	if (TrInput & IN_LEFT)
-		item->Position.yRot -= ANGLE(4.0f);
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
+	}
 	else if (TrInput & IN_RIGHT)
-		item->Position.yRot += ANGLE(4.0f);
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_MED_TURN_MAX;
+	}
 
 	if (!(TrInput & IN_FORWARD))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
@@ -161,9 +177,17 @@ void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		item->Position.yRot -= ANGLE(2.0f);
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+	}
 	else if (TrInput & IN_RIGHT)
-		item->Position.yRot += ANGLE(2.0f);
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+	}
 
 	if (!(TrInput & IN_LSTEP))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
@@ -199,9 +223,17 @@ void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		item->Position.yRot -= ANGLE(2.0f);
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+	}
 	else if (TrInput & IN_RIGHT)
-		item->Position.yRot += ANGLE(2.0f);
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+	}
 
 	if (!(TrInput & IN_RSTEP))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
@@ -237,9 +269,17 @@ void lara_as_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		item->Position.yRot -= ANGLE(2.0f);
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+	}
 	else if (TrInput & IN_RIGHT)
-		item->Position.yRot += ANGLE(2.0f);
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+	}
 
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
