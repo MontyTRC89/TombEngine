@@ -81,7 +81,7 @@ extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATE
 
 void LaraControl(ITEM_INFO* item, CollisionInfo* coll);
 void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll);
-void LaraUnderWater(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSurface(ITEM_INFO* item, CollisionInfo* coll);
+void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll);
+void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll);
 void LaraCheat(ITEM_INFO* item, CollisionInfo* coll);
 void AnimateLara(ITEM_INFO* item);

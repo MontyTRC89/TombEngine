@@ -225,5 +225,5 @@ void InitialiseDirectInput(HWND handle, HINSTANCE instance);
 void DI_ReadKeyboard(byte* keys);
 int DD_SpinMessageLoopMaybe();
 int S_UpdateInput();
-int Key(int number);
+bool Key(int number);
 void DefaultConflict();

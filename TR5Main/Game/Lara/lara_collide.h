@@ -30,7 +30,6 @@ void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, short moveAngle);
 void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll);
 void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll);
 
-// TODO: Temporary placement.
 bool TestLaraHitCeiling(CollisionInfo* coll);
 void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll);
 

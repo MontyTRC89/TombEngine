@@ -70,9 +70,9 @@ short KeyboardLayout[2][18] =
 	{ DIK_UP, DIK_DOWN, DIK_LEFT, DIK_RIGHT, DIK_PERIOD, DIK_SLASH, DIK_RSHIFT, DIK_RMENU, DIK_RCONTROL, DIK_SPACE, DIK_COMMA, DIK_NUMPAD0, DIK_END, DIK_ESCAPE, DIK_DELETE, DIK_NEXT, DIK_P, DIK_RETURN }
 };
 
-int joy_x;
-int joy_y;
-int joy_fire;
+int JoyX;
+int JoyY;
+int JoyFire;
 
 void InitialiseDirectInput(HWND handle, HINSTANCE instance)
 {
@@ -116,87 +116,106 @@ int DD_SpinMessageLoopMaybe()
 	return 0;
 }
 
-int Key(int number)
+bool Key(int number)
 {
 	short key = KeyboardLayout[1][number];
 
 	if (number >= 256)
-		return joy_fire & (1 << number);
+		return JoyFire & (1 << number);
 
 	if (KeyMap[key])
-		return 1;
+		return true;
 
 	switch (key)
 	{
 	case DIK_RCONTROL:
 		return KeyMap[DIK_LCONTROL];
+
 	case DIK_LCONTROL:
 		return KeyMap[DIK_RCONTROL];
+
 	case DIK_RSHIFT:
 		return KeyMap[DIK_LSHIFT];
+
 	case DIK_LSHIFT:
 		return KeyMap[DIK_RSHIFT];
+
 	case DIK_RMENU:
 		return KeyMap[DIK_LMENU];
+
 	case DIK_LMENU:
 		return KeyMap[DIK_RMENU];
 	}
 
 	if (ConflictingKeys[number])
-		return 0;
+		return false;
 
 	key = KeyboardLayout[0][number];
 
 	if (KeyMap[key])
-		return 1;
+		return true;
 
 	switch (key)
 	{
 	case DIK_RCONTROL:
 		return KeyMap[DIK_LCONTROL];
+
 	case DIK_LCONTROL:
 		return KeyMap[DIK_RCONTROL];
+
 	case DIK_RSHIFT:
 		return KeyMap[DIK_LSHIFT];
+
 	case DIK_LSHIFT:
 		return KeyMap[DIK_RSHIFT];
+
 	case DIK_RMENU:
 		return KeyMap[DIK_LMENU];
+
 	case DIK_LMENU:
 		return KeyMap[DIK_RMENU];
 	}
 
-	return 0;
+	return false;
 }
 
 int S_UpdateInput()
 {
 	DI_ReadKeyboard(KeyMap);
 
-	static int linput;
+	static int lInput;
 
-	linput = 0;
+	lInput = 0;
 
 	if (Key(KEY_FORWARD))
-		linput |= IN_FORWARD;
+		lInput |= IN_FORWARD;
+
 	if (Key(KEY_BACK))
-		linput |= IN_BACK;
+		lInput |= IN_BACK;
+
 	if (Key(KEY_LEFT))
-		linput |= IN_LEFT;
+		lInput |= IN_LEFT;
+
 	if (Key(KEY_RIGHT))
-		linput |= IN_RIGHT;
+		lInput |= IN_RIGHT;
+
 	if (Key(KEY_DUCK))
-		linput |= IN_CROUCH;
+		lInput |= IN_CROUCH;
+
 	if (Key(KEY_SPRINT))
-		linput |= IN_SPRINT;
+		lInput |= IN_SPRINT;
+
 	if (Key(KEY_WALK))
-		linput |= IN_WALK;
+		lInput |= IN_WALK;
+
 	if (Key(KEY_JUMP))
-		linput |= IN_JUMP;
+		lInput |= IN_JUMP;
+
 	if (Key(KEY_ACTION))
-		linput |= IN_ACTION | IN_SELECT;
+		lInput |= IN_ACTION | IN_SELECT;
+
 	if (Key(KEY_DRAW))
-		linput |= IN_DRAW;
+		lInput |= IN_DRAW;
 
 	bool flare = false;
 	static bool flareNo = false;
@@ -204,21 +223,28 @@ int S_UpdateInput()
 	/*if (opt_ControlMethod == CM_JOYSTICK)
 	{
 		if (Key(opt_JJmp + 256))
-			linput |= IN_JUMP;
+			lInput |= IN_JUMP;
+
 		if (Key(opt_JAct + 256))
-			linput |= IN_ACTION | IN_SELECT;
+			lInput |= IN_ACTION | IN_SELECT;
+
 		if (Key(opt_JDrw + 256))
-			linput |= IN_DRAW;
+			lInput |= IN_DRAW;
+
 		if (Key(opt_JDsh + 256))
-			linput |= IN_SPRINT;
+			lInput |= IN_SPRINT;
+
 		if (Key(opt_JWlk + 256))
-			linput |= IN_WALK;
+			lInput |= IN_WALK;
+
 		if (Key(opt_JDck + 256))
-			linput |= IN_CROUCH;
+			lInput |= IN_CROUCH;
+
 		if (Key(opt_JFlr + 256))
 			flare = true;
 	}*/
 
+	// TODO: Better flare handling in crawl states.
 	if (Key(KEY_FLARE) || flare)
 	{
 		if (!flareNo)
@@ -236,43 +262,49 @@ int S_UpdateInput()
 			else
 			{
 				flareNo = false;
-				linput |= IN_FLARE;
+				lInput |= IN_FLARE;
 			}
 		}
 	}
 	else
-	{
 		flareNo = false;
-	}
 
 	if (Key(KEY_LOOK))
-		linput |= IN_LOOK;
+		lInput |= IN_LOOK;
+
 	if (Key(KEY_ROLL))
-		linput |= IN_ROLL;
+		lInput |= IN_ROLL;
+
 	if (Key(KEY_OPTION))
-		linput |= IN_OPTION;
+		lInput |= IN_OPTION;
+
 	if (Key(KEY_STEPL))
-		linput |= IN_LSTEP;
+		lInput |= IN_LSTEP;
+
 	if (Key(KEY_STEPR))
-		linput |= IN_RSTEP;
+		lInput |= IN_RSTEP;
+
 	if (Key(KEY_PAUSE))
-		linput |= IN_PAUSE;
+		lInput |= IN_PAUSE;
+
 	if (Key(KEY_SELECT))
-		linput |= IN_SELECT;
+		lInput |= IN_SELECT;
 
 	/*if (opt_ControlMethod == CM_JOYSTICK)
 	{
 		if (Key(opt_JLok + 256))
-			linput |= IN_LOOK;
+			lInput |= IN_LOOK;
+
 		if (Key(opt_JRol + 256))
-			linput |= IN_ROLL;
+			lInput |= IN_ROLL;
+
 		if (Key(opt_JInv + 256))
-			linput |= IN_OPTION;
+			lInput |= IN_OPTION;
 	}*/
 
 	// CHECK
 	if (KeyMap[1])
-		linput |= IN_OPTION | IN_DESELECT;
+		lInput |= IN_OPTION | IN_DESELECT;
 	
 	// Switch debug pages
 
@@ -295,22 +327,20 @@ int S_UpdateInput()
 		// TODO: AutoTarget Not Saved
 		//Savegame.AutoTarget = 1;
 
-		if (linput & IN_LOOK)
+		if (lInput & IN_LOOK)
 		{
 			if (lookTimeout >= 6)
-			{
 				lookTimeout = 100;
-			}
 			else
 			{
-				linput &= ~IN_LOOK;
+				lInput &= ~IN_LOOK;
 				lookTimeout++;
 			}
 		}
 		else
 		{
 			if (lookTimeout != 0 && lookTimeout != 100)
-				linput |= IN_LOOKSWITCH;
+				lInput |= IN_LOOKSWITCH;
 
 			lookTimeout = 0;
 		}
@@ -321,27 +351,34 @@ int S_UpdateInput()
 	/***************************WEAPON HOTKEYS***************************/
 	if (KeyMap[DIK_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+
 	if (KeyMap[DIK_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+
 	if (KeyMap[DIK_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+
 	if (KeyMap[DIK_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+
 	if (KeyMap[DIK_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+
 	if (KeyMap[DIK_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+
 	if (KeyMap[DIK_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+
 	if (KeyMap[DIK_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
-		/*------------------------------------------------------------------*/
+	/*------------------------------------------------------------------*/
 
 	if (KeyMap[DIK_0])
 	{
 		if (medipackTimeout == 0)
 		{
-			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.PoisonPotency)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
 			{
 				if (Lara.Inventory.TotalSmallMedipacks != 0)
 				{
@@ -349,12 +386,12 @@ int S_UpdateInput()
 						Lara.Inventory.TotalSmallMedipacks--;
 
 					Lara.PoisonPotency = 0;
-					LaraItem->HitPoints += 500;
-					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);//Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
+					LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
+					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2); // TODO: Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
 
-					if (LaraItem->HitPoints > 1000)
+					if (LaraItem->HitPoints > LARA_HEALTH_MAX)
 					{
-						LaraItem->HitPoints = 1000;
+						LaraItem->HitPoints = LARA_HEALTH_MAX;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Statistics.Game.HealthUsed++;
 					}
@@ -368,7 +405,7 @@ int S_UpdateInput()
 	{
 		if (medipackTimeout == 0)
 		{
-			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < 1000 || Lara.PoisonPotency)
+			if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
 			{
 				if (Lara.Inventory.TotalLargeMedipacks != 0)
 				{
@@ -376,11 +413,11 @@ int S_UpdateInput()
 						Lara.Inventory.TotalLargeMedipacks--;
 
 					Lara.PoisonPotency = 0;
-					LaraItem->HitPoints += 1000;
+					LaraItem->HitPoints += LARA_HEALTH_MAX;
 
-					if (LaraItem->HitPoints > 1000)
+					if (LaraItem->HitPoints > LARA_HEALTH_MAX)
 					{
-						LaraItem->HitPoints = 1000;
+						LaraItem->HitPoints = LARA_HEALTH_MAX;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, 2);
 						Statistics.Game.HealthUsed++;
 					}
@@ -391,44 +428,43 @@ int S_UpdateInput()
 		}
 	}
 	else if (medipackTimeout != 0)
-	{
 		medipackTimeout--;
-	}
 
 	if (KeyMap[DIK_F10])
-		linput |= IN_E;
+		lInput |= IN_E;
 
-	if (linput & IN_WALK && !(linput & IN_FORWARD) && !(linput & IN_BACK))
+	// TODO: Revert this WALK+LEFT/RIGHT to LSTEP/RSTEP translation.
+	if (lInput & IN_WALK && !(lInput & IN_FORWARD) && !(lInput & IN_BACK))
 	{
-		if (linput & IN_LEFT)
+		if (lInput & IN_LEFT)
 		{
-			linput &= ~IN_LEFT;
-			linput |= IN_LSTEP;
+			lInput &= ~IN_LEFT;
+			lInput |= IN_LSTEP;
 		}
-		else if (linput & IN_RIGHT)
+		else if (lInput & IN_RIGHT)
 		{
-			linput &= ~IN_RIGHT;
-			linput |= IN_RSTEP;
+			lInput &= ~IN_RIGHT;
+			lInput |= IN_RSTEP;
 		}
 	}
 
-	if (linput & IN_FORWARD && linput & IN_BACK)
-		linput |= IN_ROLL;
+	if (lInput & IN_FORWARD && lInput & IN_BACK)
+		lInput |= IN_ROLL;
 
-	if (linput & IN_ROLL && BinocularRange)
-		linput &= ~IN_ROLL;
+	if (lInput & IN_ROLL && BinocularRange)
+		lInput &= ~IN_ROLL;
 
-	if (linput & IN_LEFT && linput & IN_RIGHT)
-		linput &= ~(IN_LEFT | IN_RIGHT);
+	if (lInput & IN_LEFT && lInput & IN_RIGHT)
+		lInput &= ~(IN_LEFT | IN_RIGHT);
 
 	if (SetDebounce)
 		DbInput = InputBusy;
 
 	if (KeyMap[DIK_F5])
-		linput |= IN_SAVE;
+		lInput |= IN_SAVE;
 
 	if (KeyMap[DIK_F6])
-		linput |= IN_LOAD;
+		lInput |= IN_LOAD;
 
 	/*if (Gameflow->CheatEnabled)
 	{
@@ -442,40 +478,47 @@ int S_UpdateInput()
 		case 0:
 			if (Key(DIK_D))
 				cheat_code = 1;
+
 			break;
+
 		case 1:
 			if (Key(DIK_O))
 				cheat_code = 2;
+
 			break;
+
 		case 2:
 			if (Key(DIK_Z))
 				cheat_code = 3;
+
 			break;
+
 		case 3:
 			if (Key(DIK_Y))
 				linput = IN_CHEAT;
+
 			break;
 		}
 	}*/
 
-	InputBusy = linput;
-	TrInput = linput;
+	InputBusy = lInput;
+	TrInput = lInput;
 
 	if (Lara.Inventory.IsBusy)
 	{
-		linput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
+		lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
 
-		if (linput & IN_FORWARD && linput & IN_BACK)
-			linput &= ~IN_BACK;
+		if (lInput & IN_FORWARD && lInput & IN_BACK)
+			lInput &= ~IN_BACK;
 	}
 
 	if (SetDebounce)
 		DbInput = TrInput & (DbInput ^ TrInput);
 
 	if (KeyMap[DIK_F])
-		linput |= IN_FORWARD;
+		lInput |= IN_FORWARD;
 	else
-		linput &= ~IN_FORWARD;
+		lInput &= ~IN_FORWARD;
 
 	//dbginput = TrInput;
 
