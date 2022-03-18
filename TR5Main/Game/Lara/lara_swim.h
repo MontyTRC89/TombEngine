@@ -17,7 +17,3 @@ void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll);
 void lara_as_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll);
 void lara_col_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll);
 
-void UpdateSubsuitAngles(ITEM_INFO* item);
-void SwimTurnSubsuit(ITEM_INFO* item);
-void SwimTurn(ITEM_INFO* item, CollisionInfo* coll);
-void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll);
