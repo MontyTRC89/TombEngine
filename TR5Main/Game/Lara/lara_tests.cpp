@@ -1585,14 +1585,12 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll)
 	int distance = CLICK(3);
 	auto probe = GetCollision(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&				// Within lower floor bound.
-		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&			// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&		// Within lowest ceiling bound.
-		!probe.Position.FloorSlope &&								// Not a slope.
-		lara->WaterSurfaceDist >= -CLICK(1) &&						// Water depth is optically permissive.
-		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
-			lara->Flare.Life))
+	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
+		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
+		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
+		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
+		!probe.Position.FloorSlope &&							// Not a slope.
+		lara->WaterSurfaceDist >= -CLICK(1))					// Water depth is optically permissive.
 	{
 		return true;
 	}
@@ -1606,7 +1604,7 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
-		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare.
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. @Sezz 2022.03.18
 			lara->Flare.Life))
 	{
 		return true;
