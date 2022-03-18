@@ -2099,6 +2099,7 @@ namespace TEN::Renderer
 				                  LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
 				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
+				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
 				                  r->z + r->zSize * SECTOR(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
@@ -2113,11 +2114,10 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
 				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
 				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
+				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
+				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
 				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("Lara Airborne: %d", LaraItem->Animation.Airborne);
-				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Lara WeaponItem: %d", Lara.Control.Weapon.WeaponItem);
-				PrintDebugMessage("Lara GunType: %d", Lara.Control.Weapon.GunType);
 				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
