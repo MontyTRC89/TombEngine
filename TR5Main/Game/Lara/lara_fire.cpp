@@ -302,22 +302,31 @@ GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 	{
 	case LaraWeaponType::Uzi:
 		return ID_UZI_ANIM;
+
 	case LaraWeaponType::Shotgun:
 		return ID_SHOTGUN_ANIM;
+
 	case LaraWeaponType::Revolver:
 		return ID_REVOLVER_ANIM;
+
 	case LaraWeaponType::Crossbow:
 		return ID_CROSSBOW_ANIM;
+
 	case LaraWeaponType::HK:
 		return ID_HK_ANIM;
+
 	case LaraWeaponType::Flare:
 		return ID_LARA_FLARE_ANIM;
+
 	case LaraWeaponType::GrenadeLauncher:
 		return ID_GRENADE_ANIM;
+
 	case LaraWeaponType::RocketLauncher:
 		return ID_ROCKET_ANIM;
+
 	case LaraWeaponType::HarpoonGun:
 		return ID_HARPOON_ANIM;
+
 	default:
 		return ID_PISTOLS_ANIM;
 	}
@@ -363,12 +372,12 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	arm->Rotation.zRot = 0;
 }
 
-void SmashItem(short itemNum)
+void SmashItem(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
-		SmashObject(itemNum);
+		SmashObject(itemNumber);
 }
 
 void LaraGun(ITEM_INFO* laraItem)
@@ -824,7 +833,6 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 		ammo--;
 
 	auto* weapon = &Weapons[(int)weaponType];
-	int r;
 
 	PHD_VECTOR muzzleOffset;
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);

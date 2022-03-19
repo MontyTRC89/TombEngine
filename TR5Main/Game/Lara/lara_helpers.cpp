@@ -56,13 +56,13 @@ void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll)
 
 	// Reset lean.
 	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
-		ResetLaraLean(item, 6);
+		ResetLaraLean(item, 6.0f);
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
 		(!item->Animation.Velocity || (item->Animation.Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
-		ResetLaraFlex(item, 12);
+		ResetLaraFlex(item, 12.0f);
 	}
 
 	// Reset turn rate.
@@ -153,7 +153,7 @@ void EaseOutLaraHeight(ITEM_INFO* item, int height)
 
 	// Translate Lara to new height.
 	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	static constexpr int rate = 50;
+	constexpr int rate = 50;
 	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
 	
