@@ -2247,8 +2247,8 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 bool TestLaraCrawlToHang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	int y = item->Position.yPos;
-	int dist = CLICK(1.2f);
-	auto probe = GetCollision(item, item->Position.yRot + ANGLE(180.0f), dist, -LARA_HEIGHT_CRAWL);
+	int distance = CLICK(1.2f);
+	auto probe = GetCollision(item, item->Position.yRot + ANGLE(180.0f), distance, -LARA_HEIGHT_CRAWL);
 
 	bool objectCollided = TestLaraObjectCollision(item, item->Position.yRot + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
 
