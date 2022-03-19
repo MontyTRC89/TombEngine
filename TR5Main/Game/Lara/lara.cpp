@@ -479,15 +479,14 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 			Camera.targetElevation = -ANGLE(22.0f);
 
 			// Water is deep enough to swim; dispatch dive.
-			if (waterDepth >= SWIM_DEPTH &&
-				!isSwamp)
+			if (waterDepth >= SWIM_DEPTH && !isSwamp)
 			{
 				if (isWater)
 				{
+					item->Position.yPos += 100;
+					item->Animation.Airborne = false;
 					lara->Air = LARA_AIR_MAX;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
-					item->Animation.Airborne = false;
-					item->Position.yPos += 100;
 
 					UpdateItemRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
@@ -548,8 +547,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 		case WaterStatus::Underwater:
 			if (isWater ||
-				waterDepth == DEEP_WATER ||
-				abs(heightFromWater) >= CLICK(1) ||
+				waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1) ||
 				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE ||
 				item->Animation.AnimNumber == LA_ONWATER_DIVE)
 			{
@@ -582,11 +580,11 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 			else
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
+				ResetLaraLean(item);
+				ResetLaraFlex(item);
 				item->Position.yPos = waterHeight + 1;
 				item->Animation.VerticalVelocity = 0;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
-				ResetLaraLean(item);
-				ResetLaraFlex(item);
 
 				UpdateItemRoom(item, 0);
 				SoundEffect(SFX_TR4_LARA_BREATH, &item->Position, 2);
@@ -702,8 +700,8 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 			{
 			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && lara->anxiety < 251)
 			//		lara->anxiety += 4;
-				lara->Air = -1;
 				item->HitPoints -= 5;
+				lara->Air = -1;
 			}
 		}
 
@@ -762,7 +760,7 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	// TODO: Move radius and height default resets above look checks when look feature is refactored.
+	// TODO: Move radius and height default resets above look checks once look feature is refactored.
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 	lara->Control.CanLook = true;
@@ -914,11 +912,9 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 	item->Position.yRot += lara->Control.TurnRate;
 
+	// Reset lean.
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
-	{
-		if (abs(item->Position.zRot) > 0)
-			item->Position.zRot += item->Position.zRot / -8;
-	}
+		ResetLaraLean(item, 8.0f);
 
 	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
@@ -1003,7 +999,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 		UpdateLaraSubsuitAngles(item);
 
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
-		ResetLaraLean(item, 1, true, false);
+		ResetLaraLean(item, 8.0f, true, false);
 
 	if (item->Position.xRot < -ANGLE(85.0f))
 		item->Position.xRot = -ANGLE(85.0f);
