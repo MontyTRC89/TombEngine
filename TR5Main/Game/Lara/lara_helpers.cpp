@@ -619,9 +619,10 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
-	short deltaAngle = abs((short)(direction - item->Position.yRot));
+	short deltaAngle = direction - item->Position.yRot;
 
-	// TODO: Take inertia into consideration before switching slide animations.
+	if (!g_GameFlow->Animations.HasSlideExtended)
+		item->Position.yRot = direction;
 
 	// Snap to height upon slide entrance.
 	if (item->Animation.ActiveState != LS_SLIDE_FORWARD &&
@@ -631,17 +632,17 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	// Slide forward.
-	if (deltaAngle <= ANGLE(90.0f))
+	if (abs(deltaAngle) <= ANGLE(90.0f))
 	{
-		if (item->Animation.ActiveState == LS_SLIDE_FORWARD && deltaAngle <= ANGLE(90.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_FORWARD && abs(deltaAngle) <= ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_FORWARD);
 	}
-	// Slide back.
+	// Slide backward.
 	else
 	{
-		if (item->Animation.ActiveState == LS_SLIDE_BACK && deltaAngle > ANGLE(90.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);
