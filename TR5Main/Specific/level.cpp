@@ -843,10 +843,9 @@ void FreeLevel()
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < 4; j++)
-		{
 			g_Level.Zones[j][i].clear();
-		}
 	}
+
 	g_Renderer.freeRendererData();
 	g_GameScript->FreeLevelScripts();
 }
@@ -867,7 +866,7 @@ void LoadSoundSources()
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
 	{
-		auto & source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
+		auto& source = g_Level.SoundSources.emplace_back(SOUND_SOURCE_INFO{});
 
 		source.x = ReadInt32();
 		source.y = ReadInt32();
@@ -894,6 +893,7 @@ void LoadAnimatedTextures()
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
 		sequence.numFrames = ReadInt32();
+
 		for (int j = 0; j < sequence.numFrames; j++)
 		{
 			ANIMATED_TEXTURES_FRAME frame;
@@ -907,6 +907,7 @@ void LoadAnimatedTextures()
 			frame.y4 = ReadFloat();
 			sequence.frames.push_back(frame);
 		}
+
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
 	}
 
@@ -927,11 +928,13 @@ void LoadTextureInfos()
 		texture.attribute = ReadInt32();
 		texture.tileAndFlag = ReadInt32();
 		texture.newFlags = ReadInt32();
+
 		for (int j = 0; j < 4; j++)
 		{
 			texture.vertices[j].x = ReadFloat();
 			texture.vertices[j].y = ReadFloat();
 		}
+
 		texture.destination = ReadInt32();
 		g_Level.ObjectTextures.push_back(texture);
 	}
@@ -995,9 +998,7 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 		return true;
 	}
 	else
-	{
 		return false;
-	}
 }
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
@@ -1080,9 +1081,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		FileClose(LevelFilePtr);
 	}
 	else
-	{
 		return false;
-	}
 
 	g_Renderer.updateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
@@ -1173,9 +1172,7 @@ void LoadBoxes()
 	for (int i = 0; i < numBoxes; i++)
 	{
 		if (g_Level.Boxes[i].flags & BLOCKABLE)
-		{
 			g_Level.Boxes[i].flags |= BLOCKED;
-		}
 	}
 }
 
@@ -1256,20 +1253,21 @@ void GetCarriedItems()
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		auto item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 		if (Objects[item->ObjectNumber].intelligent || item->ObjectNumber >= ID_SEARCH_OBJECT1 && item->ObjectNumber <= ID_SEARCH_OBJECT3)
 		{
-			for (short linknum = g_Level.Rooms[item->RoomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
+			for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{
-				auto item2 = &g_Level.Items[linknum];
-				if (abs(item2->Position.xPos - item->Position.xPos) < 512
-					&& abs(item2->Position.zPos - item->Position.zPos) < 512
-					&& abs(item2->Position.yPos - item->Position.yPos) < 256
-					&& Objects[item2->ObjectNumber].isPickup)
+				auto* item2 = &g_Level.Items[linkNumber];
+
+				if (abs(item2->Position.xPos - item->Position.xPos) < CLICK(2) &&
+					abs(item2->Position.zPos - item->Position.zPos) < CLICK(2) &&
+					abs(item2->Position.yPos - item->Position.yPos) < CLICK(1) &&
+					Objects[item2->ObjectNumber].isPickup)
 				{
 					item2->CarriedItem = item->CarriedItem;
-					item->CarriedItem = linknum;
-					RemoveDrawnItem(linknum);
+					item->CarriedItem = linkNumber;
+					RemoveDrawnItem(linkNumber);
 					item2->RoomNumber = NO_ROOM;
 				}
 			}
@@ -1284,25 +1282,30 @@ void GetAIPickups()
 		auto* item = &g_Level.Items[i];
 		if (Objects[item->ObjectNumber].intelligent)
 		{
-			auto* creature = GetCreatureInfo(item);
-
 			item->AIBits = 0;
-			for (int num = 0; num < g_Level.AIObjects.size(); ++num)
+
+			for (int number = 0; number < g_Level.AIObjects.size(); ++number)
 			{
-				auto object = &g_Level.AIObjects[num];
-				if (abs(object->x - item->Position.xPos) < 512
-					&& abs(object->z - item->Position.zPos) < 512
-					&& object->roomNumber == item->RoomNumber
-					&& object->objectNumber < ID_AI_PATROL2)
+				auto* object = &g_Level.AIObjects[number];
+
+				if (abs(object->x - item->Position.xPos) < CLICK(2) &&
+					abs(object->z - item->Position.zPos) < CLICK(2) &&
+					object->roomNumber == item->RoomNumber &&
+					object->objectNumber < ID_AI_PATROL2)
 				{
 					item->AIBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
 					item->ItemFlags[3] = object->triggerFlags;
+
 					if (object->objectNumber != ID_AI_GUARD)
 						object->roomNumber = NO_ROOM;
 				}
 			}
 
-			creature->Tosspad |= item->AIBits << 8 | (char) item->ItemFlags[3];
+			if (item->Data.is<CreatureInfo>())
+			{
+				auto* creature = GetCreatureInfo(item);
+				creature->Tosspad |= item->AIBits << 8 | (char)item->ItemFlags[3];
+			}
 		}
 	}
 }
@@ -1310,8 +1313,10 @@ void GetAIPickups()
 void BuildOutsideRoomsTable()
 {
 	for (int x = 0; x < OUTSIDE_SIZE; x++)
+	{
 		for (int z = 0; z < OUTSIDE_SIZE; z++)
 			OutsideRoomTable[x][z].clear();
+	}
 
 	for (int x = 0; x < OUTSIDE_SIZE; x++)
 	{
@@ -1319,13 +1324,16 @@ void BuildOutsideRoomsTable()
 		{
 			for (int i = 0; i < g_Level.Rooms.size(); i++)
 			{
-				ROOM_INFO* r = &g_Level.Rooms[i];
+				auto* room = &g_Level.Rooms[i];
 
-				int rx = (r->x / 1024);
-				int rz = (r->z / 1024);
+				int rx = (room->x / SECTOR(1));
+				int rz = (room->z / SECTOR(1));
 
-				if (x >= rx + 1 && z >= rz + 1 && x <= (rx + r->xSize - 2) && z <= (rz + r->zSize - 2))
+				if (x >= (rx + 1) && z >= (rz + 1) &&
+					x <= (rx + room->xSize - 2) && z <= (rz + room->zSize - 2))
+				{
 					OutsideRoomTable[x][z].push_back(i);
+				}
 			}
 		}
 	}
