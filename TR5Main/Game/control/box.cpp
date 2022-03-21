@@ -231,9 +231,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	LaraItem->Position.yRot = item->Position.yRot;
 	LaraItem->Position.xRot = item->Position.xRot;
 	LaraItem->Position.zRot = item->Position.zRot;
+	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
 	LaraItem->Animation.Airborne = false;
-	LaraItem->Animation.VerticalVelocity = 0;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -275,7 +275,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	PHD_VECTOR pos = { bite->x, bite->y, bite->z };
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Position.yRot, item->RoomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
@@ -397,7 +397,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 	int x = creature->Target.x - item->Position.xPos;
 	int z = creature->Target.z - item->Position.zPos;
 	angle = phd_atan(z, x) - item->Position.yRot;
-	int range = item->Animation.VerticalVelocity * (16384 / maxTurn);
+	int range = item->Animation.Velocity * (16384 / maxTurn);
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
@@ -604,7 +604,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	short biffAngle;
-	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.VerticalVelocity && item->HitPoints > 0)
+	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity && item->HitPoints > 0)
 		biffAngle = CreatureCreature(itemNumber);
 	else
 		biffAngle = 0;
@@ -679,7 +679,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Position.xPos, y, item->Position.zPos, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Position.xPos, y, item->Position.zPos);
  
-		angle = (item->Animation.VerticalVelocity) ? phd_atan(item->Animation.VerticalVelocity, -dy) : 0;
+		angle = (item->Animation.Velocity) ? phd_atan(item->Animation.Velocity, -dy) : 0;
 		if (angle < -ANGLE(20.0f))
 			angle = -ANGLE(20.0f);
 		else if (angle > ANGLE(20.0f))
@@ -1437,13 +1437,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->Position.xPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
-		z = enemy->Position.zPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
+		x = enemy->Position.xPos + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
+		z = enemy->Position.zPos + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
 	}
 	else
 	{
-		x = enemy->Position.xPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Position.yRot) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
-		z = enemy->Position.zPos + enemy->Animation.VerticalVelocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Position.yRot) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
+		x = enemy->Position.xPos + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Position.yRot) - item->Position.xPos - object->pivotLength * phd_sin(item->Position.yRot);
+		z = enemy->Position.zPos + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Position.yRot) - item->Position.zPos - object->pivotLength * phd_cos(item->Position.yRot);
 	}
 
 	y = item->Position.yPos - enemy->Position.yPos;

@@ -163,7 +163,7 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		// TODO: Huh?
 		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Position.xRot);
-		harpoonItem->Animation.VerticalVelocity = HARPOON_VELOCITY * phd_cos(harpoonItem->Position.xRot);
+		harpoonItem->Animation.Velocity = HARPOON_VELOCITY * phd_cos(harpoonItem->Position.xRot);
 		harpoonItem->HitPoints = HARPOON_TIME;
 		harpoonItem->ItemFlags[0] = 1;
 
@@ -779,7 +779,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			UPV->Flags |= UPV_DEAD;
 		}
 
-		UPVItem->Animation.VerticalVelocity = 0;
+		UPVItem->Animation.Velocity = 0;
 		break;
 	}
 
@@ -924,7 +924,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		UPVControl(laraItem, UPVItem);
 
-		UPVItem->Animation.VerticalVelocity = UPV->Velocity / (USHRT_MAX + 1);
+		UPVItem->Animation.Velocity = UPV->Velocity / (USHRT_MAX + 1);
 
 		UPVItem->Position.xRot += UPV->XRot / (USHRT_MAX + 1);
 		UPVItem->Position.yRot += UPV->Rot / (USHRT_MAX + 1);
@@ -935,9 +935,9 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		else if (UPVItem->Position.xRot < -UPDOWN_LIMIT)
 			UPVItem->Position.xRot = -UPDOWN_LIMIT;
 
-		UPVItem->Position.xPos += phd_sin(UPVItem->Position.yRot) * UPVItem->Animation.VerticalVelocity * phd_cos(UPVItem->Position.xRot);
-		UPVItem->Position.yPos -= phd_sin(UPVItem->Position.xRot) * UPVItem->Animation.VerticalVelocity;
-		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.VerticalVelocity * phd_cos(UPVItem->Position.xRot);
+		UPVItem->Position.xPos += phd_sin(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot);
+		UPVItem->Position.yPos -= phd_sin(UPVItem->Position.xRot) * UPVItem->Animation.Velocity;
+		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot);
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;
@@ -948,7 +948,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		UPVItem->Position.xPos = oldPos.xPos;
 		UPVItem->Position.yPos = oldPos.yPos;
 		UPVItem->Position.zPos = oldPos.zPos;
-		UPVItem->Animation.VerticalVelocity = 0;
+		UPVItem->Animation.Velocity = 0;
 	}
 
 	UPVItem->Floor = probe.Position.Floor;
@@ -1047,7 +1047,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->Animation.VerticalVelocity * (USHRT_MAX + 1)));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->Animation.Velocity * (USHRT_MAX + 1)));
 
 		UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
@@ -1072,6 +1072,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		SetAnimation(UPVItem, UPV_ANIM_IDLE);
 		UPVItem->Animation.VerticalVelocity = 0;
+		UPVItem->Animation.Velocity = 0;
 		UPVItem->Animation.Airborne = true;
 		AnimateItem(UPVItem);
 

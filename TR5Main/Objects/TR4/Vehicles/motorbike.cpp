@@ -485,7 +485,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
         pos.z = -500;
         GetJointAbsPosition(item, &pos, 0);
 
-        speed = item->Animation.VerticalVelocity;
+        speed = item->Animation.Velocity;
         if (speed > 32 && speed < 64)
         {
             TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Position.yRot - ANGLE(180), 64 - speed, TRUE);
@@ -805,9 +805,9 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room_number);
     height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
     if (item->Position.yPos >= height)
-        speed = item->Animation.VerticalVelocity * phd_cos(item->Position.xRot);
+        speed = item->Animation.Velocity * phd_cos(item->Position.xRot);
     else
-        speed = item->Animation.VerticalVelocity;
+        speed = item->Animation.Velocity;
 
     item->Position.zPos += speed * phd_cos(motorbike->momentumAngle);
     item->Position.xPos += speed * phd_sin(motorbike->momentumAngle);
@@ -1333,7 +1333,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             }
         }
 
-        item->Animation.VerticalVelocity = motorbike->velocity / 256;
+        item->Animation.Velocity = motorbike->velocity / 256;
 
         if (motorbike->engineRevs > MOTORBIKE_ACCEL_MAX)
             motorbike->engineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;

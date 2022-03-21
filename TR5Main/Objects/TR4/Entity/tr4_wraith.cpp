@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 		item->Data = WraithInfo();
 		auto* wraith = (WraithInfo*)item->Data;
 
-		item->Animation.VerticalVelocity = WraithVelocity;
+		item->Animation.Velocity = WraithVelocity;
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[6] = 0;
 
@@ -93,7 +93,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Position.xRot;
 
-		int velocity = 8 * (WraithVelocity / item->Animation.VerticalVelocity);
+		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
@@ -151,9 +151,9 @@ namespace TEN::Entities::TR4
 		oldY = item->Position.yPos;
 		oldZ = item->Position.zPos;
 
-		item->Position.xPos += item->Animation.VerticalVelocity * phd_sin(item->Position.yRot);
-		item->Position.yPos += item->Animation.VerticalVelocity * phd_sin(item->Position.xRot);
-		item->Position.zPos += item->Animation.VerticalVelocity * phd_cos(item->Position.yRot);
+		item->Position.xPos += item->Animation.Velocity * phd_sin(item->Position.yRot);
+		item->Position.yPos += item->Animation.Velocity * phd_sin(item->Position.xRot);
+		item->Position.zPos += item->Animation.Velocity * phd_cos(item->Position.yRot);
 
 		auto outsideRoom = IsRoomOutside(item->Position.xPos, item->Position.yPos, item->Position.zPos);
 		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
@@ -223,8 +223,8 @@ namespace TEN::Entities::TR4
 		{
 			if (Wibble & 16)
 			{
-				if (item->Animation.VerticalVelocity < WraithVelocity)
-					item->Animation.VerticalVelocity++;
+				if (item->Animation.Velocity < WraithVelocity)
+					item->Animation.Velocity++;
 				
 				if (item->ItemFlags[6])
 				{
@@ -235,8 +235,8 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (item->Animation.VerticalVelocity > 32)
-				item->Animation.VerticalVelocity -= 12;
+			if (item->Animation.Velocity > 32)
+				item->Animation.Velocity -= 12;
 			
 			if (target == LaraItem)
 			{
