@@ -46,7 +46,7 @@ static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, short velocity, s
 
 		harpoonItem->Position.xRot = 0;
 		harpoonItem->Position.yRot = yRot;
-		harpoonItem->Animation.VerticalVelocity = 150;
+		harpoonItem->Animation.Velocity = 150;
 
 		AddActiveItem(harpoonItemNumber);
 		harpoonItem->Status = ITEM_ACTIVE;
@@ -70,10 +70,10 @@ void ScubaHarpoonControl(short itemNumber)
 		int ox = item->Position.xPos;
 		int oz = item->Position.zPos;
 
-		int velocity = item->Animation.VerticalVelocity * phd_cos(item->Position.xRot);
+		int velocity = item->Animation.Velocity * phd_cos(item->Position.xRot);
 		item->Position.zPos += velocity * phd_cos(item->Position.yRot);
 		item->Position.xPos += velocity * phd_sin(item->Position.yRot);
-		item->Position.yPos += -item->Animation.VerticalVelocity * phd_sin(item->Position.xRot);
+		item->Position.yPos += -item->Animation.Velocity * phd_sin(item->Position.xRot);
 
 		auto probe = GetCollision(item);
 
@@ -202,7 +202,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
+				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.Velocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
 
@@ -243,7 +243,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.VerticalVelocity, item->Position.yRot, item->RoomNumber);
+				ShootHarpoon(item, item->Position.xPos, item->Position.yPos, item->Position.zPos, item->Animation.Velocity, item->Position.yRot, item->RoomNumber);
 				creature->Flags = 1;
 			}
 
