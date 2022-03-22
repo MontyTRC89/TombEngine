@@ -642,7 +642,7 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 	// Slide backward.
 	else
 	{
-		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs(short(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && abs((short)(deltaAngle - ANGLE(180.0f))) <= -ANGLE(180.0f))
 			return;
 
 		SetAnimation(item, LA_SLIDE_BACK_START);

@@ -829,11 +829,11 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	static bool dbU = false;
 	if (doRoutines || KeyMap[DIK_U] && !dbU)
 	{
-		// Handle current Lara status.
-		lara_control_routines[item->Animation.ActiveState](item, coll);
 		HandleLaraMovementParameters(item, coll);
 
-		// Animate Lara.
+		// Handle current Lara status.
+		lara_control_routines[item->Animation.ActiveState](item, coll);
+
 		AnimateLara(item);
 
 		if (lara->ExtraAnim == -1)
