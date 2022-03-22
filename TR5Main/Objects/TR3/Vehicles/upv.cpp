@@ -404,8 +404,8 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		int dz = target.z - laraItem->Position.zPos;
 
 		int velocity = g_Level.Sinks[sinkVal].strength;
-		dx = phd_sin(angle * 16) * velocity * 1024;
-		dz = phd_cos(angle * 16) * velocity * 1024;
+		dx = phd_sin(angle * 16) * velocity * SECTOR(1);
+		dz = phd_cos(angle * 16) * velocity * SECTOR(1);
 
 		lara->WaterCurrentPull.x += ((dx - lara->WaterCurrentPull.x) / 16);
 		lara->WaterCurrentPull.z += ((dz - lara->WaterCurrentPull.z) / 16);
@@ -425,6 +425,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
 	coll->Setup.LowerCeilingBound = UPV_HEIGHT;
+	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 	coll->Setup.OldPosition.x = UPVItem->Position.xPos;
 	coll->Setup.OldPosition.y = UPVItem->Position.yPos;
 	coll->Setup.OldPosition.z = UPVItem->Position.zPos;
@@ -432,6 +433,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.FloorSlopeIsWall = false;
 	coll->Setup.FloorSlopeIsPit = false;
 	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.NoMonkeyFlagIsWall = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;

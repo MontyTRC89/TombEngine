@@ -839,7 +839,7 @@ bool LaraPositionOnLOS(ITEM_INFO* item, short angle, int distance)
 	auto result1 = LOS(&start1, &end1);
 	auto result2 = LOS(&start2, &end2);
 
-	return (!result1 && !result2);
+	return (result1 && result2);
 }
 
 int LaraFloorFront(ITEM_INFO* item, short angle, int distance)
