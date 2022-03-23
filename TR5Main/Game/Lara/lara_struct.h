@@ -784,7 +784,6 @@ enum LaraAnim
 	LA_OVERHANG_EXIT_DROP = 541,
 	LA_OVERHANG_EXIT_HANG = 542,
 
-	// TODO: Move to open slots.
 	LA_VAULT_TO_STAND_3_STEPS_END = 543,
 	LA_RUN_START_LEFT = 544,
 	LA_RUN_TO_STAND_LEFT_SOFT = 545,
@@ -793,6 +792,7 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
+	// 46
 	// 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
 };
