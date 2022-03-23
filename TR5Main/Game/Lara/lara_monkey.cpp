@@ -181,12 +181,11 @@ void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		// TODO
-		/*if (TrInput & IN_ROLL | IN_BACK)
+		if (TrInput & IN_ROLL | IN_FORWARD & IN_BACK)
 		{
-			item->TargetState = LS_MONKEY_TURN_180;
+			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
-		}*/
+		}
 
 		if (TrInput & IN_FORWARD)
 		{
