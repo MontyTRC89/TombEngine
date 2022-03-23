@@ -162,8 +162,7 @@ void lara_as_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -300,9 +299,7 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -312,8 +309,7 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -466,8 +462,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -477,8 +472,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -591,8 +585,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -645,8 +638,7 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -897,8 +889,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -908,8 +899,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1001,8 +991,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1051,8 +1040,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1144,8 +1132,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1155,8 +1142,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1248,8 +1234,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1298,8 +1283,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1590,9 +1574,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1602,8 +1584,7 @@ void lara_as_turn_right_fast(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -1716,9 +1697,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1728,8 +1707,7 @@ void lara_as_turn_left_fast(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -2171,8 +2149,7 @@ void lara_as_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -2215,8 +2192,7 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -2318,8 +2294,7 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH &&
-		(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)))
+	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -2331,9 +2306,8 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (TrInput & IN_ACTION && lara->Control.HandStatus == HandStatus::Free &&
-			!TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) && // HACK: Allow immediate vault only in the case of a soft splat.
-			vaultResult.Success)
+		if (TrInput & IN_ACTION && vaultResult.Success &&
+			!TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f))) // HACK: Allow immediate vault only in the case of a soft splat.
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);

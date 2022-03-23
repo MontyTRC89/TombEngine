@@ -78,6 +78,7 @@ bool TestLaraStepRightSwamp(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraCrawlForward(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraCrawlBack(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll);
+bool TestLaraCrouch(ITEM_INFO* item);
 bool TestLaraCrouchToCrawl(ITEM_INFO* item);
 
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup);

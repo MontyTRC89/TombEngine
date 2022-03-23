@@ -1598,6 +1598,19 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
+bool TestLaraCrouch(ITEM_INFO* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
