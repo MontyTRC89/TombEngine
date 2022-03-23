@@ -616,7 +616,57 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
+// temp
 void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+		return;
+
+	static short oldAngle = 1;
+
+	if (abs(coll->FloorTilt.x) <= 2 && abs(coll->FloorTilt.y) <= 2)
+		return;
+
+	short angle = ANGLE(0.0f);
+	if (coll->FloorTilt.x > 2)
+		angle = -ANGLE(90.0f);
+	else if (coll->FloorTilt.x < -2)
+		angle = ANGLE(90.0f);
+
+	if (coll->FloorTilt.y > 2 && coll->FloorTilt.y > abs(coll->FloorTilt.x))
+		angle = ANGLE(180.0f);
+	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
+		angle = ANGLE(0.0f);
+
+	short delta = angle - item->Position.yRot;
+
+	ShiftItem(item, coll);
+
+	if (delta < -ANGLE(90.0f) || delta > ANGLE(90.0f))
+	{
+		if (item->Animation.ActiveState == LS_SLIDE_BACK && oldAngle == angle)
+			return;
+
+		SetAnimation(item, LA_SLIDE_BACK_START);
+		item->Position.yRot = angle + ANGLE(180.0f);
+	}
+	else
+	{
+		if (item->Animation.ActiveState == LS_SLIDE_FORWARD && oldAngle == angle)
+			return;
+
+		SetAnimation(item, LA_SLIDE_FORWARD);
+		item->Position.yRot = angle;
+	}
+
+	lara->Control.MoveAngle = angle;
+	oldAngle = angle;
+}
+
+// TODO
+void newSetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);
 	short deltaAngle = direction - item->Position.yRot;

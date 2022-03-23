@@ -261,7 +261,7 @@ enum LaraAnim
 	LA_VAULT_TO_STAND_3_STEPS_TO_RUN = 43,					// Standing 3-step vault > run
 	LA_TURN_RIGHT_FAST = 44,								// Rotate right quickly
 	LA_HANG_IDLE = 45,										// Hang from ledge (looped)
-	LA_REACH_TO_FREEFALL_ALTERNATE_UNUSED = 46,				// Reach > freefall
+	LA_UNDERWATER_USE_PUZZLE = 46,							// Insert puzzle underwater
 	LA_ROLL_180_START_ALTERNATE_UNUSED = 47,				// Standing roll 180 (1/2)
 	LA_ROLL_180_END_ALTERNATE_UNUSED = 48,					// Standing roll 180 (2/2)
 	LA_JUMP_FORWARD_TO_FREEFALL = 49,						// Jump forward > freefall
@@ -794,7 +794,7 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 46, 102
+	// 102
 	// 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
 };
