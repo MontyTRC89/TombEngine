@@ -32,9 +32,12 @@ void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (TrInput & IN_LOOK)
+		LookUpDown(item);
+
 	if (TestLaraSlide(item, coll))
 	{
-		short direction = GetLaraSlideDirection(item, coll);
+		/*short direction = GetLaraSlideDirection(item, coll);
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
@@ -42,7 +45,7 @@ void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
-			/*if (TrInput & IN_LEFT)
+			if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -57,10 +60,10 @@ void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}*/
+			}
 		}
 		else
-			ApproachLaraTargetAngle(item, direction);
+			ApproachLaraTargetAngle(item, direction);*/
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
@@ -106,13 +109,6 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		SetLaraFallAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-
-		if (g_GameFlow->Animations.HasSlideExtended)
-		{
-			item->Animation.Velocity = lara->ExtraVelocity.x;
-			item->Animation.VerticalVelocity = lara->ExtraVelocity.y;
-		}
-
 		return;
 	}
 
@@ -123,7 +119,8 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TestLaraStep(item, coll))
 	{
-		DoLaraStep(item, coll);
+		//DoLaraStep(item, coll);
+		LaraSnapToHeight(item, coll);
 		return;
 	}
 }
@@ -143,9 +140,12 @@ void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (TrInput & IN_LOOK)
+		LookUpDown(item);
+
 	if (TestLaraSlide(item, coll))
 	{
-		short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
@@ -153,7 +153,7 @@ void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
-			/*if (TrInput & IN_LEFT)
+			if (TrInput & IN_LEFT)
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
@@ -168,10 +168,10 @@ void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
-			}*/
+			}
 		}
 		else
-			ApproachLaraTargetAngle(item, direction);
+			ApproachLaraTargetAngle(item, direction);*/
 
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
@@ -213,13 +213,6 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		SetLaraFallBackAnimation(item);
 		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
-
-		if (g_GameFlow->Animations.HasSlideExtended)
-		{
-			item->Animation.Velocity = lara->ExtraVelocity.x;
-			item->Animation.VerticalVelocity = lara->ExtraVelocity.y;
-		}
-
 		return;
 	}
 
@@ -230,7 +223,8 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TestLaraStep(item, coll))
 	{
-		DoLaraStep(item, coll);
+		//DoLaraStep(item, coll);
+		LaraSnapToHeight(item, coll);
 		return;
 	}
 }
