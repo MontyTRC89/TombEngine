@@ -319,7 +319,7 @@ enum LaraAnim
 																// TODO: remove. Possibly a leftover linking anim.
 	LA_JUMP_FORWARD_TO_REACH_4 = 100,						// Jump forward > reach, 4th opportunity
 	LA_JUMP_FORWARD_TO_REACH_ALTERNATE_UNUSED = 101,		// Jump forward (from jump forward anim) > reach
-	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2)
+	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2) TODO: remove, not used anymore
 	LA_STAND_IDLE = 103,									// Stand idle (looped)
 	LA_SLIDE_BACK_START = 104,								// Land on slope > slide back
 	LA_SLIDE_BACK = 105,									// Slide back (looped) 
@@ -491,7 +491,7 @@ enum LaraAnim
 	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
 	LA_CRAWL_IDLE = 263,											// Crwal idle
 	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
-	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,							// Crouch > crawl (3/3)
+	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,								// Crouch > crawl (3/3) remove
 	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,							// TODO: remove.
 	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
 	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
@@ -788,11 +788,13 @@ enum LaraAnim
 	LA_RUN_START_LEFT = 544,
 	LA_RUN_TO_STAND_LEFT_SOFT = 545,
 	LA_RUN_TO_STAND_RIGHT_SOFT = 546,
+	LA_MONKEY_JUMP_START = 547,
+	LA_MONKEY_JUMP = 548,
 
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 46
+	// 46, 102
 	// 265, 266, 268, 273, 274, 278, 280,
 	// 364, 366, 368, 370,
 };
