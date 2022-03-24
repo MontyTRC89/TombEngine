@@ -337,10 +337,10 @@ void RomanStatueControl(short itemNumber)
 		creature->enemy = LaraItem;
 
 		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		CreatureAIInfo(item,&info);
 		
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item,&info, VIOLENT);
+		CreatureMood(item,&info, VIOLENT);
 		
 		angle = CreatureTurn(item, creature->maximumTurn);
 		
@@ -422,7 +422,7 @@ void RomanStatueControl(short itemNumber)
 				}
 				if (item->triggerFlags == 1)
 				{
-					if (Targetable(item, &info) && GetRandomControl() & 1)
+					if (Targetable(item,&info) && GetRandomControl() & 1)
 					{
 						item->goalAnimState = STATE_ROMAN_STATUE_ENERGY_ATTACK;
 						break;
@@ -444,12 +444,12 @@ void RomanStatueControl(short itemNumber)
 			pos1.x = -32;
 			pos1.y = 48;
 			pos1.z = 64;
-			GetJointAbsPosition(item, &pos1, 14);
+			GetJointAbsPosition(item,&pos1, 14);
 
 			pos2.x = -48;
 			pos2.y = 48;
 			pos2.z = 490;
-			GetJointAbsPosition(item, &pos2, 14);
+			GetJointAbsPosition(item,&pos2, 14);
 
 			pos.x = (pos1.x + pos2.x) / 2;
 			pos.y = (pos1.y + pos2.y) / 2;
@@ -512,7 +512,7 @@ void RomanStatueControl(short itemNumber)
 				pos.z = GetRandomControl() % 360;
 			}
 
-			GetJointAbsPosition(item, &pos, 14);
+			GetJointAbsPosition(item,&pos, 14);
 
 			color = (GetRandomControl() & 0x3F) + 128;
 			
@@ -599,7 +599,7 @@ void RomanStatueControl(short itemNumber)
 				pos.y = 0;
 				pos.z = 0;
 				
-				GetJointAbsPosition(item, &pos, 16);
+				GetJointAbsPosition(item,&pos, 16);
 
 				room = &g_Level.Rooms[item->roomNumber];
 				floor = GetSector(room, pos.x - room->x, pos.z - room->z);
@@ -633,8 +633,8 @@ void RomanStatueControl(short itemNumber)
 					{
 						LaraItem->hitPoints -= 200;
 						LaraItem->hitStatus = true;
-						CreatureEffect2(item, &RomanStatueBite, 20, item->pos.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
+						CreatureEffect2(item,&RomanStatueBite, 20, item->pos.yRot, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD,&item->pos, 0);
 						creature->flags = 1;
 					}
 				}
@@ -645,7 +645,7 @@ void RomanStatueControl(short itemNumber)
 					pos1.y = 64;
 					pos1.z = 360;
 					
-					GetJointAbsPosition(item, &pos1, 14);
+					GetJointAbsPosition(item,&pos1, 14);
 
 					pos1.y = item->pos.yPos - 64;
 					
@@ -716,7 +716,7 @@ void RomanStatueControl(short itemNumber)
 
 			if (item->triggerFlags == 1)
 			{
-				if (Targetable(item, &info) && !(GetRandomControl() & 3))
+				if (Targetable(item,&info) && !(GetRandomControl() & 3))
 				{
 					item->goalAnimState = STATE_ROMAN_STATUE_STOP;
 					break;
@@ -762,12 +762,12 @@ void RomanStatueControl(short itemNumber)
 				pos1.x = -48;
 				pos1.y = 48;
 				pos1.z = 1024;
-				GetJointAbsPosition(item, &pos1, 14);
+				GetJointAbsPosition(item,&pos1, 14);
 
 				pos2.x = -48;
 				pos2.y = 48;
 				pos2.z = 450;
-				GetJointAbsPosition(item, &pos2, 14);
+				GetJointAbsPosition(item,&pos2, 14);
 
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
@@ -779,7 +779,7 @@ void RomanStatueControl(short itemNumber)
 				attackPos.zRot = 0;
 
 				roomNumber = item->roomNumber;
-				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
+				GetFloor(pos2.x, pos2.y, pos2.z,&roomNumber);
 
 				RomanStatueAttack(&attackPos, roomNumber, 1);
 
@@ -811,12 +811,12 @@ void RomanStatueControl(short itemNumber)
 				pos1.x = -32;
 				pos1.y = 48;
 				pos1.z = 64;
-				GetJointAbsPosition(item, &pos1, 14);
+				GetJointAbsPosition(item,&pos1, 14);
 				
 				pos2.x = -48;
 				pos2.y = 48;
 				pos2.z = 490;
-				GetJointAbsPosition(item, &pos2, 14);
+				GetJointAbsPosition(item,&pos2, 14);
 				
 				for (i = 0; i < 4; i++)
 				{
@@ -859,14 +859,14 @@ void RomanStatueControl(short itemNumber)
 					{
 						if (deltaFrame == 24)
 						{
-							/*TriggerEnergyArc(&pos1, &pos2, 0, ((GetRandomControl() & 0x3F) + 128),
+							/*TriggerEnergyArc(&pos1,&pos2, 0, ((GetRandomControl() & 0x3F) + 128),
 								(((GetRandomControl() & 0x3F) + 128) / 2), 256, 32, 32, ENERGY_ARC_NO_RANDOMIZE,
 								ENERGY_ARC_STRAIGHT_LINE);*/
 						}
 					}
 					else
 					{
-						/*TriggerEnergyArc(&pos1, &pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
+						/*TriggerEnergyArc(&pos1,&pos2, 0, g, b, 256, 24, 32, ENERGY_ARC_NO_RANDOMIZE,
 							ENERGY_ARC_STRAIGHT_LINE);*/
 
 						/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
@@ -934,7 +934,7 @@ void RomanStatueControl(short itemNumber)
 		pos.x = (GetRandomControl() & 0x1F) - 16;
 		pos.y = 86;
 		pos.z = (GetRandomControl() & 0x1F) - 16;
-		RomanStatueHitEffect(item, &pos, 10);
+		RomanStatueHitEffect(item,&pos, 10);
 	}
 
 	if (item->swapMeshFlags & 0x10)
@@ -943,7 +943,7 @@ void RomanStatueControl(short itemNumber)
 		pos.x = -40;
 		pos.y = (GetRandomControl() & 0x7F) + 148;
 		pos.z = (GetRandomControl() & 0x3F) - 32;
-		RomanStatueHitEffect(item, &pos, 4);
+		RomanStatueHitEffect(item,&pos, 4);
 	}
 
 	if (item->swapMeshFlags & 0x100)
@@ -952,7 +952,7 @@ void RomanStatueControl(short itemNumber)
 		pos.x = (GetRandomControl() & 0x3F) + 54;
 		pos.y = -170;
 		pos.z = (GetRandomControl() & 0x1F) + 27;
-		RomanStatueHitEffect(item, &pos, 8);
+		RomanStatueHitEffect(item,&pos, 8);
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);

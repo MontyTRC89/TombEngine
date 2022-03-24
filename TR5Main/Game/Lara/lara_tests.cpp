@@ -473,7 +473,7 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto angle = item->pos.yRot;
 
-	if (TestHangSwingIn(item, angle))
+	if (TestHangSwingIn(item, coll))
 	{
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
 	}
@@ -543,7 +543,7 @@ bool TestLaraHangJump(ITEM_INFO* item, COLL_INFO* coll)
 
 	auto angle = item->pos.yRot;
 
-	if (TestHangSwingIn(item, angle))
+	if (TestHangSwingIn(item, coll))
 	{
 		if (g_GameFlow->Animations.OscillateHang)
 		{
@@ -1088,35 +1088,18 @@ int TestLaraEdgeCatch(ITEM_INFO* item, COLL_INFO* coll, int* edge)
 	return 1;
 }
 
-bool TestHangSwingIn(ITEM_INFO* item, short angle)
+bool TestHangSwingIn(ITEM_INFO* item, COLL_INFO* coll)
 {
 	LaraInfo*& info = item->data;
-	int x = item->pos.xPos;
+
 	int y = item->pos.yPos;
-	int z = item->pos.zPos;
-	short roomNum = item->roomNumber;
-	FLOOR_INFO* floor;
-	int floorHeight, ceilingHeight;
+	auto probe = GetCollisionResult(item, item->pos.yRot, OFFSET_RADIUS(coll->Setup.Radius), 0);
 
-	z += phd_cos(angle) * CLICK(0.5f);
-	x += phd_sin(angle) * CLICK(0.5f);
-
-	floor = GetFloor(x, y, z, &roomNum);
-	floorHeight = GetFloorHeight(floor, x, y, z);
-	ceilingHeight = GetCeiling(floor, x, y, z);
-
-	if (floorHeight != NO_HEIGHT)
+	if ((probe.Position.Floor - y) > 0 &&
+		(probe.Position.Ceiling - y) < -400 &&
+		probe.Position.Floor != NO_HEIGHT)
 	{
-		if (g_GameFlow->Animations.OscillateHang)
-		{
-			if (floorHeight - y > 0 && ceilingHeight - y < -400)
-				return true;
-		}
-		else
-		{
-			if (floorHeight - y > 0 && ceilingHeight - y < -400 && (y - 819 - ceilingHeight > -72))
-				return true;
-		}
+		return true;
 	}
 
 	return false;
