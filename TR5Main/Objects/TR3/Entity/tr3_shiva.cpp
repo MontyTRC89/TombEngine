@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_shiva.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -402,7 +403,31 @@ void ShivaControl(short itemNum)
 
 	if (lara_alive && LaraItem->hitPoints <= 0)
 	{
-		CreatureKill(item, 18, 6, 2);
+		item->goalAnimState = 6;
+
+		if (LaraItem->roomNumber != item->roomNumber)
+			ItemNewRoom(Lara.itemNumber, item->roomNumber);
+
+		LaraItem->pos.xPos = item->pos.xPos;
+		LaraItem->pos.yPos = item->pos.yPos;
+		LaraItem->pos.zPos = item->pos.zPos;
+		LaraItem->pos.yRot = item->pos.yRot;
+		LaraItem->pos.xRot = 0;
+		LaraItem->pos.zRot = 0;
+		LaraItem->gravityStatus = false;
+
+		LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 9;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+		LaraItem->currentAnimState = LS_DEATH;
+		LaraItem->goalAnimState = LS_DEATH;
+
+		LaraItem->hitPoints = -16384;
+		Lara.air = -1;
+		Lara.gunStatus = LG_HANDS_BUSY;
+		Lara.gunType = WEAPON_NONE;
+
+		Camera.targetDistance = SECTOR(2);
+		Camera.flags = CF_CHASE_OBJECT;
 		return;
 	}
 
