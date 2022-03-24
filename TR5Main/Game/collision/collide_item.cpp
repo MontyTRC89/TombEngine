@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 #include "Game/collision/sphere.h"
@@ -401,6 +402,8 @@ void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 
 bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 {
+	auto* lara = GetLaraInfo(laraItem);
+
 	PHD_3DPOS dest;
 	dest.xRot = item->Position.xRot;
 	dest.yRot = item->Position.yRot;
@@ -426,16 +429,21 @@ bool MoveLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	int height = GetCollision(dest.xPos, dest.yPos, dest.zPos, laraItem->RoomNumber).Position.Floor;
 	if (abs(height - laraItem->Position.yPos) <= CLICK(2))
 	{
-		if (sqrt(pow(dest.xPos - laraItem->Position.xPos, 2) + pow(dest.yPos - laraItem->Position.yPos, 2) + pow(dest.zPos - laraItem->Position.zPos, 2)) < CLICK(0.5f))
+		int x = dest.xPos - laraItem->Position.xPos;
+		int y = dest.yPos - laraItem->Position.yPos;
+		int z = dest.zPos - laraItem->Position.zPos;
+
+		float distance = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+		if (distance < CLICK(0.5f))
 			return true;
 
 		return Move3DPosTo3DPos(&laraItem->Position, &dest, LARA_VELOCITY, ANGLE(2.0f));
 	}
 
-	if (Lara.Control.IsMoving)
+	if (lara->Control.IsMoving)
 	{
-		Lara.Control.IsMoving = false;
-		Lara.Control.HandStatus = HandStatus::Free;
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return false;
@@ -649,11 +657,11 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 		return false;
 }
 
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spazon, char bigpush) // previously ItemPushLara
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
 {
 	// Get item's rotation
-	auto c = phd_cos(item->Position.yRot);
 	auto s = phd_sin(item->Position.yRot);
+	auto c = phd_cos(item->Position.yRot);
 
 	// Get vector from item to Lara
 	int dx = item2->Position.xPos - item->Position.xPos;
@@ -664,7 +672,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	int rz = c * dz + s * dx;
 
 	BOUNDING_BOX* bounds;
-	if (bigpush & 2)
+	if (bigPush & 2)
 		bounds = &GlobalCollisionBounds;
 	else
 		bounds = (BOUNDING_BOX*)GetBestFrame(item);
@@ -674,7 +682,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	int minZ = bounds->Z1;
 	int maxZ = bounds->Z2;
 
-	if (bigpush & 1)
+	if (bigPush & 1)
 	{
 		minX -= coll->Setup.Radius;
 		maxX += coll->Setup.Radius;
@@ -709,7 +717,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 
 	auto* lara = item2->Data.is<LaraInfo*>() ? (LaraInfo*&)item2->Data : nullptr;
 
-	if (lara != nullptr && spazon && bounds->Y2 - bounds->Y1 > CLICK(1))
+	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
 	{
 		rx = (bounds->X1 + bounds->X2) / 2;
 		rz = (bounds->Z1 + bounds->Z2) / 2;

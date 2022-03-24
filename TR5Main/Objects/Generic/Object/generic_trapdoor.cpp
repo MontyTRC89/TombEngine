@@ -21,9 +21,9 @@ OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
 	-256, 256,
 	0, 900,
 	-768, -256,
-	-1820, 1820,
-	-5460, 5460,
-	-1820, 1820
+	-ANGLE(10.0f), ANGLE(10.0f),
+	-ANGLE(30.0f), ANGLE(30.0f),
+	-ANGLE(10.0f), ANGLE(10.0f)
 };
 static PHD_VECTOR CeilingTrapDoorPos = { 0, 1056, -480 };
 
@@ -32,9 +32,9 @@ OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 	-256, 256,
 	0, 0,
 	-1024, -256,
-	-1820, 1820,
-	-5460, 5460,
-	-1820, 1820
+	-ANGLE(10.0f), ANGLE(10.0f),
+	-ANGLE(30.0f), ANGLE(30.0f),
+	-ANGLE(10.0f), ANGLE(10.0f)
 };
 static PHD_VECTOR FloorTrapDoorPos = { 0, 0, -655 };
 
@@ -69,10 +69,10 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionIn
 	laraItem->Position.yRot += ANGLE(180.0f);
 
 	if (TrInput & IN_ACTION &&
-		trapDoorItem->Status != ITEM_ACTIVE &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
 		laraItem->Animation.Airborne &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
+		trapDoorItem->Status != ITEM_ACTIVE &&
 		itemIsAbove &&
 		(result || result2))
 	{
@@ -115,12 +115,12 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if ((TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
-		trapDoorItem->Status != ITEM_ACTIVE ||
-		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		trapDoorItem->Status != ITEM_ACTIVE) ||
+		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
 		if (TestLaraPosition(&FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
@@ -211,7 +211,8 @@ int TrapDoorCeilingBorder(short itemNumber)
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* trapDoorItem = &g_Level.Items[itemNumber];
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
+
 	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
@@ -220,7 +221,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* trapDoorItem = &g_Level.Items[itemNumber];
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
 	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;

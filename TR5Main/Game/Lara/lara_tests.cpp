@@ -165,7 +165,7 @@ bool TestLaraHang(ITEM_INFO* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21) &&
+				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameNumber(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
 					TestLaraClimbIdle(item, coll))
 				{
 					item->Animation.TargetState = LS_LADDER_IDLE;
@@ -2068,7 +2068,6 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = GetFrameNumber(item, 0);
 		item->Animation.TargetState = LS_JUMP_UP;
 		item->Animation.ActiveState = LS_IDLE;
-		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.TurnRate = 0;
 
 		ShiftItem(item, coll);

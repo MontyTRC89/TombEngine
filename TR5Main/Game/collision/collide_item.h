@@ -41,7 +41,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angle
 
 bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius);
 bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* laraItem, CollisionInfo* coll, bool spazon, char bigpush);
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
 bool ItemPushStatic(ITEM_INFO* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
 bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll);
