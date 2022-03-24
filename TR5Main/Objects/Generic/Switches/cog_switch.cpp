@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 
 	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNum];
 		auto* triggerIndex = GetTriggerIndex(switchItem);
 
@@ -70,10 +70,10 @@ namespace TEN::Entities::Switches
 				(TrInput & IN_ACTION &&
 					laraItem->Animation.ActiveState == LS_IDLE &&
 					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-					laraInfo->Control.HandStatus == HandStatus::Free &&
+					lara->Control.HandStatus == HandStatus::Free &&
 					!switchItem->Animation.Airborne ||
-					laraInfo->Control.IsMoving &&
-					laraInfo->InteractedItem == itemNum))
+					lara->Control.IsMoving &&
+					lara->InteractedItem == itemNum))
 			{
 				if (TestLaraPosition(&CogSwitchBounds, switchItem, laraItem))
 				{
@@ -84,9 +84,9 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-						laraInfo->Control.IsMoving = false;
-						laraInfo->Control.HandStatus = HandStatus::Busy;
-						laraInfo->InteractedItem = targetItemNum;
+						lara->Control.IsMoving = false;
+						lara->Control.HandStatus = HandStatus::Busy;
+						lara->InteractedItem = targetItemNum;
 
 						AddActiveItem(itemNum);
 						switchItem->Animation.TargetState = SWITCH_ON;
@@ -102,14 +102,14 @@ namespace TEN::Entities::Switches
 						}
 					}
 					else
-						laraInfo->InteractedItem = itemNum;
+						lara->InteractedItem = itemNum;
 
 					return;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNum)
+				else if (lara->Control.IsMoving && lara->InteractedItem == itemNum)
 				{
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Free;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Free;
 				}
 			}
 

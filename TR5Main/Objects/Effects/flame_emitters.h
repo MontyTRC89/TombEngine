@@ -15,5 +15,5 @@ namespace TEN::Entities::Effects
 	void FlameEmitter2Control(short itemNumber);
 	void FlameEmitter3Control(short itemNumber);
 	void FlameControl(short fxNumber);
-	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
+	void FlameEmitterCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }
