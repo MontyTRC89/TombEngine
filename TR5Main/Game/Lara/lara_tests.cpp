@@ -1186,7 +1186,7 @@ bool TestLaraPose(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
-		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled. TODO: Will she pose with weapons drawn?
+		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled.
 			lara->Flare.Life) &&
 		lara->Vehicle == NO_ITEM)									// Not in a vehicle.
 	{
@@ -1198,8 +1198,8 @@ bool TestLaraPose(ITEM_INFO* item, CollisionInfo* coll)
 
 bool TestLaraKeepLow(ITEM_INFO* item, CollisionInfo* coll)
 {
-	// HACK: coll->Setup.Radius is currently only set to
-	// LARA_RAD_CRAWL in the collision function, then reset by LaraAboveWater().
+	// HACK: coll->Setup.Radius is only set to LARA_RAD_CRAWL
+	// in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
 	int radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
@@ -1886,7 +1886,7 @@ VaultTestResult TestLaraLedgeAutoJump(ITEM_INFO* item, CollisionInfo* coll)
 	VaultTestSetup testSetup
 	{
 		-CLICK(3.5f), -CLICK(7.5f),
-		CLICK(0.1f)/* TODO: Is this enough hand room?*/,-MAX_HEIGHT,
+		CLICK(0.1f)/* TODO: Is this enough hand room?*/, -MAX_HEIGHT,
 		CLICK(0.1f),
 		false
 	};
@@ -1911,7 +1911,7 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, CollisionInfo* coll)
 		!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
 		lara->Control.CanClimbLadder &&							// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
-		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall (tentative).
+		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
 	{
 		return VaultTestResult{ true, probeMiddle.Position.Ceiling, false, true, true };
 	}
@@ -2432,13 +2432,13 @@ bool TestLaraPoleCollision(ITEM_INFO* item, CollisionInfo* coll, bool up, float 
 		int i = 0;
 		while (CollidedItems[i] != NULL)
 		{
-			auto& obj = CollidedItems[i];
+			auto*& object = CollidedItems[i];
 			i++;
 
-			if (obj->ObjectNumber != ID_POLEROPE)
+			if (object->ObjectNumber != ID_POLEROPE)
 				continue;
 
-			auto poleBox = TO_DX_BBOX(obj->Position, GetBoundsAccurate(obj));
+			auto poleBox = TO_DX_BBOX(object->Position, GetBoundsAccurate(object));
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
 
 			//g_Renderer.addDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);

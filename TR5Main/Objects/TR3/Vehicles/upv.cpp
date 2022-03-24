@@ -425,7 +425,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
 	coll->Setup.LowerCeilingBound = UPV_HEIGHT;
-	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
+	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 	coll->Setup.OldPosition.x = UPVItem->Position.xPos;
 	coll->Setup.OldPosition.y = UPVItem->Position.yPos;
 	coll->Setup.OldPosition.z = UPVItem->Position.zPos;
