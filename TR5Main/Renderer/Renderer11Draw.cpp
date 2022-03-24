@@ -43,6 +43,11 @@ namespace TEN::Renderer
 
 	void Renderer11::drawPickup(short objectNum)
 	{
+		// Clear just the Z-buffer so we can start drawing on top of the scene
+		ID3D11DepthStencilView* dsv;
+		m_context->OMGetRenderTargets(1, nullptr, &dsv);
+		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
 		DrawObjectOn2DPosition(700 + PickupX, 450, objectNum, 0, m_pickupRotation, 0, 0.5f); // TODO: + PickupY
 		m_pickupRotation += 45 * 360 / 30;
 	}
@@ -92,11 +97,6 @@ namespace TEN::Renderer
 
 		Vector3 pos = m_viewportToolkit.Unproject(Vector3(x, y, 1), projection, view, Matrix::Identity);
 
-		// Clear just the Z-buffer so we can start drawing on top of the scene
-		ID3D11DepthStencilView* dsv;
-		m_context->OMGetRenderTargets(1, nullptr, &dsv);
-		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 		// Set vertex buffer
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -111,7 +111,7 @@ namespace TEN::Renderer
 		CCameraMatrixBuffer HudCamera;
 		HudCamera.ViewProjection = view * projection;
 		m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 
 		for (int n = 0; n < (*moveableObj).ObjectMeshes.size(); n++)
 		{
@@ -141,15 +141,17 @@ namespace TEN::Renderer
 				m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
 			m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			m_cbItem.updateData(m_stItem, m_context.Get());
-			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 			for (auto& bucket : mesh->buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
 
-				SetBlendMode(bucket.BlendMode);
+				SetBlendMode(BLENDMODE_OPAQUE);
+				SetCullMode(CULL_MODE_CCW);
+				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
 				            SAMPLER_ANISOTROPIC_CLAMP);
@@ -2010,7 +2012,7 @@ namespace TEN::Renderer
 		CalculateFrameRate();
 	}
 
-	void Renderer11::DrawDebugInfo()
+	void Renderer11::DrawDebugInfo(RenderView& view)
 	{
 		if (CurrentLevel != 0)
 		{
@@ -2037,6 +2039,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", numRoomsTransparentPolygons);
+				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
@@ -2592,6 +2595,9 @@ namespace TEN::Renderer
 		UpdateItemsAnimations(view);
 		UpdateEffects(view);
 
+		m_stAlphaTest.AlphaTest = -1;
+		m_stAlphaTest.AlphaThreshold = -1;
+
 		// Prepare the shadow map
 		if (g_Configuration.EnableShadows)
 			RenderShadowMap(view);
@@ -2719,7 +2725,7 @@ namespace TEN::Renderer
 
 		DoFadingAndCinematicBars(target, depthTarget, view);
 
-		DrawDebugInfo();
+		DrawDebugInfo(view);
 		DrawAllStrings();
 		ClearScene();
 	}
