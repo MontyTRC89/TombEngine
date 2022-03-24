@@ -50,10 +50,12 @@ namespace TEN::Entities::Generic
 		spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE;
 
 		spark->rotAng = GetRandomControl() & 0xFFF;
+
 		if (GetRandomControl() & 1)
 			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
 		else
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+
 		spark->gravity = -16 - (GetRandomControl() & 0x1F);
 		spark->nodeNumber = node;
 		spark->maxYvel = -16 - (GetRandomControl() & 7);
@@ -222,13 +224,12 @@ namespace TEN::Entities::Generic
 		{
 			item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
 			item->Animation.Velocity += (5 - item->Animation.Velocity) / 2;
+
 			if (item->ItemFlags[3] != 0)
 				item->ItemFlags[3] = 0;
 		}
 		else
-		{
 			item->Animation.VerticalVelocity += 6;
-		}
 
 		item->Position.yPos += item->Animation.VerticalVelocity;
 
@@ -244,16 +245,18 @@ namespace TEN::Entities::Generic
 					ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
 			}
 			else
-			{
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
-			}
+			
 			item->Animation.Velocity >>= 1;
 		}
+
 		if (item->ItemFlags[3])
 		{
 			TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
+			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
+
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 		}
 	}
@@ -290,8 +293,7 @@ namespace TEN::Entities::Generic
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* torchItem = &g_Level.Items[itemNumber];
 
-		if (
-			!(TrInput & IN_ACTION) ||
+		if (!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraItem->Animation.Airborne ||

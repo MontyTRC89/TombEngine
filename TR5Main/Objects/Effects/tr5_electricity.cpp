@@ -63,6 +63,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 		spark->zVel = (GetRandomControl() & 0x1F) - 0x0F;
 		spark->y = (GetRandomControl() & 0x3F) - 0x1F;
 	}
+
 	spark->friction = 51;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -85,10 +86,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 {
-	PHD_VECTOR pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
+	PHD_VECTOR pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);
 
 	SPARKS* spark = &Sparks[GetFreeSpark()];
@@ -123,9 +121,9 @@ void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 
 static bool ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta)
 {
-	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1]
-	&&  pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3]
-	&&  pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
+	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
+		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
+		pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
 	{
 		return true;
 	}
@@ -135,7 +133,7 @@ static bool ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta)
 
 void ElectricityWiresControl(short itemNumber)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
 
@@ -146,7 +144,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	GetCollidedObjects(item, SECTOR(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
 
-	auto obj = &Objects[item->ObjectNumber];
+	auto* object = &Objects[item->ObjectNumber];
 
 	auto cableBox = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
@@ -154,7 +152,7 @@ void ElectricityWiresControl(short itemNumber)
 	int currentEndNode = 0;
 	int flashingNode = GlobalCounter % 3;
 
-	for (int i = 0; i < obj->nmeshes; i++)
+	for (int i = 0; i < object->nmeshes; i++)
 	{
 		auto pos = PHD_VECTOR(0, 0, CLICK(1));
 		GetJointAbsPosition(item, &pos, i);
@@ -185,8 +183,8 @@ void ElectricityWiresControl(short itemNumber)
 	int k = 0;
 	while (CollidedItems[k] != nullptr)
 	{
-		auto collItem = CollidedItems[k];
-		auto collObj = &Objects[collItem->ObjectNumber];
+		auto* collItem = CollidedItems[k];
+		auto* collObj = &Objects[collItem->ObjectNumber];
 
 		k++;
 
@@ -196,7 +194,7 @@ void ElectricityWiresControl(short itemNumber)
 		bool isWaterNearby = false;
 		auto npcBox = TO_DX_BBOX(collItem->Position, GetBoundsAccurate(collItem));
 
-		for (int i = 0; i < obj->nmeshes; i++)
+		for (int i = 0; i < object->nmeshes; i++)
 		{
 			auto pos = PHD_VECTOR(0, 0, CLICK(1));
 			GetJointAbsPosition(item, &pos, i);
@@ -232,7 +230,7 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				if (collItem->Data.is<LaraInfo*>())
 				{
-					auto lara = (LaraInfo*&)collItem->Data;
+					auto* lara = (LaraInfo*&)collItem->Data;
 					lara->BurnBlue = 1;
 					lara->BurnCount = 48;
 

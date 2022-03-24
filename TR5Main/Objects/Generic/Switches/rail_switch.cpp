@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 
 	void RailSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		int flag = 0;
@@ -45,9 +45,9 @@ namespace TEN::Entities::Switches
 		if ((!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraInfo->Control.HandStatus != HandStatus::Free) &&
-			(!laraInfo->Control.IsMoving ||
-				laraInfo->InteractedItem != itemNumber))
+			lara->Control.HandStatus != HandStatus::Free) &&
+			(!lara->Control.IsMoving ||
+				lara->InteractedItem != itemNumber))
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
@@ -65,12 +65,12 @@ namespace TEN::Entities::Switches
 						flag = 1;
 					}
 					else
-						laraInfo->InteractedItem = itemNumber;
+						lara->InteractedItem = itemNumber;
 				}
-				else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				else if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
 				{
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Free;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Free;
 				}
 
 				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
@@ -82,8 +82,8 @@ namespace TEN::Entities::Switches
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;
 					laraItem->Animation.ActiveState = LS_LEVERSWITCH_PUSH;
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Busy;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Busy;
 					switchItem->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNumber);
@@ -105,8 +105,8 @@ namespace TEN::Entities::Switches
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;
 					laraItem->Animation.ActiveState = LS_LEVERSWITCH_PUSH;
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Busy;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Busy;
 					switchItem->Animation.TargetState = SWITCH_ON;
 					switchItem->Status = ITEM_ACTIVE;
 
@@ -114,14 +114,14 @@ namespace TEN::Entities::Switches
 					AnimateItem(switchItem);
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					lara->InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving)
+			else if (lara->Control.IsMoving)
 			{
-				if (laraInfo->InteractedItem == itemNumber)
+				if (lara->InteractedItem == itemNumber)
 				{
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Free;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Free;
 				}
 			}
 
