@@ -384,9 +384,13 @@ namespace TEN::Renderer
 
 	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold)
 	{
-		m_stAlphaTest.AlphaTest = static_cast<int>(mode);
-		m_stAlphaTest.AlphaThreshold = threshold;
-		m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
-		BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
+		if (m_stAlphaTest.AlphaTest != static_cast<int>(mode) ||
+			m_stAlphaTest.AlphaThreshold != threshold)
+		{
+			m_stAlphaTest.AlphaTest = static_cast<int>(mode);
+			m_stAlphaTest.AlphaThreshold = threshold;
+			m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
+			BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
+		}
 	}
 }
