@@ -181,11 +181,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case WEAPON_FLARE:
 		case WEAPON_TORCH:
 			// Left arm
-			LaraItem->animNumber = Lara.leftArm.animNumber;
-			LaraItem->frameNumber = Lara.leftArm.frameNumber;
+			ITEM_INFO tempItem;
+			tempItem.animNumber = Lara.leftArm.animNumber;
+			tempItem.frameNumber = Lara.leftArm.frameNumber;
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			frac = GetFrame(LaraItem, framePtr, &rate);
+			frac = GetFrame(&tempItem, framePtr, &rate);
 			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
 			// Right arm

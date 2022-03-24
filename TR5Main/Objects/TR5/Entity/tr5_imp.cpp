@@ -62,7 +62,7 @@ static void ImpThrowStones(ITEM_INFO* item)
 	pos1.x = 0;
 	pos1.y = 0;
 	pos1.z = 0;
-	GetJointAbsPosition(item, &pos1, 9);
+	GetJointAbsPosition(item,&pos1, 9);
 
 	PHD_VECTOR pos2;
 	pos2.x = 0;
@@ -135,7 +135,7 @@ void ImpControl(short itemNumber)
 			}
 
 			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			CreatureAIInfo(item,&info);
 			
 			if (creature->enemy == LaraItem)
 			{
@@ -162,11 +162,11 @@ void ImpControl(short itemNumber)
 
 			info.xAngle = phd_atan(d2, d1);
 
-			GetCreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item,&info, VIOLENT);
 			if (item->currentAnimState == STATE_IMP_SCARED)
 				creature->mood = ESCAPE_MOOD;
 
-			CreatureMood(item, &info, VIOLENT);
+			CreatureMood(item,&info, VIOLENT);
 
 			angle = CreatureTurn(item, creature->maximumTurn);
 			joint1 = info.angle / 2;
@@ -247,7 +247,7 @@ void ImpControl(short itemNumber)
 				{
 					LaraItem->hitPoints -= 3;
 					LaraItem->hitStatus = true;
-					CreatureEffect2(item, &ImpBite, 10, item->pos.yRot, DoBloodSplat);
+					CreatureEffect2(item,&ImpBite, 10, item->pos.yRot, DoBloodSplat);
 				}
 				break;
 
