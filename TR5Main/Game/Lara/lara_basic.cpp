@@ -285,13 +285,6 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 		SetLaraRunJumpQueue(item, coll);
 	}
 
-	if (TrInput & IN_SPRINT && lara->SprintEnergy &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
-	{
-		item->Animation.TargetState = LS_SPRINT;
-		return;
-	}
-
 	if ((TrInput & (IN_ROLL | IN_FORWARD & IN_BACK)) && !lara->Control.RunJumpQueued &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -319,6 +312,8 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_WADE_FORWARD;
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_WALK_FORWARD;
+		else if (TrInput & IN_SPRINT && lara->SprintEnergy)
+			item->Animation.TargetState = LS_SPRINT;
 		else [[likely]]
 			item->Animation.TargetState = LS_RUN_FORWARD;
 
@@ -527,8 +522,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (TrInput & IN_SPRINT ||
-			lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
+		if (TrInput & IN_SPRINT || lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
 			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
 			(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
@@ -541,8 +535,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		if (TrInput & IN_SPRINT ||
-			lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
+		if (TrInput & IN_SPRINT || lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
 			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
 			(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
 		{
@@ -2314,9 +2307,9 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 		else if (lara->Control.WaterStatus == WaterStatus::Wade)
-			item->Animation.TargetState = LS_RUN_FORWARD;	// TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
+			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
-			item->Animation.TargetState = LS_WALK_FORWARD;
+			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Direct dispatch to walk?
 		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) [[likely]]
 			item->Animation.TargetState = LS_SPRINT;
 		else
@@ -2449,25 +2442,6 @@ void lara_col_sprint_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (item->Animation.Velocity < 0)
 		lara->Control.MoveAngle = item->Position.yRot; // ???
-
-	if (coll->Middle.Floor <= 0 && item->Animation.VerticalVelocity > 0)
-	{
-		DoLaraFallDamage(item);
-
-		if (item->HitPoints <= 0) // TODO: It seems Core wanted to make the sprint dive a true jump.
-			item->Animation.TargetState = LS_DEATH;
-		else if (!(TrInput & IN_FORWARD) || TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade)
-			item->Animation.TargetState = LS_IDLE;
-		else
-			item->Animation.TargetState = LS_RUN_FORWARD;
-
-		item->Animation.Airborne = false;
-		item->Animation.VerticalVelocity = 0;
-		item->Position.yPos += coll->Middle.Floor;
-		item->Animation.Velocity = 0;
-
-		AnimateLara(item);
-	}
 
 	ShiftItem(item, coll);
 
