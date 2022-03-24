@@ -146,14 +146,15 @@ void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
 		item->Position.yRot = targetAngle;
 }
 
+// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
+// Nobody panic. I have ideas. @Sezz 2022.03.24
 void EaseOutLaraHeight(ITEM_INFO* item, int height)
 {
 	if (height == NO_HEIGHT)
 		return;
 
 	// Translate Lara to new height.
-	// TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
-	constexpr int rate = 50;
+	static constexpr int rate = 50;
 	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
 	
@@ -545,7 +546,7 @@ void SetLaraRunJumpQueue(ITEM_INFO* item, CollisionInfo* coll)
 	auto probe = GetCollision(item, item->Position.yRot, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height is permissive far ahead
+			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
 			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
