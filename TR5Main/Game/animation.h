@@ -71,7 +71,7 @@ struct BONE_MUTATOR
 void AnimateLara(ITEM_INFO* item);
 void AnimateItem(ITEM_INFO* item);
 
-bool HasChange(ITEM_INFO* item, int targetState = -1);
+bool HasStateDispatch(ITEM_INFO* item, int targetState = -1);
 bool TestLastFrame(ITEM_INFO* item, int animNumber = -1);
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z);

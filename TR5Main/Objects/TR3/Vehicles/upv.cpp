@@ -733,7 +733,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			GetLaraJointPosition(&vec, LM_HIPS);
 
 			laraItem->Position.xPos = vec.x;
-			//laraItem->pos.yPos += -heightFromWater + 1; // Doesn't work as intended.
+			//laraItem->Position.yPos += -heightFromWater + 1; // Doesn't work as intended.
 			laraItem->Position.yPos = vec.y;
 			laraItem->Position.zPos = vec.z;
 

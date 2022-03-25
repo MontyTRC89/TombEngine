@@ -523,6 +523,13 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
@@ -591,6 +598,13 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
