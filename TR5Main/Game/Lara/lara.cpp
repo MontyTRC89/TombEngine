@@ -734,6 +734,9 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// TODO: temp
+	g_Renderer.PrintDebugMessage("Lara CollisionType: %d", coll->CollisionType);
+
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.OldPosition.x = item->Position.xPos;

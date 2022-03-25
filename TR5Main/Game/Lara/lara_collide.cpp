@@ -77,24 +77,33 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (coll->CollisionType == CT_TOP || coll->Middle.Ceiling >= 0)
+	switch (coll->CollisionType)
 	{
+	case CT_LEFT:
+		item->Position.yRot += ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		break;
+
+	case CT_RIGHT:
+		item->Position.yRot -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		break;
+
+	case CT_TOP:
+	case CT_TOP_FRONT:
 		if (item->Animation.VerticalVelocity <= 0)
 			item->Animation.VerticalVelocity = 1;
-	}
-	else if (coll->CollisionType == CT_LEFT)
-		item->Position.yRot += ANGLE(DEFLECT_STRAIGHT_ANGLE);
-	else if (coll->CollisionType == CT_RIGHT)
-		item->Position.yRot -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
-	else if (coll->CollisionType == CT_CLAMP)
-	{
-		item->Position.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
+
+		break;
+
+	case CT_CLAMP:
 		item->Position.zPos -= 400 * phd_cos(coll->Setup.ForwardAngle);
+		item->Position.xPos -= 400 * phd_sin(coll->Setup.ForwardAngle);
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
 		if (item->Animation.VerticalVelocity <= 0)
 			item->Animation.VerticalVelocity = 16;
+
+		break;
 	}
 
 	return false;
