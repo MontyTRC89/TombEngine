@@ -981,7 +981,6 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.VerticalVelocity = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
-
 	return true;
 }
 
@@ -1005,21 +1004,21 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, CollisionInfo* coll) // NEW functio
 	if (!TestLaraClimbIdle(item, coll))
 		return false;
 
-	short rot = item->Position.yRot;
+	short facing = item->Position.yRot;
 
-	if (rot >= -ANGLE(35.0f) && rot <= ANGLE(35.0f))
-		rot = 0;
-	else if (rot >= ANGLE(55.0f) && rot <= ANGLE(125.0f))
-		rot = ANGLE(90.0f);
-	else if (rot >= ANGLE(145.0f) || rot <= -ANGLE(145.0f))
-		rot = ANGLE(180.0f);
-	else if (rot >= -ANGLE(125.0f) && rot <= -ANGLE(55.0f))
-		rot = -ANGLE(90.0f);
+	if (facing >= -ANGLE(35.0f) && facing <= ANGLE(35.0f))
+		facing = 0;
+	else if (facing >= ANGLE(55.0f) && facing <= ANGLE(125.0f))
+		facing = ANGLE(90.0f);
+	else if (facing >= ANGLE(145.0f) || facing <= -ANGLE(145.0f))
+		facing = ANGLE(180.0f);
+	else if (facing >= -ANGLE(125.0f) && facing <= -ANGLE(55.0f))
+		facing = -ANGLE(90.0f);
 
-	if (rot & 0x3FFF)
+	if (facing & 0x3FFF)
 		return false;
 
-	switch ((unsigned short)rot / ANGLE(90.0f))
+	switch ((unsigned short)facing / ANGLE(90.0f))
 	{
 	case NORTH:
 		item->Position.zPos = (item->Position.zPos | (SECTOR(1) - 1)) - LARA_RAD - 1;
@@ -1042,9 +1041,9 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, CollisionInfo* coll) // NEW functio
 	item->Animation.TargetState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
-	item->Position.yRot = rot;
-	item->Position.yPos -= 10;//otherwise she falls back into the water
+	item->Position.yPos -= 10; // Otherwise she falls back into the water.
 	item->Position.xRot = 0;
+	item->Position.yRot = facing;
 	item->Position.zRot = 0;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
@@ -1059,9 +1058,8 @@ void TestLaraWaterDepth(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	short roomNum = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNum);
-	int waterDepth = GetWaterDepth(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNum);
+	auto probe = GetCollision(item);
+	int waterDepth = GetWaterDepth(item->Position.xPos, item->Position.yPos, item->Position.zPos, probe.RoomNumber);
 
 	if (waterDepth == NO_HEIGHT)
 	{
@@ -1076,12 +1074,12 @@ void TestLaraWaterDepth(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		item->Animation.TargetState = LS_IDLE;
-		item->Position.zRot = 0;
+		item->Position.yPos = probe.Position.Floor;
 		item->Position.xRot = 0;
+		item->Position.zRot = 0;
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
 		item->Animation.Airborne = false;
-		item->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
