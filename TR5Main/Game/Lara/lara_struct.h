@@ -1254,10 +1254,10 @@ struct LaraInfo
 	FX_INFO* SpasmEffect;	// Not saved.
 	unsigned int SpasmEffectCount;
 
+	short InteractedItem;
 	int ProjectedFloorHeight;
 	short TargetFacingAngle;
 	int WaterSurfaceDist;
-	short InteractedItem;
 	PHD_3DPOS NextCornerPos;
 
 	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
