@@ -383,18 +383,18 @@ bool TestLaraHangJumpUp(ITEM_INFO* item, CollisionInfo* coll)
 int TestLaraEdgeCatch(ITEM_INFO* item, CollisionInfo* coll, int* edge)
 {
 	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-	int hdif = coll->Front.Floor - bounds->Y1;
+	int heightDif = coll->Front.Floor - bounds->Y1;
 
-	if (hdif < 0 == hdif + item->Animation.VerticalVelocity < 0)
+	if (heightDif < 0 == heightDif + item->Animation.VerticalVelocity < 0)
 	{
-		hdif = item->Position.yPos + bounds->Y1;
+		heightDif = item->Position.yPos + bounds->Y1;
 
-		if ((hdif + item->Animation.VerticalVelocity & 0xFFFFFF00) != (hdif & 0xFFFFFF00))
+		if ((heightDif + item->Animation.VerticalVelocity & 0xFFFFFF00) != (heightDif & 0xFFFFFF00))
 		{
 			if (item->Animation.VerticalVelocity > 0)
-				*edge = (hdif + item->Animation.VerticalVelocity) & 0xFFFFFF00;
+				*edge = (heightDif + item->Animation.VerticalVelocity) & 0xFFFFFF00;
 			else
-				*edge = hdif & 0xFFFFFF00;
+				*edge = heightDif & 0xFFFFFF00;
 
 			return -1;
 		}
@@ -453,7 +453,7 @@ bool TestLaraHangOnClimbableWall(ITEM_INFO* item, CollisionInfo* coll)
 		return false;
 
 	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
-	// Until climb wall tests are fully refactored, we need to recalculate COLL_INFO.
+	// Until climb wall tests are fully refactored, we need to recalculate CollisionInfo.
 
 	auto coll2 = *coll;
 	coll2.Setup.Mode = CollisionProbeMode::Quadrants;
@@ -1979,7 +1979,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_1_STEP_CROUCH;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -1988,7 +1988,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -1998,7 +1998,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2007,7 +2007,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2017,7 +2017,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 			g_GameFlow->Animations.HasCrawlExtended)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2026,7 +2026,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_AUTO_JUMP;
-			vaultResult.Success = HasChange(item, vaultResult.TargetState);
+			vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 			return vaultResult;
 		}
 	}
@@ -2040,7 +2040,7 @@ VaultTestResult TestLaraVault(ITEM_INFO* item, CollisionInfo* coll)
 		g_GameFlow->Animations.HasMonkeyAutoJump)
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
-		vaultResult.Success = HasChange(item, vaultResult.TargetState);
+		vaultResult.Success = HasStateDispatch(item, vaultResult.TargetState);
 		return vaultResult;
 	}
 	
@@ -2218,7 +2218,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 		else [[likely]]
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
-		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2231,7 +2231,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 		else [[likely]]
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
-		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2240,7 +2240,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_UP;
-		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2249,7 +2249,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ITEM_INFO* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		crawlVaultResult.Success = HasChange(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
