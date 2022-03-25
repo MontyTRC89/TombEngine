@@ -270,7 +270,7 @@ void DoLaraTightropeBalance(ITEM_INFO* item)
 	{
 		lara->Control.Tightrope.Balance -= factor;
 		if (lara->Control.Tightrope.Balance <= -ANGLE(45.0f))
-			lara->Control.Tightrope.Balance = ANGLE(45.0f);
+			lara->Control.Tightrope.Balance = -ANGLE(45.0f);
 
 	}
 	else if (lara->Control.Tightrope.Balance > 0)

@@ -309,7 +309,6 @@ enum LaraAnim
 	LA_JUMP_UP_START = 91,									// Prepare standing jump > jump up
 	LA_LAND_TO_RUN = 92,									// Jump forward > land running
 	LA_FALL_BACK = 93,										// Light fall back
-																// TODO: remove? This is a duplicate of 35, only without the RUN_FORWARD state change.
 	LA_JUMP_FORWARD_TO_REACH_3 = 94,						// Jump forward > reach, 3rd opportunity
 	LA_REACH = 95,											// Reach (looped)
 	LA_REACH_TO_HANG = 96,									// Reach > hang
@@ -794,8 +793,9 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 	
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 102
+	// 99, 102
 	// 265, 266, 268, 273, 274, 278, 280,
+	// 343, 345,
 	// 364, 366, 368, 370,
 };
 #pragma endregion
