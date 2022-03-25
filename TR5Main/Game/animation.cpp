@@ -372,8 +372,7 @@ void AnimateItem(ITEM_INFO* item)
 	g_Renderer.updateItemAnimations(itemNumber, true);
 }
 
-// Checks whether targetState can be dispatched from the current frame.
-bool HasChange(ITEM_INFO* item, int targetState)
+bool HasStateDispatch(ITEM_INFO* item, int targetState)
 {
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
@@ -386,13 +385,13 @@ bool HasChange(ITEM_INFO* item, int targetState)
 	// Iterate over possible state dispatches.
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
-		auto* change = &g_Level.Changes[anim->changeIndex + i];
-		if (change->TargetState == targetState)
+		auto* dispatch = &g_Level.Changes[anim->changeIndex + i];
+		if (dispatch->TargetState == targetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < change->numberRanges; j++)
+			for (int j = 0; j < dispatch->numberRanges; j++)
 			{
-				auto* range = &g_Level.Ranges[change->rangeIndex + j];
+				auto* range = &g_Level.Ranges[dispatch->rangeIndex + j];
 				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
 					return true;
 			}
@@ -416,8 +415,8 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	float c = phd_cos(item->Position.yRot);
 	float s = phd_sin(item->Position.yRot);
+	float c = phd_cos(item->Position.yRot);
 
 	item->Position.xPos += roundf(c * x + s * z);
 	item->Position.yPos += y;
@@ -426,7 +425,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 
 void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
 {
-	auto index = Objects[item->ObjectNumber].animIndex + animIndex;
+	int index = Objects[item->ObjectNumber].animIndex + animIndex;
 
 	if (index < 0 || index >= g_Level.Anims.size())
 	{
@@ -454,13 +453,13 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	// Iterate over possible state dispatches.
 	for (int i = 0; i < anim->numberChanges; i++)
 	{
-		auto* change = &g_Level.Changes[anim->changeIndex + i];
-		if (change->TargetState == item->Animation.TargetState)
+		auto* dispatch = &g_Level.Changes[anim->changeIndex + i];
+		if (dispatch->TargetState == item->Animation.TargetState)
 		{
 			// Iterate over frame range of state dispatch.
-			for (int j = 0; j < change->numberRanges; j++)
+			for (int j = 0; j < dispatch->numberRanges; j++)
 			{
-				auto* range = &g_Level.Ranges[change->rangeIndex + j];
+				auto* range = &g_Level.Ranges[dispatch->rangeIndex + j];
 				if (item->Animation.FrameNumber >= range->startFrame && item->Animation.FrameNumber <= range->endFrame)
 				{
 					item->Animation.AnimNumber = range->linkAnimNum;
@@ -490,7 +489,6 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)
 		InterpolatedBounds.Y2 = framePtr[0]->boundingBox.Y2 + (framePtr[1]->boundingBox.Y2 - framePtr[0]->boundingBox.Y2) * frac / rate;
 		InterpolatedBounds.Z1 = framePtr[0]->boundingBox.Z1 + (framePtr[1]->boundingBox.Z1 - framePtr[0]->boundingBox.Z1) * frac / rate;
 		InterpolatedBounds.Z2 = framePtr[0]->boundingBox.Z2 + (framePtr[1]->boundingBox.Z2 - framePtr[0]->boundingBox.Z2) * frac / rate;
-
 		return &InterpolatedBounds;
 	}
 }
@@ -564,7 +562,7 @@ int GetNextAnimState(ITEM_INFO* item)
 
 int GetNextAnimState(int objectID, int animNumber)
 {
-	auto nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
+	int nextAnim = g_Level.Anims[Objects[objectID].animIndex + animNumber].jumpAnimNum;
 	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].ActiveState;
 }
 
