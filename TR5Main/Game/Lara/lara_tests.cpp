@@ -1237,12 +1237,14 @@ bool TestLaraLand(ITEM_INFO* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Position.yPos;
 
-	if (item->Animation.Airborne && item->Animation.VerticalVelocity >= 0 &&
-		(heightFromFloor <= item->Animation.VerticalVelocity || TestEnvironment(ENV_FLAG_SWAMP, item)))
+	if (item->Animation.Airborne &&
+		item->Animation.VerticalVelocity >= 0 &&
+		(heightFromFloor <= item->Animation.VerticalVelocity ||
+			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
 		return true;
 	}
-
+	
 	return false;
 }
 
