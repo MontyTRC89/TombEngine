@@ -434,14 +434,14 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT)
 	{
 		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
+		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
+		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
 	}
 
 	if (TestLaraLand(item, coll))

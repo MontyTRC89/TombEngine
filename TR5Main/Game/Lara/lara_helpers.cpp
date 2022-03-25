@@ -220,15 +220,20 @@ void DoLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll)
 	EaseOutLaraHeight(item, coll->Middle.Ceiling);
 }
 
-// TODO: Doesn't always work on bridges.
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.ForwardAngle = item->Position.yRot + ANGLE(180.0f);
 	GetCollisionInfo(coll, item);
+
 	SnapItemToLedge(item, coll);
-	MoveItem(item, item->Position.yRot, -LARA_RAD_CRAWL);
-	item->Position.yRot += ANGLE(180.0f);
 	LaraResetGravityStatus(item, coll);
+
+	// Bridges behave differently.
+	if (coll->Middle.Bridge < 0)
+	{
+		MoveItem(item, item->Position.yRot, -LARA_RAD_CRAWL);
+		item->Position.yRot += ANGLE(180.0f);
+	}
 }
 
 void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate)
