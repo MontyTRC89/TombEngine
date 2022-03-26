@@ -27,7 +27,7 @@ void InitialiseDoberman(short itemNum)
         item->Animation.ActiveState = 6;
         item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
     }
-    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 }
 
 void DobermanControl(short itemNumber)
@@ -217,7 +217,7 @@ void DobermanControl(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[ID_DOG].animIndex + 13;
 			item->Animation.ActiveState = 10;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 
 		CreatureTilt(item, tilt);

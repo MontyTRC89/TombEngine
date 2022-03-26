@@ -43,7 +43,7 @@ void InitialiseHydra(short itemNumber)
 	ClearItem(itemNumber);
 	
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = 30 * item->TriggerFlags + g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = HYDRA_STATE_STOP;
 	item->Animation.ActiveState = HYDRA_STATE_STOP;
 
@@ -314,7 +314,7 @@ void HydraControl(short itemNumber)
 
 			if (!(GlobalCounter & 3))
 			{
-				frame = ((g_Level.Anims[item->Animation.AnimNumber].frameBase - item->Animation.FrameNumber) / 8) + 1;
+				frame = ((g_Level.Anims[item->Animation.AnimNumber].FrameBase - item->Animation.FrameNumber) / 8) + 1;
 				if (frame > 16)
 					frame = 16;
 
@@ -324,7 +324,7 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 3:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				pos1 = { 0, 1024, 40 };
 				GetJointAbsPosition(item, &pos1, 10);
@@ -389,10 +389,10 @@ void HydraControl(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 15;
 			item->Animation.ActiveState = HYDRA_STATE_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 
-		if (!((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) & 7))
+		if (!((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) & 7))
 		{
 			if (item->ItemFlags[3] < 12)
 			{

@@ -257,11 +257,11 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 						{
 							if (item->ObjectNumber == ID_ANIMATING2)
 							{
-								if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+								if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase &&
 									(laraItem->Animation.ActiveState == CART_STATE_SWIPE &&
 										laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 6))
 								{
-									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 									if (frame >= 12 && frame <= 22)
 									{
 										SoundEffect(220, &item->Position, 2);
@@ -680,7 +680,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 
 	case CART_STATE_DISMOUNT_LEFT:
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 1 &&
-			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].FrameEnd)
 		{
 			PHD_VECTOR pos = { 0, 640, 0 };
 			GetLaraJointPosition(&pos, LM_HIPS);
@@ -702,7 +702,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 
 	case CART_STATE_DISMOUNT_RIGHT:
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 47 &&
-			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].FrameEnd)
 		{
 			PHD_VECTOR pos = { 0, 640, 0 };
 			GetLaraJointPosition(&pos, LM_HIPS);
@@ -787,7 +787,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		AnimateItem(laraItem);
 
 		minecartItem->Animation.AnimNumber = Objects[ID_MINECART].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
-		minecartItem->Animation.FrameNumber = g_Level.Anims[minecartItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		minecartItem->Animation.FrameNumber = g_Level.Anims[minecartItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 	}
 	if (laraItem->Animation.ActiveState != CART_TURN_DEATH &&
 		laraItem->Animation.ActiveState != CART_WALL_DEATH &&
@@ -797,7 +797,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			minecartItem->Position.zRot < -TERMINAL_ANGLE)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = CART_TURN_DEATH;
 			minecartItem->Animation.Velocity = 0;
 			minecart->Flags = (minecart->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_STOPPED | CART_FLAG_DEAD;
@@ -809,7 +809,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		if (floorHeight < -CLICK(2))
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 23;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = CART_WALL_DEATH;
 			laraItem->HitPoints = -1;
 			minecartItem->Animation.Velocity = 0;
@@ -828,7 +828,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			if (coll.HitStatic)
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = CART_STATE_HIT;
 				DoLotsOfBlood(laraItem->Position.xPos, laraItem->Position.yPos - CLICK(3), laraItem->Position.zPos, minecartItem->Animation.Velocity, minecartItem->Position.yRot, laraItem->RoomNumber, 3);
 
@@ -879,7 +879,7 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		else
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_MOUNT_LEFT;
 
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		laraItem->Animation.TargetState = CART_STATE_MOUNT;
 		laraItem->Animation.ActiveState = CART_STATE_MOUNT;
 

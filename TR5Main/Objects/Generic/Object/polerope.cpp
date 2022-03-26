@@ -50,7 +50,7 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Animation.AnimNumber = LA_STAND_TO_POLE;
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
@@ -89,14 +89,14 @@ namespace TEN::Entities::Generic
 						PolePosR.y = laraItem->Position.yPos - poleItem->Position.yPos + 10;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_REACH_TO_POLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 					}
 					else
 					{
 						PolePosR.y = laraItem->Position.yPos - poleItem->Position.yPos + 66;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_JUMP_UP_TO_POLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 					}
 
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;

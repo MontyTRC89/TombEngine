@@ -60,10 +60,10 @@ struct EntityAnimationData
 	int RequiredState; // TODO: Phase out this weird feature.
 
 	bool Airborne;
-	int Velocity;
-	int VerticalVelocity;
-	int LateralVelocity;
-	std::vector<BONE_MUTATOR> Mutator;
+	float Velocity;
+	float VerticalVelocity;
+	float LateralVelocity;
+	std::vector<BoneMutator> Mutator;
 };
 
 struct ITEM_INFO

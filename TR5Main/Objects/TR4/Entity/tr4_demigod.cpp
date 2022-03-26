@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 
 		if (animIndex == 8)
 		{
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
@@ -168,7 +168,7 @@ namespace TEN::Entities::TR4
 		else if (animIndex == 19)
 		{
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				PHD_VECTOR pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
@@ -196,7 +196,7 @@ namespace TEN::Entities::TR4
 		else if (animIndex == 16)
 		{
 			// Animation 16 (State 10) is the big circle attack of DEMIGOD_3
-			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
@@ -290,7 +290,7 @@ namespace TEN::Entities::TR4
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 		item->Animation.TargetState = STATE_DEMIGOD_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = STATE_DEMIGOD_IDLE;
 
 		/*if (g_Level.NumItems > 0)
@@ -347,13 +347,13 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
 					item->Animation.ActiveState = STATE_DEMIGOD_DEATH_2;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				}
 				else
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
 					item->Animation.ActiveState = STATE_DEMIGOD_DEATH_1;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				}
 			}
 		}
@@ -666,7 +666,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_HAMMER_ATTACK:
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 26)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 26)
 				{
 					PHD_VECTOR pos = { 80, -8, -40 };
 					GetJointAbsPosition(item, &pos, 17);
@@ -690,7 +690,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.TargetState = 3;
 						LaraItem->Animation.ActiveState = 3;
 						LaraItem->Animation.AnimNumber = 34;
-						LaraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						LaraItem->HitStatus = true;
 						LaraItem->Animation.Velocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;

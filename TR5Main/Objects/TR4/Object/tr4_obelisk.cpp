@@ -18,7 +18,7 @@ void InitialiseObelisk(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 	AddActiveItem(itemNumber);
 	item->Status = ITEM_ACTIVE;
@@ -173,7 +173,7 @@ void ObeliskControl(short itemNumber)
 			if (TrInput & IN_ACTION)
 			{
 				item->Animation.AnimNumber = obj->animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			}
 			else
 				flag = true;
@@ -186,20 +186,20 @@ void ObeliskControl(short itemNumber)
 			if (!(TrInput & IN_ACTION))
 			{
 				item->Animation.AnimNumber = obj->animIndex + 3;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				flag = false;
 			}
 			else
 			{
 				item->Animation.AnimNumber = obj->animIndex + 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			}
 		}
 
 		if (flag)
 		{
 			item->Animation.AnimNumber = obj->animIndex + 3;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 
 		if (item->TriggerFlags == 2)

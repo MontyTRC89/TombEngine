@@ -220,7 +220,7 @@ void WreckingBallControl(short itemNumber)
 		{
 			item->Animation.TargetState = 1;
 		}
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 		{
 			SoundEffect(SFX_TR5_BASECLAWDROP, &item->Position, 0);
 			++item->ItemFlags[1];
@@ -240,7 +240,7 @@ void WreckingBallControl(short itemNumber)
 			if (item->Animation.VerticalVelocity > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 8;
 			}
 			else
 			{
@@ -265,7 +265,7 @@ void WreckingBallControl(short itemNumber)
 			if (item->Animation.VerticalVelocity < -32)
 			{
 				SoundEffect(SFX_TR5_BASECLAWTOPIMPACT, &item->Position, 4104);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 8;
 				BounceCamera(item, 16, 8192);
 			}
 			else

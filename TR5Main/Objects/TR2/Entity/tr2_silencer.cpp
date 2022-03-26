@@ -43,7 +43,7 @@ void SilencerControl(short itemNumber)
 		if (item->Animation.ActiveState != 12 && item->Animation.ActiveState != 13)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 13;
 		}
 	}

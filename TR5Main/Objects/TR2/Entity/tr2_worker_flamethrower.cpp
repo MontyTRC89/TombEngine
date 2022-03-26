@@ -56,7 +56,7 @@ void InitialiseWorkerFlamethrower(short itemNumber)
 	ClearItem(itemNumber);
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.FrameNumber = anim->FrameBase;
 	item->Animation.ActiveState = anim->ActiveState;
 }
 
@@ -87,7 +87,7 @@ void WorkerFlamethrower(short itemNumber)
 		if (item->Animation.ActiveState != 7)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 7;
 		}
 	}

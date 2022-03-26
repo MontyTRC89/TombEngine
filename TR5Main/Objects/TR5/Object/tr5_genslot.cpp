@@ -14,7 +14,7 @@ void GenSlot1Control(short itemNumber)
 
 	if (TriggerActive(item) && !item->TriggerFlags)
 	{
-		int df = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		int df = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 		if (df == 10 || df == 11)
 		{

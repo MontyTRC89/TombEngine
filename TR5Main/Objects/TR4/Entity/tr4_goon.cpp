@@ -235,7 +235,7 @@ namespace TEN::Entities::TR4
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_IDLE;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_IDLE;
 			item->Animation.ActiveState = GOON_STATE_IDLE;
 			return;
@@ -245,7 +245,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 1)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_JUMP_RIGHT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_JUMP_RIGHT;
 			item->Animation.ActiveState = GOON_STATE_JUMP_RIGHT;
 			return;
@@ -255,7 +255,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 2)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_ROLL_LEFT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_ROLL_LEFT;
 			item->Animation.ActiveState = GOON_STATE_ROLL_LEFT;
 			return;
@@ -265,7 +265,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 3)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_CROUCH;
 			item->Animation.ActiveState = GOON_STATE_CROUCH;
 			return;
@@ -275,7 +275,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 4)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_4_STEPS;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
 			item->Position.xPos += phd_sin(item->Position.yRot) * CLICK(4);
@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 		if (ocb > 100)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = GOON_STATE_CROUCH;
 			item->Animation.ActiveState = GOON_STATE_CROUCH;
 			item->Position.xPos += phd_sin(item->Position.yRot) * CLICK(4);
@@ -296,7 +296,7 @@ namespace TEN::Entities::TR4
 			return;
 		}
 	
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	}
 
 	void GoonControl(short itemNumber)
@@ -466,14 +466,14 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_MONKEY_IDLE:
 			case GOON_STATE_MONKEY_FORWARD:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_MONKEY_TO_FREEFALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity = 0;
 				break;
 
 			default:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
 
@@ -681,7 +681,7 @@ namespace TEN::Entities::TR4
 					currentCreature->MaxTurn = 0;
 					currentCreature->LOT.IsJumping = true;
 					item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_JUMP_FORWARD;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = GOON_STATE_JUMP_FORWARD_1_BLOCK;
 
 					if (!canJump2Sectors)
@@ -854,7 +854,7 @@ namespace TEN::Entities::TR4
 					joint3 = AI.angle;
 				
 				if (objectNumber == ID_GOON2 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_RUN_TO_SOMERSAULT &&
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Position.yPos) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
@@ -906,7 +906,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.ActiveState != GOON_STATE_SWORD_HIT_FRONT ||
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_NO_DAMAGE_MAX)
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
@@ -923,8 +923,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x1C000)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MIN &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MAX)
 						{
 							CreatureEffect2(
 								item,
@@ -941,7 +941,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1)
 					currentCreature->Flags = 0;
 
 				break;
@@ -1027,7 +1027,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.ActiveState = LS_JUMP_UP;
 						LaraItem->Animation.TargetState = LS_JUMP_UP;
 						LaraItem->Animation.AnimNumber = LA_JUMP_UP;
-						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.FrameNumber].frameBase + 9;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.FrameNumber].FrameBase + 9;
 						LaraItem->Animation.Airborne = true;
 						LaraItem->Animation.VerticalVelocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;
@@ -1078,7 +1078,7 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_CROUCH_PICKUP:
 				ClampRotation(&item->Position, AI.angle, ANGLE(11.0f));
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_CROUCH_PICKUP)
 					break;
 
 				if (!currentCreature->Enemy)
@@ -1153,8 +1153,8 @@ namespace TEN::Entities::TR4
 				}
 				ClampRotation(&item->Position, AI.angle, ANGLE(7.0f));
 
-				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MAX ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MIN)
+				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_FIRE_MAX ||
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_FIRE_MIN)
 				{
 					break;
 				}
@@ -1171,25 +1171,25 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_HOLSTER_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_HOLSTER_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_HOLSTER_GUN)
 					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_EMPTY;
 
 				break;
 
 			case GOON_STATE_DRAW_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_DRAW_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_DRAW_GUN)
 					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_GUN;
 
 				break;
 
 			case GOON_STATE_HOLSTER_SWORD:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_HOLSTER_SWORD)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_HOLSTER_SWORD)
 					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_EMPTY;
 				
 				break;
 
 			case GOON_STATE_DRAW_SWORD:
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_DRAW_SWORD)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_DRAW_SWORD)
 					break;
 
 				if (item->ObjectNumber == ID_GOON1)
@@ -1228,7 +1228,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SOMERSAULT_START_TAKE_OFF)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_GOON_SOMERSAULT_START_TAKE_OFF)
 					break;
 
 				currentCreature->LOT.IsJumping = true;
@@ -1268,14 +1268,14 @@ namespace TEN::Entities::TR4
 			{
 			case 2:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_2_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_CLIMB_2_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_CLIMB_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
@@ -1283,20 +1283,20 @@ namespace TEN::Entities::TR4
 			case 4:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_4_STEPS;
 				item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_JUMP_OFF_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_JUMP_OFF_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_JUMP_OFF_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GOON_STATE_JUMP_OFF_4_STEPS;
 				creature->MaxTurn = 0;
 				break;
@@ -1308,7 +1308,7 @@ namespace TEN::Entities::TR4
 		else
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_BLIND;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + (GetRandomControl() & 7);
 			item->Animation.ActiveState = GOON_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}

@@ -37,7 +37,7 @@ void InitialiseSmallScorpion(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = SSCORPION_STATE_IDLE;
 	item->Animation.ActiveState = SSCORPION_STATE_IDLE;
 }
@@ -66,7 +66,7 @@ void SmallScorpionControl(short itemNumber)
 			item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 		{
 			item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
 		}
 	}
@@ -148,8 +148,8 @@ void SmallScorpionControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x1B00100)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32)
 					{
 						Lara.PoisonPotency += 2;
 						LaraItem->HitPoints -= 20;

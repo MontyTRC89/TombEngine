@@ -543,11 +543,11 @@ void TonyControl(short itemNumber)
 		if (item->Animation.ActiveState != 6)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 6;
 		}
 
-		if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) > 110)
+		if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) > 110)
 		{
 			item->MeshBits = 0;
 			if (!BossData.DroppedIcon)
@@ -603,7 +603,7 @@ void TonyControl(short itemNumber)
 				break;
 
 			case TONY_STATE_RISE:
-				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) > 16)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) > 16)
 					creature->MaxTurn = TONY_TURN;
 				else
 					creature->MaxTurn = 0;
@@ -650,7 +650,7 @@ void TonyControl(short itemNumber)
 				torsoX = AI.xAngle;
 				torsoY = AI.angle;
 
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 40)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 40)
 				{
 					TriggerFireBall(item, T_ROCKZAPPL, NULL, item->RoomNumber, 0, 0);
 					TriggerFireBall(item, T_ROCKZAPPR, NULL, item->RoomNumber, 0, 0);
@@ -663,7 +663,7 @@ void TonyControl(short itemNumber)
 				torsoX = AI.xAngle;
 				torsoY = AI.angle;
 
-				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) == 28)
 					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Position.yRot, 0);
 
 				break;
@@ -671,7 +671,7 @@ void TonyControl(short itemNumber)
 			case TONY_STATE_BIGBOOM:
 				creature->MaxTurn = 0;
 
-				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 56)
+				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) == 56)
 				{
 					item->ItemFlags[3] = 2;
 					BossData.DrawExplode = true;
@@ -688,10 +688,10 @@ void TonyControl(short itemNumber)
 		item->Animation.ActiveState == TONY_STATE_ZAPP ||
 		item->Animation.ActiveState == TONY_STATE_BIGBOOM)
 	{
-		int bright = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		int bright = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		if (bright > 16)
 		{
-			bright = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
+			bright = g_Level.Anims[item->Animation.AnimNumber].FrameEnd - item->Animation.FrameNumber;
 			if (bright > 16)
 				bright = 16;
 		}

@@ -68,7 +68,7 @@ void InitialiseCivvy(short itemNumber)
 	InitialiseCreature(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_STOP_ANIM;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.ActiveState = item->Animation.TargetState = CIVVY_STOP;
 }
 
@@ -97,7 +97,7 @@ void CivvyControl(short itemNumber)
 		if (item->Animation.ActiveState != CIVVY_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_DIE_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CIVVY_DEATH;
 			creature->LOT.Step = CLICK(1);
 		}
@@ -394,28 +394,28 @@ void CivvyControl(short itemNumber)
 		case 2:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB1_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CIVVY_CLIMB1;
 			break;
 
 		case 3:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB2_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CIVVY_CLIMB2;
 			break;
 
 		case 4:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_CLIMB3_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CIVVY_CLIMB3;
 			break;
 
 		case -4:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CIVVY_FALL3_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CIVVY_FALL3;
 			break;
 		}

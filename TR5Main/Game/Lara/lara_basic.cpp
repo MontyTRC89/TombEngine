@@ -69,7 +69,7 @@ void lara_as_controlled(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
+	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 

@@ -703,7 +703,7 @@ namespace TEN::Entities::Effects
 				}
 
 				l->Animation.ActiveState = LS_MISC_CONTROL;
-				l->Animation.FrameNumber = g_Level.Anims[l->Animation.AnimNumber].frameBase;
+				l->Animation.FrameNumber = g_Level.Anims[l->Animation.AnimNumber].FrameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
 				Lara.InteractedItem = itemNumber;
@@ -718,7 +718,7 @@ namespace TEN::Entities::Effects
 		{
 			if (l->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && l->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (l->Animation.FrameNumber - g_Level.Anims[l->Animation.AnimNumber].frameBase == 40)
+				if (l->Animation.FrameNumber - g_Level.Anims[l->Animation.AnimNumber].FrameBase == 40)
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 

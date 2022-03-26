@@ -31,15 +31,18 @@ struct RANGE_STRUCT
 
 struct ANIM_STRUCT
 {
-	int framePtr;
-	int interpolation;
+	int FramePtr;
+	int Interpolation;
 	int ActiveState;
-	int velocity;
-	int acceleration;
-	int Xvelocity;
-	int Xacceleration;
-	int frameBase;
-	int frameEnd;
+
+	float VelocityStart;
+	float VelocityEnd;
+	float LateralVelocityStart;
+	float LateralVelocityEnd;
+
+	int FrameBase;
+	int FrameEnd;
+
 	int jumpAnimNum;
 	int jumpFrameNum;
 	int numberChanges;
@@ -59,7 +62,7 @@ enum ANIMCOMMAND_TYPES
 	COMMAND_EFFECT
 };
 
-struct BONE_MUTATOR
+struct BoneMutator
 {
 	Vector3 Scale    = Vector3::One;
 	Vector3 Offset   = Vector3::Zero;

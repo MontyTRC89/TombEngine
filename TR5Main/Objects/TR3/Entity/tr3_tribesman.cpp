@@ -72,7 +72,7 @@ void TribemanAxeControl(short itemNumber)
 			else
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 9;
 		}
 	}
@@ -245,7 +245,7 @@ void TribemanAxeControl(short itemNumber)
 		case 12:
 			item->ItemFlags[0] = 1;
 			creature->MaxTurn = ANGLE(4.0f);
-			creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			if (creature->Enemy == LaraItem)
 			{
@@ -364,7 +364,7 @@ void TribemanDartsControl(short itemNumber)
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 21;
 			else
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 20;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			item->Animation.ActiveState = 9;
 		}
@@ -550,7 +550,7 @@ void TribemanDartsControl(short itemNumber)
 			else
 				item->Position.yRot += ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15)
 			{
 				TribesmanShotDart(item);
 				item->Animation.TargetState = 1;

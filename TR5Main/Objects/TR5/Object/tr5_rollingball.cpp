@@ -25,7 +25,7 @@ void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* 
 			if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.VerticalVelocity))
 			{
 				laraItem->Animation.AnimNumber = LA_BOULDER_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 				laraItem->Animation.TargetState = LS_DEATH;
 				laraItem->Animation.ActiveState = LS_DEATH;
 				laraItem->Animation.Airborne = false;
@@ -71,7 +71,7 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->Animation.Velocity) <= CLICK(2) || (GetRandomControl() & 0x1F))
 				item->Animation.VerticalVelocity = 0;
 			else
-				item->Animation.VerticalVelocity = -(short)(GetRandomControl() % (item->Animation.Velocity / 8));
+				item->Animation.VerticalVelocity = -(short)(GetRandomControl() % ((int)item->Animation.Velocity / 8));
 		}
 		else
 			item->Animation.VerticalVelocity = -(short)(item->Animation.VerticalVelocity / 4);
@@ -316,7 +316,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 				lara->Position.zRot = 0;	
 
 				lara->Animation.AnimNumber = LA_BOULDER_DEATH;
-				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].frameBase;
+				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].FrameBase;
 				lara->Animation.ActiveState = LS_BOULDER_DEATH;
 				lara->Animation.TargetState = LS_BOULDER_DEATH;
 						
@@ -450,7 +450,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState; 
 			item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 			item->Animation.RequiredState = 0;

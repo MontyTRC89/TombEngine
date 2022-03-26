@@ -62,7 +62,7 @@ void InitialiseImp(short itemNumber)
 
 	item->Animation.TargetState = state;
 	item->Animation.ActiveState = state;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 }
 
 static void ImpThrowStones(ITEM_INFO* item)
@@ -260,7 +260,7 @@ void ImpControl(short itemNumber)
 			case IMP_STATE_THROW_STONES:
 				creature->MaxTurn = -1;
 
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 40)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 40)
 					ImpThrowStones(item);
 
 				break;
@@ -277,7 +277,7 @@ void ImpControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[ID_IMP].animIndex + IMP_ANIM_DEATH;
 				item->Animation.ActiveState = IMP_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			}
 		}
 

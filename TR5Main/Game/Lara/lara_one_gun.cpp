@@ -109,7 +109,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -174,7 +174,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		else if (weaponType == LaraWeaponType::Shotgun && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 12 &&
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -183,7 +183,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 0)
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 0)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
@@ -250,8 +250,8 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(item);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
-	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
@@ -345,7 +345,7 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = WEAPON_STATE_DRAW;
 		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
@@ -361,7 +361,7 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (item->Animation.ActiveState != 0 && item->Animation.ActiveState != 6)
 	{
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == Weapons[(int)weaponType].DrawFrame)
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == Weapons[(int)weaponType].DrawFrame)
 			DrawShotgunMeshes(laraItem, weaponType);
 		else if (lara->Control.WaterStatus == WaterStatus::Underwater)
 			item->Animation.TargetState = 6;
@@ -369,8 +369,8 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	else
 		ReadyShotgun(laraItem, weaponType);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
-	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
@@ -394,13 +394,13 @@ void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->RightArm.FrameNumber = 0;
 		lara->LeftArm.FrameNumber = 0;
 	}
-	else if (item->Animation.ActiveState == 3 && item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 21)
+	else if (item->Animation.ActiveState == 3 && item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 21)
 		UndrawShotgunMeshes(laraItem, weaponType);
 
-	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
-	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
-	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber;
 }
@@ -814,16 +814,16 @@ void GrenadeControl(short itemNumber)
 	{
 		aboveWater = false;
 		someFlag = false;
-		item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) >> 1;
-		item->Animation.Velocity -= item->Animation.Velocity >> 2;
+		item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
+		item->Animation.Velocity -= item->Animation.Velocity / 4;
 
 		if (item->Animation.Velocity)
 		{
-			item->Position.zRot += (((item->Animation.Velocity >> 4) + 3) * ANGLE(1.0f));
+			item->Position.zRot += (((item->Animation.Velocity / 16) + 3) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Position.yRot += (((item->Animation.Velocity >> 2) + 3) * ANGLE(1.0f));
+				item->Position.yRot += (((item->Animation.Velocity / 4) + 3) * ANGLE(1.0f));
 			else
-				item->Position.xRot += (((item->Animation.Velocity >> 2) + 3) * ANGLE(1.0f));
+				item->Position.xRot += (((item->Animation.Velocity / 4) + 3) * ANGLE(1.0f));
 		}
 	}
 	else
@@ -834,11 +834,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Position.zRot += (((item->Animation.Velocity >> 2) + 7) * ANGLE(1.0f));
+			item->Position.zRot += (((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f));
 			if (item->Animation.RequiredState)
-				item->Position.yRot += (((item->Animation.Velocity >> 1) + 7) * ANGLE(1.0f));
+				item->Position.yRot += (((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f));
 			else
-				item->Position.xRot += (((item->Animation.Velocity >> 1) + 7) * ANGLE(1.0f));
+				item->Position.xRot += (((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f));
 		}
 	}
 
@@ -1496,7 +1496,7 @@ void CrossbowBoltControl(short itemNumber)
 		PHD_VECTOR bubblePos = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
 
 		if (item->Animation.Velocity > 64)
-			item->Animation.Velocity -= (item->Animation.Velocity >> 4);
+			item->Animation.Velocity -= (item->Animation.Velocity / 16);
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);

@@ -92,28 +92,28 @@ namespace TEN::Entities::TR4
 			item->Animation.TargetState = 0;
 			item->Animation.ActiveState = 0;
 			item->Animation.AnimNumber = obj->animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 1:
 			item->Animation.TargetState = STATE_SKELETON_JUMP_RIGHT;
 			item->Animation.ActiveState = STATE_SKELETON_JUMP_RIGHT;
 			item->Animation.AnimNumber = obj->animIndex + 37;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 2:
 			item->Animation.TargetState = STATE_SKELETON_JUMP_LEFT;
 			item->Animation.ActiveState = STATE_SKELETON_JUMP_LEFT;
 			item->Animation.AnimNumber = obj->animIndex + 34;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 3:
 			item->Animation.TargetState = STATE_SKELETON_JUMP_LIE_DOWN;
 			item->Animation.ActiveState = STATE_SKELETON_JUMP_LIE_DOWN;
 			item->Animation.AnimNumber = obj->animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			//item->status = ITEM_DEACTIVATED;
 			break;
 
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR4
 				item->Position.yRot += info.angle;
 			}
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			creature->LOT.IsJumping = true;
 			item->HitPoints = 25;
 		}
@@ -362,7 +362,7 @@ namespace TEN::Entities::TR4
 					{
 						creature->MaxTurn = 0;
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 40;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.ActiveState = STATE_SKELETON_JUMP_LEFT;
 						if (!canJump2sectors)
 						{
@@ -378,14 +378,14 @@ namespace TEN::Entities::TR4
 					else if (jumpLeft)
 					{
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 34;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.TargetState = STATE_SKELETON_JUMP_LEFT;
 						item->Animation.ActiveState = STATE_SKELETON_JUMP_LEFT;
 					}
 					else if (jumpRight)
 					{
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 37;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.TargetState = STATE_SKELETON_JUMP_RIGHT;
 						item->Animation.ActiveState = STATE_SKELETON_JUMP_RIGHT;
 					}
@@ -546,7 +546,7 @@ namespace TEN::Entities::TR4
 						creature->MaxTurn = 0;
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
 						item->Animation.ActiveState = 23;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						creature->LOT.IsJumping = false;
 						item->Animation.Airborne = true;
 					}
@@ -630,7 +630,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Position.yRot += info.angle;
 				}
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15)
 				{
 					ROOM_INFO* room = &g_Level.Rooms[item->RoomNumber];
 					PHD_VECTOR pos;
@@ -706,7 +706,7 @@ namespace TEN::Entities::TR4
 					{
 						creature->MaxTurn = 0;
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.ActiveState = 23;
 						creature->LOT.IsJumping = false;
 						item->Animation.Airborne = true;
@@ -736,7 +736,7 @@ namespace TEN::Entities::TR4
 			case STATE_SKELETON_HURT_BY_SHOTGUN2:
 				if ((item->Animation.ActiveState == STATE_SKELETON_HURT_BY_SHOTGUN1 
 					|| item->Animation.ActiveState == STATE_SKELETON_HURT_BY_SHOTGUN2) &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
 				{
 					item->HitPoints = 25;
 					creature->MaxTurn = 0;
@@ -764,7 +764,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = 0;
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 47;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = 24;
 					item->Animation.Airborne = true;
 				}
@@ -778,7 +778,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_SKELETON_UNDER_FLOOR:
-				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase < 32)
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase < 32)
 				{
 					TriggerRiseEffect(item);
 				}

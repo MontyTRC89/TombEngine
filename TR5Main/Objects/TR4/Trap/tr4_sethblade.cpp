@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 		item->Animation.TargetState = 2;
 		item->Animation.ActiveState = 2;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->ItemFlags[2] = abs(item->TriggerFlags);
 	}
 
@@ -44,7 +44,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 				if (frameNumber >= 0 && frameNumber <= 6)
 				{

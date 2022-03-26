@@ -48,7 +48,7 @@ void RaptorControl(short itemNumber)
 			else
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 5;
 		}
 	}
