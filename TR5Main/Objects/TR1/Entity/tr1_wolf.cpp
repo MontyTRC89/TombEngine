@@ -79,7 +79,7 @@ void WolfControl(short itemNumber)
 		if (item->Animation.ActiveState != WOLF_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = WOLF_STATE_DEATH;
 		}
 	}

@@ -723,7 +723,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 			distance = 1024;
 		}
 
-		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 		{
 			Camera.targetDistance = distance;
 			Camera.targetElevation = int(3072 * frac);
@@ -777,7 +777,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 
 		Camera.flags = 1;
 
-		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 		{
 			
 			Camera.targetAngle = (short)(-16384 * frac);

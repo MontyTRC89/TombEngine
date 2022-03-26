@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 					if (item->Position.yPos >= LaraItem->Position.yPos && height < 50)
 					{
 						LaraItem->Animation.AnimNumber = LA_SPIKE_DEATH;
-						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 						LaraItem->Animation.ActiveState = LS_DEATH;
 						LaraItem->Animation.TargetState = LS_DEATH;
 						LaraItem->Animation.Airborne = false;

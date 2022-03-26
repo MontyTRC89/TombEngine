@@ -85,7 +85,7 @@ namespace TEN::Renderer
 
 		if (obj->animIndex != -1)
 		{
-			ANIM_FRAME* frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
+			ANIM_FRAME* frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].FramePtr]};
 			UpdateAnimation(NULL, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
 		}
 
@@ -2112,7 +2112,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
+				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %f %f %f", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
 				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
 				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);

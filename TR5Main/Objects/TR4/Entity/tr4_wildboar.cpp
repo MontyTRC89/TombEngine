@@ -20,7 +20,7 @@ void InitialiseWildBoar(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
 }
@@ -167,7 +167,7 @@ void WildBoarControl(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
 			item->Animation.ActiveState = 5;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 	}
 

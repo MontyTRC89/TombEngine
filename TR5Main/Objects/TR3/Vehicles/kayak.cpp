@@ -736,11 +736,11 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		laraItem->Animation.ActiveState != KAYAK_STATE_IDLE_DEATH)
 	{
 		laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_IDLE_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_IDLE_DEATH;
 	}
 
-	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 
 	switch (laraItem->Animation.ActiveState)
 	{
@@ -1188,7 +1188,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 	laraItem->Animation.ActiveState = 12; // TODO
 	laraItem->Animation.TargetState = 12;
 	laraItem->HitPoints = 0;
@@ -1231,7 +1231,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		else if (mountType == KayakMountType::Left)
 			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_LEFT;
 
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
 		laraItem->Position.xPos = kayakItem->Position.xPos;
 		laraItem->Position.yPos = kayakItem->Position.yPos;
@@ -1317,7 +1317,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 		AnimateItem(laraItem);
 
 		kayakItem->Animation.AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
-		kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 		Camera.targetDistance = CLICK(8);

@@ -657,7 +657,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
 	laraItem->Animation.ActiveState = 0;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 
 	if (laraItem->RoomNumber != item->RoomNumber)
@@ -715,7 +715,7 @@ void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
 			laraItem->Animation.TargetState = RBOAT_STATE_DEATH;
 			laraItem->Animation.ActiveState = RBOAT_STATE_DEATH;
 			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE_DEATH;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		}
 	}
 	else if (rBoatItem->Position.yPos < (rBoat->Water - CLICK(0.5f)) &&
@@ -726,7 +726,7 @@ void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
 			laraItem->Animation.TargetState = RBOAT_STATE_FALL;
 			laraItem->Animation.ActiveState = RBOAT_STATE_FALL;
 			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_LEAP_START;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		}
 	}
 	else if (collide)
@@ -736,7 +736,7 @@ void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
 			laraItem->Animation.TargetState = RBOAT_STATE_HIT;
 			laraItem->Animation.ActiveState = RBOAT_STATE_HIT;
 			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		}
 	}
 	else
@@ -862,7 +862,7 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	if ((laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_RIGHT || laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT) &&
-		laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
+		laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].FrameEnd)
 	{
 		if (laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT)
 			laraItem->Position.yRot -= ANGLE(90.0f);
@@ -872,7 +872,7 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		laraItem->Animation.TargetState = LS_JUMP_FORWARD;
 		laraItem->Animation.ActiveState = LS_JUMP_FORWARD;
 		laraItem->Animation.AnimNumber = LA_JUMP_FORWARD;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		laraItem->Animation.Velocity = 20;
 		laraItem->Animation.VerticalVelocity = -40;
 		laraItem->Animation.Airborne = true;
@@ -896,7 +896,7 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		laraItem->Position.yPos = y;
 
 		rBoatItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT].animIndex;
-		rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].frameBase;
+		rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].FrameBase;
 	}
 }
 
@@ -1014,7 +1014,7 @@ void RubberBoatControl(short itemNumber)
 		if (laraItem->HitPoints > 0)
 		{
 			rBoatItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex);
-			rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 		}
 
 		Camera.targetElevation = -ANGLE(20);

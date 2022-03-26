@@ -53,7 +53,7 @@ void InitialiseCyborg(short itemNumber)
     ClearItem(itemNumber);
 
     item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
     item->Animation.TargetState = CYBORG_STATE_IDLE;
     item->Animation.ActiveState = CYBORG_STATE_IDLE;
 }
@@ -209,7 +209,7 @@ void CyborgControl(short itemNumber)
 						item->Animation.ActiveState = CYBORG_STATE_DEATH;
 						item->Animation.AnimNumber = object->animIndex + 69;
 						item->HitPoints = 0;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						DropEntityPickups(item);
 					}
 
@@ -253,7 +253,7 @@ void CyborgControl(short itemNumber)
 				{
 					item->Animation.ActiveState = CYBORG_STATE_GASSED;
 					item->Animation.AnimNumber = object->animIndex + 68;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				}
 			}
 
@@ -322,7 +322,7 @@ void CyborgControl(short itemNumber)
 								creature->MaxTurn = 0;
 								item->Animation.AnimNumber = object->animIndex + 22;
 								item->Animation.ActiveState = CYBORG_STATE_JUMP;
-								item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+								item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 								if (canJump2blocks)
 									item->Animation.TargetState = CYBORG_STATE_JUMP_2_BLOCKS;
@@ -374,7 +374,7 @@ void CyborgControl(short itemNumber)
 					{
 						item->Animation.AnimNumber = object->animIndex + 22;
 						item->Animation.ActiveState = CYBORG_STATE_JUMP;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						creature->MaxTurn = 0;
 
 						if (canJump2blocks)
@@ -416,7 +416,7 @@ void CyborgControl(short itemNumber)
 				{
 					item->Animation.AnimNumber = object->animIndex + 22;
 					item->Animation.ActiveState = CYBORG_STATE_JUMP;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					creature->MaxTurn = 0;
 
 					if (canJump2blocks)
@@ -517,9 +517,9 @@ void CyborgControl(short itemNumber)
 				else
 					item->Position.yRot += AI.angle;
 
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
-					((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 6 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 16 &&
+					((byte)item->Animation.FrameNumber - (byte)g_Level.Anims[item->Animation.AnimNumber].FrameBase) & 1)
 				{
 					creature->FiredWeapon = 1;
 					ShotLara(item, &AI, &CyborgGunBite, joint0, 12);
@@ -604,42 +604,42 @@ void CyborgControl(short itemNumber)
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 35;
 				item->Animation.ActiveState = 25;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			case 1:
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 41;
 				item->Animation.ActiveState = 24;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			case 2:
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 42;
 				item->Animation.ActiveState = 23;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			case 6:
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 29;
 				item->Animation.ActiveState = 19;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			case 7:
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 28;
 				item->Animation.ActiveState = 18;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			case 8:
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = object->animIndex + 27;
 				item->Animation.ActiveState = 17;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				break;
 
 			default:

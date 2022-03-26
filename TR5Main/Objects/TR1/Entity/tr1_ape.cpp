@@ -127,7 +127,7 @@ void ApeVault(short itemNumber, short angle)
 	case 2:
 		item->Position.yPos = y;
 		item->Animation.AnimNumber = Objects[ID_APE].animIndex + APE_ANIM_VAULT;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = APE_STATE_VAULT;
 		break;
 
@@ -152,7 +152,7 @@ void ApeControl(short itemNumber)
 		if (item->Animation.ActiveState != APE_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + APE_ANIM_DEATH + (short)(GetRandomControl() / 0x4000);
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = APE_STATE_DEATH;
 		}
 	}

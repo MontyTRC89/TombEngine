@@ -389,10 +389,10 @@ int TestLaraEdgeCatch(ITEM_INFO* item, CollisionInfo* coll, int* edge)
 	{
 		heightDif = item->Position.yPos + bounds->Y1;
 
-		if ((heightDif + item->Animation.VerticalVelocity & 0xFFFFFF00) != (heightDif & 0xFFFFFF00))
+		if ((heightDif + (int)item->Animation.VerticalVelocity & 0xFFFFFF00) != (heightDif & 0xFFFFFF00))
 		{
 			if (item->Animation.VerticalVelocity > 0)
-				*edge = (heightDif + item->Animation.VerticalVelocity) & 0xFFFFFF00;
+				*edge = (int)(heightDif + item->Animation.VerticalVelocity) & 0xFFFFFF00;
 			else
 				*edge = heightDif & 0xFFFFFF00;
 

@@ -15,7 +15,7 @@ void InitialiseJeanYves(short itemNumber)
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
 	item->Animation.AnimNumber = objectInfo->animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 }
 
 void JeanYvesControl(short itemNumber)
@@ -45,7 +45,7 @@ void JeanYvesControl(short itemNumber)
 
 		item->Animation.TargetState = item->Animation.ActiveState = state;
 		item->Animation.AnimNumber = animNumber;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->TriggerFlags = Lara.HighestLocation;
 
 		AnimateItem(item);

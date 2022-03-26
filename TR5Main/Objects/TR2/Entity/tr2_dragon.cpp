@@ -177,7 +177,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			int angle = laraItem->Position.yRot - item->Position.yRot;
 
 			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				TrInput & IN_ACTION &&
@@ -191,7 +191,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 				laraItem->Animation.ActiveState = 0;
 				laraItem->Animation.TargetState = 7;
 
@@ -259,7 +259,7 @@ void DragonControl(short backItemNumber)
 		if (item->Animation.ActiveState != DRAGON_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_DRAGON_FRONT].animIndex + 21;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = DRAGON_STATE_DEATH;
 			item->Animation.TargetState = DRAGON_STATE_DEATH;
 			creature->Flags = 0;
@@ -457,7 +457,7 @@ void DragonControl(short backItemNumber)
 
 	back->Animation.ActiveState = item->Animation.ActiveState;
 	back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-	back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+	back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].FrameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase);
 	back->Position.xPos = item->Position.xPos;
 	back->Position.yPos = item->Position.yPos;
 	back->Position.zPos = item->Position.zPos;

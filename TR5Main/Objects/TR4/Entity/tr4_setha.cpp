@@ -24,7 +24,7 @@ void InitialiseSetha(short itemNumber)
 	ClearItem(itemNumber);
 	
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = 12;
 	item->Animation.ActiveState = 12;
 }
@@ -223,7 +223,7 @@ void SethaControl(short itemNumber)
 			if (canJump)
 			{
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 15
-					&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+					&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 				{
 					creature->ReachedGoal = true;
 					creature->MaxTurn = 0;
@@ -274,7 +274,7 @@ void SethaControl(short itemNumber)
 
 		case 7:
 			if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 
-				&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 			{
 				if (GetRandomControl() & 1)
 				{
@@ -307,8 +307,8 @@ void SethaControl(short itemNumber)
 			{
 				if (item->TouchBits)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 
-						&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 
+						&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
 					{
 						LaraItem->HitPoints -= 250;
 						LaraItem->HitStatus = true;
@@ -441,7 +441,7 @@ void SethaControl(short itemNumber)
 					item->Animation.TargetState = 16;
 					item->Animation.ActiveState = 16;
 				}
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			}
 		}
 	}

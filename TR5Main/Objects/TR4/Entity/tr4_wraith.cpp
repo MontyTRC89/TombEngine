@@ -266,7 +266,7 @@ namespace TEN::Entities::TR4
 					target->HitPoints = 0;
 
 					if (target->TriggerFlags > 0)
-						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
+						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].FrameBase;
 
 					KillItem(itemNumber);
 				}

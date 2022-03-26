@@ -453,13 +453,13 @@ void GameScriptItemInfo::SetAnimNumber(int animNumber)
 
 int GameScriptItemInfo::GetFrameNumber() const
 {
-	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].FrameBase;
 }
 
 void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
+	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].FrameBase;
+	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].FrameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = (frameNumber < frameCount);
 	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";

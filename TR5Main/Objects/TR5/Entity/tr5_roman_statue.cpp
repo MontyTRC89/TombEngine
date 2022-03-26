@@ -287,7 +287,7 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_START_JUMP_DOWN;
 	item->Animation.TargetState = 13;
 	item->Animation.ActiveState = 13;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Status = ITEM_NOT_ACTIVE;
 	item->Position.xPos += 486 * phd_sin(item->Position.yRot + ANGLE(90.0f));
 	item->Position.zPos += 486 * phd_cos(item->Position.yRot + ANGLE(90.0f));
@@ -343,7 +343,7 @@ void RomanStatueControl(short itemNumber)
 		item->Animation.TargetState = STATUE_STATE_HIT;
 		item->Animation.ActiveState = STATUE_STATE_HIT;
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_HIT;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	}
 
 	if (item->HitPoints > 0)
@@ -444,7 +444,7 @@ void RomanStatueControl(short itemNumber)
 
 			pos = { (pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2};
 
-			deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			if (deltaFrame > 68 && deltaFrame < 130)
 			{
@@ -570,7 +570,7 @@ void RomanStatueControl(short itemNumber)
 			else
 				item->Position.yRot += AI.angle;
 
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10)
 			{
 				pos = { 0, 0, 0 };
 				GetJointAbsPosition(item, &pos, 16);
@@ -621,7 +621,7 @@ void RomanStatueControl(short itemNumber)
 
 					pos1.y = item->Position.yPos - 64;
 					
-					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
+					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 34 && item->Animation.ActiveState == 3)
 					{
 						if (item->ItemFlags[0])
 							item->ItemFlags[0]--;
@@ -632,8 +632,8 @@ void RomanStatueControl(short itemNumber)
 						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 					}
 
-					deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					int deltaFrame2 = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
+					deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					int deltaFrame2 = g_Level.Anims[item->Animation.AnimNumber].FrameEnd - item->Animation.FrameNumber;
 					
 					if (deltaFrame2 >= 16)
 					{
@@ -705,7 +705,7 @@ void RomanStatueControl(short itemNumber)
 			else
 				item->Position.yRot += ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				item->Position.yRot += -ANGLE(180.0f);
 		
 			break;
@@ -721,7 +721,7 @@ void RomanStatueControl(short itemNumber)
 				TriggerDynamicLight(RomanStatueData.Position.x, RomanStatueData.Position.y, RomanStatueData.Position.z, 16, 0, color, color / 2);
 			}
 			
-			deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 			if (deltaFrame == 34)
 			{
@@ -851,14 +851,14 @@ void RomanStatueControl(short itemNumber)
 
 		if (item->Animation.ActiveState == STATUE_STATE_DEATH)
 		{
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 54 &&
-				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 54 &&
+				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 74 &&
 				item->TouchBits)
 			{
 				LaraItem->HitPoints -= 40;
 				LaraItem->HitStatus = true;
 			}
-			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 			{
 				// Activate trigger on death
 				short roomNumber = item->ItemFlags[2] & 0xFF;
@@ -876,7 +876,7 @@ void RomanStatueControl(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + STATUE_ANIM_DEATH;
 			item->Animation.ActiveState = STATUE_STATE_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 	}
 

@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[ID_HORSE];
 
 		item->Animation.AnimNumber = object->animIndex + 2;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = HORSEMAN_STATE_HORSE_RUN;
 		item->Animation.ActiveState = HORSEMAN_STATE_HORSE_RUN;
 	}
@@ -130,7 +130,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = object->animIndex + 8;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = 9;
 		item->Animation.ActiveState = 9;
 		item->ItemFlags[0] = NO_ITEM; // No horse yet
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + 21;
 					item->Animation.ActiveState = 16;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 					if (item->ItemFlags[0])
 					{
@@ -215,7 +215,7 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[1] = 0;
 				item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + 3;
 				item->Animation.ActiveState = 8;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 				creature->Enemy = NULL;
 				horseItem->Animation.TargetState = HORSEMAN_STATE_HORSE_RUN;
@@ -457,11 +457,11 @@ namespace TEN::Entities::TR4
 			case 4:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 				{
 					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + 1;
 					horseItem->Animation.ActiveState = HORSEMAN_STATE_HORSE_REARING;
-					horseItem->Animation.FrameNumber = g_Level.Anims[horseItem->Animation.AnimNumber].frameBase;
+					horseItem->Animation.FrameNumber = g_Level.Anims[horseItem->Animation.AnimNumber].FrameBase;
 				}
 
 				if (!horseItem->Flags)
@@ -581,7 +581,7 @@ namespace TEN::Entities::TR4
 
 					item->Animation.AnimNumber = Objects[ID_HORSEMAN].animIndex + 14;
 					item->Animation.ActiveState = HORSEMAN_STATE_MOUNT_HORSE;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 					creature->MaxTurn = 0;
 					break;
@@ -728,10 +728,10 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.AnimNumber == Objects[ID_HORSEMAN].animIndex + 29 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 				{
 					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + 10;
-					horseItem->Animation.FrameNumber = g_Level.Anims[horseItem->Animation.AnimNumber].frameBase;
+					horseItem->Animation.FrameNumber = g_Level.Anims[horseItem->Animation.AnimNumber].FrameBase;
 				}
 
 				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal)

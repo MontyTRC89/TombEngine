@@ -83,7 +83,7 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 						lara->InteractedItem = targetItemNum;
@@ -133,7 +133,7 @@ namespace TEN::Entities::Switches
 
 			if (LaraItem->Animation.AnimNumber == LA_COGWHEEL_PULL)
 			{
-				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 10)
+				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase + 10)
 				{
 					auto* doorItem = &g_Level.Items[Lara.InteractedItem];
 					doorItem->ItemFlags[0] = COG_DOOR_TURN;
@@ -142,7 +142,7 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].FrameEnd)
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;
@@ -150,7 +150,7 @@ namespace TEN::Entities::Switches
 				RemoveActiveItem(itemNumber);
 
 				LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 				LaraItem->Animation.TargetState = LS_IDLE;
 				LaraItem->Animation.ActiveState = LS_IDLE;
 				Lara.Control.HandStatus = HandStatus::Free;

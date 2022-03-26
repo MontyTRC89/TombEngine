@@ -35,7 +35,7 @@ void InitialiseHammerhead(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = HAMMERHEAD_STATE_IDLE;
 	item->Animation.ActiveState = HAMMERHEAD_STATE_IDLE;
 }
@@ -134,7 +134,7 @@ void HammerheadControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
 				item->Animation.ActiveState = HAMMERHEAD_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].FrameBase;
 			}
 
 			CreatureFloat(itemNumber);

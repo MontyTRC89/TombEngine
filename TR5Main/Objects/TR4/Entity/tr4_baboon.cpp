@@ -165,7 +165,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
 		baboonRespawn->Count++;
 
 	item->Animation.AnimNumber = object->animIndex + BABOON_SIT_IDLE_ANIM;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.ActiveState = BABOON_SIT_IDLE;
 	item->Animation.TargetState = BABOON_SIT_IDLE;
 	item->HitPoints = object->HitPoints;
@@ -205,7 +205,7 @@ void InitialiseBaboon(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SIT_IDLE_ANIM;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = BABOON_SIT_IDLE;
 	item->Animation.ActiveState = BABOON_SIT_IDLE;
 
@@ -231,13 +231,13 @@ void BaboonControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState == BABOON_DEATH)
 		{
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				BaboonRespawnFunction(itemNumber);
 		}
 		else if (item->Animation.ActiveState != BABOON_ACTIVATE_SWITCH)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_DEATH_ANIM;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = BABOON_DEATH;
 			item->Animation.TargetState = BABOON_DEATH;
 		}
@@ -284,7 +284,7 @@ void BaboonControl(short itemNumber)
 				item->Position.zPos = creature->Enemy->Position.zPos;
 				item->Position.yRot = creature->Enemy->Position.yRot;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.TargetState = BABOON_ACTIVATE_SWITCH;
 				item->Animation.ActiveState = BABOON_ACTIVATE_SWITCH;
 				item->AIBits &= ~(FOLLOW);
@@ -463,7 +463,7 @@ void BaboonControl(short itemNumber)
 			creature->MaxTurn = 0;
 			item->HitPoints = NOT_TARGETABLE;
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 212)
 			{
 				GAME_VECTOR pos = { 0, 0, 0 };
 				pos.boxNumber = 0;

@@ -303,7 +303,7 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 		laraItem->Position.yPos = y;
 
 		sBoatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex;
-		sBoatItem->Animation.FrameNumber = g_Level.Anims[sBoatItem->Animation.AnimNumber].frameBase;
+		sBoatItem->Animation.FrameNumber = g_Level.Anims[sBoatItem->Animation.AnimNumber].FrameBase;
 	}
 }
 
@@ -741,7 +741,7 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 		if (laraItem->Animation.ActiveState != SBOAT_STATE_DEATH)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_DEATH;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SBOAT_STATE_DEATH;
 		}
 	}
@@ -750,7 +750,7 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 		if (laraItem->Animation.ActiveState != SBOAT_STATE_FALL)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SBOAT_ANIM_LEAP_START;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SBOAT_STATE_FALL;
 		}
 	}
@@ -759,7 +759,7 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 		if (laraItem->Animation.ActiveState != SBOAT_STATE_HIT)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SBOAT_STATE_HIT;
 		}
 	}
@@ -892,7 +892,7 @@ void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 	laraItem->Animation.ActiveState = SBOAT_STATE_MOUNT;
 	laraItem->Animation.TargetState = SBOAT_STATE_MOUNT;
 	lara->Control.WaterStatus = WaterStatus::Dry;
@@ -1025,7 +1025,7 @@ void SpeedBoatControl(short itemNumber)
 		if (laraItem->HitPoints > 0)
 		{
 			sBoatItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex);
-			sBoatItem->Animation.FrameNumber = g_Level.Anims[sBoatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+			sBoatItem->Animation.FrameNumber = g_Level.Anims[sBoatItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 		}
 
 		Camera.targetElevation = -ANGLE(20.0f);

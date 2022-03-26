@@ -139,7 +139,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 				receptableItem->ItemFlags[0] = 1;
 			}
 
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraInfo->Control.IsMoving = false;
 			ResetLaraFlex(laraItem);
 			laraInfo->Control.HandStatus = HandStatus::Busy;
@@ -196,7 +196,7 @@ void PuzzleDone(ITEM_INFO* item, short itemNumber)
 {
 	item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.RequiredState = 0;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
@@ -304,7 +304,7 @@ void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll
 				}
 
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 				laraInfo->Control.IsMoving = false;
 				ResetLaraFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;

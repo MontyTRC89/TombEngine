@@ -59,7 +59,7 @@ void InitialiseSpearGuardian(short itemNumber)
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.FrameNumber = anim->FrameBase;
 	item->Animation.ActiveState = anim->ActiveState;
 }
 

@@ -42,7 +42,7 @@ void RatControl(short itemNumber)
 		if (item->Animation.ActiveState != 6)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 6;
 		}
 	}

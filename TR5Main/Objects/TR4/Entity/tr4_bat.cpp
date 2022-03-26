@@ -53,7 +53,7 @@ namespace TEN::Entities::TR4
 		InitialiseCreature(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = BAT_STATE_IDLE;
 		item->Animation.ActiveState = BAT_STATE_IDLE;
 	}
@@ -183,7 +183,7 @@ namespace TEN::Entities::TR4
 		else if (item->Animation.ActiveState == BAT_STATE_ATTACK)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = BAT_STATE_FLY;
 			item->Animation.ActiveState = BAT_STATE_FLY;
 		}
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.Airborne = true;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.TargetState = BAT_STATE_FALL;
 				item->Animation.ActiveState = BAT_STATE_FALL;
 				item->Animation.Velocity = 0;

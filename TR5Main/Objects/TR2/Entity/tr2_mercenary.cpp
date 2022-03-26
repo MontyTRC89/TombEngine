@@ -46,7 +46,7 @@ void MercenaryUziControl(short itemNumber)
 		if (item->Animation.ActiveState != 13)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 13;
 		}
 	}
@@ -217,7 +217,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 		if (item->Animation.ActiveState != 11)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 11;
 		}
 	}

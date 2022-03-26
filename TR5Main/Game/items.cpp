@@ -320,7 +320,7 @@ void InitialiseItem(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 	item->Animation.RequiredState = 0;
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;

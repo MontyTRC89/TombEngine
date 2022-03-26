@@ -79,7 +79,7 @@ namespace TEN::Entities::Switches
 				{
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;
 					laraItem->Animation.ActiveState = LS_LEVERSWITCH_PUSH;
 					lara->Control.IsMoving = false;
@@ -102,7 +102,7 @@ namespace TEN::Entities::Switches
 				{
 					ResetLaraFlex(laraItem);
 					laraItem->Animation.AnimNumber = LA_LEVER_PUSH;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 					laraItem->Animation.TargetState = LS_LEVERSWITCH_PUSH;
 					laraItem->Animation.ActiveState = LS_LEVERSWITCH_PUSH;
 					lara->Control.IsMoving = false;

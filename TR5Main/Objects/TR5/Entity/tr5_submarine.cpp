@@ -169,7 +169,7 @@ void InitialiseSubmarine(short itemNumber)
 
 	ClearItem(itemNumber);
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = 0;
 	item->Animation.ActiveState = 0;
 

@@ -86,10 +86,10 @@ void MPGunControl(short itemNumber)
 		if (item->Animation.ActiveState != 13)
 		{
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_GUN].animIndex + 14;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 13;
 		}
-		else if (!(GetRandomControl() & 3) && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)  
+		else if (!(GetRandomControl() & 3) && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 1)  
 		{
 			CreatureAIInfo(item, &AI);
 
@@ -308,7 +308,7 @@ void MPGunControl(short itemNumber)
 			}
 
 			if (item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 12 ||
-				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10))  
+				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 1 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10))  
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
 					item->Animation.RequiredState = MPGUN_STATE_WAIT;
@@ -340,7 +340,7 @@ void MPGunControl(short itemNumber)
 				torsoY = AI.angle;
 			}
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
@@ -361,8 +361,8 @@ void MPGunControl(short itemNumber)
 				torsoY = AI.angle;
 			}
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase ||
-				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 11)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 11)
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
@@ -382,8 +382,8 @@ void MPGunControl(short itemNumber)
 				torsoY = AI.angle;
 			}
 
-			if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 17) ||
-				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 6))  
+			if ((item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 18 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 17) ||
+				(item->Animation.AnimNumber == Objects[ID_MP_WITH_GUN].animIndex + 19 && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 6))  
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
 					item->Animation.RequiredState = MPGUN_STATE_WALK;
@@ -410,7 +410,7 @@ void MPGunControl(short itemNumber)
 			if (item->Animation.RequiredState == MPGUN_STATE_WALK)
 				item->Animation.TargetState = MPGUN_STATE_WALK;
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 16)
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32))
 					item->Animation.TargetState = MPGUN_STATE_WALK;
@@ -453,7 +453,7 @@ void MPGunControl(short itemNumber)
 			if (AI.ahead)
 				torsoY = AI.angle;
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				if (!ShotLara(item, &AI, &MPGunBite, torsoY, 32) || !(GetRandomControl() & 0x7))
 					item->Animation.TargetState = MPGUN_STATE_CROUCHED;

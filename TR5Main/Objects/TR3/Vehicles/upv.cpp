@@ -513,7 +513,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	TestUPVDismount(laraItem, UPVItem);
 
 	int anim = laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
-	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+	int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 
 	switch (laraItem->Animation.ActiveState)
 	{
@@ -902,7 +902,7 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = UPV_STATE_MOUNT;
 		}
 
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		AnimateItem(laraItem);
 	}
 	else
@@ -937,9 +937,9 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		else if (UPVItem->Position.xRot < -UPDOWN_LIMIT)
 			UPVItem->Position.xRot = -UPDOWN_LIMIT;
 
-		UPVItem->Position.xPos += phd_sin(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot);
-		UPVItem->Position.yPos -= phd_sin(UPVItem->Position.xRot) * UPVItem->Animation.Velocity;
-		UPVItem->Position.zPos += phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot);
+		UPVItem->Position.xPos += round(phd_sin(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot));
+		UPVItem->Position.yPos -= round(phd_sin(UPVItem->Position.xRot) * UPVItem->Animation.Velocity);
+		UPVItem->Position.zPos += round(phd_cos(UPVItem->Position.yRot) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Position.xRot));
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;
@@ -1049,10 +1049,10 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | (UPVItem->Animation.Velocity * (USHRT_MAX + 1)));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Position.xPos, 2 | 4 | 0x1000000 | ((int)UPVItem->Animation.Velocity * (USHRT_MAX + 1)));
 
 		UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
-		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 
 		if (UPV->Flags & UPV_SURFACE)
 			Camera.targetElevation = -ANGLE(60.0f);

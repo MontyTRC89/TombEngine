@@ -1029,9 +1029,9 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	item->Position.xPos += phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_sin(item->Position.yRot) / 4;
-	item->Position.yPos -= item->Animation.VerticalVelocity * phd_sin(item->Position.xRot) / 4;
-	item->Position.zPos += phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_cos(item->Position.yRot) / 4;
+	item->Position.xPos += round(phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_sin(item->Position.yRot) / 4);
+	item->Position.yPos -= round(item->Animation.VerticalVelocity * phd_sin(item->Position.xRot) / 4);
+	item->Position.zPos += round(phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_cos(item->Position.yRot) / 4);
 
 	DoObjectCollision(item, coll);
 

@@ -89,7 +89,7 @@ void ControlDeathSlide(short itemNumber)
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
 			zipLineItem->Animation.ActiveState = zipLineItem->Animation.TargetState = 1;
 			zipLineItem->Animation.AnimNumber = Objects[zipLineItem->ObjectNumber].animIndex;
-			zipLineItem->Animation.FrameNumber = g_Level.Anims[zipLineItem->Animation.AnimNumber].frameBase;
+			zipLineItem->Animation.FrameNumber = g_Level.Anims[zipLineItem->Animation.AnimNumber].FrameBase;
 
 			RemoveActiveItem(itemNumber);
 			return;

@@ -54,7 +54,7 @@ void InitialiseScorpion(short itemNumber)
 		item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + 2;
 	}
 
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 }
 
 void ScorpionControl(short itemNumber)
@@ -121,7 +121,7 @@ void ScorpionControl(short itemNumber)
 
 				item->Animation.AnimNumber = Objects[item->Animation.AnimNumber].animIndex + 5;
 				item->Animation.ActiveState = BSCORPION_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Status = ITEM_INVISIBLE;
 				creature->MaxTurn = 0;
 				
@@ -146,12 +146,12 @@ void ScorpionControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
 				item->Animation.ActiveState = BSCORPION_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			}
 		}
 		else if (CutSeqNum == 4)
 		{
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1;
 			item->Status = ITEM_INVISIBLE;
 		}
 		else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH)
@@ -337,7 +337,7 @@ void ScorpionControl(short itemNumber)
 
 		case BSCORPION_STATE_TROOPS_ATTACK:
 			creature->MaxTurn = 0;
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 			{
 				item->TriggerFlags++;
 			}
