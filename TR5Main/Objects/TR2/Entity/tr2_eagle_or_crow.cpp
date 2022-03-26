@@ -34,13 +34,13 @@ void InitialiseEagle(short itemNumber)
 	if (item->ObjectNumber == ID_CROW)
 	{
 		item->Animation.AnimNumber = Objects[ID_CROW].animIndex + 14;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = item->Animation.TargetState = 7;
 	}
 	else
 	{
 		item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 5;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = item->Animation.TargetState = 2;
 	}
 }
@@ -80,7 +80,7 @@ void EagleControl(short itemNumber)
 			else
 				item->Animation.AnimNumber = Objects[ID_EAGLE].animIndex + 8;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 4;
 			item->Animation.Velocity = 0;
 			item->Animation.Airborne = true;

@@ -190,7 +190,7 @@ void CentaurControl(short itemNumber)
 		if (item->Animation.ActiveState != CENTAUR_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_CENTAUR_MUTANT].animIndex + CENTAUR_ANIM_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = CENTAUR_STATE_DEATH;
 		}
 	}

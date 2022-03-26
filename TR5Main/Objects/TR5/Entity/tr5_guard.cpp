@@ -142,7 +142,7 @@ void InitialiseGuard(short itemNum)
 					roomItemNumber = item2->NextItem;
 					if (roomItemNumber == NO_ITEM)
 					{
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.ActiveState = item->Animation.TargetState;
 						break;
 					}
@@ -200,7 +200,7 @@ void InitialiseSniper(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = SNIPER_STATE_IDLE;
 	item->Animation.ActiveState = SNIPER_STATE_IDLE;
 
@@ -216,7 +216,7 @@ void InitialiseGuardLaser(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = GUARD_STATE_IDLE;
 	item->Animation.ActiveState = GUARD_STATE_IDLE;
 }
@@ -331,7 +331,7 @@ void GuardControl(short itemNumber)
 				item->Position.yRot += laraAI.angle;
 			}
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 	}
 	else
@@ -368,7 +368,7 @@ void GuardControl(short itemNumber)
 				if (item->HitPoints <= 0)
 				{
 					item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = GUARD_STATE_DEATH_2;
 				}
 			}
@@ -471,7 +471,7 @@ void GuardControl(short itemNumber)
 			else if (canJump1block || canJump2blocks)
 			{
 				item->Animation.AnimNumber = animIndex + 41;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
 				creature->MaxTurn = 0;
 
@@ -507,7 +507,7 @@ void GuardControl(short itemNumber)
 			else
 				item->Position.yRot += ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				item->Position.yRot += -ANGLE(180.0f);
 
 			break;
@@ -533,8 +533,8 @@ void GuardControl(short itemNumber)
 			{
 				if (creature->Flags)
 				{
-					if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 10 &&
-						(item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) & 1)
+					if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10 &&
+						(item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase) & 1)
 					{
 						creature->Flags = 0;
 					}
@@ -601,7 +601,7 @@ void GuardControl(short itemNumber)
 				if (canJump1block || canJump2blocks)
 				{
 					item->Animation.AnimNumber = animIndex + 41;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
 					creature->MaxTurn = 0;
 
@@ -646,7 +646,7 @@ void GuardControl(short itemNumber)
 			else if (canJump1block || canJump2blocks)
 			{
 				item->Animation.AnimNumber = animIndex + 50;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = GUARD_STATE_IDLE_START_JUMP;
 				creature->MaxTurn = 0;
 
@@ -706,13 +706,13 @@ void GuardControl(short itemNumber)
 
 		case GUARD_STATE_STAND_UP:
 		case 18:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				TestTriggers(item, true);
 				break;
 			}
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 44)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 44)
 			{
 				item->SwapMeshFlags = 0;
 
@@ -741,7 +741,7 @@ void GuardControl(short itemNumber)
 
 				currentItem->MeshBits = -3;
 			}
-			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				item->Position.yRot -= ANGLE(90.0f);
 			
 			break;
@@ -786,7 +786,7 @@ void GuardControl(short itemNumber)
 			break;
 
 		case GUARD_STATE_INSERT_CODE:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 39)
 				TestTriggers(item, true);
 			
 			break;
@@ -801,7 +801,7 @@ void GuardControl(short itemNumber)
 				if (item->ObjectNumber == ID_PUZZLE_HOLE8)
 					break;
 			}
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				currentItem->MeshBits = 0x1FFF;
 				item->Position.xPos = currentItem->Position.xPos - CLICK(1);
@@ -811,17 +811,17 @@ void GuardControl(short itemNumber)
 			}
 			else
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32)
 					currentItem->MeshBits = 16381;
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 74)
+				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 74)
 					currentItem->MeshBits = 278461;
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
+				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 120)
 					currentItem->MeshBits = 802621;
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 157)
+				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 157)
 					currentItem->MeshBits = 819001;
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 190)
+				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 190)
 					currentItem->MeshBits = 17592121;
-				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				{
 					currentItem->MeshBits = 0x1FFF;
 					TestTriggers(item, true);
@@ -862,7 +862,7 @@ void GuardControl(short itemNumber)
 				item->Animation.TargetState = GUARD_STATE_IDLE;
 			}
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 39)
 				TestTriggers(item->Position.xPos, item->Position.yPos, item->Position.zPos, enemy->RoomNumber, true);
 
 			break;
@@ -933,42 +933,42 @@ void GuardControl(short itemNumber)
 		{
 		case 0:
 			item->Animation.AnimNumber = animIndex + 38;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 23;
 			creature->MaxTurn = 0;
 			break;
 
 		case 1:
 			item->Animation.AnimNumber = animIndex + 39;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 24;
 			creature->MaxTurn = 0;
 			break;
 
 		case 2:
 			item->Animation.AnimNumber = animIndex + 40;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 25;
 			creature->MaxTurn = 0;
 			break;
 
 		case 6:
 			item->Animation.AnimNumber = animIndex + 35;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 20;
 			creature->MaxTurn = 0;
 			break;
 
 		case 7:
 			item->Animation.AnimNumber = animIndex + 36;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 21;
 			creature->MaxTurn = 0;
 			break;
 
 		case 8:
 			item->Animation.AnimNumber = animIndex + 37;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 22;
 			creature->MaxTurn = 0;
 			break;
@@ -1069,7 +1069,7 @@ void SniperControl(short itemNumber)
 		if (item->Animation.ActiveState != SNIPER_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_SNIPER].animIndex + 5;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = SNIPER_STATE_DEATH;
 		}
 	}
@@ -1088,7 +1088,7 @@ void InitialiseMafia2(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = GUARD_STATE_IDLE;
 	item->Animation.ActiveState = GUARD_STATE_IDLE;
 	item->SwapMeshFlags = 9216;
@@ -1245,7 +1245,7 @@ void Mafia2Control(short itemNumber)
 					if (canJump1Sector || canJump2Sectors)
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 						creature->MaxTurn = 0;
 
@@ -1279,10 +1279,10 @@ void Mafia2Control(short itemNumber)
 			else
 				item->Position.yRot += ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
+			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + 16 ||
 				item->SwapMeshFlags != 9216)
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 					item->Position.yRot += -ANGLE(180.0f);
 			}
 			else
@@ -1359,7 +1359,7 @@ void Mafia2Control(short itemNumber)
 				if (canJump1Sector || canJump2Sectors)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 					creature->MaxTurn = 0;
 
@@ -1395,7 +1395,7 @@ void Mafia2Control(short itemNumber)
 			else if (canJump1Sector || canJump2Sectors)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 50;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = MAFIA2_STATE_IDLE_START_JUMP;
 				creature->MaxTurn = 0;
 
@@ -1419,7 +1419,7 @@ void Mafia2Control(short itemNumber)
 			else
 				item->Position.yRot -= ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 16 &&
 				item->SwapMeshFlags == 9216)
 			{
 				item->SwapMeshFlags = 128;
@@ -1449,7 +1449,7 @@ void Mafia2Control(short itemNumber)
 				item->Position.yRot += AI.angle;
 			}
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		}
 	}
 
@@ -1469,41 +1469,41 @@ void Mafia2Control(short itemNumber)
 		{
 		case 0:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 38;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 23;
 			break;
 
 		case 1:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 39;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 24;
 			creature->MaxTurn = 0;
 			break;
 
 		case 2:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 40;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 25;
 			creature->MaxTurn = 0;
 			break;
 
 		case 6:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 20;
 			creature->MaxTurn = 0;
 			break;
 
 		case 7:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 21;
 			creature->MaxTurn = 0;
 			break;
 
 		case 8:
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 22;
 			creature->MaxTurn = 0;
 			break;

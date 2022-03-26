@@ -56,7 +56,7 @@ void AutoGunsControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 		{
 			std::array<short, 4>& data = item->Data;
 

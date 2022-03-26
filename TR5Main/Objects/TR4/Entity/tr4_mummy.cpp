@@ -62,7 +62,7 @@ void InitialiseMummy(short itemNumber)
 	if (item->TriggerFlags == 2)
 	{
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_LYING_DOWN;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = MUMMY_STATE_LYING_DOWN;
 		item->Animation.ActiveState = MUMMY_STATE_LYING_DOWN;
 		item->Status = ITEM_INVISIBLE;
@@ -70,7 +70,7 @@ void InitialiseMummy(short itemNumber)
 	else
 	{
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_ARMS_CROSSED;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = MUMMY_STATE_ARMS_CROSSED;
 		item->Animation.ActiveState = MUMMY_STATE_ARMS_CROSSED;
 	}
@@ -128,14 +128,14 @@ void MummyControl(short itemNumber)
 							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_PUSHED_BACK;
 						}
 
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Position.yRot += AI.angle;
 					}
 				}
 				else
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
 					item->Position.yRot += AI.angle;
 					creature->MaxTurn = 0;
@@ -189,7 +189,7 @@ void MummyControl(short itemNumber)
 			{
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 					item->TriggerFlags = 0;
 			}
 			else
@@ -271,8 +271,8 @@ void MummyControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x4800)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 					{
 						LaraItem->HitPoints -= 100;
 						LaraItem->HitStatus = true;

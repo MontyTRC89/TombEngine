@@ -33,7 +33,7 @@ void InitialiseSphinx(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = SPHINX_SLEEPING;
 	item->Animation.ActiveState = SPHINX_SLEEPING;
 }
@@ -204,7 +204,7 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_HIT:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			TestTriggers(item, true);
 

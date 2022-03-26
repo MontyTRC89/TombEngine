@@ -68,14 +68,14 @@ void InitialiseBigRat(short itemNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BIG_RAT_ANIM_SWIM;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = BIG_RAT_STATE_SWIM;
 		item->Animation.TargetState = BIG_RAT_STATE_SWIM;
 	}
 	else
 	{
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BIG_RAT_ANIM_EMPTY;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = BIG_RAT_STATE_IDLE;
 		item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 	}
@@ -131,14 +131,14 @@ void BigRatControl(short itemNumber)
 			if (TestEnvironment(ENV_FLAG_WATER, item))
 			{
 				item->Animation.AnimNumber = objectInfo->animIndex + BIG_RAT_ANIM_WATER_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = BIG_RAT_STATE_WATER_DEATH;
 				item->Animation.TargetState = BIG_RAT_STATE_WATER_DEATH;
 			}
 			else
 			{
 				item->Animation.AnimNumber = objectInfo->animIndex + BIG_RAT_ANIM_LAND_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = BIG_RAT_STATE_LAND_DEATH;
 				item->Animation.TargetState = BIG_RAT_STATE_LAND_DEATH;
 			}

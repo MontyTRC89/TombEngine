@@ -487,7 +487,7 @@ void SetArmInfo(ITEM_INFO* laraItem, ArmInfo* arm, int frame)
 		arm->AnimNumber = animBase + 3;
 
 	arm->FrameNumber = frame;
-	arm->FrameBase = g_Level.Anims[arm->AnimNumber].framePtr;
+	arm->FrameBase = g_Level.Anims[arm->AnimNumber].FramePtr;
 }
 
 void DrawPistolMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)

@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = 1;
 		item->Animation.ActiveState = 1;
 	}
@@ -63,7 +63,7 @@ namespace TEN::Entities::TR4
 					else
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 						item->Animation.ActiveState = 6;
 						item->Animation.Velocity = 0;
 						item->Animation.Airborne = true;

@@ -246,7 +246,7 @@ void FlameThrowerControl(short itemNumber)
 		if (item->Animation.ActiveState != 7)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 7;
 		}
 	}
@@ -388,7 +388,7 @@ void FlameThrowerControl(short itemNumber)
 			if (item->AIBits & GUARD)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = 1;
 				item->Animation.TargetState = 1;
 			}

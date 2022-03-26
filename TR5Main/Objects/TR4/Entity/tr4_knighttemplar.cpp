@@ -23,7 +23,7 @@ void InitialiseKnightTemplar(short itemNumber)
 	item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->MeshBits &= 0xF7FF;
 }
 
@@ -132,7 +132,7 @@ void KnightTemplarControl(short itemNumber)
 			item->Position.yRot += AI.angle;
 
 		frameNumber = item->Animation.FrameNumber;
-		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		frameBase = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{

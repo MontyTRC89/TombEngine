@@ -15,7 +15,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (LaraItem->Animation.AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
-		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].frameBase;
+		short fb = g_Level.Anims[LA_MECHANICAL_BEETLE_USE].FrameBase;
 
 		if (LaraItem->Animation.FrameNumber < fb + 14)
 		{
@@ -70,7 +70,7 @@ void ClockworkBeetleControl(short itemNumber)
 		if (beetle->Animation.VerticalVelocity <= 32)
 			beetle->Animation.VerticalVelocity = 0;
 		else
-			beetle->Animation.VerticalVelocity = -beetle->Animation.VerticalVelocity >> 1;
+			beetle->Animation.VerticalVelocity = -beetle->Animation.VerticalVelocity / 2;
 
 		flag = 1;
 	}

@@ -217,11 +217,11 @@ void AlertAllGuards(short itemNumber)
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState)
 {
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.ActiveState = killState;
 
 	LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-	LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+	LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 	LaraItem->Animation.ActiveState = 0;
 	LaraItem->Animation.TargetState = laraKillState;
 
@@ -335,7 +335,7 @@ void CreatureFloat(short itemNumber)
 
 	if (item->Position.yPos <= waterLevel)
 	{
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			item->Position.yPos = waterLevel;
 			item->Collidable = false;

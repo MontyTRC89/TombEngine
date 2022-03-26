@@ -44,7 +44,7 @@ void InitialiseMPStick(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 6;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.ActiveState = item->Animation.TargetState = MPSTICK_STATE_STOP;
 }
 
@@ -74,7 +74,7 @@ void MPStickControl(short itemNumber)
 		if (item->Animation.ActiveState != MPSTICK_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 26;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MPSTICK_STATE_DEATH;
 			creature->LOT.Step = 256;
 		}
@@ -456,7 +456,7 @@ void MPStickControl(short itemNumber)
 			if (enemy == LaraItem)
 			{
 				if (creature->Flags != 1 && item->TouchBits & 0x60 &&
-					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 8)
 				{
 					CreatureEffect(item, &MPStickBite2, DoBloodSplat);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
@@ -469,7 +469,7 @@ void MPStickControl(short itemNumber)
 			else
 			{
 				if (!creature->Flags != 1 && enemy &&
-					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
+					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 8)
 				{
 					if (abs(enemy->Position.xPos - item->Position.xPos) < SECTOR(0.25f) &&
 						abs(enemy->Position.yPos - item->Position.yPos) <= SECTOR(0.25f) &&
@@ -500,28 +500,28 @@ void MPStickControl(short itemNumber)
 		{
 		case 2:
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 28;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MPSTICK_STATE_CLIMB1;
 			creature->MaxTurn = 0;
 			break;
 
 		case 3:
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 29;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MPSTICK_STATE_CLIMB2;
 			creature->MaxTurn = 0;
 			break;
 
 		case 4:
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 27;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MPSTICK_STATE_CLIMB3;
 			creature->MaxTurn = 0;
 			break;
 
 		case -4:
 			item->Animation.AnimNumber = Objects[ID_MP_WITH_STICK].animIndex + 30;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MPSTICK_STATE_FALL3;
 			creature->MaxTurn = 0;
 			break;

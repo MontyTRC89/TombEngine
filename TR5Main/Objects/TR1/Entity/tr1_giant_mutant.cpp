@@ -65,7 +65,7 @@ void GiantMutantControl(short itemNumber)
 		if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = MUTANT_STATE_DEATH;
 		}
 	}
@@ -197,7 +197,7 @@ void GiantMutantControl(short itemNumber)
 				Camera.flags = CF_FOLLOW_CENTER;
 
 				LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 				LaraItem->RoomNumber = item->RoomNumber;
 				LaraItem->Position.xPos = item->Position.xPos;

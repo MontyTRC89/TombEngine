@@ -23,7 +23,7 @@ void SpringBoardControl(short itemNumber)
 		LaraItem->Animation.VerticalVelocity = -240;
 		LaraItem->Animation.Airborne = true;
 		LaraItem->Animation.AnimNumber = LA_FALL_START;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 		LaraItem->Animation.ActiveState = LS_JUMP_FORWARD;
 		LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 

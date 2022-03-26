@@ -123,7 +123,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		if (laraItem->Animation.AnimNumber == LA_STAND_IDLE)
 		{
 			laraItem->Animation.AnimNumber = LA_DISCARD_FLARE;
-			flareFrame = armFrame + g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			flareFrame = armFrame + g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 			laraItem->Animation.FrameNumber = flareFrame;
 			lara->Flare.Frame = flareFrame;
 		}
@@ -132,7 +132,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 		{
 			lara->Flare.ControlLeft = false;
 
-			if (flareFrame >= g_Level.Anims[laraItem->Animation.AnimNumber].frameBase + 31) // Last frame.
+			if (flareFrame >= g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase + 31) // Last frame.
 			{
 				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.LastGunType;
 				lara->Control.Weapon.GunType = lara->Control.Weapon.LastGunType;
@@ -144,7 +144,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 				lara->RightArm.Locked = false;
 				lara->LeftArm.Locked = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				lara->Flare.Frame = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				lara->Flare.Frame = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 				return;
 			}
 
@@ -279,7 +279,7 @@ void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
 		flareAnimNum += 1;
 
 	lara->LeftArm.AnimNumber = flareAnimNum;
-	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
+	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].FramePtr;
 }
 
 void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)

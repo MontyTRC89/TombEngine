@@ -90,7 +90,7 @@ namespace TEN::Entities::TR4
 
 		InitialiseCreature(itemNumber);
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = AHMET_STATE_IDLE;
 		item->Animation.ActiveState = AHMET_STATE_IDLE;
 		item->ItemFlags[0] = item->Position.xPos / SECTOR(1);
@@ -122,16 +122,16 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState == AHMET_STATE_DIE)
 			{
 				// dont clear it !
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 				{
 					item->Collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
-					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1);
+					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1);
 				}
 			}
 			else
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + AHMET_ANIM_DEATH_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				item->Animation.ActiveState = AHMET_STATE_DIE;
 				item->Animation.TargetState = AHMET_STATE_DIE;
 				Lara.InteractedItem = itemNumber;
@@ -262,7 +262,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Position.yRot += AI.angle;
 
-				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
+				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
 				{
 					CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
 					creature->Flags |= 1;
@@ -270,7 +270,7 @@ namespace TEN::Entities::TR4
 					LaraItem->HitStatus = true;
 					LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
 				}
-				else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) && (item->TouchBits & AHMET_RIGHT_TOUCH))
+				else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32) && (item->TouchBits & AHMET_RIGHT_TOUCH))
 				{
 					CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
 					creature->Flags |= 2;
@@ -300,7 +300,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!(creature->Flags & 1) && item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK)
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
+						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 11) &&
 							item->TouchBits & AHMET_LEFT_TOUCH)
 						{
 							CreatureEffect2(item, &AhmetBiteJaw, 10, -1, DoBloodSplat);
@@ -332,7 +332,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if (!(creature->Flags & 1) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 14) &&
 						item->TouchBits & AHMET_LEFT_TOUCH)
 					{
 						CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
@@ -342,7 +342,7 @@ namespace TEN::Entities::TR4
 						LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
 					}
 					else if (!(creature->Flags & 2) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
+						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 22) &&
 						item->TouchBits & AHMET_RIGHT_TOUCH)
 					{
 						CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
@@ -367,7 +367,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Animation.ActiveState != 7 || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.ActiveState != 7 || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 			return false;
 
 		Weather.Flash(255, 64, 0, 0.03f);
@@ -382,7 +382,7 @@ namespace TEN::Entities::TR4
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 		item->Animation.TargetState = 1;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = 1;
 		item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 

@@ -184,7 +184,7 @@ void ControlTeleporter(short itemNumber)
 		}
 
 		LaraItem->Animation.AnimNumber = LA_ELEVATOR_RECOVER;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 		LaraItem->Animation.TargetState = LS_MISC_CONTROL;
 		LaraItem->Animation.ActiveState = LS_MISC_CONTROL;
 

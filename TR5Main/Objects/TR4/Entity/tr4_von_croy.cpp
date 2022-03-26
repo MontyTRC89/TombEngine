@@ -51,7 +51,7 @@ void InitialiseVonCroy(short itemNumber)
 	ClearItem(itemNumber);
 	
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = STATE_VON_CROY_TOGGLE_KNIFE;
 	item->Animation.ActiveState = STATE_VON_CROY_TOGGLE_KNIFE;
 	item->SwapMeshFlags = SWAPMESHFLAGS_VON_CROY;
@@ -205,7 +205,7 @@ void VonCroyControl(short itemNumber)
 
 		GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &item->RoomNumber);
 
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 1)
 		{
 			CreateZone(item);
 		}
@@ -337,7 +337,7 @@ void VonCroyControl(short itemNumber)
 		{
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = STATE_VON_CROY_JUMP;
 			creature->LOT.IsJumping = true;
 
@@ -570,7 +570,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case STATE_VON_CROY_TOGGLE_KNIFE:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase) 
 		{
 			if (!(item->SwapMeshFlags & SWAPMESHFLAGS_VON_CROY))
 			{
@@ -584,7 +584,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case STATE_VON_CROY_LOOK_BEFORE_JUMP:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			item->Position.xPos = enemy->Position.xPos;
 			item->Position.yPos = enemy->Position.yPos;
@@ -599,7 +599,7 @@ void VonCroyControl(short itemNumber)
 				item->Animation.ActiveState = STATE_VON_CROY_JUMP;
 				item->Animation.TargetState = STATE_VON_CROY_JUMP_2BLOCKS;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				creature->LOT.IsJumping = true;
 			}
 
@@ -613,7 +613,7 @@ void VonCroyControl(short itemNumber)
 
 	case STATE_VON_CROY_JUMP_2BLOCKS:
 		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 25
-			|| item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 5)
+			|| item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 5)
 		{
 			creature->LOT.IsJumping = true;
 			//if (canJump3blocks)
@@ -632,7 +632,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case STATE_VON_CROY_ENABLE_TRAP:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			item->Position.xPos = enemy->Position.xPos;
 			item->Position.yPos = enemy->Position.yPos;
@@ -641,7 +641,7 @@ void VonCroyControl(short itemNumber)
 			item->Position.yRot = enemy->Position.yRot;
 			item->Position.zRot = enemy->Position.zRot;
 		}
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
+		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 120)
 		{
 			TestTriggers(
 				creature->AITarget->Position.xPos,
@@ -671,8 +671,8 @@ void VonCroyControl(short itemNumber)
 
 		if (!creature->Flags && enemy != NULL) 
 		{
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 
-				&& item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 45) 
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20 
+				&& item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 45) 
 			{
 				if (abs(item->Position.xPos - enemy->Position.xPos) < 512
 					&& abs(item->Position.yPos - enemy->Position.yPos) < 512
@@ -741,12 +741,12 @@ void VonCroyControl(short itemNumber)
 
 		if ((enemy == NULL
 			|| enemy->Flags != 0) 
-			|| item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
+			|| item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].FrameBase + 21)
 		{
 			if (creature->Flags == 0 && enemy != NULL) 
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 
-					&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 
+					&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
 				{
 					if (abs(item->Position.xPos - enemy->Position.xPos) < 512
 						&& abs(item->Position.yPos - enemy->Position.yPos) < 512
@@ -793,7 +793,7 @@ void VonCroyControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 47) 
 		{
-			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase) 
 				break;
 		}
 		else 
@@ -813,7 +813,7 @@ void VonCroyControl(short itemNumber)
 	case 33:
 		flags = 1;
 		if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + 52
-			|| item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+			|| item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase) 
 		{
 			flags = 0;
 		}
@@ -858,56 +858,56 @@ void VonCroyControl(short itemNumber)
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex+29;
 			item->Animation.ActiveState = 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 3:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
 			item->Animation.ActiveState = 18;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 4:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
 			item->Animation.ActiveState = 17;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case 7:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
 			item->Animation.ActiveState = 27;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case -7:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
 			item->Animation.ActiveState = 26;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case -4:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
 			item->Animation.ActiveState = 25;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case -3:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
 			item->Animation.ActiveState = 24;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		case -2:
 			creature->MaxTurn = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 42;
 			item->Animation.ActiveState = 23;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			break;
 
 		}

@@ -31,7 +31,7 @@ void InitialiseCobra(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + 45;
 	item->Animation.ActiveState = item->Animation.TargetState = 3;
 	item->ItemFlags[2] = item->HitStatus;
 }
@@ -53,7 +53,7 @@ void CobraControl(short itemNumber)
 		if (item->Animation.ActiveState != 4)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 4;
 		}
 	}

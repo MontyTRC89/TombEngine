@@ -49,7 +49,7 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	else
 	{
 		if (item->Animation.VerticalVelocity >= 8)
-			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity >> 3;
+			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 8;
 		else
 			item->Animation.VerticalVelocity = 0;
 	}

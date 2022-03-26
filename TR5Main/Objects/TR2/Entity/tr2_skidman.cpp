@@ -130,7 +130,7 @@ void SkidooManControl(short riderItemNumber)
 			riderItem->RoomNumber = item->RoomNumber;
 
 			riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
-			riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].frameBase;
+			riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].FrameBase;
 			riderItem->Animation.ActiveState = SMAN_STATE_DEATH;
 
 			if (Lara.TargetEntity == item)
@@ -222,7 +222,7 @@ void SkidooManControl(short riderItemNumber)
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(155, &item->Position, 4 + ((0x10000 - (100 - item->Animation.Velocity) * 100) << 8));
+		SoundEffect(155, &item->Position, 4 + ((0x10000 - (100 - (int)item->Animation.Velocity) * 100) << 8));
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);
@@ -238,7 +238,7 @@ void SkidooManControl(short riderItemNumber)
 			ItemNewRoom(riderItemNumber, item->RoomNumber);
 
 		riderItem->Animation.AnimNumber = item->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].FrameBase - g_Level.Anims[item->Animation.AnimNumber].FrameBase);
 	}
 	else if (riderItem->Status == ITEM_DEACTIVATED &&
 		item->Animation.Velocity == 0 &&

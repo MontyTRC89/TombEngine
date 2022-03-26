@@ -1209,7 +1209,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QUAD_STATE_MOUNT_RIGHT;
 		}
 
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		laraItem->Position.xPos = quadItem->Position.xPos;
 		laraItem->Position.yPos = quadItem->Position.yPos;
 		laraItem->Position.zPos = quadItem->Position.zPos;
@@ -1386,7 +1386,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		AnimateItem(laraItem);
 
 		quadItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
-		quadItem->Animation.FrameNumber = g_Level.Anims[quadItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+		quadItem->Animation.FrameNumber = g_Level.Anims[quadItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
 
 		Camera.targetElevation = -ANGLE(30.0f);
 

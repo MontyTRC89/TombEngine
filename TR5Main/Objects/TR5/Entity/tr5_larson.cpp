@@ -35,7 +35,7 @@ void InitialiseLarson(short itemNum)
 	ClearItem(itemNum);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 	item->Animation.ActiveState = STATE_TR5_LARSON_STOP;
 
@@ -339,7 +339,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->Position.yRot += info.angle;
 			}
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
 				if (item->ObjectNumber == ID_PIERRE)
 				{
@@ -365,7 +365,7 @@ void LarsonControl(short itemNumber)
 	{
 		// When Larson dies, it activates trigger at start position
 		if (item->ObjectNumber == ID_LARSON 
-			&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
 		{
 			short roomNumber = item->ItemFlags[2] & 0xFF;
 			short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -388,7 +388,7 @@ void LarsonControl(short itemNumber)
 		else
 			item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 		item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	}
 
 	CreatureTilt(item, tilt);

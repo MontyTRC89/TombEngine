@@ -64,7 +64,7 @@ namespace TEN::Entities::Switches
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].FrameBase;
 							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
@@ -93,7 +93,7 @@ namespace TEN::Entities::Switches
 						{
 							doSwitch = 1;
 							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].FrameBase;
 							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else

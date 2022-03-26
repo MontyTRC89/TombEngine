@@ -40,7 +40,7 @@ void InitialiseGuide(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = GUIDE_STATE_IDLE;
 	item->Animation.ActiveState = GUIDE_STATE_IDLE;
 	
@@ -93,8 +93,8 @@ void GuideControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == object->animIndex + 61)
 		{
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 32 &&
-				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32 &&
+				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
 			{
 				TriggerFireFlame(
 					(random & 0x3F) + pos.x - 32,
@@ -442,7 +442,7 @@ void GuideControl(short itemNumber)
 
 		GetJointAbsPosition(item, &pos1, GuideBite2.meshNum);
 
-		frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		random = GetRandomControl();
 
 		if (frameNumber == 32)
@@ -556,8 +556,8 @@ void GuideControl(short itemNumber)
 		{
 			if (enemy)
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
 				{
 					dx = abs(enemy->Position.xPos - item->Position.xPos);
 					dy = abs(enemy->Position.yPos - item->Position.yPos);
@@ -612,7 +612,7 @@ void GuideControl(short itemNumber)
 		else
 		{
 			if (item->Animation.AnimNumber != object->animIndex + 57 &&
-				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 20)
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 20)
 			{
 				TestTriggers(item, true);
 
@@ -628,7 +628,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_PICKUP_TORCH:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			someFlag = true;
 
@@ -639,7 +639,7 @@ void GuideControl(short itemNumber)
 			item->Position.yRot = enemy->Position.yRot;
 			item->Position.zRot = enemy->Position.zRot;
 		}
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
+		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 35)
 		{
 			item->SwapMeshFlags &= 0xFFFBFFFF;
 
@@ -679,7 +679,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 38:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
 			item->Position.xPos = enemy->Position.xPos;
 			item->Position.yPos = enemy->Position.yPos;
@@ -687,7 +687,7 @@ void GuideControl(short itemNumber)
 		}
 		else
 		{
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
 			{
 				TestTriggers(item, true);
 
@@ -698,7 +698,7 @@ void GuideControl(short itemNumber)
 				creature->Enemy = NULL;
 				break;
 			}
-			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
+			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
 			{
 				if (enemy->Position.yRot - item->Position.yRot <= ANGLE(2.0f))
 				{
@@ -713,9 +713,9 @@ void GuideControl(short itemNumber)
 		break;
 
 	case 39:
-		if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+		if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
 		{
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 
@@ -728,7 +728,7 @@ void GuideControl(short itemNumber)
 				break;
 			}
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && item->RoomNumber == 70)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 70 && item->RoomNumber == 70)
 			{
 				item->Animation.RequiredState = GUIDE_STATE_RUN;
 				item->SwapMeshFlags |= 0x200000;

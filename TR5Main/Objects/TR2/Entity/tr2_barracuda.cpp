@@ -40,7 +40,7 @@ void BarracudaControl(short itemNumber)
 		if (item->Animation.ActiveState != 6)
 		{
 			item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 6;
 		}
 

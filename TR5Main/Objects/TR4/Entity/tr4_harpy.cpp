@@ -253,7 +253,7 @@ void InitialiseHarpy(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	item->Animation.TargetState = STATE_HARPY_STOP;
 	item->Animation.ActiveState = STATE_HARPY_STOP;
 }
@@ -291,7 +291,7 @@ void HarpyControl(short itemNumber)
 				else
 				{
 					item->Animation.AnimNumber = object->animIndex + 5;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 					item->Animation.ActiveState = 9;
 					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;

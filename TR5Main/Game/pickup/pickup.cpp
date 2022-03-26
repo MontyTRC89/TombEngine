@@ -366,7 +366,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 						}
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
@@ -720,7 +720,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
 		ResetLaraFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -795,7 +795,7 @@ void PickupControl(short itemNumber)
 			if (item->Animation.VerticalVelocity <= 64)
 				item->TriggerFlags &= 0xC0;
 			else
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 2;
+				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 4;
 		}
 
 		if (item->RoomNumber != roomNumber)
@@ -983,7 +983,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo*
 			{
 				laraitem->Animation.ActiveState = LS_MISC_CONTROL;
 				laraitem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].FrameBase;
 				ResetLaraFlex(laraitem);
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Busy;
@@ -997,7 +997,7 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo*
 				}
 
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 				AnimateItem(item);
 			}
 			else
@@ -1023,7 +1023,7 @@ void SearchObjectControl(short itemNumber)
 
 	ITEM_INFO* item2;
 
-	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)
@@ -1164,7 +1164,7 @@ bool UseSpecialItem(ITEM_INFO* item)
 			else if (flag == 2)
 				item->Animation.AnimNumber = LA_WATERSKIN_POUR_LOW;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = LS_MISC_CONTROL;
 			item->Animation.ActiveState = LS_MISC_CONTROL;
 			Lara.Control.HandStatus = HandStatus::Busy;
