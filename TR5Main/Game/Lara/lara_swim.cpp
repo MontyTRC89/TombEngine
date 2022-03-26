@@ -86,9 +86,9 @@ void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 	else
 		ModulateLaraSubsuitSwimTurn(item);
 
-	item->Animation.VerticalVelocity += 8;
-	if (item->Animation.VerticalVelocity > 200)
-		item->Animation.VerticalVelocity = 200;
+	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX)
+		item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX;
 
 	if (!(TrInput & IN_JUMP))
 		item->Animation.TargetState = LS_UNDERWATER_INERTIA;
@@ -127,11 +127,11 @@ void lara_as_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_JUMP)
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
-	item->Animation.VerticalVelocity -= 6;
+	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
-	if (item->Animation.VerticalVelocity <= 133)
+	if (item->Animation.VerticalVelocity < LARA_SWIM_INTERTIA_VELOCITY_MIN)
 		item->Animation.TargetState = LS_UNDERWATER_IDLE;
 }
 
@@ -150,7 +150,7 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 
 	lara->Control.CanLook = false;
 
-	item->Animation.VerticalVelocity -= 8;
+	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
 	if (item->Animation.VerticalVelocity <= 0)
 		item->Animation.VerticalVelocity = 0;
 
