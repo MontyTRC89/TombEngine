@@ -1282,23 +1282,23 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
 			item->Animation.TargetState = LS_WADE_FORWARD;
 
 		return;
 	}
-	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
+	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
 		item->Animation.TargetState = LS_WALK_BACK;
 		return;
 	}
 
-	if (TrInput & IN_LSTEP && TestLaraStepLeft(item, coll))
+	if (TrInput & IN_LSTEP && TestLaraStepLeftSwamp(item, coll))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP && TestLaraStepRight(item, coll))
+	else if (TrInput & IN_RSTEP && TestLaraStepRightSwamp(item, coll))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
