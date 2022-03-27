@@ -697,7 +697,7 @@ void lara_col_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-		return;
+		//return; // Helps getting out of clamps.
 	}
 
 	if (TestLaraFall(item, coll))

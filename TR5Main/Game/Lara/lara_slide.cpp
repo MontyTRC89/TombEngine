@@ -102,6 +102,7 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
+		MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.25f));
 		return;
 	}
 
@@ -206,6 +207,7 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
+		MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.25f));
 		return;
 	}
 

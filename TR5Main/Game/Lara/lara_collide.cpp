@@ -684,6 +684,9 @@ void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
+
+	if (coll->CollisionType == CT_CLAMP)
+		item->Position.yPos += coll->Middle.Floor;
 }
 
 bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height, int side)
