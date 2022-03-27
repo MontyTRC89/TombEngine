@@ -151,7 +151,7 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 
 	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
-	if (item->Animation.VerticalVelocity <= 0)
+	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
 	if (item->Position.xRot < -ANGLE(2.0f) ||
