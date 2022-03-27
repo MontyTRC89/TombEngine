@@ -432,27 +432,14 @@ int S_UpdateInput()
 	if (KeyMap[DIK_F10])
 		lInput |= IN_E;
 
-	// TODO: Revert this WALK+LEFT/RIGHT to LSTEP/RSTEP translation.
-	if (lInput & IN_WALK && !(lInput & IN_FORWARD) && !(lInput & IN_BACK))
-	{
-		if (lInput & IN_LEFT)
-		{
-			lInput &= ~IN_LEFT;
-			lInput |= IN_LSTEP;
-		}
-		else if (lInput & IN_RIGHT)
-		{
-			lInput &= ~IN_RIGHT;
-			lInput |= IN_RSTEP;
-		}
-	}
-
+	// TODO: Make FORWARD+BACK to turn 180 degrees a user option.
 	if (lInput & IN_FORWARD && lInput & IN_BACK)
 		lInput |= IN_ROLL;
 
 	if (lInput & IN_ROLL && BinocularRange)
 		lInput &= ~IN_ROLL;
 
+	// Block simultaneous LEFT+RIGHT input.
 	if (lInput & IN_LEFT && lInput & IN_RIGHT)
 		lInput &= ~(IN_LEFT | IN_RIGHT);
 
