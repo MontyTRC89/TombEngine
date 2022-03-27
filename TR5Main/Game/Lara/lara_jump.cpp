@@ -64,6 +64,12 @@ void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -101,12 +107,6 @@ void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.HandStatus == HandStatus::Free)
 	{
 		item->Animation.TargetState = LS_SWAN_DIVE;
-		return;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -211,6 +211,12 @@ void lara_as_reach(ITEM_INFO* item, CollisionInfo* coll)
 			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -223,12 +229,6 @@ void lara_as_reach(ITEM_INFO* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
-		return;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -444,6 +444,12 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -462,12 +468,6 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & (IN_ROLL | IN_FORWARD))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
-		return;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -500,6 +500,12 @@ void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -521,12 +527,6 @@ void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 		item->TargetState = LS_JUMP_ROLL_180;
 		return;
 	}*/
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
-		return;
-	}
 
 	item->Animation.TargetState = LS_JUMP_RIGHT;
 }
@@ -557,6 +557,12 @@ void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -578,12 +584,6 @@ void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 		item->TargetState = LS_JUMP_ROLL_180;
 		return;
 	}*/
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
-		return;
-	}
 
 	item->Animation.TargetState = LS_JUMP_LEFT;
 }
@@ -611,6 +611,12 @@ void lara_as_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 			SetLaraLand(item, coll);
 		}
 
+		return;
+	}
+
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -647,12 +653,6 @@ void lara_as_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
 		item->Position.xRot += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item->Animation.Velocity) - item->Position.xRot) / 3);
 		lara->ExtraHeadRot.yRot += (ANGLE(10.0f) - item->Position.zRot) / 3;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
-		return;
 	}
 
 	item->Animation.TargetState = LS_JUMP_UP;
@@ -717,6 +717,12 @@ void lara_as_fall_back(ITEM_INFO* item, CollisionInfo* coll)
 			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
 	}
 
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL;
+		return;
+	}
+
 	if (TestLaraLand(item, coll))
 	{
 		DoLaraFallDamage(item);
@@ -736,12 +742,6 @@ void lara_as_fall_back(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.HandStatus == HandStatus::Free)
 	{
 		item->Animation.TargetState = LS_REACH;
-		return;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
 
@@ -766,6 +766,23 @@ void lara_as_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
+	if (item->HitPoints <= 0)
+	{
+		if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+		{
+			item->Animation.TargetState = LS_FREEFALL_DIVE;
+			return;
+		}
+
+		if (TestLaraLand(item, coll))
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetLaraLand(item, coll);
+		}
+
+		return;
+	}
+
 	if (TrInput & IN_LEFT)
 	{
 		lara->Control.TurnRate -= LARA_TURN_RATE;
@@ -781,6 +798,12 @@ void lara_as_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
+	}
+
+	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
+	{
+		item->Animation.TargetState = LS_FREEFALL_DIVE;
+		return;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -804,12 +827,6 @@ void lara_as_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 		SetLaraLand(item, coll);
 		lara->Control.HandStatus = HandStatus::Free;
-		return;
-	}
-
-	if (item->Animation.VerticalVelocity >= LARA_FREEFALL_VELOCITY)
-	{
-		item->Animation.TargetState = LS_FREEFALL_DIVE;
 		return;
 	}
 
@@ -850,6 +867,17 @@ void lara_as_freefall_dive(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+
+	if (item->HitPoints <= 0)
+	{
+		if (TestLaraLand(item, coll))
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetLaraLand(item, coll);
+		}
+
+		return;
+	}
 
 	if (TestLaraLand(item, coll))
 	{
