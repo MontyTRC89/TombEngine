@@ -922,8 +922,8 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	item->Position.xPos += item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4;
-	item->Position.zPos += item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4;
+	item->Position.xPos += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
+	item->Position.zPos += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
 
 	DoObjectCollision(item, coll);
 
