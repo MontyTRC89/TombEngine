@@ -282,7 +282,8 @@ void lara_as_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_FORWARD | IN_BACK))
+	if (TrInput & (IN_FORWARD | IN_BACK) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_LEFT)
 		{
@@ -303,7 +304,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
-			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes logical priority in this excpetion.
+			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
