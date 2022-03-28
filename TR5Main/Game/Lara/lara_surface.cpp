@@ -74,7 +74,7 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (TrInput & IN_ROLL)
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
