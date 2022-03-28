@@ -734,10 +734,18 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// TODO: temp
-	g_Renderer.PrintDebugMessage("Lara CollisionType: %d", coll->CollisionType);
+	coll->Setup.Mode = CollisionProbeMode::Quadrants;
+	// TODO: Move radius and height resets here when look feature is refactored. @Sezz 2022.03.29
 
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
+
+	coll->Setup.BlockFloorSlopeUp = false;
+	coll->Setup.BlockFloorSlopeDown = false;
+	coll->Setup.BlockCeilingSlope = false;
+	coll->Setup.BlockDeathFlagDown = false;
+	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpasm = true;
 
 	coll->Setup.OldPosition.x = item->Position.xPos;
 	coll->Setup.OldPosition.y = item->Position.yPos;
@@ -745,15 +753,6 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.OldState = item->Animation.ActiveState;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
-
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = true;
-	coll->Setup.FloorSlopeIsWall = false;
-	coll->Setup.FloorSlopeIsPit = false;
-	coll->Setup.CeilingSlopeIsWall = false;
-	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoMonkeyFlagIsWall = false;
-	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook &&
 		lara->ExtraAnim == NO_ITEM)
@@ -763,7 +762,6 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	// TODO: Move radius and height default resets above look checks once look feature is refactored.
 	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
 	lara->Control.CanLook = true;
@@ -874,26 +872,26 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
+	coll->Setup.Mode = CollisionProbeMode::FreeForward;
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_SURFACE;
+
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(0.5f);
 	coll->Setup.LowerCeilingBound = LARA_RAD;
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
+	coll->Setup.BlockFloorSlopeUp = false;
+	coll->Setup.BlockFloorSlopeDown = false;
+	coll->Setup.BlockCeilingSlope = false;
+	coll->Setup.BlockDeathFlagDown = false;
+	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+
 	coll->Setup.OldPosition.x = item->Position.xPos;
 	coll->Setup.OldPosition.y = item->Position.yPos;
 	coll->Setup.OldPosition.z = item->Position.zPos;
-
-	coll->Setup.FloorSlopeIsWall = false;
-	coll->Setup.FloorSlopeIsPit = false;
-	coll->Setup.CeilingSlopeIsWall = false;
-	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoMonkeyFlagIsWall = false;
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = CollisionProbeMode::FreeForward;
-
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);
@@ -947,26 +945,26 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	coll->Setup.Mode = CollisionProbeMode::Quadrants;
+	coll->Setup.Radius = LARA_RAD_UNDERWATER;
+	coll->Setup.Height = LARA_HEIGHT;
+
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
 	coll->Setup.LowerCeilingBound = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
+	coll->Setup.BlockFloorSlopeUp = false;
+	coll->Setup.BlockFloorSlopeDown = false;
+	coll->Setup.BlockCeilingSlope = false;
+	coll->Setup.BlockDeathFlagDown = false;
+	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpasm = false;
+
 	coll->Setup.OldPosition.x = item->Position.xPos;
 	coll->Setup.OldPosition.y = item->Position.yPos;
 	coll->Setup.OldPosition.z = item->Position.zPos;
-
-	coll->Setup.FloorSlopeIsWall = false;
-	coll->Setup.FloorSlopeIsPit = false;
-	coll->Setup.CeilingSlopeIsWall = false;
-	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoMonkeyFlagIsWall = false;
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = CollisionProbeMode::Quadrants;
-
-	coll->Setup.Radius = LARA_RAD_UNDERWATER;
-	coll->Setup.Height = LARA_HEIGHT;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);

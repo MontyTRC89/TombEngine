@@ -815,7 +815,7 @@ void lara_col_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.BlockFloorSlopeUp = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: There's a visible snap if Lara hits the ground at a high velocity.
@@ -942,7 +942,7 @@ void lara_col_pole_down(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RAD;
 	GetCollisionInfo(coll, item);
