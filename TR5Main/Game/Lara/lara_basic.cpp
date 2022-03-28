@@ -417,7 +417,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookUpDown(item);
 
-	if (!(TrInput & IN_JUMP))	// JUMP locks orientation.
+	if (!(TrInput & IN_JUMP) ||	isSwamp)	// JUMP locks orientation outside swamps.
 	{
 		if (TrInput & IN_LEFT &&
 			!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Sidestep locks orientation.
@@ -569,7 +569,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 void PseudoLaraAsWadeIdle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-
+	
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_PREPARE;
