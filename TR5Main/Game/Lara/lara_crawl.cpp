@@ -109,8 +109,8 @@ void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -182,7 +182,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.ForwardAngle = item->Position.yRot;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsWall = true;
+	coll->Setup.BlockFloorSlopeUp = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
@@ -452,8 +452,8 @@ void lara_col_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.FloorSlopeIsPit = true;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockFloorSlopeDown = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
@@ -549,11 +549,11 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
+	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);	// TODO: Stepping approach is different from walk/run. Resolve this someday. @Sezz 2021.10.31
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopeIsPit = true;
-	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.DeathFlagIsPit = true;
+	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockDeathFlagDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
@@ -645,12 +645,12 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.FloorSlopeIsPit = true;
-	coll->Setup.FloorSlopeIsWall = true;
-	coll->Setup.DeathFlagIsPit = true;
+	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockDeathFlagDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 

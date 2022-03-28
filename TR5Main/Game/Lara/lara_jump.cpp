@@ -380,8 +380,8 @@ void lara_col_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = isSwamp ? NO_LOWER_BOUND : STEPUP_HEIGHT;	// Security.
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.FloorSlopeIsPit = isSwamp ? false : true;	// Security.
-	coll->Setup.FloorSlopeIsWall = isSwamp ? false : true;	// Security.
+	coll->Setup.BlockFloorSlopeDown = !isSwamp;	// Security.
+	coll->Setup.BlockFloorSlopeUp = !isSwamp;	// Security.
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
