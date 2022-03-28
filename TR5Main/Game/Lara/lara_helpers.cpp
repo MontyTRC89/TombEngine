@@ -741,8 +741,8 @@ void SetLaraSwimDiveAnimation(ITEM_INFO* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+	item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 0.4f;
 	item->Position.xRot = -ANGLE(45.0f);
-	item->Animation.VerticalVelocity = 80;
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 
