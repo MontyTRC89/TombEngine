@@ -97,7 +97,7 @@ void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_ROLL | IN_BACK))
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
@@ -302,7 +302,8 @@ void lara_as_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
 		lara->Control.JumpDirection = JumpDirection::None;
 
-	if ((TrInput & IN_FORWARD ||
+	if (((TrInput & IN_FORWARD &&
+			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes logical priority in this excpetion.
 		!(TrInput & IN_DIRECTION) && lara->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
@@ -465,7 +466,7 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_ROLL | IN_FORWARD))
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;

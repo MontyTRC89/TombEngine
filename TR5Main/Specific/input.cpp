@@ -199,7 +199,7 @@ int S_UpdateInput()
 	if (Key(KEY_RIGHT))
 		lInput |= IN_RIGHT;
 
-	if (Key(KEY_DUCK))
+	if (Key(KEY_CROUCH))
 		lInput |= IN_CROUCH;
 
 	if (Key(KEY_SPRINT))
@@ -277,10 +277,10 @@ int S_UpdateInput()
 	if (Key(KEY_OPTION))
 		lInput |= IN_OPTION;
 
-	if (Key(KEY_STEPL))
+	if (Key(KEY_LSTEP))
 		lInput |= IN_LSTEP;
 
-	if (Key(KEY_STEPR))
+	if (Key(KEY_RSTEP))
 		lInput |= IN_RSTEP;
 
 	if (Key(KEY_PAUSE))
@@ -433,9 +433,8 @@ int S_UpdateInput()
 		lInput |= IN_E;
 
 	// TODO: Make FORWARD+BACK to turn 180 degrees a user option.
-	if (lInput & IN_FORWARD && lInput & IN_BACK)
-		lInput |= IN_ROLL;
-
+	/*if (lInput & IN_FORWARD && lInput & IN_BACK)
+		lInput |= IN_ROLL;*/
 	if (lInput & IN_ROLL && BinocularRange)
 		lInput &= ~IN_ROLL;
 
