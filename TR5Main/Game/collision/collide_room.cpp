@@ -181,8 +181,8 @@ CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z)
 	// Probe bottom block through portals.
 	while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 	{
-		auto r = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-		floor = GetSector(r, x - r->x, z - r->z);
+		auto* room = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+		floor = GetSector(room, x - room->x, z - room->z);
 	}
 
 	// Return probed bottom block into result.
