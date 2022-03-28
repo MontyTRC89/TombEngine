@@ -51,10 +51,12 @@ constexpr auto LARA_RAD_UNDERWATER = 300;
 constexpr auto LARA_RAD_DEATH = 400;
 constexpr auto LARA_VELOCITY = 12;
 
+// TODO: Convert velocities to floats and eliminate the division that goes on with these values. @Sezz
 constexpr auto LARA_SWIM_ACCELERATION = 8;
 constexpr auto LARA_SWIM_DECELERATION = 6;
 constexpr auto LARA_SWIM_VELOCITY_MAX = 200;
 constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 134;
+constexpr auto LARA_TREAD_VELOCITY_MAX = 70;
 
 constexpr auto LARA_FREEFALL_VELOCITY = 131;
 constexpr auto LARA_DAMAGE_VELOCITY = 141;
