@@ -486,10 +486,10 @@ bool TestLaraHangOnClimbableWall(ITEM_INFO* item, CollisionInfo* coll)
 			return false;
 	}
 
-	if (LaraTestClimbPos(item, LARA_RAD, LARA_RAD, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
-		LaraTestClimbPos(item, LARA_RAD, -LARA_RAD, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
+	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds->Y1, bounds->Y2 - bounds->Y1, &shift) &&
+		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds->Y1, bounds->Y2 - bounds->Y1, &shift))
 	{
-		result = LaraTestClimbPos(item, LARA_RAD, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
+		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds->Y1, bounds->Y2 - bounds->Y1, &shift);
 		if (result)
 		{
 			if (result != 1)
@@ -920,7 +920,7 @@ bool TestLaraWaterClimbOut(ITEM_INFO* item, CollisionInfo* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return false;
 
-	int frontFloor = coll->Front.Floor + LARA_HEIGHT_SURFSWIM;
+	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
 	if (frontFloor <= -CLICK(2) ||
 		frontFloor > CLICK(1.25f) - 4)
 	{
@@ -1021,19 +1021,19 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, CollisionInfo* coll) // NEW functio
 	switch ((unsigned short)facing / ANGLE(90.0f))
 	{
 	case NORTH:
-		item->Position.zPos = (item->Position.zPos | (SECTOR(1) - 1)) - LARA_RAD - 1;
+		item->Position.zPos = (item->Position.zPos | (SECTOR(1) - 1)) - LARA_RADIUS - 1;
 		break;
 
 	case EAST:
-		item->Position.xPos = (item->Position.xPos | (SECTOR(1) - 1)) - LARA_RAD - 1;
+		item->Position.xPos = (item->Position.xPos | (SECTOR(1) - 1)) - LARA_RADIUS - 1;
 		break;
 
 	case SOUTH:
-		item->Position.zPos = (item->Position.zPos & -SECTOR(1)) + LARA_RAD + 1;
+		item->Position.zPos = (item->Position.zPos & -SECTOR(1)) + LARA_RADIUS + 1;
 		break;
 
 	case WEST:
-		item->Position.xPos = (item->Position.xPos & -SECTOR(1)) + LARA_RAD + 1;
+		item->Position.xPos = (item->Position.xPos & -SECTOR(1)) + LARA_RADIUS + 1;
 		break;
 	}
 
@@ -1196,13 +1196,13 @@ bool TestLaraPose(ITEM_INFO* item, CollisionInfo* coll)
 
 bool TestLaraKeepLow(ITEM_INFO* item, CollisionInfo* coll)
 {
-	// HACK: coll->Setup.Radius is only set to LARA_RAD_CRAWL
+	// HACK: coll->Setup.Radius is only set to LARA_RADIUS_CRAWL
 	// in the collision function, then reset by LaraAboveWater().
 	// For tests called in control functions, then, it will store the wrong radius. @Sezz 2021.11.05
 	int radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
-		? LARA_RAD : LARA_RAD_CRAWL;
+		? LARA_RADIUS : LARA_RADIUS_CRAWL;
 
 	auto probeFront = GetCollision(item, item->Position.yRot, radius, -coll->Setup.Height);
 	auto probeBack = GetCollision(item, item->Position.yRot + ANGLE(180.0f), radius, -coll->Setup.Height);
@@ -1356,7 +1356,7 @@ bool TestLaraMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MoveTestSetup t
 	// This means they store the wrong values for move tests called in crawl lara_as functions.
 	// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
 	// for the useCrawlSetup argument. @Sezz 2022.03.16
-	int laraRadius = useCrawlSetup ? LARA_RAD_CRAWL : coll->Setup.Radius;
+	int laraRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
 	int laraHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
 
 	int y = item->Position.yPos;

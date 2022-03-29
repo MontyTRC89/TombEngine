@@ -187,8 +187,8 @@ void UpdateSprintBar(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->SprintEnergy < LARA_SPRINT_MAX)
-		DrawSprintBar(lara->SprintEnergy / LARA_SPRINT_MAX);
+	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX)
+		DrawSprintBar(lara->SprintEnergy / LARA_SPRINT_ENERGY_MAX);
 }
 
 void DrawAllPickups()
