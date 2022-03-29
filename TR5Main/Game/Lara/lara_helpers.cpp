@@ -231,7 +231,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll)
 	// Bridges behave differently.
 	if (coll->Middle.Bridge < 0)
 	{
-		MoveItem(item, item->Position.yRot, -LARA_RAD_CRAWL);
+		MoveItem(item, item->Position.yRot, -LARA_RADIUS_CRAWL);
 		item->Position.yRot += ANGLE(180.0f);
 	}
 }

@@ -447,7 +447,7 @@ void lara_col_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
@@ -546,7 +546,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Position.yRot;
 	lara->ExtraTorsoRot.xRot = 0;
 	lara->ExtraTorsoRot.yRot = 0;
-	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);	// TODO: Stepping approach is different from walk/run. Resolve this someday. @Sezz 2021.10.31
@@ -643,7 +643,7 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
-	coll->Setup.Radius = LARA_RAD_CRAWL;
+	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down steps.
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);

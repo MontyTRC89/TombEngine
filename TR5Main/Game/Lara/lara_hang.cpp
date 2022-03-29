@@ -219,7 +219,7 @@ void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	/*state 30*/
 	/*state code: lara_as_hangleft*/
 	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
 	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
@@ -246,7 +246,7 @@ void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 	/*state 31*/
 	/*state code: lara_as_hangright*/
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	TestLaraHang(item, coll);
 	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 }

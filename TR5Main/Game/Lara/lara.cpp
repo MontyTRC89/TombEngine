@@ -447,7 +447,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 
-	if (lara->SprintEnergy < LARA_SPRINT_MAX && item->Animation.ActiveState != LS_SPRINT)
+	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->SprintEnergy++;
 
 	lara->Control.IsLow = false;
@@ -762,7 +762,7 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT;
 	lara->Control.CanLook = true;
 
@@ -873,12 +873,12 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(0.5f);
-	coll->Setup.LowerCeilingBound = LARA_RAD;
+	coll->Setup.LowerCeilingBound = LARA_RADIUS;
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.BlockFloorSlopeUp = false;
@@ -932,7 +932,7 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 
 	lara->ExtraVelocity = PHD_VECTOR();
 
-	UpdateItemRoom(item, LARA_RAD);
+	UpdateItemRoom(item, LARA_RADIUS);
 
 	LaraGun(item);
 
@@ -946,12 +946,12 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
-	coll->Setup.Radius = LARA_RAD_UNDERWATER;
+	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -(LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3));
-	coll->Setup.LowerCeilingBound = LARA_RAD_UNDERWATER + (LARA_RAD_UNDERWATER / 3);
+	coll->Setup.UpperFloorBound = -(LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3));
+	coll->Setup.LowerCeilingBound = LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3);
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
 	coll->Setup.BlockFloorSlopeUp = false;
