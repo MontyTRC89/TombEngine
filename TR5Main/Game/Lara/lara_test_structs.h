@@ -19,8 +19,8 @@ struct MonkeyMoveTestSetup
 
 struct VaultTestSetup
 {
-	int LowerCeilingBound;
-	int UpperCeilingBound;
+	int LowerFloorBound;
+	int UpperFloorBound;
 	int ClampMin;
 	int ClampMax;
 	int GapMin;
