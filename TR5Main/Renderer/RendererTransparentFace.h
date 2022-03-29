@@ -1,11 +1,11 @@
 #pragma once
-
 #include <SimpleMath.h>
 #include "Renderer11Enums.h"
 
 struct MESH_INFO;
 
-namespace TEN::Renderer {
+namespace TEN::Renderer
+{
 	struct RendererBucket;
 	struct RendererPolygon;
 	struct RendererSpriteToDraw;
