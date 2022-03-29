@@ -289,7 +289,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_climb_end,
 	lara_col_climb_right,
 	lara_col_climb_down,
-	lara_void_func,//62
+	lara_col_jump_prepare,//62
 	lara_void_func,
 	lara_void_func,
 	lara_col_wade_forward,
