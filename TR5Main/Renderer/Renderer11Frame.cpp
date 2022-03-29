@@ -19,7 +19,8 @@ namespace TEN::Renderer
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
-		for (int i = 0; i < g_Level.Rooms.size(); i++) {
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
+		{
 			m_rooms[i].ItemsToDraw.clear();
 			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
@@ -32,9 +33,8 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectItems(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber) {
+		if (m_rooms.size() < roomNumber)
 			return;
-		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
@@ -81,9 +81,8 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectStatics(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber) {
+		if (m_rooms.size() < roomNumber)
 			return;
-		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
@@ -114,9 +113,8 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
 	{
 		effect->Lights.clear();
-		if (m_rooms.size() < roomNumber) {
+		if (m_rooms.size() < roomNumber)
 			return;
-		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
@@ -217,9 +215,8 @@ namespace TEN::Renderer
 	{
 		item->LightsToDraw.clear();
 
-		if (m_rooms.size() < roomNumber){
+		if (m_rooms.size() < roomNumber)
 			return;
-		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
@@ -246,14 +243,10 @@ namespace TEN::Renderer
 			item->AmbientLightSteps = 0;
 		}
 		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
-		{
 			item->AmbientLightSteps++;
-		}
 
 		if (item->PreviousRoomNumber == NO_ITEM)
-		{
 			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
-		}
 		else
 		{
 			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
@@ -268,9 +261,7 @@ namespace TEN::Renderer
 		Vector3 itemPosition = Vector3(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos);
 
 		if (nativeItem->ObjectNumber == ID_LARA)
-		{
 			shadowLight = nullptr;
-		}
 
 		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
@@ -308,9 +299,7 @@ namespace TEN::Renderer
 				light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
 
 				if (!light->AffectNeighbourRooms && roomToCheck != roomNumber)
-				{
 					continue;
-				}
 
 				// Check only lights different from sun
 				if (light->Type == LIGHT_TYPE_SUN)
@@ -392,24 +381,21 @@ namespace TEN::Renderer
 		}
 
 		if (nativeItem->ObjectNumber == ID_LARA)
-		{
 			shadowLight = brightestLight;
-		}
 
 		// Sort lights by distance
 		std::sort(
 			tempLights.begin(),
 			tempLights.end(),
-			[](RendererLight* a, RendererLight* b) {
+			[](RendererLight* a, RendererLight* b)
+			{
 				return a->LocalIntensity > b->LocalIntensity;
 			}
 		);
 
 		// Add max 8 lights per item, including the shadow light for Lara eventually
 		if (shadowLight != nullptr)
-		{
 			item->LightsToDraw.push_back(shadowLight);
-		}
 		for (int i = 0; i < tempLights.size(); i++)
 		{
 			if (shadowLight != nullptr && shadowLight == tempLights[i])
@@ -424,9 +410,9 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber){
+		if (m_rooms.size() < roomNumber)
 			return;
-		}
+		
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
@@ -441,8 +427,8 @@ namespace TEN::Renderer
 			Vector3 boxMax = Vector3(r->x + (r->xSize + 1) * WALL_SIZE, -(r->maxceiling - STEP_SIZE), r->z + (r->zSize + 1) * WALL_SIZE);
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
-			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1
-				&& SphereBoxIntersection(boxMin, boxMax, center, light->Out))
+			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1 &&
+				SphereBoxIntersection(boxMin, boxMax, center, light->Out))
 				renderView.lightsToDraw.push_back(light);
 		}
 	}
@@ -481,8 +467,6 @@ namespace TEN::Renderer
 	void Renderer11::resetAnimations()
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
-		{
 			m_items[i].DoneAnimations = false;
-		}
 	}
 } // namespace TEN::Renderer
