@@ -1626,6 +1626,19 @@ bool TestLaraCrouchToCrawl(ITEM_INFO* item)
 	return false;
 }
 
+bool TestLaraFastTurn(ITEM_INFO* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if ((lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+		(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup)
 {
 	int y = item->Position.yPos - LARA_HEIGHT_MONKEY;
