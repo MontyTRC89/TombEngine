@@ -1428,7 +1428,7 @@ void lara_col_death(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.Radius = LARA_RAD_DEATH;
+	coll->Setup.Radius = LARA_RADIUS_DEATH;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 

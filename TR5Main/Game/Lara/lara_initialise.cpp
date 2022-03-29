@@ -37,7 +37,7 @@ void InitialiseLara(int restore)
 	Lara.Control.CanLook = true;
 	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
-	Lara.SprintEnergy = LARA_SPRINT_MAX;
+	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
 	PoisonFlag = 0;

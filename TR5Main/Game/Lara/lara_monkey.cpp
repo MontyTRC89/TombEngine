@@ -133,7 +133,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
@@ -222,7 +222,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -303,7 +303,7 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -384,7 +384,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -465,7 +465,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 

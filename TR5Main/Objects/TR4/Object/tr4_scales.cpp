@@ -91,7 +91,7 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (TestBoundsCollide(item, laraItem, LARA_RAD))
+	if (TestBoundsCollide(item, laraItem, LARA_RADIUS))
 	{
 		if (laraItem->Animation.AnimNumber != LA_WATERSKIN_POUR_LOW && laraItem->Animation.AnimNumber != LA_WATERSKIN_POUR_HIGH || item->Animation.ActiveState != 1)
 		{
