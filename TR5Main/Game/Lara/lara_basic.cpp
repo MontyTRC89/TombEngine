@@ -533,9 +533,8 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		if (TrInput & IN_SPRINT || lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
-			(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
+		if (TrInput & IN_SPRINT ||
+			lara->Control.TurnRate <= -LARA_SLOW_TURN_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
@@ -546,9 +545,8 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		if (TrInput & IN_SPRINT || lara->Control.TurnRate >= LARA_SLOW_TURN_MAX ||
-			(lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
-			(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
+		if (TrInput & IN_SPRINT ||
+			lara->Control.TurnRate >= LARA_SLOW_TURN_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
