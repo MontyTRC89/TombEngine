@@ -1737,10 +1737,10 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 {
 	auto* lara = GetLaraInfo(item);
 
-	int y = item->Position.yPos;
 	int distance = OFFSET_RADIUS(coll->Setup.Radius);
 	auto probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollision(item);
+	int y = probeMiddle.Position.Floor;
 
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
 	
@@ -1751,11 +1751,11 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 	// HACK: Where the probe finds that the wall in front is formed by a ceiling or the space between the floor and ceiling is a clamp,
 	// any climbable floor in a room above will be missed.
 	// Raise y position of probe point by increments of CLICK(0.5f) to find this potential vault candidate location.
-	int yOffset = testSetup.LowerCeilingBound;
+	int yOffset = testSetup.LowerFloorBound;
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height...
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMin ||		// OR clamp is too small
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMax) &&		// OR clamp is too large (future-proofing; not possible right now).
-		yOffset > (testSetup.UpperCeilingBound - coll->Setup.Height))								// Offset is not too high.
+		yOffset > (testSetup.UpperFloorBound - coll->Setup.Height))									// Offset is not too high.
 	{
 		probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, yOffset);
 		yOffset -= std::max<int>(CLICK(0.5f), testSetup.ClampMin);
@@ -1766,8 +1766,8 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 		return VaultTestResult{ false };
 
 	// Assess vault candidate location.
-	if ((probeFront.Position.Floor - y) < testSetup.LowerCeilingBound &&						// Within lower floor bound.
-		(probeFront.Position.Floor - y) >= testSetup.UpperCeilingBound &&						// Within upper floor bound.
+	if ((probeFront.Position.Floor - y) < testSetup.LowerFloorBound &&							// Within lower floor bound.
+		(probeFront.Position.Floor - y) >= testSetup.UpperFloorBound &&							// Within upper floor bound.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Within clamp min.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMax &&	// Within clamp max.
 		abs(probeMiddle.Position.Ceiling - probeFront.Position.Floor) >= testSetup.GapMin)		// Gap is optically permissive.

@@ -105,7 +105,7 @@ void lara_as_vault(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // State:		LS_AUTO_JUMP (62)
-// Collision:	lara_lara_void_func()
+// Collision:	lara_as_jump_prepare()
 void lara_as_auto_jump(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
