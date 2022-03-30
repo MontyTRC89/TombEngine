@@ -756,7 +756,7 @@ bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 	{
 		int number = bits;
 		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
-			SoundEffect(SFX_TR5_SMASHMETAL, &item->Position, 0);
+			SoundEffect(SFX_TR5_SMASH_METAL, &item->Position, 0);
 		else if (number == 256)
 			number = -64;
 
