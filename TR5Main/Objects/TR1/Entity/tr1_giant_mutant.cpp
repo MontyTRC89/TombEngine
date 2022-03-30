@@ -18,8 +18,8 @@ enum abortion_anims {
 	ABORT_ATTACK3, ABORT_FORWARD, ABORT_SET, ABORT_FALL, ABORT_DEATH, ABORT_KILL
 };
 
-#define ABORT_NEED_TURN ANGLE(90)
-#define ABORT_TURN ANGLE(6)
+#define ABORT_NEED_TURN ANGLE(45)
+#define ABORT_TURN ANGLE(3)
 #define ABORT_ATTACK_RANGE SQUARE(2600)
 #define ABORT_CLOSE_RANGE SQUARE(2250)
 #define ABORT_ATTACK1_CHANCE 11000
@@ -29,7 +29,7 @@ enum abortion_anims {
 #define ABORT_TOUCH	(ABORT_TLEFT|ABORT_TRIGHT)
 #define ABORT_PART_DAMAGE 250
 #define ABORT_ATTACK_DAMAGE 500
-#define ABORT_TOUCH_DAMAGE 0
+#define ABORT_TOUCH_DAMAGE 5
 #define ABORT_DIE_ANIM 13
 
 void AbortionControl(short itemNum)
@@ -165,7 +165,7 @@ void AbortionControl(short itemNum)
 			{
 				item->goalAnimState = ABORT_KILL;
 
-				LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 6;
+				LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
 				LaraItem->currentAnimState = LaraItem->goalAnimState = 46;
 				LaraItem->roomNumber = item->roomNumber;
@@ -181,13 +181,13 @@ void AbortionControl(short itemNum)
 				Lara.gunType = WEAPON_NONE;
 
 				Camera.targetDistance = SECTOR(2);
-				Camera.flags = CF_CHASE_OBJECT;
+				Camera.flags = CF_FOLLOW_CENTER;
 			}
 			break;
 
 		case ABORT_KILL:
-			Camera.targetDistance = SECTOR(5);
-			Camera.flags = CF_CHASE_OBJECT;
+			Camera.targetDistance = SECTOR(2);
+			Camera.flags = CF_FOLLOW_CENTER;
 			break;
 		}
 	}
@@ -211,8 +211,8 @@ void AbortionControl(short itemNum)
 
 	if (item->status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(423, &item->pos, NULL);
-		ExplodingDeath(225, 0xfffffff, ABORT_PART_DAMAGE);
+		SoundEffect(171, &item->pos, NULL);
+		ExplodingDeath(itemNum, 0xffffffff, ABORT_PART_DAMAGE);
 
 		TestTriggers(item, true);
 
