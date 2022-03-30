@@ -93,7 +93,7 @@ void LarsonControl(short itemNumber)
 		pos.y = LarsonGun.y;
 		pos.z = LarsonGun.z;
 
-		GetJointAbsPosition(item, &pos, LarsonGun.meshNum);
+		GetJointAbsPosition(item,&pos, LarsonGun.meshNum);
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item->firedWeapon + 10, 192, 128, 32);
 		
 		item->firedWeapon--;
@@ -127,7 +127,7 @@ void LarsonControl(short itemNumber)
 			creature->enemy = LaraItem;
 
 		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		CreatureAIInfo(item,&info);
 
 		if (info.ahead)
 			joint2 = info.angle;
@@ -143,13 +143,13 @@ void LarsonControl(short itemNumber)
 			creature->flags = 0;
 		}*/
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item,&info, VIOLENT);
+		CreatureMood(item,&info, VIOLENT);
 
 		if (info.distance < SQUARE(2048) 
 			&& LaraItem->speed > 20
 			|| item->hitStatus
-			|| TargetVisible(item, &info) != 0)
+			|| TargetVisible(item,&info) != 0)
 		{
 			item->status &= ~ITEM_ACTIVE;
 			creature->alerted = true;
@@ -173,7 +173,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->goalAnimState = STATE_TR5_LARSON_RUN;
 			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item,&info))
 			{
 				item->goalAnimState = STATE_TR5_LARSON_AIM;
 			}
@@ -229,7 +229,7 @@ void LarsonControl(short itemNumber)
 				item->requiredAnimState = STATE_TR5_LARSON_RUN;
 				item->goalAnimState = STATE_TR5_LARSON_STOP;
 			}
-			else if (Targetable(item, &info))
+			else if (Targetable(item,&info))
 			{
 				item->requiredAnimState = STATE_TR5_LARSON_AIM;
 				item->goalAnimState = STATE_TR5_LARSON_STOP;
@@ -257,7 +257,7 @@ void LarsonControl(short itemNumber)
 			}
 			else if (creature->mood || GetRandomControl() >= 96)
 			{
-				if (Targetable(item, &info))
+				if (Targetable(item,&info))
 				{
 					item->requiredAnimState = STATE_TR5_LARSON_AIM;
 					item->goalAnimState = STATE_TR5_LARSON_STOP;
@@ -296,7 +296,7 @@ void LarsonControl(short itemNumber)
 				item->pos.yRot += info.angle;
 			}
 
-			if (Targetable(item, &info))
+			if (Targetable(item,&info))
 				item->goalAnimState = STATE_TR5_LARSON_ATTACK;
 			else
 				item->goalAnimState = STATE_TR5_LARSON_STOP;
@@ -343,12 +343,12 @@ void LarsonControl(short itemNumber)
 			{
 				if (item->objectNumber == ID_PIERRE)
 				{
-					ShotLara(item, &info, &PierreGun1, joint0, 20);
-					ShotLara(item, &info, &PierreGun2, joint0, 20);
+					ShotLara(item,&info,&PierreGun1, joint0, 20);
+					ShotLara(item,&info,&PierreGun2, joint0, 20);
 				}
 				else
 				{
-					ShotLara(item, &info, &LarsonGun, joint0, 20);
+					ShotLara(item,&info,&LarsonGun, joint0, 20);
 				}
 				item->firedWeapon = 2;
 			}

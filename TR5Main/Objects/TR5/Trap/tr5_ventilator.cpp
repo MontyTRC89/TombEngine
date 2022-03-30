@@ -274,7 +274,7 @@ void VentilatorControl(short itemNumber)
 	else
 	{
 		BOUNDING_BOX tbounds;
-		phd_RotBoundingBoxNoPersp(&item->pos, bounds, &tbounds);
+		phd_RotBoundingBoxNoPersp(&item->pos, bounds,&tbounds);
 
 		effectBounds.X1 = item->pos.xPos + tbounds.X1;
 		effectBounds.X2 = item->pos.xPos + tbounds.X2;
