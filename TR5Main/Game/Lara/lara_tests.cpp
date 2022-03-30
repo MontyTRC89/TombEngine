@@ -134,7 +134,7 @@ bool TestLaraHang(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
-	auto embedOffset = 4;
+	int embedOffset = 4;
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		embedOffset = 16;
 
@@ -1930,11 +1930,15 @@ VaultTestResult TestLaraLadderAutoJump(ITEM_INFO* item, CollisionInfo* coll)
 	auto probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollision(item);
 
-	if (TestValidLedgeAngle(item, coll) &&						// Appropriate angle difference from ladder.
-		!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
-		lara->Control.CanClimbLadder &&							// Ladder sector flag set.
-		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&	// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
-		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
+	// Check ledge angle.
+	if (!TestValidLedgeAngle(item, coll))
+		return VaultTestResult{ false };
+
+	if (lara->Control.CanClimbLadder &&								// Ladder sector flag set.
+		(probeMiddle.Position.Ceiling - y) <= -CLICK(6.5f) &&		// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
+		((probeFront.Position.Floor - y) <= -CLICK(6.5f) ||			// Floor height is appropriate, OR
+			(probeFront.Position.Ceiling - y) > -CLICK(6.5f)) &&		// Ceiling height is appropriate. (Synced with TestLaraLadderMount())
+		coll->NearestLedgeDistance <= coll->Setup.Radius)			// Appropriate distance from wall.
 	{
 		return VaultTestResult{ true, probeMiddle.Position.Ceiling, false, true, true };
 	}
@@ -1951,9 +1955,13 @@ VaultTestResult TestLaraLadderMount(ITEM_INFO* item, CollisionInfo* coll)
 	auto probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollision(item);
 
-	if (TestValidLedgeAngle(item, coll) &&
-		lara->Control.CanClimbLadder &&							// Ladder sector flag set.
+	// Check ledge angle.
+	if (!TestValidLedgeAngle(item, coll))
+		return VaultTestResult{ false };
+
+	if (lara->Control.CanClimbLadder &&							// Ladder sector flag set.
 		(probeMiddle.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lower middle ceiling bound.
+		(probeMiddle.Position.Ceiling - y) > -CLICK(6.5f) &&	// Within upper middle ceiling bound.
 		(probeMiddle.Position.Floor - y) > -CLICK(6.5f) &&		// Within upper middle floor bound. (Synced with TestLaraAutoJump())
 		(probeFront.Position.Ceiling - y) <= -CLICK(4.5f) &&	// Within lowest front ceiling bound.
 		coll->NearestLedgeDistance <= coll->Setup.Radius)		// Appropriate distance from wall.
@@ -1971,8 +1979,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ITEM_INFO* item, CollisionInfo* coll)
 	int y = item->Position.yPos;
 	auto probe = GetCollision(item);
 
-	if (!TestEnvironment(ENV_FLAG_SWAMP, item) &&				// No swamp.
-		lara->Control.CanMonkeySwing &&							// Monkey swing sector flag set.
+	if (lara->Control.CanMonkeySwing &&							// Monkey swing sector flag set.
 		(probe.Position.Ceiling - y) < -LARA_HEIGHT_MONKEY &&	// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(7))				// Within upper ceiling bound.
 	{
