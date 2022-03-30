@@ -975,8 +975,6 @@ namespace TEN::Renderer
 				m_numDrawCalls++;
 			}
 		}
-		//m_context->RSSetState(m_states->CullCounterClockwise());
-		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	}
 
@@ -989,7 +987,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
 		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
-
+		  
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1003,7 +1001,7 @@ namespace TEN::Renderer
 		SetBlendMode(info->blendMode);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(ALPHA_TEST_NONE, 0);
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
