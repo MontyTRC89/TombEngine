@@ -4,7 +4,7 @@
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
 
-cbuffer LightsBuffer : register(b1)
+cbuffer LightsBuffer : register(b2)
 {
 	ShaderLight Lights[MAX_LIGHTS];
 	int NumLights;
