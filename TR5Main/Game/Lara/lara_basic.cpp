@@ -1902,6 +1902,7 @@ void lara_as_step_right(ITEM_INFO* item, CollisionInfo* coll)
 		}
 	}
 
+	// TODO: Funky?
 	if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
