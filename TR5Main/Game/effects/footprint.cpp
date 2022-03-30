@@ -67,11 +67,11 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Grass:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_GRASS;
 			break;
 
 		case FLOOR_MATERIAL::Gravel:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_GRAVEL;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_GRAVEL;
 			break;
 
 		case FLOOR_MATERIAL::Ice:
@@ -79,27 +79,27 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Marble:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MARBLE;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_MARBLE;
 			break;
 
 		case FLOOR_MATERIAL::Metal:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_METAL;
 			break;
 
 		case FLOOR_MATERIAL::Mud:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_MUD;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_MUD;
 			break;
 
 		case FLOOR_MATERIAL::OldMetal:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_METAL;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_METAL;
 			break;
 
 		case FLOOR_MATERIAL::OldWood:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_WOOD;
 			break;
 
 		case FLOOR_MATERIAL::Sand:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_SAND__AND__GRASS;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOSTEPS_SAND;
 			break;
 
 		case FLOOR_MATERIAL::Snow:
@@ -115,7 +115,39 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Wood:
-			fx = SOUND_EFFECTS::SFX_TR4_FOOTSTEPS_WOOD;
+			fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_WOOD;
+			break;
+
+		case FLOOR_MATERIAL::Custom_Sound_1:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_1;
+		break;
+
+		case FLOOR_MATERIAL::Custom_Sound_2:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_2;
+		break; 
+		
+		case FLOOR_MATERIAL::Custom_Sound_3:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_3;
+		break;
+		
+		case FLOOR_MATERIAL::Custom_Sound_4:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_4;
+		break; 
+		
+		case FLOOR_MATERIAL::Custom_Sound_5:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_5;
+			break;
+
+		case FLOOR_MATERIAL::Custom_Sound_6:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_6;
+			break;
+
+		case FLOOR_MATERIAL::Custom_Sound_7:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_7;
+			break;
+
+		case FLOOR_MATERIAL::Custom_Sound_8:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_8;
 			break;
 		}
 
