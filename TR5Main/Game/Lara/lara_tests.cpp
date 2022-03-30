@@ -1581,21 +1581,29 @@ bool TestLaraCrouchRoll(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	int y = item->Position.yPos;
-	int distance = CLICK(3);
-	auto probe = GetCollision(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
+	// Assess water depth.
+	if (lara->WaterSurfaceDist < -CLICK(1))
+		return false;
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					// Avoid unsightly concurrent actions.
-		(probe.Position.Floor - y) <= (CLICK(1) - 1) &&			// Within lower floor bound.
-		(probe.Position.Floor - y) >= -(CLICK(1) - 1) &&		// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -LARA_HEIGHT_CRAWL &&	// Within lowest ceiling bound.
-		!probe.Position.FloorSlope &&							// Not a slope.
-		lara->WaterSurfaceDist >= -CLICK(1))					// Water depth is optically permissive.
+	// Assess continuity of path.
+	int distance = 0;
+	auto probeA = GetCollision(item);
+	while (distance < SECTOR(1))
 	{
-		return true;
+		distance += CLICK(1);
+		auto probeB = GetCollision(item, item->Position.yRot, distance, -LARA_HEIGHT_CRAWL);
+
+		if (abs(probeA.Position.Floor - probeB.Position.Floor) > (CLICK(1) - 1) ||			// Ensure floor height difference is within a threshold.
+			abs(probeB.Position.Ceiling - probeB.Position.Floor) <= LARA_HEIGHT_CRAWL ||	// Avoid clamps.
+			probeB.Position.FloorSlope)														// Avoid slopes.
+		{
+			return false;
+		}
+
+		probeA = probeB;
 	}
 
-	return false;
+	return true;
 }
 
 bool TestLaraCrouch(ITEM_INFO* item)
@@ -1755,7 +1763,9 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 	auto probeMiddle = GetCollision(item);
 	int y = probeMiddle.Position.Floor;
 
-	bool swampTooDeep = testSetup.CheckSwampDepth ? (TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3)) : TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool swampTooDeep = testSetup.CheckSwampDepth ?
+		(TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3)) :
+		TestEnvironment(ENV_FLAG_SWAMP, item);
 	
 	// Check swamp depth (if applicable).
 	if (swampTooDeep)
