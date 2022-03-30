@@ -398,9 +398,9 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	float s = phd_sin(item->Position.yRot);
 	float c = phd_cos(item->Position.yRot);
 
-	item->Position.xPos += roundf(c * x + s * z);
+	item->Position.xPos += round(c * x + s * z);
 	item->Position.yPos += y;
-	item->Position.zPos += roundf(-s * x + c * z);
+	item->Position.zPos += round(-s * x + c * z);
 }
 
 void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)

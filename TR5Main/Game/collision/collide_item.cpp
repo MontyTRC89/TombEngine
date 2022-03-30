@@ -476,7 +476,7 @@ bool ItemNearLara(PHD_3DPOS* pos, int radius)
 		return false;
 
 	auto* bounds = GetBoundsAccurate(LaraItem);
-	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RAD))
+	if (target.y >= bounds->Y1 && target.y <= (bounds->Y2 + LARA_RADIUS))
 		return true;
 
 	return false;

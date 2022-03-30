@@ -35,20 +35,20 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_ACTION)
-		TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos, 31, 255, 255, 255);
+		TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos, 31, 150, 150, 150);
 
 	if (TrInput & IN_OPTION)
 		lara->Control.TurnRate = -ANGLE(12.0f);
 
 	if (TrInput & IN_JUMP)
 	{
-		item->Animation.VerticalVelocity += 16;
-		if (item->Animation.VerticalVelocity > 400)
-			item->Animation.VerticalVelocity = 400;
+		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION * 2;
+		if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX * 2)
+			item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 2;
 	}
 	else
 	{
-		if (item->Animation.VerticalVelocity >= 8)
+		if (item->Animation.VerticalVelocity >= LARA_SWIM_ACCELERATION)
 			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 8;
 		else
 			item->Animation.VerticalVelocity = 0;
@@ -73,16 +73,16 @@ void LaraCheatyBits(ITEM_INFO* item)
 				if (lara->Control.WaterStatus != WaterStatus::FlyCheat)
 				{
 					SetAnimation(item, LA_DOZY);
-					item->Position.xRot = ANGLE(30.0f);
 					item->Animation.VerticalVelocity = 30;
 					item->Animation.Airborne = false;
-					item->HitPoints = 1000;
+					item->Position.xRot = ANGLE(30.0f);
+					item->HitPoints = LARA_HEALTH_MAX;
 
 					ResetLaraFlex(item);
 					lara->Control.WaterStatus = WaterStatus::FlyCheat;
-					lara->PoisonPotency = 0;
-					lara->Air = 1800;
 					lara->Control.Count.Death = 0;
+					lara->PoisonPotency = 0;
+					lara->Air = LARA_AIR_MAX;
 				}
 			}
 			else if (!lara->Control.Count.NoCheat)

@@ -71,7 +71,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_ROLL)
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -130,10 +130,10 @@ void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
-	coll->Setup.CeilingSlopeIsWall = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
@@ -188,7 +188,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_ROLL | IN_FORWARD & IN_BACK)
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -219,10 +219,10 @@ void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
-	coll->Setup.CeilingSlopeIsWall = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -300,10 +300,10 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
-	coll->Setup.CeilingSlopeIsWall = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -381,10 +381,10 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
-	coll->Setup.CeilingSlopeIsWall = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
@@ -462,10 +462,10 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
-	coll->Setup.CeilingSlopeIsWall = true;
-	coll->Setup.NoMonkeyFlagIsWall = true;
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockNoMonkeyFlag = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 
