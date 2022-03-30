@@ -420,7 +420,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll)
 
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
-	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_SURFSWIM, 0));
+	GetCollisionInfo(coll, item, PHD_VECTOR(0, LARA_HEIGHT_TREAD, 0));
 	ShiftItem(item, coll);
 
 	if (coll->CollisionType & (CT_FRONT | CT_TOP | CT_TOP_FRONT | CT_CLAMP) ||
@@ -684,6 +684,9 @@ void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
+
+	if (coll->CollisionType == CT_CLAMP)
+		item->Position.yPos += coll->Middle.Floor;
 }
 
 bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height, int side)
@@ -695,7 +698,7 @@ bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int hei
 	item->Position.yPos += height;
 	item->Position.zPos += phd_cos(item->Position.yRot + angle) * distance + phd_sin(angle + ANGLE(90.0f) * sideSign) * abs(side);
 
-	auto result = GetCollidedObjects(item, LARA_RAD, true, CollidedItems, CollidedMeshes, 0);
+	auto result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
 
 	item->Position = oldPos;
 	return result;

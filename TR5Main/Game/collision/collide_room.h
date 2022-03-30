@@ -61,31 +61,33 @@ struct CollisionResult
 	FLOOR_INFO* BottomBlock;
 
 	CollisionPosition Position;
-	Vector2 FloorTilt;		// x = x, y = z
-	Vector2 CeilingTilt;	// x = x, y = z
+	Vector2 FloorTilt;			// x = x, y = z
+	Vector2 CeilingTilt;		// x = x, y = z
 };
 
 struct CollisionSetup
 {
 	CollisionProbeMode Mode;	// Probe rotation mode
-
-	bool CeilingSlopeIsWall;	// Treat steep slopes on ceilings as walls
-	bool FloorSlopeIsWall;		// Treat steep slopes as walls
-	bool FloorSlopeIsPit;		// Treat steep slopes as pits
-	bool DeathFlagIsPit;		// Treat death sectors as pits
-	bool NoMonkeyFlagIsWall;	// Treat non-monkey sectors as walls
-	bool EnableObjectPush;		// Can be pushed by objects
-	bool EnableSpasm;			// Convulse when pushed
-						    
 	int   Radius;				// Collision bounds horizontal size
 	int   Height;				// Collision bounds vertical size
 	short ForwardAngle;			// Forward angle direction
+
 	int   LowerFloorBound;		// Borderline floor step-up height 
 	int   UpperFloorBound;		// Borderline floor step-down height
 	int   LowerCeilingBound;	// Borderline ceiling step-up height
 	int   UpperCeilingBound;	// Borderline ceiling step-down height
 
-	PHD_VECTOR OldPosition;		// Preserve old parameters to restore later
+	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
+	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
+	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
+	bool BlockDeathFlagDown;	// Treat death sectors as pits
+	bool BlockNoMonkeyFlag;		// Treat non-monkey sectors as walls
+	
+	bool EnableObjectPush;		// Can be pushed by objects
+	bool EnableSpasm;			// Convulse when pushed
+
+	// Preserve old parameters to restore later
+	PHD_VECTOR OldPosition;
 	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
@@ -104,8 +106,8 @@ struct CollisionInfo
 
 	PHD_VECTOR Shift;
 	CollisionType CollisionType;
-	Vector2 FloorTilt;		// x = x, y = z
-	Vector2 CeilingTilt;	// x = x, y = z
+	Vector2 FloorTilt;				// x = x, y = z
+	Vector2 CeilingTilt;			// x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 

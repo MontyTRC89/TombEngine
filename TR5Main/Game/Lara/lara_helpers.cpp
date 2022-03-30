@@ -231,7 +231,7 @@ void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll)
 	// Bridges behave differently.
 	if (coll->Middle.Bridge < 0)
 	{
-		MoveItem(item, item->Position.yRot, -LARA_RAD_CRAWL);
+		MoveItem(item, item->Position.yRot, -LARA_RADIUS_CRAWL);
 		item->Position.yRot += ANGLE(180.0f);
 	}
 }
@@ -576,7 +576,15 @@ void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultRes
 	}
 
 	if (vaultResult.SetJumpVelocity)
-		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * std::max<int>(lara->ProjectedFloorHeight - item->Position.yPos, -CLICK(7.5f)));
+	{
+		int height = lara->ProjectedFloorHeight - item->Position.yPos;
+		if (height > -CLICK(3.5f))
+			height = -CLICK(3.5f);
+		else if (height < -CLICK(7.5f))
+			height = -CLICK(7.5f);
+
+		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this.
+	}
 }
 
 void SetLaraLand(ITEM_INFO* item, CollisionInfo* coll)
@@ -741,8 +749,8 @@ void SetLaraSwimDiveAnimation(ITEM_INFO* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+	item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 0.4f;
 	item->Position.xRot = -ANGLE(45.0f);
-	item->Animation.VerticalVelocity = 80;
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }
 

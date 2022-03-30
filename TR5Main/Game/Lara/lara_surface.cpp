@@ -39,7 +39,7 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity -= 4;
+	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
@@ -74,7 +74,7 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (TrInput & IN_ROLL)
+	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 	{
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
@@ -91,12 +91,12 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (TrInput & IN_LSTEP)
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 	{
 		item->Animation.TargetState = LS_ONWATER_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP)
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 	{
 		item->Animation.TargetState = LS_ONWATER_RIGHT;
 		return;
@@ -146,9 +146,9 @@ void lara_as_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	item->Animation.VerticalVelocity += 8;
-	if (item->Animation.VerticalVelocity > 60)
-		item->Animation.VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_FORWARD (34)
@@ -157,8 +157,8 @@ void lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	lara->Control.MoveAngle = item->Position.yRot;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
@@ -195,9 +195,9 @@ void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	item->Animation.VerticalVelocity += 8;
-	if (item->Animation.VerticalVelocity > 60)
-		item->Animation.VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_LEFT (48)
@@ -241,9 +241,9 @@ void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
 
-	item->Animation.VerticalVelocity += 8;
-	if (item->Animation.VerticalVelocity > 60)
-		item->Animation.VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_RIGHT (49)
@@ -287,9 +287,9 @@ void lara_as_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 	if (!(TrInput & IN_BACK))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	item->Animation.VerticalVelocity += 8;
-	if (item->Animation.VerticalVelocity > 60)
-		item->Animation.VerticalVelocity = 60;
+	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
+		item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 }
 
 // State:		LS_ONWATER_BACK (47)
