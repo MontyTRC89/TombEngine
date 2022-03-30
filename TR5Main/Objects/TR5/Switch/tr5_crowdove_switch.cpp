@@ -99,7 +99,7 @@ namespace TEN::Entities::TR5
 		if (item->MeshBits & 2) 
 		{
 			ExplodeItemNode(item, 1, 0, 256); 
-			SoundEffect(SFX_TR5_RAVENSWITCHEXPLODE, &item->Position, 0);
+			SoundEffect(SFX_TR5_RAVEN_SWITCH_EXPLODE, &item->Position, 0);
 			item->MeshBits = 5;	
 			RemoveActiveItem(itemNumber);
 
