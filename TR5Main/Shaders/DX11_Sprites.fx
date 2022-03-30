@@ -2,12 +2,12 @@
 #include "./AlphaTestBuffer.hlsli"
 #include "./VertexInput.hlsli"
 
-cbuffer SpriteBuffer: register(b9) {
+cbuffer SpriteBuffer: register(b9)
+{
 	float4x4 billboardMatrix;
 	float4 color;
 	bool isBillboard;
 }
-
 
 struct PixelShaderInput
 {
@@ -27,10 +27,12 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4 worldPosition;
 
-	if (isBillboard) {
+	if (isBillboard) 
+	{
 		worldPosition = mul(float4(input.Position, 1.0f), billboardMatrix);
 		output.Position = mul(mul(float4(input.Position, 1.0f), billboardMatrix), ViewProjection);
-	} else {
+	} else 
+	{
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
 	}
