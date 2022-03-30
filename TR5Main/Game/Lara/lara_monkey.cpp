@@ -49,13 +49,15 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	//if (item->TargetState == LS_MONKEY_IDLE)
 	//	return;
 
-	if (TrInput & IN_LEFT)
+	if (TrInput & IN_LEFT &&
+		!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Shimmy locks orientation.
 	{
 		lara->Control.TurnRate -= LARA_TURN_RATE;
 		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX / 2)
 			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX / 2;
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (TrInput & IN_RIGHT &&
+		!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 	{
 		lara->Control.TurnRate += LARA_TURN_RATE;
 		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX / 2)
@@ -88,6 +90,25 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		{
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
+			return;
+		}
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		{
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
+			return;
+		}
+
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
@@ -96,17 +117,6 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 		else if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
-			return;
-		}
-
-		if ((TrInput & IN_LSTEP || (TrInput & IN_WALK && IN_LEFT)) && TestLaraMonkeyShimmyLeft(item, coll))
-		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
-			return;
-		}
-		else if ((TrInput & IN_RSTEP || (TrInput & IN_WALK && IN_RIGHT)) && TestLaraMonkeyShimmyRight(item, coll))
-		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
 		}
 
@@ -341,22 +351,25 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		}
 	}
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_LSTEP)
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
@@ -422,22 +435,25 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		}
 	}
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_RSTEP)
+		if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
@@ -541,14 +557,22 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
 			return;
 		}
-		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
 			return;
 		}
 
@@ -616,14 +640,22 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
 		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
 			return;
 		}
-		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 		{
-			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
 			return;
 		}
 
