@@ -99,12 +99,12 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_LSTEP && TestLaraMonkeyShimmyLeft(item, coll))
+		if ((TrInput & IN_LSTEP || (TrInput & IN_WALK && IN_LEFT)) && TestLaraMonkeyShimmyLeft(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
 		}
-		else if (TrInput & IN_RSTEP && TestLaraMonkeyShimmyRight(item, coll))
+		else if ((TrInput & IN_RSTEP || (TrInput & IN_WALK && IN_RIGHT)) && TestLaraMonkeyShimmyRight(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
