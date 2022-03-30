@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -23,9 +24,7 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
-// TODO: Temp. debug
 using namespace TEN::Renderer;
-#include "Renderer/Renderer11.h"
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -583,7 +582,7 @@ void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultRes
 		else if (height < -CLICK(7.5f))
 			height = -CLICK(7.5f);
 
-		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this.
+		lara->Control.CalculatedJumpVelocity = -3 - sqrt(-9600 - 12 * height); // TODO: Find a better formula for this that won't require the above block.
 	}
 }
 
@@ -679,7 +678,7 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 	oldAngle = angle;
 }
 
-// TODO
+// TODO: Do it later.
 void newSetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 {
 	short direction = GetLaraSlideDirection(item, coll);

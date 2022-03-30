@@ -772,84 +772,24 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Temp. debug stuff
-	//---
+	HandleLaraMovementParameters(item, coll);
 
-	// Kill Lara.
-	if (KeyMap[DIK_D])
-		item->HitPoints = 0;
+	// Handle current Lara status.
+	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	// Say no.
-	static bool dbNo = false;
-	if (KeyMap[DIK_N] && !dbNo)
-		SayNo();
-	dbNo = KeyMap[DIK_N] ? true : false;
+	AnimateLara(item);
 
-	static PHD_3DPOS posO = item->Position;
-	static short roomNumO = item->RoomNumber;
-	static CAMERA_INFO camO = Camera;
-
-	// Save position.
-	if (KeyMap[DIK_Q] && TrInput & IN_WALK)
+	if (lara->ExtraAnim == -1)
 	{
-		posO = item->Position;
-		roomNumO = item->RoomNumber;
-		camO = Camera;
+		// Check for collision with items.
+		DoObjectCollision(item, coll);
+
+		// Handle Lara collision.
+		if (lara->Vehicle == NO_ITEM)
+			lara_collision_routines[item->Animation.ActiveState](item, coll);
 	}
-	
-	// Restore position.
-	if (KeyMap[DIK_E])
-	{
-		item->Position = posO;
-		item->RoomNumber = roomNumO;
-		Camera = camO;
-	}
-	
-	// Forward 1 unit.
-	if (KeyMap[DIK_I])
-		MoveItem(item, item->Position.yRot, 1);
-	// Back 1 unit.
-	else if (KeyMap[DIK_K])
-		MoveItem(item, item->Position.yRot + ANGLE(180.0f), 1);
-	// Left 1 unit.
-	else if (KeyMap[DIK_J])
-		MoveItem(item, item->Position.yRot - ANGLE(90.0f), 1);
-	// Right 1 unit.
-	else if (KeyMap[DIK_L])
-		MoveItem(item, item->Position.yRot + ANGLE(90.0f), 1);
 
-	//---
-
-	// Temp. debug stuff.
-	static bool doRoutines = true;
-	static bool dbT = false;
-	if (KeyMap[DIK_T] && !dbT)
-		doRoutines = !doRoutines;
-	dbT = KeyMap[DIK_T] ? true : false;
-
-	static bool dbU = false;
-	if (doRoutines || KeyMap[DIK_U] && !dbU)
-	{
-		HandleLaraMovementParameters(item, coll);
-
-		// Handle current Lara status.
-		lara_control_routines[item->Animation.ActiveState](item, coll);
-
-		AnimateLara(item);
-
-		if (lara->ExtraAnim == -1)
-		{
-			// Check for collision with items.
-			DoObjectCollision(item, coll);
-
-			// Handle Lara collision.
-			if (lara->Vehicle == NO_ITEM)
-				lara_collision_routines[item->Animation.ActiveState](item, coll);
-		}
-
-		lara->ExtraVelocity = PHD_VECTOR();
-	}
-	dbU = KeyMap[DIK_U] ? true : false;
+	lara->ExtraVelocity = PHD_VECTOR();
 
 	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
