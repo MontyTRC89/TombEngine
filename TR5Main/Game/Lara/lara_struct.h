@@ -314,8 +314,7 @@ enum LaraAnim
 	LA_REACH_TO_HANG = 96,									// Reach > hang
 	LA_HANG_TO_STAND = 97,									// Pull up from hang > stand (1/2)
 	LA_REACH_TO_FREEFALL = 98,								// Reach > freefall
-	LA_LAND_TRANSITION_UNUSED = 99,							// Light fall > mid-land transition
-																// TODO: remove. Possibly a leftover linking anim.
+	LA_UNDERWATER_USE_KEY = 99,								// Use key underwater
 	LA_JUMP_FORWARD_TO_REACH_4 = 100,						// Jump forward > reach, 4th opportunity
 	LA_JUMP_FORWARD_TO_REACH_ALTERNATE_UNUSED = 101,		// Jump forward (from jump forward anim) > reach
 	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2) TODO: remove, not used anymore
@@ -791,9 +790,9 @@ enum LaraAnim
 	LA_MONKEY_JUMP = 548,
 
 	NUM_LARA_ANIMS
-	
+
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 99, 102
+	// 102
 	// 265, 266, 268, 273, 274, 278, 280,
 	// 343, 345,
 	// 364, 366, 368, 370,

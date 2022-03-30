@@ -422,21 +422,24 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	auto* UPV = (UPVInfo*)UPVItem->Data;
 	CollisionInfo cinfo, * coll = &cinfo; // ??
 
+	coll->Setup.Mode = CollisionProbeMode::Quadrants;
+	coll->Setup.Radius = UPV_RADIUS;
+
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -UPV_HEIGHT;
 	coll->Setup.LowerCeilingBound = UPV_HEIGHT;
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
+
+	coll->Setup.BlockFloorSlopeUp = false;
+	coll->Setup.BlockFloorSlopeDown = false;
+	coll->Setup.BlockDeathFlagDown = false;
+	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpasm = false;
+
 	coll->Setup.OldPosition.x = UPVItem->Position.xPos;
 	coll->Setup.OldPosition.y = UPVItem->Position.yPos;
 	coll->Setup.OldPosition.z = UPVItem->Position.zPos;
-	coll->Setup.Radius = UPV_RADIUS;
-	coll->Setup.FloorSlopeIsWall = false;
-	coll->Setup.FloorSlopeIsPit = false;
-	coll->Setup.DeathFlagIsPit = false;
-	coll->Setup.NoMonkeyFlagIsWall = false;
-	coll->Setup.EnableSpasm = false;
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 
 	if ((UPVItem->Position.xRot >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Position.xRot <= (SHRT_MAX / 2 + 1)))
 	{

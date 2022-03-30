@@ -40,16 +40,23 @@ struct CollisionInfo;
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;	// Lara height in basic states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;		// Lara height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY = 850;	// Lara height in monkey swing states.
-constexpr auto LARA_HEIGHT_SURFSWIM = 700;	// Lara height in water treading states.
+constexpr auto LARA_HEIGHT_TREAD = 700;		// Lara height in water treading states.
 constexpr auto LARA_HEIGHT_STRETCH = 870;	// Lara height in jump-up and ledge hanging states.
 constexpr auto LARA_HEIGHT_REACH = 820;		// Lara height in reach state.
 constexpr auto LARA_HEIGHT_SURFACE = 800;	// Lara height when surfacing water.
 constexpr auto LARA_HEADROOM = 160;			// Amount of reasonable space above Lara's head.
-constexpr auto LARA_RAD = 100;
-constexpr auto LARA_RAD_CRAWL = 200;
-constexpr auto LARA_RAD_UNDERWATER = 300;
-constexpr auto LARA_RAD_DEATH = 400;
+constexpr auto LARA_RADIUS = 100;
+constexpr auto LARA_RADIUS_CRAWL = 200;
+constexpr auto LARA_RADIUS_UNDERWATER = 300;
+constexpr auto LARA_RADIUS_DEATH = 400;
 constexpr auto LARA_VELOCITY = 12;
+
+// TODO: Convert velocities to floats and eliminate the division that goes on with these values. @Sezz
+constexpr auto LARA_SWIM_ACCELERATION = 8;
+constexpr auto LARA_SWIM_DECELERATION = 6;
+constexpr auto LARA_TREAD_VELOCITY_MAX = 70;
+constexpr auto LARA_SWIM_VELOCITY_MAX = 200;
+constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 134;
 
 constexpr auto LARA_FREEFALL_VELOCITY = 131;
 constexpr auto LARA_DAMAGE_VELOCITY = 141;
@@ -63,7 +70,7 @@ constexpr auto LARA_RUN_JUMP_TIME = 22;					// Frames to count before a running 
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
 constexpr auto LARA_AIR_MAX = 1800.0f;
-constexpr auto LARA_SPRINT_MAX = 120.0f;
+constexpr auto LARA_SPRINT_ENERGY_MAX = 120.0f;
 constexpr auto LARA_POISON_POTENCY_MAX = 16;
 
 extern LaraInfo Lara;
