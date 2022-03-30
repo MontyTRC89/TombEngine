@@ -2132,7 +2132,7 @@ namespace TEN::Renderer
 			bool outputPolygons = false;
 
 			for (auto& face : room.TransparentFacesToDraw)
-			{
+			{  
 				if (oldInfo != nullptr)
 				{
 					// Check if it's time to output polygons
@@ -2268,15 +2268,15 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						p0t = Vector3(-0.5, -0.5, 0);
-						p1t = Vector3(-0.5, 0.5, 0);
+						p0t = Vector3(-0.5, 0.5, 0);
+						p1t = Vector3(0.5, 0.5, 0);
 						p2t = Vector3(0.5, -0.5, 0);
-						p3t = Vector3(0.5, 0.5, 0);
+						p3t = Vector3(-0.5, -0.5, 0);
 
 						uv0 = Vector2(0, 0);
 						uv1 = Vector2(1, 0);
-						uv2 = Vector2(0, 1);
-						uv3 = Vector2(1, 1);
+						uv2 = Vector2(1, 1);
+						uv3 = Vector2(0, 1);
 					}
 
 					RendererVertex v0;
