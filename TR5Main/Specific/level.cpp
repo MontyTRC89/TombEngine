@@ -117,10 +117,10 @@ void LoadItems()
 			
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();
-			item->Position.xPos = ReadInt32();
-			item->Position.yPos = ReadInt32();
-			item->Position.zPos = ReadInt32();
-			item->Position.yRot = ReadInt16();
+			item->Pose.Position.x = ReadInt32();
+			item->Pose.Position.y = ReadInt32();
+			item->Pose.Position.z = ReadInt32();
+			item->Pose.Orientation.y = ReadInt16();
 			item->Shade = ReadInt16();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -132,7 +132,7 @@ void LoadItems()
 
 			g_GameScript->AddName(item->LuaName, i);
 
-			memcpy(&item->StartPosition, &item->Position, sizeof(PHD_3DPOS));
+			memcpy(&item->StartPosition, &item->Pose, sizeof(PHD_3DPOS));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -1260,9 +1260,9 @@ void GetCarriedItems()
 			{
 				auto* item2 = &g_Level.Items[linkNumber];
 
-				if (abs(item2->Position.xPos - item->Position.xPos) < CLICK(2) &&
-					abs(item2->Position.zPos - item->Position.zPos) < CLICK(2) &&
-					abs(item2->Position.yPos - item->Position.yPos) < CLICK(1) &&
+				if (abs(item2->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
+					abs(item2->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
+					abs(item2->Pose.Position.y - item->Pose.Position.y) < CLICK(1) &&
 					Objects[item2->ObjectNumber].isPickup)
 				{
 					item2->CarriedItem = item->CarriedItem;
@@ -1288,8 +1288,8 @@ void GetAIPickups()
 			{
 				auto* object = &g_Level.AIObjects[number];
 
-				if (abs(object->x - item->Position.xPos) < CLICK(2) &&
-					abs(object->z - item->Position.zPos) < CLICK(2) &&
+				if (abs(object->x - item->Pose.Position.x) < CLICK(2) &&
+					abs(object->z - item->Pose.Position.z) < CLICK(2) &&
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{

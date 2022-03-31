@@ -144,7 +144,7 @@ void LionControl(short itemNumber)
 			case 4:
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite1, 10, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 200;
@@ -158,7 +158,7 @@ void LionControl(short itemNumber)
 
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite2, 10, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 60;

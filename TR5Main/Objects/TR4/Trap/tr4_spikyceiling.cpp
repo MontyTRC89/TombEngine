@@ -15,8 +15,8 @@ void ControlSpikyCeiling(short itemNumber)
 
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int y = item->Position.yPos + ((item->ItemFlags[0] == 1) ? 10 : 5);
-		auto probe = GetCollision(item->Position.xPos, y, item->Position.zPos, item->RoomNumber);
+		int y = item->Pose.Position.y + ((item->ItemFlags[0] == 1) ? 10 : 5);
+		auto probe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
 
 		if (probe.Position.Floor < (y + SECTOR(1)))
 		{
@@ -25,12 +25,12 @@ void ControlSpikyCeiling(short itemNumber)
 		}
 		else
 		{
-			item->Position.yPos = y;
+			item->Pose.Position.y = y;
 
 			if (probe.RoomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			SoundEffect(147, &item->Position, 0);
+			SoundEffect(147, &item->Pose, 0);
 		}
 	}
 
@@ -39,10 +39,10 @@ void ControlSpikyCeiling(short itemNumber)
 		LaraItem->HitPoints -= 20;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Position.xPos, item->Position.yPos + CLICK(3), LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
-		SoundEffect(56, &item->Position, 0);
+		SoundEffect(56, &item->Pose, 0);
 	}
 
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED && item->ItemFlags[0] == 1)

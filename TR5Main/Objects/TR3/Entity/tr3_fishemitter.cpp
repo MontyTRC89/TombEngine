@@ -113,7 +113,7 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Position.xPos, fish->z + item->Position.zPos, enemy->Position.xPos, enemy->Position.zPos) + 0x4000)) / 16) & 4095;
+		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Pose.Position.x, fish->z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + 0x4000)) / 16) & 4095;
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 	}
 
@@ -284,15 +284,15 @@ void ControlFish(short itemNumber)
 		if (item->Flags & OCB_FISH_LETAL)
 		{
 			PHD_3DPOS pos;
-			pos.xPos = item->Position.xPos + fish->x;
-			pos.yPos = item->Position.yPos + fish->y;
-			pos.zPos = item->Position.zPos + fish->z;
+			pos.xPos = item->Pose.Position.x + fish->x;
+			pos.yPos = item->Pose.Position.y + fish->y;
+			pos.zPos = item->Pose.Position.z + fish->z;
 
 			if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
 			{
 				if (PirahnaHitWait == 0)
 				{
-					DoBloodSplat(item->Position.xPos + fish->x, item->Position.yPos + fish->y, item->Position.zPos + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
+					DoBloodSplat(item->Pose.Position.x + fish->x, item->Pose.Position.y + fish->y, item->Pose.Position.z + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
 					PirahnaHitWait = 8;
 				}
 
@@ -389,7 +389,7 @@ void ControlFish(short itemNumber)
 		}
 		else
 		{
-			int y = enemy->Position.yPos - item->Position.yPos;
+			int y = enemy->Pose.Position.y - item->Pose.Position.y;
 			if (abs(fish->y - fish->destY) < 16)
 				fish->destY = y + (GetRandomControl() & 255); 
 		}
@@ -401,9 +401,9 @@ void ControlFish(short itemNumber)
 
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 {
-	int x = pos->xPos - item->Position.xPos;
-	int y = abs(pos->yPos - item->Position.yPos);
-	int z = pos->zPos - item->Position.zPos;
+	int x = pos->xPos - item->Pose.Position.x;
+	int y = abs(pos->yPos - item->Pose.Position.y);
+	int z = pos->zPos - item->Pose.Position.z;
 
 	if (x < -distance || x > distance || z < -distance || z > distance || y < -SECTOR(3) || y > SECTOR(3))
 		return false;

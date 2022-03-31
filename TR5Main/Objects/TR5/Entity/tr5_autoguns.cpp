@@ -78,7 +78,7 @@ void AutoGunsControl(short itemNumber)
 			if (los)
 			{
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-				angles[0] -= item->Position.yRot;
+				angles[0] -= item->Pose.Orientation.y;
 			}
 			else
 			{
@@ -97,7 +97,7 @@ void AutoGunsControl(short itemNumber)
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_LARA_HK_FIRE, &item->Position, 0xC00004);
+				SoundEffect(SFX_LARA_HK_FIRE, &item->Pose, 0xC00004);
 
 				if (GlobalCounter & 1)
 				{

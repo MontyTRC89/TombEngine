@@ -70,8 +70,8 @@ namespace TEN::Entities::Switches
 					switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 4;
 					switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 					switchItem->ItemFlags[0] = TURN_SWITCH_ANTICLOCKWISE;
-					ForcedFixedCamera.x = switchItem->Position.xPos - 1024 * phd_sin(switchItem->Position.yRot);
-					ForcedFixedCamera.z = switchItem->Position.zPos - 1024 * phd_cos(switchItem->Position.yRot);
+					ForcedFixedCamera.x = switchItem->Pose.Position.x - 1024 * phd_sin(switchItem->Pose.Orientation.y);
+					ForcedFixedCamera.z = switchItem->Pose.Position.z - 1024 * phd_cos(switchItem->Pose.Orientation.y);
 
 					doSwitch = -1;
 				}
@@ -80,7 +80,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 				if (TestLaraPosition(&TurnSwitchBoundsC, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
@@ -88,8 +88,8 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						switchItem->ItemFlags[0] = TURN_SWITCH_CLOCKWISE;
-						ForcedFixedCamera.x = switchItem->Position.xPos + 1024 * phd_sin(switchItem->Position.yRot);
-						ForcedFixedCamera.z = switchItem->Position.zPos + 1024 * phd_cos(switchItem->Position.yRot);
+						ForcedFixedCamera.x = switchItem->Pose.Position.x + 1024 * phd_sin(switchItem->Pose.Orientation.y);
+						ForcedFixedCamera.z = switchItem->Pose.Position.z + 1024 * phd_cos(switchItem->Pose.Orientation.y);
 						doSwitch = 1;
 					}
 					else
@@ -101,7 +101,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace TEN::Entities::Switches
 			laraItem->Animation.ActiveState = LA_REACH;
 
 			UseForcedFixedCamera = true;
-			ForcedFixedCamera.y = switchItem->Position.yPos - 2048;
+			ForcedFixedCamera.y = switchItem->Pose.Position.y - 2048;
 			ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
 
 			AddActiveItem(itemNumber);
@@ -164,7 +164,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
 			{
-				switchItem->Position.yRot += ANGLE(90.0f);
+				switchItem->Pose.Orientation.y += ANGLE(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
@@ -185,14 +185,14 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 58 &&
 				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 115)
 			{
-				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Position, 2);
+				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, 2);
 			}
 		}
 		else
 		{
 			if (switchItem->Animation.AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
 			{
-				switchItem->Position.yRot -= ANGLE(90.0f);
+				switchItem->Pose.Orientation.y -= ANGLE(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START;
@@ -211,7 +211,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 58 &&
 				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 115)
 			{
-				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Position, 2);
+				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, 2);
 			}
 		}
 

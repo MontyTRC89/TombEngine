@@ -46,9 +46,9 @@ namespace TEN::Entities::TR4
                 if (TriggerActive(cogItem))
                 {
                     DoBloodSplat(
-                        (GetRandomControl() & 0x3F) + laraItem->Position.xPos - 32, 
-                        (GetRandomControl() & 0x1F) + cogItem->Position.yPos - 16, 
-                        (GetRandomControl() & 0x3F) + laraItem->Position.zPos - 32, 
+                        (GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32, 
+                        (GetRandomControl() & 0x1F) + cogItem->Pose.Position.y - 16, 
+                        (GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32, 
                         (GetRandomControl() & 3) + 2, 
                         2 * GetRandomControl(),
                         laraItem->RoomNumber);

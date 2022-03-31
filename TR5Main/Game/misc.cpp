@@ -29,9 +29,9 @@ void TargetNearestEntity(ITEM_INFO* item, CreatureInfo* creature)
 			target->HitPoints > 0 &&
 			target->Status != ITEM_INVISIBLE)
 		{
-			int x = target->Position.xPos - item->Position.xPos;
-			int y = target->Position.yPos - item->Position.yPos;
-			int z = target->Position.zPos - item->Position.zPos;
+			int x = target->Pose.Position.x - item->Pose.Position.x;
+			int y = target->Pose.Position.y - item->Pose.Position.y;
+			int z = target->Pose.Position.z - item->Pose.Position.z;
 
 			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 			if (distance < bestDistance)

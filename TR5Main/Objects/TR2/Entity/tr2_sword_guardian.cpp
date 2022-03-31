@@ -25,12 +25,12 @@ void InitialiseSwordGuardian(short itemNumber)
 static void SwordGuardianFly(ITEM_INFO* item)
 {
 	PHD_VECTOR pos;
-	pos.x = (GetRandomControl() * 256 / 32768) + item->Position.xPos - 128;
-	pos.y = (GetRandomControl() * 256 / 32768) + item->Position.yPos - 256;
-	pos.z = (GetRandomControl() * 256 / 32768) + item->Position.zPos - 128;
+	pos.x = (GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128;
+	pos.y = (GetRandomControl() * 256 / 32768) + item->Pose.Position.y - 256;
+	pos.z = (GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
-	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Position, 0);
+	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose, 0);
 }
 
 void SwordGuardianControl(short itemNumber)
@@ -52,8 +52,8 @@ void SwordGuardianControl(short itemNumber)
 		if (item->Animation.ActiveState != 12)
 		{
 			//item->meshBits >>= 1;
-			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Position, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Position, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose, 0);
+			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose, 0);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
 			ExplodingDeath(itemNumber, -1, 256);

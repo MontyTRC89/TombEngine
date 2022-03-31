@@ -28,26 +28,26 @@ void ClockworkBeetleControl(short itemNumber)
 			PHD_VECTOR pos = { 0, 0, -32 };
 			GetLaraJointPosition(&pos, LM_RHAND);
 
-			beetle->Position.xPos = pos.x;
-			beetle->Position.yPos = pos.y;
-			beetle->Position.zPos = pos.z;
+			beetle->Pose.Position.x = pos.x;
+			beetle->Pose.Position.y = pos.y;
+			beetle->Pose.Position.z = pos.z;
 			beetle->Status = ITEM_ACTIVE;
-			beetle->Position.yRot = LaraItem->Position.yRot;
-			beetle->Position.zRot = -0x31C4;
+			beetle->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
+			beetle->Pose.Orientation.z = -0x31C4;
 			return;
 		}
 
 		if (LaraItem->Animation.FrameNumber == fb + 104)
 		{
 			short roomNumber = beetle->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, &roomNumber);
-			int height = GetFloorHeight(floor, beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
+			FLOOR_INFO* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &roomNumber);
+			int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 
-			if (abs(LaraItem->Position.yPos - height) > 64)
+			if (abs(LaraItem->Pose.Position.y - height) > 64)
 			{
-				beetle->Position.xPos = LaraItem->Position.xPos;
-				beetle->Position.yPos = LaraItem->Position.yPos;
-				beetle->Position.zPos = LaraItem->Position.zPos;
+				beetle->Pose.Position.x = LaraItem->Pose.Position.x;
+				beetle->Pose.Position.y = LaraItem->Pose.Position.y;
+				beetle->Pose.Position.z = LaraItem->Pose.Position.z;
 			}
 
 			return;
@@ -57,15 +57,15 @@ void ClockworkBeetleControl(short itemNumber)
 	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Position, 0);
 
 	beetle->Animation.VerticalVelocity += 12;
-	beetle->Position.yPos += beetle->Animation.VerticalVelocity;
+	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;
 
 	short roomNumber = beetle->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(beetle->Position.xPos, beetle->Position.yPos - 20, beetle->Position.zPos, &roomNumber);
-	int height = GetFloorHeight(floor, beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
+	FLOOR_INFO* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y - 20, beetle->Pose.Position.z, &roomNumber);
+	int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 
-	if (beetle->Position.yPos > height)
+	if (beetle->Pose.Position.y > height)
 	{
-		beetle->Position.yPos = height;
+		beetle->Pose.Position.y = height;
 
 		if (beetle->Animation.VerticalVelocity <= 32)
 			beetle->Animation.VerticalVelocity = 0;
@@ -82,7 +82,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (beetle->ItemFlags[0])
 	{
-		beetle->Position.zRot = ANGLE(22.5f) * phd_sin(ANGLE(22.5f) * (GlobalCounter & 0xF));
+		beetle->Pose.Orientation.z = ANGLE(22.5f) * phd_sin(ANGLE(22.5f) * (GlobalCounter & 0xF));
 
 		switch (beetle->ItemFlags[2])
 		{
@@ -90,33 +90,33 @@ void ClockworkBeetleControl(short itemNumber)
 		{
 			int x, z;
 
-			x = (beetle->Position.xPos & -CLICK(2)) | 0x200;
-			z = (beetle->Position.zPos & -CLICK(2)) | 0x200;
-			x -= beetle->Position.xPos;
-			z -= beetle->Position.zPos;
+			x = (beetle->Pose.Position.x & -CLICK(2)) | 0x200;
+			z = (beetle->Pose.Position.z & -CLICK(2)) | 0x200;
+			x -= beetle->Pose.Position.x;
+			z -= beetle->Pose.Position.z;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
 				int atan = phd_atan(z, x);
-				short rot = atan - beetle->Position.yRot;
+				short rot = atan - beetle->Pose.Orientation.y;
 
 				if (abs(rot) > ANGLE(180.0f))
-					rot = beetle->Position.yRot - atan;
+					rot = beetle->Pose.Orientation.y - atan;
 
 				if (abs(rot) < ANGLE(1.4f))
 				{
-					beetle->Position.yRot = atan;
+					beetle->Pose.Orientation.y = atan;
 					beetle->ItemFlags[2] = 1;
 				}
 				else if (rot < 0)
-					beetle->Position.yRot -= ANGLE(1.4f);
+					beetle->Pose.Orientation.y -= ANGLE(1.4f);
 				else
-					beetle->Position.yRot += ANGLE(1.4f);
+					beetle->Pose.Orientation.y += ANGLE(1.4f);
 			}
 			else
 			{
-				beetle->Position.zPos &= -CLICK(2);
-				beetle->Position.zPos &= -CLICK(2);
+				beetle->Pose.Position.z &= -CLICK(2);
+				beetle->Pose.Position.z &= -CLICK(2);
 				beetle->ItemFlags[2] = 2;
 			}
 
@@ -128,15 +128,15 @@ void ClockworkBeetleControl(short itemNumber)
 		{
 			int x, z;
 
-			x = (beetle->Position.xPos & -CLICK(2)) | CLICK(2);
-			z = (beetle->Position.zPos & -CLICK(2)) | CLICK(2);
-			x -= beetle->Position.xPos;
-			z -= beetle->Position.zPos;
+			x = (beetle->Pose.Position.x & -CLICK(2)) | CLICK(2);
+			z = (beetle->Pose.Position.z & -CLICK(2)) | CLICK(2);
+			x -= beetle->Pose.Position.x;
+			z -= beetle->Pose.Position.z;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
 				int atan = phd_atan(z, x);
-				beetle->Position.yRot = atan;
+				beetle->Pose.Orientation.y = atan;
 
 				if (pow(x, 2) + pow(z, 2) >= 0x19000)
 				{
@@ -154,13 +154,13 @@ void ClockworkBeetleControl(short itemNumber)
 						beetle->Animation.Velocity = beetle->Animation.Velocity - (beetle->ItemFlags[2] == 4) - 1;
 				}
 
-				beetle->Position.xPos += beetle->Animation.Velocity * phd_sin(beetle->Position.yRot);
-				beetle->Position.zPos += beetle->Animation.Velocity * phd_cos(beetle->Position.yRot);
+				beetle->Pose.Position.x += beetle->Animation.Velocity * phd_sin(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.z += beetle->Animation.Velocity * phd_cos(beetle->Pose.Orientation.y);
 			}
 			else
 			{
-				beetle->Position.xPos = (beetle->Position.xPos & -512) | 0x200;
-				beetle->Position.zPos = (beetle->Position.zPos & -512) | 0x200;
+				beetle->Pose.Position.x = (beetle->Pose.Position.x & -512) | 0x200;
+				beetle->Pose.Position.z = (beetle->Pose.Position.z & -512) | 0x200;
 
 				if (beetle->ItemFlags[2] == 1)
 					beetle->ItemFlags[2] = 2;
@@ -182,9 +182,9 @@ void ClockworkBeetleControl(short itemNumber)
 
 							if (item->ObjectNumber == ID_MAPPER)
 							{
-								int dx = beetle->Position.xPos - item->Position.xPos;
-								int dy = beetle->Position.yPos - item->Position.yPos;
-								int dz = beetle->Position.zPos - item->Position.zPos;
+								int dx = beetle->Pose.Position.x - item->Pose.Position.x;
+								int dy = beetle->Pose.Position.y - item->Pose.Position.y;
+								int dz = beetle->Pose.Position.z - item->Pose.Position.z;
 
 								if (dx > -SECTOR(1) && dx < SECTOR(1) &&
 									dz > -SECTOR(1) && dz < SECTOR(1) &&
@@ -210,22 +210,22 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 2:
 		{
-			int rotation = beetle->ItemFlags[1] - beetle->Position.yRot;
+			int rotation = beetle->ItemFlags[1] - beetle->Pose.Orientation.y;
 
 			if (abs(rotation) > ANGLE(180.0f))
-				rotation = beetle->Position.yRot - beetle->ItemFlags[1];
+				rotation = beetle->Pose.Orientation.y - beetle->ItemFlags[1];
 
 			if (abs(rotation) < ANGLE(1.4f))
 			{
 				beetle->ItemFlags[2] = 3;
-				beetle->Position.yRot = beetle->ItemFlags[1];
+				beetle->Pose.Orientation.y = beetle->ItemFlags[1];
 			}
 			else
 			{
 				if (rotation < 0)
-					beetle->Position.yRot -= ANGLE(1.4f);
+					beetle->Pose.Orientation.y -= ANGLE(1.4f);
 				else
-					beetle->Position.yRot += ANGLE(1.4f);
+					beetle->Pose.Orientation.y += ANGLE(1.4f);
 			}
 
 			break;
@@ -236,8 +236,8 @@ void ClockworkBeetleControl(short itemNumber)
 			if (beetle->Animation.Velocity < 32)
 				beetle->Animation.Velocity++;
 
-			beetle->Position.xPos += beetle->Animation.Velocity * phd_sin(beetle->Position.yRot);
-			beetle->Position.zPos += beetle->Animation.Velocity * phd_cos(beetle->Position.yRot);
+			beetle->Pose.Position.x += beetle->Animation.Velocity * phd_sin(beetle->Pose.Orientation.y);
+			beetle->Pose.Position.z += beetle->Animation.Velocity * phd_cos(beetle->Pose.Orientation.y);
 
 			if (!floor->Flags.MarkBeetle)
 				beetle->ItemFlags[3] = 1;
@@ -256,7 +256,7 @@ void ClockworkBeetleControl(short itemNumber)
 	}
 	else
 	{
-		beetle->Position.zRot = ANGLE(45.0f) * phd_sin(ANGLE(45.0f) * (GlobalCounter & 0x7));
+		beetle->Pose.Orientation.z = ANGLE(45.0f) * phd_sin(ANGLE(45.0f) * (GlobalCounter & 0x7));
 
 		if (beetle->ItemFlags[3])
 			beetle->ItemFlags[3]--;
@@ -270,7 +270,7 @@ void ClockworkBeetleControl(short itemNumber)
 			else
 				val = 150 - beetle->ItemFlags[3];
 
-			beetle->Position.yRot += 32 * val;
+			beetle->Pose.Orientation.y += 32 * val;
 			val >>= 1;
 
 			if (flag && beetle->ItemFlags[3] > 30 && val)
@@ -281,9 +281,9 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 		else
 		{
-			beetle->Position.zRot *= 2;
+			beetle->Pose.Orientation.z *= 2;
 			int val = (150 - beetle->ItemFlags[3]) >> 1;
-			beetle->Position.yRot += val << 7;
+			beetle->Pose.Orientation.y += val << 7;
 
 			if (flag && val)
 			{
@@ -319,14 +319,14 @@ void UseClockworkBeetle(short flag)
 			item->Shade = -15856;
 			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
 			item->RoomNumber = LaraItem->RoomNumber;
-			item->Position.xPos = LaraItem->Position.xPos;
-			item->Position.yPos = LaraItem->Position.yPos;
-			item->Position.zPos = LaraItem->Position.zPos;
+			item->Pose.Position.x = LaraItem->Pose.Position.x;
+			item->Pose.Position.y = LaraItem->Pose.Position.y;
+			item->Pose.Position.z = LaraItem->Pose.Position.z;
 
 			InitialiseItem(itemNumber);
-			item->Position.xRot = 0;
-			item->Position.yRot = LaraItem->Position.yRot;
-			item->Position.zRot = 0;
+			item->Pose.Orientation.x = 0;
+			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
+			item->Pose.Orientation.z = 0;
 
 			if (Lara.Inventory.BeetleLife)
 				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;
@@ -350,9 +350,9 @@ void UseClockworkBeetle(short flag)
 
 						if (item2->ObjectNumber == ID_MAPPER)
 						{
-							int dx = item->Position.xPos - item2->Position.xPos;
-							int dy = item->Position.yPos - item2->Position.yPos;
-							int dz = item->Position.zPos - item2->Position.zPos;
+							int dx = item->Pose.Position.x - item2->Pose.Position.x;
+							int dy = item->Pose.Position.y - item2->Pose.Position.y;
+							int dz = item->Pose.Position.z - item2->Pose.Position.z;
 
 							if (dx > -SECTOR(1) && dx < SECTOR(1) &&
 								dz > -SECTOR(1) && dz < SECTOR(1) &&
@@ -373,7 +373,7 @@ void UseClockworkBeetle(short flag)
 						}
 					}
 
-					item->ItemFlags[1] = item2->Position.yRot + 0x8000;
+					item->ItemFlags[1] = item2->Pose.Orientation.y + 0x8000;
 
 					if (item2->ItemFlags[0])
 						item->ItemFlags[0] = 0;

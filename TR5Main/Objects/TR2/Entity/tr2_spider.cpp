@@ -21,25 +21,25 @@ static void S_SpiderBite(ITEM_INFO* item)
 	PHD_VECTOR pos = { SpiderBite.x, SpiderBite.y, SpiderBite.z };
 	GetJointAbsPosition(item, &pos, SpiderBite.meshNum);
 
-	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Position.yPos, item->RoomNumber);
+	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
 }
 
 static void SpiderLeap(short itemNumber, ITEM_INFO* item, short angle)
 {
 	GAME_VECTOR vec;
-	vec.x = item->Position.xPos;
-	vec.y = item->Position.yPos;
-	vec.z = item->Position.zPos;
+	vec.x = item->Pose.Position.x;
+	vec.y = item->Pose.Position.y;
+	vec.z = item->Pose.Position.z;
 	vec.roomNumber = item->RoomNumber;
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	if (item->Position.yPos > (vec.y - CLICK(1.5f)))
+	if (item->Pose.Position.y > (vec.y - CLICK(1.5f)))
 		return;
 
-	item->Position.xPos = vec.x;
-	item->Position.yPos = vec.y;
-	item->Position.zPos = vec.z;
+	item->Pose.Position.x = vec.x;
+	item->Pose.Position.y = vec.y;
+	item->Pose.Position.z = vec.z;
 	if (item->RoomNumber != vec.roomNumber)
 		ItemNewRoom(item->RoomNumber, vec.roomNumber);
 

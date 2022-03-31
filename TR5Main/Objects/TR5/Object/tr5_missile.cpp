@@ -23,25 +23,25 @@ void MissileControl(short itemNumber)
 	auto* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
-		fx->pos.zRot += 16 * fx->speed;
+		fx->pos.Orientation.z += 16 * fx->speed;
 
 		if (fx->speed > 64)
 			fx->speed -= 4;
 
-		if (fx->pos.xRot > -12288)
+		if (fx->pos.Orientation.x > -12288)
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;
-			fx->pos.xRot -= fx->fallspeed;
+			fx->pos.Orientation.x -= fx->fallspeed;
 		}
 	}
 	else
 	{
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->Position.xPos - fx->pos.xPos,
-			LaraItem->Position.yPos - fx->pos.yPos - 256,
-			LaraItem->Position.zPos - fx->pos.zPos,
+			LaraItem->Pose.Position.x - fx->pos.Position.x,
+			LaraItem->Pose.Position.y - fx->pos.Position.y - 256,
+			LaraItem->Pose.Position.z - fx->pos.Position.z,
 			angles);
 
 		int dh;
@@ -59,12 +59,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles[0] - fx->pos.yRot;
+			int dy = angles[0] - fx->pos.Orientation.y;
 			if (abs(dy) > 0x8000)
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles[1] - fx->pos.xRot;
+			int dx = angles[1] - fx->pos.Orientation.x;
 			if (abs(dx) > 0x8000)
 				dx = -dx;
 			dx /= 8;
@@ -85,42 +85,42 @@ void MissileControl(short itemNumber)
 			else
 				dx = dh;
 
-			fx->pos.yRot += dy;
-			fx->pos.xRot += dx;
+			fx->pos.Orientation.y += dy;
+			fx->pos.Orientation.x += dx;
 		}
 		
-		fx->pos.zRot += 16 * fx->speed;
+		fx->pos.Orientation.z += 16 * fx->speed;
 
 		if (!fx->flag1)
-			fx->pos.zRot += 16 * fx->speed;
+			fx->pos.Orientation.z += 16 * fx->speed;
 	}
 
-	int x = fx->pos.xPos;
-	int y = fx->pos.yPos;
-	int z = fx->pos.zPos;
+	int x = fx->pos.Position.x;
+	int y = fx->pos.Position.y;
+	int z = fx->pos.Position.z;
 
-	int c = fx->speed * phd_cos(fx->pos.xRot);
+	int c = fx->speed * phd_cos(fx->pos.Orientation.x);
 
-	fx->pos.xPos += c * phd_sin(fx->pos.yRot);
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
+	fx->pos.Position.x += c * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
+	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 	
-	if (fx->pos.yPos >= probe.Position.Floor || fx->pos.yPos <= probe.Position.Ceiling)
+	if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
 	{
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 
 		if (fx->flag1)
 		{
 			if (fx->flag1 == 1)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
-				fx->pos.yPos -= 64;
+				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
-				fx->pos.yPos -= 128;
+				fx->pos.Position.y -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
 			else if (fx->flag1 == 2)
@@ -147,9 +147,9 @@ void MissileControl(short itemNumber)
 			{
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
-				fx->pos.yPos -= 64;
+				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
-				fx->pos.yPos -= 128;
+				fx->pos.Position.y -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
 				LaraItem->HitPoints -= 200;			
 				KillEffect(itemNumber);
@@ -161,9 +161,9 @@ void MissileControl(short itemNumber)
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
 					LaraItem->HitPoints -= 50;
-					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->Position.yRot, LaraItem->RoomNumber);
+					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos, 0);
-					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Position, 0);
+					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 				}
 				
 				KillEffect(itemNumber);
@@ -190,9 +190,9 @@ void MissileControl(short itemNumber)
 		{
 			PHD_VECTOR pos = { x, y, z };
 
-			int xv = x - fx->pos.xPos;
-			int yv = y - fx->pos.yPos;
-			int zv = z - fx->pos.zPos;
+			int xv = x - fx->pos.Position.x;
+			int yv = y - fx->pos.Position.y;
+			int zv = z - fx->pos.Position.z;
 
 			if (fx->flag1 == 1)
 				TriggerRomanStatueMissileSparks(&pos, itemNumber);
@@ -207,11 +207,11 @@ void MissileControl(short itemNumber)
 
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 {
-	ShatterItem.yRot = fx->pos.yRot;
+	ShatterItem.yRot = fx->pos.Orientation.y;
 	ShatterItem.meshIndex = fx->frameNumber;
-	ShatterItem.sphere.x = fx->pos.xPos;
-	ShatterItem.sphere.y = fx->pos.yPos;
-	ShatterItem.sphere.z = fx->pos.zPos;
+	ShatterItem.sphere.x = fx->pos.Position.x;
+	ShatterItem.sphere.y = fx->pos.Position.y;
+	ShatterItem.sphere.z = fx->pos.Position.z;
 	ShatterItem.bit = 0;
 	ShatterItem.flags = fx->flag2 & 0x1400;
 

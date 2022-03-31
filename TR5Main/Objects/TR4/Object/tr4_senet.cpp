@@ -50,7 +50,7 @@ void GameSticksControl(short itemNumber)
 	if (item->ItemFlags[7] > -1)
 	{
 		if (item->HitPoints == 100)
-			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Position, 0);
+			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Pose, 0);
 		for (int i = 0; i < 4; ++i)
 		{
 			if (item->HitPoints < 100 - 2 * i)
@@ -104,25 +104,25 @@ void GameSticksControl(short itemNumber)
 			z = SenetTargetZ + SECTOR(4 - piece);
 		}
 
-		if (abs(x - item2->Position.xPos) < 128)
-			item2->Position.xPos = x;
-		else if (x > item2->Position.xPos)
-			item2->Position.xPos += 128;
+		if (abs(x - item2->Pose.Position.x) < 128)
+			item2->Pose.Position.x = x;
+		else if (x > item2->Pose.Position.x)
+			item2->Pose.Position.x += 128;
 		else
-			item2->Position.xPos -= 128;
-		if (abs(z - item2->Position.zPos) < 128)
-			item2->Position.zPos = z;
-		else if (z > item2->Position.zPos)
-			item2->Position.zPos += 128;
+			item2->Pose.Position.x -= 128;
+		if (abs(z - item2->Pose.Position.z) < 128)
+			item2->Pose.Position.z = z;
+		else if (z > item2->Pose.Position.z)
+			item2->Pose.Position.z += 128;
 		else
-			item2->Position.zPos -= 128;
+			item2->Pose.Position.z -= 128;
 
-		probedRoomNumber = GetCollision(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+		probedRoomNumber = GetCollision(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z, item2->RoomNumber).RoomNumber;
 		if (item2->RoomNumber != probedRoomNumber)
 			ItemNewRoom(SenetPiecesNumber[ActivePiece], probedRoomNumber);
 		
-		if (x == item2->Position.xPos &&
-			z == item2->Position.zPos)
+		if (x == item2->Pose.Position.x &&
+			z == item2->Pose.Position.z)
 		{
 			item2->AfterDeath = 0;
 
@@ -166,14 +166,14 @@ void GameSticksControl(short itemNumber)
 					{
 						item2 = &g_Level.Items[SenetPiecesNumber[i]];
 
-						if (x == item2->Position.xPos &&
-							z == item2->Position.zPos)
+						if (x == item2->Pose.Position.x &&
+							z == item2->Pose.Position.z)
 						{
 							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
-							item2->Position.xPos = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
-							item2->Position.zPos = SenetTargetZ + SECTOR(i % 3);
+							item2->Pose.Position.x = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
+							item2->Pose.Position.z = SenetTargetZ + SECTOR(i % 3);
 							
-							probedRoomNumber = GetCollision(item2->Position.xPos, item2->Position.yPos - 32, item2->Position.zPos, item2->RoomNumber).RoomNumber;
+							probedRoomNumber = GetCollision(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z, item2->RoomNumber).RoomNumber;
 							if (item2->RoomNumber != probedRoomNumber)
 								ItemNewRoom(SenetPiecesNumber[i], probedRoomNumber);
 							
@@ -312,12 +312,12 @@ void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
 {
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
-	item->Position.yPos -= STEPUP_HEIGHT;
-	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
-	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
-	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
-	TriggerShockwave(&item->Position, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
-	item->Position.yPos += STEPUP_HEIGHT;
+	item->Pose.Position.y -= STEPUP_HEIGHT;
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0, 0);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x2000, 0);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x4000, 0);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, 0x6000, 0);
+	item->Pose.Position.y += STEPUP_HEIGHT;
 }
 
 void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
@@ -430,7 +430,7 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
-		laraItem->Position.yRot ^= 0x8000;
+		laraItem->Pose.Orientation.y ^= 0x8000;
 
 		if (TestLaraPosition(&GameStixBounds, item, laraItem))
 		{
@@ -444,14 +444,14 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(itemNumber);
-				laraItem->Position.yRot ^= 0x8000;
+				laraItem->Pose.Orientation.y ^= 0x8000;
 				return;
 			}
 
 			Lara.InteractedItem = itemNumber;
 		}
 
-		laraItem->Position.yRot ^= 0x8000;
+		laraItem->Pose.Orientation.y ^= 0x8000;
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);
@@ -463,14 +463,14 @@ void ControlGodHead(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		if (item->Position.yRot == 0)
-			item->Position.zPos &= ~1023;
-		else if (item->Position.yRot == 0x4000)
-			item->Position.xPos &= ~1023;
-		else if (item->Position.yRot == -0x4000)
-			item->Position.xPos |= 1023;
-		else if (item->Position.yRot == -0x8000)
-			item->Position.zPos |= 1023;
+		if (item->Pose.Orientation.y == 0)
+			item->Pose.Position.z &= ~1023;
+		else if (item->Pose.Orientation.y == 0x4000)
+			item->Pose.Position.x &= ~1023;
+		else if (item->Pose.Orientation.y == -0x4000)
+			item->Pose.Position.x |= 1023;
+		else if (item->Pose.Orientation.y == -0x8000)
+			item->Pose.Position.z |= 1023;
 
 		if (item->ItemFlags[0])
 		{
@@ -514,8 +514,8 @@ void InitialiseGamePiece(short itemNumber)
 			if (item->ObjectNumber == ID_GAME_PIECE1)
 			{
 				SenetPiecesNumber[0] = i;
-				SenetTargetX = item->Position.xPos + 1024;
-				SenetTargetZ = item->Position.zPos;
+				SenetTargetX = item->Pose.Position.x + 1024;
+				SenetTargetZ = item->Pose.Position.z;
 			}
 			else if (item->ObjectNumber == ID_GAME_PIECE2)
 				SenetPiecesNumber[1] = i;

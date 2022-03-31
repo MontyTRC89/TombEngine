@@ -129,7 +129,7 @@ void MummyControl(short itemNumber)
 						}
 
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 					}
 				}
 				else
@@ -137,7 +137,7 @@ void MummyControl(short itemNumber)
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 					creature->MaxTurn = 0;
 				}
 			}
@@ -260,12 +260,12 @@ void MummyControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(7.0f);
+					item->Pose.Orientation.y += ANGLE(7.0f);
 				else
-					item->Position.yRot -= ANGLE(7.0f);
+					item->Pose.Orientation.y -= ANGLE(7.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{

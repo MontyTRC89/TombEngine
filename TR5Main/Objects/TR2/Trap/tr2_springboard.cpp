@@ -10,9 +10,9 @@ void SpringBoardControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Animation.ActiveState == 0 && LaraItem->Position.yPos == item->Position.yPos &&
-		LaraItem->Position.xPos / SECTOR(1) == item->Position.xPos / SECTOR(1) &&
-		LaraItem->Position.zPos / SECTOR(1) == item->Position.zPos / SECTOR(1))
+	if (item->Animation.ActiveState == 0 && LaraItem->Pose.Position.y == item->Pose.Position.y &&
+		LaraItem->Pose.Position.x / SECTOR(1) == item->Pose.Position.x / SECTOR(1) &&
+		LaraItem->Pose.Position.z / SECTOR(1) == item->Pose.Position.z / SECTOR(1))
 	{
 		if (LaraItem->HitPoints <= 0)
 			return;
