@@ -128,11 +128,11 @@ void LaraInitialiseMeshes(ITEM_INFO* item)
 		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 
 	lara->Control.HandStatus = HandStatus::Free;
+	lara->TargetEntity = NULL;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->TargetEntity = NULL;
-	lara->RightArm.Locked = false;
 	lara->LeftArm.Locked = false;
+	lara->RightArm.Locked = false;
 }
 
 void InitialiseLaraAnims(ITEM_INFO* item)

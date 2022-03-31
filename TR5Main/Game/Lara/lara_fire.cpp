@@ -29,7 +29,7 @@ bool MonksAttackLara;
 ITEM_INFO* LastTargets[MAX_TARGETS];
 ITEM_INFO* TargetList[MAX_TARGETS];
 
-WeaponInfo Weapons[(int)LaraWeaponType::Total] =
+WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapons
 	{

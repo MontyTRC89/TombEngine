@@ -43,7 +43,7 @@ enum WeaponState
 	WEAPON_STATE_UNDERWATER_RECOIL = 8
 };
 
-extern WeaponInfo Weapons[(int)LaraWeaponType::Total];
+extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
