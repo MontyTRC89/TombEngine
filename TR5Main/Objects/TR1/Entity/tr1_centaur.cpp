@@ -49,18 +49,18 @@ void ControlCentaurBomb(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	bool aboveWater = false;
-	PHD_VECTOR oldPos = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	PHD_VECTOR oldPos = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
 
-	item->Pose.Orientation.z += ANGLE(35.0f);
+	item->Position.zRot += ANGLE(35.0f);
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		item->Pose.Orientation.x -= ANGLE(1.0f);
-		if (item->Pose.Orientation.x < -ANGLE(90.0f))
-			item->Pose.Orientation.x = -ANGLE(90.0f);
+		item->Position.xRot -= ANGLE(1.0f);
+		if (item->Position.xRot < -ANGLE(90.0f))
+			item->Position.xRot = -ANGLE(90.0f);
 
 		aboveWater = true;
-		item->Animation.Velocity = BOMB_SPEED * phd_cos(item->Pose.Orientation.x);
-		item->Animation.VerticalVelocity = -BOMB_SPEED * phd_sin(item->Pose.Orientation.x);
+		item->Animation.Velocity = BOMB_SPEED * phd_cos(item->Position.xRot);
+		item->Animation.VerticalVelocity = -BOMB_SPEED * phd_sin(item->Position.xRot);
 	}
 	else
 	{
@@ -69,35 +69,35 @@ void ControlCentaurBomb(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f);
+			item->Position.zRot += ((item->Animation.Velocity / 4) + 7) * ANGLE(1.0f);
 
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
+				item->Position.yRot += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
 			else
-				item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
+				item->Position.xRot += ((item->Animation.Velocity / 2) + 7) * ANGLE(1.0f);
 
 		}
 	}
 
-	item->Pose.Position.x += item->Animation.Velocity * phd_cos(item->Pose.Orientation.x) * phd_sin(item->Pose.Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * phd_sin(-item->Pose.Orientation.x);
-	item->Pose.Position.z += item->Animation.Velocity * phd_cos(item->Pose.Orientation.x) * phd_cos(item->Pose.Orientation.y);
+	item->Position.xPos += item->Animation.Velocity * phd_cos(item->Position.xRot) * phd_sin(item->Position.yRot);
+	item->Position.yPos += item->Animation.Velocity * phd_sin(-item->Position.xRot);
+	item->Position.zPos += item->Animation.Velocity * phd_cos(item->Position.xRot) * phd_cos(item->Position.yRot);
 
 	auto probe = GetCollision(item);
 
-	if (probe.Position.Floor < item->Pose.Position.y ||
-		probe.Position.Ceiling > item->Pose.Position.y)
+	if (probe.Position.Floor < item->Position.yPos ||
+		probe.Position.Ceiling > item->Position.yPos)
 	{
-		item->Pose.Position.x = oldPos.x;
-		item->Pose.Position.y = oldPos.y;
-		item->Pose.Position.z = oldPos.z;
+		item->Position.xPos = oldPos.x;
+		item->Position.yPos = oldPos.y;
+		item->Position.zPos = oldPos.z;
 
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 			TriggerUnderwaterExplosion(item, 0);
 		else
 		{
-			item->Pose.Position.y -= CLICK(0.5f);
-			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+			item->Position.yPos -= CLICK(0.5f);
+			TriggerShockwave(&item->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
 			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 			for (int x = 0; x < 2; x++)
@@ -111,7 +111,7 @@ void ControlCentaurBomb(short itemNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
-		SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+		SetupRipple(item->Position.xPos, g_Level.Rooms[item->RoomNumber].minfloor, item->Position.zPos, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 0);
 
@@ -157,17 +157,17 @@ static void RocketGun(ITEM_INFO* centaurItem)
 		PHD_VECTOR pos = { 11, 415, 41 };
 		GetJointAbsPosition(centaurItem, &pos, 13);
 
-		projectileItem->Pose.Position.x = pos.x;
-		projectileItem->Pose.Position.y = pos.y;
-		projectileItem->Pose.Position.z = pos.z;
+		projectileItem->Position.xPos = pos.x;
+		projectileItem->Position.yPos = pos.y;
+		projectileItem->Position.zPos = pos.z;
 		InitialiseItem(itemNumber);
 
-		projectileItem->Pose.Orientation.x = 0;
-		projectileItem->Pose.Orientation.y = centaurItem->Pose.Orientation.y;
-		projectileItem->Pose.Orientation.z = 0;
+		projectileItem->Position.xRot = 0;
+		projectileItem->Position.yRot = centaurItem->Position.yRot;
+		projectileItem->Position.zRot = 0;
 
-		projectileItem->Animation.Velocity = BOMB_SPEED * phd_cos(projectileItem->Pose.Orientation.x);
-		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * phd_cos(projectileItem->Pose.Orientation.x);
+		projectileItem->Animation.Velocity = BOMB_SPEED * phd_cos(projectileItem->Position.xRot);
+		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * phd_cos(projectileItem->Position.xRot);
 		projectileItem->ItemFlags[0] = 1;
 
 		AddActiveItem(itemNumber);
@@ -278,7 +278,7 @@ void CentaurControl(short itemNumber)
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(171, &item->Pose, NULL);
+		SoundEffect(171, &item->Position, NULL);
 		ExplodingDeath(itemNumber, 0xffffffff, FLYER_PART_DAMAGE);
 		KillItem(itemNumber);
 		item->Status = ITEM_DEACTIVATED;

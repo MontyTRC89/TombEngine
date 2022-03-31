@@ -672,8 +672,8 @@ namespace TEN::Floordata
 	void AddBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += item.Position.xPos;
+		z += item.Position.zPos;
 
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->AddItem(itemNumber);
@@ -704,8 +704,8 @@ namespace TEN::Floordata
 	void RemoveBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += item.Position.xPos;
+		z += item.Position.zPos;
 
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->RemoveItem(itemNumber);
@@ -744,13 +744,13 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto dxBounds = TO_DX_BBOX(item->Position, bounds);
 
 		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
 
 		static float distance;
 		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1) };
+			return std::optional{ item->Position.yPos + (bottom ? bounds->Y2 : bounds->Y1) };
 		else
 			return std::nullopt;
 	}
@@ -762,7 +762,7 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		auto bounds = GetBoundsAccurate(item);
-		return item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1);
+		return item->Position.yPos + (bottom ? bounds->Y2 : bounds->Y1);
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
@@ -777,7 +777,7 @@ namespace TEN::Floordata
 
 		// Get real OBB bounds of a bridge in world space
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto dxBounds = TO_DX_BBOX(item->Position, bounds);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];
@@ -797,8 +797,8 @@ namespace TEN::Floordata
 			{
 				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
 				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
-				auto offX = pX - item->Pose.Position.x;
-				auto offZ = pZ - item->Pose.Position.z;
+				auto offX = pX - item->Position.xPos;
+				auto offZ = pZ - item->Position.zPos;
 
 				// Clean previous bridge state
 				RemoveBridge(itemNumber, offX, offZ);

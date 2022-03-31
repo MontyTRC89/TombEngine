@@ -172,16 +172,16 @@ namespace TEN::Entities::TR4
 
 		if (horseItem != NULL)
 		{
-			int x = horseItem->Pose.Position.x + 341 * phd_sin(horseItem->Pose.Orientation.y);
-			int y = horseItem->Pose.Position.y;
-			int z = horseItem->Pose.Position.z + 341 * phd_cos(horseItem->Pose.Orientation.y);
+			int x = horseItem->Position.xPos + 341 * phd_sin(horseItem->Position.yRot);
+			int y = horseItem->Position.yPos;
+			int z = horseItem->Position.zPos + 341 * phd_cos(horseItem->Position.yRot);
 
 			auto probe = GetCollision(x, y, z, item->RoomNumber);
 			int height1 = probe.Position.Floor;
 
-			x = horseItem->Pose.Position.x - 341 * phd_sin(horseItem->Pose.Orientation.y);
-			y = horseItem->Pose.Position.y;
-			z = horseItem->Pose.Position.z - 341 * phd_cos(horseItem->Pose.Orientation.y);
+			x = horseItem->Position.xPos - 341 * phd_sin(horseItem->Position.yRot);
+			y = horseItem->Position.yPos;
+			z = horseItem->Position.zPos - 341 * phd_cos(horseItem->Position.yRot);
 
 			int height2 = GetCollision(x, y, z, probe.RoomNumber).Position.Floor;
 
@@ -239,10 +239,10 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int deltaX = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int deltaZ = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				int deltaX = LaraItem->Position.zPos - item->Position.zPos;
+				int deltaZ = LaraItem->Position.zPos - item->Position.zPos;
 
-				laraAI.angle = phd_atan(deltaZ, deltaX) - item->Pose.Orientation.y;
+				laraAI.angle = phd_atan(deltaZ, deltaX) - item->Position.yRot;
 				laraAI.distance = pow(deltaX, 2) + pow(deltaZ, 2);
 			}
 
@@ -282,12 +282,12 @@ namespace TEN::Entities::TR4
 								else
 									item->HitPoints--;
 
-								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose, 0);
-								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Pose, 0);
+								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Position, 0);
+								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Position, 0);
 
 								PHD_VECTOR pos = { 0, -128, 80 };
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
-								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
+								HorsemanSparks(&pos, item->Position.yRot, 7);
 							}
 							else if (!(GetRandomControl() & 7))
 							{
@@ -506,7 +506,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite1,
 							10,
-							item->Pose.Orientation.y,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->Flags = 1;
@@ -530,7 +530,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite2,
 							3,
-							item->Pose.Orientation.y,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->Flags = 1;
@@ -569,12 +569,12 @@ namespace TEN::Entities::TR4
 					item->AIBits = 0;
 					item->ItemFlags[1] = 1;
 
-					item->Pose.Position.x = horseItem->Pose.Position.x;
-					item->Pose.Position.y = horseItem->Pose.Position.y;
-					item->Pose.Position.z = horseItem->Pose.Position.z;
-					item->Pose.Orientation.x = horseItem->Pose.Orientation.x;
-					item->Pose.Orientation.y = horseItem->Pose.Orientation.y;
-					item->Pose.Orientation.z = horseItem->Pose.Orientation.z;
+					item->Position.xPos = horseItem->Position.xPos;
+					item->Position.yPos = horseItem->Position.yPos;
+					item->Position.zPos = horseItem->Position.zPos;
+					item->Position.xRot = horseItem->Position.xRot;
+					item->Position.yRot = horseItem->Position.yRot;
+					item->Position.zRot = horseItem->Position.zRot;
 
 					creature->ReachedGoal = false;
 					creature->Enemy = NULL;
@@ -618,12 +618,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= ANGLE(3.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(3.0f);
+						item->Position.yRot += ANGLE(3.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(3.0f);
+						item->Position.yRot -= ANGLE(3.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Position.yRot += AI.angle;
 
 				if (!creature->Flags)
 				{
@@ -636,7 +636,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite2,
 							3,
-							item->Pose.Orientation.y,
+							item->Position.yRot,
 							DoBloodSplat);
 
 						creature->Flags = 1;
@@ -754,22 +754,22 @@ namespace TEN::Entities::TR4
 
 			if (horseItem && item->ItemFlags[1])
 			{
-				if (abs(xRot - item->Pose.Orientation.x) < ANGLE(1.4f))
-					item->Pose.Orientation.x = xRot;
-				else if (xRot <= item->Pose.Orientation.x)
+				if (abs(xRot - item->Position.xRot) < ANGLE(1.4f))
+					item->Position.xRot = xRot;
+				else if (xRot <= item->Position.xRot)
 				{
-					if (xRot < item->Pose.Orientation.x)
-						item->Pose.Orientation.x -= ANGLE(1.4f);
+					if (xRot < item->Position.xRot)
+						item->Position.xRot -= ANGLE(1.4f);
 				}
 				else
-					item->Pose.Orientation.x += ANGLE(1.4f);
+					item->Position.xRot += ANGLE(1.4f);
 
-				horseItem->Pose.Position.x = item->Pose.Position.x;
-				horseItem->Pose.Position.y = item->Pose.Position.y;
-				horseItem->Pose.Position.z = item->Pose.Position.z;
-				horseItem->Pose.Orientation.x = item->Pose.Orientation.x;
-				horseItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				horseItem->Pose.Orientation.z = item->Pose.Orientation.z;
+				horseItem->Position.xPos = item->Position.xPos;
+				horseItem->Position.yPos = item->Position.yPos;
+				horseItem->Position.zPos = item->Position.zPos;
+				horseItem->Position.xRot = item->Position.xRot;
+				horseItem->Position.yRot = item->Position.yRot;
+				horseItem->Position.zRot = item->Position.zRot;
 
 				if (horseItem->RoomNumber != item->RoomNumber)
 					ItemNewRoom(item->ItemFlags[0], item->RoomNumber);

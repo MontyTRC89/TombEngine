@@ -21,9 +21,9 @@
 
 void ShootAtLara(FX_INFO *fx)
 {
-	int x = LaraItem->Pose.Position.x - fx->pos.xPos;
-	int y = LaraItem->Pose.Position.y - fx->pos.yPos;
-	int z = LaraItem->Pose.Position.z - fx->pos.zPos;
+	int x = LaraItem->Position.xPos - fx->pos.xPos;
+	int y = LaraItem->Position.yPos - fx->pos.yPos;
+	int z = LaraItem->Position.zPos - fx->pos.zPos;
 
 	auto* bounds = GetBoundsAccurate(LaraItem);
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
@@ -108,7 +108,7 @@ void ControlMissile(short fxNumber)
 
 		LaraItem->HitStatus = 1;
 
-		fx->pos.yRot = LaraItem->Pose.Orientation.y;
+		fx->pos.yRot = LaraItem->Position.yRot;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}

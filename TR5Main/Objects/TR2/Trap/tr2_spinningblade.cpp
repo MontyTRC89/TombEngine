@@ -30,10 +30,10 @@ void SpinningBladeControl(short itemNumber)
 	{
 		if (item->Animation.TargetState != 1)
 		{
-			int x = item->Pose.Position.x + SECTOR(3) * phd_sin(item->Pose.Orientation.y) / 2;
-			int z = item->Pose.Position.z + SECTOR(3) * phd_cos(item->Pose.Orientation.y) / 2;
+			int x = item->Position.xPos + SECTOR(3) * phd_sin(item->Position.yRot) / 2;
+			int z = item->Position.zPos + SECTOR(3) * phd_cos(item->Position.yRot) / 2;
 
-			int height = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+			int height = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
 			if (height == NO_HEIGHT)
 				item->Animation.TargetState = 1;
 		}
@@ -45,10 +45,10 @@ void SpinningBladeControl(short itemNumber)
 			LaraItem->HitStatus = true;
 			LaraItem->HitPoints -= 100;
 
-			DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, (short)(item->Animation.Velocity * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);
+			DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - CLICK(2), LaraItem->Position.zPos, (short)(item->Animation.Velocity * 2), LaraItem->Position.yRot, LaraItem->RoomNumber, 2);
 		}
 
-		SoundEffect(231, &item->Pose, 0);
+		SoundEffect(231, &item->Position, 0);
 	}
 	else
 	{
@@ -63,11 +63,11 @@ void SpinningBladeControl(short itemNumber)
 	auto probe = GetCollision(item);
 
 	item->Floor = probe.Position.Floor;
-	item->Pose.Position.y = probe.Position.Floor;
+	item->Position.yPos = probe.Position.Floor;
 
 	if (probe.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	if (spinning && item->Animation.ActiveState == 1)
-		item->Pose.Orientation.y += -ANGLE(180.0f);
+		item->Position.yRot += -ANGLE(180.0f);
 }

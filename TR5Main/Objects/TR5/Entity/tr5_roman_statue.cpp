@@ -289,8 +289,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
-	item->Pose.Position.z += 486 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+	item->Position.xPos += 486 * phd_sin(item->Position.yRot + ANGLE(90.0f));
+	item->Position.zPos += 486 * phd_cos(item->Position.yRot + ANGLE(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -495,9 +495,9 @@ void RomanStatueControl(short itemNumber)
 
 			color = (GetRandomControl() & 0x3F) + 128;
 			
-			pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
-			pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - SECTOR(4);
-			pos1.z = (GetRandomControl() & 0xFFF) + item->Pose.Position.z - SECTOR(2);
+			pos1.x = (GetRandomControl() & 0xFFF) + item->Position.xPos - SECTOR(2);
+			pos1.y = item->Position.yPos - (GetRandomControl() & 0x3FF) - SECTOR(4);
+			pos1.z = (GetRandomControl() & 0xFFF) + item->Position.zPos - SECTOR(2);
 			
 			for (int i = 0; i < 8; i++)
 			{
@@ -563,12 +563,12 @@ void RomanStatueControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(2.0f);
+					item->Position.yRot += ANGLE(2.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(2.0f);
+					item->Position.yRot -= ANGLE(2.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -605,8 +605,8 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
-						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Position.yRot, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 200;
@@ -619,7 +619,7 @@ void RomanStatueControl(short itemNumber)
 					pos1 = { -40, 64, 360 };
 					GetJointAbsPosition(item, &pos1, 14);
 
-					pos1.y = item->Pose.Position.y - 64;
+					pos1.y = item->Position.yPos - 64;
 					
 					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
 					{
@@ -660,12 +660,12 @@ void RomanStatueControl(short itemNumber)
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Pose.Orientation.y += ANGLE(2.0f);
+						item->Position.yRot += ANGLE(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2.0f);
+						item->Position.yRot -= ANGLE(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Position.yRot += AI.angle;
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -701,12 +701,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.y -= ANGLE(2.0f);
+				item->Position.yRot -= ANGLE(2.0f);
 			else
-				item->Pose.Orientation.y += ANGLE(2.0f);
+				item->Position.yRot += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.y += -ANGLE(180.0f);
+				item->Position.yRot += -ANGLE(180.0f);
 		
 			break;
 

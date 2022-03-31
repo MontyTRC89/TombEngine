@@ -154,16 +154,16 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
-	if (item->Pose.Orientation.x < -ANGLE(2.0f) ||
-		item->Pose.Orientation.x > ANGLE(2.0f))
+	if (item->Position.xRot < -ANGLE(2.0f) ||
+		item->Position.xRot > ANGLE(2.0f))
 	{
-		if (item->Pose.Orientation.x >= 0)
-			item->Pose.Orientation.x -= ANGLE(2.0f);
+		if (item->Position.xRot >= 0)
+			item->Position.xRot -= ANGLE(2.0f);
 		else
-			item->Pose.Orientation.x += ANGLE(2.0f);
+			item->Position.xRot += ANGLE(2.0f);
 	}
 	else
-		item->Pose.Orientation.x = 0;
+		item->Position.xRot = 0;
 }
 
 // State:		LS_WATER_DEATH (44)
@@ -177,10 +177,10 @@ void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 
 	int waterHeight = GetWaterHeight(item);
-	if (waterHeight < (item->Pose.Position.y - (CLICK(0.4f) - 2)) &&
+	if (waterHeight < (item->Position.yPos - (CLICK(0.4f) - 2)) &&
 		waterHeight != NO_HEIGHT)
 	{
-		item->Pose.Position.y -= 5;
+		item->Position.yPos -= 5;
 	}
 
 	LaraSwimCollision(item, coll);

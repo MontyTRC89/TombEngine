@@ -40,10 +40,10 @@ namespace TEN::Entities::TR4
 			// Emitter.
 			if (item->ObjectNumber == ID_LOCUSTS_EMITTER)
 			{
-				end.x = item->Pose.Position.x;
-				end.y = item->Pose.Position.y;
-				end.z = item->Pose.Position.z;
-				angles[0] = item->Pose.Orientation.y - ANGLE(180.0f);
+				end.x = item->Position.xPos;
+				end.y = item->Position.yPos;
+				end.z = item->Position.zPos;
+				angles[0] = item->Position.yRot - ANGLE(180.0f);
 				angles[1] = 0;
 			}
 			// Mutant.
@@ -82,20 +82,20 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Pose.Orientation.y > 0)
+		if (item->Position.yRot > 0)
 		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += CLICK(2);
+			if (item->Position.yRot == ANGLE(90.0f))
+				item->Position.xPos += CLICK(2);
 		}
-		else if (item->Pose.Orientation.y < 0)
+		else if (item->Position.yRot < 0)
 		{
-			if (item->Pose.Orientation.y == -ANGLE(180.0f))
-				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-				item->Pose.Position.x -= CLICK(2);
+			if (item->Position.yRot == -ANGLE(180.0f))
+				item->Position.zPos -= CLICK(2);
+			else if (item->Position.yRot == -ANGLE(90.0f))
+				item->Position.xPos -= CLICK(2);
 		}
 		else
-			item->Pose.Position.z += CLICK(2);
+			item->Position.zPos += CLICK(2);
 	}
 
 	void LocustControl(short itemNumber)
@@ -149,12 +149,12 @@ namespace TEN::Entities::TR4
 				}
 
 				phd_GetVectorAngles(
-					LaraItem->Pose.Position.x + 8 * locust->escapeXrot - locust->pos.xPos,
-					LaraItem->Pose.Position.y - locust->escapeYrot - locust->pos.yPos,
-					LaraItem->Pose.Position.z + 8 * locust->escapeZrot - locust->pos.zPos,
+					LaraItem->Position.xPos + 8 * locust->escapeXrot - locust->pos.xPos,
+					LaraItem->Position.yPos - locust->escapeYrot - locust->pos.yPos,
+					LaraItem->Position.zPos + 8 * locust->escapeZrot - locust->pos.zPos,
 					angles);
 
-				int distance = SQUARE(LaraItem->Pose.Position.z - locust->pos.zPos) + SQUARE(LaraItem->Pose.Position.x - locust->pos.xPos);
+				int distance = SQUARE(LaraItem->Position.zPos - locust->pos.zPos) + SQUARE(LaraItem->Position.xPos - locust->pos.xPos);
 				int square = int(sqrt(distance)) / 8;
 				if (square <= 128)
 				{

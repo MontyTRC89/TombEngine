@@ -97,18 +97,18 @@ void lara_as_switch_off(ITEM_INFO* item, CollisionInfo* coll)
 // Control:	lara_as_controlled_no_look()
 void lara_col_turn_switch(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (coll->Setup.OldPosition.x != item->Pose.Position.x || coll->Setup.OldPosition.z != item->Pose.Position.z)
+	if (coll->Setup.OldPosition.x != item->Position.xPos || coll->Setup.OldPosition.z != item->Position.zPos)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.y -= ANGLE(90.0f);
+			item->Position.yRot -= ANGLE(90.0f);
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.y += ANGLE(90.0f);
+			item->Position.yRot += ANGLE(90.0f);
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
@@ -281,7 +281,7 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 	{
 		int distance;
-		if (item->Pose.Orientation.y == barItem->Pose.Orientation.y)
+		if (item->Position.yRot == barItem->Position.yRot)
 			distance = (barItem->TriggerFlags / 100) - 2;
 		else
 			distance = (barItem->TriggerFlags % 100) - 2;
@@ -293,9 +293,9 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLastFrame(item))
 	{
 		SetAnimation(item, LA_REACH);
-		item->Pose.Position.x += 700 * phd_sin(item->Pose.Orientation.y);
-		item->Pose.Position.y -= 361;
-		item->Pose.Position.z += 700 * phd_cos(item->Pose.Orientation.y);
+		item->Position.xPos += 700 * phd_sin(item->Position.yRot);
+		item->Position.yPos -= 361;
+		item->Position.zPos += 700 * phd_cos(item->Position.yRot);
 	}
 }
 
@@ -344,8 +344,8 @@ void lara_as_tightrope_dismount(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_TIGHTROPE_END &&
 		TestLastFrame(item))
 	{
-		item->Pose.Orientation.z = 0;
-		lara->ExtraTorsoRot.z = 0;
+		item->Position.zRot = 0;
+		lara->ExtraTorsoRot.zRot = 0;
 	}
 }
 
@@ -447,8 +447,8 @@ void lara_as_tightrope_walk(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		short roomNumber = item->RoomNumber;
 
-		if (GetFloorHeight(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber),
-			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) == item->Pose.Position.y)
+		if (GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber),
+			item->Position.xPos, item->Position.yPos, item->Position.zPos) == item->Position.yPos)
 		{
 			item->Animation.TargetState = LS_TIGHTROPE_DISMOUNT;
 			lara->Control.TightropeControl.Off = 0;
@@ -483,9 +483,9 @@ void lara_as_tightrope_fall(ITEM_INFO* item, CollisionInfo* coll)
 			PHD_VECTOR pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_RFOOT);
 
-			item->Pose.Position.x = pos.x;
-			item->Pose.Position.y = pos.y + 75;
-			item->Pose.Position.z = pos.z;
+			item->Position.xPos = pos.x;
+			item->Position.yPos = pos.y + 75;
+			item->Position.zPos = pos.z;
 
 			item->Animation.TargetState = LS_FREEFALL;
 			item->Animation.ActiveState = LS_FREEFALL;
@@ -646,7 +646,7 @@ void lara_col_rope_swing(ITEM_INFO* item, CollisionInfo* coll)
 
 			ApplyVelocityToRope(
 				lara->Control.Rope.Segment - 2,
-				item->Pose.Orientation.y + (lara->Control.Rope.Direction ? 0 : ANGLE(180.0f)),
+				item->Position.yRot + (lara->Control.Rope.Direction ? 0 : ANGLE(180.0f)),
 				velocity >> 5);
 		}
 
@@ -680,7 +680,7 @@ void lara_col_rope_swing(ITEM_INFO* item, CollisionInfo* coll)
 			JumpOffRope(item);
 	}
 	else if (item->Animation.FrameNumber == g_Level.Anims[LA_ROPE_IDLE_TO_SWING].frameBase + 15)
-		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.y, 128);
+		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Position.yRot, 128);
 }
 
 // State:	LS_ROPE_UP (112)
@@ -798,8 +798,8 @@ void lara_as_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL;
 
 		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-		item->Pose.Position.x -= phd_sin(item->Pose.Orientation.y) * 64;
-		item->Pose.Position.z -= phd_cos(item->Pose.Orientation.y) * 64;
+		item->Position.xPos -= phd_sin(item->Position.yRot) * 64;
+		item->Position.zPos -= phd_cos(item->Position.yRot) * 64;
 	}
 }
 
@@ -809,7 +809,7 @@ void lara_col_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -820,7 +820,7 @@ void lara_col_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 	// TODO: There's a visible snap if Lara hits the ground at a high velocity.
 	if (coll->Middle.Floor < 0)
-		item->Pose.Position.y += coll->Middle.Floor;
+		item->Position.yPos += coll->Middle.Floor;
 }
 
 // State:		LS_POLE_UP (100)
@@ -895,7 +895,7 @@ void lara_as_pole_down(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	// TODO: In WAD.
-	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose, 0);
+	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Position, 0);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -938,7 +938,7 @@ void lara_col_pole_down(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -961,9 +961,9 @@ void lara_col_pole_down(ITEM_INFO* item, CollisionInfo* coll)
 	
 	// TODO: Do something about that ugly snap at the bottom.
 	if ((coll->Middle.Floor + item->Animation.VerticalVelocity) < 0)
-		item->Pose.Position.y += coll->Middle.Floor;
+		item->Position.yPos += coll->Middle.Floor;
 	else if (TestLaraPoleCollision(item, coll, false))
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Position.yPos += item->Animation.VerticalVelocity;
 }
 
 // State:		LS_POLE_TURN_CLOCKWISE (102)
@@ -1096,6 +1096,6 @@ void lara_as_zip_line(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.Velocity = 100;
 		item->Animation.VerticalVelocity = 40;
 		item->Animation.Airborne = true;
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->Control.MoveAngle = item->Position.yRot;
 	}
 }

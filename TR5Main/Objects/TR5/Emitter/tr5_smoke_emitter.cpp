@@ -11,25 +11,25 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 	if (item->TriggerFlags == 111)
 	{
-		if (item->Pose.Orientation.y > 0)
+		if (item->Position.yRot > 0)
 		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += 512;
+			if (item->Position.yRot == ANGLE(90.0f))
+				item->Position.xPos += 512;
 		}
-		else if (item->Pose.Orientation.y)
+		else if (item->Position.yRot)
 		{
-			if (item->Pose.Orientation.y == -ANGLE(180.0f))
+			if (item->Position.yRot == -ANGLE(180.0f))
 			{
-				item->Pose.Position.z -= 512;
+				item->Position.zPos -= 512;
 			}
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+			else if (item->Position.yRot == -ANGLE(90.0f))
 			{
-				item->Pose.Position.x -= 512;
+				item->Position.xPos -= 512;
 			}
 		}
 		else
 		{
-			item->Pose.Position.z += 512;
+			item->Position.zPos += 512;
 		}
 	}
 	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
@@ -40,23 +40,23 @@ void InitialiseSmokeEmitter(short itemNumber)
 	{
 		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->Pose.Orientation.y > 0)
+		if (item->Position.yRot > 0)
 		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += 256;
+			if (item->Position.yRot == ANGLE(90.0f))
+				item->Position.xPos += 256;
 		}
 		else
 		{
-			if (item->Pose.Orientation.y == 0)
+			if (item->Position.yRot == 0)
 			{
-				item->Pose.Position.z += 256;
+				item->Position.zPos += 256;
 			}
-			else if (item->Pose.Orientation.y == -ANGLE(180.0f))
+			else if (item->Position.yRot == -ANGLE(180.0f))
 			{
-				item->Pose.Position.z -= 256;
+				item->Position.zPos -= 256;
 			}
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-				item->Pose.Position.x -= 256;
+			else if (item->Position.yRot == -ANGLE(90.0f))
+				item->Position.xPos -= 256;
 		}
 
 		if ((signed short)(item->TriggerFlags / 16) <= 0)

@@ -60,9 +60,9 @@ void EagleControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 4:
-			if (item->Pose.Position.y > item->Floor)
+			if (item->Position.yPos > item->Floor)
 			{
-				item->Pose.Position.y = item->Floor;
+				item->Position.yPos = item->Floor;
 				item->Animation.VerticalVelocity = 0;
 				item->Animation.Airborne = false;
 				item->Animation.TargetState = 5;
@@ -71,7 +71,7 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 5:
-			item->Pose.Position.y = item->Floor;
+			item->Position.yPos = item->Floor;
 			break;
 
 		default:
@@ -86,7 +86,7 @@ void EagleControl(short itemNumber)
 			item->Animation.Airborne = true;
 			break;
 		}
-		item->Pose.Orientation.x = 0;
+		item->Position.xRot = 0;
 	}
 	else
 	{
@@ -101,7 +101,7 @@ void EagleControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 7:
-			item->Pose.Position.y = item->Floor;
+			item->Position.yPos = item->Floor;
 
 			if (creature->Mood != MoodType::Bored)
 				item->Animation.TargetState = 1;
@@ -109,7 +109,7 @@ void EagleControl(short itemNumber)
 			break;
 
 		case 2:
-			item->Pose.Position.y = item->Floor;
+			item->Position.yPos = item->Floor;
 
 			if (creature->Mood == MoodType::Bored)
 				break;

@@ -67,7 +67,7 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation,
 
 				PHD_VECTOR pos = { 0, 0, 0 };
 				GetJointAbsPosition(enemy, &pos, random);
-				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
+				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Position.yRot, enemy->RoomNumber);
 			}
 		}
 	}
@@ -80,9 +80,9 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation,
 short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	GAME_VECTOR pos;
-	pos.x = LaraItem->Pose.Position.x + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
+	pos.x = LaraItem->Position.xPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.y = LaraItem->Floor;
-	pos.z = LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
+	pos.z = LaraItem->Position.zPos + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.roomNumber = LaraItem->RoomNumber;
 
 	Richochet((PHD_3DPOS*)&pos);
@@ -95,8 +95,8 @@ short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	PHD_VECTOR pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
-	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
+	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Position.yRot, LaraItem->RoomNumber);
+	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Position, 0);
 
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
@@ -120,17 +120,17 @@ bool Targetable(ITEM_INFO* item, AI_INFO* AI)
 	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 
 	GAME_VECTOR start;
-	start.x = item->Pose.Position.x;
-	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Pose.Position.y - CLICK(3)) : (item->Pose.Position.y + ((bounds->Y2 + 3 * bounds->Y1) / 4));
-	start.z = item->Pose.Position.z;
+	start.x = item->Position.xPos;
+	start.y = (item->ObjectNumber == ID_SNIPER) ? (item->Position.yPos - CLICK(3)) : (item->Position.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4));
+	start.z = item->Position.zPos;
 	start.roomNumber = item->RoomNumber;
 
 	bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
 
 	GAME_VECTOR target;
-	target.x = enemy->Pose.Position.x;
-	target.y = enemy->Pose.Position.y + ((bounds->Y2 + 3 * bounds->Y1) / 4);
-	target.z = enemy->Pose.Position.z;
+	target.x = enemy->Position.xPos;
+	target.y = enemy->Position.yPos + ((bounds->Y2 + 3 * bounds->Y1) / 4);
+	target.z = enemy->Position.zPos;
 
 	return LOS(&start, &target);
 }
@@ -146,16 +146,16 @@ bool TargetVisible(ITEM_INFO* item, AI_INFO* AI)
 		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
 			GAME_VECTOR start;
-			start.x = item->Pose.Position.x;
-			start.y = item->Pose.Position.y - CLICK(3);
-			start.z = item->Pose.Position.z;
+			start.x = item->Position.xPos;
+			start.y = item->Position.yPos - CLICK(3);
+			start.z = item->Position.zPos;
 			start.roomNumber = item->RoomNumber;
 
 			GAME_VECTOR target;
-			target.x = enemy->Pose.Position.x;
+			target.x = enemy->Position.xPos;
 			auto* bounds = (BOUNDING_BOX*)GetBestFrame(enemy);
-			target.y = enemy->Pose.Position.y + ((((bounds->Y1 * 2) + bounds->Y1) + bounds->Y2) / 4);
-			target.z = enemy->Pose.Position.z;
+			target.y = enemy->Position.yPos + ((((bounds->Y1 * 2) + bounds->Y1) + bounds->Y2) / 4);
+			target.z = enemy->Position.zPos;
 
 			return LOS(&start, &target);
 		}

@@ -300,9 +300,9 @@ void PlaySoundEffect(ITEM_INFO* item)
 
 void FloorShake(ITEM_INFO* item)
 {
-	int x = abs(item->Pose.Position.x - Camera.pos.x);
-	int y = abs(item->Pose.Position.y - Camera.pos.y);
-	int z = abs(item->Pose.Position.z - Camera.pos.z);
+	int x = abs(item->Position.xPos - Camera.pos.x);
+	int y = abs(item->Position.yPos - Camera.pos.y);
+	int z = abs(item->Position.zPos - Camera.pos.z);
 
 	if (x < SECTOR(16) &&
 		y < SECTOR(16) &&
@@ -314,8 +314,8 @@ void FloorShake(ITEM_INFO* item)
 
 void Turn180(ITEM_INFO* item)
 {
-	item->Pose.Orientation.y -= ANGLE(180.0f);
-	item->Pose.Orientation.x = -item->Pose.Orientation.x;
+	item->Position.yRot -= ANGLE(180.0f);
+	item->Position.xRot = -item->Position.xRot;
 }
 
 void FinishLevel(ITEM_INFO* item)
