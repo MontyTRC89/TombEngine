@@ -17,15 +17,15 @@ void PulseLightControl(short itemNumber)
 	{
 		item->ItemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Position.yPos & 0x3FFF));
+		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Pose.Position.y & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
 
 		TriggerDynamicLight(
-			item->Position.xPos,
-			item->Position.yPos,
-			item->Position.zPos,
+			item->Pose.Position.x,
+			item->Pose.Position.y,
+			item->Pose.Position.z,
 			24,
 			(pulse * 8 * (item->TriggerFlags & 0x1F)) / 512,
 			(pulse * ((item->TriggerFlags / 4) & 0xF8)) / 512,
@@ -35,14 +35,14 @@ void PulseLightControl(short itemNumber)
 
 void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
 {
-	GAME_VECTOR start;
+	GameVector start;
 	start.x = x;
 	start.y = y;
 	start.z = z;
 	GetFloor(x, y, z, &room);
 	start.roomNumber = room;
 
-	GAME_VECTOR end;
+	GameVector end;
 	end.x = x + 16384 * phd_sin(16 * angle);
 	end.y = y;
 	end.z = z + 16384 * phd_cos(16 * angle);
@@ -57,25 +57,25 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->Position.yRot += ANGLE(16.0f);
+		item->Pose.Orientation.y += ANGLE(16.0f);
 
 		byte r = 8 * (item->TriggerFlags & 0x1F);
 		byte g = (item->TriggerFlags / 4) & 0xF8;
 		byte b = (item->TriggerFlags / 128) & 0xF8;
 
 		TriggerAlertLight(
-			item->Position.xPos,
-			item->Position.yPos - 512,
-			item->Position.zPos,
+			item->Pose.Position.x,
+			item->Pose.Position.y - 512,
+			item->Pose.Position.z,
 			r, g, b,
-			((item->Position.yRot + 22528) / 16) & 0xFFF,
+			((item->Pose.Orientation.y + 22528) / 16) & 0xFFF,
 			item->RoomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->Position.xPos + 256 * phd_sin(item->Position.yRot + 22528),
-			item->Position.yPos - 768,
-			item->Position.zPos + 256 * phd_cos(item->Position.yRot + 22528),
+			item->Pose.Position.x + 256 * phd_sin(item->Pose.Orientation.y + 22528),
+			item->Pose.Position.y - 768,
+			item->Pose.Position.z + 256 * phd_cos(item->Pose.Orientation.y + 22528),
 			8,
 			r, g, b);
 	}
@@ -88,9 +88,9 @@ void ColorLightControl(short itemNumber)
 	if (TriggerActive(item))
 	{
 		TriggerDynamicLight(
-			item->Position.xPos,
-			item->Position.yPos,
-			item->Position.zPos,
+			item->Pose.Position.x,
+			item->Pose.Position.y,
+			item->Pose.Position.z,
 			24,
 			8 * (item->TriggerFlags & 0x1F),
 			(item->TriggerFlags / 4) & 0xF8,
@@ -161,16 +161,16 @@ void ElectricalLightControl(short itemNumber)
 
 			intensity = item->ItemFlags[1] - (GetRandomControl() & 0x7F);
 			if (intensity > 64)
-				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Position, 32 * (intensity & 0xFFFFFFF8) | 8);
+				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, 32 * (intensity & 0xFFFFFFF8) | 8);
 		}
 		else
 			return;
 	}
 
 	TriggerDynamicLight(
-		item->Position.xPos,
-		item->Position.yPos,
-		item->Position.zPos,
+		item->Pose.Position.x,
+		item->Pose.Position.y,
+		item->Pose.Position.z,
 		24,
 		(intensity * 8 * (item->TriggerFlags & 0x1F)) / 256,
 		(intensity * ((item->TriggerFlags / 4) & 0xF8)) / 256,
@@ -189,7 +189,7 @@ void BlinkingLightControl(short itemNumber)
 			item->MeshBits = 1;
 		else
 		{
-			PHD_VECTOR pos = { 0, 0, 0 };
+			Vector3Int pos = { 0, 0, 0 };
 			GetJointAbsPosition(item, &pos, 0);
 
 			TriggerDynamicLight(

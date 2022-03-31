@@ -67,10 +67,10 @@ void InitialiseImp(short itemNumber)
 
 static void ImpThrowStones(ITEM_INFO* item)
 {
-	PHD_VECTOR pos1 = { 0, 0, 0 };
+	Vector3Int pos1 = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos1, 9);
 
-	PHD_VECTOR pos2 = { 0, 0, 0 };
+	Vector3Int pos2 = { 0, 0, 0 };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	int dx = pos1.x - pos2.x;
@@ -92,13 +92,13 @@ static void ImpThrowStones(ITEM_INFO* item)
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = pos1.x;
-		fx->pos.yPos = pos1.y;
-		fx->pos.zPos = pos1.z;
+		fx->pos.Position.x = pos1.x;
+		fx->pos.Position.y = pos1.y;
+		fx->pos.Position.z = pos1.z;
 		fx->roomNumber = item->RoomNumber;
-		fx->pos.xRot = (angles[1] + distance) / 2;
-		fx->pos.yRot = angles[0];
-		fx->pos.zRot = 0;
+		fx->pos.Orientation.x = (angles[1] + distance) / 2;
+		fx->pos.Orientation.y = angles[0];
+		fx->pos.Orientation.z = 0;
 		fx->speed = 4 * sqrt(distance);
 
 		if (fx->speed < 256)
@@ -142,9 +142,9 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos) - item->Position.yRot;
+				angle2 = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
-			int d1 = item->Position.yPos - LaraItem->Position.yPos + CLICK(1.5f);
+			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
 			if (LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
 				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
@@ -153,7 +153,7 @@ void ImpControl(short itemNumber)
 				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 			{
-				d1 = item->Position.yPos - LaraItem->Position.yPos;
+				d1 = item->Pose.Position.y - LaraItem->Pose.Position.y;
 			}
 
 			int d2 = sqrt(AI.distance);
@@ -240,7 +240,7 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
-					CreatureEffect2(item, &ImpBite, 10, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
@@ -287,12 +287,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= ANGLE(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += angle2;
+				item->Pose.Orientation.y += angle2;
 		}
 
 		CreatureTilt(item, 0);

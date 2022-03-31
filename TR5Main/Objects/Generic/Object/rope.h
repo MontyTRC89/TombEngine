@@ -2,7 +2,7 @@
 
 struct ITEM_INFO;
 struct CollisionInfo;
-struct PHD_VECTOR;
+struct Vector3Int;
 
 namespace TEN::Entities::Generic
 {
@@ -11,12 +11,12 @@ namespace TEN::Entities::Generic
 
 	struct ROPE_STRUCT
 	{
-		PHD_VECTOR segment[ROPE_SEGMENTS];
-		PHD_VECTOR velocity[ROPE_SEGMENTS];
-		PHD_VECTOR normalisedSegment[ROPE_SEGMENTS];
-		PHD_VECTOR meshSegment[ROPE_SEGMENTS];
-		PHD_VECTOR position;
-		PHD_VECTOR coords[ROPE_SEGMENTS];
+		Vector3Int segment[ROPE_SEGMENTS];
+		Vector3Int velocity[ROPE_SEGMENTS];
+		Vector3Int normalisedSegment[ROPE_SEGMENTS];
+		Vector3Int meshSegment[ROPE_SEGMENTS];
+		Vector3Int position;
+		Vector3Int coords[ROPE_SEGMENTS];
 		int segmentLength;
 		short active;
 		short coiled;
@@ -24,8 +24,8 @@ namespace TEN::Entities::Generic
 
 	struct PENDULUM
 	{
-		PHD_VECTOR position;
-		PHD_VECTOR velocity;
+		Vector3Int position;
+		Vector3Int velocity;
 		int node;
 		ROPE_STRUCT* rope;
 	};
@@ -36,12 +36,12 @@ namespace TEN::Entities::Generic
 	extern int RopeSwing;
 
 	void InitialiseRope(short itemNumber);
-	void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item);
-	PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec);
+	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ITEM_INFO* item);
+	Vector3Int* NormaliseRopeVector(Vector3Int* vec);
 	void GetRopePos(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z);
-	int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v);
-	void ScaleVector(PHD_VECTOR* src, int c, PHD_VECTOR* dest);
-	void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* dest);
+	int DotProduct(Vector3Int* u, Vector3Int* v);
+	void ScaleVector(Vector3Int* src, int c, Vector3Int* dest);
+	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* dest);
 	void phd_GetMatrixAngles(int* array, short* angle);
 	void RopeControl(short itemNumber);
 	void RopeCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
@@ -50,8 +50,8 @@ namespace TEN::Entities::Generic
 	void ApplyVelocityToRope(int node, short angle, short n);
 	void SetPendulumVelocity(int x, int y, int z);
 	void SetPendulumPoint(ROPE_STRUCT* rope, int node);
-	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value);
-	void ModelRigid(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length);
+	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3Int* ropeVelocity, Vector3Int* pendulumVelocity, int value);
+	void ModelRigid(Vector3Int* segment, Vector3Int* nextSegment, Vector3Int* velocity, Vector3Int* nextVelocity, int length);
 	void DelAlignLaraToRope(ITEM_INFO* item);
 	void UpdateRopeSwing(ITEM_INFO* item);
 	void JumpOffRope(ITEM_INFO* item);

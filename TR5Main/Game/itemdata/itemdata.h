@@ -56,7 +56,7 @@ class ITEM_DATA
 		SkidooInfo,
 		UPVInfo,
 		SpeedBoatInfo,
-		GAME_VECTOR,
+		GameVector,
 		WraithInfo,
 		RubberBoatInfo,
 		PushableInfo,

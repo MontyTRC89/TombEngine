@@ -11,7 +11,7 @@
 
 namespace TEN::Entities::Switches
 {
-	PHD_VECTOR RailSwitchPos = { 0, 0, -550 };
+	Vector3Int RailSwitchPos = { 0, 0, -550 };
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds =
 	{
@@ -23,7 +23,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR RailSwitchPos2 = { 0, 0, 550 }; 
+	Vector3Int RailSwitchPos2 = { 0, 0, 550 }; 
 
 	OBJECT_COLLISION_BOUNDS RailSwitchBounds2 =
 	{
@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (TestLaraPosition(&RailSwitchBounds2, switchItem, laraItem))
 				{
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (flag)
 				{

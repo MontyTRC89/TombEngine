@@ -56,7 +56,7 @@ namespace TEN::Renderer
 			if (!m_moveableObjects[item->ObjectNumber].has_value())
 				continue;
 
-			auto bounds = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
+			auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 			Vector3 min = bounds.Center - bounds.Extents;
 			Vector3 max = bounds.Center + bounds.Extents;
 
@@ -66,10 +66,10 @@ namespace TEN::Renderer
 			auto newItem = &m_items[itemNum];
 
 			newItem->ItemNumber = itemNum;
-			newItem->Translation = Matrix::CreateTranslation(item->Position.xPos, item->Position.yPos, item->Position.zPos);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Position.yRot),
-															   TO_RAD(item->Position.xRot),
-															   TO_RAD(item->Position.zRot));
+			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
+															   TO_RAD(item->Pose.Orientation.x),
+															   TO_RAD(item->Pose.Orientation.z));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
@@ -123,7 +123,7 @@ namespace TEN::Renderer
 			return;
 		LinearArrayBuffer<RendererLight*, 8> tempLights;
 
-		Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
+		Vector3 itemPosition = Vector3(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z);
 
 		// Dynamic lights have the priority
 		for (int i = 0; i < dynamicLights.size(); i++)
@@ -258,7 +258,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 
-		Vector3 itemPosition = Vector3(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
 
 		if (nativeItem->ObjectNumber == ID_LARA)
 			shadowLight = nullptr;
@@ -455,7 +455,7 @@ namespace TEN::Renderer
 
 			newEffect->Effect = fx;
 			newEffect->Id = fxNum;
-			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);

@@ -42,8 +42,8 @@ void InitialiseChef(short itemNumber)
 	item->Animation.TargetState = CHEF_STATE_COOKING;
 	item->Animation.ActiveState = CHEF_STATE_COOKING;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Position.xPos += 192 * phd_sin(item->Position.yRot);
-	item->Position.zPos += 192 * phd_cos(item->Position.yRot);
+	item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
+	item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
 }
 
 void ControlChef(short itemNumber)
@@ -87,10 +87,10 @@ void ControlChef(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			aiLaraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
+			aiLaraInfo.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			aiLaraInfo.ahead = true;
 
 			if (aiLaraInfo.angle <= -ANGLE(90.0f) || aiLaraInfo.angle >= ANGLE(90.0f))
@@ -116,7 +116,7 @@ void ControlChef(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case CHEF_STATE_COOKING:
-			if (abs(LaraItem->Position.yPos - item->Position.yPos) < SECTOR(1) &&
+			if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
 				AI.distance < pow(SECTOR(1.5f), 2) &&
 				(item->TouchBits ||
 					item->HitStatus ||
@@ -134,11 +134,11 @@ void ControlChef(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle > 0)
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Position.yRot += -ANGLE(180.0f);
+				item->Pose.Orientation.y += -ANGLE(180.0f);
 
 			break;
 
@@ -148,12 +148,12 @@ void ControlChef(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle > 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{
@@ -161,8 +161,8 @@ void ControlChef(short itemNumber)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
-						CreatureEffect2(item, &ChefBite, 20, item->Position.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 80;

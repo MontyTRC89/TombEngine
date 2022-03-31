@@ -53,7 +53,7 @@ void FireRocket(ITEM_INFO* laraItem);
 void RocketControl(short itemNumber);
 void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GAME_VECTOR* src, GAME_VECTOR* target);
+void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GameVector* src, GameVector* target);
 
 void FireHK(ITEM_INFO* laraItem, int mode);
 void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType);

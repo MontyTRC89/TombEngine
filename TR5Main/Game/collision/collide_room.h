@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	VectorInt3 Coordinates;
+	Vector3 Coordinates;
 	int RoomNumber;
 
 	FLOOR_INFO* Block;
@@ -87,7 +87,7 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	PHD_VECTOR OldPosition;
+	Vector3Int OldPosition;
 	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
@@ -104,7 +104,7 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	PHD_VECTOR Shift;
+	Vector3Int Shift;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;				// x = x, y = z
 	Vector2 CeilingTilt;			// x = x, y = z
@@ -125,7 +125,7 @@ CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ITEM_INFO* item);
 
-void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
 short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);

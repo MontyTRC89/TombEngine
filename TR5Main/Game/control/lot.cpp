@@ -40,9 +40,9 @@ int EnableBaddieAI(short itemNum, int always)
 		int cameraDistance = 0;
 		if (!always)
 		{
-			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
-			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
-			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
+			int deltaX = (item->pos.Position.x - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.Position.y - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.Position.z - Camera.pos.z) >> 8;
 			cameraDistance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 		}
 
@@ -54,9 +54,9 @@ int EnableBaddieAI(short itemNum, int always)
 			CREATURE_INFO* creature = ActiveCreatures[slot];
 			item = &g_Level.Items[creature->itemNum];
 
-			int deltaX = (item->pos.xPos - Camera.pos.x) >> 8;
-			int deltaY = (item->pos.yPos - Camera.pos.y) >> 8;
-			int deltaZ = (item->pos.zPos - Camera.pos.z) >> 8;
+			int deltaX = (item->pos.Position.x - Camera.pos.x) >> 8;
+			int deltaY = (item->pos.Position.y - Camera.pos.y) >> 8;
+			int deltaZ = (item->pos.Position.z - Camera.pos.z) >> 8;
 			int distance = SQUARE(deltaX) + SQUARE(deltaY) + SQUARE(deltaZ);
 
 			if (distance > cameraDistance)
@@ -302,7 +302,7 @@ void CreateZone(ITEM_INFO* item)
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z)->Box;
+	item->BoxNumber = GetSector(r, item->Pose.Position.x - r->x, item->Pose.Position.z - r->z)->Box;
 
 	if (creature->LOT.Fly)
 	{

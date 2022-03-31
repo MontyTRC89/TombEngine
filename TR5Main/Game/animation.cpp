@@ -112,7 +112,7 @@ void AnimateLara(ITEM_INFO* item)
 					(flags == (int)SOUND_PLAYCONDITION::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
 					(flags == (int)SOUND_PLAYCONDITION::Water && lara->WaterSurfaceDist < 0 && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 				{
-					SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
+					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 2);
 				}
 
 				cmd += 2;
@@ -158,7 +158,7 @@ void AnimateLara(ITEM_INFO* item)
 			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 4;
 			if (item->Animation.VerticalVelocity < 4)
 				item->Animation.VerticalVelocity = 4;
-			item->Position.yPos += item->Animation.VerticalVelocity;
+			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
 		else
 		{
@@ -166,7 +166,7 @@ void AnimateLara(ITEM_INFO* item)
 			item->Animation.Velocity -= velocity >> 16;
 			item->Animation.Velocity += (velocity + anim->acceleration) >> 16;
 			item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : GRAVITY);
-			item->Position.yPos += item->Animation.VerticalVelocity;
+			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
 	}
 	else
@@ -187,7 +187,7 @@ void AnimateLara(ITEM_INFO* item)
 		}
 
 		item->Animation.Velocity = velocity >> 16;
-		item->Position.yPos += lara->ExtraVelocity.y;
+		item->Pose.Position.y += lara->ExtraVelocity.y;
 	}
 
 	if (lara->Control.Rope.Ptr != -1)
@@ -300,26 +300,26 @@ void AnimateItem(ITEM_INFO* item)
 				{
 					if (item->RoomNumber == NO_ROOM)
 					{
-						item->Position.xPos = LaraItem->Position.xPos;
-						item->Position.yPos = LaraItem->Position.yPos - 762;
-						item->Position.zPos = LaraItem->Position.zPos;
+						item->Pose.Position.x = LaraItem->Pose.Position.x;
+						item->Pose.Position.y = LaraItem->Pose.Position.y - 762;
+						item->Pose.Position.z = LaraItem->Pose.Position.z;
 
-						SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 2);
 					}
 					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
 						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)  || Objects[item->ObjectNumber].intelligent))
-							SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
+							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 2);
 					}
 					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
-						SoundEffect(cmd[1] & 0x3FFF, &item->Position, 2);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 2);
 				}
 				else
 				{
 					if (TestEnvironment(ENV_FLAG_WATER, item))
-						SoundEffect(cmd[1] & 0x3FFF, &item->Position, 1);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 1);
 					else
-						SoundEffect(cmd[1] & 0x3FFF, &item->Position, 0);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 0);
 				}
 
 				break;
@@ -348,7 +348,7 @@ void AnimateItem(ITEM_INFO* item)
 	if (item->Animation.Airborne)
 	{
 		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : 6);
-		item->Position.yPos += item->Animation.VerticalVelocity;
+		item->Pose.Position.y += item->Animation.VerticalVelocity;
 	}
 	else
 	{
@@ -365,7 +365,7 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	MoveItem(item, item->Position.yRot, item->Animation.Velocity, lateral);
+	MoveItem(item, item->Pose.Orientation.y, item->Animation.Velocity, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -415,12 +415,12 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	float s = phd_sin(item->Position.yRot);
-	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Pose.Orientation.y);
+	float c = phd_cos(item->Pose.Orientation.y);
 
-	item->Position.xPos += round(c * x + s * z);
-	item->Position.yPos += y;
-	item->Position.zPos += round(-s * x + c * z);
+	item->Pose.Position.x += round(c * x + s * z);
+	item->Pose.Position.y += y;
+	item->Pose.Position.z += round(-s * x + c * z);
 }
 
 void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
@@ -572,7 +572,7 @@ void DrawAnimatingItem(ITEM_INFO* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
 }
 
-void GetLaraJointPosition(PHD_VECTOR* pos, int laraMeshIndex)
+void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
 {
 	if (laraMeshIndex >= NUM_LARA_MESHES)
 		laraMeshIndex = LM_HEAD;
@@ -590,10 +590,10 @@ void ClampRotation(PHD_3DPOS* pos, short angle, short rotation)
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pos->yRot += angle;
+			pos->Orientation.y += angle;
 		else
-			pos->yRot -= rotation;
+			pos->Orientation.y -= rotation;
 	}
 	else
-		pos->yRot += rotation;
+		pos->Orientation.y += rotation;
 }

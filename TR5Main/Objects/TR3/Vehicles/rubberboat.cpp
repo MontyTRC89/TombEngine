@@ -136,14 +136,14 @@ RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber
 		return mountType;
 	}
 
-	short x = laraItem->Position.xPos - rBoat->Position.xPos;
-	short z = laraItem->Position.zPos - rBoat->Position.zPos;
+	short x = laraItem->Pose.Position.x - rBoat->Pose.Position.x;
+	short z = laraItem->Pose.Position.z - rBoat->Pose.Position.z;
 
-	int distance = z * phd_cos(-rBoat->Position.yRot) - x * phd_sin(-rBoat->Position.yRot);
+	int distance = z * phd_cos(-rBoat->Pose.Orientation.y) - x * phd_sin(-rBoat->Pose.Orientation.y);
 	if (distance > CLICK(2))
 		return mountType;
 
-	short deltaAngle = rBoat->Position.yRot - laraItem->Position.yRot;
+	short deltaAngle = rBoat->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 	if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f))
@@ -155,16 +155,16 @@ RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber
 	{
 		if (laraItem->Animation.VerticalVelocity > 0)
 		{
-			if ((laraItem->Position.yPos + CLICK(2)) > rBoat->Position.yPos)
+			if ((laraItem->Pose.Position.y + CLICK(2)) > rBoat->Pose.Position.y)
 				mountType = RBOAT_MOUNT_JUMP;
 		}
 		else if (laraItem->Animation.VerticalVelocity == 0)
 		{
 			if (deltaAngle > -ANGLE(135.0f) && deltaAngle < ANGLE(135.0f))
 			{
-				if (laraItem->Position.xPos == rBoat->Position.xPos &&
-					laraItem->Position.yPos == rBoat->Position.xPos &&
-					laraItem->Position.zPos == rBoat->Position.zPos)
+				if (laraItem->Pose.Position.x == rBoat->Pose.Position.x &&
+					laraItem->Pose.Position.y == rBoat->Pose.Position.x &&
+					laraItem->Pose.Position.z == rBoat->Pose.Position.z)
 				{
 					mountType = RBOAT_MOUNT_LEVEL_START;
 				}
@@ -186,14 +186,14 @@ RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber
 	return mountType;
 }
 
-int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, PHD_VECTOR* pos)
+int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, Vector3Int* pos)
 {
-	float s = phd_sin(rBoatItem->Position.yRot);
-	float c = phd_cos(rBoatItem->Position.yRot);
+	float s = phd_sin(rBoatItem->Pose.Orientation.y);
+	float c = phd_cos(rBoatItem->Pose.Orientation.y);
 
-	pos->x = rBoatItem->Position.xPos + zOffset * s + xOffset * c;
-	pos->y = rBoatItem->Position.yPos - zOffset * phd_sin(rBoatItem->Position.xRot) + xOffset * phd_sin(rBoatItem->Position.zRot);
-	pos->z = rBoatItem->Position.zPos + zOffset * c - xOffset * s;
+	pos->x = rBoatItem->Pose.Position.x + zOffset * s + xOffset * c;
+	pos->y = rBoatItem->Pose.Position.y - zOffset * phd_sin(rBoatItem->Pose.Orientation.x) + xOffset * phd_sin(rBoatItem->Pose.Orientation.z);
+	pos->z = rBoatItem->Pose.Position.z + zOffset * c - xOffset * s;
 
 	auto probe = GetCollision(pos->x, pos->y, pos->z, rBoatItem->RoomNumber);
 	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
@@ -220,14 +220,14 @@ static void DoRubberBoatShift(ITEM_INFO* laraItem, int itemNumber)
 
 		if (item->ObjectNumber == ID_RUBBER_BOAT && itemNumber2 != itemNumber && lara->Vehicle != itemNumber2)
 		{
-			int x = item->Position.xPos - boatItem->Position.xPos;
-			int z = item->Position.zPos - boatItem->Position.zPos;
+			int x = item->Pose.Position.x - boatItem->Pose.Position.x;
+			int z = item->Pose.Position.z - boatItem->Pose.Position.z;
 
 			int distance = pow(x, 2) + pow(z, 2);
 			if (distance < 1000000)
 			{
-				boatItem->Position.xPos = item->Position.xPos - x * 1000000 / distance;
-				boatItem->Position.zPos = item->Position.zPos - z * 1000000 / distance;
+				boatItem->Pose.Position.x = item->Pose.Position.x - x * 1000000 / distance;
+				boatItem->Pose.Position.z = item->Pose.Position.z - z * 1000000 / distance;
 			}
 
 			return;
@@ -237,7 +237,7 @@ static void DoRubberBoatShift(ITEM_INFO* laraItem, int itemNumber)
 	}
 }
 
-static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, PHD_VECTOR* pos, PHD_VECTOR* old)
+static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, Vector3Int* pos, Vector3Int* old)
 {
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -252,31 +252,31 @@ static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, PHD_VECTOR* pos, PHD_VECTOR*
 	{
 		if (z == zOld)
 		{
-			rBoatItem->Position.zPos += (old->z - pos->z);
-			rBoatItem->Position.xPos += (old->x - pos->x);
+			rBoatItem->Pose.Position.z += (old->z - pos->z);
+			rBoatItem->Pose.Position.x += (old->x - pos->x);
 		}
 		else if (z > zOld)
 		{
-			rBoatItem->Position.zPos -= zShift + 1;
-			return (pos->x - rBoatItem->Position.xPos);
+			rBoatItem->Pose.Position.z -= zShift + 1;
+			return (pos->x - rBoatItem->Pose.Position.x);
 		}
 		else
 		{
-			rBoatItem->Position.zPos += SECTOR(1) - zShift;
-			return (rBoatItem->Position.xPos - pos->x);
+			rBoatItem->Pose.Position.z += SECTOR(1) - zShift;
+			return (rBoatItem->Pose.Position.x - pos->x);
 		}
 	}
 	else if (z == zOld)
 	{
 		if (x > xOld)
 		{
-			rBoatItem->Position.xPos -= xShift + 1;
-			return (rBoatItem->Position.zPos - pos->z);
+			rBoatItem->Pose.Position.x -= xShift + 1;
+			return (rBoatItem->Pose.Position.z - pos->z);
 		}
 		else
 		{
-			rBoatItem->Position.xPos += SECTOR(1) - xShift;
-			return (pos->z - rBoatItem->Position.zPos);
+			rBoatItem->Pose.Position.x += SECTOR(1) - xShift;
+			return (pos->z - rBoatItem->Pose.Position.z);
 		}
 	}
 	else
@@ -304,44 +304,44 @@ static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, PHD_VECTOR* pos, PHD_VECTOR*
 
 		if (x && z)
 		{
-			rBoatItem->Position.zPos += z;
-			rBoatItem->Position.xPos += x;
+			rBoatItem->Pose.Position.z += z;
+			rBoatItem->Pose.Position.x += x;
 		}
 		else if (z)
 		{
-			rBoatItem->Position.zPos += z;
+			rBoatItem->Pose.Position.z += z;
 			if (z > 0)
-				return (rBoatItem->Position.xPos - pos->x);
+				return (rBoatItem->Pose.Position.x - pos->x);
 			else
-				return (pos->x - rBoatItem->Position.xPos);
+				return (pos->x - rBoatItem->Pose.Position.x);
 		}
 		else if (x)
 		{
-			rBoatItem->Position.xPos += x;
+			rBoatItem->Pose.Position.x += x;
 			if (x > 0)
-				return (pos->z - rBoatItem->Position.zPos);
+				return (pos->z - rBoatItem->Pose.Position.z);
 			else
-				return (rBoatItem->Position.zPos - pos->z);
+				return (rBoatItem->Pose.Position.z - pos->z);
 		}
 		else
 		{
-			rBoatItem->Position.zPos += (old->z - pos->z);
-			rBoatItem->Position.xPos += (old->x - pos->x);
+			rBoatItem->Pose.Position.z += (old->z - pos->z);
+			rBoatItem->Pose.Position.x += (old->x - pos->x);
 		}
 	}
 
 	return 0;
 }
 
-static int GetRubberBoatCollisionAnim(ITEM_INFO* rBoatItem, PHD_VECTOR* moved)
+static int GetRubberBoatCollisionAnim(ITEM_INFO* rBoatItem, Vector3Int* moved)
 {
-	moved->x = rBoatItem->Position.xPos - moved->x;
-	moved->z = rBoatItem->Position.zPos - moved->z;
+	moved->x = rBoatItem->Pose.Position.x - moved->x;
+	moved->z = rBoatItem->Pose.Position.z - moved->z;
 
 	if (moved->x || moved->z)
 	{
-		float c = phd_cos(rBoatItem->Position.yRot);
-		float s = phd_sin(rBoatItem->Position.yRot);
+		float c = phd_cos(rBoatItem->Pose.Orientation.y);
+		float s = phd_sin(rBoatItem->Pose.Orientation.y);
 		long front = moved->z * c + moved->x * s;
 		long side = -moved->z * s + moved->x * c;
 
@@ -369,19 +369,19 @@ static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	auto* rBoatItem = &g_Level.Items[itemNumber];
 	auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
 
-	rBoatItem->Position.zRot -= rBoat->LeanAngle;
+	rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
-	PHD_VECTOR frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+	Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 	int heightFrontLeftOld = TestWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, &frontLeftOld);
 	int heightFrontRightOld = TestWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, &frontRightOld);
 	int heightBackLeftOld = TestWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, &backLeftOld);
 	int heightBackRightOld = TestWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, &backRightOld);
 	int heightFrontOld = TestWaterHeight(rBoatItem, 1000, 0, &frontOld);
 	
-	PHD_VECTOR old;
-	old.x = rBoatItem->Position.xPos;
-	old.y = rBoatItem->Position.yPos;
-	old.z = rBoatItem->Position.zPos;
+	Vector3Int old;
+	old.x = rBoatItem->Pose.Position.x;
+	old.y = rBoatItem->Pose.Position.y;
+	old.z = rBoatItem->Pose.Position.z;
 
 	if (backLeftOld.y > heightBackLeftOld)
 		backLeftOld.y = heightBackLeftOld;
@@ -394,37 +394,37 @@ static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	if (frontOld.y > heightFrontOld)
 		frontOld.y = heightFrontOld;
 
-	rBoatItem->Position.yRot += rBoat->TurnRate + rBoat->ExtraRotation;
+	rBoatItem->Pose.Orientation.y += rBoat->TurnRate + rBoat->ExtraRotation;
 	rBoat->LeanAngle = rBoat->TurnRate * 6;
 
-	rBoatItem->Position.zPos += rBoatItem->Animation.Velocity * phd_cos(rBoatItem->Position.yRot);
-	rBoatItem->Position.xPos += rBoatItem->Animation.Velocity * phd_sin(rBoatItem->Position.yRot);
+	rBoatItem->Pose.Position.z += rBoatItem->Animation.Velocity * phd_cos(rBoatItem->Pose.Orientation.y);
+	rBoatItem->Pose.Position.x += rBoatItem->Animation.Velocity * phd_sin(rBoatItem->Pose.Orientation.y);
 	if (rBoatItem->Animation.Velocity >= 0)
 		rBoat->PropellerRotation += (rBoatItem->Animation.Velocity * ANGLE(3.0f)) + ANGLE(2.0f);
 	else
 		rBoat->PropellerRotation += ANGLE(33.0f);
 
-	int slip = RBOAT_SIDE_SLIP * phd_sin(rBoatItem->Position.zRot);
-	if (!slip && rBoatItem->Position.zRot)
-		slip = (rBoatItem->Position.zRot > 0) ? 1 : -1;
+	int slip = RBOAT_SIDE_SLIP * phd_sin(rBoatItem->Pose.Orientation.z);
+	if (!slip && rBoatItem->Pose.Orientation.z)
+		slip = (rBoatItem->Pose.Orientation.z > 0) ? 1 : -1;
 
-	rBoatItem->Position.zPos -= slip * phd_sin(rBoatItem->Position.yRot);
-	rBoatItem->Position.xPos += slip * phd_cos(rBoatItem->Position.yRot);
+	rBoatItem->Pose.Position.z -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
+	rBoatItem->Pose.Position.x += slip * phd_cos(rBoatItem->Pose.Orientation.y);
 
-	slip = RBOAT_SLIP * phd_sin(rBoatItem->Position.xRot);
-	if (!slip && rBoatItem->Position.xRot)
-		slip = (rBoatItem->Position.xRot > 0) ? 1 : -1;
+	slip = RBOAT_SLIP * phd_sin(rBoatItem->Pose.Orientation.x);
+	if (!slip && rBoatItem->Pose.Orientation.x)
+		slip = (rBoatItem->Pose.Orientation.x > 0) ? 1 : -1;
 
-	rBoatItem->Position.zPos -= slip * phd_cos(rBoatItem->Position.yRot);
-	rBoatItem->Position.xPos -= slip * phd_sin(rBoatItem->Position.yRot);
+	rBoatItem->Pose.Position.z -= slip * phd_cos(rBoatItem->Pose.Orientation.y);
+	rBoatItem->Pose.Position.x -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
 
-	PHD_VECTOR moved;
-	moved.x = rBoatItem->Position.xPos;
-	moved.z = rBoatItem->Position.zPos;
+	Vector3Int moved;
+	moved.x = rBoatItem->Pose.Position.x;
+	moved.z = rBoatItem->Pose.Position.z;
 
 	DoRubberBoatShift(laraItem, itemNumber);
 
-	PHD_VECTOR frontLeft, frontRight, backRight, backLeft, front;
+	Vector3Int frontLeft, frontRight, backRight, backLeft, front;
 	short rotation = 0;
 
 	int heightBackLeft = TestWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, &backLeft);
@@ -451,21 +451,21 @@ static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	}
 
 	short roomNumber = rBoatItem->RoomNumber;
-	auto floor = GetFloor(rBoatItem->Position.xPos, rBoatItem->Position.yPos, rBoatItem->Position.zPos, &roomNumber);
-	int height = GetWaterHeight(rBoatItem->Position.xPos, rBoatItem->Position.yPos, rBoatItem->Position.zPos, roomNumber);
+	auto floor = GetFloor(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, &roomNumber);
+	int height = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, roomNumber);
 
 	if (height == NO_HEIGHT)
-		height = GetFloorHeight(floor, rBoatItem->Position.xPos, rBoatItem->Position.yPos, rBoatItem->Position.zPos);
+		height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
 
-	if (height < (rBoatItem->Position.yPos - CLICK(0.5f)))
-		DoRubberBoatShift2(rBoatItem, (PHD_VECTOR*)&rBoatItem->Position, &old);
+	if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
+		DoRubberBoatShift2(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
 
 	rBoat->ExtraRotation = rotation;
 	int collide = GetRubberBoatCollisionAnim(rBoatItem, &moved);
 
 	if (slip || collide)
 	{
-		int newVelocity = (rBoatItem->Position.zPos - old.z) * phd_cos(rBoatItem->Position.yRot) + (rBoatItem->Position.xPos - old.x) * phd_sin(rBoatItem->Position.yRot);
+		int newVelocity = (rBoatItem->Pose.Position.z - old.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - old.x) * phd_sin(rBoatItem->Pose.Orientation.y);
 
 		if (lara->Vehicle == itemNumber &&
 			rBoatItem->Animation.Velocity > (RBOAT_MAX_VELOCITY + RBOAT_ACCELERATION) &&
@@ -473,7 +473,7 @@ static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 		{
 			laraItem->HitPoints -= rBoatItem->Animation.Velocity;
 			laraItem->HitStatus = 1;
-			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Position, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose, 0);
 			newVelocity /= 2;
 			rBoatItem->Animation.Velocity /= 2;
 		}
@@ -530,7 +530,7 @@ bool RubberBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 
 	bool noTurn = true;
 
-	if (rBoatItem->Position.yPos >= (rBoat->Water - 128) && 
+	if (rBoatItem->Pose.Position.y >= (rBoat->Water - 128) && 
 		rBoat->Water != NO_HEIGHT)
 	{
 		if (!(TrInput & RBOAT_IN_DISMOUNT) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity)
@@ -647,12 +647,12 @@ void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll
 	else
 		laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE;
 
-	laraItem->Position.xPos = item->Position.xPos;
-	laraItem->Position.yPos = item->Position.yPos - 5;
-	laraItem->Position.zPos = item->Position.zPos;
-	laraItem->Position.xRot = 0;
-	laraItem->Position.yRot = item->Position.yRot;
-	laraItem->Position.zRot = 0;
+	laraItem->Pose.Position.x = item->Pose.Position.x;
+	laraItem->Pose.Position.y = item->Pose.Position.y - 5;
+	laraItem->Pose.Position.z = item->Pose.Position.z;
+	laraItem->Pose.Orientation.x = 0;
+	laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+	laraItem->Pose.Orientation.z = 0;
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -679,23 +679,23 @@ static bool TestRubberBoatDismount(ITEM_INFO* laraItem, int direction)
 
 	short angle;
 	if (direction < 0)
-		angle = sBoatItem->Position.yRot - ANGLE(90.0f);
+		angle = sBoatItem->Pose.Orientation.y - ANGLE(90.0f);
 	else
-		angle = sBoatItem->Position.yRot + ANGLE(90.0f);
+		angle = sBoatItem->Pose.Orientation.y + ANGLE(90.0f);
 
-	int x = sBoatItem->Position.xPos + SECTOR(1) * phd_sin(angle);
-	int y = sBoatItem->Position.yPos;
-	int z = sBoatItem->Position.zPos + SECTOR(1) * phd_cos(angle);
+	int x = sBoatItem->Pose.Position.x + SECTOR(1) * phd_sin(angle);
+	int y = sBoatItem->Pose.Position.y;
+	int z = sBoatItem->Pose.Position.z + SECTOR(1) * phd_cos(angle);
 
 	auto collResult = GetCollision(x, y, z, sBoatItem->RoomNumber);
 
-	if ((collResult.Position.Floor - sBoatItem->Position.yPos) < -512)
+	if ((collResult.Position.Floor - sBoatItem->Pose.Position.y) < -512)
 		return false;
 
 	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT)
 		return false;
 
-	if ((collResult.Position.Ceiling - sBoatItem->Position.yPos) > -LARA_HEIGHT ||
+	if ((collResult.Position.Ceiling - sBoatItem->Pose.Position.y) > -LARA_HEIGHT ||
 		(collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
 	{
 		return false;
@@ -718,7 +718,7 @@ void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		}
 	}
-	else if (rBoatItem->Position.yPos < (rBoat->Water - CLICK(0.5f)) &&
+	else if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) &&
 		rBoatItem->Animation.VerticalVelocity > 0)
 	{
 		if (laraItem->Animation.ActiveState != RBOAT_STATE_FALL)
@@ -748,9 +748,9 @@ void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
 			{
 				if (rBoatItem->Animation.Velocity == 0)
 				{
-					if (TrInput & IN_RIGHT && TestRubberBoatDismount(laraItem, rBoatItem->Position.yRot + ANGLE(90.0f)))
+					if (TrInput & IN_RIGHT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y + ANGLE(90.0f)))
 						laraItem->Animation.TargetState = RBOAT_STATE_JUMP_RIGHT;
-					else if (TrInput & IN_LEFT && TestRubberBoatDismount(laraItem, rBoatItem->Position.yRot - ANGLE(90.0f)))
+					else if (TrInput & IN_LEFT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y - ANGLE(90.0f)))
 						laraItem->Animation.TargetState = RBOAT_STATE_JUMP_LEFT;
 				}
 			}
@@ -865,9 +865,9 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 	{
 		if (laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT)
-			laraItem->Position.yRot -= ANGLE(90.0f);
+			laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 		else
-			laraItem->Position.yRot += ANGLE(90.0f);
+			laraItem->Pose.Orientation.y += ANGLE(90.0f);
 
 		laraItem->Animation.TargetState = LS_JUMP_FORWARD;
 		laraItem->Animation.ActiveState = LS_JUMP_FORWARD;
@@ -876,24 +876,24 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		laraItem->Animation.Velocity = 20;
 		laraItem->Animation.VerticalVelocity = -40;
 		laraItem->Animation.Airborne = true;
-		laraItem->Position.xRot = 0;
-		laraItem->Position.zRot = 0;
+		laraItem->Pose.Orientation.x = 0;
+		laraItem->Pose.Orientation.z = 0;
 		lara->Vehicle = NO_ITEM;
 
-		int x = laraItem->Position.xPos + 360 * phd_sin(laraItem->Position.yRot);
-		int y = laraItem->Position.yPos - 90;
-		int z = laraItem->Position.zPos + 360 * phd_cos(laraItem->Position.yRot);
+		int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
+		int y = laraItem->Pose.Position.y - 90;
+		int z = laraItem->Pose.Position.z + 360 * phd_cos(laraItem->Pose.Orientation.y);
 
 		auto probe = GetCollision(x, y, z, laraItem->RoomNumber);
 		if (probe.Position.Floor >= (y - CLICK(1)))
 		{
-			laraItem->Position.xPos = x;
-			laraItem->Position.zPos = z;
+			laraItem->Pose.Position.x = x;
+			laraItem->Pose.Position.z = z;
 
 			if (probe.RoomNumber != laraItem->RoomNumber)
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
-		laraItem->Position.yPos = y;
+		laraItem->Pose.Position.y = y;
 
 		rBoatItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT].animIndex;
 		rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].frameBase;
@@ -912,7 +912,7 @@ void RubberBoatControl(short itemNumber)
 
 	int pitch, height, ofs, nowake;
 
-	PHD_VECTOR frontLeft, frontRight;
+	Vector3Int frontLeft, frontRight;
 	int collide = RubberBoatDynamics(laraItem, itemNumber);
 	int heightFrontLeft = TestWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, &frontLeft);
 	int heightFrontRight = TestWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, &frontRight);
@@ -925,7 +925,7 @@ void RubberBoatControl(short itemNumber)
 	}
 
 	auto probe = GetCollision(rBoatItem);
-	int water = GetWaterHeight(rBoatItem->Position.xPos, rBoatItem->Position.yPos, rBoatItem->Position.zPos, probe.RoomNumber);
+	int water = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, probe.RoomNumber);
 	rBoat->Water = water;
 
 	if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
@@ -972,7 +972,7 @@ void RubberBoatControl(short itemNumber)
 	rBoat->LeftVerticalVelocity = DoRubberBoatDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, (int*)&frontLeft.y);
 	rBoat->RightVerticalVelocity = DoRubberBoatDynamics(heightFrontRight, rBoat->RightVerticalVelocity, (int*)&frontRight.y);
 	ofs = rBoatItem->Animation.VerticalVelocity;
-	rBoatItem->Animation.VerticalVelocity = DoRubberBoatDynamics(rBoat->Water, rBoatItem->Animation.VerticalVelocity, (int*)&rBoatItem->Position.yPos);
+	rBoatItem->Animation.VerticalVelocity = DoRubberBoatDynamics(rBoat->Water, rBoatItem->Animation.VerticalVelocity, (int*)&rBoatItem->Pose.Position.y);
 
 	height = frontLeft.y + frontRight.y;
 	if (height < 0)
@@ -980,16 +980,16 @@ void RubberBoatControl(short itemNumber)
 	else
 		height = height / 2;
 
-	short xRot = phd_atan(RBOAT_FRONT, rBoatItem->Position.yPos - height);
+	short xRot = phd_atan(RBOAT_FRONT, rBoatItem->Pose.Position.y - height);
 	short rRot = phd_atan(RBOAT_SIDE, height - frontLeft.y);
 
-	rBoatItem->Position.xRot += ((xRot - rBoatItem->Position.xRot) / 2);
-	rBoatItem->Position.zRot += ((rRot - rBoatItem->Position.zRot) / 2);
+	rBoatItem->Pose.Orientation.x += ((xRot - rBoatItem->Pose.Orientation.x) / 2);
+	rBoatItem->Pose.Orientation.z += ((rRot - rBoatItem->Pose.Orientation.z) / 2);
 
-	if (!xRot && abs(rBoatItem->Position.xRot) < 4)
-		rBoatItem->Position.xRot = 0;
-	if (!rRot && abs(rBoatItem->Position.zRot) < 4)
-		rBoatItem->Position.zRot = 0;
+	if (!xRot && abs(rBoatItem->Pose.Orientation.x) < 4)
+		rBoatItem->Pose.Orientation.x = 0;
+	if (!rRot && abs(rBoatItem->Pose.Orientation.z) < 4)
+		rBoatItem->Pose.Orientation.z = 0;
 
 	if (lara->Vehicle == itemNumber)
 	{
@@ -1001,13 +1001,13 @@ void RubberBoatControl(short itemNumber)
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
-		rBoatItem->Position.zRot += rBoat->LeanAngle;
-		laraItem->Position.xPos = rBoatItem->Position.xPos;
-		laraItem->Position.xRot = rBoatItem->Position.xRot;
-		laraItem->Position.yPos = rBoatItem->Position.yPos;
-		laraItem->Position.yRot = rBoatItem->Position.yRot;
-		laraItem->Position.zPos = rBoatItem->Position.zPos;
-		laraItem->Position.zRot = rBoatItem->Position.zRot;
+		rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
+		laraItem->Pose.Position.x = rBoatItem->Pose.Position.x;
+		laraItem->Pose.Orientation.x = rBoatItem->Pose.Orientation.x;
+		laraItem->Pose.Position.y = rBoatItem->Pose.Position.y;
+		laraItem->Pose.Orientation.y = rBoatItem->Pose.Orientation.y;
+		laraItem->Pose.Position.z = rBoatItem->Pose.Position.z;
+		laraItem->Pose.Orientation.z = rBoatItem->Pose.Orientation.z;
 
 		AnimateItem(laraItem);
 
@@ -1025,30 +1025,30 @@ void RubberBoatControl(short itemNumber)
 		if (probe.RoomNumber != rBoatItem->RoomNumber)
 			ItemNewRoom(itemNumber, probe.RoomNumber);
 
-		rBoatItem->Position.zRot += rBoat->LeanAngle;
+		rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
 	}
 
 	pitch = rBoatItem->Animation.Velocity;
 	rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
 
 	if (rBoatItem->Animation.Velocity > 8)
-		SoundEffect(SFX_TR3_RUBBERBOAT_MOVING, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_MOVING, &rBoatItem->Pose, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 	else if (drive)
-		SoundEffect(SFX_TR3_RUBBERBOAT_IDLE, &rBoatItem->Position, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_IDLE, &rBoatItem->Pose, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 
 	if (lara->Vehicle != itemNumber)
 		return;
 
 	DoRubberBoatDismount(laraItem, rBoatItem);
 
-	short probedRoomNumber = GetCollision(rBoatItem->Position.xPos, rBoatItem->Position.yPos + 128, rBoatItem->Position.zPos, rBoatItem->RoomNumber).RoomNumber;
-	height = GetWaterHeight(rBoatItem->Position.xPos, rBoatItem->Position.yPos + 128, rBoatItem->Position.zPos, probedRoomNumber);
-	if (height > rBoatItem->Position.yPos + 32 || height == NO_HEIGHT)
+	short probedRoomNumber = GetCollision(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z, rBoatItem->RoomNumber).RoomNumber;
+	height = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z, probedRoomNumber);
+	if (height > rBoatItem->Pose.Position.y + 32 || height == NO_HEIGHT)
 		height = 0;
 	else
 		height = 1;
 
-	PHD_VECTOR prop = { 0, 0, -80 };
+	Vector3Int prop = { 0, 0, -80 };
 	GetJointAbsPosition(rBoatItem, &prop, 2);
 
 	probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
@@ -1057,17 +1057,17 @@ void RubberBoatControl(short itemNumber)
 		height < prop.y &&
 		height != NO_HEIGHT)
 	{
-		TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity), rBoatItem->Position.yRot + 0x8000, 0);
+		TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity), rBoatItem->Pose.Orientation.y + 0x8000, 0);
 		if ((GetRandomControl() & 1) == 0)
 		{
 			PHD_3DPOS pos;
-			pos.xPos = prop.x + (GetRandomControl() & 63) - 32;
-			pos.yPos = prop.y + (GetRandomControl() & 15);
-			pos.zPos = prop.z + (GetRandomControl() & 63) - 32;
+			pos.Position.x = prop.x + (GetRandomControl() & 63) - 32;
+			pos.Position.y = prop.y + (GetRandomControl() & 15);
+			pos.Position.z = prop.z + (GetRandomControl() & 63) - 32;
 
 			short roomNumber = rBoatItem->RoomNumber;
-			GetFloor(pos.xPos, pos.yPos, pos.zPos, &roomNumber);
-			CreateBubble((PHD_VECTOR*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
+			GetFloor(pos.Position.x, pos.Position.y, pos.Position.z, &roomNumber);
+			CreateBubble((Vector3Int*)&pos, roomNumber, 16, 8, 0, 0, 0, 0);
 		}
 	}
 	else
@@ -1076,14 +1076,14 @@ void RubberBoatControl(short itemNumber)
 		if (prop.y > height &&
 			!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		{
-			GAME_VECTOR pos;
+			GameVector pos;
 			pos.x = prop.x;
 			pos.y = prop.y;
 			pos.z = prop.z;
 
 			long cnt = (GetRandomControl() & 3) + 3;
 			for (;cnt>0;cnt--)
-				TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) * 16, rBoatItem->Position.yRot + 0x4000 + GetRandomControl(), 1);
+				TriggerRubberBoatMist(prop.x, prop.y, prop.z, ((GetRandomControl() & 15) + 96) * 16, rBoatItem->Pose.Orientation.y + 0x4000 + GetRandomControl(), 1);
 		}
 	}
 }

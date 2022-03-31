@@ -3,4 +3,4 @@
 
 void InitialiseRomanStatue(short itemNumber);
 void RomanStatueControl(short itemNumber);
-void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObject);
+void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject);

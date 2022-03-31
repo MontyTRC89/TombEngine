@@ -37,7 +37,7 @@ OBJECT_COLLISION_BOUNDS PuzzleBounds =
 	-ANGLE(10.0f), ANGLE(10.0f)
 };
 
-static PHD_VECTOR KeyHolePosition(0, 0, 312);
+static Vector3Int KeyHolePosition(0, 0, 312);
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 {
 	-256, 256,
@@ -82,7 +82,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 		(laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber))
 	{
-		short oldYrot = receptableItem->Position.yRot;
+		short oldYrot = receptableItem->Pose.Orientation.y;
 
 		auto* bounds = GetBoundsAccurate(receptableItem);
 		PuzzleBounds.boundingBox.X1 = bounds->X1 - CLICK(1);
@@ -99,25 +99,25 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 					if (g_Gui.IsObjectInInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
 						g_Gui.SetEnterInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
-					receptableItem->Position.yRot = oldYrot;
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 
 				if (g_Gui.GetInventoryItemChosen() != receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
-					receptableItem->Position.yRot = oldYrot;
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 			}
 
 			if (puzzleType != PuzzleType::Cutscene)
 			{
-				PHD_VECTOR pos = { 0, 0, bounds->Z1 - 100 };
+				Vector3Int pos = { 0, 0, bounds->Z1 - 100 };
 				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
 				{
 					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					receptableItem->Position.yRot = oldYrot;
+					receptableItem->Pose.Orientation.y = oldYrot;
 					return;
 				}
 			}
@@ -145,7 +145,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraInfo->InteractedItem = itemNumber;
-			receptableItem->Position.yRot = oldYrot;
+			receptableItem->Pose.Orientation.y = oldYrot;
 			receptableItem->Flags |= 0x20;
 			return;
 		}
@@ -159,7 +159,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 			}
 		}
 
-		receptableItem->Position.yRot = oldYrot;
+		receptableItem->Pose.Orientation.y = oldYrot;
 	}
 	else
 	{

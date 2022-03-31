@@ -168,14 +168,14 @@ bool SaveGame::Save(int slot)
 		wet.push_back(Lara.Wet[i] == 1);
 	auto wetOffset = fbb.CreateVector(wet);
 
-	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.xPos, Lara.NextCornerPos.yPos, Lara.NextCornerPos.zPos);
-	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.xRot, Lara.NextCornerPos.yRot, Lara.NextCornerPos.zRot);
+	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.Position.x, Lara.NextCornerPos.Position.y, Lara.NextCornerPos.Position.z);
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.x, Lara.NextCornerPos.Orientation.y, Lara.NextCornerPos.Orientation.z);
 
-	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.xRot, Lara.LeftArm.Rotation.yRot, Lara.LeftArm.Rotation.zRot);
-	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.xRot, Lara.RightArm.Rotation.yRot, Lara.RightArm.Rotation.zRot);
+	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.x, Lara.LeftArm.Rotation.y, Lara.LeftArm.Rotation.z);
+	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.x, Lara.RightArm.Rotation.y, Lara.RightArm.Rotation.z);
 	
-	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.xRot, Lara.ExtraHeadRot.yRot, Lara.ExtraHeadRot.zRot);
-	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.xRot, Lara.ExtraTorsoRot.yRot, Lara.ExtraTorsoRot.zRot);
+	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.x, Lara.ExtraHeadRot.y, Lara.ExtraHeadRot.z);
+	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.x, Lara.ExtraTorsoRot.y, Lara.ExtraTorsoRot.z);
 	Save::Vector3 extraVelocity = Save::Vector3(Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
 	Save::Vector3 waterCurrentPull = Save::Vector3(Lara.WaterCurrentPull.x, Lara.WaterCurrentPull.y, Lara.WaterCurrentPull.z);
 
@@ -450,12 +450,12 @@ bool SaveGame::Save(int slot)
 		} 
 
 		Save::Position position = Save::Position(
-			(int32_t)itemToSerialize.Position.xPos,
-			(int32_t)itemToSerialize.Position.yPos,
-			(int32_t)itemToSerialize.Position.zPos,
-			(int32_t)itemToSerialize.Position.xRot,
-			(int32_t)itemToSerialize.Position.yRot,
-			(int32_t)itemToSerialize.Position.zRot);
+			(int32_t)itemToSerialize.Pose.Position.x,
+			(int32_t)itemToSerialize.Pose.Position.y,
+			(int32_t)itemToSerialize.Pose.Position.z,
+			(int32_t)itemToSerialize.Pose.Orientation.x,
+			(int32_t)itemToSerialize.Pose.Orientation.y,
+			(int32_t)itemToSerialize.Pose.Orientation.z);
 
 		Save::ItemBuilder serializedItem{ fbb };
 
@@ -593,12 +593,12 @@ bool SaveGame::Save(int slot)
 		batInfo.add_counter(bat->counter);
 		batInfo.add_on(bat->on);
 		batInfo.add_room_number(bat->roomNumber);
-		batInfo.add_x(bat->pos.xPos);
-		batInfo.add_y(bat->pos.yPos);
-		batInfo.add_z(bat->pos.zPos);
-		batInfo.add_x_rot(bat->pos.xRot);
-		batInfo.add_y_rot(bat->pos.yRot);
-		batInfo.add_z_rot(bat->pos.zRot);
+		batInfo.add_x(bat->pos.Position.x);
+		batInfo.add_y(bat->pos.Position.y);
+		batInfo.add_z(bat->pos.Position.z);
+		batInfo.add_x_rot(bat->pos.Orientation.x);
+		batInfo.add_y_rot(bat->pos.Orientation.y);
+		batInfo.add_z_rot(bat->pos.Orientation.z);
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -614,12 +614,12 @@ bool SaveGame::Save(int slot)
 		spiderInfo.add_flags(spider->flags);
 		spiderInfo.add_on(spider->on);
 		spiderInfo.add_room_number(spider->roomNumber);
-		spiderInfo.add_x(spider->pos.xPos);
-		spiderInfo.add_y(spider->pos.yPos);
-		spiderInfo.add_z(spider->pos.zPos);
-		spiderInfo.add_x_rot(spider->pos.xRot);
-		spiderInfo.add_y_rot(spider->pos.yRot);
-		spiderInfo.add_z_rot(spider->pos.zRot);
+		spiderInfo.add_x(spider->pos.Position.x);
+		spiderInfo.add_y(spider->pos.Position.y);
+		spiderInfo.add_z(spider->pos.Position.z);
+		spiderInfo.add_x_rot(spider->pos.Orientation.x);
+		spiderInfo.add_y_rot(spider->pos.Orientation.y);
+		spiderInfo.add_z_rot(spider->pos.Orientation.z);
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -635,12 +635,12 @@ bool SaveGame::Save(int slot)
 		ratInfo.add_flags(rat->flags);
 		ratInfo.add_on(rat->on);
 		ratInfo.add_room_number(rat->roomNumber);
-		ratInfo.add_x(rat->pos.xPos);
-		ratInfo.add_y(rat->pos.yPos);
-		ratInfo.add_z(rat->pos.zPos);
-		ratInfo.add_x_rot(rat->pos.xRot);
-		ratInfo.add_y_rot(rat->pos.yRot);
-		ratInfo.add_z_rot(rat->pos.zRot);
+		ratInfo.add_x(rat->pos.Position.x);
+		ratInfo.add_y(rat->pos.Position.y);
+		ratInfo.add_z(rat->pos.Position.z);
+		ratInfo.add_x_rot(rat->pos.Orientation.x);
+		ratInfo.add_y_rot(rat->pos.Orientation.y);
+		ratInfo.add_z_rot(rat->pos.Orientation.z);
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -656,12 +656,12 @@ bool SaveGame::Save(int slot)
 		scarabInfo.add_flags(scarab->Flags);
 		scarabInfo.add_on(scarab->On);
 		scarabInfo.add_room_number(scarab->RoomNumber);
-		scarabInfo.add_x(scarab->Position.xPos);
-		scarabInfo.add_y(scarab->Position.yPos);
-		scarabInfo.add_z(scarab->Position.zPos);
-		scarabInfo.add_x_rot(scarab->Position.xRot);
-		scarabInfo.add_y_rot(scarab->Position.yRot);
-		scarabInfo.add_z_rot(scarab->Position.zRot);
+		scarabInfo.add_x(scarab->Pose.Position.x);
+		scarabInfo.add_y(scarab->Pose.Position.y);
+		scarabInfo.add_z(scarab->Pose.Position.z);
+		scarabInfo.add_x_rot(scarab->Pose.Orientation.x);
+		scarabInfo.add_y_rot(scarab->Pose.Orientation.y);
+		scarabInfo.add_z_rot(scarab->Pose.Orientation.z);
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -861,8 +861,8 @@ bool SaveGame::Load(int slot)
 		if (!room->mesh[i].flags)
 		{
 			short roomNumber = staticMesh->room_number();
-			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, &roomNumber);
-			TestTriggers(room->mesh[i].pos.xPos, room->mesh[i].pos.yPos, room->mesh[i].pos.zPos, staticMesh->room_number(), true, 0);
+			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
+			TestTriggers(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, staticMesh->room_number(), true, 0);
 			floor->Stopper = false;
 		}
 	}
@@ -933,12 +933,12 @@ bool SaveGame::Load(int slot)
 				continue;
 		}
 
-		item->Position.xPos = savedItem->position()->x_pos();
-		item->Position.yPos = savedItem->position()->y_pos();
-		item->Position.zPos = savedItem->position()->z_pos();
-		item->Position.xRot = savedItem->position()->x_rot();
-		item->Position.yRot = savedItem->position()->y_rot();
-		item->Position.zRot = savedItem->position()->z_rot();
+		item->Pose.Position.x = savedItem->position()->x_pos();
+		item->Pose.Position.y = savedItem->position()->y_pos();
+		item->Pose.Position.z = savedItem->position()->z_pos();
+		item->Pose.Orientation.x = savedItem->position()->x_rot();
+		item->Pose.Orientation.y = savedItem->position()->y_rot();
+		item->Pose.Orientation.z = savedItem->position()->z_rot();
 
 		short roomNumber = savedItem->room_number();
 
@@ -949,12 +949,12 @@ bool SaveGame::Load(int slot)
 			InitialiseItem(itemNumber);
 			
 			// InitialiseItem could overwrite position so restore it
-			item->Position.xPos = savedItem->position()->x_pos();
-			item->Position.yPos = savedItem->position()->y_pos();
-			item->Position.zPos = savedItem->position()->z_pos();
-			item->Position.xRot = savedItem->position()->x_rot();
-			item->Position.yRot = savedItem->position()->y_rot();
-			item->Position.zRot = savedItem->position()->z_rot();
+			item->Pose.Position.x = savedItem->position()->x_pos();
+			item->Pose.Position.y = savedItem->position()->y_pos();
+			item->Pose.Position.z = savedItem->position()->z_pos();
+			item->Pose.Orientation.x = savedItem->position()->x_rot();
+			item->Pose.Orientation.y = savedItem->position()->y_rot();
+			item->Pose.Orientation.z = savedItem->position()->z_rot();
 		}
 
 		item->Animation.Velocity = savedItem->velocity();
@@ -964,7 +964,7 @@ bool SaveGame::Load(int slot)
 		if (item->ObjectNumber == ID_LARA)
 		{
 			LaraItem->Location.roomNumber = roomNumber;
-			LaraItem->Location.yNumber = item->Position.yPos;
+			LaraItem->Location.yNumber = item->Pose.Position.y;
 			item->RoomNumber = roomNumber;
 			Lara.ItemNumber = i;
 			LaraItem = item;
@@ -977,8 +977,8 @@ bool SaveGame::Load(int slot)
 
 			if (obj->shadowSize)
 			{
-				FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-				item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+				FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+				item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			}
 		}
 
@@ -1090,12 +1090,12 @@ bool SaveGame::Load(int slot)
 		bat->on = batInfo->on();
 		bat->counter = batInfo->counter();
 		bat->roomNumber = batInfo->room_number();
-		bat->pos.xPos = batInfo->x();
-		bat->pos.yPos = batInfo->y();
-		bat->pos.zPos = batInfo->z();
-		bat->pos.xRot = batInfo->x_rot();
-		bat->pos.yRot = batInfo->y_rot();
-		bat->pos.zRot = batInfo->z_rot();
+		bat->pos.Position.x = batInfo->x();
+		bat->pos.Position.y = batInfo->y();
+		bat->pos.Position.z = batInfo->z();
+		bat->pos.Orientation.x = batInfo->x_rot();
+		bat->pos.Orientation.y = batInfo->y_rot();
+		bat->pos.Orientation.z = batInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
@@ -1106,12 +1106,12 @@ bool SaveGame::Load(int slot)
 		rat->on = ratInfo->on();
 		rat->flags = ratInfo->flags();
 		rat->roomNumber = ratInfo->room_number();
-		rat->pos.xPos = ratInfo->x();
-		rat->pos.yPos = ratInfo->y();
-		rat->pos.zPos = ratInfo->z();
-		rat->pos.xRot = ratInfo->x_rot();
-		rat->pos.yRot = ratInfo->y_rot();
-		rat->pos.zRot = ratInfo->z_rot();
+		rat->pos.Position.x = ratInfo->x();
+		rat->pos.Position.y = ratInfo->y();
+		rat->pos.Position.z = ratInfo->z();
+		rat->pos.Orientation.x = ratInfo->x_rot();
+		rat->pos.Orientation.y = ratInfo->y_rot();
+		rat->pos.Orientation.z = ratInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
@@ -1122,12 +1122,12 @@ bool SaveGame::Load(int slot)
 		spider->on = spiderInfo->on();
 		spider->flags = spiderInfo->flags();
 		spider->roomNumber = spiderInfo->room_number();
-		spider->pos.xPos = spiderInfo->x();
-		spider->pos.yPos = spiderInfo->y();
-		spider->pos.zPos = spiderInfo->z();
-		spider->pos.xRot = spiderInfo->x_rot();
-		spider->pos.yRot = spiderInfo->y_rot();
-		spider->pos.zRot = spiderInfo->z_rot();
+		spider->pos.Position.x = spiderInfo->x();
+		spider->pos.Position.y = spiderInfo->y();
+		spider->pos.Position.z = spiderInfo->z();
+		spider->pos.Orientation.x = spiderInfo->x_rot();
+		spider->pos.Orientation.y = spiderInfo->y_rot();
+		spider->pos.Orientation.z = spiderInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
@@ -1138,12 +1138,12 @@ bool SaveGame::Load(int slot)
 		scarab->On = scarabInfo->on();
 		scarab->Flags = scarabInfo->flags();
 		scarab->RoomNumber = scarabInfo->room_number();
-		scarab->Position.xPos = scarabInfo->x();
-		scarab->Position.yPos = scarabInfo->y();
-		scarab->Position.zPos = scarabInfo->z();
-		scarab->Position.xRot = scarabInfo->x_rot();
-		scarab->Position.yRot = scarabInfo->y_rot();
-		scarab->Position.zRot = scarabInfo->z_rot();
+		scarab->Pose.Position.x = scarabInfo->x();
+		scarab->Pose.Position.y = scarabInfo->y();
+		scarab->Pose.Position.z = scarabInfo->z();
+		scarab->Pose.Orientation.x = scarabInfo->x_rot();
+		scarab->Pose.Orientation.y = scarabInfo->y_rot();
+		scarab->Pose.Orientation.z = scarabInfo->z_rot();
 	}
 
 	JustLoaded = 1;	
@@ -1245,12 +1245,12 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
 	Lara.ExtraAnim = s->lara()->extra_anim();
-	Lara.ExtraHeadRot.xRot = s->lara()->extra_head_rot()->x();
-	Lara.ExtraHeadRot.yRot = s->lara()->extra_head_rot()->y();
-	Lara.ExtraHeadRot.zRot = s->lara()->extra_head_rot()->z();
-	Lara.ExtraTorsoRot.zRot = s->lara()->extra_torso_rot()->x();
-	Lara.ExtraTorsoRot.yRot = s->lara()->extra_torso_rot()->y();
-	Lara.ExtraTorsoRot.zRot = s->lara()->extra_torso_rot()->z();
+	Lara.ExtraHeadRot.x = s->lara()->extra_head_rot()->x();
+	Lara.ExtraHeadRot.y = s->lara()->extra_head_rot()->y();
+	Lara.ExtraHeadRot.z = s->lara()->extra_head_rot()->z();
+	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
+	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
+	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
 	Lara.ExtraVelocity.x = s->lara()->extra_velocity()->x();
 	Lara.ExtraVelocity.y = s->lara()->extra_velocity()->y();
 	Lara.ExtraVelocity.z = s->lara()->extra_velocity()->z();
@@ -1286,9 +1286,9 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Rotation.xRot = s->lara()->left_arm()->rotation()->x();
-	Lara.LeftArm.Rotation.yRot = s->lara()->left_arm()->rotation()->y();
-	Lara.LeftArm.Rotation.zRot = s->lara()->left_arm()->rotation()->z();
+	Lara.LeftArm.Rotation.x = s->lara()->left_arm()->rotation()->x();
+	Lara.LeftArm.Rotation.y = s->lara()->left_arm()->rotation()->y();
+	Lara.LeftArm.Rotation.z = s->lara()->left_arm()->rotation()->z();
 	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
@@ -1306,9 +1306,9 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Rotation.xRot = s->lara()->right_arm()->rotation()->x();
-	Lara.RightArm.Rotation.yRot = s->lara()->right_arm()->rotation()->y();
-	Lara.RightArm.Rotation.zRot = s->lara()->right_arm()->rotation()->z();
+	Lara.RightArm.Rotation.x = s->lara()->right_arm()->rotation()->x();
+	Lara.RightArm.Rotation.y = s->lara()->right_arm()->rotation()->y();
+	Lara.RightArm.Rotation.z = s->lara()->right_arm()->rotation()->z();
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
@@ -1387,27 +1387,27 @@ bool SaveGame::Load(int slot)
 		
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{
-			rope->segment[i] = PHD_VECTOR(
+			rope->segment[i] = Vector3Int(
 				s->rope()->segments()->Get(i)->x(),
 				s->rope()->segments()->Get(i)->y(),
 				s->rope()->segments()->Get(i)->z());
 
-			rope->normalisedSegment[i] = PHD_VECTOR(
+			rope->normalisedSegment[i] = Vector3Int(
 				s->rope()->normalised_segments()->Get(i)->x(),
 				s->rope()->normalised_segments()->Get(i)->y(),
 				s->rope()->normalised_segments()->Get(i)->z());
 
-			rope->meshSegment[i] = PHD_VECTOR(
+			rope->meshSegment[i] = Vector3Int(
 				s->rope()->mesh_segments()->Get(i)->x(),
 				s->rope()->mesh_segments()->Get(i)->y(),
 				s->rope()->mesh_segments()->Get(i)->z());
 
-			rope->coords[i] = PHD_VECTOR(
+			rope->coords[i] = Vector3Int(
 				s->rope()->coords()->Get(i)->x(),
 				s->rope()->coords()->Get(i)->y(),
 				s->rope()->coords()->Get(i)->z());
 
-			rope->velocity[i] = PHD_VECTOR(
+			rope->velocity[i] = Vector3Int(
 				s->rope()->velocities()->Get(i)->x(),
 				s->rope()->velocities()->Get(i)->y(),
 				s->rope()->velocities()->Get(i)->z());
@@ -1415,17 +1415,17 @@ bool SaveGame::Load(int slot)
 
 		rope->coiled = s->rope()->coiled();
 		rope->active = s->rope()->active();
-		rope->position = PHD_VECTOR(
+		rope->position = Vector3Int(
 			s->rope()->position()->x(),
 			s->rope()->position()->y(),
 			s->rope()->position()->z());
 
-		CurrentPendulum.position = PHD_VECTOR(
+		CurrentPendulum.position = Vector3Int(
 			s->pendulum()->position()->x(),
 			s->pendulum()->position()->y(),
 			s->pendulum()->position()->z());
 
-		CurrentPendulum.velocity = PHD_VECTOR(
+		CurrentPendulum.velocity = Vector3Int(
 			s->pendulum()->velocity()->x(),
 			s->pendulum()->velocity()->y(),
 			s->pendulum()->velocity()->z());
@@ -1433,12 +1433,12 @@ bool SaveGame::Load(int slot)
 		CurrentPendulum.node = s->pendulum()->node();
 		CurrentPendulum.rope = rope;
 
-		AlternatePendulum.position = PHD_VECTOR(
+		AlternatePendulum.position = Vector3Int(
 			s->alternate_pendulum()->position()->x(),
 			s->alternate_pendulum()->position()->y(),
 			s->alternate_pendulum()->position()->z());
 
-		AlternatePendulum.velocity = PHD_VECTOR(
+		AlternatePendulum.velocity = Vector3Int(
 			s->alternate_pendulum()->velocity()->x(),
 			s->alternate_pendulum()->velocity()->y(),
 			s->alternate_pendulum()->velocity()->z());

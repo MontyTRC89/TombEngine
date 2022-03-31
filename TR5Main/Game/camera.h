@@ -13,8 +13,8 @@ enum class CameraType
 
 struct CAMERA_INFO
 {
-	GAME_VECTOR pos; // size=16, offset=0
-	GAME_VECTOR target; // size=16, offset=16
+	GameVector pos; // size=16, offset=0
+	GameVector target; // size=16, offset=16
 	CameraType type; // size=4, offset=32
 	CameraType oldType; // size=4, offset=36
 	int shift; // size=0, offset=40
@@ -38,7 +38,7 @@ struct CAMERA_INFO
 	ITEM_INFO* item; // size=144, offset=92
 	ITEM_INFO* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
-	PHD_VECTOR mikePos; // size=12, offset=108
+	Vector3Int mikePos; // size=12, offset=108
 };
 
 enum CAMERA_FLAGS
@@ -53,9 +53,9 @@ constexpr auto NO_MINY = 0xFFFFFF;
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
 
-extern PHD_VECTOR CurrentCameraPosition;
+extern Vector3Int CurrentCameraPosition;
 extern CAMERA_INFO Camera;
-extern GAME_VECTOR ForcedFixedCamera;
+extern GameVector ForcedFixedCamera;
 extern int UseForcedFixedCamera;
 extern int NumberCameras;
 extern int BinocularRange;
@@ -78,11 +78,11 @@ extern float CinematicBarsSpeed;
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
 void InitialiseCamera();
-void MoveCamera(GAME_VECTOR* ideal, int speed);
+void MoveCamera(GameVector* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);
 void UpdateCameraElevation();
 void CombatCamera(ITEM_INFO* item);
-bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst);
+bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst);
 void FixedCamera(ITEM_INFO* item);
 void LookCamera(ITEM_INFO* item);
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);

@@ -27,7 +27,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -134,7 +134,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.Airborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
@@ -171,7 +171,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -224,7 +224,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -258,7 +258,7 @@ void lara_as_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -305,7 +305,7 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -339,7 +339,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -389,7 +389,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
@@ -423,7 +423,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -473,7 +473,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
@@ -525,7 +525,7 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -608,7 +608,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = PHD_3DPOS();
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);

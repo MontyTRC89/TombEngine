@@ -1,19 +1,6 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct VectorInt2
-{
-	int x;
-	int y;
-};
-
-struct VectorInt3
-{
-	int x;
-	int y;
-	int z;
-};
-
 constexpr auto PI = 3.14159265358979323846f;
 constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
@@ -65,15 +52,15 @@ constexpr auto FP_SHIFT = 16;
 constexpr auto FP_ONE = (1 << FP_SHIFT);
 constexpr auto W2V_SHIFT = 14;
 
-void FP_VectorMul(PHD_VECTOR* v, int scale, PHD_VECTOR* result);
+void FP_VectorMul(Vector3Int* v, int scale, Vector3Int* result);
 __int64 FP_Mul(__int64 a, __int64 b);
 __int64 FP_Div(__int64 a, __int64 b);
-int FP_DotProduct(PHD_VECTOR* a, PHD_VECTOR* b);
-void FP_CrossProduct(PHD_VECTOR* a, PHD_VECTOR* b, PHD_VECTOR* n);
+int FP_DotProduct(Vector3Int* a, Vector3Int* b);
+void FP_CrossProduct(Vector3Int* a, Vector3Int* b, Vector3Int* n);
 void FP_GetMatrixAngles(MATRIX3D* m, short* angles);
 __int64 FP_ToFixed(__int64 value);
 __int64 FP_FromFixed(__int64 value);
-PHD_VECTOR* FP_Normalise(PHD_VECTOR* v);
+Vector3Int* FP_Normalise(Vector3Int* v);
 
 
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)

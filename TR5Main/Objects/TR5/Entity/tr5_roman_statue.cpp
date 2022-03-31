@@ -20,7 +20,7 @@ using namespace TEN::Effects::Lightning;
 
 struct RomanStatueInfo
 {
-	PHD_VECTOR Position;
+	Vector3Int Position;
 	LIGHTNING_INFO* EnergyArcs[8];
 	unsigned int Count;
 };
@@ -53,7 +53,7 @@ enum RomanStatueAnim
 	STATUE_ANIM_START_JUMP_DOWN = 16
 };
 
-static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
+static void RomanStatueHitEffect(ITEM_INFO* item, Vector3Int* pos, int joint)
 {
 	GetJointAbsPosition(item, pos, joint);
 
@@ -64,13 +64,13 @@ static void RomanStatueHitEffect(ITEM_INFO* item, PHD_VECTOR* pos, int joint)
 		{
 			auto* fx = &EffectList[fxNumber];
 
-			fx->pos.xPos = pos->x;
-			fx->pos.yPos = pos->y;
-			fx->pos.zPos = pos->z;
+			fx->pos.Position.x = pos->x;
+			fx->pos.Position.y = pos->y;
+			fx->pos.Position.z = pos->z;
 			fx->roomNumber = item->RoomNumber;
-			fx->pos.zRot = 0;
-			fx->pos.xRot = 0;
-			fx->pos.yRot = 2 * GetRandomControl();
+			fx->pos.Orientation.z = 0;
+			fx->pos.Orientation.x = 0;
+			fx->pos.Orientation.y = 2 * GetRandomControl();
 			fx->speed = 1;
 			fx->fallspeed = 0;
 			fx->objectNumber = ID_BODY_PART;
@@ -229,12 +229,12 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		fx->pos.yRot = pos->yRot;
-		fx->pos.zRot = 0;
+		fx->pos.Position.x = pos->Position.x;
+		fx->pos.Position.y = pos->Position.y;
+		fx->pos.Position.z = pos->Position.z;
+		fx->pos.Orientation.x = pos->Orientation.x;
+		fx->pos.Orientation.y = pos->Orientation.y;
+		fx->pos.Orientation.z = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 1;
@@ -244,7 +244,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 	}
 }
 
-void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObject)
+void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 {
 	auto* spark = &Sparks[GetFreeSpark()];
 
@@ -289,8 +289,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Position.xPos += 486 * phd_sin(item->Position.yRot + ANGLE(90.0f));
-	item->Position.zPos += 486 * phd_cos(item->Position.yRot + ANGLE(90.0f));
+	item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
+	item->Pose.Position.z += 486 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -367,7 +367,7 @@ void RomanStatueControl(short itemNumber)
 
 		creature->MaxTurn = 0;
 
-		PHD_VECTOR pos, pos1, pos2;
+		Vector3Int pos, pos1, pos2;
 		byte color;
 		int deltaFrame;
 		bool unknown;
@@ -495,9 +495,9 @@ void RomanStatueControl(short itemNumber)
 
 			color = (GetRandomControl() & 0x3F) + 128;
 			
-			pos1.x = (GetRandomControl() & 0xFFF) + item->Position.xPos - SECTOR(2);
-			pos1.y = item->Position.yPos - (GetRandomControl() & 0x3FF) - SECTOR(4);
-			pos1.z = (GetRandomControl() & 0xFFF) + item->Position.zPos - SECTOR(2);
+			pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
+			pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - SECTOR(4);
+			pos1.z = (GetRandomControl() & 0xFFF) + item->Pose.Position.z - SECTOR(2);
 			
 			for (int i = 0; i < 8; i++)
 			{
@@ -526,8 +526,8 @@ void RomanStatueControl(short itemNumber)
 				if (item->TriggerFlags)
 				{
 					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-						(PHD_VECTOR*)& dest.xRot,
-						(PHD_VECTOR*)& dest,
+						(Vector3Int*)& dest.Orientation.x,
+						(Vector3Int*)& dest,
 						(GetRandomControl() & 0x3F) + 16,
 						(color >> 1) | ((color | 0x180000) << 8),
 						15,
@@ -563,12 +563,12 @@ void RomanStatueControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -585,7 +585,7 @@ void RomanStatueControl(short itemNumber)
 					{
 						auto* mesh = &room->mesh[i];
 						
-						if (!((mesh->pos.zPos ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.xPos ^ pos.x) & 0xFFFFFC00))
+						if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
 						{
 							if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 							{
@@ -605,8 +605,8 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
-						CreatureEffect2(item, &RomanStatueBite, 20, item->Position.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 200;
@@ -619,7 +619,7 @@ void RomanStatueControl(short itemNumber)
 					pos1 = { -40, 64, 360 };
 					GetJointAbsPosition(item, &pos1, 14);
 
-					pos1.y = item->Position.yPos - 64;
+					pos1.y = item->Pose.Position.y - 64;
 					
 					if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 34 && item->Animation.ActiveState == 3)
 					{
@@ -660,12 +660,12 @@ void RomanStatueControl(short itemNumber)
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Position.yRot += ANGLE(2.0f);
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Position.yRot -= ANGLE(2.0f);
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -701,12 +701,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Position.yRot += -ANGLE(180.0f);
+				item->Pose.Orientation.y += -ANGLE(180.0f);
 		
 			break;
 
@@ -735,12 +735,12 @@ void RomanStatueControl(short itemNumber)
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				PHD_3DPOS attackPos;
-				attackPos.xPos = pos2.x;
-				attackPos.yPos = pos2.y;
-				attackPos.zPos = pos2.z;
-				attackPos.xRot = angles[1];
-				attackPos.yRot = angles[0];
-				attackPos.zRot = 0;
+				attackPos.Position.x = pos2.x;
+				attackPos.Position.y = pos2.y;
+				attackPos.Position.z = pos2.z;
+				attackPos.Orientation.x = angles[1];
+				attackPos.Orientation.y = angles[0];
+				attackPos.Orientation.z = 0;
 
 				short roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
@@ -748,18 +748,18 @@ void RomanStatueControl(short itemNumber)
 				RomanStatueAttack(&attackPos, roomNumber, 1);
 
 				TriggerRomanStatueShockwaveAttackSparks(
-					attackPos.xPos,
-					attackPos.yPos,
-					attackPos.zPos,
+					attackPos.Position.x,
+					attackPos.Position.y,
+					attackPos.Position.z,
 					0, 
 					(((GetRandomControl() & 0x3F) + 128) / 2),
 					(((GetRandomControl() & 0x3F) + 128)),
 					64);
 				
 				RomanStatueData.Count = 16;	
-				RomanStatueData.Position.x = attackPos.xPos;
-				RomanStatueData.Position.y = attackPos.yPos;
-				RomanStatueData.Position.z = attackPos.zPos;
+				RomanStatueData.Position.x = attackPos.Position.x;
+				RomanStatueData.Position.y = attackPos.Position.y;
+				RomanStatueData.Position.z = attackPos.Position.z;
 				
 				if (item->ItemFlags[0])
 					item->ItemFlags[0]--;
@@ -887,7 +887,7 @@ void RomanStatueControl(short itemNumber)
 
 	if (item->SwapMeshFlags & 0x400)
 	{
-		PHD_VECTOR pos;
+		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x1F) - 16;
 		pos.y = 86;
 		pos.z = (GetRandomControl() & 0x1F) - 16;
@@ -896,7 +896,7 @@ void RomanStatueControl(short itemNumber)
 
 	if (item->SwapMeshFlags & 0x10)
 	{
-		PHD_VECTOR pos;
+		Vector3Int pos;
 		pos.x = -40;
 		pos.y = (GetRandomControl() & 0x7F) + 148;
 		pos.z = (GetRandomControl() & 0x3F) - 32;
@@ -905,7 +905,7 @@ void RomanStatueControl(short itemNumber)
 
 	if (item->SwapMeshFlags & 0x100)
 	{
-		PHD_VECTOR pos;
+		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x3F) + 54;
 		pos.y = -170;
 		pos.z = (GetRandomControl() & 0x1F) + 27;
