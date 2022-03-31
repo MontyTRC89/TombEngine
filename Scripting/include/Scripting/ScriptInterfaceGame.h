@@ -18,9 +18,7 @@ using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int,
 using VarSaveType = std::variant<bool, double, std::string>;
 
 using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
-//todo make some of these pointers to save copying
 
-//todo make sure you either add bool here or make sure double works as a bool
 using SavedVar = std::variant<std::string, double, IndexTable>;
 
 class ScriptInterfaceGame {
