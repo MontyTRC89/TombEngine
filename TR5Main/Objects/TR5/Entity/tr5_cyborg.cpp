@@ -60,8 +60,8 @@ void InitialiseCyborg(short itemNumber)
 
 static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short zv)
 {
-	int dx = LaraItem->Position.xPos - x;
-	int dz = LaraItem->Position.zPos - z;
+	int dx = LaraItem->Pose.Position.x - x;
+	int dz = LaraItem->Pose.Position.z - z;
 
 	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 		dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -109,41 +109,41 @@ void CyborgControl(short itemNumber)
 		short joint1 = 0;
 		short joint0 = 0;
 
-		int x = item->Position.xPos;
-		int z = item->Position.zPos;
+		int x = item->Pose.Position.x;
+		int z = item->Pose.Position.z;
 
-		int dx = 808 * phd_sin(item->Position.yRot);
-		int dz = 808 * phd_cos(item->Position.yRot);
-
-		x += dx;
-		z += dz;
-		int height1 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+		int dx = 808 * phd_sin(item->Pose.Orientation.y);
+		int dz = 808 * phd_cos(item->Pose.Orientation.y);
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+		int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
-		auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
+		int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+
+		x += dx;
+		z += dz;
+		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 		short roomNumber = probe.RoomNumber;
 		int height3 = probe.Position.Floor;
 
 		bool canJump1block = true;
 		if (item->BoxNumber == LaraItem->BoxNumber ||
-			item->Position.yPos >= (height1 - CLICK(1.5f)) ||
-			item->Position.yPos >= (height2 + CLICK(2)) ||
-			item->Position.yPos <= (height2 - CLICK(2)))
+			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height2 + CLICK(2)) ||
+			item->Pose.Position.y <= (height2 - CLICK(2)))
 		{
 			canJump1block = false;
 		}
 
 		bool canJump2blocks = true;
 		if (item->BoxNumber == LaraItem->BoxNumber ||
-			item->Position.yPos >= (height1 - CLICK(1.5f)) ||
-			item->Position.yPos >= (height2 - CLICK(1.5f)) ||
-			item->Position.yPos >= (height3 + CLICK(2)) ||
-			item->Position.yPos <= (height3 - CLICK(2)))
+			item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height2 - CLICK(1.5f)) ||
+			item->Pose.Position.y >= (height3 + CLICK(2)) ||
+			item->Pose.Position.y <= (height3 - CLICK(2)))
 		{
 			canJump2blocks = false;
 		}
@@ -189,7 +189,7 @@ void CyborgControl(short itemNumber)
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
-			SoundEffect(SFX_TR5_HITMAN_ELECSHORT, &item->Position, 0);
+			SoundEffect(SFX_TR5_HITMAN_ELECSHORT, &item->Pose, 0);
 
 			if (random == 5 || random == 7 || random == 10)
 			{
@@ -234,9 +234,9 @@ void CyborgControl(short itemNumber)
 			}
 			else
 			{
-				int dx = LaraItem->Position.xPos - item->Position.xPos;
-				int dz = LaraItem->Position.zPos - item->Position.zPos;
-				laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -342,7 +342,7 @@ void CyborgControl(short itemNumber)
 							}
 							else
 							{
-								probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+								probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
 								roomNumber = probe.RoomNumber;
 								height = probe.Position.Floor;
 
@@ -440,7 +440,7 @@ void CyborgControl(short itemNumber)
 				if (item->BoxNumber == creature->LOT.TargetBox ||
 					!creature->MonkeySwingAhead)
 				{
-					probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+					probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
 					roomNumber = probe.RoomNumber;
 					height = probe.Position.Floor;
 
@@ -460,7 +460,7 @@ void CyborgControl(short itemNumber)
 				if (item->BoxNumber == creature->LOT.TargetBox ||
 					!creature->MonkeySwingAhead)
 				{
-					probe = GetCollision(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNumber);
+					probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
 					roomNumber = probe.RoomNumber;
 					height = probe.Position.Floor;
 
@@ -482,12 +482,12 @@ void CyborgControl(short itemNumber)
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Position.yRot += ANGLE(2.0f);
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Position.yRot -= ANGLE(2.0f);
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (Targetable(item, &AI) &&
 					(AI.distance < pow(SECTOR(4), 2) ||
@@ -510,12 +510,12 @@ void CyborgControl(short itemNumber)
 				if (abs(AI.angle) >= ANGLE(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Position.yRot += ANGLE(2.0f);
+						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
-						item->Position.yRot -= ANGLE(2.0f);
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
@@ -572,9 +572,9 @@ void CyborgControl(short itemNumber)
 			if (creature->Enemy)
 			{
 				TestTriggers(
-					creature->Enemy->Position.xPos,
-					creature->Enemy->Position.yPos,
-					creature->Enemy->Position.zPos, roomNumber, true);
+					creature->Enemy->Pose.Position.x,
+					creature->Enemy->Pose.Position.y,
+					creature->Enemy->Pose.Position.z, roomNumber, true);
 				
 				item->Animation.RequiredState = CYBORG_STATE_WALK;
 

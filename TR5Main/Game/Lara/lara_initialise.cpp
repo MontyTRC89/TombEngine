@@ -19,7 +19,7 @@ void InitialiseLara(int restore)
 	LaraItem->Data = &Lara;
 	LaraItem->Collidable = false;
 	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
-	LaraItem->Location.yNumber = LaraItem->Position.yPos;
+	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
 
 	if (restore)
 	{

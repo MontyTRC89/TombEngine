@@ -30,8 +30,8 @@ enum ShivaAnim
 
 static void TriggerShivaSmoke(long x, long y, long z, long uw)
 {
-	long dx = LaraItem->Position.xPos - x;
-	long dz = LaraItem->Position.zPos - z;
+	long dx = LaraItem->Pose.Position.x - x;
+	long dz = LaraItem->Pose.Position.z - z;
 
 	if (dx < -SECTOR(16) || dx > SECTOR(16) ||
 		dz < -SECTOR(16) || dz > SECTOR(16))
@@ -121,7 +121,7 @@ static void ShivaDamage(ITEM_INFO* item, CreatureInfo* creature, int damage)
 	if (!(creature->Flags) && item->TouchBits & 0x2400000)
 	{
 		CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;
@@ -131,7 +131,7 @@ static void ShivaDamage(ITEM_INFO* item, CreatureInfo* creature, int damage)
 	if (!(creature->Flags) && item->TouchBits & 0x2400)
 	{
 		CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Position, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;
@@ -188,8 +188,8 @@ void ShivaControl(short itemNumber)
 
 		if (shiva->Mood == MoodType::Escape)
 		{
-			shiva->Target.x = LaraItem->Position.xPos;
-			shiva->Target.z = LaraItem->Position.zPos;
+			shiva->Target.x = LaraItem->Pose.Position.x;
+			shiva->Target.z = LaraItem->Pose.Position.z;
 		}
 
 		angle = CreatureTurn(item, shiva->MaxTurn);
@@ -238,7 +238,7 @@ void ShivaControl(short itemNumber)
 			if (shiva->Flags < 0)
 			{
 				shiva->Flags++;
-				TriggerShivaSmoke(item->Position.xPos + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Position.zPos + (GetRandomControl() & 0x5FF) - 0x300, 1);
+				TriggerShivaSmoke(item->Pose.Position.x + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Pose.Position.z + (GetRandomControl() & 0x5FF) - 0x300, 1);
 				break;
 			}
 
@@ -247,9 +247,9 @@ void ShivaControl(short itemNumber)
 
 			if (shiva->Mood == MoodType::Escape)
 			{
-				int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(180.0f));
-				int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(180.0f));
-				auto box = GetCollision(x, item->Position.yPos, z, item->RoomNumber).BottomBlock->Box;
+				int x = item->Pose.Position.x + SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+				int z = item->Pose.Position.z + SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+				auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)
 					item->Animation.TargetState = 8;

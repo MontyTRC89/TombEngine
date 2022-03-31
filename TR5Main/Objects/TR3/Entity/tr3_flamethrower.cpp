@@ -30,8 +30,8 @@ enum FlamethrowerAnim
 
 static void TriggerPilotFlame(int itemNumber)
 {
-	int dx = LaraItem->Position.xPos - g_Level.Items[itemNumber].Position.xPos;
-	int dz = LaraItem->Position.zPos - g_Level.Items[itemNumber].Position.zPos;
+	int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
+	int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
 
 	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
 		return;
@@ -273,8 +273,8 @@ void FlameThrowerControl(short itemNumber)
 				if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0)
 					continue;
 
-				int x = target->Position.xPos - item->Position.xPos;
-				int z = target->Position.zPos - item->Position.zPos;
+				int x = target->Pose.Position.x - item->Pose.Position.x;
+				int z = target->Pose.Position.z - item->Pose.Position.z;
 
 				int distance = pow(x, 2) + pow(z, 2);
 				if (distance < minDistance)
@@ -299,10 +299,10 @@ void FlameThrowerControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			laraAI.angle = phd_atan(dz, dz) - item->Position.yRot; 
+			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y; 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			
 			AI.xAngle -= 0x800;
@@ -318,7 +318,7 @@ void FlameThrowerControl(short itemNumber)
 		if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
 		{
 			if (!creature->Alerted)
-				SoundEffect(300, &item->Position, 0);
+				SoundEffect(300, &item->Pose, 0);
 
 			AlertAllGuards(itemNumber);
 		}
@@ -483,7 +483,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(204, &item->Position, 0);
+			SoundEffect(204, &item->Pose, 0);
 			break;
 			
 		case 6:
@@ -518,7 +518,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(204, &item->Position, 0);
+			SoundEffect(204, &item->Pose, 0);
 			break;
 		}
 	}

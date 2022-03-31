@@ -608,13 +608,13 @@ GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		Camera.pos.x = LaraItem->Position.xPos + 256;
-		Camera.pos.y = LaraItem->Position.yPos + 256;
-		Camera.pos.z = LaraItem->Position.zPos + 256;
+		Camera.pos.x = LaraItem->Pose.Position.x + 256;
+		Camera.pos.y = LaraItem->Pose.Position.y + 256;
+		Camera.pos.z = LaraItem->Pose.Position.z + 256;
 
-		Camera.target.x = LaraItem->Position.xPos;
-		Camera.target.y = LaraItem->Position.yPos;
-		Camera.target.z = LaraItem->Position.zPos;
+		Camera.target.x = LaraItem->Pose.Position.x;
+		Camera.target.y = LaraItem->Pose.Position.y;
+		Camera.target.z = LaraItem->Pose.Position.z;
 
 		int x = Lara.Control.Weapon.WeaponItem;
 
@@ -756,12 +756,12 @@ bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 	{
 		int number = bits;
 		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
-			SoundEffect(SFX_TR5_SMASH_METAL, &item->Position, 0);
+			SoundEffect(SFX_TR5_SMASH_METAL, &item->Pose, 0);
 		else if (number == 256)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
-		ShatterItem.yRot = item->Position.yRot;
+		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.bit = 1 << node;
 		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
 		ShatterItem.sphere.x = CreatureSpheres[node].x;

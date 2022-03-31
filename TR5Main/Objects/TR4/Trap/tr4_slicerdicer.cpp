@@ -13,15 +13,15 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int dx = phd_sin(item->Position.yRot + ANGLE(90.0f)) * 512;
-		int dz = phd_cos(item->Position.yRot + ANGLE(90.0f)) * 512;
+		int dx = phd_sin(item->Pose.Orientation.y + ANGLE(90.0f)) * 512;
+		int dz = phd_cos(item->Pose.Orientation.y + ANGLE(90.0f)) * 512;
 
-		item->Position.xPos += dx;
-		item->Position.zPos += dz;
+		item->Pose.Position.x += dx;
+		item->Pose.Position.z += dz;
 
-		item->ItemFlags[0] = item->Position.xPos / 256;
-		item->ItemFlags[1] = (item->Position.yPos - 4608) / 256;
-		item->ItemFlags[2] = item->Position.zPos / 256;
+		item->ItemFlags[0] = item->Pose.Position.x / 256;
+		item->ItemFlags[1] = (item->Pose.Position.y - 4608) / 256;
+		item->ItemFlags[2] = item->Pose.Position.z / 256;
 		item->ItemFlags[3] = 50;
 	}
 
@@ -29,12 +29,12 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
-		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Position, 0);
+		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
+		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Pose, 0);
 
-		item->Position.xPos = (item->ItemFlags[0] * 256) + 4608 * phd_cos(item->TriggerFlags) * phd_sin(item->Position.yRot);
-		item->Position.yPos = (item->ItemFlags[1] * 256) - 4608 * phd_sin(item->TriggerFlags);
-		item->Position.zPos = (item->ItemFlags[2] * 256) + 4608 * phd_cos(item->TriggerFlags) * phd_cos(item->Position.yRot);
+		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * phd_cos(item->TriggerFlags) * phd_sin(item->Pose.Orientation.y);
+		item->Pose.Position.y = (item->ItemFlags[1] * 256) - 4608 * phd_sin(item->TriggerFlags);
+		item->Pose.Position.z = (item->ItemFlags[2] * 256) + 4608 * phd_cos(item->TriggerFlags) * phd_cos(item->Pose.Orientation.y);
 
 		item->TriggerFlags += 170;
 

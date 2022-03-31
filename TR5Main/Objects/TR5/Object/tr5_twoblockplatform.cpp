@@ -16,7 +16,7 @@ void InitialiseTwoBlocksPlatform(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = item->Position.yPos;
+	item->ItemFlags[0] = item->Pose.Position.y;
 	item->ItemFlags[1] = 1;
 	UpdateBridgeItem(itemNumber);
 }
@@ -29,8 +29,8 @@ void TwoBlocksPlatformControl(short itemNumber)
 	{
 		if (item->TriggerFlags)
 		{
-			if (item->Position.yPos > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
-				item->Position.yPos -= item->TriggerFlags & 0xF;
+			if (item->Pose.Position.y > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
+				item->Pose.Position.y -= item->TriggerFlags & 0xF;
 
 			auto probe = GetCollision(item);
 
@@ -47,12 +47,12 @@ void TwoBlocksPlatformControl(short itemNumber)
 		{
 			bool onObject = false;
 
-			int height = LaraItem->Position.yPos + 1;
-			if (GetBridgeItemIntersect(itemNumber, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, false).has_value())
+			int height = LaraItem->Pose.Position.y + 1;
+			if (GetBridgeItemIntersect(itemNumber, LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, false).has_value())
 			{
-				if (LaraItem->Position.yPos <= item->Position.yPos + 32)
+				if (LaraItem->Pose.Position.y <= item->Pose.Position.y + 32)
 				{
-					if (item->Position.yPos < height)
+					if (item->Pose.Position.y < height)
 						onObject = true;
 				}
 			}
@@ -64,22 +64,22 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 			if (item->ItemFlags[1] < 0)
 			{
-				if (item->Position.yPos <= item->ItemFlags[0])
+				if (item->Pose.Position.y <= item->ItemFlags[0])
 					item->ItemFlags[1] = 1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
-					item->Position.yPos -= 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					item->Pose.Position.y -= 4;
 				}
 			}
 			else if (item->ItemFlags[1] > 0)
 			{
-				if (item->Position.yPos >= item->ItemFlags[0] + 128)
+				if (item->Pose.Position.y >= item->ItemFlags[0] + 128)
 					item->ItemFlags[1] = -1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Position, 0);
-					item->Position.yPos += 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					item->Pose.Position.y += 4;
 				}
 			}
 		}

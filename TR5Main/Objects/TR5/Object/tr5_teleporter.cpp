@@ -195,13 +195,13 @@ void ControlTeleporter(short itemNumber)
 	else
 	{
 		Camera.fixedCamera = true;
-		LaraItem->Position.xPos = item->Position.xPos;
-		LaraItem->Position.zPos = item->Position.zPos;
-		LaraItem->Position.yRot = item->Position.yRot - ANGLE(180.0f);
+		LaraItem->Pose.Position.x = item->Pose.Position.x;
+		LaraItem->Pose.Position.z = item->Pose.Position.z;
+		LaraItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 
 		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-		LaraItem->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		LaraItem->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 		if (LaraItem->RoomNumber != roomNumber)
 			ItemNewRoom(Lara.ItemNumber, roomNumber);

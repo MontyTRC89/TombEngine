@@ -83,9 +83,9 @@ static bool CrocodileIsInWater(ITEM_INFO* item)
 	auto* info = GetCreatureInfo(item);
 
 	EntityStoringInfo storingInfo;
-	storingInfo.x = item->Position.xPos;
-	storingInfo.y = item->Position.yPos;
-	storingInfo.z = item->Position.zPos;
+	storingInfo.x = item->Pose.Position.x;
+	storingInfo.y = item->Pose.Position.y;
+	storingInfo.z = item->Pose.Position.z;
 	storingInfo.roomNumber = item->RoomNumber;
 
 	GetFloor(storingInfo.x, storingInfo.y, storingInfo.z, &storingInfo.roomNumber);

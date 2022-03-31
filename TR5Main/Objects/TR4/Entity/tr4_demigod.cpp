@@ -47,8 +47,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		int dx = LaraItem->Position.xPos - fx->pos.xPos;
-		int dz = LaraItem->Position.zPos - fx->pos.zPos;
+		int dx = LaraItem->Pose.Position.x - fx->pos.xPos;
+		int dz = LaraItem->Pose.Position.z - fx->pos.zPos;
 
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -378,9 +378,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = LaraItem->Position.xPos - item->Position.xPos;
-				dz = LaraItem->Position.zPos - item->Position.zPos;
-				laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;
@@ -388,7 +388,7 @@ namespace TEN::Entities::TR4
 					laraAI.ahead = false;
 
 				dx = abs(dx);
-				dy = item->Position.yPos - LaraItem->Position.yPos;
+				dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
 				dz = abs(dz);
 
 				if (dx <= dz)
@@ -556,11 +556,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
-						item->Position.yRot += ANGLE(7.0f);
+						item->Pose.Orientation.y += ANGLE(7.0f);
 					else if (AI.angle <= -ANGLE(7))
-						item->Position.yRot += -ANGLE(7.0f);
+						item->Pose.Orientation.y += -ANGLE(7.0f);
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -620,11 +620,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
-						item->Position.yRot += ANGLE(7.0f);
+						item->Pose.Orientation.y += ANGLE(7.0f);
 					else if (AI.angle <= -ANGLE(7.0f))
-						item->Position.yRot += -ANGLE(7.0f);
+						item->Pose.Orientation.y += -ANGLE(7.0f);
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -646,11 +646,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= ANGLE(7.0f))
-					item->Position.yRot += ANGLE(7.0f);
+					item->Pose.Orientation.y += ANGLE(7.0f);
 				else if (AI.angle <= -ANGLE(7.0f))
-					item->Position.yRot += -ANGLE(7.0f);
+					item->Pose.Orientation.y += -ANGLE(7.0f);
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&

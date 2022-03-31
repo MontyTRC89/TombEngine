@@ -28,8 +28,8 @@ void InitialiseWreckingBall(short itemNumber)
 	item = &g_Level.Items[itemNumber];
 	item->ItemFlags[3] = FindAllItems(ID_ANIMATING16)[0];
 	room = item->RoomNumber;
-	item->Position.yPos = GetCeiling(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room), item->Position.xPos, item->Position.yPos, item->Position.zPos) + 1644;
-	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room);
+	item->Pose.Position.y = GetCeiling(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) + 1644;
+	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
 	if (room != item->RoomNumber)
 		ItemNewRoom(itemNumber, room);
 }
@@ -43,9 +43,9 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 	item = &g_Level.Items[itemNumber];
 	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
-		x = l->Position.xPos;
-		y = l->Position.yPos;
-		z = l->Position.zPos;
+		x = l->Pose.Position.x;
+		y = l->Pose.Position.y;
+		z = l->Pose.Position.z;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
 		damage = item->Animation.VerticalVelocity > 0 ? 96 : 0;
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
@@ -54,22 +54,22 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 				l->HitPoints = 0;
 			else
 				l->HitPoints -= damage;
-			x -= l->Position.xPos;
-			y -= l->Position.yPos;
-			z -= l->Position.zPos;
+			x -= l->Pose.Position.x;
+			y -= l->Pose.Position.y;
+			z -= l->Pose.Position.z;
 			if (damage)
 			{
 				for (int i = 14 + (GetRandomControl() & 3); i > 0; --i)
 				{
-					TriggerBlood(l->Position.xPos + (GetRandomControl() & 63) - 32, l->Position.yPos - (GetRandomControl() & 511) - 256,
-						l->Position.zPos + (GetRandomControl() & 63) - 32, -1, 1);
+					TriggerBlood(l->Pose.Position.x + (GetRandomControl() & 63) - 32, l->Pose.Position.y - (GetRandomControl() & 511) - 256,
+						l->Pose.Position.z + (GetRandomControl() & 63) - 32, -1, 1);
 				}
 			}
 			if (!coll->Setup.EnableObjectPush || test)
 			{
-				l->Position.xPos += x;
-				l->Position.yPos += y;
-				l->Position.zPos += z;
+				l->Pose.Position.x += x;
+				l->Pose.Position.y += y;
+				l->Pose.Position.z += z;
 			}
 		}
 	}
@@ -84,7 +84,7 @@ void WreckingBallControl(short itemNumber)
 	item = &g_Level.Items[itemNumber];
 	test = 1;
 	item2 = &g_Level.Items[item->ItemFlags[3]];
-	if (LaraItem->Position.xPos >= 45056 && LaraItem->Position.xPos <= 57344 && LaraItem->Position.zPos >= 26624 && LaraItem->Position.zPos <= 43008
+	if (LaraItem->Pose.Position.x >= 45056 && LaraItem->Pose.Position.x <= 57344 && LaraItem->Pose.Position.z >= 26624 && LaraItem->Pose.Position.z <= 43008
 		|| item->ItemFlags[2] < 900)
 	{
 		if (item->ItemFlags[2] < 900)
@@ -100,8 +100,8 @@ void WreckingBallControl(short itemNumber)
 		}
 		else
 		{
-			x = LaraItem->Position.xPos;
-			z = LaraItem->Position.zPos;
+			x = LaraItem->Pose.Position.x;
+			z = LaraItem->Pose.Position.z;
 		}
 	}
 	else
@@ -115,12 +115,12 @@ void WreckingBallControl(short itemNumber)
 
 	if (item->ItemFlags[1] <= 0)
 	{
-		oldX = item->Position.xPos;
-		oldZ = item->Position.zPos;
+		oldX = item->Pose.Position.x;
+		oldZ = item->Pose.Position.z;
 		x = x & 0xFFFFFE00 | 0x200;
 		z = z & 0xFFFFFE00 | 0x200;
-		dx = x - item->Position.xPos;
-		dz = z - item->Position.zPos;
+		dx = x - item->Pose.Position.x;
+		dz = z - item->Pose.Position.z;
 		wx = 0;
 		if (dx < 0)
 			wx = -1024;
@@ -132,14 +132,14 @@ void WreckingBallControl(short itemNumber)
 		else if (dz > 0)
 			wz = 1024;
 		room = item->RoomNumber;
-		ceilingX = GetCeiling(GetFloor(item->Position.xPos + wx, item2->Position.yPos, item->Position.zPos, &room), item->Position.xPos + wx, item2->Position.yPos, item->Position.zPos);
+		ceilingX = GetCeiling(GetFloor(item->Pose.Position.x + wx, item2->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x + wx, item2->Pose.Position.y, item->Pose.Position.z);
 		room = item->RoomNumber;
-		ceilingZ = GetCeiling(GetFloor(item->Position.xPos, item2->Position.yPos, item->Position.zPos + wz, &room), item->Position.xPos, item2->Position.yPos, item->Position.zPos + wz);
-		if (ceilingX <= item2->Position.yPos && ceilingX != NO_HEIGHT)
+		ceilingZ = GetCeiling(GetFloor(item->Pose.Position.x, item2->Pose.Position.y, item->Pose.Position.z + wz, &room), item->Pose.Position.x, item2->Pose.Position.y, item->Pose.Position.z + wz);
+		if (ceilingX <= item2->Pose.Position.y && ceilingX != NO_HEIGHT)
 			flagX = 1;
 		else
 			flagX = 0;
-		if (ceilingZ <= item2->Position.yPos && ceilingZ != NO_HEIGHT)
+		if (ceilingZ <= item2->Pose.Position.y && ceilingZ != NO_HEIGHT)
 			flagZ = 1;
 		else
 			flagZ = 0;
@@ -156,17 +156,17 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->ItemFlags[0] == 1)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Position, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
 			adx = abs(dx);
 			if (adx >= 32)
 				adx = 32;
 			if (dx > 0)
 			{
-				item->Position.xPos += adx;
+				item->Pose.Position.x += adx;
 			}
 			else if (dx < 0)
 			{
-				item->Position.xPos -= adx;
+				item->Pose.Position.x -= adx;
 			}
 			else
 			{
@@ -175,36 +175,36 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->ItemFlags[0] == 2)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Position, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
 			adz = abs(dz);
 			if (adz >= 32)
 				adz = 32;
 			if (dz > 0)
 			{
-				item->Position.zPos += adz;
+				item->Pose.Position.z += adz;
 			}
 			else if (dz < 0)
 			{
-				item->Position.zPos -= adz;
+				item->Pose.Position.z -= adz;
 			}
 			else
 			{
 				item->ItemFlags[0] = 0;
 			}
 		}
-		if (item->ItemFlags[1] == -1 && (oldX != item->Position.xPos || oldZ != item->Position.zPos))
+		if (item->ItemFlags[1] == -1 && (oldX != item->Pose.Position.x || oldZ != item->Pose.Position.z))
 		{
 			item->ItemFlags[1] = 0;
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_A, &item->Position, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_A, &item->Pose, 0);
 		}
-		if ((item->Position.xPos & 0x3FF) == 512 && (item->Position.zPos & 0x3FF) == 512)
+		if ((item->Pose.Position.x & 0x3FF) == 512 && (item->Pose.Position.z & 0x3FF) == 512)
 			item->ItemFlags[0] = 0;
-		if (x == item->Position.xPos && z == item->Position.zPos && test)
+		if (x == item->Pose.Position.x && z == item->Pose.Position.z && test)
 		{
 			if (item->ItemFlags[1] != -1)
 			{
 				StopSoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP);
-				SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_C, &item->Position, 0);
+				SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_C, &item->Pose, 0);
 			}
 			item->ItemFlags[1] = 1;
 			item->TriggerFlags = 30;
@@ -222,21 +222,21 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Position, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose, 0);
 			++item->ItemFlags[1];
 			item->Animation.VerticalVelocity = 6;
-			item->Position.yPos += item->Animation.VerticalVelocity;
+			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
 	}
 	else if (item->ItemFlags[1] == 2)
 	{
 		item->Animation.VerticalVelocity += 24;
-		item->Position.yPos += item->Animation.VerticalVelocity;
+		item->Pose.Position.y += item->Animation.VerticalVelocity;
 		room = item->RoomNumber;
-		height = GetFloorHeight(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room), item->Position.xPos, item->Position.yPos, item->Position.zPos);
-		if (height < item->Position.yPos)
+		height = GetFloorHeight(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+		if (height < item->Pose.Position.y)
 		{
-			item->Position.yPos = height;
+			item->Pose.Position.y = height;
 			if (item->Animation.VerticalVelocity > 48)
 			{
 				BounceCamera(item, 64, 8192);
@@ -248,7 +248,7 @@ void WreckingBallControl(short itemNumber)
 				item->Animation.VerticalVelocity = 0;
 			}
 		}
-		else if (height - item->Position.yPos < 1536 && item->Animation.ActiveState)
+		else if (height - item->Pose.Position.y < 1536 && item->Animation.ActiveState)
 		{
 			item->Animation.TargetState = 0;
 		}
@@ -256,15 +256,15 @@ void WreckingBallControl(short itemNumber)
 	else if (item->ItemFlags[1] == 3)
 	{
 		item->Animation.VerticalVelocity -= 3;
-		item->Position.yPos += item->Animation.VerticalVelocity;
-		if (item->Position.yPos < item2->Position.yPos + 1644)
+		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		if (item->Pose.Position.y < item2->Pose.Position.y + 1644)
 		{
 			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP);
 			item->ItemFlags[0] = 1;
-			item->Position.yPos = item2->Position.yPos + 1644;
+			item->Pose.Position.y = item2->Pose.Position.y + 1644;
 			if (item->Animation.VerticalVelocity < -32)
 			{
-				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Position, 4104);
+				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, 4104);
 				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
 				BounceCamera(item, 16, 8192);
 			}
@@ -277,20 +277,20 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->ItemFlags[0])
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Position, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose, 0);
 		}
 	}
-	item2->Position.xPos = item->Position.xPos;
-	item2->Position.zPos = item->Position.zPos;
+	item2->Pose.Position.x = item->Pose.Position.x;
+	item2->Pose.Position.z = item->Pose.Position.z;
 	room = item->RoomNumber;
-	item2->Position.yPos = GetCeiling(GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room), item->Position.xPos, item->Position.yPos, item->Position.zPos);
-	GetFloor(item2->Position.xPos, item2->Position.yPos, item2->Position.zPos, &room);
+	item2->Pose.Position.y = GetCeiling(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	GetFloor(item2->Pose.Position.x, item2->Pose.Position.y, item2->Pose.Position.z, &room);
 	if (room != item2->RoomNumber)
 		ItemNewRoom(item->ItemFlags[3], room);
-	TriggerAlertLight(item2->Position.xPos, item2->Position.yPos + 64, item2->Position.zPos, 255, 64, 0, 64 * (GlobalCounter & 0x3F), item2->RoomNumber, 24);
-	TriggerAlertLight(item2->Position.xPos, item2->Position.yPos + 64, item2->Position.zPos, 255, 64, 0, 64 * (GlobalCounter - 32) & 0xFFF, item2->RoomNumber, 24);
+	TriggerAlertLight(item2->Pose.Position.x, item2->Pose.Position.y + 64, item2->Pose.Position.z, 255, 64, 0, 64 * (GlobalCounter & 0x3F), item2->RoomNumber, 24);
+	TriggerAlertLight(item2->Pose.Position.x, item2->Pose.Position.y + 64, item2->Pose.Position.z, 255, 64, 0, 64 * (GlobalCounter - 32) & 0xFFF, item2->RoomNumber, 24);
 	room = item->RoomNumber;
-	GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room);
+	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
 	if (room != item->RoomNumber)
 		ItemNewRoom(itemNumber, room);
 	AnimateItem(item);

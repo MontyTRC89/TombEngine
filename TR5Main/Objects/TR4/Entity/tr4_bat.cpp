@@ -147,7 +147,7 @@ namespace TEN::Entities::TR4
 						|| creature->Enemy != LaraItem
 						&& aiInfo.distance < BAT_ATTACK_RANGE
 						&& aiInfo.ahead
-						&& abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
+						&& abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS)
 					{
 						item->Animation.TargetState = BAT_STATE_ATTACK;
 					}
@@ -161,7 +161,7 @@ namespace TEN::Entities::TR4
 						|| creature->Enemy != LaraItem)
 					&& aiInfo.distance < BAT_ATTACK_RANGE
 					&& aiInfo.ahead &&
-					abs(item->Position.yPos - creature->Enemy->Position.yPos) < BAT_TARGET_YPOS)
+					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
 					if (creature->Enemy == LaraItem)
@@ -189,10 +189,10 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			if (item->Position.yPos >= item->Floor)
+			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Animation.TargetState = BAT_STATE_DEATH;
-				item->Position.yPos = item->Floor;
+				item->Pose.Position.y = item->Floor;
 				item->Animation.Airborne = false;
 			}
 			else

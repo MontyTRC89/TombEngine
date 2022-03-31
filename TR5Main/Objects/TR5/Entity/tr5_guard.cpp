@@ -162,7 +162,7 @@ void InitialiseGuard(short itemNum)
 		case 5:
 			item->Animation.AnimNumber = anim + 26;
 			item->Animation.TargetState = GUARD_STATE_ROPE_DOWN;
-			item->Position.yPos = GetCollision(item).Position.Ceiling - SECTOR(2);
+			item->Pose.Position.y = GetCollision(item).Position.Ceiling - SECTOR(2);
 			break;
 
 		case 6:
@@ -174,8 +174,8 @@ void InitialiseGuard(short itemNum)
 		case 9:
 			item->Animation.AnimNumber = anim + 59;
 			item->Animation.TargetState = GUARD_STATE_USE_COMPUTER;
-			item->Position.xPos -= CLICK(2) * phd_sin(item->Position.yRot);
-			item->Position.zPos -= CLICK(2) * phd_cos(item->Position.yRot);
+			item->Pose.Position.x -= CLICK(2) * phd_sin(item->Pose.Orientation.y);
+			item->Pose.Position.z -= CLICK(2) * phd_cos(item->Pose.Orientation.y);
 			break;
 
 		case 8:
@@ -204,9 +204,9 @@ void InitialiseSniper(short itemNumber)
 	item->Animation.TargetState = SNIPER_STATE_IDLE;
 	item->Animation.ActiveState = SNIPER_STATE_IDLE;
 
-	item->Position.xPos += SECTOR(1) * phd_sin(item->Position.yRot + ANGLE(90.0f));
-	item->Position.yPos += CLICK(2);
-	item->Position.zPos += SECTOR(1) * phd_cos(item->Position.yRot + ANGLE(90.0f));
+	item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
+	item->Pose.Position.y += CLICK(2);
+	item->Pose.Position.z += SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 }
 
 void InitialiseGuardLaser(short itemNumber)
@@ -245,38 +245,38 @@ void GuardControl(short itemNumber)
 	short joint1 = 0;
 	short joint2 = 0;
 
-	int x = item->Position.xPos;
-	int z = item->Position.zPos;
-	int dx = 870 * phd_sin(item->Position.yRot);
-	int dz = 870 * phd_cos(item->Position.yRot);
+	int x = item->Pose.Position.x;
+	int z = item->Pose.Position.z;
+	int dx = 870 * phd_sin(item->Pose.Orientation.y);
+	int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
-	int height1 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+	int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
 
 	x += dx;
 	z += dz;
-	int height2 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+	int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
 
 	x += dx;
 	z += dz;
-	int height3 = GetCollision(x, item->Position.yPos, z, item->RoomNumber).Position.Floor;
+	int height3 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
 
 	bool canJump1block = true;
 	if (item->BoxNumber == LaraItem->BoxNumber ||
-		item->Position.yPos >= (height1 - CLICK(1.5f)) ||
-		item->Position.yPos >= (height2 + CLICK(1)) ||
-		item->Position.yPos <= (height2 - CLICK(1)))
+		item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+		item->Pose.Position.y >= (height2 + CLICK(1)) ||
+		item->Pose.Position.y <= (height2 - CLICK(1)))
 	{
 		canJump1block = false;
 	}
 
 	bool canJump2blocks = true;
 	if (item->BoxNumber == LaraItem->BoxNumber ||
-		item->Position.yPos >= (height1 - CLICK(1.5f)) ||
-		item->Position.yPos >= (height2 - CLICK(1.5f)) ||
-		item->Position.yPos >= (height3 + CLICK(1)) ||
-		item->Position.yPos <= (height3 - CLICK(1)))
+		item->Pose.Position.y >= (height1 - CLICK(1.5f)) ||
+		item->Pose.Position.y >= (height2 - CLICK(1.5f)) ||
+		item->Pose.Position.y >= (height3 + CLICK(1)) ||
+		item->Pose.Position.y <= (height3 - CLICK(1)))
 	{
 		canJump2blocks = false;
 	}
@@ -307,9 +307,9 @@ void GuardControl(short itemNumber)
 	}
 	else
 	{
-		int dx = LaraItem->Position.xPos - item->Position.xPos;
-		int dz = LaraItem->Position.zPos - item->Position.zPos;
-		laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 		laraAI.distance = pow(dx, 2) + pow(dz, 2);
 	}
 	
@@ -322,13 +322,13 @@ void GuardControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_2;
-				item->Position.yRot += laraAI.angle + -ANGLE(180.0f);
+				item->Pose.Orientation.y += laraAI.angle + -ANGLE(180.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH1;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_1;
-				item->Position.yRot += laraAI.angle;
+				item->Pose.Orientation.y += laraAI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -354,7 +354,7 @@ void GuardControl(short itemNumber)
 				item->ItemFlags[0]++;
 				if (item->ItemFlags[0] > 60 && !(GetRandomControl() & 0xF))
 				{
-					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Position, 0);
+					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Pose, 0);
 					item->ItemFlags[0] = 0;
 				}
 			}
@@ -386,7 +386,7 @@ void GuardControl(short itemNumber)
 		{
 			if (!(item->AIBits & FOLLOW) &&
 				item->ObjectNumber != ID_SCIENTIST &&
-				abs(item->Position.yPos - LaraItem->Position.yPos) < SECTOR(1.25f))
+				abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < SECTOR(1.25f))
 			{
 				creature->Enemy = LaraItem;
 				AlertAllGuards(itemNumber);
@@ -396,17 +396,17 @@ void GuardControl(short itemNumber)
 		creature->Enemy = enemy;
 
 		GAME_VECTOR src;
-		src.x = item->Position.xPos;
-		src.y = item->Position.yPos - CLICK(1.5f);
-		src.z = item->Position.zPos;
+		src.x = item->Pose.Position.x;
+		src.y = item->Pose.Position.y - CLICK(1.5f);
+		src.z = item->Pose.Position.z;
 		src.roomNumber = item->RoomNumber;
 
 		auto* frame = GetBestFrame(LaraItem);
 
 		GAME_VECTOR dest;
-		dest.x = LaraItem->Position.xPos;
-		dest.y = LaraItem->Position.yPos + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
-		dest.z = LaraItem->Position.zPos;
+		dest.x = LaraItem->Pose.Position.x;
+		dest.y = LaraItem->Pose.Position.y + ((frame->boundingBox.Y2 + 3 * frame->boundingBox.Y1) / 4);
+		dest.z = LaraItem->Pose.Position.z;
 
 		bool los = !LOS(&src, &dest) && item->TriggerFlags != 10;
 
@@ -503,12 +503,12 @@ void GuardControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle >= 0)
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Position.yRot += -ANGLE(180.0f);
+				item->Pose.Orientation.y += -ANGLE(180.0f);
 
 			break;
 
@@ -522,12 +522,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.ActiveState == GUARD_STATE_FIRE_FAST)
 			{
@@ -573,12 +573,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!Targetable(item, &AI))
 				item->Animation.TargetState = GUARD_STATE_IDLE;
@@ -672,27 +672,27 @@ void GuardControl(short itemNumber)
 		case GUARD_STATE_ROPE_DOWN:
 			joint2 = laraAI.angle;
 
-			if (item->Position.yPos <= (item->Floor - SECTOR(2)) ||
+			if (item->Pose.Position.y <= (item->Floor - SECTOR(2)) ||
 				item->TriggerFlags != 5)
 			{
-				if (item->Position.yPos >= (item->Floor - CLICK(2)))
+				if (item->Pose.Position.y >= (item->Floor - CLICK(2)))
 					item->Animation.TargetState = GUARD_STATE_AIM;
 			}
 			else
 			{
 				item->TriggerFlags = 0;
 				TestTriggers(item, true);
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Position, 0);
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose, 0);
 			}
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if ((AI.angle & 0x8000) == 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			
 			break;
 
@@ -742,7 +742,7 @@ void GuardControl(short itemNumber)
 				currentItem->MeshBits = -3;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Position.yRot -= ANGLE(90.0f);
+				item->Pose.Orientation.y -= ANGLE(90.0f);
 			
 			break;
 
@@ -804,9 +804,9 @@ void GuardControl(short itemNumber)
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				currentItem->MeshBits = 0x1FFF;
-				item->Position.xPos = currentItem->Position.xPos - CLICK(1);
-				item->Position.yRot = currentItem->Position.yRot;
-				item->Position.zPos = currentItem->Position.zPos + CLICK(0.5f);
+				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
+				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
+				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
 				item->SwapMeshFlags = 1024;
 			}
 			else
@@ -863,7 +863,7 @@ void GuardControl(short itemNumber)
 			}
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 39)
-				TestTriggers(item->Position.xPos, item->Position.yPos, item->Position.zPos, enemy->RoomNumber, true);
+				TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, enemy->RoomNumber, true);
 
 			break;
 
@@ -899,7 +899,7 @@ void GuardControl(short itemNumber)
 				}
 				else
 				{
-					TestTriggers(creature->Enemy->Position.xPos, creature->Enemy->Position.yPos, creature->Enemy->Position.zPos, enemy->RoomNumber, true);
+					TestTriggers(creature->Enemy->Pose.Position.x, creature->Enemy->Pose.Position.y, creature->Enemy->Pose.Position.z, enemy->RoomNumber, true);
 					item->Animation.RequiredState = GUARD_STATE_WALK;
 
 					if (creature->Enemy->Flags & 2)
@@ -1108,12 +1108,12 @@ void Mafia2Control(short itemNumber)
 	short joint2 = 0;
 
 	// Can mafia jump? Check for a distances of 1 and 2 sectors.
-	int x = item->Position.xPos;
-	int y = item->Position.yPos;
-	int z = item->Position.zPos;
+	int x = item->Pose.Position.x;
+	int y = item->Pose.Position.y;
+	int z = item->Pose.Position.z;
 
-	int dx = 870 * phd_sin(item->Position.yRot);
-	int dz = 870 * phd_cos(item->Position.yRot);
+	int dx = 870 * phd_sin(item->Pose.Orientation.y);
+	int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
@@ -1177,9 +1177,9 @@ void Mafia2Control(short itemNumber)
 		}
 		else
 		{
-			dx = LaraItem->Position.xPos - item->Position.xPos;
-			dz = LaraItem->Position.zPos - item->Position.zPos;
-			laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -1275,15 +1275,15 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
 				item->SwapMeshFlags != 9216)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-					item->Position.yRot += -ANGLE(180.0f);
+					item->Pose.Orientation.y += -ANGLE(180.0f);
 			}
 			else
 				item->SwapMeshFlags = 128;
@@ -1301,12 +1301,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			
 			if (!creature->Flags)
 			{
@@ -1329,12 +1329,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (Targetable(item, &AI))
 				item->Animation.TargetState = MAFIA2_STATE_FIRE;
@@ -1415,9 +1415,9 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 			else
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
 				item->SwapMeshFlags == 9216)
@@ -1440,13 +1440,13 @@ void Mafia2Control(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_2;
-				item->Position.yRot += AI.angle - ANGLE(18.0f);
+				item->Pose.Orientation.y += AI.angle - ANGLE(18.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_1;
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

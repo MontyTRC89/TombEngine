@@ -60,9 +60,9 @@ void LittleRatsControl(short itemNumber)
 			{
 				RAT_STRUCT* rat = &Rats[ratNum];
 
-				rat->pos.xPos = item->Position.xPos;
-				rat->pos.yPos = item->Position.yPos;
-				rat->pos.zPos = item->Position.zPos;
+				rat->pos.xPos = item->Pose.Position.x;
+				rat->pos.yPos = item->Pose.Position.y;
+				rat->pos.zPos = item->Pose.Position.z;
 				rat->roomNumber = item->RoomNumber;
 
 				if (item->ItemFlags[0])
@@ -73,7 +73,7 @@ void LittleRatsControl(short itemNumber)
 				else
 				{
 					rat->fallspeed = 0;
-					rat->pos.yRot = item->Position.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+					rat->pos.yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45);
 				}
 
 				rat->pos.xRot = 0;
@@ -102,7 +102,7 @@ void InitialiseLittleRats(short itemNumber)
 
 	char flags = item->TriggerFlags / 1000;
 
-	item->Position.xRot = ANGLE(45);
+	item->Pose.Orientation.x = ANGLE(45);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -114,22 +114,22 @@ void InitialiseLittleRats(short itemNumber)
 		return;
 	}
 
-	if (item->Position.yRot > -28672 && item->Position.yRot < -4096)
+	if (item->Pose.Orientation.y > -28672 && item->Pose.Orientation.y < -4096)
 	{
-		item->Position.xPos += 512;
+		item->Pose.Position.x += 512;
 	}
-	else if (item->Position.yRot > 4096 && item->Position.yRot < 28672)
+	else if (item->Pose.Orientation.y > 4096 && item->Pose.Orientation.y < 28672)
 	{
-		item->Position.xPos -= 512;
+		item->Pose.Position.x -= 512;
 	}
 
-	if (item->Position.yRot > -8192 && item->Position.yRot < 8192)
+	if (item->Pose.Orientation.y > -8192 && item->Pose.Orientation.y < 8192)
 	{
-		item->Position.zPos -= 512;
+		item->Pose.Position.z -= 512;
 	}
-	else if (item->Position.yRot < -20480 || item->Position.yRot > 20480)
+	else if (item->Pose.Orientation.y < -20480 || item->Pose.Orientation.y > 20480)
 	{
-		item->Position.zPos += 512;
+		item->Pose.Position.z += 512;
 	}
 
 	ClearRats();
@@ -155,9 +155,9 @@ void UpdateRats()
 
 				rat->fallspeed += GRAVITY;
 
-				int dx = LaraItem->Position.xPos - rat->pos.xPos;
-				int dy = LaraItem->Position.yPos - rat->pos.yPos;
-				int dz = LaraItem->Position.zPos - rat->pos.zPos;
+				int dx = LaraItem->Pose.Position.x - rat->pos.xPos;
+				int dy = LaraItem->Pose.Position.y - rat->pos.yPos;
+				int dz = LaraItem->Pose.Position.z - rat->pos.zPos;
 
 				short angle;
 				if (rat->flags >= 170)
