@@ -109,7 +109,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(ITEM_INFO* item)
 	{
-		auto bbox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+		auto bbox = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
 		g_Renderer.addDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);

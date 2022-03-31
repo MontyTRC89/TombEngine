@@ -277,16 +277,16 @@ the WadTool animation editor.
 
 void GameScriptItemInfo::Init()
 {
-	bool cond = IsPointInRoom(m_item->Pose, m_item->RoomNumber);
+	bool cond = IsPointInRoom(m_item->Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
 	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
 		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
-		m_item->Pose.Position.x = center.xPos;
-		m_item->Pose.Position.y = center.yPos;
-		m_item->Pose.Position.z = center.zPos;
+		m_item->Position.xPos = center.xPos;
+		m_item->Position.yPos = center.yPos;
+		m_item->Position.zPos = center.zPos;
 	}
 	InitialiseItem(m_num);
 	m_initialised = true;
@@ -326,12 +326,12 @@ void GameScriptItemInfo::SetName(std::string const & id)
 
 GameScriptPosition GameScriptItemInfo::GetPos() const
 {
-	return GameScriptPosition(	m_item->Pose	);
+	return GameScriptPosition(	m_item->Position	);
 }
 
 void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 {
-	pos.StoreInPHDPos(m_item->Pose);
+	pos.StoreInPHDPos(m_item->Position);
 }
 
 // This does not guarantee that the returned value will be identical
@@ -340,16 +340,16 @@ void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	return GameScriptRotation(	int(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.z)) % 360);
+	return GameScriptRotation(	int(TO_DEGREES(m_item->Position.xRot)) % 360,
+								int(TO_DEGREES(m_item->Position.yRot)) % 360,
+								int(TO_DEGREES(m_item->Position.zRot)) % 360);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
+	m_item->Position.xRot = FROM_DEGREES(rot.x);
+	m_item->Position.yRot = FROM_DEGREES(rot.y);
+	m_item->Position.zRot = FROM_DEGREES(rot.z);
 }
 
 short GameScriptItemInfo::GetHP() const

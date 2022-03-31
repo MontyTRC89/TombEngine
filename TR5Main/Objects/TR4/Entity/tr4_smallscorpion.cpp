@@ -72,8 +72,8 @@ void SmallScorpionControl(short itemNumber)
 	}
 	else
 	{
-		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		int dx = LaraItem->Position.xPos - item->Position.xPos;
+		int dz = LaraItem->Position.zPos - item->Position.zPos;
 		int laraDistance = dx * dx + dz * dz;
 
 		if (item->AIBits & GUARD)
@@ -137,12 +137,12 @@ void SmallScorpionControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(6.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(6.0f);
+					item->Position.yRot += ANGLE(6.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(6.0f);
+					item->Position.yRot -= ANGLE(6.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 			
 			if (!creature->Flags)
 			{
@@ -159,12 +159,12 @@ void SmallScorpionControl(short itemNumber)
 						BITE_INFO* biteInfo;
 						if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 						{
-							rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
+							rotation = item->Position.yRot + -ANGLE(180.0f);
 							biteInfo = &SmallScorpionBiteInfo1;
 						}
 						else
 						{
-							rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
+							rotation = item->Position.yRot + -ANGLE(180.0f);
 							biteInfo = &SmallScorpionBiteInfo2;
 						}
 

@@ -278,8 +278,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = GOON_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
-			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
-			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
+			item->Position.xPos += phd_sin(item->Position.yRot) * CLICK(4);
+			item->Position.zPos += phd_cos(item->Position.yRot) * CLICK(4);
 			return;
 		}
 
@@ -290,8 +290,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = GOON_STATE_CROUCH;
 			item->Animation.ActiveState = GOON_STATE_CROUCH;
-			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
-			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
+			item->Position.xPos += phd_sin(item->Position.yRot) * CLICK(4);
+			item->Position.zPos += phd_cos(item->Position.yRot) * CLICK(4);
 			item->ItemFlags[3] = ocb;
 			return;
 		}
@@ -337,12 +337,12 @@ namespace TEN::Entities::TR4
 		}
 
 		// Can goon jump? Check for a distance of 1 and 2 sectors
-		int x = item->Pose.Position.x;
-		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z;
+		int x = item->Position.xPos;
+		int y = item->Position.yPos;
+		int z = item->Position.zPos;
 
-		int dx = 942 * phd_sin(item->Pose.Orientation.y);
-		int dz = 942 * phd_cos(item->Pose.Orientation.y);
+		int dx = 942 * phd_sin(item->Position.yRot);
+		int dz = 942 * phd_cos(item->Position.yRot);
 
 		x += dx;
 		z += dz;
@@ -431,9 +431,9 @@ namespace TEN::Entities::TR4
 				item->Animation.Airborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 
-				if (item->Pose.Position.y >= item->Floor)
+				if (item->Position.yPos >= item->Floor)
 				{
-					item->Pose.Position.y = item->Floor;
+					item->Position.yPos = item->Floor;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
 				}
@@ -448,9 +448,9 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_FREEFALL:
 				item->Animation.Airborne = true;
 
-				if (item->Pose.Position.y >= item->Floor)
+				if (item->Position.yPos >= item->Floor)
 				{
-					item->Pose.Position.y = item->Floor;
+					item->Position.yPos = item->Floor;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
 					item->Animation.TargetState = GOON_STATE_FREEFALL_LAND_DEATH;
@@ -459,7 +459,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_FREEFALL_LAND_DEATH:
-				item->Pose.Position.y = item->Floor;
+				item->Position.yPos = item->Floor;
 				break;
 
 			case GOON_STATE_MONKEY_GRAB:
@@ -521,9 +521,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				dx = LaraItem->Position.xPos - item->Position.xPos;
+				dz = LaraItem->Position.zPos - item->Position.zPos;
+				laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
 				laraAI.ahead = true;
 
 				if (laraAI.angle <= -ANGLE(90.0f) || laraAI.angle >= ANGLE(90.0f))
@@ -551,7 +551,7 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus ||
 				laraAI.distance < pow(SECTOR(1), 2) ||
 				TargetVisible(item, &laraAI) &&
-				abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < CLICK(4))
+				abs(LaraItem->Position.yPos - item->Position.yPos) < CLICK(4))
 			{
 				currentCreature->Alerted = true;
 			}
@@ -566,49 +566,49 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = 942 * phd_sin(item->Pose.Orientation.y + ANGLE(45.0f));
-				dz = 942 * phd_cos(item->Pose.Orientation.y + ANGLE(45.0f));
+				dx = 942 * phd_sin(item->Position.yRot + ANGLE(45.0f));
+				dz = 942 * phd_cos(item->Position.yRot + ANGLE(45.0f));
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * phd_sin(item->Pose.Orientation.y + ANGLE(78.75f));
-				dz = 942 * phd_cos(item->Pose.Orientation.y + ANGLE(78.75f));
+				dx = 942 * phd_sin(item->Position.yRot + ANGLE(78.75f));
+				dz = 942 * phd_cos(item->Position.yRot + ANGLE(78.75f));
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 				int height5 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				if (abs(height5 - item->Pose.Position.y) > CLICK(1))
+				if (abs(height5 - item->Position.yPos) > CLICK(1))
 					jump = false;
 				else
 				{
 					jump = true;
-					if ((height4 + CLICK(2)) >= item->Pose.Position.y)
+					if ((height4 + CLICK(2)) >= item->Position.yPos)
 						jump = false;
 				}
 
-				dx = 942 * phd_sin(item->Pose.Orientation.y - ANGLE(45.0f));
-				dz = 942 * phd_cos(item->Pose.Orientation.y - ANGLE(45.0f));
+				dx = 942 * phd_sin(item->Position.yRot - ANGLE(45.0f));
+				dz = 942 * phd_cos(item->Position.yRot - ANGLE(45.0f));
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * phd_sin(item->Pose.Orientation.y - ANGLE(78.75f));
-				dz = 942 * phd_cos(item->Pose.Orientation.y - ANGLE(78.75f));
+				dx = 942 * phd_sin(item->Position.yRot - ANGLE(78.75f));
+				dz = 942 * phd_cos(item->Position.yRot - ANGLE(78.75f));
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 				int height7 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				if (abs(height7 - item->Pose.Position.y) > CLICK(1) ||
-					(height6 + CLICK(2)) >= item->Pose.Position.y)
+				if (abs(height7 - item->Position.yPos) > CLICK(1) ||
+					(height6 + CLICK(2)) >= item->Position.yPos)
 				{
 					roll = false;
 					someFlag3 = false;
@@ -670,7 +670,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.TargetState = GOON_STATE_IDLE;
 
-					if (item->Floor > item->Pose.Position.y + CLICK(3))
+					if (item->Floor > item->Position.yPos + CLICK(3))
 						item->AIBits &= ~MODIFY;
 
 					break;
@@ -856,7 +856,7 @@ namespace TEN::Entities::TR4
 				if (objectNumber == ID_GOON2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
-					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
+					abs(height1 - item->Position.yPos) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
 						AI.distance < pow(SECTOR(3), 2) ||
 						height2 >= (height1 + CLICK(2))))
@@ -911,12 +911,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(7.0f);
+							item->Position.yRot += ANGLE(7.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(7.0f);
+							item->Position.yRot -= ANGLE(7.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Position.yRot += AI.angle;
 				}
 
 				if (!currentCreature->Flags)
@@ -930,7 +930,7 @@ namespace TEN::Entities::TR4
 								item,
 								&GoonSwordBite,
 								10,
-								item->Pose.Orientation.y,
+								item->Position.yRot,
 								DoBloodSplat);
 
 							currentCreature->Flags = 1;
@@ -1031,7 +1031,7 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.Airborne = true;
 						LaraItem->Animation.VerticalVelocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;
-						LaraItem->Pose.Position.y += CLICK(0.75f);
+						LaraItem->Position.yPos += CLICK(0.75f);
 						Lara.Control.HandStatus = HandStatus::Free;
 						currentCreature->Flags = 1;
 					}
@@ -1076,7 +1076,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_CROUCH_PICKUP:
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(&item->Position, AI.angle, ANGLE(11.0f));
 
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_CROUCH_PICKUP)
 					break;
@@ -1131,7 +1131,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7));
+				ClampRotation(&item->Position, AI.angle, ANGLE(7));
 
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
@@ -1151,7 +1151,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+				ClampRotation(&item->Position, AI.angle, ANGLE(7.0f));
 
 				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MAX ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MIN)
@@ -1202,7 +1202,7 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
-				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
+				ClampRotation(&item->Position, AI.angle, ANGLE(11.0f));
 
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
@@ -1224,7 +1224,7 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_SOMERSAULT:
 				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + GOON_ANIM_SOMERSAULT_END)
 				{
-					ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
+					ClampRotation(&item->Position, AI.angle, ANGLE(7.0f));
 					break;
 				}
 

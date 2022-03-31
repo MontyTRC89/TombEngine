@@ -73,8 +73,8 @@ void MonkeyControl(short itemNumber)
 
 				if (target->ObjectNumber == ID_SMALLMEDI_ITEM)
 				{
-					int x = target->Pose.Position.x - item->Pose.Position.x;
-					int z = target->Pose.Position.z - item->Pose.Position.z;
+					int x = target->Position.xPos - item->Position.xPos;
+					int z = target->Position.zPos - item->Position.zPos;
 					int distance = pow(x, 2) + pow(z, 2);
 
 					if (distance < minDistance)
@@ -115,10 +115,10 @@ void MonkeyControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			int dx = LaraItem->Position.xPos - item->Position.xPos;
+			int dz = LaraItem->Position.zPos - item->Position.zPos;
 
-			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y;
+			laraAI.angle = phd_atan(dz, dz) - item->Position.yRot;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -249,7 +249,7 @@ void MonkeyControl(short itemNumber)
 			}
 			else if (AI.bite && AI.distance < pow(341, 2))
 			{
-				if (LaraItem->Pose.Position.y < item->Pose.Position.y)
+				if (LaraItem->Position.yPos < item->Position.yPos)
 					item->Animation.TargetState = 13;
 				else
 					item->Animation.TargetState = 12;
@@ -260,7 +260,7 @@ void MonkeyControl(short itemNumber)
 				item->Animation.TargetState = 2;
 			else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != NULL &&
 				creature->Enemy->ObjectNumber != ID_AI_PATROL1 && creature->Enemy->ObjectNumber != ID_AI_PATROL2 &&
-				abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < 256)
+				abs(item->Position.yPos - creature->Enemy->Position.yPos) < 256)
 			{
 				item->Animation.TargetState = 5;
 			}
@@ -317,9 +317,9 @@ void MonkeyControl(short itemNumber)
 
 				auto* carriedItem = &g_Level.Items[item->CarriedItem];
 
-				carriedItem->Pose.Position.x = item->Pose.Position.x;
-				carriedItem->Pose.Position.y = item->Pose.Position.y;
-				carriedItem->Pose.Position.z = item->Pose.Position.z;
+				carriedItem->Position.xPos = item->Position.xPos;
+				carriedItem->Position.yPos = item->Position.yPos;
+				carriedItem->Position.zPos = item->Position.zPos;
 
 				ItemNewRoom(item->CarriedItem, item->RoomNumber);
 				item->CarriedItem = NO_ITEM;
@@ -332,11 +332,11 @@ void MonkeyControl(short itemNumber)
 				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) < ANGLE(7.0f))
-					item->Pose.Orientation.y += AI.angle;
+					item->Position.yRot += AI.angle;
 				else if (AI.angle < 0)
-					item->Pose.Orientation.y -= ANGLE(7.0f);
+					item->Position.yRot -= ANGLE(7.0f);
 				else
-					item->Pose.Orientation.y += ANGLE(7.0f);
+					item->Position.yRot += ANGLE(7.0f);
 			}
 
 			break;
@@ -398,11 +398,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+				item->Position.yRot -= ANGLE(7.0f);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->Position.yRot += ANGLE(7.0f);
 
 			if (enemy == LaraItem)
 			{
@@ -419,9 +419,9 @@ void MonkeyControl(short itemNumber)
 			{
 				if (!creature->Flags && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(1) &&
+						abs(enemy->Position.yPos - item->Position.yPos) <= CLICK(1) &&
+						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(1))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;
@@ -444,11 +444,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+				item->Position.yRot -= ANGLE(7.0f);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->Position.yRot += ANGLE(7.0f);
 
 			if (enemy == LaraItem)
 			{
@@ -465,9 +465,9 @@ void MonkeyControl(short itemNumber)
 			{
 				if (!creature->Flags && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(1) &&
+						abs(enemy->Position.yPos - item->Position.yPos) <= CLICK(1) &&
+						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(1))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;
@@ -490,11 +490,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+				item->Position.yRot -= ANGLE(7.0f);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->Position.yRot += ANGLE(7.0f);
 
 			if (enemy == LaraItem)
 			{
@@ -511,9 +511,9 @@ void MonkeyControl(short itemNumber)
 			{
 				if (creature->Flags != 1 && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(1) &&
+						abs(enemy->Position.yPos - item->Position.yPos) <= CLICK(1) &&
+						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(1))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
 						creature->Flags = 1;

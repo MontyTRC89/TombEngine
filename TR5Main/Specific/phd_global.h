@@ -23,39 +23,51 @@ struct PHD_VECTOR
 
 struct PHD_3DPOS
 {
-	Vector3Int Position;
-	Vector3Shrt Orientation;
+	int xPos;
+	int yPos;
+	int zPos;
+	short xRot;
+	short yRot;
+	short zRot;
 
 	PHD_3DPOS()
 	{
-		this->Position = Vector3Int();
-		this->Orientation = Vector3Shrt();
+		this->xPos = 0;
+		this->yPos = 0;
+		this->zPos = 0;
+		this->xRot = 0;
+		this->yRot = 0;
+		this->zRot = 0;
 	}
 
-	PHD_3DPOS(int xPos, int yPos, int zPos)
+	PHD_3DPOS(int x, int y, int z)
 	{
-		this->Position.x = xPos;
-		this->Position.y = yPos;
-		this->Position.z = zPos;
-		this->Orientation = Vector3Shrt();
+		this->xPos = x;
+		this->yPos = y;
+		this->zPos = z;
+		this->xRot = 0;
+		this->yRot = 0;
+		this->zRot = 0;
 	}
 
-	PHD_3DPOS(short xOrient, short yOrient, short zOrient)
+	PHD_3DPOS(short xrot, short yrot, short zrot)
 	{
-		this->Position = Vector3Int();
-		this->Orientation.x = xOrient;
-		this->Orientation.y = yOrient;
-		this->Orientation.z = zOrient;
+		this->xPos = 0;
+		this->yPos = 0;
+		this->zPos = 0;
+		this->xRot = xrot;
+		this->yRot = yrot;
+		this->zRot = zrot;
 	}
 
-	PHD_3DPOS(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient)
+	PHD_3DPOS(int x, int y, int z, short xrot, short yrot, short zrot)
 	{
-		this->Position.x = xPos;
-		this->Position.y = yPos;
-		this->Position.z = zPos;
-		this->Orientation.x = xOrient;
-		this->Orientation.y = yOrient;
-		this->Orientation.z = zOrient;
+		this->xPos = x;
+		this->yPos = y;
+		this->zPos = z;
+		this->xRot = xrot;
+		this->yRot = yrot;
+		this->zRot = zrot;
 	}
 };
 

@@ -255,8 +255,8 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 short* GetTriggerIndex(ITEM_INFO* item)
 {
 	auto roomNumber = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	return GetTriggerIndex(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 }
 
 void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
@@ -697,7 +697,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, heavy, heavyFlags);
+	TestTriggers(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber, heavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -729,14 +729,14 @@ void ProcessSectorFlags(FLOOR_INFO* floor)
 
 	// Burn Lara
 	if (floor->Flags.Death &&
-		(LaraItem->Pose.Position.y == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
+		(LaraItem->Position.yPos == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
 			Lara.Control.WaterStatus != WaterStatus::Dry))
 	{
 		LavaBurn(LaraItem);
 	}
 
 	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.y) + 8)) & GetClimbFlags(floor))
+	if ((1 << (GetQuadrant(LaraItem->Position.yRot) + 8)) & GetClimbFlags(floor))
 		Lara.Control.CanClimbLadder = true;
 	else
 		Lara.Control.CanClimbLadder = false;

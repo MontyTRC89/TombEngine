@@ -124,9 +124,9 @@ namespace TEN::Entities::TR4
 
 			if (item->TriggerFlags == 0)
 			{
-				item->Pose.Position.y -= 512;
+				item->Position.yPos -= 512;
 				CreatureAIInfo(item, &info);
-				item->Pose.Position.y += 512;
+				item->Position.yPos += 512;
 
 				int deltaAngle = info.angle - creature->JointRotation[0];
 
@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 								item->ItemFlags[0] = 2;
 
 								ShotLara(item, &info, &sentryGunBite, creature->JointRotation[0], 5);
-								SoundEffect(SFX_TR4_AUTOGUNS, &item->Pose, 0);
+								SoundEffect(SFX_TR4_AUTOGUNS, &item->Position, 0);
 
 								item->ItemFlags[2] += 256;
 								if (item->ItemFlags[2] > 6144)
@@ -217,12 +217,12 @@ namespace TEN::Entities::TR4
 
 			RemoveAllItemsInRoom(item->RoomNumber, ID_SMOKE_EMITTER_BLACK);
 
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y - 768, item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 3, -2, 0, item->RoomNumber);
 			for (int i = 0; i < 2; i++)
-				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y - 768, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 3, -1, 0, item->RoomNumber);
 
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
 		}
 	}
 }

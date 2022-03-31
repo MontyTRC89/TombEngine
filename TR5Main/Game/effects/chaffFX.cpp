@@ -45,17 +45,17 @@ void TriggerChaffEffects(ITEM_INFO* Item,int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Pose.Orientation.y), TO_RAD(Item->Pose.Orientation.x), TO_RAD(Item->Pose.Orientation.z));
+		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Position.yRot), TO_RAD(Item->Position.xRot), TO_RAD(Item->Position.zRot));
 
 	PHD_VECTOR pos;
-	pos.x = Item->Pose.Position.x + world.Translation().x;
-	pos.y = Item->Pose.Position.y + world.Translation().y;
-	pos.z = Item->Pose.Position.z + world.Translation().z;
+	pos.x = Item->Position.xPos + world.Translation().x;
+	pos.y = Item->Position.yPos + world.Translation().y;
+	pos.z = Item->Position.zPos + world.Translation().z;
 
 	world
 		= Matrix::CreateTranslation(-6, 6, 32)
 		* Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Pose.Orientation.y), TO_RAD(Item->Pose.Orientation.x), TO_RAD(Item->Pose.Orientation.z));
+		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Position.yRot), TO_RAD(Item->Position.xRot), TO_RAD(Item->Position.zRot));
 
 	PHD_VECTOR vel;
 	vel.x = world.Translation().x;
@@ -72,8 +72,8 @@ void TriggerChaffEffects(ITEM_INFO* item, PHD_VECTOR* pos, PHD_VECTOR* vel, int 
 	{
 		long	dx, dz;
 
-		dx = item->Pose.Position.x - pos->x;
-		dz = item->Pose.Position.z - pos->z;
+		dx = item->Position.xPos - pos->x;
+		dz = item->Position.zPos - pos->z;
 
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;

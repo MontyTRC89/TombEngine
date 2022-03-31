@@ -77,9 +77,9 @@ namespace TEN::Renderer
 
 				for (int j = 0; j < 6; j++)
 				{
-					LightningPos[j].x -= LaraItem->Pose.Position.x;
-					LightningPos[j].y -= LaraItem->Pose.Position.y;
-					LightningPos[j].z -= LaraItem->Pose.Position.z;
+					LightningPos[j].x -= LaraItem->Position.xPos;
+					LightningPos[j].y -= LaraItem->Position.yPos;
+					LightningPos[j].z -= LaraItem->Position.zPos;
 				}
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
@@ -90,15 +90,15 @@ namespace TEN::Renderer
 
 					for (int s = 0; s < 3 * arc->segments - 1; s++)
 					{
-						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
+						int ix = LaraItem->Position.xPos + interpolatedPos[0];
+						int iy = LaraItem->Position.yPos + interpolatedPos[1];
+						int iz = LaraItem->Position.zPos + interpolatedPos[2];
 
 						interpolatedPos += 4;
 
-						int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
+						int ix2 = LaraItem->Position.xPos + interpolatedPos[0];
+						int iy2 = LaraItem->Position.yPos + interpolatedPos[1];
+						int iz2 = LaraItem->Position.zPos + interpolatedPos[2];
 
 						byte r, g, b;
 
@@ -254,9 +254,9 @@ namespace TEN::Renderer
 						} 
 						else 
 						{
-							pos.x += item->Pose.Position.x;
-							pos.y += item->Pose.Position.y;
-							pos.z += item->Pose.Position.z;
+							pos.x += item->Position.xPos;
+							pos.y += item->Position.yPos;
+							pos.z += item->Position.zPos;
 						}
 					}
 
@@ -757,9 +757,9 @@ namespace TEN::Renderer
 			RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
 
 			if (dust->Reset) {
-				dust->X = LaraItem->Pose.Position.x + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Y = LaraItem->Pose.Position.y + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Z = LaraItem->Pose.Position.z + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->X = LaraItem->Position.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Y = LaraItem->Position.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Z = LaraItem->Position.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
 
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;

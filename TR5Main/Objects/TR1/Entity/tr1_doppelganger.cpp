@@ -62,15 +62,15 @@ void DoppelgangerControl(short itemNumber)
 		PHD_VECTOR pos;
 		if (reference == nullptr)
 		{
-			pos.x = item->Pose.Position.x;
-			pos.y = LaraItem->Pose.Position.y;
-			pos.z = item->Pose.Position.z;
+			pos.x = item->Position.xPos;
+			pos.y = LaraItem->Position.yPos;
+			pos.z = item->Position.zPos;
 		}
 		else
 		{
-			pos.x = 2 * reference->Pose.Position.x - LaraItem->Pose.Position.x;
-			pos.y = LaraItem->Pose.Position.y;
-			pos.z = 2 * reference->Pose.Position.z - LaraItem->Pose.Position.z;
+			pos.x = 2 * reference->Position.xPos - LaraItem->Position.xPos;
+			pos.y = LaraItem->Position.yPos;
+			pos.z = 2 * reference->Position.zPos - LaraItem->Position.zPos;
 		}
 
 		// Get floor heights for comparison.
@@ -80,12 +80,12 @@ void DoppelgangerControl(short itemNumber)
 		// Animate bacon Lara, mirroring Lara's position.
 		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
 		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
-		item->Pose.Position.x = pos.x;
-		item->Pose.Position.y = pos.y;
-		item->Pose.Position.z = pos.z;
-		item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
-		item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
-		item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
+		item->Position.xPos = pos.x;
+		item->Position.yPos = pos.y;
+		item->Position.zPos = pos.z;
+		item->Position.xRot = LaraItem->Position.xRot;
+		item->Position.yRot = LaraItem->Position.yRot - ANGLE(180.0f);
+		item->Position.zRot = LaraItem->Position.zRot;
 		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
 
 		// Compare floor heights.
@@ -97,7 +97,7 @@ void DoppelgangerControl(short itemNumber)
 			item->Animation.VerticalVelocity = 0;
 			item->Animation.Airborne = true;
 			item->Data = -1;
-			item->Pose.Position.y += 50;
+			item->Position.yPos += 50;
 		}
 	}
 	
@@ -107,9 +107,9 @@ void DoppelgangerControl(short itemNumber)
 		TestTriggers(item, true);
 
 		item->Floor = GetCollision(item).Position.Floor;
-		if (item->Pose.Position.y >= item->Floor)
+		if (item->Position.yPos >= item->Floor)
 		{
-			item->Pose.Position.y = item->Floor;
+			item->Position.yPos = item->Floor;
 			TestTriggers(item, true);
 
 			item->Animation.VerticalVelocity = 0;

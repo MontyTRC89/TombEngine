@@ -2,7 +2,7 @@
 
 struct BigGunInfo
 {
-	Vector3Shrt Rotation;
+	PHD_3DPOS Rotation;
 	short BarrelZRotation;
 	short StartYRot;
 	long GunRotYAdd;

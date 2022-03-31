@@ -23,7 +23,7 @@
 void lara_as_surface_dive(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.x -= ANGLE(1.0f);
+		item->Position.xRot -= ANGLE(1.0f);
 }
 
 // State:		LS_ONWATER_DIVE (35)
@@ -111,7 +111,7 @@ void lara_col_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Position.yRot;
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -157,7 +157,7 @@ void lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Position.yRot;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
@@ -206,7 +206,7 @@ void lara_col_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -252,7 +252,7 @@ void lara_col_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -298,7 +298,7 @@ void lara_col_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);
 }
 

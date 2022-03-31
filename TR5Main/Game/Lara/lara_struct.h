@@ -1052,7 +1052,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 	bool Locked;
-	Vector3Shrt Rotation;
+	PHD_3DPOS Rotation;
 	short FlashGun;
 };
 
@@ -1230,8 +1230,8 @@ struct LaraInfo
 	FlareData Flare;
 	bool LitTorch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	PHD_3DPOS ExtraHeadRot;
+	PHD_3DPOS ExtraTorsoRot;
 	PHD_VECTOR ExtraVelocity;
 	short WaterCurrentActive;
 	PHD_VECTOR WaterCurrentPull;

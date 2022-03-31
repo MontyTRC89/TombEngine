@@ -28,11 +28,11 @@ namespace TEN::Entities::TR4
 			FX_INFO* fx = &EffectList[fxNum];
 
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
-			fx->pos.xPos = (byte)GetRandomControl() + item->Pose.Position.x - 128;
-			fx->pos.yPos = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			fx->pos.zPos = (byte)GetRandomControl() + item->Pose.Position.z - 128;
+			fx->pos.xPos = (byte)GetRandomControl() + item->Position.xPos - 128;
+			fx->pos.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			fx->pos.zPos = (byte)GetRandomControl() + item->Position.zPos - 128;
 			fx->roomNumber = item->RoomNumber;
 			fx->pos.yRot = 2 * GetRandomControl();
 			fx->speed = GetRandomControl() / 2048;
@@ -139,12 +139,12 @@ namespace TEN::Entities::TR4
 		short rot = 0;
 
 		// Can skeleton jump? Check for a distance of 1 and 2 sectors
-		int x = item->Pose.Position.x;
-		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z;
+		int x = item->Position.xPos;
+		int y = item->Position.yPos;
+		int z = item->Position.zPos;
 
-		int dx = 870 * phd_sin(item->Pose.Orientation.y);
-		int dz = 870 * phd_cos(item->Pose.Orientation.y);
+		int dx = 870 * phd_sin(item->Position.yRot);
+		int dz = 870 * phd_cos(item->Position.yRot);
 
 		x += dx;
 		z += dz;
@@ -210,13 +210,13 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.ActiveState = STATE_SKELETON_HURT_BY_SHOTGUN2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->Pose.Orientation.y += info.angle + -32768;
+				item->Position.yRot += info.angle + -32768;
 			}
 			else
 			{
 				item->Animation.ActiveState = STATE_SKELETON_HURT_BY_SHOTGUN1;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
-				item->Pose.Orientation.y += info.angle;
+				item->Position.yRot += info.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -232,9 +232,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraInfo.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				dx = LaraItem->Position.xPos - item->Position.xPos;
+				dz = LaraItem->Position.zPos - item->Position.zPos;
+				laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
 				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			}
 
@@ -262,60 +262,60 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(45));
-				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(45));
+				dx = 870 * phd_sin(item->Position.yRot + ANGLE(45));
+				dz = 870 * phd_cos(item->Position.yRot + ANGLE(45));
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 
 				roomNumber = item->RoomNumber;
 				floor = GetFloor(x, y, z, &roomNumber);
 				int height4 = GetFloorHeight(floor, x, y, z);
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y + 14336);
-				dz = 870 * phd_cos(item->Pose.Orientation.y + 14336);
+				dx = 870 * phd_sin(item->Position.yRot + 14336);
+				dz = 870 * phd_cos(item->Position.yRot + 14336);
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 
 				roomNumber = item->RoomNumber;
 				floor = GetFloor(x, y, z, &roomNumber);
 				int height5 = GetFloorHeight(floor, x, y, z);
 
-				if (abs(height5 - item->Pose.Position.y) > 256)
+				if (abs(height5 - item->Position.yPos) > 256)
 					jumpRight = false;
 				else
 				{
 					jumpRight = true;
-					if (height4 + 512 >= item->Pose.Position.y)
+					if (height4 + 512 >= item->Position.yPos)
 						jumpRight = false;
 				}
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y - 8192);
-				dz = 870 * phd_cos(item->Pose.Orientation.y - 8192);
+				dx = 870 * phd_sin(item->Position.yRot - 8192);
+				dz = 870 * phd_cos(item->Position.yRot - 8192);
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 
 				roomNumber = item->RoomNumber;
 				floor = GetFloor(x, y, z, &roomNumber);
 				int height6 = GetFloorHeight(floor, x, y, z);
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y - 14336);
-				dz = 870 * phd_cos(item->Pose.Orientation.y - 14336);
+				dx = 870 * phd_sin(item->Position.yRot - 14336);
+				dz = 870 * phd_cos(item->Position.yRot - 14336);
 
-				x = item->Pose.Position.x + dx;
-				y = item->Pose.Position.y;
-				z = item->Pose.Position.z + dz;
+				x = item->Position.xPos + dx;
+				y = item->Position.yPos;
+				z = item->Position.zPos + dz;
 
 				roomNumber = item->RoomNumber;
 				floor = GetFloor(x, y, z, &roomNumber);
 				int height7 = GetFloorHeight(floor, x, y, z);
 
-				if (abs(height7 - item->Pose.Position.y) > 256 || height6 + 512 >= item->Pose.Position.y)
+				if (abs(height7 - item->Position.yPos) > 256 || height6 + 512 >= item->Position.yPos)
 					jumpLeft = false;
 				else
 					jumpLeft = true;
@@ -540,8 +540,8 @@ namespace TEN::Entities::TR4
 					}
 
 					creature->LOT.IsJumping = true;
-					floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-					if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) > item->Pose.Position.y + 1024)
+					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+					if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos + 1024)
 					{
 						creature->MaxTurn = 0;
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
@@ -582,16 +582,16 @@ namespace TEN::Entities::TR4
 				{
 					if (info.angle >= 0)
 					{
-						item->Pose.Orientation.y += 1092;
+						item->Position.yRot += 1092;
 					}
 					else
 					{
-						item->Pose.Orientation.y -= 1092;
+						item->Position.yRot -= 1092;
 					}
 				}
 				else
 				{
-					item->Pose.Orientation.y += info.angle;
+					item->Position.yRot += info.angle;
 				}
 
 				if (!creature->Flags)
@@ -601,7 +601,7 @@ namespace TEN::Entities::TR4
 						LaraItem->HitPoints -= 80;
 						LaraItem->HitStatus = true;
 						CreatureEffect2(item, &skeletonBite, 15, -1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 						creature->Flags = 1;
 					}
 				}
@@ -619,16 +619,16 @@ namespace TEN::Entities::TR4
 				{
 					if (info.angle >= 0)
 					{
-						item->Pose.Orientation.y += 1092;
+						item->Position.yRot += 1092;
 					}
 					else
 					{
-						item->Pose.Orientation.y -= 1092;
+						item->Position.yRot -= 1092;
 					}
 				}
 				else
 				{
-					item->Pose.Orientation.y += info.angle;
+					item->Position.yRot += info.angle;
 				}
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
@@ -648,7 +648,7 @@ namespace TEN::Entities::TR4
 								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
-								SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+								SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
 								TestTriggers(item, true);
@@ -662,9 +662,9 @@ namespace TEN::Entities::TR4
 						{
 							LaraItem->HitPoints -= 80;
 							LaraItem->HitStatus = true;
-							CreatureEffect2(item, &skeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, &skeletonBite, 10, item->Position.yRot, DoBloodSplat);
 
-							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
 
 							creature->Flags = 1;
 						}
@@ -701,8 +701,8 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 43)
 				{
 					roomNumber = item->RoomNumber;
-					floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-					if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) > item->Pose.Position.y + 1280)
+					floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+					if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) > item->Position.yPos + 1280)
 					{
 						creature->MaxTurn = 0;
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
@@ -717,8 +717,8 @@ namespace TEN::Entities::TR4
 			case 23:
 			case 24:
 				roomNumber = item->RoomNumber;
-				floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-				if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) <= item->Pose.Position.y)
+				floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+				if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) <= item->Position.yPos)
 				{
 					if (item->Active)
 					{
@@ -752,8 +752,8 @@ namespace TEN::Entities::TR4
 				creature->LOT.IsJumping = false;
 
 				roomNumber = item->RoomNumber;
-				floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-				if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) <= item->Pose.Position.y + 1024)
+				floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+				if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) <= item->Position.yPos + 1024)
 				{
 					if (!(GetRandomControl() & 0x1F))
 					{

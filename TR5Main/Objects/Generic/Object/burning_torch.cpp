@@ -202,23 +202,23 @@ namespace TEN::Entities::Generic
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int oldX = item->Pose.Position.x;
-		int oldY = item->Pose.Position.y;
-		int oldZ = item->Pose.Position.z;
+		int oldX = item->Position.xPos;
+		int oldY = item->Position.yPos;
+		int oldZ = item->Position.zPos;
 
 		if (item->Animation.VerticalVelocity)
-			item->Pose.Orientation.z += ANGLE(5);
+			item->Position.zRot += ANGLE(5);
 		else if (!item->Animation.Velocity)
 		{
-			item->Pose.Orientation.x = 0;
-			item->Pose.Orientation.z = 0;
+			item->Position.xRot = 0;
+			item->Position.zRot = 0;
 		}
 
-		int xv = item->Animation.Velocity * phd_sin(item->Pose.Orientation.y);
-		int zv = item->Animation.Velocity * phd_cos(item->Pose.Orientation.y);
+		int xv = item->Animation.Velocity * phd_sin(item->Position.yRot);
+		int zv = item->Animation.Velocity * phd_cos(item->Position.yRot);
 
-		item->Pose.Position.x += xv;
-		item->Pose.Position.z += zv;
+		item->Position.xPos += xv;
+		item->Position.zPos += zv;
 
 		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 		{
@@ -231,7 +231,7 @@ namespace TEN::Entities::Generic
 		else
 			item->Animation.VerticalVelocity += 6;
 
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->Position.yPos += item->Animation.VerticalVelocity;
 
 		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->Animation.VerticalVelocity, zv);
 
@@ -252,12 +252,12 @@ namespace TEN::Entities::Generic
 
 		if (item->ItemFlags[3])
 		{
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
+			TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 		}
 	}
 
@@ -308,7 +308,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			short rot = torchItem->Pose.Orientation.y;
+			short rot = torchItem->Position.yRot;
 
 			switch (torchItem->ObjectNumber)
 			{
@@ -340,7 +340,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			torchItem->Position.yRot = laraItem->Position.yRot;
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
@@ -348,7 +348,7 @@ namespace TEN::Entities::Generic
 					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;
 				else
 				{
-					int dy = abs(laraItem->Pose.Position.y - torchItem->Pose.Position.y);
+					int dy = abs(laraItem->Position.yPos - torchItem->Position.yPos);
 					laraItem->ItemFlags[3] = 1;
 					laraItem->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
@@ -360,7 +360,7 @@ namespace TEN::Entities::Generic
 				laraInfo->InteractedItem = itemNumber;
 			}
 
-			torchItem->Pose.Orientation.y = rot;
+			torchItem->Position.yRot = rot;
 		}
 		if (laraItem->Animation.ActiveState == LS_MISC_CONTROL &&
 			laraInfo->InteractedItem == itemNumber &&

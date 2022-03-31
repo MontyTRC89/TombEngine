@@ -72,8 +72,8 @@ void Tr5DogControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			int dx = LaraItem->Position.xPos - item->Position.xPos;
+			int dz = LaraItem->Position.zPos - item->Position.zPos;
 			phd_atan(dz, dx);
 			distance = SQUARE(dx) + SQUARE(dz);
 		}

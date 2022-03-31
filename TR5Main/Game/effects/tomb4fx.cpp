@@ -849,12 +849,12 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 
 	GUNSHELL_STRUCT* gshell = &Gunshells[GetFreeGunshell()];
 
-	gshell->pos.Position.x = pos.x;
-	gshell->pos.Position.y = pos.y;
-	gshell->pos.Position.z = pos.z;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
+	gshell->pos.xPos = pos.x;
+	gshell->pos.yPos = pos.y;
+	gshell->pos.zPos = pos.z;
+	gshell->pos.xRot = 0;
+	gshell->pos.yRot = 0;
+	gshell->pos.zRot = GetRandomControl();
 	gshell->roomNumber = LaraItem->RoomNumber;
 	gshell->speed = (GetRandomControl() & 0x1F) + 16;
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
@@ -864,29 +864,29 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun)
 		{
-			gshell->dirXrot = Lara.LeftArm.Rotation.y
-				+ Lara.ExtraTorsoRot.y
-				+ LaraItem->Pose.Orientation.y
+			gshell->dirXrot = Lara.LeftArm.Rotation.yRot
+				+ Lara.ExtraTorsoRot.yRot
+				+ LaraItem->Position.yRot
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
-			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
-				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y;
+			gshell->pos.yRot += Lara.LeftArm.Rotation.yRot 
+				+ Lara.ExtraTorsoRot.yRot 
+				+ LaraItem->Position.yRot;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
-			gshell->dirXrot = Lara.LeftArm.Rotation.y 
-				+ LaraItem->Pose.Orientation.y 
+			gshell->dirXrot = Lara.LeftArm.Rotation.yRot 
+				+ LaraItem->Position.yRot 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
 	}
 	else
 	{
-		gshell->dirXrot = Lara.LeftArm.Rotation.y 
-			+ LaraItem->Pose.Orientation.y 
+		gshell->dirXrot = Lara.LeftArm.Rotation.yRot 
+			+ LaraItem->Position.yRot 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
@@ -908,9 +908,9 @@ void UpdateGunShells()
 
 		if (gs->counter)
 		{
-			int oldX = gs->pos.Position.x;
-			int oldY = gs->pos.Position.y;
-			int oldZ = gs->pos.Position.z;
+			int oldX = gs->pos.xPos;
+			int oldY = gs->pos.yPos;
+			int oldZ = gs->pos.zPos;
 
 			gs->counter--;
 
@@ -936,28 +936,28 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * ANGLE(1);
-			gs->pos.Orientation.y += gs->speed * ANGLE(1);
-			gs->pos.Orientation.z += ANGLE(23);
+			gs->pos.xRot += (gs->speed >> 1 + 7) * ANGLE(1);
+			gs->pos.yRot += gs->speed * ANGLE(1);
+			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.Position.x += gs->speed * phd_sin(gs->dirXrot);
-			gs->pos.Position.y += gs->fallspeed;
-			gs->pos.Position.z += gs->speed * phd_cos(gs->dirXrot);
+			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot);
+			gs->pos.yPos += gs->fallspeed;
+			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot);
 
-			FLOOR_INFO* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
+			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z), gs->roomNumber);
-				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
-				SetupRipple(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
+				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				gs->fallspeed >>= 5;
 				continue;
 			}
 
-			int ceiling = GetCeiling(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y < ceiling)
+			int ceiling = GetCeiling(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
+			if (gs->pos.yPos < ceiling)
 			{
 				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 4;
@@ -968,12 +968,12 @@ void UpdateGunShells()
 					continue;
 				}
 
-				gs->pos.Position.y = ceiling;
+				gs->pos.yPos = ceiling;
 				gs->fallspeed = -gs->fallspeed;
 			}
 
-			int height = GetFloorHeight(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y >= height)
+			int height = GetFloorHeight(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
+			if (gs->pos.yPos >= height)
 			{
 				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 8;
@@ -986,10 +986,10 @@ void UpdateGunShells()
 					else
 					{
 						gs->dirXrot += -ANGLE(180);
-						gs->pos.Position.x = oldX;
-						gs->pos.Position.z = oldZ;
+						gs->pos.xPos = oldX;
+						gs->pos.zPos = oldZ;
 					}
-					gs->pos.Position.y = oldY;
+					gs->pos.yPos = oldY;
 				}
 				else
 				{
@@ -1040,7 +1040,7 @@ void LaraBubbles(ITEM_INFO* item)
 	PHD_VECTOR pos;
 	int num, i;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, 1);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Position, 1);
 
 	pos.x = 0;
 
@@ -1211,9 +1211,9 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		TO_RAD(item->Position.yRot),
+		TO_RAD(item->Position.xRot),
+		TO_RAD(item->Position.zRot)
 	);
 
 	int bit = 1;
@@ -1231,13 +1231,13 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
-				fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-				fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+				fx->pos.xPos = boneMatrix.Translation().x + item->Position.xPos;
+				fx->pos.yPos = boneMatrix.Translation().y + item->Position.yPos;
+				fx->pos.zPos = boneMatrix.Translation().z + item->Position.zPos;
 
 				fx->roomNumber = item->RoomNumber;
-				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->pos.xRot = 0;
+				fx->pos.yRot = GetRandomControl() * 2;
 
 				if (!(flags & 0x10))
 				{
@@ -1282,13 +1282,13 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				{
 					FX_INFO* fx = &EffectList[fxNumber];
 
-					fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-					fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+					fx->pos.xPos = boneMatrix.Translation().x + item->Position.xPos;
+					fx->pos.yPos = boneMatrix.Translation().y + item->Position.yPos;
+					fx->pos.zPos = boneMatrix.Translation().z + item->Position.zPos;
 
 					fx->roomNumber = item->RoomNumber;
-					fx->pos.Orientation.x = 0;
-					fx->pos.Orientation.y = GetRandomControl() * 2;
+					fx->pos.xRot = 0;
+					fx->pos.yRot = GetRandomControl() * 2;
 
 					if (!(flags & 0x10))
 					{
@@ -1342,9 +1342,9 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 	{
 		sptr = &ShockWaves[s];
 
-		sptr->x = pos->Position.x;
-		sptr->y = pos->Position.y;
-		sptr->z = pos->Position.z;
+		sptr->x = pos->xPos;
+		sptr->y = pos->yPos;
+		sptr->z = pos->zPos;
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
@@ -1361,8 +1361,8 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1436,12 +1436,12 @@ void UpdateShockwaves()
 					{
 						ANIM_FRAME* frame = GetBestFrame(LaraItem);
 
-						int dx = LaraItem->Pose.Position.x - sw->x;
-						int dz = LaraItem->Pose.Position.z - sw->z;
+						int dx = LaraItem->Position.xPos - sw->x;
+						int dz = LaraItem->Position.zPos - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
-						if (sw->y <= LaraItem->Pose.Position.y + frame->boundingBox.Y1
-							|| sw->y >= LaraItem->Pose.Position.y + frame->boundingBox.Y2 + 256
+						if (sw->y <= LaraItem->Position.yPos + frame->boundingBox.Y1
+							|| sw->y >= LaraItem->Position.yPos + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
 							|| distance >= sw->outerRad)
 						{
@@ -1450,9 +1450,9 @@ void UpdateShockwaves()
 						else
 						{
 							short angle = phd_atan(dz, dx);
-							TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
+							TriggerShockwaveHitEffect(LaraItem->Position.xPos,
 								sw->y,
-								LaraItem->Pose.Position.z,
+								LaraItem->Position.zPos,
 								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
@@ -1467,8 +1467,8 @@ void UpdateShockwaves()
 
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	int dx = LaraItem->Position.xPos - x;
+	int dz = LaraItem->Position.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1593,9 +1593,9 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 {
 	GAME_VECTOR pos;
 
-	pos.x = item->pos.Position.x;
-	pos.y = item->pos.Position.y;
-	pos.z = item->pos.Position.z;
+	pos.x = item->pos.xPos;
+	pos.y = item->pos.yPos;
+	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
 
 	SetUpLensFlare(0, 0, 0, &pos);

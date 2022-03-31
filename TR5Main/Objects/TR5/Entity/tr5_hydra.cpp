@@ -48,13 +48,13 @@ void InitialiseHydra(short itemNumber)
 	item->Animation.ActiveState = HYDRA_STATE_STOP;
 
 	if (item->TriggerFlags == 1)
-		item->Pose.Position.z += CLICK(1.5f);
+		item->Position.zPos += CLICK(1.5f);
 
 	if (item->TriggerFlags == 2)
-		item->Pose.Position.z -= CLICK(1.5f);
+		item->Position.zPos -= CLICK(1.5f);
 
-	item->Pose.Orientation.y = ANGLE(90.0f);
-	item->Pose.Position.x -= CLICK(1);
+	item->Position.yRot = ANGLE(90.0f);
+	item->Position.xPos -= CLICK(1);
 }
 
 static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
@@ -196,12 +196,12 @@ void HydraControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.y += ANGLE(1.0f);
+					item->Position.yRot += ANGLE(1.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(1.0f);
+					item->Position.yRot -= ANGLE(1.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Position.yRot += AI.angle;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
@@ -259,7 +259,7 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
-					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
@@ -278,7 +278,7 @@ void HydraControl(short itemNumber)
 					{
 						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
-						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
 					}
 				}
 			}
@@ -303,7 +303,7 @@ void HydraControl(short itemNumber)
 				{
 					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
-					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
 				}
 			}
 
@@ -397,7 +397,7 @@ void HydraControl(short itemNumber)
 			if (item->ItemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->ItemFlags[3], 0, 64);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 				item->ItemFlags[3]++;
 			}
 		}

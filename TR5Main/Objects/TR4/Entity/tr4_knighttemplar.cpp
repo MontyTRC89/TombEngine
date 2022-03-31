@@ -70,7 +70,7 @@ void KnightTemplarControl(short itemNumber)
 
 	int a = 0;
 	if (creature->Enemy != LaraItem)
-		a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
+		a = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
 
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
@@ -124,12 +124,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+				item->Position.yRot += ANGLE(1.0f);
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Position.yRot += AI.angle;
 
 		frameNumber = item->Animation.FrameNumber;
 		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -153,7 +153,7 @@ void KnightTemplarControl(short itemNumber)
 						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+						SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;
@@ -190,12 +190,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+				item->Position.yRot += ANGLE(1.0f);
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+				item->Position.yRot -= ANGLE(1.0f);
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Position.yRot += AI.angle;
 
 		if (item->HitStatus)
 		{

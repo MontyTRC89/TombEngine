@@ -47,9 +47,9 @@ void SphinxControl(short itemNumber)
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
-	int x = item->Pose.Position.x + 614 * phd_sin(item->Pose.Orientation.y);
-	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z + 614 * phd_cos(item->Pose.Orientation.y);
+	int x = item->Position.xPos + 614 * phd_sin(item->Position.yRot);
+	int y = item->Position.yPos;
+	int z = item->Position.zPos + 614 * phd_cos(item->Position.yRot);
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -68,7 +68,7 @@ void SphinxControl(short itemNumber)
 				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
 				ShatterObject(NULL, mesh, -64, item->RoomNumber, 0);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
 
 				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 				floor->Stopper = false;
@@ -78,9 +78,9 @@ void SphinxControl(short itemNumber)
 		}
 	}
 
-	x = item->Pose.Position.x - 614 * phd_sin(item->Pose.Orientation.y);
-	y = item->Pose.Position.y;
-	z = item->Pose.Position.z - 614 * phd_cos(item->Pose.Orientation.y);
+	x = item->Position.xPos - 614 * phd_sin(item->Position.yRot);
+	y = item->Position.yPos;
+	z = item->Position.zPos - 614 * phd_cos(item->Position.yRot);
 
 	roomNumber = item->RoomNumber;
 
@@ -98,15 +98,15 @@ void SphinxControl(short itemNumber)
 	CreatureAIInfo(item, &info);
 
 	if (creature->Enemy != LaraItem)
-		phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+		phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
 
 	GetCreatureMood(item, &info, VIOLENT);
 	CreatureMood(item, &info, VIOLENT);
 
 	short angle = CreatureTurn(item, creature->MaxTurn);
 
-	int dx = abs(item->ItemFlags[2] - (short)item->Pose.Position.x);
-	int dz = abs(item->ItemFlags[3] - (short)item->Pose.Position.z);
+	int dx = abs(item->ItemFlags[2] - (short)item->Position.xPos);
+	int dz = abs(item->ItemFlags[3] - (short)item->Position.zPos);
 
 	switch (item->Animation.ActiveState)
 	{
@@ -149,7 +149,7 @@ void SphinxControl(short itemNumber)
 		}
 		else if (info.distance < SQUARE(2048) && item->Animation.TargetState != SPHINX_RUN)
 		{
-			if (height2 <= item->Pose.Position.y + 256 && height2 >= item->Pose.Position.y - 256)
+			if (height2 <= item->Position.yPos + 256 && height2 >= item->Position.yPos - 256)
 			{
 				item->Animation.TargetState = SPHINX_STOP;
 				item->Animation.RequiredState = SPHINX_WALK_BACK;
@@ -195,7 +195,7 @@ void SphinxControl(short itemNumber)
 
 	case SPHINX_WALK_BACK:
 		creature->MaxTurn = ANGLE(3);
-		if (info.distance > SQUARE(2048) || height2 > item->Pose.Position.y + 256 || height2 < item->Pose.Position.y - 256)
+		if (info.distance > SQUARE(2048) || height2 > item->Position.yPos + 256 || height2 < item->Position.yPos - 256)
 		{
 			item->Animation.TargetState = SPHINX_STOP;
 			item->Animation.RequiredState = SPHINX_RUN;
@@ -241,8 +241,8 @@ void SphinxControl(short itemNumber)
 		break;
 	}
 
-	item->ItemFlags[2] = (short)item->Pose.Position.x;
-	item->ItemFlags[3] = (short)item->Pose.Position.z;
+	item->ItemFlags[2] = (short)item->Position.xPos;
+	item->ItemFlags[3] = (short)item->Position.zPos;
 
 	CreatureAnimation(itemNumber, angle, 0);
 }
