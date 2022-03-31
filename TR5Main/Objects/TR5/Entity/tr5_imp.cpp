@@ -142,9 +142,9 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos) - item->Position.yRot;
+				angle2 = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
-			int d1 = item->Position.yPos - LaraItem->Position.yPos + CLICK(1.5f);
+			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
 			if (LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
 				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
@@ -153,7 +153,7 @@ void ImpControl(short itemNumber)
 				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
 			{
-				d1 = item->Position.yPos - LaraItem->Position.yPos;
+				d1 = item->Pose.Position.y - LaraItem->Pose.Position.y;
 			}
 
 			int d2 = sqrt(AI.distance);
@@ -240,7 +240,7 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
-					CreatureEffect2(item, &ImpBite, 10, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
@@ -287,12 +287,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= ANGLE(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 				else
-					item->Position.yRot -= ANGLE(2.0f);
+					item->Pose.Orientation.y -= ANGLE(2.0f);
 			}
 			else
-				item->Position.yRot += angle2;
+				item->Pose.Orientation.y += angle2;
 		}
 
 		CreatureTilt(item, 0);

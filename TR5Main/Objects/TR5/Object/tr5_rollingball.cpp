@@ -44,27 +44,27 @@ void RollingBallControl(short itemNumber)
 		return;
 
 	item->Animation.VerticalVelocity += GRAVITY;
-	item->Position.xPos += item->ItemFlags[0] / 32;
-	item->Position.yPos += item->Animation.VerticalVelocity;
-	item->Position.zPos += item->ItemFlags[1] / 32;
+	item->Pose.Position.x += item->ItemFlags[0] / 32;
+	item->Pose.Position.y += item->Animation.VerticalVelocity;
+	item->Pose.Position.z += item->ItemFlags[1] / 32;
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
-	if (item->Position.yPos > dh)
+	if (item->Pose.Position.y > dh)
 	{
 		if (abs(item->Animation.VerticalVelocity) > 16)
 		{
 			int distance = sqrt(
-				pow(Camera.pos.x - item->Position.xPos, 2) +
-				pow(Camera.pos.y - item->Position.yPos, 2) +
-				pow(Camera.pos.z - item->Position.zPos, 2));
+				pow(Camera.pos.x - item->Pose.Position.x, 2) +
+				pow(Camera.pos.y - item->Pose.Position.y, 2) +
+				pow(Camera.pos.z - item->Pose.Position.z, 2));
 
 			if (distance < 16384)
 				Camera.bounce = -(((16384 - distance) * abs(item->Animation.VerticalVelocity)) / 16384);
 		}
 
-		if ((item->Position.yPos - dh) < CLICK(2))
-			item->Position.yPos = dh;
+		if ((item->Pose.Position.y - dh) < CLICK(2))
+			item->Pose.Position.y = dh;
 
 		if (item->Animation.VerticalVelocity <= 64)
 		{
@@ -77,19 +77,19 @@ void RollingBallControl(short itemNumber)
 			item->Animation.VerticalVelocity = -(short)(item->Animation.VerticalVelocity / 4);
 	}
 
-	int frontX = item->Position.xPos;
-	int frontZ = item->Position.zPos + CLICK(0.5f);
-	int backX  = item->Position.xPos;
-	int backZ  = item->Position.zPos - CLICK(0.5f);
-	int rightX = item->Position.xPos + CLICK(0.5f);
-	int rightZ = item->Position.zPos;
-	int leftX  = item->Position.xPos - CLICK(0.5f);
-	int leftZ  = item->Position.zPos;
+	int frontX = item->Pose.Position.x;
+	int frontZ = item->Pose.Position.z + CLICK(0.5f);
+	int backX  = item->Pose.Position.x;
+	int backZ  = item->Pose.Position.z - CLICK(0.5f);
+	int rightX = item->Pose.Position.x + CLICK(0.5f);
+	int rightZ = item->Pose.Position.z;
+	int leftX  = item->Pose.Position.x - CLICK(0.5f);
+	int leftZ  = item->Pose.Position.z;
 
-	auto frontFloor = GetCollision(frontX, item->Position.yPos, frontZ, item->RoomNumber);
-	auto backFloor  = GetCollision(backX,  item->Position.yPos, backZ,  item->RoomNumber);
-	auto rightFloor = GetCollision(rightX, item->Position.yPos, rightZ, item->RoomNumber);
-	auto leftFloor  = GetCollision(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
+	auto frontFloor = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
+	auto backFloor  = GetCollision(backX,  item->Pose.Position.y, backZ,  item->RoomNumber);
+	auto rightFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
+	auto leftFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
 
 	int frontHeight = frontFloor.Position.Floor - CLICK(2);
 	int backHeight  = backFloor.Position.Floor  - CLICK(2);
@@ -101,19 +101,19 @@ void RollingBallControl(short itemNumber)
 	int rightCeiling = rightFloor.Position.Ceiling + CLICK(2);
 	int leftCeiling  = leftFloor.Position.Ceiling  + CLICK(2);
 
-	frontX = item->Position.xPos;
-	frontZ = item->Position.zPos + CLICK(2);
-	backX  = item->Position.xPos;
-	backZ  = item->Position.zPos - CLICK(2);
-	rightX = item->Position.xPos + CLICK(2);
-	rightZ = item->Position.zPos;
-	leftX  = item->Position.xPos - CLICK(2);
-	leftZ  = item->Position.zPos;
+	frontX = item->Pose.Position.x;
+	frontZ = item->Pose.Position.z + CLICK(2);
+	backX  = item->Pose.Position.x;
+	backZ  = item->Pose.Position.z - CLICK(2);
+	rightX = item->Pose.Position.x + CLICK(2);
+	rightZ = item->Pose.Position.z;
+	leftX  = item->Pose.Position.x - CLICK(2);
+	leftZ  = item->Pose.Position.z;
 
-	auto fronFarFloor  = GetCollision(frontX, item->Position.yPos, frontZ, item->RoomNumber);
-	auto backFarFloor  = GetCollision(backX,  item->Position.yPos, backZ,  item->RoomNumber);
-	auto rightFarFloor = GetCollision(rightX, item->Position.yPos, rightZ, item->RoomNumber);
-	auto leftFarFloor  = GetCollision(leftX,  item->Position.yPos, leftZ,  item->RoomNumber);
+	auto fronFarFloor  = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
+	auto backFarFloor  = GetCollision(backX,  item->Pose.Position.y, backZ,  item->RoomNumber);
+	auto rightFarFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
+	auto leftFarFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
 
 	int frontFarHeight = fronFarFloor.Position.Floor  - CLICK(2);
 	int backFarHeight  = backFarFloor.Position.Floor  - CLICK(2);
@@ -125,11 +125,11 @@ void RollingBallControl(short itemNumber)
 	int rightFarCeiling = rightFarFloor.Position.Ceiling + CLICK(2);
 	int leftFarCeiling  = leftFarFloor.Position.Ceiling  + CLICK(2);
 
-	if (item->Position.yPos - dh > -CLICK(1) ||
-		item->Position.yPos - frontFarHeight >= CLICK(2) ||
-		item->Position.yPos - rightFarHeight >= CLICK(2) ||
-		item->Position.yPos - backFarHeight  >= CLICK(2) ||
-		item->Position.yPos - leftFarHeight  >= CLICK(2))
+	if (item->Pose.Position.y - dh > -CLICK(1) ||
+		item->Pose.Position.y - frontFarHeight >= CLICK(2) ||
+		item->Pose.Position.y - rightFarHeight >= CLICK(2) ||
+		item->Pose.Position.y - backFarHeight  >= CLICK(2) ||
+		item->Pose.Position.y - leftFarHeight  >= CLICK(2))
 	{
 		int counterZ = 0;
 
@@ -140,12 +140,12 @@ void RollingBallControl(short itemNumber)
 				if (item->ItemFlags[1] <= 0)
 				{
 					if (!item->ItemFlags[1] && item->ItemFlags[0])
-						item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
+						item->Pose.Position.z = (item->Pose.Position.z & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 				else
 				{
 					item->ItemFlags[1] = -item->ItemFlags[1] / 2;
-					item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
+					item->Pose.Position.z = (item->Pose.Position.z & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (frontHeight == dh)
@@ -161,12 +161,12 @@ void RollingBallControl(short itemNumber)
 				if (item->ItemFlags[1] >= 0)
 				{
 					if (!item->ItemFlags[1] && item->ItemFlags[0])
-						item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
+						item->Pose.Position.z = (item->Pose.Position.z & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 				else
 				{
 					item->ItemFlags[1] = -item->ItemFlags[1] / 2;
-					item->Position.zPos = (item->Position.zPos & ~(CLICK(4) - 1)) | CLICK(2);
+					item->Pose.Position.z = (item->Pose.Position.z & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (backHeight == dh)
@@ -192,12 +192,12 @@ void RollingBallControl(short itemNumber)
 				if (item->ItemFlags[0] >= 0)
 				{
 					if (!item->ItemFlags[0] && item->ItemFlags[1])
-						item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
+						item->Pose.Position.x = (item->Pose.Position.x & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 				else
 				{
 					item->ItemFlags[0] = -item->ItemFlags[0] / 2;
-					item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
+					item->Pose.Position.x = (item->Pose.Position.x & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (leftHeight == dh)
@@ -213,12 +213,12 @@ void RollingBallControl(short itemNumber)
 				if (item->ItemFlags[0] <= 0)
 				{
 					if (!item->ItemFlags[0] && item->ItemFlags[1])
-						item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
+						item->Pose.Position.x = (item->Pose.Position.x & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 				else
 				{
 					item->ItemFlags[0] = -item->ItemFlags[0] / 2;
-					item->Position.xPos = (item->Position.xPos & ~(CLICK(4) - 1)) | CLICK(2);
+					item->Pose.Position.x = (item->Pose.Position.x & ~(CLICK(4) - 1)) | CLICK(2);
 				}
 			}
 			else if (rightHeight == dh)
@@ -256,22 +256,22 @@ void RollingBallControl(short itemNumber)
 	if (item->ItemFlags[1] || item->ItemFlags[0])
 		angle = phd_atan(item->ItemFlags[1], item->ItemFlags[0]);
 	else
-		angle = item->Position.yRot;
+		angle = item->Pose.Orientation.y;
 
-	if (item->Position.yRot != angle)
+	if (item->Pose.Orientation.y != angle)
 	{
-		if (((angle - item->Position.yRot) & 0x7fff) >= 512)
+		if (((angle - item->Pose.Orientation.y) & 0x7fff) >= 512)
 		{
-			if (angle <= item->Position.yRot || angle - item->Position.yRot >= 0x8000)
-				item->Position.yRot -= CLICK(2);
+			if (angle <= item->Pose.Orientation.y || angle - item->Pose.Orientation.y >= 0x8000)
+				item->Pose.Orientation.y -= CLICK(2);
 			else
-				item->Position.yRot += CLICK(2);
+				item->Pose.Orientation.y += CLICK(2);
 		}
 		else
-			item->Position.yRot = angle;
+			item->Pose.Orientation.y = angle;
 	}
 
-	item->Position.xRot -= (abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2;
+	item->Pose.Orientation.x -= (abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2;
 
 	TestTriggers(item, true);
 }
@@ -292,18 +292,18 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
 
 			lara->HitPoints -= 100;
-			int x = lara->Position.xPos - item->Position.xPos;
-			int y = (lara->Position.yPos - 350) - (item->Position.yPos - 512);
-			int z = lara->Position.zPos - item->Position.zPos;
+			int x = lara->Pose.Position.x - item->Pose.Position.x;
+			int y = (lara->Pose.Position.y - 350) - (item->Pose.Position.y - 512);
+			int z = lara->Pose.Position.z - item->Pose.Position.z;
 			short d = (short)sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 
 			if (d < 512)
 				d = 512;
 
-			x = item->Position.xPos + ((x * 512) / d);
-			y = item->Position.yPos - 512 + ((y * 512) / d);
-			z = item->Position.zPos + ((z * 512) / d);
-			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Position.yRot, item->RoomNumber);
+			x = item->Pose.Position.x + ((x * 512) / d);
+			y = item->Pose.Position.y - 512 + ((y * 512) / d);
+			z = item->Pose.Position.z + ((z * 512) / d);
+			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
 		}
 		else
 		{
@@ -311,9 +311,9 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 			if (lara->HitPoints > 0)
 			{
 				lara->HitPoints = -1;//?
-				lara->Position.yRot = item->Position.yRot;
-				lara->Position.zPos = 0;
-				lara->Position.zRot = 0;	
+				lara->Pose.Orientation.y = item->Pose.Orientation.y;
+				lara->Pose.Position.z = 0;
+				lara->Pose.Orientation.z = 0;	
 
 				lara->Animation.AnimNumber = LA_BOULDER_DEATH;
 				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].frameBase;
@@ -325,10 +325,10 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 				Camera.targetElevation = -ANGLE(25);
 				for (int i = 0; i < 15; i++)
 				{
-					int x = lara->Position.xPos + (GetRandomControl() - ANGLE(180.0f) / 256);
-					int y = lara->Position.yPos - (GetRandomControl() / 64);
-					int z = lara->Position.zPos + (GetRandomControl() - ANGLE(180.0f) / 256);
-					short d = ((GetRandomControl() - ANGLE(180) / 8) + item->Position.yRot);
+					int x = lara->Pose.Position.x + (GetRandomControl() - ANGLE(180.0f) / 256);
+					int y = lara->Pose.Position.y - (GetRandomControl() / 64);
+					int z = lara->Pose.Position.z + (GetRandomControl() - ANGLE(180.0f) / 256);
+					short d = ((GetRandomControl() - ANGLE(180) / 8) + item->Pose.Orientation.y);
 					DoBloodSplat(x, y, z, (short)(item->Animation.Velocity * 2), d, item->RoomNumber);
 				}
 			}
@@ -357,7 +357,7 @@ void ClassicRollingBallControl(short itemNum)
 			return;
 		}
 
-		if (item->Position.yPos < item->Floor)
+		if (item->Pose.Position.y < item->Floor)
 		{
 			if (!item->Animation.Airborne)
 			{
@@ -368,25 +368,25 @@ void ClassicRollingBallControl(short itemNum)
 		else if (item->Animation.ActiveState == 0)
 			item->Animation.TargetState = 1;
 
-		oldx = item->Position.xPos;
-		oldz = item->Position.zPos;
+		oldx = item->Pose.Position.x;
+		oldz = item->Pose.Position.z;
 		AnimateItem(item);
 		roomNum = item->RoomNumber;
-		floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNum);
+		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNum);
 		if (item->RoomNumber != roomNum)
 			ItemNewRoom(itemNum, item->RoomNumber);
 
-		item->Floor = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-		TestTriggers(item->Position.xPos, item->Position.yPos, item->Position.zPos, roomNum, true);
+		TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNum, true);
 
-		if (item->Position.yPos >= (int)floor - 256)
+		if (item->Pose.Position.y >= (int)floor - 256)
 		{
 			item->Animation.Airborne = false;
 			item->Animation.VerticalVelocity = 0;
-			item->Position.yPos = item->Floor;
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Position, 0);
-			dist = sqrt((SQUARE(Camera.mikePos.x - item->Position.xPos)) + (SQUARE(Camera.mikePos.z - item->Position.zPos)));
+			item->Pose.Position.y = item->Floor;
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose, 0);
+			dist = sqrt((SQUARE(Camera.mikePos.x - item->Pose.Position.x)) + (SQUARE(Camera.mikePos.z - item->Pose.Position.z)));
 			if (dist < 10240)
 				Camera.bounce = -40 * (10240 - dist) / 10240;
 		}
@@ -408,23 +408,23 @@ void ClassicRollingBallControl(short itemNum)
 			ydist = 1024;
 		}
 
-		x = item->Position.xPos + dist * phd_sin(item->Position.yRot);
-		z = item->Position.zPos + dist * phd_cos(item->Position.yRot);
+		x = item->Pose.Position.x + dist * phd_sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + dist * phd_cos(item->Pose.Orientation.y);
 
-		floor = GetFloor(x, item->Position.yPos, z, &roomNum);
-		y1 = GetFloorHeight(floor, x, item->Position.yPos, z);
+		floor = GetFloor(x, item->Pose.Position.y, z, &roomNum);
+		y1 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
 
 		roomNum = item->RoomNumber;
-		floor = GetFloor(x, item->Position.yPos - ydist, z, &roomNum);
-		y2 = GetCeiling(floor, x, item->Position.yPos - ydist, z);
+		floor = GetFloor(x, item->Pose.Position.y - ydist, z, &roomNum);
+		y2 = GetCeiling(floor, x, item->Pose.Position.y - ydist, z);
 
-		if (y1 < item->Position.yPos || y2 > (item->Position.yPos-ydist)) //there's something wrong here, this if statement returns true, executing this block, deactivating the boulders.
+		if (y1 < item->Pose.Position.y || y2 > (item->Pose.Position.y-ydist)) //there's something wrong here, this if statement returns true, executing this block, deactivating the boulders.
 		{
 			/*stupid sound crap hardcoded to object # idk*/
 			item->Status = ITEM_DEACTIVATED;
-			item->Position.yPos = item->Floor;
-			item->Position.xPos = oldx;
-			item->Position.zPos = oldz;
+			item->Pose.Position.y = item->Floor;
+			item->Pose.Position.x = oldx;
+			item->Pose.Position.z = oldz;
 			item->Animation.Velocity = 0;
 			item->Animation.VerticalVelocity = 0;
 			item->TouchBits = 0;
@@ -436,9 +436,9 @@ void ClassicRollingBallControl(short itemNum)
 		{
 			item->Status = ITEM_NOT_ACTIVE;
 			old = (GAME_VECTOR*)item->Data;
-			item->Position.xPos = old->x;
-			item->Position.yPos = old->y;
-			item->Position.zPos = old->z;
+			item->Pose.Position.x = old->x;
+			item->Pose.Position.y = old->y;
+			item->Pose.Position.z = old->z;
 			if (item->RoomNumber != old->roomNumber)
 			{
 				RemoveDrawnItem(itemNum);
@@ -467,9 +467,9 @@ void InitialiseClassicRollingBall(short itemNum)
 	item = &g_Level.Items[itemNum];
 	item->Data = GAME_VECTOR{ };
 	old = item->Data;
-	old->x = item->Position.xPos;
-	old->y = item->Position.yPos;
-	old->z = item->Position.zPos;
+	old->x = item->Pose.Position.x;
+	old->y = item->Pose.Position.y;
+	old->z = item->Pose.Position.z;
 	old->roomNumber = item->RoomNumber;
 
 }

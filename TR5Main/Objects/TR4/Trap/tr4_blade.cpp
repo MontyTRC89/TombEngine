@@ -21,9 +21,9 @@ namespace TEN::Entities::TR4
 		{
 			if (TestBoundsCollide(bladeItem, laraItem, coll->Setup.Radius))
 			{
-				int oldX = laraItem->Position.xPos;
-				int oldY = laraItem->Position.yPos;
-				int oldZ = laraItem->Position.zPos;
+				int oldX = laraItem->Pose.Position.x;
+				int oldY = laraItem->Pose.Position.y;
+				int oldZ = laraItem->Pose.Position.z;
 
 				int dx = 0;
 				int dy = 0;
@@ -33,16 +33,16 @@ namespace TEN::Entities::TR4
 				{
 					laraItem->HitPoints -= bladeItem->ItemFlags[3];
 
-					dx = oldX - laraItem->Position.xPos;
-					dy = oldY - laraItem->Position.yPos;
-					dz = oldZ - laraItem->Position.zPos;
+					dx = oldX - laraItem->Pose.Position.x;
+					dy = oldY - laraItem->Pose.Position.y;
+					dz = oldZ - laraItem->Pose.Position.z;
 
 					if ((dx || dy || dz) && TriggerActive(bladeItem))
 					{
 						DoBloodSplat(
-							(GetRandomControl() & 0x3F) + laraItem->Position.xPos - 32,
-							laraItem->Position.yPos - (GetRandomControl() & 0x1FF) - 256,
-							(GetRandomControl() & 0x3F) + laraItem->Position.zPos - 32,
+							(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
+							laraItem->Pose.Position.y - (GetRandomControl() & 0x1FF) - 256,
+							(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 							(GetRandomControl() & 3) + (bladeItem->ItemFlags[3] / 32) + 2,
 							2 * GetRandomControl(),
 							laraItem->RoomNumber
@@ -51,9 +51,9 @@ namespace TEN::Entities::TR4
 
 					if (!coll->Setup.EnableObjectPush)
 					{
-						laraItem->Position.xPos += dx;
-						laraItem->Position.yPos += dy;
-						laraItem->Position.zPos += dz;
+						laraItem->Pose.Position.x += dx;
+						laraItem->Pose.Position.y += dy;
+						laraItem->Pose.Position.z += dz;
 					}
 				}
 			}

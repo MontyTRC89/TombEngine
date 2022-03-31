@@ -18,33 +18,33 @@ namespace TEN::Entities::Traps
 			LaraItem->HitPoints -= 25;
 			LaraItem->HitStatus = true;
 			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
-			DoBloodSplat(item->Position.xPos, item->Position.yPos, item->Position.zPos, (GetRandomControl() & 3) + 4, LaraItem->Position.yRot, LaraItem->RoomNumber);
+			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else
 		{
-			int oldX = item->Position.xPos;
-			int oldZ = item->Position.zPos - 1000;
+			int oldX = item->Pose.Position.x;
+			int oldZ = item->Pose.Position.z - 1000;
 
-			int velocity = item->Animation.Velocity * phd_cos(item->Position.xRot);
+			int velocity = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
 
-			item->Position.xPos += velocity * phd_sin(item->Position.yRot);
-			item->Position.yPos -= item->Animation.Velocity * phd_sin(item->Position.xRot);
-			item->Position.zPos += velocity * phd_cos(item->Position.yRot);
+			item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
+			item->Pose.Position.y -= item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
+			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
 
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 			if (item->RoomNumber != roomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
 
-			int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			item->Floor = height;
 
-			if (item->Position.yPos >= height)
+			if (item->Pose.Position.y >= height)
 			{
 				for (int i = 0; i < 4; i++)
-					TriggerDartSmoke(oldX, item->Position.yPos, oldZ, 0, 0, true);
+					TriggerDartSmoke(oldX, item->Pose.Position.y, oldZ, 0, 0, true);
 
 				KillItem(itemNumber);
 			}
@@ -78,7 +78,7 @@ namespace TEN::Entities::Traps
 			int x = 0;
 			int z = 0;
 
-			switch (item->Position.yRot)
+			switch (item->Pose.Orientation.y)
 			{
 			case 0:
 				z = WALL_SIZE / 2;
@@ -97,14 +97,14 @@ namespace TEN::Entities::Traps
 				break;
 			}
 
-			dartItem->Position.xPos = x + item->Position.xPos;
-			dartItem->Position.yPos = item->Position.yPos - WALL_SIZE / 2;
-			dartItem->Position.zPos = z + item->Position.zPos;
+			dartItem->Pose.Position.x = x + item->Pose.Position.x;
+			dartItem->Pose.Position.y = item->Pose.Position.y - WALL_SIZE / 2;
+			dartItem->Pose.Position.z = z + item->Pose.Position.z;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Position.xRot = 0;
-			dartItem->Position.yRot = item->Position.yRot + -ANGLE(180);
+			dartItem->Pose.Orientation.x = 0;
+			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
 			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;
@@ -132,20 +132,20 @@ namespace TEN::Entities::Traps
 				else
 					xv = -(xf & random);
 
-				TriggerDartSmoke(dartItem->Position.xPos, dartItem->Position.yPos, dartItem->Position.zPos, xv, zv, false);
+				TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, xv, zv, false);
 			}
 
 			AddActiveItem(dartItemNumber);
 			dartItem->Status = ITEM_ACTIVE;
 
-			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Position, 0);
+			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Pose, 0);
 		}
 	}
 
 	void TriggerDartSmoke(int x, int y, int z, int xv, int zv, bool hit)
 	{
-		int dx = LaraItem->Position.xPos - x;
-		int dz = LaraItem->Position.zPos - z;
+		int dx = LaraItem->Pose.Position.x - x;
+		int dz = LaraItem->Pose.Position.z - z;
 
 		if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 			return;

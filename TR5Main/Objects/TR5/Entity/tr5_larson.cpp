@@ -43,23 +43,23 @@ void InitialiseLarson(short itemNum)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	short rotY = item->Position.yRot;
+	short rotY = item->Pose.Orientation.y;
 
 	if (rotY > ANGLE(22.5f) && rotY < 28672)
 	{
-		item->Position.xPos += STEPUP_HEIGHT;
+		item->Pose.Position.x += STEPUP_HEIGHT;
 	}
 	else if (rotY < -ANGLE(22.5f) && rotY > -28672)
 	{
-		item->Position.xPos -= STEPUP_HEIGHT;
+		item->Pose.Position.x -= STEPUP_HEIGHT;
 	}
 	else if (rotY < -20480 || rotY > 20480)
 	{
-		item->Position.zPos -= STEPUP_HEIGHT;
+		item->Pose.Position.z -= STEPUP_HEIGHT;
 	}
 	else if (rotY > -8192 || rotY < 8192)
 	{
-		item->Position.zPos += STEPUP_HEIGHT;
+		item->Pose.Position.z += STEPUP_HEIGHT;
 	}
 }
 
@@ -186,13 +186,13 @@ void LarsonControl(short itemNumber)
 					if (abs(info.angle) >= ANGLE(2))
 					{
 						if (info.angle > 0)
-							item->Position.yRot += ANGLE(2);
+							item->Pose.Orientation.y += ANGLE(2);
 						else
-							item->Position.yRot -= ANGLE(2);
+							item->Pose.Orientation.y -= ANGLE(2);
 					}
 					else
 					{
-						item->Position.yRot += info.angle;
+						item->Pose.Orientation.y += info.angle;
 					}
 				}
 				else
@@ -287,13 +287,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle > 0)
-					item->Position.yRot += ANGLE(2);
+					item->Pose.Orientation.y += ANGLE(2);
 				else
-					item->Position.yRot -= ANGLE(2);
+					item->Pose.Orientation.y -= ANGLE(2);
 			}
 			else
 			{
-				item->Position.yRot += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 
 			if (Targetable(item, &info))
@@ -331,13 +331,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= ANGLE(2))
 			{
 				if (info.angle > 0)
-					item->Position.yRot += ANGLE(2);
+					item->Pose.Orientation.y += ANGLE(2);
 				else
-					item->Position.yRot -= ANGLE(2);
+					item->Pose.Orientation.y -= ANGLE(2);
 			}
 			else
 			{
-				item->Position.yRot += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{

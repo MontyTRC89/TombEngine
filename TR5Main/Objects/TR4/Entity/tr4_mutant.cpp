@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Position.yRot;
+			headAngle = item->Pose.Orientation.y;
 			return;
 		}
 
@@ -148,9 +148,9 @@ namespace TEN::Entities::TR4
 		PHD_VECTOR pos = { 0, 0, 0 };
 		GetJointAbsPosition(item, &pos, joint);
 
-		int x = enemy->Position.xPos - pos.x;
-		int z = enemy->Position.zPos - pos.z;
-		headAngle = (short)(phd_atan(z, x) - item->Position.yRot) / 2;
+		int x = enemy->Pose.Position.x - pos.x;
+		int z = enemy->Pose.Position.z - pos.z;
+		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
 	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
@@ -174,46 +174,46 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Position.yRot));
+		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:
-			item->Position.zPos += distance;
+			item->Pose.Position.z += distance;
 			break;
 
 		case C_EAST:
-			item->Position.xPos += distance;
+			item->Pose.Position.x += distance;
 			break;
 
 		case C_SOUTH:
-			item->Position.zPos -= distance;
+			item->Pose.Position.z -= distance;
 			break;
 
 		case C_WEST:
-			item->Position.xPos -= distance;
+			item->Pose.Position.x -= distance;
 			break;
 		}
 	}
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Position.yRot));
+		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:
-			item->Position.zPos -= distance;
+			item->Pose.Position.z -= distance;
 			break;
 
 		case C_EAST:
-			item->Position.xPos -= distance;
+			item->Pose.Position.x -= distance;
 			break;
 
 		case C_SOUTH:
-			item->Position.zPos += distance;
+			item->Pose.Position.z += distance;
 			break;
 
 		case C_WEST:
-			item->Position.xPos += distance;
+			item->Pose.Position.x += distance;
 			break;
 		}
 	}
@@ -221,9 +221,9 @@ namespace TEN::Entities::TR4
 	static void MutantAIFix(ITEM_INFO* item, AI_INFO* info)
 	{
 		MoveItemFront(item, SECTOR(2));
-		item->Position.yPos -= CLICK(3);
+		item->Pose.Position.y -= CLICK(3);
 		CreatureAIInfo(item, info);
-		item->Position.yPos += CLICK(3);
+		item->Pose.Position.y += CLICK(3);
 		MoveItemBack(item, SECTOR(2));
 	}
 

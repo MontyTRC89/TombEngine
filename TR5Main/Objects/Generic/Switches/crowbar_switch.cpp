@@ -54,7 +54,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraitem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraitem))
 				{
@@ -81,7 +81,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraitem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraitem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 			}
 			else
 			{
@@ -120,11 +120,11 @@ namespace TEN::Entities::Switches
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{
-					if (OldPickupPos.x != laraitem->Position.xPos || OldPickupPos.y != laraitem->Position.yPos || OldPickupPos.z != laraitem->Position.zPos)
+					if (OldPickupPos.x != laraitem->Pose.Position.x || OldPickupPos.y != laraitem->Pose.Position.y || OldPickupPos.z != laraitem->Pose.Position.z)
 					{
-						OldPickupPos.x = laraitem->Position.xPos;
-						OldPickupPos.y = laraitem->Position.yPos;
-						OldPickupPos.z = laraitem->Position.zPos;
+						OldPickupPos.x = laraitem->Pose.Position.x;
+						OldPickupPos.y = laraitem->Pose.Position.y;
+						OldPickupPos.z = laraitem->Pose.Position.z;
 						SayNo();
 					}
 				}

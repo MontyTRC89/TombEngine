@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	VectorInt3 Coordinates;
+	Vector3 Coordinates;
 	int RoomNumber;
 
 	FLOOR_INFO* Block;

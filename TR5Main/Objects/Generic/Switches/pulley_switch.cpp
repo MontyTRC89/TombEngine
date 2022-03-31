@@ -51,17 +51,17 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			short oldYrot = switchItem->Position.yRot;
-			switchItem->Position.yRot = laraItem->Position.yRot;
+			short oldYrot = switchItem->Pose.Orientation.y;
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
-					if (OldPickupPos.x != laraItem->Position.xPos || OldPickupPos.y != laraItem->Position.yPos || OldPickupPos.z != laraItem->Position.zPos)
+					if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
 					{
-						OldPickupPos.x = laraItem->Position.xPos;
-						OldPickupPos.y = laraItem->Position.yPos;
-						OldPickupPos.z = laraItem->Position.zPos;
+						OldPickupPos.x = laraItem->Pose.Position.x;
+						OldPickupPos.y = laraItem->Pose.Position.y;
+						OldPickupPos.z = laraItem->Pose.Position.z;
 						SayNo();
 					}
 				}
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 
 					AddActiveItem(itemNumber);
 
-					switchItem->Position.yRot = oldYrot;
+					switchItem->Pose.Orientation.y = oldYrot;
 					switchItem->Status = ITEM_ACTIVE;
 
 					laraInfo->Control.IsMoving = false;
@@ -84,7 +84,7 @@ namespace TEN::Entities::Switches
 				else
 					laraInfo->InteractedItem = itemNumber;
 				
-				switchItem->Position.yRot = oldYrot;
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
 			{
@@ -94,7 +94,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				switchItem->Position.yRot = oldYrot;
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 		}
 		else if (laraItem->Animation.ActiveState != LS_PULLEY)

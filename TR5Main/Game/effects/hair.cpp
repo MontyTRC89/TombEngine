@@ -208,9 +208,9 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 		Hairs[ponytail][0].pos.zPos = pos.z;
 
 		short roomNumber = item->RoomNumber;
-		int x = item->Position.xPos + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-		int y = item->Position.yPos + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
-		int z = item->Position.zPos + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
+		int x = item->Pose.Position.x + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int y = item->Pose.Position.y + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
+		int z = item->Pose.Position.z + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
 		int wh = GetWaterHeight(x, y, z, roomNumber);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)

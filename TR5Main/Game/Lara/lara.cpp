@@ -433,7 +433,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	if (!lara->Control.Locked)
 		lara->LocationPad = 128;
 
-	auto oldPos = Vector3(item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	auto oldPos = Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -457,7 +457,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 	int heightFromWater;
 	if (waterHeight != NO_HEIGHT)
-		heightFromWater = item->Position.yPos - waterHeight;
+		heightFromWater = item->Pose.Position.y - waterHeight;
 	else
 		heightFromWater = NO_HEIGHT;
 	lara->WaterSurfaceDist = -heightFromWater;
@@ -480,7 +480,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 			{
 				if (isWater)
 				{
-					item->Position.yPos += CLICK(0.5f) - 28;
+					item->Pose.Position.y += CLICK(0.5f) - 28;
 					item->Animation.Airborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
@@ -491,21 +491,21 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Position.xRot = -ANGLE(45.0f);
+						item->Pose.Orientation.x = -ANGLE(45.0f);
 						item->Animation.VerticalVelocity *= 2;
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
 						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Position.xRot = -ANGLE(85.0f);
+						item->Pose.Orientation.x = -ANGLE(85.0f);
 						item->Animation.VerticalVelocity *= 2;
 						lara->Control.HandStatus = HandStatus::Free;
 					}
 					else
 					{
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->Position.xRot = -ANGLE(45.0f);
+						item->Pose.Orientation.x = -ANGLE(45.0f);
 						item->Animation.VerticalVelocity = item->Animation.VerticalVelocity / 2 * 3;
 					}
 
@@ -533,7 +533,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Position.yPos = waterHeight + (SECTOR(1) - 24);
+						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -565,12 +565,12 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 						SetAnimation(item, LA_UNDERWATER_RESURFACE);
 						ResetLaraLean(item);
 						ResetLaraFlex(item);
-						item->Position.yPos = waterHeight;
+						item->Pose.Position.y = waterHeight;
 						item->Animation.VerticalVelocity = 0;
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
-						SoundEffect(SFX_TR4_LARA_BREATH, &item->Position, 2);
+						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
 					}
 				}
 			}
@@ -579,12 +579,12 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
 				ResetLaraLean(item);
 				ResetLaraFlex(item);
-				item->Position.yPos = waterHeight + 1;
+				item->Pose.Position.y = waterHeight + 1;
 				item->Animation.VerticalVelocity = 0;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 				UpdateItemRoom(item, 0);
-				SoundEffect(SFX_TR4_LARA_BREATH, &item->Position, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
 			}
 
 			break;
@@ -622,7 +622,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 					SetAnimation(item, LA_ONWATER_IDLE);
 					ResetLaraLean(item);
 					ResetLaraFlex(item);
-					item->Position.yPos += 1 - heightFromWater;
+					item->Pose.Position.y += 1 - heightFromWater;
 					item->Animation.Airborne = false;
 					item->Animation.VerticalVelocity = 0;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
@@ -722,9 +722,9 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	Statistics.Game.Distance += sqrt(
-		pow(item->Position.xPos - oldPos.x, 2) +
-		pow(item->Position.yPos - oldPos.y, 2) +
-		pow(item->Position.zPos - oldPos.z, 2));
+		pow(item->Pose.Position.x - oldPos.x, 2) +
+		pow(item->Pose.Position.y - oldPos.y, 2) +
+		pow(item->Pose.Position.z - oldPos.z, 2));
 }
 
 void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
@@ -744,9 +744,9 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
 
-	coll->Setup.OldPosition.x = item->Position.xPos;
-	coll->Setup.OldPosition.y = item->Position.yPos;
-	coll->Setup.OldPosition.z = item->Position.zPos;
+	coll->Setup.OldPosition.x = item->Pose.Position.x;
+	coll->Setup.OldPosition.y = item->Pose.Position.y;
+	coll->Setup.OldPosition.z = item->Pose.Position.z;
 	coll->Setup.OldState = item->Animation.ActiveState;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
@@ -826,9 +826,9 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition.x = item->Position.xPos;
-	coll->Setup.OldPosition.y = item->Position.yPos;
-	coll->Setup.OldPosition.z = item->Position.zPos;
+	coll->Setup.OldPosition.x = item->Pose.Position.x;
+	coll->Setup.OldPosition.y = item->Pose.Position.y;
+	coll->Setup.OldPosition.z = item->Pose.Position.z;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);
@@ -848,7 +848,7 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.TurnRate -= ANGLE(0.5f) * sign;
 	else
 		lara->Control.TurnRate = 0;
-	item->Position.yRot += lara->Control.TurnRate;
+	item->Pose.Orientation.y += lara->Control.TurnRate;
 
 	// Reset lean.
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
@@ -859,8 +859,8 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	item->Position.xPos += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
-	item->Position.zPos += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
+	item->Pose.Position.x += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
+	item->Pose.Position.z += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
 
 	DoObjectCollision(item, coll);
 
@@ -899,9 +899,9 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition.x = item->Position.xPos;
-	coll->Setup.OldPosition.y = item->Position.yPos;
-	coll->Setup.OldPosition.z = item->Position.zPos;
+	coll->Setup.OldPosition.x = item->Pose.Position.x;
+	coll->Setup.OldPosition.y = item->Pose.Position.y;
+	coll->Setup.OldPosition.z = item->Pose.Position.z;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);
@@ -930,7 +930,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.TurnRate -= ANGLE(2.0f);
 	else
 		lara->Control.TurnRate = 0;
-	item->Position.yRot += lara->Control.TurnRate;
+	item->Pose.Orientation.y += lara->Control.TurnRate;
 
 	if (level->LaraType == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -938,24 +938,24 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetLaraLean(item, 8.0f, true, false);
 
-	if (item->Position.xRot < -ANGLE(85.0f))
-		item->Position.xRot = -ANGLE(85.0f);
-	else if (item->Position.xRot > ANGLE(85.0f))
-		item->Position.xRot = ANGLE(85.0f);
+	if (item->Pose.Orientation.x < -ANGLE(85.0f))
+		item->Pose.Orientation.x = -ANGLE(85.0f);
+	else if (item->Pose.Orientation.x > ANGLE(85.0f))
+		item->Pose.Orientation.x = ANGLE(85.0f);
 
 	if (level->LaraType == LaraType::Divesuit)
 	{
-		if (item->Position.zRot > ANGLE(44.0f))
-			item->Position.zRot = ANGLE(44.0f);
-		else if (item->Position.zRot < -ANGLE(44.0f))
-			item->Position.zRot = -ANGLE(44.0f);
+		if (item->Pose.Orientation.z > ANGLE(44.0f))
+			item->Pose.Orientation.z = ANGLE(44.0f);
+		else if (item->Pose.Orientation.z < -ANGLE(44.0f))
+			item->Pose.Orientation.z = -ANGLE(44.0f);
 	}
 	else
 	{
-		if (item->Position.zRot > ANGLE(22.0f))
-			item->Position.zRot = ANGLE(22.0f);
-		else if (item->Position.zRot < -ANGLE(22.0f))
-			item->Position.zRot = -ANGLE(22.0f);
+		if (item->Pose.Orientation.z > ANGLE(22.0f))
+			item->Pose.Orientation.z = ANGLE(22.0f);
+		else if (item->Pose.Orientation.z < -ANGLE(22.0f))
+			item->Pose.Orientation.z = -ANGLE(22.0f);
 	}
 
 	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
@@ -963,9 +963,9 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	item->Position.xPos += round(phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_sin(item->Position.yRot) / 4);
-	item->Position.yPos -= round(item->Animation.VerticalVelocity * phd_sin(item->Position.xRot) / 4);
-	item->Position.zPos += round(phd_cos(item->Position.xRot) * item->Animation.VerticalVelocity * phd_cos(item->Position.yRot) / 4);
+	item->Pose.Position.x += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.y) / 4);
+	item->Pose.Position.y -= round(item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.x) / 4);
+	item->Pose.Position.z += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_cos(item->Pose.Orientation.y) / 4);
 
 	DoObjectCollision(item, coll);
 
@@ -1001,8 +1001,8 @@ void LaraCheat(ITEM_INFO* item, CollisionInfo* coll)
 		else
 		{
 			SetAnimation(item, LA_STAND_SOLID);
-			item->Position.xRot = 0;
-			item->Position.zRot = 0;
+			item->Pose.Orientation.x = 0;
+			item->Pose.Orientation.z = 0;
 			ResetLaraFlex(item);
 			lara->Control.WaterStatus = WaterStatus::Dry;
 		}

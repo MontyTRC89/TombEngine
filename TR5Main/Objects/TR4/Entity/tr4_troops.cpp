@@ -110,13 +110,13 @@ void TroopsControl(short itemNumber)
 
 					angle = 0;
 
-					item->Position.xPos = creature->Enemy->Position.xPos;
-					item->Position.yPos = creature->Enemy->Position.yPos;
-					item->Position.zPos = creature->Enemy->Position.zPos;
+					item->Pose.Position.x = creature->Enemy->Pose.Position.x;
+					item->Pose.Position.y = creature->Enemy->Pose.Position.y;
+					item->Pose.Position.z = creature->Enemy->Pose.Position.z;
 
-					item->Position.xRot = creature->Enemy->Position.xRot;
-					item->Position.yRot = creature->Enemy->Position.yRot;
-					item->Position.zRot = creature->Enemy->Position.zRot;
+					item->Pose.Orientation.x = creature->Enemy->Pose.Orientation.x;
+					item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.y;
+					item->Pose.Orientation.z = creature->Enemy->Pose.Orientation.z;
 
 					creature->Enemy->TriggerFlags = 99;
 				}
@@ -158,9 +158,9 @@ void TroopsControl(short itemNumber)
 						if (currentItem->ObjectNumber != ID_TROOPS &&
 							(currentItem != LaraItem || creature->HurtByLara))
 						{
-							dx = currentItem->Position.xPos - item->Position.xPos;
-							dy = currentItem->Position.yPos - item->Position.yPos;
-							dz = currentItem->Position.zPos - item->Position.zPos;
+							dx = currentItem->Pose.Position.x - item->Pose.Position.x;
+							dy = currentItem->Pose.Position.y - item->Pose.Position.y;
+							dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
 							distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
 
@@ -189,10 +189,10 @@ void TroopsControl(short itemNumber)
 		}
 		else
 		{
-			dx = LaraItem->Position.xPos - item->Position.xPos;
-			dz = LaraItem->Position.zPos - item->Position.zPos;
+			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			distance = SQUARE(dx) + SQUARE(dz);
-			rot = phd_atan(dz, dx) - item->Position.yRot;
+			rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
 		}
 
 		if (!creature->HurtByLara && creature->Enemy == LaraItem)
@@ -223,16 +223,16 @@ void TroopsControl(short itemNumber)
 				{
 					if (info.angle >= 0)
 					{
-						item->Position.yRot += ANGLE(10);
+						item->Pose.Orientation.y += ANGLE(10);
 					}
 					else
 					{
-						item->Position.yRot -= ANGLE(10);
+						item->Pose.Orientation.y -= ANGLE(10);
 					}
 				}
 				else
 				{
-					item->Position.yRot += info.angle;
+					item->Pose.Orientation.y += info.angle;
 				}
 			}
 

@@ -17,9 +17,9 @@ namespace Footprints {
 
 	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition) 
 	{
-		int x = item.Position.xPos;
-		int y = item.Position.yPos;
-		int z = item.Position.zPos;
+		int x = item.Pose.Position.x;
+		int y = item.Pose.Position.y;
+		int z = item.Pose.Position.z;
 		short roomNumber = item.RoomNumber;
 
 		auto floor = GetFloor(x, y, z, &roomNumber);
@@ -153,7 +153,7 @@ namespace Footprints {
 
 		// HACK: must be here until reference wad2 is revised
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
-			SoundEffect(fx, &item->Position, 0);
+			SoundEffect(fx, &item->Pose, 0);
 
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
 			floor->Material != FLOOR_MATERIAL::Snow &&
@@ -163,9 +163,9 @@ namespace Footprints {
 
 		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Position.yRot + ANGLE(180));
-		auto s = phd_sin(item->Position.yRot + ANGLE(180));
-		auto yRot = TO_RAD(item->Position.yRot);
+		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180));
+		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180));
+		auto yRot = TO_RAD(item->Pose.Orientation.y);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 
