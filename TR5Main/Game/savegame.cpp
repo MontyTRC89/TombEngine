@@ -726,6 +726,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::ScriptTable> scriptTableOffset;
 		flatbuffers::Offset<Save::stringTable> strOffset;
 		flatbuffers::Offset<Save::doubleTable> doubleOffset;
+		flatbuffers::Offset<Save::boolTable> boolOffset;
 
 		if (std::holds_alternative<std::string>(s))
 		{
@@ -739,6 +740,12 @@ bool SaveGame::Save(int slot)
 			Save::doubleTableBuilder dtb{ fbb };
 			dtb.add_scalar(std::get<double>(s));
 			doubleOffset = dtb.Finish();
+		}
+		else if (std::holds_alternative<bool>(s))
+		{
+			Save::boolTableBuilder btb{ fbb };
+			btb.add_scalar(std::get<bool>(s));
+			boolOffset = btb.Finish();
 		}
 		else if (std::holds_alternative<IndexTable>(s))
 		{
@@ -765,6 +772,11 @@ bool SaveGame::Save(int slot)
 		{
 			ut.add_u_type(Save::VarUnion::num);
 			ut.add_u(doubleOffset.Union());
+		}
+		else if (std::holds_alternative<bool>(s))
+		{
+			ut.add_u_type(Save::VarUnion::boolean);
+			ut.add_u(boolOffset.Union());
 		}
 		else if (std::holds_alternative<IndexTable>(s))
 		{
@@ -1461,6 +1473,10 @@ bool SaveGame::Load(int slot)
 			if (var->u_type() == Save::VarUnion::num)
 			{
 				loadedVars.push_back(var->u_as_num()->scalar());
+			}
+			else if (var->u_type() == Save::VarUnion::boolean)
+			{
+				loadedVars.push_back(var->u_as_boolean()->scalar());
 			}
 			else if (var->u_type() == Save::VarUnion::str)
 			{

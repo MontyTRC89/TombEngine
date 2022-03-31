@@ -302,10 +302,15 @@ table doubleTable {
 	scalar: double;
 }
 
+table boolTable {
+	scalar: bool;
+}
+
 union VarUnion {
 	str: stringTable,
 	tab: ScriptTable,
-	num: doubleTable
+	num: doubleTable,
+	boolean: boolTable
 }
 
 table UnionTable{
