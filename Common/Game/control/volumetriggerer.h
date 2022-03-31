@@ -1,8 +1,8 @@
 #pragma once
 #include <variant>
 
-class MESH_INFO;
-class CAMERA_INFO;
+struct MESH_INFO;
+struct CAMERA_INFO;
 
 namespace TEN::Control::Volumes
 {
