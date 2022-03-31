@@ -263,7 +263,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMul
 	SoundSlot[freeSlot].EffectID = effectID;
 	SoundSlot[freeSlot].Channel = channel;
 	SoundSlot[freeSlot].Gain = gain;
-	SoundSlot[freeSlot].Origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
+	SoundSlot[freeSlot].Origin = position ? Vector3(position->Position.x, position->Position.y, position->Position.z) : SOUND_OMNIPRESENT_ORIGIN;
 
 	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
 		return 0;
@@ -544,7 +544,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
-				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
+				Vector3 origin = Vector3(position->Position.x, position->Position.y, position->Position.z);
 				if (Vector3::Distance(origin, SoundSlot[i].Origin) < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
@@ -560,7 +560,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 float Sound_DistanceToListener(PHD_3DPOS *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(Vector3(position->xPos, position->yPos, position->zPos));
+	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
 }
 float Sound_DistanceToListener(Vector3 position)
 {
@@ -609,12 +609,12 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 		BASS_ChannelGetInfo(SoundSlot[index].Channel, &info);
 		if (info.flags & BASS_SAMPLE_3D)
 		{
-			SoundSlot[index].Origin.x = position->xPos;
-			SoundSlot[index].Origin.y = position->yPos;
-			SoundSlot[index].Origin.z = position->zPos;
+			SoundSlot[index].Origin.x = position->Position.x;
+			SoundSlot[index].Origin.y = position->Position.y;
+			SoundSlot[index].Origin.z = position->Position.z;
 
-			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
-			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
+			auto pos = BASS_3DVECTOR(position->Position.x, position->Position.y, position->Position.z);
+			auto rot = BASS_3DVECTOR(position->Orientation.x, position->Orientation.y, position->Orientation.z);
 			BASS_ChannelSet3DPosition(SoundSlot[index].Channel, &pos, &rot, NULL);
 			BASS_Apply3D();
 		}

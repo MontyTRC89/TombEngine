@@ -88,7 +88,7 @@ void CivvyControl(short itemNumber)
 
 	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 	{
-		DoLotsOfBlood(item->Position.xPos, item->Position.yPos - (GetRandomControl() & 255) - 32, item->Position.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
+		DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
 		item->HitPoints -= 20;
 	}
 
@@ -120,9 +120,9 @@ void CivvyControl(short itemNumber)
 		}
 		else
 		{
-			int laraDz = LaraItem->Position.zPos - item->Position.zPos;
-			int laraDx = LaraItem->Position.xPos - item->Position.xPos;
-			laraAiInfo.angle = phd_atan(laraDz, laraDx) - item->Position.yRot;
+			int laraDz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			int laraDx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			laraAiInfo.angle = phd_atan(laraDz, laraDx) - item->Pose.Orientation.y;
 			laraAiInfo.distance = pow(laraDx, 2) + pow(laraDz, 2);
 		}
 
@@ -147,7 +147,7 @@ void CivvyControl(short itemNumber)
 			!(item->AIBits & FOLLOW))
 		{
 			if (!creature->Alerted)
-				SoundEffect(300, &item->Position, 0);
+				SoundEffect(300, &item->Pose, 0);
 			AlertAllGuards(itemNumber);
 		}
 		creature->Enemy = realEnemy;
@@ -326,7 +326,7 @@ void CivvyControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(70, &item->Position, 0);
+				SoundEffect(70, &item->Pose, 0);
 				creature->Flags = 1;
 
 				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
@@ -347,7 +347,7 @@ void CivvyControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(70, &item->Position, 0);
+				SoundEffect(70, &item->Pose, 0);
 				creature->Flags = 1;
 
 				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
@@ -371,7 +371,7 @@ void CivvyControl(short itemNumber)
 			if (creature->Flags != 2 && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(70, &item->Position, 0);
+				SoundEffect(70, &item->Pose, 0);
 				creature->Flags = 2;
 
 				LaraItem->HitPoints -= CIVVY_SWIPE_DAMAGE;

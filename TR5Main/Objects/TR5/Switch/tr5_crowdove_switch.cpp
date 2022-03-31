@@ -25,7 +25,7 @@ namespace TEN::Entities::TR5
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR CrowDovePos = { 0, 0, -400 }; 
+	Vector3Int CrowDovePos = { 0, 0, -400 }; 
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{
@@ -51,8 +51,8 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			int oldYrot = switchItem->Position.yRot;
-			switchItem->Position.yRot = laraItem->Position.yRot;
+			int oldYrot = switchItem->Pose.Orientation.y;
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
@@ -68,7 +68,7 @@ namespace TEN::Entities::TR5
 					switchItem->ItemFlags[0] = 0;
 
 					switchItem->Status = ITEM_ACTIVE;
-					switchItem->Position.yRot = oldYrot;
+					switchItem->Pose.Orientation.y = oldYrot;
 					laraInfo->Control.IsMoving = false;
 					ResetLaraFlex(laraItem);
 					laraInfo->Control.HandStatus = HandStatus::Busy;
@@ -77,7 +77,7 @@ namespace TEN::Entities::TR5
 				else
 					laraInfo->InteractedItem = itemNumber;
 				
-				switchItem->Position.yRot = oldYrot;
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
 			{
@@ -87,7 +87,7 @@ namespace TEN::Entities::TR5
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				switchItem->Position.yRot = oldYrot;
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 		}
 	}
@@ -99,7 +99,7 @@ namespace TEN::Entities::TR5
 		if (item->MeshBits & 2) 
 		{
 			ExplodeItemNode(item, 1, 0, 256); 
-			SoundEffect(SFX_TR5_RAVEN_SWITCH_EXPLODE, &item->Position, 0);
+			SoundEffect(SFX_TR5_RAVEN_SWITCH_EXPLODE, &item->Pose, 0);
 			item->MeshBits = 5;	
 			RemoveActiveItem(itemNumber);
 
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR5
 			AnimateItem(item);
 
 			if (item->Animation.ActiveState == SWITCH_OFF)
-				item->Position.yRot += ANGLE(90.0f);
+				item->Pose.Orientation.y += ANGLE(90.0f);
 		}
 	}
 }

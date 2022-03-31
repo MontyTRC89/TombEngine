@@ -32,10 +32,10 @@ void KillerStatueControl(short itemNumber)
 		LaraItem->HitStatus = 1;
 		LaraItem->HitPoints -= 20;
 
-		int x = LaraItem->Position.xPos + (GetRandomControl() - 16384) / 256;
-		int z = LaraItem->Position.zPos + (GetRandomControl() - 16384) / 256;
-		int y = LaraItem->Position.yPos - GetRandomControl() / 44;
-		int d = (GetRandomControl() - 16384) / 8 + LaraItem->Position.yRot;
+		int x = LaraItem->Pose.Position.x + (GetRandomControl() - 16384) / 256;
+		int z = LaraItem->Pose.Position.z + (GetRandomControl() - 16384) / 256;
+		int y = LaraItem->Pose.Position.y - GetRandomControl() / 44;
+		int d = (GetRandomControl() - 16384) / 8 + LaraItem->Pose.Orientation.y;
 
 		DoBloodSplat(x, y, z, LaraItem->Animation.Velocity, d, LaraItem->RoomNumber);
 	}

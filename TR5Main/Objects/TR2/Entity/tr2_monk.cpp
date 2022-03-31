@@ -197,7 +197,7 @@ void MonkControl(short itemNumber)
 				if (!(info->Flags & 0xF000) && item->TouchBits & 0x4000)
 				{
 					info->Flags |= 0x1000;
-					SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
+					SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
 					CreatureEffect(item, &MonkBite, DoBloodSplat);
 
 					enemy->HitPoints -= 150;
@@ -208,12 +208,12 @@ void MonkControl(short itemNumber)
 			{
 				if (!(info->Flags & 0xf000) && enemy)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < CLICK(2) &&
-						abs(enemy->Position.yPos - item->Position.yPos) < CLICK(2) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < CLICK(2))
+					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
+						abs(enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
+						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
 					{
 						info->Flags |= 0x1000;
-						SoundEffect(SFX_TR2_CRUNCH1, &item->Position, 0);
+						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = true;

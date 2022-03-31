@@ -78,66 +78,66 @@ void VonCroyControl(short itemNumber)
 
 	// check if Von Croy can jump 1 or 2 blocks
 
-	int x = item->Position.xPos;
-	int z = item->Position.zPos;
+	int x = item->Pose.Position.x;
+	int z = item->Pose.Position.z;
 
-	int dx = 808 * phd_sin(item->Position.yRot);
-	int dz = 808 * phd_cos(item->Position.yRot);
+	int dx = 808 * phd_sin(item->Pose.Orientation.y);
+	int dz = 808 * phd_cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
-	int height1 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	FLOOR_INFO* floor = GetFloor(x, item->Pose.Position.y, z, &roomNumber);
+	int height1 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->RoomNumber;
-	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
-	int height2 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	floor = GetFloor(x, item->Pose.Position.y, z, &roomNumber);
+	int height2 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
 
 	x += dx;
 	z += dz;
 
 	roomNumber = item->RoomNumber;
-	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
-	int height3 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	floor = GetFloor(x, item->Pose.Position.y, z, &roomNumber);
+	int height3 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
 
 	x += dx ;
 	z += dz ;
 
 	roomNumber = item->RoomNumber;
-	floor = GetFloor(x, item->Position.yPos, z, &roomNumber);
-	int height4 = GetFloorHeight(floor, x, item->Position.yPos, z);
+	floor = GetFloor(x, item->Pose.Position.y, z, &roomNumber);
+	int height4 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
 
 	bool canJump1block;
 	if (item->BoxNumber == LaraItem->BoxNumber
-		|| item->Position.yPos >= height1 - 384
-		|| item->Position.yPos >= height2 + 256
-		|| item->Position.yPos <= height2 - 256)
+		|| item->Pose.Position.y >= height1 - 384
+		|| item->Pose.Position.y >= height2 + 256
+		|| item->Pose.Position.y <= height2 - 256)
 		canJump1block = false;
 	else
 		canJump1block = true;
 
 	bool canJump2blocks;
 	if (item->BoxNumber == LaraItem->BoxNumber
-		|| item->Position.yPos >= height1 - 384
-		|| item->Position.yPos >= height2 - 384
-		|| item->Position.yPos >= height3 + 256
-		|| item->Position.yPos <= height3 - 256)
+		|| item->Pose.Position.y >= height1 - 384
+		|| item->Pose.Position.y >= height2 - 384
+		|| item->Pose.Position.y >= height3 + 256
+		|| item->Pose.Position.y <= height3 - 256)
 		canJump2blocks = false;
 	else
 		canJump2blocks = true;
 
 	bool canJump3blocks;
 	if (item->BoxNumber == LaraItem->BoxNumber
-		|| item->Position.yPos >= height1 - 384
-		|| item->Position.yPos >= height2 - 384
-		|| item->Position.yPos >= height3 - 384
-		|| item->Position.yPos >= height4 + 256
-		|| item->Position.yPos <= height4 - 256)
+		|| item->Pose.Position.y >= height1 - 384
+		|| item->Pose.Position.y >= height2 - 384
+		|| item->Pose.Position.y >= height3 - 384
+		|| item->Pose.Position.y >= height4 + 256
+		|| item->Pose.Position.y <= height4 - 256)
 		canJump3blocks = false;
 	else
 		canJump3blocks = true;
@@ -169,10 +169,10 @@ void VonCroyControl(short itemNumber)
 				continue;
 
 			ITEM_INFO* currentItem = &g_Level.Items[targetCreature->ItemNumber];
-			if (abs(currentItem->Position.yPos - item->Position.yPos) <= 512)
+			if (abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
 			{
-				dx = currentItem->Position.xPos - item->Position.xPos;
-				dz = currentItem->Position.zPos - item->Position.zPos;
+				dx = currentItem->Pose.Position.x - item->Pose.Position.x;
+				dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
 				if (abs(dx) < 5120 && abs(dz) < 5120)
 				{
@@ -200,10 +200,10 @@ void VonCroyControl(short itemNumber)
 		|| item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + ANIMATION_VON_CROY_CLIMB_UP_AFTER_JUMP)
 	{
 		short oldRoom = item->RoomNumber;
-		item->Position.xPos += dx;
-		item->Position.zPos += dz;
+		item->Pose.Position.x += dx;
+		item->Pose.Position.z += dz;
 
-		GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &item->RoomNumber);
+		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
 
 		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)
 		{
@@ -212,8 +212,8 @@ void VonCroyControl(short itemNumber)
 		CreatureAIInfo(item, &info);
 
 		item->RoomNumber = oldRoom;
-		item->Position.xPos -= dx;
-		item->Position.zPos -= dz;
+		item->Pose.Position.x -= dx;
+		item->Pose.Position.z -= dz;
 	}
 	else
 	{
@@ -229,15 +229,15 @@ void VonCroyControl(short itemNumber)
 	}
 	else
 	{
-		dx = LaraItem->Position.xPos - item->Position.xPos;
-		dz = LaraItem->Position.zPos - item->Position.zPos;
-		laraInfo.angle = phd_atan(dz, dx) - item->Position.yRot;
+		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		laraInfo.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 
 		laraInfo.ahead = true;
 		if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
 			laraInfo.ahead = false;
 
-		laraInfo.enemyFacing = laraInfo.angle - LaraItem->Position.xPos + -ANGLE(180);
+		laraInfo.enemyFacing = laraInfo.angle - LaraItem->Pose.Position.x + -ANGLE(180);
 		int distance = 0;
 		if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
 			laraInfo.distance = 0x7FFFFFFF;
@@ -247,7 +247,7 @@ void VonCroyControl(short itemNumber)
 		dx = abs(dx);
 		dz = abs(dz);
 
-		int dy = item->Position.yPos - LaraItem->Position.yPos;
+		int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
 		short rot2 = 0;
 
 		if (dx <= dz)
@@ -316,7 +316,7 @@ void VonCroyControl(short itemNumber)
 		if (item->AIBits & MODIFY)
 		{
 			item->Animation.TargetState = STATE_VON_CROY_STOP;
-			if (item->Floor > item->Position.yPos + (STEP_SIZE * 3))
+			if (item->Floor > item->Pose.Position.y + (STEP_SIZE * 3))
 				item->AIBits &= ~MODIFY;
 			break;
 		}
@@ -352,9 +352,9 @@ void VonCroyControl(short itemNumber)
 
 		if (creature->MonkeySwingAhead)
 		{
-			floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-			height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-			if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - 1536)
+			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			if (GetCeiling(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) == height - 1536)
 			{
 				if (item->SwapMeshFlags == SWAPMESHFLAGS_VON_CROY)
 					item->Animation.TargetState = STATE_VON_CROY_TOGGLE_KNIFE;
@@ -372,7 +372,7 @@ void VonCroyControl(short itemNumber)
 				{
 					if (enemy->HitPoints > 0 && info.ahead)
 					{
-						if (abs(enemy->Position.yPos - item->Position.yPos + 512) < 512)
+						if (abs(enemy->Pose.Position.y - item->Pose.Position.y + 512) < 512)
 							item->Animation.TargetState = STATE_VON_CROY_KNIFE_ATTACK_HIGH;
 						else
 							item->Animation.TargetState = STATE_VON_CROY_KNIFE_ATTACK_LOW;
@@ -545,9 +545,9 @@ void VonCroyControl(short itemNumber)
 		}
 		else
 		{
-			floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-			height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-			ceiling = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			ceiling = GetCeiling(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			if (ceiling == height - 1536)
 				item->Animation.TargetState = STATE_VON_CROY_STOP;
 		}
@@ -561,9 +561,9 @@ void VonCroyControl(short itemNumber)
 
 		if (item->BoxNumber == creature->LOT.TargetBox || !creature->MonkeySwingAhead)
 		{
-			floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-			height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-			if (GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) == height - 1536)
+			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			if (GetCeiling(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) == height - 1536)
 				item->Animation.TargetState = STATE_VON_CROY_START_MONKEY;
 		}
 
@@ -586,12 +586,12 @@ void VonCroyControl(short itemNumber)
 	case STATE_VON_CROY_LOOK_BEFORE_JUMP:
 		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 		{
-			item->Position.xPos = enemy->Position.xPos;
-			item->Position.yPos = enemy->Position.yPos;
-			item->Position.zPos = enemy->Position.zPos;
-			item->Position.xRot = enemy->Position.xRot;
-			item->Position.yRot = enemy->Position.yRot;
-			item->Position.zRot = enemy->Position.zRot;
+			item->Pose.Position.x = enemy->Pose.Position.x;
+			item->Pose.Position.y = enemy->Pose.Position.y;
+			item->Pose.Position.z = enemy->Pose.Position.z;
+			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
+			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
 
 			if (item->ItemFlags[2] == VON_CROY_FLAG_JUMP)
 			{
@@ -634,19 +634,19 @@ void VonCroyControl(short itemNumber)
 	case STATE_VON_CROY_ENABLE_TRAP:
 		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 		{
-			item->Position.xPos = enemy->Position.xPos;
-			item->Position.yPos = enemy->Position.yPos;
-			item->Position.zPos = enemy->Position.zPos;
-			item->Position.xRot = enemy->Position.xRot;
-			item->Position.yRot = enemy->Position.yRot;
-			item->Position.zRot = enemy->Position.zRot;
+			item->Pose.Position.x = enemy->Pose.Position.x;
+			item->Pose.Position.y = enemy->Pose.Position.y;
+			item->Pose.Position.z = enemy->Pose.Position.z;
+			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
+			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 		{
 			TestTriggers(
-				creature->AITarget->Position.xPos,
-				creature->AITarget->Position.yPos,
-				creature->AITarget->Position.zPos,
+				creature->AITarget->Pose.Position.x,
+				creature->AITarget->Pose.Position.y,
+				creature->AITarget->Pose.Position.z,
 				creature->AITarget->RoomNumber,
 				true);
 
@@ -667,16 +667,16 @@ void VonCroyControl(short itemNumber)
 		}
 
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Position, info.angle, ANGLE(6));
+		ClampRotation(&item->Pose, info.angle, ANGLE(6));
 
 		if (!creature->Flags && enemy != NULL) 
 		{
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 
 				&& item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 45) 
 			{
-				if (abs(item->Position.xPos - enemy->Position.xPos) < 512
-					&& abs(item->Position.yPos - enemy->Position.yPos) < 512
-					&& abs(item->Position.zPos - enemy->Position.zPos) < 512)
+				if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < 512
+					&& abs(item->Pose.Position.y - enemy->Pose.Position.y) < 512
+					&& abs(item->Pose.Position.z - enemy->Pose.Position.z) < 512)
 				{
 					enemy->HitPoints -= 40;
 					if (enemy->HitPoints <= 0)
@@ -697,11 +697,11 @@ void VonCroyControl(short itemNumber)
 		creature->MaxTurn = 0;
 		if (item->ItemFlags[2] == 0)
 		{
-			ClampRotation(&item->Position, laraInfo.angle, 512);
+			ClampRotation(&item->Pose, laraInfo.angle, 512);
 		}
 		else
 		{
-			ClampRotation(&item->Position, enemy->Position.yRot - item->Position.yRot, 512);
+			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, 512);
 		}
 		break;
 
@@ -737,7 +737,7 @@ void VonCroyControl(short itemNumber)
 		}
 
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Position, info.angle, ANGLE(6));
+		ClampRotation(&item->Pose, info.angle, ANGLE(6));
 
 		if ((enemy == NULL
 			|| enemy->Flags != 0) 
@@ -748,9 +748,9 @@ void VonCroyControl(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 
 					&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 				{
-					if (abs(item->Position.xPos - enemy->Position.xPos) < 512
-						&& abs(item->Position.yPos - enemy->Position.yPos) < 512
-						&& abs(item->Position.zPos - enemy->Position.zPos) < 512)
+					if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < 512
+						&& abs(item->Pose.Position.y - enemy->Pose.Position.y) < 512
+						&& abs(item->Pose.Position.z - enemy->Pose.Position.z) < 512)
 					{
 						enemy->HitPoints -= 20;
 						if (enemy->HitPoints <= 0)
@@ -767,9 +767,9 @@ void VonCroyControl(short itemNumber)
 		}
 
 		TestTriggers(
-			creature->AITarget->Position.xPos,
-			creature->AITarget->Position.yPos,
-			creature->AITarget->Position.zPos,
+			creature->AITarget->Pose.Position.x,
+			creature->AITarget->Pose.Position.y,
+			creature->AITarget->Pose.Position.z,
 			creature->AITarget->RoomNumber,
 			true);
 
@@ -789,7 +789,7 @@ void VonCroyControl(short itemNumber)
 		}
 		
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Position, info.angle / 2, ANGLE(6));
+		ClampRotation(&item->Pose, info.angle / 2, ANGLE(6));
 
 		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 47) 
 		{
@@ -839,7 +839,7 @@ void VonCroyControl(short itemNumber)
 	case 36:
 	case 37:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Position, &enemy->Position, 15, enemy->Position.yRot-item->Position.yRot, 512);
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y-item->Pose.Orientation.y, 512);
 		break;
 
 	}

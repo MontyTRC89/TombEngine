@@ -29,9 +29,9 @@ namespace TEN::Entities::TR4
 		int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		if (item->ItemFlags[0] >= 150)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 0, 0.7f, 0.5f);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
 
 			if (num > 0)
 			{
@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 		}
 	}
 
@@ -100,9 +100,9 @@ namespace TEN::Entities::TR4
 			{
 				if (TestBoundsCollide(mineItem, laraItem, 512))
 				{
-					TriggerExplosionSparks(mineItem->Position.xPos, mineItem->Position.yPos, mineItem->Position.zPos, 3, -2, 0, mineItem->RoomNumber);
+					TriggerExplosionSparks(mineItem->Pose.Position.x, mineItem->Pose.Position.y, mineItem->Pose.Position.z, 3, -2, 0, mineItem->RoomNumber);
 					for (int i = 0; i < 2; i++)
-						TriggerExplosionSparks(mineItem->Position.xPos, mineItem->Position.yPos, mineItem->Position.zPos, 3, -1, 0, mineItem->RoomNumber);
+						TriggerExplosionSparks(mineItem->Pose.Position.x, mineItem->Pose.Position.y, mineItem->Pose.Position.z, 3, -1, 0, mineItem->RoomNumber);
 
 					mineItem->MeshBits = 1;
 
@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.ActiveState = LS_DEATH;
 					laraItem->Animation.Velocity = 0;
 
-					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &mineItem->Position, 0);
+					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &mineItem->Pose, 0);
 				}
 			}
 			else
@@ -129,9 +129,9 @@ namespace TEN::Entities::TR4
 						currentItem->TriggerFlags == 0)
 					{
 						TriggerExplosionSparks(
-							currentItem->Position.xPos,
-							currentItem->Position.yPos,
-							currentItem->Position.zPos,
+							currentItem->Pose.Position.x,
+							currentItem->Pose.Position.y,
+							currentItem->Pose.Position.z,
 							3,
 							-2,
 							0,
@@ -139,9 +139,9 @@ namespace TEN::Entities::TR4
 
 						for (int j = 0; j < 2; j++)
 							TriggerExplosionSparks(
-								currentItem->Position.xPos,
-								currentItem->Position.yPos,
-								currentItem->Position.zPos,
+								currentItem->Pose.Position.x,
+								currentItem->Pose.Position.y,
+								currentItem->Pose.Position.z,
 								3,
 								-1,
 								0,
@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 						KillItem(i);
 
 						if (!(GetRandomControl() & 3))
-							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->Position, 0);
+							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->Pose, 0);
 
 						currentItem->Status = ITEM_INVISIBLE;
 					}

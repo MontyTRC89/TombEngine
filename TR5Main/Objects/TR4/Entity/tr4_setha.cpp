@@ -37,12 +37,12 @@ void SethaControl(short itemNumber)
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 
-	int x = item->Position.xPos;
-	int y = item->Position.yPos;
-	int z = item->Position.zPos;
+	int x = item->Pose.Position.x;
+	int y = item->Pose.Position.y;
+	int z = item->Pose.Position.z;
 
-	int dx = 870 * phd_sin(item->Position.yRot);
-	int dz = 870 * phd_cos(item->Position.yRot);
+	int dx = 870 * phd_sin(item->Pose.Orientation.y);
+	int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -69,8 +69,8 @@ void SethaControl(short itemNumber)
 	bool canJump = (y < height1 - 384 || y < height2 - 384)
 		&& (y < height3 + 256 && y > height3 - 256 || height3 == NO_HEIGHT);
 
-	x = item->Position.xPos - dx;
-	z = item->Position.zPos - dz;
+	x = item->Pose.Position.x - dx;
+	z = item->Pose.Position.z - dz;
 	roomNumber = item->RoomNumber;
 	floor = GetFloor(x, y, z, &roomNumber);
 	int height4 = GetFloorHeight(floor, x, y, z);
@@ -112,7 +112,7 @@ void SethaControl(short itemNumber)
 				item->Animation.TargetState = 8;
 				break;
 			}
-			else if (LaraItem->Position.yPos >= item->Position.yPos - 1024)
+			else if (LaraItem->Pose.Position.y >= item->Pose.Position.y - 1024)
 			{
 				if (info.distance < SQUARE(2560)
 					&& info.ahead
@@ -124,22 +124,22 @@ void SethaControl(short itemNumber)
 					break;
 				}
 				else if (ceiling != NO_HEIGHT
-					&& ceiling < item->Position.yPos - 1792
+					&& ceiling < item->Pose.Position.y - 1792
 					&& height4 != NO_HEIGHT
-					&& height4 > item->Position.yPos - 1024
+					&& height4 > item->Pose.Position.y - 1024
 					&& GetRandomControl() & 1)
 				{
-					item->Position.yPos -= 1536;
+					item->Pose.Position.y -= 1536;
 					if (Targetable(item, &info))
 					{
 						item->ItemFlags[0] = 0;
-						item->Position.yPos += 1536;
+						item->Pose.Position.y += 1536;
 						item->Animation.TargetState = 12;
 					}
 					else
 					{
 						item->Animation.TargetState = 2;
-						item->Position.yPos += 1536;
+						item->Pose.Position.y += 1536;
 					}
 					break;
 				}
@@ -157,7 +157,7 @@ void SethaControl(short itemNumber)
 						&& info.angle < ANGLE(45)
 						&& info.angle > -ANGLE(45)
 						&& height4 != NO_HEIGHT
-						&& height4 >= item->Position.yPos - 256
+						&& height4 >= item->Pose.Position.y - 256
 						&& Targetable(item, &info))
 					{
 						item->ItemFlags[0] = 0;
@@ -291,16 +291,16 @@ void SethaControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->Position.yRot += ANGLE(3);
+					item->Pose.Orientation.y += ANGLE(3);
 				}
 				else
 				{
-					item->Position.yRot -= ANGLE(3);
+					item->Pose.Orientation.y -= ANGLE(3);
 				}
 			}
 			else
 			{
-				item->Position.yRot += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 
 			if (!creature->Flags)
@@ -337,7 +337,7 @@ void SethaControl(short itemNumber)
 		case 13:
 		case 15:
 			if (item->Animation.ActiveState==15)
-				creature->Target.y = LaraItem->Position.yPos;
+				creature->Target.y = LaraItem->Pose.Position.y;
 		
 			creature->MaxTurn = 0;
 
@@ -345,17 +345,17 @@ void SethaControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->Position.yRot += ANGLE(3);
+					item->Pose.Orientation.y += ANGLE(3);
 				}
 				else
 				{
-					item->Position.yRot -= ANGLE(3);
+					item->Pose.Orientation.y -= ANGLE(3);
 				}
 				SethaAttack(itemNumber);
 			}
 			else
 			{
-				item->Position.yRot += info.angle;
+				item->Pose.Orientation.y += info.angle;
 				SethaAttack(itemNumber);
 			}
 
@@ -367,26 +367,26 @@ void SethaControl(short itemNumber)
 				creature->LOT.Fly = 16;
 				item->Animation.Airborne = false;
 				creature->MaxTurn = 0;
-				creature->Target.y = LaraItem->Position.yPos;
+				creature->Target.y = LaraItem->Pose.Position.y;
 
 				if (abs(info.angle) >= ANGLE(3))
 				{
 					if (info.angle >= 0)
 					{
-						item->Position.yRot += ANGLE(3);
+						item->Pose.Orientation.y += ANGLE(3);
 					}
 					else
 					{
-						item->Position.yRot -= ANGLE(3);
+						item->Pose.Orientation.y -= ANGLE(3);
 					}
 				}
 				else
 				{
-					item->Position.yRot += info.angle;
+					item->Pose.Orientation.y += info.angle;
 				}
 			}
 
-			if (LaraItem->Position.yPos <= item->Floor - 512)
+			if (LaraItem->Pose.Position.y <= item->Floor - 512)
 			{
 				if (Targetable(item, &info))
 				{
@@ -398,7 +398,7 @@ void SethaControl(short itemNumber)
 			{
 				creature->LOT.Fly = 0;
 				item->Animation.Airborne = true;
-				if (item->Position.yPos - item->Floor > 0)
+				if (item->Pose.Position.y - item->Floor > 0)
 				{
 					item->Animation.TargetState = 1;
 				}
@@ -422,7 +422,7 @@ void SethaControl(short itemNumber)
 			{
 				if (item->Animation.ActiveState <= 13)
 				{
-					if (abs(height4 - item->Position.yPos) >= 512)
+					if (abs(height4 - item->Pose.Position.y) >= 512)
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
 						item->Animation.TargetState = 6;
@@ -451,8 +451,8 @@ void SethaControl(short itemNumber)
 
 void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv)
 {
-	int dx = LaraItem->Position.xPos - x;
-	int dz = LaraItem->Position.zPos - z;
+	int dx = LaraItem->Pose.Position.x - x;
+	int dz = LaraItem->Pose.Position.z - z;
 	
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -487,8 +487,8 @@ void TriggerSethaSparks1(int x, int y, int z, short xv, short yv, short zv)
 
 void TriggerSethaSparks2(short itemNumber, char node, int size)
 {
-	int dx = LaraItem->Position.xPos - g_Level.Items[itemNumber].Position.xPos;
-	int dz = LaraItem->Position.zPos - g_Level.Items[itemNumber].Position.zPos;
+	int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
+	int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -539,12 +539,12 @@ void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
 	{
 		FX_INFO* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		fx->pos.yRot = pos->yRot;
-		fx->pos.zRot = 0;
+		fx->pos.Position.x = pos->Position.x;
+		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
+		fx->pos.Position.z = pos->Position.z;
+		fx->pos.Orientation.x = pos->Orientation.x;
+		fx->pos.Orientation.y = pos->Orientation.y;
+		fx->pos.Orientation.z = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
 		fx->flag1 = mesh;
@@ -560,20 +560,20 @@ void SethaAttack(int itemNumber)
 
 	item->ItemFlags[0]++;
 
-	PHD_VECTOR pos1;
+	Vector3Int pos1;
 	pos1.x = SethaAttack1.x;
 	pos1.y = SethaAttack1.y;
 	pos1.z = SethaAttack1.z;
 	GetJointAbsPosition(item, &pos1, SethaAttack1.meshNum);
 
-	PHD_VECTOR pos2;
+	Vector3Int pos2;
 	pos2.x = SethaAttack2.x;
 	pos2.y = SethaAttack2.y;
 	pos2.z = SethaAttack2.z;
 	GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
 
 	int i, size;
-	PHD_VECTOR pos;
+	Vector3Int pos;
 	short angles[2];
 	PHD_3DPOS attackPos;
 
@@ -637,11 +637,11 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-			attackPos.xPos = pos1.x;
-			attackPos.yPos = pos1.y;
-			attackPos.zPos = pos1.z;
-			attackPos.xRot = angles[1];
-			attackPos.yRot = angles[0];
+			attackPos.Position.x = pos1.x;
+			attackPos.Position.y = pos1.y;
+			attackPos.Position.z = pos1.z;
+			attackPos.Orientation.x = angles[1];
+			attackPos.Orientation.y = angles[0];
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -654,11 +654,11 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
 
-			attackPos.xPos = pos2.x;
-			attackPos.yPos = pos2.y;
-			attackPos.zPos = pos2.z;
-			attackPos.xRot = angles[1];
-			attackPos.yRot = angles[0];
+			attackPos.Position.x = pos2.x;
+			attackPos.Position.y = pos2.y;
+			attackPos.Position.z = pos2.z;
+			attackPos.Orientation.x = angles[1];
+			attackPos.Orientation.y = angles[0];
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -694,11 +694,11 @@ void SethaAttack(int itemNumber)
 
 				phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-				attackPos.xPos = pos1.x;
-				attackPos.yPos = pos1.y;
-				attackPos.zPos = pos1.z;
-				attackPos.xRot = angles[1];
-				attackPos.yRot = angles[0];
+				attackPos.Position.x = pos1.x;
+				attackPos.Position.y = pos1.y;
+				attackPos.Position.z = pos1.z;
+				attackPos.Orientation.x = angles[1];
+				attackPos.Orientation.y = angles[0];
 
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 
@@ -709,11 +709,11 @@ void SethaAttack(int itemNumber)
 
 				phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
 
-				attackPos.xPos = pos2.x;
-				attackPos.yPos = pos2.y;
-				attackPos.zPos = pos2.z;
-				attackPos.xRot = angles[1];
-				attackPos.yRot = angles[0];
+				attackPos.Position.x = pos2.x;
+				attackPos.Position.y = pos2.y;
+				attackPos.Position.z = pos2.z;
+				attackPos.Orientation.x = angles[1];
+				attackPos.Orientation.y = angles[0];
 
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 			}
@@ -778,11 +778,11 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-			attackPos.xPos = pos1.x;
-			attackPos.yPos = pos1.y;
-			attackPos.zPos = pos1.z;
-			attackPos.xRot = angles[1];
-			attackPos.yRot = angles[0];
+			attackPos.Position.x = pos1.x;
+			attackPos.Position.y = pos1.y;
+			attackPos.Position.z = pos1.z;
+			attackPos.Orientation.x = angles[1];
+			attackPos.Orientation.y = angles[0];
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}

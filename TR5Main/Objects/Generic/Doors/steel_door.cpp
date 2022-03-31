@@ -26,7 +26,7 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		doorItem->MeshBits = 1;
-		doorItem->Position.yPos -= 1024;
+		doorItem->Pose.Position.y -= 1024;
 	}
 
 	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)

@@ -32,7 +32,7 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Position, 0);
+			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Pose, 0);
 			item->ItemFlags[0] = 0x36DB600;
 			AnimateItem(item);
 		}
@@ -72,28 +72,28 @@ namespace TEN::Entities::TR4
 					{
 						if (result & 1)
 						{
-							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->Position.xPos;
-							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->Position.yPos;
-							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->Position.zPos;
-							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->Position.xPos;
-							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->Position.yPos;
-							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->Position.zPos;
+							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->Pose.Position.x;
+							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->Pose.Position.y;
+							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->Pose.Position.z;
+							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->Pose.Position.x;
+							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->Pose.Position.y;
+							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->Pose.Position.z;
 
-							int oldX = LaraItem->Position.xPos;
-							int oldY = LaraItem->Position.yPos;
-							int oldZ = LaraItem->Position.zPos;
+							int oldX = LaraItem->Pose.Position.x;
+							int oldY = LaraItem->Pose.Position.y;
+							int oldZ = LaraItem->Pose.Position.z;
 
 							if (ItemPushItem(item, laraItem, coll, flags & 1, 2))
 							{
 								if ((flags & 1) &&
-									(oldX != LaraItem->Position.xPos ||
-									oldY != LaraItem->Position.yPos ||
-									oldZ != LaraItem->Position.zPos) &&
+									(oldX != LaraItem->Pose.Position.x ||
+									oldY != LaraItem->Pose.Position.y ||
+									oldZ != LaraItem->Pose.Position.z) &&
 									TriggerActive(item))
 								{
-									DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Position.xPos - 32,
+									DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
 										(GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16,
-										(GetRandomControl() & 0x3F) + laraItem->Position.zPos - 32,
+										(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 										(GetRandomControl() & 3) + 2,
 										2 * GetRandomControl(),
 										laraItem->RoomNumber);

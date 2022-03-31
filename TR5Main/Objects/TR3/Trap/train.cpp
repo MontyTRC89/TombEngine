@@ -21,13 +21,13 @@
 
 long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 {
-	float s = phd_sin(item->Position.yRot);
-	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Pose.Orientation.y);
+	float c = phd_cos(item->Pose.Orientation.y);
 
-	PHD_VECTOR pos;
-	pos.x = item->Position.xPos + z * s + x * c;
-	pos.y = item->Position.yPos - z * phd_sin(item->Position.xRot) + x * phd_sin(item->Position.zRot);
-	pos.z = item->Position.zPos + z * c - x * s;
+	Vector3Int pos;
+	pos.x = item->Pose.Position.x + z * s + x * c;
+	pos.y = item->Pose.Position.y - z * phd_sin(item->Pose.Orientation.x) + x * phd_sin(item->Pose.Orientation.z);
+	pos.z = item->Pose.Position.z + z * c - x * s;
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 
@@ -45,16 +45,16 @@ void TrainControl(short itemNumber)
 	if (item->ItemFlags[0] == 0)
 		item->ItemFlags[0] = item->ItemFlags[1] = TRAIN_VEL;
 
-	float s = phd_sin(item->Position.yRot);
-	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Pose.Orientation.y);
+	float c = phd_cos(item->Pose.Orientation.y);
 
-	item->Position.xPos += item->ItemFlags[1] * s;
-	item->Position.zPos += item->ItemFlags[1] * c;
+	item->Pose.Position.x += item->ItemFlags[1] * s;
+	item->Pose.Position.z += item->ItemFlags[1] * c;
 
 	short roomNumber;
 	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
 	long floorHeight = TrainTestHeight(item, 0, 0, &roomNumber);
-	item->Position.yPos = floorHeight;
+	item->Pose.Position.y = floorHeight;
 
 	if (floorHeight == NO_HEIGHT)
 	{
@@ -62,15 +62,15 @@ void TrainControl(short itemNumber)
 		return;
 	}
 
-	item->Position.yPos -= 32;// ?
+	item->Pose.Position.y -= 32;// ?
 
 	short probedRoomNumber = GetCollision(item).RoomNumber;
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 
-	item->Position.xRot = -(rh - floorHeight) * 2;
+	item->Pose.Orientation.x = -(rh - floorHeight) * 2;
 
-	TriggerDynamicLight(item->Position.xPos + SECTOR(3) * s, item->Position.yPos, item->Position.zPos + SECTOR(3) * c, 16, 31, 31, 31);
+	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * s, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * c, 16, 31, 31, 31);
 
 	if (item->ItemFlags[1] != TRAIN_VEL)
 	{
@@ -80,17 +80,17 @@ void TrainControl(short itemNumber)
 
 		if (!UseForcedFixedCamera)
 		{
-			ForcedFixedCamera.x = item->Position.xPos + SECTOR(8) * s;
-			ForcedFixedCamera.z = item->Position.zPos + SECTOR(8) * c;
+			ForcedFixedCamera.x = item->Pose.Position.x + SECTOR(8) * s;
+			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * c;
 
-			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Position.yPos - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
+			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
 			ForcedFixedCamera.roomNumber = roomNumber;
 			UseForcedFixedCamera = 1;
 		}
 	}
 	else
-		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Position, SFX_ALWAYS);
+		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Pose, SFX_ALWAYS);
 }
 
 void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
@@ -103,8 +103,8 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	if (!TestCollision(trainItem, laraItem))
 		return;
 
-	SoundEffect(SFX_LARA_GENERAL_DEATH, &laraItem->Position, SFX_ALWAYS);
-	SoundEffect(SFX_LARA_HIGH_FALL_DEATH, &laraItem->Position, SFX_ALWAYS);
+	SoundEffect(SFX_LARA_GENERAL_DEATH, &laraItem->Pose, SFX_ALWAYS);
+	SoundEffect(SFX_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SFX_ALWAYS);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
@@ -112,7 +112,7 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
 	laraItem->HitPoints = 0;
-	laraItem->Position.yRot = trainItem->Position.yRot;
+	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.y;
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -127,11 +127,11 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 	trainItem->ItemFlags[1] = 160;
 
-	float s = phd_sin(trainItem->Position.yRot);
-	float c = phd_cos(trainItem->Position.yRot);
+	float s = phd_sin(trainItem->Pose.Orientation.y);
+	float c = phd_cos(trainItem->Pose.Orientation.y);
 
-	long x = laraItem->Position.xPos + CLICK(1) * s;
-	long z = laraItem->Position.zPos + CLICK(1) * c;
+	long x = laraItem->Pose.Position.x + CLICK(1) * s;
+	long z = laraItem->Pose.Position.z + CLICK(1) * c;
 
-	DoLotsOfBlood(x, laraItem->Position.yPos - CLICK(2), z, SECTOR(1), trainItem->Position.yRot, laraItem->RoomNumber, 15);
+	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), trainItem->Pose.Orientation.y, laraItem->RoomNumber, 15);
 }

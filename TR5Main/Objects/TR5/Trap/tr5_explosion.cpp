@@ -70,17 +70,17 @@ void ExplosionControl(short itemNumber)
 			else
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;
 			
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
-			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -2, flag, item->RoomNumber);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
 			
 			for (int i = 0; i < item->ItemFlags[2]; ++i)
-				TriggerExplosionSparks(item->Position.xPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Position.yPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Position.zPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
+				TriggerExplosionSparks(item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
 			
 			PHD_3DPOS pos;
-			pos.xPos = item->Position.xPos;
-			pos.yPos = item->Position.yPos - 128;
-			pos.zPos = item->Position.zPos;
+			pos.Position.x = item->Pose.Position.x;
+			pos.Position.y = item->Pose.Position.y - 128;
+			pos.Position.z = item->Pose.Position.z;
 			
 			if (item->ItemFlags[3])
 			{
@@ -91,12 +91,12 @@ void ExplosionControl(short itemNumber)
 			}
 			else if (flag == 2)
 			{
-				PHD_VECTOR vec = { 0, 0, 0 };
+				Vector3Int vec = { 0, 0, 0 };
 				GetLaraJointPosition(&vec, 0);
 
-				int dx = vec.x - item->Position.xPos;
-				int dy = vec.y - item->Position.yPos;
-				int dz = vec.z - item->Position.zPos;
+				int dx = vec.x - item->Pose.Position.x;
+				int dy = vec.y - item->Pose.Position.y;
+				int dz = vec.z - item->Pose.Position.z;
 				
 				if (abs(dx) < SECTOR(1) &&
 					abs(dy) < SECTOR(1) &&
@@ -121,10 +121,10 @@ void ExplosionControl(short itemNumber)
 				{
 					if (CollidedItems[i]->ObjectNumber >= ID_SMASH_OBJECT1 && CollidedItems[i]->ObjectNumber <= ID_SMASH_OBJECT16)
 					{
-						TriggerExplosionSparks(CollidedItems[i]->Position.xPos, CollidedItems[i]->Position.yPos, CollidedItems[i]->Position.zPos, 3, -2, 0, CollidedItems[i]->RoomNumber);
-						CollidedItems[i]->Position.yPos -= 128;
-						TriggerShockwave(&CollidedItems[i]->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-						CollidedItems[i]->Position.yPos += 128;
+						TriggerExplosionSparks(CollidedItems[i]->Pose.Position.x, CollidedItems[i]->Pose.Position.y, CollidedItems[i]->Pose.Position.z, 3, -2, 0, CollidedItems[i]->RoomNumber);
+						CollidedItems[i]->Pose.Position.y -= 128;
+						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+						CollidedItems[i]->Pose.Position.y += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
 						SmashObject(CollidedItems[i] - g_Level.Items.data());
 						KillItem(CollidedItems[i] - g_Level.Items.data());
@@ -147,10 +147,10 @@ void ExplosionControl(short itemNumber)
 				{
 					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != SHT_NONE)
 					{
-						TriggerExplosionSparks(CollidedMeshes[i]->pos.xPos, CollidedMeshes[i]->pos.yPos, CollidedMeshes[i]->pos.zPos, 3, -2, 0, item->RoomNumber);
-						CollidedMeshes[i]->pos.yPos -= 128;
+						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
+						CollidedMeshes[i]->pos.Position.y -= 128;
 						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
-						CollidedMeshes[i]->pos.yPos += 128;
+						CollidedMeshes[i]->pos.Position.y += 128;
 						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos, 0);
 						ShatterObject(NULL, CollidedMeshes[i], -128, item->RoomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;

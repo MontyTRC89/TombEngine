@@ -186,7 +186,7 @@ namespace TEN::Renderer
 		//DrawLara(false, true);
 
 		Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-		Vector3 itemPos = Vector3(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+		Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 		if (lightPos == itemPos)
 			return;
 
@@ -231,7 +231,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 
 		m_stItem.World = m_LaraWorldMatrix;
-		m_stItem.Position = Vector4(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, 1.0f);
+		m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -299,8 +299,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), 0) *
-				Matrix::CreateTranslation(hairs->pos.xPos, hairs->pos.yPos, hairs->pos.zPos);
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
 			matrices[i + 1] = world;
 		}
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
@@ -385,10 +385,10 @@ namespace TEN::Renderer
 				OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
 				RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
-				Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos,
-				                                               gunshell->pos.zPos);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot),
-				                                                 TO_RAD(gunshell->pos.zRot));
+				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
+				                                               gunshell->pos.Position.z);
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
+				                                                 TO_RAD(gunshell->pos.Orientation.z));
 				Matrix world = rotation * translation;
 
 				m_stItem.World = world;
@@ -1365,7 +1365,7 @@ namespace TEN::Renderer
 
 				for (int n = 0; n < ROPE_SEGMENTS; n++)
 				{
-					PHD_VECTOR* s = &rope->meshSegment[n];
+					Vector3Int* s = &rope->meshSegment[n];
 					Vector3 t;
 					Vector3 output;
 
@@ -1486,8 +1486,8 @@ namespace TEN::Renderer
 
 		        if (spider->on)
 		        {
-		            XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
-		            XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
+		            XMMATRIXTranslation(&m_tempTranslation, spider->pos.Position.x, spider->pos.Position.y, spider->pos.Position.z);
+		            XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.Orientation.y, spider->pos.Orientation.x, spider->pos.Orientation.z);
 		            XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
 		            effect->SetMatrix(effect->GetParameterByName(NULL, "World"), &m_tempWorld);
 
@@ -1532,13 +1532,13 @@ namespace TEN::Renderer
 				if (rat->on)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
-					Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot),
-					                                                 TO_RAD(rat->pos.zRot));
+					Matrix translation = Matrix::CreateTranslation(rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.Orientation.y), TO_RAD(rat->pos.Orientation.x),
+					                                                 TO_RAD(rat->pos.Orientation.z));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
+					m_stItem.Position = Vector4(rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z, 1.0f);
 					m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
@@ -1589,13 +1589,13 @@ namespace TEN::Renderer
 
 					if (bat->on)
 					{
-						Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+						Matrix translation = Matrix::CreateTranslation(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							TO_RAD(bat->pos.yRot), TO_RAD(bat->pos.xRot), TO_RAD(bat->pos.zRot));
+							TO_RAD(bat->pos.Orientation.y), TO_RAD(bat->pos.Orientation.x), TO_RAD(bat->pos.Orientation.z));
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
-						m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
+						m_stItem.Position = Vector4(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z, 1.0f);
 						m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
@@ -1633,13 +1633,13 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
-						Matrix::CreateTranslation(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Position.yRot), TO_RAD(beetle->Position.xRot),
-					                                                 TO_RAD(beetle->Position.zRot));
+						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Pose.Orientation.y), TO_RAD(beetle->Pose.Orientation.x),
+					                                                 TO_RAD(beetle->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->Position.xPos, beetle->Position.yPos, beetle->Position.zPos, 1.0f);
+					m_stItem.Position = Vector4(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, 1.0f);
 					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
@@ -1684,13 +1684,13 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 					Matrix translation =
-						Matrix::CreateTranslation(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.yRot, locust->pos.xRot,
-					                                                 locust->pos.zRot);
+						Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.Orientation.y, locust->pos.Orientation.x,
+					                                                 locust->pos.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 1.0f);
+					m_stItem.Position = Vector4(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 1.0f);
 					m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
@@ -2097,8 +2097,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
 				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				                  LaraItem->BoxNumber);
-				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
-				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Position.xRot, LaraItem->Position.yRot, LaraItem->Position.zRot);
+				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
 				                  r->z + r->zSize * SECTOR(1));
@@ -2860,11 +2860,11 @@ namespace TEN::Renderer
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
-		Vector3 itemPosition = Vector3(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos, 1.0f);
+		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -2969,16 +2969,16 @@ namespace TEN::Renderer
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		Vector3 start = Vector3(
-			nativeItem->Position.xPos,
-			nativeItem->Position.yPos,
-			nativeItem->Position.zPos);
+			nativeItem->Pose.Position.x,
+			nativeItem->Pose.Position.y,
+			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Position.xRot)));
+		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
 
 		Vector3 end = Vector3(
-			nativeItem->Position.xPos + speed * phd_sin(TO_RAD(nativeItem->Position.yRot)),
-			nativeItem->Position.yPos + 96 * phd_sin(TO_RAD(nativeItem->Position.xRot)),
-			nativeItem->Position.zPos + speed * phd_cos(TO_RAD(nativeItem->Position.yRot)));
+			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
+			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
+			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
 
 		addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
@@ -3015,8 +3015,8 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < 7; i++)
 			{
-				Vector3 p1 = Vector3(info[i].Position.xPos, info[i].Position.yPos, info[i].Position.zPos);
-				Vector3 p2 = Vector3(info[i + 1].Position.xPos, info[i + 1].Position.yPos, info[i + 1].Position.zPos);
+				Vector3 p1 = Vector3(info[i].Pose.Position.x, info[i].Pose.Position.y, info[i].Pose.Position.z);
+				Vector3 p2 = Vector3(info[i + 1].Pose.Position.x, info[i + 1].Pose.Position.y, info[i + 1].Pose.Position.z);
 
 				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
@@ -3047,11 +3047,11 @@ namespace TEN::Renderer
 				if (!m_staticObjects[msh->staticNumber])
 					continue;
 
-				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot),
-				                                               TO_RAD(msh->pos.zRot)) * Matrix::CreateTranslation(
-					msh->pos.xPos, msh->pos.yPos, msh->pos.zPos));
+				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.Orientation.y), TO_RAD(msh->pos.Orientation.x),
+				                                               TO_RAD(msh->pos.Orientation.z)) * Matrix::CreateTranslation(
+					msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
 				m_stStatic.World = world;
-				m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
+				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
 				m_stStatic.Color = msh->color;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
@@ -3087,7 +3087,7 @@ namespace TEN::Renderer
 								face.info.room = room;
 								face.info.staticMesh = msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
+								face.info.position = Vector3(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z);
 								face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
@@ -3467,7 +3467,7 @@ namespace TEN::Renderer
 
 	void Renderer11::Draw()
 	{
-		//renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+		//renderToCubemap(m_reflectionCubemap, Vector3(LaraItem->pos.Position.x, LaraItem->pos.Position.y - 1024, LaraItem->pos.Position.z), LaraItem->roomNumber);
 		renderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
 		m_context->ClearState();
 		m_swapChain->Present(1, 0);

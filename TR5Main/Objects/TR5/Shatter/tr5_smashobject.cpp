@@ -14,7 +14,7 @@ void InitialiseSmashObject(short itemNumber)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	FLOOR_INFO* floor = GetSector(room, item->Position.xPos - room->x, item->Position.zPos - room->z);
+	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	auto* box = &g_Level.Boxes[floor->Box];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
@@ -25,13 +25,13 @@ void SmashObject(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	int sector = ((item->Position.zPos - room->z) / 1024) + room->zSize * ((item->Position.xPos - room->x) / 1024);
+	int sector = ((item->Pose.Position.z - room->z) / 1024) + room->zSize * ((item->Pose.Position.x - room->x) / 1024);
 
 	auto* box = &g_Level.Boxes[room->floor[sector].Box];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 
-	SoundEffect(SFX_TR5_SMASH_GLASS, &item->Position, 0);
+	SoundEffect(SFX_TR5_SMASH_GLASS, &item->Pose, 0);
 
 	item->Collidable = 0;
 	item->MeshBits = 0xFFFE;

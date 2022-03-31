@@ -55,7 +55,7 @@ struct LOTInfo
 	bool IsMonkeying;
 	bool IsAmphibious;
 
-	PHD_VECTOR Target;
+	Vector3Int Target;
 	ZoneType Zone;
 };
 
@@ -103,7 +103,7 @@ struct CreatureInfo
 	short AITargetNumber;
 	ITEM_INFO* AITarget;
 	short Pad;				// Unused?
-	PHD_VECTOR Target;
+	Vector3Int Target;
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 	CreatureAIPriority Priority;
