@@ -330,12 +330,12 @@ bool SaveGame::Save(int slot)
 	auto controlOffset = control.Finish();
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
-	for (int i = 0; i < (int)LaraWeaponType::Total; i++)
+	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::Total; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::NumAmmos; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].getCount());

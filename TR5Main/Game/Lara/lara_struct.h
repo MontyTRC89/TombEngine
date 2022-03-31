@@ -826,7 +826,7 @@ enum class WeaponAmmoType
 	Ammo2,
 	Ammo3,
 
-	Total
+	NumAmmos
 };
 
 enum class LaraWeaponType
@@ -845,7 +845,7 @@ enum class LaraWeaponType
 	RocketLauncher,
 	Snowmobile,
 
-	Total
+	NumWeapons
 };
 
 enum LaraWeaponTypeCarried
@@ -1038,7 +1038,7 @@ struct HolsterInfo
 struct CarriedWeaponInfo
 {
 	bool Present;
-	Ammo Ammo[(int)WeaponAmmoType::Total];
+	Ammo Ammo[(int)WeaponAmmoType::NumAmmos];
 	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
@@ -1226,7 +1226,7 @@ struct LaraInfo
 	short ItemNumber;
 	LaraControlData Control;
 	LaraInventoryData Inventory;
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::Total];
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
 	bool LitTorch;
 
