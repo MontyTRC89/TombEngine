@@ -22,16 +22,6 @@ struct GameScriptVector3 {
 	float z;
 };
 
-
-class LuaVariables
-{
-public:
-	std::unordered_map<std::string, sol::object>			variables;
-
-	sol::object							GetVariable(sol::table tab, std::string key);
-	void								SetVariable(sol::table tab, std::string key, sol::object value);
-};
-
 struct LuaVariable
 {
 	bool IsGlobal;
@@ -46,8 +36,6 @@ struct LuaVariable
 class LogicHandler : public LuaHandler, public ScriptInterfaceGame
 {
 private:
-	LuaVariables												m_globals{};
-	LuaVariables												m_locals{};
 	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
 	sol::protected_function										m_onStart{};
 	sol::protected_function										m_onLoad{};
@@ -56,6 +44,7 @@ private:
 	sol::protected_function										m_onEnd{};
 
 	void ResetLevelTables();
+	void ResetGameTables();
 
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
@@ -68,10 +57,10 @@ public:
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
 
-	void								GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const override;
-	void								SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) override;
+	void								GetVariables(std::vector<SavedVar>& vars) const override;
 	void								ResetVariables();
 
+	void								SetVariables(std::vector<SavedVar> const& vars) override;
 	void								InitCallbacks() override;
 	void								OnStart() override;
 	void								OnLoad() override;
