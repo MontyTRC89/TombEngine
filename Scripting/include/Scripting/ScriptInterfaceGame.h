@@ -17,6 +17,12 @@ using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int,
 
 using VarSaveType = std::variant<bool, double, std::string>;
 
+using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
+//todo make some of these pointers to save copying
+
+//todo make sure you either add bool here or make sure double works as a bool
+using SavedVar = std::variant<std::string, double, IndexTable>;
+
 class ScriptInterfaceGame {
 public:
 	virtual ~ScriptInterfaceGame() = default;
@@ -33,8 +39,8 @@ public:
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
 	virtual void ExecuteFunction(std::string const& luaFileName, TEN::Control::Volumes::VolumeTriggerer) = 0;
 
-	virtual void SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) = 0;
-	virtual void GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const = 0;
+	virtual void GetVariables(std::vector<SavedVar> & vars) const = 0;
+	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

@@ -32,23 +32,79 @@ Functions and callbacks for level-specific logic scripts.
 
 #endif
 
+void SetVariable(sol::table tab, sol::object key, sol::object value)
+{
+#if TEN_OPTIONAL_LUA
+	TENLog("lol");
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+	case sol::type::boolean:
+	case sol::type::number:
+	case sol::type::string:
+	case sol::type::table:
+		switch (key.get_type())
+		{
+		case sol::type::number:
+		case sol::type::string:
+			tab.raw_set(key, value);
+			break;
+		default:
+			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ERROR_MODE::TERMINATE);
+			break;
+		}
+		break;
+	default:
+		key.push();
+		size_t strLen;
+		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
+		if (str)
+		{
+			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ERROR_MODE::TERMINATE);
+			lua_pop(tab.lua_state(), 1);
+		}
+		else
+		{
+			ScriptAssert(false, "Variable has an unsupported type.", ERROR_MODE::TERMINATE);
+		}
+		key.pop();
+		break;
+	}
+#endif
+}
+
+sol::object GetVariable(sol::table tab, sol::object key)
+{
+#if TEN_OPTIONAL_LUA
+	return tab.raw_get<sol::object>(key);
+#endif
+}
+
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
 {
 #if TEN_OPTIONAL_LUA
 	ResetLevelTables();
 
-	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
+	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &GetVariable, &SetVariable);
 	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
 #endif
 }
 
+void LogicHandler::ResetGameTables()
+{
+#if TEN_OPTIONAL_LUA
+	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &GetVariable, &SetVariable);
+#endif
+}
+
+
 void LogicHandler::ResetLevelTables()
 {
 #if TEN_OPTIONAL_LUA
 	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
-	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
+	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &GetVariable, &SetVariable);
 #endif
 }
 
@@ -90,7 +146,6 @@ void LogicHandler::FreeLevelScripts()
 {
 #if TEN_OPTIONAL_LUA
 	m_levelFuncs.clear();
-	m_locals = LuaVariables{};
 	ResetLevelTables();
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
@@ -139,37 +194,150 @@ void AddOneSecret()
 #endif
 }
 
-
-void LogicHandler::SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals)
+void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 #if TEN_OPTIONAL_LUA
-	m_locals.variables.clear();
-	for (const auto& it : locals)
+	ResetGameTables();
+	ResetLevelTables();
+
+	std::unordered_map<uint32_t, sol::table> solTables;
+
+	for(std::size_t i = 0; i < vars.size(); ++i)
 	{
-		m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		if (std::holds_alternative<IndexTable>(vars[i]))
+		{
+			solTables.try_emplace(i, *m_lua, sol::create);
+			auto indexTab = std::get<IndexTable>(vars[i]);
+			for (auto& id : indexTab)
+			{
+				// if we're wanting to reference a table, make sure that table exists
+				// create it if need be
+				if (std::holds_alternative<IndexTable>(vars[id.second]))
+				{
+					solTables.try_emplace(id.second, *m_lua, sol::create);
+					solTables[i][vars[id.first]] = solTables[id.second];
+				}
+				else
+				{
+					solTables[i][vars[id.first]] = vars[id.second];
+				}
+			}
+		}
 	}
-	m_globals.variables.clear();
-	for (const auto& it : globals)
+	
+	auto rootTable = solTables[0];
+
+	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
+	for (auto& mem : levelVars)
 	{
-		m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		(*m_lua)[ScriptReserved_LevelVars][mem.first] = mem.second;
+	}
+
+	sol::table gameVars = rootTable[ScriptReserved_GameVars];
+	for (auto& mem : gameVars)
+	{
+		(*m_lua)[ScriptReserved_GameVars][mem.first] = mem.second;
 	}
 #endif
 }
 
-void LogicHandler::GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const
+void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
 {
 #if TEN_OPTIONAL_LUA
-	for (const auto& it : m_locals.variables)
+	sol::table tab{ *m_lua, sol::create };
+	tab[ScriptReserved_LevelVars] = (*m_lua)[ScriptReserved_LevelVars];
+	tab[ScriptReserved_GameVars] = (*m_lua)[ScriptReserved_GameVars];
+
+	std::unordered_map<void const*, uint32_t> varsMap;
+	std::unordered_map<double, uint32_t> numMap;
+	size_t nVars = 0;
+	auto handleNum = [&](double num)
 	{
-		locals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
-	}
-	for (const auto& it : m_globals.variables)
+		auto numIt = numMap.insert(std::pair<double, uint32_t>(num, nVars));
+
+		// true if the var was inserted
+		if (numIt.second)
+		{
+			vars.push_back(num);
+			++nVars;
+		}
+
+		return numIt.first->second;
+	};
+
+	auto handleStr = [&](sol::object const& obj)
 	{
-		globals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
-	}
+		auto str = obj.as<sol::string_view>();
+		auto stringIt = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
+
+		// true if the string was inserted
+		if (stringIt.second)
+		{
+			vars.push_back(std::string{ str.data() });
+			++nVars;
+		}
+
+		return stringIt.first->second;
+	};
+
+	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj)
+	{
+		auto tabIt = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
+
+		// true if the table was inserted
+		if(tabIt.second)
+		{
+			++nVars;
+			auto id = tabIt.first->second;
+
+			vars.push_back(IndexTable{});
+			for (auto& mem : obj)
+			{
+				bool isStringKey = true;
+				uint32_t keyIndex = 0;
+				
+				// Strings and numbers can be keys AND values
+				switch (mem.first.get_type())
+				{
+				case sol::type::string:
+					keyIndex = handleStr(mem.first);
+					break;
+				case sol::type::number:
+					keyIndex = handleNum(mem.first.as<double>());
+					break;
+				default:
+					ScriptAssert(false, "Tried saving an unsupported type as a key");
+				}
+
+				uint32_t valIndex = 0;
+				switch (mem.second.get_type())
+				{
+				case sol::type::table:
+					valIndex = populate(mem.second.as<sol::table>());
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::string:
+					valIndex = handleStr(mem.second);
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::number:
+					valIndex = handleNum(mem.second.as<double>());
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::boolean:
+					valIndex = handleNum(static_cast<double>(mem.second.as<bool>()));
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				default:
+					ScriptAssert(false, "Tried saving an unsupported type as a value");
+				}
+			}
+		}
+		return tabIt.first->second;
+	};
+	populate(tab);
 #endif
 }
-
 
 template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
@@ -191,40 +359,6 @@ void LogicHandler::ResetVariables()
 {
 #if TEN_OPTIONAL_LUA
 	(*m_lua)["Lara"] = NULL;
-#endif
-}
-
-
-
-sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
-{
-#if TEN_OPTIONAL_LUA
-	if (variables.find(key) == variables.end())
-		return sol::lua_nil;
-
-	return variables[key];
-#else
-	return sol::nil;
-#endif
-}
-
-void LuaVariables::SetVariable(sol::table tab, std::string key, sol::object value)
-{
-#if TEN_OPTIONAL_LUA
-	switch (value.get_type())
-	{
-	case sol::type::lua_nil:
-		variables.erase(key);
-		break;
-	case sol::type::boolean:
-	case sol::type::number:
-	case sol::type::string:
-		variables[key] = value;
-		break;
-	default:
-		ScriptAssert(false, "Variable " + key + " has an unsupported type.", ERROR_MODE::TERMINATE);
-		break;
-	}
 #endif
 }
 
@@ -274,6 +408,7 @@ void LogicHandler::OnStart()
 #if TEN_OPTIONAL_LUA
 	if (m_onStart.valid())
 		doCallback(m_onStart);
+
 #endif
 }
 
