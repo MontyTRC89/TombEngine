@@ -250,10 +250,25 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
 
 	std::unordered_map<void const*, uint32_t> varsMap;
 	std::unordered_map<double, uint32_t> numMap;
+	std::unordered_map<bool, uint32_t> boolMap;
 	size_t nVars = 0;
 	auto handleNum = [&](double num)
 	{
 		auto numIt = numMap.insert(std::pair<double, uint32_t>(num, nVars));
+
+		// true if the var was inserted
+		if (numIt.second)
+		{
+			vars.push_back(num);
+			++nVars;
+		}
+
+		return numIt.first->second;
+	};
+
+	auto handleBool = [&](bool num)
+	{
+		auto numIt = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
 
 		// true if the var was inserted
 		if (numIt.second)
@@ -325,7 +340,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				case sol::type::boolean:
-					valIndex = handleNum(static_cast<double>(mem.second.as<bool>()));
+					valIndex = handleBool(mem.second.as<bool>());
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				default:

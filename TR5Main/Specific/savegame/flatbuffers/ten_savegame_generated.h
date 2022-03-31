@@ -99,6 +99,10 @@ struct doubleTable;
 struct doubleTableBuilder;
 struct doubleTableT;
 
+struct boolTable;
+struct boolTableBuilder;
+struct boolTableT;
+
 struct UnionTable;
 struct UnionTableBuilder;
 struct UnionTableT;
@@ -124,33 +128,36 @@ enum class VarUnion : uint8_t {
   str = 1,
   tab = 2,
   num = 3,
+  boolean = 4,
   MIN = NONE,
-  MAX = num
+  MAX = boolean
 };
 
-inline const VarUnion (&EnumValuesVarUnion())[4] {
+inline const VarUnion (&EnumValuesVarUnion())[5] {
   static const VarUnion values[] = {
     VarUnion::NONE,
     VarUnion::str,
     VarUnion::tab,
-    VarUnion::num
+    VarUnion::num,
+    VarUnion::boolean
   };
   return values;
 }
 
 inline const char * const *EnumNamesVarUnion() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "NONE",
     "str",
     "tab",
     "num",
+    "boolean",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameVarUnion(VarUnion e) {
-  if (flatbuffers::IsOutRange(e, VarUnion::NONE, VarUnion::num)) return "";
+  if (flatbuffers::IsOutRange(e, VarUnion::NONE, VarUnion::boolean)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesVarUnion()[index];
 }
@@ -169,6 +176,10 @@ template<> struct VarUnionTraits<TEN::Save::ScriptTable> {
 
 template<> struct VarUnionTraits<TEN::Save::doubleTable> {
   static const VarUnion enum_value = VarUnion::num;
+};
+
+template<> struct VarUnionTraits<TEN::Save::boolTable> {
+  static const VarUnion enum_value = VarUnion::boolean;
 };
 
 struct VarUnionUnion {
@@ -226,6 +237,14 @@ struct VarUnionUnion {
   const TEN::Save::doubleTableT *Asnum() const {
     return type == VarUnion::num ?
       reinterpret_cast<const TEN::Save::doubleTableT *>(value) : nullptr;
+  }
+  TEN::Save::boolTableT *Asboolean() {
+    return type == VarUnion::boolean ?
+      reinterpret_cast<TEN::Save::boolTableT *>(value) : nullptr;
+  }
+  const TEN::Save::boolTableT *Asboolean() const {
+    return type == VarUnion::boolean ?
+      reinterpret_cast<const TEN::Save::boolTableT *>(value) : nullptr;
   }
 };
 
@@ -4370,6 +4389,64 @@ struct doubleTable::Traits {
 
 flatbuffers::Offset<doubleTable> CreatedoubleTable(flatbuffers::FlatBufferBuilder &_fbb, const doubleTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct boolTableT : public flatbuffers::NativeTable {
+  typedef boolTable TableType;
+  bool scalar = false;
+};
+
+struct boolTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef boolTableT NativeTableType;
+  typedef boolTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  bool scalar() const {
+    return GetField<uint8_t>(VT_SCALAR, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  boolTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(boolTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<boolTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct boolTableBuilder {
+  typedef boolTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(bool scalar) {
+    fbb_.AddElement<uint8_t>(boolTable::VT_SCALAR, static_cast<uint8_t>(scalar), 0);
+  }
+  explicit boolTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<boolTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<boolTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<boolTable> CreateboolTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool scalar = false) {
+  boolTableBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct boolTable::Traits {
+  using type = boolTable;
+  static auto constexpr Create = CreateboolTable;
+};
+
+flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct UnionTableT : public flatbuffers::NativeTable {
   typedef UnionTable TableType;
   TEN::Save::VarUnionUnion u{};
@@ -4399,6 +4476,9 @@ struct UnionTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::doubleTable *u_as_num() const {
     return u_type() == TEN::Save::VarUnion::num ? static_cast<const TEN::Save::doubleTable *>(u()) : nullptr;
   }
+  const TEN::Save::boolTable *u_as_boolean() const {
+    return u_type() == TEN::Save::VarUnion::boolean ? static_cast<const TEN::Save::boolTable *>(u()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_U_TYPE) &&
@@ -4421,6 +4501,10 @@ template<> inline const TEN::Save::ScriptTable *UnionTable::u_as<TEN::Save::Scri
 
 template<> inline const TEN::Save::doubleTable *UnionTable::u_as<TEN::Save::doubleTable>() const {
   return u_as_num();
+}
+
+template<> inline const TEN::Save::boolTable *UnionTable::u_as<TEN::Save::boolTable>() const {
+  return u_as_boolean();
 }
 
 struct UnionTableBuilder {
@@ -6449,6 +6533,32 @@ inline flatbuffers::Offset<doubleTable> CreatedoubleTable(flatbuffers::FlatBuffe
       _scalar);
 }
 
+inline boolTableT *boolTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<boolTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void boolTable::UnPackTo(boolTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<boolTable> boolTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateboolTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const boolTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateboolTable(
+      _fbb,
+      _scalar);
+}
+
 inline UnionTableT *UnionTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<UnionTableT>();
   UnPackTo(_o.get(), _resolver);
@@ -6719,6 +6829,10 @@ inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, Var
       auto ptr = reinterpret_cast<const TEN::Save::doubleTable *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -6749,6 +6863,10 @@ inline void *VarUnionUnion::UnPack(const void *obj, VarUnion type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::doubleTable *>(obj);
       return ptr->UnPack(resolver);
     }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -6767,6 +6885,10 @@ inline flatbuffers::Offset<void> VarUnionUnion::Pack(flatbuffers::FlatBufferBuil
       auto ptr = reinterpret_cast<const TEN::Save::doubleTableT *>(value);
       return CreatedoubleTable(_fbb, ptr, _rehasher).Union();
     }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTableT *>(value);
+      return CreateboolTable(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -6783,6 +6905,10 @@ inline VarUnionUnion::VarUnionUnion(const VarUnionUnion &u) : type(u.type), valu
     }
     case VarUnion::num: {
       value = new TEN::Save::doubleTableT(*reinterpret_cast<TEN::Save::doubleTableT *>(u.value));
+      break;
+    }
+    case VarUnion::boolean: {
+      value = new TEN::Save::boolTableT(*reinterpret_cast<TEN::Save::boolTableT *>(u.value));
       break;
     }
     default:
@@ -6804,6 +6930,11 @@ inline void VarUnionUnion::Reset() {
     }
     case VarUnion::num: {
       auto ptr = reinterpret_cast<TEN::Save::doubleTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<TEN::Save::boolTableT *>(value);
       delete ptr;
       break;
     }
