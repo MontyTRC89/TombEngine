@@ -84,6 +84,7 @@
     <ClCompile Include="src\ScriptInterfaceState.cpp" />
     <ClCompile Include="src\LuaHandler.cpp" />
     <ClCompile Include="src\ScriptAssert.cpp" />
+    <ClCompile Include="src\ScriptUtil.cpp" />
     <ClCompile Include="src\TEN\Color\Color.cpp" />
     <ClCompile Include="src\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="src\TEN\Flow\FlowHandler.cpp" />

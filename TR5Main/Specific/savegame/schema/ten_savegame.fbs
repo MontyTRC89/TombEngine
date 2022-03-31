@@ -285,19 +285,35 @@ table Pendulum {
 	node: int32;
 }
 
-table ScriptNumber {
-	key: string;
-	value: double;
+struct KeyValPair {
+	key: uint32;
+	val: uint32;
 }
 
-table ScriptBool {
-	key: string;
-	value: bool;
+table ScriptTable {
+	keys_vals: [KeyValPair];
 }
 
-table ScriptString {
-	key: string;
-	value: string;
+table stringTable {
+	str: string;
+}
+
+table doubleTable {
+	scalar: double;
+}
+
+union VarUnion {
+	str: stringTable,
+	tab: ScriptTable,
+	num: doubleTable
+}
+
+table UnionTable{
+	u:VarUnion;
+}
+
+table UnionVec {
+	members: [UnionTable];
 }
 
 table SaveGameHeader {
@@ -349,12 +365,7 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
-	script_bool_level: [ScriptBool];
-	script_number_level: [ScriptNumber];
-	script_string_level: [ScriptString];
-	script_bool_game: [ScriptBool];
-	script_number_game: [ScriptNumber];
-	script_string_game: [ScriptString];
-}
+	script_vars: UnionVec;
+	}
 
 root_type TEN.Save.SaveGame;

@@ -28,18 +28,20 @@
 // This alias is an effort to avoid the above problems.
 template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol::object>;
 
+sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);
 
-template <typename funcIndex, typename funcNewindex, typename obj>
-static void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, obj objPtr)
+template <typename funcIndex, typename funcNewindex>
+void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni)
 {
-	std::string metaName{ name + "Meta" };
-	auto meta = sol::table{ *state, sol::create };
-	state->set(metaName, meta);
-	meta.set("__metatable", "\"metatable is protected\"");
-	auto tab = state->create_named_table(name);
-	tab[sol::metatable_key] = meta;
-	state->set(metaName, sol::nil);
+	auto meta = MakeSpecialTableBase(state, name);
+	meta.set_function("__index", fi);
+	meta.set_function("__newindex", fni);
+}
+
+template <typename funcIndex, typename funcNewindex, typename ObjPtr>
+void MakeSpecialTable(sol::state * state, std::string const & name, funcIndex const & fi, funcNewindex const & fni, ObjPtr objPtr)
+{
+	auto meta = MakeSpecialTableBase(state, name);
 	meta.set_function("__index", fi, objPtr);
 	meta.set_function("__newindex", fni, objPtr);
 }
-
