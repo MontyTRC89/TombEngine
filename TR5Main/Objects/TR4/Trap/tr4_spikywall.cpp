@@ -15,24 +15,24 @@ void ControlSpikyWall(short itemNumber)
 	// Move wall.
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int x = item->Pose.Position.x + phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + phd_cos(item->Pose.Orientation.y);
-		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
+		int x = item->Position.xPos + phd_sin(item->Position.yRot);
+		int z = item->Position.zPos + phd_cos(item->Position.yRot);
+		auto probe = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
 
-		if (probe.Position.Floor != item->Pose.Position.y)
+		if (probe.Position.Floor != item->Position.yPos)
 		{
 			item->Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 		}
 		else
 		{
-			item->Pose.Position.x = x;
-			item->Pose.Position.z = z;
+			item->Position.xPos = x;
+			item->Position.zPos = z;
 
 			if (probe.RoomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose, 0);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Position, 0);
 		}
 	}
 
@@ -41,9 +41,9 @@ void ControlSpikyWall(short itemNumber)
 		LaraItem->HitPoints -= 15;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Position.xPos, LaraItem->Position.yPos - CLICK(2), LaraItem->Position.zPos, 4, item->Position.yRot, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
-		SoundEffect(56, &item->Pose, 0);
+		SoundEffect(56, &item->Position, 0);
 	}
 }

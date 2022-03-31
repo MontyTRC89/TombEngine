@@ -95,8 +95,8 @@ namespace TEN::Entities::TR4
 				distance = AI.distance;
 			else
 			{
-				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				int dx = LaraItem->Position.xPos - item->Position.xPos;
+				int dz = LaraItem->Position.zPos - item->Position.zPos;
 				phd_atan(dz, dx);
 				distance = pow(dx, 2) + pow(dz, 2);
 			}

@@ -70,17 +70,17 @@ void ExplosionControl(short itemNumber)
 			else
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;
 			
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Position, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Position, 0);
+			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -2, flag, item->RoomNumber);
 			
 			for (int i = 0; i < item->ItemFlags[2]; ++i)
-				TriggerExplosionSparks(item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
+				TriggerExplosionSparks(item->Position.xPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Position.yPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Position.zPos + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
 			
 			PHD_3DPOS pos;
-			pos.xPos = item->Pose.Position.x;
-			pos.yPos = item->Pose.Position.y - 128;
-			pos.zPos = item->Pose.Position.z;
+			pos.xPos = item->Position.xPos;
+			pos.yPos = item->Position.yPos - 128;
+			pos.zPos = item->Position.zPos;
 			
 			if (item->ItemFlags[3])
 			{
@@ -94,9 +94,9 @@ void ExplosionControl(short itemNumber)
 				PHD_VECTOR vec = { 0, 0, 0 };
 				GetLaraJointPosition(&vec, 0);
 
-				int dx = vec.x - item->Pose.Position.x;
-				int dy = vec.y - item->Pose.Position.y;
-				int dz = vec.z - item->Pose.Position.z;
+				int dx = vec.x - item->Position.xPos;
+				int dy = vec.y - item->Position.yPos;
+				int dz = vec.z - item->Position.zPos;
 				
 				if (abs(dx) < SECTOR(1) &&
 					abs(dy) < SECTOR(1) &&
@@ -121,10 +121,10 @@ void ExplosionControl(short itemNumber)
 				{
 					if (CollidedItems[i]->ObjectNumber >= ID_SMASH_OBJECT1 && CollidedItems[i]->ObjectNumber <= ID_SMASH_OBJECT16)
 					{
-						TriggerExplosionSparks(CollidedItems[i]->Pose.Position.x, CollidedItems[i]->Pose.Position.y, CollidedItems[i]->Pose.Position.z, 3, -2, 0, CollidedItems[i]->RoomNumber);
-						CollidedItems[i]->Pose.Position.y -= 128;
+						TriggerExplosionSparks(CollidedItems[i]->Position.xPos, CollidedItems[i]->Position.yPos, CollidedItems[i]->Position.zPos, 3, -2, 0, CollidedItems[i]->RoomNumber);
+						CollidedItems[i]->Position.yPos -= 128;
 						TriggerShockwave(&CollidedItems[i]->Position, 48, 304, 96, 0, 96, 128, 24, 0, 0);
-						CollidedItems[i]->Pose.Position.y += 128;
+						CollidedItems[i]->Position.yPos += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
 						SmashObject(CollidedItems[i] - g_Level.Items.data());
 						KillItem(CollidedItems[i] - g_Level.Items.data());

@@ -23,7 +23,7 @@ void InitialiseHighObject1(short itemNumber)
 			if (currentItem->ObjectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
 				item->ItemFlags[3] |= (i * 256);
-				currentItem->Pose.Position.y = item->Pose.Position.y - 512;
+				currentItem->Position.yPos = item->Position.yPos - 512;
 				continue;
 			}
 		}
@@ -39,15 +39,15 @@ void InitialiseHighObject1(short itemNumber)
 			if (currentItem->ObjectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
 				item->ItemFlags[3] |= (i * 256);
-				currentItem->Pose.Position.y = item->Pose.Position.y - 512;
+				currentItem->Position.yPos = item->Position.yPos - 512;
 				continue;
 			}
 		}
 		else
 		{
-			x = currentItem->Pose.Position.x;
-			y = currentItem->Pose.Position.y;
-			z = currentItem->Pose.Position.z;
+			x = currentItem->Position.xPos;
+			y = currentItem->Position.yPos;
+			z = currentItem->Position.zPos;
 		}
 	}
 
@@ -56,9 +56,9 @@ void InitialiseHighObject1(short itemNumber)
 		auto* currentItem = &g_Level.Items[i];
 
 		if (currentItem->ObjectNumber == ID_PULLEY &&
-			currentItem->Pose.Position.x == x &&
-			currentItem->Pose.Position.y == y &&
-			currentItem->Pose.Position.z == z)
+			currentItem->Position.xPos == x &&
+			currentItem->Position.yPos == y &&
+			currentItem->Position.zPos == z)
 		{
 			item->ItemFlags[2] |= i;
 			break;
@@ -107,13 +107,13 @@ void ControlHighObject1(short itemNumber)
 				else
 					flags = item->ItemFlags[1] / 8;
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, (flags * 256) | 8);
 
-				item->Pose.Position.y += 8;
+				item->Position.yPos += 8;
 
 				auto* targetItem = &g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF];
 				targetItem->Flags |= 0x20u;
-				targetItem->Pose.Position.y = item->Pose.Position.y - 560;
+				targetItem->Position.yPos = item->Position.yPos - 560;
 			}
 
 			if (item->ItemFlags[1] < -60)
@@ -196,14 +196,14 @@ void ControlHighObject1(short itemNumber)
 		else
 			flags = item->ItemFlags[1];
 
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, (flags * 256) | 8);
 
 		item->ItemFlags[1] += 16;
-		item->Pose.Position.y -= 16;
+		item->Position.yPos -= 16;
 
 		short targetItemNumber = (item->ItemFlags[3] / 256) & 0xFF;
 		auto* targetItem = &g_Level.Items[targetItemNumber];
 		targetItem->Flags |= 0x20;
-		targetItem->Pose.Position.y = item->Pose.Position.y - 560;
+		targetItem->Position.yPos = item->Position.yPos - 560;
 	}
 }

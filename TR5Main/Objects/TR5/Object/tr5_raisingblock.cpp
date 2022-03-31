@@ -19,7 +19,7 @@ void InitialiseRaisingBlock(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 	if(floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
@@ -72,15 +72,15 @@ void ControlRaisingBlock(short itemNumber)
 			item->ItemFlags[1] = 1;
 		else if (item->ItemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, 0);
+			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
 
 			item->ItemFlags[1] += 64;
 
 			if (item->TriggerFlags > 0)
 			{
-				if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240)
+				if (abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+					abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+					abs(item->Position.xPos - Camera.pos.x) < 10240)
 				{
 					if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
 						Camera.bounce = -32;
@@ -123,13 +123,13 @@ void ControlRaisingBlock(short itemNumber)
 	}
 	else
 	{
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, 0);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Position, 0);
 
 		if (item->TriggerFlags >= 0)
 		{
-			if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240)
+			if (abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+				abs(item->Position.xPos - Camera.pos.x) < 10240 &&
+				abs(item->Position.xPos - Camera.pos.x) < 10240)
 			{
 				if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
 					Camera.bounce = -32;
@@ -160,7 +160,7 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 		auto* bounds = GetBoundsAccurate(item);
 		int height = abs(bounds->Y2 - bounds->Y1);
 
-		int currentHeight = item->Pose.Position.y - height * item->ItemFlags[1] / 4096;
+		int currentHeight = item->Position.yPos - height * item->ItemFlags[1] / 4096;
 		return std::optional{ currentHeight };
 	}
 

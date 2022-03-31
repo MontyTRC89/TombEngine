@@ -50,7 +50,7 @@ void ControlAnimatingSlots(short itemNumber)
 void ControlTriggerTriggerer(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &item->RoomNumber);
 
 	if (floor->Flags.MarkTriggerer)
 	{
@@ -97,22 +97,22 @@ void ControlWaterfall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int dx = item->Pose.Position.x - LaraItem->Pose.Position.x;
-	int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
-	int dz = item->Pose.Position.z - LaraItem->Pose.Position.z;
+	int dx = item->Position.xPos - LaraItem->Position.xPos;
+	int dy = item->Position.yPos - LaraItem->Position.yPos;
+	int dz = item->Position.zPos - LaraItem->Position.zPos;
 
 	if (dx >= -16384 && dx <= 16384 && dy >= -16384 && dy <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		if (!(Wibble & 0xC))
 		{
 			TriggerWaterfallMist(
-				item->Pose.Position.x + 68 * phd_sin(item->Pose.Orientation.y),
-				item->Pose.Position.y,
-				item->Pose.Position.z + 68 * phd_cos(item->Pose.Orientation.y),
-				item->Pose.Orientation.y >> 4);
+				item->Position.xPos + 68 * phd_sin(item->Position.yRot),
+				item->Position.yPos,
+				item->Position.zPos + 68 * phd_cos(item->Position.yRot),
+				item->Position.yRot >> 4);
 		}
 
-		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
+		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Position, 0);
 	}
 }
 
@@ -133,9 +133,9 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
 		{
-			if (tightropeItem->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (tightropeItem->Position.yRot == laraItem->Position.yRot)
 			{
-				if (abs(tightropeItem->Pose.Position.x - laraItem->Pose.Position.x) + abs(tightropeItem->Pose.Position.z - laraItem->Pose.Position.z) < 640)
+				if (abs(tightropeItem->Position.xPos - laraItem->Position.xPos) + abs(tightropeItem->Position.zPos - laraItem->Position.zPos) < 640)
 					laraInfo->Control.Tightrope.CanDismount = true;
 			}
 		}
@@ -145,9 +145,9 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.Off)
 		{
-			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (item->Position.yRot == laraItem->Position.yRot)
 			{
-				if (abs(item->Pose.Position.x - laraItem->Pose.Position.x) + abs(item->Pose.Position.z - laraItem->Pose.Position.z) < 640)
+				if (abs(item->Position.xPos - laraItem->Position.xPos) + abs(item->Position.zPos - laraItem->Position.zPos) < 640)
 					laraInfo->tightRopeOff = true;
 			}
 		}
@@ -155,7 +155,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	}
 	else
 	{
-		tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+		tightropeItem->Position.yRot += -ANGLE(180.0f);
 
 		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
@@ -180,14 +180,14 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 			else
 				laraInfo->InteractedItem = itemNumber;
 
-			tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+			tightropeItem->Position.yRot += -ANGLE(180.0f);
 		}
 		else
 		{
 			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
-			tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+			tightropeItem->Position.yRot += -ANGLE(180.0f);
 		}
 	}
 }
@@ -205,9 +205,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		int test2 = 0;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.y += -ANGLE(180.0f);
+			barItem->Position.yRot += -ANGLE(180.0f);
 			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.y += -ANGLE(180);
+			barItem->Position.yRot += -ANGLE(180);
 		}
 
 		if (test1 || test2)
@@ -221,9 +221,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			ResetLaraFlex(barItem);
 
 			if (test1)
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
+				laraItem->Position.yRot = barItem->Position.yRot;
 			else
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + -ANGLE(180.0f);
+				laraItem->Position.yRot = barItem->Position.yRot + -ANGLE(180.0f);
 
 			PHD_VECTOR pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
@@ -231,11 +231,11 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			PHD_VECTOR pos2 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
-			if (laraItem->Pose.Orientation.y & 0x4000)
-				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);
+			if (laraItem->Position.yRot & 0x4000)
+				laraItem->Position.xPos += barItem->Position.xPos - ((pos1.x + pos2.x) >> 1);
 			else
-				laraItem->Pose.Position.z += barItem->Pose.Position.z - ((pos1.z + pos2.z) / 2);
-			laraItem->Pose.Position.y += barItem->Pose.Position.y - ((pos1.y + pos2.y) / 2);
+				laraItem->Position.zPos += barItem->Position.zPos - ((pos1.z + pos2.z) / 2);
+			laraItem->Position.yPos += barItem->Position.yPos - ((pos1.y + pos2.y) / 2);
 
 			laraInfo->InteractedItem = itemNumber;
 		}
@@ -256,16 +256,16 @@ void CutsceneRopeControl(short itemNumber)
 	PHD_VECTOR pos2 = { 830, -12, 0 };
 	GetJointAbsPosition(&g_Level.Items[ropeItem->ItemFlags[3]], &pos2, 0);
 
-	ropeItem->Pose.Position.x = pos2.x;
-	ropeItem->Pose.Position.y = pos2.y;
-	ropeItem->Pose.Position.z = pos2.z;
+	ropeItem->Position.xPos = pos2.x;
+	ropeItem->Position.yPos = pos2.y;
+	ropeItem->Position.zPos = pos2.z;
 
 	int dx = (pos2.x - pos1.x) * (pos2.x - pos1.x);
 	int dy = (pos2.y - pos1.y) * (pos2.y - pos1.y);
 	int dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
 	ropeItem->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	ropeItem->Pose.Orientation.x = -4869;
+	ropeItem->Position.xRot = -4869;
 }
 
 void HybridCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll) 
@@ -285,20 +285,20 @@ void InitialiseTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
-	if (tightropeItem->Pose.Orientation.y > 0)
+	if (tightropeItem->Position.yRot > 0)
 	{
-		if (tightropeItem->Pose.Orientation.y == ANGLE(90.0f))
-			tightropeItem->Pose.Position.x -= 256;
+		if (tightropeItem->Position.yRot == ANGLE(90.0f))
+			tightropeItem->Position.xPos -= 256;
 	}
-	else if (tightropeItem->Pose.Orientation.y)
+	else if (tightropeItem->Position.yRot)
 	{
-		if (tightropeItem->Pose.Orientation.y == -ANGLE(180.0f))
-			tightropeItem->Pose.Position.z += CLICK(1);
-		else if (tightropeItem->Pose.Orientation.y == -ANGLE(90.0f))
-			tightropeItem->Pose.Position.x += CLICK(1);
+		if (tightropeItem->Position.yRot == -ANGLE(180.0f))
+			tightropeItem->Position.zPos += CLICK(1);
+		else if (tightropeItem->Position.yRot == -ANGLE(90.0f))
+			tightropeItem->Position.xPos += CLICK(1);
 	}
 	else
-		tightropeItem->Pose.Position.z -= CLICK(1);
+		tightropeItem->Position.zPos -= CLICK(1);
 }
 
 void InitialiseAnimating(short itemNumber)
@@ -359,9 +359,9 @@ void HighObject2Control(short itemNumber)
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 		spark->transType = TransTypeEnum::COLADD;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
-		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Pose.Position.x - 544;
-		spark->y = item->Pose.Position.y;
-		spark->z = item->ItemFlags[0] + (GetRandomControl() & 0x3F) + item->Pose.Position.z - 544;
+		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Position.xPos - 544;
+		spark->y = item->Position.yPos;
+		spark->z = item->ItemFlags[0] + (GetRandomControl() & 0x3F) + item->Position.zPos - 544;
 		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
 		spark->friction = 6;
 		spark->zVel = (GetRandomControl() & 0x1FF) - 256;

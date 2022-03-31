@@ -17,15 +17,15 @@ void PulseLightControl(short itemNumber)
 	{
 		item->ItemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Pose.Position.y & 0x3FFF));
+		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Position.yPos & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
 
 		TriggerDynamicLight(
-			item->Pose.Position.x,
-			item->Pose.Position.y,
-			item->Pose.Position.z,
+			item->Position.xPos,
+			item->Position.yPos,
+			item->Position.zPos,
 			24,
 			(pulse * 8 * (item->TriggerFlags & 0x1F)) / 512,
 			(pulse * ((item->TriggerFlags / 4) & 0xF8)) / 512,
@@ -57,25 +57,25 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->Pose.Orientation.y += ANGLE(16.0f);
+		item->Position.yRot += ANGLE(16.0f);
 
 		byte r = 8 * (item->TriggerFlags & 0x1F);
 		byte g = (item->TriggerFlags / 4) & 0xF8;
 		byte b = (item->TriggerFlags / 128) & 0xF8;
 
 		TriggerAlertLight(
-			item->Pose.Position.x,
-			item->Pose.Position.y - 512,
-			item->Pose.Position.z,
+			item->Position.xPos,
+			item->Position.yPos - 512,
+			item->Position.zPos,
 			r, g, b,
-			((item->Pose.Orientation.y + 22528) / 16) & 0xFFF,
+			((item->Position.yRot + 22528) / 16) & 0xFFF,
 			item->RoomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->Pose.Position.x + 256 * phd_sin(item->Pose.Orientation.y + 22528),
-			item->Pose.Position.y - 768,
-			item->Pose.Position.z + 256 * phd_cos(item->Pose.Orientation.y + 22528),
+			item->Position.xPos + 256 * phd_sin(item->Position.yRot + 22528),
+			item->Position.yPos - 768,
+			item->Position.zPos + 256 * phd_cos(item->Position.yRot + 22528),
 			8,
 			r, g, b);
 	}
@@ -88,9 +88,9 @@ void ColorLightControl(short itemNumber)
 	if (TriggerActive(item))
 	{
 		TriggerDynamicLight(
-			item->Pose.Position.x,
-			item->Pose.Position.y,
-			item->Pose.Position.z,
+			item->Position.xPos,
+			item->Position.yPos,
+			item->Position.zPos,
 			24,
 			8 * (item->TriggerFlags & 0x1F),
 			(item->TriggerFlags / 4) & 0xF8,
@@ -161,16 +161,16 @@ void ElectricalLightControl(short itemNumber)
 
 			intensity = item->ItemFlags[1] - (GetRandomControl() & 0x7F);
 			if (intensity > 64)
-				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, 32 * (intensity & 0xFFFFFFF8) | 8);
+				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Position, 32 * (intensity & 0xFFFFFFF8) | 8);
 		}
 		else
 			return;
 	}
 
 	TriggerDynamicLight(
-		item->Pose.Position.x,
-		item->Pose.Position.y,
-		item->Pose.Position.z,
+		item->Position.xPos,
+		item->Position.yPos,
+		item->Position.zPos,
 		24,
 		(intensity * 8 * (item->TriggerFlags & 0x1F)) / 256,
 		(intensity * ((item->TriggerFlags / 4) & 0xF8)) / 256,

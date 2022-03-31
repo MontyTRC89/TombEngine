@@ -1,64 +1,17 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct Vector2Int
+struct VectorInt2
 {
 	int x;
 	int y;
-
-	Vector2Int()
-	{
-		this->x = 0;
-		this->y = 0;
-	}
-
-	Vector2Int(int x, int y)
-	{
-		this->x = x;
-		this->y = y;
-	}
 };
 
-struct Vector3Int
+struct VectorInt3
 {
 	int x;
 	int y;
 	int z;
-
-	Vector3Int()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-	}
-
-	Vector3Int(int x, int y, int z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-};
-
-struct Vector3Shrt
-{
-	short x;
-	short y;
-	short z;
-
-	Vector3Shrt()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-	}
-
-	Vector3Shrt(short x, short y, short z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
 };
 
 constexpr auto PI = 3.14159265358979323846f;

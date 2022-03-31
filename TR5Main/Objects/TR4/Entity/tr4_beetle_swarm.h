@@ -3,7 +3,7 @@
 
 struct BeetleInfo
 {
-	PHD_3DPOS Pose;
+	PHD_3DPOS Position;
 	short RoomNumber;
 	int Velocity;
 	int VerticalVelocity;

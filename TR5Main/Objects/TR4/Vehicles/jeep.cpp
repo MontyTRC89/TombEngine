@@ -113,13 +113,13 @@ short Unk_0080DE24;
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, PHD_VECTOR* pos)
 {
-	pos->y = item->Pose.Position.y - dz * phd_sin(item->Pose.Orientation.x) + dx * phd_sin(item->Pose.Orientation.z);
+	pos->y = item->Position.yPos - dz * phd_sin(item->Position.xRot) + dx * phd_sin(item->Position.zRot);
 
-	float c = phd_cos(item->Pose.Orientation.y);
-	float s = phd_sin(item->Pose.Orientation.y);
+	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Position.yRot);
 
-	pos->z = item->Pose.Position.z + dz * c - dx * s;
-	pos->x = item->Pose.Position.x + dz * s + dx * c;
+	pos->z = item->Position.zPos + dz * c - dx * s;
+	pos->x = item->Position.xPos + dz * s + dx * c;
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
@@ -143,31 +143,31 @@ static int DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
 	{
 		if (z == oldZ)
 		{
-			jeep->Pose.Position.z += (old->z - pos->z);
-			jeep->Pose.Position.x += (old->x - pos->x);
+			jeep->Position.zPos += (old->z - pos->z);
+			jeep->Position.xPos += (old->x - pos->x);
 		}
 		else if (z > oldZ)
 		{
-			jeep->Pose.Position.z -= shiftZ + 1;
-			return (pos->x - jeep->Pose.Position.x);
+			jeep->Position.zPos -= shiftZ + 1;
+			return (pos->x - jeep->Position.xPos);
 		}
 		else
 		{
-			jeep->Pose.Position.z += WALL_SIZE - shiftZ;
-			return (jeep->Pose.Position.x - pos->x);
+			jeep->Position.zPos += WALL_SIZE - shiftZ;
+			return (jeep->Position.xPos - pos->x);
 		}
 	}
 	else if (z == oldZ)
 	{
 		if (x > oldX)
 		{
-			jeep->Pose.Position.x -= shiftX + 1;
-			return (jeep->Pose.Position.z - pos->z);
+			jeep->Position.xPos -= shiftX + 1;
+			return (jeep->Position.zPos - pos->z);
 		}
 		else
 		{
-			jeep->Pose.Position.x += WALL_SIZE - shiftX;
-			return (pos->z - jeep->Pose.Position.z);
+			jeep->Position.xPos += WALL_SIZE - shiftX;
+			return (pos->z - jeep->Position.zPos);
 		}
 	}
 	else
@@ -199,29 +199,29 @@ static int DoJeepShift(ITEM_INFO* jeep, PHD_VECTOR* pos, PHD_VECTOR* old)
 
 		if (x && z)
 		{
-			jeep->Pose.Position.z += z;
-			jeep->Pose.Position.x += x;
+			jeep->Position.zPos += z;
+			jeep->Position.xPos += x;
 		}
 		else if (z)
 		{
-			jeep->Pose.Position.z += z;
+			jeep->Position.zPos += z;
 			if (z > 0)
-				return (jeep->Pose.Position.x - pos->x);
+				return (jeep->Position.xPos - pos->x);
 			else
-				return (pos->x - jeep->Pose.Position.x);
+				return (pos->x - jeep->Position.xPos);
 		}
 		else if (x)
 		{
-			jeep->Pose.Position.x += x;
+			jeep->Position.xPos += x;
 			if (x > 0)
-				return (pos->z - jeep->Pose.Position.z);
+				return (pos->z - jeep->Position.zPos);
 			else
-				return (jeep->Pose.Position.z - pos->z);
+				return (jeep->Position.zPos - pos->z);
 		}
 		else
 		{
-			jeep->Pose.Position.z += (old->z - pos->z);
-			jeep->Pose.Position.x += (old->x - pos->x);
+			jeep->Position.zPos += (old->z - pos->z);
+			jeep->Position.xPos += (old->x - pos->x);
 		}
 	}
 
@@ -277,11 +277,11 @@ static int JeepCanGetOff()
 {
 	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
 
-	short angle = item->Pose.Orientation.y + 0x4000;
+	short angle = item->Position.yRot + 0x4000;
 
-	int x = item->Pose.Position.x - JEEP_GETOFF_DISTANCE * phd_sin(angle);
-	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z - JEEP_GETOFF_DISTANCE * phd_cos(angle);
+	int x = item->Position.xPos - JEEP_GETOFF_DISTANCE * phd_sin(angle);
+	int y = item->Position.yPos;
+	int z = item->Position.zPos - JEEP_GETOFF_DISTANCE * phd_cos(angle);
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -292,12 +292,12 @@ static int JeepCanGetOff()
 	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT)
 		return 0;
 
-	if (abs(height - item->Pose.Position.y) > WALL_SIZE / 2)
+	if (abs(height - item->Position.yPos) > WALL_SIZE / 2)
 		return 0;
 
 	int ceiling = GetCeiling(floor, x, y, z);
 
-	if ((ceiling - item->Pose.Position.y > -LARA_HEIGHT)
+	if ((ceiling - item->Position.yPos > -LARA_HEIGHT)
 		|| (height - ceiling < LARA_HEIGHT))
 		return 0;
 
@@ -381,7 +381,7 @@ void InitialiseJeep(short itemNum)
 	jeep->jeepTurn = 0;
 	jeep->fallSpeed = 0;
 	jeep->extraRotation = 0;
-	jeep->momentumAngle = item->Pose.Position.y;
+	jeep->momentumAngle = item->Position.yPos;
 	jeep->pitch = 0;
 	jeep->flags = 0;
 	jeep->unknown2 = 0;
@@ -399,15 +399,15 @@ static int JeepCheckGetOff()
 	{
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
 		{
-			LaraItem->Pose.Orientation.y += ANGLE(90);
+			LaraItem->Position.yRot += ANGLE(90);
 			LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.TargetState = LS_IDLE;
 			LaraItem->Animation.ActiveState = LS_IDLE;
-			LaraItem->Pose.Position.x -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->Pose.Orientation.y);
-			LaraItem->Pose.Position.z -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->Pose.Orientation.y);
-			LaraItem->Pose.Orientation.x = 0;
-			LaraItem->Pose.Orientation.z = 0;
+			LaraItem->Position.xPos -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->Position.yRot);
+			LaraItem->Position.zPos -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->Position.yRot);
+			LaraItem->Position.xRot = 0;
+			LaraItem->Position.zRot = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.Control.HandStatus = HandStatus::Free;
 			return false;
@@ -439,23 +439,23 @@ static int GetOnJeep(int itemNumber)
 	if (LaraItem->Animation.Airborne)
 		return 0;
 
-	if (abs(item->Pose.Position.y - LaraItem->Pose.Position.y) >= STEP_SIZE)
+	if (abs(item->Position.yPos - LaraItem->Position.yPos) >= STEP_SIZE)
 		return 0;
 
 	if (!TestBoundsCollide(item, LaraItem, 100))
 		return 0;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) < -32000)
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < -32000)
 		return 0;
 
-	short angle = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
-	angle -= item->Pose.Orientation.y;
+	short angle = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
+	angle -= item->Position.yRot;
 
 	if ((angle > -ANGLE(45)) && (angle < ANGLE(135)))
 	{
-		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+		int tempAngle = LaraItem->Position.yRot - item->Position.yRot;
 		if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
@@ -476,7 +476,7 @@ static int GetOnJeep(int itemNumber)
 	}
 	else
 	{
-		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+		int tempAngle = LaraItem->Position.yRot - item->Position.yRot;
 		if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
@@ -505,13 +505,13 @@ static int GetJeepCollisionAnim(ITEM_INFO* item, PHD_VECTOR* p)
 	if (jeep->unknown2 != 0)
 		return 0;
 
-	p->x = item->Pose.Position.x - p->x;
-	p->z = item->Pose.Position.z - p->z;
+	p->x = item->Position.xPos - p->x;
+	p->z = item->Position.zPos - p->z;
 
 	if (p->x || p->z)
 	{
-		float c = phd_cos(item->Pose.Orientation.y);
-		float s = phd_sin(item->Pose.Orientation.y);
+		float c = phd_cos(item->Position.yRot);
+		float s = phd_sin(item->Position.yRot);
 		int front = p->z * c + p->x * s;
 		int side = -p->z * s + p->x * c;
 
@@ -560,9 +560,9 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 					if (object->collision && object->intelligent ||
 						item->ObjectNumber == ID_ROLLINGBALL)
 					{
-						int x = jeep->Pose.Position.x - item->Pose.Position.x;
-						int y = jeep->Pose.Position.y - item->Pose.Position.y;
-						int z = jeep->Pose.Position.z - item->Pose.Position.z;
+						int x = jeep->Position.xPos - item->Position.xPos;
+						int y = jeep->Position.yPos - item->Position.yPos;
+						int z = jeep->Position.zPos - item->Position.zPos;
 						if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
 						{
 							if (item->ObjectNumber == ID_ROLLINGBALL)
@@ -571,11 +571,11 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 								{
 									if (LaraItem->HitPoints > 0)
 									{
-										DoLotsOfBlood(LaraItem->Pose.Position.x,
-											LaraItem->Pose.Position.y - 512,
-											LaraItem->Pose.Position.z,
+										DoLotsOfBlood(LaraItem->Position.xPos,
+											LaraItem->Position.yPos - 512,
+											LaraItem->Position.zPos,
 											GetRandomControl() & 3,
-											LaraItem->Pose.Orientation.y,
+											LaraItem->Position.yRot,
 											LaraItem->RoomNumber,
 											5);
 										item->HitPoints -= 8;
@@ -586,11 +586,11 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 							{
 								if (TestBoundsCollide(item, jeep, JEEP_FRONT))
 								{
-									DoLotsOfBlood(item->Pose.Position.x,
-										jeep->Pose.Position.y - STEP_SIZE,
-										item->Pose.Position.z,
+									DoLotsOfBlood(item->Position.xPos,
+										jeep->Position.yPos - STEP_SIZE,
+										item->Position.zPos,
 										GetRandomControl() & 3,
-										jeep->Pose.Orientation.y,
+										jeep->Position.yRot,
 										item->RoomNumber,
 										3);
 									item->HitPoints = 0;
@@ -613,10 +613,10 @@ static void JeepExplode(ITEM_INFO* item)
 	}
 	else
 	{
-		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
+		TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -2, 0, item->RoomNumber);
 		for (int i = 0; i < 3; i++)
 		{
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
+			TriggerExplosionSparks(item->Position.xPos, item->Position.yPos, item->Position.zPos, 3, -1, 0, item->RoomNumber);
 		}
 	}
 
@@ -641,9 +641,9 @@ int JeepDynamics(ITEM_INFO* item)
 	int hmb_old = TestJeepHeight(item, -(JEEP_FRONT + 50), 0, (PHD_VECTOR*)&mb_old);
 
 	PHD_VECTOR oldPos;
-	oldPos.x = item->Pose.Position.x;
-	oldPos.y = item->Pose.Position.y;
-	oldPos.z = item->Pose.Position.z;
+	oldPos.x = item->Position.xPos;
+	oldPos.y = item->Position.yPos;
+	oldPos.z = item->Position.zPos;
 
 	if (mm_old.y > hmm_old)
 		mm_old.y = hmm_old;
@@ -667,8 +667,8 @@ int JeepDynamics(ITEM_INFO* item)
 		else
 			jeep->jeepTurn = 0;
 
-		item->Pose.Orientation.y += jeep->jeepTurn + jeep->extraRotation;
-		jeep->momentumAngle += ((item->Pose.Orientation.y - jeep->momentumAngle) / 32);
+		item->Position.yRot += jeep->jeepTurn + jeep->extraRotation;
+		jeep->momentumAngle += ((item->Position.yRot - jeep->momentumAngle) / 32);
 	}
 	else
 	{
@@ -682,9 +682,9 @@ int JeepDynamics(ITEM_INFO* item)
 		else
 			jeep->jeepTurn = 0;
 
-		item->Pose.Orientation.y += jeep->jeepTurn + jeep->extraRotation;
+		item->Position.yRot += jeep->jeepTurn + jeep->extraRotation;
 
-		rot = item->Pose.Orientation.y - jeep->momentumAngle;
+		rot = item->Position.yRot - jeep->momentumAngle;
 		momentum = 728 - ((3 * jeep->velocity) / 2048);
 
 		if (!(TrInput & IN_ACTION) && jeep->velocity > 0)
@@ -693,12 +693,12 @@ int JeepDynamics(ITEM_INFO* item)
 		if (rot >= -273)
 		{
 			if (rot <= 273)
-				jeep->momentumAngle = item->Pose.Orientation.y;
+				jeep->momentumAngle = item->Position.yRot;
 			else
 			{
 				if (rot > 13650)
 				{
-					item->Pose.Position.y -= 41;
+					item->Position.yPos -= 41;
 					item->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
 					jeep->jeepTurn = 0;
 					jeep->velocity -= (jeep->velocity / 8);
@@ -707,14 +707,14 @@ int JeepDynamics(ITEM_INFO* item)
 				if (rot <= 16380)
 					jeep->momentumAngle += momentum;
 				else
-					jeep->momentumAngle = item->Pose.Orientation.y - 16380;
+					jeep->momentumAngle = item->Position.yRot - 16380;
 			}
 		}
 		else
 		{
 			if (rot < -13650)
 			{
-				item->Pose.Position.y -= 41;
+				item->Position.yPos -= 41;
 				item->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
 				jeep->jeepTurn = 0;
 				jeep->velocity -= (jeep->velocity / 8);
@@ -723,27 +723,27 @@ int JeepDynamics(ITEM_INFO* item)
 			if (rot >= -16380)
 				jeep->momentumAngle -= momentum;
 			else
-				jeep->momentumAngle = item->Pose.Orientation.y + 16380;
+				jeep->momentumAngle = item->Position.yRot + 16380;
 		}
 	}
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
 	short speed;
-	if (item->Pose.Position.y < height)
+	if (item->Position.yPos < height)
 		speed = item->Animation.Velocity;
 	else
-		speed = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+		speed = item->Animation.Velocity * phd_cos(item->Position.xRot);
 
-	item->Pose.Position.x += speed * phd_sin(jeep->momentumAngle);
-	item->Pose.Position.z += speed * phd_cos(jeep->momentumAngle);
+	item->Position.xPos += speed * phd_sin(jeep->momentumAngle);
+	item->Position.zPos += speed * phd_cos(jeep->momentumAngle);
 	
 	int slip = 0;
-	if (item->Pose.Position.y >= height)
+	if (item->Position.yPos >= height)
 	{
-		slip = JEEP_SLIP * phd_sin(item->Pose.Orientation.x);
+		slip = JEEP_SLIP * phd_sin(item->Position.xRot);
 
 		if (abs(slip) > 16)
 		{
@@ -757,20 +757,20 @@ int JeepDynamics(ITEM_INFO* item)
 		else
 			JeepNoGetOff = 0;
 
-		slip = JEEP_SLIP_SIDE * phd_sin(item->Pose.Orientation.z);
+		slip = JEEP_SLIP_SIDE * phd_sin(item->Position.zRot);
 		if (abs(slip) > JEEP_SLIP_SIDE / 4)
 		{
 			JeepNoGetOff = 1;
 
 			if (slip >= 0)
 			{
-				item->Pose.Position.x += (slip - 24) * phd_sin(item->Pose.Orientation.y + ANGLE(90));
-				item->Pose.Position.z += (slip - 24) * phd_cos(item->Pose.Orientation.y + ANGLE(90));
+				item->Position.xPos += (slip - 24) * phd_sin(item->Position.yRot + ANGLE(90));
+				item->Position.zPos += (slip - 24) * phd_cos(item->Position.yRot + ANGLE(90));
 			}
 			else
 			{
-				item->Pose.Position.x += (slip - 24) * phd_sin(item->Pose.Orientation.y - ANGLE(90));
-				item->Pose.Position.z += (slip - 24) * phd_cos(item->Pose.Orientation.y - ANGLE(90));
+				item->Position.xPos += (slip - 24) * phd_sin(item->Position.yRot - ANGLE(90));
+				item->Position.zPos += (slip - 24) * phd_cos(item->Position.yRot - ANGLE(90));
 			}
 		}
 		else
@@ -783,8 +783,8 @@ int JeepDynamics(ITEM_INFO* item)
 		jeep->velocity = -JEEP_MAX_BACK;
 
 	PHD_VECTOR movedPos;
-	movedPos.x = item->Pose.Position.x;
-	movedPos.z = item->Pose.Position.z;
+	movedPos.x = item->Position.xPos;
+	movedPos.z = item->Position.zPos;
 
 	if (!(item->Flags & ONESHOT))
 	{
@@ -831,9 +831,9 @@ int JeepDynamics(ITEM_INFO* item)
 		rot1 = rot2;
 	   
 	roomNumber = item->RoomNumber;
-	floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) < item->Pose.Position.y - STEP_SIZE)
-		DoJeepShift(item, (PHD_VECTOR*)&item->Pose, &oldPos);
+	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	if (GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos) < item->Position.yPos - STEP_SIZE)
+		DoJeepShift(item, (PHD_VECTOR*)&item->Position, &oldPos);
 
 	if (!jeep->velocity)
 		rot1 = 0;
@@ -855,7 +855,7 @@ int JeepDynamics(ITEM_INFO* item)
 	
 	if (collide)
 	{
-		newspeed = (item->Pose.Position.z - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->Pose.Position.x - oldPos.x) * phd_sin(jeep->momentumAngle);
+		newspeed = (item->Position.zPos - oldPos.z) * phd_cos(jeep->momentumAngle) + (item->Position.xPos - oldPos.x) * phd_sin(jeep->momentumAngle);
 		newspeed *= 256;
 
 		if ((&g_Level.Items[Lara.Vehicle] == item) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
@@ -895,7 +895,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 	int rot1 = 0;
 	int rot2 = 0;
 
-	if (item->Pose.Position.y >= height - STEP_SIZE)
+	if (item->Position.yPos >= height - STEP_SIZE)
 	{
 		if (!jeep->velocity)
 		{
@@ -986,7 +986,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 					jeep->velocity = JEEP_MAX_SPEED;
 			}
 
-			jeep->velocity -= (abs(item->Pose.Orientation.y - jeep->momentumAngle) / 64);
+			jeep->velocity -= (abs(item->Position.yRot - jeep->momentumAngle) / 64);
 		}
 		else if (jeep->velocity > 256)
 			jeep->velocity -= 256;
@@ -1028,7 +1028,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 {
 	JeepInfo* jeep = (JeepInfo*)item->Data;
 	bool dismount;
-	if (item->Pose.Position.y != item->Floor && 
+	if (item->Position.yPos != item->Floor && 
 		LaraItem->Animation.ActiveState != JS_JUMP && 
 		LaraItem->Animation.ActiveState != JS_LAND && 
 		!dead)
@@ -1315,7 +1315,7 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 			break;
 
 		case JS_JUMP:
-			if (item->Pose.Position.y == item->Floor)
+			if (item->Position.yPos == item->Floor)
 				LaraItem->Animation.TargetState = JS_LAND;
 			else if (item->Animation.VerticalVelocity > 300)
 				jeep->flags |= JF_FALLING;
@@ -1530,8 +1530,8 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 				AddActiveItem(v4);
 			}*/
 
-			short ang = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
-			ang -= item->Pose.Orientation.y;
+			short ang = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
+			ang -= item->Position.yRot;
 
 			if ((ang > -(ANGLE(45))) && (ang < (ANGLE(135))))
 				LaraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
@@ -1543,10 +1543,10 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 
 			item->HitPoints = 1;
-			LaraItem->Pose.Position.x = item->Pose.Position.x;
-			LaraItem->Pose.Position.y = item->Pose.Position.y;
-			LaraItem->Pose.Position.z = item->Pose.Position.z;
-			LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+			LaraItem->Position.xPos = item->Position.xPos;
+			LaraItem->Position.yPos = item->Position.yPos;
+			LaraItem->Position.zPos = item->Position.zPos;
+			LaraItem->Position.yRot = item->Position.yRot;
 
 			ResetLaraFlex(LaraItem);
 			Lara.HitDirection = -1;
@@ -1577,15 +1577,15 @@ int JeepControl(void)
 	int collide = JeepDynamics(item);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 	GAME_VECTOR oldPos;
-	oldPos.x = item->Pose.Position.x;
-	oldPos.y = item->Pose.Position.y;
-	oldPos.z = item->Pose.Position.z;
+	oldPos.x = item->Position.xPos;
+	oldPos.y = item->Position.yPos;
+	oldPos.z = item->Position.zPos;
 
-	int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-	int ceiling = GetCeiling(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	int height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	int ceiling = GetCeiling(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
 	PHD_VECTOR fl, fr, bc;
 	int hfl = TestJeepHeight(item, JEEP_FRONT, -JEEP_SIDE, &fl);
@@ -1593,8 +1593,8 @@ int JeepControl(void)
 	int hbc = TestJeepHeight(item, -(JEEP_FRONT + 50), 0, &bc);
 
 	roomNumber = item->RoomNumber;
-	floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
+	height = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
 
 	TestTriggers(item, true);
 	TestTriggers(item, false);
@@ -1627,12 +1627,12 @@ int JeepControl(void)
 		else
 			jeep->pitch = -32768;
 
-		SoundEffect(155, &item->Pose, (jeep->pitch * 256) + 16777220);
+		SoundEffect(155, &item->Position, (jeep->pitch * 256) + 16777220);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(153, &item->Pose, 0);
+			SoundEffect(153, &item->Position, 0);
 		jeep->pitch = 0;
 	}
 
@@ -1643,8 +1643,8 @@ int JeepControl(void)
 	jeep->rot3 -= rotAdd;
 	jeep->rot4 -= rotAdd;
 
-	int oldY = item->Pose.Position.y;
-	item->Animation.VerticalVelocity = DoJeepDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
+	int oldY = item->Position.yPos;
+	item->Animation.VerticalVelocity = DoJeepDynamics(height, item->Animation.VerticalVelocity, &item->Position.yPos, 0);
 
 	height = (fl.y + fr.y) / 2;
 	short xRot;
@@ -1654,26 +1654,26 @@ int JeepControl(void)
 		if (height >= (hfl + hfr) / 2)
 			xRot = phd_atan(1100, hbc - height);
 		else
-			xRot = phd_atan(JEEP_FRONT, hbc - item->Pose.Position.y);
+			xRot = phd_atan(JEEP_FRONT, hbc - item->Position.yPos);
 	}
 	else
 	{
 		if (height >= (hfl + hfr) / 2)
-			xRot = phd_atan(JEEP_FRONT, item->Pose.Position.y - height);
+			xRot = phd_atan(JEEP_FRONT, item->Position.yPos - height);
 		else
 		{
-			xRot = -phd_atan(137, oldY - item->Pose.Position.y);
+			xRot = -phd_atan(137, oldY - item->Position.yPos);
 			if (jeep->velocity < 0)
 				xRot = -xRot;
 		}
 	}
 
-	item->Pose.Orientation.x += (xRot - item->Pose.Orientation.x) / 4;
-	item->Pose.Orientation.z += (phd_atan(256, height - fl.y) - item->Pose.Orientation.z) / 4;
+	item->Position.xRot += (xRot - item->Position.xRot) / 4;
+	item->Position.zRot += (phd_atan(256, height - fl.y) - item->Position.zRot) / 4;
 	if (jeep->velocity == 0)
 	{
-		item->Pose.Orientation.x = 0;
-		item->Pose.Orientation.z = 0;
+		item->Position.xRot = 0;
+		item->Position.zRot = 0;
 	}
 	if (!(jeep->flags & JF_DEAD))
 	{
@@ -1683,12 +1683,12 @@ int JeepControl(void)
 			ItemNewRoom(Lara.ItemNumber, roomNumber);
 		}
 
-		LaraItem->Pose.Position.x = item->Pose.Position.x;
-		LaraItem->Pose.Position.y = item->Pose.Position.y;
-		LaraItem->Pose.Position.z = item->Pose.Position.z;
-		LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+		LaraItem->Position.xPos = item->Position.xPos;
+		LaraItem->Position.yPos = item->Position.yPos;
+		LaraItem->Position.zPos = item->Position.zPos;
+		LaraItem->Position.xRot = item->Position.xRot;
+		LaraItem->Position.yRot = item->Position.yRot;
+		LaraItem->Position.zRot = item->Position.zRot;
 
 		int jeepAnim = Objects[ID_JEEP].animIndex;
 		int laraAnim = LaraItem->Animation.AnimNumber;
@@ -1718,7 +1718,7 @@ int JeepControl(void)
 
 		Camera.targetAngle = jeep->fallSpeed;
 
-		if (jeep->flags & JF_FALLING && item->Pose.Position.y == item->Floor)
+		if (jeep->flags & JF_FALLING && item->Position.yPos == item->Floor)
 		{
 			LaraItem->MeshBits = 0;
 			LaraItem->HitPoints = 0;
@@ -1757,10 +1757,10 @@ int JeepControl(void)
 				speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * JeepSmokeStart) * 64;
 				JeepSmokeStart++;
 			}
-			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y + -32768, speed, 0);
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->Position.yRot + -32768, speed, 0);
 		}
 		else if (item->Animation.Velocity < 64)
-			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - 32768, 64 - item->Animation.Velocity, 1);
+			TriggerJeepExhaustSmoke(pos.x, pos.y, pos.z, item->Position.yRot - 32768, 64 - item->Animation.Velocity, 1);
 	}
 
 	return JeepCheckGetOff();

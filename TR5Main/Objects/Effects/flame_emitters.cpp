@@ -67,9 +67,9 @@ namespace TEN::Entities::Effects
 				short flags = -item->TriggerFlags;
 				if ((flags & 7) == 2 || (flags & 7) == 7)
 				{
-					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Position, 0);
 					TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
-					TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 						(GetRandomControl() & 3) + 20,
 						(GetRandomControl() & 0x3F) + 192,
 						(GetRandomControl() & 0x1F) + 96, 0);
@@ -106,18 +106,18 @@ namespace TEN::Entities::Effects
 					}
 
 					if (item->ItemFlags[2])
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_NORMALFIRE, item->RoomNumber, item->ItemFlags[2]);
+						AddFire(item->Position.xPos, item->Position.yPos, item->Position.zPos, SP_NORMALFIRE, item->RoomNumber, item->ItemFlags[2]);
 
 					if (item->ItemFlags[1])
 					{
-						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Position, 0);
 
 						if (item->ItemFlags[1] <= -8192)
 							TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 						else
 							TriggerSuperJetFlame(item, item->ItemFlags[1], GlobalCounter & 1);
 
-						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 							(-item->ItemFlags[1] >> 10) - (GetRandomControl() & 1) + 16,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
@@ -128,33 +128,33 @@ namespace TEN::Entities::Effects
 						byte g = (GetRandomControl() & 0x1F) + 96;
 						byte falloff = 10 - (GetRandomControl() & 1);
 
-						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 							10 - (GetRandomControl() & 1),
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
 					}
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 			}
 			else
 			{
 				if (item->TriggerFlags < 8)
 					FlameEmitterFlags[item->TriggerFlags] = true;
 
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_BIGFIRE, item->RoomNumber, 0);
+				AddFire(item->Position.xPos, item->Position.yPos, item->Position.zPos, SP_BIGFIRE, item->RoomNumber, 0);
 
-				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+				TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 					16 - (GetRandomControl() & 1),
 					(GetRandomControl() & 0x3F) + 192,
 					(GetRandomControl() & 0x1F) + 96, 0);
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 
 				if (!Lara.Burn &&
-					ItemNearLara(&item->Pose, 600) &&
-					(pow(LaraItem->Pose.Position.x - item->Pose.Position.x, 2) +
-						pow(LaraItem->Pose.Position.z - item->Pose.Position.z, 2) < pow(SECTOR(0.5f), 2)) &&
+					ItemNearLara(&item->Position, 600) &&
+					(pow(LaraItem->Position.xPos - item->Position.xPos, 2) +
+						pow(LaraItem->Position.zPos - item->Position.zPos, 2) < pow(SECTOR(0.5f), 2)) &&
 					Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 				{
 					LaraBurn(LaraItem);
@@ -183,17 +183,17 @@ namespace TEN::Entities::Effects
 					if (item->TriggerFlags == 123)
 					{
 						// Middle of the block
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_SMALLFIRE, item->RoomNumber, item->ItemFlags[3]);
+						AddFire(item->Position.xPos, item->Position.yPos, item->Position.zPos, SP_SMALLFIRE, item->RoomNumber, item->ItemFlags[3]);
 					}
 					else
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_SMALLFIRE - item->TriggerFlags, item->RoomNumber, item->ItemFlags[3]);
+						AddFire(item->Position.xPos, item->Position.yPos, item->Position.zPos, SP_SMALLFIRE - item->TriggerFlags, item->RoomNumber, item->ItemFlags[3]);
 				}
 
 				if (item->TriggerFlags == 0 || item->TriggerFlags == 2)
 				{
 					if (item->ItemFlags[3])
 					{
-						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 							10,
 							((GetRandomControl() & 0x3F) + 192) * item->ItemFlags[3] >> 8,
 							(GetRandomControl() & 0x1F) + 96 * item->ItemFlags[3] >> 8,
@@ -201,7 +201,7 @@ namespace TEN::Entities::Effects
 					}
 					else
 					{
-						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Position.xPos, item->Position.yPos, item->Position.zPos,
 							10,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96,
@@ -211,11 +211,11 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180));
-					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180));
+					item->Position.xPos += phd_sin(item->Position.yRot - ANGLE(180));
+					item->Position.zPos += phd_cos(item->Position.yRot - ANGLE(180));
 
 					short roomNumber = item->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+					FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
 
 					if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 					{
@@ -229,15 +229,15 @@ namespace TEN::Entities::Effects
 						ItemNewRoom(itemNumber, roomNumber);
 					}
 
-					item->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);;
+					item->Position.yPos = GetFloorHeight(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);;
 
 					if (Wibble & 7)
 					{
-						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, -1, 1);
+						TriggerFireFlame(item->Position.xPos, item->Position.yPos - 32, item->Position.zPos, -1, 1);
 					}
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 			}
 			else if (item->ItemFlags[0] == 0)
 			{
@@ -364,22 +364,22 @@ namespace TEN::Entities::Effects
 
 			if (((-item->TriggerFlags) & 7) == 7)
 			{
-				switch (item->Pose.Orientation.y)
+				switch (item->Position.yRot)
 				{
 				case 0:
-					item->Pose.Position.z += 512;
+					item->Position.zPos += 512;
 					break;
 
 				case 0x4000:
-					item->Pose.Position.x += 512;
+					item->Position.xPos += 512;
 					break;
 
 				case -0x8000:
-					item->Pose.Position.z -= 512;
+					item->Position.zPos -= 512;
 					break;
 
 				case -0x4000:
-					item->Pose.Position.x -= 512;
+					item->Position.xPos -= 512;
 					break;
 				}
 			}
@@ -390,38 +390,38 @@ namespace TEN::Entities::Effects
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		item->Pose.Position.y -= 64;
+		item->Position.yPos -= 64;
 
 		if (item->TriggerFlags != 123)
 		{
-			switch (item->Pose.Orientation.y)
+			switch (item->Position.yRot)
 			{
 			case 0:
 				if (item->TriggerFlags == 2)
-					item->Pose.Position.z += 80;
+					item->Position.zPos += 80;
 				else
-					item->Pose.Position.z += 256;
+					item->Position.zPos += 256;
 				break;
 
 			case 0x4000:
 				if (item->TriggerFlags == 2)
-					item->Pose.Position.x += 80;
+					item->Position.xPos += 80;
 				else
-					item->Pose.Position.x += 256;
+					item->Position.xPos += 256;
 				break;
 
 			case -0x8000:
 				if (item->TriggerFlags == 2)
-					item->Pose.Position.z -= 80;
+					item->Position.zPos -= 80;
 				else
-					item->Pose.Position.z -= 256;
+					item->Position.zPos -= 256;
 				break;
 
 			case -0x4000:
 				if (item->TriggerFlags == 2)
-					item->Pose.Position.x -= 80;
+					item->Position.xPos -= 80;
 				else
-					item->Pose.Position.x -= 256;
+					item->Position.xPos -= 256;
 				break;
 			}
 		}
@@ -456,7 +456,7 @@ namespace TEN::Entities::Effects
 		{
 			if (item->TriggerFlags)
 			{
-				SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &item->Pose, 0);
+				SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &item->Position, 0);
 
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
@@ -464,17 +464,17 @@ namespace TEN::Entities::Effects
 				PHD_VECTOR src;
 				PHD_VECTOR dest;
 
-				src.x = item->Pose.Position.x;
-				src.y = item->Pose.Position.y;
-				src.z = item->Pose.Position.z;
+				src.x = item->Position.xPos;
+				src.y = item->Position.yPos;
+				src.z = item->Position.zPos;
 
 				if (!(GlobalCounter & 3))
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180));
-						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180));
+						dest.x = item->Position.xPos + 2048 * phd_sin(item->Position.yRot + ANGLE(180));
+						dest.y = item->Position.yPos;
+						dest.z = item->Position.zPos + 2048 * phd_cos(item->Position.yRot + ANGLE(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -554,9 +554,9 @@ namespace TEN::Entities::Effects
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					src.x = item->Pose.Position.x;
-					src.y = item->Pose.Position.y;
-					src.z = item->Pose.Position.z;
+					src.x = item->Position.xPos;
+					src.y = item->Position.yPos;
+					src.z = item->Position.zPos;
 
 					dest.x = (GetRandomControl() & 0x1FF) + src.x - 256;
 					dest.y = (GetRandomControl() & 0x1FF) + src.y - 256;
@@ -599,24 +599,24 @@ namespace TEN::Entities::Effects
 					i = item->ItemFlags[1] & 7;
 					x = 16 * (Flame3xzoffs[i][0] - 32);
 					z = 16 * (Flame3xzoffs[i][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Position.xPos, item->Position.yPos, z + item->Position.zPos, -1, 2);
 				}
 				else
 				{
 					i = item->ItemFlags[1] >> 3;
 					x = 16 * (Flame3xzoffs[i + 8][0] - 32);
 					z = 16 * (Flame3xzoffs[i + 8][1] - 32);
-					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
+					TriggerFireFlame(x + item->Position.xPos, item->Position.yPos, z + item->Position.zPos, -1, 2);
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
 
-				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
+				TriggerDynamicLight(x, item->Position.yPos, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				PHD_3DPOS pos;
-				pos.xPos = item->Pose.Position.x;
-				pos.yPos = item->Pose.Position.y;
-				pos.zPos = item->Pose.Position.z;
+				pos.xPos = item->Position.xPos;
+				pos.yPos = item->Position.yPos;
+				pos.zPos = item->Position.zPos;
 
 				if (ItemNearLara(&pos, 600))
 				{
@@ -625,8 +625,8 @@ namespace TEN::Entities::Effects
 						LaraItem->HitPoints -= 5;
 						LaraItem->HitStatus = true;
 
-						int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-						int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+						int dx = LaraItem->Position.xPos - item->Position.xPos;
+						int dz = LaraItem->Position.zPos - item->Position.zPos;
 
 						if (SQUARE(dx) + SQUARE(dz) < SQUARE(450))
 							LaraBurn(LaraItem);
@@ -686,8 +686,8 @@ namespace TEN::Entities::Effects
 
 			}
 
-			short oldYrot = item->Pose.Orientation.y;
-			item->Pose.Orientation.y = l->Pose.Orientation.y;
+			short oldYrot = item->Position.yRot;
+			item->Position.yRot = l->Position.yRot;
 
 			if (TestLaraPosition(&FireBounds, item, l))
 			{
@@ -697,7 +697,7 @@ namespace TEN::Entities::Effects
 				}
 				else
 				{
-					int dy = abs(l->Pose.Position.y - item->Pose.Position.y);
+					int dy = abs(l->Position.yPos - item->Position.yPos);
 					l->ItemFlags[3] = 1;
 					l->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
@@ -709,7 +709,7 @@ namespace TEN::Entities::Effects
 				Lara.InteractedItem = itemNumber;
 			}
 
-			item->Pose.Orientation.y = oldYrot;
+			item->Position.yRot = oldYrot;
 		}
 
 		if (Lara.InteractedItem == itemNumber

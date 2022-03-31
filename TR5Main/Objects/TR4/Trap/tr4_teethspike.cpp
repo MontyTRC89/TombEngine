@@ -52,20 +52,20 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags & 8)
 		{
 			angle = item->TriggerFlags & 7;
-			item->Pose.Orientation.x = rotations[angle];
-			item->Pose.Orientation.y = ANGLE(90.0f);
-			item->Pose.Position.z -= SPxzoffs[angle];
+			item->Position.xRot = rotations[angle];
+			item->Position.yRot = ANGLE(90.0f);
+			item->Position.zPos -= SPxzoffs[angle];
 		}
 		else
 		{
 			angle = item->TriggerFlags & 7;
-			item->Pose.Position.x += SPxzoffs[angle];
-			item->Pose.Orientation.z = rotations[angle];
+			item->Position.xPos += SPxzoffs[angle];
+			item->Position.zRot = rotations[angle];
 		}
 
 		item->ItemFlags[0] = 1024;
 		item->ItemFlags[2] = 0;
-		item->Pose.Position.y += SPyoffs[angle];
+		item->Position.yPos += SPyoffs[angle];
 	}
 
 	bool TestBoundsCollideTeethSpikes(ITEM_INFO* item)
@@ -77,28 +77,28 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags & 8)
 		{
-			x = (item->Pose.Position.x & (~1023)) | 512;
-			z = ((item->Pose.Position.z + SPxzoffs[angle]) & (~1023)) | 512;
+			x = (item->Position.xPos & (~1023)) | 512;
+			z = ((item->Position.zPos + SPxzoffs[angle]) & (~1023)) | 512;
 		}
 		else
 		{
-			x = ((item->Pose.Position.x - SPxzoffs[angle]) & (~1023)) | 512;
-			z = (item->Pose.Position.z & (~1023)) | 512;
+			x = ((item->Position.xPos - SPxzoffs[angle]) & (~1023)) | 512;
+			z = (item->Position.zPos & (~1023)) | 512;
 		}
 
 		int size = (item->TriggerFlags & 1 ? 300 : 480);
-		int y = item->Pose.Position.y + SPDETyoffs[angle];
+		int y = item->Position.yPos + SPDETyoffs[angle];
 
 		ANIM_FRAME* frames = GetBestFrame(LaraItem);
 
-		if (LaraItem->Pose.Position.y + frames->boundingBox.Y1 <= y
-			&& LaraItem->Pose.Position.y + frames->boundingBox.Y2 >= y - 900)
+		if (LaraItem->Position.yPos + frames->boundingBox.Y1 <= y
+			&& LaraItem->Position.yPos + frames->boundingBox.Y2 >= y - 900)
 		{
-			if (LaraItem->Pose.Position.x + frames->boundingBox.X1 <= (x + size)
-				&& LaraItem->Pose.Position.x + frames->boundingBox.X2 >= (x - size))
+			if (LaraItem->Position.xPos + frames->boundingBox.X1 <= (x + size)
+				&& LaraItem->Position.xPos + frames->boundingBox.X2 >= (x - size))
 			{
-				if (LaraItem->Pose.Position.z + frames->boundingBox.Z1 <= (z + size)
-					&& LaraItem->Pose.Position.z + frames->boundingBox.Z2 >= (z - size))
+				if (LaraItem->Position.zPos + frames->boundingBox.Z1 <= (z + size)
+					&& LaraItem->Position.zPos + frames->boundingBox.Z2 >= (z - size))
 					return true;
 			}
 		}
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR4
 			bool hit = false;
 
 			if (item->ItemFlags[0] == 1024)	// Just started.
-				SoundEffect(SFX_TR4_TEETH_SPIKES, (PHD_3DPOS*)&item->Pose, 0);
+				SoundEffect(SFX_TR4_TEETH_SPIKES, (PHD_3DPOS*)&item->Position, 0);
 
 			item->Status = ITEM_ACTIVE;
 
@@ -146,8 +146,8 @@ namespace TEN::Entities::TR4
 				else
 					bloodCount = 0;
 
-				int yTop = laraBounds->Y1 + LaraItem->Pose.Position.y;
-				int yBottom = laraBounds->Y2 + LaraItem->Pose.Position.y;
+				int yTop = laraBounds->Y1 + LaraItem->Position.yPos;
+				int yBottom = laraBounds->Y2 + LaraItem->Position.yPos;
 				int y1, y2;
 
 				if ((item->TriggerFlags & 15) == 8 ||
@@ -162,10 +162,10 @@ namespace TEN::Entities::TR4
 					y2 = bounds->Y2;
 				}
 
-				if (yTop < y1 + item->Pose.Position.y)
-					yTop = y1 + item->Pose.Position.y;
-				if (yBottom > y2 + item->Pose.Position.y)
-					yBottom = y2 + item->Pose.Position.y;	
+				if (yTop < y1 + item->Position.yPos)
+					yTop = y1 + item->Position.yPos;
+				if (yBottom > y2 + item->Position.yPos)
+					yBottom = y2 + item->Position.yPos;	
 				int dy = (abs(yTop - yBottom)) + 1;
 
 				if ((item->TriggerFlags & 7) == 2 
@@ -174,18 +174,18 @@ namespace TEN::Entities::TR4
 
 				for (int i = 0; i < bloodCount; i++)
 				{
-					int dx = LaraItem->Pose.Position.x + (GetRandomControl() & 127) - 64;
-					int dz = LaraItem->Pose.Position.z + (GetRandomControl() & 127) - 64;
+					int dx = LaraItem->Position.xPos + (GetRandomControl() & 127) - 64;
+					int dz = LaraItem->Position.zPos + (GetRandomControl() & 127) - 64;
 					TriggerBlood(dx, yBottom - (GetRandomControl() % dy), dz, GetRandomControl() << 1, 1);
 				}
 
 				if (LaraItem->HitPoints <= 0)
 				{
 					short roomNumber = LaraItem->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, &roomNumber);
-					int height = GetFloorHeight(floor, LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-					height -= LaraItem->Pose.Position.y;
-					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && height < 50)
+					FLOOR_INFO* floor = GetFloor(LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos, &roomNumber);
+					int height = GetFloorHeight(floor, LaraItem->Position.xPos, LaraItem->Position.yPos, LaraItem->Position.zPos);
+					height -= LaraItem->Position.yPos;
+					if (item->Position.yPos >= LaraItem->Position.yPos && height < 50)
 					{
 						LaraItem->Animation.AnimNumber = LA_SPIKE_DEATH;
 						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;

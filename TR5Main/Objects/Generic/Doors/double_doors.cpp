@@ -46,7 +46,7 @@ namespace TEN::Entities::Doors
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+			doorItem->Position.yRot ^= ANGLE(180.0f);
 
 			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
 			{
@@ -64,7 +64,7 @@ namespace TEN::Entities::Doors
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				doorItem->Position.yRot ^= ANGLE(180.0f);
 			}
 		}
 	}

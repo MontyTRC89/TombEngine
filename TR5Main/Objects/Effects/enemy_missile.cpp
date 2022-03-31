@@ -23,8 +23,8 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.xPos;
-		int dz = LaraItem->Pose.Position.z - fx->pos.zPos;
+		int dx = LaraItem->Position.xPos - fx->pos.xPos;
+		int dz = LaraItem->Position.zPos - fx->pos.zPos;
 
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -75,8 +75,8 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.xPos;
-		int dz = LaraItem->Pose.Position.z - fx->pos.zPos;
+		int dx = LaraItem->Position.xPos - fx->pos.xPos;
+		int dz = LaraItem->Position.zPos - fx->pos.zPos;
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
@@ -134,9 +134,9 @@ namespace TEN::Entities::Effects
 
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->Pose.Position.x - fx->pos.xPos,
-			LaraItem->Pose.Position.y - fx->pos.yPos - CLICK(1),
-			LaraItem->Pose.Position.z - fx->pos.zPos,
+			LaraItem->Position.xPos - fx->pos.xPos,
+			LaraItem->Position.yPos - fx->pos.yPos - CLICK(1),
+			LaraItem->Position.zPos - fx->pos.zPos,
 			angles);
 
 		int maxRotation = 0;

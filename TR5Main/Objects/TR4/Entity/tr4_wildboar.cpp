@@ -44,8 +44,8 @@ void WildBoarControl(short itemNumber)
 
 	if (item->HitPoints > 0)
 	{
-		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		int dx = LaraItem->Position.xPos - item->Position.xPos;
+		int dz = LaraItem->Position.zPos - item->Position.zPos;
 		int laraDistance = dx * dx + dz * dz;
 
 		if (item->AIBits & GUARD)
@@ -66,8 +66,8 @@ void WildBoarControl(short itemNumber)
 				auto* target = &g_Level.Items[currentItem->ItemNumber];
 				if (target->ObjectNumber != ID_WILD_BOAR)
 				{
-					int dx2 = target->Pose.Position.x - item->Pose.Position.x;
-					int dz2 = target->Pose.Position.z - item->Pose.Position.z;
+					int dx2 = target->Position.xPos - item->Position.xPos;
+					int dz2 = target->Position.zPos - item->Position.zPos;
 					int distance = dx2 * dx2 + dz2 * dz2;
 
 					if (distance < minDistance &&
@@ -148,7 +148,7 @@ void WildBoarControl(short itemNumber)
 					creature->Enemy->HitStatus = true;
 				}
 
-				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Position.yRot, DoBloodSplat);
 				item->Flags = 1;
 			}
 

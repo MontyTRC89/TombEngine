@@ -58,7 +58,7 @@ void HammerheadControl(short itemNumber)
 			CreatureAIInfo(item, &AI);
 
 			if (creature->Enemy != LaraItem)
-				phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+				phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
 
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);

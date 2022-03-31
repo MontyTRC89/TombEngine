@@ -82,7 +82,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 		(laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber))
 	{
-		short oldYrot = receptableItem->Pose.Orientation.y;
+		short oldYrot = receptableItem->Position.yRot;
 
 		auto* bounds = GetBoundsAccurate(receptableItem);
 		PuzzleBounds.boundingBox.X1 = bounds->X1 - CLICK(1);
@@ -99,13 +99,13 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 					if (g_Gui.IsObjectInInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
 						g_Gui.SetEnterInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
-					receptableItem->Pose.Orientation.y = oldYrot;
+					receptableItem->Position.yRot = oldYrot;
 					return;
 				}
 
 				if (g_Gui.GetInventoryItemChosen() != receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
-					receptableItem->Pose.Orientation.y = oldYrot;
+					receptableItem->Position.yRot = oldYrot;
 					return;
 				}
 			}
@@ -117,7 +117,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 				{
 					laraInfo->InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					receptableItem->Pose.Orientation.y = oldYrot;
+					receptableItem->Position.yRot = oldYrot;
 					return;
 				}
 			}
@@ -145,7 +145,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraInfo->InteractedItem = itemNumber;
-			receptableItem->Pose.Orientation.y = oldYrot;
+			receptableItem->Position.yRot = oldYrot;
 			receptableItem->Flags |= 0x20;
 			return;
 		}
@@ -159,7 +159,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 			}
 		}
 
-		receptableItem->Pose.Orientation.y = oldYrot;
+		receptableItem->Position.yRot = oldYrot;
 	}
 	else
 	{

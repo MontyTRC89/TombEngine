@@ -705,11 +705,11 @@ namespace TEN::Renderer
 		Matrix world;
 
 		if (worldSpace & SPHERES_SPACE_WORLD)
-			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+			world = Matrix::CreateTranslation(nativeItem->Position.xPos, nativeItem->Position.yPos, nativeItem->Position.zPos) * local;
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->Pose.Orientation.y), TO_RAD(nativeItem->Pose.Orientation.x), TO_RAD(nativeItem->Pose.Orientation.z)) * world;
+		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->Position.yRot), TO_RAD(nativeItem->Position.xRot), TO_RAD(nativeItem->Position.zRot)) * world;
 
 		short objNum = nativeItem->ObjectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;

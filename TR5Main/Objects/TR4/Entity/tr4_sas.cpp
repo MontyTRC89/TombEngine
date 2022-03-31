@@ -143,9 +143,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int ang = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				int dx = LaraItem->Position.xPos - item->Position.xPos;
+				int dz = LaraItem->Position.zPos - item->Position.zPos;
+				int ang = phd_atan(dz, dx) - item->Position.yRot;
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -176,24 +176,24 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= ANGLE(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(10.0f);
+							item->Position.yRot += ANGLE(10.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(10.0f);
+							item->Position.yRot -= ANGLE(10.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Position.yRot += AI.angle;
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) >= ANGLE(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(2.0f);
+							item->Position.yRot += ANGLE(2.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(2.0f);
+							item->Position.yRot -= ANGLE(2.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Position.yRot += AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
@@ -562,18 +562,18 @@ namespace TEN::Entities::TR4
 			PHD_VECTOR pos = { SASGunBite.x, SASGunBite.y, SASGunBite.z };
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
-			grenadeItem->Pose.Position.x = pos.x;
-			grenadeItem->Pose.Position.y = pos.y;
-			grenadeItem->Pose.Position.z = pos.z;
+			grenadeItem->Position.xPos = pos.x;
+			grenadeItem->Position.yPos = pos.y;
+			grenadeItem->Position.zPos = pos.z;
 
 			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
 			grenadeItem->RoomNumber = probe.RoomNumber;
 
-			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
+			if (probe.Position.Floor < grenadeItem->Position.yPos)
 			{
-				grenadeItem->Pose.Position.x = item->Pose.Position.x;
-				grenadeItem->Pose.Position.y = probe.Position.Floor;
-				grenadeItem->Pose.Position.z = item->Pose.Position.z;
+				grenadeItem->Position.xPos = item->Position.xPos;
+				grenadeItem->Position.yPos = probe.Position.Floor;
+				grenadeItem->Position.zPos = item->Position.zPos;
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
@@ -585,9 +585,9 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->Pose.Orientation.x = angle1 + item->Pose.Orientation.x;
-			grenadeItem->Pose.Orientation.y = angle2 + item->Pose.Orientation.y;
-			grenadeItem->Pose.Orientation.z = 0;
+			grenadeItem->Position.xRot = angle1 + item->Position.xRot;
+			grenadeItem->Position.yRot = angle2 + item->Position.yRot;
+			grenadeItem->Position.zRot = 0;
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
@@ -596,9 +596,9 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->ItemFlags[2] = 1;
 			grenadeItem->Animation.Velocity = 128;
-			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
-			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
+			grenadeItem->Animation.ActiveState = grenadeItem->Position.xRot;
+			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Position.xRot);
+			grenadeItem->Animation.TargetState = grenadeItem->Position.yRot;
 			grenadeItem->Animation.RequiredState = 0;
 			grenadeItem->HitPoints = 120;
 
@@ -663,9 +663,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					int x = laraItem->Pose.Position.x - 512 * phd_sin(laraItem->Pose.Orientation.y);
-					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * phd_cos(laraItem->Pose.Orientation.y);
+					int x = laraItem->Position.xPos - 512 * phd_sin(laraItem->Position.yRot);
+					int y = laraItem->Position.yPos;
+					int z = laraItem->Position.zPos - 512 * phd_cos(laraItem->Position.yRot);
 
 					TestTriggers(x, y, z, laraItem->RoomNumber, true);
 
@@ -685,7 +685,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+					laraItem->Position.yRot = item->Position.yRot;
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

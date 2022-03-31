@@ -70,9 +70,9 @@ void RaptorControl(short itemNumber)
 
 				auto* targetItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
 
-				int x = (targetItem->Pose.Position.x - item->Pose.Position.x) / 64;
-				int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
-				int z = (targetItem->Pose.Position.z - item->Pose.Position.z) / 64;
+				int x = (targetItem->Position.xPos - item->Position.xPos) / 64;
+				int y = (targetItem->Position.yPos - item->Position.yPos) / 64;
+				int z = (targetItem->Position.zPos - item->Position.zPos) / 64;
 
 				int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 				if (distance < minDistance && item->HitPoints > 0)
@@ -87,9 +87,9 @@ void RaptorControl(short itemNumber)
 			if (nearestItem != NULL && (nearestItem->ObjectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < pow(SECTOR(2), 2))))
 				creature->Enemy = nearestItem;
 
-			int x = (LaraItem->Pose.Position.x - item->Pose.Position.x) / 64;
-			int y = (LaraItem->Pose.Position.y - item->Pose.Position.y) / 64;
-			int z = (LaraItem->Pose.Position.z - item->Pose.Position.z) / 64;
+			int x = (LaraItem->Position.xPos - item->Position.xPos) / 64;
+			int y = (LaraItem->Position.yPos - item->Position.yPos) / 64;
+			int z = (LaraItem->Position.zPos - item->Position.zPos) / 64;
 
 			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 			if (distance <= minDistance)
@@ -212,9 +212,9 @@ void RaptorControl(short itemNumber)
 			{
 				if (!(creature->Flags & 1) && creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
+					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < CLICK(2) &&
+						abs(creature->Enemy->Position.yPos - item->Position.yPos) < CLICK(2) &&
+						abs(creature->Enemy->Position.zPos - item->Position.zPos) < CLICK(2))
 					{
 						creature->Enemy->HitPoints -= 25;
 						creature->Enemy->HitStatus = 1;
@@ -255,9 +255,9 @@ void RaptorControl(short itemNumber)
 			{
 				if (!(creature->Flags & 1) && creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512)
+					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < 512 &&
+						abs(creature->Enemy->Position.yPos - item->Position.yPos) < 512 &&
+						abs(creature->Enemy->Position.zPos - item->Position.zPos) < 512)
 					{
 						creature->Enemy->HitPoints -= 25;
 						creature->Enemy->HitStatus = 1;
@@ -298,9 +298,9 @@ void RaptorControl(short itemNumber)
 			{
 				if (!(creature->Flags & 1) && creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512)
+					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < 512 &&
+						abs(creature->Enemy->Position.yPos - item->Position.yPos) < 512 &&
+						abs(creature->Enemy->Position.zPos - item->Position.zPos) < 512)
 					{
 						creature->Enemy->HitPoints -= 25;
 						creature->Enemy->HitStatus = 1;

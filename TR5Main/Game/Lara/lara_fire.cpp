@@ -781,20 +781,20 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int 
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Position, 0);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(hitPos, laraItem->Position.yRot, 3, 0);
 					return;
 				}
 				else
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Position.yRot, target->RoomNumber);
 
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(hitPos, laraItem->Position.yRot, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				TriggerRicochetSpark(hitPos, laraItem->Position.yRot, 3, -5);
 
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
@@ -838,9 +838,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
 	PHD_VECTOR pos;
-	pos.x = src->Pose.Position.x;
+	pos.x = src->Position.xPos;
 	pos.y = muzzleOffset.y;
-	pos.z = src->Pose.Position.z;
+	pos.z = src->Position.zPos;
 	PHD_3DPOS rotation;
 	rotation.xRot = angles[1] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536;
 	rotation.yRot = angles[0] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536;
@@ -962,12 +962,12 @@ void FindTargetPoint(ITEM_INFO* item, GAME_VECTOR* target)
 	int y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
 	int z = (int)(bounds->Z1 + bounds->Z2) / 2;
 
-	float c = phd_cos(item->Pose.Orientation.y);
-	float s = phd_sin(item->Pose.Orientation.y);
+	float c = phd_cos(item->Position.yRot);
+	float s = phd_sin(item->Position.yRot);
 
-	target->x = item->Pose.Position.x + c * x + s * z;
-	target->y = item->Pose.Position.y + y;
-	target->z = item->Pose.Position.z + c * z - s * x;
+	target->x = item->Position.xPos + c * x + s * z;
+	target->y = item->Position.yPos + y;
+	target->z = item->Position.zPos + c * z - s * x;
 	target->roomNumber = item->RoomNumber;
 }
 
@@ -990,17 +990,17 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
 	GAME_VECTOR src;
-	src.x = laraItem->Pose.Position.x;
+	src.x = laraItem->Position.xPos;
 	src.y = muzzleOffset.y;
-	src.z = laraItem->Pose.Position.z;
+	src.z = laraItem->Position.zPos;
 	src.roomNumber = laraItem->RoomNumber;
 
 	GAME_VECTOR targetPoint;
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
-	angles[0] -= laraItem->Pose.Orientation.y;
-	angles[1] -= laraItem->Pose.Orientation.x;
+	angles[0] -= laraItem->Position.yRot;
+	angles[1] -= laraItem->Position.xRot;
 
 	if (LOS(&src, &targetPoint))
 	{
@@ -1057,9 +1057,9 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
 	GAME_VECTOR src;
-	src.x = laraItem->Pose.Position.x;
+	src.x = laraItem->Position.xPos;
 	src.y = muzzleOffset.y;
-	src.z = laraItem->Pose.Position.z;
+	src.z = laraItem->Position.zPos;
 	src.roomNumber = laraItem->RoomNumber;
 
 	ITEM_INFO* bestItem = NULL;
@@ -1074,9 +1074,9 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 			auto* item = &g_Level.Items[ActiveCreatures[slot]->ItemNumber];
 			if (item->HitPoints > 0)
 			{
-				int x = item->Pose.Position.x - src.x;
-				int y = item->Pose.Position.y - src.y;
-				int z = item->Pose.Position.z - src.z;
+				int x = item->Position.xPos - src.x;
+				int y = item->Position.yPos - src.y;
+				int z = item->Position.zPos - src.z;
 				if (abs(x) <= maxDistance && abs(y) <= maxDistance && abs(z) <= maxDistance)
 				{
 					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
@@ -1088,8 +1088,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 						{
 							short angle[2];
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
-							angle[1] -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
+							angle[0] -= laraItem->Position.yRot + lara->ExtraTorsoRot.yRot;
+							angle[1] -= laraItem->Position.xRot + lara->ExtraTorsoRot.xRot;
 
 							if (angle[0] >= weaponInfo->LockAngles[0] && angle[0] <= weaponInfo->LockAngles[1] && angle[1] >= weaponInfo->LockAngles[2] && angle[1] <= weaponInfo->LockAngles[3])
 							{

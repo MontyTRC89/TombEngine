@@ -79,8 +79,8 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* 
 			auto* currentItem = &g_Level.Items[linkNumber];
 
 			if (linkNumber != itemNumber &&
-				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
-				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
+				currentItem->Position.xPos == sarcItem->Position.xPos &&
+				currentItem->Position.zPos == sarcItem->Position.zPos)
 			{
 				if (Objects[currentItem->ObjectNumber].isPickup)
 				{

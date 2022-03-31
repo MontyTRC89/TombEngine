@@ -302,7 +302,7 @@ void CreateZone(ITEM_INFO* item)
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(r, item->Pose.Position.x - r->x, item->Pose.Position.z - r->z)->Box;
+	item->BoxNumber = GetSector(r, item->Position.xPos - r->x, item->Position.zPos - r->z)->Box;
 
 	if (creature->LOT.Fly)
 	{

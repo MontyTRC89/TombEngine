@@ -40,9 +40,9 @@ void FallingCeilingControl(short itemNumber)
 
 		if (item->Animation.ActiveState == 1)
 		{
-			if (item->Pose.Position.y >= item->Floor)
+			if (item->Position.yPos >= item->Floor)
 			{
-				item->Pose.Position.y = item->Floor;
+				item->Position.yPos = item->Floor;
 				item->Animation.Airborne = false;
 				item->Animation.TargetState = 2;
 				item->Animation.VerticalVelocity = 0;

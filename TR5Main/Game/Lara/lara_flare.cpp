@@ -31,22 +31,22 @@ void FlareControl(short itemNumber)
 
 	if (flareItem->Animation.VerticalVelocity)
 	{
-		flareItem->Pose.Orientation.x += ANGLE(3.0f);
-		flareItem->Pose.Orientation.z += ANGLE(5.0f);
+		flareItem->Position.xRot += ANGLE(3.0f);
+		flareItem->Position.zRot += ANGLE(5.0f);
 	}
 	else
 	{
-		flareItem->Pose.Orientation.x = 0;
-		flareItem->Pose.Orientation.z = 0;
+		flareItem->Position.xRot = 0;
+		flareItem->Position.zRot = 0;
 	}
 
-	PHD_VECTOR oldPos = { flareItem->Pose.Position.x , flareItem->Pose.Position.y , flareItem->Pose.Position.z };
+	PHD_VECTOR oldPos = { flareItem->Position.xPos , flareItem->Position.yPos , flareItem->Position.zPos };
 
-	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y);
-	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y);
+	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Position.yRot);
+	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Position.yRot);
 
-	flareItem->Pose.Position.x += xVel;
-	flareItem->Pose.Position.z += zVel;
+	flareItem->Position.xPos += xVel;
+	flareItem->Position.zPos += zVel;
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
@@ -57,7 +57,7 @@ void FlareControl(short itemNumber)
 	else
 		flareItem->Animation.VerticalVelocity += 6;
 
-	flareItem->Pose.Position.y += flareItem->Animation.VerticalVelocity;
+	flareItem->Position.yPos += flareItem->Animation.VerticalVelocity;
 
 	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->Animation.VerticalVelocity, zVel);
 
@@ -74,7 +74,7 @@ void FlareControl(short itemNumber)
 	else
 		life++;
 
-	if (DoFlareLight((PHD_VECTOR*)&flareItem->Pose, life))
+	if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		/* Hardcoded code */
@@ -88,8 +88,8 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Rotation = PHD_3DPOS();
+	lara->RightArm.Rotation = PHD_3DPOS();
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->TargetEntity = NULL;
@@ -243,7 +243,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem));
+				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Position, TestEnvironment(ENV_FLAG_WATER, laraItem));
 				lara->Flare.Life = 1;
 			}
 
@@ -298,34 +298,34 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		PHD_VECTOR pos = { -16, 32, 42 };
 		GetLaraJointPosition(&pos, LM_LHAND);
 
-		flareItem->Pose.Position.x = pos.x;
-		flareItem->Pose.Position.y = pos.y;
-		flareItem->Pose.Position.z = pos.z;
+		flareItem->Position.xPos = pos.x;
+		flareItem->Position.yPos = pos.y;
+		flareItem->Position.zPos = pos.z;
 
 		int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber).Position.Floor;
 		auto collided = GetCollidedObjects(flareItem, 0, true, CollidedItems, CollidedMeshes, true);
 		if (floorHeight < pos.y || collided)
 		{
 			flag = true;
-			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
-			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * phd_sin(flareItem->Pose.Orientation.y);
-			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * phd_cos(flareItem->Pose.Orientation.y);
+			flareItem->Position.yRot = laraItem->Position.yRot + ANGLE(180.0f);
+			flareItem->Position.xPos = laraItem->Position.xPos + 320 * phd_sin(flareItem->Position.yRot);
+			flareItem->Position.zPos = laraItem->Position.zPos + 320 * phd_cos(flareItem->Position.yRot);
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 		else
 		{
 			if (thrown)
-				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+				flareItem->Position.yRot = laraItem->Position.yRot;
 			else
-				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y - ANGLE(45.0f);
+				flareItem->Position.yRot = laraItem->Position.yRot - ANGLE(45.0f);
 
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 
 		InitialiseItem(itemNumber);
 
-		flareItem->Pose.Orientation.x = 0;
-		flareItem->Pose.Orientation.z = 0;
+		flareItem->Position.xRot = 0;
+		flareItem->Position.zRot = 0;
 		flareItem->Shade = -1;
 
 		if (thrown)
@@ -346,7 +346,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		{
 			flareItem->Data = (int)0;
 			int& life = flareItem->Data;
-			if (DoFlareLight((PHD_VECTOR*)&flareItem->Pose, lara->Flare.Life))
+			if (DoFlareLight((PHD_VECTOR*)&flareItem->Position, lara->Flare.Life))
 				life = lara->Flare.Life | 0x8000;
 			else
 				life = lara->Flare.Life & 0x7FFF;

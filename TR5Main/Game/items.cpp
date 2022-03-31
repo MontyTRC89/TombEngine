@@ -17,7 +17,7 @@ void ClearItem(short itemNumber)
 
 	item->Collidable = true;
 	item->Data = nullptr;
-	item->StartPosition = item->Pose;
+	item->StartPosition = item->Position;
 }
 
 void KillItem(short itemNumber)
@@ -326,8 +326,8 @@ void InitialiseItem(short itemNumber)
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 
-	item->Pose.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
+	item->Position.zRot = 0;
+	item->Position.xRot = 0;
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Velocity = 0;
@@ -383,8 +383,8 @@ void InitialiseItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
+	FLOOR_INFO* floor = GetSector(room, item->Position.xPos - room->x, item->Position.zPos - room->z);
+	item->Floor = floor->FloorHeight(item->Position.xPos, item->Position.zPos);
 	item->BoxNumber = floor->Box;
 
 	if (Objects[item->ObjectNumber].nmeshes > 0)
@@ -442,7 +442,7 @@ short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
 
 		spawn->ObjectNumber = objectNumber;
 		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Position, &item->Pose, sizeof(PHD_3DPOS));
+		memcpy(&spawn->Position, &item->Position, sizeof(PHD_3DPOS));
 
 		InitialiseItem(itemNumber);
 
@@ -476,12 +476,12 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float s = phd_sin(item->Position.yRot);
+	float c = phd_cos(item->Position.yRot);
 
-	int x = item->Pose.Position.x + roundf(c * xOffset + s * zOffset);
-	int y = height + item->Pose.Position.y;
-	int z = item->Pose.Position.z + roundf(-s * xOffset + c * zOffset);
+	int x = item->Position.xPos + roundf(c * xOffset + s * zOffset);
+	int y = height + item->Position.yPos;
+	int z = item->Position.zPos + roundf(-s * xOffset + c * zOffset);
 
 	item->Location = GetRoom(item->Location, x, y, z);
 	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);

@@ -41,8 +41,8 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE || laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber)
 		{
-			short rot = poleItem->Pose.Orientation.y;
-			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			short rot = poleItem->Position.yRot;
+			poleItem->Position.yRot = laraItem->Position.yRot;
 
 			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
 			{
@@ -57,7 +57,7 @@ namespace TEN::Entities::Generic
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				poleItem->Pose.Orientation.y = rot;
+				poleItem->Position.yRot = rot;
 			}
 			else
 			{
@@ -67,7 +67,7 @@ namespace TEN::Entities::Generic
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				poleItem->Pose.Orientation.y = rot;
+				poleItem->Position.yRot = rot;
 			}
 		}
 		else if (TrInput & IN_ACTION && isLara &&
@@ -82,18 +82,18 @@ namespace TEN::Entities::Generic
 			{
 				if (TestCollision(poleItem, laraItem))
 				{
-					short rot = poleItem->Pose.Orientation.y;
-					poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+					short rot = poleItem->Position.yRot;
+					poleItem->Position.yRot = laraItem->Position.yRot;
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
-						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
+						PolePosR.y = laraItem->Position.yPos - poleItem->Position.yPos + 10;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_REACH_TO_POLE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					}
 					else
 					{
-						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
+						PolePosR.y = laraItem->Position.yPos - poleItem->Position.yPos + 66;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_JUMP_UP_TO_POLE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -103,7 +103,7 @@ namespace TEN::Entities::Generic
 					laraItem->Animation.VerticalVelocity = 0;
 					laraItem->Animation.Airborne = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					poleItem->Pose.Orientation.y = rot;
+					poleItem->Position.yRot = rot;
 				}
 			}
 		}
