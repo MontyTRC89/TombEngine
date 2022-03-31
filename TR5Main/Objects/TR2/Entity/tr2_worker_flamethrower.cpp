@@ -36,9 +36,9 @@ static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumbe
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
 		//TODO: complete fx parameters
 		fx->shade = 14 * 256;
@@ -65,7 +65,7 @@ void WorkerFlamethrower(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	PHD_VECTOR pos;
+	Vector3Int pos;
 
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);

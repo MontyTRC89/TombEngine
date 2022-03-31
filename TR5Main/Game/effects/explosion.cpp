@@ -24,7 +24,7 @@ namespace TEN {
 					SpawnExplosionParticle(particlePos);
 				}
 				if (triggerSparks) {
-					PHD_VECTOR sparkPos;
+					Vector3Int sparkPos;
 					sparkPos.x = pos.x;
 					sparkPos.y = pos.y;
 					sparkPos.z = pos.z;
@@ -32,9 +32,9 @@ namespace TEN {
 				}
 				if (triggerShockwave) {
 					PHD_3DPOS shockPos;
-					shockPos.xPos = pos.x;
-					shockPos.yPos = pos.y;
-					shockPos.zPos = pos.z;
+					shockPos.Position.x = pos.x;
+					shockPos.Position.y = pos.y;
+					shockPos.Position.z = pos.z;
 					TriggerShockwave(&shockPos, 0, size, 64, 32, 32, 32, 30, rand() & 0xFFFF, 0);
 				}
 			}

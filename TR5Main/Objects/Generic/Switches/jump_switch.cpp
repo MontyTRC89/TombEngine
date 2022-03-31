@@ -21,7 +21,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR JumpSwitchPos = { 0, -208, 256 };  
+	Vector3Int JumpSwitchPos = { 0, -208, 256 };  
 
 	void JumpSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{

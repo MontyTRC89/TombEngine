@@ -22,7 +22,7 @@ void InitialiseInvisibleGhost(short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
-	item->Position.yPos += CLICK(2);
+	item->Pose.Position.y += CLICK(2);
 }
 
 void InvisibleGhostControl(short itemNumber)
@@ -50,12 +50,12 @@ void InvisibleGhostControl(short itemNumber)
 	if (abs(AI.angle) >= ANGLE(3.0f))
 	{
 		if (AI.angle > 0)
-			item->Position.yRot += ANGLE(3.0f);
+			item->Pose.Orientation.y += ANGLE(3.0f);
 		else
-			item->Position.yRot -= ANGLE(3.0f);
+			item->Pose.Orientation.y -= ANGLE(3.0f);
 	}
 	else
-		item->Position.yRot += AI.angle;
+		item->Pose.Orientation.y += AI.angle;
 
 	if (AI.ahead)
 	{
@@ -84,7 +84,7 @@ void InvisibleGhostControl(short itemNumber)
 		item->TouchBits & 0x9470 &&
 		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 	{
-		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Position.yRot, DoBloodSplat);
+		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= 400;
@@ -106,7 +106,7 @@ void InvisibleGhostControl(short itemNumber)
 		if (item->ItemFlags[0] == 0)
 		{
 			item->ItemFlags[0] = 1;
-			SoundEffect(SFX_TR5_SKELETON_GHOST_APPEAR, &item->Position, 0);
+			SoundEffect(SFX_TR5_SKELETON_GHOST_APPEAR, &item->Pose, 0);
 		}
 	}
 

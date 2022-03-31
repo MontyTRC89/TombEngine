@@ -2,7 +2,7 @@
 #include "Specific/phd_global.h"
 
 struct PHD_3DPOS;
-struct PHD_VECTOR;
+struct Vector3Int;
 struct ITEM_INFO;
 
 struct ANIM_FRAME
@@ -88,8 +88,8 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
 ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
 
 BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
-void GetLaraJointPosition(PHD_VECTOR* pos, int laraMeshIndex);
-void GetJointAbsPosition(ITEM_INFO* item, PHD_VECTOR* vec, int joint);
+void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
+void GetJointAbsPosition(ITEM_INFO* item, Vector3Int* vec, int joint);
 
 void ClampRotation(PHD_3DPOS* pos, short angle, short rotation); 
 

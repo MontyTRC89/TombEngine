@@ -27,15 +27,15 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		short roomNumber = item->RoomNumber;
 
-		PHD_VECTOR itemPos;
-		itemPos.x = item->Position.xPos;
-		itemPos.y = item->Position.yPos;
-		itemPos.z = item->Position.zPos;
+		Vector3Int itemPos;
+		itemPos.x = item->Pose.Position.x;
+		itemPos.y = item->Pose.Position.y;
+		itemPos.z = item->Pose.Position.z;
 
 		FLOOR_INFO* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
 		itemPos.y = GetCeiling(floor, itemPos.x, itemPos.y, itemPos.z);
 
-		PHD_VECTOR pos = { 0, 16384, 0 };
+		Vector3Int pos = { 0, 16384, 0 };
 		ROPE_STRUCT rope;
 		PrepareRope(&rope, &itemPos, &pos, CLICK(0.5f), item);
 
@@ -44,7 +44,7 @@ namespace TEN::Entities::Generic
 		Ropes.push_back(rope);
 	}
 
-	void PrepareRope(ROPE_STRUCT* rope, PHD_VECTOR* pos1, PHD_VECTOR* pos2, int length, ITEM_INFO* item)
+	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ITEM_INFO* item)
 	{
 		rope->position = *pos1;
 		rope->segmentLength = length << 16;
@@ -92,7 +92,7 @@ namespace TEN::Entities::Generic
 		rope->active = 0;
 	}
 
-	PHD_VECTOR* NormaliseRopeVector(PHD_VECTOR* vec)
+	Vector3Int* NormaliseRopeVector(Vector3Int* vec)
 	{
 		int x = vec->x >> FP_SHIFT;
 		int y = vec->y >> FP_SHIFT;
@@ -126,19 +126,19 @@ namespace TEN::Entities::Generic
 		*z = (rope->normalisedSegment[segment].z * frame >> FP_SHIFT) + (rope->meshSegment[segment].z >> FP_SHIFT) + rope->position.z;
 	}
 
-	int DotProduct(PHD_VECTOR* u, PHD_VECTOR* v)
+	int DotProduct(Vector3Int* u, Vector3Int* v)
 	{
 		return (u->x * v->x + u->y * v->y + u->z * v->z) >> W2V_SHIFT;
 	}
 
-	void ScaleVector(PHD_VECTOR* u, int c, PHD_VECTOR* destination)
+	void ScaleVector(Vector3Int* u, int c, Vector3Int* destination)
 	{
 		destination->x = c * u->x >> W2V_SHIFT;
 		destination->y = c * u->y >> W2V_SHIFT;
 		destination->z = c * u->z >> W2V_SHIFT;
 	}
 
-	void CrossProduct(PHD_VECTOR* u, PHD_VECTOR* v, PHD_VECTOR* destination)
+	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* destination)
 	{
 		destination->x = (u->y * v->z - u->z * v->y) >> W2V_SHIFT;
 		destination->y = (u->z * v->x - u->x * v->z) >> W2V_SHIFT;
@@ -186,9 +186,9 @@ namespace TEN::Entities::Generic
 
 			int segment = RopeNodeCollision(
 				rope,
-				laraItem->Position.xPos,
-				laraItem->Position.yPos + frame->Y1 + 512,
-				laraItem->Position.zPos + frame->Z2 * phd_cos(laraItem->Position.yRot),
+				laraItem->Pose.Position.x,
+				laraItem->Pose.Position.y + frame->Y1 + 512,
+				laraItem->Pose.Position.z + frame->Z2 * phd_cos(laraItem->Pose.Orientation.y),
 				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
@@ -213,7 +213,7 @@ namespace TEN::Entities::Generic
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
 				laraInfo->Control.Rope.Segment = segment;
-				laraInfo->Control.Rope.Y = laraItem->Position.yRot;
+				laraInfo->Control.Rope.Y = laraItem->Pose.Orientation.y;
 
 				DelAlignLaraToRope(laraItem);
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, laraItem->Position.yRot, 16 * laraItem->Animation.Velocity);
+				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ namespace TEN::Entities::Generic
 	void RopeDynamics(ROPE_STRUCT* rope)
 	{
 		PENDULUM* pendulumPointer;
-		PHD_VECTOR vec, vec2;
+		Vector3Int vec, vec2;
 
 		int flag = 0;
 		if (rope->coiled)
@@ -481,9 +481,9 @@ namespace TEN::Entities::Generic
 		CurrentPendulum.rope = rope;
 	}
 
-	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, PHD_VECTOR* ropeVelocity, PHD_VECTOR* pendulumVelocity, int value)
+	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3Int* ropeVelocity, Vector3Int* pendulumVelocity, int value)
 	{
-		PHD_VECTOR vec;
+		Vector3Int vec;
 		vec.x = pendulumPointer->position.x + pendulumVelocity->x - rope->segment[0].x;
 		vec.y = pendulumPointer->position.y + pendulumVelocity->y - rope->segment[0].y;
 		vec.z = pendulumPointer->position.z + pendulumVelocity->z - rope->segment[0].z;
@@ -496,9 +496,9 @@ namespace TEN::Entities::Generic
 		pendulumVelocity->z -= (int64_t)result * vec.z >> FP_SHIFT;
 	}
 
-	void ModelRigid(PHD_VECTOR* segment, PHD_VECTOR* nextSegment, PHD_VECTOR* velocity, PHD_VECTOR* nextVelocity, int length)
+	void ModelRigid(Vector3Int* segment, Vector3Int* nextSegment, Vector3Int* velocity, Vector3Int* nextVelocity, int length)
 	{
-		PHD_VECTOR vec;
+		Vector3Int vec;
 		vec.x = nextSegment->x + nextVelocity->x - segment->x - velocity->x;
 		vec.y = nextSegment->y + nextVelocity->y - segment->y - velocity->y;
 		vec.z = nextSegment->z + nextVelocity->z - segment->z - velocity->z;
@@ -529,7 +529,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Position.xRot > 0 && item->Position.xRot - Lara.Control.Rope.LastX < -100)
+			if (item->Pose.Orientation.x > 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX < -100)
 			{
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
@@ -544,7 +544,7 @@ namespace TEN::Entities::Generic
 				else
 					RopeSwing = 0;
 
-				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
+				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Pose, 0);
 			}
 			else if (Lara.Control.Rope.LastX < 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
@@ -560,7 +560,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->Position.xRot < 0 && item->Position.xRot - Lara.Control.Rope.LastX > 100)
+			if (item->Pose.Orientation.x < 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX > 100)
 			{
 				Lara.Control.Rope.ArcBack = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 1;
@@ -575,7 +575,7 @@ namespace TEN::Entities::Generic
 				else
 					RopeSwing = 0;
 
-				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Position, 0);
+				SoundEffect(SFX_TR4_LARA_ROPE_CREAK, &item->Pose, 0);
 			}
 			else if (Lara.Control.Rope.LastX > 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
@@ -590,16 +590,16 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		Lara.Control.Rope.LastX = item->Position.xRot;
+		Lara.Control.Rope.LastX = item->Pose.Orientation.x;
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Position.xRot > Lara.Control.Rope.MaxXForward)
-				Lara.Control.Rope.MaxXForward = item->Position.xRot;
+			if (item->Pose.Orientation.x > Lara.Control.Rope.MaxXForward)
+				Lara.Control.Rope.MaxXForward = item->Pose.Orientation.x;
 		}
 		else
 		{
-			if (item->Position.xRot < -Lara.Control.Rope.MaxXBackward)
-				Lara.Control.Rope.MaxXBackward = abs(item->Position.xRot);
+			if (item->Pose.Orientation.x < -Lara.Control.Rope.MaxXBackward)
+				Lara.Control.Rope.MaxXBackward = abs(item->Pose.Orientation.x);
 		}
 	}
 
@@ -607,10 +607,10 @@ namespace TEN::Entities::Generic
 	{
 		if (Lara.Control.Rope.Ptr != -1)
 		{
-			if (item->Position.xRot >= 0)
+			if (item->Pose.Orientation.x >= 0)
 			{
 				item->Animation.VerticalVelocity = -112;
-				item->Animation.Velocity = item->Position.xRot / 128;
+				item->Animation.Velocity = item->Pose.Orientation.x / 128;
 			}
 			else
 			{
@@ -618,7 +618,7 @@ namespace TEN::Entities::Generic
 				item->Animation.VerticalVelocity = -20;
 			}
 
-			item->Position.xRot = 0;
+			item->Pose.Orientation.x = 0;
 			item->Animation.Airborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
@@ -640,8 +640,8 @@ namespace TEN::Entities::Generic
 	void FallFromRope(ITEM_INFO* item)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
-		item->Position.xRot = 0;
-		item->Position.yPos += 320;
+		item->Pose.Orientation.x = 0;
+		item->Pose.Position.y += 320;
 
 		item->Animation.AnimNumber = LA_FALL_START;
 		item->Animation.FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
@@ -692,7 +692,7 @@ namespace TEN::Entities::Generic
 
 			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Position, 0);
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Pose, 0);
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				Lara.Control.Rope.Flag = 0;
 				++Lara.Control.Rope.Segment;
@@ -708,7 +708,7 @@ namespace TEN::Entities::Generic
 	{
 		ROPE_STRUCT* rope;
 		short ropeY;
-		PHD_VECTOR vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
+		Vector3Int vec, vec2, vec3, vec4, vec5, pos, pos2, diff, diff2;
 		int matrix[12];
 		short angle[3];
 		ANIM_FRAME* frame;
@@ -787,9 +787,9 @@ namespace TEN::Entities::Generic
 
 		phd_GetMatrixAngles(matrix, angle);
 
-		item->Position.xPos = rope->position.x + (rope->meshSegment[Lara.Control.Rope.Segment].x >> FP_SHIFT);
-		item->Position.yPos = rope->position.y + (rope->meshSegment[Lara.Control.Rope.Segment].y >> FP_SHIFT) + Lara.Control.Rope.Offset;
-		item->Position.zPos = rope->position.z + (rope->meshSegment[Lara.Control.Rope.Segment].z >> FP_SHIFT);
+		item->Pose.Position.x = rope->position.x + (rope->meshSegment[Lara.Control.Rope.Segment].x >> FP_SHIFT);
+		item->Pose.Position.y = rope->position.y + (rope->meshSegment[Lara.Control.Rope.Segment].y >> FP_SHIFT) + Lara.Control.Rope.Offset;
+		item->Pose.Position.z = rope->position.z + (rope->meshSegment[Lara.Control.Rope.Segment].z >> FP_SHIFT);
 
 		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
 			TO_RAD(angle[1]),
@@ -799,12 +799,12 @@ namespace TEN::Entities::Generic
 
 		rotMatrix = rotMatrix.Transpose();
 
-		item->Position.xPos += -112 * rotMatrix.m[0][2];
-		item->Position.yPos += -112 * rotMatrix.m[1][2];
-		item->Position.zPos += -112 * rotMatrix.m[2][2];
+		item->Pose.Position.x += -112 * rotMatrix.m[0][2];
+		item->Pose.Position.y += -112 * rotMatrix.m[1][2];
+		item->Pose.Position.z += -112 * rotMatrix.m[2][2];
 
-		item->Position.xRot = angle[0];
-		item->Position.yRot = angle[1];
-		item->Position.zRot = angle[2];
+		item->Pose.Orientation.x = angle[0];
+		item->Pose.Orientation.y = angle[1];
+		item->Pose.Orientation.z = angle[2];
 	}
 }

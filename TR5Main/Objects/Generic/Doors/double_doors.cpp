@@ -21,7 +21,7 @@
 
 namespace TEN::Entities::Doors
 {
-	PHD_VECTOR DoubleDoorPos(0, 0, 220);
+	Vector3Int DoubleDoorPos(0, 0, 220);
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{
@@ -46,7 +46,7 @@ namespace TEN::Entities::Doors
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			doorItem->Position.yRot ^= ANGLE(180.0f);
+			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
 			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
 			{
@@ -64,7 +64,7 @@ namespace TEN::Entities::Doors
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				doorItem->Position.yRot ^= ANGLE(180.0f);
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				doorItem->Position.yRot ^= ANGLE(180.0f);
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 		}
 	}

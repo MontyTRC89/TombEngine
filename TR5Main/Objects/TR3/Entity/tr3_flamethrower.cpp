@@ -30,8 +30,8 @@ enum FlamethrowerAnim
 
 static void TriggerPilotFlame(int itemNumber)
 {
-	int dx = LaraItem->Position.xPos - g_Level.Items[itemNumber].Position.xPos;
-	int dz = LaraItem->Position.zPos - g_Level.Items[itemNumber].Position.zPos;
+	int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
+	int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
 
 	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
 		return;
@@ -165,24 +165,24 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	{
 		auto* fx = &EffectList[effectNumber];
 
-		PHD_VECTOR pos1 = { bite->x, bite->y, bite->z };
+		Vector3Int pos1 = { bite->x, bite->y, bite->z };
 		GetJointAbsPosition(item, &pos1, bite->meshNum);
 
-		PHD_VECTOR pos2 = { bite->x, bite->y / 2, bite->z };
+		Vector3Int pos2 = { bite->x, bite->y / 2, bite->z };
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
 		short angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-		fx->pos.xPos = pos1.x;
-		fx->pos.yPos = pos1.y;
-		fx->pos.zPos = pos1.z;
+		fx->pos.Position.x = pos1.x;
+		fx->pos.Position.y = pos1.y;
+		fx->pos.Position.z = pos1.z;
 
 		fx->roomNumber = item->RoomNumber;
 
-		fx->pos.xRot = angles[1];
-		fx->pos.zRot = 0;
-		fx->pos.yRot = angles[0];
+		fx->pos.Orientation.x = angles[1];
+		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.y = angles[0];
 		fx->speed = speed * 4;
 		fx->counter = 20;
 		fx->flag1 = 0;
@@ -195,21 +195,21 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed * 4)) + 32;
-			velocity = speed * phd_cos(fx->pos.xRot);
+			velocity = speed * phd_cos(fx->pos.Orientation.x);
 
-			xv = velocity * phd_sin(fx->pos.yRot);
-			yv = -speed * phd_sin(fx->pos.xRot);
-			zv = velocity * phd_cos(fx->pos.yRot);
+			xv = velocity * phd_sin(fx->pos.Orientation.y);
+			yv = -speed * phd_sin(fx->pos.Orientation.x);
+			zv = velocity * phd_cos(fx->pos.Orientation.y);
 
-			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -1);
+			TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -1);
 		}
 
-		velocity = (speed * 2) * phd_cos(fx->pos.xRot);
-		zv = velocity * phd_cos(fx->pos.yRot);
-		xv = velocity * phd_sin(fx->pos.yRot);
-		yv = -(speed * 2) * phd_sin(fx->pos.xRot);
+		velocity = (speed * 2) * phd_cos(fx->pos.Orientation.x);
+		zv = velocity * phd_cos(fx->pos.Orientation.y);
+		xv = velocity * phd_sin(fx->pos.Orientation.y);
+		yv = -(speed * 2) * phd_sin(fx->pos.Orientation.x);
 
-		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -2);
+		TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -2);
 	}
 
 	return effectNumber;
@@ -229,7 +229,7 @@ void FlameThrowerControl(short itemNumber)
 	short tilt = 0;
 	short head = 0;
 
-	PHD_VECTOR pos = { FlamethrowerBite.x, FlamethrowerBite.y, FlamethrowerBite.z };
+	Vector3Int pos = { FlamethrowerBite.x, FlamethrowerBite.y, FlamethrowerBite.z };
 	GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
 
 	int random = GetRandomControl();
@@ -273,8 +273,8 @@ void FlameThrowerControl(short itemNumber)
 				if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0)
 					continue;
 
-				int x = target->Position.xPos - item->Position.xPos;
-				int z = target->Position.zPos - item->Position.zPos;
+				int x = target->Pose.Position.x - item->Pose.Position.x;
+				int z = target->Pose.Position.z - item->Pose.Position.z;
 
 				int distance = pow(x, 2) + pow(z, 2);
 				if (distance < minDistance)
@@ -299,10 +299,10 @@ void FlameThrowerControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			laraAI.angle = phd_atan(dz, dz) - item->Position.yRot; 
+			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y; 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			
 			AI.xAngle -= 0x800;
@@ -318,7 +318,7 @@ void FlameThrowerControl(short itemNumber)
 		if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
 		{
 			if (!creature->Alerted)
-				SoundEffect(300, &item->Position, 0);
+				SoundEffect(300, &item->Pose, 0);
 
 			AlertAllGuards(itemNumber);
 		}
@@ -483,7 +483,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(204, &item->Position, 0);
+			SoundEffect(204, &item->Pose, 0);
 			break;
 			
 		case 6:
@@ -518,7 +518,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(204, &item->Position, 0);
+			SoundEffect(204, &item->Pose, 0);
 			break;
 		}
 	}

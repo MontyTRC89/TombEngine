@@ -18,21 +18,21 @@ void InitialiseLittleBats(short itemNumber)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->Position.yRot == 0)
+	if (item->Pose.Orientation.y == 0)
 	{
-		item->Position.zPos += 512;
+		item->Pose.Position.z += 512;
 	}
-	else if (item->Position.yRot == -ANGLE(180))
+	else if (item->Pose.Orientation.y == -ANGLE(180))
 	{
-		item->Position.zPos -= 512;
+		item->Pose.Position.z -= 512;
 	}
-	else if (item->Position.yRot == -ANGLE(90))
+	else if (item->Pose.Orientation.y == -ANGLE(90))
 	{
-		item->Position.xPos -= 512;
+		item->Pose.Position.x -= 512;
 	}
-	else if (item->Position.yRot == ANGLE(90))
+	else if (item->Pose.Orientation.y == ANGLE(90))
 	{
-		item->Position.xPos += 512;
+		item->Pose.Position.x += 512;
 	}
 
 	if (Objects[ID_BATS_EMITTER].loaded)
@@ -98,13 +98,13 @@ void TriggerLittleBat(ITEM_INFO* item)
 		BAT_STRUCT* bat = &Bats[batNumber];
 
 		bat->roomNumber = item->RoomNumber;
-		bat->pos.xPos = item->Position.xPos;
-		bat->pos.yPos = item->Position.yPos;
-		bat->pos.zPos = item->Position.zPos;
-		bat->pos.yRot = (GetRandomControl() & 0x7FF) + item->Position.yRot + -ANGLE(180) - 1024;
+		bat->pos.Position.x = item->Pose.Position.x;
+		bat->pos.Position.y = item->Pose.Position.y;
+		bat->pos.Position.z = item->Pose.Position.z;
+		bat->pos.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180) - 1024;
 		bat->on = 1;
 		bat->flags = 0;
-		bat->pos.xRot = (GetRandomControl() & 0x3FF) - 512;
+		bat->pos.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
 		bat->speed = (GetRandomControl() & 0x1F) + 16;
 		bat->laraTarget = GetRandomControl() & 0x1FF;
 		bat->counter = 20 * ((GetRandomControl() & 7) + 15);
@@ -118,14 +118,14 @@ void UpdateBats()
 
 	BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
 
-	int x1 = LaraItem->Position.xPos + bounds->X1 - (bounds->X1 / 4);
-	int x2 = LaraItem->Position.xPos + bounds->X2 - (bounds->X2 / 4);
+	int x1 = LaraItem->Pose.Position.x + bounds->X1 - (bounds->X1 / 4);
+	int x2 = LaraItem->Pose.Position.x + bounds->X2 - (bounds->X2 / 4);
 
-	int y1 = LaraItem->Position.yPos + bounds->Y1 - (bounds->Y1 / 4);
-	int y2 = LaraItem->Position.yPos + bounds->Y1 - (bounds->Y1 / 4);
+	int y1 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
+	int y2 = LaraItem->Pose.Position.y + bounds->Y1 - (bounds->Y1 / 4);
 
-	int z1 = LaraItem->Position.zPos + bounds->Z1 - (bounds->Z1 / 4);
-	int z2 = LaraItem->Position.zPos + bounds->Z1 - (bounds->Z1 / 4);
+	int z1 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
+	int z2 = LaraItem->Pose.Position.z + bounds->Z1 - (bounds->Z1 / 4);
 
 	int minDistance = MAXINT;
 	int minIndex = -1;
@@ -157,13 +157,13 @@ void UpdateBats()
 
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->Position.xPos + 8 * bat->xTarget - bat->pos.xPos,
-			LaraItem->Position.yPos - bat->laraTarget - bat->pos.yPos,
-			LaraItem->Position.zPos + 8 * bat->zTarget - bat->pos.zPos,
+			LaraItem->Pose.Position.x + 8 * bat->xTarget - bat->pos.Position.x,
+			LaraItem->Pose.Position.y - bat->laraTarget - bat->pos.Position.y,
+			LaraItem->Pose.Position.z + 8 * bat->zTarget - bat->pos.Position.z,
 			angles);
 
-		int distance = SQUARE(LaraItem->Position.zPos - bat->pos.zPos) +
-			SQUARE(LaraItem->Position.xPos - bat->pos.xPos);
+		int distance = SQUARE(LaraItem->Pose.Position.z - bat->pos.Position.z) +
+			SQUARE(LaraItem->Pose.Position.x - bat->pos.Position.x);
 		if (distance < minDistance)
 		{
 			minDistance = distance;
@@ -185,8 +185,8 @@ void UpdateBats()
 		{
 			short speed = bat->speed * 128;
 
-			short xAngle = abs(angles[1] - bat->pos.xRot) / 8;
-			short yAngle = abs(angles[0] - bat->pos.yRot) / 8;
+			short xAngle = abs(angles[1] - bat->pos.Orientation.x) / 8;
+			short yAngle = abs(angles[0] - bat->pos.Orientation.y) / 8;
 
 			if (xAngle < -speed)
 				xAngle = -speed;
@@ -198,25 +198,25 @@ void UpdateBats()
 			else if (yAngle > speed)
 				yAngle = speed;
 
-			bat->pos.yRot += yAngle;
-			bat->pos.xRot += xAngle;
+			bat->pos.Orientation.y += yAngle;
+			bat->pos.Orientation.x += xAngle;
 		}
 
-		int sp = bat->speed * phd_cos(bat->pos.xRot);
+		int sp = bat->speed * phd_cos(bat->pos.Orientation.x);
 
-		bat->pos.xPos += sp * phd_sin(bat->pos.yRot);
-		bat->pos.yPos += bat->speed * phd_sin(-bat->pos.xRot);
-		bat->pos.zPos += sp * phd_cos(bat->pos.yRot);
+		bat->pos.Position.x += sp * phd_sin(bat->pos.Orientation.y);
+		bat->pos.Position.y += bat->speed * phd_sin(-bat->pos.Orientation.x);
+		bat->pos.Position.z += sp * phd_cos(bat->pos.Orientation.y);
 
 		if ((i % 2 == 0)
-			&& bat->pos.xPos > x1
-			&& bat->pos.xPos < x2
-			&& bat->pos.yPos > y1
-			&& bat->pos.yPos < y2
-			&& bat->pos.zPos > z1
-			&& bat->pos.zPos < z2)
+			&& bat->pos.Position.x > x1
+			&& bat->pos.Position.x < x2
+			&& bat->pos.Position.y > y1
+			&& bat->pos.Position.y < y2
+			&& bat->pos.Position.z > z1
+			&& bat->pos.Position.z < z2)
 		{
-			TriggerBlood(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 2 * GetRandomControl(), 2);
+			TriggerBlood(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z, 2 * GetRandomControl(), 2);
 			if (LaraItem->HitPoints > 0)
 				LaraItem->HitPoints -= 2;
 		}

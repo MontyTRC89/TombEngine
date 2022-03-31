@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 
         if (item->TriggerFlags == 1)
         {
-            SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
+            SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 
             byte r = (GetRandomControl() & 0x3F) + 192;
             byte g = (GetRandomControl() & 0x1F) + 96;
@@ -64,8 +64,8 @@ namespace TEN::Entities::TR4
             else
                 on = 0;
 
-            AddFire(item->Position.xPos, item->Position.yPos - 620, item->Position.zPos, 1, item->RoomNumber, on);
-            TriggerDynamicLight(item->Position.xPos, item->Position.yPos - 768, item->Position.zPos, 12, r, g, b);
+            AddFire(item->Pose.Position.x, item->Pose.Position.y - 620, item->Pose.Position.z, 1, item->RoomNumber, on);
+            TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y - 768, item->Pose.Position.z, 12, r, g, b);
             return;
         }
 
@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
             return;
 
         if (item->ItemFlags[1] > 90)
-            SoundEffect(SFX_TR4_JOBY_WIND, &item->Position, 0);
+            SoundEffect(SFX_TR4_JOBY_WIND, &item->Pose, 0);
 
         if (item->ItemFlags[1] < 60)
         {
@@ -186,8 +186,8 @@ namespace TEN::Entities::TR4
             ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
             ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-            short oldRot = puzzleItem->Position.yRot;
-            puzzleItem->Position.yRot = laraItem->Position.yRot;
+            short oldRot = puzzleItem->Pose.Orientation.y;
+            puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
             if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
             {
@@ -205,7 +205,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 48;
                         TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Position.yRot = oldRot;
+                        puzzleItem->Pose.Orientation.y = oldRot;
                         return;
                     }
 
@@ -214,7 +214,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 3;
                         laraInfo->Inventory.Pickups[1]--;
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Position.yRot = oldRot;
+                        puzzleItem->Pose.Orientation.y = oldRot;
                         return;
                     }
 
@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
                 }
             }
 
-            puzzleItem->Position.yRot = oldRot;
+            puzzleItem->Pose.Orientation.y = oldRot;
         }
         else
         {
@@ -264,12 +264,12 @@ namespace TEN::Entities::TR4
                 ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
                 ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-                short oldRot = puzzleItem->Position.yRot;
-                puzzleItem->Position.yRot = laraItem->Position.yRot;
+                short oldRot = puzzleItem->Pose.Orientation.y;
+                puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
                 if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {
-                    laraItem->Animation.AnimNumber = (abs(puzzleItem->Position.yPos - laraItem->Position.yPos) >> 8) + LA_TORCH_LIGHT_3;
+                    laraItem->Animation.AnimNumber = (abs(puzzleItem->Pose.Position.y - laraItem->Pose.Position.y) >> 8) + LA_TORCH_LIGHT_3;
                     laraItem->Animation.FrameNumber = g_Level.Anims[puzzleItem->Animation.AnimNumber].frameBase;
                     laraItem->Animation.ActiveState = LS_MISC_CONTROL;
                     laraInfo->Flare.ControlLeft = false;
@@ -277,7 +277,7 @@ namespace TEN::Entities::TR4
                     puzzleItem->ItemFlags[0] = 2;
                 }
 
-                puzzleItem->Position.yRot = oldRot;
+                puzzleItem->Pose.Orientation.y = oldRot;
             }
         }
     }

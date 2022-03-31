@@ -88,17 +88,17 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
-	auto v1 = Vector3(first->xPos, first->yPos, first->zPos);
-	auto v2 = Vector3(second->xPos, second->yPos, second->zPos);
+	auto v1 = Vector3(first->Position.x, first->Position.y, first->Position.z);
+	auto v2 = Vector3(second->Position.x, second->Position.y, second->Position.z);
 	return (int)round(Vector3::Distance(v1, v2));
 }
 
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(pos->yRot),
-		TO_RAD(pos->xRot),
-		TO_RAD(pos->zRot)
+		TO_RAD(pos->Orientation.y),
+		TO_RAD(pos->Orientation.x),
+		TO_RAD(pos->Orientation.z)
 	);
 
 	Vector3 bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
@@ -179,10 +179,10 @@ BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
 	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.yRot), TO_RAD(pos.xRot), TO_RAD(pos.zRot));
+	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.Orientation.y), TO_RAD(pos.Orientation.x), TO_RAD(pos.Orientation.z));
 
 	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.xPos, pos.yPos, pos.zPos));
+	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
 	return result;
 }
 
@@ -197,19 +197,19 @@ __int64 FP_Div(__int64 a, __int64 b)
 	return (int)(((a) / (b >> 8)) << 8);
 }
 
-void FP_VectorMul(PHD_VECTOR* v, int scale, PHD_VECTOR* result)
+void FP_VectorMul(Vector3Int* v, int scale, Vector3Int* result)
 {
 	result->x = FP_FromFixed(v->x * scale);
 	result->y = FP_FromFixed(v->y * scale);
 	result->z = FP_FromFixed(v->z * scale);
 }
 
-int FP_DotProduct(PHD_VECTOR* a, PHD_VECTOR* b)
+int FP_DotProduct(Vector3Int* a, Vector3Int* b)
 {
 	return ((a->x * b->x) + (a->y * b->y) + (a->z * b->z)) >> W2V_SHIFT;
 }
 
-void FP_CrossProduct(PHD_VECTOR* a, PHD_VECTOR* b, PHD_VECTOR* result)
+void FP_CrossProduct(Vector3Int* a, Vector3Int* b, Vector3Int* result)
 {
 	result->x = ((a->y * b->z) - (a->z * b->y)) >> W2V_SHIFT;
 	result->y = ((a->z * b->x) - (a->x * b->z)) >> W2V_SHIFT;
@@ -244,7 +244,7 @@ __int64 FP_FromFixed(__int64 value)
 	return (value >> FP_SHIFT);
 }
 
-PHD_VECTOR* FP_Normalise(PHD_VECTOR* v)
+Vector3Int* FP_Normalise(Vector3Int* v)
 {
 	long a = v->x >> FP_SHIFT;
 	long b = v->y >> FP_SHIFT;

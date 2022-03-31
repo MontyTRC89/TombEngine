@@ -217,7 +217,7 @@ int CreatureActive(short itemNumber);
 void InitialiseCreature(short itemNumber);
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI);
-TARGET_TYPE CalculateTarget(PHD_VECTOR* target, ITEM_INFO* item, LOTInfo* LOT);
+TARGET_TYPE CalculateTarget(Vector3Int* target, ITEM_INFO* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set);
 void InitialiseItemBoxData();

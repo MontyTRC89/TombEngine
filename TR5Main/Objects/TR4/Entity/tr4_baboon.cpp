@@ -79,9 +79,9 @@ static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 	{
 		auto* dieEffect = &ShockWaves[shockwaveID];
 
-		dieEffect->x = pos.xPos;
-		dieEffect->y = pos.yPos;
-		dieEffect->z = pos.zPos;
+		dieEffect->x = pos.Position.x;
+		dieEffect->y = pos.Position.y;
+		dieEffect->z = pos.Position.z;
 		dieEffect->innerRad = 0x2000280;
 		dieEffect->outerRad = 0x28802000;
 		dieEffect->xRot = xRot;
@@ -95,7 +95,7 @@ static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 
 void BaboonDieEffect(ITEM_INFO* item)
 {
-	PHD_3DPOS pos = PHD_3DPOS(item->Position.xPos, item->Position.yPos - 128, item->Position.zPos);
+	PHD_3DPOS pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
 
 	// trigger shockwave effect
 	TriggerBaboonShockwave(pos, ANGLE(0.0f));
@@ -155,9 +155,9 @@ static void UpdateRespawnedBaboon(short itemNumber)
 	if (baboonRespawn == nullptr)
 		return;
 
-	item->Position = baboonRespawn->Pos;
+	item->Pose = baboonRespawn->Pos;
 
-	auto outsideRoom = IsRoomOutside(item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 	if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
 		ItemNewRoom(itemNumber, outsideRoom);
 
@@ -252,10 +252,10 @@ void BaboonControl(short itemNumber)
 		AI_INFO laraAI;
 		if (!item->HitStatus && item->ObjectNumber == ID_BABOON_NORMAL)
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = phd_atan(dx, dz) - item->Position.yRot;
+			laraAI.angle = phd_atan(dx, dz) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
 			if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
@@ -275,14 +275,14 @@ void BaboonControl(short itemNumber)
 		if (creature->Enemy != nullptr && creature->Enemy != LaraItem && creature->Enemy->ObjectNumber == ID_AI_FOLLOW)
 		{
 			if (creature->ReachedGoal &&
-				abs(item->Position.xPos - creature->Enemy->Position.xPos) < CLICK(1) &&
-				abs(item->Position.yPos - creature->Enemy->Position.yPos) < CLICK(1) &&
-				abs(item->Position.zPos - creature->Enemy->Position.zPos) < CLICK(1))
+				abs(item->Pose.Position.x - creature->Enemy->Pose.Position.x) < CLICK(1) &&
+				abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < CLICK(1) &&
+				abs(item->Pose.Position.z - creature->Enemy->Pose.Position.z) < CLICK(1))
 			{
-				item->Position.xPos = creature->Enemy->Position.xPos;
-				item->Position.yPos = creature->Enemy->Position.yPos;
-				item->Position.zPos = creature->Enemy->Position.zPos;
-				item->Position.yRot = creature->Enemy->Position.yRot;
+				item->Pose.Position.x = creature->Enemy->Pose.Position.x;
+				item->Pose.Position.y = creature->Enemy->Pose.Position.y;
+				item->Pose.Position.z = creature->Enemy->Pose.Position.z;
+				item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.y;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.TargetState = BABOON_ACTIVATE_SWITCH;
@@ -327,7 +327,7 @@ void BaboonControl(short itemNumber)
 				{
 					if (AI.bite && AI.distance < BABOON_ATK_NORMALRANGE)
 					{
-						if (LaraItem->Position.yPos >= item->Position.yPos)
+						if (LaraItem->Pose.Position.y >= item->Pose.Position.y)
 							item->Animation.TargetState = BABOON_ATK1;
 						else
 							item->Animation.TargetState = BABOON_JUMPATK;
@@ -465,34 +465,34 @@ void BaboonControl(short itemNumber)
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
 			{
-				GAME_VECTOR pos = { 0, 0, 0 };
+				GameVector pos = { 0, 0, 0 };
 				pos.boxNumber = 0;
 				pos.roomNumber = NO_ROOM;
 
-				switch (item->Position.yRot)
+				switch (item->Pose.Orientation.y)
 				{
 				case -0x4000: // WEST (OK)
-					pos.x = item->Position.xPos - SECTOR(1);
-					pos.z = item->Position.zPos;
+					pos.x = item->Pose.Position.x - SECTOR(1);
+					pos.z = item->Pose.Position.z;
 					break;
 
 				case 0x4000: // EAST (OK)
-					pos.x = item->Position.xPos + SECTOR(1);
-					pos.z = item->Position.zPos;
+					pos.x = item->Pose.Position.x + SECTOR(1);
+					pos.z = item->Pose.Position.z;
 					break;
 
 				case 0:      // NORTH (NOP) maybe okay now with TombEngine
-					pos.x = item->Position.xPos;
-					pos.z = item->Position.zPos + SECTOR(1);
+					pos.x = item->Pose.Position.x;
+					pos.z = item->Pose.Position.z + SECTOR(1);
 					break;
 
 				case -0x8000: // SOUTH (OK)
-					pos.x = item->Position.xPos;
-					pos.z = item->Position.zPos - SECTOR(1);
+					pos.x = item->Pose.Position.x;
+					pos.z = item->Pose.Position.z - SECTOR(1);
 					break;
 				}
 
-				pos.y = item->Position.yPos;
+				pos.y = item->Pose.Position.y;
 				pos.roomNumber = item->RoomNumber;
 				FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
 				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
@@ -514,12 +514,12 @@ void BaboonControl(short itemNumber)
 			if (abs(AI.angle) >= BABOON_ATTACK_ANGLE)
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.y += BABOON_ATTACK_ANGLE;
 				else
-					item->Position.yRot -= BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.y -= BABOON_ATTACK_ANGLE;
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (creature->Flags == 0 &&
 				(item->TouchBits & BABOON_TOUCHBITS ||
@@ -551,7 +551,7 @@ void BaboonRespawnClass::Add(ITEM_INFO* item, unsigned int maxCount)
 {
 	BaboonRespawnStruct toAdd;
 	toAdd.ID = GetBaboonFreePlace();
-	toAdd.Pos = item->Position;
+	toAdd.Pos = item->Pose;
 	toAdd.Count = 0;
 	toAdd.MaxCount = maxCount;
 
