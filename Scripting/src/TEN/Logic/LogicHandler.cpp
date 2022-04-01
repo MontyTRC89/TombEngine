@@ -92,7 +92,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ l
 #endif
 }
 
-void LogicHandler::ResetGameTables()
+void LogicHandler::ResetGameTables() const
 {
 #if TEN_OPTIONAL_LUA
 	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &GetVariable, &SetVariable);
@@ -208,18 +208,18 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 		{
 			solTables.try_emplace(i, *m_lua, sol::create);
 			auto indexTab = std::get<IndexTable>(vars[i]);
-			for (auto& id : indexTab)
+			for (auto& [first, second] : indexTab)
 			{
 				// if we're wanting to reference a table, make sure that table exists
 				// create it if need be
-				if (std::holds_alternative<IndexTable>(vars[id.second]))
+				if (std::holds_alternative<IndexTable>(vars[second]))
 				{
-					solTables.try_emplace(id.second, *m_lua, sol::create);
-					solTables[i][vars[id.first]] = solTables[id.second];
+					solTables.try_emplace(second, *m_lua, sol::create);
+					solTables[i][vars[first]] = solTables[second];
 				}
 				else
 				{
-					solTables[i][vars[id.first]] = vars[id.second];
+					solTables[i][vars[first]] = vars[second];
 				}
 			}
 		}
@@ -228,15 +228,15 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	auto rootTable = solTables[0];
 
 	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
-	for (auto& mem : levelVars)
+	for (auto& [first, second] : levelVars)
 	{
-		(*m_lua)[ScriptReserved_LevelVars][mem.first] = mem.second;
+		(*m_lua)[ScriptReserved_LevelVars][first] = second;
 	}
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
-	for (auto& mem : gameVars)
+	for (auto& [first, second] : gameVars)
 	{
-		(*m_lua)[ScriptReserved_GameVars][mem.first] = mem.second;
+		(*m_lua)[ScriptReserved_GameVars][first] = second;
 	}
 #endif
 }
@@ -254,93 +254,92 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
 	size_t nVars = 0;
 	auto handleNum = [&](double num)
 	{
-		auto numIt = numMap.insert(std::pair<double, uint32_t>(num, nVars));
+		auto [first, second] = numMap.insert(std::pair<double, uint32_t>(num, nVars));
 
 		// true if the var was inserted
-		if (numIt.second)
+		if (second)
 		{
 			vars.push_back(num);
 			++nVars;
 		}
 
-		return numIt.first->second;
+		return first->second;
 	};
 
 	auto handleBool = [&](bool num)
 	{
-		auto numIt = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
+		auto [first, second] = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
 
 		// true if the var was inserted
-		if (numIt.second)
+		if (second)
 		{
 			vars.push_back(num);
 			++nVars;
 		}
 
-		return numIt.first->second;
+		return first->second;
 	};
 
 	auto handleStr = [&](sol::object const& obj)
 	{
 		auto str = obj.as<sol::string_view>();
-		auto stringIt = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
+		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
 
 		// true if the string was inserted
-		if (stringIt.second)
+		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
 			++nVars;
 		}
 
-		return stringIt.first->second;
+		return first->second;
 	};
 
-	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj)
+	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj) 
 	{
-		auto tabIt = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
+		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
 
 		// true if the table was inserted
-		if(tabIt.second)
+		if(second)
 		{
 			++nVars;
-			auto id = tabIt.first->second;
+			auto id = first->second;
 
 			vars.push_back(IndexTable{});
-			for (auto& mem : obj)
+			for (auto& [first, second] : obj)
 			{
-				bool isStringKey = true;
 				uint32_t keyIndex = 0;
 				
 				// Strings and numbers can be keys AND values
-				switch (mem.first.get_type())
+				switch (first.get_type())
 				{
 				case sol::type::string:
-					keyIndex = handleStr(mem.first);
+					keyIndex = handleStr(first);
 					break;
 				case sol::type::number:
-					keyIndex = handleNum(mem.first.as<double>());
+					keyIndex = handleNum(first.as<double>());
 					break;
 				default:
 					ScriptAssert(false, "Tried saving an unsupported type as a key");
 				}
 
 				uint32_t valIndex = 0;
-				switch (mem.second.get_type())
+				switch (second.get_type())
 				{
 				case sol::type::table:
-					valIndex = populate(mem.second.as<sol::table>());
+					valIndex = populate(second.as<sol::table>());
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				case sol::type::string:
-					valIndex = handleStr(mem.second);
+					valIndex = handleStr(second);
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				case sol::type::number:
-					valIndex = handleNum(mem.second.as<double>());
+					valIndex = handleNum(second.as<double>());
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				case sol::type::boolean:
-					valIndex = handleBool(mem.second.as<bool>());
+					valIndex = handleBool(second.as<bool>());
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 					break;
 				default:
@@ -348,7 +347,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
 				}
 			}
 		}
-		return tabIt.first->second;
+		return first->second;
 	};
 	populate(tab);
 #endif
@@ -370,7 +369,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 /*** A @{Objects.Moveable} representing Lara herself.
 @table Lara
 */
-void LogicHandler::ResetVariables()
+void LogicHandler::ResetVariables() const
 {
 #if TEN_OPTIONAL_LUA
 	(*m_lua)["Lara"] = NULL;
