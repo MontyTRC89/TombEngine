@@ -403,9 +403,11 @@ void Moveable::SetPos(Position const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return Rotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
-						int(TO_DEGREES(m_item->pos.yRot)) % 360,
-						int(TO_DEGREES(m_item->pos.zRot)) % 360);
+	return {
+		static_cast<int>(TO_DEGREES(m_item->pos.xRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->pos.yRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->pos.zRot)) % 360
+	};
 }
 
 void Moveable::SetRot(Rotation const& rot)
