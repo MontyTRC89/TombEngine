@@ -155,10 +155,10 @@ namespace TEN::Entities::TR4
 
 	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
 	{
-		Vector3Int start = { 0, -96, 144 };
+		auto start = Vector3Int(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
 
-		Vector3Int end = { 0, -128, 288 };
+		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
 		short angles[2];

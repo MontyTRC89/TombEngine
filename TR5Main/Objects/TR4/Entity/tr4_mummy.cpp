@@ -160,8 +160,8 @@ void MummyControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case MUMMY_STATE_IDLE:
-			creature->Flags = 0;
 			creature->MaxTurn = 0;
+			creature->Flags = 0;
 
 			if (AI.distance <= pow(SECTOR(0.5f), 2) ||
 				AI.distance >= pow(SECTOR(7), 2))
@@ -208,8 +208,8 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_WALK_ARMS_UP:
-			creature->Flags = 0;
 			creature->MaxTurn = ANGLE(7.0f);
+			creature->Flags = 0;
 
 			if (AI.distance < pow(SECTOR(0.5f), 2))
 			{
