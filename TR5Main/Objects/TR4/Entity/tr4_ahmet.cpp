@@ -255,9 +255,9 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += 910;
+						item->Pose.Orientation.y += ANGLE(5.0f);
 					else
-						item->Pose.Orientation.y -= 910;
+						item->Pose.Orientation.y -= ANGLE(5.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;

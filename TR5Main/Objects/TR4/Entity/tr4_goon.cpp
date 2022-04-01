@@ -305,7 +305,7 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		CreatureInfo* creature = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 		auto* enemyItem = creature->Enemy;
 		auto* object = &Objects[ID_GOON1];
 
@@ -411,7 +411,7 @@ namespace TEN::Entities::TR4
 		// Handle goon firing
 		if (creature->FiredWeapon)
 		{
-			Vector3Int pos = { GoonGunBite.x, GoonGunBite.y, GoonGunBite.z };
+			auto pos = Vector3Int(GoonGunBite.x, GoonGunBite.y, GoonGunBite.z);
 			GetJointAbsPosition(item, &pos, GoonGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
