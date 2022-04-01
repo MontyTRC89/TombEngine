@@ -136,7 +136,7 @@ void KnightTemplarControl(short itemNumber)
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
-			Vector3Int pos = { 0, 0, 0 };
+			auto pos = Vector3Int();
 			GetJointAbsPosition(item, &pos, 11);
 
 			auto* room = &g_Level.Rooms[item->RoomNumber];

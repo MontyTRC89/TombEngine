@@ -7,7 +7,7 @@
 
 void InitialiseSmokeEmitter(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags == 111)
 	{
@@ -19,23 +19,15 @@ void InitialiseSmokeEmitter(short itemNumber)
 		else if (item->Pose.Orientation.y)
 		{
 			if (item->Pose.Orientation.y == -ANGLE(180.0f))
-			{
-				item->Pose.Position.z -= 512;
-			}
+				item->Pose.Position.z -= CLICK(2);
 			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-			{
-				item->Pose.Position.x -= 512;
-			}
+				item->Pose.Position.x -= CLICK(2);
 		}
 		else
-		{
-			item->Pose.Position.z += 512;
-		}
+			item->Pose.Position.z += CLICK(2);
 	}
 	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
-	{
 		return;
-	}
 	else if (item->TriggerFlags & 8)
 	{
 		item->ItemFlags[0] = item->TriggerFlags / 16;
@@ -43,20 +35,16 @@ void InitialiseSmokeEmitter(short itemNumber)
 		if (item->Pose.Orientation.y > 0)
 		{
 			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += 256;
+				item->Pose.Position.x += CLICK(1);
 		}
 		else
 		{
 			if (item->Pose.Orientation.y == 0)
-			{
-				item->Pose.Position.z += 256;
-			}
+				item->Pose.Position.z += CLICK(1);
 			else if (item->Pose.Orientation.y == -ANGLE(180.0f))
-			{
-				item->Pose.Position.z -= 256;
-			}
+				item->Pose.Position.z -= CLICK(1);
 			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-				item->Pose.Position.x -= 256;
+				item->Pose.Position.x -= CLICK(1);
 		}
 
 		if ((signed short)(item->TriggerFlags / 16) <= 0)
@@ -74,7 +62,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 void SmokeEmitterControl(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;

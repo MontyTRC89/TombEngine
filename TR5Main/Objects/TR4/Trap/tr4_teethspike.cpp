@@ -39,14 +39,14 @@ namespace TEN::Entities::TR4
 
 		short rotations[8] =
 		{
-			ANGLE(180),
-			ANGLE(225),
-			ANGLE(270),
-			ANGLE(315),
-			ANGLE(0),
-			ANGLE(45),
-			ANGLE(90),
-			ANGLE(135)
+			ANGLE(180.0f),
+			ANGLE(225.0f),
+			ANGLE(270.0f),
+			ANGLE(315.0f),
+			ANGLE(0.0f),
+			ANGLE(45.0f),
+			ANGLE(90.0f),
+			ANGLE(135.0f)
 		};
 
 		if (item->TriggerFlags & 8)
@@ -89,17 +89,19 @@ namespace TEN::Entities::TR4
 		int size = (item->TriggerFlags & 1 ? 300 : 480);
 		int y = item->Pose.Position.y + SPDETyoffs[angle];
 
-		ANIM_FRAME* frames = GetBestFrame(LaraItem);
+		auto* frames = GetBestFrame(LaraItem);
 
-		if (LaraItem->Pose.Position.y + frames->boundingBox.Y1 <= y
-			&& LaraItem->Pose.Position.y + frames->boundingBox.Y2 >= y - 900)
+		if (LaraItem->Pose.Position.y + frames->boundingBox.Y1 <= y &&
+			LaraItem->Pose.Position.y + frames->boundingBox.Y2 >= y - 900)
 		{
-			if (LaraItem->Pose.Position.x + frames->boundingBox.X1 <= (x + size)
-				&& LaraItem->Pose.Position.x + frames->boundingBox.X2 >= (x - size))
+			if (LaraItem->Pose.Position.x + frames->boundingBox.X1 <= (x + size) &&
+				LaraItem->Pose.Position.x + frames->boundingBox.X2 >= (x - size))
 			{
-				if (LaraItem->Pose.Position.z + frames->boundingBox.Z1 <= (z + size)
-					&& LaraItem->Pose.Position.z + frames->boundingBox.Z2 >= (z - size))
+				if (LaraItem->Pose.Position.z + frames->boundingBox.Z1 <= (z + size) &&
+					LaraItem->Pose.Position.z + frames->boundingBox.Z2 >= (z - size))
+				{
 					return true;
+				}
 			}
 		}
 
@@ -108,7 +110,7 @@ namespace TEN::Entities::TR4
 
 	void ControlTeethSpikes(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
@@ -123,14 +125,14 @@ namespace TEN::Entities::TR4
 
 			if (LaraItem->HitPoints > 0 && hit)
 			{
-				BOUNDING_BOX* bounds = (BOUNDING_BOX*)GetBestFrame(item);
-				BOUNDING_BOX* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
+				auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
+				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
 
-				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.Airborne) 
-					&& (item->TriggerFlags & 7) > 2 
-					&& (item->TriggerFlags & 7) < 6)
+				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.Airborne) &&
+					(item->TriggerFlags & 7) > 2 &&
+					(item->TriggerFlags & 7) < 6)
 				{
 					if (LaraItem->Animation.VerticalVelocity > 6 || item->ItemFlags[0] > 1024)
 					{
@@ -168,9 +170,11 @@ namespace TEN::Entities::TR4
 					yBottom = y2 + item->Pose.Position.y;	
 				int dy = (abs(yTop - yBottom)) + 1;
 
-				if ((item->TriggerFlags & 7) == 2 
-					|| (item->TriggerFlags & 7) == 6)
+				if ((item->TriggerFlags & 7) == 2 ||
+					(item->TriggerFlags & 7) == 6)
+				{
 					bloodCount >>= 1;
+				}
 
 				for (int i = 0; i < bloodCount; i++)
 				{
@@ -181,10 +185,7 @@ namespace TEN::Entities::TR4
 
 				if (LaraItem->HitPoints <= 0)
 				{
-					short roomNumber = LaraItem->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, &roomNumber);
-					int height = GetFloorHeight(floor, LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-					height -= LaraItem->Pose.Position.y;
+					int height = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
 					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && height < 50)
 					{
 						LaraItem->Animation.AnimNumber = LA_SPIKE_DEATH;
@@ -208,9 +209,7 @@ namespace TEN::Entities::TR4
 						item->ItemFlags[2] = 64;
 				}
 				else
-				{
 					item->ItemFlags[0] = -item->ItemFlags[0] >> 1;
-				}
 			}
 
 		}

@@ -72,10 +72,10 @@ struct CollisionSetup
 	int   Height;				// Collision bounds vertical size
 	short ForwardAngle;			// Forward angle direction
 
-	int   LowerFloorBound;		// Borderline floor step-up height 
-	int   UpperFloorBound;		// Borderline floor step-down height
-	int   LowerCeilingBound;	// Borderline ceiling step-up height
-	int   UpperCeilingBound;	// Borderline ceiling step-down height
+	int LowerFloorBound;		// Borderline floor step-up height 
+	int UpperFloorBound;		// Borderline floor step-down height
+	int LowerCeilingBound;		// Borderline ceiling step-up height
+	int UpperCeilingBound;		// Borderline ceiling step-down height
 
 	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits

@@ -25,9 +25,9 @@ long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 	float c = phd_cos(item->Pose.Orientation.y);
 
 	Vector3Int pos;
-	pos.x = item->Pose.Position.x + z * s + x * c;
-	pos.y = item->Pose.Position.y - z * phd_sin(item->Pose.Orientation.x) + x * phd_sin(item->Pose.Orientation.z);
-	pos.z = item->Pose.Position.z + z * c - x * s;
+	pos.x = round(item->Pose.Position.x + z * s + x * c);
+	pos.y = round(item->Pose.Position.y - z * phd_sin(item->Pose.Orientation.x) + x * phd_sin(item->Pose.Orientation.z));
+	pos.z = round(item->Pose.Position.z + z * c - x * s);
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 
