@@ -432,8 +432,8 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
-	coll->Setup.BlockDeathFlagDown = false;
-	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.BlockDeathFloorDown = false;
+	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 

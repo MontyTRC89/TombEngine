@@ -141,7 +141,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.BlockCeilingSlope = true;
-	coll->Setup.BlockNoMonkeyFlag = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -230,7 +230,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.BlockCeilingSlope = true;
-	coll->Setup.BlockNoMonkeyFlag = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -311,7 +311,7 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
 	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
 	coll->Setup.BlockCeilingSlope = true;
-	coll->Setup.BlockNoMonkeyFlag = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -395,7 +395,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.BlockCeilingSlope = true;
-	coll->Setup.BlockNoMonkeyFlag = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
@@ -479,7 +479,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.BlockCeilingSlope = true;
-	coll->Setup.BlockNoMonkeyFlag = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;

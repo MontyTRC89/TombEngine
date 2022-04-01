@@ -195,7 +195,7 @@ void lara_col_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1576,7 +1576,7 @@ void lara_col_walk_back(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeDown = !isSwamp;
 	coll->Setup.BlockFloorSlopeUp = !isSwamp;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -1929,7 +1929,7 @@ void lara_col_step_right(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeDown = !isSwamp;
 	coll->Setup.BlockFloorSlopeUp = !isSwamp;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
@@ -2028,7 +2028,7 @@ void lara_col_step_left(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeDown = !isSwamp;
 	coll->Setup.BlockFloorSlopeUp = !isSwamp;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 

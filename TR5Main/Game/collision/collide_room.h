@@ -80,8 +80,8 @@ struct CollisionSetup
 	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
 	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
-	bool BlockDeathFlagDown;	// Treat death sectors as pits
-	bool BlockNoMonkeyFlag;		// Treat non-monkey sectors as walls
+	bool BlockDeathFloorDown;	// Treat death sectors as pits
+	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
 	
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed

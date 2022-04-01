@@ -739,8 +739,8 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFlagDown = false;
-	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.BlockDeathFloorDown = false;
+	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
 
@@ -821,8 +821,8 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFlagDown = false;
-	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.BlockDeathFloorDown = false;
+	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -894,8 +894,8 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFlagDown = false;
-	coll->Setup.BlockNoMonkeyFlag = false;
+	coll->Setup.BlockDeathFloorDown = false;
+	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
