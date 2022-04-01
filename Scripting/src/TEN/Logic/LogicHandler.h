@@ -44,7 +44,7 @@ private:
 	sol::protected_function										m_onEnd{};
 
 	void ResetLevelTables();
-	void ResetGameTables();
+	void ResetGameTables() const;
 
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
@@ -58,7 +58,7 @@ public:
 	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
 
 	void								GetVariables(std::vector<SavedVar>& vars) const override;
-	void								ResetVariables();
+	void								ResetVariables() const;
 
 	void								SetVariables(std::vector<SavedVar> const& vars) override;
 	void								InitCallbacks() override;
