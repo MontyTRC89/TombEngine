@@ -93,6 +93,7 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -102,7 +103,6 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-		MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.25f));
 		return;
 	}
 
@@ -198,6 +198,7 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 
 	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -207,7 +208,6 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-		MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.25f));
 		return;
 	}
 

@@ -95,8 +95,8 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		item->Pose.Position.z -= 400 * phd_cos(coll->Setup.ForwardAngle);
-		item->Pose.Position.x -= 400 * phd_sin(coll->Setup.ForwardAngle);
+		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -131,8 +131,8 @@ void LaraSlideEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		item->Pose.Position.z -= 400 * phd_cos(coll->Setup.ForwardAngle);
-		item->Pose.Position.x -= 400 * phd_sin(coll->Setup.ForwardAngle);
+		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -684,9 +684,6 @@ void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
-
-	if (coll->CollisionType == CT_CLAMP)
-		item->Pose.Position.y += coll->Middle.Floor;
 }
 
 bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height, int side)

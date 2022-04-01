@@ -719,11 +719,12 @@ void lara_col_idle(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraHitCeiling(coll))
+	// TODO: Better clamp handling. This can result in Lara standing above or below the floor. @Sezz 2022.04.01
+	/*if (TestLaraHitCeiling(coll))
 	{
 		SetLaraHitCeiling(item, coll);
-		//return; // Helps getting out of clamps.
-	}
+		return;
+	}*/
 
 	if (TestLaraFall(item, coll))
 	{
