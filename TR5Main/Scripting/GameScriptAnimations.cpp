@@ -11,11 +11,12 @@ void GameScriptAnimations::Register(sol::state* lua)
 {
 	lua->new_usertype<GameScriptAnimations>(
 		"Animations",
+		"hasPose", &GameScriptAnimations::HasPose,
 		"hasSlideExtended", &GameScriptAnimations::HasSlideExtended,
+		"hasSprintJump", &GameScriptAnimations::HasSprintJump,
+		"hasMonkeyAutoJump", &GameScriptAnimations::HasMonkeyAutoJump,
+		"hasCrawlspaceDive", &GameScriptAnimations::HasCrawlspaceDive,
 		"hasCrawlExtended", &GameScriptAnimations::HasCrawlExtended,
 		"hasCrouchRoll", &GameScriptAnimations::HasCrouchRoll,
-		"hasCrawlspaceSwandive", &GameScriptAnimations::HasCrawlspaceDive,
-		"hasOverhangClimb", &GameScriptAnimations::HasOverhangClimb,
-		"hasPose", &GameScriptAnimations::HasPose,
-		"hasMonkeyAutoJump", &GameScriptAnimations::HasMonkeyAutoJump);
+		"hasOverhangClimb", &GameScriptAnimations::HasOverhangClimb);
 }
