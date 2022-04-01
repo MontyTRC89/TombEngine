@@ -12,38 +12,30 @@
 #include "Game/items.h"
 
 int NextBat;
-BAT_STRUCT Bats[NUM_BATS];
+BatData Bats[NUM_BATS];
 
 void InitialiseLittleBats(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->Pose.Orientation.y == 0)
-	{
-		item->Pose.Position.z += 512;
-	}
-	else if (item->Pose.Orientation.y == -ANGLE(180))
-	{
-		item->Pose.Position.z -= 512;
-	}
-	else if (item->Pose.Orientation.y == -ANGLE(90))
-	{
-		item->Pose.Position.x -= 512;
-	}
-	else if (item->Pose.Orientation.y == ANGLE(90))
-	{
-		item->Pose.Position.x += 512;
-	}
+		item->Pose.Position.z += CLICK(2);
+	else if (item->Pose.Orientation.y == -ANGLE(180.0f))
+		item->Pose.Position.z -= CLICK(2);
+	else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+		item->Pose.Position.x -= CLICK(2);
+	else if (item->Pose.Orientation.y == ANGLE(90.0f))
+		item->Pose.Position.x += CLICK(2);
 
 	if (Objects[ID_BATS_EMITTER].loaded)
-		ZeroMemory(Bats, NUM_BATS * sizeof(BAT_STRUCT));
+		ZeroMemory(Bats, NUM_BATS * sizeof(BatData));
 
 	//LOWORD(item) = sub_402F27(ebx0, Bats, 0, 1920);
 }
 
 void LittleBatsControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
@@ -53,23 +45,21 @@ void LittleBatsControl(short itemNumber)
 			item->TriggerFlags--;
 		}
 		else
-		{
 			KillItem(itemNumber);
-		}
 	}
 }
 
 short GetNextBat()
 {
 	short batNumber = NextBat;
-	int index = 0;
-	BAT_STRUCT* bat = &Bats[NextBat];
+	auto* bat = &Bats[NextBat];
 
-	while (bat->on)
+	int index = 0;
+	while (bat->On)
 	{
 		if (batNumber == NUM_BATS - 1)
 		{
-			bat = (BAT_STRUCT*)Bats;
+			bat = (BatData*)Bats;
 			batNumber = 0;
 		}
 		else
@@ -95,19 +85,19 @@ void TriggerLittleBat(ITEM_INFO* item)
 
 	if (batNumber != NO_ITEM)
 	{
-		BAT_STRUCT* bat = &Bats[batNumber];
+		auto* bat = &Bats[batNumber];
 
-		bat->roomNumber = item->RoomNumber;
-		bat->pos.Position.x = item->Pose.Position.x;
-		bat->pos.Position.y = item->Pose.Position.y;
-		bat->pos.Position.z = item->Pose.Position.z;
-		bat->pos.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180) - 1024;
-		bat->on = 1;
-		bat->flags = 0;
-		bat->pos.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
-		bat->speed = (GetRandomControl() & 0x1F) + 16;
-		bat->laraTarget = GetRandomControl() & 0x1FF;
-		bat->counter = 20 * ((GetRandomControl() & 7) + 15);
+		bat->RoomNumber = item->RoomNumber;
+		bat->Pose.Position.x = item->Pose.Position.x;
+		bat->Pose.Position.y = item->Pose.Position.y;
+		bat->Pose.Position.z = item->Pose.Position.z;
+		bat->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180.0f) - 1024;
+		bat->On = true;
+		bat->Flags = 0;
+		bat->Pose.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
+		bat->Velocity = (GetRandomControl() & 0x1F) + 16;
+		bat->LaraTarget = GetRandomControl() & 0x1FF;
+		bat->Counter = 20 * ((GetRandomControl() & 7) + 15);
 	}
 }
 
@@ -116,7 +106,7 @@ void UpdateBats()
 	if (!Objects[ID_BATS_EMITTER].loaded)
 		return;
 
-	BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
+	auto* bounds = GetBoundsAccurate(LaraItem);
 
 	int x1 = LaraItem->Pose.Position.x + bounds->X1 - (bounds->X1 / 4);
 	int x2 = LaraItem->Pose.Position.x + bounds->X2 - (bounds->X2 / 4);
@@ -132,38 +122,41 @@ void UpdateBats()
 
 	for (int i = 0; i < NUM_BATS; i++)
 	{
-		BAT_STRUCT* bat = &Bats[i];
+		auto* bat = &Bats[i];
 
-		if (!bat->on)
+		if (!bat->On)
 			continue;
 
-		if ((Lara.Burn || LaraItem->HitPoints <= 0)
-			&& bat->counter > 90
-			&& !(GetRandomControl() & 7))
-			bat->counter = 90;
-
-		if (!(--bat->counter))
+		if ((Lara.Burn || LaraItem->HitPoints <= 0) &&
+			bat->Counter > 90 &&
+			!(GetRandomControl() & 7))
 		{
-			bat->on = 0;
+			bat->Counter = 90;
+		}
+
+		if (!(--bat->Counter))
+		{
+			bat->On = false;
 			continue;
 		}
 
 		if (!(GetRandomControl() & 7))
 		{
-			bat->laraTarget = GetRandomControl() % 640 + 128;
-			bat->xTarget = (GetRandomControl() & 0x7F) - 64;
-			bat->zTarget = (GetRandomControl() & 0x7F) - 64;
+			bat->LaraTarget = GetRandomControl() % 640 + 128;
+			bat->XTarget = (GetRandomControl() & 0x7F) - 64;
+			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->Pose.Position.x + 8 * bat->xTarget - bat->pos.Position.x,
-			LaraItem->Pose.Position.y - bat->laraTarget - bat->pos.Position.y,
-			LaraItem->Pose.Position.z + 8 * bat->zTarget - bat->pos.Position.z,
+			LaraItem->Pose.Position.x + 8 * bat->XTarget - bat->Pose.Position.x,
+			LaraItem->Pose.Position.y - bat->LaraTarget - bat->Pose.Position.y,
+			LaraItem->Pose.Position.z + 8 * bat->ZTarget - bat->Pose.Position.z,
 			angles);
 
-		int distance = SQUARE(LaraItem->Pose.Position.z - bat->pos.Position.z) +
-			SQUARE(LaraItem->Pose.Position.x - bat->pos.Position.x);
+		int x = LaraItem->Pose.Position.x - bat->Pose.Position.x;
+		int z = LaraItem->Pose.Position.z - bat->Pose.Position.z;
+		int distance = pow(x, 2) + pow(z, 2);
 		if (distance < minDistance)
 		{
 			minDistance = distance;
@@ -176,47 +169,47 @@ void UpdateBats()
 		else if (distance > 128)
 			distance = 128;
 
-		if (bat->speed < distance)
-			bat->speed++;
-		else if (bat->speed > distance)
-			bat->speed--;
+		if (bat->Velocity < distance)
+			bat->Velocity++;
+		else if (bat->Velocity > distance)
+			bat->Velocity--;
 
-		if (bat->counter > 90)
+		if (bat->Counter > 90)
 		{
-			short speed = bat->speed * 128;
+			short Velocity = bat->Velocity * 128;
 
-			short xAngle = abs(angles[1] - bat->pos.Orientation.x) / 8;
-			short yAngle = abs(angles[0] - bat->pos.Orientation.y) / 8;
+			short xAngle = abs(angles[1] - bat->Pose.Orientation.x) / 8;
+			short yAngle = abs(angles[0] - bat->Pose.Orientation.y) / 8;
 
-			if (xAngle < -speed)
-				xAngle = -speed;
-			else if (xAngle > speed)
-				xAngle = speed;
+			if (xAngle < -Velocity)
+				xAngle = -Velocity;
+			else if (xAngle > Velocity)
+				xAngle = Velocity;
 
-			if (yAngle < -speed)
-				yAngle = -speed;
-			else if (yAngle > speed)
-				yAngle = speed;
+			if (yAngle < -Velocity)
+				yAngle = -Velocity;
+			else if (yAngle > Velocity)
+				yAngle = Velocity;
 
-			bat->pos.Orientation.y += yAngle;
-			bat->pos.Orientation.x += xAngle;
+			bat->Pose.Orientation.y += yAngle;
+			bat->Pose.Orientation.x += xAngle;
 		}
 
-		int sp = bat->speed * phd_cos(bat->pos.Orientation.x);
+		int sp = bat->Velocity * phd_cos(bat->Pose.Orientation.x);
 
-		bat->pos.Position.x += sp * phd_sin(bat->pos.Orientation.y);
-		bat->pos.Position.y += bat->speed * phd_sin(-bat->pos.Orientation.x);
-		bat->pos.Position.z += sp * phd_cos(bat->pos.Orientation.y);
+		bat->Pose.Position.x += sp * phd_sin(bat->Pose.Orientation.y);
+		bat->Pose.Position.y += bat->Velocity * phd_sin(-bat->Pose.Orientation.x);
+		bat->Pose.Position.z += sp * phd_cos(bat->Pose.Orientation.y);
 
-		if ((i % 2 == 0)
-			&& bat->pos.Position.x > x1
-			&& bat->pos.Position.x < x2
-			&& bat->pos.Position.y > y1
-			&& bat->pos.Position.y < y2
-			&& bat->pos.Position.z > z1
-			&& bat->pos.Position.z < z2)
+		if ((i % 2) == 0 &&
+			bat->Pose.Position.x > x1 &&
+			bat->Pose.Position.x < x2 &&
+			bat->Pose.Position.y > y1 &&
+			bat->Pose.Position.y < y2 &&
+			bat->Pose.Position.z > z1 &&
+			bat->Pose.Position.z < z2)
 		{
-			TriggerBlood(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z, 2 * GetRandomControl(), 2);
+			TriggerBlood(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 2 * GetRandomControl(), 2);
 			if (LaraItem->HitPoints > 0)
 				LaraItem->HitPoints -= 2;
 		}
@@ -224,8 +217,9 @@ void UpdateBats()
 
 	if (minIndex != -1)
 	{
-		BAT_STRUCT* bat = &Bats[minIndex];
+		auto* bat = &Bats[minIndex];
+
 		if (!(GetRandomControl() & 4))
-			SoundEffect(157,&bat->pos, 0);
+			SoundEffect(157,&bat->Pose, 0);
 	}
 }
