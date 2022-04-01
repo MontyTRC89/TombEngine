@@ -272,8 +272,7 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	if ((TrInput & IN_JUMP || lara->Control.RunJumpQueued) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
 		if (lara->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
@@ -1886,7 +1885,6 @@ void lara_as_step_right(ITEM_INFO* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
@@ -2381,10 +2379,21 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	if (TrInput & IN_JUMP)
+	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
-		item->Animation.TargetState = LS_SPRINT_DIVE;
-		return;
+		if (TrInput & IN_WALK || !g_GameFlow->Animations.HasSprintJump)
+		{
+			item->Animation.TargetState = LS_SPRINT_DIVE;
+			return;
+		}
+		else if (lara->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
+			TestLaraRunJumpForward(item, coll) && HasStateDispatch(item, LS_JUMP_FORWARD))
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			return;
+		}
+
+		SetLaraRunJumpQueue(item, coll);
 	}
 
 	if (TrInput & IN_CROUCH && TestLaraCrouch(item))

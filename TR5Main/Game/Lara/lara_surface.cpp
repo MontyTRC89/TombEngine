@@ -176,20 +176,23 @@ void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		}
 	}
 
-	if (!(TrInput & IN_LSTEP))
+	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
 	if (DbInput & IN_JUMP)
@@ -222,20 +225,23 @@ void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		}
 	}
 
-	if (!(TrInput & IN_RSTEP))
+	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
 	if (DbInput & IN_JUMP)

@@ -16,11 +16,12 @@ settings.errorMode = ErrorMode.WARN;
 SetSettings(settings);
 
 local anims = Animations.new();
-anims.hasSlideExtended = true;
+anims.hasPose = false;
+anims.hasSlideExtended = false;
+anims.hasSprintJump = true;
+anims.hasMonkeyAutoJump = false;
+anims.hasCrawlspaceDive = true;
 anims.hasCrawlExtended = true;
 anims.hasCrouchRoll = true;
-anims.hasCrawlspaceSwandive = true;
 anims.hasOverhangClimb = true;
-anims.hasPose = false;
-anims.hasMonkeyAutoJump = false;
 SetAnimations(anims);
