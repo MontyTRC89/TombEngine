@@ -1202,7 +1202,7 @@ bool TestLaraKeepLow(ITEM_INFO* item, CollisionInfo* coll)
 	int radius = (item->Animation.ActiveState == LS_CROUCH_IDLE ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
 		item->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
-		? LARA_RADIUS : LARA_RADIUS_CRAWL;
+		? LARA_RADIUS_CRAWL : LARA_RADIUS;
 
 	auto probeFront = GetCollision(item, item->Pose.Orientation.y, radius, -coll->Setup.Height);
 	auto probeBack = GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), radius, -coll->Setup.Height);
