@@ -35,7 +35,6 @@ Functions and callbacks for level-specific logic scripts.
 void SetVariable(sol::table tab, sol::object key, sol::object value)
 {
 #if TEN_OPTIONAL_LUA
-	TENLog("lol");
 	switch (value.get_type())
 	{
 	case sol::type::lua_nil:
