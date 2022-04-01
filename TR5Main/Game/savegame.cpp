@@ -571,7 +571,8 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::StaticMeshInfo>> staticMeshes;
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		ROOM_INFO* room = &g_Level.Rooms[i];
+		auto* room = &g_Level.Rooms[i];
+
 		for (int j = 0; j < room->mesh.size(); j++)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
@@ -586,19 +587,19 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
 	for (int i = 0; i < NUM_BATS; i++)
 	{
-		BAT_STRUCT* bat = &Bats[i];
+		auto* bat = &Bats[i];
 
 		Save::BatInfoBuilder batInfo{ fbb };
 
-		batInfo.add_counter(bat->counter);
-		batInfo.add_on(bat->on);
-		batInfo.add_room_number(bat->roomNumber);
-		batInfo.add_x(bat->pos.Position.x);
-		batInfo.add_y(bat->pos.Position.y);
-		batInfo.add_z(bat->pos.Position.z);
-		batInfo.add_x_rot(bat->pos.Orientation.x);
-		batInfo.add_y_rot(bat->pos.Orientation.y);
-		batInfo.add_z_rot(bat->pos.Orientation.z);
+		batInfo.add_counter(bat->Counter);
+		batInfo.add_on(bat->On);
+		batInfo.add_room_number(bat->RoomNumber);
+		batInfo.add_x(bat->Pose.Position.x);
+		batInfo.add_y(bat->Pose.Position.y);
+		batInfo.add_z(bat->Pose.Position.z);
+		batInfo.add_x_rot(bat->Pose.Orientation.x);
+		batInfo.add_y_rot(bat->Pose.Orientation.y);
+		batInfo.add_z_rot(bat->Pose.Orientation.z);
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -607,19 +608,19 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::SpiderInfo>> spiders;
 	for (int i = 0; i < NUM_SPIDERS; i++)
 	{
-		SPIDER_STRUCT* spider = &Spiders[i];
+		auto* spider = &Spiders[i];
 
 		Save::SpiderInfoBuilder spiderInfo{ fbb };
 
-		spiderInfo.add_flags(spider->flags);
-		spiderInfo.add_on(spider->on);
-		spiderInfo.add_room_number(spider->roomNumber);
-		spiderInfo.add_x(spider->pos.Position.x);
-		spiderInfo.add_y(spider->pos.Position.y);
-		spiderInfo.add_z(spider->pos.Position.z);
-		spiderInfo.add_x_rot(spider->pos.Orientation.x);
-		spiderInfo.add_y_rot(spider->pos.Orientation.y);
-		spiderInfo.add_z_rot(spider->pos.Orientation.z);
+		spiderInfo.add_flags(spider->Flags);
+		spiderInfo.add_on(spider->On);
+		spiderInfo.add_room_number(spider->RoomNumber);
+		spiderInfo.add_x(spider->Pose.Position.x);
+		spiderInfo.add_y(spider->Pose.Position.y);
+		spiderInfo.add_z(spider->Pose.Position.z);
+		spiderInfo.add_x_rot(spider->Pose.Orientation.x);
+		spiderInfo.add_y_rot(spider->Pose.Orientation.y);
+		spiderInfo.add_z_rot(spider->Pose.Orientation.z);
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -628,19 +629,19 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::RatInfo>> rats;
 	for (int i = 0; i < NUM_RATS; i++)
 	{
-		RAT_STRUCT* rat = &Rats[i];
+		auto* rat = &Rats[i];
 
 		Save::RatInfoBuilder ratInfo{ fbb };
 
-		ratInfo.add_flags(rat->flags);
-		ratInfo.add_on(rat->on);
-		ratInfo.add_room_number(rat->roomNumber);
-		ratInfo.add_x(rat->pos.Position.x);
-		ratInfo.add_y(rat->pos.Position.y);
-		ratInfo.add_z(rat->pos.Position.z);
-		ratInfo.add_x_rot(rat->pos.Orientation.x);
-		ratInfo.add_y_rot(rat->pos.Orientation.y);
-		ratInfo.add_z_rot(rat->pos.Orientation.z);
+		ratInfo.add_flags(rat->Flags);
+		ratInfo.add_on(rat->On);
+		ratInfo.add_room_number(rat->RoomNumber);
+		ratInfo.add_x(rat->Pose.Position.x);
+		ratInfo.add_y(rat->Pose.Position.y);
+		ratInfo.add_z(rat->Pose.Position.z);
+		ratInfo.add_x_rot(rat->Pose.Orientation.x);
+		ratInfo.add_y_rot(rat->Pose.Orientation.y);
+		ratInfo.add_z_rot(rat->Pose.Orientation.z);
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -649,19 +650,19 @@ bool SaveGame::Save(int slot)
 	std::vector<flatbuffers::Offset<Save::ScarabInfo>> scarabs;
 	for (int i = 0; i < NUM_BATS; i++)
 	{
-		BeetleInfo* scarab = &BeetleSwarm[i];
+		auto* beetle = &BeetleSwarm[i];
 
 		Save::ScarabInfoBuilder scarabInfo{ fbb };
 
-		scarabInfo.add_flags(scarab->Flags);
-		scarabInfo.add_on(scarab->On);
-		scarabInfo.add_room_number(scarab->RoomNumber);
-		scarabInfo.add_x(scarab->Pose.Position.x);
-		scarabInfo.add_y(scarab->Pose.Position.y);
-		scarabInfo.add_z(scarab->Pose.Position.z);
-		scarabInfo.add_x_rot(scarab->Pose.Orientation.x);
-		scarabInfo.add_y_rot(scarab->Pose.Orientation.y);
-		scarabInfo.add_z_rot(scarab->Pose.Orientation.z);
+		scarabInfo.add_flags(beetle->Flags);
+		scarabInfo.add_on(beetle->On);
+		scarabInfo.add_room_number(beetle->RoomNumber);
+		scarabInfo.add_x(beetle->Pose.Position.x);
+		scarabInfo.add_y(beetle->Pose.Position.y);
+		scarabInfo.add_z(beetle->Pose.Position.z);
+		scarabInfo.add_x_rot(beetle->Pose.Orientation.x);
+		scarabInfo.add_y_rot(beetle->Pose.Orientation.y);
+		scarabInfo.add_z_rot(beetle->Pose.Orientation.z);
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1085,65 +1086,65 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < s->bats()->size(); i++)
 	{
 		auto batInfo = s->bats()->Get(i);
-		BAT_STRUCT* bat = &Bats[i];
+		auto* bat = &Bats[i];
 
-		bat->on = batInfo->on();
-		bat->counter = batInfo->counter();
-		bat->roomNumber = batInfo->room_number();
-		bat->pos.Position.x = batInfo->x();
-		bat->pos.Position.y = batInfo->y();
-		bat->pos.Position.z = batInfo->z();
-		bat->pos.Orientation.x = batInfo->x_rot();
-		bat->pos.Orientation.y = batInfo->y_rot();
-		bat->pos.Orientation.z = batInfo->z_rot();
+		bat->On = batInfo->on();
+		bat->Counter = batInfo->counter();
+		bat->RoomNumber = batInfo->room_number();
+		bat->Pose.Position.x = batInfo->x();
+		bat->Pose.Position.y = batInfo->y();
+		bat->Pose.Position.z = batInfo->z();
+		bat->Pose.Orientation.x = batInfo->x_rot();
+		bat->Pose.Orientation.y = batInfo->y_rot();
+		bat->Pose.Orientation.z = batInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
 	{
 		auto ratInfo = s->rats()->Get(i);
-		RAT_STRUCT* rat = &Rats[i];
+		auto* rat = &Rats[i];
 
-		rat->on = ratInfo->on();
-		rat->flags = ratInfo->flags();
-		rat->roomNumber = ratInfo->room_number();
-		rat->pos.Position.x = ratInfo->x();
-		rat->pos.Position.y = ratInfo->y();
-		rat->pos.Position.z = ratInfo->z();
-		rat->pos.Orientation.x = ratInfo->x_rot();
-		rat->pos.Orientation.y = ratInfo->y_rot();
-		rat->pos.Orientation.z = ratInfo->z_rot();
+		rat->On = ratInfo->on();
+		rat->Flags = ratInfo->flags();
+		rat->RoomNumber = ratInfo->room_number();
+		rat->Pose.Position.x = ratInfo->x();
+		rat->Pose.Position.y = ratInfo->y();
+		rat->Pose.Position.z = ratInfo->z();
+		rat->Pose.Orientation.x = ratInfo->x_rot();
+		rat->Pose.Orientation.y = ratInfo->y_rot();
+		rat->Pose.Orientation.z = ratInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
 	{
 		auto spiderInfo = s->spiders()->Get(i);
-		SPIDER_STRUCT* spider = &Spiders[i];
+		auto* spider = &Spiders[i];
 
-		spider->on = spiderInfo->on();
-		spider->flags = spiderInfo->flags();
-		spider->roomNumber = spiderInfo->room_number();
-		spider->pos.Position.x = spiderInfo->x();
-		spider->pos.Position.y = spiderInfo->y();
-		spider->pos.Position.z = spiderInfo->z();
-		spider->pos.Orientation.x = spiderInfo->x_rot();
-		spider->pos.Orientation.y = spiderInfo->y_rot();
-		spider->pos.Orientation.z = spiderInfo->z_rot();
+		spider->On = spiderInfo->on();
+		spider->Flags = spiderInfo->flags();
+		spider->RoomNumber = spiderInfo->room_number();
+		spider->Pose.Position.x = spiderInfo->x();
+		spider->Pose.Position.y = spiderInfo->y();
+		spider->Pose.Position.z = spiderInfo->z();
+		spider->Pose.Orientation.x = spiderInfo->x_rot();
+		spider->Pose.Orientation.y = spiderInfo->y_rot();
+		spider->Pose.Orientation.z = spiderInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
 	{
-		auto scarabInfo = s->scarabs()->Get(i);
-		BeetleInfo* scarab = &BeetleSwarm[i];
+		auto beetleInfo = s->scarabs()->Get(i);
+		auto* Beetle = &BeetleSwarm[i];
 
-		scarab->On = scarabInfo->on();
-		scarab->Flags = scarabInfo->flags();
-		scarab->RoomNumber = scarabInfo->room_number();
-		scarab->Pose.Position.x = scarabInfo->x();
-		scarab->Pose.Position.y = scarabInfo->y();
-		scarab->Pose.Position.z = scarabInfo->z();
-		scarab->Pose.Orientation.x = scarabInfo->x_rot();
-		scarab->Pose.Orientation.y = scarabInfo->y_rot();
-		scarab->Pose.Orientation.z = scarabInfo->z_rot();
+		Beetle->On = beetleInfo->on();
+		Beetle->Flags = beetleInfo->flags();
+		Beetle->RoomNumber = beetleInfo->room_number();
+		Beetle->Pose.Position.x = beetleInfo->x();
+		Beetle->Pose.Position.y = beetleInfo->y();
+		Beetle->Pose.Position.z = beetleInfo->z();
+		Beetle->Pose.Orientation.x = beetleInfo->x_rot();
+		Beetle->Pose.Orientation.y = beetleInfo->y_rot();
+		Beetle->Pose.Orientation.z = beetleInfo->z_rot();
 	}
 
 	JustLoaded = 1;	

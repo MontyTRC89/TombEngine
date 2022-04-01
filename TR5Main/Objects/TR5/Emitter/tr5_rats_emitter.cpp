@@ -11,24 +11,24 @@
 #include "Game/items.h"
 
 int NextRat;
-RAT_STRUCT Rats[NUM_RATS];
+RatData Rats[NUM_RATS];
 
 short GetNextRat()
 {
-	short ratNum = NextRat;
-	int i = 0;
-	RAT_STRUCT* rat = &Rats[NextRat];
+	short ratNumber = NextRat;
+	auto* rat = &Rats[NextRat];
 
-	while (rat->on)
+	int i = 0;
+	while (rat->On)
 	{
-		if (ratNum == NUM_RATS - 1)
+		if (ratNumber == NUM_RATS - 1)
 		{
 			rat = &Rats[0];
-			ratNum = 0;
+			ratNumber = 0;
 		}
 		else
 		{
-			ratNum++;
+			ratNumber++;
 			rat++;
 		}
 
@@ -38,13 +38,13 @@ short GetNextRat()
 			return NO_ITEM;
 	}
 
-	NextRat = (ratNum + 1) & 0x1F;
-	return ratNum;
+	NextRat = (ratNumber + 1) & 0x1F;
+	return ratNumber;
 }
 
 void LittleRatsControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags)
 	{
@@ -55,32 +55,32 @@ void LittleRatsControl(short itemNumber)
 			if (item->ItemFlags[2] && GetRandomControl() & 1)
 				item->ItemFlags[2]--;
 
-			short ratNum = GetNextRat();
-			if (ratNum != -1)
+			short ratNumber = GetNextRat();
+			if (ratNumber != -1)
 			{
-				RAT_STRUCT* rat = &Rats[ratNum];
+				auto* rat = &Rats[ratNumber];
 
-				rat->pos.Position.x = item->Pose.Position.x;
-				rat->pos.Position.y = item->Pose.Position.y;
-				rat->pos.Position.z = item->Pose.Position.z;
-				rat->roomNumber = item->RoomNumber;
+				rat->Pose.Position.x = item->Pose.Position.x;
+				rat->Pose.Position.y = item->Pose.Position.y;
+				rat->Pose.Position.z = item->Pose.Position.z;
+				rat->RoomNumber = item->RoomNumber;
 
 				if (item->ItemFlags[0])
 				{
-					rat->pos.Orientation.y = 2 * GetRandomControl();
-					rat->fallspeed = -16 - (GetRandomControl() & 31);
+					rat->Pose.Orientation.y = 2 * GetRandomControl();
+					rat->VerticalVelocity = -16 - (GetRandomControl() & 31);
 				}
 				else
 				{
-					rat->fallspeed = 0;
-					rat->pos.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+					rat->VerticalVelocity = 0;
+					rat->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45);
 				}
 
-				rat->pos.Orientation.x = 0;
-				rat->pos.Orientation.z = 0;
-				rat->on = 1;
-				rat->flags = GetRandomControl() & 30;
-				rat->speed = (GetRandomControl() & 31) + 1;
+				rat->Pose.Orientation.x = 0;
+				rat->Pose.Orientation.z = 0;
+				rat->On = true;
+				rat->Flags = GetRandomControl() & 30;
+				rat->Velocity = (GetRandomControl() & 31) + 1;
 			}
 		}
 	}
@@ -90,7 +90,7 @@ void ClearRats()
 {
 	if (Objects[ID_RATS_EMITTER].loaded)
 	{
-		ZeroMemory(Rats, NUM_RATS * sizeof(RAT_STRUCT));
+		ZeroMemory(Rats, NUM_RATS * sizeof(RatData));
 		NextRat = 0;
 		FlipEffect = -1;
 	}
@@ -98,11 +98,11 @@ void ClearRats()
 
 void InitialiseLittleRats(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	char flags = item->TriggerFlags / 1000;
 
-	item->Pose.Orientation.x = ANGLE(45);
+	item->Pose.Orientation.x = ANGLE(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -114,23 +114,15 @@ void InitialiseLittleRats(short itemNumber)
 		return;
 	}
 
-	if (item->Pose.Orientation.y > -28672 && item->Pose.Orientation.y < -4096)
-	{
-		item->Pose.Position.x += 512;
-	}
-	else if (item->Pose.Orientation.y > 4096 && item->Pose.Orientation.y < 28672)
-	{
-		item->Pose.Position.x -= 512;
-	}
+	if (item->Pose.Orientation.y > -ANGLE(157.5f) && item->Pose.Orientation.y < -ANGLE(22.5f))
+		item->Pose.Position.x += CLICK(2);
+	else if (item->Pose.Orientation.y > ANGLE(22.5f) && item->Pose.Orientation.y < ANGLE(157.5f))
+		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Pose.Orientation.y > -8192 && item->Pose.Orientation.y < 8192)
-	{
-		item->Pose.Position.z -= 512;
-	}
-	else if (item->Pose.Orientation.y < -20480 || item->Pose.Orientation.y > 20480)
-	{
-		item->Pose.Position.z += 512;
-	}
+	if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+		item->Pose.Position.z -= CLICK(2);
+	else if (item->Pose.Orientation.y < -ANGLE(112.5f) || item->Pose.Orientation.y > ANGLE(112.5f))
+		item->Pose.Position.z += CLICK(2);
 
 	ClearRats();
 }
@@ -141,29 +133,29 @@ void UpdateRats()
 	{
 		for (int i = 0; i < NUM_RATS; i++)
 		{
-			RAT_STRUCT* rat = &Rats[i];
+			auto* rat = &Rats[i];
 
-			if (rat->on)
+			if (rat->On)
 			{
-				int oldX = rat->pos.Position.x;
-				int oldY = rat->pos.Position.y;
-				int oldZ = rat->pos.Position.z;
+				int oldX = rat->Pose.Position.x;
+				int oldY = rat->Pose.Position.y;
+				int oldZ = rat->Pose.Position.z;
 
-				rat->pos.Position.x += rat->speed * phd_sin(rat->pos.Orientation.y);
-				rat->pos.Position.y += rat->fallspeed;
-				rat->pos.Position.z += rat->speed * phd_cos(rat->pos.Orientation.y);
+				rat->Pose.Position.x += rat->Velocity * phd_sin(rat->Pose.Orientation.y);
+				rat->Pose.Position.y += rat->VerticalVelocity;
+				rat->Pose.Position.z += rat->Velocity * phd_cos(rat->Pose.Orientation.y);
 
-				rat->fallspeed += GRAVITY;
+				rat->VerticalVelocity += GRAVITY;
 
-				int dx = LaraItem->Pose.Position.x - rat->pos.Position.x;
-				int dy = LaraItem->Pose.Position.y - rat->pos.Position.y;
-				int dz = LaraItem->Pose.Position.z - rat->pos.Position.z;
+				int dx = LaraItem->Pose.Position.x - rat->Pose.Position.x;
+				int dy = LaraItem->Pose.Position.y - rat->Pose.Position.y;
+				int dz = LaraItem->Pose.Position.z - rat->Pose.Position.z;
 
 				short angle;
-				if (rat->flags >= 170)
-					angle = rat->pos.Orientation.y - (short)phd_atan(dz, dx);
+				if (rat->Flags >= 170)
+					angle = rat->Pose.Orientation.y - (short)phd_atan(dz, dx);
 				else
-					angle = (short)phd_atan(dz, dx) - rat->pos.Orientation.y;
+					angle = (short)phd_atan(dz, dx) - rat->Pose.Orientation.y;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
@@ -172,128 +164,123 @@ void UpdateRats()
 				}
 
 				// if life is even
-				if (rat->flags & 1)
+				if (rat->Flags & 1)
 				{
 					// if rat is very near
-					if (abs(dz) + abs(dx) <= 1024)
+					if (abs(dz) + abs(dx) <= SECTOR(1))
 					{
-						if (rat->speed & 1)
-							rat->pos.Orientation.y += 512;
+						if (rat->Velocity & 1)
+							rat->Pose.Orientation.y += ANGLE(2.8f);
 						else
-							rat->pos.Orientation.y -= 512;
-						rat->speed = 48 - (abs(angle) / 1024);
+							rat->Pose.Orientation.y -= ANGLE(2.8f);
+						rat->Velocity = 48 - (abs(angle) / ANGLE(5.6f));
 					}
 					else
 					{
-						if (rat->speed < (i & 31) + 24)
-							rat->speed++;
+						if (rat->Velocity < (i & 31) + 24)
+							rat->Velocity++;
 
-						if (abs(angle) >= 2048)
+						if (abs(angle) >= ANGLE(11.25f))
 						{
 							if (angle >= 0)
-								rat->pos.Orientation.y += 1024;
+								rat->Pose.Orientation.y += ANGLE(5.6f);
 							else
-								rat->pos.Orientation.y -= 1024;
+								rat->Pose.Orientation.y -= ANGLE(5.6f);
 						}
 						else
-						{
-							rat->pos.Orientation.y += 8 * (Wibble - i);
-						}
+							rat->Pose.Orientation.y += 8 * (Wibble - i);
 					}
 				}
 
-				short oldRoomNumber = rat->roomNumber;
+				short oldRoomNumber = rat->RoomNumber;
 
-				FLOOR_INFO* floor = GetFloor(rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z,&rat->roomNumber);
-				int height = GetFloorHeight(floor, rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z);
+				FLOOR_INFO* floor = GetFloor(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z,&rat->RoomNumber);
+				int height = GetFloorHeight(floor, rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
 
 				// if height is higher than 5 clicks 
-				if (height < rat->pos.Position.y - 1280 ||
+				if (height < rat->Pose.Position.y - 1280 ||
 					height == NO_HEIGHT)
 				{
 					// if timer is higher than 170 time to disappear 
-					if (rat->flags > 170)
+					if (rat->Flags > 170)
 					{
-						rat->on = 0;
+						rat->On = 0;
 						NextRat = 0;
 					}
 
 					if (angle <= 0)
-						rat->pos.Orientation.y -= ANGLE(90);
+						rat->Pose.Orientation.y -= ANGLE(90.0f);
 					else
-						rat->pos.Orientation.y += ANGLE(90);
+						rat->Pose.Orientation.y += ANGLE(90.0f);
 
-					// reset rat to old position and disable fall
-					rat->pos.Position.x = oldX;
-					rat->pos.Position.y = oldY;
-					rat->pos.Position.z = oldZ;
-					rat->fallspeed = 0;
+					// reset rat to old Poseition and disable fall
+					rat->Pose.Position.x = oldX;
+					rat->Pose.Position.y = oldY;
+					rat->Pose.Position.z = oldZ;
+					rat->VerticalVelocity = 0;
 				}
 				else
 				{
 					// if height is lower than Y + 64
-					if (height >= rat->pos.Position.y - 64)
+					if (height >= rat->Pose.Position.y - 64)
 					{
 						// if rat is higher than floor
-						if (height >= rat->pos.Position.y)
+						if (height >= rat->Pose.Position.y)
 						{
-							// if fallspeed is too much or life is ended then kill rat
-							if (rat->fallspeed >= 500 ||
-								rat->flags >= 200)
+							// if VerticalVelocity is too much or life is ended then kill rat
+							if (rat->VerticalVelocity >= 500 ||
+								rat->Flags >= 200)
 							{
-								rat->on = 0;
+								rat->On = 0;
 								NextRat = 0;
 							}
 							else
-							{
-								rat->pos.Orientation.x = -128 * rat->fallspeed;
-							}
+								rat->Pose.Orientation.x = -128 * rat->VerticalVelocity;
 						}
 						else
 						{
-							rat->pos.Position.y = height;
-							rat->fallspeed = 0;
-							rat->flags |= 1;
+							rat->Pose.Position.y = height;
+							rat->VerticalVelocity = 0;
+							rat->Flags |= 1;
 						}
 					}
 					else
 					{
-						// if block is higher than rat position then run vertically
-						rat->pos.Orientation.x = 14336;
-						rat->pos.Position.x = oldX;
-						rat->pos.Position.y = oldY - 24;
-						rat->pos.Position.z = oldZ;
-						rat->fallspeed = 0;
+						// if block is higher than rat Poseition then run vertically
+						rat->Pose.Orientation.x = ANGLE(78.75f);
+						rat->Pose.Position.x = oldX;
+						rat->Pose.Position.y = oldY - 24;
+						rat->Pose.Position.z = oldZ;
+						rat->VerticalVelocity = 0;
 					}
 				}
 
 				if (!(Wibble & 60))
-					rat->flags += 2;
+					rat->Flags += 2;
 
-				ROOM_INFO* r = &g_Level.Rooms[rat->roomNumber];
-				if (r->flags & ENV_FLAG_WATER)
+				auto* room = &g_Level.Rooms[rat->RoomNumber];
+
+				if (TestEnvironment(ENV_FLAG_WATER, room->flags))
 				{
-					rat->fallspeed = 0;
-					rat->speed = 16;
-					rat->pos.Position.y = r->maxceiling + 50;
+					rat->Pose.Position.y = room->maxceiling + 50;
+					rat->Velocity = 16;
+					rat->VerticalVelocity = 0;
 
-					if (g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER)
+					if (TestEnvironment(ENV_FLAG_WATER, oldRoomNumber))
 					{
 						if (!(GetRandomControl() & 0xF))
-						{
-							SetupRipple(rat->pos.Position.x, r->maxceiling, rat->pos.Position.z, (GetRandomControl() & 3) + 48, 2,Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_RIPPLES);
-						}
+							SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, 2,Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_RIPPLES);
 					}
 					else
 					{
-						AddWaterSparks(rat->pos.Position.x, r->maxceiling, rat->pos.Position.z, 16);
-						SetupRipple(rat->pos.Position.x, r->maxceiling, rat->pos.Position.z, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-						SoundEffect(1080,&rat->pos, 0);
+						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
+						SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+						SoundEffect(1080,&rat->Pose, 0);
 					}
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(1079,&rat->pos, 0);
+					SoundEffect(1079,&rat->Pose, 0);
 			}
 		}
 	}

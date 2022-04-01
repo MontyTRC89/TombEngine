@@ -11,7 +11,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BeetleInfo BeetleSwarm[NUM_BEETLES];
+	BeetleData BeetleSwarm[NUM_BEETLES];
 	int NextBeetle;
 
 	void InitialiseBeetleSwarm(short itemNumber)
@@ -94,7 +94,7 @@ namespace TEN::Entities::TR4
 	{
 		if (Objects[ID_LITTLE_BEETLE].loaded)
 		{
-			ZeroMemory(BeetleSwarm, NUM_BEETLES * sizeof(BeetleInfo));
+			ZeroMemory(BeetleSwarm, NUM_BEETLES * sizeof(BeetleData));
 			NextBeetle = 0;
 			FlipEffect = -1;
 		}
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR4
 
 	short GetFreeBeetle()
 	{
-		BeetleInfo* beetle = &BeetleSwarm[NextBeetle];
+		auto* beetle = &BeetleSwarm[NextBeetle];
 		short result = NextBeetle;
 
 		int i = 0;

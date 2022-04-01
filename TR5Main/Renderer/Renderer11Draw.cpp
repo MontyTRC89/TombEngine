@@ -1527,19 +1527,19 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
-				RAT_STRUCT* rat = &Rats[i];
+				auto* rat = &Rats[i];
 
-				if (rat->on)
+				if (rat->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
-					Matrix translation = Matrix::CreateTranslation(rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.Orientation.y), TO_RAD(rat->pos.Orientation.x),
-					                                                 TO_RAD(rat->pos.Orientation.z));
+					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->Pose.Orientation.y), TO_RAD(rat->Pose.Orientation.x),
+					                                                 TO_RAD(rat->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(rat->pos.Position.x, rat->pos.Position.y, rat->pos.Position.z, 1.0f);
-					m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
+					m_stItem.Position = Vector4(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z, 1.0f);
+					m_stItem.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)
@@ -1585,18 +1585,18 @@ namespace TEN::Renderer
 
 				for (int i = 0; i < NUM_BATS; i++)
 				{
-					BAT_STRUCT* bat = &Bats[i];
+					auto* bat = &Bats[i];
 
-					if (bat->on)
+					if (bat->On)
 					{
-						Matrix translation = Matrix::CreateTranslation(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z);
+						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							TO_RAD(bat->pos.Orientation.y), TO_RAD(bat->pos.Orientation.x), TO_RAD(bat->pos.Orientation.z));
+							TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), TO_RAD(bat->Pose.Orientation.z));
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
-						m_stItem.Position = Vector4(bat->pos.Position.x, bat->pos.Position.y, bat->pos.Position.z, 1.0f);
-						m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
+						m_stItem.Position = Vector4(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 1.0f);
+						m_stItem.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
 						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1627,7 +1627,7 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				BeetleInfo* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+				auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
 
 				if (beetle->On)
 				{
