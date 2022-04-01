@@ -3,21 +3,10 @@
 
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/Lara/lara.h"
 #include "Game/savegame.h"
-#include "Game/control/lot.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/effects.h"
-#include "Game/pickup/pickup.h"
-#include "Game/gui.h"
 #include "ReservedScriptNames.h"
-#include "Game/camera.h"
-#include <Renderer/Renderer11Enums.h>
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
 #include "Objects/Moveable/Moveable.h"

@@ -114,8 +114,8 @@ namespace Misc {
 	{
 		auto fWidth = static_cast<double>(g_Configuration.Width);
 		auto fHeight = static_cast<double>(g_Configuration.Height);
-		int resX = std::round(fWidth / 100.0 * x);
-		int resY = std::round(fHeight / 100.0 * y);
+		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
+		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
 		//todo this still assumes a resolution of 800/600. account for this somehow
 		return std::make_tuple(resX, resY);
 	}
@@ -134,7 +134,6 @@ namespace Misc {
 	void Register(sol::state * state, sol::table & parent) {
 		sol::table table_misc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, table_misc);
-
 
 		///Set and play an ambient track
 		//@function SetAmbientTrack
