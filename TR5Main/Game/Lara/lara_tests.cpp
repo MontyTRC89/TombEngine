@@ -1152,6 +1152,7 @@ bool IsJumpState(LaraState state)
 bool IsRunJumpQueueableState(LaraState state)
 {
 	if (state == LS_RUN_FORWARD ||
+		state == LS_SPRINT ||
 		state == LS_STEP_UP ||
 		state == LS_STEP_DOWN)
 	{

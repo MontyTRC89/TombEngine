@@ -10,13 +10,14 @@ namespace sol
 
 struct GameScriptAnimations
 {
-	bool HasSlideExtended;		// Extended slope sliding functionality.
+	bool HasPose;				// Crossed arms AFK posing.
+	bool HasSlideExtended;		// Extended slope sliding functionality (not ready yet).
+	bool HasSprintJump;			// Sprint jump.
+	bool HasMonkeyAutoJump;		// Auto jump to monkey swing when pressing UP + ACTION. TODO: Make this a player setting.
+	bool HasCrawlspaceDive;		// Dive into crawlspaces.
 	bool HasCrawlExtended;		// Extended crawl moveset.
 	bool HasCrouchRoll;			// Crouch roll.
-	bool HasCrawlspaceDive;		// Dive into crawlspaces.
 	bool HasOverhangClimb;		// Overhang functionality.
-	bool HasPose;				// Crossed arms AFK posing.
-	bool HasMonkeyAutoJump;		// Auto jump to monkey swing when pressing UP + ACTION.
 
 	static void Register(sol::state* lua);
 };
