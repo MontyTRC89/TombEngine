@@ -16,15 +16,8 @@ Sound source
 static auto index_error = index_error_maker(SoundSource, ScriptReserved_SoundSource);
 static auto newindex_error = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
 
-SoundSource::SoundSource(SOUND_SOURCE_INFO & ref, bool temp) : m_soundSource{ref}, m_temporary{ temp }
+SoundSource::SoundSource(SOUND_SOURCE_INFO & ref) : m_soundSource{ref}
 {};
-
-SoundSource::~SoundSource() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_soundSource.luaName);
-	}
-}
 
 void SoundSource::Register(sol::table & parent)
 {
