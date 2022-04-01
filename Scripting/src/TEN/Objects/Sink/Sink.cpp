@@ -17,15 +17,8 @@ Sink
 static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
 static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
 
-Sink::Sink(SINK_INFO & ref, bool temp) : m_sink{ref}, m_temporary{ temp }
+Sink::Sink(SINK_INFO & ref) : m_sink{ref}
 {};
-
-Sink::~Sink() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_sink.luaName);
-	}
-}
 
 void Sink::Register(sol::table& parent)
 {

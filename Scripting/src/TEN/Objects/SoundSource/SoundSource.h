@@ -12,8 +12,8 @@ class SoundSource : public NamedBase<SoundSource, SOUND_SOURCE_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SOUND_SOURCE_INFO>;
-	SoundSource(SOUND_SOURCE_INFO& ref, bool temp);
-	~SoundSource();
+	SoundSource(SOUND_SOURCE_INFO& ref);
+	~SoundSource() = default;
 
 	SoundSource& operator=(SoundSource const& other) = delete;
 	SoundSource(SoundSource const& other) = delete;
@@ -30,6 +30,5 @@ public:
 
 private:
 	SOUND_SOURCE_INFO & m_soundSource;
-	bool m_temporary;
 };
 
