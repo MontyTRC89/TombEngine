@@ -399,13 +399,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->Front.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
@@ -457,13 +457,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -510,13 +510,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->FrontLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -568,13 +568,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->MiddleRight.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -621,13 +621,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->FrontRight.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;

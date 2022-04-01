@@ -553,7 +553,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
@@ -650,7 +650,7 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockDeathFlagDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item, true);
 
