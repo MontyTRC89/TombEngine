@@ -12,8 +12,8 @@ class Sink : public NamedBase<Sink, SINK_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<SINK_INFO>;
-	Sink(SINK_INFO& ref, bool temp);
-	~Sink();
+	Sink(SINK_INFO& ref);
+	~Sink() = default;
 
 	Sink& operator=(Sink const& other) = delete;
 	Sink(Sink const& other) = delete;
@@ -30,5 +30,4 @@ public:
 
 private:
 	SINK_INFO & m_sink;
-	bool m_temporary;
 };

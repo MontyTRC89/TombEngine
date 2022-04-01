@@ -18,15 +18,8 @@ Mesh info
 static auto index_error = index_error_maker(Static, ScriptReserved_Static);
 static auto newindex_error = newindex_error_maker(Static, ScriptReserved_Static);
 
-Static::Static(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
+Static::Static(MESH_INFO & ref) : m_mesh{ref}
 {};
-
-Static::~Static() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_mesh.luaName);
-	}
-}
 
 void Static::Register(sol::table & parent)
 {

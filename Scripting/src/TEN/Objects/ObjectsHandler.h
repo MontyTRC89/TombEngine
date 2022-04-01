@@ -35,7 +35,7 @@ private:
 	std::unique_ptr<R> GetByName(std::string const& name)
 	{
 		ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name);
-		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)), false);
+		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
 	}
 
 	bool AddName(std::string const& key, VarMapVal val) override

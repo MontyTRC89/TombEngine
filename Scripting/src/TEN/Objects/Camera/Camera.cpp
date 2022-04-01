@@ -18,15 +18,8 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 static auto index_error = index_error_maker(Camera, ScriptReserved_Camera);
 static auto newindex_error = newindex_error_maker(Camera, ScriptReserved_Camera);
 
-Camera::Camera(LEVEL_CAMERA_INFO & ref, bool temp) : m_camera{ref}, m_temporary{ temp }
+Camera::Camera(LEVEL_CAMERA_INFO & ref) : m_camera{ref}
 {};
-
-Camera::~Camera() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_camera.luaName);
-	}
-}
 
 void Camera::Register(sol::table & parent)
 {
