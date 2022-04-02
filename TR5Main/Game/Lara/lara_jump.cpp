@@ -97,7 +97,7 @@ void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	if (TrInput & IN_ROLL || TrInput & IN_BACK)
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
@@ -467,7 +467,7 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	if (TrInput & IN_ROLL || TrInput & IN_FORWARD)
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
