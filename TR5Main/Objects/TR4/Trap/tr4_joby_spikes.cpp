@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < item->Animation.Mutator.size(); i++)
 			item->Animation.Mutator[i].Scale.y = 0.0f;
 
-        item->Position.yRot = GetRandomControl() * 1024;
+        item->Pose.Orientation.y = GetRandomControl() * 1024;
         item->ItemFlags[2] = GetRandomControl() & 1;
 
         auto probe = GetCollision(item);
@@ -40,23 +40,23 @@ namespace TEN::Entities::TR4
 
         ANIM_FRAME* framePtr[2];
         int rate;
-        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Position, 0);
+        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
         GetFrame(LaraItem, framePtr, &rate);
 
-        int dy = LaraItem->Position.yPos + framePtr[0]->boundingBox.Y1;
+        int dy = LaraItem->Pose.Position.y + framePtr[0]->boundingBox.Y1;
         int dl = 3328 * item->ItemFlags[1] / 4096;
 
         if (LaraItem->HitPoints > 0)
         {
-            if (item->Position.yPos + dl > dy)
+            if (item->Pose.Position.y + dl > dy)
             {
-                if (abs(item->Position.xPos - LaraItem->Position.xPos) < CLICK(2))
+                if (abs(item->Pose.Position.x - LaraItem->Pose.Position.x) < CLICK(2))
                 {
-                    if (abs(item->Position.zPos - LaraItem->Position.zPos) < CLICK(2))
+                    if (abs(item->Pose.Position.z - LaraItem->Pose.Position.z) < CLICK(2))
                     {
-                        int x = (GetRandomControl() & 0x7F) + LaraItem->Position.xPos - 64;
-                        int y = dy + GetRandomControl() % (item->Position.yPos - dy + dl);
-                        int z = (GetRandomControl() & 0x7F) + LaraItem->Position.zPos - 64;
+                        int x = (GetRandomControl() & 0x7F) + LaraItem->Pose.Position.x - 64;
+                        int y = dy + GetRandomControl() % (item->Pose.Position.y - dy + dl);
+                        int z = (GetRandomControl() & 0x7F) + LaraItem->Pose.Position.z - 64;
 
                         DoBloodSplat(x, y, z, (GetRandomControl() & 3) + 2, 2 * GetRandomControl(), item->RoomNumber);
                         LaraItem->HitPoints -= 8;
@@ -76,7 +76,7 @@ namespace TEN::Entities::TR4
         if (item->ItemFlags[1] < item->ItemFlags[3])
             item->ItemFlags[1] += 3;
 
-        item->Position.yRot += item->ItemFlags[0];
+        item->Pose.Orientation.y += item->ItemFlags[0];
 
 		// Update bone mutators
 		if (item->ItemFlags[1])

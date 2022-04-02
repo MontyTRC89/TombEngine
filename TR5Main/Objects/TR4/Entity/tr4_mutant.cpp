@@ -35,12 +35,12 @@ namespace TEN::Entities::TR4
 		if (fxNumber != NO_ITEM)
 		{
 			auto* fx = &EffectList[fxNumber];
-			fx->pos.xPos = src->xPos;
-			fx->pos.yPos = src->yPos - (GetRandomControl() & 0x3F) - 32;
-			fx->pos.zPos = src->zPos;
-			fx->pos.xRot = src->xRot;
-			fx->pos.yRot = src->yRot;
-			fx->pos.zRot = 0;
+			fx->pos.Position.x = src->Position.x;
+			fx->pos.Position.y = src->Position.y - (GetRandomControl() & 0x3F) - 32;
+			fx->pos.Position.z = src->Position.z;
+			fx->pos.Orientation.x = src->Orientation.x;
+			fx->pos.Orientation.y = src->Orientation.y;
+			fx->pos.Orientation.z = 0;
 			fx->roomNumber = roomNumber;
 			fx->counter = 16 * counter + 15;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -52,8 +52,8 @@ namespace TEN::Entities::TR4
 
 	void TriggerCrocgodMissileFlame(short fxNumber, short xVel, short yVel, short zVel)
 	{
-		//x = LaraItem->pos.xPos - Effects[m_fxNumber].pos.xPos;
-		//z = LaraItem->pos.zPos - Effects[m_fxNumber].pos.zPos;
+		//x = LaraItem->pos.Position.x - Effects[m_fxNumber].pos.Position.x;
+		//z = LaraItem->pos.Position.z - Effects[m_fxNumber].pos.Position.z;
 		//if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
 		auto* fx = &EffectList[fxNumber];
@@ -78,9 +78,9 @@ namespace TEN::Entities::TR4
 		sptr->x = (GetRandomControl() & 0xF) - 8;
 		sptr->y = 0;
 		sptr->z = (GetRandomControl() & 0xF) - 8;
-		sptr->x += fx->pos.xPos;
-		sptr->y += fx->pos.yPos;
-		sptr->z += fx->pos.zPos;
+		sptr->x += fx->pos.Position.x;
+		sptr->y += fx->pos.Position.y;
+		sptr->z += fx->pos.Position.z;
 		sptr->xVel = xVel;
 		sptr->yVel = yVel;
 		sptr->zVel = zVel;
@@ -108,11 +108,11 @@ namespace TEN::Entities::TR4
 		switch (rotation)
 		{
 		case MissileRotationType::Left:
-			src->yRot -= GetRandomControl() % 0x2000;
+			src->Orientation.y -= GetRandomControl() % 0x2000;
 			break;
 
 		case MissileRotationType::Right:
-			src->yRot += GetRandomControl() % 0x2000;
+			src->Orientation.y += GetRandomControl() % 0x2000;
 			break;
 		}
 
@@ -140,80 +140,80 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Position.yRot;
+			headAngle = item->Pose.Orientation.y;
 			return;
 		}
 
 		auto* enemy = creature->Enemy;
-		PHD_VECTOR pos = { 0, 0, 0 };
+		Vector3Int pos = { 0, 0, 0 };
 		GetJointAbsPosition(item, &pos, joint);
 
-		int x = enemy->Position.xPos - pos.x;
-		int z = enemy->Position.zPos - pos.z;
-		headAngle = (short)(phd_atan(z, x) - item->Position.yRot) / 2;
+		int x = enemy->Pose.Position.x - pos.x;
+		int z = enemy->Pose.Position.z - pos.z;
+		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
 	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
 	{
-		PHD_VECTOR start = { 0, -96, 144 };
+		auto start = Vector3Int(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
 
-		PHD_VECTOR end = { 0, -128, 288 };
+		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
 		short angles[2];
 		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
 
-		target->xPos = end.x;
-		target->yPos = end.y;
-		target->zPos = end.z;
-		target->xRot = angles[1];
-		target->yRot = angles[0];
-		target->zRot = 0;
+		target->Position.x = end.x;
+		target->Position.y = end.y;
+		target->Position.z = end.z;
+		target->Orientation.x = angles[1];
+		target->Orientation.y = angles[0];
+		target->Orientation.z = 0;
 	}
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Position.yRot));
+		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:
-			item->Position.zPos += distance;
+			item->Pose.Position.z += distance;
 			break;
 
 		case C_EAST:
-			item->Position.xPos += distance;
+			item->Pose.Position.x += distance;
 			break;
 
 		case C_SOUTH:
-			item->Position.zPos -= distance;
+			item->Pose.Position.z -= distance;
 			break;
 
 		case C_WEST:
-			item->Position.xPos -= distance;
+			item->Pose.Position.x -= distance;
 			break;
 		}
 	}
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Position.yRot));
+		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:
-			item->Position.zPos -= distance;
+			item->Pose.Position.z -= distance;
 			break;
 
 		case C_EAST:
-			item->Position.xPos -= distance;
+			item->Pose.Position.x -= distance;
 			break;
 
 		case C_SOUTH:
-			item->Position.zPos += distance;
+			item->Pose.Position.z += distance;
 			break;
 
 		case C_WEST:
-			item->Position.xPos += distance;
+			item->Pose.Position.x += distance;
 			break;
 		}
 	}
@@ -221,9 +221,9 @@ namespace TEN::Entities::TR4
 	static void MutantAIFix(ITEM_INFO* item, AI_INFO* info)
 	{
 		MoveItemFront(item, SECTOR(2));
-		item->Position.yPos -= CLICK(3);
+		item->Pose.Position.y -= CLICK(3);
 		CreatureAIInfo(item, info);
-		item->Position.yPos += CLICK(3);
+		item->Pose.Position.y += CLICK(3);
 		MoveItemBack(item, SECTOR(2));
 	}
 

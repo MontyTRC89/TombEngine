@@ -25,7 +25,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(30.0f), ANGLE(30.0f),
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
-	PHD_VECTOR CogSwitchPos(0, 0, -856);
+	Vector3Int CogSwitchPos(0, 0, -856);
 
 	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{

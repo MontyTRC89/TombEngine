@@ -38,29 +38,29 @@ struct OLD_CAMERA
 	short actualAngle;
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
-	PHD_VECTOR target;
+	Vector3Int target;
 };
 
 float LfAspectCorrection;
-GAME_VECTOR LastTarget;
+GameVector LastTarget;
 byte SniperCamActive;
 
 extern int KeyTriggerActive;
 
-PHD_VECTOR CurrentCameraPosition;
+Vector3Int CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
-GAME_VECTOR LastIdeal;
-GAME_VECTOR	Ideals[5];
+GameVector LastIdeal;
+GameVector	Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
-GAME_VECTOR LookCamPosition;
-GAME_VECTOR LookCamTarget;
+GameVector LookCamPosition;
+GameVector LookCamTarget;
 int LSHKTimer = 0;
 int LSHKShotsFired = 0;
-PHD_VECTOR CamOldPos;
+Vector3Int CamOldPos;
 CAMERA_INFO Camera;
-GAME_VECTOR ForcedFixedCamera;
+GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
 int BinocularRange;
@@ -103,11 +103,11 @@ void AlterFOV(int value)
 
 void InitialiseCamera()
 {
-	Camera.shift = LaraItem->Position.yPos - SECTOR(1);
+	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
 
-	LastTarget.x = LaraItem->Position.xPos;
+	LastTarget.x = LaraItem->Pose.Position.x;
 	LastTarget.y = Camera.shift;
-	LastTarget.z = LaraItem->Position.zPos;
+	LastTarget.z = LaraItem->Pose.Position.z;
 	LastTarget.roomNumber = LaraItem->RoomNumber;
 
 	Camera.target.x = LastTarget.x;
@@ -136,9 +136,9 @@ void InitialiseCamera()
 	CalculateCamera();
 }
 
-void MoveCamera(GAME_VECTOR* ideal, int speed)
+void MoveCamera(GameVector* ideal, int speed)
 {
-	GAME_VECTOR from, to;
+	GameVector from, to;
 
 	if (BinocularOn < 0)
 	{
@@ -146,16 +146,16 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		BinocularOn++;
 	}
 
-	if (OldCam.pos.xRot != LaraItem->Position.xRot ||
-		OldCam.pos.yRot != LaraItem->Position.yRot ||
-		OldCam.pos.zRot != LaraItem->Position.zRot ||
-		OldCam.pos2.xRot != Lara.ExtraHeadRot.xRot ||
-		OldCam.pos2.yRot != Lara.ExtraHeadRot.yRot ||
-		OldCam.pos2.xPos != Lara.ExtraTorsoRot.xRot ||
-		OldCam.pos2.yPos != Lara.ExtraTorsoRot.yRot ||
-		OldCam.pos.xPos != LaraItem->Position.xPos ||
-		OldCam.pos.yPos != LaraItem->Position.yPos ||
-		OldCam.pos.zPos != LaraItem->Position.zPos ||
+	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
+		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
+		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
+		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
+		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
+		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
+		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
+		OldCam.pos.Position.x != LaraItem->Pose.Position.x ||
+		OldCam.pos.Position.y != LaraItem->Pose.Position.y ||
+		OldCam.pos.Position.z != LaraItem->Pose.Position.z ||
 		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
 		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
@@ -168,16 +168,16 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		Camera.oldType != Camera.type ||
 		BinocularOn < 0)
 	{
-		OldCam.pos.xRot = LaraItem->Position.xRot;
-		OldCam.pos.yRot = LaraItem->Position.yRot;
-		OldCam.pos.zRot = LaraItem->Position.zRot;
-		OldCam.pos2.xRot = Lara.ExtraHeadRot.xRot;
-		OldCam.pos2.yRot = Lara.ExtraHeadRot.yRot;
-		OldCam.pos2.xPos = Lara.ExtraTorsoRot.xRot;
-		OldCam.pos2.yPos = Lara.ExtraTorsoRot.yRot;
-		OldCam.pos.xPos = LaraItem->Position.xPos;
-		OldCam.pos.yPos = LaraItem->Position.yPos;
-		OldCam.pos.zPos = LaraItem->Position.zPos;
+		OldCam.pos.Orientation.x = LaraItem->Pose.Orientation.x;
+		OldCam.pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		OldCam.pos.Orientation.z = LaraItem->Pose.Orientation.z;
+		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
+		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
+		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
+		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
+		OldCam.pos.Position.x = LaraItem->Pose.Position.x;
+		OldCam.pos.Position.y = LaraItem->Pose.Position.y;
+		OldCam.pos.Position.z = LaraItem->Pose.Position.z;
 		OldCam.ActiveState = LaraItem->Animation.ActiveState;
 		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
@@ -302,9 +302,9 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.mikePos.x = LaraItem->Position.xPos;
-		Camera.mikePos.y = LaraItem->Position.yPos;
-		Camera.mikePos.z = LaraItem->Position.zPos;
+		Camera.mikePos.x = LaraItem->Pose.Position.x;
+		Camera.mikePos.y = LaraItem->Pose.Position.y;
+		Camera.mikePos.z = LaraItem->Pose.Position.z;
 		Camera.oldType = Camera.type;
 	}
 	else
@@ -322,7 +322,7 @@ void ChaseCamera(ITEM_INFO* item)
 	if (!Camera.targetElevation)
 		Camera.targetElevation = -ANGLE(10.0f);
 
-	Camera.targetElevation += item->Position.xRot;
+	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp x rotation.
@@ -357,7 +357,7 @@ void ChaseCamera(ITEM_INFO* item)
 
 	int farthest = INT_MAX;
 	int farthestnum = 0;
-	GAME_VECTOR temp[2];
+	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -427,7 +427,7 @@ void ChaseCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
+	GameVector ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
@@ -438,10 +438,10 @@ void UpdateCameraElevation()
 {
 	if (Camera.laraNode != -1)
 	{
-		PHD_VECTOR pos = { 0, 0, 0 };
+		Vector3Int pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		PHD_VECTOR pos1 = { 0, -CLICK(1), SECTOR(2) };
+		Vector3Int pos1 = { 0, -CLICK(1), SECTOR(2) };
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.z = pos1.z - pos.z;
@@ -449,7 +449,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->Position.yRot + Camera.targetAngle;
+		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
@@ -458,18 +458,18 @@ void CombatCamera(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.target.x = item->Position.xPos;
-	Camera.target.z = item->Position.zPos;
+	Camera.target.x = item->Pose.Position.x;
+	Camera.target.z = item->Pose.Position.z;
 
 	if (lara->TargetEntity)
 	{
 		Camera.targetAngle = lara->TargetArmAngles[0];
-		Camera.targetElevation = lara->TargetArmAngles[1] + item->Position.xRot;
+		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.x;
 	}
 	else
 	{
-		Camera.targetAngle = lara->ExtraHeadRot.yRot + lara->ExtraTorsoRot.yRot;
-		Camera.targetElevation = lara->ExtraHeadRot.xRot + lara->ExtraTorsoRot.xRot + item->Position.xRot - ANGLE(15.0f);
+		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - ANGLE(15.0f);
 	}
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
@@ -529,7 +529,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	int farthest = INT_MAX;
 	int farthestnum = 0;
-	GAME_VECTOR temp[2];
+	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -601,7 +601,7 @@ void CombatCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
+	GameVector ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
 	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
@@ -612,7 +612,7 @@ void CombatCamera(ITEM_INFO* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
-bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
+bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst)
 {
 	int x = ideal->x;
 	int y = ideal->y;
@@ -738,7 +738,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 
 void FixedCamera(ITEM_INFO* item)
 {
-	GAME_VECTOR from, to;
+	GameVector from, to;
 
 	// Fixed cameras before TR3 had optional "movement" effect. 
 	// Later for some reason it was forced to always be 1, and actual speed value
@@ -783,36 +783,36 @@ void LookCamera(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	short headXRot = lara->ExtraHeadRot.xRot;
-	short headYRot = lara->ExtraHeadRot.yRot;
-	short torsoXRot = lara->ExtraTorsoRot.xRot;
-	short torsoYRot = lara->ExtraTorsoRot.yRot;
+	short headXRot = lara->ExtraHeadRot.x;
+	short headYRot = lara->ExtraHeadRot.y;
+	short torsoXRot = lara->ExtraTorsoRot.x;
+	short torsoYRot = lara->ExtraTorsoRot.y;
 
-	lara->ExtraTorsoRot.xRot = 0;
-	lara->ExtraTorsoRot.yRot = 0;
-	lara->ExtraHeadRot.xRot *= 2;
-	lara->ExtraHeadRot.yRot *= 2;
+	lara->ExtraTorsoRot.x = 0;
+	lara->ExtraTorsoRot.y = 0;
+	lara->ExtraHeadRot.x *= 2;
+	lara->ExtraHeadRot.y *= 2;
 
 	// Clamp head rotation.
-	if (lara->ExtraHeadRot.xRot > ANGLE(55.0f))
-		lara->ExtraHeadRot.xRot = ANGLE(55.0f);
-	else if (lara->ExtraHeadRot.xRot < -ANGLE(75.0f))
-		lara->ExtraHeadRot.xRot = -ANGLE(75.0f);
-	if (lara->ExtraHeadRot.yRot < -ANGLE(80.0f))
-		lara->ExtraHeadRot.yRot = -ANGLE(80.0f);
-	else if (lara->ExtraHeadRot.yRot > ANGLE(80.0f))
-		lara->ExtraHeadRot.yRot = ANGLE(80.0f);
+	if (lara->ExtraHeadRot.x > ANGLE(55.0f))
+		lara->ExtraHeadRot.x = ANGLE(55.0f);
+	else if (lara->ExtraHeadRot.x < -ANGLE(75.0f))
+		lara->ExtraHeadRot.x = -ANGLE(75.0f);
+	if (lara->ExtraHeadRot.y < -ANGLE(80.0f))
+		lara->ExtraHeadRot.y = -ANGLE(80.0f);
+	else if (lara->ExtraHeadRot.y > ANGLE(80.0f))
+		lara->ExtraHeadRot.y = ANGLE(80.0f);
 
-	if (abs(lara->ExtraHeadRot.xRot - OldCam.pos.xRot) >= 16)
-		OldCam.pos.xRot = (lara->ExtraHeadRot.xRot + OldCam.pos.xRot) / 2;
+	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= 16)
+		OldCam.pos.Orientation.x = (lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2;
 	else
-		OldCam.pos.xRot = lara->ExtraHeadRot.xRot;
-	if (abs(lara->ExtraHeadRot.yRot - OldCam.pos.yRot) >= 16)
-		OldCam.pos.yRot = (lara->ExtraHeadRot.yRot + OldCam.pos.yRot) / 2;
+		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= 16)
+		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2;
 	else
-		OldCam.pos.yRot = lara->ExtraHeadRot.yRot;
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
-	PHD_VECTOR pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
+	Vector3Int pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
 	GetLaraJointPosition(&pos, LM_HEAD);
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
@@ -847,10 +847,10 @@ void LookCamera(ITEM_INFO* item)
 		}
 	}
 
-	PHD_VECTOR pos2 = { 0, 0, -SECTOR(1) };
+	Vector3Int pos2 = { 0, 0, -SECTOR(1) };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
-	PHD_VECTOR pos3 = { 0, 0, CLICK(8) };
+	Vector3Int pos3 = { 0, 0, CLICK(8) };
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -896,14 +896,14 @@ void LookCamera(ITEM_INFO* item)
 		z -= dz;
 	}
 
-	GAME_VECTOR ideal = { x, y, z };
+	GameVector ideal = { x, y, z };
 	ideal.roomNumber = roomNum;
 
-	if (OldCam.pos.xRot == lara->ExtraHeadRot.xRot &&
-		OldCam.pos.yRot == lara->ExtraHeadRot.yRot &&
-		OldCam.pos.xPos == item->Position.xPos &&
-		OldCam.pos.yPos == item->Position.yPos &&
-		OldCam.pos.zPos == item->Position.zPos &&
+	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
+		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
+		OldCam.pos.Position.x == item->Pose.Position.x &&
+		OldCam.pos.Position.y == item->Pose.Position.y &&
+		OldCam.pos.Position.z == item->Pose.Position.z &&
 		OldCam.ActiveState == item->Animation.ActiveState &&
 		OldCam.TargetState == item->Animation.TargetState &&
 		Camera.oldType == CameraType::Look)
@@ -918,11 +918,11 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OldCam.pos.xRot = lara->ExtraHeadRot.xRot;
-		OldCam.pos.yRot = lara->ExtraHeadRot.yRot;
-		OldCam.pos.xPos = item->Position.xPos;
-		OldCam.pos.yPos = item->Position.yPos;
-		OldCam.pos.zPos = item->Position.zPos;
+		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
+		OldCam.pos.Position.x = item->Pose.Position.x;
+		OldCam.pos.Position.y = item->Pose.Position.y;
+		OldCam.pos.Position.z = item->Pose.Position.z;
 		OldCam.ActiveState = item->Animation.ActiveState;
 		OldCam.TargetState = item->Animation.TargetState;
 		LookCamPosition.x = ideal.x;
@@ -1035,10 +1035,10 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Position.yRot + lara->ExtraHeadRot.yRot + lara->ExtraTorsoRot.yRot;
-		Camera.mikePos.x = item->Position.xPos;
-		Camera.mikePos.y = item->Position.yPos;
-		Camera.mikePos.z = item->Position.zPos;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.mikePos.x = item->Pose.Position.x;
+		Camera.mikePos.y = item->Pose.Position.y;
+		Camera.mikePos.z = item->Pose.Position.z;
 	}
 	else
 	{
@@ -1050,18 +1050,18 @@ void LookCamera(ITEM_INFO* item)
 
 	Camera.oldType = Camera.type;
 
-	lara->ExtraHeadRot.xRot = headXRot;
-	lara->ExtraHeadRot.yRot = headYRot;
-	lara->ExtraTorsoRot.xRot = torsoXRot;
-	lara->ExtraTorsoRot.yRot = torsoYRot;
+	lara->ExtraHeadRot.x = headXRot;
+	lara->ExtraHeadRot.y = headYRot;
+	lara->ExtraTorsoRot.x = torsoXRot;
+	lara->ExtraTorsoRot.y = torsoYRot;
 }
 
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 {
 	int distance = sqrt(
-		pow(item->Position.xPos - Camera.pos.x, 2) +
-		pow(item->Position.yPos - Camera.pos.y, 2) +
-		pow(item->Position.zPos - Camera.pos.z, 2));
+		pow(item->Pose.Position.x - Camera.pos.x, 2) +
+		pow(item->Pose.Position.y - Camera.pos.y, 2) +
+		pow(item->Pose.Position.z - Camera.pos.z, 2));
 
 	if (distance < maxDistance)
 	{
@@ -1094,10 +1094,10 @@ void BinocularCamera(ITEM_INFO* item)
 			AlterFOV(14560);
 			item->MeshBits = -1;
 			lara->Inventory.IsBusy = false;
-			lara->ExtraHeadRot.yRot = 0;
-			lara->ExtraHeadRot.xRot = 0;
-			lara->ExtraTorsoRot.yRot = 0;
-			lara->ExtraTorsoRot.xRot = 0;
+			lara->ExtraHeadRot.y = 0;
+			lara->ExtraHeadRot.x = 0;
+			lara->ExtraTorsoRot.y = 0;
+			lara->ExtraTorsoRot.x = 0;
 			Camera.type = BinocularOldCamera;
 
 			return;
@@ -1107,8 +1107,8 @@ void BinocularCamera(ITEM_INFO* item)
 	item->MeshBits = 0;
 	AlterFOV(7 * (2080 - BinocularRange));
 
-	short headXRot = lara->ExtraHeadRot.xRot * 2;
-	short headYRot = lara->ExtraHeadRot.yRot;
+	short headXRot = lara->ExtraHeadRot.x * 2;
+	short headYRot = lara->ExtraHeadRot.y;
 
 	if (headXRot > ANGLE(75.0f))
 		headXRot = ANGLE(75.0f);
@@ -1120,9 +1120,9 @@ void BinocularCamera(ITEM_INFO* item)
 	else if (headYRot < -ANGLE(80.0f))
 		headYRot = -ANGLE(80.0f);
 
-	int x = item->Position.xPos;
-	int y = item->Position.yPos - CLICK(2);
-	int z = item->Position.zPos;
+	int x = item->Pose.Position.x;
+	int y = item->Pose.Position.y - CLICK(2);
+	int z = item->Pose.Position.z;
 
 	auto probe = GetCollision(x, y, z, item->RoomNumber);
 	if (probe.Position.Ceiling <= (y - CLICK(1)))
@@ -1137,9 +1137,9 @@ void BinocularCamera(ITEM_INFO* item)
 
 	int l = SECTOR(20.25f) * phd_cos(headXRot);
 
-	int tx = x + l * phd_sin(item->Position.yRot + headYRot);
+	int tx = x + l * phd_sin(item->Pose.Orientation.y + headYRot);
 	int ty = y - SECTOR(20.25f) * phd_sin(headXRot);
-	int tz = z + l * phd_cos(item->Position.yRot + headYRot);
+	int tz = z + l * phd_cos(item->Pose.Orientation.y + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1178,10 +1178,10 @@ void BinocularCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Position.yRot + lara->ExtraHeadRot.yRot + lara->ExtraTorsoRot.yRot;
-		Camera.mikePos.x = item->Position.xPos;
-		Camera.mikePos.y = item->Position.yPos;
-		Camera.mikePos.z = item->Position.zPos;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.mikePos.x = item->Pose.Position.x;
+		Camera.mikePos.y = item->Pose.Position.y;
+		Camera.mikePos.z = item->Pose.Position.z;
 	}
 	else
 	{
@@ -1224,8 +1224,8 @@ void BinocularCamera(ITEM_INFO* item)
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 
-	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
-	PHD_VECTOR target = { Camera.target.x, Camera.target.y, Camera.target.z };
+	Vector3Int src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
+	Vector3Int target = { Camera.target.x, Camera.target.y, Camera.target.z };
 
 	if (LaserSight)
 	{
@@ -1357,13 +1357,13 @@ void BinocularCamera(ITEM_INFO* item)
 			// Reimplement this mode?
 		}
 		else
-			LaraTorch(&src, &target, lara->ExtraHeadRot.yRot, 192);
+			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
 	}
 }
 
 void ConfirmCameraTargetPos()
 {
-	PHD_VECTOR pos = { 0, 0, 0 };
+	Vector3Int pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
@@ -1374,9 +1374,9 @@ void ConfirmCameraTargetPos()
 	}
 	else
 	{
-		Camera.target.x = LaraItem->Position.xPos;
+		Camera.target.x = LaraItem->Pose.Position.x;
 		Camera.target.y = (Camera.target.y + pos.y) >> 1;
-		Camera.target.z = LaraItem->Position.zPos;
+		Camera.target.z = LaraItem->Pose.Position.z;
 	}
 
 	int y = Camera.target.y;
@@ -1448,41 +1448,41 @@ void CalculateCamera()
 	auto* bounds = GetBoundsAccurate(item);
 
 	int x;
-	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->Position.yPos - CLICK(1);
+	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->Pose.Position.y - CLICK(1);
 	int z;
 
 	if (Camera.item)
 	{
 		if (!fixedCamera)
 		{
-			auto dx = Camera.item->Position.xPos - item->Position.xPos;
-			auto dz = Camera.item->Position.zPos - item->Position.zPos;
+			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
+			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
-			short angle = phd_atan(dz, dx) - item->Position.yRot;
-			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Position.yPos);
+			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle /= 2;
 			tilt /= 2;
 
 			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
 			{
-				short change = angle - Lara.ExtraHeadRot.yRot;
+				short change = angle - Lara.ExtraHeadRot.y;
 				if (change > ANGLE(4.0f))
-					Lara.ExtraHeadRot.yRot += ANGLE(4.0f);
+					Lara.ExtraHeadRot.y += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.ExtraHeadRot.yRot -= ANGLE(4.0f);
+					Lara.ExtraHeadRot.y -= ANGLE(4.0f);
 				else
-					Lara.ExtraHeadRot.yRot += change;
-				Lara.ExtraTorsoRot.yRot = Lara.ExtraHeadRot.yRot;
+					Lara.ExtraHeadRot.y += change;
+				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
 
-				change = tilt - Lara.ExtraHeadRot.xRot;
+				change = tilt - Lara.ExtraHeadRot.x;
 				if (change > ANGLE(4.0f))
-					Lara.ExtraHeadRot.xRot += ANGLE(4.0f);
+					Lara.ExtraHeadRot.x += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.ExtraHeadRot.xRot -= ANGLE(4.0f);
+					Lara.ExtraHeadRot.x -= ANGLE(4.0f);
 				else
-					Lara.ExtraHeadRot.xRot += change;
-				Lara.ExtraTorsoRot.xRot = Lara.ExtraHeadRot.xRot;
+					Lara.ExtraHeadRot.x += change;
+				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = 1;
@@ -1534,7 +1534,7 @@ void CalculateCamera()
 			Camera.flags != CF_CHASE_OBJECT &&
 			(Camera.number != -1 && (SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
-			PHD_VECTOR pos = { 0, 0, 0 };
+			Vector3Int pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;
@@ -1548,8 +1548,8 @@ void CalculateCamera()
 		else
 		{
 			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->Position.xPos + shift * phd_sin(item->Position.yRot);
-			z = item->Position.zPos + shift * phd_cos(item->Position.yRot);
+			x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
+			z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
 
 			Camera.target.x = x;
 			Camera.target.z = z;
@@ -1633,23 +1633,23 @@ void LookLeftRight(ITEM_INFO* item)
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (lara->ExtraHeadRot.yRot > -ANGLE(44.0f))
+		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.yRot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				lara->ExtraHeadRot.yRot -= ANGLE(2.0f);
+				lara->ExtraHeadRot.y -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (lara->ExtraHeadRot.yRot < ANGLE(44.0f))
+		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.yRot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				lara->ExtraHeadRot.yRot += ANGLE(2.0f);
+				lara->ExtraHeadRot.y += ANGLE(2.0f);
 		}
 	}
 	if (lara->Control.HandStatus != HandStatus::Busy &&
@@ -1657,7 +1657,7 @@ void LookLeftRight(ITEM_INFO* item)
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.yRot = lara->ExtraHeadRot.yRot;
+		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
 	}
 }
 
@@ -1669,23 +1669,23 @@ void LookUpDown(ITEM_INFO* item)
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (lara->ExtraHeadRot.xRot > -ANGLE(35.0f))
+		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.xRot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				lara->ExtraHeadRot.xRot -= ANGLE(2.0f);
+				lara->ExtraHeadRot.x -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (lara->ExtraHeadRot.xRot < ANGLE(30.0f))
+		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.xRot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				lara->ExtraHeadRot.xRot += ANGLE(2.0f);
+				lara->ExtraHeadRot.x += ANGLE(2.0f);
 		}
 	}
 	if (lara->Control.HandStatus != HandStatus::Busy &&
@@ -1693,7 +1693,7 @@ void LookUpDown(ITEM_INFO* item)
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.xRot = lara->ExtraHeadRot.xRot;
+		lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
 	}
 }
 
@@ -1703,38 +1703,38 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CameraType::Look)
 	{
-		if (abs(lara->ExtraHeadRot.xRot) > ANGLE(0.1f))
-			lara->ExtraHeadRot.xRot += lara->ExtraHeadRot.xRot / -8;
+		if (abs(lara->ExtraHeadRot.x) > ANGLE(0.1f))
+			lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -8;
 		else
-			lara->ExtraHeadRot.xRot = 0;
+			lara->ExtraHeadRot.x = 0;
 
-		if (abs(lara->ExtraHeadRot.yRot) > ANGLE(0.1f))
-			lara->ExtraHeadRot.yRot += lara->ExtraHeadRot.yRot / -8;
+		if (abs(lara->ExtraHeadRot.y) > ANGLE(0.1f))
+			lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -8;
 		else
-			lara->ExtraHeadRot.yRot = 0;
+			lara->ExtraHeadRot.y = 0;
 
-		if (abs(lara->ExtraHeadRot.zRot) > ANGLE(0.1f))
-			lara->ExtraHeadRot.zRot += lara->ExtraHeadRot.zRot / -8;
+		if (abs(lara->ExtraHeadRot.z) > ANGLE(0.1f))
+			lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -8;
 		else
-			lara->ExtraHeadRot.zRot = 0;
+			lara->ExtraHeadRot.z = 0;
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&
 			!lara->RightArm.Locked &&
 			lara->Vehicle == NO_ITEM)
 		{
-			lara->ExtraTorsoRot.xRot = lara->ExtraHeadRot.xRot;
-			lara->ExtraTorsoRot.yRot = lara->ExtraHeadRot.yRot;
-			lara->ExtraTorsoRot.zRot = lara->ExtraHeadRot.zRot;
+			lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
+			lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
+			lara->ExtraTorsoRot.z = lara->ExtraHeadRot.z;
 		}
 		else
 		{
-			if (!lara->ExtraHeadRot.xRot)
-				lara->ExtraTorsoRot.xRot = 0;
-			if (!lara->ExtraHeadRot.yRot)
-				lara->ExtraTorsoRot.yRot = 0;
-			if (!lara->ExtraHeadRot.zRot)
-				lara->ExtraTorsoRot.zRot = 0;
+			if (!lara->ExtraHeadRot.x)
+				lara->ExtraTorsoRot.x = 0;
+			if (!lara->ExtraHeadRot.y)
+				lara->ExtraTorsoRot.y = 0;
+			if (!lara->ExtraHeadRot.z)
+				lara->ExtraTorsoRot.z = 0;
 		}
 	}
 }
@@ -1748,10 +1748,10 @@ bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
-	int dx = Camera.pos.x - pos->xPos;
-	int dz = Camera.pos.z - pos->zPos;
-	auto sin = phd_sin(pos->yRot);
-	auto cos = phd_cos(pos->yRot);
+	int dx = Camera.pos.x - pos->Position.x;
+	int dz = Camera.pos.z - pos->Position.z;
+	auto sin = phd_sin(pos->Orientation.y);
+	auto cos = phd_cos(pos->Orientation.y);
 	auto x = dx * cos - dz * sin;
 	auto z = dx * sin + dz * cos;
 
@@ -1777,8 +1777,8 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	else
 		z -= bottom; // Bottom
 
-	Camera.pos.x = pos->xPos + (cos * x + sin * z);
-	Camera.pos.z = pos->zPos + (cos * z - sin * x);
+	Camera.pos.x = pos->Position.x + (cos * x + sin * z);
+	Camera.pos.z = pos->Position.z + (cos * z - sin * x);
 
 	auto coll = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
 	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
@@ -1792,9 +1792,9 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 
 static bool CheckItemCollideCamera(ITEM_INFO* item)
 {
-	auto dx = Camera.pos.x - item->Position.xPos;
-	auto dy = Camera.pos.y - item->Position.yPos;
-	auto dz = Camera.pos.z - item->Position.zPos;
+	auto dx = Camera.pos.x - item->Pose.Position.x;
+	auto dy = Camera.pos.y - item->Pose.Position.y;
+	auto dz = Camera.pos.z - item->Pose.Position.z;
 
 	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
 						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
@@ -1809,7 +1809,7 @@ static bool CheckItemCollideCamera(ITEM_INFO* item)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	Vector3 extents = TO_DX_BBOX(item->Position, GetBoundsAccurate(item)).Extents;
+	Vector3 extents = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item)).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1841,9 +1841,9 @@ std::vector<short> FillCollideableItemList()
 
 static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	auto dx = Camera.pos.x - mesh->pos.xPos;
-	auto dy = Camera.pos.y - mesh->pos.yPos;
-	auto dz = Camera.pos.z - mesh->pos.zPos;
+	auto dx = Camera.pos.x - mesh->pos.Position.x;
+	auto dy = Camera.pos.y - mesh->pos.Position.y;
+	auto dz = Camera.pos.z - mesh->pos.Position.z;
 
 	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
 						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
@@ -1903,20 +1903,20 @@ void ItemsCollideCamera()
 		if (!item)
 			return;
 
-		auto dx = abs(LaraItem->Position.xPos - item->Position.xPos);
-		auto dy = abs(LaraItem->Position.yPos - item->Position.yPos);
-		auto dz = abs(LaraItem->Position.zPos - item->Position.zPos);
+		auto dx = abs(LaraItem->Pose.Position.x - item->Pose.Position.x);
+		auto dy = abs(LaraItem->Pose.Position.y - item->Pose.Position.y);
+		auto dz = abs(LaraItem->Pose.Position.z - item->Pose.Position.z);
 
 		// If camera is stuck behind some item, and Lara runs off somewhere
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
-		if (TestBoundsCollideCamera(bounds, &item->Position, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &item->Position, rad);
+		if (TestBoundsCollideCamera(bounds, &item->Pose, CAMERA_RADIUS))
+			ItemPushCamera(bounds, &item->Pose, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->Position, bounds),
+		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->Pose, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
@@ -1935,9 +1935,9 @@ void ItemsCollideCamera()
 		if (!mesh || !stat)
 			return;
 
-		auto dx = abs(LaraItem->Position.xPos - mesh->pos.xPos);
-		auto dy = abs(LaraItem->Position.yPos - mesh->pos.yPos);
-		auto dz = abs(LaraItem->Position.zPos - mesh->pos.zPos);
+		auto dx = abs(LaraItem->Pose.Position.x - mesh->pos.Position.x);
+		auto dy = abs(LaraItem->Pose.Position.y - mesh->pos.Position.y);
+		auto dz = abs(LaraItem->Pose.Position.z - mesh->pos.Position.z);
 
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;

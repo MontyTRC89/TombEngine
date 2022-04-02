@@ -3,18 +3,20 @@
 
 constexpr auto NUM_RATS = 32;
 
-struct RAT_STRUCT
+struct RatData
 {
-	PHD_3DPOS pos; // size=20, offset=0
-	short roomNumber; // size=0, offset=20
-	short speed; // size=0, offset=22
-	short fallspeed; // size=0, offset=24
-	byte on; // size=0, offset=26
-	byte flags; // size=0, offset=27
+	byte On;
+	PHD_3DPOS Pose;
+	short RoomNumber;
+
+	short Velocity;
+	short VerticalVelocity;
+
+	byte Flags;
 };
 
 extern int NextRat;
-extern RAT_STRUCT Rats[NUM_RATS];
+extern RatData Rats[NUM_RATS];
 
 void ClearRats();
 short GetNextRat();

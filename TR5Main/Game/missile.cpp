@@ -21,20 +21,20 @@
 
 void ShootAtLara(FX_INFO *fx)
 {
-	int x = LaraItem->Position.xPos - fx->pos.xPos;
-	int y = LaraItem->Position.yPos - fx->pos.yPos;
-	int z = LaraItem->Position.zPos - fx->pos.zPos;
+	int x = LaraItem->Pose.Position.x - fx->pos.Position.x;
+	int y = LaraItem->Pose.Position.y - fx->pos.Position.y;
+	int z = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
 	auto* bounds = GetBoundsAccurate(LaraItem);
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
-	fx->pos.xRot = -phd_atan(distance, y);
-	fx->pos.yRot = phd_atan(z, x);
+	fx->pos.Orientation.x = -phd_atan(distance, y);
+	fx->pos.Orientation.y = phd_atan(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
-	fx->pos.xRot += (GetRandomControl() - 0x4000) / 0x40;
-	fx->pos.yRot += (GetRandomControl() - 0x4000) / 0x40;
+	fx->pos.Orientation.x += (GetRandomControl() - 0x4000) / 0x40;
+	fx->pos.Orientation.y += (GetRandomControl() - 0x4000) / 0x40;
 }
 
 void ControlMissile(short fxNumber)
@@ -44,21 +44,21 @@ void ControlMissile(short fxNumber)
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON &&
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
-			fx->pos.xRot > -0x3000);
+			fx->pos.Orientation.x > -0x3000);
 	{
-		fx->pos.xRot -= ANGLE(1.0f);
+		fx->pos.Orientation.x -= ANGLE(1.0f);
 	}
 
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	int velocity = fx->speed * phd_cos(fx->pos.xRot);
-	fx->pos.zPos += velocity * phd_cos(fx->pos.yRot);
-	fx->pos.xPos += velocity * phd_sin(fx->pos.yRot);
+	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
+	int velocity = fx->speed * phd_cos(fx->pos.Orientation.x);
+	fx->pos.Position.z += velocity * phd_cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += velocity * phd_sin(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
 	// Check for hitting something.
-	if (fx->pos.yPos >= probe.Position.Floor ||
-		fx->pos.yPos <= probe.Position.Ceiling)
+	if (fx->pos.Position.y >= probe.Position.Floor ||
+		fx->pos.Position.y <= probe.Position.Ceiling)
 	{
 		if (/*fx->objectNumber == KNIFE ||*/ fx->objectNumber == ID_SCUBA_HARPOON)
 		{
@@ -71,7 +71,7 @@ void ControlMissile(short fxNumber)
 		}
 		/*else if (fx->objectNumber == DRAGON_FIRE)
 		{
-			AddDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 14, 11);
+			AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
 			KillEffect(fx_number);
 		}*/
 		return;
@@ -108,7 +108,7 @@ void ControlMissile(short fxNumber)
 
 		LaraItem->HitStatus = 1;
 
-		fx->pos.yRot = LaraItem->Position.yRot;
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
@@ -118,12 +118,12 @@ void ControlMissile(short fxNumber)
 	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{
-		AddDynamicLight(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 14, 11);
+		AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
 		SoundEffect(305, &fx->pos, 0);
 		KillEffect(fx_number);
 	}
 	else if (fx->objectNumber == KNIFE)
-		fx->pos.zRot += 30 * ONE_DEGREE;*/
+		fx->pos.Orientation.z += 30 * ONE_DEGREE;*/
 }
 
 void ControlNatlaGun(short fxNumber)
@@ -138,9 +138,9 @@ void ControlNatlaGun(short fxNumber)
 	/* If first frame, then start another explosion at next position */
 	if (fx->frameNumber == -1)
 	{
-		int z = fx->pos.zPos + fx->speed * phd_cos(fx->pos.yRot);
-		int x = fx->pos.xPos + fx->speed * phd_sin(fx->pos.yRot);
-		int y = fx->pos.yPos;
+		int z = fx->pos.Position.z + fx->speed * phd_cos(fx->pos.Orientation.y);
+		int x = fx->pos.Position.x + fx->speed * phd_sin(fx->pos.Orientation.y);
+		int y = fx->pos.Position.y;
 
 		auto probe = GetCollision(x, y, z, fx->roomNumber);
 
@@ -156,10 +156,10 @@ void ControlNatlaGun(short fxNumber)
 		{
 			auto* fxNew = &EffectList[fxNumber];
 
-			fxNew->pos.xPos = x;
-			fxNew->pos.yPos = y;
-			fxNew->pos.zPos = z;
-			fxNew->pos.yRot = fx->pos.yRot;
+			fxNew->pos.Position.x = x;
+			fxNew->pos.Position.y = y;
+			fxNew->pos.Position.z = z;
+			fxNew->pos.Orientation.y = fx->pos.Orientation.y;
 			fxNew->roomNumber = probe.RoomNumber;
 			fxNew->speed = fx->speed;
 			fxNew->frameNumber = 0;
@@ -175,12 +175,12 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yRot;
+		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.y = yRot;
 		fx->speed = SHARD_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_SHARD;
@@ -198,12 +198,12 @@ short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yRot;
+		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.y = yRot;
 		fx->speed = ROCKET_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_BOMB;
@@ -221,12 +221,12 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.xRot = fx->pos.zRot = 0;
-		fx->pos.yRot = yRot;
+		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.y = yRot;
 		fx->speed = NATLA_GUN_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;

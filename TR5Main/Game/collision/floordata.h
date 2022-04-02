@@ -29,8 +29,14 @@ enum class FLOOR_MATERIAL : unsigned char
 	Concrete = 11,
 	OldWood = 12,
 	OldMetal = 13,
-	Unknown14 = 14,
-	Unknown15 = 15
+	Custom_Sound_1 = 14,
+	Custom_Sound_2 = 15,
+	Custom_Sound_3 = 16,
+	Custom_Sound_4 = 17,
+	Custom_Sound_5 = 18,
+	Custom_Sound_6 = 19,
+	Custom_Sound_7 = 20,
+	Custom_Sound_8 = 21,
 };
 
 
@@ -122,9 +128,9 @@ class FLOOR_INFO
 
 namespace TEN::Floordata
 {
-	VectorInt2 GetSectorPoint(int x, int z);
-	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
-	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos);
+	Vector2Int GetSectorPoint(int x, int z);
+	Vector2Int GetRoomPosition(int roomNumber, int x, int z);
+	FLOOR_INFO& GetFloor(int roomNumber, const Vector2Int& pos);
 	FLOOR_INFO& GetFloor(int roomNumber, int x, int z);
 	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FLOOR_INFO& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);

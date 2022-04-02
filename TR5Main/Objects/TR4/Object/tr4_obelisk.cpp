@@ -67,30 +67,30 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Position, 0);
+					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose, 0);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
-				pos.xPos = item->Position.xPos + (3456 * phd_sin(item->Position.yRot + ANGLE(90.0f)));
-				pos.yPos = item->Position.yPos - CLICK(1);
-				pos.zPos = item->Position.zPos + (3456 * phd_cos(item->Position.yRot + ANGLE(90.0f)));
+				pos.Position.x = item->Pose.Position.x + (3456 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f)));
+				pos.Position.y = item->Pose.Position.y - CLICK(1);
+				pos.Position.z = item->Pose.Position.z + (3456 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f)));
 
-				pos2.xPos = item->Position.xPos + (someNumber * phd_sin(item->Position.yRot + ANGLE(90.0f)));
-				pos2.yPos = item->Position.yPos;
-				pos2.xPos = item->Position.zPos + (someNumber * phd_cos(item->Position.zRot + ANGLE(90.0f)));
+				pos2.Position.x = item->Pose.Position.x + (someNumber * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f)));
+				pos2.Position.y = item->Pose.Position.y;
+				pos2.Position.x = item->Pose.Position.z + (someNumber * phd_cos(item->Pose.Orientation.z + ANGLE(90.0f)));
 
-				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
-					abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
-					abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20) &&
-					abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
-					abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
-					abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
+				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
+					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
+					abs(pos.Position.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
+					abs(pos2.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
+					abs(pos2.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
+					abs(pos2.Position.z - LaraItem->Pose.Position.z) < SECTOR(20))
 				{
 					if (!(GlobalCounter & 3))
 					{
 						TriggerLightning(
-							(PHD_VECTOR*)&pos,
-							(PHD_VECTOR*)&pos2,
+							(Vector3Int*)&pos,
+							(Vector3Int*)&pos2,
 							(GetRandomControl() & 0x1F) + 32,
 							r,
 							g,
@@ -101,31 +101,31 @@ void ObeliskControl(short itemNumber)
 							5);
 					}
 
-					TriggerLightningGlow(pos.xPos, pos.yPos, pos.zPos, 48, r, g, b);
+					TriggerLightningGlow(pos.Position.x, pos.Position.y, pos.Position.z, 48, r, g, b);
 				}
 			}
 		}
 
 		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
 		{
-			pos.xPos = item->Position.xPos + SECTOR(8) * phd_sin(item->Position.yRot);
-			pos.yPos = item->Position.yPos;
-			pos.zPos = item->Position.zPos + SECTOR(8) * phd_cos(item->Position.yRot + ANGLE(90.0f));
+			pos.Position.x = item->Pose.Position.x + SECTOR(8) * phd_sin(item->Pose.Orientation.y);
+			pos.Position.y = item->Pose.Position.y;
+			pos.Position.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
 			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
 
 			if (GlobalCounter & 1)
 			{
-				pos2.xPos = (GetRandomControl() & 0x3FF) + pos.xPos - 512;
-				pos2.yPos = (GetRandomControl() & 0x3FF) + pos.yPos - 512;
-				pos2.zPos = (GetRandomControl() & 0x3FF) + pos.zPos - 512;
+				pos2.Position.x = (GetRandomControl() & 0x3FF) + pos.Position.x - 512;
+				pos2.Position.y = (GetRandomControl() & 0x3FF) + pos.Position.y - 512;
+				pos2.Position.z = (GetRandomControl() & 0x3FF) + pos.Position.z - 512;
 
-				if (abs(pos.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
-					abs(pos.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
-					abs(pos.zPos - LaraItem->Position.zPos) < SECTOR(20) &&
-					abs(pos2.xPos - LaraItem->Position.xPos) < SECTOR(20) &&
-					abs(pos2.yPos - LaraItem->Position.yPos) < SECTOR(20) &&
-					abs(pos2.zPos - LaraItem->Position.zPos) < SECTOR(20))
+				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
+					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
+					abs(pos.Position.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
+					abs(pos2.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
+					abs(pos2.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
+					abs(pos2.Position.z - LaraItem->Pose.Position.z) < SECTOR(20))
 				{
 					if (item->ItemFlags[2] != NO_ITEM)
 					{
@@ -133,20 +133,20 @@ void ObeliskControl(short itemNumber)
 						ExplodeItemNode(item2, 0, 0, 128);
 						KillItem(item->ItemFlags[2]);
 
-						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -2, 0, item2->RoomNumber);
-						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -1, 0, item2->RoomNumber);
+						TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -2, 0, item2->RoomNumber);
+						TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -1, 0, item2->RoomNumber);
 
 						item->ItemFlags[2] = NO_ITEM;
 						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
 						item2->Status = ITEM_NOT_ACTIVE;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Position, 0);
-						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Position, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Pose, 0);
+						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Pose, 0);
 					}
 
 					TriggerLightning(
-						(PHD_VECTOR*)&pos,
-						(PHD_VECTOR*)&pos2,
+						(Vector3Int*)&pos,
+						(Vector3Int*)&pos2,
 						(GetRandomControl() & 0xF) + 16,
 						r,
 						g,
@@ -168,7 +168,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 2)
 		{
-			item->Position.yRot -= ANGLE(90.0f);
+			item->Pose.Orientation.y -= ANGLE(90.0f);
 
 			if (TrInput & IN_ACTION)
 			{
@@ -181,7 +181,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 6)
 		{
-			item->Position.yRot += ANGLE(90.0f);
+			item->Pose.Orientation.y += ANGLE(90.0f);
 
 			if (!(TrInput & IN_ACTION))
 			{
@@ -211,9 +211,9 @@ void ObeliskControl(short itemNumber)
 				if (currentItem->ObjectNumber == ID_PULLEY)
 				{
 					currentItem->ItemFlags[1] =
-						(item->Position.yRot != -ANGLE(90.0f) ||
-							g_Level.Items[item->ItemFlags[0]].Position.yRot != ANGLE(90.0f) ||
-							g_Level.Items[item->ItemFlags[1]].Position.yRot != 0 ? 0 : 1) ^ 1;
+						(item->Pose.Orientation.y != -ANGLE(90.0f) ||
+							g_Level.Items[item->ItemFlags[0]].Pose.Orientation.y != ANGLE(90.0f) ||
+							g_Level.Items[item->ItemFlags[1]].Pose.Orientation.y != 0 ? 0 : 1) ^ 1;
 
 					break;
 				}

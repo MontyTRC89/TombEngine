@@ -10,7 +10,7 @@
 #include "Game/health.h"
 #include "Game/collision/collide_item.h"
 
-static PHD_VECTOR SarcophagusPosition(0, 0, -300);
+static Vector3Int SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {
 	-512, 512,
@@ -79,8 +79,8 @@ void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* 
 			auto* currentItem = &g_Level.Items[linkNumber];
 
 			if (linkNumber != itemNumber &&
-				currentItem->Position.xPos == sarcItem->Position.xPos &&
-				currentItem->Position.zPos == sarcItem->Position.zPos)
+				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
+				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
 			{
 				if (Objects[currentItem->ObjectNumber].isPickup)
 				{

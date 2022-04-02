@@ -21,7 +21,7 @@ void InitialiseAutoGuns(short itemNumber)
 	
 }
 
-static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
+static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
 {
 	auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
@@ -62,11 +62,11 @@ void AutoGunsControl(short itemNumber)
 
 			item->MeshBits = 1664;
 
-			GAME_VECTOR pos1 = { 0, 0, -64 };
-			GetJointAbsPosition(item, (PHD_VECTOR*)&pos1, 8);
+			GameVector pos1 = { 0, 0, -64 };
+			GetJointAbsPosition(item, (Vector3Int*)&pos1, 8);
 
-			GAME_VECTOR pos2 = { 0, 0, 0 };
-			GetLaraJointPosition((PHD_VECTOR*)&pos2, 0);
+			GameVector pos2 = { 0, 0, 0 };
+			GetLaraJointPosition((Vector3Int*)&pos2, 0);
 
 			pos1.roomNumber = item->RoomNumber;
 
@@ -78,7 +78,7 @@ void AutoGunsControl(short itemNumber)
 			if (los)
 			{
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-				angles[0] -= item->Position.yRot;
+				angles[0] -= item->Pose.Orientation.y;
 			}
 			else
 			{
@@ -97,7 +97,7 @@ void AutoGunsControl(short itemNumber)
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_LARA_HK_FIRE, &item->Position, 0xC00004);
+				SoundEffect(SFX_LARA_HK_FIRE, &item->Pose, 0xC00004);
 
 				if (GlobalCounter & 1)
 				{
@@ -110,14 +110,14 @@ void AutoGunsControl(short itemNumber)
 						pos2.x = 0;
 						pos2.y = 0;
 						pos2.z = 0;
-						GetLaraJointPosition((PHD_VECTOR*)& pos2, GetRandomControl() % 15);
+						GetLaraJointPosition((Vector3Int*)& pos2, GetRandomControl() % 15);
 
 						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
 						LaraItem->HitPoints -= 20;
 					}
 					else
 					{
-						GAME_VECTOR pos;
+						GameVector pos;
 						pos.x = pos2.x;
 						pos.y = pos2.y;
 						pos.z = pos2.z;
@@ -163,7 +163,7 @@ void AutoGunsControl(short itemNumber)
 			}
 
 			if (item->ItemFlags[2])
-				TriggerAutoGunSmoke((PHD_VECTOR*)&pos1, item->ItemFlags[2] / 16);
+				TriggerAutoGunSmoke((Vector3Int*)&pos1, item->ItemFlags[2] / 16);
 		}
 		else
 		{

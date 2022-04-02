@@ -1,77 +1,104 @@
 #pragma once
 
-struct PHD_VECTOR
+struct Vector2Int
+{
+	int x;
+	int y;
+
+	Vector2Int()
+	{
+		this->x = 0;
+		this->y = 0;
+	}
+
+	Vector2Int(int x, int y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+};
+
+struct Vector3Int
 {
 	int x;
 	int y;
 	int z;
 
-	PHD_VECTOR()
+	Vector3Int()
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
 	}
 
-	PHD_VECTOR(int xpos, int ypos, int zpos)
+	Vector3Int(int x, int y, int z)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+};
+
+struct Vector3Shrt
+{
+	short x;
+	short y;
+	short z;
+
+	Vector3Shrt()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+	}
+
+	Vector3Shrt(short x, short y, short z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
 	}
 };
 
 struct PHD_3DPOS
 {
-	int xPos;
-	int yPos;
-	int zPos;
-	short xRot;
-	short yRot;
-	short zRot;
+	Vector3Int Position;
+	Vector3Shrt Orientation;
 
 	PHD_3DPOS()
 	{
-		this->xPos = 0;
-		this->yPos = 0;
-		this->zPos = 0;
-		this->xRot = 0;
-		this->yRot = 0;
-		this->zRot = 0;
+		this->Position = Vector3Int();
+		this->Orientation = Vector3Shrt();
 	}
 
-	PHD_3DPOS(int x, int y, int z)
+	PHD_3DPOS(int xPos, int yPos, int zPos)
 	{
-		this->xPos = x;
-		this->yPos = y;
-		this->zPos = z;
-		this->xRot = 0;
-		this->yRot = 0;
-		this->zRot = 0;
+		this->Position.x = xPos;
+		this->Position.y = yPos;
+		this->Position.z = zPos;
+		this->Orientation = Vector3Shrt();
 	}
 
-	PHD_3DPOS(short xrot, short yrot, short zrot)
+	PHD_3DPOS(short xOrient, short yOrient, short zOrient)
 	{
-		this->xPos = 0;
-		this->yPos = 0;
-		this->zPos = 0;
-		this->xRot = xrot;
-		this->yRot = yrot;
-		this->zRot = zrot;
+		this->Position = Vector3Int();
+		this->Orientation.x = xOrient;
+		this->Orientation.y = yOrient;
+		this->Orientation.z = zOrient;
 	}
 
-	PHD_3DPOS(int x, int y, int z, short xrot, short yrot, short zrot)
+	PHD_3DPOS(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient)
 	{
-		this->xPos = x;
-		this->yPos = y;
-		this->zPos = z;
-		this->xRot = xrot;
-		this->yRot = yrot;
-		this->zRot = zrot;
+		this->Position.x = xPos;
+		this->Position.y = yPos;
+		this->Position.z = zPos;
+		this->Orientation.x = xOrient;
+		this->Orientation.y = yOrient;
+		this->Orientation.z = zOrient;
 	}
 };
 
-struct GAME_VECTOR
+struct GameVector
 {
 	int x;
 	int y;
@@ -79,7 +106,7 @@ struct GAME_VECTOR
 	int boxNumber;
 	short roomNumber;
 
-	GAME_VECTOR()
+	GameVector()
 	{
 		this->x = 0;
 		this->y = 0;
@@ -88,7 +115,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos)
+	GameVector(int xpos, int ypos, int zpos)
 	{
 		this->x = xpos;
 		this->y = ypos;
@@ -97,7 +124,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos, short roomNumber)
+	GameVector(int xpos, int ypos, int zpos, short roomNumber)
 	{
 		this->x = xpos;
 		this->y = ypos;
@@ -106,7 +133,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
+	GameVector(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
 	{
 		this->x = xpos;
 		this->y = ypos;

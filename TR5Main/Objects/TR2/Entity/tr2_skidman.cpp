@@ -51,10 +51,10 @@ void InitialiseSkidooMan(short itemNumber)
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
 
 		skidooItem->ObjectNumber = ID_SNOWMOBILE_GUN;
-		skidooItem->Position.xPos = riderItem->Position.xPos;
-		skidooItem->Position.yPos = riderItem->Position.yPos;
-		skidooItem->Position.zPos = riderItem->Position.zPos;
-		skidooItem->Position.yRot = riderItem->Position.yRot;
+		skidooItem->Pose.Position.x = riderItem->Pose.Position.x;
+		skidooItem->Pose.Position.y = riderItem->Pose.Position.y;
+		skidooItem->Pose.Position.z = riderItem->Pose.Position.z;
+		skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
 		skidooItem->RoomNumber = riderItem->RoomNumber;
 		skidooItem->Flags = ITEM_INVISIBLE;
 		skidooItem->Shade = -1;
@@ -123,10 +123,10 @@ void SkidooManControl(short riderItemNumber)
 	{
 		if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
 		{
-			riderItem->Position.xPos = item->Position.xPos;
-			riderItem->Position.yPos = item->Position.yPos;
-			riderItem->Position.zPos = item->Position.zPos;
-			riderItem->Position.yRot = item->Position.yRot;
+			riderItem->Pose.Position.x = item->Pose.Position.x;
+			riderItem->Pose.Position.y = item->Pose.Position.y;
+			riderItem->Pose.Position.z = item->Pose.Position.z;
+			riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
 			riderItem->RoomNumber = item->RoomNumber;
 
 			riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
@@ -208,31 +208,31 @@ void SkidooManControl(short riderItemNumber)
 
 		if (creatureInfo->Flags)
 		{
-			SoundEffect(43, &item->Position, 0);
+			SoundEffect(43, &item->Pose, 0);
 			creatureInfo->Flags--;
 		}
 	}
 
 	if (item->Animation.ActiveState == SMAN_STATE_WAIT)
 	{
-		SoundEffect(153, &item->Position, 0);
+		SoundEffect(153, &item->Pose, 0);
 		creatureInfo->JointRotation[0] = 0;
 	}
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(155, &item->Position, 4 + ((0x10000 - (100 - (int)item->Animation.Velocity) * 100) << 8));
+		SoundEffect(155, &item->Pose, 4 + ((0x10000 - (100 - (int)item->Animation.Velocity) * 100) << 8));
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);
 
 	if (riderItem->Animation.ActiveState != SMAN_STATE_DEATH)
 	{
-		riderItem->Position.xPos = item->Position.xPos;
-		riderItem->Position.yPos = item->Position.yPos;
-		riderItem->Position.zPos = item->Position.zPos;
-		riderItem->Position.yRot = item->Position.yRot;
+		riderItem->Pose.Position.x = item->Pose.Position.x;
+		riderItem->Pose.Position.y = item->Pose.Position.y;
+		riderItem->Pose.Position.z = item->Pose.Position.z;
+		riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
 
 		if (item->RoomNumber != riderItem->RoomNumber)
 			ItemNewRoom(riderItemNumber, item->RoomNumber);

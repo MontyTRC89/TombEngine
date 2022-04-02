@@ -80,7 +80,7 @@ void GiantMutantControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)phd_atan(creature->Target.z - item->Position.zPos, creature->Target.x - item->Position.xPos) - item->Position.yRot;
+		angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 		if (item->TouchBits)
 		{
@@ -145,7 +145,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Position.yRot += ANGLE(14.0f);
+				item->Pose.Orientation.y += ANGLE(14.0f);
 			}
 
 			if (angle < MUTANT_NEED_TURN)
@@ -159,7 +159,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Position.yRot -= ANGLE(9.0f);
+				item->Pose.Orientation.y -= ANGLE(9.0f);
 			}
 
 			if (angle > -MUTANT_NEED_TURN)
@@ -200,11 +200,11 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
 				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 				LaraItem->RoomNumber = item->RoomNumber;
-				LaraItem->Position.xPos = item->Position.xPos;
-				LaraItem->Position.yPos = item->Position.yPos;
-				LaraItem->Position.zPos = item->Position.zPos;
-				LaraItem->Position.yRot = item->Position.yRot;
-				LaraItem->Position.xRot = LaraItem->Position.zRot = 0;
+				LaraItem->Pose.Position.x = item->Pose.Position.x;
+				LaraItem->Pose.Position.y = item->Pose.Position.y;
+				LaraItem->Pose.Position.z = item->Pose.Position.z;
+				LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+				LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
 				LaraItem->Animation.Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;
@@ -227,11 +227,11 @@ void GiantMutantControl(short itemNumber)
 	{
 		AnimateItem(item);
 
-		if (item->Position.yPos > item->Floor)
+		if (item->Pose.Position.y > item->Floor)
 		{
 			item->Animation.TargetState = MUTANT_STATE_IDLE;
 			item->Animation.Airborne = false;
-			item->Position.yPos = item->Floor;
+			item->Pose.Position.y = item->Floor;
 			Camera.bounce = 500;
 		}
 	}
@@ -240,7 +240,7 @@ void GiantMutantControl(short itemNumber)
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(171, &item->Position, NULL);
+		SoundEffect(171, &item->Pose, NULL);
 		ExplodingDeath(itemNumber, UINT_MAX, MUTANT_PART_DAMAGE);
 		
 		TestTriggers(item, true);

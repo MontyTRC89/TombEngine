@@ -42,15 +42,15 @@ void KnifeControl(short fxNumber)
 	else
 		fx->counter--;
 
-	int speed = fx->speed * phd_cos(fx->pos.xRot);
-	fx->pos.zPos += speed * phd_cos(fx->pos.yRot);
-	fx->pos.xPos += speed * phd_sin(fx->pos.yRot);
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
+	int speed = fx->speed * phd_cos(fx->pos.Orientation.x);
+	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
 
-	auto probe = GetCollision(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
-	if (fx->pos.yPos >= probe.Position.Floor ||
-		fx->pos.yPos <= probe.Position.Ceiling)
+	if (fx->pos.Position.y >= probe.Position.Floor ||
+		fx->pos.Position.y <= probe.Position.Ceiling)
 	{
 		KillEffect(fxNumber);
 		return;
@@ -59,19 +59,19 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.zRot += ANGLE(30.0f);
+	fx->pos.Orientation.z += ANGLE(30.0f);
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
 		LaraItem->HitPoints -= 50;
 		LaraItem->HitStatus = true;
 
-		fx->pos.yRot = LaraItem->Position.yRot;
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
-		DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, 80, fx->pos.yRot, fx->roomNumber);
+		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);
 		KillEffect(fxNumber);
 	}
 }

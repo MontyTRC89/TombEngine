@@ -57,7 +57,7 @@ void HammerControl(short itemNumber)
                         v17 = *(_WORD*)(Items + 2 * v16 + 12) == 165;
                         currentItem = (ITEM_INFO_OK*)(Items + 2 * v16);
                         if (v17
-                            && currentItem->pos.yRot == -16384
+                            && currentItem->pos.Orientation.y == -16384
                             && *(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[0] + 78) == 0x4000
                             && !*(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[1] + 78))
                         {
@@ -90,8 +90,8 @@ void HammerControl(short itemNumber)
                     v11 = 5622 * v8 + v9;
                     if (v10 >= 156
                         && v10 <= 159
-                        && *(_DWORD*)(v11 + 64) == item->pos.xPos
-                        && *(_DWORD*)(v11 + 72) == item->pos.zPos)
+                        && *(_DWORD*)(v11 + 64) == item->pos.Position.x
+                        && *(_DWORD*)(v11 + 72) == item->pos.Position.z)
                     {
                         ExplodeItemNode(5622 * v8 + v9, 0, 0, 128);
                         KillItem(v8);
@@ -110,8 +110,8 @@ void HammerControl(short itemNumber)
                             currentItem_1 = (ITEM_INFO_OK*)(5622 * v12);
                             v14 = *(WORD*)((char*)&currentItem_1->objectNumber + v9);
                             if ((v14 == 193 || v14 == 194 || v14 == 179)
-                                && *(_DWORD*)((char*)&currentItem_1->pos.xPos + v9) == item->pos.xPos
-                                && *(_DWORD*)((char*)&currentItem_1->pos.zPos + v9) == item->pos.zPos)
+                                && *(_DWORD*)((char*)&currentItem_1->pos.Position.x + v9) == item->pos.Position.x
+                                && *(_DWORD*)((char*)&currentItem_1->pos.Position.z + v9) == item->pos.Position.z)
                             {
                                 *(DWORD*)((char*)&currentItem_1->MainFlags + v9) &= 0xFFFFFFF9;
                                 v9 = Items;

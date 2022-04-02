@@ -47,8 +47,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		int dx = LaraItem->Position.xPos - fx->pos.xPos;
-		int dz = LaraItem->Position.zPos - fx->pos.zPos;
+		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
+		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
 
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -110,18 +110,18 @@ namespace TEN::Entities::TR4
 		{
 			FX_INFO* fx = &EffectList[fxNumber];
 
-			fx->pos.xPos = pos->xPos;
-			fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-			fx->pos.zPos = pos->zPos;
+			fx->pos.Position.x = pos->Position.x;
+			fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
+			fx->pos.Position.z = pos->Position.z;
 
-			fx->pos.xRot = pos->xRot;
+			fx->pos.Orientation.x = pos->Orientation.x;
 
 			if (flags < 4)
-				fx->pos.yRot = pos->yRot;
+				fx->pos.Orientation.y = pos->Orientation.y;
 			else
-				fx->pos.yRot = pos->yRot + (GetRandomControl() & 0x7FF) - 1024;
+				fx->pos.Orientation.y = pos->Orientation.y + (GetRandomControl() & 0x7FF) - 1024;
 
-			fx->pos.zRot = 0;
+			fx->pos.Orientation.z = 0;
 
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + -ANGLE(180.0f);
@@ -142,22 +142,22 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
-				PHD_VECTOR pos1 = { -544, 96, 0 };
+				Vector3Int pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
 
-				PHD_VECTOR pos2 = { -900, 96, 0 };
+				Vector3Int pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
 				short angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
-				pos.xPos = pos1.x;
-				pos.yPos = pos1.y;
-				pos.zPos = pos1.z;
-				pos.xRot = angles[1];
-				pos.yRot = angles[0];
-				pos.zRot = 0;
+				pos.Position.x = pos1.x;
+				pos.Position.y = pos1.y;
+				pos.Position.z = pos1.z;
+				pos.Orientation.x = angles[1];
+				pos.Orientation.y = angles[0];
+				pos.Orientation.z = 0;
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -170,22 +170,22 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
-				PHD_VECTOR pos1 = { -544, 96, 0 };
+				Vector3Int pos1 = { -544, 96, 0 };
 				GetJointAbsPosition(item, &pos1, 16);
 
-				PHD_VECTOR pos2 = { -900, 96, 0 };
+				Vector3Int pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
 				short angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
-				pos.xPos = pos1.x;
-				pos.yPos = pos1.y;
-				pos.zPos = pos1.z;
-				pos.xRot = angles[1];
-				pos.yRot = angles[0];
-				pos.zRot = 0;
+				pos.Position.x = pos1.x;
+				pos.Position.y = pos1.y;
+				pos.Position.z = pos1.z;
+				pos.Orientation.x = angles[1];
+				pos.Orientation.y = angles[0];
+				pos.Orientation.z = 0;
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -200,8 +200,8 @@ namespace TEN::Entities::TR4
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				PHD_VECTOR pos1 = { 0, 0, 192 };
-				PHD_VECTOR pos2 = { 0, 0, 384 };
+				Vector3Int pos1 = { 0, 0, 192 };
+				Vector3Int pos2 = { 0, 0, 384 };
 
 				if (GlobalCounter & 1)
 				{
@@ -218,12 +218,12 @@ namespace TEN::Entities::TR4
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
-				pos.xPos = pos1.x;
-				pos.yPos = pos1.y;
-				pos.zPos = pos1.z;
-				pos.xRot = angles[1];
-				pos.yRot = angles[0];
-				pos.zRot = 0;
+				pos.Position.x = pos1.x;
+				pos.Position.y = pos1.y;
+				pos.Position.z = pos1.z;
+				pos.Orientation.x = angles[1];
+				pos.Orientation.y = angles[0];
+				pos.Orientation.z = 0;
 
 				TriggerDemigodMissile(&pos, item->RoomNumber, 4);
 			}
@@ -378,9 +378,9 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = LaraItem->Position.xPos - item->Position.xPos;
-				dz = LaraItem->Position.zPos - item->Position.zPos;
-				laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;
@@ -388,7 +388,7 @@ namespace TEN::Entities::TR4
 					laraAI.ahead = false;
 
 				dx = abs(dx);
-				dy = item->Position.yPos - LaraItem->Position.yPos;
+				dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
 				dz = abs(dz);
 
 				if (dx <= dz)
@@ -556,11 +556,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
-						item->Position.yRot += ANGLE(7.0f);
+						item->Pose.Orientation.y += ANGLE(7.0f);
 					else if (AI.angle <= -ANGLE(7))
-						item->Position.yRot += -ANGLE(7.0f);
+						item->Pose.Orientation.y += -ANGLE(7.0f);
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -620,11 +620,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= ANGLE(7.0f))
-						item->Position.yRot += ANGLE(7.0f);
+						item->Pose.Orientation.y += ANGLE(7.0f);
 					else if (AI.angle <= -ANGLE(7.0f))
-						item->Position.yRot += -ANGLE(7.0f);
+						item->Pose.Orientation.y += -ANGLE(7.0f);
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -646,11 +646,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= ANGLE(7.0f))
-					item->Position.yRot += ANGLE(7.0f);
+					item->Pose.Orientation.y += ANGLE(7.0f);
 				else if (AI.angle <= -ANGLE(7.0f))
-					item->Position.yRot += -ANGLE(7.0f);
+					item->Pose.Orientation.y += -ANGLE(7.0f);
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&
@@ -668,7 +668,7 @@ namespace TEN::Entities::TR4
 			case STATE_DEMIGOD_HAMMER_ATTACK:
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 26)
 				{
-					PHD_VECTOR pos = { 80, -8, -40 };
+					Vector3Int pos = { 80, -8, -40 };
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;

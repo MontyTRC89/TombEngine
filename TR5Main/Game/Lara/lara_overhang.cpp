@@ -44,7 +44,7 @@ bool TestMonkey(FLOOR_INFO* floor, int x, int y, int z)
 	return GetCollision(floor, x, y, z).BottomBlock->Flags.Monkeyswing;
 }
 
-short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight, int minCeilY = 0, int maxCeilY = 0)
+short FindBridge(int tiltGrade, short facing, Vector3Int& pos, int* returnHeight, int minCeilY = 0, int maxCeilY = 0)
 {
 	short bridgeSlot;
 
@@ -82,7 +82,7 @@ short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight
 		if (obj->ObjectNumber != bridgeSlot)
 			continue;
 
-		short facingDiff = (short)(obj->Position.yRot - facing);
+		short facingDiff = (short)(obj->Pose.Orientation.y - facing);
 
 		bool facingCheck = false;
 		if (facingDiff == ANGLE(90))
@@ -95,10 +95,10 @@ short FindBridge(int tiltGrade, short facing, PHD_VECTOR& pos, int* returnHeight
 		if (!facingCheck)
 			continue;
 
-		if (obj->Position.xPos >= xmin &&
-			obj->Position.xPos <= xmax &&
-			obj->Position.zPos >= zmin &&
-			obj->Position.zPos <= zmax)
+		if (obj->Pose.Position.x >= xmin &&
+			obj->Pose.Position.x <= xmax &&
+			obj->Pose.Position.z >= zmin &&
+			obj->Pose.Position.z <= zmax)
 		{
 			if (minCeilY || maxCeilY)
 			{
@@ -181,29 +181,29 @@ void AlignToEdge(ITEM_INFO* item, short edgeDist)
 		edgeDist = WALL_MASK;
 
 	// Align to closest cardinal facing
-	item->Position.yRot += ANGLE(45.0f);
-	item->Position.yRot &= 0xC000;
+	item->Pose.Orientation.y += ANGLE(45.0f);
+	item->Pose.Orientation.y &= 0xC000;
 
-	switch (item->Position.yRot) // Align to faced edge
+	switch (item->Pose.Orientation.y) // Align to faced edge
 	{
 	case FACING_NORTH:
-		item->Position.zPos &= ~WALL_MASK;
-		item->Position.zPos += (WALL_MASK - edgeDist);
+		item->Pose.Position.z &= ~WALL_MASK;
+		item->Pose.Position.z += (WALL_MASK - edgeDist);
 		break;
 
 	case FACING_SOUTH:
-		item->Position.zPos &= ~WALL_MASK;
-		item->Position.zPos += edgeDist + 1;
+		item->Pose.Position.z &= ~WALL_MASK;
+		item->Pose.Position.z += edgeDist + 1;
 		break;
 
 	case FACING_EAST:
-		item->Position.xPos &= ~WALL_MASK;
-		item->Position.xPos += (WALL_MASK - edgeDist);
+		item->Pose.Position.x &= ~WALL_MASK;
+		item->Pose.Position.x += (WALL_MASK - edgeDist);
 		break;
 
 	case FACING_WEST:
-		item->Position.xPos &= ~WALL_MASK;
-		item->Position.xPos += edgeDist + 1;
+		item->Pose.Position.x &= ~WALL_MASK;
+		item->Pose.Position.x += edgeDist + 1;
 		break;
 	}
 }
@@ -213,48 +213,48 @@ bool AlignToGrab(ITEM_INFO* item)
 {
 	bool legLeft = false;
 
-	item->Position.yRot += ANGLE(45.0f);
-	item->Position.yRot &= 0xC000;
+	item->Pose.Orientation.y += ANGLE(45.0f);
+	item->Pose.Orientation.y &= 0xC000;
 
-	switch (item->Position.yRot)
+	switch (item->Pose.Orientation.y)
 	{
 	case FACING_NORTH:
-		if (((item->Position.zPos + (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Position.zPos & ~WALL_MASK))
-			item->Position.zPos += CLICK(0.5f);
+		if (((item->Pose.Position.z + (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Pose.Position.z & ~WALL_MASK))
+			item->Pose.Position.z += CLICK(0.5f);
 
-		item->Position.zPos = (item->Position.zPos & ~CLICK(1)) + HORIZONTAL_ALIGN_NORTHEAST;
-		legLeft = (item->Position.zPos & CLICK(1)) ? false : true;
+		item->Pose.Position.z = (item->Pose.Position.z & ~CLICK(1)) + HORIZONTAL_ALIGN_NORTHEAST;
+		legLeft = (item->Pose.Position.z & CLICK(1)) ? false : true;
 		break;
 
 	case FACING_SOUTH:
-		if (((item->Position.zPos - (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Position.zPos & ~WALL_MASK))
-			item->Position.zPos -= CLICK(0.5f);
+		if (((item->Pose.Position.z - (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Pose.Position.z & ~WALL_MASK))
+			item->Pose.Position.z -= CLICK(0.5f);
 
-		item->Position.zPos = (item->Position.zPos & ~CLICK(1)) + HORIZONTAL_ALIGN_SOUTHWEST;
-		legLeft = (item->Position.zPos & CLICK(1)) ? true : false;
+		item->Pose.Position.z = (item->Pose.Position.z & ~CLICK(1)) + HORIZONTAL_ALIGN_SOUTHWEST;
+		legLeft = (item->Pose.Position.z & CLICK(1)) ? true : false;
 		break;
 
 	case FACING_WEST:
-		if (((item->Position.xPos - (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Position.xPos & ~WALL_MASK))
-			item->Position.xPos -= CLICK(0.5f);
+		if (((item->Pose.Position.x - (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Pose.Position.x & ~WALL_MASK))
+			item->Pose.Position.x -= CLICK(0.5f);
 
-		item->Position.xPos = (item->Position.xPos & ~CLICK(1)) + HORIZONTAL_ALIGN_SOUTHWEST;
-		legLeft = (item->Position.xPos & CLICK(1)) ? true : false;
+		item->Pose.Position.x = (item->Pose.Position.x & ~CLICK(1)) + HORIZONTAL_ALIGN_SOUTHWEST;
+		legLeft = (item->Pose.Position.x & CLICK(1)) ? true : false;
 		break;
 
 	case FACING_EAST:
-		if (((item->Position.xPos + (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Position.xPos & ~WALL_MASK))
-			item->Position.xPos += CLICK(0.5f);
+		if (((item->Pose.Position.x + (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Pose.Position.x & ~WALL_MASK))
+			item->Pose.Position.x += CLICK(0.5f);
 
-		item->Position.xPos = (item->Position.xPos & ~CLICK(1)) + HORIZONTAL_ALIGN_NORTHEAST;
-		legLeft = (item->Position.xPos & CLICK(1)) ? false : true;
+		item->Pose.Position.x = (item->Pose.Position.x & ~CLICK(1)) + HORIZONTAL_ALIGN_NORTHEAST;
+		legLeft = (item->Pose.Position.x & CLICK(1)) ? false : true;
 		break;
 	}
 
 	return legLeft;
 }
 
-void FillSlopeData(short orient, Vector2& goal, short& climbOrient, short& goalOrient, PHD_VECTOR& pos)
+void FillSlopeData(short orient, Vector2& goal, short& climbOrient, short& goalOrient, Vector3Int& pos)
 {
 	switch (GetQuadrant(orient))
 	{
@@ -294,16 +294,16 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
-	PHD_VECTOR up = { item->Position.xPos - offset.x, item->Position.yPos - CLICK(1), item->Position.zPos - offset.z };
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
+	Vector3Int up = { item->Pose.Position.x - offset.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z - offset.z };
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 
 	auto collResultUp = GetCollision(up.x, up.y, up.z, item->RoomNumber);
 	auto collResultDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
@@ -315,7 +315,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-	item->Position.yPos = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed
 	if (!(TrInput & IN_ACTION))
@@ -328,7 +328,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
 		auto* lara = GetLaraInfo(item);
-		lara->NextCornerPos.zRot = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
+		lara->NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK!
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -345,7 +345,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			auto testLedge = GetFloor(now.x, now.y - CLICK(3), now.z, &tempRoom);
 			int ledgeCeiling = GetCeiling(testLedge, now.x, now.y - CLICK(3), now.z);
 			int ledgeHeight = GetFloorHeight(testLedge, now.x, now.y - CLICK(3), now.z);
-			if ((ledgeHeight - ledgeCeiling >= CLICK(3)) && abs((item->Position.yPos - 688) - ledgeHeight) < 64)
+			if ((ledgeHeight - ledgeCeiling >= CLICK(3)) && abs((item->Pose.Position.y - 688) - ledgeHeight) < 64)
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_LEDGE_VAULT_START); // Ledge climb-up from slope
@@ -354,10 +354,10 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 
 		// Test for slope to overhead ladder transition (convex)
 		if (GetClimbFlags(collResultUp.BottomBlock) & climbOrient &&
-			InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, CLICK(3), CLICK(4)))
+			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
 			if (TestLaraWall(item, 0, 0, -CLICK(4)) &&
-				GetCeiling(collResultUp.Block, up.x, up.y, up.z) - item->Position.yPos <= 1456)  // Check if a wall is actually there...
+				GetCeiling(collResultUp.Block, up.x, up.y, up.z) - item->Pose.Position.y <= 1456)  // Check if a wall is actually there...
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
@@ -374,7 +374,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			int height; // Height variable for bridge ceiling functions
 
 			// Test for upwards slope to climb
-			short bridge1 = FindBridge(4, item->Position.yRot, up, &height, -CLICK(5) / 2, -CLICK(3) / 2);
+			short bridge1 = FindBridge(4, item->Pose.Orientation.y, up, &height, -CLICK(5) / 2, -CLICK(3) / 2);
 			if (yDiff >= -CLICK(5) / 4 && yDiff <= -CLICK(3) / 4 && (SlopeCheck(slope, goal) || bridge1 >= 0))
 			{
 				// Do one more check for wall/ceiling step 2*offX/Z further to avoid lara sinking her head in wall/step
@@ -406,8 +406,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 		// Get floor_lara 256 downstream of Lara
 		auto floorNext = (FLOOR_INFO*)GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
-		if ((GetClimbFlags(GetCollision(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos).BottomBlock) & climbOrient) &&
-			InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, 0, CLICK(1)))
+		if ((GetClimbFlags(GetCollision(floorNow, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & climbOrient) &&
+			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
 		{
 			AlignToEdge(item, BACKWARD_ALIGNMENT);
 			SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // Slope to underlying ladder transition (concave)
@@ -443,9 +443,9 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -462,9 +462,9 @@ void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Airborne = true;
 
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -480,20 +480,20 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
 
 	short tempRoom = 0;
 
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-	item->Position.yPos = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed 
 	if (!(TrInput & IN_ACTION))
@@ -508,13 +508,13 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
 		{
 			auto* lara = GetLaraInfo(item);
-			SetAnimation(item, lara->NextCornerPos.zRot ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
+			SetAnimation(item, lara->NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK!
 		}
 
 		// Shimmy control
 		if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 		{
-			PHD_VECTOR shimmy = { now.x, now.y, now.z };
+			Vector3Int shimmy = { now.x, now.y, now.z };
 			short dir = 0;
 
 			if (TrInput & IN_LEFT)
@@ -551,9 +551,9 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -567,22 +567,22 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
 
 	short tempRoom = 0;
 
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
 	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-	item->Position.yPos = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
 
-	PHD_VECTOR shimmy = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
+	Vector3Int shimmy = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
 	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
 		shimmy.x -= offset.z / 2;
@@ -617,9 +617,9 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -632,12 +632,12 @@ void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
-		lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 		Camera.targetAngle = -ANGLE(22.5f);
 	}
 	else
 	{
-		lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 		Camera.targetAngle = ANGLE(22.5f);
 	}
 }
@@ -645,9 +645,9 @@ void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -676,9 +676,9 @@ void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 	else
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -748,9 +748,9 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	if (GlobalCounter % 2)
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 	else
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 }
 
 void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
@@ -800,9 +800,9 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 
 
 	if (GlobalCounter % 2)
-		item->Position.xRot++;
+		item->Pose.Orientation.x++;
 	else
-		item->Position.xRot--;
+		item->Pose.Orientation.x--;
 }
 
 void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
@@ -829,8 +829,8 @@ void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
 		break;
 	}
 
-	((LaraInfo*&)item->Data)->NextCornerPos.zRot = 0;
-	item->Position.xRot = 0;
+	((LaraInfo*&)item->Data)->NextCornerPos.Orientation.z = 0;
+	item->Pose.Orientation.x = 0;
 }
 
 // ********  Extending existing state routines  ********
@@ -841,17 +841,17 @@ void SlopeHangExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
 
 	short tempRoom = 0;
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 	auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
-	int ceilDist = item->Position.yPos - GetCeiling(floorNext, down.x, down.y, down.z);
+	int ceilDist = item->Pose.Position.y - GetCeiling(floorNext, down.x, down.y, down.z);
 
 	if (item->Animation.TargetState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder
 	{
@@ -889,20 +889,20 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 
 	short tempRoom = 0;
 
 	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceilDist = item->Position.yPos - GetCeiling(floorNow, now.x, now.y, now.z);
+	int ceilDist = item->Pose.Position.y - GetCeiling(floorNow, now.x, now.y, now.z);
 
 	if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist <= CLICK(3.5f))
 	{
@@ -916,7 +916,7 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 			bool disableGrab = true;
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
-				if (abs(DirOrientDiff(item->Position.yRot, goalOrient)) < 0x1800)
+				if (abs(DirOrientDiff(item->Pose.Orientation.y, goalOrient)) < 0x1800)
 					disableGrab = false;
 			}
 
@@ -932,15 +932,15 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 
 	short tempRoom = 0;
 
@@ -953,22 +953,22 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 		if (TrInput & IN_FORWARD)
 		{
 			int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-			int ceilDist = ceiling - item->Position.yPos;
+			int ceilDist = ceiling - item->Pose.Position.y;
 
 			if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist >= -CLICK(4) && ceilDist <= -CLICK(3))
 			{
-				slope = floorNow->TiltXZ(item->Position.xPos, item->Position.zPos, false);
+				slope = floorNow->TiltXZ(item->Pose.Position.x, item->Pose.Position.z, false);
 
 				int height;
 
-				short facing = item->Position.yRot + ANGLE(45);
+				short facing = item->Pose.Orientation.y + ANGLE(45);
 				facing &= 0xC000;
 
 				short bridge1 = FindBridge(4, facing, now, &height, -CLICK(4), -CLICK(3)); 
 
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
-					item->Position.yPos = ceiling + 900;
+					item->Pose.Position.y = ceiling + 900;
 					SetAnimation(item, LA_OVERHANG_LADDER_SLOPE_CONCAVE); // Ladder to overhead slope transition (concave)
 				}
 			}
@@ -978,7 +978,7 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 			int ceiling = GetCeiling(floorNext, down.x, down.y, down.z);
-			int ceilDist = ceiling - item->Position.yPos;
+			int ceilDist = ceiling - item->Pose.Position.y;
 
 			if (TestMonkey(floorNext, down.x, down.y, down.z) && ceilDist >= 0 && ceilDist <= CLICK(1))
 			{
@@ -986,14 +986,14 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 				int height;
 
-				short facing = item->Position.yRot + ANGLE(45);
+				short facing = item->Pose.Orientation.y + ANGLE(45);
 				facing &= 0xC000;
 
 				short bridge1 = FindBridge(4, facing, down, &height, -CLICK(0.5f), -CLICK(0.25f)); 
 
 				if (SlopeCheck(slope, goal) || bridge1 >= 0)
 				{
-					item->Position.yPos = ceiling - 156;
+					item->Pose.Position.y = ceiling - 156;
 					SetAnimation(item, LA_OVERHANG_LADDER_SLOPE_CONVEX); // Ladder to underlying slope transition (convex)
 				}
 			}
@@ -1007,12 +1007,12 @@ void LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 
 	auto result = GetCollision(item);
-	auto ceilingTilt = result.Block->TiltXZ(item->Position.xPos, item->Position.yPos, false);
+	auto ceilingTilt = result.Block->TiltXZ(item->Pose.Position.x, item->Pose.Position.y, false);
 
 	if (abs(ceilingTilt.x) > 2 || abs(ceilingTilt.y) > 2)
 		return;
 
-	if (result.BottomBlock->Flags.Monkeyswing && (item->Position.yPos - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
+	if (result.BottomBlock->Flags.Monkeyswing && (item->Pose.Position.y - coll->Setup.Height - CLICK(0.5f) <= result.Position.Ceiling))
 		item->Animation.TargetState = LS_MONKEY_IDLE;
 }
 
@@ -1022,15 +1022,15 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 
 	short tempRoom = 0;
 
@@ -1043,7 +1043,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 			int ceiling = GetCeiling(floorNext, down.x, down.y, down.z);
-			int ceilDist = ceiling - item->Position.yPos;
+			int ceilDist = ceiling - item->Pose.Position.y;
 
 			if (TestMonkey(floorNext, down.x, down.y, down.z))
 			{
@@ -1064,7 +1064,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 					short bridge1 = FindBridge(4, goalOrient, down, &height, -CLICK(2), CLICK(5)); 
 					if (ceilDist < CLICK(1) * 2 && (bridge1 >= 0 || SlopeCheck(slope, goal)))
 					{
-						item->Position.yPos += CLICK(1); // Do midpoint Y translation
+						item->Pose.Position.y += CLICK(1); // Do midpoint Y translation
 						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}
@@ -1081,15 +1081,15 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (!g_GameFlow->Animations.HasOverhangClimb)
 		return;
 
-	PHD_VECTOR now = { item->Position.xPos, item->Position.yPos, item->Position.zPos };
-	PHD_VECTOR offset = { 0, 0, 0 };
+	Vector3Int now = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	Vector3Int offset = { 0, 0, 0 };
 	Vector2 slope = { 0, 0 };
 	Vector2 goal = { 0, 0 };
 	short climbOrient = 0;
 	short goalOrient = 0;
 
-	FillSlopeData(item->Position.yRot, goal, climbOrient, goalOrient, offset);
-	PHD_VECTOR down = { item->Position.xPos + offset.x, item->Position.yPos + CLICK(1), item->Position.zPos + offset.z };
+	FillSlopeData(item->Pose.Orientation.y, goal, climbOrient, goalOrient, offset);
+	Vector3Int down = { item->Pose.Position.x + offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + offset.z };
 
 	short tempRoom = 0;
 
@@ -1099,7 +1099,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameNumber(item, 0)) // Manage proper grabbing of monkey slope on forward jump
 	{
 		int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-		int ceilDist = item->Position.yPos - ceiling;
+		int ceilDist = item->Pose.Position.y - ceiling;
 
 		if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist <= CLICK(3.5f))
 		{
@@ -1107,17 +1107,17 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 			int height;
 
-			short facing = item->Position.yRot + ANGLE(45);
+			short facing = item->Pose.Orientation.y + ANGLE(45);
 			facing &= 0xC000;
 
 			short bridge1 = FindBridge(4, facing, now, &height, -CLICK(3.5f), -CLICK(2.5f)); 
 
 			if (SlopeCheck(slope, goal) || bridge1 >= 0)
 			{
-				lara->NextCornerPos.zRot = AlignToGrab(item);
+				lara->NextCornerPos.Orientation.z = AlignToGrab(item);
 
-				int ceiling2 = GetCeiling(floorNow, item->Position.xPos, item->Position.yPos, item->Position.zPos);
-				item->Position.yPos = ceiling2 + HEIGHT_ADJUST;
+				int ceiling2 = GetCeiling(floorNow, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+				item->Pose.Position.y = ceiling2 + HEIGHT_ADJUST;
 
 				SetAnimation(item, LA_OVERHANG_HANG_SWING);
 			}
@@ -1128,8 +1128,8 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if (TestMonkey(floorNow, now.x, now.y, now.z) && ((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
-			if (abs(DirOrientDiff(goalOrient, item->Position.yRot)) <= ANGLE(30) &&
-				InStrip(item->Position.xPos, item->Position.zPos, item->Position.yRot, 0, CLICK(1) / 2))
+			if (abs(DirOrientDiff(goalOrient, item->Pose.Orientation.y)) <= ANGLE(30) &&
+				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1) / 2))
 			{
 				auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
@@ -1148,7 +1148,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONCAVE); // Transition from monkey to underlying slope (concave)
 						return;
-						//item->pos.yPos = ceiling + 496;
+						//item->pos.Position.y = ceiling + 496;
 						//PerformFlipeffect(NULL, 51, 1, 2); // Disable the UP key command for 2 sec // HACK!!!
 					}
 
@@ -1158,7 +1158,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONVEX); // Transition from monkey to overhanging slope (convex)
 						return;
-						//item->pos.yPos = ceiling + 914;
+						//item->pos.Position.y = ceiling + 914;
 					}
 				}
 			}
@@ -1168,11 +1168,11 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			// Additional overhang ladder tests
 
-			auto collResult = GetCollision(down.x, item->Position.yPos - coll->Setup.Height, down.z, item->RoomNumber);
-			auto topSide = item->Position.yPos - coll->Setup.Height;
+			auto collResult = GetCollision(down.x, item->Pose.Position.y - coll->Setup.Height, down.z, item->RoomNumber);
+			auto topSide = item->Pose.Position.y - coll->Setup.Height;
 
-			if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Position.yRot + ANGLE(180.0f))) &&
-				collResult.Position.Floor >= item->Position.yPos - CLICK(1) &&
+			if (collResult.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Pose.Orientation.y + ANGLE(180.0f))) &&
+				collResult.Position.Floor >= item->Pose.Position.y - CLICK(1) &&
 				collResult.Position.Ceiling <= topSide - CLICK(1))
 			{
 				// Primary checks succeeded, now do C-shaped secondary probing

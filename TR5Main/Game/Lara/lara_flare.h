@@ -2,7 +2,7 @@
 
 struct ITEM_INFO;
 struct CollisionInfo;
-struct PHD_VECTOR;
+struct Vector3Int;
 enum GAME_OBJECT_ID : short;
 
 constexpr auto FLARE_LIFE_MAX = 60 * 30;	// 60 * 30 frames = 60 seconds.
@@ -17,4 +17,4 @@ void SetFlareArm(ITEM_INFO* laraItem, int armFrame);
 void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown);
 void DrawFlareInAir(ITEM_INFO* flareItem);
 void DoFlareInHand(ITEM_INFO* laraItem, int flareLife);
-int DoFlareLight(PHD_VECTOR* pos, int flareLife);
+int DoFlareLight(Vector3Int* pos, int flareLife);

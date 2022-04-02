@@ -77,14 +77,14 @@ void NatlaControl(short itemNumber)
 
 		if (facing)
 		{
-			item->Position.yRot += facing;
+			item->Pose.Orientation.y += facing;
 			facing = 0;
 		}
 
 		switch (item->Animation.ActiveState)
 		{
 		case NATLA_STATE_FALL:
-			if (item->Position.yPos < item->Floor)
+			if (item->Pose.Position.y < item->Floor)
 			{
 				item->Animation.Velocity = 0;
 				item->Animation.Airborne = true;
@@ -93,7 +93,7 @@ void NatlaControl(short itemNumber)
 			{
 				item->Animation.Airborne = 0;
 				item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
-				item->Position.yPos = item->Floor;
+				item->Pose.Position.y = item->Floor;
 				timer = 0;
 			}
 
@@ -109,7 +109,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.xRot;
+					gun = fx->pos.Orientation.x;
 					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
 				}
 
@@ -127,7 +127,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.xRot;
+					gun = fx->pos.Orientation.x;
 					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
 				}
 
@@ -198,7 +198,7 @@ void NatlaControl(short itemNumber)
 		if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
 			CreatureMood(item, &AI, TIMID);
 
-		item->Position.yRot -= facing;
+		item->Pose.Orientation.y -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
 		if (item->Animation.ActiveState == NATLA_STATE_FLY)
@@ -210,11 +210,11 @@ void NatlaControl(short itemNumber)
 			else
 				facing += AI.angle;
 
-			item->Position.yRot += facing;
+			item->Pose.Orientation.y += facing;
 		}
 		else
 		{
-			item->Position.yRot += facing - angle;
+			item->Pose.Orientation.y += facing - angle;
 			facing = 0;
 		}
 
@@ -231,7 +231,7 @@ void NatlaControl(short itemNumber)
 			break;
 
 		case NATLA_STATE_FLY:
-			if (!(creature->Flags & NATLA_FLYMODE) && item->Position.yPos == item->Floor)
+			if (!(creature->Flags & NATLA_FLYMODE) && item->Pose.Position.y == item->Floor)
 				item->Animation.TargetState = NATLA_STATE_IDLE;
 
 			if (timer >= 30)
@@ -240,7 +240,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.xRot;
+					gun = fx->pos.Orientation.x;
 					SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos, NULL);
 				}
 
@@ -264,15 +264,15 @@ void NatlaControl(short itemNumber)
 			{
 				short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					gun = EffectList[FXNumber].pos.xRot;
+					gun = EffectList[FXNumber].pos.Orientation.x;
 
 				FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					EffectList[FXNumber].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 
 				FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					EffectList[FXNumber].pos.yRot += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
 
 				item->Animation.RequiredState = NATLA_STATE_IDLE;
 			}
@@ -290,7 +290,7 @@ void NatlaControl(short itemNumber)
 	timer++;
 	creature->Flags = (creature->Flags & NATLA_FLYMODE) + timer;
 
-	item->Position.yRot -= facing;
+	item->Pose.Orientation.y -= facing;
 	CreatureAnimation(itemNumber, angle, tilt);
-	item->Position.yRot += facing;
+	item->Pose.Orientation.y += facing;
 }
