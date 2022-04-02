@@ -11,24 +11,24 @@
 #include "Game/items.h"
 
 int NextSpider;
-SPIDER_STRUCT Spiders[NUM_SPIDERS];
+SpiderData Spiders[NUM_SPIDERS];
 
 short GetNextSpider()
 {
-	short spiderNum = NextSpider;
-	int i = 0;
-	SPIDER_STRUCT* spider = &Spiders[NextSpider];
+	short spiderNumber = NextSpider;
+	auto* spider = &Spiders[NextSpider];
 
-	while (spider->on)
+	int i = 0;
+	while (spider->On)
 	{
-		if (spiderNum == (NUM_SPIDERS - 1))
+		if (spiderNumber == (NUM_SPIDERS - 1))
 		{
 			spider = &Spiders[0];
-			spiderNum = 0;
+			spiderNumber = 0;
 		}
 		else
 		{
-			++spiderNum;
+			++spiderNumber;
 			++spider;
 		}
 
@@ -36,15 +36,15 @@ short GetNextSpider()
 			return NO_ITEM;
 	}
 
-	NextSpider = (spiderNum + 1) & (NUM_SPIDERS - 1);
-	return spiderNum;
+	NextSpider = (spiderNumber + 1) & (NUM_SPIDERS - 1);
+	return spiderNumber;
 }
 
 void ClearSpiders()
 {
 	if (Objects[ID_SPIDERS_EMITTER].loaded)
 	{
-		ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SPIDER_STRUCT));
+		ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SpiderData));
 		NextSpider = 0;
 		FlipEffect = -1;
 	}
@@ -57,11 +57,11 @@ void ClearSpidersPatch(ITEM_INFO* item)
 
 void InitialiseSpiders(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	short flags = item->TriggerFlags / -24;
 
-	item->Position.xRot = ANGLE(45);
+	item->Pose.Orientation.x = ANGLE(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -73,30 +73,22 @@ void InitialiseSpiders(short itemNumber)
 		return;
 	}
 
-	if (item->Position.yRot > -28672 && item->Position.yRot < -4096)
-	{
-		item->Position.xPos += 512;
-	}
-	else if (item->Position.yRot > 4096 && item->Position.yRot < 28672)
-	{
-		item->Position.xPos -= 512;
-	}
+	if (item->Pose.Orientation.y > -ANGLE(157.5f) && item->Pose.Orientation.y < -ANGLE(22.5f))
+		item->Pose.Position.x += CLICK(2);
+	else if (item->Pose.Orientation.y > ANGLE(22.5f) && item->Pose.Orientation.y < ANGLE(157.5f))
+		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Position.yRot > -8192 && item->Position.yRot < 8192)
-	{
-		item->Position.zPos -= 512;
-	}
-	else if (item->Position.yRot < -20480 || item->Position.yRot > 20480)
-	{
-		item->Position.zPos += 512;
-	}
+	if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+		item->Pose.Position.z -= CLICK(2);
+	else if (item->Pose.Orientation.y < -ANGLE(112.5f) || item->Pose.Orientation.y > ANGLE(112.5f))
+		item->Pose.Position.z += CLICK(2);
 
 	ClearSpiders();
 }
 
 void SpidersEmitterControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags)
 	{
@@ -107,32 +99,32 @@ void SpidersEmitterControl(short itemNumber)
 			if (item->ItemFlags[2] && GetRandomControl() & 1)
 				item->ItemFlags[2]--;
 
-			short spiderNum = GetNextSpider();
-			if (spiderNum != NO_ITEM)
+			short spiderNumber = GetNextSpider();
+			if (spiderNumber != NO_ITEM)
 			{
-				SPIDER_STRUCT* spider = &Spiders[spiderNum];
+				auto* spider = &Spiders[spiderNumber];
 
-				spider->pos.xPos = item->Position.xPos;
-				spider->pos.yPos = item->Position.yPos;
-				spider->pos.zPos = item->Position.zPos;
-				spider->roomNumber = item->RoomNumber;
+				spider->Pose.Position.x = item->Pose.Position.x;
+				spider->Pose.Position.y = item->Pose.Position.y;
+				spider->Pose.Position.z = item->Pose.Position.z;
+				spider->RoomNumber = item->RoomNumber;
 
 				if (item->ItemFlags[0])
 				{
-					spider->pos.yRot = 2 * GetRandomControl();
-					spider->fallspeed = -16 - (GetRandomControl() & 0x1F);
+					spider->Pose.Orientation.y = 2 * GetRandomControl();
+					spider->VerticalVelocity = -16 - (GetRandomControl() & 0x1F);
 				}
 				else
 				{
-					spider->fallspeed = 0;
-					spider->pos.yRot = item->Position.yRot + (GetRandomControl() & 0x3FFF) - ANGLE(45);
+					spider->VerticalVelocity = 0;
+					spider->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45.0f);
 				}
 
-				spider->pos.xRot = 0;
-				spider->pos.zRot = 0;
-				spider->on = true;
-				spider->flags = 0;
-				spider->speed = (GetRandomControl() & 0x1F) + 1;
+				spider->Pose.Orientation.x = 0;
+				spider->Pose.Orientation.z = 0;
+				spider->On = true;
+				spider->Flags = 0;
+				spider->Velocity = (GetRandomControl() & 0x1F) + 1;
 			}
 		}
 	}
@@ -144,118 +136,118 @@ void UpdateSpiders()
 	{
 		for (int i = 0; i < NUM_SPIDERS; i++)
 		{
-			SPIDER_STRUCT* spider = &Spiders[i];
-			if (spider->on)
+			auto* spider = &Spiders[i];
+
+			if (spider->On)
 			{
-				int x = spider->pos.xPos;
-				int y = spider->pos.yPos;
-				int z = spider->pos.zPos;
+				int x = spider->Pose.Position.x;
+				int y = spider->Pose.Position.y;
+				int z = spider->Pose.Position.z;
 
-				spider->pos.xPos += spider->speed * phd_sin(spider->pos.yRot);
-				spider->pos.yPos += spider->fallspeed;
-				spider->pos.zPos += spider->speed * phd_cos(spider->pos.yRot);
-				spider->fallspeed += GRAVITY;
+				spider->Pose.Position.x += spider->Velocity * phd_sin(spider->Pose.Orientation.y);
+				spider->Pose.Position.y += spider->VerticalVelocity;
+				spider->Pose.Position.z += spider->Velocity * phd_cos(spider->Pose.Orientation.y);
+				spider->VerticalVelocity += GRAVITY;
 
-				int dx = LaraItem->Position.xPos - spider->pos.xPos;
-				int dy = LaraItem->Position.yPos - spider->pos.yPos;
-				int dz = LaraItem->Position.zPos - spider->pos.zPos;
+				int dx = LaraItem->Pose.Position.x - spider->Pose.Position.x;
+				int dy = LaraItem->Pose.Position.y - spider->Pose.Position.y;
+				int dz = LaraItem->Pose.Position.z - spider->Pose.Position.z;
 
-				short angle = phd_atan(dz, dx) - spider->pos.yRot;
+				short angle = phd_atan(dz, dx) - spider->Pose.Orientation.y;
 
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
-					TriggerBlood(spider->pos.xPos, spider->pos.yPos, spider->pos.zPos, spider->pos.yRot, 1);
+					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.y, 1);
 				}
 
-				if (spider->flags)
+				if (spider->Flags)
 				{
-					if (abs(dx) + abs(dz) <= 768)
+					if (abs(dx) + abs(dz) <= CLICK(3))
 					{
-						if (spider->speed & 1)
-							spider->pos.yRot += 512;
+						if (spider->Velocity & 1)
+							spider->Pose.Orientation.y += ANGLE(2.8f);
 						else
-							spider->pos.yRot -= 512;
-						spider->speed = 48 - (abs(angle) / 1024);
+							spider->Pose.Orientation.y -= ANGLE(2.8f);
+
+						spider->Velocity = 48 - (abs(angle) / ANGLE(5.6f));
 					}
 					else
 					{
-						if (spider->speed < (i & 0x1F) + 24)
-							spider->speed++;
+						if (spider->Velocity < (i & 0x1F) + 24)
+							spider->Velocity++;
 
-						if (abs(angle) >= 2048)
+						if (abs(angle) >= ANGLE(11.25f))
 						{
 							if (angle >= 0)
-								spider->pos.yRot += 1024;
+								spider->Pose.Orientation.y += ANGLE(5.6f);
 							else
-								spider->pos.yRot -= 1024;
+								spider->Pose.Orientation.y -= ANGLE(5.6f);
 						}
 						else
-						{
-							spider->pos.yRot += 8 * (Wibble - i);
-						}
+							spider->Pose.Orientation.y += 8 * (Wibble - i);
 					}
 				}
 
-				FLOOR_INFO* floor = GetFloor(spider->pos.xPos, spider->pos.yPos, spider->pos.zPos,&spider->roomNumber);
-				int height = GetFloorHeight(floor, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
+				FLOOR_INFO* floor = GetFloor(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z,&spider->RoomNumber);
+				int height = GetFloorHeight(floor, spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z);
 
-				if (height >= spider->pos.yPos - 1280 || height == -32512)
+				if (height >= spider->Pose.Position.y - CLICK(5) || height == -SECTOR(31.75f))
 				{
-					if (height >= spider->pos.yPos - 64)
+					if (height >= spider->Pose.Position.y - 64)
 					{
-						if (spider->pos.yPos <= height)
+						if (spider->Pose.Position.y <= height)
 						{
-							if (spider->fallspeed >= 500)
+							if (spider->VerticalVelocity >= 500)
 							{
-								spider->on = false;
+								spider->On = false;
 								NextSpider = 0;
 							}
 							else
-							{
-								spider->pos.xRot = -128 * spider->fallspeed;
-							}
+								spider->Pose.Orientation.x = -128 * spider->VerticalVelocity;
 						}
 						else
 						{
-							spider->pos.yPos = height;
-							spider->fallspeed = 0;
-							spider->flags = 1;
+							spider->Pose.Position.y = height;
+							spider->VerticalVelocity = 0;
+							spider->Flags = 1;
 						}
 					}
 					else
 					{
-						spider->pos.xRot = 14336;
-						spider->pos.xPos = x;
-						spider->pos.yPos = y - 8;
-						spider->pos.zPos = z;
-						spider->fallspeed = 0;
+						spider->Pose.Position.x = x;
+						spider->Pose.Position.y = y - 8;
+						spider->Pose.Position.z = z;
+						spider->Pose.Orientation.x = ANGLE(78.75f);
+						spider->VerticalVelocity = 0;
+
 						if (!(GetRandomControl() & 0x1F))
-							spider->pos.yRot += -ANGLE(180);
+							spider->Pose.Orientation.y += -ANGLE(180.0f);
 					}
 				}
 				else
 				{
 					if (angle <= 0)
-						spider->pos.yRot -= ANGLE(90);
+						spider->Pose.Orientation.y -= ANGLE(90.0f);
 					else
-						spider->pos.yRot += ANGLE(90);
-					spider->pos.xPos = x;
-					spider->pos.yPos = y;
-					spider->pos.zPos = z;
-					spider->fallspeed = 0;
+						spider->Pose.Orientation.y += ANGLE(90.0f);
+
+					spider->Pose.Position.x = x;
+					spider->Pose.Position.y = y;
+					spider->Pose.Position.z = z;
+					spider->VerticalVelocity = 0;
 				}
 
-				if (spider->pos.yPos < g_Level.Rooms[spider->roomNumber].maxceiling + 50)
+				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
 				{
-					spider->fallspeed = 1;
-					spider->pos.yRot += -32768;
-					spider->pos.yPos = g_Level.Rooms[spider->roomNumber].maxceiling + 50;
+					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
+					spider->Pose.Orientation.y += -ANGLE(180.0f);
+					spider->VerticalVelocity = 1;
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(982,&spider->pos, 0);
+					SoundEffect(982,&spider->Pose, 0);
 			}
 		}
 	}

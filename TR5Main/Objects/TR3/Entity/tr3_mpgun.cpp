@@ -65,7 +65,7 @@ void MPGunControl(short itemNumber)
 
 	if (creature->FiredWeapon)
 	{
-		PHD_VECTOR pos = { MPGunBite.x, MPGunBite.y, MPGunBite.z };
+		Vector3Int pos = { MPGunBite.x, MPGunBite.y, MPGunBite.z };
 		GetJointAbsPosition(item, &pos, MPGunBite.meshNum);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);
@@ -74,7 +74,7 @@ void MPGunControl(short itemNumber)
 
 	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 	{
-		DoLotsOfBlood(item->Position.xPos, item->Position.yPos - (GetRandomControl() & 255) - 32, item->Position.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
+		DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
 		item->HitPoints -= 20;
 	}
 
@@ -101,7 +101,7 @@ void MPGunControl(short itemNumber)
 					head = AI.angle;
 					torsoY = AI.angle;
 					ShotLara(item, &AI, &MPGunBite, torsoY, 32);
-					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Position, 24576);
+					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, 24576);
 				}
 			}
 
@@ -115,8 +115,8 @@ void MPGunControl(short itemNumber)
 		{
 			creature->Enemy = LaraItem;
 
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
 			laraAI.distance = pow(dx, 2) + pow(dx, 2);
 			
@@ -130,8 +130,8 @@ void MPGunControl(short itemNumber)
 				if (target->ObjectNumber != ID_LARA)
 					continue;
 
-				dx = target->Position.xPos - item->Position.xPos;
-				dz = target->Position.zPos - item->Position.zPos;
+				dx = target->Pose.Position.x - item->Pose.Position.x;
+				dz = target->Pose.Position.z - item->Pose.Position.z;
 
 				int distance = pow(dx, 2) + pow(dz, 2);
 				if (distance < laraAI.distance)
@@ -148,9 +148,9 @@ void MPGunControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
-			laraAI.angle = phd_atan(dz, dx) - item->Position.yRot; 
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y; 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -159,12 +159,12 @@ void MPGunControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		int x = item->Position.xPos + SECTOR(1) * phd_sin(item->Position.yRot + laraAI.angle);
-		int y = item->Position.yPos;
-		int z = item->Position.zPos + SECTOR(1) * phd_cos(item->Position.yRot + laraAI.angle);
+		int x = item->Pose.Position.x + SECTOR(1) * phd_sin(item->Pose.Orientation.y + laraAI.angle);
+		int y = item->Pose.Position.y;
+		int z = item->Pose.Position.z + SECTOR(1) * phd_cos(item->Pose.Orientation.y + laraAI.angle);
 		
 		int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
-		bool cover = (item->Position.yPos > (height + CLICK(3)) && item->Position.yPos < (height + CLICK(4.5f)) && laraAI.distance > pow(SECTOR(1), 2));
+		bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(SECTOR(1), 2));
 
 		auto* enemy = creature->Enemy; 
 		creature->Enemy = LaraItem;
@@ -172,7 +172,7 @@ void MPGunControl(short itemNumber)
 		if (laraAI.distance < pow(SECTOR(1), 2) || item->HitStatus || TargetVisible(item, &laraAI)) 
 		{
 			if (!creature->Alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Position, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose, 0);
 
 			AlertAllGuards(itemNumber);
 		}
@@ -190,11 +190,11 @@ void MPGunControl(short itemNumber)
 				item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 28)
 			{
 				if (abs(AI.angle) < ANGLE(10.0f))
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 				else if (AI.angle < 0)
-					item->Position.yRot -= ANGLE(10.0f);
+					item->Pose.Orientation.y -= ANGLE(10.0f);
 				else
-					item->Position.yRot += ANGLE(10.0f);
+					item->Pose.Orientation.y += ANGLE(10.0f);
 			}
 
 			if (item->AIBits & GUARD)

@@ -43,7 +43,7 @@ void KnightTemplarControl(short itemNumber)
 	{
 		if (GetRandomControl() & 1)
 		{
-			PHD_VECTOR pos = { 0, 48, 448 };
+			Vector3Int pos = { 0, 48, 448 };
 			GetJointAbsPosition(item, &pos, 10);
 
 			TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
@@ -70,7 +70,7 @@ void KnightTemplarControl(short itemNumber)
 
 	int a = 0;
 	if (creature->Enemy != LaraItem)
-		a = phd_atan(item->Position.zPos - LaraItem->Position.zPos, item->Position.xPos - LaraItem->Position.xPos);
+		a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
@@ -124,19 +124,19 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Position.yRot += ANGLE(1.0f);
+				item->Pose.Orientation.y += ANGLE(1.0f);
 			else
-				item->Position.yRot -= ANGLE(1.0f);
+				item->Pose.Orientation.y -= ANGLE(1.0f);
 		}
 		else
-			item->Position.yRot += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		frameNumber = item->Animation.FrameNumber;
 		frameBase = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
-			PHD_VECTOR pos = { 0, 0, 0 };
+			auto pos = Vector3Int();
 			GetJointAbsPosition(item, &pos, 11);
 
 			auto* room = &g_Level.Rooms[item->RoomNumber];
@@ -148,12 +148,12 @@ void KnightTemplarControl(short itemNumber)
 				{
 					auto* mesh = &room->mesh[i];
 
-					if (floor(pos.x) == floor(mesh->pos.xPos) &&
-						floor(pos.z) == floor(mesh->pos.zPos) &&
+					if (floor(pos.x) == floor(mesh->pos.Position.x) &&
+						floor(pos.z) == floor(mesh->pos.Position.z) &&
 						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
+						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;
@@ -190,12 +190,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= ANGLE(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Position.yRot += ANGLE(1.0f);
+				item->Pose.Orientation.y += ANGLE(1.0f);
 			else
-				item->Position.yRot -= ANGLE(1.0f);
+				item->Pose.Orientation.y -= ANGLE(1.0f);
 		}
 		else
-			item->Position.yRot += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		if (item->HitStatus)
 		{

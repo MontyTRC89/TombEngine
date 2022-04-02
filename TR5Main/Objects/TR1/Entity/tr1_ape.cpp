@@ -68,26 +68,26 @@ void ApeVault(short itemNumber, short angle)
 
 	if (creature->Flags & APE_FLAG_TURN_LEFT)
 	{
-		item->Position.yRot -= ANGLE(90.0f);
+		item->Pose.Orientation.y -= ANGLE(90.0f);
 		creature->Flags -= APE_FLAG_TURN_LEFT;
 	}
 	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
-		item->Position.yRot += ANGLE(90.0f);
+		item->Pose.Orientation.y += ANGLE(90.0f);
 		creature->Flags -= APE_FLAG_TURN_RIGHT;
 	}
 
-	long long xx = item->Position.zPos / SECTOR(1);
-	long long yy = item->Position.xPos / SECTOR(1);
-	long long y = item->Position.yPos;
+	long long xx = item->Pose.Position.z / SECTOR(1);
+	long long yy = item->Pose.Position.x / SECTOR(1);
+	long long y = item->Pose.Position.y;
 
 	CreatureAnimation(itemNumber, angle, 0);
 
-	if (item->Position.yPos > (y - CLICK(1.5f)))
+	if (item->Pose.Position.y > (y - CLICK(1.5f)))
 		return;
 
-	long long xFloor = item->Position.zPos / SECTOR(1);
-	long long yFloor = item->Position.xPos / SECTOR(1);
+	long long xFloor = item->Pose.Position.z / SECTOR(1);
+	long long yFloor = item->Pose.Position.x / SECTOR(1);
 	if (xx == xFloor)
 	{
 		if (yy == yFloor)
@@ -95,26 +95,26 @@ void ApeVault(short itemNumber, short angle)
 
 		if (yy < yFloor)
 		{
-			item->Position.xPos = (yFloor * SECTOR(1)) - SHIFT;
-			item->Position.yRot = ANGLE(90.0f);
+			item->Pose.Position.x = (yFloor * SECTOR(1)) - SHIFT;
+			item->Pose.Orientation.y = ANGLE(90.0f);
 		}
 		else
 		{
-			item->Position.xPos = (yy * SECTOR(1)) + SHIFT;
-			item->Position.yRot = -ANGLE(90.0f);
+			item->Pose.Position.x = (yy * SECTOR(1)) + SHIFT;
+			item->Pose.Orientation.y = -ANGLE(90.0f);
 		}
 	}
 	else if (yy == yFloor)
 	{
 		if (xx < xFloor)
 		{
-			item->Position.zPos = (xFloor * SECTOR(1)) - SHIFT;
-			item->Position.yRot = 0;
+			item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
+			item->Pose.Orientation.y = 0;
 		}
 		else
 		{
-			item->Position.zPos = (xx * SECTOR(1)) + SHIFT;
-			item->Position.yRot = -ANGLE(180.0f);
+			item->Pose.Position.z = (xx * SECTOR(1)) + SHIFT;
+			item->Pose.Orientation.y = -ANGLE(180.0f);
 		}
 	}
 	else
@@ -125,7 +125,7 @@ void ApeVault(short itemNumber, short angle)
 	switch (CreatureVault(itemNumber, angle, 2, SHIFT))
 	{
 	case 2:
-		item->Position.yPos = y;
+		item->Pose.Position.y = y;
 		item->Animation.AnimNumber = Objects[ID_APE].animIndex + APE_ANIM_VAULT;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.ActiveState = APE_STATE_VAULT;
@@ -179,12 +179,12 @@ void ApeControl(short itemNumber)
 		case APE_STATE_IDLE:
 			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
-				item->Position.yRot -= ANGLE(90);
+				item->Pose.Orientation.y -= ANGLE(90);
 				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
 			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
-				item->Position.yRot += ANGLE(90);
+				item->Pose.Orientation.y += ANGLE(90);
 				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -257,7 +257,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_LEFT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 			{
-				item->Position.yRot -= ANGLE(90);
+				item->Pose.Orientation.y -= ANGLE(90);
 				creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -267,7 +267,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_RIGHT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 			{
-				item->Position.yRot += ANGLE(90);
+				item->Pose.Orientation.y += ANGLE(90);
 				creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 			}
 

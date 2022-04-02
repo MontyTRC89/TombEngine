@@ -1223,5 +1223,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	ZeroMemory(TEN::Entities::TR4::BeetleSwarm, TEN::Entities::TR4::NUM_BEETLES * sizeof(BeetleInfo));
+	ZeroMemory(TEN::Entities::TR4::BeetleSwarm, TEN::Entities::TR4::NUM_BEETLES * sizeof(BeetleData));
 }

@@ -42,8 +42,8 @@ namespace TEN::Effects::Lara
 		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Position.xPos, 32000, item->Position.zPos, &roomNumber);
-			if (item->Floor == GetFloorHeight(floor, item->Position.xPos, 32000, item->Position.zPos))
+			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
+			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
 			{
 				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
 				//				KayakLaraRapidsDrown();
@@ -92,17 +92,17 @@ namespace TEN::Effects::Lara
 				return;
 		}
 
-		float z = std::sin(TO_RAD(item->Position.yRot)) * -64.0f;
-		float x = std::cos(TO_RAD(item->Position.yRot)) * -64.0f;
-		auto offset = PHD_VECTOR(0, -4, 64);
+		float z = std::sin(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
+		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
+		auto offset = Vector3Int(0, -4, 64);
 
 		GetLaraJointPosition(&offset, LM_HEAD);
 
-		auto seed = PHD_VECTOR((GetRandomControl() & 7) - 4,
+		auto seed = Vector3Int((GetRandomControl() & 7) - 4,
 			(GetRandomControl() & 7) - 8,
 			(GetRandomControl() & 7) - 4);
 
 		GetLaraJointPosition(&seed, LM_HEAD);
-		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Position.yRot);
+		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Pose.Orientation.y);
 	}
 }

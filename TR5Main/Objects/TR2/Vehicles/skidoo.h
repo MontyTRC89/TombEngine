@@ -8,7 +8,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction);
 bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 
-int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, PHD_VECTOR* moved);
+int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, Vector3Int* moved);
 void SkidooCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
 
@@ -21,8 +21,8 @@ bool SkidooUserControl(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int height, i
 void SkidooAnimation(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int collide, bool dead);
 
 int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem);
-int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, PHD_VECTOR* pos);
-short DoSkidooShift(ITEM_INFO* skidooItem, PHD_VECTOR* pos, PHD_VECTOR* old);
+int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, Vector3Int* pos);
+short DoSkidooShift(ITEM_INFO* skidooItem, Vector3Int* pos, Vector3Int* old);
 int DoSkidooDynamics(int height, int verticalVelocity, int* y);
 
 void DrawSkidoo(ITEM_INFO* skidooItem);

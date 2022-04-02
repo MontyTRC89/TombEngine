@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	VectorInt3 Coordinates;
+	Vector3 Coordinates;
 	int RoomNumber;
 
 	FLOOR_INFO* Block;
@@ -72,22 +72,22 @@ struct CollisionSetup
 	int   Height;				// Collision bounds vertical size
 	short ForwardAngle;			// Forward angle direction
 
-	int   LowerFloorBound;		// Borderline floor step-up height 
-	int   UpperFloorBound;		// Borderline floor step-down height
-	int   LowerCeilingBound;	// Borderline ceiling step-up height
-	int   UpperCeilingBound;	// Borderline ceiling step-down height
+	int LowerFloorBound;		// Borderline floor step-up height 
+	int UpperFloorBound;		// Borderline floor step-down height
+	int LowerCeilingBound;		// Borderline ceiling step-up height
+	int UpperCeilingBound;		// Borderline ceiling step-down height
 
 	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
 	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
-	bool BlockDeathFlagDown;	// Treat death sectors as pits
-	bool BlockNoMonkeyFlag;		// Treat non-monkey sectors as walls
+	bool BlockDeathFloorDown;	// Treat death sectors as pits
+	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
 	
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	PHD_VECTOR OldPosition;
+	Vector3Int OldPosition;
 	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
@@ -104,7 +104,7 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	PHD_VECTOR Shift;
+	Vector3Int Shift;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;				// x = x, y = z
 	Vector2 CeilingTilt;			// x = x, y = z
@@ -125,7 +125,7 @@ CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ITEM_INFO* item);
 
-void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
 short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);

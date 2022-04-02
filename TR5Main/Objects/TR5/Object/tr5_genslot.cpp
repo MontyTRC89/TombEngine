@@ -28,7 +28,7 @@ void GenSlot1Control(short itemNumber)
 			bool found = false;
 			for (int i = 0; i < 6; i++)
 			{
-				PHD_VECTOR pos = { 0, -350, 0 };
+				Vector3Int pos = { 0, -350, 0 };
 				GetJointAbsPosition(item, &pos, i + 1);
 
 				if (pos.x > DeadlyBounds[0] &&
@@ -46,7 +46,7 @@ void GenSlot1Control(short itemNumber)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					PHD_VECTOR pos = { 0, 0, 0 };
+					Vector3Int pos = { 0, 0, 0 };
 					GetLaraJointPosition(&pos, i + 7);
 
 					int x = pos.x + (GetRandomControl() & 0xFF) - 128;
@@ -78,20 +78,20 @@ void InitialiseGenSlot4(short itemNumber)
 
 	HIWORD(v1) = HIWORD(items);
 	item = &g_Level.Items[itemNumber];
-	LOWORD(v1) = item->pos.yRot;
-	v3 = item->pos.xPos;
+	LOWORD(v1) = item->pos.Orientation.y;
+	v3 = item->pos.Position.x;
 	v4 = 2 * ((v1 >> 3) & 0x1FFE);
 	v5 = 5 * *(__int16*)((char*)rcossin_tbl + v4);
-	v6 = item->pos.zPos;
+	v6 = item->pos.Position.z;
 	v7 = v6 + (10240 * *(__int16*)((char*)& rcossin_tbl[1] + v4) >> 14);
 	item->item_flags[2] = 1;
 	BYTE1(v4) = v6 >> 9;
 	LOBYTE(v4) = v3 >> 9;
 	item->item_flags[0] = v4;
-	LOBYTE(v6) = (item->pos.xPos + (v5 << 11 >> 14)) >> 9;
+	LOBYTE(v6) = (item->pos.Position.x + (v5 << 11 >> 14)) >> 9;
 	BYTE1(v6) = v7 >> 9;
 
-	item->itemFlags[1] = item->pos.xPos + 2560 * phd_sin(item->pos.yRot) >> W2V_SHIFT;
+	item->itemFlags[1] = item->pos.Position.x + 2560 * phd_sin(item->pos.Orientation.y) >> W2V_SHIFT;
 	item->itemFlags[3] = 0;
 	item->triggerFlags = 0;*/
 }

@@ -80,8 +80,8 @@ namespace TEN::Entities::TR4
 		}
 
 		// NOTE: fixed light below the ground with -STEP_L!
-		TriggerDynamicLight(item->Position.xPos, (item->Position.yPos - STEP_SIZE), item->Position.zPos, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
-		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, NULL);
+		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - STEP_SIZE), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, NULL);
 	}
 
 	void InitialiseAhmet(short itemNumber)
@@ -93,9 +93,9 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = AHMET_STATE_IDLE;
 		item->Animation.ActiveState = AHMET_STATE_IDLE;
-		item->ItemFlags[0] = item->Position.xPos / SECTOR(1);
-		item->ItemFlags[1] = item->Position.yPos * 4 / SECTOR(1);
-		item->ItemFlags[2] = item->Position.zPos / SECTOR(1);
+		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
+		item->ItemFlags[1] = item->Pose.Position.y * 4 / SECTOR(1);
+		item->ItemFlags[2] = item->Pose.Position.z / SECTOR(1);
 	}
 
 	void AhmetControl(short itemNumber)
@@ -153,10 +153,10 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				int dx = LaraItem->Position.xPos - item->Position.xPos;
-				int dz = LaraItem->Position.zPos - item->Position.zPos;
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				int angle = phd_atan(dx, dz);
-				laraAI.angle = angle - item->Position.yRot;
+				laraAI.angle = angle - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -255,12 +255,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Position.yRot += 910;
+						item->Pose.Orientation.y += ANGLE(5.0f);
 					else
-						item->Position.yRot -= 910;
+						item->Pose.Orientation.y -= ANGLE(5.0f);
 				}
 				else
-					item->Position.yRot += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].FrameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
 				{
@@ -289,12 +289,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Position.yRot += ANGLE(5.0f);
+							item->Pose.Orientation.y += ANGLE(5.0f);
 						else
-							item->Position.yRot -= ANGLE(5.0f);
+							item->Pose.Orientation.y -= ANGLE(5.0f);
 					}
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{
@@ -322,12 +322,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Position.yRot += ANGLE(5.0f);
+							item->Pose.Orientation.y += ANGLE(5.0f);
 						else
-							item->Position.yRot -= ANGLE(5.0f);
+							item->Pose.Orientation.y -= ANGLE(5.0f);
 					}
 					else
-						item->Position.yRot += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{
@@ -372,11 +372,11 @@ namespace TEN::Entities::TR4
 
 		Weather.Flash(255, 64, 0, 0.03f);
 
-		item->Position.xPos = (item->ItemFlags[0] * SECTOR(1)) + CLICK(2);
-		item->Position.yPos = (item->ItemFlags[1] * CLICK(1));
-		item->Position.zPos = (item->ItemFlags[2] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.x = (item->ItemFlags[0] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.y = (item->ItemFlags[1] * CLICK(1));
+		item->Pose.Position.z = (item->ItemFlags[2] * SECTOR(1)) + CLICK(2);
 
-		auto outsideRoom = IsRoomOutside(item->Position.xPos, item->Position.yPos, item->Position.zPos);
+		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom)
 			ItemNewRoom(itemNumber, outsideRoom);
 

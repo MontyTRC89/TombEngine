@@ -23,7 +23,7 @@
 void lara_as_surface_dive(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
-		item->Position.xRot -= ANGLE(1.0f);
+		item->Pose.Orientation.x -= ANGLE(1.0f);
 }
 
 // State:		LS_ONWATER_DIVE (35)
@@ -111,7 +111,7 @@ void lara_col_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -157,7 +157,7 @@ void lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
@@ -176,20 +176,23 @@ void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		}
 	}
 
-	if (!(TrInput & IN_LSTEP))
+	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
 	if (DbInput & IN_JUMP)
@@ -206,7 +209,7 @@ void lara_col_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -222,20 +225,23 @@ void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
-		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE * 1.25f;
+			if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
+		}
 	}
 
-	if (!(TrInput & IN_RSTEP))
+	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
 	if (DbInput & IN_JUMP)
@@ -252,7 +258,7 @@ void lara_col_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -298,7 +304,7 @@ void lara_col_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Position.yRot + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);
 }
 

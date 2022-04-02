@@ -64,7 +64,7 @@ void MPStickControl(short itemNumber)
 
 	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 	{
-		DoLotsOfBlood(item->Position.xPos, item->Position.yPos - (GetRandomControl() & 255) - 32, item->Position.zPos, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
+		DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
 		item->HitPoints -= 20;
 	}
 
@@ -87,8 +87,8 @@ void MPStickControl(short itemNumber)
 		{
 			creature->Enemy = LaraItem;
 
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			laraAI.distance = pow(dx, 2) + pow(dx, 2);
 
 			int bestDistance = 0x7fffffff;
@@ -102,8 +102,8 @@ void MPStickControl(short itemNumber)
 				if (target->ObjectNumber != ID_LARA)
 					continue;
 
-				dx = target->Position.xPos - item->Position.xPos;
-				dz = target->Position.zPos - item->Position.zPos;
+				dx = target->Pose.Position.x - item->Pose.Position.x;
+				dz = target->Pose.Position.z - item->Pose.Position.z;
 
 				if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) ||
 					dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
@@ -130,9 +130,9 @@ void MPStickControl(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
-			laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -145,10 +145,10 @@ void MPStickControl(short itemNumber)
 		creature->Enemy = LaraItem;
 
 		if (item->HitStatus || ((laraAI.distance < pow(SECTOR(1), 2) ||
-			TargetVisible(item, &laraAI)) && abs(LaraItem->Position.yPos - item->Position.yPos) < SECTOR(1)))
+			TargetVisible(item, &laraAI)) && abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1)))
 		{
 			if (!creature->Alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Position, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose, 0);
 
 			AlertAllGuards(itemNumber);
 		}
@@ -335,7 +335,7 @@ void MPStickControl(short itemNumber)
 				if (!creature->Flags && item->TouchBits & 0x2400)
 				{
 					CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 80;
@@ -346,13 +346,13 @@ void MPStickControl(short itemNumber)
 			{
 				if (!creature->Flags && enemy)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < SECTOR(0.25f) &&
-						abs(enemy->Position.yPos - item->Position.yPos) <= SECTOR(0.25f) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < SECTOR(0.25f))
+					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
@@ -376,7 +376,7 @@ void MPStickControl(short itemNumber)
 				if (!creature->Flags && item->TouchBits & 0x2400)
 				{
 					CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 80;
@@ -387,13 +387,13 @@ void MPStickControl(short itemNumber)
 			{
 				if (!creature->Flags && enemy)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < SECTOR(0.25f) &&
-						abs(enemy->Position.yPos - item->Position.yPos) <= SECTOR(0.25f) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < SECTOR(0.25f))
+					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
@@ -421,7 +421,7 @@ void MPStickControl(short itemNumber)
 				{
 					CreatureEffect(item, &MPStickBite1, DoBloodSplat);
 					creature->Flags = 2;
-					SoundEffect(70, &item->Position, 0);
+					SoundEffect(70, &item->Pose, 0);
 
 					LaraItem->HitPoints -= 100;
 					LaraItem->HitStatus = 1;
@@ -431,13 +431,13 @@ void MPStickControl(short itemNumber)
 			{
 				if (creature->Flags != 2 && enemy)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < SECTOR(0.25f) &&
-						abs(enemy->Position.yPos - item->Position.yPos) <= SECTOR(0.25f) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < SECTOR(0.25f))
+					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 					{
 						creature->Flags = 2;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 6;
 						enemy->HitStatus = 1;
@@ -459,7 +459,7 @@ void MPStickControl(short itemNumber)
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 8)
 				{
 					CreatureEffect(item, &MPStickBite2, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 150;
@@ -471,13 +471,13 @@ void MPStickControl(short itemNumber)
 				if (!creature->Flags != 1 && enemy &&
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 8)
 				{
-					if (abs(enemy->Position.xPos - item->Position.xPos) < SECTOR(0.25f) &&
-						abs(enemy->Position.yPos - item->Position.yPos) <= SECTOR(0.25f) &&
-						abs(enemy->Position.zPos - item->Position.zPos) < SECTOR(0.25f))
+					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(0.25f) &&
+						abs(enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.25f))
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite2, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 9;
 						enemy->HitStatus = 1;

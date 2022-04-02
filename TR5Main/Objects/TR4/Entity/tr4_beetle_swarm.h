@@ -1,9 +1,9 @@
 #pragma once
 #include <items.h>
 
-struct BeetleInfo
+struct BeetleData
 {
-	PHD_3DPOS Position;
+	PHD_3DPOS Pose;
 	short RoomNumber;
 	int Velocity;
 	int VerticalVelocity;
@@ -16,7 +16,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto NUM_BEETLES = 256;
 
-	extern BeetleInfo BeetleSwarm[NUM_BEETLES];
+	extern BeetleData BeetleSwarm[NUM_BEETLES];
 	extern int NextBeetle;
 
 	void InitialiseBeetleSwarm(short itemNumber);

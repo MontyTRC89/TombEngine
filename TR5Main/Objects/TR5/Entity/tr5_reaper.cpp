@@ -59,7 +59,7 @@ void ReaperControl(short itemNumber)
 			}
 		}
 
-		item->Position.xRot = -ANGLE(67.5f);
+		item->Pose.Orientation.x = -ANGLE(67.5f);
 		CreatureAnimation(itemNumber, angle, 0);
 		CreatureUnderwater(item, SECTOR(1));
 	}

@@ -43,7 +43,7 @@ enum WeaponState
 	WEAPON_STATE_UNDERWATER_RECOIL = 8
 };
 
-extern WeaponInfo Weapons[(int)LaraWeaponType::Total];
+extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
@@ -52,9 +52,9 @@ Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void InitialiseNewWeapon(ITEM_INFO* laraItem);
 GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
-void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GAME_VECTOR* hitPos, int damage, int flag);
+void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int damage, int flag);
 FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
-void FindTargetPoint(ITEM_INFO* laraItem, GAME_VECTOR* target);
+void FindTargetPoint(ITEM_INFO* laraItem, GameVector* target);
 void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
 bool CheckForHoldingState(LaraState state);
 void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);

@@ -77,8 +77,8 @@ struct ITEM_INFO
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS Position;
-	PHD_3DPOS StartPosition;
+	PHD_3DPOS Pose;
+	PHD_3DPOS StartPose;
 	int Floor;
 
 	int HitPoints;
