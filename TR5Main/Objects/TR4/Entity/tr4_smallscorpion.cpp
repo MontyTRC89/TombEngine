@@ -112,6 +112,7 @@ void SmallScorpionControl(short itemNumber)
 
 		case SSCORPION_STATE_WALK:
 			creature->MaxTurn = ANGLE(6.0f);
+
 			if (AI.distance >= pow(341, 2))
 			{
 				if (AI.distance > pow(213, 2))
