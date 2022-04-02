@@ -37,12 +37,10 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
-			wraith->Pose.Position.x = item->Pose.Position.x;
-			wraith->Pose.Position.y = item->Pose.Position.y;
-			wraith->Pose.Position.z = item->Pose.Position.z;
+			wraith->Pose.Position = item->Pose.Position;
 			wraith->Pose.Orientation.z = 0;
-			wraith->Pose.Position.y = 0;
 			wraith->Pose.Position.x = 0;
+			wraith->Pose.Position.y = 0;
 			wraith->r = 0;
 			wraith->g = 0;
 			wraith->b = 0;
@@ -147,10 +145,6 @@ namespace TEN::Entities::TR4
 		if (probe.Position.Floor < item->Pose.Position.y || probe.Position.Ceiling > item->Pose.Position.y)
 			hitWall = true;
 
-		oldX = item->Pose.Position.x;
-		oldY = item->Pose.Position.y;
-		oldZ = item->Pose.Position.z;
-
 		item->Pose.Position.x += item->Animation.Velocity * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.y += item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
 		item->Pose.Position.z += item->Animation.Velocity * phd_cos(item->Pose.Orientation.y);
@@ -185,9 +179,10 @@ namespace TEN::Entities::TR4
 		{
 			// WRAITH1 AND WRAITH2 can die on contact with water
 			// WRAITH1 dies because it's fire and it dies on contact with water, WRAITH2 instead triggers a flipmap for making icy water
-			if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+			if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 			{
 				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
+				
 				item->ItemFlags[1]--;
 				if (item->ItemFlags[1] < -1)
 				{

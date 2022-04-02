@@ -59,10 +59,10 @@ void InitialiseHydra(short itemNumber)
 
 static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 {
-	short fxNum = CreateNewEffect(roomNumber);
-	if (fxNum != NO_ITEM)
+	short fxNumber = CreateNewEffect(roomNumber);
+	if (fxNumber != NO_ITEM)
 	{
-		auto* fx = &EffectList[fxNum];
+		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
@@ -219,7 +219,6 @@ void HydraControl(short itemNumber)
 		joint0 = -joint1;
 
 		int distance, damage, frame;
-		Vector3Int pos1, pos2;
 		short angles[2];
 		short roomNumber;
 
@@ -326,22 +325,15 @@ void HydraControl(short itemNumber)
 		case 3:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				pos1 = { 0, 1024, 40 };
+				auto pos1 = Vector3Int(0, 1024, 40);
 				GetJointAbsPosition(item, &pos1, 10);
 
-				pos2 = { 0, 144, 40 };
+				auto pos2 = Vector3Int(0, 144, 40);
 				GetJointAbsPosition(item, &pos2, 10);
 
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
-
+				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 

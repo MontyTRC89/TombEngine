@@ -31,7 +31,7 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		InitialiseItem(grenadeItemNumber);
 
 		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
+		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180.0f);
 		grenadeItem->Pose.Orientation.z = 0;
 
 		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* phd_sin(grenadeItem->Pose.Orientation.y);
@@ -49,11 +49,11 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		else
 			grenadeItem->ItemFlags[0] = 2;
 
-		grenadeItem->Animation.Velocity = 32;
 		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-		grenadeItem->Animation.VerticalVelocity = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 		grenadeItem->Animation.RequiredState = 0;
+		grenadeItem->Animation.Velocity = 32;
+		grenadeItem->Animation.VerticalVelocity = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 		grenadeItem->HitPoints = 120;
 
 		AddActiveItem(grenadeItemNumber);
@@ -155,13 +155,13 @@ void EnemyJeepControl(short itemNumber)
 			item->ItemFlags[0] -= 128;
 			item->MeshBits = -98305;
 
-			if (item->ItemFlags[0] < 0)
-				item->ItemFlags[0] = 0;
-
 			pos = Vector3Int(0, -144, -1024);
 			GetJointAbsPosition(item, &pos, 11);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+
+			if (item->ItemFlags[0] < 0)
+				item->ItemFlags[0] = 0;
 			
 			if (item->Animation.RequiredState)
 				item->Animation.TargetState = item->Animation.RequiredState;
@@ -260,12 +260,7 @@ void EnemyJeepControl(short itemNumber)
 
 				if (target->Flags & 4)
 				{
-					item->Pose.Position.x = target->Pose.Position.x;
-					item->Pose.Position.y = target->Pose.Position.y;
-					item->Pose.Position.z = target->Pose.Position.z;
-					item->Pose.Orientation.x = target->Pose.Orientation.x;
-					item->Pose.Orientation.y = target->Pose.Orientation.y;
-					item->Pose.Orientation.z = target->Pose.Orientation.z;
+					item->Pose = target->Pose;
 
 					if (item->RoomNumber != target->RoomNumber)
 						ItemNewRoom(itemNumber, target->RoomNumber);

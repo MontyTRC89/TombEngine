@@ -46,7 +46,7 @@ void WildBoarControl(short itemNumber)
 	{
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		int laraDistance = dx * dx + dz * dz;
+		int laraDistance = pow(dx, 2) + pow(dz, 2);
 
 		if (item->AIBits & GUARD)
 			GetAITarget(creature);
@@ -54,7 +54,7 @@ void WildBoarControl(short itemNumber)
 		{
 			creature->Enemy = LaraItem;
 
-			int minDistance = 0x7FFFFFFF;
+			int minDistance = INT_MAX;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
@@ -68,7 +68,7 @@ void WildBoarControl(short itemNumber)
 				{
 					int dx2 = target->Pose.Position.x - item->Pose.Position.x;
 					int dz2 = target->Pose.Position.z - item->Pose.Position.z;
-					int distance = dx2 * dx2 + dz2 * dz2;
+					int distance = pow(dx2, 2) + pow(dz2, 2);
 
 					if (distance < minDistance &&
 						distance < laraDistance)
@@ -126,19 +126,19 @@ void WildBoarControl(short itemNumber)
 			break;
 
 		case 2:
-			if (AI.distance >= 0x400000)
+			if (AI.distance >= SECTOR(4096))
 			{
-				creature->MaxTurn = 1092;
+				creature->MaxTurn = ANGLE(6.0f);
 				item->Flags = 0;
 			}
 			else
 			{
-				creature->MaxTurn = 546;
+				creature->MaxTurn = ANGLE(3.0f);
 				joint0 = -AI.distance;
 				joint2 = -AI.distance;
 			}
 
-			if (!item->Flags && (AI.distance < 0x10000 && AI.bite))
+			if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
 			{
 				item->Animation.TargetState = 4;
 
@@ -166,8 +166,8 @@ void WildBoarControl(short itemNumber)
 		if (item->Animation.ActiveState != 5)
 		{
 			item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
-			item->Animation.ActiveState = 5;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 5;
 		}
 	}
 

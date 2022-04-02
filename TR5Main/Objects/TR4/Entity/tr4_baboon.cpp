@@ -19,7 +19,7 @@ using namespace TEN::Effects::Environment;
 BaboonRespawnClass BaboonRespawn;
 static BITE_INFO BaboonBite = { 10, 10, 11, 4 };
 
-enum BABOON_STATE
+enum BaboonState
 {
 	BABOON_NULL,
 	BABOON_EMPTY,

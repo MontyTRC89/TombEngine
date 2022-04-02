@@ -2114,7 +2114,7 @@ void lara_col_roll_back(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2)) // Was 200.
+	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2))
 	{
 		SetLaraFallBackAnimation(item);
 		return;
@@ -2137,7 +2137,7 @@ void lara_as_roll_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	lara->Control.CanLook = false;
 
-	// TODO: Change swandive roll anim state to something sensible.
+	// TODO: Change swandive roll anim's state to something sensible.
 	if (TrInput & IN_FORWARD &&
 		item->Animation.AnimNumber == LA_SWANDIVE_ROLL) // Hack.
 	{
@@ -2419,7 +2419,7 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
-			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Direct dispatch to walk?
+			item->Animation.TargetState = LS_RUN_FORWARD;
 		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) [[likely]]
 			item->Animation.TargetState = LS_SPRINT;
 		else
