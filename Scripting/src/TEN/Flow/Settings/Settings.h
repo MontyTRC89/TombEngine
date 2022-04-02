@@ -26,6 +26,6 @@ struct Settings
 	bool ShowDebugInfo;
 	ErrorMode ErrorMode;
 
-	static void Register(sol::table & lua);
+	static void Register(sol::table & parent);
 };
 
