@@ -23,7 +23,7 @@ public:
 	void SetPos(Position const& pos);
 
 	short GetRoom() const;
-	void SetRoom(short Room);
+	void SetRoom(short room);
 
 	std::string GetName() const;
 	void SetName(std::string const &);
