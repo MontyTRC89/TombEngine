@@ -141,7 +141,7 @@ void EnemyJeepControl(short itemNumber)
 		if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
 			dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
 		{
-			distance = 0x7FFFFFFF;
+			distance = INT_MAX;
 		}
 		else
 			distance = pow(dx, 2) + pow(dz, 2);
