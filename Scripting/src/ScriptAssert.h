@@ -4,35 +4,33 @@
 #include <optional>
 #include <spdlog/fmt/fmt.h>
 
-enum class ERROR_MODE
+enum class ErrorMode
 {
-	SILENT,
-	WARN,
-	TERMINATE
+	Silent,
+	Warn,
+	Terminate
 };
 
-void SetScriptErrorMode(ERROR_MODE mode);
-ERROR_MODE GetScriptErrorMode();
+void SetScriptErrorMode(ErrorMode mode);
+ErrorMode GetScriptErrorMode();
 
 void ScriptWarn(std::string const& msg);
 
-bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> forceMode = std::nullopt);
+bool ScriptAssert(bool cond, std::string const& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
 template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
 {
 	if (!cond)
 	{
 		auto msg = fmt::format(str, args...);
-		auto mode = GetScriptErrorMode();
-		switch (mode)
+		switch (GetScriptErrorMode())
 		{
-		case ERROR_MODE::WARN:
+		case ErrorMode::Warn:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			break;
-		case ERROR_MODE::TERMINATE:
+		case ErrorMode::Terminate:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			throw TENScriptException(msg);
-			break;
 		}
 	}
 	return cond;

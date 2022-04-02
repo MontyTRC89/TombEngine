@@ -38,7 +38,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			tab.raw_set(key, value);
 			break;
 		default:
-			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ERROR_MODE::TERMINATE);
+			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
 		}
 		break;
@@ -48,12 +48,12 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
 		if (str)
 		{
-			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ERROR_MODE::TERMINATE);
+			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ErrorMode::Terminate);
 			lua_pop(tab.lua_state(), 1);
 		}
 		else
 		{
-			ScriptAssert(false, "Variable has an unsupported type.", ERROR_MODE::TERMINATE);
+			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
 		}
 		key.pop();
 		break;
@@ -345,7 +345,7 @@ template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
 {
 #if TEN_OPTIONAL_LUA
-	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ERROR_MODE::TERMINATE);
+	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ErrorMode::Terminate);
 	return std::make_unique<R>(map.at(name), false);
 #endif
 }
@@ -400,7 +400,7 @@ static void doCallback(sol::protected_function const & func, std::optional<float
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
+		ScriptAssert(false, err.what(), ErrorMode::Terminate);
 	}
 }
 #endif

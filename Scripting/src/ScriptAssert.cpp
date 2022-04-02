@@ -1,31 +1,31 @@
 #include "frameworkandsol.h"
 #include "ScriptAssert.h"
 
-static ERROR_MODE ScriptErrorMode = ERROR_MODE::WARN;
+static ErrorMode ScriptErrorMode = ErrorMode::Warn;
 
 void ScriptWarn(std::string const& msg)
 {
 	switch (ScriptErrorMode)
 	{
-	case ERROR_MODE::TERMINATE:
-	case ERROR_MODE::WARN:
+	case ErrorMode::Terminate:
+	case ErrorMode::Warn:
 		TENLog(msg, LogLevel::Warning, LogConfig::All);
 		break;
 	}
 }
 
 
-bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> forceMode)
+bool ScriptAssert(bool cond, std::string const& msg, std::optional<ErrorMode> forceMode)
 {
 	if (!cond)
 	{
-		ERROR_MODE mode = forceMode ? *forceMode : ScriptErrorMode;
+		ErrorMode mode = forceMode ? *forceMode : ScriptErrorMode;
 		switch (mode)
 		{
-		case ERROR_MODE::WARN:
+		case ErrorMode::Warn:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			break;
-		case ERROR_MODE::TERMINATE:
+		case ErrorMode::Terminate:
 			TENLog(msg, LogLevel::Error, LogConfig::All);
 			throw TENScriptException(msg);
 			break;
@@ -35,12 +35,12 @@ bool ScriptAssert(bool cond, std::string const& msg, std::optional<ERROR_MODE> f
 }
 
 
-void SetScriptErrorMode(ERROR_MODE mode)
+void SetScriptErrorMode(ErrorMode mode)
 {
 	ScriptErrorMode = mode;
 }
 
-ERROR_MODE GetScriptErrorMode()
+ErrorMode GetScriptErrorMode()
 {
 	return ScriptErrorMode;
 }
