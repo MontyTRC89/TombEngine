@@ -309,7 +309,7 @@ void ControlGladiator(short itemNumber)
 			{
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 
-				Vector3Int pos = { 0, 0, 0 };
+				auto pos = Vector3Int();
 				GetJointAbsPosition(item, &pos, 16);
 
 				auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);

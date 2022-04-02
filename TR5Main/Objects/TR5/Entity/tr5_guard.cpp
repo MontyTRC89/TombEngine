@@ -285,7 +285,7 @@ void GuardControl(short itemNumber)
 	{
 		creature->FiredWeapon--;
 
-		Vector3Int pos = { SwatGunBite.x, SwatGunBite.y, SwatGunBite.z };
+		auto pos = Vector3Int(SwatGunBite.x, SwatGunBite.y, SwatGunBite.z);
 		GetJointAbsPosition(item, &pos, SwatGunBite.meshNum);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -991,7 +991,7 @@ void SniperControl(short itemNumber)
 
 	if (creature->FiredWeapon)
 	{
-		Vector3Int pos = { SniperGunBite.x, SniperGunBite.y, SniperGunBite.z };
+		auto pos = Vector3Int(SniperGunBite.x, SniperGunBite.y, SniperGunBite.z);
 		GetJointAbsPosition(item, &pos, SniperGunBite.meshNum);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 10, 192, 128, 32);
@@ -1150,7 +1150,7 @@ void Mafia2Control(short itemNumber)
 
 	if (creature->FiredWeapon)
 	{
-		Vector3Int pos = { ArmedMafia2GunBite.x, ArmedMafia2GunBite.y, ArmedMafia2GunBite.z };
+		auto pos = Vector3Int(ArmedMafia2GunBite.x, ArmedMafia2GunBite.y, ArmedMafia2GunBite.z);
 		GetJointAbsPosition(item, &pos, ArmedMafia2GunBite.meshNum);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);

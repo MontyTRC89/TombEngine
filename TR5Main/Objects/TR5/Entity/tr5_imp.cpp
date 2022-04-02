@@ -67,10 +67,10 @@ void InitialiseImp(short itemNumber)
 
 static void ImpThrowStones(ITEM_INFO* item)
 {
-	Vector3Int pos1 = { 0, 0, 0 };
+	auto pos1 = Vector3Int();
 	GetJointAbsPosition(item, &pos1, 9);
 
-	Vector3Int pos2 = { 0, 0, 0 };
+	auto pos2 = Vector3Int();
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
 	int dx = pos1.x - pos2.x;
