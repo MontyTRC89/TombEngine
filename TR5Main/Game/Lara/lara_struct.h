@@ -1267,7 +1267,7 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	short TargetFacingAngle;
+	Vector3Shrt TargetOrientation;
 	int WaterSurfaceDist;
 	PHD_3DPOS NextCornerPos;
 

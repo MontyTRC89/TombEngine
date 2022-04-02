@@ -13,7 +13,7 @@ struct VaultTestResult;
 
 void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll);
-void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate = 1.0f);
+void ApproachLaraTargetOrientation(ITEM_INFO* item, Vector3Shrt targetOrient, float rate = 1.0f);
 void EaseOutLaraHeight(ITEM_INFO* item, int height);
 void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate);
 void DoLaraStep(ITEM_INFO* item, CollisionInfo* coll);

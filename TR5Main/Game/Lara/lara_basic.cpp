@@ -100,7 +100,7 @@ void lara_as_vault(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
+	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -114,7 +114,7 @@ void lara_as_auto_jump(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
-	ApproachLaraTargetAngle(item, lara->TargetFacingAngle, 2.5f);
+	ApproachLaraTargetOrientation(item, lara->TargetOrientation, 2.5f);
 }
 
 // ---------------
