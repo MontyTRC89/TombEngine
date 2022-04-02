@@ -746,12 +746,12 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			!lara->WaterCurrentActive &&
 			!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
 		{
-			if (TrInput & KAYAK_IN_LEFT && KayakCanGetOut(kayakItem, -1))
+			if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD) && KayakCanGetOut(kayakItem, -1))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
 				laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_LEFT;
 			}
-			else if (TrInput & KAYAK_IN_RIGHT && KayakCanGetOut(kayakItem, 1))
+			else if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD) && KayakCanGetOut(kayakItem, 1))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
 				laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_RIGHT;
@@ -765,7 +765,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		}
 		else if (TrInput & KAYAK_IN_BACK)
 			laraItem->Animation.TargetState = KAYAK_STATE_BACK;
-		else if (TrInput & KAYAK_IN_LEFT)
+		else if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
 		{
 			laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 
@@ -777,7 +777,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			kayak->Forward = false;
 		}
 
-		else if (TrInput & KAYAK_IN_RIGHT)
+		else if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
 		{
 			laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 
@@ -818,7 +818,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			if (TrInput & KAYAK_IN_FORWARD)
 			{
-				if (TrInput & KAYAK_IN_LEFT)
+				if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
 				{
 					if ((kayak->LeftRightCount & ~0x80) >= 2)
 						laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
@@ -877,7 +877,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			if (TrInput & KAYAK_IN_FORWARD)
 			{
-				if (TrInput & KAYAK_IN_RIGHT)
+				if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
 				{
 					if ((kayak->LeftRightCount & ~0x80) >= 2)
 						laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
