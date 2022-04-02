@@ -4,7 +4,6 @@
 #if TEN_OPTIONAL_LUA
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
-#include "ReservedScriptNames.h"
 #include "ObjectIDs.h"
 
 /***
@@ -14,10 +13,11 @@ Scripts that will be run on game startup.
 */
 #endif
 
-ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
+ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
+	LuaHandler{ lua },
+	m_table_objects(sol::table{m_lua->lua_state(), sol::create})
 {
 #if TEN_OPTIONAL_LUA
-	m_table_objects = sol::table{ m_lua->lua_state(), sol::create };
 	parent.set(ScriptReserved_Objects, m_table_objects);
 
 	/***

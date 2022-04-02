@@ -2,9 +2,8 @@
 #include "frameworkandsol.h"
 #include "LuaHandler.h"
 
-LuaHandler::LuaHandler(sol::state* lua) {
-	m_lua = lua;
-}
+LuaHandler::LuaHandler(sol::state* lua) : m_lua{ lua }
+{}
 
 void LuaHandler::ExecuteScript(std::string const& luaFilename) {
 	auto result = m_lua->safe_script_file(luaFilename, sol::script_pass_on_error);
