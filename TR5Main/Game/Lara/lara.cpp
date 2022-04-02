@@ -433,7 +433,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	if (!lara->Control.Locked)
 		lara->LocationPad = 128;
 
-	auto oldPos = Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto oldPos = Vector3Int(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -744,9 +744,7 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
 
-	coll->Setup.OldPosition.x = item->Pose.Position.x;
-	coll->Setup.OldPosition.y = item->Pose.Position.y;
-	coll->Setup.OldPosition.z = item->Pose.Position.z;
+	coll->Setup.OldPosition = item->Pose.Position;
 	coll->Setup.OldState = item->Animation.ActiveState;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
@@ -826,9 +824,7 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition.x = item->Pose.Position.x;
-	coll->Setup.OldPosition.y = item->Pose.Position.y;
-	coll->Setup.OldPosition.z = item->Pose.Position.z;
+	coll->Setup.OldPosition = item->Pose.Position;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);
@@ -899,9 +895,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition.x = item->Pose.Position.x;
-	coll->Setup.OldPosition.y = item->Pose.Position.y;
-	coll->Setup.OldPosition.z = item->Pose.Position.z;
+	coll->Setup.OldPosition = item->Pose.Position;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookLeftRight(item);
