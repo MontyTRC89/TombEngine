@@ -45,7 +45,7 @@ struct CrawlVaultTestSetup
 	int GapMin;
 	int CrossDist;
 	int DestDist;
-	int MaxProbeHeightDif;
+	int FloorBound;
 	bool CheckSlope = true;
 	bool CheckDeath = true;
 };

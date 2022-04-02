@@ -1,6 +1,6 @@
 -- TombEngine settings file
 -- Created by MontyTRC
--- Place all the engine settings for your game in this LUA script.
+-- Place all the engine settings for your game in this Lua script.
 -- WARNING: Bad values could make your game unplayable; please follow reference guide attentively.
 
 local settings = Settings.new();
