@@ -35,6 +35,7 @@ constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
 constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
+constexpr auto OFFSET_RADIUS = [](auto x) { return roundf(x * sqrt(2) + 4); };
 
 short ANGLE(float angle);
 short FROM_DEGREES(float angle);

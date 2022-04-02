@@ -33,7 +33,7 @@ void FallingCeilingControl(short itemNumber)
 	else
 	{
 		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
 		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
 		if (roomNumber != item->roomNumber)
