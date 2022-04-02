@@ -22,7 +22,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR FullBlockSwitchPos = { 0, 0, 0 };
+	Vector3Int FullBlockSwitchPos = { 0, 0, 0 };
 
 	byte SequenceUsed[6];
 	byte SequenceResults[3][3][3];

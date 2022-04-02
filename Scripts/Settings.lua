@@ -1,6 +1,6 @@
 -- TombEngine settings file
 -- Created by MontyTRC
--- Place all the engine settings for your game in this LUA script.
+-- Place all the engine settings for your game in this Lua script.
 -- WARNING: Bad values could make your game unplayable; please follow reference guide attentively.
 
 local settings = Settings.new();
@@ -16,11 +16,12 @@ settings.errorMode = ErrorMode.WARN;
 SetSettings(settings);
 
 local anims = Animations.new();
-anims.hasSlideExtended = true;
+anims.hasPose = false;
+anims.hasSlideExtended = false;
+anims.hasSprintJump = true;
+anims.hasMonkeyAutoJump = false;
+anims.hasCrawlspaceDive = true;
 anims.hasCrawlExtended = true;
 anims.hasCrouchRoll = true;
-anims.hasCrawlspaceSwandive = true;
 anims.hasOverhangClimb = true;
-anims.hasPose = false;
-anims.hasMonkeyAutoJump = false;
 SetAnimations(anims);

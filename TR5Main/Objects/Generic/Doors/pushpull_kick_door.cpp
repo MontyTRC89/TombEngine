@@ -30,9 +30,9 @@ namespace TEN::Entities::Doors
 		STATE_PUSHPULL_KICK_DOOR_PULL = 3
 	};
 
-	PHD_VECTOR PullDoorPos(-201, 0, 322);
-	PHD_VECTOR PushDoorPos(201, 0, -702);
-	PHD_VECTOR KickDoorPos(0, 0, -917);
+	Vector3Int PullDoorPos(-201, 0, 322);
+	Vector3Int PushDoorPos(201, 0, -702);
+	Vector3Int KickDoorPos(0, 0, -917);
 
 	OBJECT_COLLISION_BOUNDS PushPullKickDoorBounds =
 	{
@@ -61,7 +61,7 @@ namespace TEN::Entities::Doors
 
 			if (laraItem->RoomNumber == doorItem->RoomNumber)
 			{
-				doorItem->Position.yRot ^= ANGLE(180.0f);
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 				pull = true;
 			}
 
@@ -125,7 +125,7 @@ namespace TEN::Entities::Doors
 			}
 
 			if (pull)
-				doorItem->Position.yRot ^= ANGLE(180.0f);
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 		}
 		else if (doorItem->Animation.ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNumber, laraItem, coll);

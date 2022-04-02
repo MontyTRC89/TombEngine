@@ -67,19 +67,19 @@ void CobraControl(short itemNumber)
 		GetCreatureMood(item, &AI, 1);
 		CreatureMood(item, &AI, 1);
 
-		info->Target.x = LaraItem->Position.xPos;
-		info->Target.z = LaraItem->Position.zPos;
+		info->Target.x = LaraItem->Pose.Position.x;
+		info->Target.z = LaraItem->Pose.Position.z;
 		angle = CreatureTurn(item, info->MaxTurn);
 
 		if (AI.ahead)
 			head = AI.angle;
 
 		if (abs(AI.angle) < ANGLE(10.0f))
-			item->Position.yRot += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 		else if (AI.angle < 0)
-			item->Position.yRot -= ANGLE(10.0f);
+			item->Pose.Orientation.y -= ANGLE(10.0f);
 		else
-			item->Position.yRot += ANGLE(10.0f);
+			item->Pose.Orientation.y += ANGLE(10.0f);
 
 		switch (item->Animation.ActiveState)
 		{

@@ -86,7 +86,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 {
-	PHD_VECTOR pos = { 0, 0, 0 };
+	Vector3Int pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);
 
 	SPARKS* spark = &Sparks[GetFreeSpark()];
@@ -119,7 +119,7 @@ void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
 }
 
-static bool ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta)
+static bool ElectricityWireCheckDeadlyBounds(Vector3Int* pos, short delta)
 {
 	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
 		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
@@ -140,13 +140,13 @@ void ElectricityWiresControl(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
-	SoundEffect(SFX_TR5_ELECTRICWIRES, &item->Position, 0);
+	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose, 0);
 
 	GetCollidedObjects(item, SECTOR(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
 
 	auto* object = &Objects[item->ObjectNumber];
 
-	auto cableBox = TO_DX_BBOX(item->Position, GetBoundsAccurate(item));
+	auto cableBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
@@ -154,7 +154,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	for (int i = 0; i < object->nmeshes; i++)
 	{
-		auto pos = PHD_VECTOR(0, 0, CLICK(1));
+		auto pos = Vector3Int(0, 0, CLICK(1));
 		GetJointAbsPosition(item, &pos, i);
 
 		if (pos.y < cableBottomPlane)
@@ -192,11 +192,11 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = TO_DX_BBOX(collItem->Position, GetBoundsAccurate(collItem));
+		auto npcBox = TO_DX_BBOX(collItem->Pose, GetBoundsAccurate(collItem));
 
 		for (int i = 0; i < object->nmeshes; i++)
 		{
-			auto pos = PHD_VECTOR(0, 0, CLICK(1));
+			auto pos = Vector3Int(0, 0, CLICK(1));
 			GetJointAbsPosition(item, &pos, i);
 
 			short roomNumber = item->RoomNumber;
@@ -215,7 +215,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
-				PHD_VECTOR collPos = {};
+				Vector3Int collPos = {};
 				GetJointAbsPosition(collItem, &collPos, j);
 
 				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
@@ -250,9 +250,9 @@ void ElectricityWiresControl(short itemNumber)
 				}
 
 				TriggerDynamicLight(
-					collItem->Position.xPos,
-					collItem->Position.yPos,
-					collItem->Position.zPos,
+					collItem->Pose.Position.x,
+					collItem->Pose.Position.y,
+					collItem->Pose.Position.z,
 					5,
 					0,
 					(GetRandomControl() & 0x3F) + 0x2F,

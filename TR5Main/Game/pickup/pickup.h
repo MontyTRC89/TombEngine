@@ -2,13 +2,13 @@
 
 struct ITEM_INFO;
 struct CollisionInfo;
-struct PHD_VECTOR;
+struct Vector3Int;
 struct BOUNDING_BOX;
 enum GAME_OBJECT_ID : short;
 
 extern int NumRPickups;
 extern short RPickups[16];
-extern PHD_VECTOR OldPickupPos;
+extern Vector3Int OldPickupPos;
 
 void InitialisePickup(short itemNumber);
 void PickedUpObject(GAME_OBJECT_ID objectID, int count);

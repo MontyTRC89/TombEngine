@@ -86,9 +86,9 @@ static bool RatIsInWater(ITEM_INFO* item)
 	auto* creature = GetCreatureInfo(item);
 
 	EntityStoringInfo storingInfo;
-	storingInfo.x = item->Position.xPos;
-	storingInfo.y = item->Position.yPos;
-	storingInfo.z = item->Position.zPos;
+	storingInfo.x = item->Pose.Position.x;
+	storingInfo.y = item->Pose.Position.y;
+	storingInfo.z = item->Pose.Position.z;
 	storingInfo.roomNumber = item->RoomNumber;
 
 	GetFloor(storingInfo.x, storingInfo.y, storingInfo.z, &storingInfo.roomNumber);
@@ -121,7 +121,7 @@ void BigRatControl(short itemNumber)
 
 	short head = 0;
 	short angle = 0;
-	int waterHeight = GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
 	if (item->HitPoints <= 0)
 	{
@@ -274,8 +274,8 @@ void BigRatControl(short itemNumber)
 	if (RatIsInWater(item))
 	{
 		CreatureUnderwater(item, 0);
-		item->Position.yPos = waterHeight;
+		item->Pose.Position.y = waterHeight;
 	}
 	else
-		item->Position.yPos = item->Floor;
+		item->Pose.Position.y = item->Floor;
 }

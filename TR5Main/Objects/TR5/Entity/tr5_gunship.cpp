@@ -20,15 +20,15 @@ void ControlGunShip(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Position, 0);
+		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose, 0);
 
-		GAME_VECTOR pos;
+		GameVector pos;
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
 		pos.y = (GetRandomControl() & 0x1FF) - 255;
 		pos.z = (GetRandomControl() & 0x1FF) - 255;
-		GetLaraJointPosition((PHD_VECTOR*)&pos, LM_TORSO);
+		GetLaraJointPosition((Vector3Int*)&pos, LM_TORSO);
 
-		GAME_VECTOR end = pos;
+		GameVector end = pos;
 
 		if (!item->ItemFlags[0] && !item->ItemFlags[1] && !item->ItemFlags[2])
 		{
@@ -46,15 +46,15 @@ void ControlGunShip(short itemNumber)
 		item->ItemFlags[2] = pos.z / 16;
 
 		if (item->TriggerFlags == 1)
-			item->Position.zPos += (pos.z - item->Position.zPos) / 32;
+			item->Pose.Position.z += (pos.z - item->Pose.Position.z) / 32;
 		else
-			item->Position.xPos += (pos.x - item->Position.xPos) / 32;
-		item->Position.yPos += (pos.y - item->Position.yPos - 256) / 32;
+			item->Pose.Position.x += (pos.x - item->Pose.Position.x) / 32;
+		item->Pose.Position.y += (pos.y - item->Pose.Position.y - 256) / 32;
 
-		GAME_VECTOR start;
-		start.x = GetRandomControl() + item->Position.xPos - 128;
-		start.y = GetRandomControl() + item->Position.yPos - 128;
-		start.z = GetRandomControl() + item->Position.zPos - 128;
+		GameVector start;
+		start.x = GetRandomControl() + item->Pose.Position.x - 128;
+		start.y = GetRandomControl() + item->Pose.Position.y - 128;
+		start.z = GetRandomControl() + item->Pose.Position.z - 128;
 		start.roomNumber = item->RoomNumber;
 		bool los = LOS(&start, &end);
 
@@ -74,12 +74,12 @@ void ControlGunShip(short itemNumber)
 			item->MeshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_LARA_HK_FIRE, &item->Position, 0xC00004);
+			SoundEffect(SFX_LARA_HK_FIRE, &item->Pose, 0xC00004);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);
 
-		PHD_VECTOR hitPos;
+		Vector3Int hitPos;
 		MESH_INFO* hitMesh = NULL;
 		int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 
@@ -106,12 +106,12 @@ void ControlGunShip(short itemNumber)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-					TestTriggers(hitMesh->pos.xPos, hitMesh->pos.yPos, hitMesh->pos.zPos, end.roomNumber, true);
+					TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, end.roomNumber, true);
 					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos, 0);
 				}
 
-				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);
-				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);
+				TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
+				TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
 			}
 		}
 		else

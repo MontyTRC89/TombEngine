@@ -18,9 +18,9 @@ int NumberLosRooms;
 short LosRooms[20];
 int ClosestItem;
 int ClosestDist;
-PHD_VECTOR ClosestCoord;
+Vector3Int ClosestCoord;
 
-bool ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
+bool ClipTarget(GameVector* start, GameVector* target)
 {
 	int x, y, z, wx, wy, wz;
 
@@ -75,12 +75,12 @@ bool ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target)
 	return true;
 }
 
-bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool firing)
+bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firing)
 {
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();
 
-	GAME_VECTOR target = { dest->x, dest->y, dest->z };
+	GameVector target = { dest->x, dest->y, dest->z };
 	int result = LOS(src, &target);
 
 	GetFloor(target.x, target.y, target.z, &target.roomNumber);
@@ -97,7 +97,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 	bool hit = false;
 
 	MESH_INFO* mesh;
-	PHD_VECTOR vector;
+	Vector3Int vector;
 	int itemNumber = ObjectOnLOS2(src, dest, &vector, &mesh);
 	if (itemNumber != NO_LOS_ITEM)
 	{
@@ -121,7 +121,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 					if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterImpactData.impactDirection = direction;
-						ShatterImpactData.impactLocation = Vector3(mesh->pos.xPos, mesh->pos.yPos, mesh->pos.zPos);
+						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(NULL, mesh, 128, target.roomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = target.roomNumber;
 						SmashedMesh[SmashedMeshCount] = mesh;
@@ -130,8 +130,8 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 					}
 
-					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
-					TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
 				}
 				else
 				{
@@ -147,7 +147,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 							ShatterImpactData.impactDirection = direction;
 							ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 							ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-							TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+							TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
 							/*}
 							else
 							{
@@ -160,7 +160,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 								}
 								else
 								{
-									angle = phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos) - item->pos.yRot;
+									angle = phd_atan(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
 										item->HitPoints = 0;
@@ -180,7 +180,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 								{
 									// TR5
 									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
 								}
 							}
 							else
@@ -190,11 +190,11 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 								else
 								{
 									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
-										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Position.yRot, item->RoomNumber);
+										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, -5);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, -5);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
 									
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
@@ -228,7 +228,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 									if (item->Flags & IFLAG_ACTIVATION_MASK &&
 										(item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
 									{
-										TestTriggers(item->Position.xPos, item->Position.yPos - 256, item->Position.zPos, item->RoomNumber, true, item->Flags & IFLAG_ACTIVATION_MASK);
+										TestTriggers(item->Pose.Position.x, item->Pose.Position.y - 256, item->Pose.Position.z, item->RoomNumber, true, item->Flags & IFLAG_ACTIVATION_MASK);
 									}
 									else
 									{
@@ -251,7 +251,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 							}
 						}
 
-						TriggerRicochetSpark(&target, LaraItem->Position.yRot, 3, 0);
+						TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
 					}
 				}
 			}
@@ -278,7 +278,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 			target.z -= target.z - src->z >> 5;
 
 			if (firing && !result)
-				TriggerRicochetSpark(&target, LaraItem->Position.yRot, 8, 0);
+				TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 8, 0);
 		}
 	}
 
@@ -294,7 +294,7 @@ bool GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int drawTarget, bool fi
 	return hit;
 }
 
-int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
+int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
 {
 	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(end->x - start->x) + SQUARE(end->y - start->y) + SQUARE(end->z - start->z);
@@ -310,10 +310,10 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 
 			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 			{
-				pos.xPos = meshp->pos.xPos;
-				pos.yPos = meshp->pos.yPos;
-				pos.zPos = meshp->pos.zPos;
-				pos.yRot = meshp->pos.yRot;
+				pos.Position.x = meshp->pos.Position.x;
+				pos.Position.y = meshp->pos.Position.y;
+				pos.Position.z = meshp->pos.Position.z;
+				pos.Orientation.y = meshp->pos.Orientation.y;
 
 				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].collisionBox, &pos, vec, -1 - meshp->staticNumber))
 				{
@@ -341,10 +341,10 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 
 			auto* box = GetBoundsAccurate(item);
 
-			pos.xPos = item->Position.xPos;
-			pos.yPos = item->Position.yPos;
-			pos.zPos = item->Position.zPos;
-			pos.yRot = item->Position.yRot;
+			pos.Position.x = item->Pose.Position.x;
+			pos.Position.y = item->Pose.Position.y;
+			pos.Position.z = item->Pose.Position.z;
+			pos.Orientation.y = item->Pose.Orientation.y;
 
 			if (DoRayBox(start, end, box, &pos, vec, linknum))
 				end->roomNumber = LosRooms[r];
@@ -358,7 +358,7 @@ int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INF
 	return ClosestItem;
 }
 
-bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber)
+bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, Vector3Int* hitPos, short closesItemNumber)
 {
 	// Ray
 	FXMVECTOR rayStart = { (float)start->x, (float)start->y, (float)start->z };
@@ -379,9 +379,9 @@ bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS
 
 	// Get the raw collision point
 	Vector3 collidedPoint = rayStart + distance * rayDirNormalized;
-	hitPos->x = collidedPoint.x - itemOrStaticPos->xPos;
-	hitPos->y = collidedPoint.y - itemOrStaticPos->yPos;
-	hitPos->z = collidedPoint.z - itemOrStaticPos->zPos;
+	hitPos->x = collidedPoint.x - itemOrStaticPos->Position.x;
+	hitPos->y = collidedPoint.y - itemOrStaticPos->Position.y;
+	hitPos->z = collidedPoint.z - itemOrStaticPos->Position.z;
 
 	// Now in the case of items we need to test single spheres
 	int meshIndex = 0;
@@ -446,7 +446,7 @@ bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS
 				}
 #endif
 
-				PHD_VECTOR p[4];
+				Vector3Int p[4];
 
 				p[1].x = start->x;
 				p[1].y = start->y;
@@ -514,9 +514,9 @@ bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS
 		return false;
 
 	// Setup test result
-	ClosestCoord.x = hitPos->x + itemOrStaticPos->xPos;
-	ClosestCoord.y = hitPos->y + itemOrStaticPos->yPos;
-	ClosestCoord.z = hitPos->z + itemOrStaticPos->zPos;
+	ClosestCoord.x = hitPos->x + itemOrStaticPos->Position.x;
+	ClosestCoord.y = hitPos->y + itemOrStaticPos->Position.y;
+	ClosestCoord.z = hitPos->z + itemOrStaticPos->Position.z;
 	ClosestDist = distance;
 	ClosestItem = closesItemNumber;
 
@@ -527,7 +527,7 @@ bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
-		ShatterItem.yRot = item->Position.yRot;
+		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;
@@ -539,7 +539,7 @@ bool DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS
 	return true;
 }
 
-bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
+bool LOS(GameVector* start, GameVector* end)
 {
 	int result1, result2;
 
@@ -565,7 +565,7 @@ bool LOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return false;
 }
 
-int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
+int xLOS(GameVector* start, GameVector* end)
 {
 	int x, y, z;
 	FLOOR_INFO* floor;
@@ -686,7 +686,7 @@ int xLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return flag;
 }
 
-int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
+int zLOS(GameVector* start, GameVector* end)
 {
 	int  x, y, z;
 	FLOOR_INFO* floor;
@@ -807,7 +807,7 @@ int zLOS(GAME_VECTOR* start, GAME_VECTOR* end)
 	return flag;
 }
 
-bool LOSAndReturnTarget(GAME_VECTOR* start, GAME_VECTOR* target, int push)
+bool LOSAndReturnTarget(GameVector* start, GameVector* target, int push)
 {
 	int floorHeight, ceilingHeight;
 	FLOOR_INFO* floor;

@@ -256,7 +256,7 @@ void TribemanAxeControl(short itemNumber)
 					for (int i = 0; i < TribesmanAxeHit[item->Animation.ActiveState][2]; i += 8)
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
 
-					SoundEffect(70, &item->Position, 0);
+					SoundEffect(70, &item->Pose, 0);
 
 					LaraItem->HitPoints -= TribesmanAxeHit[item->Animation.ActiveState][2];
 					LaraItem->HitStatus = true;
@@ -266,9 +266,9 @@ void TribemanAxeControl(short itemNumber)
 			{
 				if (creature->Enemy)
 				{
-					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < 512 &&
-						abs(creature->Enemy->Position.yPos - item->Position.yPos) < 512 &&
-						abs(creature->Enemy->Position.zPos - item->Position.zPos) < 512 &&
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512 &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{
@@ -276,7 +276,7 @@ void TribemanAxeControl(short itemNumber)
 						creature->Enemy->HitStatus = true;
 
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
-						SoundEffect(70, &item->Position, 0);
+						SoundEffect(70, &item->Pose, 0);
 					}
 				}
 			}
@@ -301,13 +301,13 @@ static void TribesmanShotDart(ITEM_INFO* item)
 		dartItem->ObjectNumber = ID_DARTS;
 		dartItem->RoomNumber = item->RoomNumber;
 
-		PHD_VECTOR pos1;
+		Vector3Int pos1;
 		pos1.x = TribesmanDartBite2.x;
 		pos1.y = TribesmanDartBite2.y;
 		pos1.z = TribesmanDartBite2.z;
 		GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 
-		PHD_VECTOR pos2;
+		Vector3Int pos2;
 		pos2.x = TribesmanDartBite2.x;
 		pos2.y = TribesmanDartBite2.y;
 		pos2.z = TribesmanDartBite2.z * 2;
@@ -316,14 +316,14 @@ static void TribesmanShotDart(ITEM_INFO* item)
 		short angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-		dartItem->Position.xPos = pos1.x;
-		dartItem->Position.yPos = pos1.y;
-		dartItem->Position.zPos = pos1.z;
+		dartItem->Pose.Position.x = pos1.x;
+		dartItem->Pose.Position.y = pos1.y;
+		dartItem->Pose.Position.z = pos1.z;
 
 		InitialiseItem(dartItemNumber);
 
-		dartItem->Position.xRot = angles[1];
-		dartItem->Position.yRot = angles[0];
+		dartItem->Pose.Orientation.x = angles[1];
+		dartItem->Pose.Orientation.y = angles[0];
 		dartItem->Animation.Velocity = CLICK(1);
 
 		AddActiveItem(dartItemNumber);
@@ -393,7 +393,7 @@ void TribemanDartsControl(short itemNumber)
 
 		if (item->HitStatus ||
 			(creature->Enemy == LaraItem && (AI.distance < SECTOR(1) ||
-				TargetVisible(item, &AI)) && (abs(LaraItem->Position.yPos - item->Position.yPos) < SECTOR(2))))
+				TargetVisible(item, &AI)) && (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(2))))
 		{
 			AlertAllGuards(itemNumber);
 		}
@@ -544,11 +544,11 @@ void TribemanDartsControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < ANGLE(2.0f))
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
-				item->Position.yRot += ANGLE(2.0f);
+				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15)
 			{
@@ -563,7 +563,7 @@ void TribemanDartsControl(short itemNumber)
 			{
 				if (!(creature->Flags & 0xf000) && item->TouchBits & 0x2400)
 				{
-					SoundEffect(70, &item->Position, 0);
+					SoundEffect(70, &item->Pose, 0);
 					CreatureEffect(item, &TribesmanDartBite1, DoBloodSplat);
 					creature->Flags |= 0x1000;
 
@@ -575,15 +575,15 @@ void TribemanDartsControl(short itemNumber)
 			{
 				if (!(creature->Flags & 0xf000) && creature->Enemy)
 				{
-					if (abs(creature->Enemy->Position.xPos - item->Position.xPos) < pow(SECTOR(0.5f), 2) &&
-						abs(creature->Enemy->Position.yPos - item->Position.yPos) < pow(SECTOR(0.5f), 2) &&
-						abs(creature->Enemy->Position.zPos - item->Position.zPos) < pow(SECTOR(0.5f), 2))
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < pow(SECTOR(0.5f), 2) &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < pow(SECTOR(0.5f), 2) &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < pow(SECTOR(0.5f), 2))
 					{
 						creature->Enemy->HitPoints -= 5;
 						creature->Enemy->HitStatus = true;
 						creature->Flags |= 0x1000;
 
-						SoundEffect(70, &item->Position, 0);
+						SoundEffect(70, &item->Pose, 0);
 					}
 				}
 			}

@@ -57,8 +57,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Animation.ActiveState == 8)
 					{
-						item->Position.xRot = 0;
-						item->Position.yPos = item->Floor;
+						item->Pose.Orientation.x = 0;
+						item->Pose.Position.y = item->Floor;
 					}
 					else
 					{
@@ -67,19 +67,19 @@ namespace TEN::Entities::TR4
 						item->Animation.ActiveState = 6;
 						item->Animation.Velocity = 0;
 						item->Animation.Airborne = true;
-						item->Position.xRot = 0;
+						item->Pose.Orientation.x = 0;
 					}
 				}
-				else if (item->Position.yPos >= item->Floor)
+				else if (item->Pose.Position.y >= item->Floor)
 				{
-					item->Position.yPos = item->Floor;
+					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
 					item->Animation.TargetState = 8;
 				}
 			}
 
-			item->Position.xRot = 0;
+			item->Pose.Orientation.x = 0;
 		}
 		else
 		{
@@ -105,7 +105,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case 1:
-				item->Position.yPos = item->Floor;
+				item->Pose.Position.y = item->Floor;
 				creature->MaxTurn = ANGLE(1.0f);
 
 				if (item->HitStatus ||
@@ -170,9 +170,9 @@ namespace TEN::Entities::TR4
 			case 5:
 				creature->Flags = 0;
 
-				item->Position.yPos += 51;
-				if (item->Position.yPos > item->Floor)
-					item->Position.yPos = item->Floor;
+				item->Pose.Position.y += 51;
+				if (item->Pose.Position.y > item->Floor)
+					item->Pose.Position.y = item->Floor;
 
 				break;
 

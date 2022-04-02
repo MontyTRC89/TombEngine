@@ -46,12 +46,12 @@ static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
 	{
 		auto* fx = &EffectList[fxNumber];
 
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		fx->pos.yRot = pos->yRot;
-		fx->pos.zRot = 0;
+		fx->pos.Position.x = pos->Position.x;
+		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
+		fx->pos.Position.z = pos->Position.z;
+		fx->pos.Orientation.x = pos->Orientation.x;
+		fx->pos.Orientation.y = pos->Orientation.y;
+		fx->pos.Orientation.z = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -32768;
 		fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -65,8 +65,8 @@ static void TriggerHarpyFlame(short itemNumber, byte number, int size)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int dx = LaraItem->Position.xPos - item->Position.xPos;
-	int dz = LaraItem->Position.zPos - item->Position.zPos;
+	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
 	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 		dz >= -SECTOR(16) && dz <= SECTOR(16))
@@ -110,8 +110,8 @@ static void TriggerHarpyFlame(short itemNumber, byte number, int size)
 
 static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
 {
-	int dx = LaraItem->Position.xPos - x;
-	int dz = LaraItem->Position.zPos - z;
+	int dx = LaraItem->Pose.Position.x - x;
+	int dz = LaraItem->Pose.Position.z - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -148,13 +148,13 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 {
 	item->ItemFlags[0]++;
 
-	PHD_VECTOR pos1;
+	Vector3Int pos1;
 	pos1.x = HarpyAttack1.x;
 	pos1.y = HarpyAttack1.y;
 	pos1.z = HarpyAttack1.z;
 	GetJointAbsPosition(item, &pos1, HarpyAttack1.meshNum);
 
-	PHD_VECTOR pos2;
+	Vector3Int pos2;
 	pos2.x = HarpyAttack2.x;
 	pos2.y = HarpyAttack2.y;
 	pos2.z = HarpyAttack2.z;
@@ -195,16 +195,16 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 	{
 		if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 		{
-			PHD_VECTOR pos3;
+			Vector3Int pos3;
 			pos3.x = HarpyAttack1.x;
 			pos3.y = HarpyAttack1.y * 2;
 			pos3.z = HarpyAttack1.z;
 			GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
 			PHD_3DPOS pos;
-			pos.xPos = pos1.x;
-			pos.yPos = pos1.y;
-			pos.zPos = pos1.z;
+			pos.Position.x = pos1.x;
+			pos.Position.y = pos1.y;
+			pos.Position.z = pos1.z;
 
 			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -212,25 +212,25 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 				pos3.z - pos1.z,
 				angles);
 
-			pos.xRot = angles[1];
-			pos.yRot = angles[0];
-			pos.zRot = 0;
+			pos.Orientation.x = angles[1];
+			pos.Orientation.y = angles[0];
+			pos.Orientation.z = 0;
 
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}
 
 		if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 		{
-			PHD_VECTOR pos3;
+			Vector3Int pos3;
 			pos3.x = HarpyAttack2.x;
 			pos3.y = HarpyAttack2.y * 2;
 			pos3.z = HarpyAttack2.z;
 			GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
 			PHD_3DPOS pos;
-			pos.xPos = pos1.x;
-			pos.yPos = pos1.y;
-			pos.zPos = pos1.z;
+			pos.Position.x = pos1.x;
+			pos.Position.y = pos1.y;
+			pos.Position.z = pos1.z;
 
 			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -238,9 +238,9 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 				pos3.z - pos1.z,
 				angles);
 
-			pos.xRot = angles[1];
-			pos.yRot = angles[0];
-			pos.zRot = 0;
+			pos.Orientation.x = angles[1];
+			pos.Orientation.y = angles[0];
+			pos.Orientation.z = 0;
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}
 	}
@@ -285,8 +285,8 @@ void HarpyControl(short itemNumber)
 			{
 				if (state == 1)
 				{
-					item->Position.xRot = 0;
-					item->Position.yPos = item->Floor;
+					item->Pose.Orientation.x = 0;
+					item->Pose.Position.y = item->Floor;
 				}
 				else
 				{
@@ -295,7 +295,7 @@ void HarpyControl(short itemNumber)
 					item->Animation.ActiveState = 9;
 					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;
-					item->Position.xRot = 0;
+					item->Pose.Orientation.x = 0;
 				}
 
 				CreatureTilt(item, 0);
@@ -311,15 +311,15 @@ void HarpyControl(short itemNumber)
 		else
 			item->Animation.TargetState = STATE_HARPY_FALLING;
 
-		if (item->Position.yPos >= item->Floor)
+		if (item->Pose.Position.y >= item->Floor)
 		{
-			item->Position.yPos = item->Floor;
+			item->Pose.Position.y = item->Floor;
 			item->Animation.VerticalVelocity = 0;
 			item->Animation.TargetState = STATE_HARPY_DEATH;
 			item->Animation.Airborne = false;
 		}
 
-		item->Position.xRot = 0;
+		item->Pose.Orientation.x = 0;
 	}
 	else
 	{
@@ -341,8 +341,8 @@ void HarpyControl(short itemNumber)
 
 			if (target->ObjectNumber == ID_LARA_DOUBLE)
 			{
-				int dx = target->Position.xPos - item->Position.xPos;
-				int dz = target->Position.zPos - item->Position.zPos;
+				int dx = target->Pose.Position.x - item->Pose.Position.x;
+				int dz = target->Pose.Position.z - item->Pose.Position.z;
 				int distance = dx * dx + dz * dz;
 
 				if (distance < minDistance)
@@ -358,7 +358,7 @@ void HarpyControl(short itemNumber)
 		CreatureAIInfo(item, &info);
 
 		if (creature->Enemy != LaraItem)
-			phd_atan(LaraItem->Position.zPos - item->Position.zPos, LaraItem->Position.xPos - item->Position.xPos);
+			phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
 		GetCreatureMood(item, &info, VIOLENT);
 		CreatureMood(item, &info, VIOLENT);
@@ -383,8 +383,8 @@ void HarpyControl(short itemNumber)
 
 			if (creature->Enemy)
 			{
-				height = (item->Position.yPos + SECTOR(2));
-				if (creature->Enemy->Position.yPos > height && item->Floor > height)
+				height = (item->Pose.Position.y + SECTOR(2));
+				if (creature->Enemy->Pose.Position.y > height && item->Floor > height)
 				{
 					item->Animation.TargetState = 3;
 					break;
@@ -392,7 +392,7 @@ void HarpyControl(short itemNumber)
 			}
 			if (info.ahead)
 			{
-				dy = abs(creature->Enemy->Position.yPos - item->Position.yPos);
+				dy = abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y);
 				if (dy <= SECTOR(1))
 				{
 					if (info.distance < pow(341, 2))
@@ -486,7 +486,7 @@ void HarpyControl(short itemNumber)
 
 		case 3:
 			if (!creature->Enemy ||
-				creature->Enemy->Position.yPos < (item->Position.yPos + SECTOR(2)))
+				creature->Enemy->Pose.Position.y < (item->Pose.Position.y + SECTOR(2)))
 			{
 				item->Animation.TargetState = STATE_HARPY_STOP;
 			}
@@ -509,7 +509,7 @@ void HarpyControl(short itemNumber)
 
 			if (item->TouchBits & 0x14 ||
 				creature->Enemy && creature->Enemy != LaraItem &&
-				abs(creature->Enemy->Position.yPos - item->Position.yPos) <= SECTOR(1) &&
+				abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 				info.distance < pow(SECTOR(2), 2))
 			{
 				LaraItem->HitPoints -= 10;
@@ -543,7 +543,7 @@ void HarpyControl(short itemNumber)
 			if (creature->Flags == 0 &&
 				(item->TouchBits & 0x300000 ||
 					creature->Enemy && creature->Enemy != LaraItem &&
-					abs(creature->Enemy->Position.yPos - item->Position.yPos) <= SECTOR(1) &&
+					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					info.distance < pow(SECTOR(2), 2)))
 			{
 				LaraItem->HitPoints -= 100;

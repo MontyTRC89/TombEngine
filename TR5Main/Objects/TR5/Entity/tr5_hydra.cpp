@@ -48,13 +48,13 @@ void InitialiseHydra(short itemNumber)
 	item->Animation.ActiveState = HYDRA_STATE_STOP;
 
 	if (item->TriggerFlags == 1)
-		item->Position.zPos += CLICK(1.5f);
+		item->Pose.Position.z += CLICK(1.5f);
 
 	if (item->TriggerFlags == 2)
-		item->Position.zPos -= CLICK(1.5f);
+		item->Pose.Position.z -= CLICK(1.5f);
 
-	item->Position.yRot = ANGLE(90.0f);
-	item->Position.xPos -= CLICK(1);
+	item->Pose.Orientation.y = ANGLE(90.0f);
+	item->Pose.Position.x -= CLICK(1);
 }
 
 static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
@@ -64,12 +64,12 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 	{
 		auto* fx = &EffectList[fxNum];
 
-		fx->pos.xPos = pos->xPos;
-		fx->pos.yPos = pos->yPos - (GetRandomControl() & 0x3F) - 32;
-		fx->pos.zPos = pos->zPos;
-		fx->pos.xRot = pos->xRot;
-		fx->pos.yRot = pos->yRot;
-		fx->pos.zRot = 0;
+		fx->pos.Position.x = pos->Position.x;
+		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
+		fx->pos.Position.z = pos->Position.z;
+		fx->pos.Orientation.x = pos->Orientation.x;
+		fx->pos.Orientation.y = pos->Orientation.y;
+		fx->pos.Orientation.z = 0;
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 0;
@@ -79,7 +79,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 	}
 }
 
-void TriggerHydraMissileSparks(PHD_VECTOR* pos, short xv, short yv, short zv)
+void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 {
 	auto* spark = &Sparks[GetFreeSpark()];
 
@@ -196,12 +196,12 @@ void HydraControl(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Position.yRot += ANGLE(1.0f);
+					item->Pose.Orientation.y += ANGLE(1.0f);
 				else
-					item->Position.yRot -= ANGLE(1.0f);
+					item->Pose.Orientation.y -= ANGLE(1.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->TriggerFlags == 1)
 				tilt = -ANGLE(2.8f);
@@ -219,7 +219,7 @@ void HydraControl(short itemNumber)
 		joint0 = -joint1;
 
 		int distance, damage, frame;
-		PHD_VECTOR pos1, pos2;
+		Vector3Int pos1, pos2;
 		short angles[2];
 		short roomNumber;
 
@@ -259,7 +259,7 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
-					CreatureEffect2(item, &HydraBite, 10, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
@@ -278,7 +278,7 @@ void HydraControl(short itemNumber)
 					{
 						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
-						CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
+						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 					}
 				}
 			}
@@ -303,7 +303,7 @@ void HydraControl(short itemNumber)
 				{
 					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
-					CreatureEffect2(item, &HydraBite, 10 * damage, item->Position.yRot, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 				}
 			}
 
@@ -335,12 +335,12 @@ void HydraControl(short itemNumber)
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				PHD_3DPOS pos;
-				pos.xPos = pos1.x;
-				pos.yPos = pos1.y;
-				pos.zPos = pos1.z;
-				pos.xRot = angles[1];
-				pos.yRot = angles[0];
-				pos.zRot = 0;
+				pos.Position.x = pos1.x;
+				pos.Position.y = pos1.y;
+				pos.Position.z = pos1.z;
+				pos.Orientation.x = angles[1];
+				pos.Orientation.y = angles[0];
+				pos.Orientation.z = 0;
 
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
@@ -397,7 +397,7 @@ void HydraControl(short itemNumber)
 			if (item->ItemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->ItemFlags[3], 0, 64);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Position, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
 				item->ItemFlags[3]++;
 			}
 		}

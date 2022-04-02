@@ -18,9 +18,9 @@ using namespace TEN::Renderer;
 
 void ShiftItem(ITEM_INFO* item, CollisionInfo* coll)
 {
-	item->Position.xPos += coll->Shift.x;
-	item->Position.yPos += coll->Shift.y;
-	item->Position.zPos += coll->Shift.z;
+	item->Pose.Position.x += coll->Shift.x;
+	item->Pose.Position.y += coll->Shift.y;
+	item->Pose.Position.z += coll->Shift.z;
 	coll->Shift.x = 0;
 	coll->Shift.y = 0;
 	coll->Shift.z = 0;
@@ -36,8 +36,8 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int z)
 		float s = phd_sin(angle);
 		float c = phd_cos(angle);
 
-		item->Position.xPos += round(x * s);
-		item->Position.zPos += round(x * c);
+		item->Pose.Position.x += round(x * s);
+		item->Pose.Position.z += round(x * c);
 	}
 
 	if (z != 0)
@@ -45,20 +45,20 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int z)
 		float s = phd_sin(angle + ANGLE(90.0f));
 		float c = phd_cos(angle + ANGLE(90.0f));
 
-		item->Position.xPos += round(z * s);
-		item->Position.zPos += round(z * c);
+		item->Pose.Position.x += round(z * s);
+		item->Pose.Position.z += round(z * c);
 	}
 }
 
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
-		item->Position.yRot = coll->NearestLedgeAngle;
+		item->Pose.Orientation.y = coll->NearestLedgeAngle;
 
-	item->Position.xRot = 0;
-	item->Position.zRot = 0;
-	item->Position.xPos += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Position.zPos += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.z = 0;
+	item->Pose.Position.x += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier)
@@ -71,32 +71,32 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float of
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Position.xRot = 0;
-	item->Position.yRot = angle2;
-	item->Position.zRot = 0;
-	item->Position.xPos += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Position.zPos += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.y = angle2;
+	item->Pose.Orientation.z = 0;
+	item->Pose.Position.x += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
-	int direction = (unsigned short)(item->Position.yRot + ANGLE(45.0f)) / ANGLE(90.0f);
+	int direction = (unsigned short)(item->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
 
 	switch (direction)
 	{
 	case NORTH:
-		item->Position.zPos = (item->Position.zPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z | (WALL_SIZE - 1)) - coll->Setup.Radius;
 		break;
 	case EAST:
-		item->Position.xPos = (item->Position.xPos | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x | (WALL_SIZE - 1)) - coll->Setup.Radius;
 		break;
 	case SOUTH:
-		item->Position.zPos = (item->Position.zPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
 		break;
 	case WEST:
-		item->Position.xPos = (item->Position.xPos & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
 		break;
 	}
 }
@@ -120,11 +120,11 @@ CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int hei
 	float s = phd_sin(angle);
 	float c = phd_cos(angle);
 
-	auto x = item->Position.xPos + (distance * s) + (side * c);
-	auto y = item->Position.yPos + height;
-	auto z = item->Position.zPos + (distance * c) + (-side * s);
+	auto x = item->Pose.Position.x + (distance * s) + (side * c);
+	auto y = item->Pose.Position.y + height;
+	auto z = item->Pose.Position.z + (distance * c) + (-side * s);
 
-	return GetCollision(x, y, z, GetRoom(item->Location, item->Position.xPos, y, item->Position.zPos).roomNumber);
+	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
 }
 
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
@@ -133,8 +133,8 @@ CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int hei
 CollisionResult GetCollision(ITEM_INFO* item)
 {
 	auto room = item->RoomNumber;
-	auto floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &room);
-	auto result = GetCollision(floor, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
+	auto result = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 	result.RoomNumber = room;
 	return result;
@@ -209,10 +209,10 @@ CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z)
 
 void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom)
 {
-	GetCollisionInfo(coll, item, PHD_VECTOR(), resetRoom);
+	GetCollisionInfo(coll, item, Vector3Int(), resetRoom);
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, bool resetRoom)
+void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
@@ -225,9 +225,9 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	coll->Shift.z = 0;
 
 	// Offset base probe position by provided offset, if any.
-	int xPos = item->Position.xPos + offset.x;
-	int yPos = item->Position.yPos + offset.y;
-	int zPos = item->Position.zPos + offset.z;
+	int xPos = item->Pose.Position.x + offset.x;
+	int yPos = item->Pose.Position.y + offset.y;
+	int zPos = item->Pose.Position.z + offset.z;
 
 	// Specify base probe position, Y position being bounds top side.
 	int x = xPos;
@@ -299,7 +299,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
-	auto collResult = GetCollision(x, item->Position.yPos, z, item->RoomNumber);
+	auto collResult = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
@@ -399,13 +399,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->Front.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
@@ -457,13 +457,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
@@ -510,13 +510,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->FrontLeft.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
@@ -568,13 +568,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->MiddleRight.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
@@ -621,13 +621,13 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, PHD_VECTOR offset, b
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockDeathFlagDown && 
+	else if (coll->Setup.BlockDeathFloorDown && 
 			 coll->FrontRight.Floor >= CLICK(0.5f) &&
 			 collResult.BottomBlock->Flags.Death)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
-	else if (coll->Setup.BlockNoMonkeyFlag &&
+	else if (coll->Setup.BlockMonkeySwingEdge &&
 			!collResult.BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
@@ -824,10 +824,10 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short 
 		return;
 	}
 
-	GAME_VECTOR pos = {};
-	pos.x = item->Position.xPos;
-	pos.y = item->Position.yPos;
-	pos.z = item->Position.zPos;
+	GameVector pos = {};
+	pos.x = item->Pose.Position.x;
+	pos.y = item->Pose.Position.y;
+	pos.z = item->Pose.Position.z;
 	pos.roomNumber = item->RoomNumber;
 
 	auto* bounds = GetBoundsAccurate(item);
@@ -835,8 +835,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short 
 	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = phd_sin(item->Position.yRot) * radiusZ;
-	auto frontZ = phd_cos(item->Position.yRot) * radiusZ;
+	auto frontX = phd_sin(item->Pose.Orientation.y) * radiusZ;
+	auto frontZ = phd_cos(item->Pose.Orientation.y) * radiusZ;
 	auto leftX  = -frontZ * ratioXZ;
 	auto leftZ  =  frontX * ratioXZ;
 	auto rightX =  frontZ * ratioXZ;
@@ -855,8 +855,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short 
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Position.xRot = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Position.zRot = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	item->Pose.Orientation.x = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	item->Pose.Orientation.z = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
 int GetQuadrant(short angle)
@@ -877,14 +877,14 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
 	auto frontalOffset = coll->Setup.Radius * 0.3f;
-	auto x = item->Position.xPos + frontalOffset * s;
-	auto z = item->Position.zPos + frontalOffset * c;
+	auto x = item->Pose.Position.x + frontalOffset * s;
+	auto z = item->Pose.Position.z + frontalOffset * c;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
 	int headroom = abs(bounds->Y2 - bounds->Y1) / 20.0f;
-	int yPoints[2] = { item->Position.yPos + bounds->Y1 + headroom,
-					   item->Position.yPos + bounds->Y2 - headroom };
+	int yPoints[2] = { item->Pose.Position.y + bounds->Y1 + headroom,
+					   item->Pose.Position.y + bounds->Y2 - headroom };
 
 	// Prepare test data
 	float finalDistance[2] = { FLT_MAX, FLT_MAX };
@@ -987,7 +987,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			{
 				// Get and test DX item coll bounds
 				auto bounds = GetBoundsAccurate(&g_Level.Items[bridge]);
-				auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].Position, bounds);
+				auto dxBounds = TO_DX_BBOX(g_Level.Items[bridge].Pose, bounds);
 
 				// Decompose bounds into planes
 				Vector3 corners[8];
@@ -1157,13 +1157,13 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 
 	// HACK: Remove item from bridge objects temporarily.
 	probe.Block->RemoveItem(itemNumber);
-	auto height = GetFloorHeight(probe.Block, item->Position.xPos, item->Position.yPos, item->Position.zPos);
+	auto height = GetFloorHeight(probe.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 	probe.Block->AddItem(itemNumber);
 
 	auto bounds = GetBoundsAccurate(item);
 	int minHeight = precise ? bounds->Y2 : 0;
 
-	return (minHeight + item->Position.yPos - height);
+	return (minHeight + item->Pose.Position.y - height);
 }
 
 void AlterFloorHeight(ITEM_INFO* item, int height)
@@ -1177,8 +1177,8 @@ void AlterFloorHeight(ITEM_INFO* item, int height)
 	}
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Position.xPos, item->Position.yPos, item->Position.zPos, &roomNumber);
-	FLOOR_INFO* ceiling = GetFloor(item->Position.xPos, height + item->Position.yPos - SECTOR(1), item->Position.zPos, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FLOOR_INFO* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - SECTOR(1), item->Pose.Position.z, &roomNumber);
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
@@ -1228,7 +1228,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 int GetWaterSurface(ITEM_INFO* item)
 {
-	return GetWaterSurface(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	return GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
 int GetWaterDepth(int x, int y, int z, short roomNumber)
@@ -1314,7 +1314,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 
 int GetWaterDepth(ITEM_INFO* item)
 {
-	return GetWaterDepth(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	return GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
 int GetWaterHeight(int x, int y, int z, short roomNumber)
@@ -1409,7 +1409,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 int GetWaterHeight(ITEM_INFO* item)
 {
-	return GetWaterHeight(item->Position.xPos, item->Position.yPos, item->Position.zPos, item->RoomNumber);
+	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt)

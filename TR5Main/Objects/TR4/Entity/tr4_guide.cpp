@@ -71,14 +71,14 @@ void GuideControl(short itemNumber)
 	// Ignite torch
 	if (item->ItemFlags[1] == 2)
 	{
-		PHD_VECTOR pos;
+		Vector3Int pos;
 		pos.x = GuideBite1.x;
 		pos.y = GuideBite1.y;
 		pos.z = GuideBite1.z;
 		GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
 		AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
-		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Position, 0);
+		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 		TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		short random = GetRandomControl();
@@ -114,10 +114,10 @@ void GuideControl(short itemNumber)
 	AI_INFO AI;
 	AI_INFO laraAI;
 
-	int dx = LaraItem->Position.xPos - item->Position.xPos;
-	int dz = LaraItem->Position.zPos - item->Position.zPos;
+	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	laraAI.angle = phd_atan(dz, dx) - item->Position.yRot;
+	laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 
 	laraAI.ahead = true;
 	if (laraAI.angle <= -ANGLE(90.0f) || laraAI.angle >= ANGLE(90.0f))
@@ -132,7 +132,7 @@ void GuideControl(short itemNumber)
 	dx = abs(dx);
 	dz = abs(dz);
 
-	int dy = item->Position.yPos - LaraItem->Position.yPos;
+	int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
 	short rot2 = 0;
 
 	if (dx <= dz)
@@ -159,11 +159,11 @@ void GuideControl(short itemNumber)
 				auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
 
 				if (currentItem->ObjectNumber != ID_GUIDE &&
-					abs(currentItem->Position.yPos - item->Position.yPos) <= 512)
+					abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
 				{
-					dx = currentItem->Position.xPos - item->Position.xPos;
-					dy = currentItem->Position.yPos - item->Position.yPos;
-					dz = currentItem->Position.zPos - item->Position.zPos;
+					dx = currentItem->Pose.Position.x - item->Pose.Position.x;
+					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
+					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
 					if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
 						distance = 0x7FFFFFFF;
@@ -203,7 +203,7 @@ void GuideControl(short itemNumber)
 
 	bool someFlag = false;
 	FLOOR_INFO* floor;
-	PHD_VECTOR pos1;
+	Vector3Int pos1;
 	int frameNumber;
 	short random;
 
@@ -528,7 +528,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Position.yRot -= 399;
+			item->Pose.Orientation.y -= 399;
 
 		break;
 
@@ -545,12 +545,12 @@ void GuideControl(short itemNumber)
 		if (abs(AI.angle) >= ANGLE(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Position.yRot += ANGLE(7.0f);
+				item->Pose.Orientation.y += ANGLE(7.0f);
 			else
-				item->Position.yRot -= ANGLE(7.0f);
+				item->Pose.Orientation.y -= ANGLE(7.0f);
 		}
 		else
-			item->Position.yRot += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		if (!creature->Flags)
 		{
@@ -559,9 +559,9 @@ void GuideControl(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
 				{
-					dx = abs(enemy->Position.xPos - item->Position.xPos);
-					dy = abs(enemy->Position.yPos - item->Position.yPos);
-					dz = abs(enemy->Position.zPos - item->Position.zPos);
+					dx = abs(enemy->Pose.Position.x - item->Pose.Position.x);
+					dy = abs(enemy->Pose.Position.y - item->Pose.Position.y);
+					dz = abs(enemy->Pose.Position.z - item->Pose.Position.z);
 
 					if (dx < CLICK(2) &&
 						dy < CLICK(2) &&
@@ -592,7 +592,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Position.yRot += 399;
+			item->Pose.Orientation.y += 399;
 
 		break;
 
@@ -600,11 +600,11 @@ void GuideControl(short itemNumber)
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Position.yRot - item->Position.yRot;
+			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
 			if (deltaAngle < -ANGLE(2.0f))
-				item->Position.yRot -= ANGLE(2.0f);
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else if (deltaAngle > ANGLE(2.0f))
-				item->Position.yRot = ANGLE(2.0f);
+				item->Pose.Orientation.y = ANGLE(2.0f);
 		}
 
 		if (item->Animation.RequiredState == 43)
@@ -632,12 +632,12 @@ void GuideControl(short itemNumber)
 		{
 			someFlag = true;
 
-			item->Position.xPos = enemy->Position.xPos;
-			item->Position.yPos = enemy->Position.yPos;
-			item->Position.zPos = enemy->Position.zPos;
-			item->Position.xRot = enemy->Position.xRot;
-			item->Position.yRot = enemy->Position.yRot;
-			item->Position.zRot = enemy->Position.zRot;
+			item->Pose.Position.x = enemy->Pose.Position.x;
+			item->Pose.Position.y = enemy->Pose.Position.y;
+			item->Pose.Position.z = enemy->Pose.Position.z;
+			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
+			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 35)
 		{
@@ -653,8 +653,8 @@ void GuideControl(short itemNumber)
 
 				if (currentItem->ObjectNumber >= ID_ANIMATING1 &&
 					currentItem->ObjectNumber <= ID_ANIMATING15 &&
-					trunc(item->Position.xPos) == trunc(currentItem->Position.xPos) &&
-					trunc(item->Position.zPos) == trunc(currentItem->Position.zPos))
+					trunc(item->Pose.Position.x) == trunc(currentItem->Pose.Position.x) &&
+					trunc(item->Pose.Position.z) == trunc(currentItem->Pose.Position.z))
 				{
 					break;
 				}
@@ -681,9 +681,9 @@ void GuideControl(short itemNumber)
 	case 38:
 		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 		{
-			item->Position.xPos = enemy->Position.xPos;
-			item->Position.yPos = enemy->Position.yPos;
-			item->Position.zPos = enemy->Position.zPos;
+			item->Pose.Position.x = enemy->Pose.Position.x;
+			item->Pose.Position.y = enemy->Pose.Position.y;
+			item->Pose.Position.z = enemy->Pose.Position.z;
 		}
 		else
 		{
@@ -691,7 +691,7 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				item->Position.yRot = enemy->Position.yRot;
+				item->Pose.Orientation.y = enemy->Pose.Orientation.y;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
@@ -700,13 +700,13 @@ void GuideControl(short itemNumber)
 			}
 			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
 			{
-				if (enemy->Position.yRot - item->Position.yRot <= ANGLE(2.0f))
+				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
 				{
-					if (enemy->Position.yRot - item->Position.yRot < -ANGLE(2.0f))
-						item->Position.yRot -= ANGLE(2.0f);
+					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
+						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Position.yRot += ANGLE(2.0f);
+					item->Pose.Orientation.y += ANGLE(2.0f);
 			}
 		}
 
@@ -732,16 +732,16 @@ void GuideControl(short itemNumber)
 			{
 				item->Animation.RequiredState = GUIDE_STATE_RUN;
 				item->SwapMeshFlags |= 0x200000;
-				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Position, 0);
+				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
 			}
 		}
-		else if (enemy->Position.yRot - item->Position.yRot <= ANGLE(2.0f))
+		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
 		{
-			if (enemy->Position.yRot - item->Position.yRot < -ANGLE(2.0f))
-				item->Position.yRot -= ANGLE(2.0f);
+			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
+				item->Pose.Orientation.y -= ANGLE(2.0f);
 		}
 		else
-			item->Position.yRot += ANGLE(2.0f);
+			item->Pose.Orientation.y += ANGLE(2.0f);
 
 		break;
 
@@ -791,7 +791,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Position, &enemy->Position, 15, enemy->Position.yRot - item->Position.yRot, ANGLE(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(10.0f));
 
 	default:
 		break;

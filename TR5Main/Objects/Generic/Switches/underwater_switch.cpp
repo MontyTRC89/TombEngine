@@ -22,7 +22,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	PHD_VECTOR UnderwaterSwitchPos = { 0, 0, 108 };
+	Vector3Int UnderwaterSwitchPos = { 0, 0, 108 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds1 =
 	{
@@ -33,7 +33,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	PHD_VECTOR CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
+	Vector3Int CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
 
 	OBJECT_COLLISION_BOUNDS CeilingUnderwaterSwitchBounds2 =
 	{
@@ -44,7 +44,7 @@ namespace TEN::Entities::Switches
 		-ANGLE(80.0f), ANGLE(80.0f),
 		-ANGLE(80.0f), ANGLE(80.0f)
 	};
-	PHD_VECTOR CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
+	Vector3Int CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
 	void UnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
@@ -119,7 +119,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (TestLaraPosition(&CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
@@ -129,7 +129,7 @@ namespace TEN::Entities::Switches
 						lara->InteractedItem = itemNumber;
 				}
 
-				laraItem->Position.yRot ^= (short)ANGLE(180.0f);
+				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 			}
 
 			if (flag)
@@ -143,9 +143,9 @@ namespace TEN::Entities::Switches
 
 				AddActiveItem(itemNumber);
 
-				ForcedFixedCamera.x = switchItem->Position.xPos - SECTOR(1) * phd_sin(switchItem->Position.yRot + ANGLE(90.0f));
-				ForcedFixedCamera.y = switchItem->Position.yPos - SECTOR(1);
-				ForcedFixedCamera.z = switchItem->Position.zPos - SECTOR(1) * phd_cos(switchItem->Position.yRot + ANGLE(90.0f));
+				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
+				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
+				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
 				ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
 			}
 		}

@@ -16,12 +16,12 @@ void DoBoatWakeEffect(ITEM_INFO* sBoatItem);
 BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, CollisionInfo* coll);
 bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction);
 void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
-int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, PHD_VECTOR* pos);
+int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vector3Int* pos);
 
 void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNumber);
-short SpeedBoatDoShift(ITEM_INFO* sBoatItem, PHD_VECTOR* pos, PHD_VECTOR* old);
+short SpeedBoatDoShift(ITEM_INFO* sBoatItem, Vector3Int* pos, Vector3Int* old);
 
-int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, PHD_VECTOR* moved);
+int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, Vector3Int* moved);
 int DoSpeedBoatDynamics(int height, int verticalVelocity, int* y);
 int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber);
 bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);

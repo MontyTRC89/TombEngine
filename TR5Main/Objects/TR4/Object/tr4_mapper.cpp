@@ -26,11 +26,11 @@ namespace TEN::Entities::TR4
 
         if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase >= 200)
         {
-            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Position, 0);
+            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Pose, 0);
 
             item->MeshBits |= 2;
 
-            PHD_VECTOR pos = { 0, 0, 0 };
+            Vector3Int pos = { 0, 0, 0 };
             GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
 
             byte color = (GetRandomControl() & 0x1F) + 192;

@@ -87,10 +87,10 @@ void ControlGladiator(short itemNumber)
 		}
 		else
 		{
-			int dx = LaraItem->Position.xPos - item->Position.xPos;
-			int dz = LaraItem->Position.zPos - item->Position.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			rot = phd_atan(dz, dx) - item->Position.yRot;
+			rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
 			if (rot <= -ANGLE(90.0f) || rot >= ANGLE(90.0f))
 				unknown = false;
 
@@ -298,18 +298,18 @@ void ControlGladiator(short itemNumber)
 			if (abs(AI.angle) >= ANGLE(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Position.yRot += ANGLE(7.0f);
+					item->Pose.Orientation.y += ANGLE(7.0f);
 				else
-					item->Position.yRot -= ANGLE(7.0f);
+					item->Pose.Orientation.y -= ANGLE(7.0f);
 			}
 			else
-				item->Position.yRot += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10)
 			{
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 
-				PHD_VECTOR pos = { 0, 0, 0 };
+				Vector3Int pos = { 0, 0, 0 };
 				GetJointAbsPosition(item, &pos, 16);
 
 				auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
@@ -319,9 +319,9 @@ void ControlGladiator(short itemNumber)
 					{
 						auto* mesh = &room->mesh[i];
 
-						if (!((pos.z ^ mesh->pos.zPos) & 0xFFFFFC00))
+						if (!((pos.z ^ mesh->pos.Position.z) & 0xFFFFFC00))
 						{
-							if (!((pos.x ^ mesh->pos.xPos) & 0xFFFFFC00))
+							if (!((pos.x ^ mesh->pos.Position.x) & 0xFFFFFC00))
 							{
 								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 								{
@@ -340,8 +340,8 @@ void ControlGladiator(short itemNumber)
 				{
 					if (item->TouchBits & 0x6000)
 					{
-						CreatureEffect2(item, &GladiatorBite, 10, item->Position.yRot, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Position, 0);
+						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 120;
