@@ -37,7 +37,7 @@ void InitialiseLagoonWitch(short itemNumber)
 	item->Animation.TargetState = WITCH_STATE_IDLE;
 	item->Animation.ActiveState = WITCH_STATE_IDLE;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Pose.Position.y += 512;
+	item->Pose.Position.y += CLICK(2);
 }
 
 void LagoonWitchControl(short itemNumber)
@@ -129,7 +129,6 @@ void LagoonWitchControl(short itemNumber)
 			{
 				CreatureEffect2(item, &LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 				creature->Flags = WITCH_STATE_SWIM;
-
 
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;

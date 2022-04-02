@@ -14,7 +14,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 		if (item->Pose.Orientation.y > 0)
 		{
 			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += 512;
+				item->Pose.Position.x += CLICK(2);
 		}
 		else if (item->Pose.Orientation.y)
 		{

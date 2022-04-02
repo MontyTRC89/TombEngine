@@ -104,9 +104,7 @@ void SpidersEmitterControl(short itemNumber)
 			{
 				auto* spider = &Spiders[spiderNumber];
 
-				spider->Pose.Position.x = item->Pose.Position.x;
-				spider->Pose.Position.y = item->Pose.Position.y;
-				spider->Pose.Position.z = item->Pose.Position.z;
+				spider->Pose.Position = item->Pose.Position;
 				spider->RoomNumber = item->RoomNumber;
 
 				if (item->ItemFlags[0])
@@ -116,8 +114,8 @@ void SpidersEmitterControl(short itemNumber)
 				}
 				else
 				{
-					spider->VerticalVelocity = 0;
 					spider->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45.0f);
+					spider->VerticalVelocity = 0;
 				}
 
 				spider->Pose.Orientation.x = 0;
