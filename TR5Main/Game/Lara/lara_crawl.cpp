@@ -374,7 +374,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(lara->Control.Weapon.GunType) &&
-			item->Animation.AnimNumber != LA_CROUCH_TO_CRAWL_START)) // TODO: This is a hack.
+			HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -385,8 +385,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
-			if (TrInput & (IN_ACTION | IN_JUMP) &&
-				crawlVaultResult.Success &&
+			if (TrInput & (IN_ACTION | IN_JUMP) && crawlVaultResult.Success &&
 				g_GameFlow->Animations.HasCrawlExtended)
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
