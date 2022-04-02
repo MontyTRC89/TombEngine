@@ -11,38 +11,48 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
+#include "Game/misc.h"
 
 BITE_INFO TroopsBite1 = { 0, 300, 64, 7 };
 
-#define STATE_TROOPS_STOP						1
-#define STATE_TROOPS_WALK						2
-#define STATE_TROOPS_RUN						3
-#define STATE_TROOPS_GUARD						4
-#define STATE_TROOPS_ATTACK1					5
-#define STATE_TROOPS_ATTACK2					6
-#define STATE_TROOPS_DEATH						7
-#define STATE_TROOPS_AIM1						8
-#define STATE_TROOPS_AIM2						9
-#define STATE_TROOPS_AIM3						10
-#define STATE_TROOPS_ATTACK3					11
-#define STATE_TROOPS_KILLED_BY_SCORPION			15
-#define STATE_TROOPS_ATTACKED_BY_SCORPION		16
-#define STATE_TROOPS_FLASHED					17
+enum TroopState
+{
+	TROOP_STATE_IDLE = 1,
+	TROOP_STATE_WALK = 2,
+	TROOP_STATE_RUN = 3,
+	TROOP_STATE_GUARD = 4,
+	TROOP_STATE_ATTACK_1 = 5,
+	TROOP_STATE_ATTACK_2 = 6,
+	TROOP_STATE_DEATH = 7,
+	TROOP_STATE_AIM_1 = 8,
+	TROOP_STATE_AIM_2 = 9,
+	TROOP_STATE_AIM_3 = 10,
+	TROOP_STATE_ATTACK_3 = 11,
+	TROOP_STATE_KILLED_BY_SCORPION = 15,
+	TROOP_STATE_ATTACKED_BY_SCORPION = 16,
+	TROOP_STATE_FLASHED = 17
+};
+
+// TODO
+enum TroopAnim
+{
+
+};
 
 void InitialiseTroops(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
 	if (item->TriggerFlags == 1)
 	{
-		item->Animation.TargetState = item->Animation.ActiveState = STATE_TROOPS_ATTACKED_BY_SCORPION;
+		item->Animation.TargetState = item->Animation.ActiveState = TROOP_STATE_ATTACKED_BY_SCORPION;
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
 	}
 	else
 	{
-		item->Animation.TargetState = item->Animation.ActiveState = STATE_TROOPS_STOP;
+		item->Animation.TargetState = item->Animation.ActiveState = TROOP_STATE_IDLE;
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
 	}
 
@@ -54,16 +64,16 @@ void TroopsControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CreatureInfo* creature = (CreatureInfo*)item->Data;
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+	auto* object = &Objects[item->ObjectNumber];
 	
 	short angle = 0;
 	short tilt = 0;
+	short rot = 0;
 	short joint0 = 0;
 	short joint1 = 0;
 	short joint2 = 0;
-	short rot = 0;
 	
 	int dx = 0;
 	int dy = 0;
@@ -73,13 +83,9 @@ void TroopsControl(short itemNumber)
 
 	if (creature->FiredWeapon)
 	{
-		Vector3Int pos;
-
-		pos.x = TroopsBite1.x;
-		pos.y = TroopsBite1.y;
-		pos.z = TroopsBite1.z;
-
+		auto pos = Vector3Int(TroopsBite1.x, TroopsBite1.y, TroopsBite1.z);
 		GetJointAbsPosition(item, &pos, TroopsBite1.meshNum);
+
 		TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * creature->FiredWeapon + 8, 24, 16, 4);
 
 		creature->FiredWeapon--;
@@ -87,49 +93,42 @@ void TroopsControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != STATE_TROOPS_DEATH 
-			&& item->Animation.ActiveState != STATE_TROOPS_KILLED_BY_SCORPION)
+		if (item->Animation.ActiveState != TROOP_STATE_DEATH &&
+			item->Animation.ActiveState != TROOP_STATE_KILLED_BY_SCORPION)
 		{
-			if (creature->Enemy 
-				&& creature->Enemy->ObjectNumber == ID_BIG_SCORPION 
-				&& item->ItemFlags[0] < 80)
+			if (creature->Enemy &&
+				creature->Enemy->ObjectNumber == ID_BIG_SCORPION &&
+				item->ItemFlags[0] < 80)
 			{
 				if (creature->Enemy->Animation.AnimNumber == Objects[ID_BIG_SCORPION].animIndex + 6)
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
-					if (item->Animation.ActiveState == STATE_TROOPS_ATTACKED_BY_SCORPION)
-					{
+
+					if (item->Animation.ActiveState == TROOP_STATE_ATTACKED_BY_SCORPION)
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 37;
-					}
 					else
-					{
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					}
-					item->Animation.TargetState = STATE_TROOPS_KILLED_BY_SCORPION;
-					item->Animation.ActiveState = STATE_TROOPS_KILLED_BY_SCORPION;
+
+					item->Animation.ActiveState = TROOP_STATE_KILLED_BY_SCORPION;
+					item->Animation.TargetState = TROOP_STATE_KILLED_BY_SCORPION;
 
 					angle = 0;
 
-					item->Pose.Position.x = creature->Enemy->Pose.Position.x;
-					item->Pose.Position.y = creature->Enemy->Pose.Position.y;
-					item->Pose.Position.z = creature->Enemy->Pose.Position.z;
-
-					item->Pose.Orientation.x = creature->Enemy->Pose.Orientation.x;
-					item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.y;
-					item->Pose.Orientation.z = creature->Enemy->Pose.Orientation.z;
+					item->Pose.Position = creature->Enemy->Pose.Position;
+					item->Pose.Orientation = creature->Enemy->Pose.Orientation;
 
 					creature->Enemy->TriggerFlags = 99;
 				}
 				else
 				{
-					angle = 0;
 					item->ItemFlags[0]++;
+					angle = 0;
 				}
 			}
 			else
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-				item->Animation.ActiveState = STATE_TROOPS_DEATH;
+				item->Animation.ActiveState = TROOP_STATE_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
@@ -140,18 +139,19 @@ void TroopsControl(short itemNumber)
 			GetAITarget(creature);
 		else
 		{
-			// Search for active troops
+			// Search for active troops.
 			creature->Enemy = NULL;
-			CreatureInfo* baddy = ActiveCreatures[0];
-			int minDistance = 0x7FFFFFFF;
+			CreatureInfo* currentCreature = ActiveCreatures[0];
+			
+			int minDistance = INT_MAX;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				baddy = ActiveCreatures[i];
+				currentCreature = ActiveCreatures[i];
 
-				if (baddy->ItemNumber != NO_ITEM && baddy->ItemNumber != itemNumber)
+				if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
 				{
-					ITEM_INFO* currentItem = &g_Level.Items[baddy->ItemNumber];
+					auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 
 					if (currentItem->ObjectNumber != ID_LARA)
 					{
@@ -162,7 +162,7 @@ void TroopsControl(short itemNumber)
 							dy = currentItem->Pose.Position.y - item->Pose.Position.y;
 							dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-							distance = SQUARE(dx) + SQUARE(dy) + SQUARE(dz);
+							distance = pow(dx, 2) + pow(dy, 2) + pow(dz, 2);
 
 							if (distance < minDistance)
 							{
@@ -175,34 +175,34 @@ void TroopsControl(short itemNumber)
 			}
 		}
 		
-		if (creature->HurtByLara && item->Animation.ActiveState != STATE_TROOPS_ATTACKED_BY_SCORPION)
+		if (creature->HurtByLara && item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)
 			creature->Enemy = LaraItem;
 
-		AI_INFO info;	
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;	
+		CreatureAIInfo(item, &AI);
 
 		int distance = 0;
 		if (creature->Enemy == LaraItem)
 		{
-			distance = info.distance;
-			rot = info.angle;
+			distance = AI.distance;
+			rot = AI.angle;
 		}
 		else
 		{
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			distance = SQUARE(dx) + SQUARE(dz);
+			distance = pow(dx, 2) + pow(dz, 2);
 			rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
 		}
 
 		if (!creature->HurtByLara && creature->Enemy == LaraItem)
 			creature->Enemy = NULL;
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
 		// Vehicle handling
-		if (Lara.Vehicle != NO_ITEM && info.bite)
+		if (Lara.Vehicle != NO_ITEM && AI.bite)
 			creature->Mood = MoodType::Escape;
 
 		angle = CreatureTurn(item, creature->MaxTurn);
@@ -212,296 +212,243 @@ void TroopsControl(short itemNumber)
 
 		switch (item->Animation.ActiveState)
 		{
-		case STATE_TROOPS_STOP:
-			creature->Flags = 0;
+		case TROOP_STATE_IDLE:
 			creature->MaxTurn = 0;
+			creature->Flags = 0;
 			joint2 = rot;
 
-			if (item->Animation.AnimNumber == obj->animIndex + 17)
+			if (item->Animation.AnimNumber == object->animIndex + 17)
 			{
-				if (abs(info.angle) >= ANGLE(10))
+				if (abs(AI.angle) >= ANGLE(10.0f))
 				{
-					if (info.angle >= 0)
-					{
-						item->Pose.Orientation.y += ANGLE(10);
-					}
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(10.0f);
 					else
-					{
-						item->Pose.Orientation.y -= ANGLE(10);
-					}
+						item->Pose.Orientation.y -= ANGLE(10.0f);
 				}
 				else
-				{
-					item->Pose.Orientation.y += info.angle;
-				}
+					item->Pose.Orientation.y += AI.angle;
 			}
 
 			if (item->AIBits & GUARD)
 			{
 				joint2 = AIGuard(creature);
+
 				if (!GetRandomControl())
 				{
-					if (item->Animation.ActiveState == STATE_TROOPS_STOP)
-					{
-						item->Animation.TargetState = STATE_TROOPS_GUARD;
-					}
+					if (item->Animation.ActiveState == TROOP_STATE_IDLE)
+						item->Animation.TargetState = TROOP_STATE_GUARD;
 					else
-					{
-						item->Animation.TargetState = STATE_TROOPS_STOP;
-					}
+						item->Animation.TargetState = TROOP_STATE_IDLE;
 				}
 			}
 			else if (item->AIBits & PATROL1)
 			{
-				item->Animation.TargetState = STATE_TROOPS_WALK;
+				item->Animation.TargetState = TROOP_STATE_WALK;
 				joint2 = 0;
 			}
 			else if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = TROOP_STATE_RUN;
+			else if (Targetable(item, &AI))
 			{
-				item->Animation.TargetState = STATE_TROOPS_RUN;
-			}
-			else if (Targetable(item, &info))
-			{
-				if (info.distance < SQUARE(3072) || info.zoneNumber != info.enemyZone)
+				if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 				{
 					if (GetRandomControl() >= 16384)
-					{
-						item->Animation.TargetState = STATE_TROOPS_AIM3;
-					}
+						item->Animation.TargetState = TROOP_STATE_AIM_3;
 					else
-					{
-						item->Animation.TargetState = STATE_TROOPS_AIM1;
-					}
+						item->Animation.TargetState = TROOP_STATE_AIM_1;
 				}
 				else
-				{
-					item->Animation.TargetState = STATE_TROOPS_WALK;
-				}
+					item->Animation.TargetState = TROOP_STATE_WALK;
 			}
 			else
 			{
-				if ((creature->Alerted 
-					|| creature->Mood != MoodType::Bored)
-					&& (!(item->AIBits & FOLLOW) 
-						|| !(item->AIBits & MODIFY) 
-						&& distance <= SQUARE(2048)))
+				if ((creature->Alerted ||
+					creature->Mood != MoodType::Bored) &&
+					(!(item->AIBits & FOLLOW) ||
+						!(item->AIBits & MODIFY) &&
+						distance <= pow(SECTOR(2), 2)))
 				{
-					if (creature->Mood == MoodType::Bored || info.distance <= SQUARE(2048))
+					if (creature->Mood == MoodType::Bored || AI.distance <= pow(SECTOR(2), 2))
 					{
-						item->Animation.TargetState = STATE_TROOPS_WALK;
+						item->Animation.TargetState = TROOP_STATE_WALK;
 						break;
 					}
-					item->Animation.TargetState = STATE_TROOPS_RUN;
+
+					item->Animation.TargetState = TROOP_STATE_RUN;
 				}
 				else
-				{
-					item->Animation.TargetState = STATE_TROOPS_STOP;
-				}
+					item->Animation.TargetState = TROOP_STATE_IDLE;
 			}
 
 			break;
 
-		case STATE_TROOPS_WALK:
+		case TROOP_STATE_WALK:
+			creature->MaxTurn = ANGLE(5.0f);
 			creature->Flags = 0;
 			joint2 = rot;
-			creature->MaxTurn = ANGLE(5);
 
 			if (item->AIBits & PATROL1)
-			{
-				item->Animation.TargetState = STATE_TROOPS_WALK;
-			}
+				item->Animation.TargetState = TROOP_STATE_WALK;
 			else if (creature->Mood == MoodType::Escape)
-			{
-				item->Animation.TargetState = STATE_TROOPS_RUN;
-			}
+				item->Animation.TargetState = TROOP_STATE_RUN;
 			else
 			{
-				if ((item->AIBits & GUARD)
-					|| (item->AIBits & FOLLOW) 
-					&& (creature->ReachedGoal 
-						|| distance > SQUARE(2048)))
+				if (item->AIBits & GUARD ||
+					item->AIBits & FOLLOW &&
+					(creature->ReachedGoal ||
+						distance > pow(SECTOR(2), 2)))
 				{
-					item->Animation.TargetState = STATE_TROOPS_STOP;
+					item->Animation.TargetState = TROOP_STATE_IDLE;
 				}
-				else if (Targetable(item, &info))
+				else if (Targetable(item, &AI))
 				{
-					if (info.distance < SQUARE(3072) || info.enemyZone != info.zoneNumber)
-					{
-						item->Animation.TargetState = STATE_TROOPS_STOP;
-					}
+					if (AI.distance < pow(SECTOR(3), 2) || AI.enemyZone != AI.zoneNumber)
+						item->Animation.TargetState = TROOP_STATE_IDLE;
 					else
-					{
-						item->Animation.TargetState = STATE_TROOPS_AIM2;
-					}
+						item->Animation.TargetState = TROOP_STATE_AIM_2;
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (info.distance > SQUARE(2048))
-					{
-						item->Animation.TargetState = STATE_TROOPS_RUN;
-					}
+					if (AI.distance > pow(SECTOR(2), 2))
+						item->Animation.TargetState = TROOP_STATE_RUN;
 				}
-				else if (info.ahead)
-				{
-					item->Animation.TargetState = STATE_TROOPS_STOP;
-				}
+				else if (AI.ahead)
+					item->Animation.TargetState = TROOP_STATE_IDLE;
 			}
 
 			break;
 
-		case STATE_TROOPS_RUN:
-			if (info.ahead)
-			{
-				joint2 = info.angle;
-			}
-			creature->MaxTurn = ANGLE(10);
+		case TROOP_STATE_RUN:
+			creature->MaxTurn = ANGLE(10.0f);
 			tilt = angle / 2;
 
-			if ((item->AIBits & GUARD) 
-				|| (item->AIBits & FOLLOW) 
-				&& (creature->ReachedGoal 
-					|| distance > SQUARE(2048)))
+			if (AI.ahead)
+				joint2 = AI.angle;
+
+			if (item->AIBits & GUARD ||
+				item->AIBits & FOLLOW &&
+				(creature->ReachedGoal ||
+					distance > pow(SECTOR(2), 2)))
 			{
-				item->Animation.TargetState = STATE_TROOPS_WALK;
+				item->Animation.TargetState = TROOP_STATE_WALK;
 			}
 			else if (creature->Mood != MoodType::Escape)
 			{
-				if (Targetable(item, &info))
+				if (Targetable(item, &AI))
+					item->Animation.TargetState = TROOP_STATE_WALK;
+				else if (creature->Mood == MoodType::Bored ||
+					creature->Mood == MoodType::Stalk &&
+					!(item->AIBits & FOLLOW) &&
+					AI.distance < pow(SECTOR(2), 2))
 				{
-					item->Animation.TargetState = STATE_TROOPS_WALK;
-				}
-				else if (creature->Mood == MoodType::Bored 
-					|| creature->Mood == MoodType::Stalk 
-					&& !(item->AIBits & FOLLOW) 
-					&& info.distance < SQUARE(2048))
-				{
-					item->Animation.TargetState = STATE_TROOPS_WALK;
+					item->Animation.TargetState = TROOP_STATE_WALK;
 				}
 			}
 
 			break;
 
-		case STATE_TROOPS_GUARD:
-			creature->Flags = 0;
+		case TROOP_STATE_GUARD:
 			creature->MaxTurn = 0;
+			creature->Flags = 0;
 			joint2 = rot;
 
 			if (item->AIBits & GUARD)
 			{
 				joint2 = AIGuard(creature);
 				if (!GetRandomControl())
-				{
-					item->Animation.TargetState = STATE_TROOPS_STOP;
-				}
+					item->Animation.TargetState = TROOP_STATE_IDLE;
 			}
-			else if (Targetable(item, &info))
-			{
-				item->Animation.TargetState = STATE_TROOPS_ATTACK1;
-			}
-			else if (creature->Mood != MoodType::Bored || !info.ahead)
-			{
-				item->Animation.TargetState = STATE_TROOPS_STOP;
-			}
+			else if (Targetable(item, &AI))
+				item->Animation.TargetState = TROOP_STATE_ATTACK_1;
+			else if (creature->Mood != MoodType::Bored || !AI.ahead)
+				item->Animation.TargetState = TROOP_STATE_IDLE;
 
 			break;
 
-		case STATE_TROOPS_ATTACK1:
-		case STATE_TROOPS_ATTACK2:
-			if (info.ahead)
+		case TROOP_STATE_ATTACK_1:
+		case TROOP_STATE_ATTACK_2:
+			if (AI.ahead)
 			{
-				joint0 = info.angle;
-				joint1 = info.xAngle;
+				joint0 = AI.angle;
+				joint1 = AI.xAngle;
 			}
 
 			if (creature->Flags)
-			{
 				creature->Flags--;
-			}
 			else
 			{
-				ShotLara(item, &info, &TroopsBite1, joint0, 23);
+				ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 				creature->Flags = 5;
 			}
 
 			break;
 
-		case STATE_TROOPS_AIM1:
-		case STATE_TROOPS_AIM3:
+		case TROOP_STATE_AIM_1:
+		case TROOP_STATE_AIM_3:
 			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				joint1 = info.xAngle;
-				joint0 = info.angle;
+				joint1 = AI.xAngle;
+				joint0 = AI.angle;
 
-				if (Targetable(item, &info))
-				{
-					item->Animation.TargetState = item->Animation.ActiveState != STATE_TROOPS_AIM1 ? STATE_TROOPS_ATTACK3 : STATE_TROOPS_ATTACK1;
-				}
+				if (Targetable(item, &AI))
+					item->Animation.TargetState = item->Animation.ActiveState != TROOP_STATE_AIM_1 ? TROOP_STATE_ATTACK_3 : TROOP_STATE_ATTACK_1;
 				else
-				{
-					item->Animation.TargetState = STATE_TROOPS_STOP;
-				}
+					item->Animation.TargetState = TROOP_STATE_IDLE;
 			}
 
 			break;
 
-		case STATE_TROOPS_AIM2:
+		case TROOP_STATE_AIM_2:
 			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				joint1 = info.xAngle;
-				joint0 = info.angle;
+				joint1 = AI.xAngle;
+				joint0 = AI.angle;
 
-				if (Targetable(item, &info))
-				{
-					item->Animation.TargetState = STATE_TROOPS_ATTACK2;
-				}
+				if (Targetable(item, &AI))
+					item->Animation.TargetState = TROOP_STATE_ATTACK_2;
 				else
-				{
-					item->Animation.TargetState = STATE_TROOPS_WALK;
-				}
+					item->Animation.TargetState = TROOP_STATE_WALK;
 			}
 
 			break;
 
-		case STATE_TROOPS_ATTACK3:
-			if (item->Animation.TargetState != STATE_TROOPS_STOP
-				&& (creature->Mood == MoodType::Escape || 
-					info.distance > SQUARE(3072) || 
-					!Targetable(item, &info)))
+		case TROOP_STATE_ATTACK_3:
+			if (item->Animation.TargetState != TROOP_STATE_IDLE &&
+				(creature->Mood == MoodType::Escape ||
+					AI.distance > pow(SECTOR(3), 2) ||
+					!Targetable(item, &AI)))
 			{
-				item->Animation.TargetState = STATE_TROOPS_STOP;
+				item->Animation.TargetState = TROOP_STATE_IDLE;
 			}
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				joint0 = info.angle;
-				joint1 = info.xAngle;
+				joint0 = AI.angle;
+				joint1 = AI.xAngle;
 			}
 
 			if (creature->Flags)
-			{
 				creature->Flags--;
-			}
 			else
 			{
-				ShotLara(item, &info, &TroopsBite1, joint0, 23);
+				ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 				creature->Flags = 5;
 			}
 
 			break;
 
-		case STATE_TROOPS_ATTACKED_BY_SCORPION:
+		case TROOP_STATE_ATTACKED_BY_SCORPION:
 			creature->MaxTurn = 0;
 			break;
 
-		case STATE_TROOPS_FLASHED:
+		case TROOP_STATE_FLASHED:
 			if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
-			{
-				item->Animation.TargetState = STATE_TROOPS_GUARD;
-			}
+				item->Animation.TargetState = TROOP_STATE_GUARD;
 
 			break;
 
@@ -511,12 +458,12 @@ void TroopsControl(short itemNumber)
 
 		if (WeaponEnemyTimer > 100)
 		{
-			if (item->Animation.ActiveState != STATE_TROOPS_FLASHED 
-				&& item->Animation.ActiveState != STATE_TROOPS_ATTACKED_BY_SCORPION)
+			if (item->Animation.ActiveState != TROOP_STATE_FLASHED 
+				&& item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)
 			{
 				creature->MaxTurn = 0;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
-				item->Animation.ActiveState = STATE_TROOPS_FLASHED;
+				item->Animation.ActiveState = TROOP_STATE_FLASHED;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
 			}
 		}
