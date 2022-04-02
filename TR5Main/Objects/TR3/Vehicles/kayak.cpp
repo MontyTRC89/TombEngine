@@ -60,6 +60,7 @@ using std::vector;
 #define KAYAK_IN_BACK		IN_BACK
 #define KAYAK_IN_LEFT		IN_LEFT
 #define KAYAK_IN_RIGHT		IN_RIGHT
+#define KAYAK_IN_HOLD		IN_WALK
 #define KAYAK_IN_HOLD_LEFT	IN_LSTEP
 #define KAYAK_IN_HOLD_RIGHT	IN_RSTEP
 #define KAYAK_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
@@ -416,12 +417,8 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	{
 		int sinkval = lara->WaterCurrentActive - 1;
 		
-		Vector3Int target;
-		target.x = g_Level.Sinks[sinkval].x;
-		target.y = g_Level.Sinks[sinkval].y;
-		target.z = g_Level.Sinks[sinkval].z;
-		
-		int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90))) / 16) & 4095;
+		auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
+		int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f))) / 16) & 4095;
 
 		int dx = target.x - laraItem->Pose.Position.x;
 		int dz = target.z - laraItem->Pose.Position.z;
@@ -791,17 +788,15 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			kayak->Forward = false;
 		}
-		else if (TrInput & KAYAK_IN_HOLD_LEFT &&
+		else if ((TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) &&
 			(kayak->Velocity ||
-				lara->WaterCurrentPull.x ||
-				lara->WaterCurrentPull.z))
+				lara->WaterCurrentPull.x || lara->WaterCurrentPull.z))
 		{
 			laraItem->Animation.TargetState = KAYAK_STATE_HOLD_LEFT;
 		}
-		else if (TrInput & KAYAK_IN_HOLD_RIGHT &&
+		else if ((TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) &&
 			(kayak->Velocity ||
-				lara->WaterCurrentPull.x ||
-				lara->WaterCurrentPull.z))
+				lara->WaterCurrentPull.x || lara->WaterCurrentPull.z))
 		{
 			laraItem->Animation.TargetState = KAYAK_STATE_HOLD_RIGHT;
 		}
@@ -956,7 +951,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		break;
 		
 	case KAYAK_STATE_HOLD_LEFT:
-		if (!(TrInput & KAYAK_IN_HOLD_LEFT) ||
+		if (!(TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) ||
 			(!kayak->Velocity &&
 				!lara->WaterCurrentPull.x &&
 				!lara->WaterCurrentPull.z))
@@ -992,7 +987,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		break;
 		
 	case KAYAK_STATE_HOLD_RIGHT:
-		if (!(TrInput & KAYAK_IN_HOLD_RIGHT) ||
+		if (!(TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) ||
 			(!kayak->Velocity &&
 				!lara->WaterCurrentPull.x &&
 				!lara->WaterCurrentPull.z))

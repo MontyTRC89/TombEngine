@@ -516,28 +516,28 @@ enum LaraAnim
 	LA_CRAWL_TO_HANG_START = 289,									// Crawl > hang (1/3)
 	LA_CRAWL_TO_HANG_CONTINUE = 290,								// Crawl > hang (2/3)
 																		// TODO: position commands in 302 may be stacked in 290, so can remove 302?
-	LA_CROUCH_PICKUP = 291,									// Crouching pickup
-	LA_CRAWL_PICKUP = 292,									// Crawling pickup
-	LA_CROUCH_HIT_BACK = 293,								// Jerk back crouching from damage
-	LA_CROUCH_HIT_FRONT = 294,								// Jerk forward crouching from damage
-	LA_CROUCH_HIT_LEFT = 295,								// Jerk right crouching from damage
-	LA_CROUCH_HIT_RIGHT = 296,								// Jerk left crouching from damage
-	LA_CRAWL_HIT_BACK = 297,								// Jerk forward crawling from damage
-	LA_CRAWL_HIT_FRONT = 298,								// Jerk back crawling from damage
-	LA_CRAWL_HIT_LEFT = 299,								// Jerk left crawling from damage
-	LA_CRAWL_HIT_RIGHT = 300,								// Jerk right crawling from damage
-	LA_CRAWL_DEATH = 301,									// Crawl death
-	LA_CRAWL_TO_HANG_END = 302,								// Crawl > hang (3/3)
-	LA_STAND_TO_CROUCH_ABORT = 303,							// Stand > crouch abort
-	LA_RUN_TO_CROUCH_LEFT_START = 304,						// Run > crouch, left foot first (1/2)
-	LA_RUN_TO_CROUCH_RIGHT_START = 305,						// Run > crouch, right foot first (1/2)
-	LA_RUN_TO_CROUCH_LEFT_END = 306,						// Run > crouch, left foot first (2/2)
-	LA_RUN_TO_CROUCH_RIGHT_END = 307,						// Run > crouch, right foot first (2/2)
-	LA_SPRINT_ROLL_TO_RUN_RIGHT_START = 308,				// Sprint roll, right foot first > run (2/2)
-	LA_SPRINT_ROLL_TO_RUN_RIGHT_END = 309,					// Sprint roll, right foot first > run (2/2)
-	LA_SPRINT_TO_CROUCH_LEFT = 310,							// Sprint roll, left foot first > crouch
-	LA_SPRINT_TO_CROUCH_RIGHT = 311,						// Sprint roll, right foot first > crouch
-	LA_CROUCH_PICKUP_FLARE = 312,							// Pickup flare crouching
+	LA_CROUCH_PICKUP = 291,											// Crouching pickup
+	LA_CRAWL_PICKUP = 292,											// Crawling pickup
+	LA_CROUCH_HIT_BACK = 293,										// Jerk back crouching from damage
+	LA_CROUCH_HIT_FRONT = 294,										// Jerk forward crouching from damage
+	LA_CROUCH_HIT_LEFT = 295,										// Jerk right crouching from damage
+	LA_CROUCH_HIT_RIGHT = 296,										// Jerk left crouching from damage
+	LA_CRAWL_HIT_BACK = 297,										// Jerk forward crawling from damage
+	LA_CRAWL_HIT_FRONT = 298,										// Jerk back crawling from damage
+	LA_CRAWL_HIT_LEFT = 299,										// Jerk left crawling from damage
+	LA_CRAWL_HIT_RIGHT = 300,										// Jerk right crawling from damage
+	LA_CRAWL_DEATH = 301,											// Crawl death
+	LA_CRAWL_TO_HANG_END = 302,										// Crawl > hang (3/3)
+	LA_STAND_TO_CROUCH_ABORT = 303,									// Stand > crouch abort
+	LA_RUN_TO_CROUCH_LEFT_START = 304,								// Run > crouch, left foot first (1/2)
+	LA_RUN_TO_CROUCH_RIGHT_START = 305,								// Run > crouch, right foot first (1/2)
+	LA_RUN_TO_CROUCH_LEFT_END = 306,								// Run > crouch, left foot first (2/2)
+	LA_RUN_TO_CROUCH_RIGHT_END = 307,								// Run > crouch, right foot first (2/2)
+	LA_SPRINT_ROLL_TO_RUN_RIGHT_START = 308,						// Sprint roll, right foot first > run (2/2)
+	LA_SPRINT_ROLL_TO_RUN_RIGHT_END = 309,							// Sprint roll, right foot first > run (2/2)
+	LA_SPRINT_TO_CROUCH_LEFT = 310,									// Sprint roll, left foot first > crouch
+	LA_SPRINT_TO_CROUCH_RIGHT = 311,								// Sprint roll, right foot first > crouch
+	LA_CROUCH_PICKUP_FLARE = 312,									// Pickup flare crouching
 
 	// TR4
 	LA_DOOR_OPEN_PUSH = 313,								// Push door open using doorknob
@@ -787,9 +787,21 @@ enum LaraAnim
 	LA_RUN_TO_STAND_LEFT_SOFT = 545,
 	LA_RUN_TO_STAND_RIGHT_SOFT = 546,
 	LA_MONKEY_JUMP_START = 547,
-	LA_MONKEY_JUMP = 548,
+	LA_MONKEY_JUMP_CONTINUE = 548,
+	LA_SPRINT_JUMP_LEFT_START = 549,
+	LA_SPRINT_JUMP_LEFT_CONTINUE = 550,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_1 = 551,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_2 = 552,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_3 = 553,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_4 = 554,
+	LA_SPRINT_JUMP_RIGHT_START = 555,
+	LA_SPRINT_JUMP_RIGHT_CONTINUE = 556,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_1 = 557,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_2 = 558,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_3 = 559,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_4 = 560,
 
-	NUM_LARA_ANIMS
+	NUM_LARA_ANIMS,
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 102
