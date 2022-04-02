@@ -68,22 +68,22 @@ sol::object GetVariable(sol::table tab, sol::object key)
 #endif
 }
 
-LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
+LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 #if TEN_OPTIONAL_LUA
 	ResetLevelTables();
 
-	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &GetVariable, &SetVariable);
-	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
+	m_handler.GetState()->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
 #endif
 }
 
-void LogicHandler::ResetGameTables() const
+void LogicHandler::ResetGameTables() 
 {
 #if TEN_OPTIONAL_LUA
-	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &GetVariable, &SetVariable);
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
 #endif
 }
 
@@ -91,8 +91,8 @@ void LogicHandler::ResetGameTables() const
 void LogicHandler::ResetLevelTables()
 {
 #if TEN_OPTIONAL_LUA
-	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
-	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &GetVariable, &SetVariable);
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
 #endif
 }
 
@@ -140,7 +140,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onControlPhase = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
-	m_lua->collect_garbage();
+	m_handler.GetState()->collect_garbage();
 #endif
 }
 
@@ -194,7 +194,7 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	{
 		if (std::holds_alternative<IndexTable>(vars[i]))
 		{
-			solTables.try_emplace(i, *m_lua, sol::create);
+			solTables.try_emplace(i, *m_handler.GetState(), sol::create);
 			auto indexTab = std::get<IndexTable>(vars[i]);
 			for (auto& [first, second] : indexTab)
 			{
@@ -202,7 +202,7 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 				// create it if need be
 				if (std::holds_alternative<IndexTable>(vars[second]))
 				{
-					solTables.try_emplace(second, *m_lua, sol::create);
+					solTables.try_emplace(second, *m_handler.GetState(), sol::create);
 					solTables[i][vars[first]] = solTables[second];
 				}
 				else
@@ -218,23 +218,23 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
 	for (auto& [first, second] : levelVars)
 	{
-		(*m_lua)[ScriptReserved_LevelVars][first] = second;
+		(*m_handler.GetState())[ScriptReserved_LevelVars][first] = second;
 	}
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
 	for (auto& [first, second] : gameVars)
 	{
-		(*m_lua)[ScriptReserved_GameVars][first] = second;
+		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 	}
 #endif
 }
 
-void LogicHandler::GetVariables(std::vector<SavedVar> & vars) const
+void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 #if TEN_OPTIONAL_LUA
-	sol::table tab{ *m_lua, sol::create };
-	tab[ScriptReserved_LevelVars] = (*m_lua)[ScriptReserved_LevelVars];
-	tab[ScriptReserved_GameVars] = (*m_lua)[ScriptReserved_GameVars];
+	sol::table tab{ *m_handler.GetState(), sol::create };
+	tab[ScriptReserved_LevelVars] = (*m_handler.GetState())[ScriptReserved_LevelVars];
+	tab[ScriptReserved_GameVars] = (*m_handler.GetState())[ScriptReserved_GameVars];
 
 	std::unordered_map<void const*, uint32_t> varsMap;
 	std::unordered_map<double, uint32_t> numMap;
@@ -357,17 +357,17 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 /*** A @{Objects.Moveable} representing Lara herself.
 @table Lara
 */
-void LogicHandler::ResetVariables() const
+void LogicHandler::ResetVariables()
 {
 #if TEN_OPTIONAL_LUA
-	(*m_lua)["Lara"] = NULL;
+	(*m_handler.GetState())["Lara"] = NULL;
 #endif
 }
 
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
 #if TEN_OPTIONAL_LUA
-	ExecuteScript(luaFilename);
+	m_handler.ExecuteScript(luaFilename);
 #endif
 }
 
@@ -375,7 +375,7 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 {
 #if TEN_OPTIONAL_LUA
 	sol::protected_function_result r;
-	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];
+	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
 		r = func(std::make_unique<Moveable>( std::get<short>(triggerer), true));
@@ -521,7 +521,7 @@ void LogicHandler::InitCallbacks()
 #if TEN_OPTIONAL_LUA
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
 		std::string fullName = "LevelFuncs." + luaFunc;
-		func = (*m_lua)["LevelFuncs"][luaFunc];
+		func = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 		std::string err{ "Level's script does not define callback " + fullName};
 		if (!ScriptAssert(func.valid(), err)) {
 			ScriptWarn("Defaulting to no " + fullName + " behaviour.");

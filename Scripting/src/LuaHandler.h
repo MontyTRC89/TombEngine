@@ -5,15 +5,19 @@
 class LuaHandler {
 protected:
 	sol::state*	m_lua;
-	~LuaHandler() = default;
 
 public:
 	LuaHandler(sol::state* lua);
 	LuaHandler(LuaHandler const &) = delete;
 	LuaHandler& operator=(LuaHandler const &) = delete;
+	~LuaHandler() = default;
 
 	void ExecuteScript(const std::string & luaFilename);
 	void ExecuteString(const std::string & command);
+
+	sol::state* GetState() {
+		return m_lua;
+	};
 
 	template <typename T>void MakeReadOnlyTable(sol::table & parent, std::string const& tableName, T const& container)
 	{
