@@ -389,7 +389,7 @@ bool SaveGame::Save(int slot)
 	lara.add_right_arm(rightArmOffset);
 	lara.add_spasm_effect_count(Lara.SpasmEffectCount);
 	lara.add_sprint_energy(Lara.SprintEnergy);
-	lara.add_target_facing_angle(Lara.TargetFacingAngle);
+	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
 	lara.add_vehicle(Lara.Vehicle);
@@ -1345,7 +1345,7 @@ bool SaveGame::Load(int slot)
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmAngles[0] = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmAngles[1] = s->lara()->target_arm_angles()->Get(1);
-	Lara.TargetFacingAngle = s->lara()->target_facing_angle();
+	Lara.TargetOrientation.y = s->lara()->target_facing_angle();
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();
 

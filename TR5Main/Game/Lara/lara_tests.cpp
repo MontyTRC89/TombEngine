@@ -2103,7 +2103,7 @@ bool TestAndDoLaraLadderClimb(ITEM_INFO* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		lara->TargetFacingAngle = item->Pose.Orientation.y;
+		lara->TargetOrientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
 		AnimateLara(item);
 
 		return true;
@@ -2402,6 +2402,8 @@ bool TestLaraJumpUp(ITEM_INFO* item, CollisionInfo* coll)
 
 bool TestLaraSlideJump(ITEM_INFO* item, CollisionInfo* coll)
 {
+	return true;
+
 	// TODO: Broken on diagonal slides?
 	if (g_GameFlow->Animations.HasSlideExtended)
 	{

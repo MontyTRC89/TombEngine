@@ -127,22 +127,32 @@ bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-void ApproachLaraTargetAngle(ITEM_INFO* item, short targetAngle, float rate)
+void ApproachLaraTargetOrientation(ITEM_INFO* item, Vector3Shrt targetOrient, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (!rate)
 	{
-		TENLog(std::string("ApproachLaraTargetAngle() attempted division by zero!"), LogLevel::Warning);
+		TENLog(std::string("ApproachLaraTargetOrientation() attempted division by zero!"), LogLevel::Warning);
 		return;
 	}
 
 	rate = abs(rate);
 
-	if (abs((short)(targetAngle - item->Pose.Orientation.y)) > ANGLE(0.1f))
-		item->Pose.Orientation.y += (short)(targetAngle - item->Pose.Orientation.y) / rate;
+	if (abs((short)(targetOrient.x - item->Pose.Orientation.x)) > ANGLE(0.1f))
+		item->Pose.Orientation.x += (short)(targetOrient.x - item->Pose.Orientation.x) / rate;
 	else
-		item->Pose.Orientation.y = targetAngle;
+		item->Pose.Orientation.x = targetOrient.x;
+
+	if (abs((short)(targetOrient.y - item->Pose.Orientation.y)) > ANGLE(0.1f))
+		item->Pose.Orientation.y += (short)(targetOrient.y - item->Pose.Orientation.y) / rate;
+	else
+		item->Pose.Orientation.y = targetOrient.y;
+
+	if (abs((short)(targetOrient.z - item->Pose.Orientation.z)) > ANGLE(0.1f))
+		item->Pose.Orientation.z += (short)(targetOrient.z - item->Pose.Orientation.z) / rate;
+	else
+		item->Pose.Orientation.z = targetOrient.z;
 }
 
 // TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
@@ -571,7 +581,7 @@ void SetLaraVault(ITEM_INFO* item, CollisionInfo* coll, VaultTestResult vaultRes
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->TargetFacingAngle = coll->NearestLedgeAngle;
+		lara->TargetOrientation = Vector3Shrt(0, coll->NearestLedgeAngle, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
