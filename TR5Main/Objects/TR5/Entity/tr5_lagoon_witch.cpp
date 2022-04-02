@@ -74,13 +74,13 @@ void LagoonWitchControl(short itemNumber)
 		}
 
 		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		CreatureAIInfo(item,&info);
 
 		//if (creature->enemy != LaraItem)
 		//	phd_atan(lara_item->pos.z_pos - item->pos.z_pos, lara_item->pos.x_pos - item->pos.x_pos);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item,&info, VIOLENT);
+		CreatureMood(item,&info, VIOLENT);
 
 		angle = CreatureTurn(item, creature->maximumTurn);
 
@@ -120,7 +120,7 @@ void LagoonWitchControl(short itemNumber)
 			{
 				LaraItem->hitPoints -= 100;
 				LaraItem->hitStatus = true;
-				CreatureEffect2(item, &LagoonWitchBite, 10, item->pos.yRot, DoBloodSplat);
+				CreatureEffect2(item,&LagoonWitchBite, 10, item->pos.yRot, DoBloodSplat);
 				creature->flags = STATE_LAGOON_WITCH_SWIM;
 			}
 			break;
