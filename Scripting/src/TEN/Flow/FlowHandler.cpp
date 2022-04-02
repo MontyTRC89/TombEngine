@@ -6,6 +6,7 @@
 #include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
+#include "Position/Position.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 /***
@@ -23,7 +24,7 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
+FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 
 /*** gameflow.lua.
@@ -32,7 +33,7 @@ They handle a game's 'metadata'; i.e., things such as level titles, loading scre
 ambient tracks.
 @section Flowlua
 */
-	sol::table table_flow{ m_lua->lua_state(), sol::create };
+	sol::table table_flow{ m_handler.GetState()->lua_state(), sol::create };
 	parent.set(ScriptReserved_Flow, table_flow);
 
 /***
@@ -118,12 +119,12 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(table_flow);
 	Fog::Register(table_flow);
 
-	MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
-	MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
-	MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
-	MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
-	MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
-	MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_InvItem, kInventorySlots);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
+	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
 }
 
 FlowHandler::~FlowHandler()
@@ -186,9 +187,9 @@ void FlowHandler::SetGameFarView(byte val)
 
 void FlowHandler::LoadFlowScript()
 {
-	ExecuteScript("Scripts/Gameflow.lua");
-	ExecuteScript("Scripts/Strings.lua");
-	ExecuteScript("Scripts/Settings.lua");
+	m_handler.ExecuteScript("Scripts/Gameflow.lua");
+	m_handler.ExecuteScript("Scripts/Strings.lua");
+	m_handler.ExecuteScript("Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 }

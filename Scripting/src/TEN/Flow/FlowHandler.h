@@ -9,7 +9,7 @@
 #include "ScriptInterfaceGame.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
-class FlowHandler : public LuaHandler, public ScriptInterfaceFlowHandler
+class FlowHandler :  public ScriptInterfaceFlowHandler
 {
 private:
 	Settings				m_settings;
@@ -18,6 +18,8 @@ private:
 	std::vector<std::string> m_languageNames;
 
 	std::map<short, short>			m_itemsMap;
+
+	LuaHandler m_handler;
 
 public:
 	int								FogInDistance{ 0 };
@@ -34,7 +36,7 @@ public:
 	std::vector<Level*>	Levels;
 
 	FlowHandler(sol::state* lua, sol::table & parent);
-	~FlowHandler();
+	~FlowHandler() override;
 
 	void				AddLevel(Level const& level);
 	void				LoadFlowScript();

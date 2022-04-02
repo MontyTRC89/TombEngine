@@ -1,13 +1,8 @@
 #pragma once
 #include "Scripting/ScriptInterfaceGame.h"
 #include "Game/items.h"
-#include "Game/room.h"
 #include "LuaHandler.h"
-#include "Specific/trmath.h"
 #include <unordered_set>
-#include "Color/Color.h"
-#include "Position/Position.h"
-#include "Rotation/Rotation.h"
 #include "Strings/StringsHandler.h"
 
 struct LuaFunction {
@@ -33,7 +28,7 @@ struct LuaVariable
 	bool BoolValue;
 };
 
-class LogicHandler : public LuaHandler, public ScriptInterfaceGame
+class LogicHandler : public ScriptInterfaceGame
 {
 private:
 	std::unordered_map<std::string, sol::protected_function>	m_levelFuncs{};
@@ -44,7 +39,8 @@ private:
 	sol::protected_function										m_onEnd{};
 
 	void ResetLevelTables();
-	void ResetGameTables() const;
+	void ResetGameTables();
+	LuaHandler m_handler;
 
 public:	
 	LogicHandler(sol::state* lua, sol::table & parent);
@@ -57,8 +53,8 @@ public:
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
 
-	void								GetVariables(std::vector<SavedVar>& vars) const override;
-	void								ResetVariables() const;
+	void								GetVariables(std::vector<SavedVar>& vars) override;
+	void								ResetVariables();
 
 	void								SetVariables(std::vector<SavedVar> const& vars) override;
 	void								InitCallbacks() override;
