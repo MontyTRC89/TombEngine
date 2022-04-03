@@ -2618,8 +2618,17 @@ namespace TEN::Renderer
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		                                 1.0f, 0);
-		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
+
+		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
+		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.0f, 0);
+
+		ID3D11RenderTargetView* m_pRenderViews[2]; 
+		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
+		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
+		m_context->OMSetRenderTargets(2, &m_pRenderViews[0],
 		                              m_renderTarget.DepthStencilView.Get());
+
 		m_context->RSSetViewports(1, &view.viewport);
 
 		// The camera constant buffer contains matrices, camera position, fog values and other 
@@ -2668,6 +2677,9 @@ namespace TEN::Renderer
 		DrawSpiders(view);
 		DrawScarabs(view);
 		DrawLocusts(view);
+
+		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
+			m_renderTarget.DepthStencilView.Get());
 
 		// Do special effects and weather 
 		// NOTE: functions here just fill the sprites to draw array

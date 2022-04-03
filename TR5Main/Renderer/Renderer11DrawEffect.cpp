@@ -778,6 +778,8 @@ namespace TEN::Renderer
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
 		
+		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
+
 		for (auto& spr : view.spritesToDraw) 
 		{
 			// Calculate matrices for sprites
