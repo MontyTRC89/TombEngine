@@ -32,7 +32,8 @@ struct LEB128
 			
 			result |= (long)(currentByte & 0x7F) << currentShift;
 			currentShift += 7;
-		} while ((currentByte & 0x80) != 0);
+		}
+		while ((currentByte & 0x80) != 0);
 
 		// Sign extend
 		int shift = 64 - currentShift;
@@ -114,4 +115,3 @@ struct LEB128
 		return length;
 	}
 };
-

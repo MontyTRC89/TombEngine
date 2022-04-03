@@ -2,12 +2,18 @@
 #include <d3d11.h>
 #include "Utils.h"
 #include <wrl\client.h>
-namespace TEN::Renderer {
+
+namespace TEN::Renderer
+{
 	struct RendererVertex;
+
 	using Microsoft::WRL::ComPtr;
-	class VertexBuffer {
+
+	class VertexBuffer
+	{
 	private:
 		int m_numVertices;
+
 	public:
 		ComPtr<ID3D11Buffer> Buffer;
 		VertexBuffer() {};
@@ -15,8 +21,4 @@ namespace TEN::Renderer {
 		VertexBuffer(ID3D11Device* device, int numVertices);
 		bool Update(ID3D11DeviceContext* device, std::vector<RendererVertex>& data, int startVertex, int count);
 	};
-
 }
-
-
-

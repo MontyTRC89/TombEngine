@@ -20,5 +20,3 @@ namespace TEN::Renderer
 	};
 
 }
-
-
