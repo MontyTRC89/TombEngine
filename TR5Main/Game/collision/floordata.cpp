@@ -430,21 +430,15 @@ namespace TEN::Floordata
 			floor = &GetTopFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
-			{
 				y = floor->FloorHeight(x, z);
-			}
 			else
 			{
 				floor = &GetBottomFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
-				{
 					y = floor->CeilingHeight(x, z);
-				}
 				else
-				{
 					return std::nullopt;
-				}
 			}
 		}
 
@@ -486,21 +480,15 @@ namespace TEN::Floordata
 			floor = &GetBottomFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
-			{
 				y = floor->CeilingHeight(x, z);
-			}
 			else
 			{
 				floor = &GetTopFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
-				{
 					y = floor->FloorHeight(x, z);
-				}
 				else
-				{
 					return std::nullopt;
-				}
 			}
 		}
 

@@ -25,7 +25,7 @@ namespace TEN::Entities::TR5
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	Vector3Int CrowDovePos = { 0, 0, -400 }; 
+	auto CrowDovePos = Vector3Int(0, 0, -400);
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{
@@ -69,8 +69,8 @@ namespace TEN::Entities::TR5
 
 					switchItem->Status = ITEM_ACTIVE;
 					switchItem->Pose.Orientation.y = oldYrot;
-					laraInfo->Control.IsMoving = false;
 					ResetLaraFlex(laraItem);
+					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					laraInfo->InteractedItem = itemNumber;
 				}

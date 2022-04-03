@@ -124,13 +124,13 @@ void InitialiseGuard(short itemNum)
 			item->Animation.TargetState = GUARD_STATE_SIT;
 			item->SwapMeshFlags = 9216;
 
-			ITEM_INFO* item2;
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 			if (roomItemNumber != NO_ITEM)
 			{
+				ITEM_INFO* item2;
 				while (true)
 				{
-					item2 = &g_Level.Items[roomItemNumber];
+					auto* item2 = &g_Level.Items[roomItemNumber];
 					if (item2->ObjectNumber >= ID_ANIMATING1 &&
 						item2->ObjectNumber <= ID_ANIMATING15 &&
 						item2->RoomNumber == item->RoomNumber &&
