@@ -433,7 +433,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	if (!lara->Control.Locked)
 		lara->LocationPad = 128;
 
-	auto oldPos = Vector3Int(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto oldPos = item->Pose.Position;
 
 	if (lara->Control.HandStatus == HandStatus::Busy &&
 		item->Animation.AnimNumber == LA_STAND_IDLE &&

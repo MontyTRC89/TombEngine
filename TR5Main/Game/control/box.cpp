@@ -41,9 +41,6 @@ constexpr auto FRAME_PRIO_EXP = 1.5;
 void DropEntityPickups(ITEM_INFO* item)
 {
 	ITEM_INFO* pickup = NULL;
-	FLOOR_INFO* floor;
-	short roomNumber;
-	BOUNDING_BOX* bounds;
 
 	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
 	{
@@ -51,10 +48,8 @@ void DropEntityPickups(ITEM_INFO* item)
 		pickup->Pose.Position.x = (item->Pose.Position.x & -CLICK(1)) | CLICK(1);
 		pickup->Pose.Position.z = (item->Pose.Position.z & -CLICK(1)) | CLICK(1);
 
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z, &roomNumber);
-		pickup->Pose.Position.y = GetFloorHeight(floor, pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z);
-		bounds = GetBoundsAccurate(pickup);
+		pickup->Pose.Position.y = GetCollision(pickup->Pose.Position.x, item->Pose.Position.y, pickup->Pose.Position.z, item->RoomNumber).Position.Floor;
+		auto* bounds = GetBoundsAccurate(pickup);
 		pickup->Pose.Position.y -= bounds->Y2;
 
 		ItemNewRoom(pickupNumber, item->RoomNumber);
@@ -295,9 +290,7 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 
 	if (item->Pose.Position.y < y)
 	{
-		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-		int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+		int height = GetCollision(item).Position.Floor;
 
 		item->Pose.Position.y = y;
 		if (y > height)
@@ -326,12 +319,11 @@ void CreatureFloat(short itemNumber)
 
 	AnimateItem(item);
 
-	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto probe = GetCollision(item);
+	item->Floor = probe.Position.Floor;
 	
-	if (roomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, roomNumber);
+	if (probe.RoomNumber != item->RoomNumber)
+		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	if (item->Pose.Position.y <= waterLevel)
 	{
@@ -432,7 +424,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	Vector3Int old = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	auto old = item->Pose.Position;
 	
 	/*if (!Objects[item->objectNumber].waterCreature)
 	{
@@ -1988,10 +1980,7 @@ void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set)
 
 	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
 	z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
-
-	short roomNumber = item->RoomNumber;
-	GetFloor(x, item->Pose.Position.y, z, &roomNumber);
-	room = &g_Level.Rooms[roomNumber];
+	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
 
 	floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = set;

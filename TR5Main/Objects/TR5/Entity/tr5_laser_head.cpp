@@ -14,11 +14,12 @@
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/misc.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 
-struct LASER_HEAD_STRUCT
+struct LaserHeadStruct
 {
 	Vector3Int target;
 	LIGHTNING_INFO* fireArcs[2];
@@ -30,10 +31,10 @@ struct LASER_HEAD_STRUCT
 	short yRot;
 };
 
-LASER_HEAD_STRUCT LaserHeadData;
+LaserHeadStruct LaserHeadData;
 
-Vector3Int LaserHeadBasePosition = { 0, -640, 0 };
-Vector3Int GuardianChargePositions[4] = { {-188, -832, 440}, {188, -832, -440}, {440, -832, 188}, {-440, -832, -188} };
+auto LaserHeadBasePosition = Vector3Int(0, -640, 0);
+Vector3Int GuardianChargePositions[4] = { Vector3Int(-188, -832, 440), Vector3Int(188, -832, -440), Vector3Int(440, -832, 188), Vector3Int(-440, -832, -188) };
 int GuardianMeshes[5] = { 1, 2 };
 
 static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, byte b, int unk)
@@ -42,7 +43,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 	{
 		for (int i = 0; i < count; i++)
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			spark->sR = r;
@@ -82,21 +83,18 @@ static void LaserHeadCharge(ITEM_INFO* item)
 		b = (item->ItemFlags[3] * b) / 32;
 	}
 	else
-	{
 		size = 32;
-	}
 
-	LaserHeadInfo* creature = (LaserHeadInfo*)item->Data;
+	auto* creature = (LaserHeadInfo*)item->Data;
 
-	Vector3Int src, dest;
-	dest.x = LaserHeadBasePosition.x;
-	dest.y = LaserHeadBasePosition.y;
-	dest.z = LaserHeadBasePosition.z;
+	auto dest = Vector3Int(LaserHeadBasePosition.x, LaserHeadBasePosition.y, LaserHeadBasePosition.z);
 	GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &dest, 0);
+
+	Vector3Int src;
 
 	for (int i = 0; i < 4; i++)
 	{
-		LIGHTNING_INFO* arc = LaserHeadData.chargeArcs[i];
+		auto* arc = LaserHeadData.chargeArcs[i];
 
 		if (item->ItemFlags[3] & 0x0F && arc != NULL)
 		{
@@ -107,9 +105,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 		}
 		else
 		{
-			src.x = GuardianChargePositions[i].x;
-			src.y = GuardianChargePositions[i].y;
-			src.z = GuardianChargePositions[i].z;
+			src = Vector3Int(GuardianChargePositions[i].x, GuardianChargePositions[i].y, GuardianChargePositions[i].z);
 			GetJointAbsPosition(&g_Level.Items[creature->BaseItem], &src, 0);
 			//LaserHeadData.chargeArcs[i] = TriggerEnergyArc(&src, &dest, 0, g, b, 256, 90, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); //  (GetRandomControl() & 7) + 8, v4 | ((v1 | 0x240000) << 8), 13, 48, 3);
 		}
@@ -121,9 +117,7 @@ static void LaserHeadCharge(ITEM_INFO* item)
 		{
 			if (1 << GuardianMeshes[i] & item->MeshBits)
 			{
-				src.x = 0;
-				src.y = 0;
-				src.z = 0;
+				src = Vector3Int();
 				GetJointAbsPosition(item, &src, GuardianMeshes[i]);
 
 				TriggerLightningGlow(src.x, src.y, src.z, size + (GetRandomControl() & 3), 0, g, b);
@@ -146,10 +140,10 @@ static void LaserHeadCharge(ITEM_INFO* item)
 
 void InitialiseLaserHead(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	item->Data = LaserHeadInfo();
-	LaserHeadInfo* info = item->Data;
+	auto info = (LaserHeadInfo*)item->Data;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
@@ -185,18 +179,19 @@ void InitialiseLaserHead(short itemNumber)
 	}
 
 	int y = item->Pose.Position.y - 640;
+
 	item->Pose.Position.y = y;
-	item->ItemFlags[1] = y - 640;
 	item->Animation.ActiveState = 0;
+	item->ItemFlags[1] = y - 640;
 	item->ItemFlags[3] = 90;
 
-	ZeroMemory(&LaserHeadData, sizeof(LASER_HEAD_STRUCT));
+	ZeroMemory(&LaserHeadData, sizeof(LaserHeadStruct));
 }
 
 void LaserHeadControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	LaserHeadInfo* creature = (LaserHeadInfo*)item->Data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = (LaserHeadInfo*)item->Data;
 
 	GameVector src, dest;
 
@@ -223,11 +218,11 @@ void LaserHeadControl(short itemNumber)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					ITEM_INFO* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
+					auto* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
 
-					if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1
-						&& tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd
-						&& tentacleItem->MeshBits & 1)
+					if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1 &&
+						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
+						tentacleItem->MeshBits & 1)
 					{
 						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
@@ -280,7 +275,7 @@ void LaserHeadControl(short itemNumber)
 		{
 			item->TriggerFlags++;
 			item->Pose.Position.y = item->ItemFlags[1] - 128 * phd_sin(item->ItemFlags[2]);
-			item->ItemFlags[2] += ANGLE(3);
+			item->ItemFlags[2] += ANGLE(3.0f);
 
 			// Get guardian head's position
 			src.x = 0;
@@ -299,15 +294,15 @@ void LaserHeadControl(short itemNumber)
 				GetJointAbsPosition(LaraItem, (Vector3Int*)&dest, LM_HEAD);
 
 				// Calculate distance between guardian and Lara
-				int distance = sqrt(SQUARE(src.x - dest.x) + SQUARE(src.y - dest.y) + SQUARE(src.z - dest.z));
+				int distance = sqrt(pow(src.x - dest.x, 2) + pow(src.y - dest.y, 2) + pow(src.z - dest.z, 2));
 
 				// Check if there's a valid LOS between guardian and Lara 
 				// and if distance is less than 8 sectors  and if Lara is alive and not burning
-				if (LOS(&src, &dest)
-					&& distance <= MAX_VISIBILITY_DISTANCE
-					&& LaraItem->HitPoints > 0
-					&& !Lara.Burn
-					&& (LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
+				if (LOS(&src, &dest) &&
+					distance <= MAX_VISIBILITY_DISTANCE &&
+					LaraItem->HitPoints > 0 &&
+					!Lara.Burn &&
+					(LaserHeadData.target.x || LaserHeadData.target.y || LaserHeadData.target.z))
 				{
 					// Lock target for attacking
 					dest.x = 0;
@@ -331,7 +326,7 @@ void LaserHeadControl(short itemNumber)
 						short xRot = (GetRandomControl() / 4) - 4096;
 						short yRot;
 						if (condition)
-							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135);
+							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + ANGLE(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
@@ -346,9 +341,7 @@ void LaserHeadControl(short itemNumber)
 							item->TriggerFlags = 0;
 						}
 						else
-						{
 							LaserHeadData.byte1 = (GetRandomControl() & 2) + 3;
-						}
 
 						item->ItemFlags[3] = LaserHeadData.byte1 * ((GetRandomControl() & 3) + 8);
 
@@ -375,7 +368,7 @@ void LaserHeadControl(short itemNumber)
 					int c = 8192 * phd_cos(item->Pose.Orientation.x + 3328);
 					
 					dest.x = LaserHeadData.target.x = src.x + c * phd_sin(item->Pose.Orientation.y);
-					dest.y = LaserHeadData.target.y = src.y + 8192 * phd_sin(3328 - item->Pose.Orientation.x);
+					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * phd_sin(3328 - item->Pose.Orientation.x);
 					dest.z = LaserHeadData.target.z = src.z + c * phd_cos(item->Pose.Orientation.y);
 				}
 				else
@@ -396,11 +389,11 @@ void LaserHeadControl(short itemNumber)
 			{
 				if (LaserHeadData.byte2)
 				{
-					if (!(GetRandomControl() & 0x1F)
-						&& abs(LaserHeadData.xRot) < 1024
-						&& abs(LaserHeadData.yRot) < 1024
-						&& !LaraItem->Animation.VerticalVelocity
-						|| !(GetRandomControl() & 0x1FF))
+					if (!(GetRandomControl() & 0x1F) &&
+						abs(LaserHeadData.xRot) < ANGLE(5.6f) &&
+						abs(LaserHeadData.yRot) < ANGLE(5.6f) &&
+						!LaraItem->Animation.VerticalVelocity ||
+						!(GetRandomControl() & 0x1FF))
 					{
 						item->ItemFlags[0]++;
 						item->ItemFlags[3] = 0;
@@ -424,35 +417,34 @@ void LaserHeadControl(short itemNumber)
 
 				if (item->ItemFlags[3] >= 90)
 				{
-					byte r, g, b;
+					byte r = 0;
+					byte g = (GetRandomControl() & 0x1F) + 128;
+					byte b = (GetRandomControl() & 0x1F) + 64;
 
-					r = 0;
-					g = (GetRandomControl() & 0x1F) + 128;
-					b = (GetRandomControl() & 0x1F) + 64;
-
-					LIGHTNING_INFO* arc = LaserHeadData.fireArcs[0];
+					auto* arc = LaserHeadData.fireArcs[0];
 					if (!LaserHeadData.fireArcs[0])
 						arc = LaserHeadData.fireArcs[1];
 
-					if (item->ItemFlags[3] > 90
-						&& arc
-						&& !arc->life
-						|| LaraItem->HitPoints <= 0
-						|| Lara.Burn)
+					if (item->ItemFlags[3] > 90 &&
+						arc &&
+						!arc->life ||
+						LaraItem->HitPoints <= 0 ||
+						Lara.Burn)
 					{
 						if (arc)
 						{
 							LaserHeadData.fireArcs[0] = NULL;
 							LaserHeadData.fireArcs[1] = NULL;
 						}
+
 						item->ItemFlags[0] = 1;
 						item->TriggerFlags = 0;
 					}
 					else
 					{
-						if (item->ItemFlags[3] > 90
-							&& arc
-							&& arc->life < 16)
+						if (item->ItemFlags[3] > 90 &&
+							arc &&
+							arc->life < 16)
 						{
 							g = (arc->life * g) / 16;
 							b = (arc->life * b) / 16;
@@ -473,8 +465,8 @@ void LaserHeadControl(short itemNumber)
 								dest.y = src.y + 8192 * phd_sin(-angles[1]);
 								dest.z = src.z + c * phd_cos(item->Pose.Orientation.y);
 
-								if (item->ItemFlags[3] != 90 
-									&& LaserHeadData.fireArcs[i] != NULL)
+								if (item->ItemFlags[3] != 90 &&
+									LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
 									SoundEffect(SFX_TR5_GOD_HEAD_LASERLOOPS, &item->Pose, 0);
@@ -493,11 +485,11 @@ void LaserHeadControl(short itemNumber)
 									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, 0);
 								}
 
-								LIGHTNING_INFO* currentArc = LaserHeadData.fireArcs[i];
+								auto* currentArc = LaserHeadData.fireArcs[i];
 
 								if (GlobalCounter & 1) 
 								{
-									TriggerLaserHeadSparks((Vector3Int*)& src, 3, r, g, b, 0);
+									TriggerLaserHeadSparks((Vector3Int*)&src, 3, r, g, b, 0);
 									TriggerLightningGlow(src.x, src.y, src.z, (GetRandomControl() & 3) + 32, r, g, b);
 									TriggerDynamicLight(src.x, src.y, src.z, (GetRandomControl() & 3) + 16, r, g, b);
 
@@ -514,9 +506,8 @@ void LaserHeadControl(short itemNumber)
 								{
 									int someIndex = 0;
 
-									BOUNDING_BOX* bounds = GetBoundsAccurate(LaraItem);
+									auto* bounds = GetBoundsAccurate(LaraItem);
 									BOUNDING_BOX tbounds;
-
 									phd_RotBoundingBoxNoPersp(&LaraItem->Pose, bounds, &tbounds);
 
 									int x1 = LaraItem->Pose.Position.x + tbounds.X1;
@@ -530,11 +521,11 @@ void LaserHeadControl(short itemNumber)
 									int yc = LaraItem->Pose.Position.y + ((bounds->Y1 + bounds->Y2) / 2);
 									int zc = LaraItem->Pose.Position.z + ((bounds->Z1 + bounds->Z2) / 2);
 
-									int distance = sqrt(SQUARE(xc - src.x) + SQUARE(yc - src.y) + SQUARE(zc - src.z));
+									int distance = sqrt(pow(xc - src.x, 2) + pow(yc - src.y, 2) + pow(zc - src.z, 2));
 
 									if (distance < MAX_VISIBILITY_DISTANCE)
 									{
-										int dl = distance + 512;
+										int dl = distance + CLICK(2);
 
 										if (dl < MAX_VISIBILITY_DISTANCE)
 										{
@@ -628,15 +619,17 @@ void LaserHeadControl(short itemNumber)
 			else
 			{
 				item->Animation.VerticalVelocity += 3;
+
 				if (item->Animation.VerticalVelocity > 32)
 					item->Animation.VerticalVelocity = 32;
+
 				item->Pose.Position.y -= item->Animation.VerticalVelocity;
 			}
 		}
 		else if (!(GlobalCounter & 7))
 		{
 			short tentacleItemNumber = creature->Tentacles[item->ItemFlags[2]];
-			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
+			auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
 			AddActiveItem(tentacleItemNumber);
 			tentacleItem->Status = ITEM_ACTIVE;
 			tentacleItem->Flags |= 0x3E00;
@@ -647,13 +640,13 @@ void LaserHeadControl(short itemNumber)
 	if (item->ItemFlags[0] < 3)
 	{
 		int i = 0;
-
 		for (i = 0; i < 8; i++)
 		{
 			short tentacleItemNumber = creature->Tentacles[i];
-			ITEM_INFO* tentacleItem = &g_Level.Items[tentacleItemNumber];
-			if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex
-				&& tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd)
+			auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
+
+			if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex &&
+				tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd)
 			{
 				break;
 			}
@@ -670,9 +663,9 @@ void LaserHeadControl(short itemNumber)
 			LaserHeadData.fireArcs[0] = NULL;
 			LaserHeadData.fireArcs[1] = NULL;
 
+			item->Animation.Velocity = 3;
 			item->ItemFlags[0] = 3;
 			item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
-			item->Animation.Velocity = 3;
 			item->TriggerFlags = item->Pose.Orientation.x + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}

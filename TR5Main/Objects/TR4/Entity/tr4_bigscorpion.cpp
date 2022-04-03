@@ -171,7 +171,7 @@ void ScorpionControl(short itemNumber)
 			else
 			{
 				creature->Enemy = NULL;
-				int minDistance = 0x7FFFFFFF;
+				int minDistance = INT_MAX;
 
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
@@ -337,6 +337,7 @@ void ScorpionControl(short itemNumber)
 
 		case BSCORPION_STATE_TROOPS_ATTACK:
 			creature->MaxTurn = 0;
+
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				item->TriggerFlags++;
