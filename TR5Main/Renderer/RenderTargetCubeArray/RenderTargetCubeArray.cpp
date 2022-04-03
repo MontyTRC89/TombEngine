@@ -1,8 +1,11 @@
 #include "framework.h"
 #include "RenderTargetCubeArray.h"
 #include "Utils.h"
-namespace TEN::Renderer {
-	RenderTargetCubeArray::RenderTargetCubeArray(ID3D11Device* device, size_t resolution, size_t numCubes, DXGI_FORMAT colorFormat,DXGI_FORMAT depthFormat) : numCubes(numCubes), resolution(resolution), viewport(CreateViewport(resolution)) {
+
+namespace TEN::Renderer
+{
+	RenderTargetCubeArray::RenderTargetCubeArray(ID3D11Device* device, size_t resolution, size_t numCubes, DXGI_FORMAT colorFormat,DXGI_FORMAT depthFormat) : numCubes(numCubes), resolution(resolution), viewport(CreateViewport(resolution))
+	{
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.ArraySize = numCubes*6;
 		desc.Height = resolution;
@@ -23,12 +26,16 @@ namespace TEN::Renderer {
 		viewDesc.Texture2DArray.ArraySize = 1;
 		viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 		RenderTargetView.resize(numCubes);
-		for(int i = 0; i < numCubes - 1; i++)
-			for(int j = 0; j < 6; j++){
-				viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i*numCubes+j, 1);
+
+		for (int i = 0; i < numCubes - 1; i++)
+		{
+			for (int j = 0; j < 6; j++)
+			{
+				viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * numCubes + j, 1);
 				res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, RenderTargetView[i][j].GetAddressOf());
 				Utils::throwIfFailed(res);
 			}
+		}
 		
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = colorFormat;
@@ -60,17 +67,20 @@ namespace TEN::Renderer {
 		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 		dsvDesc.Texture2DArray.ArraySize = 1;
 		DepthStencilView.resize(numCubes);
-		for(int i = 0; i < numCubes - 1; i++)
-			for(int j = 0; j < 6; j++){
+
+		for (int i = 0; i < numCubes - 1; i++)
+		{
+			for (int j = 0; j < 6; j++)
+			{
 				dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i * numCubes + j, 1);
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i][j].GetAddressOf());
 				Utils::throwIfFailed(res);
 			}
+		}
 	}
 
-	RenderTargetCubeArray::RenderTargetCubeArray() : resolution(0), viewport(CreateViewport(resolution)),numCubes(0) {
+	RenderTargetCubeArray::RenderTargetCubeArray() : resolution(0), viewport(CreateViewport(resolution)),numCubes(0)
+	{
 
 	}
-
 }
-
