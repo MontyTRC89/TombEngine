@@ -373,8 +373,7 @@ void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(lara->Control.Weapon.GunType) &&
-			HasStateDispatch(item, LS_CROUCH_IDLE)))
+			!IsStandingWeapon(lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -547,7 +546,7 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 	lara->ExtraTorsoRot.y = 0;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down full steps.
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);	// TODO: Stepping approach is different from walk/run. Resolve this someday. @Sezz 2021.10.31
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
@@ -644,7 +643,7 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down full steps.
 	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
