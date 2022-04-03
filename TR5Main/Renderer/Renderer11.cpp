@@ -267,6 +267,44 @@ namespace TEN::Renderer
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
+	void Renderer11::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)
+	{
+		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, target->ShaderResourceView.GetAddressOf());
+
+		ID3D11SamplerState* samplerState = nullptr;
+		switch (samplerType)
+		{
+		case SAMPLER_ANISOTROPIC_CLAMP:
+			samplerState = m_states->AnisotropicClamp();
+			break;
+
+		case SAMPLER_ANISOTROPIC_WRAP:
+			samplerState = m_states->AnisotropicWrap();
+			break;
+
+		case SAMPLER_LINEAR_CLAMP:
+			samplerState = m_states->LinearClamp();
+			break;
+
+		case SAMPLER_LINEAR_WRAP:
+			samplerState = m_states->LinearWrap();
+			break;
+
+		case SAMPLER_POINT_WRAP:
+			samplerState = m_states->PointWrap();
+			break;
+
+		case SAMPLER_SHADOW_MAP:
+			samplerState = m_shadowSampler.Get();
+			break;
+
+		default:
+			return;
+		}
+
+		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
 	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
 	{
 		m_context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);

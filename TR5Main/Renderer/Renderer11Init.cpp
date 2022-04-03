@@ -95,6 +95,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
 	
 	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
+	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();

@@ -13,13 +13,17 @@ struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
-	float2 UV: TEXCOORD;
+	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Fog : FOG;
+	float4 PositionCopy: TEXCOORD2;
 };
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
+
+Texture2D DepthMap : register(t6);
+SamplerState DepthMapSampler : register(s6);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -36,6 +40,8 @@ PixelShaderInput VS(VertexShaderInput input)
 		worldPosition = float4(input.Position, 1.0f);
 		output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
 	}
+
+	output.PositionCopy = output.Position;
 	
 	output.Normal = input.Normal;
 	output.Color = input.Color * color;
@@ -55,6 +61,17 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
 	DoAlphaTest(output);
+
+	float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
+	input.PositionCopy.xy /= input.PositionCopy.w;
+	float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+	float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
+
+	if (particleDepth > sceneDepth)
+		discard;
+
+	float fade = (sceneDepth - particleDepth) * 500.0F;
+	output.w = min(output.w, fade);
 
 	if (FogMaxDistance != 0)
 		output.xyz = lerp(output.xyz, FogColor, input.Fog);
