@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
 		{
-			Vector3Int pos = { SASGunBite.x, SASGunBite.y, SASGunBite.z };
+			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 24, 16, 4);
@@ -269,9 +269,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_WAIT:
-				creature->Flags = 0;
-				creature->MaxTurn = 0;
 				joint2 = angle;
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
 				if (item->AIBits & GUARD)
 				{
@@ -292,9 +292,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_WALK:
+				joint2 = angle;
 				creature->MaxTurn = ANGLE(5.0f);
 				creature->Flags = 0;
-				joint2 = angle;
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = SAS_STATE_WALK;
@@ -343,8 +343,8 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_RUN:
-				creature->MaxTurn = ANGLE(10.0f);
 				tilt = angle / 2;
+				creature->MaxTurn = ANGLE(10.0f);
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -559,7 +559,7 @@ namespace TEN::Entities::TR4
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
-			Vector3Int pos = { SASGunBite.x, SASGunBite.y, SASGunBite.z };
+			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
 			grenadeItem->Pose.Position.x = pos.x;
@@ -649,7 +649,7 @@ namespace TEN::Entities::TR4
 
 	void SasDragBlokeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION) ||
 			laraItem->Animation.Airborne ||

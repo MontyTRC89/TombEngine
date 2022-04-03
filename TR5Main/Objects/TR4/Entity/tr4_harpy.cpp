@@ -148,16 +148,10 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 {
 	item->ItemFlags[0]++;
 
-	Vector3Int pos1;
-	pos1.x = HarpyAttack1.x;
-	pos1.y = HarpyAttack1.y;
-	pos1.z = HarpyAttack1.z;
+	auto pos1 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
 	GetJointAbsPosition(item, &pos1, HarpyAttack1.meshNum);
 
-	Vector3Int pos2;
-	pos2.x = HarpyAttack2.x;
-	pos2.y = HarpyAttack2.y;
-	pos2.z = HarpyAttack2.z;
+	auto pos2 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
 	GetJointAbsPosition(item, &pos2, HarpyAttack2.meshNum);
 
 	if (item->ItemFlags[0] >= 24 &&
@@ -195,16 +189,10 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 	{
 		if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
 		{
-			Vector3Int pos3;
-			pos3.x = HarpyAttack1.x;
-			pos3.y = HarpyAttack1.y * 2;
-			pos3.z = HarpyAttack1.z;
+			auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
 			GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-			PHD_3DPOS pos;
-			pos.Position.x = pos1.x;
-			pos.Position.y = pos1.y;
-			pos.Position.z = pos1.z;
+			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
 			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -221,16 +209,10 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 
 		if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
 		{
-			Vector3Int pos3;
-			pos3.x = HarpyAttack2.x;
-			pos3.y = HarpyAttack2.y * 2;
-			pos3.z = HarpyAttack2.z;
+			auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
 			GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
-			PHD_3DPOS pos;
-			pos.Position.x = pos1.x;
-			pos.Position.y = pos1.y;
-			pos.Position.z = pos1.z;
+			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
 			short angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -326,7 +308,7 @@ void HarpyControl(short itemNumber)
 		if (item->AIBits)
 			GetAITarget(creature);
 
-		int minDistance = 0x7FFFFFFF;
+		int minDistance = INT_MAX;
 
 		creature->Enemy = NULL;
 
@@ -353,23 +335,22 @@ void HarpyControl(short itemNumber)
 			}
 		}
 
-		AI_INFO info;
-
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
 		if (creature->Enemy != LaraItem)
 			phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (info.ahead)
+		if (AI.ahead)
 		{
-			joint0 = info.angle / 2;
-			joint2 = info.angle / 2;
-			joint1 = info.xAngle;
+			joint0 = AI.angle / 2;
+			joint2 = AI.angle / 2;
+			joint1 = AI.xAngle;
 		}
 
 		int height = 0;
@@ -378,8 +359,8 @@ void HarpyControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case STATE_HARPY_STOP:
-			creature->Flags = 0;
 			creature->MaxTurn = ANGLE(7.0f);
+			creature->Flags = 0;
 
 			if (creature->Enemy)
 			{
@@ -390,17 +371,17 @@ void HarpyControl(short itemNumber)
 					break;
 				}
 			}
-			if (info.ahead)
+			if (AI.ahead)
 			{
 				dy = abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y);
 				if (dy <= SECTOR(1))
 				{
-					if (info.distance < pow(341, 2))
+					if (AI.distance < pow(341, 2))
 					{
 						item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
 						break;
 					}
-					if (dy <= SECTOR(1) && info.distance < pow(SECTOR(2), 2))
+					if (dy <= SECTOR(1) && AI.distance < pow(SECTOR(2), 2))
 					{
 						item->Animation.TargetState = 4;
 						break;
@@ -409,8 +390,8 @@ void HarpyControl(short itemNumber)
 			}
 
 			if (creature->Enemy != LaraItem ||
-				!Targetable(item, &info) ||
-				info.distance <= pow(SECTOR(3.5f), 2) ||
+				!Targetable(item, &AI) ||
+				AI.distance <= pow(SECTOR(3.5f), 2) ||
 				!(GetRandomControl() & 1))
 			{
 				item->Animation.TargetState = 2;
@@ -438,13 +419,13 @@ void HarpyControl(short itemNumber)
 				item->Animation.TargetState = 7;
 				break;
 			}
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				if (info.distance >= pow(341, 2))
+				if (AI.distance >= pow(341, 2))
 				{
-					if (info.ahead &&
-						info.distance >= pow(SECTOR(2), 2) &&
-						info.distance > pow(SECTOR(3.5f), 2) &&
+					if (AI.ahead &&
+						AI.distance >= pow(SECTOR(2), 2) &&
+						AI.distance > pow(SECTOR(3.5f), 2) &&
 						GetRandomControl() & 1)
 					{
 						item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
@@ -463,15 +444,15 @@ void HarpyControl(short itemNumber)
 				item->Animation.TargetState = 7;
 				break;
 			}
-			if (!info.ahead)
+			if (!AI.ahead)
 			{
 				item->Animation.TargetState = 4;
 				break;
 			}
-			if (info.distance >= pow(341, 2))
+			if (AI.distance >= pow(341, 2))
 			{
-				if (info.ahead && info.distance >= pow(SECTOR(2), 2) &&
-					info.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
+				if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
+					AI.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
 				{
 					item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
 					item->ItemFlags[0] = 0;
@@ -496,7 +477,7 @@ void HarpyControl(short itemNumber)
 		case 4:
 			creature->MaxTurn = ANGLE(2.0f);
 
-			if (info.ahead && info.distance < pow(SECTOR(2), 2))
+			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = STATE_HARPY_ATTACK;
 			else
 				item->Animation.TargetState = 13;
@@ -504,13 +485,13 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case STATE_HARPY_ATTACK:
-			creature->MaxTurn = ANGLE(2.0f);
 			item->Animation.TargetState = 2;
+			creature->MaxTurn = ANGLE(2.0f);
 
 			if (item->TouchBits & 0x14 ||
 				creature->Enemy && creature->Enemy != LaraItem &&
 				abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-				info.distance < pow(SECTOR(2), 2))
+				AI.distance < pow(SECTOR(2), 2))
 			{
 				LaraItem->HitPoints -= 10;
 				LaraItem->HitStatus = true;
@@ -544,7 +525,7 @@ void HarpyControl(short itemNumber)
 				(item->TouchBits & 0x300000 ||
 					creature->Enemy && creature->Enemy != LaraItem &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-					info.distance < pow(SECTOR(2), 2)))
+					AI.distance < pow(SECTOR(2), 2)))
 			{
 				LaraItem->HitPoints -= 100;
 				LaraItem->HitStatus = true;
@@ -569,7 +550,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case 12:
-			if (info.ahead && info.distance > pow(SECTOR(3.5f), 2))
+			if (AI.ahead && AI.distance > pow(SECTOR(3.5f), 2))
 			{
 				item->Animation.TargetState = 2;
 				item->Animation.RequiredState = STATE_HARPY_FLAME_ATTACK;
