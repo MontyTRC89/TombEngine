@@ -258,6 +258,7 @@ namespace TEN::Renderer
 		RenderTarget2D m_renderTarget;
 		RenderTarget2D m_currentRenderTarget;
 		RenderTarget2D m_shadowMap;
+		RenderTarget2D m_depthMap;
 		RenderTargetCube m_reflectionCubemap;
 
 		// Shaders
@@ -447,6 +448,7 @@ namespace TEN::Renderer
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
+		void BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType);
 		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		
