@@ -233,8 +233,6 @@ void lara_as_reach(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	item->Animation.TargetState = LS_REACH;
-	// TODO: overhang
-	//SlopeReachExtra(item, coll);
 }
 
 // State:		LS_REACH (11)
@@ -260,6 +258,8 @@ void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
+
+	SlopeReachExtra(item, coll);
 
 	if (TestLaraHangJump(item, coll))
 		return;

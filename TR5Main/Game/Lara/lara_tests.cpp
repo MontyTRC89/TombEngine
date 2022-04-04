@@ -1283,10 +1283,11 @@ bool TestLaraMonkeyFall(ITEM_INFO* item, CollisionInfo* coll)
 	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollision(item);
 
-	if (!lara->Control.CanMonkeySwing ||				// No monkey sector.
-		(probe.Position.Ceiling - y) > CLICK(1.25f) ||	// Outside lower bound.
-		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||	// Outside upper bound.
-		probe.Position.CeilingSlope ||					// Is ceiling slope.
+	if (!lara->Control.CanMonkeySwing ||					// No monkey sector.
+		(probe.Position.Ceiling - y) > CLICK(1.25f) ||		// Outside lower bound.
+		(probe.Position.Ceiling - y) < -CLICK(1.25f) ||		// Outside upper bound.
+		(probe.Position.CeilingSlope &&						// Is ceiling slope (if applicable).
+			!g_GameFlow->Animations.HasOverhangClimb) ||
 		probe.Position.Ceiling == NO_HEIGHT)
 	{
 		return true;
@@ -1682,8 +1683,8 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MonkeyMov
 	if (probe.Position.Ceiling == NO_HEIGHT)
 		return false;
 
-	// Check for ceiling slope.
-	if (probe.Position.CeilingSlope)
+	// Check for ceiling slope (if applicable).
+	if (probe.Position.CeilingSlope && !g_GameFlow->Animations.HasOverhangClimb)
 		return false;
 
 	// Conduct ray test at lower ceiling bound and highest floor bound.
