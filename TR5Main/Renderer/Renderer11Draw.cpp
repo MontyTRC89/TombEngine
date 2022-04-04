@@ -1157,12 +1157,11 @@ namespace TEN::Renderer
 
 
 		// Set basic render states
-		SetBlendMode(BLENDMODE_OPAQUE);
-		SetCullMode(CULL_MODE_CCW);
+		SetBlendMode(BLENDMODE_OPAQUE, true);
+		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
+		SetCullMode(CULL_MODE_CCW, true);
 
 		// Bind and clear render target
-		//m_context->ClearRenderTargetView(target, Colors::Black);
-		//m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &m_viewport);
 
@@ -2611,8 +2610,9 @@ namespace TEN::Renderer
 		time1 = time2;
 
 		// Reset GPU state
-		SetBlendMode(BLENDMODE_OPAQUE);
-		SetCullMode(CULL_MODE_CCW);
+		SetBlendMode(BLENDMODE_OPAQUE, true);
+		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
+		SetCullMode(CULL_MODE_CCW, true);
 
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);

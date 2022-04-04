@@ -539,10 +539,10 @@ namespace TEN::Renderer
 		void DrawLaraHolsters(bool transparent);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
 		void DrawSimpleParticles(RenderView& view);
-		void SetBlendMode(BLEND_MODES blendMode);
-		void SetDepthState(DEPTH_STATES depthState);
-		void SetCullMode(CULL_MODES cullMode);
-		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold);
+		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
+		void SetDepthState(DEPTH_STATES depthState, bool force = false);
+		void SetCullMode(CULL_MODES cullMode, bool force = false);
+		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force = false);
 		float CalculateFrameRate();
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);

@@ -272,7 +272,7 @@ namespace TEN::Floordata
 
 		return VectorInt2{xPoint, yPoint};
 	}
-
+	
 	VectorInt2 GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
