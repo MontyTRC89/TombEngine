@@ -61,7 +61,9 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	float3 colorMul = min(input.Color.xyz, 1.0f);
 	output.Color.xyz = output.Color.xyz * colorMul.xyz;
 
-	output.Depth = float4(input.PositionCopy.z / input.PositionCopy.w, 0, 0, 1);
+	output.Depth = output.Color.w > 0.0f ?
+		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (FogMaxDistance != 0)
 		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
