@@ -133,7 +133,7 @@ void ApproachLaraTargetOrientation(ITEM_INFO* item, Vector3Shrt targetOrient, fl
 
 	if (!rate)
 	{
-		TENLog(std::string("ApproachLaraTargetOrientation() attempted division by zero!"), LogLevel::Warning);
+		TENLog(std::string("ApproachLaraTargetOrientation() attempted division by zero."), LogLevel::Warning);
 		return;
 	}
 
@@ -796,7 +796,7 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 
 	if (!rate)
 	{
-		TENLog(std::string("ResetLaraFlex() attempted division by zero!"), LogLevel::Warning);
+		TENLog(std::string("ResetLaraFlex() attempted division by zero."), LogLevel::Warning);
 		return;
 	}
 
