@@ -315,9 +315,9 @@ namespace TEN::Renderer
 		m_context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
 	}
 
-	void Renderer11::SetBlendMode(BLEND_MODES blendMode)
+	void Renderer11::SetBlendMode(BLEND_MODES blendMode, bool force)
 	{
-		if (blendMode != lastBlendMode)
+		if (blendMode != lastBlendMode || force)
 		{
 			switch (blendMode)
 			{
@@ -372,9 +372,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::SetDepthState(DEPTH_STATES depthState)
+	void Renderer11::SetDepthState(DEPTH_STATES depthState, bool force)
 	{
-		if (depthState != lastDepthState)
+		if (depthState != lastDepthState || force)
 		{
 			switch (depthState)
 			{
@@ -396,9 +396,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::SetCullMode(CULL_MODES cullMode)
+	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
-		if (cullMode != lastCullMode)
+		if (cullMode != lastCullMode || force)
 		{
 			switch (cullMode)
 			{
@@ -420,10 +420,11 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold)
+	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
 	{
 		if (m_stAlphaTest.AlphaTest != static_cast<int>(mode) ||
-			m_stAlphaTest.AlphaThreshold != threshold)
+			m_stAlphaTest.AlphaThreshold != threshold ||
+			force)
 		{
 			m_stAlphaTest.AlphaTest = static_cast<int>(mode);
 			m_stAlphaTest.AlphaThreshold = threshold;

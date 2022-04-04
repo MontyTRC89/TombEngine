@@ -9,7 +9,6 @@ cbuffer StaticMatrixBuffer : register(b8)
 	float4 Color;
 };
 
-
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;

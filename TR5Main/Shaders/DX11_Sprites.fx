@@ -70,7 +70,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	if (particleDepth > sceneDepth)
 		discard;
 
-	float fade = (sceneDepth - particleDepth) * 500.0F;
+	float fade = (sceneDepth - particleDepth) * 300.0F;
 	output.w = min(output.w, fade);
 
 	if (FogMaxDistance != 0)
