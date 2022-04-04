@@ -46,7 +46,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	SlopeMonkeyExtra(item, coll);
 
 	// This check is needed to prevent stealing goal state from previously set.
-	//if (item->TargetState == LS_MONKEY_IDLE)
+	//if (item->Animation.TargetState == LS_MONKEY_IDLE)
 	//	return;
 
 	if (TrInput & IN_LEFT &&

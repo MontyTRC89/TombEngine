@@ -77,35 +77,34 @@ short FindBridge(int tiltGrade, short facing, Vector3Int& pos, int* returnHeight
 
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{
-		auto obj = &g_Level.Items[i];
-
-		if (obj->ObjectNumber != bridgeSlot)
+		auto* bridgeItem = &g_Level.Items[i];
+		if (bridgeItem->ObjectNumber != bridgeSlot)
 			continue;
 
-		short facingDiff = (short)(obj->Pose.Orientation.y - facing);
+		short facingDiff = (short)(bridgeItem->Pose.Orientation.y - facing);
 
 		bool facingCheck = false;
 		if (facingDiff == ANGLE(90))
 			facingCheck = true;
-		else if (obj->ObjectNumber == ID_BRIDGE_FLAT)
+		else if (bridgeItem->ObjectNumber == ID_BRIDGE_FLAT)
 			facingCheck = true;
-		else if ((obj->ObjectNumber == ID_BRIDGE_TILT1 || obj->ObjectNumber == ID_BRIDGE_TILT2) && abs(facingDiff) == ANGLE(90.0f))
+		else if ((bridgeItem->ObjectNumber == ID_BRIDGE_TILT1 || bridgeItem->ObjectNumber == ID_BRIDGE_TILT2) && abs(facingDiff) == ANGLE(90.0f))
 			facingCheck = true;
 
 		if (!facingCheck)
 			continue;
 
-		if (obj->Pose.Position.x >= xmin &&
-			obj->Pose.Position.x <= xmax &&
-			obj->Pose.Position.z >= zmin &&
-			obj->Pose.Position.z <= zmax)
+		if (bridgeItem->Pose.Position.x >= xmin &&
+			bridgeItem->Pose.Position.x <= xmax &&
+			bridgeItem->Pose.Position.z >= zmin &&
+			bridgeItem->Pose.Position.z <= zmax)
 		{
 			if (minCeilY || maxCeilY)
 			{
-				if (Objects[obj->ObjectNumber].ceiling == nullptr)
+				if (Objects[bridgeItem->ObjectNumber].ceiling == nullptr)
 					continue;
 
-				*returnHeight = Objects[obj->ObjectNumber].ceiling(i, pos.x, pos.y, pos.z).value_or(NO_HEIGHT);
+				*returnHeight = Objects[bridgeItem->ObjectNumber].ceiling(i, pos.x, pos.y, pos.z).value_or(NO_HEIGHT);
 				
 				int ceilingDist = *returnHeight - pos.y;
 				if (ceilingDist >= minCeilY && ceilingDist <= maxCeilY)
@@ -126,6 +125,7 @@ short DirOrientDiff(short orient1, short orient2)
 
 	if (diff > ANGLE(180.0f))
 		diff -= ANGLE(360.0f);
+
 	if (diff < -ANGLE(180.0f))
 		diff += ANGLE(360.0f);
 
@@ -1077,7 +1077,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-// Extends state 75 (AS_HANG2)
+// Extends LS_MONKEY_IDLE (75)
 void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);

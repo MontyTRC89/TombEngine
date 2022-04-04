@@ -1266,9 +1266,12 @@ bool TestLaraMonkeyGrab(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.CanMonkeySwing && coll->Middle.Ceiling <= CLICK(0.5f) &&
-		(coll->Middle.Ceiling >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
-		abs(coll->Middle.Ceiling + coll->Middle.Floor + coll->Setup.Height) > LARA_HEIGHT_MONKEY)
+	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
+	auto probe = GetCollision(item);
+
+	if (lara->Control.CanMonkeySwing && (probe.Position.Ceiling - y) <= CLICK(0.5f) &&
+		((probe.Position.Ceiling - y) >= 0 || coll->CollisionType == CT_TOP || coll->CollisionType == CT_TOP_FRONT) &&
+		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY)
 	{
 		return true;
 	}
