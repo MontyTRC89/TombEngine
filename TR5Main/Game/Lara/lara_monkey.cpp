@@ -43,7 +43,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	// TODO: overhang
-	//SlopeMonkeyExtra(item, coll);
+	SlopeMonkeyExtra(item, coll);
 
 	// This check is needed to prevent stealing goal state from previously set.
 	//if (item->TargetState == LS_MONKEY_IDLE)
