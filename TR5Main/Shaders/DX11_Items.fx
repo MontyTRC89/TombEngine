@@ -145,7 +145,9 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	output.Color.xyz *= colorMul.xyz;
 	output.Color.xyz *= lighting.xyz;
 
-	output.Depth = float4(input.PositionCopy.z / input.PositionCopy.w, 0, 0, 1);
+	output.Depth = output.Color.w > 0.0f ?
+		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (FogMaxDistance != 0)
 	{

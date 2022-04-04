@@ -3098,7 +3098,7 @@ namespace TEN::Renderer
 								else
 								{
 									SetBlendMode(BLENDMODE_ALPHABLEND);
-									SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+									SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
 								}
 
 								BindTexture(TEXTURE_COLOR_MAP,
@@ -3511,7 +3511,7 @@ namespace TEN::Renderer
 					else
 					{
 						SetBlendMode(BLENDMODE_ALPHABLEND);
-						SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+						SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
 					}
 
 					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
