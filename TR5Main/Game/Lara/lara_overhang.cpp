@@ -714,17 +714,17 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 
 		Camera.flags = 1;
 
-		int distance = 1664;
-		if (TestLaraWall(item, 0, 1536, 0))
+		int distance = CLICK(6.5f);
+		if (TestLaraWall(item, 0, SECTOR(1.5f), 0))
 		{
-			distance = 1024;
+			distance = SECTOR(1);
 		}
 
 		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			Camera.targetDistance = distance;
-			Camera.targetElevation = int(3072 * frac);
-			Camera.targetAngle = int(-32767 * frac);
+			Camera.targetElevation = int(SECTOR(3) * frac);
+			Camera.targetAngle = int(-ANGLE(180.0f) * frac);
 			Camera.targetspeed = 15;
 		}
 		else
@@ -739,8 +739,8 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 	else// if (item->animNumber == LA_OVERHANG_MONKEY_SLOPE_CONCAVE)
 	{
 		//Camera.flags = 1;
-		Camera.targetElevation = -2048;
-		Camera.targetDistance = 1664;
+		Camera.targetElevation = -ANGLE(11.25f);
+		Camera.targetDistance = CLICK(6.5f);
 		Camera.speed = 15;
 	}
 
@@ -758,8 +758,8 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONVEX)
 	{
 		Camera.flags = 1;
-		Camera.targetDistance = 1664;
-		Camera.targetElevation = 2048;
+		Camera.targetDistance = CLICK(6.5f);
+		Camera.targetElevation = ANGLE(11.25f);
 		Camera.targetspeed = 15;
 	}
 	// Rotating camera effect during concave slope to monkey transition
@@ -778,20 +778,20 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			
 			Camera.targetAngle = (short)(-16384 * frac);
-			Camera.targetDistance = 1792 - int(512 * frac);
+			Camera.targetDistance = 1792 - int(CLICK(2) * frac);
 			Camera.targetspeed = 15;
 		}
 		else
 		{
-			Camera.targetAngle = 16384;
-			Camera.targetDistance = 1280;
+			Camera.targetAngle = ANGLE(90.0f);
+			Camera.targetDistance = SECTOR(1.25f);
 			Camera.targetspeed = 15;
 		}
 	}
 	else
 	{
-		Camera.targetDistance = 1664;
-		Camera.targetElevation = -2048;
+		Camera.targetDistance = CLICK(6.5f);
+		Camera.targetElevation = -ANGLE(11.25f);
 		Camera.targetspeed = 15;
 	}
 
@@ -901,7 +901,7 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 		auto slope = floorNow->TiltXZ(now.x, now.z, false);
 
 		int height;
-		short bridge1 = FindBridge(4, slopeData.goalOrient, now, &height, -CLICK(4), -5 * (CLICK(0.5f)));
+		short bridge1 = FindBridge(4, slopeData.goalOrient, now, &height, -CLICK(4), -CLICK(2.5f));
 
 		if (abs(slope.x) > 2 || abs(slope.y) > 2 || bridge1 >= 0)
 		{
