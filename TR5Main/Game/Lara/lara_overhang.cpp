@@ -383,8 +383,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			int height; // Height variable for bridge ceiling functions
 
 			// Test for upwards slope to climb
-			short bridge1 = FindBridge(4, item->Pose.Orientation.y, up, &height, -CLICK(5) / 2, -CLICK(3) / 2);
-			if (yDiff >= -CLICK(5) / 4 && yDiff <= -CLICK(3) / 4 && (SlopeCheck(slope, slopeData.goal) || bridge1 >= 0))
+			short bridge1 = FindBridge(4, item->Pose.Orientation.y, up, &height, -CLICK(2.5f), -CLICK(1.5f));
+			if (yDiff >= -CLICK(1.25f) && yDiff <= -CLICK(0.75f) && (SlopeCheck(slope, slopeData.goal) || bridge1 >= 0))
 			{
 				// Do one more check for wall/ceiling step 2*offX/Z further to avoid lara sinking her head in wall/step
 				auto testWall = (FLOOR_INFO*)GetFloor((up.x - slopeData.offset.x), (up.y - CLICK(1)), (up.z - slopeData.offset.z), &(tempRoom = item->RoomNumber));
@@ -399,9 +399,9 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			}
 
 			// Test for flat monkey (abs(slope) < 2)
-			bridge1 = FindBridge(0, slopeData.goalOrient, up, &height, -CLICK(9) / 4, -CLICK(5) / 4);
+			bridge1 = FindBridge(0, slopeData.goalOrient, up, &height, -CLICK(2.25f), -CLICK(1.25f));
 			if (bridge1 < 0)
-				bridge1 = FindBridge(1, slopeData.goalOrient, up, &height, -CLICK(9) / 4, -CLICK(5) / 4);
+				bridge1 = FindBridge(1, slopeData.goalOrient, up, &height, -CLICK(2.25f), -CLICK(1.25f));
 
 			// HACK: because of the different calculations of bridge height in TR4 and TEN, we need to lower yDiff tolerance to 0.9f.
 
@@ -438,8 +438,8 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 				SetAnimation(item, LA_OVERHANG_SLOPE_MONKEY_CONVEX); // Force slope to underlying monkey transition (convex)
 
 			// Test for downwards slope to climb
-			bridge1 = FindBridge(4, slopeData.goalOrient, down, &height, -CLICK(5) / 2, -CLICK(3) / 2);
-			if (yDiff >= CLICK(3) / 4 && yDiff <= CLICK(5) / 4 && (SlopeCheck(slope, slopeData.goal) || bridge1 >= 0))
+			bridge1 = FindBridge(4, slopeData.goalOrient, down, &height, -CLICK(2.5f), -CLICK(1.5f));
+			if (yDiff >= CLICK(0.75f) && yDiff <= CLICK(1.25f) && (SlopeCheck(slope, slopeData.goal) || bridge1 >= 0))
 			{
 				SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
 				return;
@@ -460,8 +460,8 @@ void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -3072;
-	Camera.targetDistance = 1792;
+	Camera.targetElevation = -ANGLE(16.75f);
+	Camera.targetDistance = SECTOR(1.75f);
 	Camera.speed = 15;
 }
 
@@ -479,8 +479,8 @@ void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -3072;
-	Camera.targetDistance = 1792;
+	Camera.targetElevation = -ANGLE(16.75f);
+	Camera.targetDistance = SECTOR(1.75f);
 	Camera.speed = 15;
 }
 
@@ -1100,7 +1100,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
 			if (abs(DirOrientDiff(slopeData.goalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
-				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1) / 2))
+				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))
 			{
 				auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
@@ -1118,7 +1118,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONCAVE); // Transition from monkey to underlying slope (concave)
 						return;
-						//item->pos.Position.y = ceiling + 496;
+						//item->Pose.Position.y = ceiling + 496;
 						//PerformFlipeffect(NULL, 51, 1, 2); // Disable the UP key command for 2 sec // HACK!!!
 					}
 
@@ -1128,7 +1128,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONVEX); // Transition from monkey to overhanging slope (convex)
 						return;
-						//item->pos.Position.y = ceiling + 914;
+						//item->Pose.Position.y = ceiling + 914;
 					}
 				}
 			}

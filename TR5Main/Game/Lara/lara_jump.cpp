@@ -259,7 +259,8 @@ void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
-	SlopeReachExtra(item, coll);
+	// TODO: overhang
+	//SlopeReachExtra(item, coll);
 
 	if (TestLaraHangJump(item, coll))
 		return;
