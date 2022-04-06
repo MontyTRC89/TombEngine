@@ -315,13 +315,15 @@ void RemoveDrawnItem(short itemNum)
 
 void RemoveActiveItem(short itemNum) 
 {
-	if (g_Level.Items[itemNum].active)
+	auto & item = g_Level.Items[itemNum];
+	if (item.active)
 	{
-		g_Level.Items[itemNum].active = false;
+		g_GameScriptEntities->NotifyKilled(&item);
+		item.active = false;
 
 		if (NextItemActive == itemNum)
 		{
-			NextItemActive = g_Level.Items[itemNum].nextActive;
+			NextItemActive = item.nextActive;
 		}
 		else
 		{
@@ -329,7 +331,7 @@ void RemoveActiveItem(short itemNum)
 			{
 				if (g_Level.Items[linknum].nextActive == itemNum)
 				{
-					g_Level.Items[linknum].nextActive = g_Level.Items[itemNum].nextActive;
+					g_Level.Items[linknum].nextActive = item.nextActive;
 					break;
 				}
 			}

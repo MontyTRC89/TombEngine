@@ -167,6 +167,8 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the status of the object
 		ScriptReserved_GetStatus, &Moveable::GetStatus,
 
+		"SetOnHit", &Moveable::SetOnHit,
+		"SetOnKill", &Moveable::SetOnKill,
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
@@ -353,6 +355,34 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 void Moveable::SetObjectID(GAME_OBJECT_ID item) 
 {
 	m_item->objectNumber = item;
+}
+
+
+void Moveable::SetOnHit(sol::protected_function func)
+{
+	m_onHit = func;
+}
+
+void Moveable::SetOnKill(sol::protected_function func)
+{
+	m_onKill = func;
+}
+
+
+void Moveable::CallOnHit()
+{
+	if (m_onHit.valid())
+	{
+		m_onHit();
+	}
+}
+
+void Moveable::CallOnKill()
+{
+	if (m_onKill.valid())
+	{
+		m_onKill();
+	}
 }
 
 

@@ -19,6 +19,7 @@ public:
 
 	virtual bool AddName(std::string const& key, VarMapVal val) = 0;
 	virtual bool NotifyKilled(ITEM_INFO *) = 0;
+	virtual bool NotifyHit(ITEM_INFO *) = 0;
 	virtual void FreeEntities() = 0;
 	virtual void AssignLara() = 0;
 };
