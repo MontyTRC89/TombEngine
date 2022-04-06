@@ -43,8 +43,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	// Overhang hook.
-	if (g_GameFlow->Animations.HasOverhangClimb)
-		SlopeMonkeyExtra(item, coll);
+	SlopeMonkeyExtra(item, coll);
 
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Shimmy locks orientation.
