@@ -12,15 +12,17 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
-/*this file has all the lara_as/lara_col functions related to hanging*/
+// -----------------------------
+// LEDGE HANG
+// Control & Collision Functions
+// -----------------------------
 
-/*normal hanging and shimmying*/
+// State:		LS_HANG (10)
+// Collision:	lara_col_hang()
 void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*state 10*/
-	/*collision: lara_col_hang*/
 	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
@@ -37,18 +39,17 @@ void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
-
-	SlopeHangExtra(item, coll);
 }
 
+
+// State:		LS_HANG (10)
+// Control:		lara_as_hang()
 void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*state 10*/
-	/*state code: lara_as_hang*/
-	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
+	item->Animation.VerticalVelocity = 0;
 
 	if (item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 		item->Animation.AnimNumber == LA_HANG_IDLE)
@@ -184,8 +185,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_BACK &&
-			lara->Control.CanClimbLadder &&
+		if (TrInput & IN_BACK && lara->Control.CanClimbLadder &&
 			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
 			(item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 				item->Animation.AnimNumber == LA_HANG_IDLE))
@@ -198,13 +198,13 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
+// State:		LS_SHIMMY_LEFT (30)
+// Collision:	lara_col_shimmy_left()
 void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 30*/
-	/*collision: lara_col_hangleft*/
+	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -212,12 +212,12 @@ void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_HANG;
 }
 
+// State:		LS_SHIMMY_LEFT (30)
+// Control:		lara_as_shimmy_left()
 void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*state 30*/
-	/*state code: lara_as_hangleft*/
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
@@ -225,10 +225,10 @@ void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 }
 
+// State:		LS_SHIMMY_RIGHT (31)
+// Collision:	lara_col_shimmy_right()
 void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 31*/
-	/*collision: lara_col_hangright*/
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
@@ -239,34 +239,33 @@ void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_HANG;
 }
 
+// State:		LS_SHIMMY_RIGHT (31)
+// Control:		lara_as_shimmy_right()
 void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*state 31*/
-	/*state code: lara_as_hangright*/
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 	TestLaraHang(item, coll);
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 }
 
-void lara_as_handstand(ITEM_INFO* item, CollisionInfo* coll)
+// State:		LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110),
+// Collision:	lara_default_col()
+void lara_as_shimmy_corner(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 54*/
-	/*collision: lara_default_col*/
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpasm = false;
-}
-
-/*go around corners*/
-
-void lara_as_corner(ITEM_INFO* item, CollisionInfo* coll)
-{
-	/*state 107*/
-	/*collision: lara_default_col*/
-	Camera.laraNode = LM_TORSO;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
+	Camera.laraNode = LM_TORSO;
+
 	SetLaraCornerAnimation(item, coll, TestLastFrame(item));
+}
+
+// State:		LS_HANDSTAND (54)
+// Collision:	lara_default_col()
+void lara_as_handstand(ITEM_INFO* item, CollisionInfo* coll)
+{
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
 }

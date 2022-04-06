@@ -17,8 +17,8 @@
 using namespace TEN::Entities::Generic;
 
 // -----------------------------------
-// MISCELLANEOUS INTERACTABLE OBJECTS
-// State Control & Collision Functions
+// MISCELLANEOUS INTERACTABLE OBJECT
+// Control & Collision Functions
 // -----------------------------------
 
 // ------

@@ -13,6 +13,11 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
+// -----------------------------
+// LADDER CLIMB
+// Control & Collision Functions
+// -----------------------------
+
 void lara_col_climb_end(ITEM_INFO* item, CollisionInfo* coll)
 {
 	return;
