@@ -260,8 +260,7 @@ void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 
 	// Overhang hook.
-	if (g_GameFlow->Animations.HasOverhangClimb)
-		SlopeReachExtra(item, coll);
+	SlopeReachExtra(item, coll);
 
 	if (TestLaraHangJump(item, coll))
 		return;
