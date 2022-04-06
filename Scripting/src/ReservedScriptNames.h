@@ -62,6 +62,8 @@ static constexpr char ScriptReserved_GetValid[]			= "GetValid";
 static constexpr char ScriptReserved_Destroy[]			= "Destroy";
 static constexpr char ScriptReserved_GetKey[]			= "GetKey";
 static constexpr char ScriptReserved_SetKey[]			= "SetKey";
+static constexpr char ScriptReserved_SetOnKill[]		= "SetOnKill";
+static constexpr char ScriptReserved_SetOnHit[]			= "SetOnHit";
 
 
 // Flow Functions
