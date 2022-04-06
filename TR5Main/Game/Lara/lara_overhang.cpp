@@ -10,9 +10,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
+#include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
-#include "Scripting/GameFlowScript.h"
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
 constexpr auto HORIZONTAL_ALIGN_SOUTHWEST = 101;
@@ -358,8 +358,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
-			if (TestLaraWall(item, 0, 0, -CLICK(4)) &&
-				GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (SECTOR(1.5f) - 80))  // Check if a wall is actually there.
+			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (SECTOR(1.5f) - 80))  // Check if a wall is actually there.
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
