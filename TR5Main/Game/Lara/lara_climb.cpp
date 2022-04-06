@@ -112,8 +112,7 @@ void lara_as_climb_down(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(45.0f);
 
 	// Overhang hook.
-	if (g_GameFlow->Animations.HasOverhangClimb)
-		SlopeClimbDownExtra(item, coll);
+	SlopeClimbDownExtra(item, coll);
 }
 
 void lara_col_climb_up(ITEM_INFO* item, CollisionInfo* coll)
@@ -372,8 +371,7 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	// Overhang hook.
-	if (g_GameFlow->Animations.HasOverhangClimb)
-		SlopeClimbExtra(item, coll);
+	SlopeClimbExtra(item, coll);
 }
 
 void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll)
