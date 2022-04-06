@@ -41,11 +41,6 @@ inline bool SlopeInvCheck(Vector2 slope, Vector2 goal)
 	return (slope.x == -goal.x && slope.y == -goal.y);
 }
 
-bool TestMonkey(FLOOR_INFO* floor, int x, int y, int z)
-{
-	return GetCollision(floor, x, y, z).BottomBlock->Flags.Monkeyswing;
-}
-
 short FindBridge(int tiltGrade, short orient, Vector3Int& pos, int* returnHeight, int ceilingMinY = 0, int ceilingMaxY = 0)
 {
 	short bridgeSlot;
@@ -184,7 +179,7 @@ void AlignToEdge(ITEM_INFO* item, short edgeDist)
 
 	// Align to closest cardinal facing.
 	item->Pose.Orientation.y += ANGLE(45.0f);
-	item->Pose.Orientation.y &= 0xC000;
+	item->Pose.Orientation.y &= ANGLE(270.0f);
 
 	// Align to faced edge.
 	switch (item->Pose.Orientation.y)
@@ -217,7 +212,7 @@ bool AlignToGrab(ITEM_INFO* item)
 	bool legLeft = false;
 
 	item->Pose.Orientation.y += ANGLE(45.0f);
-	item->Pose.Orientation.y &= 0xC000;
+	item->Pose.Orientation.y &= ANGLE(270.0f);
 
 	switch (item->Pose.Orientation.y)
 	{
@@ -320,17 +315,14 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	auto up = Vector3Int(item->Pose.Position.x - slopeData.Offset.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z - slopeData.Offset.z);
 	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
-	auto collResultUp = GetCollision(up.x, up.y, up.z, item->RoomNumber);
-	auto collResultDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
+	auto probeUp = GetCollision(up.x, up.y, up.z, item->RoomNumber);
+	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
 	if (item->Animation.AnimNumber == LA_OVERHANG_LADDER_SLOPE_CONCAVE)
 		return;
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-	
-	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = probeNow.Position.Ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed.
 	if (!(TrInput & IN_ACTION))
@@ -350,16 +342,16 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_FORWARD)
 	{
 		// Test for ledge over slope.
-		tempRoom = collResultUp.Block->RoomAbove(up.x, up.z).value_or(NO_ROOM);
+		short tempRoom = probeUp.Block->RoomAbove(up.x, up.z).value_or(NO_ROOM);
 		if (tempRoom != NO_ROOM)
 		{
-			short oldRoomCam = Camera.pos.roomNumber;
-			short oldRoomTarg = Camera.target.roomNumber; 
+			short oldRoomCamera = Camera.pos.roomNumber;
+			short oldRoomTarget = Camera.target.roomNumber; 
 
-			auto testLedge = GetFloor(now.x, now.y - CLICK(3), now.z, &tempRoom);
-			int ledgeCeiling = GetCeiling(testLedge, now.x, now.y - CLICK(3), now.z);
-			int ledgeHeight = GetFloorHeight(testLedge, now.x, now.y - CLICK(3), now.z);
-			if ((ledgeHeight - ledgeCeiling >= CLICK(3)) && abs((item->Pose.Position.y - 688) - ledgeHeight) < 64)
+			auto probeLedge = GetCollision(now.x, now.y - CLICK(3), now.z, tempRoom);
+
+			if ((probeLedge.Position.Floor - probeLedge.Position.Ceiling) >= CLICK(3) &&
+				abs((item->Pose.Position.y - 688) - probeLedge.Position.Floor) < 64)
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_LEDGE_VAULT_START); // Ledge climb-up from slope.
@@ -367,11 +359,11 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 		}
 
 		// Test for slope to overhead ladder transition (convex).
-		if (GetClimbFlags(collResultUp.BottomBlock) & slopeData.ClimbOrient &&
+		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
 			if (TestLaraWall(item, 0, 0, -CLICK(4)) &&
-				GetCeiling(collResultUp.Block, up.x, up.y, up.z) - item->Pose.Position.y <= 1456)  // Check if a wall is actually there.
+				GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= 1456)  // Check if a wall is actually there.
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
@@ -379,23 +371,21 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 		}
 
 		// Test for monkey at next position.
-		if (collResultUp.BottomBlock->Flags.Monkeyswing)
+		if (probeUp.BottomBlock->Flags.Monkeyswing)
 		{
-			int yDiff = collResultUp.Position.Ceiling - ceiling;
-
-			auto slope = collResultUp.Block->TiltXZ(up.x, up.z, false);
+			int yDiff = probeUp.Position.Ceiling - probeNow.Position.Ceiling;
 
 			int height; // Height variable for bridge ceiling functions.
 
 			// Test for upwards slope to climb.
 			short bridge = FindBridge(4, item->Pose.Orientation.y, up, &height, -CLICK(2.5f), -CLICK(1.5f));
-			if (yDiff >= -CLICK(1.25f) && yDiff <= -CLICK(0.75f) && (SlopeCheck(slope, slopeData.Goal) || bridge >= 0))
+			if (yDiff >= -CLICK(1.25f) && yDiff <= -CLICK(0.75f) && (SlopeCheck(probeUp.CeilingTilt, slopeData.Goal) || bridge >= 0))
 			{
 				// Do one more check for wall/ceiling step 2 * offX / Z further to avoid lara sinking her head in wall/step.
-				auto testWall = (FLOOR_INFO*)GetFloor((up.x - slopeData.Offset.x), (up.y - CLICK(1)), (up.z - slopeData.Offset.z), &(tempRoom = item->RoomNumber));
-				int testCeiling = GetCeiling(testWall, (up.x - slopeData.Offset.x), (up.y - CLICK(1)), (up.z - slopeData.Offset.z));
+				auto probeWall = GetCollision((up.x - slopeData.Offset.x), (up.y - CLICK(1)), (up.z - slopeData.Offset.z), item->RoomNumber);
 
-				if (!testWall->IsWall((up.x - slopeData.Offset.x), (up.z - slopeData.Offset.z)) && (ceiling - testCeiling) > CLICK(0.5f)) // No wall or downward ceiling step.
+				if (!probeWall.Block->IsWall((up.x - slopeData.Offset.x), (up.z - slopeData.Offset.z)) &&
+					(probeNow.Position.Ceiling - probeWall.Position.Ceiling) > CLICK(0.5f)) // No wall or downward ceiling step.
 				{
 					TranslateItem(item, 0, -CLICK(1), -CLICK(1));
 					SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
@@ -409,16 +399,18 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 				bridge = FindBridge(1, slopeData.GoalOrient, up, &height, -CLICK(2.25f), -CLICK(1.25f));
 
 			// HACK: because of the different calculations of bridge height in TR4 and TEN, we need to lower yDiff tolerance to 0.9f.
-			if (yDiff > -CLICK(0.9f) && yDiff <= -CLICK(0.5f) && ((abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge >= 0))
-				SetAnimation(item, LA_OVERHANG_SLOPE_MONKEY_CONCAVE); // Slope to overhead monkey transition (concave)
+			if (yDiff > -CLICK(0.9f) && yDiff <= -CLICK(0.5f) &&
+				((abs(probeUp.CeilingTilt.x) <= 2 && abs(probeUp.CeilingTilt.y) <= 2) || bridge >= 0))
+			{
+				SetAnimation(item, LA_OVERHANG_SLOPE_MONKEY_CONCAVE); // Slope to overhead monkey transition (concave).
+			}
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		// Get floor_lara 256 downstream of Lara.
-		auto floorNext = (FLOOR_INFO*)GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
 
-		if ((GetClimbFlags(GetCollision(floorNow, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
+		if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
 		{
 			AlignToEdge(item, BACKWARD_ALIGNMENT);
@@ -426,24 +418,22 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TestMonkey(floorNext, down.x, down.y, down.z))
+		if (probeDown.BottomBlock->Flags.Monkeyswing)
 		{
-			auto slope = floorNext->TiltXZ(down.x, down.z, false);
-
 			int height;
-			int yDiff = GetCeiling(floorNext, down.x, down.y, down.z) - ceiling;
+			int yDiff = probeDown.Position.Ceiling - probeNow.Position.Ceiling;
 
 			// Test for flat monkey (abs(slope) < 2).
 			short bridge = FindBridge(0, slopeData.GoalOrient, down, &height, -CLICK(3), -CLICK(2));
 			if (bridge < 0)
 				bridge = FindBridge(1, slopeData.GoalOrient, down, &height, -CLICK(3), -CLICK(2));
 
-			if ((abs(yDiff) < CLICK(1) && abs(slope.x) <= 2 && abs(slope.y) <= 2) || bridge >= 0)
+			if ((abs(yDiff) < CLICK(1) && abs(probeDown.CeilingTilt.x) <= 2 && abs(probeDown.CeilingTilt.y) <= 2) || bridge >= 0)
 				SetAnimation(item, LA_OVERHANG_SLOPE_MONKEY_CONVEX); // Force slope to underlying monkey transition (convex)
 
 			// Test for downward slope to climb.
 			bridge = FindBridge(4, slopeData.GoalOrient, down, &height, -CLICK(2.5f), -CLICK(1.5f));
-			if (yDiff >= CLICK(0.75f) && yDiff <= CLICK(1.25f) && (SlopeCheck(slope, slopeData.Goal) || bridge >= 0))
+			if (yDiff >= CLICK(0.75f) && yDiff <= CLICK(1.25f) && (SlopeCheck(probeDown.CeilingTilt, slopeData.Goal) || bridge >= 0))
 			{
 				SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
 				return;
@@ -498,16 +488,15 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 
 	auto now = item->Pose.Position;
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	
-	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = probeNow.Position.Ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed.
 	if (!(TrInput & IN_ACTION))
 	{
 		SetAnimation(item, LA_OVERHANG_HANG_DROP);
+		item->Animation.Airborne = true;
 		return;
 	}
 
@@ -536,18 +525,16 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 				direction = ANGLE(90.0f);
 			}
 
-			FLOOR_INFO* floorNext = (FLOOR_INFO*)GetFloor(shimmy.x, shimmy.y, shimmy.z, &(tempRoom = item->RoomNumber));
+			auto probeShimmy = GetCollision(shimmy.x, shimmy.y, shimmy.z, item->RoomNumber);
 
-			if (TestMonkey(floorNext, shimmy.x, shimmy.y, shimmy.z))
+			if (probeShimmy.BottomBlock->Flags.Monkeyswing)
 			{
-				auto slope = floorNext->TiltXZ(shimmy.x, shimmy.z, false);
-
-				int yDiff = GetCeiling(floorNext, shimmy.x, shimmy.y, shimmy.z) - ceiling;
+				int yDiff = probeShimmy.Position.Ceiling - probeNow.Position.Ceiling;
 
 				int height;
 				short bridge = FindBridge(4, slopeData.GoalOrient, shimmy, &height, -CLICK(2.5f), -CLICK(1.5f));
 
-				if ((SlopeCheck(slope, slopeData.Goal) && abs(yDiff) < 64) || bridge >= 0)
+				if ((SlopeCheck(probeShimmy.CeilingTilt, slopeData.Goal) && abs(yDiff) < 64) || bridge >= 0)
 					SetAnimation(item, direction < 0 ? LA_OVERHANG_SHIMMY_LEFT : LA_OVERHANG_SHIMMY_RIGHT);
 			}
 		}
@@ -577,11 +564,9 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 
 	auto now = item->Pose.Position;
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	
-	item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
+	item->Pose.Position.y = probeNow.Position.Ceiling + HEIGHT_ADJUST;
 
 	auto shimmy = item->Pose.Position;
 	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
@@ -595,19 +580,17 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 		shimmy.z -= slopeData.Offset.x / 2;
 	}
 
-	auto floorNext = GetFloor(shimmy.x, shimmy.y, shimmy.z, &(tempRoom = item->RoomNumber));
+	auto probeShimmy = GetCollision(shimmy.x, shimmy.y, shimmy.z, item->RoomNumber);
 
 	bool cancelShimmy = true;
-	if (TestMonkey(floorNext, shimmy.x, shimmy.y, shimmy.z))
+	if (probeShimmy.BottomBlock->Flags.Monkeyswing)
 	{
-		auto slope = floorNext->TiltXZ(shimmy.x, shimmy.z, false);
-
-		int yDiff = GetCeiling(floorNext, shimmy.x, shimmy.y, shimmy.z) - ceiling;
+		int yDiff = probeShimmy.Position.Ceiling - probeNow.Position.Ceiling;
 
 		int height;
 		short bridge = FindBridge(4, slopeData.GoalOrient, shimmy, &height, -CLICK(2.5f), -CLICK(1.5f));
 
-		if ((SlopeCheck(slope, slopeData.Goal) && abs(yDiff) < 64) || bridge >= 0)
+		if ((SlopeCheck(probeShimmy.CeilingTilt, slopeData.Goal) && abs(yDiff) < 64) || bridge >= 0)
 			cancelShimmy = false;
 	}
 
@@ -853,18 +836,16 @@ void SlopeHangExtra(ITEM_INFO* item, CollisionInfo* coll)
 	auto slopeData = GetSlopeData(item);
 
 	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
+	
+	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
-	short tempRoom = 0;
-	auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
-	int ceilDist = item->Pose.Position.y - GetCeiling(floorNext, down.x, down.y, down.z);
+	int ceilDist = item->Pose.Position.y - probeDown.Position.Ceiling;
 
 	if (item->Animation.TargetState == LS_LADDER_IDLE) // Prevent going from hang to climb mode if slope is under ladder.
 	{
 		if (ceilDist >= CLICK(1) && ceilDist < CLICK(2))
 		{
-			auto slope = floorNext->TiltXZ(down.x, down.z, false);
-
-			if ((slope.x / 3) == (slopeData.Goal.x / 3) || (slope.y / 3) == (slopeData.Goal.y / 3))
+			if ((probeDown.CeilingTilt.x / 3) == (slopeData.Goal.x / 3) || (probeDown.CeilingTilt.y / 3) == (slopeData.Goal.y / 3))
 			{
 				item->Animation.TargetState = LS_HANG;
 				if (TrInput & IN_FORWARD)
@@ -897,25 +878,22 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 	auto slopeData = GetSlopeData(item);
 
 	auto now = item->Pose.Position;
-	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceilDist = item->Pose.Position.y - GetCeiling(floorNow, now.x, now.y, now.z);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
+	
+	int ceilDist = item->Pose.Position.y - probeNow.Position.Ceiling;
 
-	if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist <= CLICK(3.5f))
+	if (probeNow.BottomBlock->Flags.Monkeyswing && ceilDist <= CLICK(3.5f))
 	{
-		auto slope = floorNow->TiltXZ(now.x, now.z, false);
-
 		int height;
 		short bridge = FindBridge(4, slopeData.GoalOrient, now, &height, -CLICK(4), -CLICK(2.5f));
 
-		if (abs(slope.x) > 2 || abs(slope.y) > 2 || bridge >= 0)
+		if (abs(probeNow.CeilingTilt.x) > 2 || abs(probeNow.CeilingTilt.y) > 2 || bridge >= 0)
 		{
 			bool disableGrab = true;
-			if (SlopeCheck(slope, slopeData.Goal) || bridge >= 0)
+			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				if (abs(OrientDelta(item->Pose.Orientation.y, slopeData.GoalOrient)) < 0x1800)
+				if (abs(OrientDelta(item->Pose.Orientation.y, slopeData.GoalOrient)) < ANGLE(33.75f))
 					disableGrab = false;
 			}
 
@@ -936,31 +914,26 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 	auto now = item->Pose.Position;
 	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 
 	// Block for ladder to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_LADDER_IDLE)
 	{
 		if (TrInput & IN_FORWARD)
 		{
-			int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-			int ceilDist = ceiling - item->Pose.Position.y;
+			int ceilDist = probeNow.Position.Ceiling - item->Pose.Position.y;
 
-			if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist >= -CLICK(4) && ceilDist <= -CLICK(3))
+			if (probeNow.BottomBlock->Flags.Monkeyswing && ceilDist >= -CLICK(4) && ceilDist <= -CLICK(3))
 			{
-				auto slope = floorNow->TiltXZ(item->Pose.Position.x, item->Pose.Position.z, false);
-
 				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
-				facing &= 0xC000;
+				facing &= ANGLE(270.0f);
 
 				int height;
 				short bridge = FindBridge(4, facing, now, &height, -CLICK(4), -CLICK(3)); 
 
-				if (SlopeCheck(slope, slopeData.Goal) || bridge >= 0)
+				if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 				{
-					item->Pose.Position.y = ceiling + 900;
+					item->Pose.Position.y = probeNow.Position.Ceiling + 900;
 					SetAnimation(item, LA_OVERHANG_LADDER_SLOPE_CONCAVE); // Ladder to overhead slope transition (concave).
 				}
 			}
@@ -968,23 +941,21 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 		if (TrInput & IN_BACK)
 		{
-			auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
-			int ceiling = GetCeiling(floorNext, down.x, down.y, down.z);
-			int ceilDist = ceiling - item->Pose.Position.y;
+			auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
-			if (TestMonkey(floorNext, down.x, down.y, down.z) && ceilDist >= 0 && ceilDist <= CLICK(1))
+			int ceilDist = probeDown.Position.Ceiling - item->Pose.Position.y;
+
+			if (probeDown.BottomBlock->Flags.Monkeyswing && ceilDist >= 0 && ceilDist <= CLICK(1))
 			{
-				auto slope = floorNext->TiltXZ(down.x, down.z, false);
-
 				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
-				facing &= 0xC000;
+				facing &= ANGLE(270.0f);
 
 				int height;
 				short bridge = FindBridge(4, facing, down, &height, -CLICK(0.5f), -CLICK(0.25f)); 
 
-				if (SlopeCheck(slope, slopeData.Goal) || bridge >= 0)
+				if (SlopeCheck(probeDown.CeilingTilt, slopeData.Goal) || bridge >= 0)
 				{
-					item->Pose.Position.y = ceiling - 156;
+					item->Pose.Position.y = probeDown.Position.Ceiling - 156;
 					SetAnimation(item, LA_OVERHANG_LADDER_SLOPE_CONVEX); // Ladder to underlying slope transition (convex).
 				}
 			}
@@ -1015,25 +986,17 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 	auto slopeData = GetSlopeData(item);
 
-	auto now = item->Pose.Position;
 	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
-
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
 
 	if (item->Animation.AnimNumber == LA_LADDER_DOWN) // Make Lara stop before underlying slope ceiling at correct height.
 	{
 		if (TrInput & IN_BACK)
 		{
-			auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
-			int ceiling = GetCeiling(floorNext, down.x, down.y, down.z);
-			int ceilDist = ceiling - item->Pose.Position.y;
+			auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
+			int ceilDist = probeDown.Position.Ceiling - item->Pose.Position.y;
 
-			if (TestMonkey(floorNext, down.x, down.y, down.z))
+			if (probeDown.BottomBlock->Flags.Monkeyswing)
 			{
-				auto slope = floorNext->TiltXZ(down.x, down.z, false);
-
 				int midpoint = 29; // HACK: lara_col_climb_down func, case for frame 29, dehardcode later.
 				
 				//down.y += 256;
@@ -1041,13 +1004,13 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 				if (!GetFrameNumber(item, 0))
 				{
 					short bridge = FindBridge(4, slopeData.GoalOrient, down, &height, -CLICK(3), CLICK(4));
-					if (ceilDist < CLICK(1) && (bridge >= 0 || SlopeCheck(slope, slopeData.Goal)))
+					if (ceilDist < CLICK(1) && (bridge >= 0 || SlopeCheck(probeDown.CeilingTilt, slopeData.Goal)))
 						item->Animation.TargetState = LS_LADDER_IDLE;
 				}
 				else if (GetFrameNumber(item, 0) == midpoint)
 				{
 					short bridge = FindBridge(4, slopeData.GoalOrient, down, &height, -CLICK(2), CLICK(5));
-					if (ceilDist < CLICK(1) * 2 && (bridge >= 0 || SlopeCheck(slope, slopeData.Goal)))
+					if (ceilDist < CLICK(1) * 2 && (bridge >= 0 || SlopeCheck(probeDown.CeilingTilt, slopeData.Goal)))
 					{
 						item->Pose.Position.y += CLICK(1); // Do midpoint Y translation.
 						item->Animation.TargetState = LS_LADDER_IDLE;
@@ -1071,31 +1034,26 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 	auto now = item->Pose.Position;
 	auto down = Vector3Int(item->Pose.Position.x + slopeData.Offset.x, item->Pose.Position.y + CLICK(1), item->Pose.Position.z + slopeData.Offset.z);
 
-	short tempRoom = 0;
-	auto floorNow = GetFloor(now.x, now.y, now.z, &(tempRoom = item->RoomNumber));
-	int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
+	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 
 	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameNumber(item, 0)) // Manage proper grabbing of monkey slope on forward jump.
 	{
-		int ceiling = GetCeiling(floorNow, now.x, now.y, now.z);
-		int ceilDist = item->Pose.Position.y - ceiling;
+		int ceilDist = item->Pose.Position.y - probeNow.Position.Ceiling;
 
-		if (TestMonkey(floorNow, now.x, now.y, now.z) && ceilDist <= CLICK(3.5f))
+		if (probeNow.BottomBlock->Flags.Monkeyswing && ceilDist <= CLICK(3.5f))
 		{
-			auto slope = floorNow->TiltXZ(now.x, now.z, false);
-
 			short facing = item->Pose.Orientation.y + ANGLE(45.0f);
 			facing &= 0xC000;
 
 			int height;
 			short bridge = FindBridge(4, facing, now, &height, -CLICK(3.5f), -CLICK(2.5f)); 
 
-			if (SlopeCheck(slope, slopeData.Goal) || bridge >= 0)
+			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
 				lara->NextCornerPos.Orientation.z = AlignToGrab(item);
 
-				int ceiling2 = GetCeiling(floorNow, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-				item->Pose.Position.y = ceiling2 + HEIGHT_ADJUST;
+				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
+				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
 
 				SetAnimation(item, LA_OVERHANG_HANG_SWING);
 			}
@@ -1104,24 +1062,22 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TrInput & IN_FORWARD) // Monkey to slope transitions.
 	{
-		if (TestMonkey(floorNow, now.x, now.y, now.z) &&
+		if (probeNow.BottomBlock->Flags.Monkeyswing &&
 			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
 			if (abs(OrientDelta(slopeData.GoalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
 				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))
 			{
-				auto floorNext = GetFloor(down.x, down.y, down.z, &(tempRoom = item->RoomNumber));
+				auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
-				if (TestMonkey(floorNext, down.x, down.y, down.z))
+				if (probeDown.BottomBlock->Flags.Monkeyswing)
 				{
-					int ceiling = GetCeiling(floorNext, down.x, now.y, down.z);
-					int yDiff = ceiling - GetCeiling(floorNow, now.x, now.y, now.z);
-
-					auto slope = floorNext->TiltXZ(down.x, down.z, false);
+					int ceiling = GetCollision(probeDown.Block, down.x, now.y, down.z).Position.Ceiling;
+					int yDiff = ceiling - probeNow.Position.Ceiling;
 
 					int height;
 					short bridge = FindBridge(4, slopeData.GoalOrient, down, &height, -CLICK(7) >> 1, -CLICK(5) >> 1);
-					if ((SlopeCheck(slope, slopeData.Goal) && yDiff > 0 && yDiff < CLICK(1)) || bridge >= 0)
+					if ((SlopeCheck(probeDown.CeilingTilt, slopeData.Goal) && yDiff > 0 && yDiff < CLICK(1)) || bridge >= 0)
 					{
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONCAVE); // Transition from monkey to underlying slope (concave).
@@ -1131,7 +1087,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 					}
 
 					bridge = FindBridge(4, slopeData.GoalOrient + ANGLE(180.0f), down, &height, -CLICK(5), -CLICK(4));
-					if ((SlopeInvCheck(slope, slopeData.Goal) && yDiff > -CLICK(1) && yDiff < 0) || bridge >= 0)
+					if ((SlopeInvCheck(probeDown.CeilingTilt, slopeData.Goal) && yDiff > -CLICK(1) && yDiff < 0) || bridge >= 0)
 					{
 						AlignToEdge(item, SLOPE_ALIGNMENT);
 						SetAnimation(item, LA_OVERHANG_MONKEY_SLOPE_CONVEX); // Transition from monkey to overhanging slope (convex).
