@@ -157,7 +157,7 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
-/// (int) status of object.
+/// Get the status of object.
 // possible values:
 // 0 - not active
 // 1 - active
@@ -166,9 +166,19 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 		ScriptReserved_GetStatus, &Moveable::GetStatus,
+		
+/// Set a function to be called when the moveable is shot by Lara
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam func callback function to be called
+		ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-		"SetOnHit", &Moveable::SetOnHit,
-		"SetOnKill", &Moveable::SetOnKill,
+/// Set a function to be called when the moveable is destroyed/killed
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnKill
+// @tparam func callback function to be called
+		ScriptReserved_SetOnKill, &Moveable::SetOnKill,
+
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
