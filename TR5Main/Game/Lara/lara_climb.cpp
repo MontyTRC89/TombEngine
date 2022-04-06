@@ -9,6 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
+#include "Scripting/GameFlowScript.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 
@@ -110,7 +111,9 @@ void lara_as_climb_down(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(45.0f);
 
-	SlopeClimbDownExtra(item, coll);
+	// Overhang hook.
+	if (g_GameFlow->Animations.HasOverhangClimb)
+		SlopeClimbDownExtra(item, coll);
 }
 
 void lara_col_climb_up(ITEM_INFO* item, CollisionInfo* coll)
@@ -285,10 +288,14 @@ void lara_col_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
 		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
-		if (!resultRight || !resultLeft)
+		// Overhang hook.
+		if (g_GameFlow->Animations.HasOverhangClimb)
 		{
-			LadderMonkeyExtra(item, coll);
-			return;
+			if (!resultRight || !resultLeft)
+			{
+				LadderMonkeyExtra(item, coll);
+				return;
+			}
 		}
 
 		if (resultRight >= 0 && resultLeft >= 0)
@@ -364,7 +371,9 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 		}
 	}
 
-	SlopeClimbExtra(item, coll);
+	// Overhang hook.
+	if (g_GameFlow->Animations.HasOverhangClimb)
+		SlopeClimbExtra(item, coll);
 }
 
 void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll)

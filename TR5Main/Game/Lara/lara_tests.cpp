@@ -1686,8 +1686,8 @@ bool TestLaraMonkeyMoveTolerance(ITEM_INFO* item, CollisionInfo* coll, MonkeyMov
 	if (probe.Position.Ceiling == NO_HEIGHT)
 		return false;
 
-	// Check for ceiling slope (if applicable).
-	if (probe.Position.CeilingSlope && !g_GameFlow->Animations.HasOverhangClimb)
+	// Check for ceiling slope.
+	if (probe.Position.CeilingSlope)
 		return false;
 
 	// Conduct ray test at lower ceiling bound and highest floor bound.

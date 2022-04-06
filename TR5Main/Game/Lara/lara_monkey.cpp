@@ -42,12 +42,9 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	// TODO: overhang
-	SlopeMonkeyExtra(item, coll);
-
-	// This check is needed to prevent stealing goal state from previously set.
-	//if (item->Animation.TargetState == LS_MONKEY_IDLE)
-	//	return;
+	// Overhang hook.
+	if (g_GameFlow->Animations.HasOverhangClimb)
+		SlopeMonkeyExtra(item, coll);
 
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Shimmy locks orientation.
