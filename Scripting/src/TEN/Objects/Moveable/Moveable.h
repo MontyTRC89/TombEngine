@@ -70,12 +70,21 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+
+	void SetOnHit(sol::protected_function);
+	void SetOnKill(sol::protected_function);
+
 	short GetStatus() const;
 
 	void Init();
+
+	void CallOnHit();
+	void CallOnKill();
 
 private:
 	ITEM_INFO* m_item;
 	short m_num;
 	bool m_initialised;
+	sol::protected_function	m_onHit{};
+	sol::protected_function	m_onKill{};
 };

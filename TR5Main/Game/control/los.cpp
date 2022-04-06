@@ -13,6 +13,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+
 int NumberLosRooms;
 short LosRooms[20];
 int ClosestItem;
@@ -208,6 +210,7 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									{
 										item->hitPoints -= Weapons[Lara.gunType].damage;
 									}
+									g_GameScriptEntities->NotifyHit(item);
 								}
 							}
 						}

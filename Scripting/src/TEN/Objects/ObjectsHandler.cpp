@@ -116,6 +116,23 @@ void ObjectsHandler::AssignLara()
 #endif
 }
 
+bool ObjectsHandler::NotifyHit(ITEM_INFO* key)
+{
+#if TEN_OPTIONAL_LUA
+	auto it = m_moveables.find(key);
+	if (std::end(m_moveables) != it)
+	{
+		for (auto& m : m_moveables[key])
+		{
+			// run "on hit" callback if we have one
+			m->CallOnHit();
+		}
+		return true;
+	}
+	return false;
+#endif
+}
+
 bool ObjectsHandler::NotifyKilled(ITEM_INFO* key)
 {
 #if TEN_OPTIONAL_LUA
@@ -124,6 +141,8 @@ bool ObjectsHandler::NotifyKilled(ITEM_INFO* key)
 	{
 		for (auto& m : m_moveables[key])
 		{
+			// run "on kill" callback if we have one
+			m->CallOnKill();
 			m->Invalidate();
 		}
 		return true;
