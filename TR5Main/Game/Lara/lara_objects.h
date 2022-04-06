@@ -5,7 +5,7 @@ struct CollisionInfo;
 
 // -----------------------------------
 // MISCELLANEOUS INTERACTABLE OBJECT
-// State Control & Collision Functions
+// Control & Collision Functions
 // -----------------------------------
 
 // ------

@@ -40,7 +40,7 @@ void FlareControl(short itemNumber)
 		flareItem->Pose.Orientation.z = 0;
 	}
 
-	Vector3Int oldPos = { flareItem->Pose.Position.x , flareItem->Pose.Position.y , flareItem->Pose.Position.z };
+	auto oldPos = flareItem->Pose.Position;
 
 	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y);
 	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y);
@@ -112,6 +112,7 @@ void DrawFlareMeshes(ITEM_INFO* laraItem)
 void UndrawFlare(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
+
 	int flareFrame = lara->Flare.Frame;
 	int armFrame = lara->LeftArm.FrameNumber;
 
@@ -295,7 +296,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
-		Vector3Int pos = { -16, 32, 42 };
+		auto pos = Vector3Int (-16, 32, 42);
 		GetLaraJointPosition(&pos, LM_LHAND);
 
 		flareItem->Pose.Position.x = pos.x;
@@ -368,7 +369,7 @@ void DoFlareInHand(ITEM_INFO* laraItem, int flareLife)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Vector3Int pos = { 11, 32, 41 };
+	auto pos = Vector3Int(11, 32, 41);
 	GetLaraJointPosition(&pos, LM_LHAND);
 
 	if (DoFlareLight(&pos, flareLife))

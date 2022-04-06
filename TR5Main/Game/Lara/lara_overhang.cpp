@@ -27,6 +27,14 @@ constexpr short FACING_WEST = -16384;
 
 constexpr auto HEIGHT_ADJUST = CLICK(2) + 20;
 
+struct SlopeData
+{
+	Vector3Int Offset;
+	Vector2 Goal;
+	short ClimbOrient;
+	short GoalOrient;
+};
+
 // -----------------
 // UTILITY FUNCTIONS
 // -----------------
@@ -251,14 +259,6 @@ bool AlignToGrab(ITEM_INFO* item)
 
 	return legLeft;
 }
-
-struct SlopeData
-{
-	Vector3Int Offset;
-	Vector2 Goal;
-	short ClimbOrient;
-	short GoalOrient;
-};
 
 SlopeData GetSlopeData(ITEM_INFO* item)
 {
