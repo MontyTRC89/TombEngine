@@ -14,6 +14,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_two_guns.h"
+#include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
@@ -762,15 +763,15 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 	target->HitStatus = true;
 
 	if (target->Data.is<CreatureInfo>())
-		((CreatureInfo*)target->Data)->HurtByLara = true;
+		GetCreatureInfo(target)->HurtByLara = true;
 
-	auto* obj = &Objects[target->ObjectNumber];
+	auto* object = &Objects[target->ObjectNumber];
 
 	if (hitPos != nullptr)
 	{
-		if (obj->hitEffect != HIT_NONE)
+		if (object->hitEffect != HIT_NONE)
 		{
-			switch (obj->hitEffect)
+			switch (object->hitEffect)
 			{
 			case HIT_BLOOD:
 				if (target->ObjectNumber == ID_GOON2 &&
@@ -807,7 +808,7 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 		}
 	}
 
-	if (!obj->undead || grenade ||
+	if (!object->undead || grenade ||
 		target->HitPoints == NOT_TARGETABLE)
 	{
 		if (target->HitPoints > 0)
@@ -834,36 +835,33 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 
 	auto* weapon = &Weapons[(int)weaponType];
 
-	Vector3Int muzzleOffset;
+	auto muzzleOffset = Vector3Int();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
-	Vector3Int pos;
-	pos.x = src->Pose.Position.x;
-	pos.y = muzzleOffset.y;
-	pos.z = src->Pose.Position.z;
+	auto pos = Vector3Int(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
-	Vector3Shrt rotation;
-	rotation.x = angles[1] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536;
-	rotation.y = angles[0] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536;
-	rotation.z = 0;
+	auto rotation = Vector3Shrt(
+		angles[1] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536,
+		angles[0] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536,
+		0);
 
 	// Calculate ray from rotation angles
 	float x =  sin(TO_RAD(rotation.y)) * cos(TO_RAD(rotation.x));
 	float y = -sin(TO_RAD(rotation.x));
 	float z =  cos(TO_RAD(rotation.y)) * cos(TO_RAD(rotation.x));
-	Vector3 direction = Vector3(x, y, z);
+	auto direction = Vector3(x, y, z);
 	direction.Normalize();
 
-	Vector3 source = Vector3(pos.x, pos.y, pos.z);
-	Vector3 destination = source + direction * weapon->TargetDist;
-	Ray ray = Ray(source, direction);
+	auto source = Vector3(pos.x, pos.y, pos.z);
+	auto destination = source + direction * weapon->TargetDist;
+	auto ray = Ray(source, direction);
 
 	int num = GetSpheres(target, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int best = NO_ITEM;
 	float bestDistance = FLT_MAX;
 	for (int i = 0; i < num; i++)
 	{
-		BoundingSphere sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
 		float distance;
 		if (ray.Intersects(sphere, distance))
 		{
@@ -878,20 +876,14 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 	lara->Control.Weapon.HasFired = true;
 	lara->Control.Weapon.Fired = true;
 	
-	GameVector vSrc;
-	vSrc.x = pos.x;
-	vSrc.y = pos.y;
-	vSrc.z = pos.z;
+	auto vSrc = GameVector(pos.x, pos.y, pos.z);
 	short roomNumber = src->RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vSrc.roomNumber = roomNumber;
 
 	if (best < 0)
 	{
-		GameVector vDest;
-		vDest.x = destination.x;
-		vDest.y = destination.y;
-		vDest.z = destination.z;
+		auto vDest = GameVector(destination.x, destination.y, destination.z);
 		GetTargetOnLOS(&vSrc, &vDest, false, true);
 		return FireWeaponType::Miss;
 	}
@@ -901,10 +893,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 
 		destination = source + direction * bestDistance;
 
-		GameVector vDest;
-		vDest.x = destination.x;
-		vDest.y = destination.y;
-		vDest.z = destination.z;
+		auto vDest = GameVector(destination.x, destination.y, destination.z);
 
 		// TODO: enable it when the slot is created !
 		/*
@@ -987,16 +976,16 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 
 	short angles[2];
 
-	Vector3Int muzzleOffset;
+	auto muzzleOffset = Vector3Int();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
-	GameVector src;
-	src.x = laraItem->Pose.Position.x;
-	src.y = muzzleOffset.y;
-	src.z = laraItem->Pose.Position.z;
-	src.roomNumber = laraItem->RoomNumber;
-
-	GameVector targetPoint;
+	auto src = GameVector(
+		laraItem->Pose.Position.x,
+		muzzleOffset.y,
+		laraItem->Pose.Position.z,
+		laraItem->RoomNumber);
+	
+	auto targetPoint = GameVector();
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
@@ -1054,14 +1043,14 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	Vector3Int muzzleOffset;
+	auto muzzleOffset = Vector3Int();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
 
-	GameVector src;
-	src.x = laraItem->Pose.Position.x;
-	src.y = muzzleOffset.y;
-	src.z = laraItem->Pose.Position.z;
-	src.roomNumber = laraItem->RoomNumber;
+	auto src = GameVector(
+		laraItem->Pose.Position.x,
+		muzzleOffset.y,
+		laraItem->Pose.Position.z,
+		laraItem->RoomNumber);
 
 	ITEM_INFO* bestItem = NULL;
 	short bestYrot = MAXSHORT;
@@ -1078,12 +1067,14 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 				int x = item->Pose.Position.x - src.x;
 				int y = item->Pose.Position.y - src.y;
 				int z = item->Pose.Position.z - src.z;
-				if (abs(x) <= maxDistance && abs(y) <= maxDistance && abs(z) <= maxDistance)
+				if (abs(x) <= maxDistance &&
+					abs(y) <= maxDistance &&
+					abs(z) <= maxDistance)
 				{
-					int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-					if (distance < SQUARE(maxDistance))
+					int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+					if (distance < pow(maxDistance, 2))
 					{
-						GameVector target;
+						auto target = GameVector();
 						FindTargetPoint(item, &target);
 						if (LOS(&src, &target))
 						{
@@ -1184,22 +1175,31 @@ HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
 	{
 		case LaraWeaponType::Pistol:
 			return HolsterSlot::Pistols;
+
 		case LaraWeaponType::Uzi:
 			return HolsterSlot::Uzis;
+
 		case LaraWeaponType::Revolver:
 			return HolsterSlot::Revolver;
+
 		case LaraWeaponType::Shotgun:
 			return HolsterSlot::Shotgun;
+
 		case LaraWeaponType::HK:
 			return HolsterSlot::HK;
+
 		case LaraWeaponType::HarpoonGun:
 			return HolsterSlot::Harpoon;
+
 		case LaraWeaponType::Crossbow:
 			return HolsterSlot::Crowssbow;
+
 		case LaraWeaponType::GrenadeLauncher:
 			return HolsterSlot::GrenadeLauncher;
+
 		case LaraWeaponType::RocketLauncher:
 			return HolsterSlot::RocketLauncher;
+
 		default:
 			return HolsterSlot::Empty;
 	}

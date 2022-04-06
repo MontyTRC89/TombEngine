@@ -13,6 +13,11 @@ static CLIMB_DIRECTION LeftExtRightIntTab[4] =
 	CLIMB_DIRECTION::East, CLIMB_DIRECTION::South, CLIMB_DIRECTION::West, CLIMB_DIRECTION::North
 };
 
+// -----------------------------
+// LADDER CLIMB
+// Control & Collision Functions
+// -----------------------------
+
 void lara_col_climb_end(ITEM_INFO* item, CollisionInfo* coll);
 void lara_as_climb_end(ITEM_INFO* item, CollisionInfo* coll);
 void lara_col_climb_down(ITEM_INFO* item, CollisionInfo* coll);

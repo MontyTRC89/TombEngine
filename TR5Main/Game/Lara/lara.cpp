@@ -155,10 +155,10 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_pulley,//104
 	lara_as_crouch_turn_left,//105
 	lara_as_crouch_turn_right,//106
-	lara_as_corner,//107
-	lara_as_corner,//108
-	lara_as_corner,//109
-	lara_as_corner,//110
+	lara_as_shimmy_corner,//107
+	lara_as_shimmy_corner,//108
+	lara_as_shimmy_corner,//109
+	lara_as_shimmy_corner,//110
 	lara_as_rope_idle,//111
 	lara_as_rope_up,//112
 	lara_as_rope_down,//113
