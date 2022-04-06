@@ -17,6 +17,7 @@ public:
 	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
 
 	bool NotifyKilled(ITEM_INFO* key) override;
+	bool NotifyHit(ITEM_INFO* key) override;
 	bool AddMoveableToMap(ITEM_INFO* key, Moveable* mov);
 	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
 
