@@ -61,8 +61,7 @@ Moveable::~Moveable()
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
-most can just be set to zero (see usage). See also the overload which
-takes no arguments.
+most can just be set to zero (see usage).
 	@function Moveable.New
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
@@ -139,11 +138,6 @@ void Moveable::Register(sol::table & parent)
 		ScriptReserved_newTemporary, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
-
-/// Initialise an item.
-// Use this if you called new with no arguments
-// @function Moveable.Init
-		ScriptReserved_Init, &Moveable::Init,
 
 /// Enable the item
 // @function Moveable:EnableItem
