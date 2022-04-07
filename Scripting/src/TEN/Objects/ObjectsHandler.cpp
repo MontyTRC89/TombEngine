@@ -14,8 +14,8 @@ Scripts that will be run on game startup.
 #endif
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
-	LuaHandler{ lua },
-	m_table_objects(sol::table{m_lua->lua_state(), sol::create})
+	m_handler{ lua },
+	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
 {
 #if TEN_OPTIONAL_LUA
 	parent.set(ScriptReserved_Objects, m_table_objects);
@@ -105,7 +105,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); }
 	);
 
-	MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
 #endif
 }
 
