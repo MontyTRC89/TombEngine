@@ -10,7 +10,7 @@
 #include "Objects/SoundSource/SoundSource.h"
 #include "Camera/Camera.h"
 
-class ObjectsHandler : public ScriptInterfaceObjectsHandler, public LuaHandler
+class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {
 
 public:
@@ -29,6 +29,8 @@ private:
 	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
 	std::unordered_map<std::string, short>	 					m_itemsMapName{};
 	sol::table m_table_objects;
+
+	LuaHandler m_handler;
 
 	void AssignLara() override;
 
