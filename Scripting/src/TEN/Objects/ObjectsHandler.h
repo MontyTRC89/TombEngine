@@ -22,6 +22,7 @@ public:
 	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
 
 private:
+	LuaHandler m_handler;
 	// A map between moveables and the engine entities they represent. This is needed
 	// so that something that is killed by the engine can notify all corresponding
 	// Lua variables which can then become invalid.
@@ -30,7 +31,6 @@ private:
 	std::unordered_map<std::string, short>	 					m_itemsMapName{};
 	sol::table m_table_objects;
 
-	LuaHandler m_handler;
 
 	void AssignLara() override;
 
