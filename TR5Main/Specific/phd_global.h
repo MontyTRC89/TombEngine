@@ -24,6 +24,71 @@ struct Vector3Int
 	int y;
 	int z;
 
+	Vector3Int operator +(Vector3Int pos)
+	{
+		return Vector3Int(x + pos.x, y + pos.y, z + pos.z);
+	}
+
+	Vector3Int operator -(Vector3Int pos)
+	{
+		return Vector3Int(x - pos.x, y - pos.y, z - pos.z);
+	}
+
+	Vector3Int operator *(Vector3Int pos)
+	{
+		return Vector3Int(x * pos.x, y * pos.y, z * pos.z);
+	}
+	
+	Vector3Int operator *(float value)
+	{
+		return Vector3Int(x * value, y * value, z * value);
+	}
+
+	Vector3Int operator /(Vector3Int pos)
+	{
+		return Vector3Int((int)round(x / pos.x), (int)round(y / pos.y), (int)round(z / pos.z));
+	}
+
+	Vector3Int& operator +=(Vector3Int pos)
+	{
+		this->x += pos.x;
+		this->y += pos.y;
+		this->z += pos.z;
+		return *this;
+	}
+
+	Vector3Int& operator -=(Vector3Int pos)
+	{
+		this->x -= pos.x;
+		this->y -= pos.y;
+		this->z -= pos.z;
+		return *this;
+	}
+
+	Vector3Int& operator *=(Vector3Int pos)
+	{
+		this->x *= pos.x;
+		this->y *= pos.y;
+		this->z *= pos.z;
+		return *this;
+	}
+	
+	Vector3Int& operator *=(float value)
+	{
+		this->x *= value;
+		this->y *= value;
+		this->z *= value;
+		return *this;
+	}
+
+	Vector3Int& operator /=(float value)
+	{
+		this->x = (int)round(x / value);
+		this->y = (int)round(y / value);
+		this->z = (int)round(z / value);
+		return *this;
+	}
+	
 	Vector3Int()
 	{
 		this->x = 0;
@@ -37,6 +102,11 @@ struct Vector3Int
 		this->y = y;
 		this->z = z;
 	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
+	}
 };
 
 struct Vector3Shrt
@@ -44,6 +114,71 @@ struct Vector3Shrt
 	short x;
 	short y;
 	short z;
+
+	Vector3Shrt operator +(Vector3Shrt pos)
+	{
+		return Vector3Shrt(x + pos.x, y + pos.y, z + pos.z);
+	}
+
+	Vector3Shrt operator -(Vector3Shrt pos)
+	{
+		return Vector3Shrt(x - pos.x, y - pos.y, z - pos.z);
+	}
+
+	Vector3Shrt operator *(Vector3Shrt pos)
+	{
+		return Vector3Shrt(x * pos.x, y * pos.y, z * pos.z);
+	}
+
+	Vector3Shrt operator *(float value)
+	{
+		return Vector3Shrt(x * value, y * value, z * value);
+	}
+
+	Vector3Shrt operator /(Vector3Shrt pos)
+	{
+		return Vector3Shrt((short)round(x / pos.x), (short)round(y / pos.y), (short)round(z / pos.z));
+	}
+
+	Vector3Shrt& operator +=(Vector3Shrt pos)
+	{
+		this->x += pos.x;
+		this->y += pos.y;
+		this->z += pos.z;
+		return *this;
+	}
+
+	Vector3Shrt& operator -=(Vector3Shrt pos)
+	{
+		this->x -= pos.x;
+		this->y -= pos.y;
+		this->z -= pos.z;
+		return *this;
+	}
+
+	Vector3Shrt& operator *=(Vector3Shrt pos)
+	{
+		this->x *= pos.x;
+		this->y *= pos.y;
+		this->z *= pos.z;
+		return *this;
+	}
+
+	Vector3Shrt& operator *=(float value)
+	{
+		this->x *= value;
+		this->y *= value;
+		this->z *= value;
+		return *this;
+	}
+
+	Vector3Shrt& operator /=(float value)
+	{
+		this->x = (short)round(x / value);
+		this->y = (short)round(y / value);
+		this->z = (short)round(z / value);
+		return *this;
+	}
 
 	Vector3Shrt()
 	{
@@ -57,6 +192,11 @@ struct Vector3Shrt
 		this->x = x;
 		this->y = y;
 		this->z = z;
+	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
 	}
 };
 
