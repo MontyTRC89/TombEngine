@@ -33,7 +33,7 @@ void MonkControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short torso = 0;
 	short angle = 0;
@@ -51,17 +51,17 @@ void MonkControl(short itemNumber)
 	else
 	{
 		if (MonksAttackLara)
-			info->Enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
-		if (!MonksAttackLara && info->Enemy == LaraItem)
-			info->Enemy = NULL;
+		if (!MonksAttackLara && creature->Enemy == LaraItem)
+			creature->Enemy = NULL;
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		if (AI.ahead)
 			torso = AI.angle;
@@ -69,13 +69,13 @@ void MonkControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			info->Flags &= 0x0FFF;
+			creature->Flags &= 0x0FFF;
 
 			if (!MonksAttackLara && AI.ahead && Lara.TargetEntity == item)
 				break;
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 2;
-			else if (info->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -94,13 +94,13 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 11:
-			info->Flags &= 0x0FFF;
+			creature->Flags &= 0x0FFF;
 
 			if (!MonksAttackLara && AI.ahead && Lara.TargetEntity == item)
 				break;
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 2;
-			else if (info->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -120,9 +120,9 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = ANGLE(3.0f);
 
-			if (info->Mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 			{
 				if (!MonksAttackLara && AI.ahead && Lara.TargetEntity == item)
 				{
@@ -132,7 +132,7 @@ void MonkControl(short itemNumber)
 						item->Animation.TargetState = 11;
 				}
 			}
-			else if (info->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -147,17 +147,16 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 3:
-			info->Flags &= 0x0FFF;
-			info->MaxTurn = ANGLE(4.0f);
+			tilt = angle / 4;
+			creature->MaxTurn = ANGLE(4.0f);
+			creature->Flags &= 0x0FFF;
 
 			if (MonksAttackLara)
-				info->MaxTurn += ANGLE(1.0f);
+				creature->MaxTurn += ANGLE(1.0f);
 
-			tilt = angle / 4;
-
-			if (info->Mood == MoodType::Bored)
+			if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 1;
-			else if (info->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				break;
 			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 			{
@@ -191,12 +190,12 @@ void MonkControl(short itemNumber)
 		case 6:
 		case 7:
 		case 10:
-			auto* enemy = info->Enemy;
+			auto* enemy = creature->Enemy;
 			if (enemy == LaraItem)
 			{
-				if (!(info->Flags & 0xF000) && item->TouchBits & 0x4000)
+				if (!(creature->Flags & 0xF000) && item->TouchBits & 0x4000)
 				{
-					info->Flags |= 0x1000;
+					creature->Flags |= 0x1000;
 					SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
 					CreatureEffect(item, &MonkBite, DoBloodSplat);
 
@@ -206,13 +205,13 @@ void MonkControl(short itemNumber)
 			}
 			else
 			{
-				if (!(info->Flags & 0xf000) && enemy)
+				if (!(creature->Flags & 0xf000) && enemy)
 				{
 					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
 						abs(enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
 						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
 					{
-						info->Flags |= 0x1000;
+						creature->Flags |= 0x1000;
 						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;

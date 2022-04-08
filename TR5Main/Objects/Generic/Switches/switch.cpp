@@ -16,7 +16,7 @@
 
 void ProcessExplodingSwitchType8(ITEM_INFO* item) 
 {
-	Vector3Int pos = { 0, 0, 0 };
+	auto pos = Vector3Int();
 	GetJointAbsPosition(item, &pos, 0);
 
 	TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);

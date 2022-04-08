@@ -86,7 +86,7 @@ static short ThrowKnife(int x, int y, int z, short velocity, short yRot, short r
 void KnifeThrowerControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
 	short torso = 0;
@@ -110,21 +110,21 @@ void KnifeThrowerControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 				item->Animation.TargetState = 8;
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (!AI.ahead || AI.distance > pow(SECTOR(6), 2))
 					item->Animation.TargetState = 2;
@@ -137,12 +137,12 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = ANGLE(3.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 			{
@@ -153,7 +153,7 @@ void KnifeThrowerControl(short itemNumber)
 				else
 					item->Animation.TargetState = 6;
 			}
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
 					item->Animation.TargetState = 1;
@@ -164,8 +164,8 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(6.0f);
 			tilt = angle / 3;
+			creature->MaxTurn = ANGLE(6.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
@@ -174,7 +174,7 @@ void KnifeThrowerControl(short itemNumber)
 			{
 				item->Animation.TargetState = 2;
 			}
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (AI.ahead && AI.distance < pow(SECTOR(6), 2))
 					item->Animation.TargetState = 1;
@@ -187,7 +187,7 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 4:
-			info->Flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead)
 				torso = AI.angle;
@@ -200,7 +200,7 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 6:
-			info->Flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead)
 				torso = AI.angle;
@@ -213,7 +213,7 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 8:
-			info->Flags = 0;
+			creature->Flags = 0;
 
 			if (AI.ahead)
 				torso = AI.angle;
@@ -229,10 +229,10 @@ void KnifeThrowerControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!info->Flags)
+			if (!creature->Flags)
 			{
 				CreatureEffect(item, &KnifeBiteLeft, ThrowKnife);
-				info->Flags = 1;
+				creature->Flags = 1;
 			}
 
 			break;
@@ -241,10 +241,10 @@ void KnifeThrowerControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!info->Flags)
+			if (!creature->Flags)
 			{
 				CreatureEffect(item, &KnifeBiteRight, ThrowKnife);
-				info->Flags = 1;
+				creature->Flags = 1;
 			}
 
 			break;
@@ -253,11 +253,11 @@ void KnifeThrowerControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!info->Flags)
+			if (!creature->Flags)
 			{
 				CreatureEffect(item, &KnifeBiteLeft, ThrowKnife);
 				CreatureEffect(item, &KnifeBiteRight, ThrowKnife);
-				info->Flags = 1;
+				creature->Flags = 1;
 			}
 
 			break;

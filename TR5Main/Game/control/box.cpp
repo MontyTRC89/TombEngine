@@ -57,53 +57,46 @@ void DropEntityPickups(ITEM_INFO* item)
 	}
 }
 
-int MoveCreature3DPos(PHD_3DPOS* srcPos, PHD_3DPOS* destPos, int velocity, short angleDif, int angleAdd)
+bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleDif, int angleAdd)
 {
-	int x = destPos->Position.x - srcPos->Position.x;
-	int y = destPos->Position.y - srcPos->Position.y;
-	int z = destPos->Position.z - srcPos->Position.z;
-	int distance = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+	auto differenceVector = target->Position - origin->Position;
+	float distance = Vector3::Distance(origin->Position.ToVector3(), target->Position.ToVector3());
 
 	if (velocity < distance)
-	{
-		srcPos->Position.x += x * velocity / distance;
-		srcPos->Position.y += y * velocity / distance;
-		srcPos->Position.z += z * velocity / distance;
-	}
+		origin->Position += differenceVector * (velocity / distance);
 	else
-	{
-		srcPos->Position.x = destPos->Position.x;
-		srcPos->Position.y = destPos->Position.y;
-		srcPos->Position.z = destPos->Position.z;
-	}
+		origin->Position = target->Position;
 
 	if (angleDif <= angleAdd)
 	{
 		if (angleDif >= -angleAdd)
-			srcPos->Orientation.y = destPos->Orientation.y;
+			origin->Orientation.y = target->Orientation.y;
 		else
-			srcPos->Orientation.y -= angleAdd;
+			origin->Orientation.y -= angleAdd;
 	}
 	else
-		srcPos->Orientation.y += angleAdd;
+		origin->Orientation.y += angleAdd;
 
-	return (srcPos->Position.x == destPos->Position.x &&
-		srcPos->Position.y == destPos->Position.y &&
-		srcPos->Position.z == destPos->Position.z &&
-		srcPos->Orientation.y == destPos->Orientation.y);
+	if (origin->Position == target->Position &&
+		origin->Orientation.y == target->Orientation.y)
+	{
+		return true;
+	}
+
+	return false;
 }
 
-void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angadd) 
+void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd) 
 {
-	if (angadd < angle)
+	if (angleAdd < angle)
 	{
-		srcPos->Orientation.y += angadd;
+		srcPos->Orientation.y += angleAdd;
 		return;
 	} 
 
-	if (angle < -angadd)
+	if (angle < -angleAdd)
 	{
-		srcPos->Orientation.y -= angadd;
+		srcPos->Orientation.y -= angleAdd;
 		return;
 	} 
 
@@ -1378,7 +1371,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 	}
 }
 
-void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
+void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 {
 	if (!item->Data)
 		return;
@@ -1402,9 +1395,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		item->BoxNumber = floor->Box;
 
 	if (item->BoxNumber != NO_BOX)
-		info->zoneNumber = zone[item->BoxNumber];
+		AI->zoneNumber = zone[item->BoxNumber];
 	else
-		info->zoneNumber = NO_ZONE;
+		AI->zoneNumber = NO_ZONE;
 
 	room = &g_Level.Rooms[enemy->RoomNumber];
 	enemy->BoxNumber = NO_BOX;
@@ -1413,61 +1406,61 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* info)
 		enemy->BoxNumber = floor->Box;
 
 	if (enemy->BoxNumber != NO_BOX)
-		info->enemyZone = zone[enemy->BoxNumber];
+		AI->enemyZone = zone[enemy->BoxNumber];
 	else
-		info->enemyZone = NO_ZONE;
+		AI->enemyZone = NO_ZONE;
 
 	if (!object->nonLot)
 	{
 		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
-			info->enemyZone |= BLOCKED;
+			AI->enemyZone |= BLOCKED;
 		else if (item->BoxNumber != NO_BOX && creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
-			info->enemyZone |= BLOCKED;
+			AI->enemyZone |= BLOCKED;
 	}
 
-	int x, y, z;
+	Vector3Int vector;
 
 	if (enemy == LaraItem)
 	{
-		x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
 	}
 	else
 	{
-		x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
 	}
 
-	y = item->Pose.Position.y - enemy->Pose.Position.y;
-	short angle = phd_atan(z, x);
+	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;
+	short angle = phd_atan(vector.z, vector.x);
 
-	if (x > 32000 || x < -32000 || z > 32000 || z < -32000)
-		info->distance = 0x7FFFFFFF;
+	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
+		AI->distance = INT_MAX;
 	else
 	{
 		if (creature->Enemy)
-			info->distance = pow(x, 2) + pow(z, 2);
+			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
 		else
-			info->distance = 0x7FFFFFFF;
+			AI->distance = INT_MAX;
 	}
 
-	info->angle = angle - item->Pose.Orientation.y;
-	info->enemyFacing = 0x8000 + angle - enemy->Pose.Orientation.y;
+	AI->angle = angle - item->Pose.Orientation.y;
+	AI->enemyFacing = ANGLE(180.0f) + angle - enemy->Pose.Orientation.y;
 
-	x = abs(x);
-	z = abs(z);
+	vector.x = abs(vector.x);
+	vector.z = abs(vector.z);
 
 	// Makes Lara smaller.
 	if (enemy == LaraItem && ((LaraInfo*)enemy)->Control.IsLow)
-		y -= STEPUP_HEIGHT;
+		vector.y -= STEPUP_HEIGHT;
 
-	if (x > z)
-		info->xAngle = phd_atan(x + (z >> 1), y);
+	if (vector.x > vector.z)
+		AI->xAngle = phd_atan(vector.x + (vector.z >> 1), vector.y);
 	else
-		info->xAngle = phd_atan(z + (x >> 1), y);
+		AI->xAngle = phd_atan(vector.z + (vector.x >> 1), vector.y);
 
-	info->ahead = (info->angle > -FRONT_ARC && info->angle < FRONT_ARC);
-	info->bite = (info->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
+	AI->ahead = (AI->angle > -FRONT_ARC && AI->angle < FRONT_ARC);
+	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
 }
 
 void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
@@ -1502,9 +1495,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 			break;
 
 		case MoodType::Attack:
-			LOT->Target.x = enemy->Pose.Position.x;
-			LOT->Target.y = enemy->Pose.Position.y;
-			LOT->Target.z = enemy->Pose.Position.z;
+			LOT->Target = enemy->Pose.Position;
 			LOT->RequiredBox = enemy->BoxNumber;
 
 			if (LOT->Fly != NO_FLYING && Lara.Control.WaterStatus == WaterStatus::Dry)
@@ -1996,16 +1987,16 @@ void InitialiseItemBoxData()
 			ClearMovableBlockSplitters(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, currentItem->RoomNumber);
 	}
 
-	for (auto& r : g_Level.Rooms)
+	for (auto& room : g_Level.Rooms)
 	{
-		for (const auto& mesh : r.mesh)
+		for (const auto& mesh : room.mesh)
 		{
-			long index = ((mesh.pos.Position.z - r.z) / 1024) + r.zSize * ((mesh.pos.Position.x - r.x) / 1024);
+			long index = ((mesh.pos.Position.z - room.z) / SECTOR(1)) + room.zSize * ((mesh.pos.Position.x - room.x) / SECTOR(1));
 
-			if (index > r.floor.size())
+			if (index > room.floor.size())
 				continue;
 
-			FLOOR_INFO* floor = &r.floor[index];
+			FLOOR_INFO* floor = &room.floor[index];
 
 			if (floor->Box == NO_BOX)
 				continue;
@@ -2015,7 +2006,7 @@ void InitialiseItemBoxData()
 				int floorHeight = floor->FloorHeight(mesh.pos.Position.x, mesh.pos.Position.z);
 				auto* staticInfo = &StaticObjects[mesh.staticNumber];
 
-				if (floorHeight <= mesh.pos.Position.y - staticInfo->collisionBox.Y2 + 512 &&
+				if (floorHeight <= mesh.pos.Position.y - staticInfo->collisionBox.Y2 + CLICK(2) &&
 					floorHeight < mesh.pos.Position.y - staticInfo->collisionBox.Y1)
 				{
 					if (staticInfo->collisionBox.X1 == 0 || staticInfo->collisionBox.X2 == 0 ||
