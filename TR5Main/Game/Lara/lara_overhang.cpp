@@ -955,18 +955,23 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_LADDER_IDLE (56)
-void LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
+bool LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (!g_GameFlow->Animations.HasOverhangClimb)
-		return;
+		return false;
 
 	auto probe = GetCollision(item);
 
 	if (probe.Position.CeilingSlope)
-		return;
+		return false;
 
 	if (probe.BottomBlock->Flags.Monkeyswing && (item->Pose.Position.y - coll->Setup.Height - CLICK(0.5f) <= probe.Position.Ceiling))
+	{
 		item->Animation.TargetState = LS_MONKEY_IDLE;
+		return true;
+	}
+
+	return false;
 }
 
 // Extends LS_LADDER_DOWN (61)
@@ -987,7 +992,23 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			int ceilDist = probeDown.Position.Ceiling - item->Pose.Position.y;
 
-			if (probeDown.BottomBlock->Flags.Monkeyswing)
+			if (probeDown.BottomBlock->Flags.Monkeyswing && ceilDist >= 0 && ceilDist <= CLICK(1))
+			{
+				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
+				facing &= ANGLE(270.0f);
+
+				int height;
+				short bridge = FindBridge(4, facing, down, &height, -CLICK(0.5f), -CLICK(0.25f));
+
+				if (SlopeCheck(probeDown.CeilingTilt, slopeData.Goal) || bridge >= 0)
+				{
+					item->Pose.Position.y = probeDown.Position.Ceiling - 156;
+					item->Animation.TargetState = LS_LADDER_IDLE;
+				}
+			}
+
+			// Old block.
+			/*if (probeDown.BottomBlock->Flags.Monkeyswing)
 			{
 				int midpoint = 29; // HACK: lara_col_climb_down func, case for frame 29, dehardcode later.
 				
@@ -1008,7 +1029,7 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}
-			}
+			}*/
 		}
 	}
 }

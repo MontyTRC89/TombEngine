@@ -22,4 +22,4 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll);
 void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll);
 void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll);
 void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll);
-void LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll);
+bool LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll);

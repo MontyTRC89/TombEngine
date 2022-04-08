@@ -41,7 +41,6 @@ void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(45.0f);
 }
 
-
 // State:		LS_HANG (10)
 // Control:		lara_as_hang()
 void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)

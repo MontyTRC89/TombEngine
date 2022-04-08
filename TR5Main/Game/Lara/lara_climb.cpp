@@ -297,8 +297,8 @@ void lara_col_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			if (!resultRight || !resultLeft)
 			{
-				LadderMonkeyExtra(item, coll);
-				return;
+				if (LadderMonkeyExtra(item, coll))
+					return;
 			}
 		}
 
