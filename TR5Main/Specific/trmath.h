@@ -46,7 +46,7 @@ void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BO
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
-void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index);
+void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index);
 
 constexpr auto FP_SHIFT = 16;
 constexpr auto FP_ONE = (1 << FP_SHIFT);

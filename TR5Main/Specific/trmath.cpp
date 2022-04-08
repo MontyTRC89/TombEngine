@@ -38,9 +38,9 @@ const float lerp(float v0, float v1, float t)
 
 const Vector3 getRandomVector()
 {
-	Vector3 v = {GenerateFloat(-1,1),GenerateFloat(-1,1),GenerateFloat(-1,1)};
-	v.Normalize();
-	return v;
+	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
+	vector.Normalize();
+	return vector;
 }
 
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
@@ -48,8 +48,9 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float z = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	Matrix m = Matrix::CreateRotationX(x)* Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
-	Vector3 result = direction.TransformNormal(direction, m);
+	auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
+	
+	auto result = direction.TransformNormal(direction, matrix);
 	result.Normalize();
 	return result;
 }
@@ -93,14 +94,14 @@ int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
-	Matrix world = Matrix::CreateFromYawPitchRoll(
+	auto world = Matrix::CreateFromYawPitchRoll(
 		TO_RAD(pos->Orientation.y),
 		TO_RAD(pos->Orientation.x),
 		TO_RAD(pos->Orientation.z)
 	);
 
-	Vector3 bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
-	Vector3 bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
+	auto bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
+	auto bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
 
 	bMin = Vector3::Transform(bMin, world);
 	bMax = Vector3::Transform(bMax, world);
@@ -128,9 +129,9 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
-void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
+void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 {
-	short* ptr = &frameptr[0];
+	short* ptr = &framePtr[0];
 
 	ptr += 9;
 	for (int i = 0; i < index; i++)
@@ -173,9 +174,9 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
-	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
-	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.Orientation.y), TO_RAD(pos.Orientation.x), TO_RAD(pos.Orientation.z));
+	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
+	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
+	auto rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.Orientation.y), TO_RAD(pos.Orientation.x), TO_RAD(pos.Orientation.z));
 
 	BoundingOrientedBox result;
 	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
