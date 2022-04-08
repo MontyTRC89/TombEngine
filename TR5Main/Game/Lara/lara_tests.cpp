@@ -1769,7 +1769,7 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 	bool swampTooDeep = testSetup.CheckSwampDepth ? (isSwamp && lara->WaterSurfaceDist < -CLICK(3)) : isSwamp;
-	int y = isSwamp ? item->Pose.Position.y : probeMiddle.Position.Floor;
+	int y = isSwamp ? item->Pose.Position.y : probeMiddle.Position.Floor; // HACK: Avoid cheese when in the midst of performing a step. Can be done better. @Sezz 2022.04.08	
 
 	// Check swamp depth (if applicable).
 	if (swampTooDeep)
