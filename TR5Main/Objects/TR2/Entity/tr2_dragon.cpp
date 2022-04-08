@@ -126,11 +126,9 @@ static void createDragonBone(short frontNumber)
 		auto* dragonBack = &g_Level.Items[boneBack];
 
 		dragonBack->ObjectNumber = ID_DRAGON_BONE_BACK;
-		dragonBack->Pose.Position.x = item->Pose.Position.x;
-		dragonBack->Pose.Position.y = item->Pose.Position.y;
-		dragonBack->Pose.Position.z = item->Pose.Position.z;
-		dragonBack->Pose.Orientation.x = dragonBack->Pose.Orientation.z = 0;
-		dragonBack->Pose.Orientation.y = item->Pose.Orientation.y;
+		dragonBack->Pose = item->Pose;
+		dragonBack->Pose.Orientation.x = 0;
+		dragonBack->Pose.Orientation.z = 0;
 		dragonBack->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneBack);
@@ -138,11 +136,9 @@ static void createDragonBone(short frontNumber)
 		auto* dragonFront = &g_Level.Items[boneFront];
 
 		dragonFront->ObjectNumber = ID_DRAGON_BONE_FRONT;
-		dragonFront->Pose.Position.x = item->Pose.Position.x;
-		dragonFront->Pose.Position.y = item->Pose.Position.y;
-		dragonFront->Pose.Position.z = item->Pose.Position.z;
-		dragonFront->Pose.Orientation.x = dragonFront->Pose.Orientation.z = 0;
-		dragonFront->Pose.Orientation.y = item->Pose.Orientation.y;
+		dragonFront->Pose = item->Pose;
+		dragonFront->Pose.Orientation.x = 0;
+		dragonFront->Pose.Orientation.z = 0;
 		dragonFront->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneFront);
@@ -195,15 +191,10 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				laraItem->Animation.ActiveState = 0;
 				laraItem->Animation.TargetState = 7;
 
-				laraItem->Pose.Position.x = item->Pose.Position.x;
-				laraItem->Pose.Position.y = item->Pose.Position.y;
-				laraItem->Pose.Position.z = item->Pose.Position.z;
-				laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				laraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-				laraItem->Pose.Orientation.z = item->Pose.Orientation.z;
-				laraItem->Animation.VerticalVelocity = 0;
+				laraItem->Pose = item->Pose;
 				laraItem->Animation.Airborne = false;
 				laraItem->Animation.Velocity = 0;
+				laraItem->Animation.VerticalVelocity = 0;
 
 				if (item->RoomNumber != laraItem->RoomNumber)
 					ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -420,13 +411,13 @@ void DragonControl(short backItemNumber)
 
 			if (ahead)
 			{
-				creature->Flags = 30;
 				item->Animation.TargetState = DRAGON_STATE_FIRE_1;
+				creature->Flags = 30;
 			}
 			else
 			{
-				creature->Flags = 0;
 				item->Animation.TargetState = DRAGON_STATE_AIM_1;
+				creature->Flags = 0;
 			}
 
 			break;

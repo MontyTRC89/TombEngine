@@ -32,14 +32,14 @@ void MercenaryUziControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
+	short tilt = 0;
 	short headX = 0;
 	short headY = 0;
 	short torsoX = 0;
 	short torsoY = 0;
-	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -58,7 +58,7 @@ void MercenaryUziControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->Animation.ActiveState)
 		{
@@ -69,13 +69,13 @@ void MercenaryUziControl(short itemNumber)
 				headY = AI.angle;
 			}
 
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 2;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance > 0x400000)
+				if (AI.distance > SECTOR(4096))
 					item->Animation.TargetState = 2;
 
 				if (GetRandomControl() >= 0x2000)
@@ -90,7 +90,7 @@ void MercenaryUziControl(short itemNumber)
 			}
 			else
 			{
-				if (info->Mood == MoodType::Attack)
+				if (creature->Mood == MoodType::Attack)
 					item->Animation.TargetState = 3;
 				else if (!AI.ahead)
 					item->Animation.TargetState = 2;
@@ -101,24 +101,24 @@ void MercenaryUziControl(short itemNumber)
 			break;
 
 		case 2:
+			creature->MaxTurn = ANGLE(7.0f);
+
 			if (AI.ahead)
 			{
 				headX = AI.xAngle;
 				headY = AI.angle;
 			}
 
-			info->MaxTurn = ANGLE(7.0f);
-
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance <= 0x400000 || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance <= SECTOR(4096) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 12;
 			}
-			else if (info->Mood == MoodType::Attack)
+			else if (creature->Mood == MoodType::Attack)
 				item->Animation.TargetState = 3;
 			else
 			{
@@ -132,20 +132,20 @@ void MercenaryUziControl(short itemNumber)
 			break;
 
 		case 3:
+			tilt = angle / 3;
+			creature->MaxTurn = ANGLE(10.0f);
+
 			if (AI.ahead)
 			{
 				headX = AI.xAngle;
 				headY = AI.angle;
 			}
 
-			info->MaxTurn = ANGLE(10.0f);
-			tilt = angle / 3;
-
-			if (info->Mood != MoodType::Escape)
+			if (creature->Mood != MoodType::Escape)
 			{
 				if (Targetable(item, &AI))
 					item->Animation.TargetState = 1;
-				else if (info->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 2;
 			}
 
@@ -155,7 +155,7 @@ void MercenaryUziControl(short itemNumber)
 		case 7:
 		case 8:
 		case 9:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
 			if (AI.ahead)
 			{
@@ -166,7 +166,7 @@ void MercenaryUziControl(short itemNumber)
 			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
 				item->Animation.TargetState = 1;
 
-			if (AI.distance < 0x400000)
+			if (AI.distance < SECTOR(4096))
 				item->Animation.TargetState = 1;
 
 			break;
@@ -182,7 +182,7 @@ void MercenaryUziControl(short itemNumber)
 			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
 				item->Animation.TargetState = 1;
 
-			if (AI.distance < 0x400000)
+			if (AI.distance < SECTOR(4096))
 				item->Animation.TargetState = 2;
 
 			break;
@@ -203,14 +203,14 @@ void MercenaryAutoPistolControl(short itemNumber)
 		return;
 
 	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	auto* creature = GetCreatureInfo(item);
 
 	short angle = 0;
+	short tilt = 0;
 	short headX = 0;
 	short headY = 0;
 	short torsoX = 0;
 	short torsoY = 0;
-	short tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -223,30 +223,30 @@ void MercenaryAutoPistolControl(short itemNumber)
 	}
 	else
 	{
-		AI_INFO aiInfo;
-		CreatureAIInfo(item, &aiInfo);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &aiInfo, VIOLENT);
-		CreatureMood(item, &aiInfo, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
 		switch (item->Animation.ActiveState)
 		{
 		case 2:
-			info->MaxTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				headX = aiInfo.xAngle;
-				headY = aiInfo.angle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 4;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 			{
-				if (aiInfo.distance <= 0x400000)
+				if (AI.distance <= SECTOR(4096))
 				{
 					if (GetRandomControl() >= 0x2000)
 					{
@@ -263,50 +263,50 @@ void MercenaryAutoPistolControl(short itemNumber)
 			}
 			else
 			{
-				if (info->Mood == MoodType::Attack)
+				if (creature->Mood == MoodType::Attack)
 					item->Animation.TargetState = 4;
-				if (!aiInfo.ahead || GetRandomControl() < 0x100)
+				if (!AI.ahead || GetRandomControl() < 0x100)
 					item->Animation.TargetState = 3;
 			}
 
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = ANGLE(7.0f);
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				headX = aiInfo.xAngle;
-				headY = aiInfo.angle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 4;
-			else if (Targetable(item, &aiInfo))
+			else if (Targetable(item, &AI))
 			{
-				if (aiInfo.distance < 0x400000 || aiInfo.zoneNumber == aiInfo.enemyZone || GetRandomControl() < 1024)
+				if (AI.distance < SECTOR(4096) || AI.zoneNumber == AI.enemyZone || GetRandomControl() < 1024)
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 1;
 			}
-			else if (info->Mood == MoodType::Escape)
+			else if (creature->Mood == MoodType::Escape)
 				item->Animation.TargetState = 4;
-			else if (aiInfo.ahead && GetRandomControl() < 1024)
+			else if (AI.ahead && GetRandomControl() < 1024)
 				item->Animation.TargetState = 2;
 			
 			break;
 
 		case 4:
-			info->MaxTurn = ANGLE(10.0f);
 			tilt = angle / 3;
+			creature->MaxTurn = ANGLE(10.0f);
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				headX = aiInfo.xAngle;
-				headY = aiInfo.angle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (info->Mood != MoodType::Escape && (info->Mood == MoodType::Escape || Targetable(item, &aiInfo)))
+			if (creature->Mood != MoodType::Escape && (creature->Mood == MoodType::Escape || Targetable(item, &AI)))
 				item->Animation.TargetState = 2;
 
 			break;
@@ -314,12 +314,12 @@ void MercenaryAutoPistolControl(short itemNumber)
 		case 1:
 		case 5:
 		case 6:
-			info->Flags = 0;
+			creature->Flags = 0;
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoX = aiInfo.xAngle;
-				torsoY = aiInfo.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
 			break;
@@ -327,18 +327,18 @@ void MercenaryAutoPistolControl(short itemNumber)
 		case 7:
 		case 8:
 		case 13:
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoX = aiInfo.xAngle;
-				torsoY = aiInfo.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (!info->Flags)
+				if (!creature->Flags)
 				{
 					if (GetRandomControl() < 0x2000)
 						item->Animation.TargetState = 2;
 
-					ShotLara(item, &aiInfo, &MercenaryAutoPistolBite, torsoY, 50);
-					info->Flags = 1;
+					ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50);
+					creature->Flags = 1;
 				}
 			}
 			else
@@ -347,19 +347,20 @@ void MercenaryAutoPistolControl(short itemNumber)
 			break;
 
 		case 9:
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoX = aiInfo.xAngle;
-				torsoY = aiInfo.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (aiInfo.distance < 0x400000)
+				if (AI.distance < SECTOR(4096))
 					item->Animation.TargetState = 3;
 
-				if (info->Flags != 1)
+				if (creature->Flags != 1)
 				{
-					if (!ShotLara(item, &aiInfo, &MercenaryAutoPistolBite, torsoY, 50))
+					if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
 						item->Animation.TargetState = 3;
-					info->Flags = 1;
+
+					creature->Flags = 1;
 				}
 			}
 			else
@@ -368,15 +369,15 @@ void MercenaryAutoPistolControl(short itemNumber)
 			break;
 
 		case 12:
-			info->Flags = 0;
+			creature->Flags = 0;
 
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoX = aiInfo.xAngle;
-				torsoY = aiInfo.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (Targetable(item, &aiInfo))
+			if (Targetable(item, &AI))
 				item->Animation.TargetState = 13;
 			else
 				item->Animation.TargetState = 2;
@@ -384,20 +385,20 @@ void MercenaryAutoPistolControl(short itemNumber)
 			break;
 
 		case 10:
-			if (aiInfo.ahead)
+			if (AI.ahead)
 			{
-				torsoX = aiInfo.xAngle;
-				torsoY = aiInfo.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (aiInfo.distance < 0x400000)
+				if (AI.distance < SECTOR(4096))
 					item->Animation.TargetState = 3;
 
-				if (info->Flags != 2)
+				if (creature->Flags != 2)
 				{
-					if (!ShotLara(item, &aiInfo, &MercenaryAutoPistolBite, torsoY, 50))
+					if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
 						item->Animation.TargetState = 3;
 
-					info->Flags = 2;
+					creature->Flags = 2;
 				}
 			}
 			else
