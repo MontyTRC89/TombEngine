@@ -1474,8 +1474,11 @@ void lara_col_splat(ITEM_INFO* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (abs(coll->Middle.Floor) <= CLICK(1))
-		LaraSnapToHeight(item, coll);
+	if (TestLaraStep(item, coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
 }
 
 // State:		LS_WALK_BACK (16)
