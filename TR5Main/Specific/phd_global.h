@@ -23,6 +23,24 @@ struct Vector3Int
 	int x;
 	int y;
 	int z;
+	
+	bool operator ==(Vector3Int pos)
+	{
+		return (x == pos.x && y == pos.y && z == pos.z);
+	}
+	
+	bool operator !=(Vector3Int pos)
+	{
+		return (x != pos.x || y != pos.y || z != pos.z);
+	}
+
+	Vector3Int operator =(Vector3Int pos)
+	{
+		this->x = pos.x;
+		this->y = pos.y;
+		this->z = pos.z;
+		return *this;
+	}
 
 	Vector3Int operator +(Vector3Int pos)
 	{
@@ -49,7 +67,7 @@ struct Vector3Int
 		return Vector3Int((int)round(x / pos.x), (int)round(y / pos.y), (int)round(z / pos.z));
 	}
 
-	Vector3Int& operator +=(Vector3Int pos)
+	Vector3Int& operator +=(const Vector3Int pos)
 	{
 		this->x += pos.x;
 		this->y += pos.y;
@@ -114,6 +132,24 @@ struct Vector3Shrt
 	short x;
 	short y;
 	short z;
+
+	bool operator ==(Vector3Shrt orient)
+	{
+		return (x == orient.x && y == orient.y && z == orient.z);
+	}
+
+	bool operator !=(Vector3Shrt orient)
+	{
+		return (x != orient.x || y != orient.y || z != orient.z);
+	}
+
+	Vector3Shrt operator =(Vector3Shrt orient)
+	{
+		this->x = orient.x;
+		this->y = orient.y;
+		this->z = orient.z;
+		return *this;
+	}
 
 	Vector3Shrt operator +(Vector3Shrt orient)
 	{

@@ -230,9 +230,7 @@ bool TestLaraHang(ITEM_INFO* item, CollisionInfo* coll)
 			}
 			else
 			{
-				item->Pose.Position.x = coll->Setup.OldPosition.x;
-				item->Pose.Position.y = coll->Setup.OldPosition.y;
-				item->Pose.Position.z = coll->Setup.OldPosition.z;
+				item->Pose.Position = coll->Setup.OldPosition;
 
 				if (item->Animation.ActiveState == LS_SHIMMY_LEFT ||
 					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
