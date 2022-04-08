@@ -163,14 +163,6 @@ struct Vector3Shrt
 		return *this;
 	}
 
-	Vector3Shrt& operator *=(float value)
-	{
-		this->x *= value;
-		this->y *= value;
-		this->z *= value;
-		return *this;
-	}
-
 	Vector3Shrt& operator /=(float value)
 	{
 		this->x = (short)round(x / value);
