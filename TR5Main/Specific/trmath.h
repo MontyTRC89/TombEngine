@@ -62,6 +62,5 @@ __int64 FP_ToFixed(__int64 value);
 __int64 FP_FromFixed(__int64 value);
 Vector3Int* FP_Normalise(Vector3Int* v);
 
-
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)

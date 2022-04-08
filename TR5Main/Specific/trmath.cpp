@@ -88,9 +88,7 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
-	auto v1 = Vector3(first->Position.x, first->Position.y, first->Position.z);
-	auto v2 = Vector3(second->Position.x, second->Position.y, second->Position.z);
-	return (int)round(Vector3::Distance(v1, v2));
+	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
 }
 
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
@@ -119,10 +117,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 {
 	int deltaAngle = angle - *rotation;
 
-	if (deltaAngle < -32768)
-		deltaAngle += 65536;
-	else if (deltaAngle > 32768)
-		deltaAngle -= 65536;
+	if (deltaAngle < -ANGLE(180.0f))
+		deltaAngle += ANGLE(360.0f);
+	else if (deltaAngle > ANGLE(180.0f))
+		deltaAngle -= ANGLE(360.0f);
 
 	if (outAngle)
 		*outAngle = static_cast<short>(deltaAngle);
@@ -136,9 +134,7 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 
 	ptr += 9;
 	for (int i = 0; i < index; i++)
-	{
 		ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
-	}
 
 	int rot0 = *ptr++;
 	int frameMode = (rot0 & 0xc000);
@@ -186,7 +182,6 @@ BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 	return result;
 }
 
-
 __int64 FP_Mul(__int64 a, __int64 b)
 {
 	return (int)((((__int64)a * (__int64)b)) >> FP_SHIFT);
@@ -225,9 +220,11 @@ void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
 	int cy = phd_cos(yaw);
 	short roll = phd_atan(((cy * m->m00) - (sy * m->m20)), ((sy * m->m21) - (cy * m->m01)));
 
-	if (((m->m12 >= 0) && pitch > 0)
-		|| ((m->m12 < 0) && pitch < 0))
+	if ((m->m12 >= 0 && pitch > 0) ||
+		(m->m12 < 0 && pitch < 0))
+	{
 		pitch = -pitch;
+	}
 
 	angles[0] = pitch;
 	angles[1] = yaw;
@@ -250,7 +247,7 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	long b = v->y >> FP_SHIFT;
 	long c = v->z >> FP_SHIFT;
 
-	if ((a == 0) && (b == 0) && (c == 0))	
+	if (a == 0 && b == 0 && c == 0)	
 		return v;
 
 	a = a * a;
