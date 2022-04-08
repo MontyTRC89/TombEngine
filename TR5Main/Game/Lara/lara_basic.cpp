@@ -1026,9 +1026,10 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
-
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
@@ -1083,9 +1084,10 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
+		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
-
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{
@@ -1294,9 +1296,10 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TestLaraRunForward(item, coll)) [[likely]]
+		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
-
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBack(item, coll))
 	{
@@ -1351,9 +1354,10 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
+		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
-
-		return;
+			return;
+		}
 	}
 	else if (TrInput & IN_BACK && TestLaraWalkBackSwamp(item, coll))
 	{

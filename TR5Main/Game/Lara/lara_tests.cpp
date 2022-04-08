@@ -1766,12 +1766,11 @@ VaultTestResult TestLaraVaultTolerance(ITEM_INFO* item, CollisionInfo* coll, Vau
 	int distance = OFFSET_RADIUS(coll->Setup.Radius);
 	auto probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
 	auto probeMiddle = GetCollision(item);
-	int y = probeMiddle.Position.Floor;
 
-	bool swampTooDeep = testSetup.CheckSwampDepth ?
-		(TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -CLICK(3)) :
-		TestEnvironment(ENV_FLAG_SWAMP, item);
-	
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool swampTooDeep = testSetup.CheckSwampDepth ? (isSwamp && lara->WaterSurfaceDist < -CLICK(3)) : isSwamp;
+	int y = isSwamp ? item->Pose.Position.y : probeMiddle.Position.Floor;
+
 	// Check swamp depth (if applicable).
 	if (swampTooDeep)
 		return VaultTestResult{ false };
