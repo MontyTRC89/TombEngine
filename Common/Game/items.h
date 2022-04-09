@@ -86,6 +86,8 @@ struct ITEM_INFO
 	PHD_3DPOS startPos;
 	short locationAI;
 	std::string luaName;
+	std::string luaCallbackOnKillName;
+	std::string luaCallbackOnHitName;
 };
 
 // used by fx->shade !
@@ -105,14 +107,14 @@ void AddActiveItem(short itemNumber);
 void ClearItem(short itemNum);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNum);
+void RemoveActiveItem(short const itemNum);
 void RemoveDrawnItem(short itemNum);
 void InitialiseFXArray(int allocmem);
 short CreateNewEffect(short roomNum);
 void KillEffect(short fxNumber);
 void InitialiseItem(short itemNum);
 void InitialiseItemArray(int numItems);
-void KillItem(short itemNum);
+void KillItem(short const itemNum);
 void UpdateItemRoom(ITEM_INFO* item, int height);
 std::vector<int> FindAllItems(short objectNumber);
 ITEM_INFO* FindItem(int object_number);
