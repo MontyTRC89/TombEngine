@@ -794,8 +794,11 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 				target->hitPoints = 0;
 		}
 	}
-	short index = g_GameScriptEntities->GetIndexByName(target->luaName);
-	g_GameScript->ExecuteFunction(target->luaCallbackOnHitName, index);
+	if (!target->luaCallbackOnHitName.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(target->luaName);
+		g_GameScript->ExecuteFunction(target->luaCallbackOnHitName, index);
+	}
 }
 
 FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)

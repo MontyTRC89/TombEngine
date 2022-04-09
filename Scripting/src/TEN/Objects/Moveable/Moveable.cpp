@@ -167,6 +167,11 @@ void Moveable::Register(sol::table & parent)
 // @tparam string name of callback function to be called
 		ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
+/// Get the name of the function called when this moveable is shot
+// @function Moveable:GetOnHit
+// @treturn string name of the function
+		ScriptReserved_GetOnHit, &Moveable::GetOnHit,
+
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // @function Moveable:SetOnKilled
 // @tparam string callback name of function to be called
@@ -174,6 +179,11 @@ void Moveable::Register(sol::table & parent)
 // LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
 // baddy:SetOnKilled("baddyKilled")
 		ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
+
+/// Get the name of the function called when this moveable is killed
+// @function Moveable:GetOnKilled
+// @treturn string name of the function
+		ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -300,9 +310,6 @@ void Moveable::Register(sol::table & parent)
 // @tparam Position position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
-	"GetOnHit", &Moveable::GetOnHit,
-	"GetOnKilled", &Moveable::GetOnKilled,
-
 /// Get the moveable's rotation
 // @function GetRotation
 // @treturn Rotation a copy of the moveable's rotation
@@ -374,7 +381,7 @@ void Moveable::SetOnHit(std::string const & cbName)
 
 void Moveable::SetOnKilled(std::string const & cbName)
 {
-	m_item->luaCallbackOnKillName = cbName;
+	m_item->luaCallbackOnKilledName = cbName;
 }
 
 std::string Moveable::GetOnHit() const
@@ -384,7 +391,7 @@ std::string Moveable::GetOnHit() const
 
 std::string Moveable::GetOnKilled() const
 {
-	return m_item->luaCallbackOnKillName;
+	return m_item->luaCallbackOnKilledName;
 }
 
 std::string Moveable::GetName() const
