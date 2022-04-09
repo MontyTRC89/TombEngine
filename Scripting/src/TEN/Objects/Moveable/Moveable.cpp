@@ -172,6 +172,16 @@ void Moveable::Register(sol::table & parent)
 // @treturn string name of the function
 		ScriptReserved_GetOnHit, &Moveable::GetOnHit,
 
+/// Set the name of the function called when Lara collides with this moveable
+// @function Moveable:SetOnCollided
+// @tparam string name of callback function to be called
+		ScriptReserved_SetOnCollided, &Moveable::SetOnCollided,
+
+/// Get the name of the function called when Lara collides with this moveable
+// @function Moveable:GetOnCollided
+// @treturn string name of the function
+		ScriptReserved_GetOnCollided, &Moveable::GetOnCollided,
+
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // @function Moveable:SetOnKilled
 // @tparam string callback name of function to be called
@@ -384,6 +394,11 @@ void Moveable::SetOnKilled(std::string const & cbName)
 	m_item->luaCallbackOnKilledName = cbName;
 }
 
+void Moveable::SetOnCollided(std::string const & cbName)
+{
+	m_item->luaCallbackOnCollidedName = cbName;
+}
+
 std::string Moveable::GetOnHit() const
 {
 	return m_item->luaCallbackOnHitName;
@@ -392,6 +407,11 @@ std::string Moveable::GetOnHit() const
 std::string Moveable::GetOnKilled() const
 {
 	return m_item->luaCallbackOnKilledName;
+}
+
+std::string Moveable::GetOnCollided() const
+{
+	return m_item->luaCallbackOnCollidedName;
 }
 
 std::string Moveable::GetName() const
