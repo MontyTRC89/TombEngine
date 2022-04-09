@@ -403,15 +403,15 @@ namespace TEN::Renderer
 			switch (cullMode)
 			{
 			case CULL_MODE_NONE:
-				m_context->RSSetState(m_states->CullNone());
+				m_context->RSSetState(m_cullNoneRasterizerState.Get());
 				break;
 
 			case CULL_MODE_CCW:
-				m_context->RSSetState(m_states->CullCounterClockwise());
+				m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
 				break;
 
 			case CULL_MODE_CW:
-				m_context->RSSetState(m_states->CullClockwise());
+				m_context->RSSetState(m_cullClockwiseRasterizerState.Get());
 				break;
 
 			}
@@ -431,5 +431,27 @@ namespace TEN::Renderer
 			m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
 			BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
 		}
+	}
+
+	void Renderer11::SetScissor(RendererRectangle s)
+	{
+		D3D11_RECT rects;
+		rects.left = s.left;
+		rects.top = ScreenHeight - s.top;
+		rects.right = s.right;
+		rects.bottom = ScreenHeight - s.bottom;
+
+		m_context->RSSetScissorRects(1, &rects);
+	}
+
+	void Renderer11::ResetScissor()
+	{
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = ScreenWidth;
+		rects[0].top = 0;
+		rects[0].bottom = ScreenHeight;
+
+		m_context->RSSetScissorRects(1, rects);
 	}
 }

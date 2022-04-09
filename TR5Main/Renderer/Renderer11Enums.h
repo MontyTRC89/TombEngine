@@ -240,3 +240,4 @@ constexpr auto ALPHA_TEST_THRESHOLD = 0.5f;
 constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
+constexpr auto MAX_ROOM_BOUNDS = 256;
