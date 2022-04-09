@@ -86,7 +86,7 @@ struct ITEM_INFO
 	PHD_3DPOS startPos;
 	short locationAI;
 	std::string luaName;
-	std::string luaCallbackOnKillName;
+	std::string luaCallbackOnKilledName;
 	std::string luaCallbackOnHitName;
 };
 
