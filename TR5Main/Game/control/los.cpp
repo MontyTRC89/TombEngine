@@ -211,8 +211,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									{
 										item->hitPoints -= Weapons[Lara.gunType].damage;
 									}
-									short index = g_GameScriptEntities->GetIndexByName(item->luaName);
-									g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
+									if (!item->luaCallbackOnHitName.empty())
+									{
+										short index = g_GameScriptEntities->GetIndexByName(item->luaName);
+										g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
+									}
 								}
 							}
 						}

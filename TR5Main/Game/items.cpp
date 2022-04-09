@@ -89,7 +89,10 @@ void KillItem(short const itemNum)
 		}
 
 		g_GameScriptEntities->NotifyKilled(item);
-		g_GameScript->ExecuteFunction(item->luaCallbackOnKillName, itemNum);
+		if (!item->luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNum);
+		}
 	}
 }
 
@@ -336,7 +339,10 @@ void RemoveActiveItem(short const itemNum)
 			}
 		}
 		g_GameScriptEntities->NotifyKilled(&item);
-		g_GameScript->ExecuteFunction(item.luaCallbackOnKillName, itemNum);
+		if (!item.luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNum);
+		}
 	}
 }
 
