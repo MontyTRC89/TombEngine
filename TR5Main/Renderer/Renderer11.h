@@ -240,6 +240,9 @@ namespace TEN::Renderer
 		ComPtr<ID3D11BlendState> m_screenBlendState = nullptr;
 		ComPtr<ID3D11BlendState> m_lightenBlendState = nullptr;
 		ComPtr<ID3D11BlendState> m_excludeBlendState = nullptr;
+		ComPtr<ID3D11RasterizerState> m_cullCounterClockwiseRasterizerState = nullptr;
+		ComPtr<ID3D11RasterizerState> m_cullClockwiseRasterizerState = nullptr;
+		ComPtr<ID3D11RasterizerState> m_cullNoneRasterizerState = nullptr;
 		ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
@@ -446,6 +449,14 @@ namespace TEN::Renderer
 		DEPTH_STATES lastDepthState;
 		CULL_MODES lastCullMode;
 
+		// Rooms culling 
+		bool m_outside = false;
+		bool m_cameraUnderwater = false;
+		short m_boundList[MAX_ROOM_BOUNDS];
+		short m_boundStart = 0;
+		short m_boundEnd = 1;
+		RendererRectangle m_outsideClip;
+
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
 		void BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType);
@@ -459,9 +470,11 @@ namespace TEN::Renderer
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate,
 		                     int mask, bool useObjectWorldRotation = false);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
-		void GetVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms);
-		bool CheckPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection);
+		void GetVisibleObjects(RenderView& renderView, bool onlyRooms);
+		void GetRoomBounds(RenderView& renderView, bool onlyRooms);
+		void SetRoomBounds(ROOM_DOOR* door, short parentRoomNumber, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
+		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
@@ -543,6 +556,8 @@ namespace TEN::Renderer
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
 		void SetCullMode(CULL_MODES cullMode, bool force = false);
 		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force = false);
+		void SetScissor(RendererRectangle rectangle);
+		void ResetScissor();
 		float CalculateFrameRate();
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);

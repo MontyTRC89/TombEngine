@@ -185,6 +185,7 @@ namespace TEN::Renderer
 		                              m_shadowMap.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &m_shadowMapViewport);
+		ResetScissor();
 
 		//DrawLara(false, true);
 
@@ -1164,6 +1165,7 @@ namespace TEN::Renderer
 		// Bind and clear render target
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &m_viewport);
+		ResetScissor();
 
 		if (background != nullptr)
 		{
@@ -1908,6 +1910,7 @@ namespace TEN::Renderer
 		    // Bind the back buffer
 		    m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
 		    m_context->RSSetViewports(1, &m_viewport);
+			ResetScissor();
 
 		    // Draw the full screen background
 			DrawFullScreenQuad(
@@ -1964,6 +1967,8 @@ namespace TEN::Renderer
 
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &m_viewport);
+		ResetScissor();
+
 		DrawFullScreenQuad(texture, Vector3(fade, fade, fade));
 	}
 
@@ -2513,6 +2518,7 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 		m_context->RSSetViewports(1, &view.viewport);
+		ResetScissor();
 
 		RendererVertex vertices[4];
 
@@ -2630,6 +2636,7 @@ namespace TEN::Renderer
 		                              m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.viewport);
+		ResetScissor();
 
 		// The camera constant buffer contains matrices, camera position, fog values and other 
 		// things that are shared for all shaders
@@ -2761,6 +2768,7 @@ namespace TEN::Renderer
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
 
 		m_context->RSSetViewports(1, &view.viewport);
+		ResetScissor();
 
 		// Opaque geometry
 		SetBlendMode(BLENDMODE_OPAQUE);
@@ -3180,6 +3188,8 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 			BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
+			SetScissor(room->Clip);
+
 			for (int animated = 0; animated < 2; animated++)
 			{
 				if (animated == 0)
@@ -3291,6 +3301,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
+
+		ResetScissor();
 	}
 	
 	void Renderer11::DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)

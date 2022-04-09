@@ -193,6 +193,33 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 	Utils::throwIfFailed(m_device->CreateSamplerState(&shadowSamplerDesc,m_shadowSampler.GetAddressOf()));
 	m_shadowSampler->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof("ShadowSampler") + 1, "ShadowSampler");
+	
+	D3D11_RASTERIZER_DESC rasterizerStateDesc = {};
+
+	rasterizerStateDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerStateDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerStateDesc.DepthClipEnable = true;
+	rasterizerStateDesc.MultisampleEnable = true;
+	rasterizerStateDesc.AntialiasedLineEnable = true;
+	rasterizerStateDesc.ScissorEnable = true;
+	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullCounterClockwiseRasterizerState.GetAddressOf()));
+
+	rasterizerStateDesc.CullMode = D3D11_CULL_FRONT;
+	rasterizerStateDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerStateDesc.DepthClipEnable = true;
+	rasterizerStateDesc.MultisampleEnable = true;
+	rasterizerStateDesc.AntialiasedLineEnable = true;
+	rasterizerStateDesc.ScissorEnable = true;
+	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullClockwiseRasterizerState.GetAddressOf()));
+
+	rasterizerStateDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerStateDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerStateDesc.DepthClipEnable = true;
+	rasterizerStateDesc.MultisampleEnable = true;
+	rasterizerStateDesc.AntialiasedLineEnable = true;
+	rasterizerStateDesc.ScissorEnable = true;
+	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
+
 	InitialiseBars();
 	initQuad(m_device.Get());
 }
