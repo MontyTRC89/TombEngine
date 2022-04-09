@@ -35,7 +35,7 @@ public:
 
 	virtual void FreeLevelScripts() = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
-	virtual void ExecuteFunction(std::string const& luaFileName, TEN::Control::Volumes::VolumeTriggerer) = 0;
+	virtual void ExecuteFunction(std::string const& luaFuncName, TEN::Control::Volumes::VolumeTriggerer) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;
 	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
