@@ -380,162 +380,6 @@ namespace TEN::Renderer
 		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width, g_Configuration.Height);
 	}
 
-	void Renderer11::GetVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
-	{
-		// Avoid allocations, 1024 should be fine
-		RendererRoomNode nodes[512];
-		int nextNode = 0;
-
-		// Avoid reallocations, 1024 should be fine
-		RendererRoomNode *stack[512];
-		int stackDepth = 0;
-
-		RendererRoomNode *node = &nodes[nextNode++];
-		node->To = to;
-		node->From = -1;
-
-		// Push
-		stack[stackDepth++] = node;
-
-		while (stackDepth > 0)
-		{
-			// Pop
-			node = stack[--stackDepth];
-
-			if (m_rooms[node->To].Visited)
-				continue;
-
-			ROOM_INFO *room = &g_Level.Rooms[node->To];
-
-			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
-										 (room->minfloor + room->maxceiling) / 2.0f,
-										 room->z + room->zSize * WALL_SIZE / 2.0f);
-			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
-			m_rooms[node->To].Visited = true;
-			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
-			g_Level.Rooms[node->To].boundActive = true;
-
-			if (!onlyRooms)
-			{
-				CollectLightsForRoom(node->To, renderView);
-				CollectItems(node->To, renderView);
-				CollectStatics(node->To, renderView);
-				CollectEffects(node->To, renderView);
-			}
-
-			Vector4 clipPort;
-
-			for (int i = 0; i < room->doors.size(); i++)
-			{
-				short adjoiningRoom = room->doors[i].room;
-
-				if (node->From != adjoiningRoom && CheckPortal(node->To, &room->doors[i], renderView.camera.ViewProjection))
-				{
-					RendererRoomNode *childNode = &nodes[nextNode++];
-					childNode->From = node->To;
-					childNode->To = adjoiningRoom;
-
-					// Push
-					stack[stackDepth++] = childNode;
-				}
-			}
-		}
-	}
-
-	bool Renderer11::CheckPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection)
-	{
-		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
-
-		Vector3 n = portal->normal;
-		Vector3 v = Vector3(
-			Camera.pos.x - (room->x + portal->vertices[0].x),
-			Camera.pos.y - (room->y + portal->vertices[0].y),
-			Camera.pos.z - (room->z + portal->vertices[0].z));
-
-		// Test camera and normal positions and decide if process door or not
-		if (n.Dot(v) <= 0.0f)
-			return false;
-
-		int zClip = 0;
-		Vector4 p[4];
-		Vector4 clipPort{ FLT_MAX ,FLT_MAX ,FLT_MIN,FLT_MIN };
-
-		// Project all portal's corners in screen space
-		for (int i = 0; i < 4; i++)
-		{
-			Vector4 tmp = Vector4(portal->vertices[i].x + room->x, portal->vertices[i].y + room->y, portal->vertices[i].z + room->z, 1.0f);
-
-			// Project corner on screen
-			Vector4::Transform(tmp, viewProjection, p[i]);
-
-			if (p[i].w > 0.0f)
-			{
-				// The corner is in front of camera
-				p[i].x *= (1.0f / p[i].w);
-				p[i].y *= (1.0f / p[i].w);
-				p[i].z *= (1.0f / p[i].w);
-
-				clipPort.x = std::min(clipPort.x, p[i].x);
-				clipPort.y = std::min(clipPort.y, p[i].y);
-				clipPort.z = std::max(clipPort.z, p[i].x);
-				clipPort.w = std::max(clipPort.w, p[i].y);
-			}
-			else
-				// The corner is behind camera
-				zClip++;
-		}
-
-		// If all points are behind camera then door is not visible
-		if (zClip == 4)
-			return false;
-
-		// If door crosses camera plane...
-		if (zClip > 0)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				Vector4 a = p[i];
-				Vector4 b = p[(i + 1) % 4];
-
-				if ((a.w > 0.0f) ^ (b.w > 0.0f))
-				{
-
-					if (a.x < 0.0f && b.x < 0.0f)
-						clipPort.x = -1.0f;
-					else if (a.x > 0.0f && b.x > 0.0f)
-						clipPort.z = 1.0f;
-					else
-					{
-						clipPort.x = -1.0f;
-						clipPort.z = 1.0f;
-					}
-
-					if (a.y < 0.0f && b.y < 0.0f)
-						clipPort.y = -1.0f;
-					else if (a.y > 0.0f && b.y > 0.0f)
-						clipPort.w = 1.0f;
-					else
-					{
-						clipPort.y = -1.0f;
-						clipPort.w = 1.0f;
-					}
-				}
-			}
-		}
-		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
-		clipPort.x = std::max(clipPort.x, vp.x);
-		clipPort.y = std::max(clipPort.y, vp.y);
-		clipPort.z = std::min(clipPort.z, vp.z);
-		clipPort.w = std::min(clipPort.w, vp.w);
-
-		if (clipPort.x > vp.z || clipPort.y > vp.w || clipPort.z < vp.x || clipPort.w < vp.y)
-			return false;
-
-		return true;
-	}
-
 	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
 	{
 		Vector3 centre = (boxMin + boxMax) / 2.0f;
@@ -658,5 +502,40 @@ namespace TEN::Renderer
 			RendererObject& obj = *m_moveableObjects[nativeItem->objectNumber];
 			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;
 		}
+	}
+
+	Vector4 Renderer11::GetPortalRect(Vector4 v, Vector4 vp) 
+	{
+		Vector4 sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f) 
+			+ Vector4(0.5f, 0.5f, 0.5f, 0.5f)) 
+			* Vector4(vp.z, vp.w, vp.z, vp.w);
+
+		Vector4 s(sp.x + vp.x, sp.y + vp.y, sp.z + vp.x, sp.w + vp.y);
+
+		// expand
+		s.x -= 2;
+		s.y -= 2;
+		s.z += 2;
+		s.w += 2;
+
+		// clamp
+		s.x = std::max(s.x, vp.x);
+		s.y = std::max(s.y, vp.y);
+		s.z = std::min(s.z, vp.x + vp.z);
+		s.w = std::min(s.w, vp.y + vp.w);
+
+		// convert from bounds to x,y,w,h
+		s.z -= s.x;
+		s.w -= s.y;
+
+		// Use the viewport rect if one of the dimensions is the same size
+		// as the viewport. This may fix clipping bugs while still allowing
+		// impossible geometry tricks.
+		if (s.z - s.x >= vp.z - vp.x || s.w - s.y >= vp.w - vp.y) 
+		{
+			return vp;
+		}
+
+		return s;
 	}
 }
