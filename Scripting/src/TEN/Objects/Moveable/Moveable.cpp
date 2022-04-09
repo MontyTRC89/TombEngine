@@ -123,6 +123,7 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		item->carriedItem = NO_ITEM;
 
 		// call this when resetting name too?
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
