@@ -23,6 +23,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
@@ -793,7 +794,8 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 				target->hitPoints = 0;
 		}
 	}
-	g_GameScriptEntities->NotifyHit(target);
+	short index = g_GameScriptEntities->GetIndexByName(target->luaName);
+	g_GameScript->ExecuteFunction(target->luaCallbackOnHitName, index);
 }
 
 FireWeaponType FireWeapon(LARA_WEAPON_TYPE weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)

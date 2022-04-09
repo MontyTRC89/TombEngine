@@ -19,7 +19,7 @@ class Moveable : public NamedBase<Moveable, short>
 public:
 	using IdentifierType = short;
 
-	Moveable(short num, bool init = true);
+	Moveable(short num, bool alreadyInitialised = true);
 	~Moveable();
 	Moveable& operator=(Moveable const& other) = delete;
 	Moveable(Moveable const& other) = delete;
@@ -27,64 +27,61 @@ public:
 
 	static void Register(sol::table & parent);
 
-	GAME_OBJECT_ID GetObjectID() const;
+	[[nodiscard]] GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
 
-	std::string GetName() const;
+	[[nodiscard]] std::string GetName() const;
 	bool SetName(std::string const &);
 
-	bool GetValid() const;
+	[[nodiscard]] bool GetValid() const;
 	void Invalidate();
 
 	void Destroy();
 
-	Position GetPos() const;
+	[[nodiscard]] Position GetPos() const;
 	void SetPos(Position const& pos);
 
-	Rotation GetRot() const;
+	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 
-	int GetAnimNumber() const;
+	[[nodiscard]] int GetAnimNumber() const;
 	void SetAnimNumber(int animNumber);
 
-	int GetFrameNumber() const;
+	[[nodiscard]] int GetFrameNumber() const;
 	void SetFrameNumber(int frameNumber);
 
-	short GetHP() const;
+	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
 
-	short GetOCB() const;
+	[[nodiscard]] short GetOCB() const;
 	void SetOCB(short ocb);
 
-	aiBitsType GetAIBits() const;
+	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
-	bool GetHitStatus() const;
+	[[nodiscard]] bool GetHitStatus() const;
 
-	bool GetActive() const;
+	[[nodiscard]] bool GetActive() const;
 	void SetActive(bool active);
 
-	short GetRoom() const;
-	void SetRoom(short Room);
+	[[nodiscard]] short GetRoom() const;
+	void SetRoom(short room);
 
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
 
-	void SetOnHit(sol::protected_function);
-	void SetOnKill(sol::protected_function);
+	[[nodiscard]] std::string GetOnHit() const;
+	void SetOnHit(std::string const &);
+	[[nodiscard]] std::string GetOnKilled() const;
+	void SetOnKilled(std::string const &);
 
-	short GetStatus() const;
+	[[nodiscard]] short GetStatus() const;
 
 	void Init();
-
-	void CallOnHit();
-	void CallOnKill();
 
 private:
 	ITEM_INFO* m_item;
 	short m_num;
 	bool m_initialised;
-	sol::protected_function	m_onHit{};
-	sol::protected_function	m_onKill{};
 };

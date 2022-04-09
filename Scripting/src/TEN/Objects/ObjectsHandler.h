@@ -5,10 +5,7 @@
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/Moveable.h"
 #include "Objects/Static/Static.h"
-#include "Sink/Sink.h"
 #include "Objects/AIObject/AIObject.h"
-#include "Objects/SoundSource/SoundSource.h"
-#include "Camera/Camera.h"
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {
@@ -17,7 +14,6 @@ public:
 	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
 
 	bool NotifyKilled(ITEM_INFO* key) override;
-	bool NotifyHit(ITEM_INFO* key) override;
 	bool AddMoveableToMap(ITEM_INFO* key, Moveable* mov);
 	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
 
@@ -39,6 +35,11 @@ private:
 	{
 		ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name);
 		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
+	}
+
+	[[nodiscard]] short GetIndexByName(std::string const& name) const override
+	{
+		return std::get<short>(m_nameMap.at(name));
 	}
 
 	bool AddName(std::string const& key, VarMapVal val) override

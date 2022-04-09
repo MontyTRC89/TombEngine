@@ -24,7 +24,7 @@ pickups, and Lara herself.
 @pragma nostrip
 */
 
-constexpr auto LUA_CLASS_NAME{ "Moveable" };
+constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
 static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
@@ -89,8 +89,8 @@ most can just be set to zero (see usage).
 		)
 	*/
 
-#define USE_IF_HAVE(Type, ifthere, ifnotthere) \
-std::holds_alternative<Type>(ifthere) ? std::get<Type>(ifthere) : ifnotthere
+#define USE_IF_HAVE(Type, ifThere, ifNotThere) \
+std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
 
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -161,17 +161,19 @@ void Moveable::Register(sol::table & parent)
 // @treturn int a number representing the status of the object
 		ScriptReserved_GetStatus, &Moveable::GetStatus,
 		
-/// Set a function to be called when the moveable is shot by Lara
+/// Set the name of the function to be called when the moveable is shot by Lara
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
-// @tparam func callback function to be called
+// @tparam string name of callback function to be called
 		ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
-/// Set a function to be called when the moveable is destroyed/killed
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnKill
-// @tparam func callback function to be called
-		ScriptReserved_SetOnKill, &Moveable::SetOnKill,
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// @function Moveable:SetOnKilled
+// @tparam string callback name of function to be called
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled("baddyKilled")
+		ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -298,6 +300,9 @@ void Moveable::Register(sol::table & parent)
 // @tparam Position position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
+	"GetOnHit", &Moveable::GetOnHit,
+	"GetOnKilled", &Moveable::GetOnKilled,
+
 /// Get the moveable's rotation
 // @function GetRotation
 // @treturn Rotation a copy of the moveable's rotation
@@ -356,39 +361,31 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 	return m_item->objectNumber;
 }
 
-void Moveable::SetObjectID(GAME_OBJECT_ID item) 
+void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
-	m_item->objectNumber = item;
+	m_item->objectNumber = id;
 }
 
 
-void Moveable::SetOnHit(sol::protected_function func)
+void Moveable::SetOnHit(std::string const & cbName)
 {
-	m_onHit = func;
+	m_item->luaCallbackOnHitName = cbName;
 }
 
-void Moveable::SetOnKill(sol::protected_function func)
+void Moveable::SetOnKilled(std::string const & cbName)
 {
-	m_onKill = func;
+	m_item->luaCallbackOnKillName = cbName;
 }
 
-
-void Moveable::CallOnHit()
+std::string Moveable::GetOnHit() const
 {
-	if (m_onHit.valid())
-	{
-		m_onHit();
-	}
+	return m_item->luaCallbackOnHitName;
 }
 
-void Moveable::CallOnKill()
+std::string Moveable::GetOnKilled() const
 {
-	if (m_onKill.valid())
-	{
-		m_onKill();
-	}
+	return m_item->luaCallbackOnKillName;
 }
-
 
 std::string Moveable::GetName() const
 {

@@ -378,7 +378,7 @@ void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volume
 	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
 	if (std::holds_alternative<short>(triggerer))
 	{
-		r = func(std::make_unique<Moveable>( std::get<short>(triggerer), true));
+		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true));
 	}
 	else
 	{
