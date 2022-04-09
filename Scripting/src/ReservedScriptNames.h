@@ -108,6 +108,7 @@ static constexpr char ScriptReserved_CalculateDistance[]			= "CalculateDistance"
 static constexpr char ScriptReserved_CalculateHorizontalDistance[]	= "CalculateHorizontalDistance";
 static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
+static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

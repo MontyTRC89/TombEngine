@@ -6,6 +6,7 @@
 #include "Game\effects\lightning.h"
 #include "effects\tomb4fx.h"
 #include "effects\effects.h"
+#include "control/los.h"
 #include "Specific/configuration.h"
 #include "camera.h"
 
@@ -18,6 +19,15 @@ Scripts that will be run on game startup.
 using namespace TEN::Effects::Lightning;
 
 namespace Misc {
+	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Position pos1, Position pos2)
+	{
+		GAME_VECTOR vec1, vec2;
+		pos1.StoreInGameVector(vec1);
+		vec1.roomNumber = roomNumber1;
+		pos2.StoreInGameVector(vec2);
+		return LOS(&vec1, &vec2);
+	}
+
 	static int FindRoomNumber(Position pos)
 	{
 		return 0;
@@ -167,9 +177,30 @@ namespace Misc {
 		//@function PercentToScreen
 		//@tparam float x percent value to translate to x-coordinate
 		//@tparam float y percent value to translate to y-coordinate
-		//@treturn int x x coordinate in pixels
-		//@treturn int y y coordinate in pixels
+		//@treturn int x coordinate in pixels
+		//@treturn int y coordinate in pixels
 		table_misc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
+
+		///Determine if there's a line of sight between two points.
+		//
+		//i.e. if we run a direct line from one position to another
+		//will any geometry get in the way?
+		//
+		//Note: if you use this with Moveable:GetPosition to test if (for example)
+		//two creatures can see one another, you might have to do some extra adjustments.
+		//
+		//This is because the "position" for most objects refers to its base, i.e., the floor.
+		//As a solution, you can increase the y-coordinate of this position to correspond to roughly where the
+		//eyes of the creatures would be.
+		//@function HasLineOfSight
+		//@tparam float room1 ID of the room where the first position is
+		//@tparam Position pos1 first position
+		//@tparam Position pos2 second position
+		//@treturn bool is there a direct line of sight between the two positions?
+		//@usage
+		//local flamePlinthPos = flamePlinth:GetPosition() + Position(0, flamePlinthHeight, 0);
+		//print(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))
+		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 
 
 		///Translate a pair of coordinates to percentages of window dimensions.
