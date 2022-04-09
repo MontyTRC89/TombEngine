@@ -66,6 +66,8 @@ static constexpr char ScriptReserved_GetOnKilled[]		= "GetOnKilled";
 static constexpr char ScriptReserved_SetOnKilled[]		= "SetOnKilled";
 static constexpr char ScriptReserved_GetOnHit[]			= "GetOnHit";
 static constexpr char ScriptReserved_SetOnHit[]			= "SetOnHit";
+static constexpr char ScriptReserved_GetOnCollided[]	= "GetOnCollided";
+static constexpr char ScriptReserved_SetOnCollided[]	= "SetOnCollided";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
