@@ -53,7 +53,7 @@ Moveable::Moveable(Moveable&& other) noexcept :
 
 Moveable::~Moveable()
 {
-	if (m_num > NO_ITEM) {
+	if (m_num > NO_ITEM && g_GameScriptEntities) {
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 	}
 }
