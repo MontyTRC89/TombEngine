@@ -2058,6 +2058,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
+				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.roomNumber);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:

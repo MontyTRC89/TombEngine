@@ -51,18 +51,18 @@ namespace TEN::Renderer
 			return;
 		}
 
-		float left = parentRoom->ClipTest.right;
-		float right = parentRoom->ClipTest.left;
-		float top = parentRoom->ClipTest.bottom;
-		float bottom = parentRoom->ClipTest.top;
+		int left = parentRoom->ClipTest.right;
+		int right = parentRoom->ClipTest.left;
+		int top = parentRoom->ClipTest.bottom;
+		int bottom = parentRoom->ClipTest.top;
 
 		int zBehind = 0;
 		int zTooFar = 0;
 
 		Vector4 p[4];
 
-		float xs = 0;
-		float ys = 0;
+		int xs = 0;
+		int ys = 0;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -128,36 +128,36 @@ namespace TEN::Renderer
 					if (a.x < 0 && b.x < 0)
 						left = 0;
 					else if (a.x > 0 && b.x > 0)
-						right = (float)g_Renderer.ScreenWidth;
+						right = g_Renderer.ScreenWidth;
 					else
 					{
 						left = 0;
-						right = (float)g_Renderer.ScreenWidth;
+						right = g_Renderer.ScreenWidth;
 					}
 
 					// Y clip
 					if (a.y < 0 && b.y < 0)
 						top = 0;
 					else if (a.y > 0 && b.y > 0)
-						bottom = (float)g_Renderer.ScreenHeight;
+						bottom = g_Renderer.ScreenHeight;
 					else
 					{
 						top = 0;
-						bottom = (float)g_Renderer.ScreenHeight;
+						bottom = g_Renderer.ScreenHeight;
 					}
 				}
 			}
 		}
 
 		// Clip bounds to parent bounds
-		if (left < (float)parentRoom->ClipTest.left)
-			left = (float)parentRoom->ClipTest.left;
-		if (right > (float)parentRoom->ClipTest.right)
-			right = (float)parentRoom->ClipTest.right;
-		if (top < (float)parentRoom->ClipTest.top)
-			top = (float)parentRoom->ClipTest.top;
-		if (bottom > (float)parentRoom->ClipTest.bottom)
-			bottom = (float)parentRoom->ClipTest.bottom;
+		if (left < parentRoom->ClipTest.left)
+			left = parentRoom->ClipTest.left;
+		if (right > parentRoom->ClipTest.right)
+			right = parentRoom->ClipTest.right;
+		if (top < parentRoom->ClipTest.top)
+			top = parentRoom->ClipTest.top;
+		if (bottom > parentRoom->ClipTest.bottom)
+			bottom = parentRoom->ClipTest.bottom;
 
 		if (left >= right || top >= bottom)
 			return;
